@@ -1,5 +1,20 @@
 $ ->
 
+
+  window.isEmpty = (item) ->
+    ####
+    # function to check whether or not objects and strings are empty, more variable types can be added as needed
+    ####
+    type = typeof item
+    switch(type)
+      when 'object'
+        return !Object.keys(item).length
+      when 'string'
+        return /^\s*$/.test(item)
+
+  window.stringIncludes = (str, substring) ->
+    return str.indexOf(substring) != -1
+
   completed_counter = 0
   headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
   $(document).bind(
@@ -14,15 +29,19 @@ $ ->
         $('.ajax-message-div').css('top', '140px')
       else if window.location.hash == '#lookup-detail' || window.location.hash == ''
         $('.ajax-message-div').css('top', '50%')
-      ajaxStop: () ->
+    ajaxStop: () ->
         $('.ajax-message-div').css('display', 'none')
     ajaxComplete: () ->
       completed_counter++
-#     selected_rows needs to be multiplied by the number of ajax calls that are being made to accurately gauge the number of calls
+      ####
+      # selected_rows needs to be multiplied by the number of ajax calls that are being made to
+      # accurately gauge the number of calls
+      ####
       selected_rows = $('.col-select-all input:checked').length * 5
       if completed_counter == selected_rows
         $('.ajax-message-div').css('display', 'none')
   )
+
 
   $(document).ready ->
     if window.location.hash == '#lookup-quick'
@@ -47,6 +66,58 @@ $ ->
       when 'string'
         return /^\s*$/.test(item)
 
+  window.close_modal = () ->
+    $('#confirmation-modal').modal('toggle')
+
+  window.detail_loader = () ->
+    $('.ajax-message-div').css('display', 'flex')
+
+  $(document).ready ->
+    update_tabs( window.location.hash )
+
+  $('#research-tabs li').on 'click', ->
+    update_tabs( window.location.hash )
+
+  window.update_tabs = ( location ) ->
+#    just making sure that the loader div is in the right spot.
+#    having one and changing location has been less buggy/complicated than having 2 separate ones
+    if location == '#lookup-quick'
+      $('.lookup-detail').css('display', 'none')
+      $('.ajax-message-div').css('top', '138px')
+    else if location == '#lookup-detail' || location == ''
+      $('.lookup-detail').css('display', 'unset')
+      $('.ajax-message-div').css('top', '370px')
+
+  window.reset_error_modal = () ->
+    $( '#error_modal' ).dialog(
+      position:
+        my: "right",
+        at: "top+15%",
+        of: window
+    )
+    $( '#error_modal .modal-body' ).empty()
+    $( '#error_modal' ).dialog( 'destroy' )
+
+  window.open_adjust_reptool = () ->
+    dropdown = $('#reptool_entries_bl_dropdown')
+    list = $(dropdown).find('ul')
+    type = 'reptool'
+
+    reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
+      "dga", "exploitkit", "malware", "open_proxy", "open_relay",
+      "phishing", "response", "spam", "suspicious", "tor_exit_node"]
+
+    if !$(list).has('label').length
+      build_checkbox_list(reptool_options, list, type)
+
+  window.open_wlbl = () ->
+    list = $('#wlbl_entries_dropdown').find('ul')
+    type = 'wlbl'
+    wlbl_options = [ "WL-weak", "WL-med", "WL-heavy", "BL-weak", "BL-med", "BL-heavy"]
+
+    if !$(list).has('label').length
+      build_checkbox_list(wlbl_options, list, type)
+
   window.select_all_detailed = (check)->
     is_checked = $(check).prop('checked')
     $('.dispute_check_box').prop('checked', is_checked)
@@ -65,9 +136,6 @@ $ ->
       $('#add-to-ticket-button').removeAttr('disabled')
     else
       $('#add-to-ticket-button').prop('disabled', 'disabled')
-
-  window.close_modal = () ->
-    $('#confirmation-modal').modal('toggle')
 
   window.build_checkbox_list = (arr, list, type) ->
     ####
@@ -103,6 +171,7 @@ $ ->
     # clears all actions from every selected row
     ####
     e.preventDefault()
+    $('#submit-rep-changes').attr('disabled', true)
     selected_rows = $('.col-select-all input:checked')
     $( selected_rows ).each ()->
       row = $( this ).closest('tr')
@@ -110,6 +179,9 @@ $ ->
       $( row ).find('.col-clear-actions').empty()
 
   $('.wlbl_thrt_cat_id').on 'click', ->
+    ####
+    #Only allow 5 threat cat ids to be selected
+    ####
     checked = $('.wlbl_thrt_cat_id:checked').length
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
     if checked > 0 && checked < 6
@@ -133,27 +205,28 @@ $ ->
     submit_rep_check()
 
 
-
   $(document).on 'click', '.col-actions .col-tag', () ->
     ####
     # handles deleting individual actions from an action column and reformatting the div it lives in + updating the data attribute of the action <p>
     ####
-    action = $(this).attr('data')
+    action = this.getAttribute("data");
     action_p = $(this).parents('p')[0]
     action_edit = $(action_p).text().split(':')[0]
     row = $(this).parents('tr')[0]
     col_clear = $(row).find('.col-clear-actions')[0]
     action_col = $(row).find('.row-action-clear')[0]
+    if action_p.getAttribute("wlbl_data") != undefined
+      data_type = "wlbl_data"
+    else
+      data_type = "data"
 
     # original data
-    data = $(action_p).attr('data').split(',')
+    data = action_p.getAttribute(data_type).split(',')
     # newly refined data with shit removed
-    data = data.filter((data_actions) ->
-      action != data_actions
-    )
+    data = data.filter((data_actions) -> action != data_actions )
 
     $(this).remove()
-    $(action_p).attr('data', data)
+    action_p.setAttribute(data_type, data)
     if data.length == 0
       if $(action_p).hasClass('wlbl-action-col')
         $(row).find('.threat-cat-col').remove()
@@ -214,12 +287,11 @@ $ ->
   wl_array = ['WL-weak', 'WL-med', 'WL-heavy']
 
   $(document).on 'change', '.adjust_wlbl_checkbox', '.wlbl-radio-add', () ->
-    submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
+    submit_btn = document.querySelector('#wlbl_entries_dropdown .dropdown-submit-button')
     all_checked_items = $('.adjust_wlbl_checkbox:checked')
-    current_val = $(this).val()
-    add_wlbl = $('#wlbl-add').is(":checked")
+    add_wlbl = $('#wlbl-quick-add').is(":checked")
 
-    tc_row = $('#wlbl_entries_dropdown .threat-cat-row')
+    tc_row = document.querySelector('#wlbl_entries_dropdown .threat-cat-row')
     disabled = true
     bl_hide = true
     wl_check = false
@@ -258,7 +330,7 @@ $ ->
     else
       $(tc_row).addClass('hidden')
 
-    submit_btn.prop('disabled', disabled)
+    $(submit_btn).prop('disabled', disabled)
 
   $('.wlbl-radio-add').click ->
     toggle_tc_visibility(this)
@@ -276,19 +348,18 @@ $ ->
       $(tc_row).removeClass('hidden')
 
   window.call_action_switchboard = (disputes) ->
+    $('#confirmation-modal').modal('hide')
     ####
-    # data is set and each action calls the appropriate endpoint herereptool_classes
+    # data is set and each action calls the appropriate endpoint here
     ####
     comment = $('#confirmation-modal').find('.comment-input').text()
-    $('#confirmation-modal').modal('hide')
-
     error_array = []
-    submitted_disputes = []
 
     ajax_count = Object.keys(disputes).length - 1
     dispute_calls = setInterval(()->
 
       if ajax_count == 0
+         # Once all Disputes have been processed, pass list of disputes and error array to the bulk quick update
          clearInterval(dispute_calls)
          quick_bulk_update(disputes, error_array)
     , 2000);
@@ -309,13 +380,11 @@ $ ->
                   'comment': comment
                 }]
 
-                maintain_reptool_bl(data).then((response, data)=>
+                maintain_reptool_bl(data).then( (response)=>
                   ajax_count--
                   if !response
                     error_message = "<p>Unable to update all reptool entries.</p>"
                     error_array.push(error_message)
-                  else
-                    submitted_disputes.push(dispute)
                 )
 
               when 'override'
@@ -327,13 +396,11 @@ $ ->
                   'comment': comment
                 }]
 
-                maintain_reptool_bl(data).then((response, data)=>
+                maintain_reptool_bl(data).then((response)=>
                   ajax_count--
                   if !response
                     error_message = "<p>Unable to update all reptool entries.</p>"
                     error_array.push(error_message)
-                  else
-                    submitted_disputes.push(dispute)
                 )
               when 'drop'
                 data = {
@@ -342,13 +409,11 @@ $ ->
                   'comment':  comment
                   'classifications': act[key]
                 }
-                drop_reptool_bl(data).then((response,  data)=>
+                drop_reptool_bl(data).then((response)=>
                   ajax_count--
                   if !response
                     error_message = "<p>Unable to drop all reptool entries.</p>"
                     error_array.push(error_message)
-                  else
-                    submitted_disputes.push(disput)
                 )
               when 'add'
 
@@ -357,21 +422,20 @@ $ ->
                   'trgt_list': act[key]
                   'note': comment
                 }
+
                 if stringIncludes(act[key][0], 'BL')
                   for el in action
                     #####
                     # set the values of threat_cat ids if the BL is being set
                     #####
                     if el.tc_ids
-                      { tc_ids } = el
-                      data.thrt_cat_ids = tc_ids
-                adjust_wlbl(data).then((response, hey) =>
+                      data.thrt_cat_ids = el.tc_ids
+
+                adjust_wlbl(data).then((response) =>
                   ajax_count--
                   if !response
                     error_message = "<p>Unable to adjust all wlbl entries.</p>"
                     error_array.push(error_message)
-                  else
-                    submitted_disputes.push(dispute)
                 )
 
               when 'remove'
@@ -380,13 +444,11 @@ $ ->
                   'list_types': act[key]
                   'note': comment
                 }
-                remove_wlbl(data).then((response, data)=>
+                remove_wlbl(data).then((response)=>
                   ajax_count--
                   if !response
                     error_message = "<p>Unable to remove all wlbl entries.</p>"
                     error_array.push(error_message)
-                  else
-                    submitted_disputes.push(dispute)
                 )
 
 
@@ -398,7 +460,7 @@ $ ->
       data:
         data: data
       success_reload:false
-      success: (response) ->
+      success: () ->
         $('#confirmation-modal').modal('hide')
     )
 
@@ -409,7 +471,7 @@ $ ->
       headers: headers
       data: data
       success_reload:false
-      success: (response) ->
+      success: () ->
         $('#confirmation-modal').modal('hide')
     )
 
@@ -417,9 +479,10 @@ $ ->
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+      headers: headers
       data: data
       success_reload:false
-      success: (response, more) ->
+      success: () ->
         $('#confirmation-modal').modal('hide')
     )
 
@@ -430,11 +493,12 @@ $ ->
       headers: headers
       data: data
       success_reload:false
-      success: (response) ->
+      success: () ->
         $('#confirmation-modal').modal('hide')
     )
 
   window.check_actions = (action_classes) =>
+    # depending on classlists, return appropriate action to take for final data for ajax call
 
     if stringIncludes(action_classes, 'reptool')
 
@@ -459,17 +523,17 @@ $ ->
       # super simple endpoint to quick look up bulk submit-thus sayeth chris
       # on success of at least some data, make disputes, otherwise display error message
       ####
+    errors = Array.from(new Set(errors))
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/quick_bulk_update'
-      data: {
-        update_data: data
-      }
+      data: update_data: data
       success_reload:false
       error_prefix: 'Error logging in.'
       success: (response) ->
         submitted_entries = []
         if response
+
           for key, val of data
             if key != 'comment'
               submitted_entries.push(key.trim())
@@ -483,101 +547,61 @@ $ ->
               submitted_msg = "<div>Successfully created entries: #{submitted_entries.join(', ')}</div>"
               errors = "<div>Error creating the following entries: #{submitted_entries.join(', ')}</div>"
             std_msg_error('Error Creating disputes',[errors + submitted_msg], reload: false)
-
-
         return response
     )
 
-  window.stringIncludes = (str, substring) ->
-    return str.indexOf(substring) != -1
-
   window.confirm_rep_changes = () ->
+
     ####
     #  confirm actions to be taken, data is prepared and  final submission of disputes to be made
     ####
-    confirmation_rows = $('#confirmation-modal tbody').find('tr')
+    confirmation_rows = document.querySelector('#confirmation-modal tbody').rows
     $('#confirmation-modal').modal('toggle');
 
-    comment = $('.confirm-rep-input').val()
-    reptool_dispute_changes = []
-    wlbl_dispute_changes = []
-    disputes = {
-      comment:$('.confirm-rep-input').text()
-    }
-
+    disputes = { comment: $('.confirm-rep-input').text() }
 
     $( confirmation_rows ).each ->
+        action_list = []
+        cells = $(this).find('td')
+        dispute = $( cells[0] ).text()
+        actions = $( cells[1] ).children()
 
-      action_list = []
-      cells = $( this ).find('td')
-      dispute = $( cells[0] ).text()
-      actions = $( cells[1] ).children()
-      for action, i in actions
+        for action, i in actions
+          action_tags = []
+          class_list = $(action).attr('class')
 
-        action_tags = []
-        existing_classes = []
-        existing_wlbl = []
-        class_list = $(action).attr("class")
+          if stringIncludes(class_list, 'reptool') && !stringIncludes(class_list, 'drop')
+            action_tags = $(action).attr('reptool_classes').split(',')
+          if stringIncludes(class_list, 'wlbl')
+            action_tags = $(action).attr('wlbl_data').split(',')
+          if stringIncludes(class_list, 'threat-cat-col')
+            action_tags = $(action).attr('data').split(',').map((x) -> return parseInt(x) )
 
-        maintain_check = stringIncludes(class_list, 'maintain')
-        maintain_remove = stringIncludes(class_list, 'remove')
-        drop_check = stringIncludes(class_list, 'drop')
-        threat_cat = stringIncludes(class_list, 'threat-cat-col')
+          formatted_action = check_actions(class_list)
+          action_list.push( "#{formatted_action}": action_tags )
 
-        if maintain_check || drop_check
-          if $(action).attr('reptool_classes') != undefined
-            existing_classes = $(action).attr('reptool_classes').split(',')
-            action_tags = existing_classes
+        actions = action: action_list
+        disputes[dispute] = actions
+        dispute_check = true
 
-        if threat_cat
-          tc_ids = $(action).attr('data').split(',')
-          for tc_id in tc_ids
-            action_tags.push( parseInt(tc_id) )
+        for key, value of disputes
+          if key != 'comment'
+            if typeof value != 'object'
+              dispute_check = false
+              break
 
-        formatted_action = check_actions(class_list)
-        action_list.push( "#{formatted_action}": action_tags )
-
-      actions = action: action_list
-      disputes[dispute] = actions
-      dispute_check = true
-
-      for key, value of disputes
-        if key != 'comment'
-          if typeof value != 'object'
-            dispute_check = false
-            break
-      if dispute_check
-        call_action_switchboard(disputes)
-
-
-  window.open_adjust_reptool = () ->
-    dropdown = $('#reptool_entries_bl_dropdown')
-    list = $(dropdown).find('ul')
-    type = 'reptool'
-
-    reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
-      "dga", "exploitkit", "malware", "open_proxy", "open_relay",
-      "phishing", "response", "spam", "suspicious", "tor_exit_node"]
-
-    if !$(list).has('label').length
-      build_checkbox_list(reptool_options, list, type)
-
-  window.open_wlbl = () ->
-    list = $('#wlbl_entries_dropdown').find('ul')
-    type = 'wlbl'
-    wlbl_options = [ "WL-weak", "WL-med", "WL-heavy", "BL-weak", "BL-med", "BL-heavy"]
-
-    if !$(list).has('label').length
-      build_checkbox_list(wlbl_options, list, type)
+        if dispute_check
+          call_action_switchboard(disputes)
 
 
   window.set_action_wlbl_col = () ->
 
     $('.grayed-out').removeClass('grayed-out')
+    reset_error_modal()
 
-    $('#error_modal').dialog()
-    $('#error_modal .modal-body' ).empty()
-    $('#error_modal').dialog( 'destroy' )
+    error_array = []
+    threat_cats_el = []
+    threat_cats = []
 
     action_desc = 'Add to: '
     checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
@@ -585,14 +609,8 @@ $ ->
     selected_rows = $('.col-select-all input:checked')
     list_action = $('.wlbl-radio-add:checked').val()
 
-    error_array = []
-    threat_cats_el = []
-    threat_cats = []
-
     if list_action == 'remove'
       action_desc = 'Remove from: '
-    else
-      action_desc = 'Add to: '
 
     if bl_check
       # if bl is checked, format threat cats for the dispute
@@ -604,13 +622,14 @@ $ ->
         threat_cats_el.push("<span data='#{val}' class='col-tag threat-cat-tag'>#{label}</span>")
 
     selected_rows.each ()->
+      wlbl_err = []
+      tc_err = ''
+
       row = $(this).closest('tr')
       $(row).find('.wlbl-action-col').remove()
       $(row).find('.threat-cat-col').remove()
       selected_rows = $('.col-select-all input:checked')
       data = row.find('.col-bulk-dispute').text()
-      wlbl_err = ''
-      tc_err = ''
 
       if !isEmpty(data)
         error_message = "#{data}| "
@@ -624,15 +643,17 @@ $ ->
           switch(list_action)
             when 'add'
               if wlbl_col.includes(wlbl)
-                wlbl_err += "<span class='col-tag dialog-tag'>  #{wlbl}</span>, "
+                wlbl_err.push( "<span class='col-tag dialog-tag'>  #{wlbl}</span>" )
               return !wlbl_col.includes(wlbl)
             when 'remove'
               if !wlbl_col.includes(wlbl)
-                wlbl_err += "<span class='col-tag dialog-tag'>  #{wlbl}</span>, "
+                wlbl_err.push( "<span class='col-tag dialog-tag'>  #{wlbl}</span>" )
               return wlbl_col.includes(wlbl)
         )
+
         threat_id_array = []
         current_threat_cats = []
+
         for tc in threat_cats_el
           tc_name = $(tc)[0].innerText
           if tc_name != undefined
@@ -644,10 +665,10 @@ $ ->
               current_threat_cats.push(tc)
               threat_id_array.push(tc_id = $(tc)[0].getAttribute('data'))
 
-        if wlbl_err != ''
-          error_message += "<span class='error-tag'>WLBL : #{wlbl_err;}</span>"
+        if wlbl_err.length > 0
+          error_message += "<span class='error-tag'>WLBL : #{wlbl_err.join(', ')}</span>"
         if tc_err != ''
-          error_message += "<span class='error-tag'> Threat Categories : #{tc_err;}</span>"
+          error_message += "<span class='error-tag'> Threat Categories : #{tc_err}</span>"
         check_list = col_tag_format(check_list_array)
 
         if current_threat_cats.join().length > 0
@@ -655,7 +676,7 @@ $ ->
         else
           current_threat_cats = ''
 
-        col_dialog = "<p class='wlbl-action-col #{list_action}' data='#{check_list_array}'>#{action_desc}  #{check_list} #{current_threat_cats}<p>"
+        col_dialog = "<p class='wlbl-action-col #{list_action}' wlbl_data='#{check_list_array}'>#{action_desc}  #{check_list} #{current_threat_cats}<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 
         if error_message.endsWith('</span>')
@@ -668,22 +689,15 @@ $ ->
           if !$(clear_col).has(".clear-action-button").length
             $(clear_col).append(delete_button)
 
-    if  error_array.length
-      $( '.error_modal' ).dialog({
-        position:
-          my: 'right',
-          at: 'top+15%',
-          of: window
-      })
-      $( '#error_modal .modal-header' ).html( "<h4>Cannot #{list_action} the following WLBL disputes <h4>" )
-      $( '#error_modal .modal-body' ).append( error_array )
     submit_rep_check()
 
-  wlbl_values= []
-  reptool_values= []
+    if error_array.length
+      $( '#error_modal' ).dialog().position('top')
+      $( '#error_modal .modal-header' ).html( "<h4>Cannot #{list_action} the following WLBL disputes <h4>" )
+      $( '#error_modal .modal-body' ).append( error_array )
 
   window.submit_quick_lookup = () ->
-    $('#confirmation-modal tbody').empty()
+    $('#confirmation-modal  tbody').empty()
     $('#confirmation-modal').modal()
 
     rows = $( '.col-select-all' ).closest('tr')
@@ -692,14 +706,17 @@ $ ->
     $(rows).each ->
       new_data = $(this).find('.col-bulk-dispute').text()
       actions_col = $( this ).find('.col-actions')
+      wlbl_actions = $( this ).find('.wlbl-action-col').attr('wlbl_data')
       existing_reptool = ''
-      rep_classes = actions_col.attr('reptool_classes')
-      if rep_classes != undefined
-        existing_reptool = "reptool_classes = #{rep_classes}"
+      wlbl_list = ''
+
+      if actions_col.attr('reptool_classes') != undefined
+        existing_reptool = "reptool_classes= #{actions_col.attr('reptool_classes')}"
+      if wlbl_actions != undefined
+        wlbl_list = "wlbl_data = #{wlbl_actions}"
       if !isEmpty(new_data) && new_data != undefined
         actions_col = $( this ).find('.col-actions')
         children = actions_col.children()
-        existing_actions = actions_col
         if children.length
           html = "<tr>
                     <td> #{new_data} </td>
@@ -710,7 +727,7 @@ $ ->
               threat_cat_data = ''
               if classes == 'threat-cat-col'
                 threat_cat_data = "data='#{$(child).attr('data')}'"
-              html += "<div #{existing_reptool} #{threat_cat_data} class='#{classes}'>#{$(child).html()}</div>"
+              html += "<div #{existing_reptool} #{wlbl_list} #{threat_cat_data} class='#{classes} repuation-dispute-modal'>#{$(child).html()}</div>"
           html += '</td> </tr>'
           confirmation_dialog.push( html )
 
@@ -729,42 +746,32 @@ $ ->
       $('#submit-rep-changes').attr('disabled', true)
 
   window.set_action_col = () ->
-    $( '#error_modal' ).dialog(
-      position:
-        my: "right",
-        at: "top+15%",
-        of: window
-    )
-    $( '#error_modal .modal-body' ).empty()
-    $( '#error_modal' ).dialog( 'destroy' )
+    #####
+    # set and format action to be taken in each row's action column
+    #####
 
-    selected_rows = $( '.col-select-all input:checked' )
+    reset_error_modal()
+
     check_vals = $( '.adjust_reptool_checkbox:checked' ).map( () -> return $(this).val() ).get()
     class_reptool = $( '.status_bl:checked' ).val().replace( 'reptool-' , '' )
-    reptool_add  = $( '.reptool-add:checked' ).val()
+    reptool_add = $( '.reptool-add:checked' ).val()
     reptool_class = reptool_add
+    status_class = "reptool-#{class_reptool}-submission"
+    check_list = ''
+    error_array = []
+    error_header = "<h4>Cannot #{reptool_add} the following Reptool Classification dispute<h4>"
 
     switch (class_reptool)
       when 'maintain'
-        reptool_dialog = reptool_add.charAt(0).toUpperCase() + reptool_add.slice(1)
-        status_string = "#{reptool_dialog } classifications:"
-        status_class = 'reptool-maintain-submission'
+        status_string = "#{reptool_add.charAt(0).toUpperCase()}#{reptool_add.slice(1)} classifications:"
+      when 'override'
+        status_string = 'Add classifications: '
       when 'drop'
         status_string = 'Drop all classifications (set entry to EXPIRED)'
         reptool_add = 'drop'
         reptool_class = 'drop'
-        check_list = ''
-        status_class = 'reptool-drop-submission'
-      when 'override'
-        status_string = 'Add classifications: '
-        status_class = 'reptool-override-submission'
-        reptool_add  = $( '.reptool-add:checked' ).val()
-        reptool_class = reptool_add
 
-    error_array = []
-    error_header = "<h4>Cannot #{reptool_add} the following Reptool Classification dispute<h4>"
-
-    selected_rows.each () ->
+    $('.col-select-all input:checked').each () ->
       row = $(this).closest('tr')
       rep_status = row.find('.rep-status').text()
       data = row.find('.col-bulk-dispute').text()
@@ -801,32 +808,26 @@ $ ->
           else
             check_class = '.add'
 
-          existing_actions = rep_list
-          $(actions).find("#{check_class} .col-tag").each () -> existing_actions.push( this.innerText )
+        existing_actions = rep_list
+        $(actions).find("#{check_class} .col-tag").each () -> existing_actions.push( this.innerText )
 
-          if reptool_add.toLowerCase() == 'remove'
+        if reptool_add.toLowerCase() == 'remove'
             check_list = check_vals.filter( (rep)->
-              if existing_actions.indexOf(rep) == -1 || rep_list.indexOf(rep) == -1
-                if rep_status == "ACTIVE"
+              if existing_actions.indexOf(rep) == -1 && rep_status == "ACTIVE"
                   error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
                   return false
-                else
-                    return true
               else
                 return true
-              )
+            )
             reptool_tags = $(action_col).attr( 'reptool_classes').split(',')
             action_tags = reptool_tags.filter( (val) => if check_list.indexOf(val) == -1  && val != 'ACTIVE' && val != 'EXPIRED' then return val )
             $(action_col).attr( 'reptool_classes', action_tags )
 
-          else if reptool_add.toLowerCase() == 'add'
+        else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
-              if existing_actions.indexOf(rep) > -1 || rep_list.indexOf(rep) > -1
-                if rep_status == "ACTIVE"
+              if existing_actions.indexOf(rep) > -1 && rep_status == "ACTIVE"
                   error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
                   return false
-                else
-                  return true
               else
                 return true
             )
@@ -858,171 +859,32 @@ $ ->
       $( '#error_modal .modal-header' ).html( error_header )
       $( '#error_modal .modal-body' ).append(error_array)
 
-  window.buildRow = ( text_list, parent_row) ->
-# build and append new rows to the HTML in quick lookup
-    bindControls()
-    # Once the table has been rebuilt, find the empty row and focus on it
-    tbody = document.querySelector('.research-table tbody')
-    disputes = []
-    disputes_data = []
-    existing_rows = $(tbody).find('tr')
-    parent_data = $(parent_row).find('.col-bulk-dispute').attr('data')
-    parent_index = parent_row.rowIndex
-    prev_row = existing_rows.eq(parent_index - 2)[0].innerText
-
-    $(existing_rows).each ->
-      data = $(this).find('.col-bulk-dispute').attr('data')
-      if !isEmpty(data)
-        disputes_data.push(data)
-        disputes.push(this)
-
-    if !isEmpty(parent_data) && !text_list.includes(parent_data)
-      index = disputes.indexOf(parent_data)
-      disputes.splice(index, 1)
-      parent_index = parent_index - 1
-
-    text_list = text_list.filter( (text)-> return !disputes_data.includes(text) )
-    text_list.push(' ')
-    enter_check = isEmpty(prev_row) && text_list.length == 1 && parent_index > 1 || isEmpty(parent_data)
-
-    if disputes.length
-      if enter_check
-        parent_index = parent_index - 1
-      for i in [0...text_list.length]
-        disputes.splice parent_index + i, 0, text_list[i]
-    else
-      for i in [0...text_list.length]
-        disputes.push(text_list[i])
-
-    # reset the innerHTML to nothing
-    tbody.innerHTML = ''
-    for i in [0...disputes.length]
-# if the dispute is not an HTML object, set the HTML of the new row to the below
-      if typeof disputes[i] != 'object'
-        tbody.innerHTML +=
-          "<tr>
-            <td class='col-select-all'>
-              <span class='checkbox-wrapper'>
-                <input type='checkbox' checked>
-              </span>
-            </td>
-            <td class='col-bulk-dispute' contenteditable='true' data='#{disputes[i]}'><p> #{disputes[i]} </p></td>
-            <td class='col-wbrs'></td>
-            <td class='col-wbrs-rule-hits'></td>
-            <td class='col-wbrs-rules'></td>
-            <td class='col-category'></td>
-            <td class='col-wlbl'></td>
-            <td class='col-threat-cats'></td>
-            <td class='col-reptool-class'></td>
-            <td class='col-actions' data=''></td>
-            <td class='col-clear-actions'></td>
-          </tr>"
-      else
-# if the dispute is an HTML object, set it as OuterHTML to avoid formatting issues
-        tbody.innerHTML += disputes[i].outerHTML
-
-      $(tbody).find('tr .col-bulk-dispute').each ->
-        if isEmpty( $(this).attr('data') )
-          this.focus()
-
-      setTimeout () ->
-        $("br").remove()
-      , 20
-    $('.ajax-message-div').css('display', 'none')
-
-
-
-  window.bindControls = () ->
-    # unbind and rebind blur to prevent the rebuilding of the table from being stuck in a loop
-    $(document).off('blur', '.col-bulk-dispute')
-    setTimeout () ->
-      $( document ).on 'blur', '.col-bulk-dispute', (e) -> set_row_text(e, this)
-    , 250
-
-  window.check_urls = (text_list, row, data) ->
-    checked = data.data
-    urls = []
-    valid_list = []
-    for name, value of checked
-      if !value
-        urls.push(name)
-      else
-        valid_list.push(name)
-    if urls.length
-      data = {'uri': urls}
-      $.ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
-        method: 'GET'
-        headers: headers
-        data: data
-        dataType: 'json'
-        success: (response) ->
-          {status, data } = response
-          if status == 'success'
-            for name, value of data
-              if value
-                valid_list.push(name)
-            buildRow(valid_list, row)
-      )
-    else
-      buildRow(valid_list, row)
-      return true
-  window.check_ips = (text_list) ->
-    data = {'ip_address': text_list}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_ip'
-      method: 'GET'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) -> return response
-    )
-
-  set_row_text = (e, el) ->
-    { which: key, type, shiftKey } = e
-    text = el.innerText.trim()
-    text_list = text.replace( /\n|\s/g, ", " ).split(", ")
-    row = el.closest('tr')
-    tbody = row.closest('tbody')
-
-    text_list = text_list.filter (item, index) ->
-      if item != ''
-        return text_list.indexOf item == index
-    if key == 13
-      if !shiftKey && text_list.length
-        check_ips(text_list, headers, row)
-          .then ( check_urls.bind( null, text_list, row) )
-          .then null, (err) -> console.log err
-    else if key == 0
-      if text_list.length > 1
-        check_ips(text_list, headers, row)
-          .then ( check_urls.bind( null, text_list, row) )
-          .then null, (err) -> console.log err
-      else
-        $(row).data(text)
-    else if key == 8
-        if isEmpty(text) && $(tbody).children().length > 1
-          $(row).remove()
-
-  $( document ).on 'keydown blur', '.col-bulk-dispute', (e) ->
-    set_row_text(e, this)
-    e.stopPropagation()
-
-
   window.get_rep_data = ()->
+    ####
+    # get reputation data for all rows
+    # after getting data, display in the appropriate column
+    ####
     search_items = []
     rows = $('.research-table tbody tr')
 
+    if !isEmpty( $(rows).last() )
+      $('#add_addtional_row').css('display', 'flex')
+    else
+      $('#add_addtional_row').css('display', 'none')
+
     $('.col-bulk-dispute').each ( ) ->
-      text = $(this).text()
-      if !isEmpty(text)
-        search_items.push(text)
+      checkbox = $(this).prev().find('input')
+      if checkbox.length
+        text = $(this).text()
+        if !isEmpty(text) && checkbox[0].checked
+          search_items.push(text)
 
     for i in [0...search_items.length]
       item = search_items[i]
       row = rows[i]
 
       if !isEmpty(item)
+        detail_loader()
         # for each search item, call a promise to get the data. If success, the first then runs, setting the data in the rows.
         # if it fails, the second runs, catching the error
         new get_reptool(item, headers)
@@ -1087,8 +949,7 @@ $ ->
       headers: headers
       data: data
       dataType: 'json'
-      success: (response) ->
-        return response
+      success: (response) -> return response
       error: (response) -> return response
     )
 
@@ -1112,9 +973,7 @@ $ ->
       headers: headers
       data: data
       dataType: 'json'
-      success: (response) ->
-        {threat_cats}= JSON.parse(response)
-        return response
+      success: (response) -> return response
       error: (response) -> return response
     )
 
@@ -1173,22 +1032,15 @@ $ ->
     col_tc = $(row).children('.col-threat-cats')
     $(row).find('.tc_data').remove()
     { threat_categories } = JSON.parse(data)
+    title = "It may take several hours for SDS threat category values to reflect changes."
     if threat_categories != undefined
       if threat_categories.length
-        text = "<span class = 'tc_data esc-tooltipped' title= 'It will take several hours for SDS threat category values to reflect changes.'> |  #{threat_categories.join(', ')} </span>"
+        text = "<span class = 'tc_data esc-tooltipped' title= '#{title}'> |  #{threat_categories.join(', ')} </span>"
       else
-        text = '<span class="missing-data tc_data esc-tooltipped" title= "It will take several hours for SDS threat category values to reflect changes."> | No SDS data</span>'
+        text = "<span class='missing-data tc_data esc-tooltipped' title= '#{title}'> | No SDS data</span>"
       col_tc.append( text )
     else
-      col_tc.append( '<span class="missing-data tc_data esc-tooltipped" title= "It will take several hours for SDS threat category values to reflect changes."> | No SDS data</span>')
-
-
-  $('body').on 'mouseenter', '.tc_data:not(.tooltipstered)', ->
-    $(this).tooltipster(
-      side: 'bottom'
-      interactive: true
-      theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
-    ).tooltipster 'open'
+      col_tc.append( "<span class='missing-data tc_data esc-tooltipped' title='#{title}'> | No SDS data</span>")
 
   window.set_wrbs = ( item, row, data) ->
     { score, rulehits } = data.json.data

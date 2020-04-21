@@ -2269,6 +2269,9 @@ a.static-nav-item {
 .hidden-auto-resolve{
   z-index: 0;
 }
+.reputation-research-search-wrapper #confirmation-modal .modal-body{
+  color:$type-darkest!important
+}
 .webrep_auto_resolve, #auto-resolve-dialog{
   padding: 13px!important;
   max-height: 600px!important;
@@ -5053,11 +5056,14 @@ table > tbody > tr > td.dispute_rep_tools {
 .inline-tool-content-wrapper .toolbar div {
   border: 1px solid $faint-neutral-color !important;;
 }
-
+.detail-label{
+  color: $type-lightest!important;
+}
 .dropdown-comment, .form-comment-box {
   width: 100%;
   min-height: 20px;
   border: 1px solid darken($faint-neutral-color, 5%);
+  color: $type-darkest
 }
 
 .form-comment-box {
@@ -5399,17 +5405,29 @@ input.table-entry-input:focus {
 }
 
 #research-table {
-  &{
-    line-height: 1.6em;
-  }
+  line-height: 1.6em;
+  background-color: $content-bg-color;
   th {
     color: $type-darkest;
     border-bottom: 1px solid $faint-neutral-color!important;
     padding: 8px 8px 8px 10px;
+    white-space: nowrap;
   }
   td {
     padding: 8px 8px 8px 10px;
   }
+  .tc-header{
+    text-transform: none;
+    font-weight: 600;
+    font-size: 10px;
+  }
+}
+.no-transition{
+  -webkit-transition:  width 0s!important;
+  -moz-transition:  width 0s!important;
+  -ms-transition:  width 0s!important;
+  -o-transition:  width 0s!important;
+  transition: width 0s!important;
 }
 
 /* quicklookup > bulk dispute div functions as an input */
@@ -5435,6 +5453,7 @@ input.table-entry-input:focus {
   height: 32px;
   margin: 20px 15px;
   padding: 0px 13px;
+  min-width: 140px;
   border-left: 1px solid $faint-neutral-color;
   border-right: 1px solid $faint-neutral-color;
 }
@@ -5477,7 +5496,7 @@ input.table-entry-input:focus {
   content:unset;
 }
 .reputation-research-search-wrapper .nav-tabs{
-   margin:0
+   margin:0;
  }
 .reputation-research-search-wrapper h1 {
   color: $content-bg-color;
@@ -5644,12 +5663,23 @@ table > tbody > tr > td.research-table-row-wrapper {
   color: $type-lightest;
 }
 .research-header-wrapper .nav-tabs > li > a:hover{
-  color: $type-lightest
+  color: $type-lightest;
+  white-space:nowrap;
 }
 .research-header-wrapper .nav-tabs > li.active > a {
   border: none;
   background: $primary-section-color;
   transition: background-color .1s ease-in;
+}
+@media (max-width: 1000px) {
+  .research-header-wrapper {
+    .nav-tabs > li > a{
+      width: 100px;
+    }
+    .tab-text{
+      display: none;
+    }
+  }
 }
 //caret for active tab  in reputation toolbar
 .research-header-wrapper li::after {
@@ -5694,8 +5724,13 @@ table > tbody > tr > td.research-table-row-wrapper {
 .toolbar-quicklookup{
   display:flex;
   height: 60px;
+  button{
+    white-space: nowrap;
+  }
 }
-
+.content-wrapper.research-page{
+  min-width: 400px;
+}
 .entry-details-table {
   margin: 20px;
   padding-left: 7px;
@@ -5816,7 +5851,7 @@ h5.entry-details-table-header {
   background-size: 16px;
   padding-bottom: 1px;
   border: 2px solid $ac-nav-bg-color;
-  outline: 1px solid $disabled-bg;
+  outline: 1px solid #e5e5e5;
   font-size: 9pt;
 }
 
@@ -6208,7 +6243,7 @@ button.dropdown-submit-button {
 
 .search-options-col label {
   margin-left: 8px;
-  color: $content-bg-color;
+  color: $content-label-color;
   font-size: 8pt;
   font-weight: 400;
   padding: 8px 0;
@@ -6664,17 +6699,6 @@ td.ticket-total::before {
 
 .tc_data {
     display: inline-block;
-  &:after {
-    content: url(image_path("icon_flag.svg"));
-    display: inline-block;
-    position: relative;
-    top: 6px;
-    height: 20px;
-    width: 20px;
-  }
-  &.missing-data:after{
-    content: url(image_path("icon_flag_grey.svg"));
-  }
 }
 .entry-important-flag::before, .highlight-second-review .important-flag-col .is-important {
   background-image: url(image_path('icon_important.svg'));
@@ -6912,7 +6936,7 @@ table.dispute-entry-table tbody tr.selected {
   margin-top: 20px;
 }
 .related-dropdown-text{
-  color: #999 !important;
+  color: $content-label-color !important;
 }
 
 #set-related-dispute-div {
@@ -12421,7 +12445,7 @@ table > tbody > tr > td.no-padding {
     margin-top: 9px;
     margin-left: 14px;
     width: max-content;
-    color: #999;
+    color: $content-label-color;
     font-style: italic;
   }
 }
@@ -12691,4 +12715,24 @@ table.dispute_tool_current tr.reptool-entry-row td {
   .th-reptool-comment {
     width: 120px;
   }
+}
+
+#confirmation-modal{
+  textarea{
+    min-height: 60px;
+    margin-bottom: 25px;
+  }
+  tbody{
+    line-height: 1.1em;
+  }
+}
+
+#add_addtional_row {
+  border: none;
+  background-image: url(image_path('icon_add_grey.svg'));
+  height: 20px;
+  width: 20px;
+  display: none;
+  position:absolute;
+  margin-top: -94px;
 }

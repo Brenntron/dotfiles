@@ -524,3 +524,18 @@ Given(/^I fill in selectized of element "(.*?)" with "(.*?)"$/) do |element, val
   page.execute_script("$('#{element}')[0].selectize.setValue(#{value})")
 
 end
+
+When(/^I select contenteditable text in "(.*?)"$/) do |target|
+  page.execute_script("$('#{target} p:first').select()")
+end
+
+When(/^I delete text "(.*?)"$/) do |target|
+  page.execute_script("$('#{target} p:first').select()")
+end
+
+Given(/^I remove row "(.*?)"$/) do |element|
+  field = find("#{element}", match: :first)
+  field.native.clear
+  field.send_keys [:backspace]
+end
+

@@ -1,34 +1,47 @@
-.content-wrapper
+.content-wrapper.research-page
+
   .reputation-research-search-wrapper
+
+    -# shared loader for detail and quick lookup
+    .ajax-message-div
+      .loader-gears
+        =inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Loading data...
+
     .research-header-wrapper
       %span.icon-research.top-info-icon
       %h1 Reputation Research
+
       %ul#research-tabs{class:"nav nav-tabs", role:'tablist'}
-        %li{role:"presentation", class: "active", data:"lookup-detail"}
-          %a{href:'#lookup-detail','aria-controls':'lookup-detail', 'aria-label': 'Detail lookup tab','data-toggle':'tab', role:"tab"}
+        -# Detailed and Quick Lookup tabs
+        %li.no-transition{role:"presentation", class: "active", data:"lookup-detail"}
+          %a.esc-tooltipped.no-transition{href:'#lookup-detail','aria-controls':'lookup-detail', 'aria-label': 'Detail lookup tab','data-toggle':'tab', role:"tab", title:"Detailed Lookup"}
             %span.icon-lookup-detail.top-info-icon
-            Detailed Lookup
-        %li{role:'presentation', data:"lookup-quick"}
-          %a{href:'#lookup-quick',class:'quick-lookup-tab', 'aria-controls':'lookup-quick','aria-label': 'Quick lookup tab','data-toggle':'tab', role:"tab"}
+            %span.tab-text Detailed Lookup
+        %li.no-transition{role:'presentation', data:"lookup-quick"}
+          %a.esc-tooltipped.no-transition{href:'#lookup-quick',class:'quick-lookup-tab', 'aria-controls':'lookup-quick','aria-label': 'Quick lookup tab','data-toggle':'tab', role:"tab", title:"Quick Lookup"}
             %span.icon-lookup-quick.top-info-icon
-            Quick Lookup
+            %span.tab-text Quick Lookup
+
     .research-search-form.row.tab-content
       = form_for(:search, method: "get") do |search_form|
         .search-options-col.tab-pane.active#lookup-detail
           .col-xs-4.col-sm-3.col-md-2.col-lg-2.col-xl-1
             = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
-            %label.esc-tooltipped{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
+            %label.esc-tooltipped.detail-label{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
             = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
-            %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
+            %label.esc-tooltipped.detail-label{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
             %hr.thin
-            =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary')
+            =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary',onclick: 'detail_loader()')
           .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
             = search_form.text_area(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
+
+
+        -#####################
+        -# BEGIN : quicklookup toolbar
+        -#####################
         .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}
-          .ajax-message-div#lookup-quick-loader
-            .loader-gears
-              =inline_svg 'icon_gears_loader.svg'
-            %span.loader-msg Loading data...
+
           .col-xs-12.toolbar-quicklookup
             %button.primary#get-rep-data{onclick: 'get_rep_data();return false;'} Get Reputation Data
             .toolbar.research-toolbar
@@ -46,11 +59,11 @@
                           .col-xs-2
                             %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Action
                           .col-xs-5
-                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-add', value: 'add', checked: true}
-                            %label.radio-label{for: 'wlbl-add'} Add to List
+                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-quick-add', value: 'add', checked: true}
+                            %label.radio-label{for: 'wlbl-quick-add'} Add to List
                           .col-xs-5
-                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-remove', value: 'remove'}
-                            %label.radio-label{for: 'wlbl-remove'} Remove from List
+                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-quick-remove', value: 'remove'}
+                            %label.radio-label{for: 'wlbl-quick-remove'} Remove from List
                         .row.reptool-classifications-row
                           .col-xs-12
                             %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Lists
@@ -120,10 +133,6 @@
                           %button.primary.dropdown-submit-button#quick-lookup-reptool-submit{type: 'button', disabled: true, onclick: 'set_action_col();'}
                             Add Action to Entries
               %div
-                %label.toolbar-section-label File
-                %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
-                  %span.toolbar-button-text Export to CSV
-              %div
                 %label.toolbar-section-label Actions
                 %button#clear-all-actions.toolbar-button.clear-button.esc-tooltipped{title: 'Clear all actions'}
                   %span.toolbar-button-text Clear All Actions
@@ -131,8 +140,16 @@
             %button.primary#submit-rep-changes{onclick:'submit_quick_lookup();return false;', disabled: true} Submit Reputation Changes
             %span.small.note-repsubmit
               * NOTE: Submitting reputation changes will automatically create a closed ticket
+          -#####################
+          -#END : quicklookup toolbar
+          -#####################
 
 
+
+
+          -#####################
+          -#BEGIN : quicklookup success and error modals
+          -#####################
           #confirmation-modal.modal.fade{role:"dialog"}
             .modal-dialog
               .modal-content
@@ -148,7 +165,7 @@
                   .comment-wrapper
                     %label.content-label-sm
                       Comment
-                    %textarea#confirm-rep-input.dropdown-comment.confirm-rep-input.comment-input
+                    %textarea#confirm-rep-input.dropdown-comment.confirm-rep-input.comment-input{name:'confirm-rep-input'}
                   .modal-footer
                     .button-group
                       %button.primary{id:'confirm-rep-changes', onclick: 'confirm_rep_changes(); return false;' } Confirm Reputation Changes
@@ -159,8 +176,16 @@
             .modal-header
               %h4.modal-title#commit-modal-title Duplicate Dispute Requests
             .modal-body
+          -#####################
+          -#END: quicklookup success and error modals
+          -#####################
 
 
+
+
+          -#####################
+          -# BEGIN: quicklookup research table
+          -#####################
           %table#research-table.research-table
             %colgroup
               %col
@@ -179,7 +204,9 @@
                 %th WBRS Rules
                 %th Category
                 %th WL/BL
-                %th Threat Categories
+                %th
+                  Threat Categories
+                  %span.tc_header (Pending | Current)
                 %th Reptool Classification
                 %th Actions
                 %th
@@ -196,14 +223,18 @@
                 %td.col-threat-cats
                 %td.col-actions
                 %td.col-clear-actions
+          %button#add_addtional_row.esc-tooltipped{title: 'Add Row', onclick: 'return false;'}
+      -#####################
+      -# END: quicklookup research table
+      -#####################
+
 
 
   .row
+    -#####################
+    -# BEGIN: toolbar for detail lookup results
+    -#####################
     .col-xs-12.lookup-detail
-      .ajax-message-div#lookup-detail-loader
-        .loader-gears
-          =inline_svg 'icon_gears_loader.svg'
-        %span.loader-msg Loading data...
       - if params['search']
         %h4 Results for
         %span.searched-for-url #{params['search']['uri']}
@@ -267,6 +298,7 @@
                         %span NOTE: Submitting zero threat categories removes associated blacklists too.
 
                     -# BEGIN: WL BL LISTS ROW + THREAT CATS ROW (place this 1 indent past 'inline-tool' above)
+
                     .row.lists-row
                       .col-xs-12
                         %label.content-label-sm{for: "wlbl-list-type-select"} Lists
@@ -301,6 +333,7 @@
                           .threat-cat-cell
                             = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
                             = label
+
                     -# END: WL BL LISTS ROW + THREAT CATS ROW
 
 
@@ -311,7 +344,6 @@
                       %button.primary.dropdown-submit-button{type: 'button', onclick:'submit_bulk_wlbl("research");', disabled: true}
                         Submit Reputation Changes
           %span.dropdown
-            -##reptool_entries_button
             %button#reptool_entries_button_research.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("research");'}
               %span.toolbar-button-text Adjust RepTool WL/BL
             .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
@@ -436,7 +468,16 @@
           %input#research-page-filter{'type': "text", 'onKeyUp': "researchfilter(this)"}
         %button.primary#submit-strict-changes{onclick:'submit_quick_lookup();return false;', disabled: true} Submit Reputation Changes
         %span.small.note-repsubmit * NOTE: Submitting reputation changes will automatically create a closed ticket
+      -#####################
+      -# END: toolbar for detail lookup results
+      -#####################
+
+
+
   .row.research_results
+    -#####################
+    -# BEGIN: detail lookup results
+    -#####################
     .col-xs-12
 
       %table#disputes-research-table.table.table-sm.bfrp-table
@@ -491,11 +532,13 @@
                                       %td.wlbl-current-entry-wbrs
                                       %td.wlbl-threat-cat-inline
 
-                                    -#    Removing for now. We can't do a preview until the api is updated to provide that info
+                                    -#  DO NOT REMOVE THIS
                                     -#%td.text-center
                                     -#  %label.content-label-sm New Score
                                     -#  %br
                                     -#  %span.new_wbrs_score
+                                    -#  DO NOT REMOVE THIS
+
                                 .inline-tool-content-wrapper
                                   .row
                                     .col-xs-12
@@ -1079,22 +1122,3 @@
 = render 'escalations/webrep/disputes/new_email_dialog'
 %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
 %input{:name => "xml_token", :type => "hidden", :value => "#{xml_token}"}
-
-
-
-
-  -#  h1 Reputation Research
-  -#  = form_for(:search, method: "get") do |search_form|
-  -#    = search_form.text_field(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
-  -#    .row.search-options-row
-  -#      .col-xs-6
-  -#        = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
-  -#        %label.esc-tooltipped{title: 'Strict Search returns only records matching the exact URL.', for: 'research-search-strict'} Strict Search
-  -#      .col-xs-6
-  -#        = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
-  -#        %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
-  -#    =search_form.submit :Submit, id: 'submit-button'
-  -#.row
-  -#
-  -#
-  -#

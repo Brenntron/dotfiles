@@ -681,7 +681,7 @@ window.submit_individual_wlbl = (button_tag) ->
   else if adjustment_type = 'remove'
     console.log 'inline scenario 3' # index/show/bfrp page REMOVE: use old endpoint + one entry url'
     data_old =
-      ip_uris: dispute_url
+      ip_uris: [dispute_url]
       list_types: removed_lists_arr
       note: curr_note   # ensure this is working
       thrt_cat_ids: thrt_cat_ids
@@ -743,12 +743,13 @@ window.submit_individual_wlbl = (button_tag) ->
         console.log '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
 
         data_old =
-          ip_uris: dispute_url
+          ip_uris: [dispute_url]
           list_types: removed_lists_arr
           note: curr_note
           thrt_cat_ids: thrt_cat_ids
 
         console.log data_old
+
 
         # SECOND API CALL
         std_msg_ajax(
@@ -780,7 +781,7 @@ window.submit_individual_wlbl = (button_tag) ->
 
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment}
 
-    if $('#wlbl-remove').prop('checked') == true
+    if $('#wlbl-remove').prop('checked')
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
         method: 'POST'
@@ -790,7 +791,8 @@ window.submit_individual_wlbl = (button_tag) ->
         error: (response) ->
           std_api_error(response, 'Error retrieving WL/BL Data')
       )
-    else if $('#wlbl-add').prop('checked') == true
+
+    if $('#wlbl-add').prop('checked')
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
         method: 'POST'

@@ -373,8 +373,6 @@ Feature: Webrep, the BFRP
     And  I should not see element with class "add-ip-button"
 
 
-
-
   ####
   # Quicklookup feature
   ####
@@ -393,6 +391,23 @@ Feature: Webrep, the BFRP
     Then quick lookup entry "bulk-dispute" column number "2" should have content "https://1234computer.com"
     Then quick lookup entry "bulk-dispute" column number "3" should have content "g-oogl-e.com"
     Then I should not see content "faketestcom" within "#research-table"
+
+@javascript
+  Scenario: a user can remove a row and add more rows successfully
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research#lookup-quick"
+    Then I should see content "Submit Reputation Changes" within "#submit-rep-changes"
+    And I enter content "1.2.3.4" within p with class ".col-bulk-dispute"
+    Then I hit enter within ".col-bulk-dispute"
+    And  I wait for "2" seconds
+    Then quick lookup entry "bulk-dispute" column number "1" should have content "1.2.3.4"
+    Then I remove row ".col-bulk-dispute"
+    Then There is only one element of class, "col-bulk-dispute"
+    And I enter content "1.2.3.4  https://1234computer.com" within p with class ".col-bulk-dispute"
+    Then I hit enter within ".col-bulk-dispute"
+    And  I wait for "2" seconds
+    Then quick lookup entry "bulk-dispute" column number "1" should have content "1.2.3.4"
+    Then quick lookup entry "bulk-dispute" column number "2" should have content "https://1234computer.com"
 
   @javascript
   Scenario: a user can add only ips in quicklookup without error
@@ -443,7 +458,7 @@ Feature: Webrep, the BFRP
     And I should see "New Reputation Dispute Ticket"
     And I type content "A truly fantastic test comment" within input with id "confirm-rep-input"
     Then I click "confirm-rep-changes"
-]    Then I wait for "25" seconds
+    Then I wait for "25" seconds
     Then I should see "ALL DISPUTES WERE SUCCESSFULLY CREATED"
 
   @javascript
@@ -490,5 +505,5 @@ Feature: Webrep, the BFRP
     Then I click "input[name='malware']"
     Then I click "input[name='cnc']"
     Then I click "quick-lookup-reptool-submit"
-    Then I wait for "20" seconds
+    Then I wait for "5" seconds
     Then quick lookup entry "actions" column number "1" should have content ""
