@@ -36,7 +36,7 @@ Given(/^vrtincoming exists$/) do
 end
 
 Given(/^a user with role "(.*?)" exists with cvs_username, "(.*?)", exists and is logged in$/) do |role, username|
-  @user = FactoryBot.create(:current_user, confirmed: true, cvs_username: username, cec_username: username, display_name: username )
+  @user = FactoryBot.create(:current_user, confirmed: true, cvs_username: username)
   @user.roles << FactoryBot.create(:role, role: role)
   # sign_in_user
   @user.update(bugzilla_api_key: Rails.configuration.bugzilla_api_key)
