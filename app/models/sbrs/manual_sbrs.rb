@@ -16,8 +16,19 @@ class Sbrs::ManualSbrs < Sbrs::Base
   #get_rule_names_from_rulehits(response_returned_from_get_wbrs_data) <-- will return an array of rulehit mnemonics provided by the response package of above method
 
 
+  def initialize(attributes = {})
+    if attributes.keys.present?
+      attributes.keys.each do |attr|
+        if !FIELD_NAMES.include?(attr)
+          self.class.module_eval { attr_accessor attr.to_sym}
+        end
+      end
+    end
+    super
+  end
+
   def self.new_from_attributes(attributes)
-    new(attributes.slice(*FIELD_NAMES))
+    new(attributes)
   end
 
   # Get all the manual SBRS/SDS entries.
@@ -88,7 +99,8 @@ class Sbrs::ManualSbrs < Sbrs::Base
     all_rules = Sbrs::Base.rules_matchup
 
     uri_rules = []
-    if rep_data["wbrs-rulehits"]
+
+    if rep_data["wbrs-rulehits"].present?
       rep_data["wbrs-rulehits"].each do |rule_id|
         rule_id = rule_id.to_s
         if all_rules[rule_id].present?

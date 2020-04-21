@@ -1037,7 +1037,7 @@ class ComplaintEntry < ApplicationRecord
   def process_resolution_changes(resolution, internal_comment, customer_facing_comment)
     confirmation = {}
     if !["COMPLETED","PENDING"].include?(self.status) && resolution != "REOPENED"
-      if self.is_important
+      if self.is_important && resolution != "UNCHANGED"
         self.update(status: "PENDING", resolution: resolution, internal_comment: internal_comment, resolution_comment: customer_facing_comment)
         confirmation.update(state: 'SUCCESS', host: self.hostlookup, status: self.status, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
                             message: "Successfully processed a resolution update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")

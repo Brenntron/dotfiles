@@ -15,7 +15,6 @@ $ ->
 
 
   $('#edit-dispute-entry-button').click ->
-
     if ($('.dispute_check_box:checked').length > 0)
       $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
@@ -78,7 +77,6 @@ $ ->
 
 # Inline Edit Button
   $('.inline-edit-entry-button').click ->
-    edit_button = $(this)
     entry_row = $(this).parents('.research-table-row')[0]
     $(entry_row).addClass('editing-row')
     editable_data = $(entry_row).find('.entry-data')
@@ -91,6 +89,65 @@ $ ->
     $(first_item).next('.table-entry-input')[0].focus()
     if $('.edit-entries-buttons').hasClass('hidden')
       $('.edit-entries-buttons').removeClass('hidden')
+
+
+
+  # Edit resolved host IPs
+  $('.inline-edit-ip-button').click ->
+    edit_ip_query_functions(this, 'edit')
+
+  # Save edits to resovled host IPs
+  $('.inline-save-ip-button').click ->
+    edit_ip_query_functions(this, 'save')
+
+  # Cancel edits to resolved host IPs
+  $('.inline-cancel-ip-button').click ->
+    edit_ip_query_functions(this, 'cancel')
+
+
+  window.edit_ip_query_functions = (button, action, page) ->
+    # Get our DOM elements
+    entry_row = $(button).parents('.research-table-row')[0]
+    entry_uri = $.trim($($(entry_row).find('.entry-data-content')[0]).text())
+    ip_input  = $(entry_row).find('.table-ip-input')[0]
+    ip_data   = $(entry_row).find('.entry-resolved-ip-content')[0]
+    ip_edit   = $(entry_row).find('.inline-edit-ip-button')[0]
+    ip_save   = $(entry_row).find('.inline-save-ip-button')[0]
+    ip_cancel = $(entry_row).find('.inline-cancel-ip-button')[0]
+    old_ips   = $(ip_data).text()
+    new_ips   = $(ip_input).val()
+
+    if action == 'edit'
+      $(ip_edit).hide()
+      $(ip_data).hide()
+      $(ip_input).show()
+      $(ip_save).show()
+      $(ip_cancel).show()
+      $(ip_input).focus()
+
+    else
+      $(ip_cancel).hide()
+      $(ip_save).hide()
+      $(ip_input).hide()
+      $(ip_edit).show()
+      $(ip_data).show()
+
+      if action == 'save'
+        if $.trim(old_ips) != new_ips
+          ip_arry = cleanse_array(new_ips)
+          # show the prettier cleansed array as a string
+          ip_str = ip_arry.join(', ')
+          $(ip_data).text(ip_str)
+          $(ip_input).val(ip_str)
+          # Get query data & save to db
+          query_uri_plus_ip(entry_uri, ip_arry, entry_row)
+        else
+          alert 'no changes made!'
+
+      if action == 'cancel'
+        if $.trim(old_ips) != new_ips
+          $(ip_input).val(old_ips)
+
 
 # Inline Edit Status
   $('.radio-label').click ->
@@ -326,11 +383,6 @@ $(document).ready ->
       $('.ticket-resolution-radio').prop('checked', false)
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
-
-  $('.esc-tooltipped').tooltipster theme: [
-    'tooltipster-borderless'
-    'tooltipster-borderless-customized'
-    ]
 
   $('.ticket-status-radio').click ->
     all_stat_radios = $('#show-edit-ticket-status-dropdown').find('.status-radio-wrapper')
