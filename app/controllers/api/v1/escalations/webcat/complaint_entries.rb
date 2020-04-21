@@ -86,6 +86,7 @@ module API
                                        permitted_params['status'],
                                        permitted_params['comment'],
                                        permitted_params['resolution_comment'],
+                                       '',
                                        current_user, permitted_params['commit'])
 
                 if permitted_params['commit'] == 'decline'
@@ -451,6 +452,7 @@ module API
                                                        entry['status'],
                                                        entry['comment'],
                                                        entry['resolution_comment'],
+                                                       '',
                                                        current_user, "")
 
                       Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry) }
