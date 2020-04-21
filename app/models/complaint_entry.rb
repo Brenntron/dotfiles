@@ -135,6 +135,7 @@ class ComplaintEntry < ApplicationRecord
                       entry_status,
                       comment,
                       resolution_comment,
+                      uri_as_categorized,
                       current_user,
                       commit_pending)
     ActiveRecord::Base.transaction do
@@ -151,6 +152,7 @@ class ComplaintEntry < ApplicationRecord
                    category: categories_string,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
+                   uri_as_categorized: uri_as_categorized,
                    case_resolved_at: Time.now,
                    user:current_user)
             complaint.set_status(current_status)
@@ -177,6 +179,7 @@ class ComplaintEntry < ApplicationRecord
                    url_primary_category: self.category,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
+                   uri_as_categorized: uri_as_categorized,
                    case_assigned_at: Time.now,
                    was_dismissed: true)
           end
@@ -188,6 +191,7 @@ class ComplaintEntry < ApplicationRecord
                  status:current_status,
                  internal_comment: comment,
                  resolution_comment: resolution_comment,
+                 uri_as_categorized: uri_as_categorized,
                  user:current_user)
         end
       else
@@ -201,6 +205,7 @@ class ComplaintEntry < ApplicationRecord
                status: current_status,
                internal_comment: comment,
                resolution_comment: resolution_comment,
+               uri_as_categorized: uri_as_categorized,
                case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
@@ -212,7 +217,7 @@ class ComplaintEntry < ApplicationRecord
                           description: comment,
                           user: current_user.email,
                           casenumber: self.complaint.id )
-          update!(url_primary_category: category_names_string, category: category_names_string)
+          update!(url_primary_category: category_names_string, category: category_names_string, uri_as_categorized: uri_as_categorized)
         else
           # TODO Do we need to update the record when we are not making a change?
           existing_prefixes = remote_prefixes(prefix_given: prefix)
