@@ -24,5 +24,10 @@ class Escalations::OtherAdminTools::ToolsController < ApplicationController
   def manage_escalations_sync
 
   end
+
+  def status_api
+
+  end
+
 end
 
