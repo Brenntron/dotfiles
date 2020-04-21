@@ -5416,6 +5416,18 @@ input.table-entry-input:focus {
   td {
     padding: 8px 8px 8px 10px;
   }
+  .tc-header{
+    text-transform: none;
+    font-weight: 600;
+    font-size: 10px;
+  }
+}
+.no-transition{
+  -webkit-transition:  width 0s!important;
+  -moz-transition:  width 0s!important;
+  -ms-transition:  width 0s!important;
+  -o-transition:  width 0s!important;
+  transition: width 0s!important;
 }
 
 /* quicklookup > bulk dispute div functions as an input */
@@ -5659,7 +5671,7 @@ table > tbody > tr > td.research-table-row-wrapper {
   background: $primary-section-color;
   transition: background-color .1s ease-in;
 }
-@media (max-width: 982px) {
+@media (max-width: 1000px) {
   .research-header-wrapper {
     .nav-tabs > li > a{
       width: 100px;
