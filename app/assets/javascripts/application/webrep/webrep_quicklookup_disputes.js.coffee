@@ -15,8 +15,6 @@ $ ->
   window.stringIncludes = (str, substring) ->
     return str.indexOf(substring) != -1
 
-
-
   completed_counter = 0
   headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
   $(document).bind(
@@ -27,8 +25,12 @@ $ ->
 
     ajaxStart: () ->
       $('.ajax-message-div').css('display', 'flex')
+      if window.location.hash == '#lookup-quick'
+        $('.ajax-message-div').css('top', '140px')
+      else if window.location.hash == '#lookup-detail' || window.location.hash == ''
+        $('.ajax-message-div').css('top', '50%')
     ajaxStop: () ->
-      $('.ajax-message-div').css('display', 'none')
+        $('.ajax-message-div').css('display', 'none')
     ajaxComplete: () ->
       completed_counter++
       ####
@@ -39,6 +41,30 @@ $ ->
       if completed_counter == selected_rows
         $('.ajax-message-div').css('display', 'none')
   )
+
+
+  $(document).ready ->
+    if window.location.hash == '#lookup-quick'
+      $('.lookup-detail').css('display', 'none')
+    else if window.location.hash == '#lookup-detail' || window.location.hash == ''
+      $('.lookup-detail').css('display', 'unset')
+
+  $('#research-tabs li').on 'click', ->
+    if $(this).attr('data') == 'lookup-detail'
+      $('.lookup-detail').css('display', 'unset')
+    else
+      $('.lookup-detail').css('display', 'none')
+
+  window.isEmpty = (item) ->
+    ####
+    # function to check whether or not objects and strings are empty, more variable types can be added as needed
+    ####
+    type = typeof item
+    switch(type)
+      when 'object'
+        return !Object.keys(item).length
+      when 'string'
+        return /^\s*$/.test(item)
 
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
@@ -833,8 +859,6 @@ $ ->
       $( '#error_modal .modal-header' ).html( error_header )
       $( '#error_modal .modal-body' ).append(error_array)
 
-
-
   window.get_rep_data = ()->
     ####
     # get reputation data for all rows
@@ -862,7 +886,7 @@ $ ->
       if !isEmpty(item)
         detail_loader()
         # for each search item, call a promise to get the data. If success, the first then runs, setting the data in the rows.
-        # if it fails, the secon runs, catching the error
+        # if it fails, the second runs, catching the error
         new get_reptool(item, headers)
           .then ( set_reptool.bind( null, item, row) )
           .then null, (err) -> console.log err

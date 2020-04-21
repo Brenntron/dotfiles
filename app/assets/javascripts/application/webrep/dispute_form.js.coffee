@@ -1,5 +1,5 @@
 $ ->
-  window.reset_form = (form) ->
+  window.reset_webrep_form = (form) ->
     user = form.find('#assignee').prop("defaultValue")
     form.find('.ips_urls').val('');
     form.find('#priority').val('P3');
@@ -19,6 +19,7 @@ $ ->
 
     for item in form_values
       { name, value } = item
+
       name = name.toLowerCase().replace(/-/g, '_')
       if name != 'token' && name != 'xml_token' && name != 'current_user'
         data[name] = value
@@ -47,26 +48,26 @@ $ ->
               url = url.trim()
               if url not in errors
                 successful_entries.push(url)
+
             if successful_entries.length > 0
-              message_html = "<p>The following entries referenced on ticket number #{ticket_num}</p>
-                              <p class='dupe_list'>#{successful_entries.join(', ')}</p>"
-              reset_form(form)
-              std_msg_error("Duplicate", ["#{message_html} <p class='ugh'>The following duplicate entries were not processed</p> <div class='dupe_list'>#{errors.join(', ')}</div> "], reload: false)
+              message_html = "<p >The following entries referenced on ticket number #{ticket_num} </p> <p class='dupe_list'>#{ successful_entries.join(', ') }</p>"
+              reset_webrep_form(form)
+              std_msg_error("Duplicate",["#{message_html} <p>The following duplicate entries were not processed</p> <div class='dupe_list'>#{errors.join(', ')}</div> "], reload: false)
+
           else
             ips_list = ''
+
             for ips in ips_urls
-              ips_list += '<span>' + ips + '</span>'
-              message_html = "<p>The following entries referenced are on ticket number #{ticket_num} </p>
-                              <p class='dupe_list'> #{ips_list} </p>"
-              reset_form(form)
+              ips_list += "<span>#{ips}</span>"
+              message_html = "<p>The following entries referenced are on ticket number #{ticket_num}</p> <p class='dupe_list'>#{ips_list}</p>"
+              reset_webrep_form(form)
               std_msg_success('All entries were successfully created.', [message_html], reload: false)
 
 
         error: (response) ->
           if response.responseJSON.message.includes('duplicates')
             error_list = response.responseJSON.message.split(': ')[1].trim().split(' ')
-            message = "<p>Unable to create the following duplicate dispute entries: </p>
-                       <p class='dupe_list'> #{error_list.join(' ')} </p>"
+            message = "<p>Unable to create the following duplicate dispute entries: </p> <p class='dupe_list'>#{error_list.join(' ')}</p>"
           else
             message = response.responseJSON.message
           std_msg_error("Error",[ message], reload: false)
