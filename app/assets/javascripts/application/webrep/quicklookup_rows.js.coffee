@@ -49,6 +49,7 @@ $ ->
     for i in [0...disputes.length]
 # if the dispute is not an HTML object, set the HTML of the new row to the below
       if typeof disputes[i] != 'object'
+        $('#add_addtional_row').css('display', 'none')
         tbody.innerHTML +=
           "<tr>
             <td class='col-select-all'>
@@ -155,6 +156,8 @@ $ ->
         $(row).remove()
         if !isEmpty( $(tbody).find('tr').last() )
           $('#add_addtional_row').css('display', 'flex')
+        else
+          $('#add_addtional_row').css('display', 'none')
 
   $(document).on 'click', '#add_addtional_row', ->
     row =
