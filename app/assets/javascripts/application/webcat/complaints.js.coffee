@@ -1765,11 +1765,12 @@ processSubmitMaster = () ->
       status = $(this).find("[name=resolution#{entry_id}]:checked").val()
       comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
       resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
+      uri_as_categorized = $(this).find("#complaint_prefix_#{entry_id}")[0].value
 
       if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
-        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if status == 'UNCHANGED' || status == 'INVALID'
-        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
 
