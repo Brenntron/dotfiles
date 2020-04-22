@@ -27,10 +27,12 @@
       = form_for(:search, method: "get") do |search_form|
         .search-options-col.tab-pane.active#lookup-detail
           .col-xs-4.col-sm-3.col-md-2.col-lg-2.col-xl-1
-            = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
-            %label.esc-tooltipped.detail-label{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
-            = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
-            %label.esc-tooltipped.detail-label{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
+            %span.block-label
+              = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
+              %label.esc-tooltipped.detail-label{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
+            %span.block-label
+              = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
+              %label.esc-tooltipped.detail-label{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
             %hr.thin
             =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary',onclick: 'detail_loader()')
           .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
