@@ -452,7 +452,7 @@ module API
                                                        entry['status'],
                                                        entry['comment'],
                                                        entry['resolution_comment'],
-                                                       '',
+                                                       entry['uri_as_categorized'],
                                                        current_user, "")
 
                       Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry) }
