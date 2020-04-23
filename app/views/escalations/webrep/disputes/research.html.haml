@@ -468,8 +468,9 @@
         %div
           %label.toolbar-section-label Type to filter results
           %input#research-page-filter{'type': "text", 'onKeyUp': "researchfilter(this)"}
-        %button.primary#submit-strict-changes{onclick:'submit_quick_lookup();return false;', disabled: true} Submit Reputation Changes
-        %span.small.note-repsubmit * NOTE: Submitting reputation changes will automatically create a closed ticket
+        -#  TODO - The actions collection of the detailed lookup has not been created yet. Hiding this button for that future ticket. Submit detailed lookup not a function yet.
+        -#%button.primary#submit-strict-changes{onclick:'submit_detail_lookup();return false;', disabled: true} Submit Reputation Changes
+        -#%span.small.note-repsubmit * NOTE: Submitting reputation changes will automatically create a closed ticket
       -#####################
       -# END: toolbar for detail lookup results
       -#####################

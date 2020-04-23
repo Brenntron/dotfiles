@@ -5416,7 +5416,7 @@ input.table-entry-input:focus {
   td {
     padding: 8px 8px 8px 10px;
   }
-  .tc-header{
+  .tc_header{
     text-transform: none;
     font-weight: 600;
     font-size: 10px;
@@ -12736,4 +12736,12 @@ table.dispute_tool_current tr.reptool-entry-row td {
 
 .block-label {
   display: block;
+}
+
+#research-page-toolbar .adjust-container {
+  min-width: 104px;
+}
+
+#research-page-filter {
+  height: 27px;
 }
