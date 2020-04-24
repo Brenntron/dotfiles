@@ -372,6 +372,28 @@ Feature: Webrep, the BFRP
     And  I wait for "60" seconds
     And  I should not see element with class "add-ip-button"
 
+  @javascript
+  Scenario: a user can conduct a broad search on multiple urls/ips
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And  I type content "67.227.226.240 1234computer.com 1.2.3.4.5" within input with id "search_uri"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
+    And  I wait for "70" seconds
+    And I should see "Results for 67.227.226.240, 1234computer.com, and 1.2.3.4.5"
+    Then I should not see "Loading data..."
+
+  @javascript
+  Scenario: a user can conduct a strict search on multiple urls/ips
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And I click "#research-search-strict"
+    And  I type content "67.227.226.240 1234computer.com 1.2.3.4.5" within input with id "search_uri"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
+    And  I wait for "40" seconds
+    And I should see "Results for 67.227.226.240, 1234computer.com, and 1.2.3.4.5"
+    Then I should not see "Loading data..."
 
   ####
   # Quicklookup feature
