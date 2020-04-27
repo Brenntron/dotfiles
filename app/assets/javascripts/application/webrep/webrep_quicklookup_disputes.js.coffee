@@ -70,7 +70,43 @@ $ ->
     $('#confirmation-modal').modal('toggle')
 
   window.detail_loader = () ->
-    $('.ajax-message-div').css('display', 'flex')
+    text_list = $('#search_uri').val().split(/[\s,;\t\n]+/);
+    if !text_list.length
+      std_msg_error('Error Submitting Search',["Please enter at least one URL or IP address."], reload: false)
+    else
+      $('.ajax-message-div').css('display', 'flex')
+
+      $.ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
+        method: 'GET'
+        headers: headers
+        data: {'uri': text_list}
+        dataType: 'json'
+        success: (response) ->
+
+      ).then( (response)=>
+        { status, data } = response
+        ip_list = []
+        url_list = []
+        for name, value of data
+          if !value
+            ip_list.push(name)
+          else
+            url_list.push(name)
+
+        $.ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_ip'
+          method: 'GET'
+          headers: headers
+          data: {'ip_address':text_list}
+          dataType: 'json'
+          success: (response) ->
+
+            return response
+
+        )
+        $('#search_uri').val(text_list.join())
+      )
 
   $(document).ready ->
     update_tabs( window.location.hash )
