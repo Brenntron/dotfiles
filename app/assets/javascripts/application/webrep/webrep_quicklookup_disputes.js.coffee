@@ -945,8 +945,8 @@ $ ->
         new get_rule_threat_cat(item, headers)
           .then ( set_rule_threat_cat.bind( null, item, row) )
           .then null, (err) -> console.log err
-        new get_wrbs(item, headers)
-          .then( set_wrbs.bind( null, item, row) )
+        new get_wbrs(item, headers)
+          .then( set_wbrs.bind( null, item, row) )
           .then null, (err) -> console.log err
 
   window.get_reptool = (item, headers) ->
@@ -972,7 +972,7 @@ $ ->
       error: (response) -> return response
     )
 
-  window.get_wrbs = (item, headers) ->
+  window.get_wbrs = (item, headers) ->
     data = {'uri': item.trim()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/wbrs_info'
@@ -1085,7 +1085,7 @@ $ ->
     else
       col_tc.append( "<span class='missing-data tc_data esc-tooltipped' title='#{title}'> | No SDS data</span>")
 
-  window.set_wrbs = ( item, row, data) ->
+  window.set_wbrs = ( item, row, data) ->
     { score, rulehits } = data.json.data
     col_wbrs = $(row).children('.col-wbrs')
     col_wbrs_rule = $(row).children('.col-wbrs-rules')
@@ -1093,8 +1093,11 @@ $ ->
 
     col_wbrs_rule.text( rulehits.join(', ') )
     col_wbrs_hits.text( rulehits.length )
+
     if rulehits.length == 0
       col_wbrs_rule.text('No data')
+      col_wbrs_rule.addClass('missing-data')
+
     else
       col_wbrs_rule.text( rulehits.join(', ') )
     if score != 'noscore'
