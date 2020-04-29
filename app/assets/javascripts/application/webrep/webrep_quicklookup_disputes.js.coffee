@@ -70,42 +70,49 @@ $ ->
     $('#confirmation-modal').modal('toggle')
 
   window.detail_loader = () ->
-    text_list = $('#search_uri').val().split(/[\s,;\t\n]+/);
-    if !text_list.length
+    text_list = $('#search_uri').val().split(/[\s,;\t\n]+/).filter((el)=> return el != "" )
+    if text_list.length == 0
       std_msg_error('Error Submitting Search',["Please enter at least one URL or IP address."], reload: false)
     else
       $('.ajax-message-div').css('display', 'flex')
 
-      $.ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
-        method: 'GET'
-        headers: headers
-        data: {'uri': text_list}
-        dataType: 'json'
-        success: (response) ->
-
-      ).then( (response)=>
+      check_ips(text_list).then( (response)=>
         { status, data } = response
-        ip_list = []
+        valid_list = []
         url_list = []
+        invalid_list = []
         for name, value of data
           if !value
-            ip_list.push(name)
-          else
             url_list.push(name)
-
+          else
+            valid_list.push(name)
         $.ajax(
-          url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_ip'
+          url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
           method: 'GET'
           headers: headers
-          data: {'ip_address':text_list}
+          data: {'uri': url_list}
           dataType: 'json'
           success: (response) ->
-
-            return response
-
+            {data} = response
+            for name, value of data
+              if value
+                valid_list.push(name)
+              else
+                invalid_list.push(name)
+            if valid_list.length == 0
+              std_msg_error('Error Submitting Search',["Please enter at least one valid URL or IP address."], reload: false)
+            else
+              $('#search_uri').val(valid_list.join("\n"))
+              for el in valid_list
+                el = ( "<span class='col-tag'>#{el}</span>" )
+              for el in invalid_list
+                el = ( "<span class='col-tag'>#{el}</span>" )
+              console.log 'there are some valid searches',invalid_list,valid_list
+              if invalid_list.length > 0
+                std_msg_success('Submitting Search',["<div>The following URLs and IPs are being submitted: #{valid_list}</div> <div>The following URLs and IPs are in valid and ar not being submitted: #{invalid_list}</div>"], reload: false)
+              $('.ajax-message-div').addClass('visible-ajax-message')
+              $("#research_form").submit()
         )
-        $('#search_uri').val(text_list.join())
       )
 
   $(document).ready ->

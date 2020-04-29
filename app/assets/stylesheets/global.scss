@@ -5539,6 +5539,10 @@ input.table-entry-input:focus {
     top: 140px;
   }
 }
+.visible-ajax-message{
+  display: flex!important;
+  top: 50%
+}
 .research-search-form .button_primary {
   margin: 10px 0;
 }
@@ -5796,7 +5800,11 @@ h5.entry-details-table-header {
 .select-all-label{
   margin-top: -18px;
 }
-
+#research-page-toolbar{
+  .select-all-label{
+    margin-top: 0
+  }
+}
 @media (min-width: 1600px) {
   .select-all-label{
     min-width: 153px;
