@@ -5541,7 +5541,6 @@ input.table-entry-input:focus {
 }
 .visible-ajax-message{
   display: flex!important;
-  top: 50%
 }
 .research-search-form .button_primary {
   margin: 10px 0;
@@ -9213,7 +9212,14 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   font-family: "Fira Mono", monospace;
   cursor: default;
 }
-
+.modal{
+  .col-tag{
+    white-space: nowrap;
+  }
+}
+.submit-search-msg{
+  margin-bottom: 5px
+}
 .col-actions .col-tag:hover:after{
   content: ' | X ';
   height: 20px;

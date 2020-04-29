@@ -28,7 +28,7 @@ $ ->
       if window.location.hash == '#lookup-quick'
         $('.ajax-message-div').css('top', '140px')
       else if window.location.hash == '#lookup-detail' || window.location.hash == ''
-        $('.ajax-message-div').css('top', '50%')
+        $('.ajax-message-div').css('top', '370px;')
     ajaxStop: () ->
         $('.ajax-message-div').css('display', 'none')
     ajaxComplete: () ->
@@ -103,13 +103,12 @@ $ ->
               std_msg_error('Error Submitting Search',["Please enter at least one valid URL or IP address."], reload: false)
             else
               $('#search_uri').val(valid_list.join("\n"))
-              for el in valid_list
-                el = ( "<span class='col-tag'>#{el}</span>" )
-              for el in invalid_list
-                el = ( "<span class='col-tag'>#{el}</span>" )
-              console.log 'there are some valid searches',invalid_list,valid_list
+              for el, i  in valid_list
+                valid_list[i] = "<span class='col-tag'>#{el}</span>"
+              for el, i in invalid_list
+                invalid_list[i] = "<span class='col-tag'>#{el}</span>"
               if invalid_list.length > 0
-                std_msg_success('Submitting Search',["<div>The following URLs and IPs are being submitted: #{valid_list}</div> <div>The following URLs and IPs are in valid and ar not being submitted: #{invalid_list}</div>"], reload: false)
+                std_msg_success('Submitting Search',["<div class='submit-search-msg'>The following URLs and IPs are being submitted: #{valid_list.join()}</div> <div class='submit-search-msg'>The following URLs and IPs are in valid and ar not being submitted: #{invalid_list.join()} </div>"], reload: false)
               $('.ajax-message-div').addClass('visible-ajax-message')
               $("#research_form").submit()
         )
