@@ -102,13 +102,13 @@ $ ->
             if valid_list.length == 0
               std_msg_error('Error Submitting Search',["Please enter at least one valid URL or IP address."], reload: false)
             else
-              $('#search_uri').val(valid_list.join("\n"))
               for el, i  in valid_list
                 valid_list[i] = "<span class='col-tag'>#{el}</span>"
               for el, i in invalid_list
                 invalid_list[i] = "<span class='col-tag'>#{el}</span>"
               if invalid_list.length > 0
-                std_msg_success('Submitting Search',["<div class='submit-search-msg'>The following URLs and IPs are being submitted: #{valid_list.join()}</div> <div class='submit-search-msg'>The following URLs and IPs are in valid and ar not being submitted: #{invalid_list.join()} </div>"], reload: false)
+                std_msg_success('Submitting Search',["<div class='submit-search-msg'>The following URLs and IPs are being submitted: #{valid_list.join()}</div> <div class='submit-search-msg'>The following URLs and IPs are invalid: #{invalid_list.join()} </div>"], reload: false)
+                ('#search_uri').val(valid_list.join("\n"))
               $('.ajax-message-div').addClass('visible-ajax-message')
               $("#research_form").submit()
         )
@@ -575,7 +575,6 @@ $ ->
       success: (response) ->
         submitted_entries = []
         if response
-
           for key, val of data
             if key != 'comment'
               submitted_entries.push(key.trim())
@@ -908,11 +907,11 @@ $ ->
     ####
     search_items = []
     rows = $('.research-table tbody tr')
-
+    console.log
     if !isEmpty( $(rows).last() )
-      $('#add_addtional_row').css('display', 'flex')
-    else
       $('#add_addtional_row').css('display', 'none')
+    else
+      $('#add_addtional_row').css('display', 'flex')
 
     $('.col-bulk-dispute').each ( ) ->
       checkbox = $(this).prev().find('input')
@@ -926,7 +925,6 @@ $ ->
       row = rows[i]
 
       if !isEmpty(item)
-        detail_loader()
         # for each search item, call a promise to get the data. If success, the first then runs, setting the data in the rows.
         # if it fails, the second runs, catching the error
         new get_reptool(item, headers)

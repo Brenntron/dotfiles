@@ -132,32 +132,33 @@ $ ->
   set_row_text = (e, el) ->
     { which: key, shiftKey } = e
     text = el.innerText.trim()
-    text_list = text.replace( /\n|\s/g, ", " ).split(", ")
-    row = el.closest('tr')
-    tbody = row.closest('tbody')
+    if text != undefined
+      text_list = text.replace( /\n|\s/g, ", " ).split(", ")
+      row = el.closest('tr')
+      tbody = row.closest('tbody')
 
-    text_list = text_list.filter (item, index) ->
-      if item != ''
-        return text_list.indexOf item == index
-    if key == 13
-      if !shiftKey && text_list.length
-        check_ips(text_list, headers, row)
-          .then ( check_urls.bind( null, text_list, row) )
-          .then null, (err) -> console.log err
-    else if key == 0
-      if text_list.length > 1
-        check_ips(text_list, headers, row)
-          .then ( check_urls.bind( null, text_list, row) )
-          .then null, (err) -> console.log err
-      else
-        $(row).data(text)
-    else if key == 8
-      if isEmpty(text) && $(tbody).children().length > 1
-        $(row).remove()
-        if !isEmpty( $(tbody).find('tr').last() )
-          $('#add_addtional_row').css('display', 'flex')
+      text_list = text_list.filter (item, index) ->
+        if item != ''
+          return text_list.indexOf item == index
+      if key == 13
+        if !shiftKey && text_list.length
+          check_ips(text_list, headers, row)
+            .then ( check_urls.bind( null, text_list, row) )
+            .then null, (err) -> console.log err
+      else if key == 0
+        if text_list.length > 1
+          check_ips(text_list, headers, row)
+            .then ( check_urls.bind( null, text_list, row) )
+            .then null, (err) -> console.log err
         else
-          $('#add_addtional_row').css('display', 'none')
+          $(row).data(text)
+      else if key == 8
+        if isEmpty(text) && $(tbody).children().length > 1
+          $(row).remove()
+          if !isEmpty( $(tbody).find('tr').last() )
+            $('#add_addtional_row').css('display', 'flex')
+          else
+            $('#add_addtional_row').css('display', 'none')
 
   $(document).on 'click', '#add_addtional_row', ->
     row =

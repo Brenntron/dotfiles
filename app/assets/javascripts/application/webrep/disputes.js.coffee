@@ -5,15 +5,15 @@ $(document).ready ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
-  if ($('.searched-for-url').length > 0)
-    text = $('.searched-for-url').text().trim().split(/\s+/)
-    if (text.length > 1)
-      if (text.length == 2)
-        text = text.join(', ').replace(/, /, ' and ')
-      else if (text.length > 2)
-        text = text.join(', ').replace(/, ([^,]*)$/, ', and $1')
-    text = text.replace(/(, and| and |, )/g, '<span class="unset-text">$1</span>')
-    return $('.searched-for-url').html(text)
+  if ($('.searched-for-url').length > 0) && location.hash != "#lookup-quick"
+      text = $('.searched-for-url').text().trim().split(/\s+/)
+      if (text.length > 1)
+        if (text.length == 2)
+          text = text.join(', ').replace(/, /, ' and ')
+        else if (text.length > 2)
+          text = text.join(', ').replace(/, ([^,]*)$/, ', and $1')
+        text = text.replace(/(, and| and |, )/g, '<span class="unset-text">$1</span>')
+        return $('.searched-for-url').html(text)
 
 window.select_or_deselect_all = (dispute_id)->
 

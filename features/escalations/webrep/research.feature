@@ -16,6 +16,7 @@ Feature: Webrep, the BFRP
       |1                    |mytestingdomain.com |URI/DOMAIN |
       |2                    |mytestingdomain.com |URI/DOMAIN |
       |3                    |mytestingdomain.com |URI/DOMAIN |
+
     When I goto "escalations/webrep/research?utf8=1&search%5Buri%5D=mytestingdomain.com&search%5Bscope%5D=strict&commit=Submit"
     Then I wait for "30" seconds
     Then I should see "3 ticket(s)"
@@ -41,9 +42,10 @@ Feature: Webrep, the BFRP
   Scenario: A user uses broad search
     Given a user with role "webrep user" exists and is logged in
     And I go to "escalations/webrep/research"
-    When I click "#research-search-broad"
+    And  I choose "broad"
     And I fill in "search_uri" with "blizzard.com"
-    And I click "#submit-button"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
     And I wait for "30" seconds
     Then multiple research entries exist
 
@@ -51,9 +53,10 @@ Feature: Webrep, the BFRP
   Scenario: A user uses strict search
     Given a user with role "webrep user" exists and is logged in
     And I go to "escalations/webrep/research"
-    When I click "#research-search-strict"
+    When I choose "strict"
     And I fill in "search_uri" with "cisco.com"
-    And I click "#submit-button"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
     And I wait for "15" seconds
     Then two research entries exists
 
@@ -61,9 +64,10 @@ Feature: Webrep, the BFRP
   Scenario: a user searches for a url on the research page that has a threat category assigned to it already
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "strict"
     And  I type content "1234computer.com" within input with id "search_uri"
-    Then I click "Submit"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
     And  I wait for "10" seconds
     And  I should see "2 found"
     And I should see content "Malware Sites" within first element of class ".wlbl-tc-research-span"
@@ -73,9 +77,10 @@ Feature: Webrep, the BFRP
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "strict"
     And  I type content "testing.com" within input with id "search_uri"
-    Then I click "Submit"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
     And  I wait for "20" seconds
     And  I click button "wlbl_entries_button"
     And  I should see "NO ROWS SELECTED"
@@ -85,9 +90,10 @@ Feature: Webrep, the BFRP
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "strict"
     And  I type content "testing.com" within input with id "search_uri"
-    Then I click "Submit"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
     And  I wait for "30" seconds
     And  I click ".bfrp-inline-wlbl-0"
     And  I wait for "5" seconds
@@ -111,9 +117,10 @@ Feature: Webrep, the BFRP
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "strict"
     And  I type content "testing.com" within input with id "search_uri"
-    Then I click "Submit"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
     And  I wait for "30" seconds
     And  I click ".bfrp-inline-wlbl-0"
     And  I wait for "5" seconds
@@ -147,9 +154,10 @@ Feature: Webrep, the BFRP
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "strict"
     And  I type content "testing.com" within input with id "search_uri"
-    Then I click "Submit"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
     And  I wait for "30" seconds
     And  I click ".bfrp-inline-wlbl-0"
     And  I wait for "5" seconds
@@ -187,9 +195,10 @@ Feature: Webrep, the BFRP
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-broad"
+    And  I choose "broad"
     And  I type content "testing.com" within input with id "search_uri"
-    And  I click "Submit"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
     And  I wait for "60" seconds
     When I check checkbox with class "bfrp-checkbox-0"
     And  I check checkbox with class "bfrp-checkbox-5"
@@ -220,9 +229,10 @@ Feature: Webrep, the BFRP
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-broad"
+    And  I choose "broad"
     And  I type content "testing.com" within input with id "search_uri"
-    When I click "Submit"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
     And  I wait for "60" seconds
     And  I check checkbox with class "bfrp-checkbox-0"
     And  I check checkbox with class "bfrp-checkbox-1"
@@ -232,6 +242,7 @@ Feature: Webrep, the BFRP
     And  wl/bl result number "1" should not have content "BL-weak"
     When I choose "wlbl-add"
     And  I check checkbox with class "bl-weak-checkbox"
+    And  I wait for "5" seconds  
     Then I should see "Threat Categories"
     And  I should see "Bogon"
     When I click ".wlbl_thrt_cat_id_8"
@@ -252,9 +263,10 @@ Feature: Webrep, the BFRP
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "strict"
     And  I type content "testing.com" within input with id "search_uri"
-    When I hit enter within "#search_uri"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
     And  I wait for "60" seconds
     Then I check checkbox with class "bfrp-checkbox-0"
     And  I check checkbox with class "bfrp-checkbox-1"
@@ -301,9 +313,9 @@ Feature: Webrep, the BFRP
   Scenario: a user wants to search for a url on the research page and view its initial resolved ips
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "strict"
     And  I type content "testing.com" within input with id "search_uri"
-    When I hit enter within "#search_uri"
+    Then I click "submit-button rep-research"
     And  I wait for "60" seconds
     And  I should see content "2606:4700:3037::6818:6431" within "#resolved-ip-content-no-0"
 
@@ -312,9 +324,9 @@ Feature: Webrep, the BFRP
   Scenario: a user wants to query a different host ip than the one returned on a research page result
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "strict"
     And  I type content "testing.com" within input with id "search_uri"
-    When I hit enter within "#search_uri"
+    Then I click "submit-button rep-research"
     And  I wait for "60" seconds
     And  I should see content "2606:4700:3037::6818:6431" within "#resolved-ip-content-no-0"
     And  I should not see content "1.1.1.1" within "#resolved-ip-content-no-0"
@@ -331,9 +343,9 @@ Feature: Webrep, the BFRP
   Scenario: a user wants to add multiple resolved host IPs to a research page result
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "strict"
     And  I type content "testing.com" within input with id "search_uri"
-    When I hit enter within "#search_uri"
+    Then I click "submit-button rep-research"
     And  I wait for "60" seconds
     And  I should not see content "1.1.1.1" within "#resolved-ip-content-no-0"
     And  I should see element "#edit-ip-result-no-0"
@@ -349,9 +361,9 @@ Feature: Webrep, the BFRP
   Scenario: a user tries to add an improper IP address as a resolved host IP to a dispute entry
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "strict"
     And  I type content "testing.com" within input with id "search_uri"
-    When I hit enter within "#search_uri"
+    Then I click "submit-button rep-research"
     And  I wait for "60" seconds
     Then I click "#edit-ip-result-no-0"
     And  I fill in element, "#table-ip-input-no-0" with "drumf"
@@ -366,9 +378,9 @@ Feature: Webrep, the BFRP
     Then  pending
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "strict"
     And  I type content "67.227.226.240" within input with id "search_uri"
-    When I hit enter within "#search_uri"
+    Then I click "submit-button rep-research"
     And  I wait for "60" seconds
     And  I should not see element with class "add-ip-button"
 
@@ -376,24 +388,58 @@ Feature: Webrep, the BFRP
   Scenario: a user can conduct a broad search on multiple urls/ips
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
-    And  I type content "67.227.226.240 1234computer.com 1.2.3.4.5" within input with id "search_uri"
+    And  I choose "broad"
+    And  I type content "67.227.226.240 1234computer.com 1.2.3.4" within input with id "search_uri"
     Then I click "submit-button rep-research"
     Then I should see "Loading data..."
     And  I wait for "70" seconds
-    And I should see "Results for 67.227.226.240, 1234computer.com, and 1.2.3.4.5"
+    And I should see "Results for 67.227.226.240, 1234computer.com, and 1.2.3.4"
     Then I should not see "Loading data..."
 
   @javascript
   Scenario: a user can conduct a strict search on multiple urls/ips
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
-    And I click "#research-search-strict"
-    And  I type content "67.227.226.240 1234computer.com 1.2.3.4.5" within input with id "search_uri"
+    And I choose "strict"
+    And  I type content "67.227.226.240 1234computer.com 1.2.3.4" within input with id "search_uri"
     Then I click "submit-button rep-research"
     Then I should see "Loading data..."
     And  I wait for "40" seconds
-    And I should see "Results for 67.227.226.240, 1234computer.com, and 1.2.3.4.5"
+    And I should see "Results for 67.227.226.240, 1234computer.com, and 1.2.3.4"
     Then I should not see "Loading data..."
+              Please enter at least one valid URL or IP address.
+  @javascript
+  Scenario: a user can submit valid urls/ips while invalid ones are filtered out and not submitted
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And I choose "strict"
+    And  I type content "67.227.226.240 1234computer.com 111111111" within input with id "search_uri"
+    Then I click "submit-button rep-research"
+    Then I should see "Loading data..."
+    And  I wait for "40" seconds
+    And I should see "SUBMITTING SEARCH"
+    And I should see "The following URLs and IPs are invalid: 111111111"
+    And I click ".close"
+    And I should see "Results for 67.227.226.240, 1234computer.com, and 1.2.3.4"
+    Then I should not see "111111111"
+    Then I should not see "Loading data..."
+
+  @javascript
+  Scenario: a user cannot submit an empty search
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And I choose "strict"
+    Then I click "submit-button rep-research"
+    And I should see "Please enter at least one valid URL or IP address."
+
+  @javascript
+  Scenario: a user cannot submit any invalid urls/ips
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And I choose "strict"
+    And  I type content "testtesttesttest blah.1234computer 111111111" within input with id "search_uri"
+    Then I click "submit-button rep-research"
+    And I should see "Please enter at least one valid URL or IP address."
 
   ####
   # Quicklookup feature
