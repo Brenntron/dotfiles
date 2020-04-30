@@ -1,5 +1,7 @@
 $ ->
 
+  headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
+
 
   window.isEmpty = (item) ->
     ####
@@ -15,8 +17,8 @@ $ ->
   window.stringIncludes = (str, substring) ->
     return str.indexOf(substring) != -1
 
+  #counter for ajax calls
   completed_counter = 0
-  headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
   $(document).bind(
     ####
     #This controls the show/hide of the loading wheel depending on if all ajax calls have been completed.
@@ -404,7 +406,7 @@ $ ->
          # Once all Disputes have been processed, pass list of disputes and error array to the bulk quick update
          clearInterval(dispute_calls)
          quick_bulk_update(disputes, error_array)
-    , 2000);
+    , 200);
 
     for dispute, value of disputes
       dispute = dispute.trim()

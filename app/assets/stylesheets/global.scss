@@ -11488,6 +11488,12 @@ hr.thin.extra-bottom-marg {
     }
   }
 }
+.modal-body{
+  .threat-cat-col{
+    width: 450px;
+    overflow-wrap: break-word;
+  }
+}
 #wlbl_entries_dropdown{
   .threat-cat-area{
     padding: 3px;
