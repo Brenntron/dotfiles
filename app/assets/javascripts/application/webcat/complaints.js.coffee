@@ -415,7 +415,7 @@ processSubmitPending=(entry_id,row_id)->
           valueField: 'category_id',
           labelField: 'category_name',
           searchField: ['category_name', 'category_code'],
-          options: AC.WebCat.createSelectOptions(),
+          options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id),
           items: selected_options(temp_row.data().category)
         }
         $("#domain_#{entry_id}").text(domain)
@@ -462,6 +462,7 @@ processSubmitEntry = (entry_id,row_id) ->
   resolution_status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
+  uri_as_categorized = $('#complaint_prefix_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   fixed_flag = $('#fixed'+entry_id).is(':checked')
 
@@ -475,7 +476,7 @@ processSubmitEntry = (entry_id,row_id) ->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
       headers: headers
-      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
+      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment, 'uri_as_categorized': uri_as_categorized }
       success: (response) ->
         {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
         if !error
@@ -503,7 +504,7 @@ processSubmitEntry = (entry_id,row_id) ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id)
             items: selected_options(categories)
           }
 
@@ -515,7 +516,7 @@ processSubmitEntry = (entry_id,row_id) ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_pending'+ temp_row.data().entry_id)
             items: selected_options(categories)
           }
           unless status == 'COMPLETED'
@@ -527,7 +528,7 @@ processSubmitEntry = (entry_id,row_id) ->
               valueField: 'category_id',
               labelField: 'category_name',
               searchField: ['category_name', 'category_code'],
-              options: AC.WebCat.createSelectOptions()
+              options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id)
               items: selected_options(temp_row.data().category_names)
             }
           else
@@ -541,7 +542,7 @@ processSubmitEntry = (entry_id,row_id) ->
               valueField: 'category_id',
               labelField: 'category_name',
               searchField: ['category_name', 'category_code'],
-              options: AC.WebCat.createSelectOptions()
+              options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id)
               items: selected_options(temp_row.data().category_names)
             }
             select_complete = $completed_selectize[0].selectize
@@ -1125,6 +1126,10 @@ format = (complaint_entry_row) ->
   input_cat = 'input_cat_' + entry_id
 
   if complaint_entry.status == "PENDING"
+
+    domain = complaint_entry.uri_as_categorized
+    # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
+
     complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
     complaint_submission_html =
         '<input type="radio" name="resolution_review_' + entry_id + '" value="commit" > Commit <br/>' +
@@ -1501,8 +1506,8 @@ window.click_table_buttons = (complaint_table, button)->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(),
-        items: AC.WebCat.getCategoryIds(selected_options(data.category)),
+        options: AC.WebCat.createSelectOptions(cat_select),
+        items: AC.WebCat.getCategoryIds(selected_options(data.category), cat_select),
         onItemAdd: ->
           if verifyMasterSubmit() == true
             $('#master-submit').prop('disabled', false)
@@ -1522,8 +1527,8 @@ window.click_table_buttons = (complaint_table, button)->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(),
-        items: selected_options(data.category),
+        options: AC.WebCat.createSelectOptions(cat_select),
+        items: AC.WebCat.getCategoryIds(selected_options(data.category), cat_select),
       }
       select_complete = $completed_selectize[0].selectize
       select_complete.disable()
@@ -1760,11 +1765,12 @@ processSubmitMaster = () ->
       status = $(this).find("[name=resolution#{entry_id}]:checked").val()
       comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
       resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
+      uri_as_categorized = $(this).find("#complaint_prefix_#{entry_id}")[0].value
 
       if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
-        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if status == 'UNCHANGED' || status == 'INVALID'
-        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
 
@@ -1812,7 +1818,7 @@ processSubmitMaster = () ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_'+ entry.entry_id)
             items: selected_options(entry.categories)
           }
           $('#input_cat_pending'+ entry.entry_id).selectize {
@@ -1823,7 +1829,7 @@ processSubmitMaster = () ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_pending'+ entry.entry_id)
             items: selected_options(entry.categories)
           }
 
@@ -2033,7 +2039,7 @@ $ ->
           valueField: 'category_id',
           labelField: 'category_name',
           searchField: ['category_name', 'category_code'],
-          options: AC.WebCat.createSelectOptions()
+          options: AC.WebCat.createSelectOptions('#input_cat_'+ row.data().entry_id)
           items: selected_options(row.data().category)
         }
 

@@ -409,6 +409,10 @@ module API
 
             end
 
+            get 'category_list' do
+              SbApi.category_lookup
+            end
+
           end
         end
       end

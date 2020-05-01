@@ -572,7 +572,7 @@ class Dispute < ApplicationRecord
                   verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
                 end
 
-                if auto_resolve_verdict.present? && autoresolve_verdict.auto_resolve_log.present?
+                if auto_resolve_verdict.present? && auto_resolve_verdict.auto_resolve_log.present?
                   new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
                 end
 
@@ -676,6 +676,10 @@ class Dispute < ApplicationRecord
 
               if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
                 verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+              end
+
+              if auto_resolve_verdict.present? && auto_resolve_verdict.auto_resolve_log.present?
+                new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
               end
             end
 

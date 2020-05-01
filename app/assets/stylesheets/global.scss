@@ -2448,6 +2448,30 @@ table .bug-priority {
   margin-right: 0;
   color: transparent;
 }
+.api-status-fail{
+  display: inline-block;
+  background-image: url(image_path("icon_fail.svg"));
+  height: 20px;
+  width: 20px;
+  margin: 6px 8px 0 8px;
+}
+
+.api-status-success{
+  background-image: url(image_path("icon_check_green.svg"));
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  margin: 6px 8px 0 8px;
+}
+.status_api{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  .loader-msg{
+    display: flex!important;
+    justify-content: center;
+  }
+}
 
 .bug-priority.p-Unspecified {background-image: url(image_path("icon_p_unknown.svg"));}
 .bug-priority.p-P1 {background-image: url(image_path("icon_p1.svg"));}

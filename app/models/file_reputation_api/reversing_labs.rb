@@ -11,6 +11,8 @@ class FileReputationApi::ReversingLabs
   include ActiveModel::Model
   attr_accessor :sha256_hash, :raw_json
 
+  TEST_HASH = "99e432ac19e5a47d0d1ddfad9f326d5e169ab6651d844d4b800a79f4f78d410f"
+
   def api_response
     @api_response ||= JSON.parse!(self.raw_json)
   end
@@ -182,5 +184,42 @@ class FileReputationApi::ReversingLabs
 
     response = call_request_parsed(:get, url, input: nil)
     response["rl"]["data_change_feed"]
+  end
+
+  def self.health_check
+    health_report = {}
+
+    times_to_try = 3
+    times_tried = 0
+    times_successful = 0
+    times_failed = 0
+    is_healthy = false
+
+    (1..times_to_try).each do |i|
+      begin
+        result = get_malware_data(TEST_HASH)
+        if result["rl"].present?
+          times_successful += 1
+        else
+          times_failed += 1
+        end
+        times_tried += 1
+      rescue
+        times_failed += 1
+        times_tried += 1
+      end
+
+    end
+
+    if times_successful > times_failed
+      is_healthy = true
+    end
+
+    health_report[:times_tried] = times_tried
+    health_report[:times_successful] = times_successful
+    health_report[:times_failed] = times_failed
+    health_report[:is_healthy] = is_healthy
+
+    health_report
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_31_150245) do
+ActiveRecord::Schema.define(version: 2020_04_01_134434) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -171,6 +171,7 @@ ActiveRecord::Schema.define(version: 2019_10_31_150245) do
     t.datetime "case_assigned_at"
     t.text "internal_comment"
     t.boolean "was_dismissed", default: false
+    t.text "uri_as_categorized"
     t.index ["complaint_id"], name: "index_complaint_entries_on_complaint_id"
   end
 

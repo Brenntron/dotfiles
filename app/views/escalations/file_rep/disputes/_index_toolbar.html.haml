@@ -72,7 +72,7 @@
             %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_file_rep_index_change_assignee();'}
               Assign
 
-  - if can? :update, @file_rep_dispute
+  - if can?(:update, FileReputationDispute)
     %div
       %label.toolbar-section-label
         Edit Ticket

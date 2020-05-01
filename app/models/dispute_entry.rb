@@ -333,18 +333,45 @@ class DisputeEntry < ApplicationRecord
   end
 
   def get_xbrs_value
+
     if dispute_entry_preload.present? && dispute_entry_preload.xbrs_history.present?
       xbrs = Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
     else
       case
-      when self.entry_type == "IP"
-        xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
-      when self.entry_type == "URI/DOMAIN"
-        xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+        when self.entry_type == "IP"
+          begin
+            xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
+          rescue Exception => e
+            Rails.logger.error e
+            Rails.logger.error e&.backtrace&.join("\n")
+            Rails.logger.info e
+            Rails.logger.error e&.backtrace&.join("\n")
+            Rails.logger.warn e
+            Rails.logger.error e&.backtrace&.join("\n")
+            xbrs = [{}, {'data' => [], 'legend' => []}]
+          end
+        when self.entry_type == "URI/DOMAIN"
+          begin
+            xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+          rescue Exception => e
+            Rails.logger.error e
+            Rails.logger.error e&.backtrace&.join("\n")
+            Rails.logger.info e
+            Rails.logger.error e&.backtrace&.join("\n")
+            Rails.logger.warn e
+            Rails.logger.error e&.backtrace&.join("\n")
+            xbrs = [{}, {'data' => [], 'legend' => []}]
+          end
       else
         begin
           self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
-        rescue
+        rescue Exception => e
+          Rails.logger.error e
+          Rails.logger.error e&.backtrace&.join("\n")
+          Rails.logger.info e
+          Rails.logger.error e&.backtrace&.join("\n")
+          Rails.logger.warn e
+          Rails.logger.error e&.backtrace&.join("\n")
           xbrs = [{}, {'data' => [], 'legend' => []}]
         end
       end
