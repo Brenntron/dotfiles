@@ -79,7 +79,7 @@ $ ->
       $('.ajax-message-div').css('display', 'flex')
 
       check_ips(text_list).then( (response)=>
-        { status, data } = response
+        { data } = response
         valid_list = []
         url_list = []
         invalid_list = []
@@ -88,32 +88,39 @@ $ ->
             url_list.push(name)
           else
             valid_list.push(name)
-        $.ajax(
-          url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
-          method: 'GET'
-          headers: headers
-          data: {'uri': url_list}
-          dataType: 'json'
-          success: (response) ->
-            {data} = response
-            for name, value of data
-              if value
-                valid_list.push(name)
+        if url_list.length == 0
+          $('.ajax-message-div').addClass('visible-ajax-message')
+          $("#research_form").submit()
+        else
+          $.ajax(
+            url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
+            method: 'GET'
+            headers: headers
+            data: {'uri': url_list}
+            dataType: 'json'
+            success: (response) ->
+              {data} = response
+              for name, value of data
+                if value
+                  valid_list.push(name)
+                else
+                  invalid_list.push(name)
+              if valid_list.length == 0
+                std_msg_error('Error Submitting Search',["Please enter at least one valid URL or IP address."], reload: false)
               else
-                invalid_list.push(name)
-            if valid_list.length == 0
-              std_msg_error('Error Submitting Search',["Please enter at least one valid URL or IP address."], reload: false)
-            else
-              for el, i  in valid_list
-                valid_list[i] = "<span class='col-tag'>#{el}</span>"
-              for el, i in invalid_list
-                invalid_list[i] = "<span class='col-tag'>#{el}</span>"
-              if invalid_list.length > 0
-                std_msg_success('Submitting Search',["<div class='submit-search-msg'>The following URLs and IPs are being submitted: #{valid_list.join()}</div> <div class='submit-search-msg'>The following URLs and IPs are invalid: #{invalid_list.join()} </div>"], reload: false)
-                ('#search_uri').val(valid_list.join("\n"))
-              $('.ajax-message-div').addClass('visible-ajax-message')
-              $("#research_form").submit()
-        )
+                submit_list = valid_list.join('\n')
+                $("#search_uri").val(submit_list)
+                $('.ajax-message-div').addClass('visible-ajax-message')
+                $("#research_form").submit()
+
+                for el, i  in valid_list
+                  valid_list[i] = "<span class='col-tag'>#{el}</span>"
+                for el, i in invalid_list
+                  invalid_list[i] = "<span class='col-tag'>#{el}</span>"
+                if invalid_list.length > 0
+                  std_msg_success('Submitting Search',["<div class='submit-search-msg'>The following URLs and IPs are being submitted: #{valid_list.join()}</div> <div class='submit-search-msg'>The following URLs and IPs are invalid: #{invalid_list.join()} </div>"], reload: false)
+
+          )
       )
 
   $(document).ready ->
