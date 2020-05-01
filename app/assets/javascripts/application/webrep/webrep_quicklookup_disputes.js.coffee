@@ -645,7 +645,7 @@ $ ->
 
 
   window.set_action_wlbl_col = () ->
-
+    $(".dropdown.open").removeClass("open");
     $('.grayed-out').removeClass('grayed-out')
     reset_error_modal()
 
@@ -799,7 +799,7 @@ $ ->
     #####
     # set and format action to be taken in each row's action column
     #####
-
+    $(".dropdown.open").removeClass("open");
     reset_error_modal()
 
     check_vals = $( '.adjust_reptool_checkbox:checked' ).map( () -> return $(this).val() ).get()
