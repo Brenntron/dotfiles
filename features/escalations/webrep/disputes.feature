@@ -125,6 +125,48 @@ Feature: Disputes
     Then I should see "RE-OPENED"
 
   @javascript
+  Scenario: a user picks a resolution and the comment is pre-populated
+    Given a user with role "webrep user" exists and is logged in
+    And a guest company exists
+    And the following customers exist:
+      | id | company_id |   name   | email                 |
+      | 3  |      1     |  guest   | guest@guest.com       |
+      | 4  |      2     | customer | customer@customer.com |
+    Then I do some debugging
+    Given the following disputes exist:
+      | id | submission_type | customer_id |
+      | 1  |        w        |      4      |
+      | 2  |        e        |      4      |
+      | 3  |        w        |      3      |
+    When I goto "escalations/webrep/disputes/1/"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#RESOLVED_CLOSED"
+    And I click "#FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    When I goto "escalations/webrep/disputes/2/"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#RESOLVED_CLOSED"
+    And I click "#FIXED_FP"
+    Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should not see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should not see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    When I goto "escalations/webrep/disputes/3/"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#RESOLVED_CLOSED"
+    And I click "#FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
+    When I click "#FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
+    When I click "#UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
+
+  @javascript
   Scenario: when the user encounters a situation in which no results exists (therefore none returned), an error modal should display
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/disputes"

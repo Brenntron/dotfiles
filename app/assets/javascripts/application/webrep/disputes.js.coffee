@@ -1491,7 +1491,28 @@ $ ->
       alert('No disputes selected')
 
 
+  $('#webrep-resolution-selector input[type=radio][name=dispute-resolution]').change ->
+    #Only fill comment if web type submission
+    if $('input[name=webrep-dispute-submission-type').val() == 'w'
+      if $('input[name=webrep-dispute-customer-company-name]').val() != 'Guest'
+        is_customer = true
 
+      $(".ticket-resolution-comment").html('')
+      resolution_comment = ''
+      switch @value
+        when 'FIXED_FP'
+          resolution_comment += "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
+          if is_customer
+            resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+        when 'FIXED_FN'
+          resolution_comment += "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
+          if is_customer
+            resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+        when 'UNCHANGED'
+          resolution_comment += "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
+          if is_customer
+            resolution_comment += " Please open a TAC case and provide additional details if you need further assistance."
+      $(".ticket-resolution-comment").html(resolution_comment)
 
 
 window.populate_entry_status_dropdown = (dispute_id) ->
@@ -2214,6 +2235,5 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
           $(wbrs_details_table).append(rule_row)
       return
   )
-
 
 

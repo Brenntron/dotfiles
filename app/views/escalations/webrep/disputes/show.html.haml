@@ -1,4 +1,8 @@
 -#view single record
+- unless @dispute.customer.nil? || @dispute.customer.company.nil?
+  %input{type:'hidden', name: 'webrep-dispute-customer-company-name', value: "#{@dispute.customer.company.name}"}
+%input{type: 'hidden', name: 'webrep-dispute-submission-type', value: "#{@dispute.submission_type}"}
+
 .content-wrapper.top-case-info
 
   .row
@@ -92,7 +96,7 @@
                     %input.ticket-status-radio.resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESOLVED}", value: "#{Dispute::STATUS_RESOLVED}"}
                     %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_RESOLVED}"} Resolved / Closed
                     .dropdown-menu#show-ticket-resolution-submenu
-                      .col-xs-6.submenu-left-wrapper
+                      .col-xs-6.submenu-left-wrapper{id: "webrep-resolution-selector"}
                         .submenu-header
                           Ticket Resolution
                         %ul
