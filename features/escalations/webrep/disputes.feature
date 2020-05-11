@@ -132,7 +132,6 @@ Feature: Disputes
       | id | company_id |   name   | email                 |
       | 3  |      1     |  guest   | guest@guest.com       |
       | 4  |      2     | customer | customer@customer.com |
-    Then I do some debugging
     Given the following disputes exist:
       | id | submission_type | customer_id |
       | 1  |        w        |      4      |
@@ -141,6 +140,7 @@ Feature: Disputes
     When I goto "escalations/webrep/disputes/1/"
     And I click "#show-edit-ticket-status-button"
     And I click "#RESOLVED_CLOSED"
+    #Should show full messages for customer submissions
     And I click "#FIXED_FP"
     Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
     When I click "#FIXED_FN"
@@ -150,6 +150,7 @@ Feature: Disputes
     When I goto "escalations/webrep/disputes/2/"
     And I click "#show-edit-ticket-status-button"
     And I click "#RESOLVED_CLOSED"
+    #Should not pre-populate for email type submission
     And I click "#FIXED_FP"
     Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
     When I click "#FIXED_FN"
@@ -159,6 +160,7 @@ Feature: Disputes
     When I goto "escalations/webrep/disputes/3/"
     And I click "#show-edit-ticket-status-button"
     And I click "#RESOLVED_CLOSED"
+    #Messages change for guest submissions
     And I click "#FIXED_FP"
     Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
     When I click "#FIXED_FN"
