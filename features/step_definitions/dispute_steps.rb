@@ -99,3 +99,11 @@ Then(/^clean up wlbl and remove all wlbl entries on "(.*?)"$/) do |url|
   @user = User.first
   Wbrs::ManualWlbl.adjust_urls_from_params({:urls=>[url], "trgt_list"=>[], "note"=>""}, username: @user.cvs_username)
 end
+
+Given(/^an empty dispute exists$/) do
+  FactoryBot.create(:customer) unless Customer.all.exists?
+  dispute = FactoryBot.create(:dispute, {user_id: nil, subject: nil, problem_summary: nil, case_opened_at: nil, submission_type: nil})
+  dispute.assign_attributes(customer_id: nil)
+  dispute.save!(validate: false)
+end
+
