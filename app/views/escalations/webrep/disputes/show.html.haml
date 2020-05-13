@@ -2,6 +2,7 @@
 - unless @dispute.customer.nil? || @dispute.customer.company.nil?
   %input{type:'hidden', name: 'webrep-dispute-customer-company-name', value: "#{@dispute.customer.company.name}"}
 %input{type: 'hidden', name: 'webrep-dispute-submission-type', value: "#{@dispute.submission_type}"}
+%input{type: 'hidden', name: 'webrep-dispute-submitter-type', value: "#{@dispute.submitter_type}"}
 
 .content-wrapper.top-case-info
 

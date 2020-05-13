@@ -1492,9 +1492,11 @@ $ ->
 
 
   $('#webrep-resolution-selector input[type=radio][name=dispute-resolution]').change ->
+    submission_type = $('input[name=webrep-dispute-submission-type').val()
+    submitter_type = $('input[name=webrep-dispute-submitter-type]').val()
     #Only fill comment if web type submission
-    if $('input[name=webrep-dispute-submission-type').val() == 'w'
-      if $('input[name=webrep-dispute-customer-company-name]').val() != 'Guest'
+    if submission_type == 'w' && submitter_type != "INTERNAl"
+      if submitter_type == 'CUSTOMER'
         is_customer = true
 
       $(".ticket-resolution-comment").html('')

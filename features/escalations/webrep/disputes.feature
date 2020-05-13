@@ -133,10 +133,10 @@ Feature: Disputes
       | 3  |      1     |  guest   | guest@guest.com       |
       | 4  |      2     | customer | customer@customer.com |
     Given the following disputes exist:
-      | id | submission_type | customer_id |
-      | 1  |        w        |      4      |
-      | 2  |        e        |      4      |
-      | 3  |        w        |      3      |
+      | id | submission_type |   submitter_type   | customer_id |
+      | 1  |        w        |    CUSTOMER        |     4       |
+      | 2  |        e        |    CUSTOMER        |     4       |
+      | 3  |        w        |    NON-CUSTOMER    |     3       |
     When I goto "escalations/webrep/disputes/1/"
     And I click "#show-edit-ticket-status-button"
     And I click "#RESOLVED_CLOSED"
