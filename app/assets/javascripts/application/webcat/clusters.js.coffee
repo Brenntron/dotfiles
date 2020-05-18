@@ -255,7 +255,7 @@ window.copycat_dialog = () ->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions()
+        options: AC.WebCat.createSelectOptions('#copycat_dialog #copycat-categories')
       }
   });
 
@@ -304,7 +304,7 @@ window.selectize_category_inputs = () ->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(),
+        options: AC.WebCat.createSelectOptions("##{this.id}"),
       }
 
 window.toggle_all_checkboxes = () ->
@@ -424,7 +424,14 @@ $ ->
             expand_table_row = this
             expandClusterEntryPreview(cluster, expand_table_row, max_viewable_entries)
 
-        error: (response) ->
+          # subrow icons on clusters DT need the TT init on row expand, these icons don't exist on dt draw.dt, init them here
+          $('#clusters-index .reputation-icon').tooltipster
+            theme: [
+              'tooltipster-borderless'
+              'tooltipster-borderless-customized'
+            ]
+
+          error: (response) ->
           $('.cluster-mgt-loader-wrapper').addClass('hidden')
           std_api_error(response, "There was an error loading cluster data.", reload: false)
       )
@@ -507,3 +514,16 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
     if event.keyCode == 13
       apply_filter_to_table()
     return
+
+
+
+$ ->
+# tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
+  $('#clusters-index').on 'draw.dt', ->
+    $('#clusters-index .tooltipstered').tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr
+    $('#clusters-index .esc-tooltipped').tooltipster
+      restoration: 'previous'
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
