@@ -1087,8 +1087,8 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.valid_url?(test_url)
-    url_regexp = /^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ix
-    test_url =~ url_regexp ? true : false
+
+    test_url =~ URI::regexp ? true : false
   end
 
   def self.process_multi_ip_info(uri, ips, dispute_entry = nil)
