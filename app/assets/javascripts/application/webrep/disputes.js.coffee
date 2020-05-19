@@ -1506,22 +1506,67 @@ $ ->
         is_customer = true
 
       $(".ticket-resolution-comment").html('')
-      resolution_comment = ''
-      switch @value
-        when 'FIXED_FP'
-          resolution_comment += "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
-          if is_customer
-            resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
-        when 'FIXED_FN'
-          resolution_comment += "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
-          if is_customer
-            resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
-        when 'UNCHANGED'
-          resolution_comment += "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
-          if is_customer
-            resolution_comment += " Please open a TAC case and provide additional details if you need further assistance."
+      resolution_comment = get_resolution_comment(@value, is_customer)
       $(".ticket-resolution-comment").html(resolution_comment)
 
+
+  $('#webrep-entry-resolution-selector input[type=radio][name=entry-resolution]').change ->
+    submission_type = $('input[name=webrep-dispute-submission-type').val()
+    submitter_type = $('input[name=webrep-dispute-submitter-type]').val()
+    #Only fill comment if web type submission
+    if submission_type == 'w' && submitter_type != "INTERNAl"
+      if submitter_type == 'CUSTOMER'
+        is_customer = true
+      $('#webrep-entry-resolution-comment').html('')
+      resolution_comment = get_resolution_comment(@value, is_customer)
+      $("#webrep-entry-resolution-comment").html(resolution_comment)
+
+
+  $('#index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change ->
+    $(".ticket-status-comment").html('')
+    submission_types = []
+    submitter_types = []
+    checkboxes = $('#disputes-index').find('.dispute_check_box')
+    $(checkboxes).each ->
+      if $(this).is(':checked')
+        tr = $(this).closest('tr')
+        row = window.dispute_table.row(tr)
+        submission_types.push(row.data().submission_type)
+        submitter_types.push(row.data().submitter_type)
+
+    submission_types.sort()
+    submitter_types.sort()
+
+    common_submission = (submission_types[0] == submission_types[submission_types.length - 1])
+    common_submitter = (submitter_types[0] == submitter_types[submitter_types.length - 1])
+
+    if common_submission && common_submitter
+      submission_type = submission_types[0]
+      submitter_type = submitter_types[0]
+
+      if submission_type == 'w' && submitter_type != 'INTERNAl'
+        if submitter_type == 'CUSTOMER'
+          is_customer = true
+
+        resolution_comment = get_resolution_comment(@value, is_customer)
+        $(".ticket-status-comment").html(resolution_comment)
+
+window.get_resolution_comment = (value, is_customer) ->
+  resolution_comment = ''
+  switch value
+    when 'FIXED_FP'
+      resolution_comment += "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
+      if is_customer
+        resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    when 'FIXED_FN'
+      resolution_comment += "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
+      if is_customer
+        resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    when 'UNCHANGED'
+      resolution_comment += "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
+      if is_customer
+        resolution_comment += " Please open a TAC case and provide additional details if you need further assistance."
+  return resolution_comment
 
 window.populate_entry_status_dropdown = (dispute_id) ->
   std_msg_ajax(
