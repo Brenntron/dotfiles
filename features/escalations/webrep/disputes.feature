@@ -125,6 +125,123 @@ Feature: Disputes
     Then I should see "RE-OPENED"
 
   @javascript
+  Scenario: a user picks a resolution on the index page and the comment is pre-populated
+    Given a user with role "webrep user" exists and is logged in
+    And a guest company exists
+    And the following customers exist:
+      | id | company_id |   name   | email                 |
+      | 3  |      1     |  guest   | guest@guest.com       |
+      | 4  |      2     | customer | customer@customer.com |
+    Given the following disputes exist and have entries:
+      | id | submission_type |   submitter_type   | customer_id |
+      | 1  |        w        |    CUSTOMER        |     4       |
+      | 2  |        e        |    CUSTOMER        |     4       |
+      | 3  |        w        |    NON-CUSTOMER    |     3       |
+    When I goto "escalations/webrep/disputes/"
+    Then I check "cbox0000000001"
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Should show full messages for customer submissions
+    And I click "#FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    Then I uncheck "cbox0000000001"
+    Then I check "cbox0000000002"
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Should not pre-populate for email type submission
+    And I click "#FIXED_FP"
+    Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should not see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should not see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    Then I uncheck "cbox0000000002"
+    Then I check "cbox0000000003"
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Messages change for guest submissions
+    And I click "#FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
+    When I click "#FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
+    When I click "#UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
+    Then I check "cbox0000000002"
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Should not pre-populate for email type submission
+    And I click "#FIXED_FP"
+    Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should not see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should not see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+
+  @javascript
+  Scenario: a user picks a resolution on the index page and the comment is pre-populated
+    Given a user with role "webrep user" exists and is logged in
+    And a guest company exists
+    And the following customers exist:
+      | id | company_id |   name   | email                 |
+      | 3  |      1     |  guest   | guest@guest.com       |
+      | 4  |      2     | customer | customer@customer.com |
+    Given the following disputes exist and have entries:
+      | id | submission_type |   submitter_type   | customer_id |
+      | 1  |        w        |    CUSTOMER        |     4       |
+      | 2  |        e        |    CUSTOMER        |     4       |
+      | 3  |        w        |    NON-CUSTOMER    |     3       |
+    When I goto "escalations/webrep/disputes/"
+    Then I check checkbox with class "dispute-entry-checkbox_1"
+    And I wait for "120" seconds
+    Then pending
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Should show full messages for customer submissions
+    And I click "#FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    Then I uncheck "cbox0000000001"
+    Then I check "cbox0000000002"
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Should not pre-populate for email type submission
+    And I click "#FIXED_FP"
+    Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should not see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should not see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    Then I uncheck "cbox0000000002"
+    Then I check "cbox0000000003"
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Messages change for guest submissions
+    And I click "#FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
+    When I click "#FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
+    When I click "#UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
+    Then I check "cbox0000000002"
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Should not pre-populate for email type submission
+    And I click "#FIXED_FP"
+    Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should not see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should not see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+
+
+  @javascript
   Scenario: a user picks a resolution and the comment is pre-populated
     Given a user with role "webrep user" exists and is logged in
     And a guest company exists

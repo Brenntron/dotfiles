@@ -1406,7 +1406,6 @@ $ ->
       data['contact-name'] = $("#contact-name-checkbox").is(':checked')
       data['contact-email'] = $("#contact-email-checkbox").is(':checked')
       data['status-comment'] = $("#status-comment-checkbox").is(':checked')
-
       std_msg_ajax(
         url: "/escalations/api/v1/escalations/user_preferences/update"
         method: 'POST'
@@ -1550,6 +1549,37 @@ $ ->
 
         resolution_comment = get_resolution_comment(@value, is_customer)
         $(".ticket-status-comment").html(resolution_comment)
+
+  $('#index-entry-resolution-submenu input[type=radio][name=entry-resolution]').change ->
+    $("#entry-status-comment").html('')
+    checkboxes = $('#disputes-index').find('.dispute-entry-checkbox')
+    submission_types = []
+    submitter_types = []
+    checkboxes.each ->
+      if $(this).is(':checked')
+        wrapper = $(this)[0].closest('.dispute-entry-table-wrapper')
+        entry_row = wrapper.parentElement
+        ticket_row = entry_row.previousSibling
+        row = window.dispute_table.row(ticket_row)
+        submission_types.push(row.data().submission_type)
+        submitter_types.push(row.data().submitter_type)
+
+    submission_types.sort()
+    submitter_types.sort()
+
+    common_submission = (submission_types[0] == submission_types[submission_types.length - 1])
+    common_submitter = (submitter_types[0] == submitter_types[submitter_types.length - 1])
+
+    if common_submission && common_submitter
+      submission_type = submission_types[0]
+      submitter_type = submitter_types[0]
+
+      if submission_type == 'w' && submitter_type != 'INTERNAl'
+        if submitter_type == 'CUSTOMER'
+          is_customer = true
+
+        resolution_comment = get_resolution_comment(@value, is_customer)
+        $("#entry-status-comment").html(resolution_comment)
 
 window.get_resolution_comment = (value, is_customer) ->
   resolution_comment = ''
