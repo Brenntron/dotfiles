@@ -3,6 +3,8 @@ require 'socket'
 class DisputeEntry < ApplicationRecord
   attr_writer :wbrs_xlist
 
+  attr_accessor :running_verdict
+
   has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
   belongs_to :dispute, touch: true
   belongs_to :user, optional: true
@@ -182,7 +184,15 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.get_primary_category(uri)
-    prefix_results = Wbrs::Prefix.where({:urls => [uri]})
+    begin
+      prefix_results = Wbrs::Prefix.where({:urls => [uri]})
+    rescue => except
+      Rails.logger.error("Something is wrong with RuleAPI connection")
+      Rails.logger.error(except)
+      Rails.logger.error(except.backtrace.join("\n"))
+
+      return {}
+    end
 
     return {} unless prefix_results.any?
 
@@ -321,18 +331,45 @@ class DisputeEntry < ApplicationRecord
   end
 
   def get_xbrs_value
+
     if dispute_entry_preload.present? && dispute_entry_preload.xbrs_history.present?
       xbrs = Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
     else
       case
-      when self.entry_type == "IP"
-        xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
-      when self.entry_type == "URI/DOMAIN"
-        xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+        when self.entry_type == "IP"
+          begin
+            xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
+          rescue Exception => e
+            Rails.logger.error e
+            Rails.logger.error e&.backtrace&.join("\n")
+            Rails.logger.info e
+            Rails.logger.error e&.backtrace&.join("\n")
+            Rails.logger.warn e
+            Rails.logger.error e&.backtrace&.join("\n")
+            xbrs = [{}, {'data' => [], 'legend' => []}]
+          end
+        when self.entry_type == "URI/DOMAIN"
+          begin
+            xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
+          rescue Exception => e
+            Rails.logger.error e
+            Rails.logger.error e&.backtrace&.join("\n")
+            Rails.logger.info e
+            Rails.logger.error e&.backtrace&.join("\n")
+            Rails.logger.warn e
+            Rails.logger.error e&.backtrace&.join("\n")
+            xbrs = [{}, {'data' => [], 'legend' => []}]
+          end
       else
         begin
           self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
-        rescue
+        rescue Exception => e
+          Rails.logger.error e
+          Rails.logger.error e&.backtrace&.join("\n")
+          Rails.logger.info e
+          Rails.logger.error e&.backtrace&.join("\n")
+          Rails.logger.warn e
+          Rails.logger.error e&.backtrace&.join("\n")
           xbrs = [{}, {'data' => [], 'legend' => []}]
         end
       end
@@ -1111,6 +1148,11 @@ class DisputeEntry < ApplicationRecord
 
   end
 
+
+  def running_verdict
+    @running_verdict
+  end  
+
   def self.threat_cats_from_ids(ids)
     results = JSON.parse(Sbrs::Base.remote_call_sds_v3("", "threatcat_labels"))
 
@@ -1127,22 +1169,21 @@ class DisputeEntry < ApplicationRecord
     end
 
     response
-
   end
 
   def is_disposition_matching?
 
     begin
-      verdict = ""
+
       wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
 
       if self.entry_type == "URI/DOMAIN"
-        verdict = self.class.verdict_from_score(wbrs_stuff["wbrs"]["score"])
+        @running_verdict = self.class.verdict_from_score(wbrs_stuff["wbrs"]["score"])
       else
-        verdict = self.class.email_verdict_from_score(self.sbrs_score)
+        @running_verdict = self.class.email_verdict_from_score(self.sbrs_score)
       end
 
-      if self.suggested_disposition == verdict
+      if self.suggested_disposition == @running_verdict
         self.status = STATUS_RESOLVED
         self.resolution = STATUS_RESOLVED_UNCHANGED
         self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."

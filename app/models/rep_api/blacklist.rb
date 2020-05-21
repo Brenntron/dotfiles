@@ -2,7 +2,7 @@ class RepApi::Blacklist < RepApi::Base
   FIELD_NAMES = %w{entry disposition public excluded classifications manual_classifications class_id
                    expiration expired hostname author primary_source metadata seen_by
                    _id _rev first_seen last_seen stale status ip ipi
-                   message seen_since_exclude}
+                   message seen_since_exclude comment}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   attr_accessor *FIELD_SYMS
@@ -10,6 +10,13 @@ class RepApi::Blacklist < RepApi::Base
   validates :entry, :classifications, presence: true
 
   def initialize(attributes = {})
+    if attributes.keys.present?
+      attributes.keys.each do |attr|
+        if !FIELD_NAMES.include?(attr)
+          self.class.module_eval { attr_accessor attr.to_sym}
+        end
+      end
+    end
     @new_record = attributes.has_key?(:new_record) ? attributes.delete(:new_record) : true
     super
   end
@@ -286,6 +293,45 @@ class RepApi::Blacklist < RepApi::Base
     response = call_json_request(:post, '/blacklist/expire', body: build_request_body(input))
 
     return JSON.parse(response.body)
+  end
+
+  def self.health_check
+    health_report = {}
+
+    times_to_try = 3
+    times_tried = 0
+    times_successful = 0
+    times_failed = 0
+    is_healthy = false
+
+    (1..times_to_try).each do |i|
+      begin
+        response = call_json_request(:get, '/blacklist/classifications', body: {})
+
+        result = JSON.parse(response.body)
+        if result.size > 1
+          times_successful += 1
+        else
+          times_failed += 1
+        end
+        times_tried += 1
+      rescue
+        times_failed += 1
+        times_tried += 1
+      end
+
+    end
+
+    if times_successful > times_failed
+      is_healthy = true
+    end
+
+    health_report[:times_tried] = times_tried
+    health_report[:times_successful] = times_successful
+    health_report[:times_failed] = times_failed
+    health_report[:is_healthy] = is_healthy
+
+    health_report
   end
 
 end
