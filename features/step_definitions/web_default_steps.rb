@@ -79,8 +79,12 @@ When(/^I uncheck "(.*?)"$/) do |target|
   uncheck(target)
 end
 
-And (/^I check checkbox with class "(.*?)"$/) do |cb_class|
+And(/^I check checkbox with class "(.*?)"$/) do |cb_class|
   check(class: cb_class)
+end
+
+And(/^I uncheck checkbox with class "(.*?)"$/) do |cb_class|
+  uncheck(class: cb_class)
 end
 
 When(/^I choose "(.*?)"$/) do |target|
