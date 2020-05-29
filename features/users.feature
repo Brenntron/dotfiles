@@ -346,6 +346,13 @@ Feature: User Accounts
       And I should see "Enqueued Jobs"
 
 
+  @javascript
+  Scenario: A webcat user should have access to the application token
+    Given a user with id "1" has a role "webcat user" and is logged in
+    And  I goto "escalations/users/1"
+    Then I should see content "APPLICATION TOKEN" within ".user-access-wrapper"
+
+
   ### Scenarios User Role access ###
 
 # The /admin route is no longer valid.  We could re-write this for /escalations/admin
