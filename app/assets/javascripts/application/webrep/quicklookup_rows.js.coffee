@@ -71,7 +71,7 @@ $ ->
       else
 # if the dispute is an HTML object, set it as OuterHTML to avoid formatting issues
         tbody.innerHTML += disputes[i].outerHTML
-
+      get_rep_check()
       $(tbody).find('tr .col-bulk-dispute').each ->
         if isEmpty( $(this).attr('data') )
           this.focus()

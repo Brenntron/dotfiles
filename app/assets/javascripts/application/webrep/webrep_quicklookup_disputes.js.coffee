@@ -135,6 +135,7 @@ $ ->
     if location == '#lookup-quick'
       $('.lookup-detail').css('display', 'none')
       $('.ajax-message-div').css('top', '138px')
+      window.location.search = ''
     else if location == '#lookup-detail' || location == ''
       $('.lookup-detail').css('display', 'unset')
       $('.ajax-message-div').css('top', '370px')
@@ -300,6 +301,7 @@ $ ->
     select_cols = $('.col-select-all input')
     for col in select_cols
       $(col).prop('checked', e_val)
+    get_rep_check()
 
   $(document).on 'change', '.col-select-all input', (e) ->
     ####
@@ -311,6 +313,7 @@ $ ->
       select_vals.push( $(col).prop('checked') )
     bulk_value = select_vals.every( (col) -> return col)
     $('#select-all-bulk').prop('checked', bulk_value)
+    get_rep_check()
 
   $(document).on 'change', '.adjust_reptool_checkbox, .status_bl', () ->
     ####
@@ -909,6 +912,15 @@ $ ->
       $( '#error_modal .modal-header' ).html( error_header )
       $( '#error_modal .modal-body' ).append(error_array)
 
+  window.get_rep_check = ()->
+    disabled = true
+    $('tr .col-select-all input').each ->
+      row =  $(this).closest('tr')
+      checked = this.checked
+      data = row.find('.col-bulk-dispute').text().trim()
+      if data != "" && checked
+        disabled = false
+    document.getElementById('get-rep-data').disabled = disabled
   window.get_rep_data = ()->
     ####
     # get reputation data for all rows
@@ -916,7 +928,6 @@ $ ->
     ####
     search_items = []
     rows = $('.research-table tbody tr')
-    console.log
     if !isEmpty( $(rows).last() )
       $('#add_addtional_row').css('display', 'none')
     else
@@ -924,14 +935,18 @@ $ ->
 
     $('.col-bulk-dispute').each ( ) ->
       checkbox = $(this).prev().find('input')
+      searched = $(this).attr('searched')
       if checkbox.length
+        index = $(this).parent('tr').index();
         text = $(this).text()
-        if !isEmpty(text) && checkbox[0].checked
-          search_items.push(text)
+        if !isEmpty(text) && checkbox[0].checked && searched == undefined
+          search_items.push({'search_text':text, "row_index": index})
+
 
     for i in [0...search_items.length]
-      item = search_items[i]
-      row = rows[i]
+      {search_text, row_index}= search_items[i]
+      item = search_text
+      row = rows[row_index]
 
       if !isEmpty(item)
         # for each search item, call a promise to get the data. If success, the first then runs, setting the data in the rows.
@@ -1040,12 +1055,13 @@ $ ->
   window.set_wlbl = ( item, row, data) ->
     { data } = JSON.parse(data)
     col_wlbl = $(row).children('.col-wlbl')
+    col_dispute = $(row).find('.col-bulk-dispute')
     if data.length
       text = data.join(', ')
     else
       text = "<span class='missing-data'>No Data</span>"
     col_wlbl.html( text )
-
+    col_dispute[0].setAttribute('searched', true)
   window.set_cat = ( item, row, data) ->
     { data } = JSON.parse(data)
     cat_col = $(row).children('.col-category')
@@ -1107,6 +1123,8 @@ $ ->
     else
       col_wbrs_rule.text( rulehits.join(', ') )
     if score != 'noscore'
+      if  Number(score) == score && score % 1 == 0
+        score = score.toFixed(1)
       col_wbrs.text( score )
     else
       col_wbrs.text( '0.0' )
