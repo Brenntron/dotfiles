@@ -1,5 +1,4 @@
 $ ->
-
   headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
 
 
@@ -57,6 +56,7 @@ $ ->
     else
       $('.lookup-detail').css('display', 'none')
 
+
   window.isEmpty = (item) ->
     ####
     # function to check whether or not objects and strings are empty, more variable types can be added as needed
@@ -71,7 +71,7 @@ $ ->
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
 
-  window.detail_loader = () ->
+  window.detail_search = () ->
     text_list = $('#search_uri').val().split(/[\s,;\t\n]+/).filter((el)=> return el != "" )
     if text_list.length == 0
       std_msg_error('Error Submitting Search',["Please enter at least one URL or IP address."], reload: false)
@@ -135,10 +135,12 @@ $ ->
     if location == '#lookup-quick'
       $('.lookup-detail').css('display', 'none')
       $('.ajax-message-div').css('top', '138px')
-      window.location.search = ''
+      window.history.pushState("", "", '/escalations/webrep/research#lookup-quick');
+
     else if location == '#lookup-detail' || location == ''
       $('.lookup-detail').css('display', 'unset')
       $('.ajax-message-div').css('top', '370px')
+
 
   window.reset_error_modal = () ->
     $( '#error_modal' ).dialog(
