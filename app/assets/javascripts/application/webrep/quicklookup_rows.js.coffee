@@ -119,13 +119,19 @@ $ ->
             single_row = valid_list[0] != disp_data
             if valid_list.length == 1 && single_row && disp_data != ""
               $(row).find('.col-bulk-dispute').attr('data', valid_list[0])
+              $(row).find('.col-bulk-dispute').removeAttr('searched')
+              $(row).find('.row-action-clear').click()
+              $(row).find('.col-wbrs-rule-hits, .col-wbrs-rules, .col-category, .col-wlbl, .col-wbrs, .col-threat-cats,.col-reptool-class').text('')
           buildRow(valid_list, row)
       )
     else
       disp_data =  $(row).find('.col-bulk-dispute').attr('data')
       single_row = valid_list[0] != disp_data
       if valid_list.length == 1 && single_row && disp_data != ""
-         $(row).find('.col-bulk-dispute').attr('data', valid_list[0])
+        $(row).find('.col-bulk-dispute').attr('data', valid_list[0])
+        $(row).find('.col-bulk-dispute').removeAttr('searched')
+        $(row).find('.row-action-clear').click()
+        $(row).find('.col-wbrs-rule-hits, .col-wbrs-rules, .col-category, .col-wlbl, .col-threat-cats, .col-wbrs, .col-reptool-class').text('')
       buildRow(valid_list, row)
       return true
 
