@@ -25,7 +25,7 @@ $ ->
       if !isEmpty(data)
         disputes_data.push(data)
         disputes.push(this)
-
+#
     if !isEmpty(parent_data) && !text_list.includes(parent_data)
       index = disputes.indexOf(parent_data)
       disputes.splice(index, 1)
@@ -73,8 +73,11 @@ $ ->
         tbody.innerHTML += disputes[i].outerHTML
       get_rep_check()
       $(tbody).find('tr .col-bulk-dispute').each ->
-        if isEmpty( $(this).attr('data') )
+        data = $(this).attr('data')
+        if isEmpty( data )
           this.focus()
+        else
+          $(this).text(data)
 
       setTimeout () ->
         $("br").remove()
@@ -112,9 +115,17 @@ $ ->
             for name, value of data
               if value
                 valid_list.push(name)
-            buildRow(valid_list, row)
+            disp_data =  $(row).find('.col-bulk-dispute').attr('data')
+            single_row = valid_list[0] != disp_data
+            if valid_list.length == 1 && single_row && disp_data != ""
+              $(row).find('.col-bulk-dispute').attr('data', valid_list[0])
+          buildRow(valid_list, row)
       )
     else
+      disp_data =  $(row).find('.col-bulk-dispute').attr('data')
+      single_row = valid_list[0] != disp_data
+      if valid_list.length == 1 && single_row && disp_data != ""
+         $(row).find('.col-bulk-dispute').attr('data', valid_list[0])
       buildRow(valid_list, row)
       return true
 
@@ -132,6 +143,7 @@ $ ->
   set_row_text = (e, el) ->
     { which: key, shiftKey } = e
     text = el.innerText.trim()
+    get_rep_check()
     if text != undefined
       text_list = text.replace( /\n|\s/g, ", " ).split(", ")
       row = el.closest('tr')
