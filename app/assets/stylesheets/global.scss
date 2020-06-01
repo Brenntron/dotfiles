@@ -11447,7 +11447,7 @@ hr.thin.extra-bottom-marg {
     }
     .threat-cat-area {
       padding: 3px;
-      height: 200px;
+      height: fit-content;
       display: flex; // flex to alphabetize + sort the threat cats easily
       flex-wrap: wrap;
       flex-direction: column;
@@ -11497,7 +11497,7 @@ hr.thin.extra-bottom-marg {
 #wlbl_entries_dropdown{
   .threat-cat-area{
     padding: 3px;
-    height: 200px;
+    height: 206px;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
