@@ -11721,7 +11721,12 @@ table > tbody > tr > td.no-padding {
     margin-bottom: -2px;
   }
 }
-
+#detail-lookup-loader{
+  top: 370px;
+}
+#quick-lookup-loader{
+  top: 140px;
+}
 // retain top navigation at top of page during scroll down for nav accessibility
 #nav-banner.fixed-nav {
   position: -webkit-sticky;

@@ -1,6 +1,8 @@
 $ ->
   headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
 
+  ongoing_detail_search = false
+  ongoing_quick_search = false
 
   window.isEmpty = (item) ->
     ####
@@ -19,43 +21,46 @@ $ ->
   #counter for ajax calls
   completed_counter = 0
   $(document).bind(
-    ####
-    #This controls the show/hide of the loading wheel depending on if all ajax calls have been completed.
-    #There were issues with using ajaxStop, but this works
-    ####
-
-    ajaxStart: () ->
-      $('.ajax-message-div').css('display', 'flex')
-      if window.location.hash == '#lookup-quick'
-        $('.ajax-message-div').css('top', '140px')
-      else if window.location.hash == '#lookup-detail' || window.location.hash == ''
-        $('.ajax-message-div').css('top', '370px;')
-    ajaxStop: () ->
-        $('.ajax-message-div').css('display', 'none')
     ajaxComplete: () ->
       completed_counter++
       ####
       # selected_rows needs to be multiplied by the number of ajax calls that are being made to
       # accurately gauge the number of calls
+      # This controls the show/hide of the loading wheel depending on if all ajax calls for quicklookup have been completed.
       ####
       selected_rows = $('.col-select-all input:checked').length * 5
-      if completed_counter == selected_rows
-        $('.ajax-message-div').css('display', 'none')
+      if completed_counter == selected_rows && ongoing_quick_search
+        ongoing_quick_search = false
+        $('#quick-lookup-loader').removeClass('visible-ajax-message')
   )
 
 
   $(document).ready ->
-    if window.location.hash == '#lookup-quick'
-      $('.lookup-detail').css('display', 'none')
-    else if window.location.hash == '#lookup-detail' || window.location.hash == ''
-      $('.lookup-detail').css('display', 'unset')
+    update_tabs( window.location.hash )
 
   $('#research-tabs li').on 'click', ->
-    if $(this).attr('data') == 'lookup-detail'
-      $('.lookup-detail').css('display', 'unset')
-    else
-      $('.lookup-detail').css('display', 'none')
+    update_tabs( window.location.hash )
 
+  window.update_tabs = ( location ) ->
+#    just making sure that correct loader is hidden/shown
+#    having one and changing location has been less buggy/complicated than having 2 separate ones
+    if location == '#lookup-quick'
+      $('.lookup-detail').css('display', 'none')
+      $('#detail-lookup-loader').removeClass('visible-ajax-message')
+      $('#detail-lookup-loader').css('display',' none')
+      if !ongoing_quick_search
+        $('#quick-lookup-loader').removeClass('visible-ajax-message')
+      else
+        $('#quick-lookup-loader').addClass('visible-ajax-message')
+      window.history.pushState("", "", '/escalations/webrep/research#lookup-quick');
+    else if location == '#lookup-detail' || location == ''
+      $('#quick-lookup-loader').removeClass('visible-ajax-message')
+      if !ongoing_detail_search
+        $('#detail-lookup-loader').removeClass('visible-ajax-message')
+        $('.lookup-detail').css('display', 'unset')
+      else
+        $('#detail-lookup-loader').addClass('visible-ajax-message')
+        $('.research_results').css('display', 'none')
 
   window.isEmpty = (item) ->
     ####
@@ -72,12 +77,13 @@ $ ->
     $('#confirmation-modal').modal('toggle')
 
   window.detail_search = () ->
+    ongoing_detail_search = true
     text_list = $('#search_uri').val().split(/[\s,;\t\n]+/).filter((el)=> return el != "" )
     if text_list.length == 0
       std_msg_error('Error Submitting Search',["Please enter at least one URL or IP address."], reload: false)
     else
-      $('.ajax-message-div').css('display', 'flex')
-
+      $('#detail-lookup-loader').addClass('visible-ajax-message')
+      $('.lookup-detail, .research_results').css('display', 'none')
       check_ips(text_list).then( (response)=>
         { data } = response
         valid_list = []
@@ -89,7 +95,7 @@ $ ->
           else
             valid_list.push(name)
         if url_list.length == 0
-          $('.ajax-message-div').addClass('visible-ajax-message')
+          $('#detail-lookup-loader').addClass('visible-ajax-message')
           $("#research_form").submit()
         else
           $.ajax(
@@ -110,7 +116,7 @@ $ ->
               else
                 submit_list = valid_list.join('\n')
                 $("#search_uri").val(submit_list)
-                $('.ajax-message-div').addClass('visible-ajax-message')
+                $('#detail-lookup-loader').addClass('visible-ajax-message')
                 $("#research_form").submit()
 
                 for el, i  in valid_list
@@ -122,24 +128,6 @@ $ ->
 
           )
       )
-
-  $(document).ready ->
-    update_tabs( window.location.hash )
-
-  $('#research-tabs li').on 'click', ->
-    update_tabs( window.location.hash )
-
-  window.update_tabs = ( location ) ->
-#    just making sure that the loader div is in the right spot.
-#    having one and changing location has been less buggy/complicated than having 2 separate ones
-    if location == '#lookup-quick'
-      $('.lookup-detail').css('display', 'none')
-      $('.ajax-message-div').css('top', '138px')
-      window.history.pushState("", "", '/escalations/webrep/research#lookup-quick');
-
-    else if location == '#lookup-detail' || location == ''
-      $('.lookup-detail').css('display', 'unset')
-      $('.ajax-message-div').css('top', '370px')
 
 
   window.reset_error_modal = () ->
@@ -612,7 +600,7 @@ $ ->
     ####
     confirmation_rows = document.querySelector('#confirmation-modal tbody').rows
     $('#confirmation-modal').modal('toggle');
-
+    $('#quick-lookup-loader').css('display', 'flex')
     disputes = { comment: $('.confirm-rep-input').text() }
 
     $( confirmation_rows ).each ->
@@ -923,18 +911,20 @@ $ ->
       if data != "" && checked
         disabled = false
     document.getElementById('get-rep-data').disabled = disabled
+
   window.get_rep_data = ()->
     ####
     # get reputation data for all rows
     # after getting data, display in the appropriate column
     ####
+    ongoing_quick_search = true
+    $('#quick-lookup-loader').addClass('visible-ajax-message')
     search_items = []
     rows = $('.research-table tbody tr')
     if !isEmpty( $(rows).last() )
       $('#add_addtional_row').css('display', 'none')
     else
       $('#add_addtional_row').css('display', 'flex')
-
     $('.col-bulk-dispute').each ( ) ->
       checkbox = $(this).prev().find('input')
       searched = $(this).attr('searched')

@@ -3,11 +3,14 @@
   .reputation-research-search-wrapper
 
     -# shared loader for detail and quick lookup
-    .ajax-message-div
+    .ajax-message-div#detail-lookup-loader
+      .loader-gears
+        =inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Active search processing, please wait...
+    .ajax-message-div#quick-lookup-loader
       .loader-gears
         =inline_svg 'icon_gears_loader.svg'
       %span.loader-msg Loading data...
-
     .research-header-wrapper
       %span.icon-research.top-info-icon
       %h1 Reputation Research
