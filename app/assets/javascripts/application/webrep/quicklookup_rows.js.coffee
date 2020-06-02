@@ -82,7 +82,6 @@ $ ->
       setTimeout () ->
         $("br").remove()
       , 20
-    $('.ajax-message-div').css('display', 'none')
 
 
   window.bindControls = () ->

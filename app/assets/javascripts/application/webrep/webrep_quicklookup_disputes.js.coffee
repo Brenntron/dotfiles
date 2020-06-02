@@ -32,6 +32,7 @@ $ ->
       if completed_counter == selected_rows && ongoing_quick_search
         ongoing_quick_search = false
         $('#quick-lookup-loader').removeClass('visible-ajax-message')
+        $('#quick-lookup-loader').css('display', 'none')
   )
 
 
@@ -576,6 +577,7 @@ $ ->
       error_prefix: 'Error logging in.'
       success: (response) ->
         submitted_entries = []
+        $('#quick-lookup-loader').removeClass('visible-ajax-message')
         if response
           for key, val of data
             if key != 'comment'
@@ -600,7 +602,7 @@ $ ->
     ####
     confirmation_rows = document.querySelector('#confirmation-modal tbody').rows
     $('#confirmation-modal').modal('toggle');
-    $('#quick-lookup-loader').css('display', 'flex')
+    $('#quick-lookup-loader').addClass('visible-ajax-message')
     disputes = { comment: $('.confirm-rep-input').text() }
 
     $( confirmation_rows ).each ->
