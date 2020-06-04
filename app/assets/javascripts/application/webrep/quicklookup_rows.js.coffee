@@ -9,6 +9,7 @@ $ ->
     ).tooltipster 'open'
 
   window.buildRow = ( text_list, parent_row) ->
+    console.log text_list
 # build and append new rows to the HTML in quick lookup
     bindControls()
     # Once the table has been rebuilt, find the empty row and focus on it
@@ -19,20 +20,20 @@ $ ->
     parent_data = $(parent_row).find('.col-bulk-dispute').attr('data')
     parent_index = parent_row.rowIndex
     prev_row = existing_rows.eq(parent_index - 2)[0].innerText
-
+    console.log 'before',text_list
     $(existing_rows).each ->
       data = $(this).find('.col-bulk-dispute').attr('data')
+      text_list = text_list.filter( (text)-> return !text_list.includes(data) )
+
       if !isEmpty(data)
         disputes_data.push(data)
         disputes.push(this)
-#
-    if !isEmpty(parent_data) && !text_list.includes(parent_data)
-      index = disputes.indexOf(parent_data)
-      disputes.splice(index, 1)
-      parent_index = parent_index - 1
-
-    text_list = text_list.filter( (text)-> return !disputes_data.includes(text) )
+#    if !isEmpty(parent_data) && text_list.includes(parent_data)
+#      index = disputes.indexOf(parent_data)
+#      disputes.splice(index, 1)
+#      parent_index = parent_index - 1
     text_list.push(' ')
+    console.log 'after',text_list
     enter_check = isEmpty(prev_row) && text_list.length == 1 && parent_index > 1 || isEmpty(parent_data)
 
     if disputes.length
@@ -40,12 +41,17 @@ $ ->
         parent_index = parent_index - 1
       for i in [0...text_list.length]
         disputes.splice parent_index + i, 0, text_list[i]
+      console.log disputes, enter_check, text_list
     else
+
       for i in [0...text_list.length]
         disputes.push(text_list[i])
 
     # reset the innerHTML to nothing
     tbody.innerHTML = ''
+
+#    for dispute in disputes
+
     for i in [0...disputes.length]
 # if the dispute is not an HTML object, set the HTML of the new row to the below
       if typeof disputes[i] != 'object'
@@ -93,6 +99,7 @@ $ ->
 
   window.check_urls = (text_list, row, data) ->
     checked = data.data
+    existing_rows = $("#research-table tbody").find('tr')
     urls = []
     valid_list = []
     for name, value of checked
@@ -114,25 +121,25 @@ $ ->
             for name, value of data
               if value
                 valid_list.push(name)
-            disp_data =  $(row).find('.col-bulk-dispute').attr('data')
-            single_row = valid_list[0] != disp_data
-            if valid_list.length == 1 && single_row && disp_data != ""
-              $(row).find('.col-bulk-dispute').attr('data', valid_list[0])
-              $(row).find('.col-bulk-dispute').removeAttr('searched')
-              $(row).find('.row-action-clear').click()
-              $(row).find('.col-wbrs-rule-hits, .col-wbrs-rules, .col-category, .col-wlbl, .col-wbrs, .col-threat-cats,.col-reptool-class').text('')
-          buildRow(valid_list, row)
+            check_row_data(valid_list, row)
       )
     else
-      disp_data =  $(row).find('.col-bulk-dispute').attr('data')
-      single_row = valid_list[0] != disp_data
-      if valid_list.length == 1 && single_row && disp_data != ""
-        $(row).find('.col-bulk-dispute').attr('data', valid_list[0])
-        $(row).find('.col-bulk-dispute').removeAttr('searched')
-        $(row).find('.row-action-clear').click()
-        $(row).find('.col-wbrs-rule-hits, .col-wbrs-rules, .col-category, .col-wlbl, .col-threat-cats, .col-wbrs, .col-reptool-class').text('')
-      buildRow(valid_list, row)
-      return true
+      check_row_data(valid_list, row)
+
+  window.check_row_data = (valid_list, row) ->
+    existing_rows = $("#research-table tbody").find('tr')
+    disp_data =  $(row).find('.col-bulk-dispute').attr('data')
+    single_row = valid_list[0] != disp_data
+    existing_rows.each ->
+      data = $(this).find('.col-bulk-dispute').attr('data')
+      if data == valid_list[0]
+        valid_list = ['']
+    if valid_list.length == 1 && single_row && disp_data != ""
+      $(row).find('.col-bulk-dispute').attr('data', valid_list[0])
+      $(row).find('.col-bulk-dispute').removeAttr('searched')
+      $(row).find('.row-action-clear').click()
+      $(row).find('.col-wbrs-rule-hits, .col-wbrs-rules, .col-category, .col-wlbl, .col-threat-cats, .col-wbrs, .col-reptool-class').text('')
+    buildRow(valid_list, row)
 
   window.check_ips = (text_list) ->
     data = {'ip_address': text_list}
