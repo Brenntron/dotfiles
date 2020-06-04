@@ -904,7 +904,7 @@ $ ->
       $( '#error_modal .modal-header' ).html( error_header )
       $( '#error_modal .modal-body' ).append(error_array)
 
-  window.get_rep_check = ()->
+  window.get_rep_check = (e)->
     disabled = true
     $('tr .col-select-all input').each ->
       row =  $(this).closest('tr')
@@ -912,6 +912,10 @@ $ ->
       data = row.find('.col-bulk-dispute').text().trim()
       if data != "" && checked
         disabled = false
+#      if e.type == 'focusout'
+##        row.find('.col-bulk-dispute').attr('data', data)
+#        if row.find('.col-bulk-dispute').is(':empty')
+#          row.find('.col-bulk-dispute').attr('data', '')
     document.getElementById('get-rep-data').disabled = disabled
 
   window.get_rep_data = ()->

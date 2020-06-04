@@ -9,7 +9,6 @@ $ ->
     ).tooltipster 'open'
 
   window.buildRow = ( text_list, parent_row) ->
-    console.log text_list
 # build and append new rows to the HTML in quick lookup
     bindControls()
     # Once the table has been rebuilt, find the empty row and focus on it
@@ -32,7 +31,8 @@ $ ->
 #      index = disputes.indexOf(parent_data)
 #      disputes.splice(index, 1)
 #      parent_index = parent_index - 1
-    text_list.push(' ')
+    if text_list[0] != ''
+      text_list.push(' ')
     console.log 'after',text_list
     enter_check = isEmpty(prev_row) && text_list.length == 1 && parent_index > 1 || isEmpty(parent_data)
 
@@ -155,7 +155,7 @@ $ ->
   set_row_text = (e, el) ->
     { which: key, shiftKey } = e
     text = el.innerText.trim()
-    get_rep_check()
+    get_rep_check(e)
     if text != undefined
       text_list = text.replace( /\n|\s/g, ", " ).split(", ")
       row = el.closest('tr')
@@ -177,7 +177,8 @@ $ ->
         else
           $(row).data(text)
       else if key == 8
-        if isEmpty(text) && $(tbody).children().length > 1
+        length_check = isEmpty(text) || text.length == 1
+        if length_check && $(tbody).children().length > 1
           $(row).remove()
           if !isEmpty( $(tbody).find('tr').last() )
             $('#add_addtional_row').css('display', 'flex')
@@ -207,5 +208,6 @@ $ ->
     $('#research-table').append(row)
 
   $( document ).on 'keydown blur', '.col-bulk-dispute', (e) ->
+    console.log 'ininin'
     set_row_text(e, this)
     e.stopPropagation()
