@@ -19,7 +19,6 @@ $ ->
     parent_data = $(parent_row).find('.col-bulk-dispute').attr('data')
     parent_index = parent_row.rowIndex
     prev_row = existing_rows.eq(parent_index - 2)[0].innerText
-    console.log 'before',text_list
     $(existing_rows).each ->
       data = $(this).find('.col-bulk-dispute').attr('data')
       text_list = text_list.filter( (text)-> return !text_list.includes(data) )
@@ -33,7 +32,6 @@ $ ->
 #      parent_index = parent_index - 1
     if text_list[0] != ''
       text_list.push(' ')
-    console.log 'after',text_list
     enter_check = isEmpty(prev_row) && text_list.length == 1 && parent_index > 1 || isEmpty(parent_data)
 
     if disputes.length
@@ -41,7 +39,6 @@ $ ->
         parent_index = parent_index - 1
       for i in [0...text_list.length]
         disputes.splice parent_index + i, 0, text_list[i]
-      console.log disputes, enter_check, text_list
     else
 
       for i in [0...text_list.length]
@@ -208,6 +205,5 @@ $ ->
     $('#research-table').append(row)
 
   $( document ).on 'keydown blur', '.col-bulk-dispute', (e) ->
-    console.log 'ininin'
     set_row_text(e, this)
     e.stopPropagation()
