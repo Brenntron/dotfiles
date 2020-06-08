@@ -935,10 +935,6 @@ $ ->
     ongoing_quick_search = true
     search_items = []
     rows = $('.research-table tbody tr')
-    if !isEmpty( $(rows).last() )
-      $('#add_addtional_row').css('display', 'none')
-    else
-      $('#add_addtional_row').css('display', 'flex')
     $('.col-bulk-dispute').each ( ) ->
       checkbox = $(this).prev().find('input')
       searched = $(this).attr('searched')
