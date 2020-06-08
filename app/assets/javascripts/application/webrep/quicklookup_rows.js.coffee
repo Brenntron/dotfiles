@@ -57,7 +57,7 @@ $ ->
           "<tr>
             <td class='col-select-all'>
               <span class='checkbox-wrapper'>
-                <input type='checkbox' checked>
+                <input type='checkbox' checked='true'>
               </span>
             </td>
             <td class='col-bulk-dispute' contenteditable='true' data='#{disputes[i]}'><p> #{disputes[i]} </p></td>
@@ -150,8 +150,9 @@ $ ->
     )
 
   set_row_text = (e, el) ->
-    { which: key, shiftKey } = e
+    { which: key, shiftKey, type } = e
     text = el.innerText.trim()
+
     get_rep_check(e)
     if text != undefined
       text_list = text.replace( /\n|\s/g, ", " ).split(", ")
@@ -161,6 +162,12 @@ $ ->
       text_list = text_list.filter (item, index) ->
         if item != ''
           return text_list.indexOf item == index
+      if type == 'focusout'
+        if !shiftKey && text_list.length
+          check_ips(text_list, headers, row)
+            .then ( check_urls.bind( null, text_list, row) )
+            .then null, (err) -> console.log err
+
       if key == 13
         if !shiftKey && text_list.length
           check_ips(text_list, headers, row)
@@ -205,5 +212,6 @@ $ ->
     $('#research-table').append(row)
 
   $( document ).on 'keydown blur', '.col-bulk-dispute', (e) ->
+    console.log 'in', e
     set_row_text(e, this)
     e.stopPropagation()

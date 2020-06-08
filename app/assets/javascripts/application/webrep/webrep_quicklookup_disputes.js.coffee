@@ -300,6 +300,11 @@ $ ->
     ####
     select_cols = $('.col-select-all input')
     select_vals = []
+    val = $(this).prop('checked')
+    if !val
+      $(this).removeAttr('checked')
+    else
+      $(this).attr('checked', 'true')
     for col in select_cols
       select_vals.push( $(col).prop('checked') )
     bulk_value = select_vals.every( (col) -> return col)
