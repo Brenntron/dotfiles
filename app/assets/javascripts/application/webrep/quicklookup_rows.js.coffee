@@ -212,6 +212,5 @@ $ ->
     $('#research-table').append(row)
 
   $( document ).on 'keydown blur', '.col-bulk-dispute', (e) ->
-    console.log 'in', e
     set_row_text(e, this)
     e.stopPropagation()
