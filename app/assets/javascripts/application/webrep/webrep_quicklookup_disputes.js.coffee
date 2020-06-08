@@ -79,7 +79,7 @@ $ ->
 
   window.detail_search = () ->
     ongoing_detail_search = true
-    text_list = $('#search_uri').val().split(/[\s,;\t\n]+/).filter((el)=> return el != "" )
+    text_list = $('#search_uri').val().split(/[\s\t\n]+/).filter((el)=> return el != "" )
     if text_list.length == 0
       std_msg_error('Error Submitting Search',["Please enter at least one URL or IP address."], reload: false)
     else

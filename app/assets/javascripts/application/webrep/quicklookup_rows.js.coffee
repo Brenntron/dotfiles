@@ -155,7 +155,7 @@ $ ->
 
     get_rep_check(e)
     if text != undefined
-      text_list = text.replace( /\n|\s/g, ", " ).split(", ")
+      text_list = text.split(/[\s\t\n]+/)
       row = el.closest('tr')
       tbody = row.closest('tbody')
 
