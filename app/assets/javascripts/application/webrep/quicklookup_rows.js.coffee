@@ -26,10 +26,10 @@ $ ->
       if !isEmpty(data)
         disputes_data.push(data)
         disputes.push(this)
-#    if !isEmpty(parent_data) && text_list.includes(parent_data)
-#      index = disputes.indexOf(parent_data)
-#      disputes.splice(index, 1)
-#      parent_index = parent_index - 1
+    if !isEmpty(parent_data) && text_list.includes(parent_data)
+      index = disputes.indexOf(parent_data)
+      disputes.splice(index, 1)
+      parent_index = parent_index - 1
     if text_list[0] != ''
       text_list.push(' ')
     enter_check = isEmpty(prev_row) && text_list.length == 1 && parent_index > 1 || isEmpty(parent_data)
@@ -96,7 +96,6 @@ $ ->
 
   window.check_urls = (text_list, row, data) ->
     checked = data.data
-    existing_rows = $("#research-table tbody").find('tr')
     urls = []
     valid_list = []
     for name, value of checked
@@ -162,11 +161,13 @@ $ ->
       text_list = text_list.filter (item, index) ->
         if item != ''
           return text_list.indexOf item == index
-      if type == 'focusout'
+      if type == 'focusout' && key != 8
+
         if !shiftKey && text_list.length
-          check_ips(text_list, headers, row)
-            .then ( check_urls.bind( null, text_list, row) )
-            .then null, (err) -> console.log err
+          if text_list[0].length > 1
+            check_ips(text_list, headers, row)
+              .then ( check_urls.bind( null, text_list, row) )
+              .then null, (err) -> console.log err
 
       if key == 13
         if !shiftKey && text_list.length
@@ -182,12 +183,23 @@ $ ->
           $(row).data(text)
       else if key == 8
         length_check = isEmpty(text) || text.length == 1
+        col_disp = $(tbody).find('.col-bulk-dispute')
+
         if length_check && $(tbody).children().length > 1
+
+          # setting data to empty  so there is no chance the row data may persist on deletion
           $(row).remove()
-          if !isEmpty( $(tbody).find('tr').last() )
+          if !isEmpty(col_disp.filter('[data]').attr('data')) || col_disp.length != 1
             $('#add_addtional_row').css('display', 'flex')
           else
             $('#add_addtional_row').css('display', 'none')
+
+        if isEmpty($(col_disp).text()) && col_disp.length == 1
+            $(col_disp[0]).attr('data', "")
+            $('#add_addtional_row').css('display', 'none')
+
+
+
 
   $(document).on 'click', '#add_addtional_row', ->
     row =
