@@ -3,7 +3,8 @@ $ ->
 
   ongoing_detail_search = false
   ongoing_quick_search = false
-
+  current_search_count = 0
+  completed_counter = 0
   window.isEmpty = (item) ->
     ####
     # function to check whether or not objects and strings are empty, more variable types can be added as needed
@@ -19,20 +20,23 @@ $ ->
     return str.indexOf(substring) != -1
 
   #counter for ajax calls
-  completed_counter = 0
   $(document).bind(
     ajaxComplete: () ->
-      completed_counter++
+
       ####
       # selected_rows needs to be multiplied by the number of ajax calls that are being made to
       # accurately gauge the number of calls
       # This controls the show/hide of the loading wheel depending on if all ajax calls for quicklookup have been completed.
       ####
-      selected_rows = $('.col-select-all input:checked').length * 5
-      if completed_counter == selected_rows && ongoing_quick_search
-        ongoing_quick_search = false
-        $('#quick-lookup-loader').removeClass('visible-ajax-message')
-        $('#quick-lookup-loader').css('display', 'none')
+
+      selected_rows = current_search_count * 5
+      if ongoing_quick_search
+        completed_counter++
+        if completed_counter == selected_rows && ongoing_quick_search
+          ongoing_quick_search = false
+          completed_counter = 0
+          $('#quick-lookup-loader').removeClass('visible-ajax-message')
+          $('#quick-lookup-loader').css('display', 'none')
   )
 
 
@@ -929,7 +933,6 @@ $ ->
     # after getting data, display in the appropriate column
     ####
     ongoing_quick_search = true
-    $('#quick-lookup-loader').addClass('visible-ajax-message')
     search_items = []
     rows = $('.research-table tbody tr')
     if !isEmpty( $(rows).last() )
@@ -945,8 +948,10 @@ $ ->
         if !isEmpty(text) && checkbox[0].checked && searched == undefined
           search_items.push({'search_text':text, "row_index": index})
 
+    current_search_count = search_items.length
 
     for i in [0...search_items.length]
+      $('#quick-lookup-loader').addClass('visible-ajax-message')
       {search_text, row_index}= search_items[i]
       item = search_text
       row = rows[row_index]
