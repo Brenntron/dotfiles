@@ -34,7 +34,7 @@ window.get_current_reptool =(button, page) ->
 
   # Can leave the \n's, they will get replaced with spaces on submission to Reptool
   if page == "show"
-    comment_trail = 'AC INDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
+    comment_trail = 'AC INDIVIDUAL SUBMISSION: \n TE.ACE-' + case_id
   else if page == "research"
     comment_trail = 'AC INDIVIDUAL RESEARCH SUBMISSION: \n' + entry_content
 
@@ -111,13 +111,13 @@ window.bulk_get_current_reptool = (page) ->
         entry_row = $(this).parents('.index-entry-row')[0]
         entry_content = $(entry_row).find('.entry-col-content').text().trim()
         entry_case_id = $(entry_row).attr('data-case-id')
-        comment_array.push('#' + entry_case_id + ' - ' + entry_content)
+        comment_array.push('TE.ACE-' + entry_case_id)
 
       # Prep entry content to send to reptool
       ip_uris.push(entry_content)
 
     if page == "show"
-      comment_trail = 'AC Bulk Submission: \n #' + case_id + ' - ' + ip_uris.join(', ')
+      comment_trail = 'AC Bulk Submission: \n TE.ACE-' + case_id
     else if page == "research"
       comment_trail = 'AC Research Bulk Submission: \n' + ip_uris.join('\n')
     else if page == "index"
