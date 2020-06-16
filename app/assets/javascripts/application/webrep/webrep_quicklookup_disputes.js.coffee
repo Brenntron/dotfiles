@@ -296,6 +296,8 @@ $ ->
     select_cols = $('.col-select-all input')
     for col in select_cols
       $(col).prop('checked', e_val)
+      if e_val == false
+        $(col).removeAttr('checked')
     get_rep_check()
 
   $(document).on 'change', '.col-select-all input', (e) ->
