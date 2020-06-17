@@ -295,6 +295,10 @@ $ ->
     e_val = e.currentTarget.checked
     select_cols = $('.col-select-all input')
     for col in select_cols
+      # We need to set both attr and prop here.
+      # prop makes sure all values actually get changed,
+      # attr makes sure that values persist after rows have been added
+      $(col).attr('checked', e_val)
       $(col).prop('checked', e_val)
       if e_val == false
         $(col).removeAttr('checked')
