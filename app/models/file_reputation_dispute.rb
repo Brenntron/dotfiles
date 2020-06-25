@@ -779,6 +779,10 @@ class FileReputationDispute < ApplicationRecord
 
       if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].all? {|prez| prez == false }
         #notify customer that there is no sample and to escalate via TAC with sample
+        # self.status = STATUS_RESOLVED
+        # self.resolution = RESOLUTION_AUTORESOLVED
+        # self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
+        ### Temporary bypass of no sample auto resolve per WEB-6062 until WEB-5623 is resolved
         if self.suggested_clean? || self.suggested_unknown?
           self.status = STATUS_NEW
           self.auto_resolve_log += "\n-------\nSetting Status To New as there is no sample.\n------\n"
