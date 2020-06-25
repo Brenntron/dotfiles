@@ -145,32 +145,56 @@ class ComplaintEntry < ApplicationRecord
           if commit_pending == "commit"
             # commit from pending of important case
 
-            current_status = "COMPLETED"
-            self.case_assigned_at ||= Time.now
-            # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
-            update!(status:current_status,
-                   category: categories_string,
-                   internal_comment: comment,
-                   resolution_comment: resolution_comment,
-                   uri_as_categorized: uri_as_categorized,
-                   case_resolved_at: Time.now,
-                   user:current_user)
-            complaint.set_status(current_status)
-            #this is where we should send off the category to the API
-            if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
-              existing_prefixes = remote_prefixes(prefix_given: prefix)
-              commit_category(existing_prefixes,
-                              ip_or_uri: prefix,
-                              categories_string: categories_string,
-                              description: comment,
-                              user: current_user.email,
-                              casenumber: self.complaint.id)
-              update!(url_primary_category: category_names_string, category: category_names_string)
-            else
-              # TODO Do we need to update the record when we are not making a change?
-              existing_prefixes = remote_prefixes(prefix_given: prefix)
-              cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
-              update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+            ###############################################################################################################################################################
+            ###guard rails should go here i think
+
+            results = Webcat::GuardRails.verdict_for_entries([prefix])
+            binding.pry
+            return
+
+            verdict_data = results[prefix]
+
+            if verdict_data["result"] == Webcat::GuardRails::PASS || current_user.is_webcat_manager?
+
+              #################################################
+              current_status = "COMPLETED"
+              self.case_assigned_at ||= Time.now
+              # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
+              update!(status:current_status,
+                     category: categories_string,
+                     internal_comment: comment,
+                     resolution_comment: resolution_comment,
+                     uri_as_categorized: uri_as_categorized,
+                     case_resolved_at: Time.now,
+                     user:current_user)
+              complaint.set_status(current_status)
+              #this is where we should send off the category to the API
+              if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
+                existing_prefixes = remote_prefixes(prefix_given: prefix)
+                commit_category(existing_prefixes,
+                                ip_or_uri: prefix,
+                                categories_string: categories_string,
+                                description: comment,
+                                user: current_user.email,
+                                casenumber: self.complaint.id)
+                update!(url_primary_category: category_names_string, category: category_names_string)
+              else
+                # TODO Do we need to update the record when we are not making a change?
+                existing_prefixes = remote_prefixes(prefix_given: prefix)
+                cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
+                update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+              end
+              ###################################################
+            end
+
+            if !current_user.is_webcat_manager?
+              if verdict_data["result"] == Webcat::GuardRails::FAIL
+                manager_user = User.where(:cvs_username => Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
+                guard_rails_reasons = verdict_data["why"]["reason"].pluck("reason").join(";")
+                update!(user: manager_user,
+                              internal_comment: "FAILED GUARDRAILS! Reason: #{guard_rails_reasons}"
+                )
+              end
             end
           else
             # dismiss from pending of important case
@@ -565,6 +589,8 @@ class ComplaintEntry < ApplicationRecord
         open.where(user_id: user.id)
       when "MY CLOSED COMPLAINTS"
         closed.where(user_id: user.id)
+      when "MANAGER QUEUE"
+        joins(:complaint).where("complaints.channel != 'wbnp'").where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED')")
       when "ALL"
         all
       else

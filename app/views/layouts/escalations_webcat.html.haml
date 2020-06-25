@@ -145,7 +145,11 @@
       Filter
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
-
+        - if current_user.is_webcat_manager?
+          %li{class: ("selected" if params[:f] == "MANAGER QUEUE")}
+            %a{href: '?f=MANAGER QUEUE'}
+              %span.nav-dropdown-icon.icon-my-bugs
+              Manager Queue
         %li{class: ("selected" if params[:f] == "MY COMPLAINTS")}
           %a{href: '?f=MY COMPLAINTS'}
             %span.nav-dropdown-icon.icon-my-bugs
