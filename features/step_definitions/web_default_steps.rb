@@ -67,6 +67,11 @@ Then(/^I cannot click "(.*?)"$/) do |target|
   rescue Capybara::ElementNotFound => e
   end
 end
+
+When(/^I choose "(.*?)"$/) do |target|
+  choose(:option => "#{target}")
+end
+
 When(/^I toggle checkbox "(.*?)"$/) do |target|
   page.find(target).click
 end
@@ -80,7 +85,7 @@ When(/^I uncheck "(.*?)"$/) do |target|
 end
 
 And (/^I check checkbox with class "(.*?)"$/) do |cb_class|
-  check(class: cb_class)
+  page.execute_script(" document.querySelector('.#{cb_class}').click()")
 end
 
 And (/^I check the first checkbox with class "(.*?)"$/) do |cb_class|
@@ -486,6 +491,7 @@ end
 Given (/^I enter content "(.*?)" within p with class "(.*?)"/) do |content, p|
   page.execute_script( "$('#{p}').html('#{content}')" )
 end
+
 Then (/^I hit enter within "(.*?)"/) do |element|
   find(element).native.send_keys(:return)
 end

@@ -19,20 +19,19 @@ $ ->
     parent_data = $(parent_row).find('.col-bulk-dispute').attr('data')
     parent_index = parent_row.rowIndex
     prev_row = existing_rows.eq(parent_index - 2)[0].innerText
-
     $(existing_rows).each ->
       data = $(this).find('.col-bulk-dispute').attr('data')
+      text_list = text_list.filter( (text)-> return !text_list.includes(data) )
+
       if !isEmpty(data)
         disputes_data.push(data)
         disputes.push(this)
-
-    if !isEmpty(parent_data) && !text_list.includes(parent_data)
+    if !isEmpty(parent_data) && text_list.includes(parent_data)
       index = disputes.indexOf(parent_data)
       disputes.splice(index, 1)
       parent_index = parent_index - 1
-
-    text_list = text_list.filter( (text)-> return !disputes_data.includes(text) )
-    text_list.push(' ')
+    if text_list[0] != ''
+      text_list.push(' ')
     enter_check = isEmpty(prev_row) && text_list.length == 1 && parent_index > 1 || isEmpty(parent_data)
 
     if disputes.length
@@ -41,11 +40,15 @@ $ ->
       for i in [0...text_list.length]
         disputes.splice parent_index + i, 0, text_list[i]
     else
+
       for i in [0...text_list.length]
         disputes.push(text_list[i])
 
     # reset the innerHTML to nothing
     tbody.innerHTML = ''
+
+#    for dispute in disputes
+
     for i in [0...disputes.length]
 # if the dispute is not an HTML object, set the HTML of the new row to the below
       if typeof disputes[i] != 'object'
@@ -54,7 +57,7 @@ $ ->
           "<tr>
             <td class='col-select-all'>
               <span class='checkbox-wrapper'>
-                <input type='checkbox' checked>
+                <input type='checkbox' checked='true'>
               </span>
             </td>
             <td class='col-bulk-dispute' contenteditable='true' data='#{disputes[i]}'><p> #{disputes[i]} </p></td>
@@ -71,15 +74,17 @@ $ ->
       else
 # if the dispute is an HTML object, set it as OuterHTML to avoid formatting issues
         tbody.innerHTML += disputes[i].outerHTML
-
+      get_rep_check()
       $(tbody).find('tr .col-bulk-dispute').each ->
-        if isEmpty( $(this).attr('data') )
+        data = $(this).attr('data')
+        if isEmpty( data )
           this.focus()
+        else
+          $(this).text(data)
 
       setTimeout () ->
         $("br").remove()
       , 20
-    $('.ajax-message-div').css('display', 'none')
 
 
   window.bindControls = () ->
@@ -112,11 +117,25 @@ $ ->
             for name, value of data
               if value
                 valid_list.push(name)
-            buildRow(valid_list, row)
+            check_row_data(valid_list, row)
       )
     else
-      buildRow(valid_list, row)
-      return true
+      check_row_data(valid_list, row)
+
+  window.check_row_data = (valid_list, row) ->
+    existing_rows = $("#research-table tbody").find('tr')
+    disp_data =  $(row).find('.col-bulk-dispute').attr('data')
+    single_row = valid_list[0] != disp_data
+    existing_rows.each ->
+      data = $(this).find('.col-bulk-dispute').attr('data')
+      if data == valid_list[0]
+        valid_list = ['']
+    if valid_list.length == 1 && single_row && disp_data != ""
+      $(row).find('.col-bulk-dispute').attr('data', valid_list[0])
+      $(row).find('.col-bulk-dispute').removeAttr('searched')
+      $(row).find('.row-action-clear').click()
+      $(row).find('.col-wbrs-rule-hits, .col-wbrs-rules, .col-category, .col-wlbl, .col-threat-cats, .col-wbrs, .col-reptool-class').text('')
+    buildRow(valid_list, row)
 
   window.check_ips = (text_list) ->
     data = {'ip_address': text_list}
@@ -130,34 +149,57 @@ $ ->
     )
 
   set_row_text = (e, el) ->
-    { which: key, shiftKey } = e
+    { which: key, shiftKey, type } = e
     text = el.innerText.trim()
-    text_list = text.replace( /\n|\s/g, ", " ).split(", ")
-    row = el.closest('tr')
-    tbody = row.closest('tbody')
 
-    text_list = text_list.filter (item, index) ->
-      if item != ''
-        return text_list.indexOf item == index
-    if key == 13
-      if !shiftKey && text_list.length
-        check_ips(text_list, headers, row)
-          .then ( check_urls.bind( null, text_list, row) )
-          .then null, (err) -> console.log err
-    else if key == 0
-      if text_list.length > 1
-        check_ips(text_list, headers, row)
-          .then ( check_urls.bind( null, text_list, row) )
-          .then null, (err) -> console.log err
-      else
-        $(row).data(text)
-    else if key == 8
-      if isEmpty(text) && $(tbody).children().length > 1
-        $(row).remove()
-        if !isEmpty( $(tbody).find('tr').last() )
-          $('#add_addtional_row').css('display', 'flex')
+    get_rep_check(e)
+    if text != undefined
+      text_list = text.split(/[\s\t\n]+/)
+      row = el.closest('tr')
+      tbody = row.closest('tbody')
+
+      text_list = text_list.filter (item, index) ->
+        if item != ''
+          return text_list.indexOf item == index
+      if type == 'focusout' && key != 8
+
+        if !shiftKey && text_list.length
+          if text_list[0].length > 1
+            check_ips(text_list, headers, row)
+              .then ( check_urls.bind( null, text_list, row) )
+              .then null, (err) -> console.log err
+
+      if key == 13
+        if !shiftKey && text_list.length
+          check_ips(text_list, headers, row)
+            .then ( check_urls.bind( null, text_list, row) )
+            .then null, (err) -> console.log err
+      else if key == 0
+        if text_list.length > 1
+          check_ips(text_list, headers, row)
+            .then ( check_urls.bind( null, text_list, row) )
+            .then null, (err) -> console.log err
         else
-          $('#add_addtional_row').css('display', 'none')
+          $(row).data(text)
+      else if key == 8
+        length_check = isEmpty(text) || text.length == 1
+        col_disp = $(tbody).find('.col-bulk-dispute')
+
+        if length_check && $(tbody).children().length > 1
+
+          # setting data to empty  so there is no chance the row data may persist on deletion
+          $(row).remove()
+          if !isEmpty(col_disp.filter('[data]').attr('data')) || col_disp.length != 1
+            $('#add_addtional_row').css('display', 'flex')
+          else
+            $('#add_addtional_row').css('display', 'none')
+
+        if isEmpty($(col_disp).text()) && col_disp.length == 1
+            $(col_disp[0]).attr('data', "")
+            $('#add_addtional_row').css('display', 'none')
+
+
+
 
   $(document).on 'click', '#add_addtional_row', ->
     row =

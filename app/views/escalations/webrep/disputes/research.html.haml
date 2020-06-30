@@ -3,11 +3,14 @@
   .reputation-research-search-wrapper
 
     -# shared loader for detail and quick lookup
-    .ajax-message-div
+    .ajax-message-div#detail-lookup-loader
+      .loader-gears
+        =inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Active search processing, please wait...
+    .ajax-message-div#quick-lookup-loader
       .loader-gears
         =inline_svg 'icon_gears_loader.svg'
       %span.loader-msg Loading data...
-
     .research-header-wrapper
       %span.icon-research.top-info-icon
       %h1 Reputation Research
@@ -24,15 +27,17 @@
             %span.tab-text Quick Lookup
 
     .research-search-form.row.tab-content
-      = form_for(:search, method: "get") do |search_form|
+      = form_for(:search, method: "get", :html=>{:id=>'research_form'}) do |search_form|
         .search-options-col.tab-pane.active#lookup-detail
           .col-xs-4.col-sm-3.col-md-2.col-lg-2.col-xl-1
-            = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
-            %label.esc-tooltipped.detail-label{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
-            = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
-            %label.esc-tooltipped.detail-label{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
+            %span.block-label
+              = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
+              %label.esc-tooltipped.detail-label{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
+            %span.block-label
+              = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
+              %label.esc-tooltipped.detail-label{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
             %hr.thin
-            =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary',onclick: 'detail_loader()')
+            =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary',onclick: 'detail_search(); return false')
           .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
             = search_form.text_area(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
 
@@ -43,7 +48,7 @@
         .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}
 
           .col-xs-12.toolbar-quicklookup
-            %button.primary#get-rep-data{onclick: 'get_rep_data();return false;'} Get Reputation Data
+            %button.primary#get-rep-data{onclick: 'get_rep_data();return false;', disabled: true} Get Reputation Data
             .toolbar.research-toolbar
               %div
                 %label.toolbar-section-label Adjust Reputation
@@ -246,7 +251,7 @@
             %input#select-all-entries.esc-tooltipped{type:'checkbox',title: 'Select All / Deselect All', 'onclick':'select_all_detailed(this)'}
               %span.toolbar-button-text.select-all-label Select All / Deselect All
         %div
-          %label.toolbar-section-label Table View
+          %label.toolbar-section-label View
           %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped{title: 'Expand All Rows'}
             %span.toolbar-button-text Expand All Rows
           %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped.hidden{title: 'Collapse All Rows'}
@@ -466,8 +471,9 @@
         %div
           %label.toolbar-section-label Type to filter results
           %input#research-page-filter{'type': "text", 'onKeyUp': "researchfilter(this)"}
-        %button.primary#submit-strict-changes{onclick:'submit_quick_lookup();return false;', disabled: true} Submit Reputation Changes
-        %span.small.note-repsubmit * NOTE: Submitting reputation changes will automatically create a closed ticket
+        -#  TODO - The actions collection of the detailed lookup has not been created yet. Hiding this button for that future ticket. Submit detailed lookup not a function yet.
+        -#%button.primary#submit-strict-changes{onclick:'submit_detail_lookup();return false;', disabled: true} Submit Reputation Changes
+        -#%span.small.note-repsubmit * NOTE: Submitting reputation changes will automatically create a closed ticket
       -#####################
       -# END: toolbar for detail lookup results
       -#####################

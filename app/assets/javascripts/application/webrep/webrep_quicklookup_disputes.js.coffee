@@ -1,6 +1,10 @@
 $ ->
+  headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
 
-
+  ongoing_detail_search = false
+  ongoing_quick_search = false
+  current_search_count = 0
+  completed_counter = 0
   window.isEmpty = (item) ->
     ####
     # function to check whether or not objects and strings are empty, more variable types can be added as needed
@@ -15,45 +19,53 @@ $ ->
   window.stringIncludes = (str, substring) ->
     return str.indexOf(substring) != -1
 
-  completed_counter = 0
-  headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
+  #counter for ajax calls
   $(document).bind(
-    ####
-    #This controls the show/hide of the loading wheel depending on if all ajax calls have been completed.
-    #There were issues with using ajaxStop, but this works
-    ####
-
-    ajaxStart: () ->
-      $('.ajax-message-div').css('display', 'flex')
-      if window.location.hash == '#lookup-quick'
-        $('.ajax-message-div').css('top', '140px')
-      else if window.location.hash == '#lookup-detail' || window.location.hash == ''
-        $('.ajax-message-div').css('top', '50%')
-    ajaxStop: () ->
-        $('.ajax-message-div').css('display', 'none')
     ajaxComplete: () ->
-      completed_counter++
+
       ####
       # selected_rows needs to be multiplied by the number of ajax calls that are being made to
       # accurately gauge the number of calls
+      # This controls the show/hide of the loading wheel depending on if all ajax calls for quicklookup have been completed.
       ####
-      selected_rows = $('.col-select-all input:checked').length * 5
-      if completed_counter == selected_rows
-        $('.ajax-message-div').css('display', 'none')
+
+      selected_rows = current_search_count * 5
+      if ongoing_quick_search
+        completed_counter++
+        if completed_counter == selected_rows && ongoing_quick_search
+          ongoing_quick_search = false
+          completed_counter = 0
+          $('#quick-lookup-loader').removeClass('visible-ajax-message')
+          $('#quick-lookup-loader').css('display', 'none')
   )
 
 
   $(document).ready ->
-    if window.location.hash == '#lookup-quick'
-      $('.lookup-detail').css('display', 'none')
-    else if window.location.hash == '#lookup-detail' || window.location.hash == ''
-      $('.lookup-detail').css('display', 'unset')
+    update_tabs( window.location.hash )
 
   $('#research-tabs li').on 'click', ->
-    if $(this).attr('data') == 'lookup-detail'
-      $('.lookup-detail').css('display', 'unset')
-    else
+    update_tabs( window.location.hash )
+
+  window.update_tabs = ( location ) ->
+#    just making sure that correct loader is hidden/shown
+#    having one and changing location has been less buggy/complicated than having 2 separate ones
+    if location == '#lookup-quick'
       $('.lookup-detail').css('display', 'none')
+      $('#detail-lookup-loader').removeClass('visible-ajax-message')
+      $('#detail-lookup-loader').css('display',' none')
+      if !ongoing_quick_search
+        $('#quick-lookup-loader').removeClass('visible-ajax-message')
+      else
+        $('#quick-lookup-loader').addClass('visible-ajax-message')
+      window.history.pushState("", "", '/escalations/webrep/research#lookup-quick');
+    else if location == '#lookup-detail' || location == ''
+      $('#quick-lookup-loader').removeClass('visible-ajax-message')
+      if !ongoing_detail_search
+        $('#detail-lookup-loader').removeClass('visible-ajax-message')
+        $('.lookup-detail').css('display', 'unset')
+      else
+        $('#detail-lookup-loader').addClass('visible-ajax-message')
+        $('.research_results').css('display', 'none')
 
   window.isEmpty = (item) ->
     ####
@@ -69,24 +81,59 @@ $ ->
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
 
-  window.detail_loader = () ->
-    $('.ajax-message-div').css('display', 'flex')
+  window.detail_search = () ->
+    ongoing_detail_search = true
+    text_list = $('#search_uri').val().split(/[\s\t\n]+/).filter((el)=> return el != "" )
+    if text_list.length == 0
+      std_msg_error('Error Submitting Search',["Please enter at least one URL or IP address."], reload: false)
+    else
+      $('#detail-lookup-loader').addClass('visible-ajax-message')
+      $('.lookup-detail, .research_results').css('display', 'none')
+      check_ips(text_list).then( (response)=>
+        { data } = response
+        valid_list = []
+        url_list = []
+        invalid_list = []
+        for name, value of data
+          if !value
+            url_list.push(name)
+          else
+            valid_list.push(name)
+        if url_list.length == 0
+          $('#detail-lookup-loader').addClass('visible-ajax-message')
+          $("#research_form").submit()
+        else
+          $.ajax(
+            url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
+            method: 'GET'
+            headers: headers
+            data: {'uri': url_list}
+            dataType: 'json'
+            success: (response) ->
+              {data} = response
+              for name, value of data
+                if value
+                  valid_list.push(name)
+                else
+                  invalid_list.push(name)
+              if valid_list.length == 0
+                std_msg_error('Error Submitting Search',["Please enter at least one valid URL or IP address."], reload: false)
+              else
+                submit_list = valid_list.join('\n')
+                $("#search_uri").val(submit_list)
+                $('#detail-lookup-loader').addClass('visible-ajax-message')
+                $("#research_form").submit()
 
-  $(document).ready ->
-    update_tabs( window.location.hash )
+                for el, i  in valid_list
+                  valid_list[i] = "<span class='col-tag'>#{el}</span>"
+                for el, i in invalid_list
+                  invalid_list[i] = "<span class='col-tag'>#{el}</span>"
+                if invalid_list.length > 0
+                  std_msg_success('Submitting Search',["<div class='submit-search-msg'>The following URLs and IPs are being submitted: #{valid_list.join()}</div> <div class='submit-search-msg'>The following URLs and IPs are invalid: #{invalid_list.join()} </div>"], reload: false)
 
-  $('#research-tabs li').on 'click', ->
-    update_tabs( window.location.hash )
+          )
+      )
 
-  window.update_tabs = ( location ) ->
-#    just making sure that the loader div is in the right spot.
-#    having one and changing location has been less buggy/complicated than having 2 separate ones
-    if location == '#lookup-quick'
-      $('.lookup-detail').css('display', 'none')
-      $('.ajax-message-div').css('top', '138px')
-    else if location == '#lookup-detail' || location == ''
-      $('.lookup-detail').css('display', 'unset')
-      $('.ajax-message-div').css('top', '370px')
 
   window.reset_error_modal = () ->
     $( '#error_modal' ).dialog(
@@ -248,7 +295,14 @@ $ ->
     e_val = e.currentTarget.checked
     select_cols = $('.col-select-all input')
     for col in select_cols
+      # We need to set both attr and prop here.
+      # prop makes sure all values actually get changed,
+      # attr makes sure that values persist after rows have been added
+      $(col).attr('checked', e_val)
       $(col).prop('checked', e_val)
+      if e_val == false
+        $(col).removeAttr('checked')
+    get_rep_check()
 
   $(document).on 'change', '.col-select-all input', (e) ->
     ####
@@ -256,10 +310,16 @@ $ ->
     ####
     select_cols = $('.col-select-all input')
     select_vals = []
+    val = $(this).prop('checked')
+    if !val
+      $(this).removeAttr('checked')
+    else
+      $(this).attr('checked', 'true')
     for col in select_cols
       select_vals.push( $(col).prop('checked') )
     bulk_value = select_vals.every( (col) -> return col)
     $('#select-all-bulk').prop('checked', bulk_value)
+    get_rep_check()
 
   $(document).on 'change', '.adjust_reptool_checkbox, .status_bl', () ->
     ####
@@ -362,7 +422,7 @@ $ ->
          # Once all Disputes have been processed, pass list of disputes and error array to the bulk quick update
          clearInterval(dispute_calls)
          quick_bulk_update(disputes, error_array)
-    , 2000);
+    , 200);
 
     for dispute, value of disputes
       dispute = dispute.trim()
@@ -532,8 +592,8 @@ $ ->
       error_prefix: 'Error logging in.'
       success: (response) ->
         submitted_entries = []
+        $('#quick-lookup-loader').removeClass('visible-ajax-message')
         if response
-
           for key, val of data
             if key != 'comment'
               submitted_entries.push(key.trim())
@@ -557,7 +617,7 @@ $ ->
     ####
     confirmation_rows = document.querySelector('#confirmation-modal tbody').rows
     $('#confirmation-modal').modal('toggle');
-
+    $('#quick-lookup-loader').addClass('visible-ajax-message')
     disputes = { comment: $('.confirm-rep-input').text() }
 
     $( confirmation_rows ).each ->
@@ -595,7 +655,7 @@ $ ->
 
 
   window.set_action_wlbl_col = () ->
-
+    $(".dropdown.open").removeClass("open");
     $('.grayed-out').removeClass('grayed-out')
     reset_error_modal()
 
@@ -749,7 +809,7 @@ $ ->
     #####
     # set and format action to be taken in each row's action column
     #####
-
+    $(".dropdown.open").removeClass("open");
     reset_error_modal()
 
     check_vals = $( '.adjust_reptool_checkbox:checked' ).map( () -> return $(this).val() ).get()
@@ -859,32 +919,46 @@ $ ->
       $( '#error_modal .modal-header' ).html( error_header )
       $( '#error_modal .modal-body' ).append(error_array)
 
+  window.get_rep_check = (e)->
+    disabled = true
+    $('tr .col-select-all input').each ->
+      row =  $(this).closest('tr')
+      checked = this.checked
+      data = row.find('.col-bulk-dispute').text().trim()
+      if data != "" && checked
+        disabled = false
+#      if e.type == 'focusout'
+##        row.find('.col-bulk-dispute').attr('data', data)
+#        if row.find('.col-bulk-dispute').is(':empty')
+#          row.find('.col-bulk-dispute').attr('data', '')
+    document.getElementById('get-rep-data').disabled = disabled
+
   window.get_rep_data = ()->
     ####
     # get reputation data for all rows
     # after getting data, display in the appropriate column
     ####
+    ongoing_quick_search = true
     search_items = []
     rows = $('.research-table tbody tr')
-
-    if !isEmpty( $(rows).last() )
-      $('#add_addtional_row').css('display', 'flex')
-    else
-      $('#add_addtional_row').css('display', 'none')
-
     $('.col-bulk-dispute').each ( ) ->
       checkbox = $(this).prev().find('input')
+      searched = $(this).attr('searched')
       if checkbox.length
+        index = $(this).parent('tr').index();
         text = $(this).text()
-        if !isEmpty(text) && checkbox[0].checked
-          search_items.push(text)
+        if !isEmpty(text) && checkbox[0].checked && searched == undefined
+          search_items.push({'search_text':text, "row_index": index})
+
+    current_search_count = search_items.length
 
     for i in [0...search_items.length]
-      item = search_items[i]
-      row = rows[i]
+      $('#quick-lookup-loader').addClass('visible-ajax-message')
+      {search_text, row_index}= search_items[i]
+      item = search_text
+      row = rows[row_index]
 
       if !isEmpty(item)
-        detail_loader()
         # for each search item, call a promise to get the data. If success, the first then runs, setting the data in the rows.
         # if it fails, the second runs, catching the error
         new get_reptool(item, headers)
@@ -902,8 +976,8 @@ $ ->
         new get_rule_threat_cat(item, headers)
           .then ( set_rule_threat_cat.bind( null, item, row) )
           .then null, (err) -> console.log err
-        new get_wrbs(item, headers)
-          .then( set_wrbs.bind( null, item, row) )
+        new get_wbrs(item, headers)
+          .then( set_wbrs.bind( null, item, row) )
           .then null, (err) -> console.log err
 
   window.get_reptool = (item, headers) ->
@@ -929,7 +1003,7 @@ $ ->
       error: (response) -> return response
     )
 
-  window.get_wrbs = (item, headers) ->
+  window.get_wbrs = (item, headers) ->
     data = {'uri': item.trim()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/wbrs_info'
@@ -991,12 +1065,13 @@ $ ->
   window.set_wlbl = ( item, row, data) ->
     { data } = JSON.parse(data)
     col_wlbl = $(row).children('.col-wlbl')
+    col_dispute = $(row).find('.col-bulk-dispute')
     if data.length
       text = data.join(', ')
     else
       text = "<span class='missing-data'>No Data</span>"
     col_wlbl.html( text )
-
+    col_dispute[0].setAttribute('searched', true)
   window.set_cat = ( item, row, data) ->
     { data } = JSON.parse(data)
     cat_col = $(row).children('.col-category')
@@ -1042,7 +1117,7 @@ $ ->
     else
       col_tc.append( "<span class='missing-data tc_data esc-tooltipped' title='#{title}'> | No SDS data</span>")
 
-  window.set_wrbs = ( item, row, data) ->
+  window.set_wbrs = ( item, row, data) ->
     { score, rulehits } = data.json.data
     col_wbrs = $(row).children('.col-wbrs')
     col_wbrs_rule = $(row).children('.col-wbrs-rules')
@@ -1050,11 +1125,16 @@ $ ->
 
     col_wbrs_rule.text( rulehits.join(', ') )
     col_wbrs_hits.text( rulehits.length )
+
     if rulehits.length == 0
       col_wbrs_rule.text('No data')
+      col_wbrs_rule.addClass('missing-data')
+
     else
       col_wbrs_rule.text( rulehits.join(', ') )
     if score != 'noscore'
+      if  Number(score) == score && score % 1 == 0
+        score = score.toFixed(1)
       col_wbrs.text( score )
     else
       col_wbrs.text( '0.0' )

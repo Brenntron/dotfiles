@@ -722,11 +722,11 @@ class DisputeEntry < ApplicationRecord
     end
 
     ip_addr = IPSocket.getaddress(hostlookup) rescue nil
-    if ip_addr
-      wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
-      wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
-      wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
-    end
+    #if ip_addr
+    #  wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
+    #  wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+    #  wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
+    #end
 
 
     if extra_wbrs_stuff.present?
@@ -963,9 +963,9 @@ class DisputeEntry < ApplicationRecord
       end
 
       if ip_addr
-        wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
-        wbrs_stuff_rulehits = wbrs_stuff_rulehits + (Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip) rescue [])
-        wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
+        #wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
+        #wbrs_stuff_rulehits = wbrs_stuff_rulehits + (Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip) rescue [])
+        #wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
         entry.web_ips = ip_addr
         web_ips_formatted = entry.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
 
@@ -1114,8 +1114,8 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.valid_url?(test_url)
-    url_regexp = /^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ix
-    test_url =~ url_regexp ? true : false
+
+    test_url =~ URI::regexp ? true : false
   end
 
   def self.process_multi_ip_info(uri, ips, dispute_entry = nil)

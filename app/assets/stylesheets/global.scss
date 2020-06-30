@@ -5440,7 +5440,7 @@ input.table-entry-input:focus {
   td {
     padding: 8px 8px 8px 10px;
   }
-  .tc-header{
+  .tc_header{
     text-transform: none;
     font-weight: 600;
     font-size: 10px;
@@ -5562,6 +5562,9 @@ input.table-entry-input:focus {
   .ajax-message-div{
     top: 140px;
   }
+}
+.visible-ajax-message{
+  display: flex!important;
 }
 .research-search-form .button_primary {
   margin: 10px 0;
@@ -5820,7 +5823,11 @@ h5.entry-details-table-header {
 .select-all-label{
   margin-top: -18px;
 }
-
+#research-page-toolbar{
+  .select-all-label{
+    margin-top: 0
+  }
+}
 @media (min-width: 1600px) {
   .select-all-label{
     min-width: 153px;
@@ -6159,7 +6166,6 @@ td.data-table-emph {
 #research-page-toolbar {
   #add_to_ticket_dropdown{
     background: $primary-section-color;
-    width: 300px;
     border-radius: 3px;
   }
   .new-dispute-form{
@@ -9230,7 +9236,14 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   font-family: "Fira Mono", monospace;
   cursor: default;
 }
-
+.modal{
+  .col-tag{
+    white-space: nowrap;
+  }
+}
+.submit-search-msg{
+  margin-bottom: 5px
+}
 .col-actions .col-tag:hover:after{
   content: ' | X ';
   height: 20px;
@@ -11458,7 +11471,7 @@ hr.thin.extra-bottom-marg {
     }
     .threat-cat-area {
       padding: 3px;
-      height: 200px;
+      height: fit-content;
       display: flex; // flex to alphabetize + sort the threat cats easily
       flex-wrap: wrap;
       flex-direction: column;
@@ -11499,10 +11512,16 @@ hr.thin.extra-bottom-marg {
     }
   }
 }
+.modal-body{
+  .threat-cat-col{
+    width: 450px;
+    overflow-wrap: break-word;
+  }
+}
 #wlbl_entries_dropdown{
   .threat-cat-area{
     padding: 3px;
-    height: 200px;
+    height: 206px;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
@@ -11726,7 +11745,12 @@ table > tbody > tr > td.no-padding {
     margin-bottom: -2px;
   }
 }
-
+#detail-lookup-loader{
+  top: 370px;
+}
+#quick-lookup-loader{
+  top: 140px;
+}
 // retain top navigation at top of page during scroll down for nav accessibility
 #nav-banner.fixed-nav {
   position: -webkit-sticky;
@@ -12677,10 +12701,6 @@ table > tbody > tr > td.no-padding {
   margin: 0 !important;
 }
 
-/* research page radio buttons */
-#research-search-broad {
-  margin-left: 12px;
-}
 // adding the down caret icon using the sort_by svg for advanced search button
 #advanced-search-button::after {
   content: '';
@@ -12760,4 +12780,16 @@ table.dispute_tool_current tr.reptool-entry-row td {
   display: none;
   position:absolute;
   margin-top: -94px;
+}
+
+.block-label {
+  display: block;
+}
+
+#research-page-toolbar .adjust-container {
+  min-width: 104px;
+}
+
+#research-page-filter {
+  height: 27px;
 }
