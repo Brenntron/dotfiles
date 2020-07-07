@@ -107,3 +107,6 @@ Given(/^an empty dispute exists$/) do
   dispute.save!(validate: false)
 end
 
+Given(/^the user is logged into bugzilla$/) do
+  BugzillaRest::Session.any_instance.stub(:logged_in?).and_return(true)
+end
