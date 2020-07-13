@@ -262,7 +262,7 @@ $ ->
     row = $(this).parents('tr')[0]
     col_clear = $(row).find('.col-clear-actions')[0]
     action_col = $(row).find('.row-action-clear')[0]
-    if action_p.getAttribute("wlbl_data") != undefined
+    if action_p.getAttribute("wlbl_data") != undefined && action_p.getAttribute("wlbl_data") != null
       data_type = "wlbl_data"
     else
       data_type = "data"
@@ -275,13 +275,16 @@ $ ->
     $(this).remove()
     action_p.setAttribute(data_type, data)
     if data.length == 0
+
       if $(action_p).hasClass('wlbl-action-col')
         $(row).find('.threat-cat-col').remove()
+        $(action_p).remove()
       if $(action_p).hasClass('threat-cat-col')
         $(row).find('.wlbl-action-col').remove()
-      $(action_p).remove()
+        $(action_p).remove()
       if $(action_col).html() == ''
         $(col_clear).find('button').click()
+
     else
       unless $.trim(action_edit) == 'Threat Categories'
         col_dialog = "#{action_edit}: #{col_tag_format(data)}"
