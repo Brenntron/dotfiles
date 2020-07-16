@@ -2,7 +2,7 @@ class Customer < ApplicationRecord
   belongs_to :company, optional:true
   has_many :complaints
   has_many :disputes
-  has_many :file_reputation_tickets
+  has_many :file_reputation_disputes
 
   validates :email, presence: true, uniqueness: true
 
