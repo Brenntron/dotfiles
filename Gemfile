@@ -42,7 +42,7 @@ gem 'bugzilla', require: 'bugzilla'
 gem 'xmlrpc'
 
 
-gem 'rails_admin', '~> 1.4.2'
+gem 'rails_admin', '~> 1.4.3'
 
 # System Management
 gem 'foreman', '0.85.0'
