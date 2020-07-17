@@ -88,14 +88,29 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 
 window.touchedFormChange = (url) ->
   urls_touched = (sessionStorage.getItem("touchedForm")|| "" )
+
   if !urls_touched.includes(url)
-    urls_touched += url + ","
+    url_items = urls_touched.split(",")
+    url_items.push(url)
+    urls_touched = url_items.join(",")
+  sessionStorage.setItem("touchedForm", urls_touched)
+
+window.removeTouchedFormChange = (url) ->
+  urls_touched = (sessionStorage.getItem("touchedForm")|| "" )
+
+  if urls_touched.includes(url)
+    url_items = urls_touched.split(",")
+    url_index = url_items.indexOf(url)
+    url_items.splice(url_index, 1)
+    urls_touched = url_items.join(",")
   sessionStorage.setItem("touchedForm", urls_touched)
 
 getTouchedFormCount = ()->
   form_item = sessionStorage.getItem("touchedForm")
   items = 0
   if form_item
+    if form_item.slice -1 == ","
+      form_item = form_item.slice(0, -1);
     items = form_item.split(",").length - 1
   return items
 
@@ -548,6 +563,7 @@ processSubmitEntry = (entry_id,row_id) ->
             select_complete = $completed_selectize[0].selectize
             select_complete.disable()
 
+          removeTouchedFormChange(uri)
           $("#complaint_prefix_#{entry_id}").val(uri)
           $("#domain_#{entry_id}").text(domain)
           $("#subdomain_#{entry_id}").text(subdomain)
