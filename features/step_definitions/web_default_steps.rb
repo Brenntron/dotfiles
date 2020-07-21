@@ -83,13 +83,24 @@ end
 When(/^I uncheck "(.*?)"$/) do |target|
   uncheck(target)
 end
-
+#TODO for Katie: figure out which I Check checkbox step def to keep
 And (/^I check checkbox with class "(.*?)"$/) do |cb_class|
   page.execute_script(" document.querySelector('.#{cb_class}').click()")
 end
 
 And (/^I check the first checkbox with class "(.*?)"$/) do |cb_class|
   check(class: cb_class)
+end  
+And(/^I check checkbox with class "(.*?)"$/) do |cb_class|
+  check(class: cb_class)
+end
+
+And(/^I uncheck checkbox with class "(.*?)"$/) do |cb_class|
+  uncheck(class: cb_class)
+end
+
+When(/^I choose "(.*?)"$/) do |target|
+  choose(target)
 end
 
 When(/^I click a table row$/) do

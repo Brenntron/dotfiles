@@ -107,3 +107,13 @@ Then(/^clean up reptool and remove all reptool entries on "(.*?)"$/) do |url|
   reptool_params["entries"] = [url]
   RepApi::Blacklist.adjust_from_params(reptool_params, username: @user.cvs_username)
 end
+Given(/^an empty dispute exists$/) do
+  FactoryBot.create(:customer) unless Customer.all.exists?
+  dispute = FactoryBot.create(:dispute, {user_id: nil, subject: nil, problem_summary: nil, case_opened_at: nil, submission_type: nil})
+  dispute.assign_attributes(customer_id: nil)
+  dispute.save!(validate: false)
+end
+
+Given(/^the user is logged into bugzilla$/) do
+  BugzillaRest::Session.any_instance.stub(:logged_in?).and_return(true)
+end

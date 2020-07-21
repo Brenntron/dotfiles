@@ -347,33 +347,33 @@
                             %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', class: "RESOLVED_CLOSED_#{entry.id}", id: "RESOLVED_CLOSED", onclick: 'populate_resolved_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED}"} Resolved / Closed
                             .dropdown-menu.ticket-resolution-submenu
-                              .col-xs-6.submenu-left-wrapper
+                              .col-xs-6.submenu-left-wrapper#webrep-entry-resolution-selector
                                 .submenu-header
                                   Ticket Resolution
                                 %ul
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'FIXED_FP'}
-                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_FIXED_FP}", value: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FP}"}
+                                    %label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'FIXED_FN'}
-                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_FIXED_FN}", value: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FN}"}
+                                    %label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'UNCHANGED'}
-                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_UNCHANGED}"} Unchanged
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_UNCHANGED}", value: "#{DisputeEntry::STATUS_RESOLVED_UNCHANGED}"}
+                                    %label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_UNCHANGED}"} Unchanged
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'INVALID'}
-                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_INVALID}", value: "#{DisputeEntry::STATUS_RESOLVED_INVALID}"}
+                                    %label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'TEST_TRAINING'}
-                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_TEST}"} Test / Training
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_TEST}", value: "#{DisputeEntry::STATUS_RESOLVED_TEST}"}
+                                    %label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_TEST}"} Test / Training
                                   %li
-                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: 'OTHER'}
-                                    %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED_OTHER}"} Other
+                                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_OTHER}", value: "#{DisputeEntry::STATUS_RESOLVED_OTHER}"}
+                                    %label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_OTHER}"} Other
                               .col-xs-6.submenu-right-wrapper
                                 .resolution-comment-wrapper
                                   %label.content-label-sm
                                     Comment
-                                  %textarea{name: 'resolution-comment'}
+                                  %textarea#webrep-entry-resolution-comment{name: 'resolution-comment'}
 
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RE-OPENED_#{entry.id}", id: "RE-OPENED", onclick: 'populate_status_selection();'}

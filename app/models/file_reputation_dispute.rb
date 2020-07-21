@@ -119,6 +119,10 @@ class FileReputationDispute < ApplicationRecord
     self.disposition_suggested&.downcase == DISPOSITION_CLEAN.downcase
   end
 
+  def suggested_unknown?
+    self.disposition_suggested&.downcase == DISPOSITION_UNKNOWN.downcase
+  end
+
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
@@ -703,7 +707,6 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def auto_resolve_on_matching_disposition(from: 'ACE')
-
       auto_resolve_log = ""
 
       auto_resolved_boolean = false
@@ -740,8 +743,6 @@ class FileReputationDispute < ApplicationRecord
         threatgrid_present = true
       end
 
-
-
       rev_lab = FileReputationApi::ReversingLabs.lookup(self.sha256_hash)
       rev_lab_json = JSON.parse(rev_lab.raw_json)
 
@@ -767,7 +768,7 @@ class FileReputationDispute < ApplicationRecord
       auto_resolve_log += "malware zoo: #{zoo_response.inspect.to_s}\n\n--\n"
       auto_resolve_log += "-----------------------------------\n"
 
-      self.auto_resolve_log += auto_resolve_log
+      self.auto_resolve_log = auto_resolve_log
       self.save
       if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == false } && [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == true }
         self.auto_resolve_log += "\n-------\nSetting Status To New as there are some True's and some False's with the 4 presence sources.\n------\n"
@@ -778,9 +779,18 @@ class FileReputationDispute < ApplicationRecord
 
       if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].all? {|prez| prez == false }
         #notify customer that there is no sample and to escalate via TAC with sample
-        self.status = STATUS_RESOLVED
-        self.resolution = RESOLUTION_AUTORESOLVED
-        self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
+        # self.status = STATUS_RESOLVED
+        # self.resolution = RESOLUTION_AUTORESOLVED
+        # self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
+        ### Temporary bypass of no sample auto resolve per WEB-6062 until WEB-5623 is resolved
+        if self.suggested_clean? || self.suggested_unknown?
+          self.status = STATUS_NEW
+          self.auto_resolve_log += "\n-------\nSetting Status To New as there is no sample.\n------\n"
+        else
+          self.status = STATUS_RESOLVED
+          self.resolution = RESOLUTION_AUTORESOLVED
+          self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
+        end
         self.save
         return auto_resolved_boolean
       end
