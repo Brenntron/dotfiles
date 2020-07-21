@@ -8,12 +8,20 @@
 
 ## Populating the inline Adjust Reptool dropdown for
 ## research page and research tab (individual submission form)
+$(document).ready ->
+  $('.webrep_auto_resolve').each ->
+    $(this).dialog({autoOpen : false, width: 500});
+
+window.show_webrep_auto_resolve = (entry) ->
+  dialog = $('#webrep_auto_resolve-' + entry)
+  dialog.dialog('open')
+
 window.get_current_reptool =(button, page) ->
   dropdown = $(button).parents('.dropdown')[0]
   submit_button = $(dropdown).find('.dropdown-submit-button')[0]
   entry_row = $(button).parents('.research-table-row')[0]
   entry = $(entry_row).find('.entry-data-content')
-  entry_content = $(entry).text().trim()
+  entry_content = $(entry).text().trim()   # entry_content is simply the URL in this row, this is working
   case_id = $('#dispute_id').text().trim()
   comment_trail = ''
 
@@ -21,23 +29,27 @@ window.get_current_reptool =(button, page) ->
   # Empty table
   tbody = $(dropdown).find('table.dispute_tool_current').find('tbody')
   $(tbody).empty()
-  # Empty the comment box
-  comment_box = $(dropdown).find('.comment-input')
-  comment_box.val('')
+  # Find the comment div inside this dropdown
+  comment_box = $(dropdown).find('.reptool-generated-comment')
 
+  # Can leave the \n's, they will get replaced with spaces on submission to Reptool
   if page == "show"
-    comment_trail = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
+    comment_trail = 'AC INDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
   else if page == "research"
-    comment_trail = '\n \n------------------------------- \nINDIVIDUAL RESEARCH SUBMISSION: \n' + entry_content
+    comment_trail = 'AC INDIVIDUAL RESEARCH SUBMISSION: \n' + entry_content
+
+  # ensure ip_uris is valid for the endpoint, it is just the URL for this row
+  ip_uris = entry_content
 
   # Send entry content to reptool
   data = {
     'entry': entry_content
   }
+
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
     method: 'POST'
-    data: { ip_uris: entry_content }
+    data: { ip_uris: [entry_content] }
     success: (response) ->
       response = JSON.parse(response)
       entry = response[0]
@@ -45,8 +57,18 @@ window.get_current_reptool =(button, page) ->
         rep_class = entry.classification.join(', ')
       else
         rep_class = '<span class="missing-data">No active classifications</span>'
-      tbody.append('<tr class="reptool-entry-row" data-case-id="' + 'case_id' + '"><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-expiration">' + entry['expiration'] + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
-      comment_box.val(comment_trail)
+
+      full_comment = entry['comment']
+      full_comment = full_comment.replace(': ,', ':')  # one-off string fix
+
+      # ellipsis-trick the reptool dropdown comment
+      if full_comment.length > 80
+        truncated_comment = full_comment.substring(0, 80) + '...'
+        full_comment = '<span title="' + full_comment + '">' + truncated_comment + '</span>'
+
+      tbody.append('<tr class="reptool-entry-row" data-case-id="' + 'case_id' + '"><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-expiration">' + entry['expiration'] + '</td><td class="reptool-entry-comment">' + full_comment + '</td></tr>')
+
+      $(comment_box).html(comment_trail)  # put the auto-generated comment into the read-only div
 
     error: (response) ->
       std_api_error(response, "Error retrieving Reptool Data", reload: false)
@@ -95,11 +117,11 @@ window.bulk_get_current_reptool = (page) ->
       ip_uris.push(entry_content)
 
     if page == "show"
-      comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n #' + case_id + ' - ' + ip_uris.join(', ')
+      comment_trail = 'AC Bulk Submission: \n #' + case_id + ' - ' + ip_uris.join(', ')
     else if page == "research"
-      comment_trail = '\n \n------------------------------- \nRESEARCH BULK SUBMISSION: \n' + ip_uris.join('\n')
+      comment_trail = 'AC Research Bulk Submission: \n' + ip_uris.join('\n')
     else if page == "index"
-      comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n' + comment_array.join('\n')
+      comment_trail = 'AC Bulk Submission: \n' + comment_array.join('\n')
 
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
@@ -122,8 +144,9 @@ window.bulk_get_current_reptool = (page) ->
             rep_class_list = '<span class="missing-data">No active classifications</span>'
 
           tbody.append('<tr class="reptool-entry-row" data-case-id="' + case_id + '"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class_attr + '">' + rep_class_list + '</td><td>' + rep_class_exp + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
-        comment_box.val(comment_trail)
 
+
+        # ellipsis-trick the comment if too huge for reptool dropdown
         if entry['comment'].length > 50
           entry_comment_trunc = entry['comment'].substring(0, 50) + '...'
           $('.reptool-entry-comment').text(entry_comment_trunc)
@@ -132,6 +155,8 @@ window.bulk_get_current_reptool = (page) ->
         else
           $('.reptool-entry-comment').text(entry['comment'])
 
+        # put the auto-generated comment into the read-only div
+        $('.reptool-generated-comment').html(comment_trail)
       error: (response) ->
         std_api_error(response, "Error retrieving Reptool Data", reload: false)
     )
@@ -202,7 +227,30 @@ window.submit_individual_reptool = (button) ->
   reptool_classes = checked_classes.join(', ')
 
   classification_action = $($(dropdown).find("input[name='reptool-classes-radio']:checked")).val()
-  comment = $($(dropdown).find('.dropdown-comment')).val()
+  comm_typed_in = ''
+  comm_generated = ''
+  comment = ''
+
+  # Begin: Comment reconstruction for Reptool, it needs a single-line format now w/o newlines
+  # get the 'typed in' part of the comment from the dropdown for inline
+  comm_typed_in = $(dropdown).find('.typed-in-comment-inline').val()  # get the 'typed in' part of the comment, textarea
+  comm_typed_in = comm_typed_in.replace(/(\r\n|\n|\r)/gm, " ")  # replace newlines w/ spaces if there are any
+
+  # get the 'auto-generated' part of the comment from the dropdown for inline
+  comm_generated = $(dropdown).find('.reptool-generated-comment').text()
+  comm_generated = comm_generated.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines w/ commas
+  comm_generated = comm_generated.replace(': ,', ':')  # one-off comment fix
+
+  # if they typed anything as an additional comment above the auto-generated part, add it to the end
+  if comm_typed_in.trim() != ''
+    comment = "#{comm_generated} || Comment: #{comm_typed_in}"
+  else
+    comment = comm_generated
+
+  # comment is now ready to send to Reptool
+  console.clear()
+  console.log comment
+  # End: comment is now a single-line, and ready for Reptool now
 
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
@@ -285,7 +333,7 @@ window.submit_individual_reptool = (button) ->
 ## Submit Bulk changes to Reptool - toolbar dropdown form
 ## This works on index, research page, and research tab of show page
 window.submit_bulk_reptool = () ->
-  bulk_reptool_menu = $('#reptool_adjust_entries')
+  bulk_reptool_menu = $('#reptool_adjust_entries')   # this is the dropdown
   submission_action = $(bulk_reptool_menu).find("input[name='reptool-action-radio']:checked").val()
 
   checked_classes = []
@@ -297,7 +345,9 @@ window.submit_bulk_reptool = () ->
   reptool_classes = checked_classes.join()
 
   classification_action = $(bulk_reptool_menu).find("input[name='reptool-classes-radio']:checked").val()
-  comment = bulk_reptool_menu.find('.dropdown-comment').val()
+  comm_typed_in = ''
+  comm_generated = ''
+  comment = ''
 
   #  Get the entries
   entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
@@ -311,6 +361,27 @@ window.submit_bulk_reptool = () ->
       'entry': $(entry).text()
       'classifications': current_classes
     }
+
+  # Comment reconstruction for Reptool, it needs a single-line format now without any newlines
+  # get the 'typed in' part of the comment
+  comm_typed_in = $(bulk_reptool_menu).find('.typed-in-comment-bulk').val()  # get the 'typed in' part of the comment, textarea
+  comm_typed_in = comm_typed_in.replace(/(\r\n|\n|\r)/gm, " ")  # replace newlines w/ spaces
+
+  # get the 'auto-generated' part of the comment
+  comm_generated = $(bulk_reptool_menu).find('.reptool-generated-comment').text()
+  comm_generated = comm_generated.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines w/ commas
+  comm_generated = comm_generated.replace(': ,', ':')  # one-off comment fix
+
+  # if they typed anything as an additional comment (optional but they should), append it
+  if comm_typed_in.trim() != ''
+    comment = "#{comm_generated} || Comment: #{comm_typed_in}"
+  else
+    comment = comm_generated
+
+  # comment is now ready to send to Reptool
+  console.clear()
+  console.log comment
+  # End: comment is now a single-line, and ready for Reptool now
 
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
@@ -450,3 +521,20 @@ window.submit_bulk_reptool = () ->
           errormsg = [response.responseText]
         std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
     )
+
+
+# page-load on webrep show page or bfrp page, manage the reptool comments from growing too huge
+$ ->
+  # ellipsis-trick the reptool class table cell in research row
+  if $('span.entry-reptool-comment').length > 0  # user is on a webrep show page or bfrp results page?
+    $('span.entry-reptool-comment').each ->
+      full = $(this).text().trim()
+      if full.indexOf('Comment:') > 0  # this means a "real" comment was typed in, we don't need the auto-generated
+        typed_in = full.split('Comment: ')[1]
+        $(this).attr('title', typed_in)  # mouseover the text to see full comment
+        if typed_in.length > 80   # if its huge, ellipsis-trick the comment
+          typed_in = typed_in.substring(0, 80) + '...'
+        $('.entry-reptool-comment').text(typed_in)
+      else
+        $(this).text('')  # leave empty
+

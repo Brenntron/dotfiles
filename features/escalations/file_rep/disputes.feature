@@ -20,23 +20,24 @@ Feature: Disputes
     |id| name            |
     |1 | Dispute Analyst |
     And bugzilla rest api always saves
+    And the user is logged into bugzilla
     And ThreatGrid API call is stubbed
+    And ThreatGrid API data is stubbed
     And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
     And ReversingLabs API call is stubbed
-    And AMP API call is stubbed
+    And AMP API call is stubbed and returns a disposition of, "clean"
     And Sample Zoo API call is stubbed
     And ReversingLabs Creation Data API call is stubbed
     When I go to "/escalations/file_rep/disputes"
     And I click "#new-dispute"
     And I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
-    And I wait for "12" seconds
     And I click ".primary"
     Then a FileRep Ticket should have been created
     And that FileRep Ticket should have a SHA256 of "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
     And that FileRep Ticket should have an assignee of current user
     And that FileRep Ticket should have a suggested disposition of "clean"
-    And I should see "FILE REPUTATION TICKET CREATED."
+    And I should see "FILE REPUTATION TICKETS CREATED"
 
   @javascript
   Scenario: a user visits the FileRep Dispute show page and takes a ticket
@@ -49,6 +50,7 @@ Feature: Disputes
       | sha256_hash                                                       |
       | 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54  |
     And bugzilla rest api always saves
+    And the user is logged into bugzilla
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
@@ -73,6 +75,7 @@ Feature: Disputes
     | sha256_hash                                                       |
     | 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54  |
     And bugzilla rest api always saves
+    And the user is logged into bugzilla
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
@@ -84,7 +87,7 @@ Feature: Disputes
     And I click "#new-dispute"
     And I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
     And I click ".primary"
-    And I should see "The following SHA256 hashes were duplicates and were not created: 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    And I should see "The following SHA256 hashes are duplicates (no ticket created): 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
     And I should not see "The following SHA256 hashes were created successfully:"
 
   @javascript
@@ -97,19 +100,20 @@ Feature: Disputes
       | sha256_hash                                                       |
       | 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54  |
     And bugzilla rest api always saves
+    And the user is logged into bugzilla
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
     And ReversingLabs API call is stubbed
-    And AMP API call is stubbed
+    And AMP API call is stubbed and returns a disposition of, "clean"
     And Sample Zoo API call is stubbed
     And ReversingLabs Creation Data API call is stubbed
     When I go to "/escalations/file_rep/disputes"
     And I click "#new-dispute"
     And I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54 123518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
     And I click ".primary"
-    And I should see "The following SHA256 hashes were created successfully: 123518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
-    And I should see "The following SHA256 hashes were duplicates and were not created: 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    And I should see "Tickets have been created for the following SHA256 hashes: 123518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    And I should see "The following SHA256 hashes are duplicates (no ticket created): 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
 
 
   @javascript
@@ -509,6 +513,7 @@ Feature: Disputes
     And the following customers exist:
     |id| name            |
     |1 | Dispute Analyst |
+    And the user is logged into bugzilla
     And bugzilla rest api always saves
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
@@ -524,8 +529,39 @@ Feature: Disputes
     And I click "#file_rep_submit"
     And I go to "/escalations/file_rep/disputes/"
     Then I should see content "RESOLVED" within "#status_10101"
-    And I should see content "Malicious" within ".malicious"
+    And I should see content "malicious" within first element of class ".malicious"
     And FileRep Dispute has the appropriate 'resolution_comment' for auto-resolved entries
+
+  @javascript
+  Scenario: an entry with no sample is not auto-resolved
+    Given a user with role "filerep user" exists and is logged in
+    And the following customers exist:
+      |id| name            |
+      |1 | Dispute Analyst |
+    And the user is logged into bugzilla
+    And bugzilla rest api always saves
+    And ThreatGrid API call is stubbed
+    And ThreatGrid API data is stubbed
+    And Reversing Labs certificates API call is stubbed
+    And The file is not in ReversingLabs
+    And Sandbox API call is stubbed
+    And The sample does not exist in the sandbox
+    And ReversingLabs API call is stubbed
+    And AMP API call is stubbed and returns a disposition of, "malicious"
+    And The file is not in the sample zoo
+    And ReversingLabs Creation Data API call is stubbed
+    When I go to "/escalations/file_rep/disputes/"
+    And I click "#new-dispute"
+    And I fill in "shas_list" with "b7d2790048f5cacbf03ee9e36a6b6bc9ffabfc1e449bde0c507d3667064ea791"
+    And I select "Clean" from "disposition_suggested"
+    And I click "#file_rep_submit"
+    And I go to "/escalations/file_rep/disputes/"
+    Then I should see content "NEW" within "#status_10101"
+    When I go to "/escalations/file_rep/disputes/10101"
+    And I click "#auto_resolve_log_button"
+    Then I should see "Setting Status To New as there is no sample."
+    And FileRep Dispute does not have a resolution comment
+
 
   @javascript
   Scenario: a user sees a properly worded time stamp on a comment under the Communications tab

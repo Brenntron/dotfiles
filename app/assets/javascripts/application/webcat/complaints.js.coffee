@@ -88,14 +88,29 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 
 window.touchedFormChange = (url) ->
   urls_touched = (sessionStorage.getItem("touchedForm")|| "" )
+
   if !urls_touched.includes(url)
-    urls_touched += url + ","
+    url_items = urls_touched.split(",")
+    url_items.push(url)
+    urls_touched = url_items.join(",")
+  sessionStorage.setItem("touchedForm", urls_touched)
+
+window.removeTouchedFormChange = (url) ->
+  urls_touched = (sessionStorage.getItem("touchedForm")|| "" )
+
+  if urls_touched.includes(url)
+    url_items = urls_touched.split(",")
+    url_index = url_items.indexOf(url)
+    url_items.splice(url_index, 1)
+    urls_touched = url_items.join(",")
   sessionStorage.setItem("touchedForm", urls_touched)
 
 getTouchedFormCount = ()->
   form_item = sessionStorage.getItem("touchedForm")
   items = 0
   if form_item
+    if form_item.slice -1 == ","
+      form_item = form_item.slice(0, -1);
     items = form_item.split(",").length - 1
   return items
 
@@ -415,7 +430,7 @@ processSubmitPending=(entry_id,row_id)->
           valueField: 'category_id',
           labelField: 'category_name',
           searchField: ['category_name', 'category_code'],
-          options: AC.WebCat.createSelectOptions(),
+          options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id),
           items: selected_options(temp_row.data().category)
         }
         $("#domain_#{entry_id}").text(domain)
@@ -462,6 +477,7 @@ processSubmitEntry = (entry_id,row_id) ->
   resolution_status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
+  uri_as_categorized = $('#complaint_prefix_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   fixed_flag = $('#fixed'+entry_id).is(':checked')
 
@@ -475,7 +491,7 @@ processSubmitEntry = (entry_id,row_id) ->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
       headers: headers
-      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
+      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment, 'uri_as_categorized': uri_as_categorized }
       success: (response) ->
         {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
         if !error
@@ -503,7 +519,7 @@ processSubmitEntry = (entry_id,row_id) ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id)
             items: selected_options(categories)
           }
 
@@ -515,7 +531,7 @@ processSubmitEntry = (entry_id,row_id) ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_pending'+ temp_row.data().entry_id)
             items: selected_options(categories)
           }
           unless status == 'COMPLETED'
@@ -527,7 +543,7 @@ processSubmitEntry = (entry_id,row_id) ->
               valueField: 'category_id',
               labelField: 'category_name',
               searchField: ['category_name', 'category_code'],
-              options: AC.WebCat.createSelectOptions()
+              options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id)
               items: selected_options(temp_row.data().category_names)
             }
           else
@@ -541,12 +557,13 @@ processSubmitEntry = (entry_id,row_id) ->
               valueField: 'category_id',
               labelField: 'category_name',
               searchField: ['category_name', 'category_code'],
-              options: AC.WebCat.createSelectOptions()
+              options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id)
               items: selected_options(temp_row.data().category_names)
             }
             select_complete = $completed_selectize[0].selectize
             select_complete.disable()
 
+          removeTouchedFormChange(uri)
           $("#complaint_prefix_#{entry_id}").val(uri)
           $("#domain_#{entry_id}").text(domain)
           $("#subdomain_#{entry_id}").text(subdomain)
@@ -939,19 +956,29 @@ window.drop_current_categories = () ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
+window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
+  event.preventDefault();
+  $('#' + input_id)[0].value = qual_subdomain
+  return false;
+
+
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
   host = ''
+  qual_subdomain = ''
   url = ''
   search_uri = ''
   if complaint_entry.uri
     host = complaint_entry.uri
     url = host
     uri = '<a href="http://' + complaint_entry.uri + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
-    search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.uri + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
+    uri_no_path = complaint_entry.uri
+    if uri_no_path.indexOf('/') > 0
+      uri_no_path = uri_no_path.split('/')[0] # strip out the path in a uri for Site Search, it's extraneous
+    search_uri = '<a href="https://www.google.com/search?q=site%3A' + uri_no_path + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + uri_no_path + '</a>'
   else if complaint_entry.domain
     if complaint_entry.subdomain
       host = complaint_entry.subdomain + '.'
@@ -968,6 +995,10 @@ format = (complaint_entry_row) ->
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
+
+  qual_subdomain = complaint_entry.domain
+  if complaint_entry.subdomain
+    qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
 
   entry_status = ""
   reopen_class = "hidden"
@@ -1111,6 +1142,10 @@ format = (complaint_entry_row) ->
   input_cat = 'input_cat_' + entry_id
 
   if complaint_entry.status == "PENDING"
+
+    domain = complaint_entry.uri_as_categorized
+    # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
+
     complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
     complaint_submission_html =
         '<input type="radio" name="resolution_review_' + entry_id + '" value="commit" > Commit <br/>' +
@@ -1163,11 +1198,14 @@ format = (complaint_entry_row) ->
       '</div><div class="col-xs-12 col-sm-4 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-12">' +
+      '<div><label class="content-label-sm">Original</label></div> ' +
+      '<div>' + host  + '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" onclick="this.select()" data-domain="' + domain + '"value="' + host +
+      '" type="text" onclick="this.select()" data-domain="' + domain + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + domain +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
+      '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + complaint_entry.domain + '\')"></select>' +
@@ -1484,8 +1522,8 @@ window.click_table_buttons = (complaint_table, button)->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(),
-        items: AC.WebCat.getCategoryIds(selected_options(data.category)),
+        options: AC.WebCat.createSelectOptions(cat_select),
+        items: AC.WebCat.getCategoryIds(selected_options(data.category), cat_select),
         onItemAdd: ->
           if verifyMasterSubmit() == true
             $('#master-submit').prop('disabled', false)
@@ -1505,8 +1543,8 @@ window.click_table_buttons = (complaint_table, button)->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(),
-        items: selected_options(data.category),
+        options: AC.WebCat.createSelectOptions(cat_select),
+        items: AC.WebCat.getCategoryIds(selected_options(data.category), cat_select),
       }
       select_complete = $completed_selectize[0].selectize
       select_complete.disable()
@@ -1743,11 +1781,12 @@ processSubmitMaster = () ->
       status = $(this).find("[name=resolution#{entry_id}]:checked").val()
       comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
       resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
+      uri_as_categorized = $(this).find("#complaint_prefix_#{entry_id}")[0].value
 
       if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
-        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if status == 'UNCHANGED' || status == 'INVALID'
-        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
 
@@ -1795,7 +1834,7 @@ processSubmitMaster = () ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_'+ entry.entry_id)
             items: selected_options(entry.categories)
           }
           $('#input_cat_pending'+ entry.entry_id).selectize {
@@ -1806,7 +1845,7 @@ processSubmitMaster = () ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_pending'+ entry.entry_id)
             items: selected_options(entry.categories)
           }
 
@@ -1842,7 +1881,6 @@ processSubmitMaster = () ->
 window.master_submit = () ->
   selectedItems = $('.selected + tr td.nested-complaint-data-wrapper')
   thingsSelected = getTouchedFormCount()
-  debugger
   if thingsSelected > selectedItems.length
     std_msg_confirm(
       "I noticed you have made changes to at least " + thingsSelected +  " complaints but you only have " + selectedItems.length + " items selected. Do you want to proceed with updating these items? It will reload the page and you will lose your other changes.",
@@ -2017,7 +2055,7 @@ $ ->
           valueField: 'category_id',
           labelField: 'category_name',
           searchField: ['category_name', 'category_code'],
-          options: AC.WebCat.createSelectOptions()
+          options: AC.WebCat.createSelectOptions('#input_cat_'+ row.data().entry_id)
           items: selected_options(row.data().category)
         }
 

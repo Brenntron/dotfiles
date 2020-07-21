@@ -529,6 +529,7 @@ class Dispute < ApplicationRecord
           total_hits = (wbrs_hits + sbrs_hits).uniq
 
           new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'IP', ip_address: key)
+          new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
@@ -542,28 +543,42 @@ class Dispute < ApplicationRecord
 
           matching_disposition = new_dispute_entry.is_disposition_matching?
 
+          initial_log = "--------Starting Data---------\n"
+          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
+          initial_log += "-----------------------------\n"
+
+          new_dispute_entry.auto_resolve_log += initial_log
+          new_dispute_entry.save!
+
           if !matching_disposition
 
             if !false_negative_claim
               new_dispute_entry.status = DisputeEntry::NEW
 
-              if new_dispute.submitter_type == "NON-CUSTOMER"
+              if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
                 AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
               end
 
             else
+              if new_dispute.submission_type == "w"
+                auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                                  total_hits: total_hits,
+                                                                                  resolved_at: resolved_at,
+                                                                                  dispute_entry: new_dispute_entry)
 
-              auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                                total_hits: total_hits,
-                                                                                resolved_at: resolved_at,
-                                                                                dispute_entry: new_dispute_entry)
+                if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+                  verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+                end
 
-              if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-                verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+                if auto_resolve_verdict.present? && auto_resolve_verdict.auto_resolve_log.present?
+                  new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
+                end
+
               end
 
-
             end
+
             new_dispute_entry.save!
 
           end
@@ -620,8 +635,14 @@ class Dispute < ApplicationRecord
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
           new_dispute_entry.is_important = is_important?(key)
-
+          new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.assign_url_parts(key)
+
+
+          resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
+          if resolved_ip.present?
+            new_dispute_entry.web_ips = [resolved_ip]
+          end
 
           new_dispute_entry.save!
 
@@ -629,6 +650,18 @@ class Dispute < ApplicationRecord
 
           logger.info "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
+
+          #threat cats for urls
+          complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => new_dispute_entry.uri})
+          new_dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
+
+          initial_log = "--------Starting Data---------\n"
+          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
+          initial_log += "-----------------------------\n"
+
+          new_dispute_entry.auto_resolve_log += initial_log
+          new_dispute_entry.save!
 
 
           if !matching_disposition
@@ -642,6 +675,10 @@ class Dispute < ApplicationRecord
 
               if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
                 verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+              end
+
+              if auto_resolve_verdict.present? && auto_resolve_verdict.auto_resolve_log.present?
+                new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
               end
             end
 
@@ -1103,7 +1140,7 @@ class Dispute < ApplicationRecord
       when 'named'
         named_search(search_name, user: user, reload: reload)
       when 'standard'
-        standard_search(search_name, user: user)
+        standard_search(search_name, user: user).includes(:customer => [:company])
       when 'contains'
         contains_search(params['value'])
       else
@@ -1112,11 +1149,19 @@ class Dispute < ApplicationRecord
   end
 
   def customer_name
-    customer.name
+    customer.nil? ? "" : customer.name
   end
 
   def customer_email
-    customer.email
+    customer.nil? ? "" : customer.email
+  end
+
+  def customer_org
+    if customer.nil?
+      ""
+    else
+      customer.company.nil? ? "" : customer.company.name
+    end
   end
 
   # @param [Array<Dispute>] disputes colleciton of dispute objects
@@ -1128,32 +1173,32 @@ class Dispute < ApplicationRecord
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status} </span>"
-      if dispute&.status_comment.present?
-        dispute_packet[:status_comment] = dispute&.status_comment
-      elsif dispute&.resolution_comment.present?
-        dispute_packet[:status_comment] = dispute&.resolution_comment
+      if dispute.status_comment.present?
+        dispute_packet[:status_comment] = dispute.status_comment
+      elsif dispute.resolution_comment.present?
+        dispute_packet[:status_comment] = dispute.resolution_comment
       else
         dispute_packet[:status_comment] = nil
       end
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
-      dispute_packet[:submitter_org] = dispute.customer.company.name
+      dispute_packet[:submitter_org] = dispute.customer_org
       dispute_packet[:submitter_type] = dispute.submitter_type
       dispute_packet[:submitter_domain] = dispute.org_domain
       dispute_packet[:submitter_name] = dispute.customer_name
       dispute_packet[:submitter_email] = dispute.customer_email
       dispute_packet[:dispute_domain] = dispute.org_domain
-      dispute_packet[:updated_at] = dispute.updated_at.strftime("%F %T")
-      unless dispute.dispute_entries.empty?
+      dispute_packet[:updated_at] = dispute.updated_at&.strftime("%F %T")
+      unless dispute.dispute_entries.blank?
         unless dispute.dispute_entries.first[:hostname].nil?
           dispute_packet[:dispute_domain] = dispute.dispute_entries.first[:hostname]
         end
       end
-      dispute_packet[:dispute_count] = dispute.entry_count.to_s
+      dispute_packet[:dispute_count] = dispute.entry_count&.to_s
 
       if dispute.resolution.nil?
         dispute_packet[:dispute_resolution] = ''
       else
-        if dispute.resolution_comment.nil? || dispute.resolution_comment.empty?
+        if dispute.resolution_comment.blank?
           dispute_packet[:dispute_resolution] = dispute.resolution
         else
           dispute_packet[:dispute_resolution] = "<span class='esc-tooltipped' title='#{dispute.resolution_comment}'>" + dispute.resolution + "</span>"
@@ -1161,7 +1206,7 @@ class Dispute < ApplicationRecord
       end
 
       dispute_packet[:dispute_entry_content] = []
-      unless dispute.dispute_entries.empty?
+      unless dispute.dispute_entries.blank?
         dispute.dispute_entries.each do |entry|
           unless entry[:ip_address].nil?
             dispute_packet[:dispute_entry_content].push(entry[:ip_address])
@@ -1177,15 +1222,15 @@ class Dispute < ApplicationRecord
       case
         when dispute.assignee == 'Unassigned'
           dispute_packet[:assigned_to] =
-              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
+              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
 
         when dispute.user_id?
           if dispute.user_id == user.id
             dispute_packet[:assigned_to] =
-                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
+                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
           else
             dispute_packet[:assigned_to] =
-                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
+                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
           end
       end
 
@@ -1211,6 +1256,10 @@ class Dispute < ApplicationRecord
         end
       end
       dispute_packet[:wbrs_rule_hits] = dispute_packet[:wbrs_rule_hits].join(", ")
+
+      dispute_packet.each do |k, v|
+        dispute_packet[k] = '' if dispute_packet[k].nil?
+      end
 
       dispute_packet
     end

@@ -79,8 +79,12 @@ When(/^I uncheck "(.*?)"$/) do |target|
   uncheck(target)
 end
 
-And (/^I check checkbox with class "(.*?)"$/) do |cb_class|
+And(/^I check checkbox with class "(.*?)"$/) do |cb_class|
   check(class: cb_class)
+end
+
+And(/^I uncheck checkbox with class "(.*?)"$/) do |cb_class|
+  uncheck(class: cb_class)
 end
 
 When(/^I choose "(.*?)"$/) do |target|
@@ -163,6 +167,13 @@ end
 Then(/^Element with class "(.*?)" should not have content "(.*?)"$/) do |class_name, content|
   element = find(:xpath, "//*[contains(@class, '#{class_name}')]")
   raise "content found when it should not have been found" if element.has_content?(content)
+end
+
+Then(/^Element with class "(.*?)" should not be empty$/) do |class_name|
+  element = find(:xpath, "//*[contains(@class, '#{class_name}')]")
+  unless element.has_content?
+    raise "content not found when it should have been found"
+  end
 end
 
 Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
@@ -260,13 +271,24 @@ Then(/^I should see "(.*?)"$/) do |content|
   raise "content not found" unless page.has_content?(content)
 end
 
+Then(/^I should see element "(.*?)"$/) do |element|
+  begin
+    page.find(element)
+  rescue Capybara::ElementNotFound => e
+    raise "element not found: #{element}"
+  end
+end
+
+Then(/^I should not see element with class "(.*?)"$/) do |classname|
+  page.should have_no_selector(:xpath, "//*[contains(@id, '#{classname}')]")
+end
+
 Then(/^I should see hidden element "(.*?)" with content "(.*?)"$/) do |element, content|
   begin
     page.find(element, visible: :all, text: content)
   rescue Capybara::ElementNotFound => e
     raise "content not found: #{content}"
   end
-
 end
 
 Then(/^I should see either "(.*?)" or "(.*?)"$/) do |content1, content2|

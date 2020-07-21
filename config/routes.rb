@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       get 'reptool', to: 'tools#reptool'
       get 'wbnp_reports', to: 'tools#wbnp_reports'
       get 'manage_escalations_sync', to: 'tools#manage_escalations_sync'
+      get 'status_api', to: 'tools#status_api'
 
       mount DelayedJobWeb, at: "delayed_job"
       match "/delayed_job" => DelayedJobWeb, :anchor => false, :via => [:get, :post]

@@ -15,14 +15,17 @@ module API
             desc 'update an entry'
             params do
               requires :id, type: Integer, desc:'complaint entry id'
-              requires :prefix, type: String, desc: 'the url to categorize'
-              requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
-              requires :category_names, type: String, desc: 'a list of category names to assign to Complaint Entry record'
-              requires :status, type: String, desc: 'setting the status of the entry'
+              optional :prefix, type: String, desc: 'the url to categorize'
+              optional :categories, type: String, desc: 'a list of categories to assign to this prefix'
+              optional :category_names, type: String, desc: 'a list of category names to assign to Complaint Entry record'
+              optional :status, type: String, desc: 'setting the status of the entry'
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
+              optional :uri_as_categorized, type: String, desc: 'Value of the `Edit Uri` box at the time analyst submitted it'
             end
             post 'update'do
+              std_api_v2 do
+
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
                 entry.change_category( permitted_params['prefix'],
@@ -31,6 +34,7 @@ module API
                                        permitted_params['status'],
                                        permitted_params['comment'],
                                        permitted_params['resolution_comment'],
+                                       permitted_params['uri_as_categorized'],
                                        current_user, "")
                 Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
@@ -43,6 +47,7 @@ module API
               end
               {display_name: current_user.display_name, status: entry.status, entry_resolution: permitted_params['status'],
                uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path, categories: params[:categories]}.to_json
+              end
             end
 
             desc 'Bulk update entry resolutions'
@@ -84,6 +89,7 @@ module API
                                        permitted_params['status'],
                                        permitted_params['comment'],
                                        permitted_params['resolution_comment'],
+                                       '',
                                        current_user, permitted_params['commit'])
 
                 if permitted_params['commit'] == 'decline'
@@ -405,9 +411,43 @@ module API
                 sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
 
                 {master_categories: master_categories, current_category_data: wbrs_categories,
-                 sds_category: sds_category }.to_json
+                 sds_category: sds_category}.to_json
               end
             end
+
+
+            desc 'Retrieve current categories by URL only (not complaint entry ID)'
+            params do
+              requires :domain, type: String # Must be in the form of "domain.com" only, no http/s or path
+            end
+            post 'retrieve_current_categories_by_url' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.where(:domain => params[:domain]).order(:created_at).last
+
+                if complaint_entry.subdomain.present? || complaint_entry.path.present?
+                  master_categories = complaint_entry.get_category_names_from_master
+                else
+                  master_categories = []
+                end
+
+                wbrs_categories = complaint_entry.current_category_data
+
+                # Pull category from SDS
+                sds_params = {}
+
+                if complaint_entry.entry_type == 'URI/DOMAIN'
+                  sds_params['url'] = complaint_entry.uri
+                elsif complaint_entry.entry_type == 'IP'
+                  sds_params['url'] = complaint_entry.ip_address
+                end
+
+                sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+
+                {master_categories: master_categories, current_category_data: wbrs_categories,
+                 sds_category: sds_category, complaint_entry_id: complaint_entry.id }.to_json
+              end
+            end
+
 
             desc 'Retrieve category names from master domain'
             params do
@@ -449,6 +489,7 @@ module API
                                                        entry['status'],
                                                        entry['comment'],
                                                        entry['resolution_comment'],
+                                                       entry['uri_as_categorized'],
                                                        current_user, "")
 
                       Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry) }
@@ -543,6 +584,7 @@ module API
                   begin
                     complaint_entry = ComplaintEntry.find(entry)
                     processed = complaint_entry.process_resolution_changes(permitted_params[:resolution], permitted_params[:internal_comment], permitted_params[:customer_facing_comment])
+
                     confirmations << processed
                   rescue
                     confirmations << {status: 'ERROR', id: entry.id, resolution: permitted_params[:resolution], internal_comment: permitted_params[:internal_comment],

@@ -4,7 +4,6 @@ $(document).ready ->
     if $('.dispute_check_box:checked').length == 0
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
-
 window.select_or_deselect_all = (dispute_id)->
 
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
@@ -583,7 +582,7 @@ window.take_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      $('.take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='return_dispute(#{dispute_id});'></button>")
+      $('.take-dispute-' + dispute_id).replaceWith("<button class='esc-tooltipped return-ticket-button return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='return_dispute(#{dispute_id});'></button>")
       $('#owner_' + dispute_id).text(response.username)
       $('#status_' + dispute_id).text("Assigned")
   )
@@ -634,19 +633,17 @@ window.return_dispute = (dispute_id) ->
     data: {}
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      $('.return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute_id});'></button>")
+      $('.return-ticket-' + dispute_id).replaceWith("<button class='esc-tooltipped take-ticket-button take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute_id});'></button>")
       $('#owner_' + response.dispute_id).text('Unassigned')
       $('#status_' + response.dispute_id).text('NEW')
 
   )
 
 window.save_dispute_entries = () ->
-
   data = {}
   $('#disputes-research-table').find('tr.research-table-row').each(() ->
     result = {}
     fielddata = $(this).find('.dual-edit-field').map(() ->
-
       new_value = switch (this.dataset.field)
         when 'status'
           if $(this).find("input[name='entry-status']:checked").attr('id') == undefined
@@ -746,7 +743,7 @@ window.change_ticket_status = (event) ->
 
   for dispute in checked_disputes
 #    event.preventDefault()
-    data.dispute_ids = dispute
+    data.dispute_ids = [dispute]
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
       method: 'POST'
@@ -832,7 +829,6 @@ $ ->
       $(wrapper).addClass('selected')
 
     if $(this).attr('id') == 'RESOLVED_CLOSED'
-#      debugger
       $('#show-ticket-resolution-submenu').show()
       stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
       $('#ticket-non-res-submit').hide()
@@ -1169,6 +1165,13 @@ $ ->
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'dispute-entry-table-wrapper'
 
+      # subrow icons need the TT init on row expand, these icons don't exist on dt draw.dt, init them here
+      $('#disputes-index .reputation-icon').tooltipster
+        theme: [
+          'tooltipster-borderless'
+          'tooltipster-borderless-customized'
+        ]
+
       # Check to see which columns should be displayed
       $('.toggle-vis-nested').each ->
         checkbox_trigger = $(this).attr('data-column')
@@ -1403,7 +1406,6 @@ $ ->
       data['contact-name'] = $("#contact-name-checkbox").is(':checked')
       data['contact-email'] = $("#contact-email-checkbox").is(':checked')
       data['status-comment'] = $("#status-comment-checkbox").is(':checked')
-
       std_msg_ajax(
         url: "/escalations/api/v1/escalations/user_preferences/update"
         method: 'POST'
@@ -1494,8 +1496,107 @@ $ ->
       alert('No disputes selected')
 
 
+  $('#webrep-resolution-selector input[type=radio][name=dispute-resolution]').change ->
+    submission_type = $('input[name=webrep-dispute-submission-type').val()
+    submitter_type = $('input[name=webrep-dispute-submitter-type]').val()
+    #Only fill comment if web type submission
+    if submission_type == 'w' && submitter_type != "INTERNAl"
+      if submitter_type == 'CUSTOMER'
+        is_customer = true
+
+      $(".ticket-resolution-comment").html('')
+      resolution_comment = get_resolution_comment(@value, is_customer)
+      $(".ticket-resolution-comment").html(resolution_comment)
 
 
+  $('#webrep-entry-resolution-selector input[type=radio][name=entry-resolution]').change ->
+    submission_type = $('input[name=webrep-dispute-submission-type').val()
+    submitter_type = $('input[name=webrep-dispute-submitter-type]').val()
+    #Only fill comment if web type submission
+    if submission_type == 'w' && submitter_type != "INTERNAl"
+      if submitter_type == 'CUSTOMER'
+        is_customer = true
+      $('#webrep-entry-resolution-comment').html('')
+      resolution_comment = get_resolution_comment(@value, is_customer)
+      $("#webrep-entry-resolution-comment").html(resolution_comment)
+
+
+  $('#index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change ->
+    $(".ticket-status-comment").html('')
+    submission_types = []
+    submitter_types = []
+    checkboxes = $('#disputes-index').find('.dispute_check_box')
+    $(checkboxes).each ->
+      if $(this).is(':checked')
+        tr = $(this).closest('tr')
+        row = window.dispute_table.row(tr)
+        submission_types.push(row.data().submission_type)
+        submitter_types.push(row.data().submitter_type)
+
+    submission_types.sort()
+    submitter_types.sort()
+
+    common_submission = (submission_types[0] == submission_types[submission_types.length - 1])
+    common_submitter = (submitter_types[0] == submitter_types[submitter_types.length - 1])
+
+    if common_submission && common_submitter
+      submission_type = submission_types[0]
+      submitter_type = submitter_types[0]
+
+      if submission_type == 'w' && submitter_type != 'INTERNAl'
+        if submitter_type == 'CUSTOMER'
+          is_customer = true
+
+        resolution_comment = get_resolution_comment(@value, is_customer)
+        $(".ticket-status-comment").html(resolution_comment)
+
+  $('#index-entry-resolution-submenu input[type=radio][name=entry-resolution]').change ->
+    $("#entry-status-comment").html('')
+    checkboxes = $('#disputes-index').find('.dispute-entry-checkbox')
+    submission_types = []
+    submitter_types = []
+    checkboxes.each ->
+      if $(this).is(':checked')
+        wrapper = $(this)[0].closest('.dispute-entry-table-wrapper')
+        entry_row = wrapper.parentElement
+        ticket_row = entry_row.previousSibling
+        row = window.dispute_table.row(ticket_row)
+        submission_types.push(row.data().submission_type)
+        submitter_types.push(row.data().submitter_type)
+
+    submission_types.sort()
+    submitter_types.sort()
+
+    common_submission = (submission_types[0] == submission_types[submission_types.length - 1])
+    common_submitter = (submitter_types[0] == submitter_types[submitter_types.length - 1])
+
+    if common_submission && common_submitter
+      submission_type = submission_types[0]
+      submitter_type = submitter_types[0]
+
+      if submission_type == 'w' && submitter_type != 'INTERNAl'
+        if submitter_type == 'CUSTOMER'
+          is_customer = true
+
+        resolution_comment = get_resolution_comment(@value, is_customer)
+        $("#entry-status-comment").html(resolution_comment)
+
+window.get_resolution_comment = (value, is_customer) ->
+  resolution_comment = ''
+  switch value
+    when 'FIXED_FP'
+      resolution_comment += "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
+      if is_customer
+        resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    when 'FIXED_FN'
+      resolution_comment += "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
+      if is_customer
+        resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    when 'UNCHANGED'
+      resolution_comment += "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
+      if is_customer
+        resolution_comment += " Please open a TAC case and provide additional details if you need further assistance."
+  return resolution_comment
 
 window.populate_entry_status_dropdown = (dispute_id) ->
   std_msg_ajax(
@@ -2059,3 +2160,181 @@ $ ->
         $(g_ew_rows).each ->
           unless $(this).hasClass('hidden')
             $(this).addClass('hidden')
+
+
+  # Focus on the first field in the dropdown on open
+  $('.dropdown').on 'shown.bs.dropdown', ->
+    form = $(this).find('form')[0]
+    if $(form).hasClass('add-host-ips')
+      textarea = $(form).find('textarea')[0]
+      $(textarea).focus()
+    return
+
+
+# Removes various new lines, extra spaces and crappy comma separation into single type of separation
+window.cleanse_array = (array) ->
+  clean_array = array.replace(/( +?)/g, '').replace(/( +?|\n+)/g, ',').split(',')
+
+
+window.add_host_ips = (button) ->
+  entry_id = $(button).attr('data-entry-id')
+  form     = $(button).parents('.add-host-ips')[0]
+  ips      = $(form).find('textarea').val()
+  ip_array = []
+
+  if ips.length > 0
+    ip_array_initial = cleanse_array(ips)
+    $(ip_array_initial).each ->
+      ip = this.trim()
+      ip_array.push(ip)
+
+    # Refined ip array back to string for DOM
+    final_ips = ip_array.join(', ')
+
+    # Close the dropdown
+    dropdown = $('#add_ip_button_' + entry_id).parent()
+    $(dropdown).dropdown('toggle')
+
+    # Create the IP rows
+    parent_row = $(form).parents('.research-table-row')[0]
+    uri_data_row = $(parent_row).find('.research-overview-row')[0]
+    ip_row =
+      '<tr class="research-uri-ip-query-row">' +
+        '<td rowspan="2"></td>' +
+        '<td class="input-col ip-label-col" rowspan="2"></td>' +
+        '<td class="dual-edit-field" colspan="5" data-field="host-ip" data-id="' + entry_id + '">' +
+          '<span class="entry-data entry-resolved-ip-content">' + final_ips + '</span>' +
+          '<input class="table-ip-input wide" type="text" value="' + final_ips + '">' +
+        '</td>' +
+        '<td class="text-right no-padding-right" colspan="3">' +
+          '<button class="edit-button inline-edit-ip-button esc-tooltipped" title="Edit IP Addresses">Edit IP Addresses</button>' +
+          '<button class="save-button inline-save-ip-button esc-tooltipped" title="Save IP Addresses">Save IP Addresses</button>' +
+          '<button class="cancel-button inline-cancel-ip-button esc-tooltipped"></button>' +
+        '</td>' +
+      '</tr>'
+
+    ip_data_row =
+      '<tr class="research-uri-ip-data-row">' +
+        '<td class="research-table-details-wrapper" colspan="8">' +
+          '<table><tbody>' +
+            '<tr class="single-details-row">' +
+              '<td><label>WBRS</label></td>' +
+              '<td class="text-center no-border uri-ip-wbrs-score"></td>' +
+              '<td><label>WBRS Rule Hits</label></td>' +
+              '<td class="text-center uri-ip-wbrs-rule-total"></td>' +
+              '<td><label>WBRS Rules</label></td>' +
+              '<td class="uri-ip-wbrs-rules"></td>' +
+              '<td><label>Threat Category</label></td>' +
+              '<td class="uri-ip-category"></td>' +
+              '<td><label>Proxy URI</label></td>' +
+              '<td class="uri-ip-proxy"></td>' +
+            '</tr>' +
+          '</tbody></table>' +
+        '</td>' +
+      '</tr>'
+
+    $(uri_data_row).after(ip_data_row)
+    $(uri_data_row).after(ip_row)
+
+    entry_uri = $($(parent_row).find('.entry-data-content')[0]).text()
+    entry_uri = entry_uri.trim()
+
+    # Time to make the donuts
+    # Make call to sdsv3 to populate this beautiful new row
+    query_uri_plus_ip(entry_uri, ip_array, parent_row)
+
+
+
+
+window.query_uri_plus_ip = (uri, ips, entry_row) ->
+  # Find our ip row for this entry in the DOM & insert inline loader
+  ip_row = $(entry_row).find('.entry-resolved-ip-content')
+  loader = '<span class="inline-row-loader"><span class="sync-button sync_rotate"></span>Loading...</span>'
+  $(ip_row).after(loader)
+  entry_id = $(entry_row).attr('data-entry-id')
+
+  #  Could be called via the 'Add ips', the Save changes to an entry, or refresh data button
+  #  Send the uri and ips to sdsv3
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/update_multi_ip"
+    method: 'POST'
+    data: {
+      uri: uri,
+      ip_addresses: ips,
+      dispute_entry_id: entry_id
+    }
+    success: (response) ->
+      # Kill the loader and the 'Add IP Addresses' dropdown
+      inserted_loader = $(entry_row).find('.inline-row-loader')
+      $(inserted_loader).remove()
+      dropdown = $('#add_ip_button_' + entry_id).parent()
+      $(dropdown).remove()
+
+      console.log response
+
+      # Prep for inserting into DOM
+      if response.json.rulehits?
+        rules     = response.json.rulehits.join(', ')
+        rule_hits = response.json.rulehits.length
+      else
+        rules = ''
+        rule_hits = 0
+      score     = response.json.score.toFixed(1)
+
+      if response.json.threat_cats?
+       threat_cats = response.json.threat_cats.join(', ')
+      else
+        threat_cats = ''
+
+      if response.json.proxy_uri?
+       proxy = response.json.proxy_uri
+      else
+        proxy = ''
+
+      # Find our entry's (or result's) + ip data row and cells
+      ip_data_row     = $(entry_row).find('.research-uri-ip-data-row')[0]
+      wbrs_score_cell = $(ip_data_row).find('.uri-ip-wbrs-score')[0]
+      wbrs_hits_cell  = $(ip_data_row).find('.uri-ip-wbrs-rule-total')[0]
+      wbrs_rules_cell = $(ip_data_row).find('.uri-ip-wbrs-rules')[0]
+      wbrs_cat_cell   = $(ip_data_row).find('.uri-ip-category')[0]
+      wbrs_proxy_cell = $(ip_data_row).find('.uri-ip-proxy')[0]
+
+      # Populate with our new data!
+      $(wbrs_score_cell).text(score)
+      $(wbrs_hits_cell).text(rule_hits)
+      $(wbrs_rules_cell).text(rules)
+      $(wbrs_cat_cell).text(threat_cats)
+      $(wbrs_proxy_cell).text(proxy)
+
+      # If there are rule hits, add to the rule hit details table
+      wbrs_details_table = $($(entry_row).find('.wbrs-details-table')[0]).find('tbody')[0]
+      plus_ip_rule_rows = $(wbrs_details_table).find('.plus-ip-rule-row')
+      $(plus_ip_rule_rows).each ->
+        $(this).remove()
+      if rule_hits > 0
+        $(response.json.rulehits).each ->
+          # Ignoring description and weight right now as I don't think we are getting that data currently
+          rule_row = '<tr class="plus-ip-rule-row"><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
+          $(wbrs_details_table).append(rule_row)
+      return
+  )
+
+
+$ ->
+  # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
+  $('#disputes-index').on 'draw.dt', ->
+    $("#disputes-index .tooltipstered").tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr
+    $('#disputes-index .esc-tooltipped').tooltipster
+      restoration: 'previous'
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
+
+  # subrow icons need the TT init on expand click, these icons don't exist on dt draw.dt
+  $('#disputes-index .expand-row-button-inline').click ->
+    $('.reputation-icon').tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]

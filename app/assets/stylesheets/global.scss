@@ -749,6 +749,7 @@ button {
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
+.auto-resolve-button {background-image: url(image_path('icon_reports_white.svg'));}
 .detection-button {background-image: url(image_path('icon_target.svg'));}
 .disposition-button {background-image: url(image_path('icon_hazard.svg'));}
 .take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
@@ -1317,6 +1318,9 @@ thead th.sorting.center {
 
 #message-text {
   padding-top: 5px;
+  li {
+    word-break: break-all;
+  }
 }
 
 #message-text, .message-text {
@@ -1756,7 +1760,7 @@ button.close {
   background-color: $sidebar-nav-base;
   display: block;
   position: absolute;
-  color: #fff;
+  color: $content-bg-color;
   text-transform: uppercase;
   font-weight: 700;
   line-height: $sidebar-width;
@@ -1775,7 +1779,7 @@ button.close {
 }
 
 #sidenav-menu-div a {
-  color: #fff;
+  color: $type-lightest;
   display: block;
   width: 100%;
   height:100%;
@@ -1870,7 +1874,7 @@ button.close {
 }
 
 .nav-container li, .sidenav-icons li {
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid $type-lightest;
 }
 
 li.static-nav-item {
@@ -2180,10 +2184,29 @@ a.static-nav-item {
   outline: none;
   font-weight: 400;
 }
-
+.hidden-auto-resolve{
+  z-index: 0;
+}
+.webrep_auto_resolve, #auto-resolve-dialog{
+  padding: 13px!important;
+  max-height: 600px!important;
+  overflow-x: scroll!important;
+}
 #add_dispute_entry {
   margin-top: 0;
   width: 155px;
+}
+#auto_resolve_log_button.primary{
+  padding: 7px;
+  font-size: .85em;
+  margin: 0
+}
+#auto-resolve-dialog{
+  width: 50%;
+  margin: 0 auto;
+ .close{
+   margin: 5px
+ }
 }
 #add_dispute_entry:focus {
   border: none !important;
@@ -2234,8 +2257,8 @@ a.static-nav-item {
   line-height: 1.25em;
   margin-right: 6px;
   margin-bottom: 3px;
-  font-weight: 400;
-  text-transform: none;
+  font-weight: 400 !important;
+  text-transform: none !important;
 }
 
 .content-label-sm.content-label-fullwidth {
@@ -2339,6 +2362,30 @@ table .bug-priority {
   height: 22px;
   margin-right: 0;
   color: transparent;
+}
+.api-status-fail{
+  display: inline-block;
+  background-image: url(image_path("icon_fail.svg"));
+  height: 20px;
+  width: 20px;
+  margin: 6px 8px 0 8px;
+}
+
+.api-status-success{
+  background-image: url(image_path("icon_check_green.svg"));
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  margin: 6px 8px 0 8px;
+}
+.status_api{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  .loader-msg{
+    display: flex!important;
+    justify-content: center;
+  }
 }
 
 .bug-priority.p-Unspecified {background-image: url(image_path("icon_p_unknown.svg"));}
@@ -2839,6 +2886,10 @@ a.code-content:hover {
   display: inline-block;
 }
 
+.author-username{
+  word-break: break-all;
+}
+
 .author-username, #email-reply .receiver-email {
   font-size: 8pt;
   color: $type-base-color;
@@ -3208,7 +3259,7 @@ fieldset.top-content {
   width: 0;
   pointer-events: none;
   border-color: rgba(136, 183, 213, 0);
-  border-right-color: #fff;
+  border-right-color: $content-bg-color;
   border-width: 10px;
   margin-top: -24px;
   margin-right: -1px;
@@ -3727,6 +3778,8 @@ fieldset.top-content {
   line-height: 1.3em;
   border: none;
   width: 100%;
+  word-break: break-all;
+
 }
 
 input.communication-subject {
@@ -3802,6 +3855,7 @@ input.communication-subject {
 
 .receiver-email {
   font-size: 8pt;
+  word-break: break-all;
 }
 
 .reply-button   {background-image: url(image_path('icon_reply_white.svg'));}
@@ -4002,6 +4056,12 @@ input.communication-subject {
   display: inline-block;
 }
 
+
+#auto-resolve-dialog{
+  padding: 13px;
+  max-height: 700px;
+  overflow-x: auto;
+}
 .email-reply-header-information, .dialog-form-information {
   padding: 5px;
   background-color: $faint-neutral-color;
@@ -4713,7 +4773,7 @@ input.file_attachment {
 }
 
 table > tbody > tr > td.dispute_rep_tools {
-  width: 90px;
+  width: 116px;
   padding: 0 0 8px 0 !important;
   text-align: right;
 }
@@ -4721,7 +4781,7 @@ table > tbody > tr > td.dispute_rep_tools {
 .dispute_rep_tools_wrapper {
   position: absolute;
   width: 90px;
-  margin-left: -90px;
+  right: 12px;
   margin-top: 7px;
 }
 
@@ -4734,7 +4794,6 @@ table > tbody > tr > td.dispute_rep_tools {
 .dispute_rep_tools_wrapper .edit-button {
   background-image: url(image_path('icon_edit_white.svg'));
 }
-
 .dispute_rep_tools .dropdown.open {
   background-color: transparent;
 }
@@ -5296,8 +5355,16 @@ input.table-entry-input:focus {
   padding: 6px;
 }
 
+.research-table-row-wrapper table > tbody > tr > td {
+  border: none;
+}
+
 .research-table-details-wrapper table tr:first-of-type td {
-  border-bottom: 1px solid $content-bg-color;
+  border-bottom: 1px solid $content-bg-color !important;
+}
+
+.research-table-details-wrapper table tr:first-of-type.single-details-row td {
+  border-bottom: none !important;
 }
 
 .input-col {
@@ -5318,6 +5385,10 @@ td.left-bordered {
   width: 28px;
   height: 28px;
   margin-right: 6px;
+}
+
+table > tbody > tr > td.research-table-row-wrapper {
+  border-bottom: 1px solid #CCCCCC !important;
 }
 
 .research-overview-row td:first-of-type, .research-table-details-wrapper, .research-table-row-wrapper {
@@ -5360,7 +5431,7 @@ td.left-bordered {
   margin-top: -1px;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 10px solid #fff;
+  border-top: 10px solid $content-bg-color;
 }
 
 .expanded-row-data-wrapper {
@@ -5453,7 +5524,7 @@ h5.entry-details-table-header {
   background-position: right 2px center;
   background-size: 16px;
   padding-bottom: 1px;
-  border: 2px solid #fff;
+  border: 2px solid $content-bg-color;
   outline: 1px solid #e5e5e5;
   font-size: 9pt;
 }
@@ -5462,12 +5533,12 @@ h5.entry-details-table-header {
   background-color: $bug-section-color;
   color: $content-bg-color;
   background-image: url(image_path('icon_dropdown_white.svg'));
-  border: 2px solid #fff;
+  border: 2px solid $content-bg-color;
   outline: 1px solid #e5e5e5;
 }
 
 .dropdown .inline-select-dropdown {
-  border: 2px solid #fff;
+  border: 2px solid $content-bg-color;
   outline: 1px solid #e5e5e5;
 }
 
@@ -6457,6 +6528,12 @@ table.dispute-entry-table tbody tr.selected {
 
 #new-complaint-wrapper {
   min-width: 350px;
+  .selectize-dropdown.multi.form-control.selectize {
+    min-height: 32px !important;
+    height: 100%;
+    height: auto !important;
+    background-color: $content-bg-color !important;
+  }
 }
 
 #new-complaint-wrapper textarea, #new-complaint-wrapper input, #categorize-urls-form-wrapper textarea {
@@ -6498,7 +6575,8 @@ table.dispute-entry-table tbody tr.selected {
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
   padding: 1px;
-  height: 32px;
+  min-height: 32px;
+  height: 100%;
 }
 
 .category-column .form-control.selectize {
@@ -6512,6 +6590,7 @@ table.dispute-entry-table tbody tr.selected {
 
 .selectize-dropdown.multi.form-control.selectize {
   min-height: 32px !important;
+  height: 100%;
   height: auto !important;
   background-color: $content-bg-color !important;
 }
@@ -6554,9 +6633,9 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 #new-complaint-wrapper .selectize-dropdown.multi.form-control.selectize {
-  top: 28px !important;
   background-color: $content-bg-color;
   height: auto !important;
+  margin-top: 10px;
 }
 
 .selectize-dropdown-content {
@@ -6570,9 +6649,8 @@ table.dispute-entry-table tbody tr.selected {
   }
   .form-control.selectize{
     min-height: 34px;
-    //border-top: 4px solid #fff;
-    border-left: 4px solid #fff;
-    border-right: 4px solid #fff;
+    border-left: 4px solid $content-bg-color;
+    border-right: 4px solid $content-bg-color;
     border-bottom: none;
     border-top: none;
     height: auto;
@@ -7129,7 +7207,7 @@ table#duplicates a {
 }
 
 .bug-tabs .nav-tabs li.active a {
-  background-color: #fff !important;
+  background-color: $content-bg-color !important;
 }
 
 .retro-styling #sidenav-menu-div a {
@@ -8464,7 +8542,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 .table-button-row .dropdown-menu h3 {
-  color: #fff;
+  color: $type-lightest;
   padding: 6px 10px;
   font-weight: 400;
   font-size: 9pt;
@@ -10231,7 +10309,7 @@ table.rl-content {
 }
 
 // AMP history dialog positioning - jquery overrides
-.ui-dialog[aria-describedby=amp-history-dialog] {
+.ui-dialog[aria-describedby=amp-history-dialog]{
   margin-top: 55px;
   margin-right: 15px;
   border-radius: 5px;
@@ -10593,7 +10671,7 @@ input[type="radio"].resolution_radio_button {
     font-weight: 600;
     font-size: 9.5pt;
     border: none !important;
-    color: #fff;
+    color: $type-lightest;
     display: inline-block;
   }
   hr.thin{
@@ -10805,6 +10883,11 @@ span.threat-cat-no-data {
   margin-bottom: 2px;
 }
 
+// set Webrep table bg color to white for visibility when columns extend past table
+#disputes-index {
+  background-color: $content-bg-color;
+}
+
 // webrep dispute index > ensure break/wrap properly for long url's containing parameters
 .dispute-entry-col {
   min-width: 200px;
@@ -10867,6 +10950,89 @@ span.threat-cat-no-data {
   padding-top: 1px;
   padding-right: 5px;
   vertical-align: middle;
+}
+
+.ip-label-col {
+  width: 28px;
+  background-color: #CCCCCC;
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_plus_ip_grey.svg'));
+  background-size: 20px 20px;
+  background-position: center 5px;
+  border-right: 1px solid $content-bg-color !important;
+  border-top: 1px solid $content-bg-color !important;
+}
+
+.single-details-row td {
+  height: 29px;
+  vertical-align: middle;
+}
+
+.no-padding-right {
+  padding-right: 0 !important;
+}
+
+.uri-plus-ip-rule-indicator {
+  background-image: url(image_path('icon_plus_ip_blue.svg'));
+  background-repeat: no-repeat;
+  background-position: 6px 4px;
+  width: 24px;
+  background-size: 18px 18px;
+}
+
+.add-ip-button {
+  background-image: url(image_path('icon_plus_ip_white.svg'));
+  width: 20px !important;
+  height: 20px !important;
+  margin-bottom: -5px;
+  display: block;
+}
+
+.add-ip-dropdown {
+  top: 21px;
+  left: 4px;
+  border-radius: 0 4px 4px 4px;
+  textarea {
+    width: 100%;
+    border: 1px solid darken($faint-neutral-color, 5%);
+    min-height: 60px;
+    margin-bottom: 8px;
+  }
+  .inline-tool-content-wrapper {
+    padding-top: 12px;
+  }
+  .content-label-sm {
+    margin-bottom: 0;
+  }
+  button {
+    text-transform: none;
+    font-weight: 400;
+    font-size: 8.5pt;
+  }
+}
+
+.single-button-col .open button {
+  background-color: $primary-section-color;
+}
+
+table > tbody > tr > td.no-padding {
+  padding: 0 !important;
+}
+
+.inline-row-loader {
+  display: inline-block;
+  font-style: italic;
+  color: lighten($type-lighter-color, 20%);
+  margin-left: 20px;
+  .sync-button {
+    display: inline-block;
+    margin-right: 4px;
+    height: 14px;
+    width: 14px;
+    background-repeat: no-repeat;
+    background-image: url('icon_sync_lt_grey.svg');
+    margin-bottom: -2px;
+  }
 }
 
 // retain top navigation at top of page during scroll down for nav accessibility
@@ -11665,6 +11831,52 @@ span.threat-cat-no-data {
   }
 }
 
+
+.inline-edit-ip-button {
+  background-image: url(image_path('icon_edit_white.svg'));
+  background-color: #bcc1c3;
+}
+.inline-save-ip-button, .inline-cancel-ip-button {
+  display: none;
+}
+.inline-edit-ip-button, .inline-save-ip-button, .inline-cancel-ip-button {
+  background-repeat: no-repeat;
+  height: 20px;
+  border-radius: 2px;
+  color: #fff;
+  border: none;
+  background-size: 16px 16px;
+  background-position: 2px center;
+  padding-left: 20px;
+}
+
+.inline-cancel-ip-button {
+  float: right;
+  margin-left: 8px;
+  background-position: center center !important;
+  padding-left: 0 !important;
+  width: 20px;
+  background-size: 22px !important;
+}
+
+.right-aligned-nested-button-wrapper {
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.table-ip-input {
+  display: none;
+  width: 100%;
+  border: 2px solid #fff;
+  outline: 1px solid #e5e5e5;
+}
+
+.table-ip-input:focus {
+  background-color: #fff7cd;
+  outline-offset: 0;
+}
+
 // CATEGORIZE URLs dropdown - vertical spacing tightening (below the radio buttons)
 .escalations--webcat--complaints-controller #categorize-urls-form-wrapper {
   // "Different categories for each url" is radio selected (the default view)
@@ -11764,4 +11976,65 @@ span.threat-cat-no-data {
 
 #webcat-index-toolbar .collapse-all {
   margin-right: 0;
+}
+
+// adding the down caret icon using the sort_by svg for advanced search button
+#advanced-search-button::after {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 14px;
+  right: 0;
+  background-image: url(image_path('icon_sort_by.svg'));
+  background-repeat: no-repeat;
+  background-position: 30% 92%;
+  background-size: 26px 26px;
+  float: right;
+}
+
+// reptool dropdown urls are too long, need to wrap/break
+.reptool-entry-name {
+  word-break: break-all;
+}
+
+.reptool-generated-comment, .toolbar div.reptool-generated-comment {
+  word-break: break-all;
+  white-space: pre-line;
+  background: lighten($medium-neutral-color, 5%);
+  color: $type-lighter-color;
+  margin-top: 10px;
+  line-height: 16px;
+  padding: 5px 6px;
+  max-height: 90px;
+  overflow-y: auto;
+}
+
+.inline-tool-content-wrapper .comment-wrapper .dropdown-comment.adjust-reptool-bl-input {
+  // placeholder text below
+  &::placeholder {
+    color: $content-label-color;
+  }
+  min-height: 60px;
+}
+
+/* for inline reptool dropdown, match the text color as bulk for reptool dropdown */
+table.dispute_tool_current tr.reptool-entry-row td {
+  color: darken($type-lighter-color, 10%);
+}
+
+/* define the full width of the reptool dropdown container and individual columns */
+#reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
+  width: 420px;
+  .th-reptool-dispute {
+    width: 120px;
+  }
+  .th-reptool-active-classes {
+    width: 80px;
+  }
+  .th-reptool-expiration {
+    width: 80px;
+  }
+  .th-reptool-comment {
+    width: 120px;
+  }
 }

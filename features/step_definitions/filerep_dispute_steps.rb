@@ -47,6 +47,10 @@ Given(/^FileRep Dispute has the appropriate 'resolution_comment' for auto-resolv
   expect(FileReputationDispute.first.resolution_comment).not_to eq(nil)
 end
 
+Given(/^FileRep Dispute does not have a resolution comment$/) do
+  expect(FileReputationDispute.first.resolution_comment).to eq(nil)
+end
+
 Then(/^no FileRep dispute comments exists$/) do
   expect(FileRepComment.count).to eq(0)
 end

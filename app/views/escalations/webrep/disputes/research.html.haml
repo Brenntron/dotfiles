@@ -111,7 +111,7 @@
                         Submit Reputation Changes
 
           %span.dropdown
-            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("research");'}
+            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.esc-tooltipped.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("research");'}
               %span.toolbar-button-text Adjust RepTool WL/BL
             .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
               =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
@@ -121,9 +121,10 @@
                   %table.dispute_tool_current
                     %thead
                       %tr
-                        %th.content-label-sm Dispute
-                        %th.content-label-sm Active Classes | Expiration
-                        %th.content-label-sm Comment
+                        %th.content-label-sm.th-reptool-dispute Dispute
+                        %th.content-label-sm.th-reptool-active-classes Active Classes
+                        %th.content-label-sm.th-reptool-expiration Expiration
+                        %th.content-label-sm.th-reptool-comment Comment
                     %tbody
                   -# Each checked entry will populate information here
 
@@ -158,6 +159,9 @@
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers', onclick: 'reptool_form_prep(this, "bulk")'}
                                   attackers
                               %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'banking_fraud', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  banking_fraud
+                              %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon', onclick: 'reptool_form_prep(this, "bulk")'}
                                   bogon
                               %li
@@ -169,25 +173,40 @@
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining', onclick: 'reptool_form_prep(this, "bulk")'}
                                   cryptomining
-                          .col-xs-4
-                            %ul
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga', onclick: 'reptool_form_prep(this, "bulk")'}
                                   dga
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit', onclick: 'reptool_form_prep(this, "bulk")'}
                                   exploitkit
+                          .col-xs-4
+                            %ul
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'high_risk', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  high_risk
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'ioc', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  ioc
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'link_sharing', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  link_sharing
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malicious', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  malicious
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware', onclick: 'reptool_form_prep(this, "bulk")'}
                                   malware
                               %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'newly_seen', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  newly_seen
+                              %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy', onclick: 'reptool_form_prep(this, "bulk")'}
                                   open_proxy
+                          .col-xs-4
+                            %ul
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay', onclick: 'reptool_form_prep(this, "bulk")'}
                                   open_relay
-                          .col-xs-4
-                            %ul
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing', onclick: 'reptool_form_prep(this, "bulk")'}
                                   phishing
@@ -198,6 +217,9 @@
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam', onclick: 'reptool_form_prep(this, "bulk")'}
                                   spam
                               %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spyware', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  spyware
+                              %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious', onclick: 'reptool_form_prep(this, "bulk")'}
                                   suspicious
                               %li
@@ -206,8 +228,8 @@
 
                     .comment-wrapper
                       %label.content-label-sm RepTool Comment
-                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                      %hr.thin
+                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-bulk{placeholder: 'Reason behind this change...'}
+                      .reptool-generated-comment
                     .button-row-center
                       %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool();'}
                         Submit Changes
@@ -248,7 +270,7 @@
                     %td.dispute_rep_tools.rep-tools-cell
                       %span.dispute_rep_tools_wrapper
                         %span.dropdown
-                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);', class: "bfrp-inline-wlbl-#{i}"}
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.esc-tooltipped.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);', class: "bfrp-inline-wlbl-#{i}"}
                           -# adding a unique id for this wl/bl dropdown + strip out special chars
                           .dropdown-menu{id: "wlbl_adjust_#{entry.hostlookup.gsub(/[.:\/]/,'')}"}
                             = form_for :wlbl, html: {class: 'adjust-wlbl-form inline-wlbl-form'} do |wlbl_form|
@@ -338,6 +360,7 @@
 
                         %span.dropdown
                           %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{onclick: "get_current_reptool(this, 'research')", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          -# TODO - these items don't have entry ids since they are fresh lookups, need to avoid the id syntax below as its creating dup ids
                           .dropdown-menu.toolbar-dropdown.reptool-inline-dropdown{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
                             = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                               .dispute-reptool-adjust-wrapper
@@ -349,7 +372,7 @@
                                     %tr
                                       %th.content-label-sm Active Classes
                                       %th.content-label-sm Expiration
-                                      %th.content-label-sm Comment
+                                      %th.content-label-sm.th-reptool-comment Comment
                                   %tbody
                                   -#  Will call up-to-date information from the api
                                 .inline-tool-content-wrapper
@@ -380,6 +403,9 @@
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers', onclick: 'reptool_form_prep(this, "individual")'}
                                                 attackers
                                             %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'banking_fraud', onclick: 'reptool_form_prep(this, "individual")'}
+                                                banking_fraud
+                                            %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon', onclick: 'reptool_form_prep(this, "individual")'}
                                                 bogon
                                             %li
@@ -391,25 +417,40 @@
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining', onclick: 'reptool_form_prep(this, "individual")'}
                                                 cryptomining
-                                        .col-xs-4
-                                          %ul
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga', onclick: 'reptool_form_prep(this, "individual")'}
                                                 dga
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit', onclick: 'reptool_form_prep(this, "individual")'}
                                                 exploitkit
+                                        .col-xs-4
+                                          %ul
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'high_risk', onclick: 'reptool_form_prep(this, "individual")'}
+                                                high_risk
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'ioc', onclick: 'reptool_form_prep(this, "individual")'}
+                                                ioc
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'link_sharing', onclick: 'reptool_form_prep(this, "individual")'}
+                                                link_sharing
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malicious', onclick: 'reptool_form_prep(this, "individual")'}
+                                                malicious
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware', onclick: 'reptool_form_prep(this, "individual")'}
                                                 malware
                                             %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'newly_seen', onclick: 'reptool_form_prep(this, "individual")'}
+                                                newly_seen
+                                            %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy', onclick: 'reptool_form_prep(this, "individual")'}
                                                 open_proxy
+                                        .col-xs-4
+                                          %ul
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay', onclick: 'reptool_form_prep(this, "individual")'}
                                                 open_relay
-                                        .col-xs-4
-                                          %ul
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing', onclick: 'reptool_form_prep(this, "individual")'}
                                                 phishing
@@ -420,6 +461,9 @@
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam', onclick: 'reptool_form_prep(this, "individual")'}
                                                 spam
                                             %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spyware', onclick: 'reptool_form_prep(this, "individual")'}
+                                                spyware
+                                            %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious', onclick: 'reptool_form_prep(this, "individual")'}
                                                 suspicious
                                             %li
@@ -427,13 +471,10 @@
                                                 tor_exit_node
                                   .comment-wrapper
                                     %label.content-label-sm RepTool Comment
-                                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                                      \
-                                      \
-                                      \--------------------------
+                                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-inline{placeholder: 'Reason behind this change...'}
+                                    .reptool-generated-comment
                                       INDIVIDUAL RESEARCH SUBMISSION:
                                       &#x000A; #{entry.hostlookup}
-                                    %hr.thin
                                   .button-row-center
                                     %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_individual_reptool(this)', disabled: true}
                                       Submit Changes
@@ -442,7 +483,7 @@
                   %tr.research-overview-row
                     %td
                     -#Expander area
-                    %td.research-table-details-wrapper{colspan: '20'}
+                    %td.research-table-details-wrapper{colspan: '5'}
                       %table
                         %tr
                           %td.input-col.wbrs-input-wrapper
@@ -451,26 +492,27 @@
                             %label WBRS
                           %td.text-center.entry-data-wbrs-score.wbrs-score-cell
                             = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
-                          %td.wbrs-rule-hits-label-cell
-                            %label WBRS Rule Hits
-                          %td.text-center.wbrs-rule-hits-cell
-                            = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count
                           %td.wbrs-rules-label-cell
                             %label WBRS Rules
+                          %td.text-center.wbrs-rule-hits-cell
+                            - wbrs_rules = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS' && hit.is_multi_ip_rulehit != true}
+                            = wbrs_rules.count
                           %td.rule-hits-col-list.wbrs-rules-cell
-                            - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count == 0
+                            - if wbrs_rules.count == 0
                               %span.missing-data No rule hits
                             - else
-                              - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.each do |wbrs_hit|
+                              - wbrs_rules.each do |wbrs_hit|
                                 - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
                                   %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': wbrs_hit.name}
-                                    = wbrs_hit.name
-                                    - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                      = ","
+                                    - if wbrs_hit.equal? wbrs_rules.last
+                                      = wbrs_hit.name
+                                    - else
+                                      = "#{wbrs_hit.name}, "
                                 - else
-                                  = wbrs_hit.name
-                                  - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                    = ","
+                                  - if wbrs_hit.equal? wbrs_rules.last
+                                    = wbrs_hit.name
+                                  - else
+                                    = "#{wbrs_hit.name}, "
                           %td.input-col.xbrs-input-wrapper
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %td.xbrs-history-label-cell
@@ -530,11 +572,10 @@
                             %label SBRS
                           %td.text-center.sbrs-score-cell= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
                           %td
-                            %label SBRS Rule Hits
+                            %label SBRS Rules
                           %td.text-center.sbrs-rule-hits-cell
                             = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count
-                          %td
-                            %label SBRS Rules
+
                           %td.rule-hits-col-list.sbrs-rules-cell
                             - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count == 0
                               %span.missing-data No rule hits
@@ -573,6 +614,64 @@
                               %label Umbrella
                             %td.text-center.umbrella-cell{colspan: '2'}
                               = entry.umbrellaresult
+
+                  - if entry.uri?
+                    -#If entry is uri and has a resolved host ip
+                    %tr.research-uri-ip-query-row
+                      %td{rowspan: '2'}
+                        -#Expander area
+                      %td.input-col.ip-label-col{rowspan: '2'}
+                        -# IP label
+                      %td.dual-edit-field{colspan: '2', 'data-id': entry.id, 'data-field': 'host-ip'}
+                        %span.entry-resolved-ip-content{id: "resolved-ip-content-no-#{i}"}
+                          = entry.web_ips
+                        %input.table-ip-input{type:'text', value: "#{entry.web_ips}", id: "table-ip-input-no-#{i}"}
+                      %td.text-right.no-padding-right{colspan: '2'}
+                        %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses', id: "edit-ip-result-no-#{i}"}
+                          Edit IP Addresses
+                        %button.save-button.inline-save-ip-button.esc-tooltipped{title: 'Query IP Addresses', id: "save-ip-result-no-#{i}"}
+                          Query IP Addresses
+                        %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses', id: "cancel-ip-result-no-#{i}"}
+
+                    %tr.research-uri-ip-data-row.research-page-ip-query-details
+                      %td.research-table-details-wrapper{colspan: '4'}
+                        %table
+                          %tr.single-details-row
+                            %td.wbrs-rules-label-cell
+                              %label WBRS
+                            %td.text-center.no-border.uri-ip-wbrs-score
+                              - unless entry[:score].nil?
+                                = entry[:score]
+                              - else
+                                %span.missing-data
+                                  No score.
+                            %td
+                              %label WBRS Rules
+                            %td.text-center.uri-ip-wbrs-rule-total
+                              - ip_rule_hits = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }
+                              = ip_rule_hits.length
+                            %td.uri-ip-wbrs-rules
+                              - unless ip_rule_hits.length == 0
+                                - ip_rule_hits.each do |wbrs_hit|
+                                  - if wbrs_hit == ip_rule_hits.last
+                                    = wbrs_hit.name
+                                  - else
+                                    = "#{wbrs_hit.name}, "
+                              - else
+                                %span.missing-data
+                                  No rules.
+                            %td
+                              %label Threat Category
+                            %td.uri-ip-category
+                              - unless entry[:multi_wbrs_threat_category].nil?
+                                - ip_tc_record = JSON.parse entry[:multi_wbrs_threat_category]
+                                - ip_tc = ip_tc_record.to_sentence(two_words_connector: ', ', last_word_connector: ', ')
+                                = ip_tc
+                            %td
+                              %label Proxy URI
+                            %td.uri-ip-proxy
+                              = entry[:proxy_uri]
+
                   %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                     %td.expanded-row{colspan: '8'}
                       .expanded-row-data-wrapper
@@ -609,6 +708,12 @@
                                         %td= wbrs_hit.mnemonic
                                         %td
                                           -#Put weight of rule here
+                                      -# if any wbrs rulehits are returned from querying uri + ip each do
+                                      -#  %tr
+                                      -#    %td.uri-plus-ip-rule-indicator
+                                      -#    %td= wbrs_hit.name
+                                      -#    %td= wbrs_hit.mnemonic
+                                      -#    %td
                             .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header
                                 SBRS Rule Hit Details
