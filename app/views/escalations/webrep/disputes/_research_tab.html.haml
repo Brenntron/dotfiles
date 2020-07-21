@@ -483,8 +483,8 @@
                                   .threat-cat-area
                                     - Wbrs::ThreatCategory.selections.each do |label, value|
                                       .threat-cat-cell
-                                        = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
-                                        = label
+                                        = wlbl_form.check_box(:thrt_cat_id, {id: "thrt_cat_id_#{value}", class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
+                                        = label(:thrt_cat_id,{for: "thrt_cat_id_#{value}"}, value )
                                 -# END: THREAT CATS ROW
 
                                 .comment-wrapper

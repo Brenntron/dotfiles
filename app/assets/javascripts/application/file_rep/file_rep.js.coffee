@@ -563,8 +563,6 @@ $ ->
     if $('#disputes-index-export-form').length
       document.getElementById("disputes-index-export-form").onsubmit = () ->
         return false
-
-
   window.export_file_rep_selected = () ->
     data = build_data()
     if data.selected_cases.length <= 0

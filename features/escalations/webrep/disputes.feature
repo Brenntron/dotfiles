@@ -32,6 +32,23 @@ Feature: Disputes
     Then I should see "Unable to create the following duplicate dispute entries: talosintelligence.com"
 
   @javascript
+  Scenario: A user can create new disputes with urls found through lookup detail
+    Given a user with role "webrep user" exists and is logged in
+    And vrtincoming exists
+    And bugzilla rest api always saves
+    And Dispute Analyst customer exists
+    When I go to "/escalations/webrep/research#lookup-detail"
+    And I fill in "search_uri" with "ough.com"
+    Then I click "submit-button rep-research"
+    And I wait for "60" seconds
+    Then I should see "Entry Search Results for"
+    Then I click "#select-all-entries"
+    Then I click "add-to-ticket-button"
+    When I click ".submit_new_dispute"
+    And I wait for "60" seconds
+    Then I should see "ALL ENTRIES WERE SUCCESSFULLY CREATED."
+
+  @javascript
   Scenario: The index will not break with a mostly empty record
     Given a user with role "webrep user" exists and is logged in
     Given an empty dispute exists
@@ -1092,6 +1109,7 @@ Feature: Disputes
     And I click "#button_add_dispute_entry"
     And I wait for "5" seconds
     Then I should see content "cisco.com" within ".entry-data-content"
+
     And I should see content "WL-med" within ".entry-data-wlbl"
     And I should see content "BL-heavy" within ".entry-data-wlbl"
 

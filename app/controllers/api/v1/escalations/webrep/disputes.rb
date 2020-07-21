@@ -90,7 +90,7 @@ module API
             post "" do
               std_api_v2 do
                 user_validation = User.where(cvs_username: permitted_params['assignee'])
-                separated_entries = permitted_params[:ips_urls].split("\n")
+                separated_entries = permitted_params[:ips_urls].split("\s")
                 non_duplicated_entries = []
                 duplicates = []
 
@@ -104,20 +104,22 @@ module API
                 if non_duplicated_entries.any?
                   if user_validation.present?
                     begin
-                    dispute = Dispute.create_action(bugzilla_rest_session,
-                                                    non_duplicated_entries,
-                                            permitted_params[:assignee],
-                                            permitted_params[:priority],
-                                            permitted_params[:ticket_type])
+                      dispute = Dispute.create_action(bugzilla_rest_session,
+                                                      non_duplicated_entries,
+                                                      permitted_params[:assignee],
+                                                      permitted_params[:priority],
+                                                      permitted_params[:ticket_type])
                     rescue Exception => e
                       raise ("Could not create the Dispute because of this error: #{e.message}")
                     end
                     render json: {status: 'Success', case_id: dispute.id, errors: duplicates}
+
+
                   else
                     raise ("Invalid assignee or assignee does not exist. Please try again.")
                   end
                 else
-                  raise ("Unable to create the following duplicate dispute entries: #{duplicates.join("\n")}")
+                  raise ("Unable to create the following duplicate dispute entries: #{duplicates.join(", ")}")
                 end
               end
             end
@@ -304,12 +306,12 @@ module API
                 Wbrs::ManualWlbl.destroy_from_params(ip_uris, params['lists'], username: current_user.cvs_username)
               when "replace"
                 replace_params_formatted =
-                {
-                    dispute_entry_ids: params[:dispute_entries],
-                    trgt_list: params[:lists],
-                    thrt_cats: params[:thrt_cat_ids],
-                    note: params[:note]
-                }
+                    {
+                        dispute_entry_ids: params[:dispute_entries],
+                        trgt_list: params[:lists],
+                        thrt_cats: params[:thrt_cat_ids],
+                        note: params[:note]
+                    }
                 Wbrs::ManualWlbl.adjust_entries_from_params(replace_params_formatted, username: current_user.cvs_username)
               else
                 "No valid adjustment type"
@@ -411,14 +413,14 @@ module API
               requires :dispute_id
             end
             post "sync_data" do
-                
-                dispute = Dispute.where({:id => params[:dispute_id]}).first
-                dispute.dispute_entries.each do |dispute_entry|
 
-                  dispute_entry.sync_up
+              dispute = Dispute.where({:id => params[:dispute_id]}).first
+              dispute.dispute_entries.each do |dispute_entry|
 
-                end
-                {:status => "success"}.to_json
+                dispute_entry.sync_up
+
+              end
+              {:status => "success"}.to_json
 
             end
 
@@ -688,7 +690,7 @@ module API
 
               if information[params[:entry].gsub('http://', '').gsub('https://', '')] == "NOT_FOUND"
                 return {:entry => params[:entry], :classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
-              # TODO Make expiration human readable - Just the date
+                # TODO Make expiration human readable - Just the date
               else
                 expiration = ""
                 begin
@@ -724,7 +726,7 @@ module API
 
                     comment = ""
 
-		    comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
+                    comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
 
                     return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => comment).to_json
                   end
@@ -739,7 +741,7 @@ module API
 
             get 'rule_ui_wlbl_get_info_for_form' do
               params[:entry] = params[:entry].strip
-              
+
               information = Wbrs::ManualWlbl.where({:url => params[:entry]})
 
               if information.blank?
@@ -762,6 +764,43 @@ module API
               return {:status => "success", :data => list_types, :notes => note_entries.first}.to_json
 
             end
+
+            params do
+              requires :uri, type: String
+            end
+
+            get 'rule_api_info' do
+              params[:uri] = params[:uri].strip
+
+              information = Wbrs::ManualWlbl.where({:url => params[:uri]})
+
+              if information.blank?
+                return {:status => 'success', :data => ""}.to_json
+              end
+
+              data = []
+              information.each do |entry|
+                if entry.url == params[:uri]
+                  if entry.state == "active"
+                    entry.threat_cats = DisputeEntry.threat_cats_from_ids(entry.threat_cats)
+                    data << entry
+                  end
+                end
+              end
+
+              note_entries = []
+
+              return {:status => "success", :data => data, :notes => note_entries.first}.to_json
+
+            end
+
+
+
+
+
+
+
+
 
             params do
               requires :entries, type: Array[String]
@@ -910,6 +949,45 @@ module API
               render json: {assignees: assignees}
             end
 
+            ## for bulk lookup
+
+            desc 'super simple endpoint for bulk lookup to consume'
+            params do
+              requires :uri, type: String
+            end
+
+            get 'wbrs_info' do
+              data = {}
+              data[:score] = nil
+              data[:rulehits] = []
+
+              url_to_test = permitted_params[:uri]
+
+              begin
+                results = Sbrs::ManualSbrs.call_wbrs({'url' => url_to_test}, type: 'wbrs')
+                data[:score] = results["wbrs"]["score"]
+                data[:rulehits] = Sbrs::ManualSbrs.get_rule_names_from_rulehits(results)
+                render json: {:status => "success", :data => data}
+              rescue
+                render json: {:status => "error", :data => data}
+              end
+
+            end
+
+            desc 'super simple endpoint to quick look up bulk submit'
+            params do
+            end
+
+            post 'quick_bulk_update' do
+              data = params[:update_data]
+
+              begin
+                response = Dispute.process_quick_bulk_entries(data, current_user)
+                {:status => "success", :data => response}.to_json
+              rescue
+                {:status => "error"}.to_json
+              end
+            end
 
             desc 'Get URL + IP data from SDS V3'
             post 'update_multi_ip' do
@@ -954,6 +1032,40 @@ module API
               response = SbApi.remote_call_sds(permitted_params[:uri],'wbrs')
               response
 
+            end
+
+            desc 'valid url?'
+
+            params do
+              requires :uri, type: Array[String]
+            end
+            #this needs to start with 'http' or 'https'
+            get 'is_valid_url' do
+              urls = permitted_params[:uri]
+              result = {}
+              urls.each do |url|
+                if url.start_with?( 'https://', 'http://')
+                  result[url] = DisputeEntry.valid_url?(url)
+                else
+                  result[url] = DisputeEntry.valid_url?('http://' + url)
+                end
+              end
+              {:status => "success", :data => result, :checked_url => urls}
+            end
+
+            desc 'valid ip?'
+
+            params do
+              requires :ip_address, type: Array[String]
+            end
+            #this needs to start with 'http' or 'https'
+            get 'is_valid_ip' do
+              ips = permitted_params[:ip_address]
+              result = {}
+              ips.each do |ip|
+                result[ip] = DisputeEntry.is_ip?(ip)
+              end
+              {:status => "success", :data => result, :checked_ips => ips}
             end
 
           end

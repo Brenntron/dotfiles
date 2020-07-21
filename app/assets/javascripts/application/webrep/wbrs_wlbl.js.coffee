@@ -158,8 +158,6 @@ window.bulk_get_current_wlbl = (page) ->
 
   # build the top blue dispute rows with wl/bl's and threat cats, ensures the row gets built correctly (KH refactor)
   window.build_tc_row = (entry, tbody, result) ->
-    console.log 'YOU HAVE ENTERED build_tc_row, HERE IS CURR ENTRY:'
-    console.log entry
 
     { threat_categories } = JSON.parse(result)
     { ip_uri, list_types, wbrs_score, comment } = entry
@@ -190,7 +188,6 @@ window.bulk_get_current_wlbl = (page) ->
     if list_types.length == 0
       list_types = "<span class='missing-data'>Not on a list</span>"
 
-    console.log ip_uri, list_types, wbrs_score
 
     table_row =
       "<tr class='wlbl-dropdown-row'>
@@ -782,6 +779,29 @@ window.submit_individual_wlbl = (button_tag) ->
     )
 
 
+    data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment}
+
+    if $('#wlbl-remove').prop('checked')
+      std_msg_ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+        method: 'POST'
+        data: data
+        success: (response) ->
+          std_msg_success("The following entries have been removed from " + list_types, ip_uris)
+        error: (response) ->
+          std_api_error(response, 'Error retrieving WL/BL Data')
+      )
+
+    if $('#wlbl-add').prop('checked')
+      std_msg_ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
+        method: 'POST'
+        data: data
+        success: (response) ->
+          std_msg_success("The following entries have been added to " + list_types, ip_uris)
+        error: (response) ->
+          std_api_error(response, 'Error retrieving WL/BL Data')
+      )
 
 
 
