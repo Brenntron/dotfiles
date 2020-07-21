@@ -52,3 +52,6 @@ end
 Then (/^that Complaint Ticket should have an assignee of current user$/) do
   expect(ComplaintEntry.first.user_id).to eq(1)
 end
+Then (/^that Complaint Ticket should not have an assignee of current user$/) do
+  expect(ComplaintEntry.first.user_id).not_to eq(1)
+end
