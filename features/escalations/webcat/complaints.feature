@@ -816,30 +816,8 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     And I should see "Assigned to someone else - 3"
 
-  @javascript
-  Scenario: a user tries to return a ticket that is not assigned to them
-    Given a user with role "webcat user" exists and is logged in
-    And the following users exist
-      | id | cvs_username | cec_username | display_name |
-      | 2  | test_user    | test_user    | test_user    |
-    And the following complaints exist:
-      | channel       | id |
-      | talosintel    | 1  |
-      | talosintel    | 2  |
-      | talosintel    | 3  |
-    And the following complaint entries exist:
-      | uri            | domain          | entry_type | complaint_id | status     | user_id|
-      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |        |
-      | whatever.com   | whatever.com    | URI/DOMAIN |  2           | NEW        |        |
-      | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |    2   |
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I select row "3"
-    And I click ".return-ticket-toolbar-button"
-    And I wait for "3" seconds
-    And I should see "Assigned to someone else - 3"
 
   @javascript
-
   Scenario: a user tries to take multiple tickets, some of which are already assigned
     Given a user with role "webcat user" exists and is logged in
     And the following users exist
@@ -875,3 +853,25 @@ Feature: Webcat complaints
     Then I click ".take-ticket-toolbar-button"
     And I wait for "3" seconds
     And I should see "Currently assigned to someone else - 3, 4, 7, and 9"
+
+  @javascript
+  Scenario: a user tries to return a ticket that is not assigned to them
+    Given a user with role "webcat user" exists and is logged in
+    And the following users exist
+      | id | cvs_username | cec_username | display_name |
+      | 2  | test_user    | test_user    | test_user    |
+    And the following complaints exist:
+      | channel       | id |
+      | talosintel    | 1  |
+      | talosintel    | 2  |
+      | talosintel    | 3  |
+    And the following complaint entries exist:
+      | uri            | domain          | entry_type | complaint_id | status     | user_id|
+      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |        |
+      | whatever.com   | whatever.com    | URI/DOMAIN |  2           | NEW        |        |
+      | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |    2   |
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    Then I select row "3"
+    And I click ".return-ticket-toolbar-button"
+    And I wait for "3" seconds
+    And I should see "Assigned to someone else - 3"
