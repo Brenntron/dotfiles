@@ -835,8 +835,8 @@ Feature: Webcat complaints
     And I goto "/escalations/webcat/complaints?f=ALL"
     Then I select row "3"
     And I click ".return-ticket-toolbar-button"
-    And I wait for "30" seconds
-    And I should see "Currently assigned to someone else - 1"
+    And I wait for "3" seconds
+    And I should see "Assigned to someone else - 3"
 
   @javascript
 
