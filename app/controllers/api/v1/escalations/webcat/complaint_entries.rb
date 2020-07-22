@@ -179,7 +179,7 @@ module API
                 error_entry_ids = {}
                 error_count = 0
                 permitted_params['complaint_entry_ids'].each do |id|
-                  status = ComplaintEntry.find(id).return_complaint
+                  status = ComplaintEntry.find(id).return_complaint(current_user)
                   if status != "Complaint returned"
                     error_count += 1
                     if error_entry_ids[status].nil?
@@ -209,6 +209,7 @@ module API
                 return {:error => error}.to_json
               end
               {name:current_user.display_name}.to_json
+
             end
 
 
