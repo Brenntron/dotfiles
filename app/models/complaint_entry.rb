@@ -88,7 +88,7 @@ class ComplaintEntry < ApplicationRecord
       if !self.is_important
         if status!="COMPLETED"
           if self.user.id != current_user.id
-            return("Assigned to someone else")
+            return("Currently assigned to someone else")
           else
             self.update(user: User.vrtincoming, status:"NEW")
             complaint.set_status("NEW")

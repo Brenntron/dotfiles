@@ -874,4 +874,4 @@ Feature: Webcat complaints
     Then I select row "3"
     And I click ".return-ticket-toolbar-button"
     And I wait for "3" seconds
-    And I should see "Assigned to someone else - 3"
+    And I should see "Currently assigned to someone else - 3"
