@@ -20,8 +20,8 @@ Feature: Reptool Dropdown
     And I wait for "2" seconds
     Then I should see "Adjust Reptool Classification"
     And I should see "AC Bulk Submission:"
-    And I should see "001 - thisisatest.com"
-    And I check checkbox with class "reptool-cb-bogon"
+    And I should see "TE.ACE-00001"
+    And I check checkbox with class "reptool-cb-attackers"
     And I fill in "typed-in-comment-bulk" with "Test comment for bulk."
     And I click ".dropdown-submit-button"
     And I wait for "2" seconds
