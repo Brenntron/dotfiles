@@ -62,7 +62,8 @@ Plug 'elixir-lang/vim-elixir'
 Plug 'avdgaag/vim-phoenix'
 Plug 'mmorearty/elixir-ctags'
 Plug 'mattreduce/vim-mix'
-Plug 'BjRo/vim-extest'
+Plug 'mhinz/vim-mix-format'
+Plug 'janko/vim-text'
 Plug 'frost/vim-eh-docs'
 Plug 'slashmili/alchemist.vim'
 Plug 'tpope/vim-endwise'
@@ -71,6 +72,10 @@ Plug 'jadercorrea/elixir_generator.vim'
 " Ruby Support
 Plug 'vim-ruby/vim-ruby'
 Plug 'hackhowtofaq/vim-solargraph'
+Plug 'autozimu/LanguageClient-neovim', {
+  \ 'branch': 'next',
+  \ 'do': 'bash install.sh',
+  \ }
 
 " Freemarker Support
 Plug 'andreshazard/vim-freemarker'
@@ -134,7 +139,7 @@ set softtabstop=2
 set smarttab
 set expandtab
 set noshiftround
-let g:node_host_prog = $ASDF_DIR . '/installs/nodejs/11.6.0/bin/npm'
+let g:node_host_prog = '/Users/Brenntron/.asdf/installs/nodejs/13.12.0/bin/npm'
 
 syn match javaScriptCommentSkip "^[ \t]*\*\($\|[ \t]\+\)"
 syn region javaScriptComment start="/\*" end="\*/" contains=@Spell,javaScriptCommentTodo
@@ -162,7 +167,7 @@ autocmd FileType json syntax match Comment +\/\/.\+$+
 let g:ale_linter_aliases = {'es6': ['javascript'], 'jsx': ['css', 'javascript']}
 
 let g:ale_linters = {
-\  'javascript': ['eslint', 'flow'],
+\  'javascript': ['eslint', 'prettier'],
 \  'typescript': ['tslint'],
 \  'es6': ['eslint'],
 \  'scss': ['stylelint'],
@@ -193,6 +198,7 @@ let g:ale_sign_error = 'X'
 let g:ale_sign_warning = '?'
 let g:ale_statusline_format = ['X %d', '? %d', '']
 let g:ale_echo_msg_format = '%linter% says %s'
+let g:ale_elixir_elixir_ls_release = '/Users/Brenntron/code/elixir_ls/rel'
 
 " Airline
 let g:airline#extensions#ale#enabled = 1
@@ -211,6 +217,12 @@ let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_
 let g:airline#extensions#coc#error_symbol = 'Error:'
 let g:airline#extensions#ale#error_symbol = 'E:'
 let g:airline#extensions#ale#warning_symbol = 'W:'
+
+" language client server
+let g:LanguageClient_serverCommands = {
+  \ 'ruby': ['tcp://localhost:7658']
+  \ }
+let g:LanguageClient_autoStop = 0
 
 " vim-vinegar settings
 let g:netrw_list_hide = '\(^\|\s\s\)\zs\.\S\+'
@@ -308,6 +320,7 @@ autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
 autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
 autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+autocmd FileType ruby setlocal omnifunc=LanguageClient#complete
 
 " Elixir Tagbar Configuration
 let g:tagbar_type_elixir = {
@@ -327,6 +340,17 @@ let g:tagbar_type_elixir = {
         \ 't:tests'
     \ ]
     \ }
+
+" Elixir Setup
+let g:mix_format_on_save =1
+let g:mix_format_options = '--check-equivalent'
+let g:mix_format_silent_errors = 1
+
+nmap <silent> t<C-n> :TestNearest<CR>
+nmap <silent> t<C-f> :TestFile<CR>
+nmap <silent> t<C-s> :TestSuite<CR>
+nmap <silent> t<C-l> :TestLast<CR>
+nmap <silent> t<C-g> :TestVisit<CR>
 
 " ctag config
 nmap <Leader>j :tag <C-R><C-W>

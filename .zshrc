@@ -21,14 +21,15 @@ POWERLEVEL9K_BATTERY_STAGES=($'\uf579' $'\uf57a' $'\uf57b' $'\uf57c' $'\uf57d' $
 POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND=(red3 darkorange3 darkgoldenrod gold3 yellow3 chartreuse2 mediumspringgreen green3 green3 green4 darkgreen)
 POWERLEVEL9K_BATTERY_VERBOSE=false
 
-POWERLEVEL9K_CUSTOM_RUBY_VERSION="echo '\ue23e' `(cd $PWD && asdf current ruby | sed -ne \
-  's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p')`"
+POWERLEVEL9K_CUSTOM_ELIXIR_VERSION="echo `(cd $PWD && asdf current elixir | sed -ne \
+  's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p')` '\ue62d'"
+POWERLEVEL9K_CUSTOM_ELIXIR_VERSION_BACKGROUND="purple"
+POWERLEVEL9K_CUSTOM_ELIXIR_VERSION_FOREGROUND="black"
+
+POWERLEVEL9K_CUSTOM_RUBY_VERSION="echo `(cd $PWD && asdf current ruby | sed -ne \
+  's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p')` '\ue23e'"
 POWERLEVEL9K_CUSTOM_RUBY_VERSION_BACKGROUND="red"
 POWERLEVEL9K_CUSTOM_RUBY_VERSION_FOREGROUND="black"
-
-POWERLEVEL9K_CUSTOM_PYTHON_VERSION="echo '\uf81f' `(cd $PWD && asdf current python | sed -ne \
-  's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p')`"
-POWERLEVEL9K_CUSTOM_PYTHON_VERSION_BACKGROUND="steelblue3"
 
 POWERLEVEL9K_NODE_VERSION_FOREGROUND='grey30'
 
@@ -50,7 +51,8 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
   status
   time
   node_version
-  custom_python_version
+  custom_elixir_version
+  custom_ruby_version
   dir_writable
 )
 POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
@@ -162,10 +164,6 @@ done
 
 # ensure_tmux_is_running
 
-. $HOME/.asdf/asdf.sh
-
-. $HOME/.asdf/completions/asdf.bash
-
 SSH_ENV=~/.ssh/environment
 
 # start the ssh-agent
@@ -188,6 +186,13 @@ else
     start_agent;
   fi
 
+if type brew &>/dev/null; then
+    FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+
+    autoload -Uz compinit
+    compinit
+fi
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 alias config='/usr/bin/git --git-dir=/Users/Brenntron/.myconfigs/ --work-tree=/Users/Brenntron'
 alias tmux="tmux -2"
@@ -199,3 +204,7 @@ export CPPFLAGS="-I/usr/local/opt/zlib/include"
 export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
 export PATH="$HOME/.fastlane/bin:$PATH"
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
+export CFLAGS="-O2 -g -fno-stack-check"
+export KERL_CONFIGURE_OPTIONS="--disable-hipe --with-ssl=$(brew --prefix openssl)"
+
+. /usr/local/opt/asdf/asdf.sh
