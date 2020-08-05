@@ -148,13 +148,11 @@ class ComplaintEntry < ApplicationRecord
             ###############################################################################################################################################################
             ###guard rails should go here i think
 
-            results = Webcat::GuardRails.verdict_for_entries([prefix])
-            binding.pry
-            return
+            results = JSON.parse(Webcat::GuardRails.verdict_for_entries([prefix]).body)
 
             verdict_data = results[prefix]
 
-            if verdict_data["result"] == Webcat::GuardRails::PASS || current_user.is_webcat_manager?
+            if verdict_data["guardrails"]["result"] == Webcat::GuardRails::PASS || current_user.is_webcat_manager?
 
               #################################################
               current_status = "COMPLETED"
@@ -169,6 +167,7 @@ class ComplaintEntry < ApplicationRecord
                      user:current_user)
               complaint.set_status(current_status)
               #this is where we should send off the category to the API
+
               if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
                 existing_prefixes = remote_prefixes(prefix_given: prefix)
                 commit_category(existing_prefixes,
@@ -188,9 +187,9 @@ class ComplaintEntry < ApplicationRecord
             end
 
             if !current_user.is_webcat_manager?
-              if verdict_data["result"] == Webcat::GuardRails::FAIL
+              if verdict_data["guardrails"]["result"] == Webcat::GuardRails::FAIL
                 manager_user = User.where(:cvs_username => Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
-                guard_rails_reasons = verdict_data["why"]["reason"].pluck("reason").join(";")
+                guard_rails_reasons = verdict_data["guardrails"]["reason"].pluck("reason").join(";")
                 update!(user: manager_user,
                               internal_comment: "FAILED GUARDRAILS! Reason: #{guard_rails_reasons}"
                 )
@@ -590,7 +589,7 @@ class ComplaintEntry < ApplicationRecord
       when "MY CLOSED COMPLAINTS"
         closed.where(user_id: user.id)
       when "MANAGER QUEUE"
-        joins(:complaint).where("complaints.channel != 'wbnp'").where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED')")
+        joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
       when "ALL"
         all
       else

@@ -120,7 +120,10 @@ module API
                 end
 
               rescue Exception => e
-                return e.message
+                Rails.logger.error(e)
+                Rails.logger.error e.backtrace.join("\n")
+                error = "#{e.message}"
+                return {:error => error}.to_json
               end
               {entry_id: entry.id, domain: entry.domain, subdomain: entry.subdomain, path: entry.path,
                categories: entry.url_primary_category, uri: entry.uri, status:entry.status,
