@@ -73,9 +73,10 @@
       %span.toolbar-button-text WBNP Data
   %div
     %label.toolbar-section-label Bulk
-    %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped.toolbar-button-spacer{ onclick: 'master_submit();', title: 'Submit Changes'}
-      %span.toolbar-button-text Submit Changes
-    %span.dropdown
+    - if params[:f] != "REVIEW"
+      %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped.toolbar-button-spacer{ onclick: 'master_submit();', title: 'Submit Changes'}
+        %span.toolbar-button-text Submit Changes
+      %span.dropdown
       %button#index_update_resolution.toolbar-button.resolution-submit-button.dropdown-toggle.esc-tooltipped{title: 'Submit Resolution', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Submit Resolution
@@ -91,6 +92,10 @@
             %input.form-control#customer_facing_comment{:name => "customer_facing_comment", :placeholder => "Add a comment for the customer.", :type => "text", :value => ""}
           %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
             Update
+    - else
+      %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
+        %span.toolbar-button-text Confirm Review
+
   %div
     %label.toolbar-section-label
       Pin Toolbar

@@ -108,10 +108,10 @@ module API
                     end
                   end
 
-                  # if @entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
-                  #   message = Bridge::ComplaintUpdateStatusEvent.new
-                  #   message.post_complaint(@entry.complaint)
-                  # end
+                  if @entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
+                    message = Bridge::ComplaintUpdateStatusEvent.new
+                    message.post_complaint(@entry.complaint)
+                  end
 
 
 

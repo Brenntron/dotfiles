@@ -372,12 +372,65 @@ window.domain_whois = (IP_Domain) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
+window.review_bulk_submit = () ->
+  selected_rows = $("tr.highlight-second-review.shown")
+  if selected_rows.length < 1
+    return
+  entries_to_update = []
+  selected_rows.each ->
+    entry_id = this.id
+    prefix = $('#complaint_prefix_'+entry_id)[0].value
+    status = $('[name=resolution_review_'+entry_id+']:checked').val()
+    comment = $('#complaint_comment_'+entry_id)[0].value
+    resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
+    resolution = $('.complaint-resolution'+entry_id).text()
+    #get the selectize control for the category input
+    selectizeControl = $('#input_cat_'+entry_id).selectize()[0].selectize
+    if $('#input_cat_'+entry_id).val() == null
+      categories = null
+    else
+      categories = $('#input_cat_'+entry_id).val().toString()
+
+    named_categories = ""
+    if categories == null
+      cat_array = []
+    else
+      cat_array = categories.split(',')
+      for cat, i in cat_array
+        named_categories = named_categories + selectizeControl.getItem(cat).text()
+        if i < cat_array.length
+          named_categories += ", "
+    if status != "ignore"
+      entries_to_update.push({
+        'id': entry_id,
+        'prefix': prefix,
+        'commit':status,
+        'status':resolution,
+        'comment':comment,
+        'resolution_comment': resolution_comment,
+        'categories': categories,
+        'category_names':named_categories
+      })
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
+      method: 'POST'
+      data: {data: entries_to_update}
+      success: (response) ->
+        window.location.reload(false);
+      error: (response) ->
+        notice_html = "<p>Something went wrong</p>"
+    , this)
+
 processSubmitPending=(entry_id,row_id)->
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   status = $('[name=resolution_review_'+entry_id+']:checked').val()
+  if status == "ignore"
+    alert("Because the 'Ignore' radio is checked, this operation did nothing")
+    return
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   resolution = $('.complaint-resolution'+entry_id).text()
+
   #get the selectize control for the category input
   selectizeControl = $('#input_cat_'+entry_id).selectize()[0].selectize
   if $('#input_cat_'+entry_id).val() == null
@@ -1149,7 +1202,8 @@ format = (complaint_entry_row) ->
     complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
     complaint_submission_html =
         '<input type="radio" name="resolution_review_' + entry_id + '" value="commit" > Commit <br/>' +
-        '<input type="radio" name="resolution_review_' + entry_id + '" value="decline" checked="checked"> Decline' +
+        '<input type="radio" name="resolution_review_' + entry_id + '" value="decline" checked="checked"> Decline <br />' +
+        '<input type="radio" name="resolution_review_' + entry_id + '" value="ignore"> Ignore (Bulk change only)' +
         '<br/>' +
         '<button class="tertiary" onclick="updatePending(' + entry_id + ',' + row_id + ')"> Submit </button>' +
         '</div>'
