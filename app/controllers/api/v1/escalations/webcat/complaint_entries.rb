@@ -69,62 +69,61 @@ module API
             end
 
 
-            desc 'update a high telemetry entry'
+            desc 'update high telemetry complaint entries'
             params do
-              requires :id, type:Integer, desc:'complaint entry id'
-              requires :prefix, type:String, desc: 'the url to categorize'
-              requires :commit, type: String, desc: 'set this if you want to commit a pending complaint'
-              requires :status, type: String, desc: 'this is the status of this complaint Entry'
-              requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
-              requires :category_names,type: String, desc: 'a list of category names to assign to Complaint Entry record'
-              optional :comment, type: String, desc: 'resolution comment for the customer'
-              optional :resolution_comment, type:String, desc: 'an internal comment'
+              requires :data, type: Array, desc: ''
             end
             post 'update_pending' do
               begin
-                entry = ComplaintEntry.find(permitted_params['id'])
-                entry.change_category( permitted_params['prefix'],
-                                       permitted_params['categories'],
-                                       permitted_params['category_names'],
-                                       permitted_params['status'],
-                                       permitted_params['comment'],
-                                       permitted_params['resolution_comment'],
-                                       '',
-                                       current_user, permitted_params['commit'])
+                params[:data].each do |submitted_complaint|
+                  @entry = ComplaintEntry.find(submitted_complaint[:id])
+                  @entry.change_category( submitted_complaint[:prefix],
+                                          submitted_complaint[:categories],
+                                          submitted_complaint[:category_names],
+                                          submitted_complaint[:status],
+                                          submitted_complaint[:comment],
+                                          submitted_complaint[:resolution_comment],
+                                          '',
+                                          current_user, submitted_complaint[:commit])
 
-                if permitted_params['commit'] == 'decline'
-                  category_data = entry.current_category_data.to_a
+                  if submitted_complaint[:commit] == 'decline'
+                    category_data = @entry.current_category_data.to_a
 
-                  if category_data.present?
-                    categories = []
+                    if category_data.present?
+                      categories = []
 
-                    for i in 0..5 do
-                      if category_data[i].present?
-                        categories << category_data[i][1][:descr]
+                      for i in 0..5 do
+                        if category_data[i].present?
+                          categories << category_data[i][1][:descr]
+                        end
                       end
+
+                      categories_string = categories.join(',')
+                      # 1. If the pending ticket was declined, reassign it to the declining user
+                      # 2. If the pending ticket had currently existing categories and was declined, set the ticket's categories to its WBRS categories
+                      @entry.update(url_primary_category: categories_string, user_id: current_user.id)
+                    else
+                      # 3. If the pending ticket had no currently existing categories and was declined, just reassign it to the declining user
+                      @entry.update(user_id: current_user.id)
                     end
-
-                    categories_string = categories.join(',')
-                    # 1. If the pending ticket was declined, reassign it to the declining user
-                    # 2. If the pending ticket had currently existing categories and was declined, set the ticket's categories to its WBRS categories
-                    entry.update(url_primary_category: categories_string, user_id: current_user.id)
-                  else
-                    # 3. If the pending ticket had no currently existing categories and was declined, just reassign it to the declining user
-                    entry.update(user_id: current_user.id)
                   end
-                end
 
-                if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
-                  message = Bridge::ComplaintUpdateStatusEvent.new
-                  message.post_complaint(entry.complaint)
+                  if @entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
+                    message = Bridge::ComplaintUpdateStatusEvent.new
+                    message.post_complaint(@entry.complaint)
+                  end
+
+
+
                 end
+                response = {entry_id: @entry.id, domain: @entry.domain, subdomain: @entry.subdomain, path: @entry.path,
+                            categories: @entry.url_primary_category, uri: @entry.uri, status:@entry.status,
+                            entry_resolution: params[:data][0]['commit'], was_dismissed: @entry.was_dismissed?}
+                response.to_json
 
               rescue Exception => e
-                return e.message
+                e.to_json
               end
-              {entry_id: entry.id, domain: entry.domain, subdomain: entry.subdomain, path: entry.path,
-               categories: entry.url_primary_category, uri: entry.uri, status:entry.status,
-               entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
             end
 
 
