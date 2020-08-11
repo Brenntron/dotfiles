@@ -39,8 +39,8 @@ class Sbrs::GetSbrs < Sbrs::Base
 
   def self.parse_ip_rules(rep_data)
     ip_rules = []
-    rep_data.fetch('blacklists', []).each do |blacklist|
-      blacklist.each do |list_item|
+    rep_data.fetch('block_lists', []).each do |block_list|
+      block_list.each do |list_item|
         if list_item and list_item["rules"]
           # adding [0] since the rules are doubly encoded ie [["Cbl", "Spam source"]]
           list_item["rules"][0].to_a.each do |rule|
@@ -191,12 +191,12 @@ class Sbrs::GetSbrs < Sbrs::Base
 
   def parse_ip_rules(rep_data)
     ip_rules = []
-    rep_data["blacklists"].each do |blacklist|
+    rep_data["block_lists"].each do |block_list|
       # this looks fugly
-      for i in (0..blacklist.count)
-        if blacklist[i] and blacklist[i]["rules"]
+      for i in (0..block_list.count)
+        if block_list[i] and block_list[i]["rules"]
           # adding [0] since the rules are doubly encoded ie [["Cbl", "Spam source"]]
-          blacklist[i]["rules"][0].to_a.each do |rule|
+          block_list[i]["rules"][0].to_a.each do |rule|
             ip_rules.append(rule)
             @total_rules.append(rule.downcase)
           end
