@@ -146,13 +146,43 @@ class ComplaintEntry < ApplicationRecord
             # commit from pending of important case
 
             ###############################################################################################################################################################
-            ###guard rails should go here i think
+            ###guard rails
+            verdict_pass = true
+            verdict_reasons = []
+            begin
+              all_cats = Wbrs::Category.all
 
-            results = JSON.parse(Webcat::GuardRails.verdict_for_entries([prefix]).body)
+              category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
-            verdict_data = results[prefix]
+              cats_by_short = []
 
-            if verdict_data["guardrails"]["result"] == Webcat::GuardRails::PASS || current_user.is_webcat_manager?
+              category_ids_array.each do |cat_id|
+                all_cats.each do |base_cat|
+                  if base_cat.category_id == cat_id
+                    cats_by_short << base_cat.mnem
+                  end
+                end
+              end
+
+              cats_by_short.each do |cat|
+                result = JSON.parse(Webcat::GuardRails.verdict_for_entry(prefix, cat).body)
+
+                verdict_data = result[prefix]
+
+                if verdict_data["color"] != "green" Webcat::GuardRails::PASS
+                  verdict_pass = false
+                  verdict_reason = "|#{cat} = #{verdict_data["color"]}:"
+                  verdict_reason += "#{verdict_data["why"]["reason"].pluck("reason").join(",")} \n" rescue "no reasons data\n"
+                  verdict_reasons << verdict_reason
+                end
+
+              end
+            rescue
+              verdict_pass = false
+              verdict_reasons << "there was an api call failure, erring to manager review"
+            end
+            ###############################################################################################################################################################
+            if verdict_pass == true || current_user.is_webcat_manager?
 
               #################################################
               current_status = "COMPLETED"
@@ -187,9 +217,9 @@ class ComplaintEntry < ApplicationRecord
             end
 
             if !current_user.is_webcat_manager?
-              if verdict_data["guardrails"]["result"] == Webcat::GuardRails::FAIL
+              if verdict_pass == false
                 manager_user = User.where(:cvs_username => Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
-                guard_rails_reasons = verdict_data["guardrails"]["reason"].pluck("reason").join(";")
+                guard_rails_reasons = verdict_reasons.join(";")
                 update!(user: manager_user,
                               internal_comment: "FAILED GUARDRAILS! Reason: #{guard_rails_reasons}"
                 )

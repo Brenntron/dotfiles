@@ -121,6 +121,7 @@ class Webcat::Base
   end
 
   def self.request_error_handling(response)
+
     case
       when 300 > response.code
         response
