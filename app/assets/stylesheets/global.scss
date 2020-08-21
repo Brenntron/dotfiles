@@ -340,6 +340,10 @@ table.dataTable.no-footer {
   }
 }
 
+.table-search-label {
+  height: 100%;
+}
+
 .table-search-input {
   width: 400px;
   height: 100%;
@@ -10004,12 +10008,12 @@ button.secondary.view-report-external-button {
     margin: 0 0 0 20px;
     width: 100%;
     min-width: 200px;
-    max-width: 450px;  // shorten to handle longer usernames on right
+    max-width: 550px;  // shorten to handle longer usernames on right
   }
 
   // search input field
   .input-group.search-group .search-box {
-    height: 24px;
+    height: 22px;
     margin: 0px -3px;
     padding-left: 30px;
     padding-top: 0;
@@ -10020,7 +10024,7 @@ button.secondary.view-report-external-button {
   // advanced search button
   .input-group.search-group #advanced-search-button {
     padding: 0 12px 0 18px;
-    height: 30px;
+    height: 28px;
   }
 
   // adding the down caret icon using the sort_by svg for advanced search button

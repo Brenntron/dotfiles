@@ -22,7 +22,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
   end
 
   def show
-    @dispute = Dispute.eager_load([:dispute_comments, :dispute_emails]).eager_load(:dispute_entries => [:dispute_rule_hits, :dispute_entry_preload]).where(:id => params[:id]).first
+    @dispute = Dispute.eager_load([:dispute_comments, :dispute_emails]).eager_load(dispute_entries: [:dispute_rule_hits, :dispute_entry_preload]).where(id: params[:id]).first
     @versioned_items = @dispute.compose_versioned_items
 
     @entries = @dispute.dispute_entries
@@ -39,15 +39,14 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
     @dispute.peek(user: current_user)
 
-    #@entries.each do |entry|
-      #todo: do lazy load style checking with blacklist here
-      #entry.blacklist(reload: true)
+    # @entries.each do |entry|
+    # todo: do lazy load style checking with blacklist here
+    # entry.blacklist(reload: true)
 
-    #end
+    # end
   end
 
-  def update
-  end
+  def update; end
 
   # TODO We should not have a 400 line method in a controller.
   # TODO avoid defining methods in the body of other methods.
@@ -102,7 +101,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
             worksheet.sheet_data[xpos][ypos].change_font_size(12)
 
           end
-
         end
 
         @spreadsheet_directory = Dir.mktmpdir
@@ -111,13 +109,13 @@ class Escalations::Webrep::DisputesController < ApplicationController
           mytickets_file = File.new("#{@spreadsheet_directory}/my-tickets_#{Time.now.utc.iso8601}.xlsx", 'w+')
           mytickets_xlsx = RubyXL::Workbook.new
           mytickets_workbook_names = {
-              :my_open_tickets => 'My Open Tickets',
-              :my_closed_tickets => 'My Closed Tickets',
-              :total_ticket_entries_closed => 'Total Ticket Entries Closed',
-              :time_to_close_tickets => 'Time to Close Tickets',
-              :ticket_submitted_by_submitter_type => 'Tickets Submitted by Submitter Type',
-              :closed_email_by_resolution => 'Closed Email Entries by Resolution',
-              :closed_web_by_resolution => 'Closed Web Entries by Resolution'
+            my_open_tickets: 'My Open Tickets',
+            my_closed_tickets: 'My Closed Tickets',
+            total_ticket_entries_closed: 'Total Ticket Entries Closed',
+            time_to_close_tickets: 'Time to Close Tickets',
+            ticket_submitted_by_submitter_type: 'Tickets Submitted by Submitter Type',
+            closed_email_by_resolution: 'Closed Email Entries by Resolution',
+            closed_web_by_resolution: 'Closed Web Entries by Resolution'
           }
           mytickets_xlsx.add_worksheet(mytickets_workbook_names[:my_open_tickets])
           mytickets_xlsx.add_worksheet(mytickets_workbook_names[:my_closed_tickets])
@@ -126,7 +124,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
           mytickets_xlsx.add_worksheet(mytickets_workbook_names[:ticket_submitted_by_submitter_type])
           mytickets_xlsx.add_worksheet(mytickets_workbook_names[:closed_email_by_resolution])
           mytickets_xlsx.add_worksheet(mytickets_workbook_names[:closed_web_by_resolution])
-
 
           # Build the headers of each individual worksheet
           my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Entry Count']
@@ -154,14 +151,12 @@ class Escalations::Webrep::DisputesController < ApplicationController
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets])
           end
 
-
           # My Closed Tickets
           my_closed_tickets_data = Dispute.closed_tickets_report([current_user], params[:startdate], params[:enddate])
           my_closed_tickets_data[:table_data].each do |d|
             data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_email_date], d[:total_email_count], d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets])
           end
-
 
           # Total ticket entries closed
           @total_ticket_entries_closed_data = Dispute.ticket_entries_closed_by_day_report([current_user], params[:startdate], params[:enddate])
@@ -187,7 +182,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
           insert_adhoc_data("Average Time to Close", 0, 2, mytickets_xlsx, mytickets_workbook_names[:time_to_close_tickets], "h1")
           insert_adhoc_data(time_to_close_tickets_average, 1, 2, mytickets_xlsx, mytickets_workbook_names[:time_to_close_tickets])
 
-
           # Ticket Submitted by Submitter Type
           @ticket_submitted_by_submitter_type_data = Dispute.tickets_submitted_by_submitter_per_day(params[:startdate], params[:enddate])
           @ticket_submitted_by_submitter_type_data[:chart_labels].each_with_index do |row, i|
@@ -204,7 +198,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
             data_values = [d[:resolution], d[:count], d[:percent]]
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:closed_email_by_resolution])
           end
-
 
           # Closed Web by Resolution
           closed_web_by_resolution_data = Dispute.closed_ticket_entries_by_resolution_report([current_user], params[:startdate], params[:enddate], "W")
@@ -229,15 +222,15 @@ class Escalations::Webrep::DisputesController < ApplicationController
           myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now.utc.iso8601}.xlsx", 'w+')
           myteamtickets_xlsx = RubyXL::Workbook.new
           myteamtickets_workbook_names = {
-              :open_team_tickets => 'Open Tickets',
-              :closed_team_tickets => 'Closed Tickets',
-              :average_time_to_close_tickets_by_owner => 'Average Time to Close Tickets',
-              :ticket_resolution_by_owner => 'Ticket Resolution by Assignee',
-              :rule_hits_for_false_positive_resolutions => 'Rule Hits for False Positive Resolutions',
-              :total_ticket_entries_closed => 'Total Ticket Entries Closed',
-              :ticket_submitted_by_submitter_type => 'Tickets Submitted by Submitter Type',
-              :closed_email_by_resolution => 'Closed Email Entries by Resolution',
-              :closed_web_by_resolution => 'Closed Web Entries by Resolution'
+            open_team_tickets: 'Open Tickets',
+            closed_team_tickets: 'Closed Tickets',
+            average_time_to_close_tickets_by_owner: 'Average Time to Close Tickets',
+            ticket_resolution_by_owner: 'Ticket Resolution by Assignee',
+            rule_hits_for_false_positive_resolutions: 'Rule Hits for False Positive Resolutions',
+            total_ticket_entries_closed: 'Total Ticket Entries Closed',
+            ticket_submitted_by_submitter_type: 'Tickets Submitted by Submitter Type',
+            closed_email_by_resolution: 'Closed Email Entries by Resolution',
+            closed_web_by_resolution: 'Closed Web Entries by Resolution'
           }
           myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:open_team_tickets])
           myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:closed_team_tickets])
@@ -252,14 +245,15 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # Build headers of each individual worksheet
 
           open_team_tickets_headers = [
-              'Case ID',
-              'Assignee',
-              'Submitter Type',
-              'Ticket Type',
-              'Priority',
-              'Dispute Preview',
-              'Last Email Date',
-              'Entry Count']
+            'Case ID',
+            'Assignee',
+            'Submitter Type',
+            'Ticket Type',
+            'Priority',
+            'Dispute Preview',
+            'Last Email Date',
+            'Entry Count'
+          ]
           closed_team_tickets_headers = ['Case ID', 'Assignee', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Email Count', 'Time to Close', 'Entry Count']
           average_time_to_close_by_owner_headers = ['Assignee', 'Time (hrs)']
           ticket_resolution_by_owner_headers = ['Assignee', 'Fixed FP', 'Fixed FN', 'Unchanged', 'Other']
@@ -279,21 +273,20 @@ class Escalations::Webrep::DisputesController < ApplicationController
           insert_row_with_data(closed_email_by_resolution_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_email_by_resolution], "h1")
           insert_row_with_data(closed_web_by_resolution_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_web_by_resolution], "h1")
 
-
           # Begin data insertion
 
           # My Team [open] Tickets
           open_team_tickets_data = Dispute.open_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
           open_team_tickets_data[:table_data].each do |d|
             data_values = [
-                d[:case_number],
-                d[:owner],
-                d[:submitter_type],
-                d[:submission_type],
-                d[:priority],
-                ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''),
-                d[:last_email_date],
-                ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last
+              d[:case_number],
+              d[:owner],
+              d[:submitter_type],
+              d[:submission_type],
+              d[:priority],
+              ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''),
+              d[:last_email_date],
+              ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last
             ]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:open_team_tickets])
@@ -315,7 +308,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
             final_row << @time_to_close_tickets_data[:report_data][i]
             insert_row_with_data(final_row, myteamtickets_xlsx, myteamtickets_workbook_names[:average_time_to_close_tickets_by_owner])
           end
-
 
           # current_user.my_team.each do |t|
           #   @time_to_close_tickets_data = Dispute.ticket_time_to_close_report(t.id, params[:startdate], params[:enddate])
@@ -393,7 +385,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           myteamtickets_file.rewind
         end
 
-        input_filenames = Dir.entries(@spreadsheet_directory).select {|f| !File.directory? f}
+        input_filenames = Dir.entries(@spreadsheet_directory).select { |f| !File.directory? f }
         if input_filenames.count > 1
           filename = "webrep_export-#{Time.now.utc.iso8601}.zip"
           temp_file = Tempfile.new(filename)
@@ -401,34 +393,34 @@ class Escalations::Webrep::DisputesController < ApplicationController
           begin
             Zip::OutputStream.open(temp_file) { |zos| }
 
-            #Add files to the zip file as usual
+            # Add files to the zip file as usual
             Zip::File.open(temp_file.path, Zip::File::CREATE) do |zipfile|
               input_filenames.each do |filename|
-                  zipfile.add(filename, File.join(@spreadsheet_directory, filename))
-                end
+                zipfile.add(filename, File.join(@spreadsheet_directory, filename))
+              end
             end
 
-            #Read the binary data from the file
+            # Read the binary data from the file
             zip_data = File.read(temp_file.path)
 
-            #Send the data to the browser as an attachment
-            #We do not send the file directly because it will
-            #get deleted before rails actually starts sending it
-            send_data(zip_data, :type => 'application/zip', :filename => filename)
+            # Send the data to the browser as an attachment
+            # We do not send the file directly because it will
+            # get deleted before rails actually starts sending it
+            send_data(zip_data, type: 'application/zip', filename: filename)
           ensure
-            #Close and delete the temp file
+            # Close and delete the temp file
             temp_file.close
             temp_file.unlink
 
-            #Delete all generated spreadsheets
+            # Delete all generated spreadsheets
             input_filenames.each do |file|
               File.delete(File.join(@spreadsheet_directory, file))
             end
           end
 
         elsif input_filenames.count == 1
-          File.open((File.join(@spreadsheet_directory, input_filenames[0])), 'r') do |f|
-            send_data f.read, :filename => input_filenames[0]
+          File.open(File.join(@spreadsheet_directory, input_filenames[0]), 'r') do |f|
+            send_data f.read, filename: input_filenames[0]
           end
 
           File.delete(File.join(@spreadsheet_directory, input_filenames[0]))
@@ -441,7 +433,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
         if params['customtickets'] == "true"
           # Not yet implemented
         end
-        
       end
     end
   end
@@ -450,9 +441,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @entries = DisputeEntry.research_results(research_params)
   end
 
-  def tickets
-  end
-  
+  def tickets; end
+
   # def advanced_search
   #   @dispute = Dispute.new
   # end
@@ -470,45 +460,45 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @dispute = Dispute.find(params[:id])
     contents = CSV.generate do |csv|
       csv << [
-          'Host',
-          'WBRS',
-          'WBRS Rule Hits',
-          'WBRS Rules',
-          'SBRS',
-          'SBRS Rule Hits',
-          'SBRS Rules',
-          'XBRS History',
-          'Crosslisted URLs',
-          'VirusTotal Negatives',
-          'VirusTotal Total',
-          'RepTool Class',
-          'Blacklist Status',
-          'Blacklist Comment',
-          'WL/BL',
-          'Umbrella',
-          'Referenced On',
-          'Last Submitted'
+        'Host',
+        'WBRS',
+        'WBRS Rule Hits',
+        'WBRS Rules',
+        'SBRS',
+        'SBRS Rule Hits',
+        'SBRS Rules',
+        'XBRS History',
+        'Crosslisted URLs',
+        'VirusTotal Negatives',
+        'VirusTotal Total',
+        'RepTool Class',
+        'Blacklist Status',
+        'Blacklist Comment',
+        'WL/BL',
+        'Umbrella',
+        'Referenced On',
+        'Last Submitted'
       ]
       @dispute.dispute_entries.each do |entry|
         csv << [
-            entry.hostlookup,
-            entry.wbrs_score,
-            entry.dispute_rule_hits.wbrs_rule_hits.count,
-            "\"#{entry.dispute_rule_hits.wbrs_rule_hits.map {|wbrs_hit| wbrs_hit.name}.join(', ')}\"",
-            entry.sbrs_score,
-            entry.dispute_rule_hits.sbrs_rule_hits.count,
-            "\"#{entry.dispute_rule_hits.sbrs_rule_hits.map {|wbrs_hit| wbrs_hit.name}.join(', ')}\"",
-            entry.hostlookup && entry.find_xbrs[1]['data'].count,
-            entry.wbrs_xlist.count,
-            entry.virustotals_negatives_count,
-            entry.virustotals.count,
-            entry.classifications.first,
-            entry.classifications.first && entry.blacklist.status,
-            entry.classifications.first && entry.blacklist.metadata&.fetch('VRT', {})['comment'],
-            entry.wbrs_list_type,
-            entry.umbrellaresult,
-            entry.referenced_tickets.count,
-            entry.last_submitted.to_s,
+          entry.hostlookup,
+          entry.wbrs_score,
+          entry.dispute_rule_hits.wbrs_rule_hits.count,
+          "\"#{entry.dispute_rule_hits.wbrs_rule_hits.map { |wbrs_hit| wbrs_hit.name }.join(', ')}\"",
+          entry.sbrs_score,
+          entry.dispute_rule_hits.sbrs_rule_hits.count,
+          "\"#{entry.dispute_rule_hits.sbrs_rule_hits.map { |wbrs_hit| wbrs_hit.name }.join(', ')}\"",
+          entry.hostlookup && entry.find_xbrs[1]['data'].count,
+          entry.wbrs_xlist.count,
+          entry.virustotals_negatives_count,
+          entry.virustotals.count,
+          entry.classifications.first,
+          entry.classifications.first && entry.blacklist.status,
+          entry.classifications.first && entry.blacklist.metadata&.fetch('VRT', {})['comment'],
+          entry.wbrs_list_type,
+          entry.umbrellaresult,
+          entry.referenced_tickets.count,
+          entry.last_submitted.to_s,
         ]
       end
     end
@@ -519,45 +509,45 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @dispute_entries = DisputeEntry.where(id: params[:ids])
     contents = CSV.generate do |csv|
       csv << [
-          'Host',
-          'WBRS',
-          'WBRS Rule Hits',
-          'WBRS Rules',
-          'SBRS',
-          'SBRS Rule Hits',
-          'SBRS Rules',
-          'XBRS History',
-          'Crosslisted URLs',
-          'VirusTotal Negatives',
-          'VirusTotal Total',
-          'RepTool Class',
-          'Blacklist Status',
-          'Blacklist Comment',
-          'WL/BL',
-          'Umbrella',
-          'Referenced On',
-          'Last Submitted'
+        'Host',
+        'WBRS',
+        'WBRS Rule Hits',
+        'WBRS Rules',
+        'SBRS',
+        'SBRS Rule Hits',
+        'SBRS Rules',
+        'XBRS History',
+        'Crosslisted URLs',
+        'VirusTotal Negatives',
+        'VirusTotal Total',
+        'RepTool Class',
+        'Blacklist Status',
+        'Blacklist Comment',
+        'WL/BL',
+        'Umbrella',
+        'Referenced On',
+        'Last Submitted'
       ]
       @dispute_entries.each do |entry|
         csv << [
-            entry.hostlookup,
-            entry.wbrs_score,
-            entry.dispute_rule_hits.wbrs_rule_hits.count,
-            "\"#{entry.dispute_rule_hits.wbrs_rule_hits.map {|wbrs_hit| wbrs_hit.name}.join(', ')}\"",
-            entry.sbrs_score,
-            entry.dispute_rule_hits.sbrs_rule_hits.count,
-            "\"#{entry.dispute_rule_hits.sbrs_rule_hits.map {|wbrs_hit| wbrs_hit.name}.join(', ')}\"",
-            entry.hostlookup && entry.find_xbrs[1]['data'].count,
-            entry.wbrs_xlist.count,
-            entry.virustotals_negatives_count,
-            entry.virustotals.count,
-            entry.classifications.first,
-            entry.classifications.first && entry.blacklist.status,
-            entry.classifications.first && entry.blacklist.metadata&.fetch('VRT', {})['comment'],
-            entry.wbrs_list_type,
-            entry.umbrellaresult,
-            entry.referenced_tickets.count,
-            entry.last_submitted.to_s,
+          entry.hostlookup,
+          entry.wbrs_score,
+          entry.dispute_rule_hits.wbrs_rule_hits.count,
+          "\"#{entry.dispute_rule_hits.wbrs_rule_hits.map { |wbrs_hit| wbrs_hit.name }.join(', ')}\"",
+          entry.sbrs_score,
+          entry.dispute_rule_hits.sbrs_rule_hits.count,
+          "\"#{entry.dispute_rule_hits.sbrs_rule_hits.map { |wbrs_hit| wbrs_hit.name }.join(', ')}\"",
+          entry.hostlookup && entry.find_xbrs[1]['data'].count,
+          entry.wbrs_xlist.count,
+          entry.virustotals_negatives_count,
+          entry.virustotals.count,
+          entry.classifications.first,
+          entry.classifications.first && entry.blacklist.status,
+          entry.classifications.first && entry.blacklist.metadata&.fetch('VRT', {})['comment'],
+          entry.wbrs_list_type,
+          entry.umbrellaresult,
+          entry.referenced_tickets.count,
+          entry.last_submitted.to_s,
         ]
       end
     end
@@ -576,11 +566,11 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                                   period: params['period'])
 
     contents = CSV.generate do |csv|
-      csv << [ 'Date From', 'Date To', 'Resolution', '%', 'Count' ]
+      csv << ['Date From', 'Date To', 'Resolution', '%', 'Count']
       @report.each_per_resolution do |pr_report|
-        csv << [ pr_report.date_from, pr_report.date_to, 'TOTAL', nil, pr_report.total ]
+        csv << [pr_report.date_from, pr_report.date_to, 'TOTAL', nil, pr_report.total]
         pr_report.each_resolution do |resolution, percent, count|
-          csv << [ pr_report.date_from, pr_report.date_to, resolution, percent, count ]
+          csv << [pr_report.date_from, pr_report.date_to, resolution, percent, count]
         end
       end
     end
@@ -593,11 +583,11 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                                   period: params['period'])
 
     contents = CSV.generate do |csv|
-      csv << [ 'Date From', 'Date To', 'Resolution', '%', 'Count' ]
+      csv << ['Date From', 'Date To', 'Resolution', '%', 'Count']
       @report.each_per_engineer do |pe_report|
-        csv << [ pe_report.date_from, pe_report.date_to, 'TOTAL', nil, pe_report.total ]
+        csv << [pe_report.date_from, pe_report.date_to, 'TOTAL', nil, pe_report.total]
         pe_report.each_resolution do |engineer, percent, count|
-          csv << [ pe_report.date_from, pe_report.date_to, engineer, percent, count ]
+          csv << [pe_report.date_from, pe_report.date_to, engineer, percent, count]
         end
       end
     end
@@ -610,11 +600,11 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                                   period: params['period'])
 
     contents = CSV.generate do |csv|
-      csv << [ 'Date From', 'Date To', 'Resolution', '%', 'Count' ]
+      csv << ['Date From', 'Date To', 'Resolution', '%', 'Count']
       @report.each_per_customer do |pe_report|
-        csv << [ pe_report.date_from, pe_report.date_to, 'TOTAL', nil, pe_report.total ]
+        csv << [pe_report.date_from, pe_report.date_to, 'TOTAL', nil, pe_report.total]
         pe_report.each_resolution do |customer, percent, count|
-          csv << [ pe_report.date_from, pe_report.date_to, customer.name, percent, count ]
+          csv << [pe_report.date_from, pe_report.date_to, customer.name, percent, count]
         end
       end
     end
@@ -629,15 +619,15 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @entries = DisputeEntry.from_age_report_params(age_report_params)
 
     contents = CSV.generate do |csv|
-      csv << [ 'When Resolved', 'Resolution', 'Engineer', 'Opened', 'Resolved', 'Time to Resolution' ]
+      csv << ['When Resolved', 'Resolution', 'Engineer', 'Opened', 'Resolved', 'Time to Resolution']
       @entries.each do |entry|
         csv << [
-            entry.case_resolved_at,
-            entry.resolution,
-            entry.cvs_username,
-            entry.case_opened_at,
-            entry.case_resolved_at,
-            ApplicationRecord.humanize_secs(entry.case_resolved_at - entry.case_opened_at)
+          entry.case_resolved_at,
+          entry.resolution,
+          entry.cvs_username,
+          entry.case_opened_at,
+          entry.case_resolved_at,
+          ApplicationRecord.humanize_secs(entry.case_resolved_at - entry.case_opened_at)
         ]
       end
     end
