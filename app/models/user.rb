@@ -6,10 +6,8 @@ class User < ApplicationRecord
   has_many :complaint_entries
   has_many :disputes
   has_many :file_reputation_disputes
-  has_many :bugs
   has_many :saved_searches
   has_and_belongs_to_many :roles, dependent: :destroy
-  has_many :committed_bugs, class_name: 'Bug', foreign_key: :committer_id
   has_many :named_searches
   has_many :dispute_comments
   has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }

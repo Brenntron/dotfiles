@@ -4,7 +4,10 @@ FactoryBot.define do
     name            { "Bob Jones" }
     email           { "bob@bob.com" }
     phone           { "1234567890" }
-    initialize_with {Customer.find_or_create_by(email:email)}
+    initialize_with {Customer.first_or_create(email:email)}
+    factory :dispute_analyst do
+      name            { "Dispute Analyst" }
+    end
   end
 
   factory :guest_customer do

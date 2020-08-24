@@ -61,6 +61,7 @@ class Dispute < ApplicationRecord
   STATUS_RESOLVED_INVALID = "INVALID"
   STATUS_RESOLVED_TEST = "TEST_TRAINING"
   STATUS_RESOLVED_OTHER = "OTHER"
+  STATUS_RESOLVED_QUICK_BULK = "QUICK_BULK" #tickets created and closed using the quick bulk entry form.
 
   AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
 
@@ -105,7 +106,7 @@ class Dispute < ApplicationRecord
         'classification' => 'unclassified',
     }
     new_dispute = nil
-    
+
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
     ActiveRecord::Base.transaction do
       new_dispute = Dispute.create!(id: bug_proxy.id,
@@ -1907,6 +1908,92 @@ class Dispute < ApplicationRecord
   def manual_sync
     message = Bridge::DisputeEntryUpdateStatusEvent.new
     message.post_entries(self.dispute_entries)
+  end
+
+  def self.process_quick_bulk_entries(data, user)
+
+    ips = []
+    urls = []
+
+    data.keys.each do |key|
+      if DisputeEntry.is_ip?(key)
+        ips << key
+      else
+        urls << key
+      end
+    end
+
+    customer = Customer.where(name: 'Dispute Analyst').first_or_create(name: 'Dispute Analyst')
+    summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+
+
+    full_description = %Q{
+          IPs: #{ips}
+          URIs: #{urls}
+          Problem Summary: #{summary}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations Console',
+        'component' => 'IP/Domain',
+        'summary' => summary,
+        'version' => 'unspecified', #self.version,
+        'description' => full_description,
+        'priority' => 'Unspecified',
+        'classification' => 'unclassified',
+    }
+
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    new_dispute = Dispute.new
+
+    new_dispute.id = bug_proxy.id
+    new_dispute.user_id = user.id
+
+    new_dispute.case_opened_at = Time.now
+    new_dispute.case_closed_at = Time.now
+    new_dispute.case_resolved_at = Time.now
+    new_dispute.description = full_description
+    new_dispute.problem_summary = summary
+
+    new_dispute.status = STATUS_RESOLVED
+    new_dispute.resolution = STATUS_RESOLVED_QUICK_BULK
+
+    new_dispute.customer_id = customer&.id
+
+    new_dispute.save!
+
+    ips.each do |ip|
+      new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'IP', ip_address: ip)
+      new_dispute_entry.case_opened_at = Time.now
+      new_dispute_entry.case_closed_at = Time.now
+      new_dispute_entry.case_resolved_at = Time.now
+      new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
+      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_QUICK_BULK
+      new_dispute_entry.save!
+      #DisputeEntry.quick_bulk_rep_update(ip, data[ip], note)
+    end
+
+    urls.each do |url|
+      new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'URI/DOMAIN', uri: url)
+      new_dispute_entry.case_opened_at = Time.now
+      new_dispute_entry.case_closed_at = Time.now
+      new_dispute_entry.case_resolved_at = Time.now
+      new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
+      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_QUICK_BULK
+      new_dispute_entry.save!
+      #DisputeEntry.quick_bulk_rep_update(url, data[url], note)
+    end
+
+    return_hash = {}
+    return_hash[:dispute_id] = new_dispute.id
+    return_hash[:dispute_entries] = []
+    new_dispute.dispute_entries.each do |entry|
+      return_hash[:dispute_entries] << {:dispute_entry_id => entry.id, :entry => entry.hostlookup}
+    end  
+
+    return return_hash
   end
 
 end

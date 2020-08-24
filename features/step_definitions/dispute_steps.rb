@@ -100,6 +100,13 @@ Then(/^clean up wlbl and remove all wlbl entries on "(.*?)"$/) do |url|
   Wbrs::ManualWlbl.adjust_urls_from_params({:urls=>[url], "trgt_list"=>[], "note"=>""}, username: @user.cvs_username)
 end
 
+Then(/^clean up reptool and remove all reptool entries on "(.*?)"$/) do |url|
+  @user = User.first
+  reptool_params = {}
+  reptool_params["action"] = "EXPIRED"
+  reptool_params["entries"] = [url]
+  RepApi::Blacklist.adjust_from_params(reptool_params, username: @user.cvs_username)
+end
 Given(/^an empty dispute exists$/) do
   FactoryBot.create(:customer) unless Customer.all.exists?
   dispute = FactoryBot.create(:dispute, {user_id: nil, subject: nil, problem_summary: nil, case_opened_at: nil, submission_type: nil})
@@ -107,3 +114,6 @@ Given(/^an empty dispute exists$/) do
   dispute.save!(validate: false)
 end
 
+Given(/^the user is logged into bugzilla$/) do
+  BugzillaRest::Session.any_instance.stub(:logged_in?).and_return(true)
+end
