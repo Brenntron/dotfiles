@@ -139,6 +139,7 @@ class ComplaintEntry < ApplicationRecord
                       current_user,
                       commit_pending)
     ActiveRecord::Base.transaction do
+
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
       if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
         if self.status == "PENDING"
@@ -149,6 +150,9 @@ class ComplaintEntry < ApplicationRecord
             ###guard rails
             verdict_pass = true
             verdict_reasons = []
+            if categories_string.blank?
+              raise "categories string is empty"
+            end
             begin
               all_cats = Wbrs::Category.all
 
@@ -169,7 +173,7 @@ class ComplaintEntry < ApplicationRecord
 
                 verdict_data = result[prefix]
 
-                if verdict_data["color"] != "green" Webcat::GuardRails::PASS
+                if verdict_data["color"] != Webcat::GuardRails::PASS
                   verdict_pass = false
                   verdict_reason = "|#{cat} = #{verdict_data["color"]}:"
                   verdict_reason += "#{verdict_data["why"]["reason"].pluck("reason").join(",")} \n" rescue "no reasons data\n"
@@ -177,10 +181,12 @@ class ComplaintEntry < ApplicationRecord
                 end
 
               end
-            rescue
+            rescue Exception => e
+              Rails.logger.error(e.message)
               verdict_pass = false
               verdict_reasons << "there was an api call failure, erring to manager review"
             end
+
             ###############################################################################################################################################################
             if verdict_pass == true || current_user.is_webcat_manager?
 
@@ -882,7 +888,7 @@ class ComplaintEntry < ApplicationRecord
       parsed_uri['path'] = '' unless parsed_uri['path'].present?
       parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
 
-      qualified_prefixes = prefix_results.find_all do
+      qualified_prefixes = prefix_results.find_all do |prefix_result|
         ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
       end
 

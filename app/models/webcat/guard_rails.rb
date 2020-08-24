@@ -9,7 +9,7 @@ class Webcat::GuardRails < Webcat::Base
     begin
       data = {
           "parent" => false,
-          "entries" => {entry => cat}
+          "entries" => {entry => cat_string}
       }
 
 
