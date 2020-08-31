@@ -506,7 +506,6 @@ class Dispute < ApplicationRecord
 
         logger.debug "Creating ip entries"
         new_entries_ips.each do |key, entry|
-
           false_negative_claim = false
 
           if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
@@ -535,7 +534,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
-
+          new_dispute_entry.platform = entry[:sbrs]["platform"]
           new_dispute_entry.save!
 
           logger.info "fetching preload"
@@ -612,7 +611,6 @@ class Dispute < ApplicationRecord
         end
         logger.debug "Creating url entries"
         new_entries_urls.each do |key, entry|
-
           #placeholder for preloading stuff from Micah
           #grab xbrs, reptool stuff, wl/bl entries, virustotal
           #
@@ -638,6 +636,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.is_important = is_important?(key)
           new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.assign_url_parts(key)
+          new_dispute_entry.platform = entry["platform"]
 
 
           resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
