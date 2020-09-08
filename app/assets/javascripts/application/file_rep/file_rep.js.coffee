@@ -596,7 +596,7 @@ $ ->
         if search_type == 'advanced' && search_name_check && text_check
           ###
             creating temporary tr for the filter dropdown
-            attributes added then onclick events 
+            attributes added then onclick events
           ###
           new_tr = document.createElement('tr')
           new_td = document.createElement('td')
@@ -651,7 +651,12 @@ $ ->
       16
       'desc'
     ] ]
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     pagingType: 'full_numbers'
+    language: {
+      search: "_INPUT_"
+      searchPlaceholder: "Search within the table"
+    }
     keys:
       columns: ':not(:first-child)'
     columnDefs: [
@@ -1436,6 +1441,8 @@ $ ->
         error: () ->
       )
 
+    $('#file-rep-datatable_filter input').addClass('table-search-input');
+    $('#file-rep-datatable_filter label').addClass('table-search-label');
 
 # file rep index - toggle all cb's and highlight rows
 window.file_rep_select_all = () ->
