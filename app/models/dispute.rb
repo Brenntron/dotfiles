@@ -463,6 +463,10 @@ class Dispute < ApplicationRecord
 
         bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
+        if message_paylad["payload"]["in_network"].present?
+          build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
+        end
+
         logger.debug "Creating dispute"
         new_dispute = Dispute.new
 
@@ -477,6 +481,9 @@ class Dispute < ApplicationRecord
         new_dispute.ticket_source_key = message_payload["source_key"]
         new_dispute.ticket_source = "talos-intelligence"
         new_dispute.ticket_source_type = message_payload["source_type"]
+        new_dispute.product_platform = message_payload["payload"]["product_platform"] unless message_payload["payload"]["product_platform"].blank?
+        new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
+        new_dispute.in_network = message_payload["payload"]["in_network"] unless message_payload["payload"]["in_network"].blank?
         new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
         new_dispute.status = NEW
 
@@ -491,6 +498,15 @@ class Dispute < ApplicationRecord
         logger.debug "Saving Dispute"
 
         new_dispute.save!
+
+        if message_paylad["payload"]["in_network"].present? && message_payload["payload"]["in_network"] == true
+          ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
+          linked_dispute_comment = DisputeComment.new
+          linked_dispute_comment.dispute_id = new_dispute.id
+          linked_dispute_comment.user_id = user.id
+          linked_dispute_comment.comment = "Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+          linked_dispute_comment.save
+        end
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
 
@@ -1995,5 +2011,35 @@ class Dispute < ApplicationRecord
     return return_hash
   end
 
+  def self.build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, problem, original_bug_id)
+    summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = <<~HEREDOC
+          IPs: #{new_entries_ips.keys}
+          URIs: #{new_entries_urls.keys}
+          Problem Summary: #{problem}
+    HEREDOC
+
+    bug_attrs = {
+        'product' => 'Research',
+        'component' => 'Snort Rules',
+        'summary' => summary,
+        'version' => 'No Version Specified', #self.version,
+        'description' => full_description,
+        # 'opsys' => self.os,
+        'priority' => 'Unspecified',
+        'classification' => 'unclassified',
+        'assigned_to' => "vrt-incoming@sourcefire.com",
+        'status' => "NEW"
+    }
+    logger.debug "Creating bugzilla bug"
+
+    research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
+    linked_bug_proxy.save!
+
+    research_bug_proxy
+  end
 end
 

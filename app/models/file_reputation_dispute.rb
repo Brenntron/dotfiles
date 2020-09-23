@@ -605,6 +605,9 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.status = STATUS_NEW
         new_dispute.file_name = message_payload[:payload][:file_name]
         new_dispute.customer_id = customer.id
+        new_dispute.product_platform = message_payload[:payload][:product_platform] unless message_payload[:payload][:product_platform].blank?
+        new_dispute.product_version = message_payload[:payload][:product_version] unless message_payload[:payload][:product_version].blank?
+        new_dispute.in_network = message_payload[:payload][:in_network] unless message_payload[:payload][:in_network].blank?
         new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
         new_dispute.source = message_payload[:payload][:source]
         new_dispute.platform = message_payload[:payload][:platform]
@@ -622,6 +625,16 @@ class FileReputationDispute < ApplicationRecord
         else
           new_dispute.save
         end
+
+        if message_paylad[:payload][:in_network].present? && message_payload[:payload][:in_network] == true
+          ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
+          linked_dispute_comment = FileRepComment.new
+          linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
+          linked_dispute_comment.user_id = user.id
+          linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+          linked_dispute_comment.save
+        end
+
 
       end #transaction
     if is_duplicate == true
@@ -1145,6 +1158,39 @@ class FileReputationDispute < ApplicationRecord
     candidates.each do |candidate|
       FileReputationApi::ReversingLabs.unsubscribe(candidate.sha256_hash)
     end
+  end
+
+
+  def self.build_ips_bug(bugzilla_rest_session, filename, sha256, problem, original_bug_id)
+    summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = <<~HEREDOC
+          File name: #{filename}
+          File Rep Sha: #{sha256}
+
+          Summary: #{problem}
+    HEREDOC
+
+    bug_attrs = {
+        'product' => 'Research',
+        'component' => 'Snort Rules',
+        'summary' => summary,
+        'version' => 'No Version Specified', #self.version,
+        'description' => full_description,
+        # 'opsys' => self.os,
+        'priority' => 'Unspecified',
+        'classification' => 'unclassified',
+        'assigned_to' => "vrt-incoming@sourcefire.com",
+        'status' => "NEW"
+    }
+    logger.debug "Creating bugzilla bug"
+
+    research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
+    linked_bug_proxy.save!
+
+    research_bug_proxy
   end
 
 end
