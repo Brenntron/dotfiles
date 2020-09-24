@@ -623,16 +623,17 @@ class FileReputationDispute < ApplicationRecord
           auto_resolve_on_duplicate(new_dispute)
           is_duplicate = true
         else
+
           new_dispute.save
         end
 
-        if message_paylad[:payload][:in_network].present? && message_payload[:payload][:in_network] == true
+        if message_payload[:payload][:in_network].present? && message_payload[:payload][:in_network] == true
           ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
           linked_dispute_comment = FileRepComment.new
           linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
           linked_dispute_comment.user_id = user.id
           linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
-          linked_dispute_comment.save
+          linked_dispute_comment.save(:validate => false)
         end
 
 
