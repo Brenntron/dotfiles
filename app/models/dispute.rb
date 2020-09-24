@@ -463,9 +463,6 @@ class Dispute < ApplicationRecord
 
         bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-        if message_paylad["payload"]["in_network"].present?
-          build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
-        end
 
         logger.debug "Creating dispute"
         new_dispute = Dispute.new
@@ -497,15 +494,13 @@ class Dispute < ApplicationRecord
         end
         logger.debug "Saving Dispute"
 
-        new_dispute.save!
-
-        if message_paylad["payload"]["in_network"].present? && message_payload["payload"]["in_network"] == true
+        if message_payload["payload"]["in_network"].present? && message_payload["payload"]["in_network"] == true
           ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
           linked_dispute_comment = DisputeComment.new
           linked_dispute_comment.dispute_id = new_dispute.id
           linked_dispute_comment.user_id = user.id
           linked_dispute_comment.comment = "Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
-          linked_dispute_comment.save
+          linked_dispute_comment.save(:validate => false)
         end
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
