@@ -16,7 +16,7 @@ Feature: Webcat complaints
       |2 | blah.com     |  NEW   |
       |3 | imhungry.com |  NEW   |
     And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I goto "/escalations/webcat/complaints"
     And I wait for "2" seconds
     And I click ".expand-row-button-1"
     And I wait for "2" seconds
@@ -813,8 +813,8 @@ Feature: Webcat complaints
     And I goto "/escalations/webcat/complaints?f=ALL"
     Then I select row "3"
     Then I click ".take-ticket-toolbar-button"
-    And I wait for "5" seconds
-    And I should see "Assigned to someone else - 3"
+    And I wait for "15" seconds
+    And I should see "Currently assigned to someone else - 3"
 
 
   @javascript
