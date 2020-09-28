@@ -285,8 +285,6 @@ window.build_graph_ticket_entries_submitter = () ->
     dataType: 'json'
     success: (response) ->
 
-      console.log 'tickets_submitted_by_submitter_per_day'
-      console.log response
       json = $.parseJSON(response)["data"]
 
       submitterGuestChartData = json["guest_chart_data"]
@@ -500,8 +498,6 @@ window.build_single_time_to_close_linechart = () ->
     dataType: 'json'
     success: (response) ->
 
-      console.log 'ticket_time_to_close_report'
-      console.log response
       json = $.parseJSON(response)["data"]
 
       closedTicketNumbers = json["ticket_numbers"]
@@ -700,13 +696,13 @@ window.build_single_all_tickets_web_entries_resolution_piechart = () ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/reports/all_ticket_entries_by_resolution_report'
+    url: '/escalations/api/v1/escalations/webrep/reports/auto_ticket_entries_by_resolution_report'
     method: 'GET'
     headers: headers
     data: data
     dataType: 'json'
     success: (response) ->
-      console.log 'test return'
+      console.log 'auto_ticket_entries_by_resolution_report'
       console.log $.parseJSON(response)["data"]
 
       json = $.parseJSON(response)["data"]
@@ -716,14 +712,14 @@ window.build_single_all_tickets_web_entries_resolution_piechart = () ->
 
       tableData = json["table_data"]
 
-      web_piechart_table = $('#all-web-entries-resolution-table tbody')
+      web_piechart_table = $('#auto-resolved-web-entries-table tbody')
       $(web_piechart_table).empty()
 
       $(tableData).each ->
         $(web_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
 
 
-      new Chart($('#all-web-entries-resolution-piechart'),
+      new Chart($('#auto-resolved-web-entries-piechart'),
         type: 'pie'
         data:
           labels: emailEntryResolutionLabels
@@ -779,8 +775,6 @@ window.build_single_all_tickets_web_entries_vs_closed_piechart = () ->
     data: data
     dataType: 'json'
     success: (response) ->
-      console.log 'test return'
-      console.log $.parseJSON(response)["data"]
 
       json = $.parseJSON(response)["data"]
 
@@ -824,7 +818,7 @@ window.build_single_all_tickets_web_entries_vs_closed_piechart = () ->
             showZero: true
             fontStyle: 'bolder'
             overlap: false
-            showActualPercentages: true
+            showActualPercentages: false
       )
 
     error: (response) ->

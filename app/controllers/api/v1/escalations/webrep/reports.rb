@@ -104,11 +104,12 @@ module API
               requires :users, type: Array[Integer], desc: ""
             end
 
-            get 'all_ticket_entries_by_resolution_report' do
+            get 'auto_ticket_entries_by_resolution_report' do
               authorize!(:index, Dispute)
+
               users = User.where(:id => params[:users])
 
-              report_data = Dispute.all_ticket_entries_by_resolution_report(users, params[:from], params[:to], params[:submission_types])
+              report_data = Dispute.auto_ticket_entries_by_resolution_report(users, params[:from], params[:to], params[:submission_types])
 
               response_data = {:status => "success", :data => report_data}
 
