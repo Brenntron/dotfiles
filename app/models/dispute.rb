@@ -1693,6 +1693,57 @@ class Dispute < ApplicationRecord
 
   end
 
+  def self.all_ticket_entries_vs_closed_report(users, from, to, submission_types = nil)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    user_ids = users.pluck(:id)
+
+    if submission_types.present?
+      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types)
+    else
+      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'")
+    end
+
+    #all closed tickets
+    closed_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
+
+    #all tickets counting duplicates
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry}
+
+    total_count = all_entries.size
+
+    results = {}
+    results[:chart_data] = []
+    results[:chart_labels] = [ "Total Tickets", "Total Resolved", ]
+
+    results[:chart_data] << total_count.to_f / total_count.to_f
+    results[:chart_data] << closed_entries.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
+    end
+
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
+    end
+
+    results[:table_data] = []
+    results[:table_data] << {:resolution => "Total Tickets",
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => total_count.to_f
+    }
+
+    results[:table_data] << {:resolution => "Total Resolved",
+                             :percent => (results[:chart_data][1] * 100).round(2),
+                             :count => closed_entries.size
+    }
+
+    results
+
+  end
+
   def self.tickets_submitted_by_submitter_per_day(from, to)
 
     #from = "Mon, 6 Aug 2018 17:40:08 GMT"
