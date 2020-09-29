@@ -82,7 +82,7 @@ window.refresh_visible_report_tab = ()->
     window.build_multi_ticket_resolution_by_owner_chart()
     window.build_single_time_to_close_linechart()
     window.build_single_all_tickets_web_entries_resolution_piechart()
-    window.build_single_all_tickets_web_entries_vs_closed_piechart()
+    window.build_all_closed_entries_manual_vs_auto_piechart()
 
 window.refresh_single_open_tickets_table = (user_id)->
   from = localStorage.getItem('webrep_report_range_from')
@@ -754,7 +754,7 @@ window.build_single_all_tickets_web_entries_resolution_piechart = () ->
       console.log(response, 'Error building chart')
   )
 
-window.build_single_all_tickets_web_entries_vs_closed_piechart = () ->
+window.build_all_closed_entries_manual_vs_auto_piechart = () ->
 
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
@@ -769,13 +769,15 @@ window.build_single_all_tickets_web_entries_vs_closed_piechart = () ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/reports/all_ticket_entries_vs_closed_report'
+    url: '/escalations/api/v1/escalations/webrep/reports/all_closed_entries_manual_vs_auto_report'
     method: 'GET'
     headers: headers
     data: data
     dataType: 'json'
     success: (response) ->
 
+      console.log 'all_closed_entries_manual_vs_auto_report'
+      console.log $.parseJSON(response)["data"]
       json = $.parseJSON(response)["data"]
 
       emailEntryResolutionLabels = json["chart_labels"]

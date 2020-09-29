@@ -1618,7 +1618,7 @@ class Dispute < ApplicationRecord
 
   end
 
-  def self.auto_ticket_entries_by_resolution_report(users, from, to, submission_types = nil)
+  def self.auto_ticket_entries_by_resolution_report(from, to, submission_types = nil)
 
     from = Time.parse(from)
     to = Time.parse(to)
@@ -1632,27 +1632,18 @@ class Dispute < ApplicationRecord
       closed_entries = Dispute.joins(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     end
 
-    #all closed tickets
-    # closed_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}
-
-    #closed duplicate tickets
     closed_entries_duplicates = closed_entries.select {|entry| entry.resolution == "DUPLICATE"}
-
+    closed_entries_fixed_fn = closed_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}
     total_count = closed_entries.size
 
+    other_entries_resolutions_count = closed_entries.size - (closed_entries_duplicates.size + closed_entries_fixed_fn.size)
+
     results = {}
-
-    #testing data
-    results[:closed_entries] = closed_entries
-    results[:submission_types] = submission_types
-    results[:closed_entries_duplicates] = closed_entries_duplicates
-    #end testing data
-
     results[:chart_data] = []
-    results[:chart_labels] = [ "Total Resolved", "Fixed FN", "Duplicates", ]
-
-    results[:chart_data] << closed_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size.to_f / total_count.to_f
+    results[:chart_labels] = ["Fixed FN", "Duplicates", "Other" ]
+    results[:chart_data] << closed_entries_fixed_fn.size.to_f / total_count.to_f
     results[:chart_data] << closed_entries_duplicates.size.to_f / total_count.to_f
+    results[:chart_data] << other_entries_resolutions_count.to_f / total_count.to_f
 
     if results[:chart_data][0].nan?
       results[:chart_data][0] = 0
@@ -1662,29 +1653,37 @@ class Dispute < ApplicationRecord
       results[:chart_data][1] = 0
     end
 
+    if results[:chart_data][2].nan?
+      results[:chart_data][2] = 0
+    end
 
     results[:table_data] = []
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FN,
                              :percent => (results[:chart_data][0] * 100).round(2),
-                             :count => closed_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size
+                             :count => closed_entries_fixed_fn.size
     }
 
     results[:table_data] << {:resolution => "Duplicates",
                              :percent => (results[:chart_data][1] * 100).round(2),
                              :count => closed_entries_duplicates.size
     }
-
+    results[:table_data] << {:resolution => "Other",
+                             :percent => (results[:chart_data][2] * 100).round(2),
+                             :count => other_entries_resolutions_count
+    }
+    results[:table_data] << {:resolution => "Total",
+                             :percent => 100,
+                             :count => total_count.to_f
+    }
     results
 
   end
 
-  def self.all_ticket_entries_vs_closed_report(users, from, to, submission_types = nil)
+  def self.all_closed_entries_manual_vs_auto_report(from, to, submission_types = nil)
 
     from = Time.parse(from)
     to = Time.parse(to)
-
-    user_ids = users.pluck(:id)
 
     manual_close_count = {}
     manual_close_count[:valid_tickets_total] = 0
