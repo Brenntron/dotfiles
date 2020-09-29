@@ -81,7 +81,7 @@ window.refresh_visible_report_tab = ()->
     window.build_multi_entries_closed_by_day_chart()
     window.build_multi_ticket_resolution_by_owner_chart()
     window.build_single_time_to_close_linechart()
-    window.build_single_all_tickets_web_entries_resolution_piechart()
+    window.build_auto_resolve_web_entries_resolution_piechart()
     window.build_all_closed_entries_manual_vs_auto_piechart()
 
 window.refresh_single_open_tickets_table = (user_id)->
@@ -681,7 +681,7 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
       console.log(response, 'Error building chart')
   )
 
-window.build_single_all_tickets_web_entries_resolution_piechart = () ->
+window.build_auto_resolve_web_entries_resolution_piechart = () ->
 
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
@@ -776,8 +776,6 @@ window.build_all_closed_entries_manual_vs_auto_piechart = () ->
     dataType: 'json'
     success: (response) ->
 
-      console.log 'all_closed_entries_manual_vs_auto_report'
-      console.log $.parseJSON(response)["data"]
       json = $.parseJSON(response)["data"]
 
       emailEntryResolutionLabels = json["chart_labels"]

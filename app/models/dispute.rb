@@ -65,6 +65,12 @@ class Dispute < ApplicationRecord
 
   AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
 
+  #labels for charts on webrep dashboard
+  LABEL_RESOLVED_FIXED_FP = "Fixed FP"
+  LABEL_RESOLVED_FIXED_FN = "Fixed FN"
+  LABEL_RESOLVED_UNCHANGED = "Unchanged"
+  LABEL_RESOLVED_OTHER = "Other"
+
   scope :open_disputes, -> { where(status: NEW) }
   scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
@@ -1594,22 +1600,22 @@ class Dispute < ApplicationRecord
       results[:chart_data][3] = 0
     end
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FP,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FP,
                              :percent => (results[:chart_data][2] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size
                              }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FN,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FN,
                              :percent => (results[:chart_data][0] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size
     }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_UNCHANGED,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_UNCHANGED,
                              :percent => (results[:chart_data][1] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size
     }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_OTHER,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_OTHER,
                              :percent => (results[:chart_data][3] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size
     }
@@ -1659,7 +1665,7 @@ class Dispute < ApplicationRecord
 
     results[:table_data] = []
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FN,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FN,
                              :percent => (results[:chart_data][0] * 100).round(2),
                              :count => closed_entries_fixed_fn.size
     }
@@ -1668,7 +1674,7 @@ class Dispute < ApplicationRecord
                              :percent => (results[:chart_data][1] * 100).round(2),
                              :count => closed_entries_duplicates.size
     }
-    results[:table_data] << {:resolution => "Other",
+    results[:table_data] << {:resolution => LABEL_RESOLVED_OTHER,
                              :percent => (results[:chart_data][2] * 100).round(2),
                              :count => other_entries_resolutions_count
     }
@@ -1704,11 +1710,6 @@ class Dispute < ApplicationRecord
     total_count = manual_results.size + auto_results.size
 
     results = {}
-    #testing data
-    results[:manual_results] = manual_results
-    results[:auto_results] = auto_results
-    results[:vrt] = vrt
-    #end testing data
 
     results[:chart_data] = []
     results[:chart_labels] = [ "Manually Resolved Tickets", "Automatically Resolved Tickets"]
