@@ -764,7 +764,7 @@ window.build_all_closed_entries_manual_vs_auto_piechart = () ->
     from: from,
     to: to,
     users: [user_id],
-    submission_types: ["w"]
+    submission_types: ["w", "e"]
   }
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
