@@ -98,6 +98,8 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
   before(:all) do
     FactoryBot.create(:current_user)
     FactoryBot.create(:vrt_incoming_user)
+
+    Bug.destroy_all
   end
 
   it 'receives file rep create messages' do
@@ -151,7 +153,10 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
     expect(file_rep_dispute.product_version).to eql("test_platform_version")
     expect(file_rep_dispute.in_network).to eql(true)
     expect(file_rep_dispute.file_rep_comments.size).to eql(1)
-    expect(file_rep_dispute.file_rep_comments.first.comment).to include("Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID:" )
+    expect(file_rep_dispute.file_rep_comments.first.comment).to include("Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ResearchBug.all.first.id}" )
+
+    expect(ResearchBug.all.size).to eql(1)
+
   end
 end
 

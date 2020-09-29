@@ -501,6 +501,7 @@ class Dispute < ApplicationRecord
           linked_dispute_comment.user_id = user.id
           linked_dispute_comment.comment = "Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
           linked_dispute_comment.save(:validate => false)
+
         end
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
@@ -2034,6 +2035,28 @@ class Dispute < ApplicationRecord
     linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
     linked_bug_proxy.save!
 
+    new_bug = Bug.new
+    new_bug.id = research_bug_proxy.id
+    new_bug.type = "ResearchBug"
+    new_bug.summary = research_bug_proxy.summary
+    new_bug.status = research_bug_proxy.status
+    new_bug.resolution = research_bug_proxy.resolution
+    new_bug.resolution = 'OPEN' if new_bug.resolution.blank?
+    new_bug.state = 'NEW'
+    new_bug.priority = research_bug_proxy.priority
+    new_bug.component = research_bug_proxy.component
+    new_bug.product = research_bug_proxy.product
+
+    creator = User.user_by_email(research_bug_proxy.creator)
+    new_bug.creator = creator.id unless creator.blank?
+
+    new_user = User.user_by_email(research_bug_proxy.assigned_to)
+    new_bug.user_id = new_user.id unless new_user.blank?
+
+    new_committer = User.user_by_email(research_bug_proxy.qa_contact)
+    new_bug.committer_id = new_committer.id unless new_committer.blank?
+
+    new_bug.save
     research_bug_proxy
   end
 end

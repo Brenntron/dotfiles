@@ -308,7 +308,10 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.product_version).to eql("test_platform_version")
     expect(dispute.in_network).to eql(true)
     expect(dispute.dispute_comments.size).to eql(1)
-    expect(dispute.dispute_comments.first.comment).to include("Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID:" )
+    expect(dispute.dispute_comments.first.comment).to include("Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ResearchBug.all.first.id}" )
+
+    expect(ResearchBug.all.size).to eql(1)
+
   end
 
   it 'handle error receiving dispute payload messages with no payload' do
