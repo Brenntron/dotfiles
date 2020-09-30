@@ -204,10 +204,22 @@
             %tbody
 
         .reports-graph-info-container
-          %h5.dispute-W-grey.graph-header-icon-stg Total Closed Tickets
+          %h5.dispute-W-grey.graph-header-icon-stg Autoresolved Tickets in Total Closed Web Tickets
           .reports-graph-wrapper.pie-graph-wrapper
             %canvas#all-web-entries-vs-closed-piechart
           %table.table#all-web-entries-vs-closed-table
+            %thead
+              %tr
+                %th Resolution
+                %th.text-center %
+                %th.text-center Count
+            %tbody
+
+        .reports-graph-info-container
+          %h5.dispute-W-grey.graph-header-icon-stg Autoresolved Tickets in Total Submitted Web Tickets
+          .reports-graph-wrapper.pie-graph-wrapper
+            %canvas#all-tickets-vs-closed-piechart
+          %table.table#all-tickets-vs-closed-table
             %thead
               %tr
                 %th Resolution

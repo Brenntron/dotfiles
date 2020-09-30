@@ -116,7 +116,6 @@ module API
             params do
               requires :from, type: String
               requires :to, type: String
-              requires :users, type: Array[Integer], desc: ""
             end
 
             get 'all_closed_tickets_manual_vs_auto_report' do
@@ -131,7 +130,20 @@ module API
             params do
               requires :from, type: String
               requires :to, type: String
-              requires :users, type: Array[Integer], desc: ""
+            end
+
+            get 'all_tickets_manual_vs_auto_close_report' do
+              authorize!(:index, Dispute)
+              report_data = Dispute.all_tickets_manual_vs_auto_close_report(params[:from], params[:to], params[:submission_types])
+
+              response_data = {:status => "success", :data => report_data}
+
+              response_data.to_json
+            end
+
+            params do
+              requires :from, type: String
+              requires :to, type: String
             end
 
             get 'ticket_entries_closed_by_ticket_owner_report' do

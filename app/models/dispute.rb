@@ -1642,17 +1642,16 @@ class Dispute < ApplicationRecord
 
     entries_duplicates = all_entries.select {|entry| entry.resolution == "DUPLICATE"}
     entries_fixed_fn = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}
-    entries_other_count = all_entries.size - (entries_duplicates.size + entries_fixed_fn.size)
+    entries_unchanged = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}
 
     total_count = all_entries.size
 
     results = {}
-
     results[:chart_data] = []
-    results[:chart_labels] = ["Fixed FN", "Duplicates", "Other" ]
+    results[:chart_labels] = ["Fixed FN", "Duplicates", "Unchanged" ]
     results[:chart_data] << entries_fixed_fn.size.to_f / total_count.to_f
     results[:chart_data] << entries_duplicates.size.to_f / total_count.to_f
-    results[:chart_data] << entries_other_count.to_f / total_count.to_f
+    results[:chart_data] << entries_unchanged.size.to_f / total_count.to_f
 
     if results[:chart_data][0].nan?
       results[:chart_data][0] = 0
@@ -1677,9 +1676,9 @@ class Dispute < ApplicationRecord
                              :percent => (results[:chart_data][1] * 100).round(2),
                              :count => entries_duplicates.size
     }
-    results[:table_data] << {:resolution => LABEL_RESOLVED_OTHER,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_UNCHANGED,
                              :percent => (results[:chart_data][2] * 100).round(2),
-                             :count => entries_other_count
+                             :count => entries_unchanged.size
     }
     results[:table_data] << {:resolution => "Total",
                              :percent => 100,
@@ -1694,9 +1693,6 @@ class Dispute < ApplicationRecord
     from = Time.parse(from)
     to = Time.parse(to)
 
-    manual_close_count = {}
-    manual_close_count[:valid_tickets_total] = 0
-
     vrt =  User.where(cvs_username: 'vrtincom').first
     vrt_id = vrt.id
 
@@ -1709,7 +1705,6 @@ class Dispute < ApplicationRecord
       auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
     end
 
-    #use total of manual + auto closes for %
     total_count = manual_results.size + auto_results.size
 
     results = {}
@@ -1742,6 +1737,56 @@ class Dispute < ApplicationRecord
     results[:table_data] << {:resolution => "Total Closed Tickets",
                              :percent => 100,
                              :count => total_count.to_f
+    }
+
+    results
+
+  end
+
+  def self.all_tickets_manual_vs_auto_close_report(from, to, submission_types = nil)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    vrt =  User.where(cvs_username: 'vrtincom').first
+    vrt_id = vrt.id
+
+    if submission_types.present?
+      all_results = Dispute.where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types)
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
+
+    else
+      all_results = Dispute.where("disputes.created_at between '#{from}' and '#{to}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
+    end
+
+    total_count = all_results.size
+
+    results = {}
+
+    results[:chart_data] = []
+    results[:chart_labels] = [ "All Tickets", "Automatically Resolved Tickets"]
+
+    results[:chart_data] << all_results.size.to_f / total_count.to_f
+    results[:chart_data] << auto_results.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
+    end
+
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
+    end
+
+    results[:table_data] = []
+    results[:table_data] << {:resolution => "All Tickets",
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => all_results.size.to_f
+    }
+
+    results[:table_data] << {:resolution => "Automatically Resolved Tickets",
+                             :percent => (results[:chart_data][1] * 100).round(2),
+                             :count => auto_results.size
     }
 
     results
