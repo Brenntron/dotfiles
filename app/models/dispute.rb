@@ -1689,7 +1689,7 @@ class Dispute < ApplicationRecord
 
   end
 
-  def self.all_closed_entries_manual_vs_auto_report(from, to, submission_types = nil)
+  def self.all_closed_tickets_manual_vs_auto_report(from, to, submission_types = nil)
 
     from = Time.parse(from)
     to = Time.parse(to)
@@ -1701,12 +1701,12 @@ class Dispute < ApplicationRecord
     vrt_id = vrt.id
 
     if submission_types.present?
-      manual_results = Dispute.joins(:dispute_entries).where.not(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
-      auto_results = Dispute.joins(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+      manual_results = Dispute.where.not(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
 
     else
-      manual_results = Dispute.joins(:dispute_entries).where.not(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
-      auto_results = Dispute.joins(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+      manual_results = Dispute.where.not(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
     end
 
     #use total of manual + auto closes for %
@@ -1737,6 +1737,11 @@ class Dispute < ApplicationRecord
     results[:table_data] << {:resolution => "Automatically Resolved Tickets",
                              :percent => (results[:chart_data][1] * 100).round(2),
                              :count => auto_results.size
+    }
+
+    results[:table_data] << {:resolution => "Total Closed Tickets",
+                             :percent => 100,
+                             :count => total_count.to_f
     }
 
     results

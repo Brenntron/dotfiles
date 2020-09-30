@@ -119,9 +119,9 @@ module API
               requires :users, type: Array[Integer], desc: ""
             end
 
-            get 'all_closed_entries_manual_vs_auto_report' do
+            get 'all_closed_tickets_manual_vs_auto_report' do
               authorize!(:index, Dispute)
-              report_data = Dispute.all_closed_entries_manual_vs_auto_report(params[:from], params[:to], params[:submission_types])
+              report_data = Dispute.all_closed_tickets_manual_vs_auto_report(params[:from], params[:to], params[:submission_types])
 
               response_data = {:status => "success", :data => report_data}
 
