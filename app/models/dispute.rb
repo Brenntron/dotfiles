@@ -1638,18 +1638,21 @@ class Dispute < ApplicationRecord
       closed_entries = Dispute.joins(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     end
 
-    closed_entries_duplicates = closed_entries.select {|entry| entry.resolution == "DUPLICATE"}
-    closed_entries_fixed_fn = closed_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}
-    total_count = closed_entries.size
+    all_entries = closed_entries.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
 
-    other_entries_resolutions_count = closed_entries.size - (closed_entries_duplicates.size + closed_entries_fixed_fn.size)
+    entries_duplicates = all_entries.select {|entry| entry.resolution == "DUPLICATE"}
+    entries_fixed_fn = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}
+    entries_other_count = all_entries.size - (entries_duplicates.size + entries_fixed_fn.size)
+
+    total_count = all_entries.size
 
     results = {}
+
     results[:chart_data] = []
     results[:chart_labels] = ["Fixed FN", "Duplicates", "Other" ]
-    results[:chart_data] << closed_entries_fixed_fn.size.to_f / total_count.to_f
-    results[:chart_data] << closed_entries_duplicates.size.to_f / total_count.to_f
-    results[:chart_data] << other_entries_resolutions_count.to_f / total_count.to_f
+    results[:chart_data] << entries_fixed_fn.size.to_f / total_count.to_f
+    results[:chart_data] << entries_duplicates.size.to_f / total_count.to_f
+    results[:chart_data] << entries_other_count.to_f / total_count.to_f
 
     if results[:chart_data][0].nan?
       results[:chart_data][0] = 0
@@ -1667,16 +1670,16 @@ class Dispute < ApplicationRecord
 
     results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FN,
                              :percent => (results[:chart_data][0] * 100).round(2),
-                             :count => closed_entries_fixed_fn.size
+                             :count => entries_fixed_fn.size
     }
 
     results[:table_data] << {:resolution => "Duplicates",
                              :percent => (results[:chart_data][1] * 100).round(2),
-                             :count => closed_entries_duplicates.size
+                             :count => entries_duplicates.size
     }
     results[:table_data] << {:resolution => LABEL_RESOLVED_OTHER,
                              :percent => (results[:chart_data][2] * 100).round(2),
-                             :count => other_entries_resolutions_count
+                             :count => entries_other_count
     }
     results[:table_data] << {:resolution => "Total",
                              :percent => 100,
@@ -1885,7 +1888,6 @@ class Dispute < ApplicationRecord
     results[:chart_data] = {}
     #results[:table_data] = []
     final_data = {}
-
     users.each do |user|
       results[:chart_data][user.cvs_username] = {}
       results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FP] = 0
