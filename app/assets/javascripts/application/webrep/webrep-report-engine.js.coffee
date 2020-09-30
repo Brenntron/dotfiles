@@ -703,8 +703,6 @@ window.build_auto_resolve_web_entries_resolution_piechart = () ->
     data: data
     dataType: 'json'
     success: (response) ->
-      console.log 'auto_ticket_entries_by_resolution_report'
-      console.log $.parseJSON(response)["data"]
 
       json = $.parseJSON(response)["data"]
 
@@ -777,9 +775,6 @@ window.build_all_closed_tickets_manual_vs_auto_piechart = () ->
     dataType: 'json'
     success: (response) ->
 
-      console.log 'all_closed_tickets_manual_vs_auto_report'
-      console.log $.parseJSON(response)["data"]
-
       json = $.parseJSON(response)["data"]
 
       emailEntryResolutionLabels = json["chart_labels"]
@@ -792,7 +787,6 @@ window.build_all_closed_tickets_manual_vs_auto_piechart = () ->
 
       $(tableData).each ->
         $(web_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
-
 
       new Chart($('#all-web-entries-vs-closed-piechart'),
         type: 'pie'
@@ -850,9 +844,6 @@ window.build_all_tickets_vs_auto_close_piechart = () ->
     data: data
     dataType: 'json'
     success: (response) ->
-
-      console.log 'all_tickets_manual_vs_auto_close_report'
-      console.log $.parseJSON(response)["data"]
 
       json = $.parseJSON(response)["data"]
 
