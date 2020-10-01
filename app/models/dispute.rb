@@ -1767,7 +1767,7 @@ class Dispute < ApplicationRecord
     results[:chart_data] = []
     results[:chart_labels] = [ "All Tickets", "Automatically Resolved Tickets"]
 
-    results[:chart_data] << all_results.size.to_f / total_count.to_f
+    results[:chart_data] << (all_results.size.to_f - auto_results.size.to_f)/ total_count.to_f
     results[:chart_data] << auto_results.size.to_f / total_count.to_f
 
     if results[:chart_data][0].nan?
@@ -1779,14 +1779,20 @@ class Dispute < ApplicationRecord
     end
 
     results[:table_data] = []
-    results[:table_data] << {:resolution => "All Tickets",
-                             :percent => (results[:chart_data][0] * 100).round(2),
-                             :count => all_results.size.to_f
-    }
 
     results[:table_data] << {:resolution => "Automatically Resolved Tickets",
                              :percent => (results[:chart_data][1] * 100).round(2),
                              :count => auto_results.size
+    }
+
+    results[:table_data] << {:resolution => "Non-auto resolved tickets",
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => (all_results.size - auto_results.size)
+    }
+
+    results[:table_data] << {:resolution => "Total Submitted Tickets",
+                             :percent => 100,
+                             :count => all_results.size.to_f
     }
 
     results

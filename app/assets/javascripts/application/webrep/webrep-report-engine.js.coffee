@@ -816,7 +816,7 @@ window.build_all_closed_tickets_manual_vs_auto_piechart = () ->
             showZero: true
             fontStyle: 'bolder'
             overlap: false
-            showActualPercentages: false
+            showActualPercentages: true
       )
 
     error: (response) ->
