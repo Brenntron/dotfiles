@@ -301,7 +301,6 @@ class Complaint < ApplicationRecord
         #TODO: investigate above to see if its worth refactoring, and refactor it if so.
 
         new_entries_ips.each do |key, entry|
-
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"] unless entry['wbrs']['cat_sugg'].blank?
@@ -318,7 +317,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
           new_complaint_entry.entry_type = "IP"
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",") unless entry['wbrs']['cat_sugg'].blank?
-
+          new_complaint_entry.platform = entry['wbrs']['platform']
           if prefix_response.first&.is_active == 1
             new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"] unless entry['wbrs']['current_cat'].blank?
           else
@@ -352,7 +351,6 @@ class Complaint < ApplicationRecord
         end
 
         new_entries_urls.each do |key, entry|
-
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           url_parts = parse_url(key)
           new_complaint_entry = ComplaintEntry.new
@@ -362,7 +360,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
-
+          new_complaint_entry.platform = entry["platform"]
 
           if prefix_response.first&.is_active?
             new_complaint_entry.url_primary_category = entry["current_cat"] unless entry['current_cat'].blank?

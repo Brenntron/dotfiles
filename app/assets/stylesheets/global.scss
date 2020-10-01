@@ -340,6 +340,10 @@ table.dataTable.no-footer {
   }
 }
 
+.table-search-label {
+  height: 100%;
+}
+
 .table-search-input {
   width: 400px;
   height: 100%;
@@ -10004,12 +10008,12 @@ button.secondary.view-report-external-button {
     margin: 0 0 0 20px;
     width: 100%;
     min-width: 200px;
-    max-width: 450px;  // shorten to handle longer usernames on right
+    max-width: 550px;  // shorten to handle longer usernames on right
   }
 
   // search input field
   .input-group.search-group .search-box {
-    height: 24px;
+    height: 22px;
     margin: 0px -3px;
     padding-left: 30px;
     padding-top: 0;
@@ -10020,7 +10024,7 @@ button.secondary.view-report-external-button {
   // advanced search button
   .input-group.search-group #advanced-search-button {
     padding: 0 12px 0 18px;
-    height: 30px;
+    height: 28px;
   }
 
   // adding the down caret icon using the sort_by svg for advanced search button
@@ -11451,16 +11455,9 @@ hr.thin.extra-bottom-marg {
 
 // threat category stuff goes inside this wl/bl form
 .adjust-wlbl-form {
-  .dropdown-tool-grey-row {
-    li {
-      padding: 2px 2px 6px 12px;
-    }
-    .lists-row {
-      margin-bottom: 10px;
-    }
-  }
   // threat categories row in adjust wl/bl
   .dropdown-tool-grey-row.threat-cat-row {
+    padding-bottom: 5px;
     margin-left: -10px !important; // need important overrides here
     margin-right: -10px !important;
     .threat-cat-note {
@@ -11470,22 +11467,16 @@ hr.thin.extra-bottom-marg {
       margin-bottom: 0;
     }
     .threat-cat-area {
-      padding: 3px;
-      height: fit-content;
-      display: flex; // flex to alphabetize + sort the threat cats easily
-      flex-wrap: wrap;
-      flex-direction: column;
-      justify-content: space-around;
+      padding: 6px 2px;
       .threat-cat-cell {
-        width: 33%;
         font-size: 8pt;
         line-height: 10pt;
-        padding: 3px 0 3px 10px;
+        padding: 3px 0 2px 11px;
         cursor: default;
         input[type='checkbox'] {
           float: left;
           position: relative;
-          bottom: 3px;
+          bottom: 4px;
         }
         li.threat-cat-cb {
           padding-top: 6px;
@@ -11542,7 +11533,9 @@ hr.thin.extra-bottom-marg {
   }
 }
 
-
+.lists-row {
+  padding-bottom: 20px;
+}
 
 span.threat-cat-required {
   margin-left: 5px;
@@ -12792,4 +12785,12 @@ table.dispute_tool_current tr.reptool-entry-row td {
 
 #research-page-filter {
   height: 27px;
+}
+
+input.wl-bl-list-inline {
+  vertical-align: bottom;
+}
+
+.toolbar .lists-row div.dropdown-tool-grey-row li {
+  padding: 2px 10px 5px;
 }

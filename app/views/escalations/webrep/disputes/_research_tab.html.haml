@@ -79,7 +79,6 @@
                       .col-xs-12
                         %span NOTE: Submitting zero threat categories removes associated blacklists too.
 
-                    -# BEGIN: WL BL LISTS ROW + THREAT CATS ROW (place this 1 indent past 'inline-tool')
                     .row.lists-row
                       .col-xs-12
                         %label.content-label-sm{for: "wlbl-list-type-select"} Lists
@@ -103,6 +102,7 @@
                               %li
                                 %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"} BL - Heavy
 
+                    -# threat cats row (1 of 2 for this file)
                     .row.dropdown-tool-grey-row.threat-cat-row.hidden
                       .threat-cat-note
                         %label.content-label-sm
@@ -110,14 +110,12 @@
                           %span.threat-cat-required
                             *Required for adding to any blacklist.
                             %span.five-note Up to 5 can be selected
-
                       .threat-cat-area
+                        .row
                         - Wbrs::ThreatCategory.selections.each do |label, value|
-                          .threat-cat-cell
+                          .col-md-6.threat-cat-cell
                             = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
                             = label
-                    -# END: WL BL LISTS ROW + THREAT CATS ROW
-
 
                     .comment-wrapper
                       %label.content-label-sm WL/BL Comment
@@ -472,7 +470,7 @@
                                     Preview Projected Score
                                   %button.reset-form-button.esc-tooltipped{type: 'button', title: 'Reset list toggles.', onclick: 'reset_score_preview(this)'}
 
-                                -# BEGIN: THREAT CATS ROW
+                                -# threat cats row (2 of 2 for this file)
                                 .row.dropdown-tool-grey-row.threat-cat-row.hidden
                                   .threat-cat-note
                                     %label.content-label-sm
@@ -481,11 +479,11 @@
                                         *Required for adding to any blacklist.
                                         %span.five-note Up to 5 can be selected
                                   .threat-cat-area
+                                    .row
                                     - Wbrs::ThreatCategory.selections.each do |label, value|
-                                      .threat-cat-cell
+                                      .col-md-6.threat-cat-cell
                                         = wlbl_form.check_box(:thrt_cat_id, {id: "thrt_cat_id_#{value}", class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
-                                        = label(:thrt_cat_id,{for: "thrt_cat_id_#{value}"}, value )
-                                -# END: THREAT CATS ROW
+                                        = label
 
                                 .comment-wrapper
                                   %label.content-label-sm Comment

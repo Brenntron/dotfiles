@@ -729,7 +729,7 @@ window.change_ticket_status = (event) ->
   comment = ""
   checkboxes = $('#disputes-index').find('.dispute_check_box')
   checked_disputes = []
-  
+
   $(checkboxes).each ->
     if $(this).is(':checked')
       dispute_id = $(this).val()
@@ -1073,7 +1073,7 @@ $ ->
         data: 'age_int'
         visible: false
       }
-      
+
     ])
   $('#disputes-index_filter input').addClass('table-search-input');
 
