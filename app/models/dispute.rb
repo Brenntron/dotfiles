@@ -1724,14 +1724,15 @@ class Dispute < ApplicationRecord
     end
 
     results[:table_data] = []
-    results[:table_data] << {:resolution => "Manually Closed Tickets",
-                             :percent => (results[:chart_data][0] * 100).round(2),
-                             :count => manual_results.size.to_f
-    }
 
     results[:table_data] << {:resolution => "Automatically Resolved Tickets",
                              :percent => (results[:chart_data][1] * 100).round(2),
                              :count => auto_results.size
+    }
+
+    results[:table_data] << {:resolution => "Manually Closed Tickets",
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => manual_results.size.to_f
     }
 
     results[:table_data] << {:resolution => "Total Closed Tickets",
