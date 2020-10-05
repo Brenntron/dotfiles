@@ -3,6 +3,7 @@
 require 'fileutils'
 require 'digest'
 require 'pry'
+require 'dotenv'
 
 
 # This is an install system which, unlike deploy_api.rb, avoids using the talosweb service account.
@@ -58,6 +59,7 @@ class HurlArgs
   end
 
   def set_defaults
+    Dotenv.load
     @env                    = nil
     @project                = 'analyst-console-escalations'
     @build_base             = '../releases'
@@ -69,6 +71,7 @@ class HurlArgs
     @do_disgorge            = true
     @bundler_version        = '_1.16.1_'
     @user                   = `whoami`.chomp
+    @git_auth_token         = ENV["personal_github_token"]
     @host                   = 'rulesuitest'
   end
 
@@ -131,6 +134,10 @@ class HurlArgs
     @args = args
     set_defaults
     @args_pos = scan_args(args)
+    if @git_auth_token.nil?
+      puts "You need a git auth token. Dont have on? try here https://git.vrt.sourcefire.com/settings/tokens"
+      exit
+    end
     if @user.nil?
       puts "No user specified using --user . Please provide a username to build the project"
       exit
@@ -303,8 +310,8 @@ class Hurl
         output_tar_path = args.input_tar_path
       else
         output_tar_path = args.gen_output_tar_path
-        puts "curl -Lku #{@args.user} https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
-        system "curl -Lku #{@args.user} https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        puts "curl -Lku #{@args.user}:Git_Token_is_used_here https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        system "curl -Lku #{@args.user}:#{@git_auth_token}  https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
       end
     end
 
