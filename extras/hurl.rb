@@ -218,6 +218,10 @@ class HurlArgs
     "#{build_base}/#{base_dir}.tar.gz"
   end
 
+  def git_auth_token
+    @git_auth_token
+  end
+
   def host
     @host
   end
@@ -310,8 +314,8 @@ class Hurl
         output_tar_path = args.input_tar_path
       else
         output_tar_path = args.gen_output_tar_path
-        puts "curl -Lku #{@args.user}:Git_Token_is_used_here https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
-        system "curl -Lku #{@args.user}:#{@git_auth_token}  https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        puts   "curl -Lku #{@args.user}:#{@args.git_auth_token}  https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        system "curl -Lku #{@args.user}:#{@args.git_auth_token}  https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
       end
     end
 
