@@ -65,6 +65,12 @@ class Dispute < ApplicationRecord
 
   AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
 
+  #labels for charts on webrep dashboard
+  LABEL_RESOLVED_FIXED_FP = "Fixed FP"
+  LABEL_RESOLVED_FIXED_FN = "Fixed FN"
+  LABEL_RESOLVED_UNCHANGED = "Unchanged"
+  LABEL_RESOLVED_OTHER = "Other"
+
   scope :open_disputes, -> { where(status: NEW) }
   scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
@@ -1594,24 +1600,200 @@ class Dispute < ApplicationRecord
       results[:chart_data][3] = 0
     end
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FP,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FP,
                              :percent => (results[:chart_data][2] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size
                              }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FN,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FN,
                              :percent => (results[:chart_data][0] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size
     }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_UNCHANGED,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_UNCHANGED,
                              :percent => (results[:chart_data][1] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size
     }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_OTHER,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_OTHER,
                              :percent => (results[:chart_data][3] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size
+    }
+
+    results
+
+  end
+
+  def self.auto_ticket_entries_by_resolution_report(from, to, submission_types = nil)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    vrt =  User.where(cvs_username: 'vrtincom').first
+    vrt_id = vrt.id
+
+    if submission_types.present?
+      closed_entries = Dispute.joins(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+    else
+      closed_entries = Dispute.joins(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+    end
+
+    all_entries = closed_entries.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
+
+    entries_duplicates = all_entries.select {|entry| entry.resolution == "DUPLICATE"}
+    entries_fixed_fn = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}
+    entries_unchanged = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}
+
+    total_count = all_entries.size
+
+    results = {}
+    results[:chart_data] = []
+    results[:chart_labels] = ["Fixed FN", "Duplicates", "Unchanged" ]
+    results[:chart_data] << entries_fixed_fn.size.to_f / total_count.to_f
+    results[:chart_data] << entries_duplicates.size.to_f / total_count.to_f
+    results[:chart_data] << entries_unchanged.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
+    end
+
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
+    end
+
+    if results[:chart_data][2].nan?
+      results[:chart_data][2] = 0
+    end
+
+    results[:table_data] = []
+
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FN,
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => entries_fixed_fn.size
+    }
+
+    results[:table_data] << {:resolution => "Duplicates",
+                             :percent => (results[:chart_data][1] * 100).round(2),
+                             :count => entries_duplicates.size
+    }
+    results[:table_data] << {:resolution => LABEL_RESOLVED_UNCHANGED,
+                             :percent => (results[:chart_data][2] * 100).round(2),
+                             :count => entries_unchanged.size
+    }
+    results[:table_data] << {:resolution => "Total",
+                             :percent => 100,
+                             :count => total_count.to_f
+    }
+    results
+
+  end
+
+  def self.all_closed_tickets_manual_vs_auto_report(from, to, submission_types = nil)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    vrt =  User.where(cvs_username: 'vrtincom').first
+    vrt_id = vrt.id
+
+    if submission_types.present?
+      manual_results = Dispute.where.not(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
+
+    else
+      manual_results = Dispute.where.not(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
+    end
+
+    total_count = manual_results.size + auto_results.size
+
+    results = {}
+
+    results[:chart_data] = []
+    results[:chart_labels] = [ "Manually Resolved Tickets", "Automatically Resolved Tickets"]
+
+    results[:chart_data] << manual_results.size.to_f / total_count.to_f
+    results[:chart_data] << auto_results.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
+    end
+
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
+    end
+
+    results[:table_data] = []
+
+    results[:table_data] << {:resolution => "Automatically Resolved Tickets",
+                             :percent => (results[:chart_data][1] * 100).round(2),
+                             :count => auto_results.size
+    }
+
+    results[:table_data] << {:resolution => "Manually Closed Tickets",
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => manual_results.size.to_f
+    }
+
+    results[:table_data] << {:resolution => "Total Closed Tickets",
+                             :percent => 100,
+                             :count => total_count.to_f
+    }
+
+    results
+
+  end
+
+  def self.all_tickets_manual_vs_auto_close_report(from, to, submission_types = nil)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    vrt =  User.where(cvs_username: 'vrtincom').first
+    vrt_id = vrt.id
+
+    if submission_types.present?
+      all_results = Dispute.where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types)
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
+
+    else
+      all_results = Dispute.where("disputes.created_at between '#{from}' and '#{to}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
+    end
+
+    total_count = all_results.size
+
+    results = {}
+
+    results[:chart_data] = []
+    results[:chart_labels] = [ "All Tickets", "Automatically Resolved Tickets"]
+
+    results[:chart_data] << (all_results.size.to_f - auto_results.size.to_f)/ total_count.to_f
+    results[:chart_data] << auto_results.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
+    end
+
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
+    end
+
+    results[:table_data] = []
+
+    results[:table_data] << {:resolution => "Automatically Resolved Tickets",
+                             :percent => (results[:chart_data][1] * 100).round(2),
+                             :count => auto_results.size
+    }
+
+    results[:table_data] << {:resolution => "Non-auto resolved tickets",
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => (all_results.size - auto_results.size)
+    }
+
+    results[:table_data] << {:resolution => "Total Submitted Tickets",
+                             :percent => 100,
+                             :count => all_results.size.to_f
     }
 
     results
@@ -1763,7 +1945,6 @@ class Dispute < ApplicationRecord
     results[:chart_data] = {}
     #results[:table_data] = []
     final_data = {}
-
     users.each do |user|
       results[:chart_data][user.cvs_username] = {}
       results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FP] = 0
