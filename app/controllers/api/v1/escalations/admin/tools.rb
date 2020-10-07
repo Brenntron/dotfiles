@@ -11,6 +11,32 @@ module API
             before do
               PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
+
+            desc 'reptool call'
+            params do
+              requires :path, type: String
+              optional :user_arg, type: String
+            end
+
+            post "reptool_call" do
+              unless current_user.has_role?('admin')
+                return {:status => 'error', :message => 'you do not have permissions to run this'}.to_json
+              end
+
+              #begin
+              path = permitted_params[:path]
+              arg = nil
+              arg = permitted_params[:user_arg] unless permitted_params[:user_arg].blank?
+              response = ReptoolAdminTool.process(path, arg).to_json
+
+              {:status => 'success', :message => response}
+
+              #rescue
+              #  {:status => 'error', :message => 'something went fucky'}
+              #end
+
+            end
+
             desc 'execute task'
             params do
               requires :task, type: String
@@ -138,6 +164,47 @@ module API
 
             end
 
+            #################################################### API REPORT ##############################################
+
+            get 'api_status_report' do
+
+              status_response = {}
+
+              status_response[:servers] = {}
+              status_response[:servers][:reptool] = Rails.configuration.rep_api.host
+              status_response[:servers][:rule_api] = Rails.configuration.wbrs.host
+              status_response[:servers][:sds_v3] = Sbrs::Base.sds_v3_host
+              status_response[:servers][:threatgrid] = Rails.configuration.threatgrid.host
+              status_response[:servers][:reversing_lab] = Rails.configuration.reversing_labs.host
+              status_response[:servers][:sandbox] = Rails.configuration.file_reputation_sandbox.host
+              status_response[:servers][:xbrs] = Rails.configuration.xbrs.host
+              status_response[:servers][:virustotal] = Rails.configuration.virustotal.host
+              status_response[:servers][:umbrella] = Rails.configuration.umbrella.url
+              status_response[:servers][:amp] = Rails.configuration.amp_poke.host
+
+              begin
+                status_response[:reptool] = RepApi::Blacklist.health_check
+                status_response[:rule_api] = Wbrs::ThreatCategory.health_check
+                status_response[:sds_v3] = Sbrs::Base.health_check
+                status_response[:threatgrid] = Threatgrid::Search.health_check
+                status_response[:reversing_lab] = FileReputationApi::ReversingLabs.health_check
+                status_response[:sandbox] = FileReputationApi::Sandbox.health_check
+                status_response[:xbrs] = Xbrs::GetXbrs.health_check
+                status_response[:virustotal] = Virustotal::GetVirustotal.health_check
+                status_response[:umbrella] = Umbrella::Scan.health_check
+                status_response[:amp] = FileReputationApi::Detection.health_check
+
+                status_response[:status] = "success"
+
+              rescue
+                status_response[:status] = "error"
+                status_response[:message] = "An Error Occurred trying to build a status report"
+              end
+
+
+              return status_response
+
+            end
 
 
           end

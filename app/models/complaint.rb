@@ -40,13 +40,15 @@ class Complaint < ApplicationRecord
   scope :active_count , -> {where(status:ACTIVE).count}
   scope :completed_count , -> {where(status:COMPLETED).count}
   scope :new_count , -> {where(status:NEW).count}
-  scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count}
+  scope :overdue_count , -> {where("created_at < ?",Time.now - 12.hours).where.not(status:COMPLETED).count}
   scope :open_comps, -> { where.not(status: COMPLETED) }
-  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
-  scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
-  scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
+
   scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
   scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
+
+  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
+  scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
+  scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
 
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}
@@ -297,7 +299,6 @@ class Complaint < ApplicationRecord
         #TODO: investigate above to see if its worth refactoring, and refactor it if so.
 
         new_entries_ips.each do |key, entry|
-
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"] unless entry['wbrs']['cat_sugg'].blank?
@@ -314,7 +315,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
           new_complaint_entry.entry_type = "IP"
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",") unless entry['wbrs']['cat_sugg'].blank?
-
+          new_complaint_entry.platform = entry['wbrs']['platform']
           if prefix_response.first&.is_active == 1
             new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"] unless entry['wbrs']['current_cat'].blank?
           else
@@ -348,7 +349,6 @@ class Complaint < ApplicationRecord
         end
 
         new_entries_urls.each do |key, entry|
-
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           url_parts = parse_url(key)
           new_complaint_entry = ComplaintEntry.new
@@ -358,7 +358,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
-
+          new_complaint_entry.platform = entry["platform"]
 
           if prefix_response.first&.is_active?
             new_complaint_entry.url_primary_category = entry["current_cat"] unless entry['current_cat'].blank?

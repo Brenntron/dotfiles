@@ -1,4 +1,9 @@
 -#view single record
+- unless @dispute.customer.nil? || @dispute.customer.company.nil?
+  %input{type:'hidden', name: 'webrep-dispute-customer-company-name', value: "#{@dispute.customer.company.name}"}
+%input{type: 'hidden', name: 'webrep-dispute-submission-type', value: "#{@dispute.submission_type}"}
+%input{type: 'hidden', name: 'webrep-dispute-submitter-type', value: "#{@dispute.submitter_type}"}
+
 .content-wrapper.top-case-info
 
   .row
@@ -15,7 +20,6 @@
           -# Creating notation for future change. This is neither a link nor part of a dropdown. Should be changed
           -# to a span and have the dropdown class removed.
           %a.case-id-tag.related-dropdown-text#dispute_id= @dispute.case_id_str
-
 
       .dispute-owner-wrapper
         %label.content-label-sm
@@ -92,7 +96,7 @@
                     %input.ticket-status-radio.resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESOLVED}", value: "#{Dispute::STATUS_RESOLVED}"}
                     %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_RESOLVED}"} Resolved / Closed
                     .dropdown-menu#show-ticket-resolution-submenu
-                      .col-xs-6.submenu-left-wrapper
+                      .col-xs-6.submenu-left-wrapper{id: "webrep-resolution-selector"}
                         .submenu-header
                           Ticket Resolution
                         %ul
@@ -160,7 +164,7 @@
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Dispute Entries
-      %div
+      %div.dispute-entry-ip-uri
         = @entries.first.hostlookup if @entries.present?
         -#- @entries.each do |entry|
         -#  = entry.hostlookup
@@ -183,7 +187,7 @@
           %button.cancel-button.dispute-top-buttons#cancel-dispute-button.hidden.esc-tooltipped{title: 'Cancel'}
 
 
-  .row#top_bar_extended_info
+  .row#top_bar_extended_info{style: 'display: none'}
     .col-xs-12
       %h3 Submitter Information
       .row

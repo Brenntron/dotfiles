@@ -1,6 +1,6 @@
 window.submit_wbrs_call = (arg, path, output) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
     url: '/escalations/api/v1/escalations/admin/tools/wbrs_call'
@@ -18,6 +18,30 @@ window.submit_wbrs_call = (arg, path, output) ->
     error: (response) ->
       $(output).html('An error occurred attempting to execute task')
   , this)
+
+window.submit_reptool_call = (arg, path, output) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+
+  $.ajax(
+    url: '/escalations/api/v1/escalations/admin/tools/reptool_call'
+    method: 'POST'
+    headers: headers
+    data: {'user_arg': arg, 'path': path}
+
+    success: (response) ->
+#json = $.parseJSON(response)
+      if response.status == 'error'
+        $(output).html("ERROR:" + response.message)
+      else
+        $(output).html(response.message)
+
+    error: (response) ->
+      $(output).html('An error occurred attempting to execute task')
+  , this)
+
+
+
 
 window.submit_wbnp_report_destroy = (id)->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -132,6 +156,51 @@ window.purge_mozilla_corefiles =() ->
       std_msg_error("there was an error when attempting to purge core files.",[response.responseText], reload: false)
   , this)
 
+window.get_api_status = () ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  std_msg_ajax(
+    method: 'GET'
+    headers: headers
+    url: '/escalations/api/v1/escalations/admin/tools/api_status_report'
+    data:{}
+    success: (response) ->
+      $('.ajax-message-div').css('display','none')
+      format_statuses(response)
+
+    error: (response) ->
+      $('.ajax-message-div').css('display','none')
+      std_msg_error("There was an error when attempting to get api status.",[response.responseText], reload: false)
+  , this)
+
+window.format_statuses = (data) ->
+  { servers } = data
+  stat_table = document.getElementById('status_api_table')
+  stat_table.innerHTML =
+    "<tr>
+      <th>API</th>
+      <th>Server</th>
+      <th>Status</th>
+    </tr>"
+  for server, name of servers
+    if data[server].is_healthy
+      status_class = 'api-status-success'
+    else
+      status_class = 'api-status-fail'
+
+    tr = document.createElement("tr");
+
+    tr.innerHTML =
+      "<td class = 'content-label-md'>
+        #{server}
+       </td>
+       <td>
+        #{name}
+        </td>
+       <td>
+        <span class='#{status_class}'></span>
+      </td>"
+
+    stat_table.append(tr)
 $ ->
 
   $("#sync-all-disputes").click ->
@@ -241,3 +310,31 @@ $ ->
     output = '#output-10'
 
     window.submit_wbrs_call(arg, path, output)
+####################################################
+  $("#execute-reptool-button-1").click ->
+    arg = $(".1-reptool-args").val();
+    path = 'reptool1'
+    output = '#reptool-output-1'
+
+    window.submit_reptool_call(arg, path, output)
+
+  $("#execute-reptool-button-2").click ->
+    arg = $(".2-reptool-args").val();
+    path = 'reptool2'
+    output = '#reptool-output-2'
+
+    window.submit_reptool_call(arg, path, output)
+
+  $("#execute-reptool-button-3").click ->
+    arg = $(".3-reptool-args").val();
+    path = 'reptool3'
+    output = '#reptool-output-3'
+
+    window.submit_reptool_call(arg, path, output)
+
+  $("#execute-reptool-button-4").click ->
+    arg = $(".4-reptool-args").val();
+    path = 'reptool4'
+    output = '#reptool-output-4'
+
+    window.submit_reptool_call(arg, path, output)

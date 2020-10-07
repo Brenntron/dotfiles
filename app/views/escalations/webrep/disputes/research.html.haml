@@ -1,89 +1,344 @@
-.content-wrapper
+.content-wrapper.research-page
+
   .reputation-research-search-wrapper
-    %h1 Reputation Research
-    = form_for(:search, method: "get") do |search_form|
-      = search_form.text_field(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
-      .row.search-options-row
-        .col-xs-6
-          = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
-          %label.esc-tooltipped{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
-        .col-xs-6
-          = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
-          %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
-      =search_form.submit :Submit, id: 'submit-button'
+
+    -# shared loader for detail and quick lookup
+    .ajax-message-div#detail-lookup-loader
+      .loader-gears
+        =inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Active search processing, please wait...
+    .ajax-message-div#quick-lookup-loader
+      .loader-gears
+        =inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Loading data...
+    .research-header-wrapper
+      %span.icon-research.top-info-icon
+      %h1 Reputation Research
+
+      %ul#research-tabs{class:"nav nav-tabs", role:'tablist'}
+        -# Detailed and Quick Lookup tabs
+        %li.no-transition{role:"presentation", class: "active", data:"lookup-detail"}
+          %a.esc-tooltipped.no-transition{href:'#lookup-detail','aria-controls':'lookup-detail', 'aria-label': 'Detail lookup tab','data-toggle':'tab', role:"tab", title:"Detailed Lookup"}
+            %span.icon-lookup-detail.top-info-icon
+            %span.tab-text Detailed Lookup
+        %li.no-transition{role:'presentation', data:"lookup-quick"}
+          %a.esc-tooltipped.no-transition{href:'#lookup-quick',class:'quick-lookup-tab', 'aria-controls':'lookup-quick','aria-label': 'Quick lookup tab','data-toggle':'tab', role:"tab", title:"Quick Lookup"}
+            %span.icon-lookup-quick.top-info-icon
+            %span.tab-text Quick Lookup
+
+    .research-search-form.row.tab-content
+      = form_for(:search, method: "get", :html=>{:id=>'research_form'}) do |search_form|
+        .search-options-col.tab-pane.active#lookup-detail
+          .col-xs-4.col-sm-3.col-md-2.col-lg-2.col-xl-1
+            %span.block-label
+              = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
+              %label.esc-tooltipped.detail-label{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
+            %span.block-label
+              = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
+              %label.esc-tooltipped.detail-label{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
+            %hr.thin
+            =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary',onclick: 'detail_search(); return false')
+          .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
+            = search_form.text_area(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
+
+
+        -#####################
+        -# BEGIN : quicklookup toolbar
+        -#####################
+        .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}
+
+          .col-xs-12.toolbar-quicklookup
+            %button.primary#get-rep-data{onclick: 'get_rep_data();return false;', disabled: true} Get Reputation Data
+            .toolbar.research-toolbar
+              %div
+                %label.toolbar-section-label Adjust Reputation
+                %span.dropdown
+                  %button#wlbl_entries_button.toolbar-button.toolbar-button-spacer.adjust-wlbl-button.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick:'open_wlbl();'}
+                    %span.toolbar-button-text Adjust WL/BL
+                  .dropdown-menu.toolbar-dropdown#wlbl_entries_dropdown{'aria-labelledby': 'wlbl_entries_button'}
+                    .dropdown-tool-text-divider.secondary-text-divider
+                      Adjust WL/BL
+                    .col-xs-12
+                      .inline-tool-content-wrapper
+                        .row.nested-radio-row.reptool-class-radio-row
+                          .col-xs-2
+                            %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Action
+                          .col-xs-5
+                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-quick-add', value: 'add', checked: true}
+                            %label.radio-label{for: 'wlbl-quick-add'} Add to List
+                          .col-xs-5
+                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-quick-remove', value: 'remove'}
+                            %label.radio-label{for: 'wlbl-quick-remove'} Remove from List
+                        .row.reptool-classifications-row
+                          .col-xs-12
+                            %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Lists
+                            %ul.dropdown-wlbl-list
+                            .row.dropdown-tool-grey-row.threat-cat-row.hidden
+                              .threat-cat-note
+                                %label.content-label-sm
+                                  Threat Categories
+                                  %span.threat-cat-required
+                                    *Required for adding to any blacklist.
+                                    %span.five-note Up to 5 can be selected
+                              .threat-cat-area
+                                - Wbrs::ThreatCategory.selections.each do |label, value|
+                                  .threat-cat-cell
+                                    %input{type: 'checkbox',id: "bulk-wlbl-thrtcat-#{value}", class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}", value: value}
+                                    %label{for: "bulk-wlbl-thrtcat-#{value}"} #{label}
+                      .col-xs-12
+                        .comment-wrapper
+                          %label.col-x-3.reptool-section-label{required: true} WL/BL Comment
+                          %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                          .col-x-3
+                          .col-x-6
+                            %hr.thin
+                          .button-row-center
+                            %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true, onclick: 'set_action_wlbl_col();'}
+                              Add Action to Entries
+
+
+                %span.dropdown
+                  %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'open_adjust_reptool();'}
+                    %span.toolbar-button-text Adjust RepTool BL
+                  .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'reptool_entries_button'}
+                    .dropdown-tool-text-divider.secondary-text-divider
+                      Adjust Reptool Classification
+                    .inline-tool-content-wrapper
+                      .row
+                        .col-xs-12
+                          .row
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'adjust-reptool-maintain', value: 'reptool-maintain', checked: true}
+                            %label.radio-label{for: 'adjust-reptool-maintain'} Maintain current classifications
+                          .row
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'adjust-reptool-override', value: 'reptool-override'}
+                            %label.radio-label{for: 'adjust-reptool-override'} Replace current classifications
+                          .row
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'adjust-reptool-drop', value: 'reptool-drop'}
+                            %label.radio-label{for: 'adjust-reptool-drop'} Drop all classifications (set entry to EXPIRED)
+                      %hr.thin.form-divider
+                      .row.reptool-classifications-row
+                        .col-xs-12
+                          %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Classifications
+                          .row.dropdown-tool-grey-row.nested-radio-row.reptool-class-radio-row
+                            .col-xs-6
+                              %input{type: 'radio', class:'reptool-add', name: 'reptool-classes-radio', id: 'reptool-classes-add', value: 'add', checked: true}
+                              %label.radio-label{for: 'reptool-classes-add'} Add selected classifications
+                            .col-xs-6
+                              %input{type: 'radio', class:'reptool-add', name: 'reptool-classes-radio', id: 'reptool-classes-remove', value: 'remove'}
+                              %label.radio-label{for: 'reptool-classes-remove'} Remove selected classifications
+                          %ul.dropdown-reptool-list
+                    .col-xs-12
+                      .comment-wrapper
+                        %label.col-x-3.reptool-section-label{required: true} RepTool Comment
+                        %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                        .col-x-3
+                        .col-x-6
+                          %hr.thin
+                        .button-row-center
+                          %button.primary.dropdown-submit-button#quick-lookup-reptool-submit{type: 'button', disabled: true, onclick: 'set_action_col();'}
+                            Add Action to Entries
+              %div
+                %label.toolbar-section-label Actions
+                %button#clear-all-actions.toolbar-button.clear-button.esc-tooltipped{title: 'Clear all actions'}
+                  %span.toolbar-button-text Clear All Actions
+
+            %button.primary#submit-rep-changes{onclick:'submit_quick_lookup();return false;', disabled: true} Submit Reputation Changes
+            %span.small.note-repsubmit
+              * NOTE: Submitting reputation changes will automatically create a closed ticket
+          -#####################
+          -#END : quicklookup toolbar
+          -#####################
+
+
+
+
+          -#####################
+          -#BEGIN : quicklookup success and error modals
+          -#####################
+          #confirmation-modal.modal.fade{role:"dialog"}
+            .modal-dialog
+              .modal-content
+                .modal-header
+                  %h4.modal-title#commit-modal-title New Reputation Dispute Ticket
+                .modal-body
+                  %table
+                    %thead
+                      %tr
+                        %td.bold Dispute
+                        %td.bold Actions
+                    %tbody
+                  .comment-wrapper
+                    %label.content-label-sm
+                      Comment
+                    %textarea#confirm-rep-input.dropdown-comment.confirm-rep-input.comment-input{name:'confirm-rep-input'}
+                  .modal-footer
+                    .button-group
+                      %button.primary{id:'confirm-rep-changes', onclick: 'confirm_rep_changes(); return false;' } Confirm Reputation Changes
+                      %button{title: "Cancel", class: "secondary", onclick: "close_modal(); return false;"} Cancel
+
+
+          #error_modal.modal.error_modal{tabindex:"-1", role:"dialog"}
+            .modal-header
+              %h4.modal-title#commit-modal-title Duplicate Dispute Requests
+            .modal-body
+          -#####################
+          -#END: quicklookup success and error modals
+          -#####################
+
+
+
+
+          -#####################
+          -# BEGIN: quicklookup research table
+          -#####################
+          %table#research-table.research-table
+            %colgroup
+              %col
+              %col
+              %col.alt-col{span:7}
+              %col
+              %col
+            %thead
+              %tr
+                %th
+                  %span.checkbox-wrapper
+                    %input#select-all-bulk{ :type=>"checkbox", checked: "true" }
+                %th Dispute
+                %th WBRS
+                %th WBRS Rule Hits
+                %th WBRS Rules
+                %th Category
+                %th WL/BL
+                %th
+                  Threat Categories
+                  %span.tc_header (Pending | Current)
+                %th Reptool Classification
+                %th Actions
+                %th
+            %tbody
+              %tr
+                %td.col-select-all
+                %td
+                  %p.col-bulk-dispute{ contenteditable:"true", data:''}
+                %td.col-wbrs
+                %td.col-wbrs-rule-hits
+                %td.col-wbrs-rules
+                %td.col-category
+                %td.col-wlbl
+                %td.col-threat-cats
+                %td.col-actions
+                %td.col-clear-actions
+          %button#add_addtional_row.esc-tooltipped{title: 'Add Row', onclick: 'return false;'}
+      -#####################
+      -# END: quicklookup research table
+      -#####################
+
+
+
   .row
-    .col-xs-12
+    -#####################
+    -# BEGIN: toolbar for detail lookup results
+    -#####################
+    .col-xs-12.lookup-detail
       - if params['search']
-        %h4 Entry Search Results for
+        %h4 Results for
         %span.searched-for-url #{params['search']['uri']}
         (#{@entries.count} found)
       #research-page-toolbar.toolbar
         %div
-          %label.toolbar-section-label Table View
-          %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
-            %span.toolbar-button-text Expand All Rows
-          %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped{title: 'Collapse All Rows'}
-            %span.toolbar-button-text Collapse All Rows
+          %div.toolbar-select-wrapper
+            %label.toolbar-section-label
+            %input#select-all-entries.esc-tooltipped{type:'checkbox',title: 'Select All / Deselect All', 'onclick':'select_all_detailed(this)'}
+              %span.toolbar-button-text.select-all-label Select All / Deselect All
         %div
+          %label.toolbar-section-label View
+          %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped{title: 'Expand All Rows'}
+            %span.toolbar-button-text Expand All Rows
+          %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped.hidden{title: 'Collapse All Rows'}
+            %span.toolbar-button-text Collapse All Rows
+        %div.adjust-container
+          %label.toolbar-section-label Edit
+          %span.dropdown
+            %button.toolbar-button.add-to-ticket-button.toolbar-button-spacer#add-to-ticket-button.esc-tooltipped{title: 'Add to Ticket','data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'disabled': 'disabled', onclick:'ips_textarea_toggle(this)'}
+              %span.toolbar-button-text Add to Ticket
+            .dropdown-menu.toolbar-dropdown#add_to_ticket_dropdown{'aria-labelledby': 'add-to-ticket-button'}
+              .dispute-wlbl-adjust-wrapper
+                .dropdown-tool-text-divider.primary-text-divider
+                  New Dispute
+                = render 'escalations/webrep/disputes/new'
           %span.dropdown
             %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
               %span.toolbar-button-text Adjust WBRS WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
-              = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
+              = form_for :wlbl, html: {class: 'adjust-wlbl-form bulk-wlbl-form'} do |wlbl_form|
                 .dispute-wlbl-adjust-wrapper
                   .dropdown-tool-text-divider.primary-text-divider
                     Current WBRS Reputation
-
                   %table.dispute_tool_current
                     %thead
                       %tr
                         %th.content-label-sm Dispute
                         %th.content-label-sm.no-word-break Current WL/BL List
                         %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                        %th.content-label-sm.no-word-break.th-threat-cat Threat Category
                     %tbody
-
                   -# TODO Hook up ability to preview scores based on changes in WL/BL
-
                   .dropdown-tool-text-divider.secondary-text-divider
                     Adjust WBRS Reputation
-
                   .inline-tool-content-wrapper
                     .row
-                      .col-xs-2
-                        %label.content-label-sm Action
-                      .col-xs-5
+                      .col-xs-3
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-add', value: 'wlbl-add', checked: true}
                         %label.radio-label{for: 'wlbl-add'} Add to list
-                      .col-xs-5
+                      .col-xs-4
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-remove', value: 'wlbl-remove'}
                         %label.radio-label{for: 'wlbl-remove'} Remove from list
-
                     .row
+                      .col-xs-5.replace-tc-radio.hidden
+                        %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-replace', value: 'wlbl-replace'}
+                        %label.radio-label{for: 'wlbl-replace'} Replace threat categories
+
+                    .row.tc-replace-note.hidden
+                      .col-xs-12
+                        %span NOTE: Submitting zero threat categories removes associated blacklists too.
+
+                    .row.lists-row
                       .col-xs-12
                         %label.content-label-sm{for: "wlbl-list-type-select"} Lists
                         .row.dropdown-tool-grey-row
-                          .col-xs-5.col-xs-offset-2
+                          .col-xs-4
                             %ul
                               %li
-                                %input.wl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-weak"}
-                                  WL - Weak
+                                %input.wl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-weak"} WL - Weak
                               %li
-                                %input.wl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-med"}
-                                  WL - Medium
-                              %li
-                                %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"}
-                                  WL - Heavy
-                          .col-xs-5
+                                %input.bl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-weak"} BL - Weak
+                          .col-xs-4
                             %ul
                               %li
-                                %input.bl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-weak"}
-                                  BL - Weak
+                                %input.wl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-med"} WL - Medium
                               %li
-                                %input.bl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-med"}
-                                  BL - Medium
+                                %input.bl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-med"} BL - Medium
+                          .col-xs-4
+                            %ul
                               %li
-                                %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"}
-                                  BL - Heavy
+                                %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"} WL - Heavy
+                              %li
+                                %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"} BL - Heavy
+
+                    -# threat cats row (1 of 2 for this file)
+                    .row.dropdown-tool-grey-row.threat-cat-row.hidden
+                      .threat-cat-note
+                        %label.content-label-sm
+                          Threat Categories
+                          %span.threat-cat-required
+                            *Required for adding to any blacklist.
+                            %span.five-note Up to 5 can be selected
+                      .threat-cat-area
+                        .row
+                        - Wbrs::ThreatCategory.selections.each do |label, value|
+                          .col-md-6.threat-cat-cell
+                            = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
+                            = label
 
                     .comment-wrapper
                       %label.content-label-sm WL/BL Comment
@@ -91,9 +346,8 @@
                     .button-row-center
                       %button.primary.dropdown-submit-button{type: 'button', onclick:'submit_bulk_wlbl("research");', disabled: true}
                         Submit Reputation Changes
-
           %span.dropdown
-            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("research");'}
+            %button#reptool_entries_button_research.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("research");'}
               %span.toolbar-button-text Adjust RepTool WL/BL
             .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
               =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
@@ -103,15 +357,14 @@
                   %table.dispute_tool_current
                     %thead
                       %tr
-                        %th.content-label-sm Dispute
-                        %th.content-label-sm Active Classes | Expiration
-                        %th.content-label-sm Comment
+                        %th.content-label-sm.th-reptool-dispute Dispute
+                        %th.content-label-sm.th-reptool-active-classes Active Classes
+                        %th.content-label-sm.th-reptool-expiration Expiration
+                        %th.content-label-sm.th-reptool-comment Comment
                     %tbody
                   -# Each checked entry will populate information here
-
                   .dropdown-tool-text-divider.secondary-text-divider
                     Adjust Reptool Classification
-
                   .inline-tool-content-wrapper
                     .row
                       .col-xs-12
@@ -127,10 +380,10 @@
                         %label.content-label-sm{for: "reptool-class-type-select"} Classifications
                         .row.dropdown-tool-grey-row.nested-radio-row.reptool-class-radio-row
                           .col-xs-6
-                            %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-add', value: 'add', checked: true}
+                            %input{type: 'radio', name: 'reptool-classes-radio', value: 'add', checked: true}
                             %label.radio-label{for: 'reptool-classes-add'} Add selected classifications
                           .col-xs-6
-                            %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-remove', value: 'remove'}
+                            %input{type: 'radio', name: 'reptool-classes-radio', value: 'remove'}
                             %label.radio-label{for: 'reptool-classes-remove'} Remove selected classifications
                         %hr.thin.form-divider
                         .row.dropdown-tool-grey-row.checkbox-wrapper-row
@@ -139,6 +392,9 @@
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers', onclick: 'reptool_form_prep(this, "bulk")'}
                                   attackers
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'banking_fraud', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  banking_fraud
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon', onclick: 'reptool_form_prep(this, "bulk")'}
                                   bogon
@@ -151,25 +407,40 @@
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining', onclick: 'reptool_form_prep(this, "bulk")'}
                                   cryptomining
-                          .col-xs-4
-                            %ul
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga', onclick: 'reptool_form_prep(this, "bulk")'}
                                   dga
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit', onclick: 'reptool_form_prep(this, "bulk")'}
                                   exploitkit
+                          .col-xs-4
+                            %ul
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'high_risk', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  high_risk
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'ioc', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  ioc
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'link_sharing', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  link_sharing
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malicious', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  malicious
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware', onclick: 'reptool_form_prep(this, "bulk")'}
                                   malware
                               %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'newly_seen', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  newly_seen
+                              %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy', onclick: 'reptool_form_prep(this, "bulk")'}
                                   open_proxy
+                          .col-xs-4
+                            %ul
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay', onclick: 'reptool_form_prep(this, "bulk")'}
                                   open_relay
-                          .col-xs-4
-                            %ul
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing', onclick: 'reptool_form_prep(this, "bulk")'}
                                   phishing
@@ -180,59 +451,75 @@
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam', onclick: 'reptool_form_prep(this, "bulk")'}
                                   spam
                               %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spyware', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  spyware
+                              %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious', onclick: 'reptool_form_prep(this, "bulk")'}
                                   suspicious
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'tor_exit_node', onclick: 'reptool_form_prep(this, "bulk")'}
                                   tor_exit_node
-
                     .comment-wrapper
                       %label.content-label-sm RepTool Comment
-                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                      %hr.thin
+                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-bulk{placeholder: 'Reason behind this change...'}
+                      .reptool-generated-comment
                     .button-row-center
                       %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool();'}
                         Submit Changes
         %div
           %label.toolbar-section-label Type to filter results
           %input#research-page-filter{'type': "text", 'onKeyUp': "researchfilter(this)"}
-  .row
+        -#  TODO - The actions collection of the detailed lookup has not been created yet. Hiding this button for that future ticket. Submit detailed lookup not a function yet.
+        -#%button.primary#submit-strict-changes{onclick:'submit_detail_lookup();return false;', disabled: true} Submit Reputation Changes
+        -#%span.small.note-repsubmit * NOTE: Submitting reputation changes will automatically create a closed ticket
+      -#####################
+      -# END: toolbar for detail lookup results
+      -#####################
+
+
+
+  .row.research_results
+    -#####################
+    -# BEGIN: detail lookup results
+    -#####################
     .col-xs-12
+
       %table#disputes-research-table.table.table-sm.bfrp-table
         %tbody
-          - @entries.each do |entry|
-            %tr.research-table-row{'data-entry-id': "#{entry.id}"}
+          - @entries.each_with_index do |entry, i|
+            %tr.research-table-row{'data-entry-id': "#{entry.id}", class: "result-no-#{i}"}
               %td.research-table-row-wrapper
                 %table
-                  %tr
-                    %td.expandable-row-column
+                  %tr.research-first-row
+                    %td.expandable-row-column.expandable-cell
                       %button.expand-row-button-inline{'data-entry-id': "#{entry.id}"}
-                    %td
-                      %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
-                    %td
+                    %td.cb-cell
+                      %input.dispute_check_box{type: 'checkbox', class: "bfrp-checkbox-#{i}", 'data-entry-id': "#{entry.id}"}
+                    %td.url-cell
                       - if entry[:is_important]
                         %span.entry-data.entry-data-content.entry-important-flag
                           = entry.hostlookup
                       - else
                         %span.entry-data.entry-data-content
                           = entry.hostlookup
-                    %td
+                    %td.category-cell
                       %label Category
-                      - if entry[:primary_category] != "{}"
+                      - if entry[:primary_category] != '{}' && !entry[:primary_category].nil?
                         = entry[:primary_category]
                       - else
-                        %span.missing-data No Data
-                    %td
+                        %span.missing-data No assigned categories
+                    %td.hostname-cell
                       %label Hostname
                       - unless entry[:hostname].nil?
                         = entry[:hostname]
 
-                    %td.dispute_rep_tools
+                    %td.dispute_rep_tools.rep-tools-cell
                       %span.dispute_rep_tools_wrapper
                         %span.dropdown
-                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);'}
-                          .dropdown-menu
-                            = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.esc-tooltipped.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);', class: "bfrp-inline-wlbl-#{i}"}
+                          -# adding a unique id for this wl/bl dropdown + strip out special chars
+                          .dropdown-menu{id: "wlbl_adjust_#{entry.hostlookup.gsub(/[.:\/]/,'')}"}
+                            = form_for :wlbl, html: {class: 'adjust-wlbl-form inline-wlbl-form'} do |wlbl_form|
                               .dispute-wlbl-adjust-wrapper
                                 %input.adjust-wlbl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
                                 %h3 Adjust WL/BL
@@ -241,55 +528,77 @@
                                     %tr
                                       %th.content-label-sm.no-word-break Current WL/BL List
                                       %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                                      %th.content-label-sm.no-word-break.th-threat-cat Threat Category
+
                                   %tbody
                                     %tr
                                       %td.wlbl-entry-wlbl
-                                      %td.wlbl-current-entry-wbrs.text-center
+                                      %td.wlbl-current-entry-wbrs
+                                      %td.wlbl-threat-cat-inline
 
-                                    -#    Removing for now. We can't do a preview until the api is updated to provide that info
+                                    -#  DO NOT REMOVE THIS
                                     -#%td.text-center
                                     -#  %label.content-label-sm New Score
                                     -#  %br
                                     -#  %span.new_wbrs_score
+                                    -#  DO NOT REMOVE THIS
+
                                 .inline-tool-content-wrapper
                                   .row
                                     .col-xs-12
                                       %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
-                                  .row
-                                    .col-xs-6
+                                  .row.lists-row
+                                    .col-xs-4
                                       %ul.wlbl-toggle-list
                                         %li
                                           %label.toggle-switch
-                                            %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak"}
-                                            %span.toggle-slider
+                                            %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
+                                            %span.toggle-slider#wl-weak-slider
                                           WL - Weak
                                         %li
                                           %label.toggle-switch
-                                            %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med"}
-                                            %span.toggle-slider
-                                          WL - Medium
-                                        %li
-                                          %label.toggle-switch
-                                            %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy"}
-                                            %span.toggle-slider
-                                          WL - Heavy
-                                    .col-xs-6
+                                            %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
+                                            %span.toggle-slider#bl-weak-slider
+                                          BL - Weak
+                                    .col-xs-4
                                       %ul.wlbl-toggle-list
                                         %li
                                           %label.toggle-switch
-                                            %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak"}
-                                            %span.toggle-slider
-                                          BL - Weak
+                                            %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-med', onclick: 'prepare_for_wbrs_preview(this)'}
+                                            %span.toggle-slider#wl-med-slider
+                                          WL - Medium
                                         %li
                                           %label.toggle-switch
-                                            %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med"}
-                                            %span.toggle-slider
+                                            %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-med', onclick: 'prepare_for_wbrs_preview(this)'}
+                                            %span.toggle-slider#bl-med-slider
                                           BL - Medium
+                                    .col-xs-4
+                                      %ul.wlbl-toggle-list
                                         %li
                                           %label.toggle-switch
-                                            %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
-                                            %span.toggle-slider
+                                            %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
+                                            %span.toggle-slider#wl-heavy-slider
+                                          WL - Heavy
+                                        %li
+                                          %label.toggle-switch
+                                            %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
+                                            %span.toggle-slider#bl-heavy-slider
                                           BL - Heavy
+
+                                  -# threat cats row (2 of 2 for this file)
+                                  .row.dropdown-tool-grey-row.threat-cat-row.hidden
+                                    .threat-cat-note
+                                      %label.content-label-sm
+                                        Threat Categories
+                                        %span.threat-cat-required
+                                          *Required for adding to any blacklist.
+                                          %span.five-note Up to 5 can be selected
+                                    .threat-cat-area
+                                      .row
+                                      - Wbrs::ThreatCategory.selections.each do |label, value|
+                                        .col-md-6.threat-cat-cell
+                                          = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
+                                          = label
 
                                   .comment-wrapper
                                     %label.content-label-sm Comment
@@ -300,18 +609,19 @@
 
                         %span.dropdown
                           %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{onclick: "get_current_reptool(this, 'research')", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          -# TODO - these items don't have entry ids since they are fresh lookups, need to avoid the id syntax below as its creating dup ids
                           .dropdown-menu.toolbar-dropdown.reptool-inline-dropdown{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
                             = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                               .dispute-reptool-adjust-wrapper
                                 %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
                                 %input.adjust-reptool-bl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
-                                %h3 Adjust RepTool Classification
+                                %h3.reptool-dropdown-header Adjust RepTool Classification
                                 %table.dispute_tool_current
                                   %thead
                                     %tr
                                       %th.content-label-sm Active Classes
                                       %th.content-label-sm Expiration
-                                      %th.content-label-sm Comment
+                                      %th.content-label-sm.th-reptool-comment Comment
                                   %tbody
                                   -#  Will call up-to-date information from the api
                                 .inline-tool-content-wrapper
@@ -342,6 +652,9 @@
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers', onclick: 'reptool_form_prep(this, "individual")'}
                                                 attackers
                                             %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'banking_fraud', onclick: 'reptool_form_prep(this, "individual")'}
+                                                banking_fraud
+                                            %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon', onclick: 'reptool_form_prep(this, "individual")'}
                                                 bogon
                                             %li
@@ -353,25 +666,40 @@
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining', onclick: 'reptool_form_prep(this, "individual")'}
                                                 cryptomining
-                                        .col-xs-4
-                                          %ul
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga', onclick: 'reptool_form_prep(this, "individual")'}
                                                 dga
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit', onclick: 'reptool_form_prep(this, "individual")'}
                                                 exploitkit
+                                        .col-xs-4
+                                          %ul
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'high_risk', onclick: 'reptool_form_prep(this, "individual")'}
+                                                high_risk
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'ioc', onclick: 'reptool_form_prep(this, "individual")'}
+                                                ioc
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'link_sharing', onclick: 'reptool_form_prep(this, "individual")'}
+                                                link_sharing
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malicious', onclick: 'reptool_form_prep(this, "individual")'}
+                                                malicious
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware', onclick: 'reptool_form_prep(this, "individual")'}
                                                 malware
                                             %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'newly_seen', onclick: 'reptool_form_prep(this, "individual")'}
+                                                newly_seen
+                                            %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy', onclick: 'reptool_form_prep(this, "individual")'}
                                                 open_proxy
+                                        .col-xs-4
+                                          %ul
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay', onclick: 'reptool_form_prep(this, "individual")'}
                                                 open_relay
-                                        .col-xs-4
-                                          %ul
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing', onclick: 'reptool_form_prep(this, "individual")'}
                                                 phishing
@@ -382,6 +710,9 @@
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam', onclick: 'reptool_form_prep(this, "individual")'}
                                                 spam
                                             %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spyware', onclick: 'reptool_form_prep(this, "individual")'}
+                                                spyware
+                                            %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious', onclick: 'reptool_form_prep(this, "individual")'}
                                                 suspicious
                                             %li
@@ -389,13 +720,10 @@
                                                 tor_exit_node
                                   .comment-wrapper
                                     %label.content-label-sm RepTool Comment
-                                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                                      \
-                                      \
-                                      \--------------------------
+                                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-inline{placeholder: 'Reason behind this change...'}
+                                    .reptool-generated-comment
                                       INDIVIDUAL RESEARCH SUBMISSION:
                                       &#x000A; #{entry.hostlookup}
-                                    %hr.thin
                                   .button-row-center
                                     %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_individual_reptool(this)', disabled: true}
                                       Submit Changes
@@ -404,67 +732,69 @@
                   %tr.research-overview-row
                     %td
                     -#Expander area
-                    %td.research-table-details-wrapper{colspan: '7'}
+                    %td.research-table-details-wrapper{colspan: '5'}
                       %table
                         %tr
-                          %td.input-col
-                            %span.research-table-input-wrapper.wbrs-input-wrapper
-                              %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.input-col.wbrs-input-wrapper
+                            %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.wbrs-score-label-cell
                             %label WBRS
-                          %td.text-center.entry-data-wbrs-score
+                          %td.text-center.entry-data-wbrs-score.wbrs-score-cell
                             = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
-                          %td
-                            %label WBRS Rule Hits
-                          %td.text-center
-                            = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count
-                          %td
+                          %td.wbrs-rules-label-cell
                             %label WBRS Rules
-                          %td.rule-hits-col-list
-                            - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count == 0
+                          %td.text-center.wbrs-rule-hits-cell
+                            - wbrs_rules = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS' && hit.is_multi_ip_rulehit != true}
+                            = wbrs_rules.count
+                          %td.rule-hits-col-list.wbrs-rules-cell
+                            - if wbrs_rules.count == 0
                               %span.missing-data No rule hits
                             - else
-                              - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.each do |wbrs_hit|
+                              - wbrs_rules.each do |wbrs_hit|
                                 - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
                                   %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': wbrs_hit.name}
-                                    = wbrs_hit.name
-                                    - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                      = ","
+                                    - if wbrs_hit.equal? wbrs_rules.last
+                                      = wbrs_hit.name
+                                    - else
+                                      = "#{wbrs_hit.name}, "
                                 - else
-                                  = wbrs_hit.name
-                                  - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                    = ","
-                          %td.input-col
-                            %span.research-table-input-wrapper.xbrs-input-wrapper
-                              %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                                  - if wbrs_hit.equal? wbrs_rules.last
+                                    = wbrs_hit.name
+                                  - else
+                                    = "#{wbrs_hit.name}, "
+                          %td.input-col.xbrs-input-wrapper
+                            %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.xbrs-history-label-cell
                             %label XBRS History
-                          %td.text-center
+                          %td.text-center.xbrs-history-cell
                             - unless entry.hostlookup.nil?
                               = entry.find_xbrs[1]['data'].count
-                          %td.input-col
-                            %span.research-table-input-wrapper.virus-total-input-wrapper
-                              %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.input-col.virus-total-input-wrapper
+                            %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.virustotal-label-cell
                             %label Virustotal
-                          %td.text-center
+                          %td.text-center.virustotal-cell
                             - if entry.virustotals.count == 0
                               %span.missing-data N/A
                             - else
                               = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
-                              \\
+                              \/
                               = entry.virustotals.count
-                          %td.left-bordered
+                          %td.left-bordered.wlbl-tc-label-cell
                             %label WL/BL
-                          %td
+                          %td.wlbl-and-tc-area.wlbl-tc-cell
                             - if !entry.respond_to?(:consolidated_wlbl_strings)
                               %span.missing-data Not currently on a list
                             - else
                               %span.wlbl-table-result
                                 = entry.consolidated_wlbl_strings
-                              %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog('#{entry.hostlookup}')"}
+                              %span.wlbl-tc-research-span
+                          %td.history-button-cell
+                            %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog('#{entry.hostlookup}')"}
 
-
-                          %td.left-bordered
+                          %td.left-bordered.referenced-tickets-label-cell
                             %label Referenced on
-                          %td
+                          %td.referenced-tickets-cell
                             - referenced_entries = entry.research_referenced_tickets
                             - referenced_entries_size = referenced_entries.size
                             - if referenced_entries_size < 1
@@ -483,19 +813,19 @@
                                             = reference.id
                                         %td
                                           = reference.case_opened_at
+
                         %tr
-                          %td.input-col
-                            %span.research-table-input-wrapper.sbrs-input-wrapper
-                              %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                            %label SBRS
-                          %td.text-center= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
+                          %td.input-col.sbrs-input-wrapper
+                            %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %td
-                            %label SBRS Rule Hits
-                          %td.text-center
-                            = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count
+                            %label SBRS
+                          %td.text-center.sbrs-score-cell= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
                           %td
                             %label SBRS Rules
-                          %td.rule-hits-col-list
+                          %td.text-center.sbrs-rule-hits-cell
+                            = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count
+
+                          %td.rule-hits-col-list.sbrs-rules-cell
                             - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count == 0
                               %span.missing-data No rule hits
                             - else
@@ -509,17 +839,17 @@
                                   = sbrs_hit.name
                                   - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
                                     = ","
-                          %td.input-col
-                            %span.research-table-input-wrapper.crosslisted-input-wrapper
-                              %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.input-col.crosslisted-input-wrapper
+                            %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.crosslisted-urls-label-cell
                             %label Crosslisted URLs
-                          %td.text-center
+                          %td.text-center.crosslisted-urls-cell
                             = entry.wbrs_xlist.count
-                          %td.input-col
-                            %span.research-table-input-wrapper.reptool-input-wrapper
-                              %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.input-col.reptool-input-wrapper
+                            %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td
                             %label RepTool Class
-                            %td.entry-reptool-data
+                            %td.entry-reptool-data.reptool-class-cell
                               - if entry.classifications.first.nil?
                                 %span.missing-data.entry-reptool-class Not on RepTool
                               - else
@@ -529,10 +859,68 @@
                                   = entry.blacklist.status
                                 %span.inline-col-breakup.entry-reptool-comment
                                   = entry.blacklist.metadata&.fetch('VRT', {})['comment']
-                            %td.left-bordered
+                            %td.left-bordered{colspan: '3'}
                               %label Umbrella
-                            %td.text-center
+                            %td.text-center.umbrella-cell{colspan: '2'}
                               = entry.umbrellaresult
+
+                  - if entry.uri?
+                    -#If entry is uri and has a resolved host ip
+                    %tr.research-uri-ip-query-row
+                      %td{rowspan: '2'}
+                        -#Expander area
+                      %td.input-col.ip-label-col{rowspan: '2'}
+                        -# IP label
+                      %td.dual-edit-field{colspan: '2', 'data-id': entry.id, 'data-field': 'host-ip'}
+                        %span.entry-resolved-ip-content{id: "resolved-ip-content-no-#{i}"}
+                          = entry.web_ips
+                        %input.table-ip-input{type:'text', value: "#{entry.web_ips}", id: "table-ip-input-no-#{i}"}
+                      %td.text-right.no-padding-right{colspan: '2'}
+                        %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses', id: "edit-ip-result-no-#{i}"}
+                          Edit IP Addresses
+                        %button.save-button.inline-save-ip-button.esc-tooltipped{title: 'Query IP Addresses', id: "save-ip-result-no-#{i}"}
+                          Query IP Addresses
+                        %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses', id: "cancel-ip-result-no-#{i}"}
+
+                    %tr.research-uri-ip-data-row.research-page-ip-query-details
+                      %td.research-table-details-wrapper{colspan: '4'}
+                        %table
+                          %tr.single-details-row
+                            %td.wbrs-rules-label-cell
+                              %label WBRS
+                            %td.text-center.no-border.uri-ip-wbrs-score
+                              - unless entry[:score].nil?
+                                = entry[:score]
+                              - else
+                                %span.missing-data
+                                  No score.
+                            %td
+                              %label WBRS Rules
+                            %td.text-center.uri-ip-wbrs-rule-total
+                              - ip_rule_hits = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }
+                              = ip_rule_hits.length
+                            %td.uri-ip-wbrs-rules
+                              - unless ip_rule_hits.length == 0
+                                - ip_rule_hits.each do |wbrs_hit|
+                                  - if wbrs_hit == ip_rule_hits.last
+                                    = wbrs_hit.name
+                                  - else
+                                    = "#{wbrs_hit.name}, "
+                              - else
+                                %span.missing-data
+                                  No rules.
+                            %td
+                              %label Threat Category
+                            %td.uri-ip-category
+                              - unless entry[:multi_wbrs_threat_category].nil?
+                                - ip_tc_record = JSON.parse entry[:multi_wbrs_threat_category]
+                                - ip_tc = ip_tc_record.to_sentence(two_words_connector: ', ', last_word_connector: ', ')
+                                = ip_tc
+                            %td
+                              %label Proxy URI
+                            %td.uri-ip-proxy
+                              = entry[:proxy_uri]
+
                   %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                     %td.expanded-row{colspan: '8'}
                       .expanded-row-data-wrapper
@@ -569,6 +957,12 @@
                                         %td= wbrs_hit.mnemonic
                                         %td
                                           -#Put weight of rule here
+                                      -# if any wbrs rulehits are returned from querying uri + ip each do
+                                      -#  %tr
+                                      -#    %td.uri-plus-ip-rule-indicator
+                                      -#    %td= wbrs_hit.name
+                                      -#    %td= wbrs_hit.mnemonic
+                                      -#    %td
                             .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header
                                 SBRS Rule Hit Details

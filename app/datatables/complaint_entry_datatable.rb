@@ -78,6 +78,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           tags:             complaint.complaint_tags.map{|tag| tag&.name },
           submitter_type:   complaint.submitter_type,
           description:      complaint.description,
+          uri_as_categorized: complaint_entry.uri_as_categorized,
 
           DT_RowId:         complaint_entry.id,
       }
@@ -87,7 +88,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   # private
 
   def get_raw_records
-    ComplaintEntry.all
+    ComplaintEntry.includes(complaint: {customer: :company}, user: {})
   end
 
   def filter_records(records)

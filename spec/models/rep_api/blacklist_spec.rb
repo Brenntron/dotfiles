@@ -1,7 +1,6 @@
 describe RepApi::Blacklist do
   let(:classifications_json) do
-    %w(attackers bogon bots cnc dga exploitkit malware open_proxy open_relay
-       phishing response spam suspicious tor_exit_node).to_json
+    %w(attackers banking_fraud bogon bots cnc cryptomining dga exploitkit high_risk ioc link_sharing malicious malware newly_seen open_proxy open_relay phishing response spam spyware suspicious tor_exit_node).to_json
   end
   let(:get_blacklist_json) do
     {

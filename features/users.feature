@@ -36,10 +36,8 @@ Feature: User Accounts
   ### Scenarios User management ###
 
   @javascript
-
   Scenario: A regular user should see a not found flash message
-    Then pending
-    Given a user with role "analyst" exists and is logged in
+    Given a user with role "webrep user" exists and is logged in
     Given I wait for "3" seconds
     When I goto "/escalations/users/1001"
     Then I should see could not find user "1001" flash massage
@@ -346,6 +344,13 @@ Feature: User Accounts
       And I goto "/escalations/other_admin_tools/delayed_job"
       Then I should see "Overview"
       And I should see "Enqueued Jobs"
+
+
+  @javascript
+  Scenario: A webcat user should have access to the application token
+    Given a user with id "1" has a role "webcat user" and is logged in
+    And  I goto "escalations/users/1"
+    Then I should see content "APPLICATION TOKEN" within ".user-access-wrapper"
 
 
   ### Scenarios User Role access ###

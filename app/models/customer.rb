@@ -2,16 +2,23 @@ class Customer < ApplicationRecord
   belongs_to :company, optional:true
   has_many :complaints
   has_many :disputes
-  has_many :file_reputation_tickets
+  has_many :file_reputation_disputes
 
   validates :email, presence: true, uniqueness: true
 
   delegate :name, to: :company, allow_nil: true, prefix: true
 
   def self.thread_safe_find_or_create_by(attributes)
-    with_advisory_lock("customer_create", timeout_seconds: 20) do
-      find_by(email: attributes[:email]) || create(attributes)
+    begin
+      with_advisory_lock("customer_create", timeout_seconds: 20) do
+        find_by(email: attributes[:email]) || create(attributes)
+      end
+    rescue Exception => e
+      Rails.logger.error e
+      raise "Failed to create new Customer with the following attributes: '#{attributes}'"
     end
+
+
   end
 
   def self.customer_from_ruleui(data)

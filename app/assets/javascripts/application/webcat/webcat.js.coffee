@@ -5,7 +5,37 @@ window.td_truncate = (str, max, long) ->
   long = long or '...'
   if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
 
+window.def_includes = (check, str) ->
+  return check.indexOf(str) != -1
+
+window.timeMatch = (age)->
+  time = 'exceeds time'
+  if !def_includes(age, 'months')
+    if def_includes(age, 'm') && def_includes(age, 's')
+      time = 'minutes'
+    else if def_includes(age, 'h') && def_includes(age, 'm')
+      time =  'hours'
+  return time
+
+window.wbrs_display = (score) ->
+  score = parseFloat(score)
+  if score == NaN
+    return 'unknown'
+  else if  score <= -6
+    return 'untrusted'
+  else if score <= -3
+    return 'questionable'
+  else if score <= 0
+    return 'neutral'
+  else if score < 6
+    return 'favorable'
+  else if score >= 6
+    return 'trusted'
 $ ->
+
+  # webcat: have top navigation bar scroll with page per user request
+  if $('body').hasClass("escalations--webcat--complaints-controller")
+    $('#nav-banner').addClass('fixed-nav')
 
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
@@ -19,24 +49,51 @@ $ ->
         localStorage.webcat_search_name = ''
         localStorage.webcat_search_conditions = JSON.stringify({value:webcat_search_string})
       refresh_url()
+
   $('#filter-cases-list a').on 'click', (e)->
     localStorage.setItem('webcat_reset_page', true)
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
+    user_id = assignee_input[0].selectize.items
+    tags = tag_input[0].selectize.items
+    company = $('#company-input')[0].selectize.items
+    status = $('#status-input')[0].selectize.items
+    resolution = $('#resolution-input')[0].selectize.items
+    customer_name = $('#name-input')[0].selectize.items
+    { items, options } = category_input[0].selectize
+    complaints = $('#complaint-input')[0].selectize.items
+    channels = $('#channel-input')[0].selectize.items
+    entry_ids = $('#entryid-input')[0].selectize.items
+    complaint_ids = $('#complaintid-input')[0].selectize.items
 
-    if !$('.selectize-control').closest('.form-group').hasClass('hidden')
-      tags = tag_input[0].selectize.items
-      { items, options }= category_input[0].selectize
-      if tags.length
-        form['tags'] = tags.join()
-      if items.length
-        form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
+    if tags.length
+      form['tags'] = tags.join(', ')
+    if items.length
+      form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
+    if company.length
+      form['company'] = company.join(', ')
+    if status.length
+      form['status'] = status.join(', ')
+    if resolution.length
+      form['resolution'] = resolution.join(', ')
+    if customer_name.length
+      form['customer_name'] = customer_name.join(', ')
+    if complaints.length
+      form['ip_or_uri'] = complaints.join(', ')
+    if channels.length
+      form['channel'] = channels.join(', ')
+    if entry_ids.length
+      form['entry_id'] = entry_ids.join(', ')
+    if complaint_ids.length
+      form['complaint_id'] = complaint_ids.join(', ')
+    if user_id.length
+      form['user_id'] = user_id.join(', ')
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
       name = name.toLowerCase().replace(/-/g, '_')
-      if name != 'tags' && name != 'category'
+      if name != 'tags' && name != 'category'&&  name != 'companies'
         form[name] = value
 
     localStorage.webcat_search_type = 'advanced'
@@ -54,6 +111,7 @@ $ ->
       company_name: form.company
       domain: form.domain
       tags: form.tags
+      user_id: form.user_id
       submitted_older: form.date_submitted_older
       submitted_newer: form.date_submitted_newer
       modified_older: form.date_modified_newer
@@ -126,15 +184,19 @@ $ ->
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
 
-  $('.cat_new_url').selectize {
-    persist: false,
-    create: false,
-    maxItems: 5,
-    valueField: 'category_id',
-    labelField: 'category_name',
-    searchField: ['category_name', 'category_code'],
-    options: AC.WebCat.createSelectOptions()
-  }
+
+  for select in $('select.cat_new_url')
+
+    $(select).selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      closeAfterSelect: true,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: AC.WebCat.createSelectOptions("##{select.id}")
+    }
 
   url = $('#complaints-index').data('source')
   current_url = window.location.href
@@ -155,6 +217,8 @@ $ ->
       if condition != ''
         if condition_name == 'id'
           condition_name = 'Entry Id'
+        if condition_name == 'user_id'
+          condition_name = 'Assignee'
         condition_name = condition_name.replace(/_/g, " ").toUpperCase()
         condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
 
@@ -168,16 +232,19 @@ $ ->
 
     if search_condition_tooltip.length > 0
       container.css('display', 'inline-block')
-      container.addClass('esc-tooltipped')
-      list = document.createElement('ul')
-      $(list).addClass('tooltip_content')
+      list = $(container).find('#search-tooltip_content')[0]
       for  li in search_condition_tooltip
         item = document.createElement('li')
         item.appendChild(document.createTextNode(li))
         list.appendChild(item)
-      container.prepend(list)
-      $(list).hide()
-      container.attr('data-tooltip-content', '.tooltip_content')
+      container.attr('data-tooltip-content', '#search-tooltip_content')
+      container.tooltipster(
+        theme: [
+          'tooltipster-borderless'
+          'tooltipster-borderless-customized'
+        ]
+        contentCloning: true
+      )
 
   build_header = (data) ->
     ###
@@ -238,6 +305,30 @@ $ ->
 
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
+          initComplete: ->
+            input = $('.dataTables_filter input').unbind()
+            self = @api()
+
+            $searchButton = $('<button class="dt-button dt-search-button esc-tooltipped" title="Search">').click(->
+              self.search(input.val()).draw()
+              return
+            )
+            $clearButton = $('<button class="dt-button dt-search-clear-button esc-tooltipped" title="Clear">').click(->
+              input.val ''
+              $searchButton.click()
+              return
+            )
+            $('.dataTables_filter').append $clearButton, $searchButton
+
+            # properly init these search/clear icons
+            $('.dt-button').tooltipster
+              theme: [
+                'tooltipster-borderless'
+                'tooltipster-borderless-customized'
+                'tooltipster-borderless-comment'
+              ]
+
+            return
           lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
           processing: true
           serverSide: true
@@ -383,32 +474,20 @@ $ ->
 #               age column
                 width: '40px'
                 render: ( data, type, full, meta) ->
-                  { age, case_opened_at } = full
-                  if age != "<1 hr"
-                    dispute_duration = moment( case_opened_at ).fromNow()
-                  if dispute_duration.includes('minute')
-                    dispute_latency = age
-                  if dispute_duration.includes('hour')
-                    hours = parseInt(dispute_duration.replace(/[^0-9]/g, ''))
-                  if hours <= 3
-                    dispute_latency = age
-                  else
-                    dispute_latency = '<span class="ticket-age-over3hr">' + age + '</span>'
-                  if hours > 12
-                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
-                  else
-                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
-                  if dispute_duration.includes('day')
-                    day = parseInt(age.replace(/[^0-9]/g, ''))
-                  if day >= 1
-                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
-                  if dispute_duration.includes('months')
-                    month = parseInt(age.replace(/[^0-9]/g, ''))
-                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
-                  if dispute_duration.includes('year')
-                    year = parseInt(age.replace(/[^0-9]/g, ''))
-                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
-                  dispute_latency
+                  { age } = full
+                  time = timeMatch(age)
+                  switch ( time )
+                    when 'minutes'
+                      age_class = ''
+                    when 'hours'
+                      hour = parseInt( age.split("h")[0] )
+                      if hour >= 3 && hour < 12
+                        age_class = 'ticket-age-over3hr'
+                      else if hour > 12
+                        age_class = 'ticket-age-over12hr'
+                    when 'exceeds time'
+                      age_class = 'ticket-age-over12hr'
+                  return "<span class='#{age_class}'>#{age}</span>"
               }
               {
                 data: 'status'
@@ -440,19 +519,32 @@ $ ->
                   {subdomain, entry_id} = full
 
                   if subdomain
-                    '<span id="subdomain_' + entry_id + '">' + subdomain + '</span>'
+                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + subdomain + '</span>'
                   else
-                    '<span id="subdomain_' + entry_id + '">' + '</span>'
+                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + '</span>'
                 width: '50px'
               }
               {
                 data: 'domain'
                 render:( data, type, full, meta )->
-                  { domain, ip_address, entry_id } = full
+                  { domain, ip_address, entry_id, subdomain, path } = full
+                  data_full = ''
+                  if subdomain != ''
+                    subdomain += '.'
+                    data_full = subdomain
+                  if domain != ''
+                    data_full += domain
+                  if path != ''
+                    data_full += path
+                  if ip_address != ''
+                    data_full = ip_address
+                  if data_full != ''
+                    data_full = "data-full=" + data_full
+                  title = "title=" + domain
                   if domain
-                    '<p class="input-truncate esc-tooltipped" id="domain_' + entry_id + '" title="' + domain + '">' + domain + '</p>'
+                    "<p class='input-truncate esc-tooltipped webcat-domain-holder' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
                   else
-                    '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
+                    "<a id='domain_#{entry_id}' #{data_full} href='http://#{ip_address}' target='blank'>#{ip_address}</a>"
               }
               {
                 data: 'path'
@@ -483,10 +575,16 @@ $ ->
               }
               {
                 data: 'wbrs_score'
-                width: '20px'
+                width: '55px'
                 render: ( data, type, full, meta ) ->
                   { wbrs_score, entry_id } = full
-                  '<span id="wbrs_score_' + entry_id + '">' + wbrs_score + '</span>'
+                  rep = wbrs_display(wbrs_score)
+                  wbrs_score = parseFloat(wbrs_score).toFixed(1)
+                  if rep == undefined then rep = 'unknown'
+                  if rep == 'unknown' then wbrs_score = '--'
+                  tooltip_rep = rep.toUpperCase()
+                  icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
+                  return "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
               }
               {
                 data: 'submitter_type'
@@ -510,9 +608,12 @@ $ ->
         select: 'style': 'os'
         responsive: true)
 
+
   if $('#complaints-index').length
-    $('#complaints-index_filter input').addClass('table-search-input');
     build_complaints_table()
+
+    # Make the search prettier
+    $('#complaints-index_filter input').addClass('restricted-table-search-input');
 
     $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
       $(this).focus()
@@ -546,14 +647,33 @@ $ ->
           options.push {name: x}
         return options
 
+    assignee_input = $('#assignee-input').selectize {
+      persist: false
+      create: false
+      valueField: 'name',
+      labelField: 'display_name',
+      searchField: ['name', 'display_name'],
+      options: AC.WebCat.createAssigneeOptions()
+      render:
+        option: (item, escape) ->
+          name = item.display_name
+          user_id = item.name
+          '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(user_id) + ')' + '</span></div>'
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
     tag_input = $('#tags-input').selectize {
       persist: false
       create: false
-      maxItmes: null
-      valueField: 'name'
-      labelField: 'name'
-      searchField: 'name'
+      valueField: 'name',
+      labelField: 'name',
       options: createSelectOptions()
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     category_input = $('#category-input').selectize {
       persist: false,
@@ -562,9 +682,236 @@ $ ->
       valueField: 'category_id',
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions()
+      options: AC.WebCat.createSelectOptions('#category-input')
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
+    company_input = $('#company-input').selectize {
+      persist: false,
+      create: false,
+      valueField: 'company_name',
+      labelField: 'company_name',
+      searchField: 'company_name',
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
+    status_input = $('#status-input').selectize {
+      persist: false,
+      create: false,
+      maxItems: 6,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
+      options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"}, {name: "ACTIVE"},
+               {name: "COMPLETED"}, {name: "PENDING"}, {name: "REOPENED"}]
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
+    resolution_input = $('#resolution-input').selectize {
+      persist: false,
+      create: false,
+      maxItems: 3,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
+      options: [{name: "FIXED"}, {name: "INVALID"}, {name: "UNCHANGED"}, {name: "DUPLICATE"}]
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
+    customer_input = $('#name-input').selectize {
+      persist: false,
+      create: false,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
+    complaint_input = $('#complaint-input').selectize {
+      persist: false,
+      create: (input) ->
+        {
+          value: input
+          text: input
+        }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
+    channel_input = $('#channel-input').selectize {
+      persist: false,
+      create: false,
+      maxItems: 2,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
+      options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"}]
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
+    entry_ids = $('#entryid-input').selectize {
+      delimiter: ',',
+      persist: false,
+      create: (input) ->
+        {
+          value: input
+          text: input
+        }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
+    complaint_ids = $('#complaintid-input').selectize {
+      delimiter: ',',
+      persist: false,
+      create: (input) ->
+        {
+          value: input
+          text: input
+        }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
+
+
+    window.clearSelectize = (input) ->
+      $("##{input}")[0].selectize.clear()
 
 $('#exampleModal').on 'shown.bs.modal', ->
   $('button.toolbar-button.cat-btn').addClass('active')
 
+
+$ ->
+
+  $('.toggle-vis-webcat').each ->
+    table = $('#complaints-index').DataTable()
+    column = table.column($(this).attr('data-column'))
+    checkbox = $(this).find('input')
+
+    if $(checkbox).prop('checked')
+      column.visible(true)
+    else
+      column.visible(false)
+
+    $(this).click (e) ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+      column.visible(!column.visible())
+
+    $(checkbox).click (e) ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+
+
+  # webcat > get the show/hide state for these checkboxes
+  if window.location.pathname == '/escalations/webcat/complaints'
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/user_preferences/"
+      data: {name: 'WebCatColumns'}
+      success: (response) ->
+        response = JSON.parse(response)
+
+        $.each response, (column, state) ->
+          if state == true
+            $("##{column}-checkbox").prop('checked', true)
+            $('#complaints-index').DataTable().column("##{column}").visible true
+          else
+            $("##{column}-checkbox").prop('checked', false)
+            $('#complaints-index').DataTable().column("##{column}").visible false
+
+    )
+
+  # webcat > on click any show/hide column, update user prefs table
+  $('.toggle-vis-webcat').on "click", ->
+    data = {}
+    ## retain commented line below
+    # data['important'] = $("#important-checkbox").is(':checked')
+    data['age'] = $("#age-checkbox").is(':checked')
+    data['status'] = $("#status-checkbox").is(':checked')
+    data['tags'] = $("#tags-checkbox").is(':checked')
+    data['subdomain'] = $("#subdomain-checkbox").is(':checked')
+    data['domain'] = $("#domain-checkbox").is(':checked')
+    data['path'] = $("#path-checkbox").is(':checked')
+    data['primary'] = $("#primary-checkbox").is(':checked')
+    data['suggested'] = $("#suggested-checkbox").is(':checked')
+    data['wbrs'] = $("#wbrs-checkbox").is(':checked')
+    data['submittertype'] = $("#submittertype-checkbox").is(':checked')
+    data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
+    data['assignee'] = $("#assignee-checkbox").is(':checked')
+
+    std_msg_ajax(
+      url: "/escalations/api/v1/escalations/user_preferences/update"
+      method: 'POST'
+      data: {data, name: 'WebCatColumns'}
+      dataType: 'json'
+      success: (response) ->
+        console.log 'Webcat column show/hide preferences are updated in user_prefs table.'
+    )
+
+  # webcat > complaints show page, disable two Submit toolbar buttons on page load
+  if $('body').hasClass('escalations--webcat--complaints-controller')
+    $('#master-submit, #index_update_resolution').prop('disabled','disabled')
+
+  # webcat > complaints show page, ensure this JS gets called
+  if $('body').hasClass('escalations--webcat--complaints-controller') && $('body').hasClass('show-action')
+    check_wbnp_status()
+
+  # webcat > reports page, show full metrics banner at top, not the streamlined one
+  if $('body').hasClass("escalations--webcat--reports-controller")
+    $('#tooltip-wbnp').empty()
+    $('.complaints-metrics-banner').addClass('hidden')
+    $('.webcat-reports-only').removeClass('hidden')
+
+  # wbnp report status link shows a tooltip table
+  $('.complaints-mgt-area #wbnp-report-status-link').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
+    contentCloning: true
+    side: 'bottom'
+    trigger: 'hover'
+
+
+# Prevent the many selectizes from running into each other
+window.toggle_selectize_layer = (input, focus) ->
+  input = input.$control_input[0]
+  select_parent = $(input).parents('.form-control')[0]
+  if focus == 'true'
+    $(select_parent).css('z-index', '4')
+  else
+    $(select_parent).css('z-index', '2')
+
+
+$ ->
+  # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
+  $('#complaints-index').on 'draw.dt', ->
+    $('#complaints-index .tooltipstered').tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr
+    $('#complaints-index .esc-tooltipped').tooltipster
+      restoration: 'previous'
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
+
+  # one-off init for 'clear search results' icon
+  $('#webcat-index-title #refresh-filter-button').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]

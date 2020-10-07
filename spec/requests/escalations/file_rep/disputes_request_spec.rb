@@ -8,6 +8,10 @@ RSpec.describe API::V1::Escalations::FileRep::Disputes, type: :request do
     double('BugzillaRest::Session', create_bug: bug_proxy)
   end
 
+  let(:sha256_lookup_result) do
+    { 'hits' => { 'total' => 0 } }
+  end
+
   before(:all) do
     @current_user = FactoryBot.create(:current_user)
     @current_user.roles << FactoryBot.create(:file_rep_role)
@@ -30,6 +34,7 @@ RSpec.describe API::V1::Escalations::FileRep::Disputes, type: :request do
     it 'can create a file rep dispute via the form' do
       allow(BugzillaRest::Session).to receive(:new).and_return(creater_session)
       allow(FileReputationDispute).to receive(:new).and_return(file_rep_noscore)
+      allow(FileReputationApi::SampleZoo).to receive(:sha256_lookup).and_return(sha256_lookup_result)
       create_form_params = {
           shas_array: %w[
             da8aa2429715ea57c142186130706315c8fc10b1b1fb2d416e63a2ed2734e104

@@ -33,6 +33,20 @@ module API
             end
           end
 
+          resource "escalations/webcat/customers_names_selectize" do
+
+            desc "get all customers' names as objects (for Selectize)"
+            params do
+            end
+
+            get "" do
+
+              customers = Customer.all.map{|customer| {name: customer.name}}
+              customers.sort_by {|hash| hash[:name]}.to_json
+
+            end
+          end
+
           resource "escalations/webcat/customers_company_name" do
 
             desc "get all customers' names"

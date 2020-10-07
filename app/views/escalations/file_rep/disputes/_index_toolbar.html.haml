@@ -55,11 +55,11 @@
     %div
       %label.toolbar-section-label
         Assignee
-      %button.toolbar-button.take-ticket-button-full.esc-tooltipped.toolbar-button-spacer{title: 'Assign to me', onclick: 'filerep_take_disputes();'}
+      %button.toolbar-button.take-ticket-button-full.esc-tooltipped.toolbar-button-spacer{title: 'Assign to me (alt + t)', onclick: 'filerep_take_disputes();'}
         %span.toolbar-button-text
           Take Ticket
       %span.dropdown
-        %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text
             Change Assignee
         .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
@@ -72,7 +72,7 @@
             %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_file_rep_index_change_assignee();'}
               Assign
 
-  - if can? :update, @file_rep_dispute
+  - if can?(:update, FileReputationDispute)
     %div
       %label.toolbar-section-label
         Edit Ticket
@@ -261,9 +261,9 @@
       File
     %form#disputes-index-export-form{action: escalations_file_rep_disputes_path(format: :xlsx), method: :get,  onsubmit: 'return false'}
       = hidden_field_tag('data_json', '{}', id: 'index-export-data-input')
-      %button.toolbar-button.toolbar-button-spacer.export-button.esc-tooltipped{onclick: 'export_file_rep_all();', title: 'Export All to CSV'}
+      %button.toolbar-button.toolbar-button-spacer.export-button.esc-tooltipped{onclick: 'export_file_rep_all();', title: 'Export All to CSV (alt + ctrl + shift + p)'}
         %span.toolbar-button-text
           Export All to CSV
-      %button.toolbar-button.export-button.esc-tooltipped{onclick: 'export_file_rep_selected();', title: 'Export Selected to CSV'}
+      %button.toolbar-button.export-button.esc-tooltipped{onclick: 'export_file_rep_selected();', title: 'Export Selected to CSV (alt + ctrl + p)'}
         %span.toolbar-button-text
           Export Selected to CSV

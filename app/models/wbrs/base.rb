@@ -1,6 +1,6 @@
 class Wbrs::Base
   include ActiveModel::Model
-
+  AdhocErrorResponse = Struct.new(:body, :error, :code)
   def self.host
     @host ||= Rails.configuration.wbrs.host || 'localhost'
   end
@@ -104,23 +104,49 @@ class Wbrs::Base
 
   # TODO replace with new_request
   def self.make_post_request(path:, body:)
-    if gssnegotiate?
-      HTTPI.post(request(path: path, body: body), :curb)
-    else
-      HTTPI.post(request(path: path, body: body))
+    begin
+      if gssnegotiate?
+        HTTPI.post(request(path: path, body: body), :curb)
+      else
+        HTTPI.post(request(path: path, body: body))
+      end
+    rescue => except
+      Rails.logger.error("Something is wrong with RuleAPI connection")
+      Rails.logger.error(except)
+      Rails.logger.error(except.backtrace.join("\n"))
+
+      return_response = AdhocErrorResponse.new
+      return_response.body = "{\"data\":[]}"
+      return_response.error = "RuleApi cannot be reached"
+      return_response.code = 404
+      return_response
     end
   end
 
   def self.request_error_handling(response)
     case
-      when 300 > response.code
-        response
-      when 404 == response.code
-        body = JSON.parse(response.body)
-        raise Wbrs::WbrsNotFoundError, "HTTP response #{response.code} #{body['Error']}"
-      else
-        body = JSON.parse(response.body)
-        raise Wbrs::WbrsError, "HTTP response #{response.code} #{body['Error']}"
+    when 300 > response.code
+      response
+    when 404 == response.code
+      body = JSON.parse(response.body) rescue nil
+      error = body ? body['Error'] : nil
+      #raise Wbrs::WbrsNotFoundError, "HTTP response #{response.code} #{error}"
+      #{:error => "Wbrs Not Found Error", :message => "HTTP response #{response.code} #{error}"}.to_json
+      Rails.logger.error("HTTP response #{response.code} #{error}")
+      return_response = AdhocErrorResponse.new
+      return_response.body = "{\"data\":[]}"
+      return_response.error = "HTTP response #{response.code} #{error}"
+      return_response
+    else
+      body = JSON.parse(response.body) rescue nil
+      error = body ? body['Error'] : nil
+      #raise Wbrs::WbrsError, "HTTP response #{response.code} #{error}"
+      #{:error => "Wbrs Error", :message => "HTTP response #{response.code} #{error}"}.to_json
+      Rails.logger.error("HTTP response #{response.code} #{error}")
+      return_response = AdhocErrorResponse.new
+      return_response.body = "{\"data\": []}"
+      return_response.error = "HTTP response #{response.code} #{error}"
+      return_response
     end
   end
 
@@ -130,8 +156,18 @@ class Wbrs::Base
     request.headers = {"Content-Type" => "application/json", "Authorization" => "Bearer #{Rails.configuration.wbrs.auth_token}" }
 
     request.body = body.to_json
+    begin
+      request_error_handling(call_request(method, request))
+    rescue => except
+      Rails.logger.error("Something is wrong with RuleAPI connection")
+      Rails.logger.error(except)
+      Rails.logger.error(except.backtrace.join("\n"))
 
-    request_error_handling(call_request(method, request))
+      return_response = AdhocErrorResponse.new
+      return_response.body = "{\"data\":[]}"
+      return_response.error = "RuleApi cannot be reached"
+      return_response
+    end
   end
 
   def call_json_request(method, path, body:)

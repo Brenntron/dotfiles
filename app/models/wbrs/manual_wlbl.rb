@@ -12,8 +12,19 @@ class Wbrs::ManualWlbl < Wbrs::Base
   }
   attr_accessor *FIELD_SYMS
 
+  def initialize(attributes = {})
+    if attributes.keys.present?
+      attributes.keys.each do |attr|
+        if !FIELD_NAMES.include?(attr)
+          self.class.module_eval { attr_accessor attr.to_sym}
+        end
+      end
+    end
+    super
+  end
+
   def self.new_from_attributes(attributes)
-    new(attributes.slice(*FIELD_NAMES))
+    new(attributes)
   end
 
   # Get all the manual WL/BL entries.
@@ -89,7 +100,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [String] trgt_list: Target manual list type
   # @param [Array<String>] urls: list of urls to apply the trg_list to
   # @param [String] usr: User creating the WL/BL entries
-  # @param [Array<String>] thrt_cats: List of up to five unique threat categories IDs
+  # @param [Array<Integer>] thrt_cat_ids: List of up to five unique threat categories IDs
   # @param [String] note: User’s note
   # @return [String] JSON for array of warnings
   def self.new_wlbl_from_params(wlbl_params)
@@ -101,6 +112,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
     boolean = true
     string_params = stringkey_params(wlbl_params)
     list_types = string_params['trgt_list']
+    string_params['thrt_cats'] = string_params.delete('thrt_cat_ids')
 
     list_types.each do |list_type|
       string_params['trgt_list'] = list_type.to_s
@@ -201,7 +213,11 @@ class Wbrs::ManualWlbl < Wbrs::Base
 
     if target_list.present?
       target_list.each do |wlbl|
-        new_wlbl_from_params({'urls' => params_urls, 'usr' => username, 'note' => params[:note], 'trgt_list' => wlbl })
+        new_wlbl_from_params('urls' => params_urls,
+                             'usr' => username,
+                             'note' => params[:note],
+                             'trgt_list' => wlbl,
+                             'thrt_cats' => params['thrt_cat_ids'])
       end
     end
 

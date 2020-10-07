@@ -218,12 +218,13 @@ module API
               # Convert the API response to JSON
               responses.each do |position, response|
                 responses[position] = JSON.parse(response.body)
+                responses[position] = responses[position]['data'].sort_by! { |key| key['confidence'] }
               end
 
               # Loop through each individual response's categories and add their name to a hash
               responses.each do |position, response|
                 categories[position] = {}
-                response['data'].each_with_index do |data, category_position|
+                response.each_with_index do |data, category_position|
                   categories[position][category_position] = data['category_id']
                 end
               end
@@ -336,6 +337,22 @@ module API
               end
             end
 
+            params do
+              requires :uri, type: String
+            end
+
+            get 'uri_cat_info' do
+              data = {}
+
+              uri = permitted_params[:uri]
+              begin
+                data = ComplaintEntry.current_category_data_for_uri(uri)
+                return {:status => 'success', :data => data}.to_json
+              rescue
+                return {:status => 'error', :data => data}.to_json
+              end
+            end
+
             #####REPORT STATS######
 
             # curl -X POST -k -H "Authorization: Basic Y2xhY2xhaXI6RG91cGlleGVpOEFu" -H "Token: spMbfr4zXYPyyt3yRrRq" https://analyst-console.vrt.sourcefire.com/escalations/api/v1/escalations/user_preferences/
@@ -390,6 +407,10 @@ module API
               #TODO: filed a feature request with the Ukraine team
               # https://jira.sco.cisco.com/browse/SAWEB-3063
 
+            end
+
+            get 'category_list' do
+              SbApi.category_lookup
             end
 
           end

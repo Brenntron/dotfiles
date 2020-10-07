@@ -90,9 +90,6 @@ module API
             get 'closed_ticket_entries_by_resolution_report' do
               authorize!(:index, Dispute)
               users = User.where(:id => params[:users])
-              if current_user.team_manager == current_user && users.size > 1
-                users = users - [current_user]
-              end
 
               report_data = Dispute.closed_ticket_entries_by_resolution_report(users, params[:from], params[:to], params[:submission_types])
 
@@ -105,6 +102,48 @@ module API
               requires :from, type: String
               requires :to, type: String
               requires :users, type: Array[Integer], desc: ""
+            end
+
+            get 'auto_ticket_entries_by_resolution_report' do
+              authorize!(:index, Dispute)
+              report_data = Dispute.auto_ticket_entries_by_resolution_report(params[:from], params[:to], params[:submission_types])
+
+              response_data = {:status => "success", :data => report_data}
+
+              response_data.to_json
+            end
+
+            params do
+              requires :from, type: String
+              requires :to, type: String
+            end
+
+            get 'all_closed_tickets_manual_vs_auto_report' do
+              authorize!(:index, Dispute)
+              report_data = Dispute.all_closed_tickets_manual_vs_auto_report(params[:from], params[:to], params[:submission_types])
+
+              response_data = {:status => "success", :data => report_data}
+
+              response_data.to_json
+            end
+
+            params do
+              requires :from, type: String
+              requires :to, type: String
+            end
+
+            get 'all_tickets_manual_vs_auto_close_report' do
+              authorize!(:index, Dispute)
+              report_data = Dispute.all_tickets_manual_vs_auto_close_report(params[:from], params[:to], params[:submission_types])
+
+              response_data = {:status => "success", :data => report_data}
+
+              response_data.to_json
+            end
+
+            params do
+              requires :from, type: String
+              requires :to, type: String
             end
 
             get 'ticket_entries_closed_by_ticket_owner_report' do

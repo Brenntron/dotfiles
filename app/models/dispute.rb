@@ -61,8 +61,15 @@ class Dispute < ApplicationRecord
   STATUS_RESOLVED_INVALID = "INVALID"
   STATUS_RESOLVED_TEST = "TEST_TRAINING"
   STATUS_RESOLVED_OTHER = "OTHER"
+  STATUS_RESOLVED_QUICK_BULK = "QUICK_BULK" #tickets created and closed using the quick bulk entry form.
 
   AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
+
+  #labels for charts on webrep dashboard
+  LABEL_RESOLVED_FIXED_FP = "Fixed FP"
+  LABEL_RESOLVED_FIXED_FN = "Fixed FN"
+  LABEL_RESOLVED_UNCHANGED = "Unchanged"
+  LABEL_RESOLVED_OTHER = "Other"
 
   scope :open_disputes, -> { where(status: NEW) }
   scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
@@ -105,7 +112,7 @@ class Dispute < ApplicationRecord
         'classification' => 'unclassified',
     }
     new_dispute = nil
-    
+
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
     ActiveRecord::Base.transaction do
       new_dispute = Dispute.create!(id: bug_proxy.id,
@@ -505,7 +512,6 @@ class Dispute < ApplicationRecord
 
         logger.debug "Creating ip entries"
         new_entries_ips.each do |key, entry|
-
           false_negative_claim = false
 
           if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
@@ -529,31 +535,59 @@ class Dispute < ApplicationRecord
           total_hits = (wbrs_hits + sbrs_hits).uniq
 
           new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'IP', ip_address: key)
+          new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
-
+          new_dispute_entry.platform = entry[:sbrs]["platform"]
           new_dispute_entry.save!
 
           logger.info "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
-          case
-          when !false_negative_claim
-            new_dispute_entry.status = DisputeEntry::NEW
-          else
-            auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                              total_hits: total_hits,
-                                                                              resolved_at: resolved_at,
-                                                                              dispute_entry: new_dispute_entry)
 
-            if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-              verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-            end
-          end
+          matching_disposition = new_dispute_entry.is_disposition_matching?
 
+          initial_log = "--------Starting Data---------\n"
+          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
+          initial_log += "-----------------------------\n"
+
+          new_dispute_entry.auto_resolve_log += initial_log
           new_dispute_entry.save!
+
+          if !matching_disposition
+
+            if !false_negative_claim
+              new_dispute_entry.status = DisputeEntry::NEW
+
+              if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
+                AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
+              end
+
+            else
+              if new_dispute.submission_type == "w"
+                auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                                  total_hits: total_hits,
+                                                                                  resolved_at: resolved_at,
+                                                                                  dispute_entry: new_dispute_entry)
+
+                if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+                  verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+                end
+
+                if auto_resolve_verdict.present? && auto_resolve_verdict.auto_resolve_log.present?
+                  new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
+                end
+
+              end
+
+            end
+
+            new_dispute_entry.save!
+
+          end
 
           #this is for return back to TI to populate its ticket show pages
           return_payload[key] = new_dispute_entry.new_payload_item
@@ -583,10 +617,10 @@ class Dispute < ApplicationRecord
         end
         logger.debug "Creating url entries"
         new_entries_urls.each do |key, entry|
-
           #placeholder for preloading stuff from Micah
           #grab xbrs, reptool stuff, wl/bl entries, virustotal
           #
+
 
           false_negative_claim = false
 
@@ -606,29 +640,57 @@ class Dispute < ApplicationRecord
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
           new_dispute_entry.is_important = is_important?(key)
-
+          new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.assign_url_parts(key)
+          new_dispute_entry.platform = entry["platform"]
+
+
+          resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
+          if resolved_ip.present?
+            new_dispute_entry.web_ips = [resolved_ip]
+          end
 
           new_dispute_entry.save!
+
+          matching_disposition = new_dispute_entry.is_disposition_matching?
 
           logger.info "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
-          case
-          when !false_negative_claim
-            new_dispute_entry.update(status: DisputeEntry::NEW)
-          else
-            auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                              total_hits: total_hits,
-                                                                              resolved_at: resolved_at,
-                                                                              dispute_entry: new_dispute_entry)
+          #threat cats for urls
+          complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => new_dispute_entry.uri})
+          new_dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
 
-            if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-              verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-            end
-          end
+          initial_log = "--------Starting Data---------\n"
+          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
+          initial_log += "-----------------------------\n"
 
+          new_dispute_entry.auto_resolve_log += initial_log
           new_dispute_entry.save!
+
+
+          if !matching_disposition
+            if !false_negative_claim
+              new_dispute_entry.update(status: DisputeEntry::NEW)
+            else
+              auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                                total_hits: total_hits,
+                                                                                resolved_at: resolved_at,
+                                                                                dispute_entry: new_dispute_entry)
+
+              if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+                verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+              end
+
+              if auto_resolve_verdict.present? && auto_resolve_verdict.auto_resolve_log.present?
+                new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
+              end
+            end
+
+            new_dispute_entry.save!
+
+          end
 
           return_payload[key] = new_dispute_entry.new_payload_item
           return_payload[key]['sugg_type'] = new_dispute_entry.suggested_disposition
@@ -1084,7 +1146,7 @@ class Dispute < ApplicationRecord
       when 'named'
         named_search(search_name, user: user, reload: reload)
       when 'standard'
-        standard_search(search_name, user: user)
+        standard_search(search_name, user: user).includes(:customer => [:company])
       when 'contains'
         contains_search(params['value'])
       else
@@ -1093,11 +1155,19 @@ class Dispute < ApplicationRecord
   end
 
   def customer_name
-    customer.name
+    customer.nil? ? "" : customer.name
   end
 
   def customer_email
-    customer.email
+    customer.nil? ? "" : customer.email
+  end
+
+  def customer_org
+    if customer.nil?
+      ""
+    else
+      customer.company.nil? ? "" : customer.company.name
+    end
   end
 
   # @param [Array<Dispute>] disputes colleciton of dispute objects
@@ -1109,32 +1179,32 @@ class Dispute < ApplicationRecord
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status} </span>"
-      if dispute&.status_comment.present?
-        dispute_packet[:status_comment] = dispute&.status_comment
-      elsif dispute&.resolution_comment.present?
-        dispute_packet[:status_comment] = dispute&.resolution_comment
+      if dispute.status_comment.present?
+        dispute_packet[:status_comment] = dispute.status_comment
+      elsif dispute.resolution_comment.present?
+        dispute_packet[:status_comment] = dispute.resolution_comment
       else
         dispute_packet[:status_comment] = nil
       end
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
-      dispute_packet[:submitter_org] = dispute.customer.company.name
+      dispute_packet[:submitter_org] = dispute.customer_org
       dispute_packet[:submitter_type] = dispute.submitter_type
       dispute_packet[:submitter_domain] = dispute.org_domain
       dispute_packet[:submitter_name] = dispute.customer_name
       dispute_packet[:submitter_email] = dispute.customer_email
       dispute_packet[:dispute_domain] = dispute.org_domain
-      dispute_packet[:updated_at] = dispute.updated_at.strftime("%F %T")
-      unless dispute.dispute_entries.empty?
+      dispute_packet[:updated_at] = dispute.updated_at&.strftime("%F %T")
+      unless dispute.dispute_entries.blank?
         unless dispute.dispute_entries.first[:hostname].nil?
           dispute_packet[:dispute_domain] = dispute.dispute_entries.first[:hostname]
         end
       end
-      dispute_packet[:dispute_count] = dispute.entry_count.to_s
+      dispute_packet[:dispute_count] = dispute.entry_count&.to_s
 
       if dispute.resolution.nil?
         dispute_packet[:dispute_resolution] = ''
       else
-        if dispute.resolution_comment.nil? || dispute.resolution_comment.empty?
+        if dispute.resolution_comment.blank?
           dispute_packet[:dispute_resolution] = dispute.resolution
         else
           dispute_packet[:dispute_resolution] = "<span class='esc-tooltipped' title='#{dispute.resolution_comment}'>" + dispute.resolution + "</span>"
@@ -1142,7 +1212,7 @@ class Dispute < ApplicationRecord
       end
 
       dispute_packet[:dispute_entry_content] = []
-      unless dispute.dispute_entries.empty?
+      unless dispute.dispute_entries.blank?
         dispute.dispute_entries.each do |entry|
           unless entry[:ip_address].nil?
             dispute_packet[:dispute_entry_content].push(entry[:ip_address])
@@ -1158,15 +1228,15 @@ class Dispute < ApplicationRecord
       case
         when dispute.assignee == 'Unassigned'
           dispute_packet[:assigned_to] =
-              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
+              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
 
         when dispute.user_id?
           if dispute.user_id == user.id
             dispute_packet[:assigned_to] =
-                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
+                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
           else
             dispute_packet[:assigned_to] =
-                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user.cvs_username} </span><button class='take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
+                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
           end
       end
 
@@ -1192,6 +1262,10 @@ class Dispute < ApplicationRecord
         end
       end
       dispute_packet[:wbrs_rule_hits] = dispute_packet[:wbrs_rule_hits].join(", ")
+
+      dispute_packet.each do |k, v|
+        dispute_packet[k] = '' if dispute_packet[k].nil?
+      end
 
       dispute_packet
     end
@@ -1526,24 +1600,200 @@ class Dispute < ApplicationRecord
       results[:chart_data][3] = 0
     end
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FP,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FP,
                              :percent => (results[:chart_data][2] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size
                              }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FN,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FN,
                              :percent => (results[:chart_data][0] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size
     }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_UNCHANGED,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_UNCHANGED,
                              :percent => (results[:chart_data][1] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size
     }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_OTHER,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_OTHER,
                              :percent => (results[:chart_data][3] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size
+    }
+
+    results
+
+  end
+
+  def self.auto_ticket_entries_by_resolution_report(from, to, submission_types = nil)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    vrt =  User.where(cvs_username: 'vrtincom').first
+    vrt_id = vrt.id
+
+    if submission_types.present?
+      closed_entries = Dispute.joins(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+    else
+      closed_entries = Dispute.joins(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+    end
+
+    all_entries = closed_entries.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
+
+    entries_duplicates = all_entries.select {|entry| entry.resolution == "DUPLICATE"}
+    entries_fixed_fn = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}
+    entries_unchanged = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}
+
+    total_count = all_entries.size
+
+    results = {}
+    results[:chart_data] = []
+    results[:chart_labels] = ["Fixed FN", "Duplicates", "Unchanged" ]
+    results[:chart_data] << entries_fixed_fn.size.to_f / total_count.to_f
+    results[:chart_data] << entries_duplicates.size.to_f / total_count.to_f
+    results[:chart_data] << entries_unchanged.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
+    end
+
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
+    end
+
+    if results[:chart_data][2].nan?
+      results[:chart_data][2] = 0
+    end
+
+    results[:table_data] = []
+
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FN,
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => entries_fixed_fn.size
+    }
+
+    results[:table_data] << {:resolution => "Duplicates",
+                             :percent => (results[:chart_data][1] * 100).round(2),
+                             :count => entries_duplicates.size
+    }
+    results[:table_data] << {:resolution => LABEL_RESOLVED_UNCHANGED,
+                             :percent => (results[:chart_data][2] * 100).round(2),
+                             :count => entries_unchanged.size
+    }
+    results[:table_data] << {:resolution => "Total",
+                             :percent => 100,
+                             :count => total_count.to_f
+    }
+    results
+
+  end
+
+  def self.all_closed_tickets_manual_vs_auto_report(from, to, submission_types = nil)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    vrt =  User.where(cvs_username: 'vrtincom').first
+    vrt_id = vrt.id
+
+    if submission_types.present?
+      manual_results = Dispute.where.not(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
+
+    else
+      manual_results = Dispute.where.not(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
+    end
+
+    total_count = manual_results.size + auto_results.size
+
+    results = {}
+
+    results[:chart_data] = []
+    results[:chart_labels] = [ "Manually Resolved Tickets", "Automatically Resolved Tickets"]
+
+    results[:chart_data] << manual_results.size.to_f / total_count.to_f
+    results[:chart_data] << auto_results.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
+    end
+
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
+    end
+
+    results[:table_data] = []
+
+    results[:table_data] << {:resolution => "Automatically Resolved Tickets",
+                             :percent => (results[:chart_data][1] * 100).round(2),
+                             :count => auto_results.size
+    }
+
+    results[:table_data] << {:resolution => "Manually Closed Tickets",
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => manual_results.size.to_f
+    }
+
+    results[:table_data] << {:resolution => "Total Closed Tickets",
+                             :percent => 100,
+                             :count => total_count.to_f
+    }
+
+    results
+
+  end
+
+  def self.all_tickets_manual_vs_auto_close_report(from, to, submission_types = nil)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    vrt =  User.where(cvs_username: 'vrtincom').first
+    vrt_id = vrt.id
+
+    if submission_types.present?
+      all_results = Dispute.where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types)
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
+
+    else
+      all_results = Dispute.where("disputes.created_at between '#{from}' and '#{to}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
+    end
+
+    total_count = all_results.size
+
+    results = {}
+
+    results[:chart_data] = []
+    results[:chart_labels] = [ "All Tickets", "Automatically Resolved Tickets"]
+
+    results[:chart_data] << (all_results.size.to_f - auto_results.size.to_f)/ total_count.to_f
+    results[:chart_data] << auto_results.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
+    end
+
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
+    end
+
+    results[:table_data] = []
+
+    results[:table_data] << {:resolution => "Automatically Resolved Tickets",
+                             :percent => (results[:chart_data][1] * 100).round(2),
+                             :count => auto_results.size
+    }
+
+    results[:table_data] << {:resolution => "Non-auto resolved tickets",
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => (all_results.size - auto_results.size)
+    }
+
+    results[:table_data] << {:resolution => "Total Submitted Tickets",
+                             :percent => 100,
+                             :count => all_results.size.to_f
     }
 
     results
@@ -1695,7 +1945,6 @@ class Dispute < ApplicationRecord
     results[:chart_data] = {}
     #results[:table_data] = []
     final_data = {}
-
     users.each do |user|
       results[:chart_data][user.cvs_username] = {}
       results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FP] = 0
@@ -1839,6 +2088,92 @@ class Dispute < ApplicationRecord
   def manual_sync
     message = Bridge::DisputeEntryUpdateStatusEvent.new
     message.post_entries(self.dispute_entries)
+  end
+
+  def self.process_quick_bulk_entries(data, user)
+
+    ips = []
+    urls = []
+
+    data.keys.each do |key|
+      if DisputeEntry.is_ip?(key)
+        ips << key
+      else
+        urls << key
+      end
+    end
+
+    customer = Customer.where(name: 'Dispute Analyst').first_or_create(name: 'Dispute Analyst')
+    summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+
+
+    full_description = %Q{
+          IPs: #{ips}
+          URIs: #{urls}
+          Problem Summary: #{summary}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations Console',
+        'component' => 'IP/Domain',
+        'summary' => summary,
+        'version' => 'unspecified', #self.version,
+        'description' => full_description,
+        'priority' => 'Unspecified',
+        'classification' => 'unclassified',
+    }
+
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    new_dispute = Dispute.new
+
+    new_dispute.id = bug_proxy.id
+    new_dispute.user_id = user.id
+
+    new_dispute.case_opened_at = Time.now
+    new_dispute.case_closed_at = Time.now
+    new_dispute.case_resolved_at = Time.now
+    new_dispute.description = full_description
+    new_dispute.problem_summary = summary
+
+    new_dispute.status = STATUS_RESOLVED
+    new_dispute.resolution = STATUS_RESOLVED_QUICK_BULK
+
+    new_dispute.customer_id = customer&.id
+
+    new_dispute.save!
+
+    ips.each do |ip|
+      new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'IP', ip_address: ip)
+      new_dispute_entry.case_opened_at = Time.now
+      new_dispute_entry.case_closed_at = Time.now
+      new_dispute_entry.case_resolved_at = Time.now
+      new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
+      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_QUICK_BULK
+      new_dispute_entry.save!
+      #DisputeEntry.quick_bulk_rep_update(ip, data[ip], note)
+    end
+
+    urls.each do |url|
+      new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'URI/DOMAIN', uri: url)
+      new_dispute_entry.case_opened_at = Time.now
+      new_dispute_entry.case_closed_at = Time.now
+      new_dispute_entry.case_resolved_at = Time.now
+      new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
+      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_QUICK_BULK
+      new_dispute_entry.save!
+      #DisputeEntry.quick_bulk_rep_update(url, data[url], note)
+    end
+
+    return_hash = {}
+    return_hash[:dispute_id] = new_dispute.id
+    return_hash[:dispute_entries] = []
+    new_dispute.dispute_entries.each do |entry|
+      return_hash[:dispute_entries] << {:dispute_entry_id => entry.id, :entry => entry.hostlookup}
+    end  
+
+    return return_hash
   end
 
 end

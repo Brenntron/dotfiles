@@ -16,23 +16,25 @@ class FileReputationApi::SampleZoo
     end
 
   rescue JSON::ParserError
+    Rails.logger.error('SampleZoo returned invalid JSON.')
     {error: 'Invalid Hash'}
+  rescue ApiRequester::ApiRequester::ApiRequesterNotAuthorized
+    Rails.logger.error('SampleZoo returned an "Unauthorized" response.')
+    {error: 'Unauthorized'}
   rescue
+    Rails.logger.error('SampleZoo returned an error response.')
     {error: 'Data Currently Unavailable'}
   end
 
   def self.query_from_data(api_response)
     in_zoo = false
-    begin
-      if api_response[:error]
-        raise ("#{api_response[:error]}")
-      elsif api_response&.dig("hits","total") and api_response["hits"]["total"] > 0
-        in_zoo = true
-      else
-        in_zoo = false
-      end
-    rescue Exception => e
-        raise(e.message)
+
+    if api_response[:error]
+      raise ("#{api_response[:error]}")
+    elsif api_response&.dig("hits","total") and api_response["hits"]["total"] > 0
+      in_zoo = true
+    else
+      in_zoo = false
     end
 
     {in_zoo: in_zoo}

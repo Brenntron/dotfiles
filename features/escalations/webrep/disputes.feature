@@ -30,6 +30,30 @@ Feature: Disputes
     And I fill in "assignee" with "nherbert"
     When I click "submit"
     Then I should see "Unable to create the following duplicate dispute entries: talosintelligence.com"
+
+  @javascript
+  Scenario: A user can create new disputes with urls found through lookup detail
+    Given a user with role "webrep user" exists and is logged in
+    And vrtincoming exists
+    And bugzilla rest api always saves
+    And Dispute Analyst customer exists
+    When I go to "/escalations/webrep/research#lookup-detail"
+    And I fill in "search_uri" with "ough.com"
+    Then I click "submit-button rep-research"
+    And I wait for "60" seconds
+    Then I should see "Entry Search Results for"
+    Then I click "#select-all-entries"
+    Then I click "add-to-ticket-button"
+    When I click ".submit_new_dispute"
+    And I wait for "60" seconds
+    Then I should see "ALL ENTRIES WERE SUCCESSFULLY CREATED."
+
+  @javascript
+  Scenario: The index will not break with a mostly empty record
+    Given a user with role "webrep user" exists and is logged in
+    Given an empty dispute exists
+    When I go to "/escalations/webrep/disputes"
+    Then I should see content "0000000001" within "#disputes-index"
     
   @javascript
   Scenario: A user cannot create a duplicate IP Dispute
@@ -77,7 +101,6 @@ Feature: Disputes
 
   @javascript
   Scenario: a user takes a dispute and status is updated to assigned
-    Then pending
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
       | id | cvs_username |
@@ -92,7 +115,6 @@ Feature: Disputes
 
   @javascript
   Scenario: a user takes a dispute, returns a dispute, and takes the dispute again
-    Then pending
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
       | id | cvs_username |
@@ -127,6 +149,220 @@ Feature: Disputes
     Then I should see "RE-OPENED"
 
   @javascript
+  Scenario: a user picks a resolution on the index page and the comment is pre-populated
+    Given a user with role "webrep user" exists and is logged in
+    And a guest company exists
+    And the following customers exist:
+      | id | company_id |   name   | email                 |
+      | 3  |      1     |  guest   | guest@guest.com       |
+      | 4  |      2     | customer | customer@customer.com |
+    Given the following disputes exist and have entries:
+      | id | submission_type |   submitter_type   | customer_id |
+      | 1  |        w        |    CUSTOMER        |     4       |
+      | 2  |        e        |    CUSTOMER        |     4       |
+      | 3  |        w        |    NON-CUSTOMER    |     3       |
+    When I goto "escalations/webrep/disputes/"
+    Then I check "cbox0000000001"
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Should show full messages for customer submissions
+    And I click "#FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    Then I uncheck "cbox0000000001"
+    Then I check "cbox0000000002"
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Should not pre-populate for email type submission
+    And I click "#FIXED_FP"
+    Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should not see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should not see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    Then I uncheck "cbox0000000002"
+    Then I check "cbox0000000003"
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Messages change for guest submissions
+    And I click "#FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
+    When I click "#FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
+    When I click "#UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
+    Then I check "cbox0000000002"
+    And I click "#index_ticket_status"
+    And I click "#RESOLVED_CLOSED"
+    #Should not pre-populate for email type submission
+    And I click "#FIXED_FP"
+    Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should not see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should not see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+
+  @javascript
+  Scenario: a user picks a resolution for an entry on the index page and the comment is pre-populated
+    Given a user with role "webrep user" exists and is logged in
+    And a guest company exists
+    And the following customers exist:
+      | id | company_id |   name   | email                 |
+      | 3  |      1     |  guest   | guest@guest.com       |
+      | 4  |      2     | customer | customer@customer.com |
+    Given the following disputes exist and have entries:
+      | id | submission_type |   submitter_type   | customer_id |
+      | 1  |        w        |    CUSTOMER        |     4       |
+      | 2  |        e        |    CUSTOMER        |     4       |
+      | 3  |        w        |    NON-CUSTOMER    |     3       |
+    When I goto "escalations/webrep/disputes/"
+    And I click "#expand-all-index-rows"
+    Then I check checkbox with class "dispute-entry-checkbox_1"
+    And I click "#index-entry-status-button"
+    And I click "#ENTRY_RESOLVED_CLOSED"
+    #Should show full messages for customer submissions
+    And I click "#ENTRY_FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#ENTRY_FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#ENTRY_UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    Then I uncheck checkbox with class "dispute-entry-checkbox_1"
+    Then I check checkbox with class "dispute-entry-checkbox_2"
+    And I click "#index-entry-status-button"
+    And I click "#ENTRY_RESOLVED_CLOSED"
+    #Should not pre-populate for email type submission
+    And I click "#ENTRY_FIXED_FP"
+    Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#ENTRY_FIXED_FN"
+    Then I should not see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#ENTRY_UNCHANGED"
+    Then I should not see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    Then I uncheck checkbox with class "dispute-entry-checkbox_2"
+    Then I check checkbox with class "dispute-entry-checkbox_3"
+    And I click "#index-entry-status-button"
+    And I click "#ENTRY_RESOLVED_CLOSED"
+    #Messages change for guest submissions
+    And I click "#ENTRY_FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
+    When I click "#ENTRY_FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
+    When I click "#ENTRY_UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
+    Then I check checkbox with class "dispute-entry-checkbox_2"
+    And I click "#index-entry-status-button"
+    And I click "#ENTRY_RESOLVED_CLOSED"
+    #Should not pre-populate for email type submission
+    And I click "#ENTRY_FIXED_FP"
+    Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#ENTRY_FIXED_FN"
+    Then I should not see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#ENTRY_UNCHANGED"
+    Then I should not see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+
+
+  @javascript
+  Scenario: a user picks a resolution for a ticket and the comment is pre-populated
+    Given a user with role "webrep user" exists and is logged in
+    And a guest company exists
+    And the following customers exist:
+      | id | company_id |   name   | email                 |
+      | 3  |      1     |  guest   | guest@guest.com       |
+      | 4  |      2     | customer | customer@customer.com |
+    Given the following disputes exist:
+      | id | submission_type |   submitter_type   | customer_id |
+      | 1  |        w        |    CUSTOMER        |     4       |
+      | 2  |        e        |    CUSTOMER        |     4       |
+      | 3  |        w        |    NON-CUSTOMER    |     3       |
+    When I goto "escalations/webrep/disputes/1/"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#RESOLVED_CLOSED"
+    #Should show full messages for customer submissions
+    And I click "#FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    When I goto "escalations/webrep/disputes/2/"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#RESOLVED_CLOSED"
+    #Should not pre-populate for email type submission
+    And I click "#FIXED_FP"
+    Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#FIXED_FN"
+    Then I should not see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#UNCHANGED"
+    Then I should not see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    When I goto "escalations/webrep/disputes/3/"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#RESOLVED_CLOSED"
+    #Messages change for guest submissions
+    And I click "#FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
+    When I click "#FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
+    When I click "#UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
+
+
+  @javascript
+  Scenario: a user picks a resolution for an entry and the comment is pre-populated
+    Given a user with role "webrep user" exists and is logged in
+    And a guest company exists
+    And the following customers exist:
+      | id | company_id |   name   | email                 |
+      | 3  |      1     |  guest   | guest@guest.com       |
+      | 4  |      2     | customer | customer@customer.com |
+    Given the following disputes exist and have entries:
+      | id | submission_type |   submitter_type   | customer_id |
+      | 1  |        w        |    CUSTOMER        |     4       |
+      | 2  |        e        |    CUSTOMER        |     4       |
+      | 3  |        w        |    NON-CUSTOMER    |     3       |
+    When I goto "escalations/webrep/disputes/1/"
+    And I wait for "10" seconds
+    Then I click "#research-tab-link"
+    Then I check checkbox with class "dispute-entry-cb-1"
+    And I click "#edit-dispute-entry-button"
+    And I click "#entry_status_button_1"
+    And I click "#RESOLVED_CLOSED"
+    #Should show full messages for customer submissions
+    And I click "#ENTRY_FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#ENTRY_FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#ENTRY_UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    When I goto "escalations/webrep/disputes/2/"
+    Then I click "#research-tab-link"
+    Then I check checkbox with class "dispute-entry-cb-2"
+    And I click "#edit-dispute-entry-button"
+    And I click "#entry_status_button_2"
+    And I click "#RESOLVED_CLOSED"
+    And I click "#ENTRY_FIXED_FP"
+    Then I should not see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#ENTRY_FIXED_FN"
+    Then I should not see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+    When I click "#ENTRY_UNCHANGED"
+    Then I should not see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+    When I goto "escalations/webrep/disputes/3/"
+    Then I click "#research-tab-link"
+    Then I check checkbox with class "dispute-entry-cb-3"
+    And I click "#edit-dispute-entry-button"
+    And I click "#entry_status_button_3"
+    And I click "#RESOLVED_CLOSED"
+    And I click "#ENTRY_FIXED_FP"
+    Then I should see "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
+    When I click "#ENTRY_FIXED_FN"
+    Then I should see "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
+    When I click "#ENTRY_UNCHANGED"
+    Then I should see "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
+
+
+  @javascript
   Scenario: when the user encounters a situation in which no results exists (therefore none returned), an error modal should display
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/disputes"
@@ -152,7 +388,7 @@ Feature: Disputes
 
   @javascript
   Scenario: a user uses advanced search filter (Submitted Older/Modified Older) and exports to csv
-    Given pending
+    # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id |
@@ -162,10 +398,13 @@ Feature: Disputes
     And I click "#add-search-items-button"
     And I click "#submitted-older-cb"
     And I click "#modified-older-cb"
-    And I click "#add-search-criteria"
-    Then I click ".export-button"
-    Then I wait for "3" seconds
-    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"'
+    Then I click "#cancel-add-criteria"
+    And I click "#submit-advanced-search"
+    Then I click ".export-all-btn"
+    # Thomas Walpole says that selenium driver does not provide access to response headers
+    # https://stackoverflow.com/questions/55584140/capybara-fails-with-notsupportedbydrivererror
+    # Then I wait for "3" seconds
+    # Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"'
 
   @javascript
   Scenario: a user adds and selects columns from the Column drop-down
@@ -193,6 +432,7 @@ Feature: Disputes
     Then I should see "CONTACT NAME"
     Then I should see "CONTACT EMAIL"
 
+
   @javascript
   Scenario: a users uses advanced search with 'Contact Name' as a search criteria
     Given a user with role "webrep user" exists and is logged in
@@ -200,18 +440,21 @@ Feature: Disputes
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
+    And I click "#table-show-columns-button"
+    And I click "#contact-name-checkbox"
+    And I click "#table-show-columns-button"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#name-cb"
-    And I click "#add-search-criteria"
     Then I fill in "name-input" with "Bob Jones"
+    Then I click "#cancel-add-criteria"
     Then I click "#submit-advanced-search"
     And I wait for "5" seconds
     And I click "#advanced-search-button"
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
-
+    Then I should see "Bob Jones"
 
   @javascript
   Scenario: a users uses advanced search with 'Contact Email' as a search criteria
@@ -220,10 +463,13 @@ Feature: Disputes
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
+    And I click "#table-show-columns-button"
+    And I click "#contact-email-checkbox"
+    And I click "#table-show-columns-button"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#email-cb"
-    And I click "#add-search-criteria"
+    Then I click "#cancel-add-criteria"
     Then I fill in "email-input" with "bob@bob.com"
     Then I click "#submit-advanced-search"
     And I wait for "3" seconds
@@ -231,6 +477,7 @@ Feature: Disputes
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
+    Then I should see "bob@bob.com"
 
   @javascript
   Scenario: a users uses advanced search with 'Company' as a search criteria
@@ -239,35 +486,346 @@ Feature: Disputes
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
+    And I click "#table-show-columns-button"
+    And I click "#submitter-org-checkbox"
+    And I click "#table-show-columns-button"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#company-cb"
-    And I click "#add-search-criteria"
     Then I fill in "company-input" with "Bobs Burgers"
+    Then I click "#cancel-add-criteria"
     Then I click "#submit-advanced-search"
-    And I wait for "5" seconds
-    And I click "#advanced-search-button"
-    Then I wait for "5" seconds
+    And I wait for "3" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
+    Then I should see "Bobs Burgers"
+
+
+  @javascript
+  Scenario: a user wants to do an advanced search and ensure those previous values are cleared on subsequent search
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type | status    |
+      | 1  | w               | ESCALATED |
+      | 2  | e               | PENDING   |
+    And the following dispute_entries exist:
+      | dispute_id   | uri             | entry_type |
+      | 1            | whatever.com    | URI/DOMAIN |
+      | 2            | iamatest.com    | URI/DOMAIN |
+    When I goto "escalations/webrep/disputes?f=all"
+    And I should see "All Tickets"
+    And I click "#advanced-search-button"
+    And I should see "Advanced Search"
+    And I fill in "status-input" with "ESCALATED"
+    And I should see content "ESCALATED" within "#status-input"
+    Then I click "#submit-advanced-search"
+    And I wait for "3" seconds
+    Then I should see "0000000001"
+    Then I should see "ESCALATED"
+    Then I should not see "0000000002"
+    Then I should not see "PENDING"
+    And I click "#advanced-search-button"
+    And I click "#remove-criteria-status"
+    And I click "#add-search-items-button"
+    And I click "#status-cb"
+    And I click "#cancel-add-criteria"
+    And I should not see content "ESCALATED" within "#status-input"
+    And I fill in "dispute-input" with "iamatest.com"
+    And I should see content "iamatest.com" within "#dispute-input"
+    Then I click "#submit-advanced-search"
+    And I wait for "3" seconds
+    Then I should see "0000000002"
+    Then I should see "iamatest.com"
+    Then I should not see "ESCALATED"
+
 
   @javascript
   Scenario: a user tries to export selected dispute entries
-    Given pending
+    # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=open"
-    Then take a screenshot
     And I click ".dispute_check_box"
-    And I click "Export Selected to CSV"
-    Then I wait for "3" seconds
-    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    And I click ".export-selected-btn"
+    # Thomas Walpole says that selenium driver does not provide access to response headers
+    # https://stackoverflow.com/questions/55584140/capybara-fails-with-notsupportedbydrivererror
+    # Then I wait for "3" seconds
+    # Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+
+
+
+  ### WBRS WL/BL Dropdown
+
+  @javascript
+  Scenario: a user wants to view the current WBRS lists and score for an entry from the index page
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                   |
+      | 1  | imadethisurlup.com    |
+    # Adding this step below to ensure the api data is clear
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    When I goto "escalations/webrep/disputes?f=open"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "5" seconds
+    Then I should see "Current WL/BL List"
+    And  I should see "Current WBRS Score"
+    And  I should see "Threat Category"
+    And  I should see "Not on a list"
+    And  I should see "No score"
+
+
+  @javascript
+  Scenario: a user adds an entry to a WBRS list from the index page
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    When I goto "escalations/webrep/disputes?f=open"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  I should see "Not on a list"
+    And  I should see "No score"
+    Then I click "#wlbl-add"
+    And  I check checkbox with class "wl-med-checkbox"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    And  I click button with class "close"
+    And  I wait for "1" seconds
+#    And  take a screenshot
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  Element with class "wlbl-entry-wlbl" should have content "WL-med"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+
+
+  @javascript
+  Scenario: a user removes an entry from a WBRS list from the index page
+  #  after adding it so we're starting with clean data from the api
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    When I goto "escalations/webrep/disputes?f=open"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  I should see "Not on a list"
+    Then I click "#wlbl-add"
+    And  I check checkbox with class "wl-med-checkbox"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    And  I click button with class "close"
+    And  I wait for "1" seconds
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  Element with class "wlbl-entry-wlbl" should have content "WL-med"
+    Then I click "#wlbl-remove"
+    And  I check checkbox with class "wl-med-checkbox"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    And  I click button with class "close"
+    And  I wait for "1" seconds
+#    And  take a screenshot
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  I should see "Not on a list"
+    And  I should see "No score"
+    And  Element with class "wlbl-entry-wlbl" should not have content "WL-med"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+
+
+  @javascript
+  Scenario: a user adds an entry to a WBRS Blacklist from the index page
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    When I goto "escalations/webrep/disputes?f=open"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  Element with class "wlbl-entry-wlbl" should not have content "BL-weak"
+    Then I click "#wlbl-add"
+    And  I check checkbox with class "bl-weak-checkbox"
+    And  I wait for "1" seconds
+    And  I should see "Threat Categories"
+    And  I should see "Required for adding to any blacklist."
+    And  I should see "Bogon"
+    And  I should see "Cryptojacking"
+    And  I should see "Phishing"
+    Then I click ".wlbl_thrt_cat_id_8"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    Then I click button with class "close"
+    And  I wait for "1" seconds
+    Then I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+#    And  take a screenshot
+    And  Element with class "wlbl-entry-wlbl" should have content "BL-weak"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+
+
+  @javascript
+  Scenario: a user removes an entry from one WBRS list and adds it to another on the dispute show page
+  #  after adding one first so we're starting with clean data
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "2" seconds
+    Then I click "#research-tab-link"
+    And  I click "#wlbl_button_1"
+    And  I wait for "5" seconds
+    And  I should see "Not on a list"
+    And  I should see "No score"
+    Then I click "#wl-weak-slider"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "1" seconds
+    And  I click "#wlbl_button_1"
+    And  I wait for "5" seconds
+    And  I should not see "Not on a list"
+    And  Element with class "wlbl-entry-wlbl" should have content "WL-weak"
+    # Now we're actually removing and adding
+    Then I click "#wl-weak-slider"
+    And  I click "#bl-weak-slider"
+    And  I should see "Bogon"
+    And  I should see "Cryptojacking"
+    And  I should see "Phishing"
+    And  I click ".wlbl_thrt_cat_id_8"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "1" seconds
+    And  I click "#wlbl_button_1"
+    And  I wait for "5" seconds
+    And  Element with class "wlbl-entry-wlbl" should have content "BL-weak"
+    And  Element with class "wlbl-entry-wlbl" should not have content "WL-weak"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+
+
+  @javascript
+  Scenario: a user adds multiple entries to a WBRS list from the dispute show page
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+      | 2  | thisurlisfake.com  |
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "2" seconds
+    Then I click "#research-tab-link"
+    And  I check checkbox with class "dispute-entry-cb-1"
+    And  I check checkbox with class "dispute-entry-cb-2"
+    And  I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    Then I check checkbox with class "bl-weak-checkbox"
+    And  I click ".wlbl_thrt_cat_id_1"
+    And  I click ".wlbl_thrt_cat_id_2"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "2" seconds
+    Then I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    And  Element with class "wlbl-entry-id-1" should have content "BL-weak"
+    And  Element with class "wlbl-entry-id-2" should have content "BL-weak"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
+
+
+  @javascript
+  Scenario: a user removes multiple entries from a WBRS list on the dispute show page
+  #  after adding them to one first so we start with clean api data
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+      | 2  | thisurlisfake.com  |
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "2" seconds
+    Then I click "#research-tab-link"
+    And  I check checkbox with class "dispute-entry-cb-1"
+    And  I check checkbox with class "dispute-entry-cb-2"
+    And  I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    Then I check checkbox with class "wl-weak-checkbox"
+    Then I check checkbox with class "wl-med-checkbox"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "2" seconds
+    Then I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    And  Element with class "wlbl-entry-id-1" should have content "WL-weak, WL-med"
+    And  Element with class "wlbl-entry-id-2" should have content "WL-weak, WL-med"
+    And  I choose "wlbl-remove"
+    Then I check checkbox with class "wl-med-checkbox"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "2" seconds
+    Then I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    And  Element with class "wlbl-entry-id-1" should have content "WL-weak"
+    And  Element with class "wlbl-entry-id-1" should not have content "WL-med"
+    And  Element with class "wlbl-entry-id-2" should have content "WL-weak"
+    And  Element with class "wlbl-entry-id-2" should not have content "WL-med"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
+
+
+
+
+
 
   @javascript
   Scenario: a user tries to export selected dispute entries on the Research tab
-    Given pending
+    # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id |
@@ -276,8 +834,10 @@ Feature: Disputes
     And I click "#research-tab-link"
     And I click ".dispute_check_box"
     And I click "Export Selected to CSV"
-    Then I wait for "3" seconds
-    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    # Thomas Walpole says that selenium driver does not provide access to response headers
+    # https://stackoverflow.com/questions/55584140/capybara-fails-with-notsupportedbydrivererror
+    #Then I wait for "3" seconds
+    #Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
   @javascript
   Scenario: A user creates a new resolution message template
@@ -547,8 +1107,54 @@ Feature: Disputes
     When I click "#add-entries-button"
     And I fill in "add_dispute_entry" with "cisco.com"
     And I click "#button_add_dispute_entry"
-    And I wait for "15" seconds
+    And I wait for "5" seconds
     Then I should see content "cisco.com" within ".entry-data-content"
+
     And I should see content "WL-med" within ".entry-data-wlbl"
     And I should see content "BL-heavy" within ".entry-data-wlbl"
+
+
+  # Gathering resolved host ip on creation / additional query to sdsv3 for url+ip data
+  @javascript
+  Scenario: a user creates a new dispute ticket and the entry returns with a resolved host ip
+    Given a user with role "webrep user" exists and is logged in
+    And bugzilla rest api always saves
+    And the following disputes exist:
+      | id   |
+      | 5370 |
+    And the following customers exist:
+      |id| name            |
+      |1 | Dispute Analyst |
+    And  I goto "/escalations/webrep/disputes"
+    And  I wait for "3" seconds
+    Then I click "#new-dispute"
+    And  I wait for "1" seconds
+#    WHY IS THERE A COMMA IN THIS STEP DEF?
+    And  I fill in element, "#ips_urls" with "petful.com"
+    And  I click button "submit"
+    And  I wait for "10" seconds
+    And  I click button with class "close"
+    And  I wait for "3" seconds
+    Then I click "0000005370"
+    And  I wait for "5" seconds
+    Then I click "#research-tab-link"
+    And  I wait for "3" seconds
+#    And  Element with class "entry-resolved-ip-content" should not be empty
+#    And I should see a resolved host ip etc.
+
+
+
+  @javascript
+  Scenario: Loading cogs appear when landing on a page and disappear after it is done loading
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      | id   |
+      | 5370 |
+    And I create WebRep Entries Per Page UserPreference
+    And I create WebRep Sort Order UserPreference
+    And I create WebRep Current Page UserPreference
+    When I goto "/escalations/webrep/disputes/"
+    Then I should see "Loading data..."
+    And I wait for "1" seconds
+    Then I should not see "Loading data..."
 

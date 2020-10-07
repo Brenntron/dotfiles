@@ -1,3 +1,11 @@
+$(document).on 'ready',->
+  if $('#auto-resolve-dialog').length > 0
+    $('#auto-resolve-dialog').dialog({
+      autoOpen : false
+      width: 500
+    });
+window.show_auto_resolve = () ->
+  $('#auto-resolve-dialog').dialog('open')
 window.update_file_rep_status = () ->
   checked_disputes = []
   resolution = ""
@@ -94,7 +102,7 @@ window.filerep_take_disputes = () ->
     success: (response) ->
       for dispute_id in response.dispute_ids
         # dbinebri: adding the take/return button swap logic here
-        $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
+        $('.take-ticket-button').replaceWith("<button class='esc-tooltipped return-ticket-button' title='Return ticket to open queue' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
         $('#owner_' + dispute_id).text(response.username).removeClass('missing-data')
         $('#status_' + dispute_id).text("ASSIGNED")
 
@@ -138,7 +146,7 @@ window.file_rep_take_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      $('.inline-take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
+      $(".inline-take-dispute-#{dispute_id}").replaceWith("<button class='esc-tooltipped return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
       $("#owner_#{dispute_id}").text(response.username).removeClass('missing-data')
       $('#status_' + dispute_id).text("ASSIGNED")
   )
@@ -151,7 +159,7 @@ window.file_rep_return_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_take_dispute(#{dispute_id});'></button>")
+      $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='esc-tooltipped take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_take_dispute(#{dispute_id});'></button>")
       $("#owner_#{dispute_id}").text("Unassigned").addClass('missing-data')
       $('#status_' + dispute_id).text("NEW")
   )
@@ -264,6 +272,8 @@ $ ->
           resolution_comment += " Please open a TAC case and provide additional details if you need further assistance."
     $(".resolution-status-comment").html(resolution_comment)
 
+  # note: this function below affects the global space, can be accessed everywhere
+  # these window-level funcs should probably be moved into a "global JS" file when time available
   window.triggerTooltips = (item) ->
     $('.tooltip_content').show()
     $('.nested-tooltipped').tooltipster
@@ -549,10 +559,10 @@ $ ->
       return false
 
   $(document).on 'change', '.dispute_check_box', ->
-    document.getElementById("disputes-index-export-form").onsubmit = () ->
-      return false
-
-
+    # ensure this only runs in file rep, there are dispute checkboxes on webrep
+    if $('#disputes-index-export-form').length
+      document.getElementById("disputes-index-export-form").onsubmit = () ->
+        return false
   window.export_file_rep_selected = () ->
     data = build_data()
     if data.selected_cases.length <= 0
@@ -586,7 +596,7 @@ $ ->
         if search_type == 'advanced' && search_name_check && text_check
           ###
             creating temporary tr for the filter dropdown
-            attributes added then onclick events 
+            attributes added then onclick events
           ###
           new_tr = document.createElement('tr')
           new_td = document.createElement('td')
@@ -641,7 +651,12 @@ $ ->
       16
       'desc'
     ] ]
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     pagingType: 'full_numbers'
+    language: {
+      search: "_INPUT_"
+      searchPlaceholder: "Search within the table"
+    }
     keys:
       columns: ':not(:first-child)'
     columnDefs: [
@@ -853,7 +868,7 @@ $ ->
         className: "alt-col assignee-col"
         render: (data, type, full, meta) ->
           if full.current_user == data
-            return "<span id='owner_#{full.id}'> #{data} </span><button class='return-ticket-button inline-return-ticket-#{full.id}' title='Return ticket.' onclick='file_rep_return_dispute(#{full.id});'></button>"
+            return "<span id='owner_#{full.id}'> #{data} </span><button class='esc-tooltipped return-ticket-button inline-return-ticket-#{full.id}' title='Return ticket.' onclick='file_rep_return_dispute(#{full.id});'></button>"
           else if data == 'vrtincom' || data == ""
             return "<span class='missing-data missing-data-index' id='owner_#{full.id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.id}' onClick='file_rep_take_dispute(#{full.id})'/></button></span>"
           else
@@ -1176,7 +1191,7 @@ $ ->
           if disposition == 'malicious'
             $('.amp-area .disposition').addClass('disp-negative')
 
-          history_icon = '<span class="amp-history-icon esc-tooltipped tooltipstered" title="View full available AMP history"></span>'
+          history_icon = '<span class="amp-history-icon esc-tooltipped" title="View full available AMP history"></span>'
           $('.amp-area .detection-last-updated').append(history_icon)
 
           # Retain this event listener below, need to ensure all previous succeeds first
@@ -1380,14 +1395,14 @@ $ ->
         data: {name: 'FileRepColumns'}
         success: (response) ->
           response = JSON.parse(response)
-
-          $.each response, (column, state) ->
-            if state == true
-              $("##{column}-checkbox").prop('checked', true)
-              $('#file-rep-datatable').DataTable().column("##{column}").visible true
-            else
-              $("##{column}-checkbox").prop('checked', false)
-              $('#file-rep-datatable').DataTable().column("##{column}").visible false
+          if response?
+            $.each response, (column, state) ->
+              if state == true
+                $("##{column}-checkbox").prop('checked', true)
+                $('#file-rep-datatable').DataTable().column("##{column}").visible true
+              else
+                $("##{column}-checkbox").prop('checked', false)
+                $('#file-rep-datatable').DataTable().column("##{column}").visible false
 
       )
 
@@ -1399,7 +1414,8 @@ $ ->
         data: {name: 'FileRepSortOrder'}
         success: (response) ->
           response = JSON.parse(response)
-          $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
+          if response?
+            $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
         error: () ->
       )
 
@@ -1409,7 +1425,8 @@ $ ->
         data: {name: 'FileRepCurrentPage'}
         success: (response) ->
           response = JSON.parse(response)
-          $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
+          if response?
+            $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
         error: () ->
       )
 
@@ -1419,10 +1436,13 @@ $ ->
         data: {name: 'FileRepEntriesPerPage'}
         success: (response) ->
           response = JSON.parse(response)
-          $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
+          if response?
+            $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
         error: () ->
       )
 
+    $('#file-rep-datatable_filter input').addClass('table-search-input');
+    $('#file-rep-datatable_filter label').addClass('table-search-label');
 
 # file rep index - toggle all cb's and highlight rows
 window.file_rep_select_all = () ->
@@ -1433,3 +1453,22 @@ window.file_rep_select_all = () ->
   else
     $(table).find(':checkbox').prop('checked', false)
     $(table).find('tr').removeClass('selected')
+
+
+$ ->
+  # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
+  $('#file-rep-datatable').on 'draw.dt', ->
+    $('#file-rep-datatable .tooltipstered:not(.rl-hover)').tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr
+    $('#file-rep-datatable .esc-tooltipped:not(.rl-hover)').tooltipster
+      restoration: 'previous'
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
+
+  # one-off init for 'clear search results' icon
+  $('#filerep-index-title #refresh-filter-button').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
