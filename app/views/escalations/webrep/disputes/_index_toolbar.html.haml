@@ -75,13 +75,13 @@
             %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-rules'}
               %input{type: 'checkbox', id: 'sbrs-rules-checkbox'} SBRS Rules
 
-    %button.toolbar-button.expand-row-button#expand-all-index-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
+    %button.toolbar-button.expand-row-button#expand-all-index-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows (alt + g)'}
       %span.toolbar-button-text Expand All Rows
-    %button.toolbar-button.collapse-button#collapse-all-index-rows.esc-tooltipped{title: 'Collapse All Rows'}
+    %button.toolbar-button.collapse-button#collapse-all-index-rows.esc-tooltipped{title: 'Collapse All Rows (alt + h)'}
       %span.toolbar-button-text Collapse All Rows
 
   %div
-    %button.take-ticket-button#index_ticket_assign.esc-tooltipped{title: 'Assign to me', onclick: 'take_disputes();'}
+    %button.take-ticket-button#index_ticket_assign.esc-tooltipped{title: 'Assign to me (alt + t)', onclick: 'take_disputes();'}
       %span.toolbar-button-text
 
   %div
@@ -464,10 +464,10 @@
       File
     %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :xlsx), method: :get}
       = hidden_field_tag('data_json', '{}', id: 'disputes-index-export-data-input')
-      %button.toolbar-button.dropdown-button-margin-right.export-button.export-all-btn.esc-tooltipped{title: 'Export to CSV'}
+      %button.toolbar-button.dropdown-button-margin-right.export-button.export-all-btn.esc-tooltipped{title: 'Export to CSV (alt + ctrl + shift + p)'}
         %span.toolbar-button-text
           Export to CSV
-    %button.toolbar-button.export-button.export-selected-btn.esc-tooltipped{title: 'Export Selected to CSV', onclick: 'webrep_export_selected_rows();'}
+    %button.toolbar-button.export-button.export-selected-btn.esc-tooltipped{title: 'Export Selected to CSV (alt + ctrl + p)', onclick: 'webrep_export_selected_rows();'}
       %span.toolbar-button-text
         Export Selected to CSV
 
