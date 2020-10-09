@@ -759,7 +759,8 @@ Feature: Webcat complaints
       | uri            | domain          | entry_type | complaint_id | status     |
       | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |
     And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I select row "1"
+    Then I click "#complaints_check_box"
+    And I wait for "3" seconds
     Then I click ".take-ticket-toolbar-button"
     Then that Complaint Ticket should have an assignee of current user
 
@@ -773,7 +774,8 @@ Feature: Webcat complaints
       | uri            | domain          | entry_type | complaint_id | status     | user_id|
       | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |   1    |
     And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I select row "1"
+    Then I click "#complaints_check_box"
+    And I wait for "3" seconds
     Then I click ".return-ticket-toolbar-button"
     Then that Complaint Ticket should not have an assignee of current user
 
@@ -787,7 +789,8 @@ Feature: Webcat complaints
       | uri            | domain          | entry_type | complaint_id | status     |
       | abc.com        | abc.com         | URI/DOMAIN |  1           | COMPLETED  |
     And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I select row "1"
+    Then I click "#complaints_check_box"
+    And I wait for "3" seconds
     Then I click ".take-ticket-toolbar-button"
     And I wait for "3" seconds
     And I should see "Already completed - 1"
@@ -801,20 +804,17 @@ Feature: Webcat complaints
 
     And the following complaints exist:
       | channel       | id |
-      | talosintel    | 1  |
-      | talosintel    | 2  |
       | talosintel    | 3  |
 
     And the following complaint entries exist:
       | uri            | domain          | entry_type | complaint_id | status     | user_id|
-      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |        |
-      | whatever.com   | whatever.com    | URI/DOMAIN |  2           | NEW        |        |
       | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |    2   |
     And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I select row "3"
+    Then I click "#complaints_check_box"
+    And I wait for "3" seconds
     Then I click ".take-ticket-toolbar-button"
     And I wait for "15" seconds
-    And I should see "Currently assigned to someone else - 3"
+    And I should see "Currently assigned to someone else - 1"
 
 
   @javascript
@@ -851,7 +851,7 @@ Feature: Webcat complaints
     Then I click "#complaints_check_box"
     And I wait for "3" seconds
     Then I click ".take-ticket-toolbar-button"
-    And I wait for "3" seconds
+    And I wait for "15" seconds
     And I should see "Currently assigned to someone else - 3, 4, 7, and 9"
 
   @javascript
@@ -871,7 +871,8 @@ Feature: Webcat complaints
       | whatever.com   | whatever.com    | URI/DOMAIN |  2           | NEW        |        |
       | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |    2   |
     And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I select row "3"
+    Then I click "#complaints_check_box"
+    And I wait for "3" seconds
     And I click ".return-ticket-toolbar-button"
     And I wait for "3" seconds
     And I should see "Currently assigned to someone else - 3"
