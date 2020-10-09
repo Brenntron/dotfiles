@@ -16,7 +16,7 @@ Feature: Webcat complaints
       |2 | blah.com     |  NEW   |
       |3 | imhungry.com |  NEW   |
     And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints"
+    And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "2" seconds
     And I click ".expand-row-button-1"
     And I wait for "2" seconds
