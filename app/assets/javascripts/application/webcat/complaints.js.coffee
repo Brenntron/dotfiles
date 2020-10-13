@@ -702,7 +702,7 @@ window.take_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('take error', json.error)
+          std_msg_error('Error Taking Entries', json.error)
         else
           for row, i in selected_rows[0]
             selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
@@ -793,7 +793,7 @@ window.return_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('return error', json.error)
+          std_msg_error('Error Returning Entries', json.error)
         else
           for row, i in selected_rows[0]
             selected_rows.data().cell(row,14).data("Vrt Incoming").draw()

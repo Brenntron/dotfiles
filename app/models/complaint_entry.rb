@@ -93,16 +93,23 @@ class ComplaintEntry < ApplicationRecord
         return("Already completed")
       end
     else
-      return("Someone elses complaint")
+      return("Currently assigned to someone else")
     end
     return("Complaint taken")
   end
-  def return_complaint
+
+  def return_complaint(current_user)
+
     if self.user != User.where(display_name: 'Vrt Incoming').first
+
       if !self.is_important
         if status!="COMPLETED"
-          self.update(user: User.vrtincoming, status:"NEW")
-          complaint.set_status("NEW")
+          if self.user.id != current_user.id
+            return("Currently assigned to someone else")
+          else
+            self.update(user: User.vrtincoming, status:"NEW")
+            complaint.set_status("NEW")
+          end
         else
           return("Already completed")
         end

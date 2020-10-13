@@ -599,6 +599,7 @@ $ ->
               }
               {
                 data: 'assigned_to'
+                className: 'assignee-col'
               }
               {
                 data: 'age_int'
