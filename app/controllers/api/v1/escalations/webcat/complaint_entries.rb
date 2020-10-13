@@ -148,15 +148,15 @@ module API
                 end
                 unless error_entry_ids.keys.empty?
                   if error_count == permitted_params['complaint_entry_ids'].count
-                    error_message = ["---The following entrys could not be taken because---"]
+                    error_message = ["The following entries could not be taken:"]
                   else
-                    error_message = ["---Some entries were taken however, The following entrys could not be taken because---"]
+                    error_message = ["Some entries were successfully taken, but the following entries could not be taken:"]
                   end
                   error_entry_ids.keys.each do |key|
-                    error_message << "#{key}: entry IDs -> #{error_entry_ids[key].to_sentence}"
+                    error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
                   end
                   unless error_count == permitted_params['complaint_entry_ids'].count
-                    error_message << "Please refresh the page to pickup the latest changes."
+                    error_message << "Refresh the page to pickup the latest changes."
                   end
                   return {:error => error_message}.to_json
                 end
@@ -178,7 +178,7 @@ module API
                 error_entry_ids = {}
                 error_count = 0
                 permitted_params['complaint_entry_ids'].each do |id|
-                  status = ComplaintEntry.find(id).return_complaint
+                  status = ComplaintEntry.find(id).return_complaint(current_user)
                   if status != "Complaint returned"
                     error_count += 1
                     if error_entry_ids[status].nil?
@@ -190,15 +190,15 @@ module API
                 end
                 unless error_entry_ids.keys.empty?
                   if error_count == permitted_params['complaint_entry_ids'].count
-                    error_message = ["---The following entrys could not be returned because---"]
+                    error_message = ["The following entries could not be returned:"]
                   else
-                    error_message = ["---Some entries were returned however, The following entrys could not be returned because---"]
+                    error_message = ["Some entries were successfully returned, but the following entries could not be returned:"]
                   end
                   error_entry_ids.keys.each do |key|
-                    error_message << "#{key}: entry IDs -> #{error_entry_ids[key].to_sentence}"
+                    error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
                   end
                   unless error_count == permitted_params['complaint_entry_ids'].count
-                    error_message << "Please refresh the page to pickup the latest changes."
+                    error_message << "Refresh the page to pickup the latest changes."
                   end
                   return {:error => error_message}.to_json
                 end
@@ -208,6 +208,7 @@ module API
                 return {:error => error}.to_json
               end
               {name:current_user.display_name}.to_json
+
             end
 
 
