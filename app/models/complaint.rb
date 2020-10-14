@@ -37,6 +37,8 @@ class Complaint < ApplicationRecord
 
   SOURCE_RULEUI = "RuleUI"
 
+  MAIN_WEBCAT_MANAGER_CONTACT = "admatter"
+
   scope :active_count , -> {where(status:ACTIVE).count}
   scope :completed_count , -> {where(status:COMPLETED).count}
   scope :new_count , -> {where(status:NEW).count}

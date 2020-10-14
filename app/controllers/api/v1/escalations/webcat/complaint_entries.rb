@@ -122,6 +122,8 @@ module API
                 response.to_json
 
               rescue Exception => e
+                Rails.logger.error(e)
+                Rails.logger.error e.backtrace.join("\n")
                 e.to_json
               end
             end

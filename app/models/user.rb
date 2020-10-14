@@ -74,6 +74,10 @@ class User < ApplicationRecord
     roles.where(role: role).any?
   end
 
+  def is_webcat_manager?
+    has_role?("webcat manager")
+  end
+
   def is_secure?
     SECURE_SNORT_RULE_ROLES.each do |role|
       if has_role?(role)
@@ -279,5 +283,9 @@ class User < ApplicationRecord
       login_session.bugzilla_login(username: params['uname'], password: params['psw'] )
       login_session
     end
+  end
+
+  def self.webcat_manager_ids
+    User.all.select {|user| user.is_webcat_manager?}.pluck(:id)
   end
 end
