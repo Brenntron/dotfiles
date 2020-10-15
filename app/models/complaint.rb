@@ -333,6 +333,10 @@ class Complaint < ApplicationRecord
 
 
           begin
+            # if we are generating a new screenshot then we need to remove the old one
+            unless new_complaint_entry.complaint_entry_screenshot.nil?
+              ComplaintEntryScreenshot.find(new_complaint_entry.complaint_entry_screenshot.id).delete
+            end
             ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
             ces.grab_screenshot
@@ -387,6 +391,10 @@ class Complaint < ApplicationRecord
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
           begin
+            # if we are generating a new screenshot then we need to remove the old one
+            unless new_complaint_entry.complaint_entry_screenshot.nil?
+              ComplaintEntryScreenshot.find(new_complaint_entry.complaint_entry_screenshot.id).delete
+            end
             ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
             ces.grab_screenshot
