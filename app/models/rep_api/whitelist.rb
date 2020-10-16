@@ -102,4 +102,16 @@ class RepApi::Whitelist < RepApi::Base
     freeze
     true
   end
+
+  def self.get_whitelist_info(conditions = {})
+    params = stringkey_params(conditions)
+
+    entries = params.delete('entries')
+
+    string_array = entries.map {|entry| "entry=#{entry}"}
+
+    response = call_json_request(:post, '/whitelist/gethostname', body: build_request_body(string_array))
+
+    response_body = JSON.parse(response.body)
+  end
 end

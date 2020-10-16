@@ -1,7 +1,9 @@
 class AutoResolve
   include ActiveModel::Model
 
-  attr_accessor :address_type, :address, :resolved, :status, :rule_hits, :internal_comment, :resolution_comment, :auto_resolve_log
+  #attr_accessor :address_type, :address, :resolved, :status, :rule_hits, :internal_comment, :resolution_comment, :auto_resolve_log
+
+  attr_accessor :auto_resolve_log, :internal_comment, :resolution_comment, :status, :resolved
 
   ADDRESS_TYPE_IP           = 'IP'
   ADDRESS_TYPE_URI          = 'URI'
@@ -11,6 +13,286 @@ class AutoResolve
   STATUS_MALICIOUS          = 'MALICIOUS'
   STATUS_NONMALICIOUS       = 'CLEAR'
 
+
+  def self.attempt_ai_conviction(rulehits, dispute_entry)
+    results = process_uri_interrogation(rulehits, dispute_entry)
+
+    dispute_entry = process_interrogation_results(results, dispute_entry)
+
+    dispute_entry
+  end
+
+  def self.process_uri_interrogation(rulehits, dispute_entry)
+
+    result = {}
+
+    baseline_results = process_baseline_requirements(rulehits, dispute_entry)
+
+    if baseline_results[:action] == :do_not_resolve
+      return baseline_results
+    end
+
+    conviction_results = process_conviction_requirements(dispute_entry.hostlookup)
+
+    return conviction_results
+
+  end
+
+  def self.process_baseline_requirements(rulehits, dispute_entry)
+    results = {}
+    begin
+
+      umbrella_popularity_result = check_umbrella_popularity(dispute_entry.hostlookup)
+      if umbrella_popularity_result[:pass]
+        results[:action] = :do_not_resolve
+        results[:reason] = ""
+        return results
+      end
+
+      sds_result = check_sds_allow_list(rulehits)
+      if sds_result[:pass]
+        results[:action] = :do_not_resolve
+        results[:reason] = ""
+        return results
+      end
+
+      reptool_result = check_reptool_for_allow_list(dispute_entry.hostlookup)
+      if reptool_result[:pass]
+        results[:action] = :do_not_resolve
+        results[:reason] = ""
+        return results
+      end
+
+      results[:action] = :attempt_to_resolve
+    rescue
+
+    end
+
+  end
+
+  def self.process_conviction_requirements(entry)
+    results = {}
+
+    begin
+      virustotal_results = check_virustotal_hits(entry)
+
+      if number_of_virustotal_trusted_hits(virustotal_results) > 0
+        results[:action] = :commit_malware
+        results[:reason] = ""
+        return results
+      end
+
+      umbrella_rating_results = check_umbrella_rating(entry)
+
+      if bad_umbrella_rating(umbrella_rating_results)
+        results[:action] = :commit_malware
+        results[:reason] = ""
+        return results
+      end
+
+      if virustotal_results[:positives] > 5
+        results[:action] = :commit_malware
+        results[:reason] = ""
+        return results
+      end
+
+      umbrella_domain_volume_results = check_umbrella_domain_volume(entry)
+
+      if suspicious_umbrella_domain_volume(umbrella_domain_volume_results)
+        results[:action] = :commit_phishing
+        results[:reason] = ""
+        return results
+      end
+
+      results[:action] = :do_not_resolve
+      results[:reason] = ""
+
+      results
+
+    rescue
+
+    end
+
+  end
+
+  def self.process_interrogation_results(result, dispute_entry)
+
+    action = result[:action]
+
+    if action == :do_not_resolve || action.blank?
+      dispute_entry.status = DisputeEntry::NEW
+    else
+
+      result = commit_to_reptool(action, dispute_entry)
+      if result[:success]
+        dispute_entry.status = DisputeEntry::STATUS_RESOLVED
+        dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
+        dispute_entry.case_closed_at = resolved_at
+        dispute_entry.case_resolved_at = resolved_at
+      else
+        dispute_entry.status = DisputeEntry::NEW
+      end
+    end
+
+    dispute_entry.save
+
+  end
+
+  def self.number_of_virustotal_trusted_hits(hits)
+
+    total = 0
+    hits.each do |hit|
+      total += 1 if trusted_virustotal_hits.include?(hit)
+    end
+
+    total
+  end
+
+
+######################DATA CHECKS#############################
+
+  def self.check_umbrella_popularity(entry)
+    begin
+      response = Umbrella::SecurityInfo.query_info(address: address)
+
+      if response.code == 200
+        data = JSON.parse(response.body)
+        result[:rating] = data[data.keys.first]["status"] == -1 ? "malicious" : "trusted"
+      end
+    rescue
+      result[:rating] = nil
+    end
+  end
+
+  def self.check_reptool_for_allow_list(entry)
+
+    result = RepApi::Whitelist.get_whitelist_info({:entries => entry})
+    #if 200 code + status: active
+    #look for a 404 exception for a negative RepApi::RepApiNotFoundError: HTTP response 404
+
+  end
+
+  def self.check_sds_allow_list(rulehits)
+    result = {}
+
+    result[:pass] = rulehits.any?{|rulehit| allow_listed?(rulehit)}
+
+    result
+  end
+
+  def self.check_umbrella_domain_volume(entry)
+    begin
+      response = Umbrella::DomainVolume.query_domain_volume(address: address)
+
+      if response.code == 200
+        data = JSON.parse(response.body)
+        result[:rating] = data[data.keys.first]["status"] == -1 ? "malicious" : "trusted"
+      end
+    rescue
+      result[:rating] = nil
+    end
+  end
+
+  def self.check_virustotal_hits(entry)
+    begin
+      vt_results = Virustotal::Scan.scan_hashes(address: entry)
+
+      result = {}
+      result[:positives] = 0
+      result[:positive_scans] = []
+
+      if vt_results && vt_results['scans']
+        result[:positives] = vt_results["positives"]
+        if result[:positives] > 0
+          result[:positive_scans] = vt_results["scans"].keys.select {|key| vt_results["scans"][key]["detected"] == true}
+        end
+      end
+
+      result
+    rescue
+
+    end
+  end
+
+  def self.check_umbrella_rating(entry)
+
+    result = {}
+    result[:rating] = nil
+    begin
+    response = Umbrella::Scan.scan_result(address: address)
+
+    if response.code == 200
+      data = JSON.parse(response.body)
+      result[:rating] = data[data.keys.first]["status"] == -1 ? "malicious" : "trusted"
+    end
+    rescue
+      result[:rating] = nil
+    end
+    result
+  end
+
+
+
+  ###############################################################################################################
+
+
+  def self.commit_to_reptool(action, dispute_entry)
+
+    result = {}
+    result[:success] = false
+
+    author = "reptooluser"
+
+    classification = nil
+
+    case action
+      when :commit_malware
+        classification = "malware"
+      when :commit_phishing
+        classification = "phishing"
+    end
+
+    comment = "TE SecHub-Auto-#{dispute_entry.dispute_id}"
+    begin
+    if classification.present?
+      RepApi::Blacklist.add_from_hosts(hostnames: [ uri ],
+                                       classifications: [ classification ],
+                                       author: author,
+                                       comment: comment)
+
+      result[:success] = true
+    end
+
+    rescue
+      result[:success] = false
+    end
+
+    result
+  end
+
+  def self.allow_listed?(rule_hit)
+    %w{tuse a500 vsvd suwl wlw wlm wlh deli ciwl beaker_drl}.include?(rule_hit)
+  end
+
+  def self.trusted_virustotal_hits
+    %w{Kaspersky Sophos Avira Google\ Safebrowsing BitDefender}
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  #################################################################################################################
 
   # @return (Boolean) true if address type is IP.
   def ip?
