@@ -85,11 +85,23 @@ $ ->
 
   $('#new-complaint-form').submit (e) ->
     e.preventDefault()
-    ips_urls = this.ips_urls.value
+    unparsed_ips_urls = this.ips_urls.value.replace(/, |,|\n/g,' ').split(' ')
+    for ip_url, i in unparsed_ips_urls
+      if !/^[0-9,.]*$/.test(ip_url)
+        http = ""
+        if !el.includes('http://')
+          http = 'http://'
+        url = new URL(http + ip_url.trim())
+        url.host = url.host.toLowerCase()
+        new_url = url.toString()
+        unparsed_ips_urls[i] = new_url
+    ips_urls = unparsed_ips_urls.join(' ')
     desc = this.description.value
     customer = this.customers.value
     tags = $('.selectize').val() || []
     $('#new-complaint').dropdown('toggle');
+
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaints'
       method: 'POST'
@@ -101,6 +113,7 @@ $ ->
       success: (response) ->
         std_msg_success('Complaint Created.', [], reload: true)
       error: (response) ->
+        console.log response
         std_api_error(response, "Complaint was not created.", reload: false)
     )
 
