@@ -113,7 +113,6 @@ $ ->
       success: (response) ->
         std_msg_success('Complaint Created.', [], reload: true)
       error: (response) ->
-        console.log response
         std_api_error(response, "Complaint was not created.", reload: false)
     )
 
