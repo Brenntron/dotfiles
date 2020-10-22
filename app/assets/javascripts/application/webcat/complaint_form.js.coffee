@@ -89,7 +89,7 @@ $ ->
     for ip_url, i in unparsed_ips_urls
       if !/^[0-9,.]*$/.test(ip_url)
         http = ""
-        if !el.includes('http://')
+        if !ip_url.includes('http://')
           http = 'http://'
         url = new URL(http + ip_url.trim())
         url.host = url.host.toLowerCase()
