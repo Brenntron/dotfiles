@@ -539,15 +539,8 @@ $ ->
 
   window.export_file_rep_all = () ->
     form = document.getElementById("disputes-index-export-form")
-    data = {
-      search_type: ''
-      search_name: ''
-      selected_cases: []
-    }
 
-    $('.dispute_check_box').each ->
-      case_id =  $(this).attr('value')
-      data.selected_cases.push(case_id)
+    data = build_data()
 
     if 'advanced' == data.search_type
       data.search_name = null
