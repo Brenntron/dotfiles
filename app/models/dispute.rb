@@ -568,24 +568,10 @@ class Dispute < ApplicationRecord
 
             else
               if new_dispute.submission_type == "w"
-                auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                                  total_hits: total_hits,
-                                                                                  resolved_at: resolved_at,
-                                                                                  dispute_entry: new_dispute_entry)
-
-                if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-                  verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-                end
-
-                if auto_resolve_verdict.present? && auto_resolve_verdict.auto_resolve_log.present?
-                  new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
-                end
-
+                new_dispute_entry = AutoResolve.attempt_api_conviction(total_hits, new_dispute_entry)
               end
 
             end
-
-            new_dispute_entry.save!
 
           end
 
@@ -674,21 +660,8 @@ class Dispute < ApplicationRecord
             if !false_negative_claim
               new_dispute_entry.update(status: DisputeEntry::NEW)
             else
-              auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                                total_hits: total_hits,
-                                                                                resolved_at: resolved_at,
-                                                                                dispute_entry: new_dispute_entry)
-
-              if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-                verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-              end
-
-              if auto_resolve_verdict.present? && auto_resolve_verdict.auto_resolve_log.present?
-                new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
-              end
+              new_dispute_entry = AutoResolve.attempt_api_conviction(total_hits, new_dispute_entry)
             end
-
-            new_dispute_entry.save!
 
           end
 
@@ -755,44 +728,6 @@ class Dispute < ApplicationRecord
       conn.post
 
       nil
-    end
-
-
-    verdicts_to_blacklist.each do |blacklist|
-      begin
-        auto_resolve_verdict = blacklist.first
-        if auto_resolve_verdict.malicious?
-          auto_resolve_verdict.publish_to_rep_api(dispute_id: blacklist.last.dispute_id)
-
-          dispute_entry = blacklist.last
-
-          args = {}
-          args[:dispute_id] = dispute_entry.dispute_id
-          args[:user_id] = user.id
-          args[:comment] = auto_resolve_verdict.internal_comment
-
-          DisputeComment.create(args)
-        end
-      rescue Exception => e
-        Rails.logger.error "Attempts at blacklisting a dispute entry with reptool failed. Check reptool:"
-        Rails.logger.error $!
-        Rails.logger.error $!.backtrace.join("\n")
-
-        dispute_entry = blacklist.last
-
-        dispute_entry.status = NEW
-        dispute_entry.resolution = ""
-        dispute_entry.resolution_comment = ""
-        dispute_entry.save
-
-        args = {}
-        args[:dispute_id] = dispute_entry.dispute_id
-        args[:user_id] = user&.id
-        args[:comment] = "Dispute Entry #{dispute_entry.hostlookup} was eligible for auto-resolution, but failed to connect to RepTool. Sending this to the analysts' queue"
-
-        DisputeComment.create(args)
-
-      end
     end
 
     new_dispute
