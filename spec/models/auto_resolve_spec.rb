@@ -23,6 +23,14 @@ describe AutoResolve do
     umbrella_scan_good.code = 200
     umbrella_scan_good.body = "{\"google.com\":{\"status\":1,\"security_categories\":[],\"content_categories\":[\"23\"]}}"
 
+    umbrella_domain_volume_good = UmbrellaVolumeResponse.new
+    umbrella_domain_volume_good.code = 200
+    umbrella_domain_volume_good.body = "{\"dates\":[1601121600000,1603713600000],\"queries\":[0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0]}"
+
+    umbrella_domain_volume_bad = UmbrellaVolumeResponse.new
+    umbrella_domain_volume_bad.code = 200
+    umbrella_domain_volume_bad.body = "{\"dates\":[1601121600000,1603713600000],\"queries\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,4,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,8,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,25,19,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,2,0,1,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0]}"
+
     let(:target_address) {'testing.com'}
 
     let(:reptool_whitelist_good) {
@@ -210,110 +218,76 @@ describe AutoResolve do
     end
 
     # 7.  Complaints has no hits, VT acquits, Umbrella check fails to connect produces NEW ticket.
-    xit '' do
+    it 'should auto resolve to phishing if domain volume is at suspicious levels' do
 
-      expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_clear_json))
-      allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
+      expect(Umbrella::SecurityInfo).to receive(:query_info).with(address: target_address).and_return(umbrella_popular_bad).at_least(:once)
+      expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(virus_total_clean_hash).at_least(:once)
+      expect(RepApi::Whitelist).to receive(:get_whitelist_info).and_raise(RepApi::RepApiNotFoundError, "HTTP response 404").at_least(:once)
+      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_scan_good).at_least(:once)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
-      expect(auto_resolve.resolved?).to be_falsey
-      expect(auto_resolve.internal_comment).to include('VT: -;')
+      expect(Umbrella::DomainVolume).to receive(:query_domain_volume).with(address: target_address).and_return(umbrella_domain_volume_bad).at_least(:once)
+
+
+
+      response = AutoResolve.process_baseline_requirements(['plcbo'], @dispute_entry)
+
+      expect(response).to eql ({:action=>:attempt_to_resolve, :log=>["Umbrella popularity rating: 0.0: result of pass: false", "no sds rulehits detected against allow list", "no entry with reptool whitelist, continuing."]})
+
+
+
+      response = AutoResolve.process_conviction_requirements(@dispute_entry.hostlookup, response[:log])
+
+      expect(response).to eql({:action=>:commit_phishing, :log=>["Umbrella popularity rating: 0.0: result of pass: false",
+                                                                "no sds rulehits detected against allow list",
+                                                                "no entry with reptool whitelist, continuing.",
+                                                                "vt results: \n",
+                                                                "trusted vt hits: 0\n",
+                                                                "umbrella rating returned 1",
+                                                                "suspicious data point found: 25.0 / 161.0 = 0.15527950310559005"]})
+      #integration test
+      dispute_entry = AutoResolve.attempt_ai_conviction(['plcbo'], @dispute_entry)
+      expect(dispute_entry.status).to eql(DisputeEntry::STATUS_RESOLVED)
+      expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
+
+      expect(dispute_entry.auto_resolve_log).to eql("Umbrella popularity rating: 0.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>vt results: \n<br><br>trusted vt hits: 0\n<br><br>umbrella rating returned 1<br><br>suspicious data point found: 25.0 / 161.0 = 0.15527950310559005")
+
     end
 
     # 8.  Complaints has no hits, VT check disabled, Umbrella convicts, produces malicious status.
-    xit '' do
+    it 'should not auto resolve if entire chain is non-malicious' do
 
-      allow(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
-      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
+      expect(Umbrella::SecurityInfo).to receive(:query_info).with(address: target_address).and_return(umbrella_popular_bad).at_least(:once)
+      expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(virus_total_clean_hash).at_least(:once)
+      expect(RepApi::Whitelist).to receive(:get_whitelist_info).and_raise(RepApi::RepApiNotFoundError, "HTTP response 404").at_least(:once)
+      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_scan_good).at_least(:once)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
-      expect(auto_resolve.resolved?).to be_truthy
-      expect(auto_resolve.malicious?).to be_truthy
-      expect(auto_resolve.internal_comment).to include('Umbrella: malicious domain.')
-    end
+      expect(Umbrella::DomainVolume).to receive(:query_domain_volume).with(address: target_address).and_return(umbrella_domain_volume_good).at_least(:once)
 
-    # 9.  Complaints has no hits, VT check fails to connect, Umbrella convicts, produces malicious status.
-    xit '' do
 
-      expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
-      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
+      response = AutoResolve.process_baseline_requirements(['plcbo'], @dispute_entry)
 
-      expect(auto_resolve.resolved?).to be_truthy
-      expect(auto_resolve.malicious?).to be_truthy
-      expect(auto_resolve.internal_comment).to include('Umbrella: malicious domain.')
-    end
+      expect(response).to eql ({:action=>:attempt_to_resolve, :log=>["Umbrella popularity rating: 0.0: result of pass: false", "no sds rulehits detected against allow list", "no entry with reptool whitelist, continuing."]})
 
-    # 10. Complaints has no hits, VT check disabled, Umbrella acquits, produces NEW ticket.
-    xit '' do
 
-      allow(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
-      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
+      response = AutoResolve.process_conviction_requirements(@dispute_entry.hostlookup, response[:log])
 
-      expect(auto_resolve.resolved?).to be_truthy
-      expect(auto_resolve.malicious?).to be_truthy
-      expect(auto_resolve.internal_comment).to include('Umbrella: malicious domain.')
-    end
+      expect(response).to eql({:action=>:do_not_resolve, :log=>["Umbrella popularity rating: 0.0: result of pass: false",
+                                                                 "no sds rulehits detected against allow list",
+                                                                 "no entry with reptool whitelist, continuing.",
+                                                                 "vt results: \n",
+                                                                 "trusted vt hits: 0\n",
+                                                                 "umbrella rating returned 1",
+                                                                 "no suspicious data points found."]})
+      #integration test
+      dispute_entry = AutoResolve.attempt_ai_conviction(['plcbo'], @dispute_entry)
+      expect(dispute_entry.status).to eql(DisputeEntry::NEW)
+      expect(dispute_entry.resolution).to eql(nil)
 
-    # 11. Complaints has no hits, VT check fails to connect, Umbrella acquits, produces NEW ticket.
-    xit '' do
-
-      allow(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
-      expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
-
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
-
-      expect(auto_resolve.resolved?).to be_truthy
-      expect(auto_resolve.malicious?).to be_truthy
-    end
-
-    # 12. Complaints has no hits, VT check disabled, Umbrella check disabled produces NEW ticket.
-    xit '' do
-
-      allow(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
-      allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
-
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
-
-      expect(auto_resolve.resolved?).to be_falsey
-    end
-
-    # 13. Complaints has no hits, VT check disabled, Umbrella check fails to connect produces NEW ticket.
-    xit '' do
-
-      allow(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
-      # expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
-
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
-
-      expect(auto_resolve.resolved?).to be_falsey
-    end
-
-    # 14. Complaints has no hits, VT check fails to connect, Umbrella check disabled produces NEW ticket.
-    xit '' do
-
-      # expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
-      allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
-
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
-
-      expect(auto_resolve.resolved?).to be_falsey
-    end
-
-    # 15. Complaints has no hits, VT check fails to connect, Umbrella check fails to connect produces NEW ticket.
-    xit '' do
-
-      # expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
-      allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
-
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
-
-      expect(auto_resolve.resolved?).to be_falsey
+      expect(dispute_entry.auto_resolve_log).to eql("Umbrella popularity rating: 0.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>vt results: \n<br><br>trusted vt hits: 0\n<br><br>umbrella rating returned 1<br><br>no suspicious data points found.")
     end
 
   end

@@ -16,16 +16,20 @@ class AutoResolve
 
   #entry point
   def self.attempt_ai_conviction(rulehits, dispute_entry)
-    results = process_uri_interrogation(rulehits, dispute_entry)
 
+    if auto_resolve_toggle
+      results = process_uri_interrogation(rulehits, dispute_entry)
+    else
+      results = {}
+      results[:action] = :do_not_resolve
+      results[:log] = ["auto resolution is turned off or is experiencing configuration error"]
+    end
     dispute_entry = process_interrogation_results(results, dispute_entry)
 
     dispute_entry
   end
 
   def self.process_uri_interrogation(rulehits, dispute_entry)
-
-    result = {}
 
     baseline_results = process_baseline_requirements(rulehits, dispute_entry)
 
@@ -54,11 +58,12 @@ class AutoResolve
 
       sds_result = check_sds_allow_list(rulehits)
       results[:log] << sds_result[:log]
+
       if sds_result[:pass]
         results[:action] = :do_not_resolve
         return results
       end
-
+      
       reptool_result = check_reptool_for_allow_list(dispute_entry.hostlookup)
       results[:log] << reptool_result[:log]
       if reptool_result[:pass]
@@ -82,7 +87,7 @@ class AutoResolve
     results = {}
     results[:log] = log
     results[:action] = nil
-    #begin
+    begin
       virustotal_results = check_virustotal_hits(entry)
 
       trusted_hits = number_of_virustotal_trusted_hits(virustotal_results[:positive_scans])
@@ -123,12 +128,12 @@ class AutoResolve
 
       results[:action] = :do_not_resolve
 
-    #rescue Exception => e
-    #  Rails.logger.error(e.message)
-    #  results[:action] = :do_not_resolve
-    #  results[:log] << "there was an error in conviction requirements, halting auto conviction process"
+    rescue Exception => e
+      Rails.logger.error(e.message)
+      results[:action] = :do_not_resolve
+      results[:log] << "there was an error in conviction requirements, halting auto conviction process"
 
-    #end
+    end
 
     results
   end
@@ -174,6 +179,15 @@ class AutoResolve
 
 ######################DATA CHECKS#############################
 
+  def self.auto_resolve_toggle
+    begin
+      Rails.configuration.auto_resolve.check_complaints
+    rescue Exception => e
+      Rails.logger.error(e.message)
+      false
+    end
+  end
+
   def self.check_umbrella_popularity(entry)
 
     result = {}
@@ -206,6 +220,7 @@ class AutoResolve
     rescue
       result[:rating] = nil
       result[:log] = "there was an error checking umbrella popularity"
+      result
     end
   end
 
@@ -263,13 +278,13 @@ class AutoResolve
         data = JSON.parse(response.body)["queries"]
 
         total_queries = data.inject(0){|sum, x| sum + x }
-
+        result[:log] = "domain volume is zero, moving on."
         if total_queries == 0
           return result
         end
-
+        result[:log] = "no suspicious data points found."
         data.each do |data_point|
-          if data_point == 0
+          if data_point.to_i == 0
             next
           end
           data_point_factor = (data_point.to_f / total_queries.to_f)

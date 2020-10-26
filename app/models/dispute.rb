@@ -549,10 +549,10 @@ class Dispute < ApplicationRecord
 
           matching_disposition = new_dispute_entry.is_disposition_matching?
 
-          initial_log = "--------Starting Data---------\n"
-          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
-          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
-          initial_log += "-----------------------------\n"
+          initial_log = "--------Starting Data---------<br>"
+          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}<br>"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}<br>"
+          initial_log += "-----------------------------<br>"
 
           new_dispute_entry.auto_resolve_log += initial_log
           new_dispute_entry.save!
@@ -568,7 +568,7 @@ class Dispute < ApplicationRecord
 
             else
               if new_dispute.submission_type == "w"
-                new_dispute_entry = AutoResolve.attempt_api_conviction(total_hits, new_dispute_entry)
+                new_dispute_entry = AutoResolve.attempt_ai_conviction(total_hits, new_dispute_entry)
               end
 
             end
@@ -647,12 +647,6 @@ class Dispute < ApplicationRecord
           complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => new_dispute_entry.uri})
           new_dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
 
-          initial_log = "--------Starting Data---------\n"
-          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
-          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
-          initial_log += "-----------------------------\n"
-
-          new_dispute_entry.auto_resolve_log += initial_log
           new_dispute_entry.save!
 
 
@@ -660,7 +654,7 @@ class Dispute < ApplicationRecord
             if !false_negative_claim
               new_dispute_entry.update(status: DisputeEntry::NEW)
             else
-              new_dispute_entry = AutoResolve.attempt_api_conviction(total_hits, new_dispute_entry)
+              new_dispute_entry = AutoResolve.attempt_ai_conviction(total_hits, new_dispute_entry)
             end
 
           end
