@@ -56,22 +56,6 @@ Feature: Disputes
     Then I should see content "0000000001" within "#disputes-index"
 
   @javascript
-  Scenario: When user submits an uppercase domain, that domain will become lowercased
-    Given a user with role "webrep user" exists and is logged in
-    And bugzilla rest api always saves
-    And the following customers exist:
-      | id | company_id |   name   | email                 |
-      | 3  |      1     |  guest   | guest@guest.com       |
-      | 4  |      2     | customer | customer@customer.com |
-    When I go to "/escalations/webrep/disputes"
-    And  I click button with class "close"
-    And I wait for "2" seconds
-    Then I click "new-dispute"
-    And I fill in "ips_urls" with "TESTTESTTEST.COM/moooooCOW"
-    When I click "submit"
-    And I wait for "10" seconds
-
-  @javascript
   Scenario: A user cannot create a duplicate IP Dispute
     Given a user with role "webrep user" exists and is logged in
     Given the following disputes exist:
