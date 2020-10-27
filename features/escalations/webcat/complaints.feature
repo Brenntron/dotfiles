@@ -59,7 +59,7 @@ Feature: Webcat complaints
     And I should see "urgent"
 
   @javascript
-  Scenario: a user can manually create a new complaint
+  Scenario: a user can manually create a new complaint that is uppercased and the path will become lowercased
     Given a user with role "webcat user" exists and is logged in
     And bugzilla rest api always saves
     And complaint entry preload is stubbed
