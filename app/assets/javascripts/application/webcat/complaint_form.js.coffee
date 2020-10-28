@@ -93,8 +93,13 @@ $ ->
           http = 'http://'
         url = new URL(http + ip_url.trim())
         url.host = url.host.toLowerCase()
-        new_url = url.toString()
+        new_url = url.toString().replace('http://', http)
+        if http = 'http://'
+          new_url = new_url.replace('http://', '')
+        if url.pathname == '/'
+          new_url = new_url.substring(0, new_url.length - 1);
         unparsed_ips_urls[i] = new_url
+
     ips_urls = unparsed_ips_urls.join(' ')
     desc = this.description.value
     customer = this.customers.value
