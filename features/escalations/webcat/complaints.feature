@@ -904,7 +904,7 @@ Feature: Webcat complaints
     And I goto "/escalations/webcat/complaints?f=MY%20COMPLAINTS"
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
-    When I click "#queue"
+    When I click "#complaints"
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
 
