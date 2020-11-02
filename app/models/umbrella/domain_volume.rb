@@ -12,7 +12,6 @@ class Umbrella::DomainVolume
     request.ssl = true
     request.auth.ssl.verify_mode = :peer
     request.headers['Authorization'] = "Bearer #{Rails.configuration.umbrella.api_key}"
-    #request.headers['Authorization'] = "Bearer 21784dc8-3ddc-4cdf-af17-3b4425fcd19c"
     request.headers['Content-Type'] = 'application/json'
 
     request
