@@ -2178,3 +2178,14 @@ $ ->
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
+$ ->
+  set_complaints_link = () ->
+    url = window.location.origin + window.location.pathname # without search
+    standard_filter = window.location.search
+    if standard_filter && url.indexOf('webcat') > 0
+      link = url + standard_filter
+      $('#cat-link').attr('href', link)
+      $('#cat-icon-link').attr('href', link)
+      $('#complaints').attr('href', link)
+
+  set_complaints_link()

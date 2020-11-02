@@ -2349,3 +2349,15 @@ $ ->
         'tooltipster-borderless'
         'tooltipster-borderless-customized'
       ]
+
+$ ->
+  set_disputes_link = () ->
+    url = window.location.origin + window.location.pathname # without search
+    standard_filter = window.location.search
+    if standard_filter && url.indexOf('webrep') > 0
+      link = url + standard_filter
+      $('#rep-link').attr('href', link)
+      $('#rep-icon-link').attr('href', link)
+      $('#queue').attr('href', link)
+
+  set_disputes_link()

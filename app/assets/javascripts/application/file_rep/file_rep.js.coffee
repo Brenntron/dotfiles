@@ -1472,3 +1472,15 @@ $ ->
       'tooltipster-borderless'
       'tooltipster-borderless-customized'
     ]
+
+$ ->
+  set_file_rep_link = () ->
+    url = window.location.origin + window.location.pathname # without search
+    standard_filter = window.location.search
+    if standard_filter && url.indexOf('file_rep') > 0
+      link = url + standard_filter
+      $('#amp-link').attr('href', link)
+      $('#amp-icon-link').attr('href', link)
+      $('#queue').attr('href', link)
+
+  set_file_rep_link()
