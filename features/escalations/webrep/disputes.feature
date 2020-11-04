@@ -54,7 +54,7 @@ Feature: Disputes
     Given an empty dispute exists
     When I go to "/escalations/webrep/disputes"
     Then I should see content "0000000001" within "#disputes-index"
-    
+
   @javascript
   Scenario: A user cannot create a duplicate IP Dispute
     Given a user with role "webrep user" exists and is logged in
