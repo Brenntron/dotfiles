@@ -2352,10 +2352,15 @@ $ ->
 
 $ ->
   set_disputes_link = () ->
-    url = window.location.origin + window.location.pathname # without search
-    standard_filter = window.location.search
-    if standard_filter && url.indexOf('webrep') > 0
-      link = url + standard_filter
+    url = '/escalations/webrep/disputes'
+    search = if window.location.pathname == url # only if we're on index page
+      window.location.search
+    else
+      localStorage.webrep_search_name
+
+    if search && window.location.href.indexOf('webrep') > 0
+      localStorage.setItem('webrep_search_name', search)
+      link = url + search
       $('#rep-link').attr('href', link)
       $('#rep-icon-link').attr('href', link)
       $('#queue').attr('href', link)

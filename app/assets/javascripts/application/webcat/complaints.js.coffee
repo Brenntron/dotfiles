@@ -2180,10 +2180,15 @@ $ ->
 
 $ ->
   set_complaints_link = () ->
-    url = window.location.origin + window.location.pathname # without search
-    standard_filter = window.location.search
-    if standard_filter && url.indexOf('webcat') > 0
-      link = url + standard_filter
+    url = '/escalations/webcat/complaints'
+    search = if window.location.pathname == url # only if we're on index page
+      window.location.search
+    else
+      localStorage.webcat_search_name
+
+    if search && window.location.href.indexOf('webcat') > 0
+      localStorage.setItem('webcat_search_name', search)
+      link = url + search
       $('#cat-link').attr('href', link)
       $('#cat-icon-link').attr('href', link)
       $('#complaints').attr('href', link)
