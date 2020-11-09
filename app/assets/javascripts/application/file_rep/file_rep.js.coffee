@@ -328,6 +328,7 @@ $ ->
     new_url = '/escalations/file_rep/disputes'
 
     if href != undefined
+      localStorage.setItem('file_rep_search_name', href)
       window.location.replace(new_url + href)
 
     if !href && typeof parseInt(url_check) == 'number'
@@ -1465,3 +1466,20 @@ $ ->
       'tooltipster-borderless'
       'tooltipster-borderless-customized'
     ]
+
+$ ->
+  set_file_rep_link = () ->
+    url = '/escalations/file_rep/disputes'
+    search = if window.location.pathname == url # only if we're on index page
+               window.location.search
+             else
+               localStorage.file_rep_search_name
+
+    if search && window.location.href.indexOf('file_rep') > 0
+      localStorage.setItem('file_rep_search_name', search)
+      link = url + search
+      $('#amp-link').attr('href', link)
+      $('#amp-icon-link').attr('href', link)
+      $('#queue').attr('href', link)
+
+  set_file_rep_link()

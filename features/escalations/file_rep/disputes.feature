@@ -658,4 +658,34 @@ Feature: Disputes
     And I should see content "Everyone" within ".amp-public-notes"
     And I should see content "Now" within ".amp-contact"
 
+  @javascript
+  Scenario: left nav links should apply filter if the filter was set before
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "assigned" exists
+    And A FileRep Dispute with trait "assigned_resolved" exists
+    When I go to "/escalations/file_rep/disputes?f=my_open"
+    Then I should see "000001"
+    Then I should not see "000002"
+    When I click "#nav-trigger-label"
+    And I click "Escalations"
+    And I click "#amp-icon-link"
+    Then I should see "000001"
+    Then I should not see "000002"
+    When I click "#nav-trigger-label"
+    And I click "Escalations"
+    And I click "#amp-link"
+    Then I should see "000001"
+    Then I should not see "000002"
+
+  @javascript
+  Scenario: top nav links should apply filter if the filter was set before
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "assigned" exists
+    And A FileRep Dispute with trait "assigned_resolved" exists
+    When I go to "/escalations/file_rep/disputes?f=my_open"
+    Then I should see "000001"
+    Then I should not see "000002"
+    When I click "#queue"
+    Then I should see "000001"
+    Then I should not see "000002"
 

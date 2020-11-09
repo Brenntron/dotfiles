@@ -2349,3 +2349,20 @@ $ ->
         'tooltipster-borderless'
         'tooltipster-borderless-customized'
       ]
+
+$ ->
+  set_disputes_link = () ->
+    url = '/escalations/webrep/disputes'
+    search = if window.location.pathname == url # only if we're on index page
+      window.location.search
+    else
+      localStorage.webrep_search_name
+
+    if search && window.location.href.indexOf('webrep') > 0
+      localStorage.setItem('webrep_search_name', search)
+      link = url + search
+      $('#rep-link').attr('href', link)
+      $('#rep-icon-link').attr('href', link)
+      $('#queue').attr('href', link)
+
+  set_disputes_link()
