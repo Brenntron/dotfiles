@@ -1,5 +1,10 @@
 window.apply_filter_to_table = () ->
   filter = $("#cluster_filter_field").val()
+
+  # if they have entered a regex, show the regex in upper-left area
+  if filter != '' then $('.regex-area').removeClass('hidden')
+  else $('.regex-area').addClass('hidden')
+
   $('#regex-filter').html(filter)
   populate_clusters_index_table(filter);
 
@@ -147,10 +152,21 @@ $ ->
       {
         data: null,
         render: (data) ->
-          '<button type="button" class="whois-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data.domain + '\')"></button>' +
-            '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data.domain + '\')"></button>' +
-            data.domain + '<button type="button" onclick="window.open(\'https://' + data.domain + '\', \'_blank\') " class="open-in-tab-btn right-margin esc-tooltipped", title="Open ' + data.domain + ' in a new tab"></button>' +
-            '<span class="vertical-separator"></span><span class="entry-count">' + data.cluster_size + '</span>'
+          html = ""
+          {domain, cluster_size} = data  # get domain string and cluster_size out of the data
+          is_ip = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+
+          # only show WHOIS lookup button for normal domains, not ip addresses
+          if !is_ip.test(domain)
+            html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='domain_whois(\"#{domain}\")'></button>"
+          else
+            html += "<button type='button' class='whois-btn right-margin domain-spacer'></button>"
+
+          html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
+                    #{domain} <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>
+                    <span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
+
+          return html
       }
       {
         data: 'global_volume'
