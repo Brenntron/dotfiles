@@ -8493,7 +8493,7 @@ td.text-center span {
 }
 
 .current-cluster-info-wrapper {
-  padding: 30px 0 10px;
+  padding: 25px 0 10px;
   .result-label.vertical-separator {
     border-right: 1px solid $nav-toolbar-color;
   }
@@ -8510,11 +8510,12 @@ td.text-center span {
       padding-left: 10px;
       float: right;
       display: inline-block;
-      min-width: 50px;
+      min-width: 40px;
     }
-  }
-  &.regex-area {
-    padding-left: 20px;  // regex field on clusters
+    &.regex-area {
+      padding-left: 20px;  // regex field on clusters
+      border-left: solid 1px $medium-neutral-color;
+    }
   }
 }
 
