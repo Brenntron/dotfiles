@@ -5138,7 +5138,7 @@ table > tbody > tr > td.dispute_rep_tools {
   height: 16px;
   margin-top: 3px;
   margin-right: 8px;
-  padding: 2px;
+  padding: 1px;
   float: right;
   transform: none;  // remove the odd transformY property
 }
@@ -8474,7 +8474,6 @@ td.text-center span {
 .cluster-mgt-top-area {
   background-color: $content-tab-color;
   padding-bottom: 20px;
-
   .search-box {
     background-image: none;
     padding: 0 0 0 10px;
