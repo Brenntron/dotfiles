@@ -177,7 +177,7 @@ $ ->
       window.location.replace( new_url + href )
     if !href && typeof parseInt(url_check) == 'number'
       window.location.replace('/escalations/webcat/complaints')
-    localStorage.setItem('webcat_reset_page', true)
+      localStorage.setItem('webcat_reset_page', true)
 
   refresh_localStorage = () ->
     localStorage.removeItem('webcat_search_type')
