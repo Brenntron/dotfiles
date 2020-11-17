@@ -5131,13 +5131,20 @@ table > tbody > tr > td.dispute_rep_tools {
   margin-top: 1px;
 }
 
+// webcat clusters table light gray border
 .domain-column .vertical-separator {
   border-right: 1px solid $nav-toolbar-color;
   display: inline-block;
   height: 16px;
   margin-top: 3px;
   margin-right: 8px;
+  padding: 1px;
   float: right;
+  transform: none;  // remove the odd transformY property
+}
+
+.domain-spacer {
+  visibility: hidden;
 }
 
 .take-ticket-button {
@@ -8467,7 +8474,6 @@ td.text-center span {
 .cluster-mgt-top-area {
   background-color: $content-tab-color;
   padding-bottom: 20px;
-
   .search-box {
     background-image: none;
     padding: 0 0 0 10px;
@@ -8487,8 +8493,7 @@ td.text-center span {
 }
 
 .current-cluster-info-wrapper {
-  padding: 20px 15px;
-
+  padding: 25px 0 10px;
   .result-label.vertical-separator {
     border-right: 1px solid $nav-toolbar-color;
   }
@@ -8498,25 +8503,22 @@ td.text-center span {
     font-weight: bold;
     margin-top: 0;
     display: inline-block;
-    padding: 0 15px;
-    &:last-of-type {
-      position: relative;
-      top: 6px;
-    }
-    @-moz-document url-prefix() {
-      &:last-of-type {
-        top: 7px;
-      }
-    }
-
+    padding: 0 15px 0 5px;
     span {
       color: $primary-section-color;
       text-transform: none;
       padding-left: 10px;
       float: right;
+      display: inline-block;
+      min-width: 40px;
+    }
+    &.regex-area {
+      padding-left: 20px;  // regex field on clusters
+      border-left: solid 1px $medium-neutral-color;
     }
   }
 }
+
 
 .copycat-btn {
   margin: 4px 0 0 5px;
