@@ -272,6 +272,7 @@ class Complaint < ApplicationRecord
         bugzilla_rest_session = message_payload[:bugzilla_rest_session]
         bug_proxy = bugzilla_rest_session.create_bug(bug_attrs, assigned_user: user)
 
+        internal_comment = nil
 
         new_complaint = Complaint.new
         new_complaint.submission_type = message_payload["payload"]["submission_type"]
@@ -284,7 +285,19 @@ class Complaint < ApplicationRecord
         new_complaint.customer_id = customer&.id
         new_complaint.status = NEW
         new_complaint.channel = TI_CHANNEL
+
+        new_complaint.product_platform = message_payload["payload"]["product_platform"] unless message_payload["payload"]["product_platform"].blank?
+        new_complaint.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
+        new_complaint.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
+
         new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+
+        if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
+          ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
+
+          internal_comment = "Complaint is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+
+        end
 
         new_complaint.save!
 
@@ -327,6 +340,11 @@ class Complaint < ApplicationRecord
           # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
           importance = Wbrs::TopUrl.check_urls([key]).first.is_important
           new_complaint_entry.is_important = importance if !!importance == importance #making sure importance is a boolean
+
+          if internal_comment.present?
+            new_complaint_entry.internal_comment = internal_comment
+          end
+
           new_complaint_entry.save!
 
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
@@ -374,6 +392,11 @@ class Complaint < ApplicationRecord
           # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
           importance = Wbrs::TopUrl.check_urls([key]).first.is_important
           new_complaint_entry.is_important = !!importance #making sure importance is a boolean
+
+          if internal_comment.present?
+            new_complaint_entry.internal_comment = internal_comment
+          end
+
           new_complaint_entry.save!
 
           new_payload_item = {}
@@ -618,6 +641,33 @@ class Complaint < ApplicationRecord
     message = Bridge::ComplaintUpdateStatusEvent.new
     message.post_complaint(self)
   end
+
+
+
+  def self.build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, problem, original_bug_id)
+    summary = "New Web Content Categorization Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = <<~HEREDOC
+          IPs: #{new_entries_ips.keys}
+          URIs: #{new_entries_urls.keys}
+          Problem Summary: #{problem}
+    HEREDOC
+
+    bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
+    logger.debug "Creating bugzilla bug"
+
+    research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
+    linked_bug_proxy.save!
+
+    new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
+
+    research_bug_proxy
+  end
+
+
+
 end
 
 

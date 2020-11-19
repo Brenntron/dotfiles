@@ -160,7 +160,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                     domain: '355toyota.com',
                     product_platform: "test_platform",
                     product_version: "test_platform_version",
-                    in_network: false
+                    network: false
                 }
             }
         }
@@ -241,7 +241,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                     domain: '355toyota.com',
                     product_platform: "test_platform",
                     product_version: "test_platform_version",
-                    in_network: true
+                    network: true
 
                 }
             }

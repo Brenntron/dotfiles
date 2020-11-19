@@ -480,7 +480,7 @@ class Dispute < ApplicationRecord
         new_dispute.ticket_source_type = message_payload["source_type"]
         new_dispute.product_platform = message_payload["payload"]["product_platform"] unless message_payload["payload"]["product_platform"].blank?
         new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
-        new_dispute.in_network = message_payload["payload"]["in_network"] unless message_payload["payload"]["in_network"].blank?
+        new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
         new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
         new_dispute.status = NEW
 
@@ -494,7 +494,9 @@ class Dispute < ApplicationRecord
         end
         logger.debug "Saving Dispute"
 
-        if message_payload["payload"]["in_network"].present? && message_payload["payload"]["in_network"] == true
+        new_dispute.save!
+
+        if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
           ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
           linked_dispute_comment = DisputeComment.new
           linked_dispute_comment.dispute_id = new_dispute.id

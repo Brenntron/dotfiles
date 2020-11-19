@@ -607,7 +607,7 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.customer_id = customer.id
         new_dispute.product_platform = message_payload[:payload][:product_platform] unless message_payload[:payload][:product_platform].blank?
         new_dispute.product_version = message_payload[:payload][:product_version] unless message_payload[:payload][:product_version].blank?
-        new_dispute.in_network = message_payload[:payload][:in_network] unless message_payload[:payload][:in_network].blank?
+        new_dispute.in_network = message_payload[:payload][:network] unless message_payload[:payload][:network].blank?
         new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
         new_dispute.source = message_payload[:payload][:source]
         new_dispute.platform = message_payload[:payload][:platform]
@@ -627,7 +627,7 @@ class FileReputationDispute < ApplicationRecord
           new_dispute.save
         end
 
-        if message_payload[:payload][:in_network].present? && message_payload[:payload][:in_network] == true
+        if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
           ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
           linked_dispute_comment = FileRepComment.new
           linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
