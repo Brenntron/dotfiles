@@ -57,7 +57,7 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
                     sandbox_key: "TI-Form",
                     product_platform: "test_platform",
                     product_version: "test_platform_version",
-                    in_network: false
+                    network: false
                 }
             }
 
@@ -87,7 +87,7 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
                     sandbox_key: "TI-Form",
                     product_platform: "test_platform",
                     product_version: "test_platform_version",
-                    in_network: true
+                    network: true
                 }
             }
 
