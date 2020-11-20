@@ -246,35 +246,46 @@ $ ->
     # Get all the checked entry urls
     if ($(checkbox).length > 0)
       ip_uris = []
+      closed_status = false
       $(checkbox).each ->
+
+        debugger
         if page == "show" || page == "research"
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text().trim()
+
         else if page == "index"
           entry_row = $(this).parents('.index-entry-row')[0]
           entry_content = $(entry_row).find('.entry-col-content').text().trim()
         # Send entry content to reptool
+        entry_status = $(entry_row).find('.entry-col-status').text().trim()
         ip_uris.push(entry_content)
+        if entry_status ==  "RESOLVED_CLOSED"
+          closed_status = true
+      if closed_status
+        std_api_error(["Reopen all closed entries."], reload: false)
 
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
-        method: 'POST'
-        data: { ip_uris: ip_uris }
-        success: (response) ->
-          response = JSON.parse(response)
+      else
+        std_msg_ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
+          method: 'POST'
+          data: { ip_uris: ip_uris }
+          success: (response) ->
+            console.log response
+            response = JSON.parse(response)
 
-          for entry in response
-            if entry['status'] == "ACTIVE"
-              rep_class_full = entry['classification'] + ' - ' + entry['expiration']
-              rep_class = entry['classification']
-            else
-              rep_class_full = '<span class="missing-data">No active classifications</span>'
-              rep_class = ''
+            for entry in response
+              if entry['status'] == "ACTIVE"
+                rep_class_full = entry['classification'] + ' - ' + entry['expiration']
+                rep_class = entry['classification']
+              else
+                rep_class_full = '<span class="missing-data">No active classifications</span>'
+                rep_class = ''
 
-            tbody.append('<tr class="reptool-entry-row"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
-        error: (response) ->
-          std_api_error(response, "Error retrieving Reptool Data", reload: false)
-      )
+              tbody.append('<tr class="reptool-entry-row"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
+          error: (response) ->
+            std_api_error(response, "Error retrieving Reptool Data", reload: false)
+        )
     else
       std_msg_error('Error', ['Please select one row'])
       $(dropdown).removeClass('open')
