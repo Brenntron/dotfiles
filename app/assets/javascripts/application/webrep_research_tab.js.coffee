@@ -262,8 +262,6 @@ $ ->
           closed_status = true
       if closed_status
         std_msg_error('Error', ['Please reopen dispute before adjusting reptool.'])
-        $(dropdown).removeClass('open')
-
       else
         std_msg_ajax(
           url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
@@ -287,7 +285,6 @@ $ ->
         )
     else
       std_msg_error('Error', ['Please select one row'])
-      $(dropdown).removeClass('open')
       return false
 
   ## WL/BL Form manipulation
