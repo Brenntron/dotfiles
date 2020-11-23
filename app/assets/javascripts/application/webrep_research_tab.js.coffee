@@ -248,22 +248,21 @@ $ ->
       ip_uris = []
       closed_status = false
       $(checkbox).each ->
-
-        debugger
         if page == "show" || page == "research"
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text().trim()
-
+          entry_status = $(entry_row).find('.entry-data-status').text().trim()
         else if page == "index"
           entry_row = $(this).parents('.index-entry-row')[0]
           entry_content = $(entry_row).find('.entry-col-content').text().trim()
+          entry_status = $(entry_row).find('.entry-col-status').text().trim()
         # Send entry content to reptool
-        entry_status = $(entry_row).find('.entry-col-status').text().trim()
         ip_uris.push(entry_content)
         if entry_status ==  "RESOLVED_CLOSED"
           closed_status = true
       if closed_status
-        std_api_error(["Reopen all closed entries."], reload: false)
+        std_msg_error('Error', ['Please reopen dispute before adjusting reptool.'])
+        $(dropdown).removeClass('open')
 
       else
         std_msg_ajax(
