@@ -1026,9 +1026,7 @@
                             .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header
                                 XBRS History
-                                %span.nested-table-tally
-                                  - unless entry.hostlookup.nil?
-                                    = entry.find_xbrs[1]['data'].count
+
                               - if entry.find_xbrs[1]['data'].empty?
                                 %table
                                   %thead
@@ -1037,7 +1035,20 @@
                                         %span.missing-data
                                           No XBRS data available.
                               - else
-                                %table
+                                %span.nested-table-tally
+                                  - unless entry.hostlookup.nil?
+                                    = entry.find_xbrs[1]['data'].count
+                                    %table.table-scrollable
+                                      %thead
+                                        %tr
+                                          - entry.xbrs_data['legend'].each do |header|
+                                            %th= header
+                                      %tbody
+                                        - unless entry.hostlookup.nil?
+                                          - entry.xbrs_data['data'].each do |data|
+                                            %tr
+                                              - data.each do |datapoint|
+                                                %td= datapoint
 
 
                             .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}

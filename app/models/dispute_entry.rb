@@ -447,7 +447,29 @@ class DisputeEntry < ApplicationRecord
       end
 
       formatted_data.last['data'] << datum
+
     end
+
+    columns_to_remove = %w(rule_id row_id genid proto userpass port query fragment attr attr_truncated path_truncated query_truncated unique_hash)
+    is_ip_address = !!(self.uri  =~ Resolv::IPv4::Regex)
+    if is_ip_address
+      # If this is an IP address, we can also remove the 'subdomain' and 'path' headers
+      columns_to_remove << 'subdomain'
+      columns_to_remove << 'path'
+    end
+
+
+    indices_to_delete = []
+    formatted_data[1]['legend'].each_with_index do |name, index|
+      if columns_to_remove.include? name
+        indices_to_delete << index
+      end
+    end
+
+    formatted_data[1]['legend'] = formatted_data[1]['legend'].reject.with_index { |e, i| indices_to_delete.include? i }
+    formatted_data[1]['data'] = formatted_data[1]['data'].reject.with_index  { |e, i| indices_to_delete.include? i }
+
+    # binding.pry
 
     formatted_data
 
