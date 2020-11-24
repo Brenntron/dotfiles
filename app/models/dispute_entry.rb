@@ -466,10 +466,12 @@ class DisputeEntry < ApplicationRecord
       end
     end
 
-    formatted_data[1]['legend'] = formatted_data[1]['legend'].reject.with_index { |e, i| indices_to_delete.include? i }
-    formatted_data[1]['data'] = formatted_data[1]['data'].reject.with_index  { |e, i| indices_to_delete.include? i }
 
-    # binding.pry
+    formatted_data[1]['legend'] = formatted_data[1]['legend'].reject.with_index { |e, i| indices_to_delete.include? i }
+    formatted_data[1]['data'].each_with_index do |d, index|
+      formatted_data[1]['data'][index] = d.reject.with_index { |e, i| indices_to_delete.include? i}
+    end
+
 
     formatted_data
 
