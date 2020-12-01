@@ -736,8 +736,9 @@ class Dispute < ApplicationRecord
 
 
         case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
-        logger.debug("Sending reply to bridge")
+        Rails.logger.info "_+_+_+_+_+_+_+_+_Setting up Bridge post_+_+_+_+_+_+_+_+_"
         conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_dispute.id)
+        Rails.logger.info "_+_+_+_+_+_+_+_+_Running Connection POST_+_+_+_+_+_+_+_+_"
         conn.post(return_payload, case_email)
 
       end

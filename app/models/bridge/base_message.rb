@@ -8,5 +8,6 @@ class Bridge::BaseMessage < PeakeBridge::BasicPeakeBridge
           tls_mode: Rails.configuration.peakebridge.verify_mode,
           uri_base: Rails.configuration.peakebridge.uri_base,
           ca_file: Rails.configuration.peakebridge.ca_cert_file)
+    Delayed::Worker.logger.info("Initializing Base message...")
   end
 end
