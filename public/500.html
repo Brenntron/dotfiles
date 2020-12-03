@@ -40,14 +40,14 @@
     height: 44px;
   }
 
-  .st0{fill:#EFB834;}
-  .st1{fill:#A4AFB1;}
-  .st2{fill:#2C3E50;}
-
-  #ac_logo_500{
+  #ac-logo{
     height: 36px;
     margin-top: 4px;
   }
+
+  .ac-logo-0{fill:#EFB834;}
+  .ac-logo-1{fill:#A4AFB1;}
+  .ac-logo-2{fill:#2C3E50;}
 
   #page-wrapper{
     margin-left: 44px;
@@ -65,10 +65,10 @@
     -moz-box-shadow: 2px 0 10px 1px rgba(0, 0, 0, 0.1);
     box-shadow: 2px 0 10px 1px rgba(0, 0, 0, 0.1);
     padding: 15px;
+    position: relative;
   }
 
-  #dialog-header {
-    background-color: #fff;
+  #header {
     padding: 7px 12% 0;
   }
 
@@ -79,7 +79,7 @@
     font-weight: 100;
   }
 
-  .dialog > p {
+  #subheader {
     margin: 0 0 1em;
     padding: 1em;
     border-top: 1px solid #f2f2f2;
@@ -89,6 +89,50 @@
     margin: auto;
   }
 
+  #step-container{
+    margin: auto;
+    width: 455px;
+  }
+  .section-label{
+    white-space: nowrap;
+    color: #999 !important;
+    font-size: 7pt;
+    background: #fff;
+    text-align: left;
+  }
+  .list{
+    padding: 0;
+    line-height: 1.5em;
+    font-size: 14px;
+    margin:0;
+    text-align: left;
+  }
+  #top-level-list{
+    list-style-type: none;
+  }
+  #second-level-list{
+    padding: 8px 0 0 22px;
+  }
+  #create-link{
+    color: #deebff;
+    background-color: #0079c1;
+    border: 0;
+    line-height: 1.57142857;
+    padding: 4px 10px;
+    font-weight: 600;
+    border-radius: 3px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  #warning-icon{
+    height: 22px;
+    position: absolute;
+    top: -10px;
+  }
+  .warning-icon-0{fill:#E57435;}
+  .warning-icon-1{fill:#FFFFFF;}
+
   </style>
 </head>
 
@@ -96,32 +140,58 @@
   <!-- This file lives in public/500.html -->
   <div id="side-nav">
     <div id="top-corner-square">
-      <svg version="1.1" id="ac_logo_500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+      <svg version="1.1" id="ac-logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
            viewBox="0 0 40 40" style="enable-background:new 0 0 40 40;" xml:space="preserve">
         <g>
-        <path class="st0" d="M30.7,25.3c-1-0.7-2.2-1.2-3.6,0.2c0.1,0.1,0.2,0.2,0.3,0.3c0.6,0.7,1.2,1.5,0.8,2.5c-1.2,0.3-2-0.3-2.9-1.1
+        <path class="ac-logo-0" d="M30.7,25.3c-1-0.7-2.2-1.2-3.6,0.2c0.1,0.1,0.2,0.2,0.3,0.3c0.6,0.7,1.2,1.5,0.8,2.5c-1.2,0.3-2-0.3-2.9-1.1
             l0.1-0.1l0,0c0,0-1.2,1.1-0.7,2.9c0.5,1.9,2.8,2.2,2.8,2.2s-0.3-1.6,0-2c1.1,2.1,3.6,2.9,5.7,1.5C31.6,30.4,32.4,26.7,30.7,25.3z"
         />
-          <polygon class="st1" points="13.3,10.9 10.9,13.2 19.4,38 23.1,34.3 21.4,29.3 21.5,29.3 19.8,24.7 19.8,24.7 17.2,17.2 24.8,19.7
+          <polygon class="ac-logo-1" points="13.3,10.9 10.9,13.2 19.4,38 23.1,34.3 21.4,29.3 21.5,29.3 19.8,24.7 19.8,24.7 17.2,17.2 24.8,19.7
 		21.1,23.4 22.8,27.9 29.4,21.4 34.4,23.1 38,19.5 	"/>
         <g>
-		  <path class="st2" d="M33.6,16.1C32.7,8.1,25.9,2,17.8,2C9.1,2,2,9.1,2,17.8c0,8.2,6.1,14.8,14.1,15.8l-1.7-5.1
+		  <path class="ac-logo-2" d="M33.6,16.1C32.7,8.1,25.9,2,17.8,2C9.1,2,2,9.1,2,17.8c0,8.2,6.1,14.8,14.1,15.8l-1.7-5.1
 			C9.8,27,6.6,22.8,6.6,17.8c0-6.2,5.1-11.2,11.2-11.2c5,0,9.2,3.3,10.7,7.8L33.6,16.1z"/>
         </g>
         </g>
       </svg>
-
     </div>
   </div>
   <div id="page-wrapper">
     <div id="nav-banner"></div>
     <div id="page-content-wrapper">
       <div class="content-wrapper">
-        <div class="dialog">
-          <div id="dialog-header">
-            <h1>Looks like something broke. Sorry!</h1>
-          </div>
-          <p>Please report this to the Communities Development team asap.</p>
+        <svg version="1.1" id="warning-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+             viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
+          <g>
+              <g>
+                  <g>
+                      <circle class="warning-icon-0" cx="11" cy="11" r="9.1"/>
+                    <path class="warning-icon-1" d="M11,21.1C5.4,21.1,0.9,16.6,0.9,11S5.4,0.9,11,0.9S21.1,5.4,21.1,11S16.6,21.1,11,21.1z M11,2.9
+                          c-4.5,0-8.1,3.7-8.1,8.1c0,4.5,3.7,8.1,8.1,8.1c4.5,0,8.1-3.7,8.1-8.1C19.1,6.5,15.5,2.9,11,2.9z"/>
+                  </g>
+              </g>
+                      <path class="warning-icon-1" d="M11,15.9c-0.6,0-1.1-0.5-1.1-1.1c0-0.6,0.5-1.1,1.1-1.1s1.1,0.5,1.1,1.1C12.1,15.4,11.6,15.9,11,15.9z
+                   M10.2,6.1h1.7c0.1,0,0.2,0.1,0.2,0.2l-0.5,6.3c0,0.1-0.1,0.2-0.2,0.2h-0.7c-0.1,0-0.2-0.1-0.2-0.2L9.9,6.3
+                  C9.9,6.2,10,6.1,10.2,6.1L10.2,6.1z"/>
+          </g>
+        </svg>
+        <div id="header">
+          <h1>Looks like something broke. Sorry!</h1>
+        </div>
+        <p id="subheader">Please report this to the Communities Development team asap.</p>
+        <div id="step-container">
+          <p class="section-label">Reporting Steps</p>
+          <ul id="top-level-list" class="list">
+            <li><a href="https://jira.vrt.sourcefire.com/secure/Dashboard.jspa" target="_blank">Open a Jira ticket here.</a></li>
+            <li>Click on the <button id="create-link">Create</button> button in the top navigation.</li>
+            <li>Fill out the necessary fields and submit.</li>
+          </ul>
+          <ul id="second-level-list" class="list">
+            <li>Project should be set to TalosWeb (WEB)</li>
+            <li>Issue Type is Bug</li>
+            <li>Summary should be a consize description of the problem.</li>
+            <li>Component/s should include Analyst Console Escalations.</li>
+          </ul>
         </div>
       </div>
     </div>
