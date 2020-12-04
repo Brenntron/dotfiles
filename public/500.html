@@ -3,6 +3,7 @@
 <head>
   <title>Analyst Console (500)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
   <style>
 
   html, body{
@@ -16,7 +17,7 @@
 
   body {
     background-color: #EFEFEF;
-    color: #2E2F30;
+    color: #333;
     text-align: center;
     font-family: arial, sans-serif;
     min-height: 100%;
@@ -61,15 +62,12 @@
   .content-wrapper{
     background: #fff;
     border-radius: 4px;
+    padding: 15px;
+    position: relative;
+    height: 100%;
     -webkit-box-shadow: 2px 0 10px 1px rgba(0, 0, 0, 0.1);
     -moz-box-shadow: 2px 0 10px 1px rgba(0, 0, 0, 0.1);
     box-shadow: 2px 0 10px 1px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    position: relative;
-  }
-
-  #header {
-    padding: 7px 12% 0;
   }
 
   h1 {
@@ -77,6 +75,15 @@
     line-height: 1.5em;
     font-family: 'Open Sans', sans-serif;
     font-weight: 100;
+    color: #666;
+  }
+
+  h4{
+    text-transform: uppercase;
+    font-weight: 700 !important;
+    color: #666;
+    font-size: 10pt;
+    margin-bottom: 20px;
   }
 
   #subheader {
@@ -89,30 +96,15 @@
     margin: auto;
   }
 
-  #step-container{
-    margin: auto;
-    width: 455px;
+  .top-spacing{
+    margin-top: 15px;
   }
-  .section-label{
-    white-space: nowrap;
-    color: #999 !important;
-    font-size: 7pt;
-    background: #fff;
-    text-align: left;
-  }
-  .list{
-    padding: 0;
-    line-height: 1.5em;
+
+  #step-list{
+    padding-left: 15px;
     font-size: 14px;
-    margin:0;
-    text-align: left;
   }
-  #top-level-list{
-    list-style-type: none;
-  }
-  #second-level-list{
-    padding: 8px 0 0 22px;
-  }
+
   #create-link{
     color: #deebff;
     background-color: #0079c1;
@@ -123,6 +115,7 @@
     border-radius: 3px;
     height: 30px;
     font-size: 14px;
+    display: inline-block;
   }
 
   #warning-icon{
@@ -133,6 +126,26 @@
   .warning-icon-0{fill:#E57435;}
   .warning-icon-1{fill:#FFFFFF;}
 
+  .left-aligned{
+    text-align: left;
+  }
+  .content-label-sm{
+    white-space: nowrap;
+    color: #999;
+    font-size: 7pt;
+    background: #fff;
+    text-align: left;
+    padding-bottom: 2px;
+    margin-bottom: 3px;
+    ine-height: 1.25em;
+  }
+  .top-info-data{
+    margin-bottom: 10px;
+    line-height: 1;
+  }
+  .red-highlight{
+    color: #DE360A
+  }
   </style>
 </head>
 
@@ -159,7 +172,7 @@
   <div id="page-wrapper">
     <div id="nav-banner"></div>
     <div id="page-content-wrapper">
-      <div class="content-wrapper">
+      <div id="header" class="content-wrapper">
         <svg version="1.1" id="warning-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
              viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
           <g>
@@ -175,26 +188,46 @@
                   C9.9,6.2,10,6.1,10.2,6.1L10.2,6.1z"/>
           </g>
         </svg>
-        <div id="header">
+        <div>
           <h1>Looks like something broke. Sorry!</h1>
         </div>
         <p id="subheader">Please report this to the Communities Development team asap.</p>
-        <div id="step-container">
-          <p class="section-label">Reporting Steps</p>
-          <ul id="top-level-list" class="list">
-            <li><a href="https://jira.vrt.sourcefire.com/secure/Dashboard.jspa" target="_blank">Open a Jira ticket here.</a></li>
-            <li>Click on the <button id="create-link">Create</button> button in the top navigation.</li>
-            <li>Fill out the necessary fields and submit.</li>
-          </ul>
-          <ul id="second-level-list" class="list">
-            <li>Project should be set to TalosWeb (WEB)</li>
-            <li>Issue Type is Bug</li>
-            <li>Summary should be a consize description of the problem.</li>
-            <li>Component/s should include Analyst Console Escalations.</li>
-          </ul>
-        </div>
       </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 top-spacing">
+          <div class="content-wrapper left-aligned">
+            <div id="step-container">
+              <h4>Reporting Steps</h4>
+              <ol id="step-list">
+                <li><a href="https://jira.vrt.sourcefire.com/secure/Dashboard.jspa" target="_blank">Open this link to the Jira dashboard.</a></li>
+                <li>Click on the <div id="create-link">Create</div> button in the top navigation.</li>
+                <li>Fill out the necessary fields and submit.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 top-spacing">
+          <div class="content-wrapper left-aligned">
+            <h4>Required JIRA Ticket Fields<span class="red-highlight"> *</span></h4>
+            <p class="content-label-sm">Project</p>
+            <p class="top-info-data">TalosWeb (WEB)</p>
+
+            <p class="content-label-sm">Issue Type</p>
+            <p class="top-info-data">Bug</p>
+
+            <p class="content-label-sm">Summary</p>
+            <p class="top-info-data">500 Error in Analyst Console Escalations</p>
+
+            <p class="content-label-sm">Component/s</p>
+            <p class="top-info-data">Analyst Console Escalations</p>
+          </div>
+        </div>
+
+      </div>
+
     </div>
+
   </div>
 </body>
 </html>
