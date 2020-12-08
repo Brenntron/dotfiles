@@ -627,13 +627,6 @@ $ ->
         $("#copiedAlert").remove()
       ), 1000
 
-    copyToClipboard = (text) ->
-      dummy = document.createElement('input')
-      document.body.appendChild dummy
-      dummy.setAttribute 'value', text
-      dummy.select()
-      document.execCommand 'copy'
-      document.body.removeChild dummy
 
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
@@ -898,6 +891,13 @@ window.toggle_selectize_layer = (input, focus) ->
   else
     $(select_parent).css('z-index', '2')
 
+window.copyToClipboard = (text) ->
+  dummy = document.createElement('input')
+  document.body.appendChild dummy
+  dummy.setAttribute 'value', text
+  dummy.select()
+  document.execCommand 'copy'
+  document.body.removeChild dummy
 
 $ ->
   # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load

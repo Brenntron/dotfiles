@@ -108,37 +108,21 @@ $ ->
         ]
         orderable: false
         searchable: false
-      }
-      {
-        targets: [ 0 ]
-        className: 'expandable-row-column'
-      }
-      {
-        targets: [3]
-        className: 'domain-column'
-      }
-      {
-        targets: [6]
-        className: 'category-column'
+        sortable: false
       }
     ]
     columns: [
       {
         data: null
         width: '14px'
-        orderable: false
-        searchable: false
-        sortable: false
+        className: 'expandable-row-column'
         'render':(data,type,full,meta)->
-          return '<button class="expand-row-button-inline expand-row-button-' + data.cluster_id + '"></button>'
+          return "<button class='expand-row-button-inline expand-row-button-#{data.cluster_id}'></button>"
       }
       {
         data: null
-        orderable: false
-        searchable: false
-        sortable: false
         render: (data, type, full, meta) ->
-          return '<input type="checkbox" name="cluster_id_' + data.cluster_id + '" onclick="toggleRow(this)">'
+          return "<input type='checkbox' name='cluster_id_#{data.cluster_id}' onclick='toggleRow(#{this})'>"
       }
       {
         data: 'cluster_id'
@@ -146,11 +130,14 @@ $ ->
       }
       {
         data: null,
+        className: 'domain-column',
         render: (data) ->
-          '<button type="button" class="whois-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data.domain + '\')"></button>' +
-            '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data.domain + '\')"></button>' +
-            data.domain + '<button type="button" onclick="window.open(\'https://' + data.domain + '\', \'_blank\') " class="open-in-tab-btn right-margin esc-tooltipped", title="Open ' + data.domain + ' in a new tab"></button>' +
-            '<span class="vertical-separator"></span><span class="entry-count">' + data.cluster_size + '</span>'
+          { domain, cluster_size } = data
+          "<span ondblclick='copy_domain(\"#{domain}\", this)'>#{domain} </span>
+            <button type='button' class='whois-btn right-margin esc-tooltipped' title='Whois Domain Lookup Information' onclick='domain_whois(\"#{domain}\")'></button>
+            <button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\")'></button>
+            <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>
+            <span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
       }
       {
         data: 'global_volume'
@@ -170,8 +157,9 @@ $ ->
       }
       {
         data: 'cluster_id'
+        className: 'category-column'
         render: (data) ->
-          '<select id="' + data + '_categories"' + 'class="form-control selectize cluster_categories" multiple="multiple" placeholder="Enter up to 5 categories" value="" name="">'
+          "<select id='#{data}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='' name=''>"
       }
     ]
   )
@@ -306,6 +294,13 @@ window.selectize_category_inputs = () ->
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions("##{this.id}"),
       }
+
+window.copy_domain = (domain, element) ->
+  copyToClipboard(domain)
+  $(element).after( "<p id='copiedAlert'>Copied to clipboard!</p>" )
+  setTimeout (->
+    $("#copiedAlert").remove()
+  ), 1000
 
 window.toggle_all_checkboxes = () ->
   if $('#clusters_check_box').prop('checked')
@@ -514,8 +509,6 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
     if event.keyCode == 13
       apply_filter_to_table()
     return
-
-
 
 $ ->
 # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load

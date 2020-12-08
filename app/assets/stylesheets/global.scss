@@ -7373,6 +7373,7 @@ table.dispute-entry-table tbody tr.selected {
 #copiedAlert {
   color: $communication-accent-color;
   font-size: 80%;
+  position: absolute;
 }
 
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
