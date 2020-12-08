@@ -99,10 +99,13 @@
     color: #666;
     font-size: 14px;
     margin: 0;
+    float: left;
   }
 
   .h4-wrapper{
     margin-bottom: 20px;
+    float: left;
+    width: 100%;
   }
   #subheader {
     margin: 0 0 1em;
@@ -169,9 +172,14 @@
   .red-highlight{
     color: #DE360A
   }
-    .top-form-note{
-      margin: 0 0 0 12px;
-    }
+  .top-form-note{
+    margin: 2px 0 0 18px;
+    float: left;
+    padding: 0;
+  }
+  .clear{
+    clear:both;
+  }
 
   </style>
 </head>
@@ -250,11 +258,11 @@
                 <h4>Reporting Steps</h4>
               </div>
 
-              <ol id="step-list">
+              <ol id="step-list" class="clear">
                 <li><a href="https://jira.vrt.sourcefire.com/secure/Dashboard.jspa" target="_blank">Open this link to the Jira dashboard.</a></li>
                 <li>Click on the <div id="create-faux-button">Create</div> button in the top navigation.</li>
                 <li>Carefully complete the form and submit a ticket. Be sure to include the required fields listed in the next section!</li>
-                <li>Save the url and/or the ticket number for your own convenience. We will add comments to the ticket as we look into this issue.</li>
+                <li>Save the url and/or the ticket number for your own convenience. We will update this ticket as we look into this issue.</li>
               </ol>
             </div>
           </div>
@@ -266,21 +274,22 @@
               <p class="content-label-sm top-form-note"><span class="red-highlight"> *</span> indicates a required field</p>
             </div>
 
+            <div class="clear">
+              <p class="content-label-sm">Project<span class="red-highlight"> *</span></p>
+              <p class="top-info-data">TalosWeb (WEB)</p>
 
-            <p class="content-label-sm">Project<span class="red-highlight"> *</span></p>
-            <p class="top-info-data">TalosWeb (WEB)</p>
+              <p class="content-label-sm">Issue Type<span class="red-highlight"> *</span></p>
+              <p class="top-info-data">Bug</p>
 
-            <p class="content-label-sm">Issue Type<span class="red-highlight"> *</span></p>
-            <p class="top-info-data">Bug</p>
+              <p class="content-label-sm">Description</p>
+              <p class="top-info-data">(Please be as descriptive as possible)</p>
 
-            <p class="content-label-sm">Description</p>
-            <p class="top-info-data">(Please be as descriptive as possible)</p>
+              <p class="content-label-sm">Summary<span class="red-highlight"> *</span></p>
+              <p class="top-info-data">ACE - 500 Error</p>
 
-            <p class="content-label-sm">Summary<span class="red-highlight"> *</span></p>
-            <p class="top-info-data">ACE - 500 Error</p>
-
-            <p class="content-label-sm">Component/s<span class="red-highlight"> *</span></p>
-            <p class="top-info-data">Analyst Console Escalations</p>
+              <p class="content-label-sm">Component/s<span class="red-highlight"> *</span></p>
+              <p class="top-info-data">Analyst Console Escalations</p>
+            </div>
           </div>
         </div>
 
