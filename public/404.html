@@ -22,6 +22,10 @@
     min-height: 100%;
   }
 
+  a{
+      text-decoration: none;
+      display: inline-block;
+  }
   #nav-banner{
     background-color: #4E4E4E;
     height: 44px;
@@ -137,6 +141,20 @@
   .warning-icon-0{fill:#E57435;}
   .warning-icon-1{fill:#FFF;}
 
+  #button-wrapper{
+      max-width: 296px;
+      margin: auto;
+  }
+
+  button{
+      background-color: #6dbcdb;
+      transition: all 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  button:hover{
+      background-color: #E47433;
+
+  }
+
   #back-button{
     padding: 8px 15px 8px 38px;
     font-size: 9pt;
@@ -144,28 +162,76 @@
     background-position: 18px center;
     border-radius: 2px;
     border: none;
-    background-color: #6dbcdb;
     color: #fff;
-    width: 120px;
+    width: 100%;
     cursor: pointer;
     position: relative;
-    margin: 15px 0 4px 0px;
-    transition: all 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 15px 0 0 0px;
   }
 
-  #back-button:hover{
-    background-color: #E47433;
+  @media (max-width: 450px) {
+
+  }
+
+  .back-button-fill{fill:#FFF;}
+
+  #home-links-wrapper{
+      display: flex;
+      justify-content: space-between;
+  }
+
+  #home-links-wrapper a{
+      margin-top: 4px;
+  }
+
+  .home-btn{
+      padding: 8px 15px 8px 29px;
+      font-size: 9pt;
+      background-size: 20px 20px;
+      background-position: 18px center;
+      border-radius: 2px;
+      border: none;
+      color: #fff;
+      width: 95px;
+      cursor: pointer;
+      position: relative;
+      transition: background-color 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @media (max-width: 450px) {
+      #home-links-wrapper{
+          flex-direction: column;
+      }
+      .home-btn{
+          width: 100%;
+      }
   }
 
   #back-arrow-icon{
     position: absolute;
-    left: 14px;
+    left: 36%;
     width: 24px;
     top: 3px;
   }
 
-  .back-button-fill{fill:#FFF;}
+  @media (max-width: 450px) {
+      #back-arrow-icon{
+          left: 2px;
+      }
+  }
+
   .expression-icon-fill{fill:#4D4E4E;}
+
+  .home-icon{
+      width: 19px;
+      position: absolute;
+      left: 5px;
+      top: 5px;
+  }
+  .home-icon-fill{
+      fill: #fff;
+  }
+
 </style>
 <script>
     function go_back() {
@@ -239,7 +305,7 @@
 
       <div id="h1-wrapper">
         <h1>The page you were looking for doesn't exist.</h1>
-      <svg version="1.1" id="expression-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+        <svg version="1.1" id="expression-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
            viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
             <g>
                 <path class="expression-icon-fill" d="M25,8.9C16.1,8.9,8.9,16.1,8.9,25S16.1,41.1,25,41.1S41.1,33.9,41.1,25S33.9,8.9,25,8.9z M25,39.1
@@ -261,15 +327,59 @@
       </div>
 
       <p id="subheader">You may have mistyped the address or the page may have moved.</p>
-        <button id="back-button" onclick="go_back()">Go Back
-            <svg version="1.1" id="back-arrow-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                 viewBox="0 0 10 10" xml:space="preserve">
-                <g>
-                    <path class="back-button-fill" d="M2.4,4.9C2.3,4.9,2.3,5,2.3,5.1s0,0.2,0.1,0.2l2.4,2c0.1,0.1,0.2,0.1,0.3,0c0.1,0,0.2-0.1,0.2-0.3V5.9h2.2
-                        c0.1,0.1,0.2,0,0.2-0.2V4.4c0-0.2-0.1-0.3-0.2-0.3H5.3V3c0-0.1-0.1-0.2-0.2-0.3c-0.1,0-0.2,0-0.3,0L2.4,4.9z"/>
-                </g>
-            </svg>
-        </button>
+        <div id="button-wrapper">
+            <div>
+                <button id="back-button" onclick="go_back()">Go Back
+                    <svg version="1.1" id="back-arrow-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                         viewBox="0 0 10 10" xml:space="preserve">
+                        <g>
+                            <path class="back-button-fill" d="M2.4,4.9C2.3,4.9,2.3,5,2.3,5.1s0,0.2,0.1,0.2l2.4,2c0.1,0.1,0.2,0.1,0.3,0c0.1,0,0.2-0.1,0.2-0.3V5.9h2.2
+                                c0.1,0.1,0.2,0,0.2-0.2V4.4c0-0.2-0.1-0.3-0.2-0.3H5.3V3c0-0.1-0.1-0.2-0.2-0.3c-0.1,0-0.2,0-0.3,0L2.4,4.9z"/>
+                        </g>
+                    </svg>
+                </button>
+            </div>
+            <div id="home-links-wrapper">
+                <a href="/escalations/file_rep/disputes?f=open">
+                    <button class="home-btn">
+                        File Rep
+                        <svg version="1.1" id="filerep-icon" class="home-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                             viewBox="0 0 14 14" style="enable-background:new 0 0 14 14;" xml:space="preserve">
+                        <g>
+                            <path class="home-icon-fill" d="M2.8,6.9c0,0.1,0,0.2,0,0.3c0,0.6,0,1.4,0,1.7c0,0,0,0,0,0l8.4-1.9c0,0,0,0,0,0c0-0.7,0-1.9,0-2.6c0,0,0,0,0,0
+                                L2.8,6.2C2.8,6.4,2.8,6.7,2.8,6.9z"/>
+                            <path class="home-icon-fill" d="M3.2,9.6c1,1.4,3.8,3,3.8,3s4.2-2.4,4.2-3.8c0-0.2,0-0.6,0-1L3.2,9.6z"/>
+                            <path class="home-icon-fill" d="M2.8,5.3l8.4-1.9c0-0.1,0-0.3,0-0.3L7,1.3L2.8,3.1c0,0,0,0.5,0,0.6c0,0.2,0,0.4,0,0.6C2.8,4.5,2.8,4.9,2.8,5.3
+                                z"/>
+                        </g>
+                        </svg>
+                    </button>
+                </a>
+                <a href="/escalations/webrep/disputes">
+                    <button class="home-btn">
+                        Web Rep
+                        <svg version="1.1" id="Layer_1" class="home-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                             viewBox="0 0 14 14" style="enable-background:new 0 0 14 14;" xml:space="preserve">
+                            <path class="home-icon-fill" d="M11.8,2.2C11.6,2,11.4,2,11.1,2H2.8c-0.5,0-0.9,0.4-0.9,1v5.4c0,0.5,0.4,0.9,0.9,0.9h1.1C3.9,9.3,4,9.3,4,9.4
+                            v2.5l2.4-2.7l0,0l0,0l0,0l0,0l0,0l0,0l0,0h4.6c0.5,0,0.9-0.4,0.9-0.9V2.9C12.1,2.6,12,2.4,11.8,2.2z M8.6,8L7,7.3L5.4,8l0.2-1.7
+                            L4.4,5l1.7-0.4L7,3.1l0.9,1.5L9.6,5L8.5,6.3L8.6,8z"/>
+                        </svg>
+                    </button>
+                </a>
+                <a href="/escalations/webcat/complaints">
+                    <button class="home-btn">
+                        Web Cat
+                        <svg version="1.1" id="Layer_1" class="home-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                             viewBox="0 0 14 14" style="enable-background:new 0 0 14 14;" xml:space="preserve">
+                            <path class="home-icon-fill" d="M4.1,5.1c0.5,0,1-0.4,1-1s-0.4-0.9-1-0.9S3.3,3.6,3.3,4.2C3.3,4.7,3.7,5.1,4.1,5.1z M2.5,1.9l3.2-0.4
+                            c0.3,0,0.7,0.1,0.9,0.3l5.7,5.7c0.2,0.2,0.2,0.5-0.1,0.8l-4,4c-0.3,0.3-0.6,0.3-0.8,0.1L1.7,6.7C1.6,6.5,1.5,6.1,1.5,5.8l0.4-3.2
+                            C1.9,2.2,2.2,1.9,2.5,1.9z"/>
+                        </svg>
+                    </button>
+                </a>
+
+            </div>
+        </div>
     </div>
 
   </div>
