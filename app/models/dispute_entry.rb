@@ -49,6 +49,18 @@ class DisputeEntry < ApplicationRecord
     where(case_resolved_at: (date_from..date_to))
   }
 
+  after_initialize do |dispute_entry|
+    is_ip_address = !!(dispute_entry.uri =~ Resolv::IPv4::Regex)
+
+    if is_ip_address
+      dispute_entry.ip_address = dispute_entry.uri
+      dispute_entry.uri = nil
+      dispute_entry.entry_type = "IP"
+      dispute_entry.hostname = nil
+    end
+
+  end
+
   def self.create_dispute_entry(dispute, ip_url, status = NEW)
     begin
       params = {}
@@ -894,7 +906,9 @@ class DisputeEntry < ApplicationRecord
 
   ######################################################################################
   def self.process_research_for_uri(research_params)
+
     url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
+
     domain_of_url = DisputeEntry.domain_of(url)
     entries = entries_of_url(url)
 
@@ -912,7 +926,7 @@ class DisputeEntry < ApplicationRecord
     # Make sure there will always be a "www" and "non-www" form to an inputted URL
 
     if !url.include?("www.")
-      unless entries.find{|entry| url == "www." + entry.uri}
+      unless entries.find{|entry| url == "www." + entry.uri} || (url =~ Resolv::IPv4::Regex)
         entries.prepend DisputeEntry.new(uri: "www."+ url)
       end
     elsif url.include?("www.")
