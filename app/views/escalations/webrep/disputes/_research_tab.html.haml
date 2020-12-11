@@ -920,7 +920,10 @@
                                         %td.unclean-site-result= virustotal[:result]
                         .col-sm-9
                           .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header XBRS History
+                            %h5.entry-details-table-header
+                              XBRS History
+                              - unless entry.hostlookup.nil?
+                                = entry.find_xbrs[1]['data'].count
                             - if entry.xbrs_data['data'].empty?
                               %table
                                 %thead
