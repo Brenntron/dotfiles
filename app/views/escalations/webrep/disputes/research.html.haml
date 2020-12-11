@@ -1027,7 +1027,8 @@
                               %h5.entry-details-table-header
                                 XBRS History
                                 - unless entry.hostlookup.nil?
-                                  = entry.find_xbrs[1]['data'].count
+                                  %span.nested-table-tally
+                                    = entry.find_xbrs[1]['data'].count
                               - if entry.xbrs_data['data'].empty?
                                 %table
                                   %thead
