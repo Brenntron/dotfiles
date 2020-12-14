@@ -7371,11 +7371,24 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 #copiedAlert {
-  color: $communication-accent-color;
+  color: $success-color;
+  color: #5FB766;
   font-size: 80%;
+  display: inline;
+  vertical-align: top;
+}
+.nested-complaint-static-data .copied-container{
+  margin-top: -7px;
+}
+.copied-check{
+  height: 12px;
+  width: 10px;
+  display: inline-block;
+  background-image: url(image_path('icon_check_dark_green.svg'));
+}
+.copied-container{
   position: absolute;
 }
-
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
   padding: 2px 6px;
   margin: 2px;

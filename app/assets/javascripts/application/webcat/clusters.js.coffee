@@ -297,10 +297,15 @@ window.selectize_category_inputs = () ->
 
 window.copy_domain = (domain, element) ->
   copyToClipboard(domain)
-  $(element).after( "<p id='copiedAlert'>Copied to clipboard!</p>" )
+  html = "<div class='copied-container'>
+            <div class ='copied-check'></div>
+            <p id='copiedAlert'>Copied to clipboard</p>
+          </div>"
+  $(element).after( html )
+  $('.copied-container').delay(1000).fadeOut(1000);
   setTimeout (->
-    $("#copiedAlert").remove()
-  ), 1000
+    $(".copied-container").remove()
+  ), 2000
 
 window.toggle_all_checkboxes = () ->
   if $('#clusters_check_box').prop('checked')

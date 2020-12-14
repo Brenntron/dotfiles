@@ -622,10 +622,16 @@ $ ->
       element = $(this)
       innertext = $(this).text()
       copyToClipboard(innertext)
-      $(element).after( "<p id='copiedAlert'>Copied to clipboard!</p>" )
+
+      html = "<div class='copied-container'>
+                <span class='copied-check'></span>
+                <p id='copiedAlert'>Copied to clipboard</p>
+              </div>"
+      $(element).after( html )
+      $('.copied-container').delay(1000).fadeOut(1000);
       setTimeout (->
-        $("#copiedAlert").remove()
-      ), 1000
+          $(".copied-container").remove()
+        ), 2000
 
 
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
