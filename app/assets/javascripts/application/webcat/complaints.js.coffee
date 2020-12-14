@@ -166,7 +166,6 @@ processSubmitNewURL = () ->
       isEmpty = false
 
   if !isEmpty
-
     std_msg_ajax(
       url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
       method: 'POST'
@@ -530,6 +529,7 @@ processSubmitEntry = (entry_id,row_id) ->
   resolution_status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
+  #whats this uri as categoried for?
   uri_as_categorized = $('#complaint_prefix_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   fixed_flag = $('#fixed'+entry_id).is(':checked')
@@ -1048,7 +1048,7 @@ format = (complaint_entry_row) ->
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
-
+  debugger
   qual_subdomain = complaint_entry.domain
   if complaint_entry.subdomain
     qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
@@ -1195,7 +1195,7 @@ format = (complaint_entry_row) ->
   input_cat = 'input_cat_' + entry_id
 
   if complaint_entry.status == "PENDING"
-
+    debugger
     domain = complaint_entry.uri_as_categorized
     # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
 
@@ -1221,6 +1221,7 @@ format = (complaint_entry_row) ->
   retake_in_progress = false
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
+  debugger
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
