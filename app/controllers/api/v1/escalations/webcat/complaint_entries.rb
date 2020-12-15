@@ -411,6 +411,7 @@ module API
                 sds_params = {}
 
                 if complaint_entry.entry_type == 'URI/DOMAIN'
+                  # get category for full uri
                   sds_params['url'] = complaint_entry.uri
                 elsif complaint_entry.entry_type == 'IP'
                   sds_params['url'] = complaint_entry.ip_address
@@ -424,8 +425,14 @@ module API
                   raise("having trouble with SDS setting category to empty string : #{e.message}")
                 end
 
+                sds_domain_category = ""
+                if complaint_entry.entry_type == 'URI/DOMAIN'
+                  # get category for domain
+                  sds_params['url'] = complaint_entry.domain
+                  sds_domain_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+                end
                 {master_categories: master_categories, current_category_data: wbrs_categories,
-                 sds_category: sds_category}.to_json
+                 sds_category: sds_category, sds_domain_category: sds_domain_category}.to_json
               end
             end
 
