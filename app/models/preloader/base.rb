@@ -84,9 +84,9 @@ class Preloader::Base
         pretty_umbrella_status = "Unclassified" # Default or "0"
         case
           # Per docs here: https://dashboard.umbrella.com/o/1755319/#overview
-        when @umbrella[:status] == "-1"
+        when @umbrella[host]["status"] == "-1"
           pretty_umbrella_status = "Malicious"
-        when @umbrella[:status] == "1"
+        when @umbrella[host]["status"] == "1"
           pretty_umbrella_status = "Benign"
         end
         pretty_umbrella_status
