@@ -455,5 +455,24 @@ class AutoResolve
 
   end
 
+  ############################LEGACY SUPPORT SECTION###################################
+  #
+  # until such time they can be refactored, this is for supporting code that (should not) call methods
+  # from AutoResolve as part of their non-auto resolution related functionality
+
+  def call_umbrella(address: self.address)
+    response = Umbrella::Scan.scan_result(address: address)
+    case
+    when 300 <= response.code
+      Rails.logger.error("Umbrella http response #{response.code}")
+      return nil
+    when 200 != response.code
+      Rails.logger.warn("Umbrella http response #{response.code}")
+    end
+    JSON.parse(response.body)
+  end
+
+  #
+  # ####################################################################################
 
 end
