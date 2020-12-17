@@ -529,7 +529,6 @@ processSubmitEntry = (entry_id,row_id) ->
   resolution_status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
-  #whats this uri as categoried for?
   uri_as_categorized = $('#complaint_prefix_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   fixed_flag = $('#fixed'+entry_id).is(':checked')
@@ -1048,7 +1047,6 @@ format = (complaint_entry_row) ->
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
-  debugger
   qual_subdomain = complaint_entry.domain
   if complaint_entry.subdomain
     qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
@@ -1189,14 +1187,15 @@ format = (complaint_entry_row) ->
       complaint_history = ''
 
   whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
-
   { entry_id, domain, complaint_id } = complaint_entry
   complaint_entry_html = ''
   input_cat = 'input_cat_' + entry_id
 
   if complaint_entry.status == "PENDING"
-    debugger
-    domain = complaint_entry.uri_as_categorized
+    if complaint_entry.uri_as_categorized  == ""
+      domain = complaint_entry.subdomain + "." + complaint_entry.domain
+    else
+      domain = complaint_entry.uri_as_categorized
     # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
 
     complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
@@ -1221,7 +1220,6 @@ format = (complaint_entry_row) ->
   retake_in_progress = false
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
-  debugger
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
@@ -1816,7 +1814,6 @@ window.triggerTooltips = (item) ->
 processSubmitMaster = () ->
 
   data = []
-
   $('.selected + tr td.nested-complaint-data-wrapper').each ->
     entry_id = $(this).find('tr').attr('entry_id')
     row_id = $(this).find('tr').attr('row_id')
@@ -1837,7 +1834,6 @@ processSubmitMaster = () ->
       comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
       resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
       uri_as_categorized = $(this).find("#complaint_prefix_#{entry_id}")[0].value
-
       if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if status == 'UNCHANGED' || status == 'INVALID'

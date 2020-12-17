@@ -503,7 +503,6 @@ class ComplaintEntry < ApplicationRecord
       wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
-      binding.pry
     rescue Exception => e
       Rails.logger.info (" Couldnt contact SBRS. #{e}")
       new_complaint_entry.wbrs_score = 0
@@ -541,7 +540,6 @@ class ComplaintEntry < ApplicationRecord
         new_complaint_entry.url_primary_category = current_category
         new_complaint_entry.category = current_category
       end
-      binding.pry
       new_complaint_entry.save
 
     rescue Exception => e
@@ -554,7 +552,6 @@ class ComplaintEntry < ApplicationRecord
       #this is where screen grabs happen.
       screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
       screenshot_entry.grab_screenshot
-      binding.pry
     rescue Timeout::Error => e
       #couldnt complete in time
       Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")

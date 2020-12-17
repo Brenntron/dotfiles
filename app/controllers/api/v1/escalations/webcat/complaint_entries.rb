@@ -28,13 +28,14 @@ module API
 
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
+                uri_as_categorized = permitted_params['uri_as_categorized'].blank? ? entry.uri : permitted_params['uri_as_categorized']
                 entry.change_category( permitted_params['prefix'],
                                        permitted_params['categories'],
                                        permitted_params['category_names'],
                                        permitted_params['status'],
                                        permitted_params['comment'],
                                        permitted_params['resolution_comment'],
-                                       permitted_params['uri_as_categorized'],
+                                       uri_as_categorized,
                                        current_user, "")
                 Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
@@ -497,13 +498,14 @@ module API
                   begin
                     if entry['error'] == false
                       complaint_entry = ComplaintEntry.find(entry['entry_id'])
+                      uri_as_categorized = entry['uri_as_categorized'].blank? ? complaint_entry.uri : entry['uri_as_categorized']
                       complaint_entry.change_category( entry['prefix'],
                                                        entry['categories'],
                                                        entry['category_names'],
                                                        entry['status'],
                                                        entry['comment'],
                                                        entry['resolution_comment'],
-                                                       entry['uri_as_categorized'],
+                                                       uri_as_categorized,
                                                        current_user, "")
 
                       Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry) }
