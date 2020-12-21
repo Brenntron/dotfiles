@@ -1569,7 +1569,7 @@ window.click_table_buttons = (complaint_table, button)->
       $(td).addClass 'nested-complaint-data-wrapper'
     if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
       $( cat_select ).selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
