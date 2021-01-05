@@ -72,8 +72,8 @@ class DisputeExport
              'status' => dispute_entry.dispute.status,
              'resolution' => dispute_entry.dispute.resolution,
              'submission-type' => dispute_entry.dispute.submission_type,
-             'dispute' => Dispute.entry_content_for(dispute).first,
-             'owner' => dispute_entry.dispute.user.cvs_username,
+             'dispute' => Dispute.entry_content_for(dispute_entry.dispute).first,
+             'owner' => owner_for(dispute_entry.dispute),
              'time-submitted' => dispute_entry.dispute.case_opened_at.strftime("%FT%T"),
              'last-updated' => dispute_entry.dispute.updated_at.strftime("%FT%T"),
              'age' => ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at),
@@ -107,5 +107,15 @@ class DisputeExport
 
   def to_s
     workbook.stream.string
+  end
+
+  private
+
+  def owner_for(dispute)
+    if dispute.assignee == "Unassigned"
+      dispute.assignee
+    else
+      dispute.user&.cvs_username
+    end
   end
 end
