@@ -98,7 +98,7 @@ gem 'elasticsearch'
 gem 'hashie'
 
 group :development do
-  gem 'thin', '1.7.2'
+  gem 'thin', '1.8.0'
   gem 'puma', '3.12.0'
   gem 'awesome_print', '1.8.0'
   gem 'guard','2.14.2'
