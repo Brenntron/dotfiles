@@ -1589,7 +1589,7 @@ window.click_table_buttons = (complaint_table, button)->
     else
       # need to initialize the selectize function but disable it here if entry is completed
       $completed_selectize = $( cat_select ).selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
