@@ -540,7 +540,6 @@ class ComplaintEntry < ApplicationRecord
         new_complaint_entry.url_primary_category = current_category
         new_complaint_entry.category = current_category
       end
-
       new_complaint_entry.save
 
     rescue Exception => e

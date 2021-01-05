@@ -577,7 +577,6 @@ class Complaint < ApplicationRecord
           IPs/URIs: #{ips_urls}
           Problem Summary: #{description}
     HEREDOC
-
     bug_attrs = {
         'product' => 'Escalations Console',
         'component' => 'Categorization',
