@@ -72,7 +72,7 @@ class DisputeExport
              'status' => dispute_entry.dispute.status,
              'resolution' => dispute_entry.dispute.resolution,
              'submission-type' => dispute_entry.dispute.submission_type,
-             'dispute' => dispute_entry.dispute.org_domain,
+             'dispute' => Dispute.entry_content_for(dispute).first,
              'owner' => dispute_entry.dispute.user.cvs_username,
              'time-submitted' => dispute_entry.dispute.case_opened_at.strftime("%FT%T"),
              'last-updated' => dispute_entry.dispute.updated_at.strftime("%FT%T"),
