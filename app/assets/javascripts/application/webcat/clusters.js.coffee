@@ -522,6 +522,21 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
         $(this).remove()
 
 
+window.get_wsa_status = () ->
+  serials = $('#wsa_statuses').val();
+  data_array =  serials.split(/[\s,;\t\n]+/);
+  console.log $('#wsa_statuses'), data_array
+  $.ajax(
+    method: 'POST'
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    url: "/escalations/api/v1/escalations/wsa_statuses"
+    data:
+      serials: ["FGL1629409D", "token2"]
+    success: (response) ->
+      console.log response
+    error: (response) ->
+      console.log response
+  )
 
   window.select_or_deselect_cluster = (cluster_id)->
     $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
