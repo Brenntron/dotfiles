@@ -525,15 +525,40 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
 window.get_wsa_status = () ->
   serials = $('#wsa_statuses').val();
   data_array =  serials.split(/[\s,;\t\n]+/);
-  console.log $('#wsa_statuses'), data_array
   $.ajax(
     method: 'POST'
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    headers : {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     url: "/escalations/api/v1/escalations/wsa_statuses"
     data:
-      serials: ["FGL1629409D", "token2"]
+      serials: data_array
     success: (response) ->
-      console.log response
+      {not_found, wsa_statuses} = response
+      status_table = document.createElement('table');
+      data_points = ["Company", "Modification Time", "Serial", "Source", "WSA Version"]
+      header_row = document.createElement('tr');
+
+      for header in data_points
+         tr_header = document.createElement('tr');
+         th = document.createElement('th');
+         header_text = document.createTextNode(header);
+         th.appendChild(header_text );
+         tr_header.appendChild(th);
+         header_row.appendChild(th);
+      status_table.appendChild(header_row);
+
+      for searched_serial in wsa_statuses
+        { company, mtime, serial, source, wsa_version } = searched_serial
+        statuses = [company, mtime, serial, source, wsa_version]
+
+        for status in statuses
+          tr_body = document.createElement('tr');
+          td = document.createElement('td');
+          status = document.createTextNode(status);
+          td.appendChild(status);
+          tr_body.appendChild(td);
+          status_table.appendChild(tr_body);
+
+      std_msg_success('WSA Status',["#{status_table}"], reload: false)
     error: (response) ->
       console.log response
   )
