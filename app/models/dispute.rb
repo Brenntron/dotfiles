@@ -1211,17 +1211,7 @@ class Dispute < ApplicationRecord
         end
       end
 
-      dispute_packet[:dispute_entry_content] = []
-      unless dispute.dispute_entries.blank?
-        dispute.dispute_entries.each do |entry|
-          unless entry[:ip_address].nil?
-            dispute_packet[:dispute_entry_content].push(entry[:ip_address])
-          end
-          unless entry[:uri].nil?
-            dispute_packet[:dispute_entry_content].push(entry[:uri])
-          end
-        end
-      end
+      dispute_packet[:dispute_entry_content] = entry_content_for(dispute)
       dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}
       dispute_packet[:submission_type] = dispute.submission_type
       dispute_packet[:d_entry_preview] = dispute_packet[:dispute_entry_content].first.to_s + "<span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
@@ -1269,6 +1259,23 @@ class Dispute < ApplicationRecord
 
       dispute_packet
     end
+  end
+
+  # collect entry content array for a specific disputes
+  # entry content is using to display data in UI and for disputes export
+  def self.entry_content_for(dispute)
+    entry_content = []
+    unless dispute.dispute_entries.blank?
+      dispute.dispute_entries.each do |entry|
+        unless entry[:ip_address].nil?
+          entry_content.push(entry[:ip_address])
+        end
+        unless entry[:uri].nil?
+          entry_content.push(entry[:uri])
+        end
+      end
+    end
+    entry_content
   end
 
   def peek(user:)
@@ -2175,6 +2182,5 @@ class Dispute < ApplicationRecord
 
     return return_hash
   end
-
 end
 

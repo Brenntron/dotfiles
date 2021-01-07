@@ -539,7 +539,7 @@ $ ->
       $('#filerep-index-title')[0].innerHTML = new_header
 
   window.export_file_rep_all = () ->
-    form = document.getElementById("disputes-index-export-form")
+    form = document.getElementById("file-rep-disputes-index-export-form")
 
     data = build_data()
 
@@ -552,11 +552,6 @@ $ ->
     form.onsubmit = () ->
       return false
 
-  $(document).on 'change', '.dispute_check_box', ->
-    # ensure this only runs in file rep, there are dispute checkboxes on webrep
-    if $('#disputes-index-export-form').length
-      document.getElementById("disputes-index-export-form").onsubmit = () ->
-        return false
   window.export_file_rep_selected = () ->
     data = build_data()
     if data.selected_cases.length <= 0
@@ -566,7 +561,7 @@ $ ->
       data.search_name = null
     data_json = JSON.stringify(data)
     $('#index-export-data-input').val(data_json)
-    document.getElementById("disputes-index-export-form").onsubmit = ""
+    document.getElementById("file-rep-disputes-index-export-form").onsubmit = ""
 
 
 
