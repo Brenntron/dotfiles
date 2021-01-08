@@ -532,20 +532,27 @@ window.get_wsa_status = () ->
     data:
       serials: data_array
     success: (response) ->
+      dialog = $('#wsa-status-dialog')
+      if $('.wsa-table:visible').length > 0
+        dialog.dialog('close')
       {not_found, wsa_statuses} = response
       status_table = ''
       nf_div = ''
-      data_points = ["Company", "Modification Time", "Serial", "Source", "WSA Version"]
+      data_points = ["Serial","Company", "Modification Time", "Source", "WSA Version"]
       header_row = document.createElement('tr');
 
       if not_found.length > 0
+
         nf_div = document.createElement('div');
         nf_div.classList = 'not-found-wsa'
         nf_list = document.createTextNode( not_found.join(', ') );
         nf_div.appendChild( nf_list );
 
       if wsa_statuses.length > 0
+
         status_table = document.createElement('table');
+        status_table.classList = 'wsa-table'
+
         for header in data_points
            tr_header = document.createElement('tr');
            th = document.createElement('th');
@@ -557,7 +564,7 @@ window.get_wsa_status = () ->
 
         for searched_serial in wsa_statuses
           { company, mtime, serial, source, wsa_version } = searched_serial
-          statuses = [company, mtime, serial, source, wsa_version]
+          statuses = [serial, company, mtime, source, wsa_version]
           tr_body = document.createElement('tr');
           for status in statuses
             td = document.createElement('td');
@@ -565,11 +572,16 @@ window.get_wsa_status = () ->
             td.appendChild(status);
             tr_body.appendChild(td);
             status_table.appendChild(tr_body);
-      dialog = $('#wsa-status-dialog')
+
       dialog.dialog({
-        width: 'auto'
-        minWidth: '600px'
+        width: 'auto',
+        minWidth: '600px',
+        open: () ->
+          $(this).css('padding', '15px')
+        close : () ->
+          $(this).empty()
       })
+
       wsa_el = document.getElementById('wsa-status-dialog')
       wsa_el.appendChild(status_table)
       wsa_el.appendChild(nf_div)

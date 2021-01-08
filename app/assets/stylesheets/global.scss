@@ -7479,8 +7479,15 @@ table.dispute-entry-table tbody tr.selected {
   padding: 15px;
 }
 
-.wsa-status{
 
+.wsa-table{
+  th, td {
+    padding-right: 10px;
+    white-space: nowrap;
+  }
+  td:nth-child(0) {
+    background-color: #d7dadb2b;
+  }
 }
 
 .history-table {
