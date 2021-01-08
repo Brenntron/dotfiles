@@ -585,6 +585,8 @@ window.get_wsa_status = () ->
       wsa_el = document.getElementById('wsa-status-dialog')
       wsa_el.appendChild(status_table)
       wsa_el.appendChild(nf_div)
+#      $(wsa_el).find('td:first')addClass()
+#      background-color: #d7dadb2b;
       dialog.dialog('open')
 
 #      std_msg_success('WSA Status',["#{status_table}"], reload: false)
