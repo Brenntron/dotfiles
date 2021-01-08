@@ -533,32 +533,50 @@ window.get_wsa_status = () ->
       serials: data_array
     success: (response) ->
       {not_found, wsa_statuses} = response
-      status_table = document.createElement('table');
+      status_table = ''
+      nf_div = ''
       data_points = ["Company", "Modification Time", "Serial", "Source", "WSA Version"]
       header_row = document.createElement('tr');
 
-      for header in data_points
-         tr_header = document.createElement('tr');
-         th = document.createElement('th');
-         header_text = document.createTextNode(header);
-         th.appendChild(header_text );
-         tr_header.appendChild(th);
-         header_row.appendChild(th);
-      status_table.appendChild(header_row);
+      if not_found.length > 0
+        nf_div = document.createElement('div');
+        nf_div.classList = 'not-found-wsa'
+        nf_list = document.createTextNode( not_found.join(', ') );
+        nf_div.appendChild( nf_list );
 
-      for searched_serial in wsa_statuses
-        { company, mtime, serial, source, wsa_version } = searched_serial
-        statuses = [company, mtime, serial, source, wsa_version]
+      if wsa_statuses.length > 0
+        status_table = document.createElement('table');
+        for header in data_points
+           tr_header = document.createElement('tr');
+           th = document.createElement('th');
+           header_text = document.createTextNode(header);
+           th.appendChild(header_text );
+           tr_header.appendChild(th);
+           header_row.appendChild(th);
+        status_table.appendChild(header_row);
 
-        for status in statuses
+        for searched_serial in wsa_statuses
+          { company, mtime, serial, source, wsa_version } = searched_serial
+          statuses = [company, mtime, serial, source, wsa_version]
           tr_body = document.createElement('tr');
-          td = document.createElement('td');
-          status = document.createTextNode(status);
-          td.appendChild(status);
-          tr_body.appendChild(td);
-          status_table.appendChild(tr_body);
+          for status in statuses
+            td = document.createElement('td');
+            status = document.createTextNode(status);
+            td.appendChild(status);
+            tr_body.appendChild(td);
+            status_table.appendChild(tr_body);
+      dialog = $('#wsa-status-dialog')
+      dialog.dialog({
+        width: 'auto'
+        minWidth: '600px'
+      })
+      wsa_el = document.getElementById('wsa-status-dialog')
+      wsa_el.appendChild(status_table)
+      wsa_el.appendChild(nf_div)
+      dialog.dialog('open')
 
-      std_msg_success('WSA Status',["#{status_table}"], reload: false)
+#      std_msg_success('WSA Status',["#{status_table}"], reload: false)
+
     error: (response) ->
       console.log response
   )
