@@ -7481,16 +7481,44 @@ table.dispute-entry-table tbody tr.selected {
 
 
 .wsa-table{
+  &{
+    max-height: 250px;
+    overflow-y: auto;
+    display: block;
+  }
   th, td {
     padding: 15px 10px 5px 5px;
     white-space: nowrap;
     border-bottom: 1px solid #f2f2f2;
+    &:first-child{
+      background-color: #d7dadb2b
+    }
   }
-  td:first-child, th:first-child {
-    background-color: #d7dadb2b;
-  }
+
 }
 
+.not-found-wsa {
+  & {
+    padding-top: 20px;
+    max-width: 500px;
+  }
+
+  .result-label {
+    font-weight: 700;
+    font-size: 8pt;
+    text-transform: uppercase;
+    margin-top: 0;
+    display: inline-block;
+    padding: 0 15px 0 5px;
+  }
+}
+.not-found-list{
+  display: block;
+  margin: 0 auto;
+  max-width: 500px;
+  max-height: 42px!important;
+  overflow-y: scroll;
+}
 .history-table {
   font-size: 8pt;
 }

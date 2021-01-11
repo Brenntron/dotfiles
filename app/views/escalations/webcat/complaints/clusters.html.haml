@@ -21,14 +21,7 @@
             %input#cluster_filter_field.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
           .col-xs-3.no_pad
             %button#cluster_filter_button.primary{onclick: 'apply_filter_to_table()', class:'apply-filter-btn icon-filter-white'}Apply Filter
-  .row
-    .col-xs-5
-      .card
-        .content-label-sm WSA status
-        .card-body
-          %input#wsa_statuses.text_field
-          %button.toolbar-button.icon-submit{'onclick': 'get_wsa_status()'} Search
-    .wsa-status{id:"wsa-status-dialog", title:"WSA Status"}
+
   .row
     .col-xs-7
       .current-cluster-info-wrapper
@@ -38,6 +31,14 @@
         .result-label.regex-area.hidden
           Regex:
           %span#regex-filter
+  .row
+    .col-xs-5
+      .card
+        .content-label-sm WSA status
+        .card-body
+          %input#wsa_statuses.text_field
+          %button.toolbar-button.icon-submit{'onclick': 'get_wsa_status()'} Search
+    .wsa-status{id:"wsa-status-dialog", title:"WSA Status"}
     .col-xs-5
       .card
         .content-label-sm Comment

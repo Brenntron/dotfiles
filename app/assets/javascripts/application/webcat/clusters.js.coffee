@@ -535,47 +535,72 @@ window.get_wsa_status = () ->
       dialog = $('#wsa-status-dialog')
       if $('.wsa-table:visible').length > 0
         dialog.dialog('close')
-      {not_found, wsa_statuses} = response
+      { not_found, wsa_statuses } = response
+
       status_table = ''
       nf_div = ''
       data_points = ["Serial","Company", "Modification Time", "Source", "WSA Version"]
-      header_row = document.createElement('tr');
 
-      if not_found.length > 0
-
+      if not_found != undefined
+        nf_header = document.createElement('div');
+        nf_list_div = document.createElement('div');
+        nf_header.classList = 'result-label'
+        nf_list_div.classList = 'not-found-list'
         nf_div = document.createElement('div');
         nf_div.classList = 'not-found-wsa'
         nf_list = document.createTextNode( not_found.join(', ') );
-        nf_div.appendChild( nf_list );
+
+        nf_header.appendChild( document.createTextNode( "No Shared Data:") )
+
+        nf_div.appendChild( nf_header );
+        nf_list_div.appendChild( nf_list );
+        nf_div.appendChild( nf_list_div );
 
       if wsa_statuses.length > 0
-
         status_table = document.createElement('table');
+        header_row = document.createElement('tr');
         status_table.classList = 'wsa-table'
+        thead = document.createElement('thead');
+        tbody = document.createElement('tbody');
 
         for header in data_points
-           tr_header = document.createElement('tr');
            th = document.createElement('th');
            header_text = document.createTextNode(header);
            th.appendChild(header_text );
-           tr_header.appendChild(th);
            header_row.appendChild(th);
-        status_table.appendChild(header_row);
+        thead.appendChild(header_row);
+        status_table.appendChild( thead);
 
-        for searched_serial in wsa_statuses
-          { company, mtime, serial, source, wsa_version } = searched_serial
-          statuses = [serial, company, mtime, source, wsa_version]
-          tr_body = document.createElement('tr');
-          for status in statuses
+        for x in [1..30]
+          for searched_serial in wsa_statuses
+            # limit amount of data displayed in table
+            { company, mtime, serial, source, wsa_version } = searched_serial
+            statuses = {serial, company, mtime, source, wsa_version}
+
+            tr_body = document.createElement('tr');
             td = document.createElement('td');
-            status = document.createTextNode(status);
-            td.appendChild(status);
-            tr_body.appendChild(td);
-            status_table.appendChild(tr_body);
+
+            status = document.createTextNode(v);
+            for k, v of statuses
+              td = document.createElement('td');
+              if k == 'mtime'
+                v = moment(v).format('DD/MM/YY h:mm');
+              status = document.createTextNode(v);
+              td.appendChild(status);
+              tr_body.appendChild(td);
+              tbody.appendChild(tr_body);
+
+        status_table.appendChild(tbody)
 
       dialog.dialog({
         width: 'auto',
         minWidth: '600px',
+        maxHeight: '350px;'
+        position:{
+          my: "center",
+          at: "center",
+          of: window
+        }
         open: () ->
           $(this).css('padding', '15px')
         close : () ->
