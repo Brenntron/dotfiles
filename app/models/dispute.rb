@@ -309,7 +309,7 @@ class Dispute < ApplicationRecord
   def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
     resolved_at = Time.now
     dispute.status = Dispute::RESOLVED
-    dispute.related_id = authority_dispute.id
+    dispute.related_id = authority_dispute.id unless authority_dispute.blank?
     dispute.related_at = Time.now
     dispute.resolution = Dispute::DUPLICATE
     dispute.case_closed_at = Time.now
@@ -323,7 +323,7 @@ class Dispute < ApplicationRecord
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
       new_payload_item[:status] = TI_RESOLVED
-      new_payload_item[:sugg_type] = entry["rep_sugg"]
+      new_payload_item[:sugg_type] = entry[:sbrs]["rep_sugg"]
       return_payload[ip] = new_payload_item
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = dispute.id
@@ -331,6 +331,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.entry_type = "IP"
       new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
+      new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
       new_dispute_entry.case_closed_at = resolved_at
       new_dispute_entry.case_resolved_at = resolved_at
       new_dispute_entry.save
@@ -346,6 +347,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.uri = url
       new_dispute_entry.entry_type = "URI/DOMAIN"
+      new_dispute_entry.suggested_disposition = entry["rep_sugg"]
       new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
       new_dispute_entry.case_closed_at = resolved_at
@@ -507,7 +509,7 @@ class Dispute < ApplicationRecord
         end
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
-
+        
         if response[:is_dupe] == true && response[:all_resolved] == false
           manage_duplicate_dispute(new_dispute, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
           return

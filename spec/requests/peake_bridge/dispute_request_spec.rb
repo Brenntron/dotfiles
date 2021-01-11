@@ -370,6 +370,29 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
     expect(dispute.dispute_entries.where(uri: 'thepretenders.com')).to exist
   end
+
+  it 'should process a duplicate' do
+
+
+
+    expect(Dispute).to receive(:is_possible_customer_duplicate?).and_return({:is_dupe => true, :all_resolved => false, :authority => nil})
+
+    vrt_incoming
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_json
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(4)
+    expect(dispute.dispute_entries.where(ip_address: '64.70.56.99')).to exist
+    expect(dispute.dispute_entries.where(ip_address: '184.168.47.225')).to exist
+
+    expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
+    expect(dispute.dispute_entries.where(uri: 'thepretenders.com')).to exist
+  end
 end
 
 # expect(response.code).to be_successful
