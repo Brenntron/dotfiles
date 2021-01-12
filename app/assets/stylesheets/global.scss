@@ -2102,6 +2102,8 @@ a.static-nav-item {
 .icon-opened-selected {background-image: url(image_path('icon_open_selected.svg'));}
 .icon-open-all {background-image: url(image_path('icon_open_all.svg'));}
 .icon-copycat {background-image: url(image_path('icon_copycat.svg'));}
+.icon-telemetry {background-image: url(image_path('icon-telemetry.svg'));}
+.icon-search{background-image: url(image_path('icon_search_white.svg'));}
 .icon-paste {background-image: url(image_path('icon_paste.svg'));}
 .icon-clear {background-image: url(image_path('icon_clear.svg'));}
 .icon-submit{background-image: url("icon_submit_arrow.svg")}
@@ -7475,11 +7477,19 @@ table.dispute-entry-table tbody tr.selected {
   padding: 15px;
 }
 
-#cluster_button_dialog .dialog-content-wrapper, #copycat_dialog .dialog-content-wrapper {
+#cluster_button_dialog .dialog-content-wrapper, #copycat_dialog .dialog-content-wrapper, #wsa_status_dialog .dialog-content-wrapper  {
   padding: 15px;
 }
-
-
+#cluster_comment_field{
+  padding: 0 3px 0 26px;
+  font-weight: 400;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+.cluster-comment-btn{
+  white-space: nowrap;
+  min-width: 125px;
+}
 .wsa-table{
   &{
     max-height: 250px;
@@ -8563,7 +8573,7 @@ td.text-center span {
 }
 
 
-.copycat-btn {
+.copycat-btn, .wsa-btn {
   margin: 4px 0 0 5px;
   background-color: $content-tab-color;
   color: $type-lightest;
@@ -8571,10 +8581,10 @@ td.text-center span {
   height: 27px;
 }
 
-.copycat-btn.active {
+.copycat-btn.active, .wsa-btn.active {
   background-color: $primary-section-color;
 }
-.copycat-btn:hover {
+.copycat-btn:hover, .wsa-btn:hover  {
   background-color: $sidebar-nav-base;
 }
 
@@ -8672,6 +8682,51 @@ td.text-center span {
     }
   }
 }
+
+
+// copycat tool dialog
+#wsa-status-dialog {
+  display: none;
+}
+.wsa_tool_dialog {
+  min-width: 400px;
+  min-height: 135px;
+  font-family: 'Open Sans', sans-serif !important;
+}
+#wsa_statuses{
+  width: 100%;
+  border: 1px solid #dddddd !important;
+  padding: 0 5px !important;
+  height: 32px;
+}
+
+.wsa_tool_dialog .ui-dialog-titlebar {
+  background-color: $content-tab-color;
+  background-image: url(image_path('icon-telemetry.svg'));
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  background-size: 24px 24px;
+  padding-left: 40px;
+  border: none;
+  width: 100%;
+  font-weight: bold;
+}
+.wsa-search-status-btn{
+  background-color: #6dbcdb;
+  background-size: 15px;
+  background-position: 10px center;
+  color: #fff;
+  padding: 12px 20px 12px 35px;
+}
+.wsa-tool-footer {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0 25px 15px 25px;
+  font-size: 12px;
+}
+
+
+
 
 .open-in-tab-btn, .whois-btn, .google-btn {
   background-repeat: no-repeat;

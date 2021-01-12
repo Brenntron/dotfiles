@@ -48,10 +48,17 @@ window.categorize_clusters = () ->
   user_id = $("#user_id").val()
   comment = $("#cluster_comment_field").val()
   #cluster_id comment category_ids
-  clusters_to_categorize = []
   clusters = $ '[id$=\'_categories\']'
   categories = []
+  if $('.cluster-row-select:checked').length == 0
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+    loader.addClass('hidden')
+    return
 
+  if comment == ''
+    std_msg_error('no comment added', ['Please make a comment to submit.'])
+    loader.addClass('hidden')
+    return
   data = {}
   data["comment"] = comment
   data["user_id"] = user_id
@@ -143,7 +150,7 @@ $ ->
         searchable: false
         sortable: false
         render: (data, type, full, meta) ->
-          return '<input type="checkbox" name="cluster_id_' + data.cluster_id + '" onclick="toggleRow(this)">'
+          return '<input type="checkbox" class="cluster-row-select" name="cluster_id_' + data.cluster_id + '" onclick="toggleRow(this)">'
       }
       {
         data: 'cluster_id'
@@ -274,6 +281,17 @@ window.copycat_dialog = () ->
         options: AC.WebCat.createSelectOptions('#copycat_dialog #copycat-categories')
       }
   });
+
+window.open_wsa_status = () ->
+  $('#wsa_status_dialog').dialog({
+    dialogClass: "wsa_tool_dialog",
+    position: { my: "left+475 top+160", at: "left top", of: window },
+    close: (event, ui) =>
+      $('button.icon-wsa').removeClass('active')
+    open: (event, ui) =>
+
+  });
+
 
 # delete copycat input content
 window.copycat_clear = () ->

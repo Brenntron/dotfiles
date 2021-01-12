@@ -31,20 +31,13 @@
         .result-label.regex-area.hidden
           Regex:
           %span#regex-filter
-  .row
-    .col-xs-5
-      .card
-        .content-label-sm WSA status
-        .card-body
-          %input#wsa_statuses.text_field
-          %button.toolbar-button.icon-submit{'onclick': 'get_wsa_status()'} Search
-    .wsa-status{id:"wsa-status-dialog", title:"WSA Status"}
+
     .col-xs-5
       .card
         .content-label-sm Comment
         .card-body
           %input#cluster_comment_field.text_field
-          %button.toolbar-button.icon-submit{'onclick': 'categorize_clusters()'} Submit Changes
+          %button.toolbar-button.icon-submit.cluster-comment-btn{'onclick': 'categorize_clusters()'} Submit Changes
   .row
     .col-xs-12
       .toolbar.cluster-table-toolbar
@@ -66,7 +59,8 @@
             %span.toolbar-button-text Expand All
         %button.toolbar-button.copycat-btn.icon-copycat.esc-tooltipped{'onclick': 'copycat_dialog()', title: 'CopyCat Tool'}
           %span.toolbar-button-text CopyCat Tool
-
+        %button.toolbar-button.wsa-btn.icon-telemetry.esc-tooltipped{'onclick': 'open_wsa_status()', title: 'WSA Telemetry Status'}
+          %span.toolbar-button-text WSA Telemetry Status
   .row
     .col-xs-12
       %table.table.responsive#clusters-index
@@ -89,5 +83,11 @@
   .copycat-tool-footer
     %button.toolbar-button.copycat-paste-btn.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
     %button.toolbar-button.copycat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear All Categories
+
+#wsa_status_dialog{title: 'WSA Telemetry Status'}
+  .dialog-content-wrapper
+    %input#wsa_statuses.text_field{placeholder: "Search by Companies or Serial Numbers"}
+  .wsa-tool-footer
+    %button.toolbar-button.wsa-search-status-btn.icon-search{'onclick': 'get_wsa_status()'} Search Statuses
 
 #whois_dialog{title: 'Domain Lookup Information'}
