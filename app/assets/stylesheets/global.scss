@@ -7495,16 +7495,31 @@ table.dispute-entry-table tbody tr.selected {
     max-height: 250px;
     overflow-y: auto;
     display: block;
+    margin: 20px 15px;
   }
   th, td {
-    padding: 15px 10px 5px 5px;
+    padding: 10px 10px 10px 5px;
     white-space: nowrap;
     border-bottom: 1px solid #f2f2f2;
-    &:first-child{
-      background-color: #d7dadb2b
-    }
   }
+}
 
+.shared_data{background: url(image_path('icon_success.svg')) no-repeat center;}
+.not_shared_data{background: url(image_path('icon_fail.svg'))no-repeat center; }
+.shared_data, .not_shared_data{
+  padding: 5px;
+}
+.nf_tds{
+  background-color: #d7dadb2b
+}
+.wsa-loader-wrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-botton: 15px;
+}
+.wsa_tool_dialog, #wsa_status_dialog{
+  width: fit-content!important;
 }
 
 .not-found-wsa {
@@ -8695,6 +8710,7 @@ td.text-center span {
 }
 #wsa_statuses{
   width: 100%;
+  min-width: 368px;
   border: 1px solid #dddddd !important;
   padding: 0 5px !important;
   height: 32px;

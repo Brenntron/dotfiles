@@ -89,5 +89,10 @@
     %input#wsa_statuses.text_field{placeholder: "Search by Companies or Serial Numbers"}
   .wsa-tool-footer
     %button.toolbar-button.wsa-search-status-btn.icon-search{'onclick': 'get_wsa_status()'} Search Statuses
+  .wsa-loader-wrapper.hidden
+    .gear-loader-wrapper
+      = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    %span.loader-msg Loading data...
+  #wsa-status-table.hidden
 
 #whois_dialog{title: 'Domain Lookup Information'}

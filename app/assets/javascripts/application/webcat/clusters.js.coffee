@@ -288,7 +288,7 @@ window.open_wsa_status = () ->
     position: { my: "left+475 top+160", at: "left top", of: window },
     close: (event, ui) =>
       $('button.icon-wsa').removeClass('active')
-    open: (event, ui) =>
+      $('#wsa-status-table').empty()
 
   });
 
@@ -542,7 +542,16 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
 
 window.get_wsa_status = () ->
   serials = $('#wsa_statuses').val();
+
+  if serials == ""
+    std_msg_error("No Companies or Serial numbers entered.","")
+    return
+
   data_array =  serials.split(/[\s,;\t\n]+/);
+  $('.wsa-loader-wrapper').removeClass('hidden')
+  $('#wsa-status-table').empty()
+
+
   $.ajax(
     method: 'POST'
     headers : {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -550,97 +559,78 @@ window.get_wsa_status = () ->
     data:
       serials: data_array
     success: (response) ->
-      dialog = $('#wsa-status-dialog')
-      if $('.wsa-table:visible').length > 0
-        dialog.dialog('close')
+      $('#wsa-status-table').removeClass('hidden')
       { not_found, wsa_statuses } = response
-
+      wsa_div = document.getElementById('wsa-status-table')
       status_table = ''
       nf_div = ''
-      data_points = ["Serial","Company", "Modification Time", "Source", "WSA Version"]
+      data_points = ["", "Serial","Company", "Modification Time", "Source", "WSA Version"]
 
-      if not_found != undefined
-        nf_header = document.createElement('div');
-        nf_list_div = document.createElement('div');
-        nf_header.classList = 'result-label'
-        nf_list_div.classList = 'not-found-list'
-        nf_div = document.createElement('div');
-        nf_div.classList = 'not-found-wsa'
-        nf_list = document.createTextNode( not_found.join(', ') );
+      status_table = document.createElement('table');
+      header_row = document.createElement('tr');
+      status_table.classList = 'wsa-table'
+      thead = document.createElement('thead');
+      tbody = document.createElement('tbody');
 
-        nf_header.appendChild( document.createTextNode( "No Shared Data:") )
-
-        nf_div.appendChild( nf_header );
-        nf_list_div.appendChild( nf_list );
-        nf_div.appendChild( nf_list_div );
+      for header in data_points
+        th = document.createElement('th');
+        header_text = document.createTextNode(header);
+        th.appendChild(header_text );
+        header_row.appendChild(th);
+      thead.appendChild(header_row);
+      status_table.appendChild( thead);
 
       if wsa_statuses.length > 0
-        status_table = document.createElement('table');
-        header_row = document.createElement('tr');
-        status_table.classList = 'wsa-table'
-        thead = document.createElement('thead');
-        tbody = document.createElement('tbody');
+        for searched_serial in wsa_statuses
+          # limit amount of data displayed in table
+          { company, mtime, serial, source, wsa_version } = searched_serial
+          statuses = {serial, company, mtime, source, wsa_version}
+          status_tr_body = document.createElement('tr');
+          td = document.createElement('td');
+          status = document.createTextNode(v);
 
-        for header in data_points
-           th = document.createElement('th');
-           header_text = document.createTextNode(header);
-           th.appendChild(header_text );
-           header_row.appendChild(th);
-        thead.appendChild(header_row);
-        status_table.appendChild( thead);
-
-        for x in [1..30]
-          for searched_serial in wsa_statuses
-            # limit amount of data displayed in table
-            { company, mtime, serial, source, wsa_version } = searched_serial
-            statuses = {serial, company, mtime, source, wsa_version}
-
-            tr_body = document.createElement('tr');
+          shared = document.createElement('td')
+          shared.classList = 'shared_data'
+          status_tr_body.appendChild(shared);
+          for k, v of statuses
             td = document.createElement('td');
-
             status = document.createTextNode(v);
-            for k, v of statuses
-              td = document.createElement('td');
-              if k == 'mtime'
-                v = moment(v).format('DD/MM/YY h:mm');
-              status = document.createTextNode(v);
-              td.appendChild(status);
-              tr_body.appendChild(td);
-              tbody.appendChild(tr_body);
+            td.appendChild(status);
+            status_tr_body.appendChild(td);
+
+          tbody.appendChild(status_tr_body);
+
+      if not_found.length > 0
+        for nf in not_found
+          tr_body = document.createElement('tr');
+
+          not_shared = document.createElement('td')
+          not_shared.classList = 'not_shared_data'
+          tr_body.appendChild(not_shared);
+
+          td = document.createElement('td');
+          td.appendChild( document.createTextNode(nf) );
+          lg_td = document.createElement('td');
+          lg_td.classList = 'nf_tds'
+          lg_td.setAttribute('colspan', '4')
+
+          tr_body.appendChild(td)
+          tr_body.appendChild(lg_td)
+          tbody.appendChild(tr_body)
 
         status_table.appendChild(tbody)
 
-      dialog.dialog({
-        width: 'auto',
-        minWidth: '600px',
-        maxHeight: '350px;'
-        position:{
-          my: "center",
-          at: "center",
-          of: window
-        }
-        open: () ->
-          $(this).css('padding', '15px')
-        close : () ->
-          $(this).empty()
-      })
-
-      wsa_el = document.getElementById('wsa-status-dialog')
-      wsa_el.appendChild(status_table)
-      wsa_el.appendChild(nf_div)
-#      $(wsa_el).find('td:first')addClass()
-#      background-color: #d7dadb2b;
-      dialog.dialog('open')
-
-#      std_msg_success('WSA Status',["#{status_table}"], reload: false)
+      wsa_div.appendChild(status_table)
+      $('.wsa-loader-wrapper').addClass('hidden')
 
     error: (response) ->
+      $('.wsa-loader-wrapper').addClass('hidden')
       console.log response
   )
 
   window.select_or_deselect_cluster = (cluster_id)->
     $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
-
+#
   $('#cluster_filter_field').keyup (event) ->
     if event.keyCode == 13
       apply_filter_to_table()
