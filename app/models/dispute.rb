@@ -417,86 +417,112 @@ class Dispute < ApplicationRecord
   end
 
 
+  def build_ti_payload
+    payload = {}
+
+    dispute_entries.each do |entry|
+      payload[entry.hostlookup] = entry.new_payload_item
+      payload[entry.hostlookup]['sugg_type'] = entry.suggested_disposition
+    end
+
+    payload
+  end
+
   #
   #end dispute building instance methods
   #
   def self.process_bridge_payload(message_payload)
 
+    #check to see if ticket already exists in database to prevent accidental dupes
+    record_exists = Dispute.where(:ticket_source_key => message_payload["source_key"]).first
+
+    if record_exists.present?
+      conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id)
+      return_payload = record_exists.build_ti_payload
+      case_email = DisputeEmail.generate_case_email_address(record_exists.id)
+      return conn.post(return_payload, case_email)
+
+    end
+
     new_dispute = nil
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
     begin
-      ActiveRecord::Base.transaction do
-        guest = Company.where(:name => "Guest").first
-        opened_at = Time.now
-        resolved_at = Time.now
-        customer = Customer.process_and_get_customer(message_payload)
+
+      guest = Company.where(:name => "Guest").first
+      opened_at = Time.now
+      resolved_at = Time.now
+      customer = Customer.process_and_get_customer(message_payload)
 
 
-        logger.debug "Starting ticket create"
+      logger.debug "Starting ticket create"
 
-        #user = User.where(cvs_username:"vrtincom").first
+      #user = User.where(cvs_username:"vrtincom").first
 
-        #TODO: this should be put in a params method
-        new_entries_ips = message_payload["payload"]["investigate_ips"]
-        new_entries_urls = message_payload["payload"]["investigate_urls"]
+      #TODO: this should be put in a params method
+      new_entries_ips = message_payload["payload"]["investigate_ips"]
+      new_entries_urls = message_payload["payload"]["investigate_urls"]
 
-        return_payload = {}
+      return_payload = {}
 
-        #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
+      #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
 
-        bugzilla_rest_session = message_payload[:bugzilla_rest_session]
+      bugzilla_rest_session = message_payload[:bugzilla_rest_session]
 
-        summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+      summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-        full_description = <<~HEREDOC
+      full_description = <<~HEREDOC
           IPs: #{new_entries_ips.keys}
           URIs: #{new_entries_urls.keys}
           Problem Summary: #{message_payload["payload"]["problem"]}
-        HEREDOC
+      HEREDOC
 
-        bug_attrs = {
-            'product' => 'Escalations Console',
-            'component' => 'IP/Domain',
-            'summary' => summary,
-            'version' => 'unspecified', #self.version,
-            'description' => full_description,
-            # 'opsys' => self.os,
-            'priority' => 'Unspecified',
-            'classification' => 'unclassified',
-        }
-        logger.debug "Creating bugzilla bug"
+      bug_attrs = {
+          'product' => 'Escalations Console',
+          'component' => 'IP/Domain',
+          'summary' => summary,
+          'version' => 'unspecified', #self.version,
+          'description' => full_description,
+          # 'opsys' => self.os,
+          'priority' => 'Unspecified',
+          'classification' => 'unclassified',
+      }
+      logger.debug "Creating bugzilla bug"
 
-        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-        logger.debug "Creating dispute"
-        new_dispute = Dispute.new
+      logger.debug "Creating dispute"
+      new_dispute = Dispute.new
 
-        new_dispute.id = bug_proxy.id
-        new_dispute.user_id = user.id
-        new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
-        new_dispute.org_domain = message_payload["payload"]["domain"]
-        new_dispute.case_opened_at = opened_at
-        new_dispute.subject = message_payload["payload"]["email_subject"]
-        new_dispute.description = message_payload["payload"]["email_body"]
-        new_dispute.problem_summary = message_payload["payload"]["problem"]
-        new_dispute.ticket_source_key = message_payload["source_key"]
-        new_dispute.ticket_source = "talos-intelligence"
-        new_dispute.ticket_source_type = message_payload["source_type"]
-        new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
-        new_dispute.status = NEW
+      new_dispute.id = bug_proxy.id
+      new_dispute.user_id = user.id
+      new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
+      new_dispute.org_domain = message_payload["payload"]["domain"]
+      new_dispute.case_opened_at = opened_at
+      new_dispute.subject = message_payload["payload"]["email_subject"]
+      new_dispute.description = message_payload["payload"]["email_body"]
+      new_dispute.problem_summary = message_payload["payload"]["problem"]
+      new_dispute.ticket_source_key = message_payload["source_key"]
+      new_dispute.ticket_source = "talos-intelligence"
+      new_dispute.ticket_source_type = message_payload["source_type"]
+      new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
+      new_dispute.status = NEW
 
-        new_dispute.customer_id = customer&.id
-        new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+      new_dispute.customer_id = customer&.id
+      new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
-        if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
-          new_dispute.priority = "P3"
-        else
-          new_dispute.priority = "P4"
-        end
-        logger.debug "Saving Dispute"
+      if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
+        new_dispute.priority = "P3"
+      else
+        new_dispute.priority = "P4"
+      end
+      logger.debug "Saving Dispute"
 
-        new_dispute.save!
+      new_dispute.save!
+
+
+
+      ActiveRecord::Base.transaction do
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
 
