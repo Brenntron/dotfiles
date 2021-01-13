@@ -1060,8 +1060,12 @@ $ ->
       { data: 'source' }
       {
         data: null
+        class: 'platform-col'
         render: (data,type,full,meta) ->
-          return full.dispute_entries[0].entry.platform
+          platform = full.dispute_entries[0].entry.platform
+          if  platform == "N/A" ||  platform == "Unknown" ||  platform == "Missing" ||  platform == "" ||  platform == null
+            platform = '<span class="missing-data">No Platform</span>'
+          return  platform
       }
       { data: 'submitter_type'}
       { data: 'submitter_org' }

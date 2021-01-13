@@ -432,7 +432,7 @@ $ ->
               orderData: 15
             }
             {
-              targets: [ 12 ]
+              targets: [ 13 ]
               className: 'submitter-col'
             }
           ]
@@ -445,6 +445,7 @@ $ ->
                 sortable: false
                 render: ( data ) ->
                   { entry_id } = data
+                  console.log data
                   return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
               }
               {
@@ -585,6 +586,14 @@ $ ->
                   tooltip_rep = rep.toUpperCase()
                   icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
                   return "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
+              }
+              {
+                data: 'platform'
+                class: 'platform-col'
+                render: (data, type, full, meta) ->
+                  if data == "N/A" || data == "Unknown" || data == "Missing" || data == ""
+                    data = '<span class="missing-data">No Platform</span>'
+                  return data
               }
               {
                 data: 'submitter_type'

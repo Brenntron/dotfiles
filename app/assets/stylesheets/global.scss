@@ -9237,6 +9237,9 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   padding: 0 3px;
   font-size: 8pt;
 }
+.platform-col{
+  white-space: nowrap;
+}
 .col-tag{
   background: $faint-neutral-color;
   font-weight: 200;
