@@ -1,14 +1,15 @@
 describe ComplaintEntryCredits::CreditHandler do
+  subject(:handler) { described_class.new(user, complaint_entry) }
   let(:complaint_entry) { FactoryBot.create(:complaint_entry) }
   let(:user) { FactoryBot.create(:user) }
 
   describe 'PENDING credit' do
-    subject { described_class.handle_pending_credit(user, complaint_entry) }
+    subject { handler.handle_pending_credit }
 
     context 'when user does not have credits for the complaint entry' do
       it 'adds PENDING credit for the user' do
-        expect { subject }.to change { ComplaintEntryCredit }.to(1)
-        expect(user.complaint_entry_credits).to be 1
+        expect { subject }.to change { ComplaintEntryCredit.count }.to(1)
+        expect(user.complaint_entry_credits.count).to be 1
         expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::PENDING
       end
     end
@@ -24,19 +25,19 @@ describe ComplaintEntryCredits::CreditHandler do
 
       it 'removes prevoius credit and adds the PENDING credit' do
         subject
-        expect(user.complaint_entry_credits).to be 1
+        expect(user.complaint_entry_credits.count).to be 1
         expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::PENDING
       end
     end
   end
 
   describe 'UNCHANGED credit' do
-    subject { described_class.handle_unchanged_credit(user, complaint_entry) }
+    subject { handler.handle_unchanged_credit }
 
     context 'when user does not have credits for the complaint entry' do
       it 'adds UNCHANGED credit for the user' do
-        expect { subject }.to change { ComplaintEntryCredit }.to(1)
-        expect(user.complaint_entry_credits).to be 1
+        expect { subject }.to change { ComplaintEntryCredit.count }.to(1)
+        expect(user.complaint_entry_credits.count).to be 1
         expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::UNCHANGED
       end
     end
@@ -52,19 +53,19 @@ describe ComplaintEntryCredits::CreditHandler do
 
       it 'removes prevoius credit and adds the PENDING credit' do
         subject
-        expect(user.complaint_entry_credits).to be 1
+        expect(user.complaint_entry_credits.count).to be 1
         expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::UNCHANGED
       end
     end
   end
 
   describe 'FIXED credit' do
-    subject { described_class.handle_fixed_credit(user, complaint_entry) }
+    subject { handler.handle_fixed_credit }
 
     context 'when user does not have credits for the complaint entry' do
       it 'adds FIXED credit for the user' do
-        expect { subject }.to change { ComplaintEntryCredit }.to(1)
-        expect(user.complaint_entry_credits).to be 1
+        expect { subject }.to change { ComplaintEntryCredit.count }.to(1)
+        expect(user.complaint_entry_credits.count).to be 1
         expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::FIXED
       end
     end
@@ -80,19 +81,19 @@ describe ComplaintEntryCredits::CreditHandler do
 
       it 'removes prevoius credit and adds the PENDING credit' do
         subject
-        expect(user.complaint_entry_credits).to be 1
+        expect(user.complaint_entry_credits.count).to be 1
         expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::FIXED
       end
     end
   end
 
   describe 'INVALID credit' do
-    subject { described_class.handle_invalid_credit(user, complaint_entry) }
+    subject { handler.handle_invalid_credit }
 
     context 'when user does not have credits for the complaint entry' do
       it 'adds INVALID credit for the user' do
-        expect { subject }.to change { ComplaintEntryCredit }.to(1)
-        expect(user.complaint_entry_credits).to be 1
+        expect { subject }.to change { ComplaintEntryCredit.count }.to(1)
+        expect(user.complaint_entry_credits.count).to be 1
         expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::INVALID
       end
     end
@@ -108,20 +109,20 @@ describe ComplaintEntryCredits::CreditHandler do
 
       it 'removes prevoius credit and adds the PENDING credit' do
         subject
-        expect(user.complaint_entry_credits).to be 1
+        expect(user.complaint_entry_credits.count).to be 1
         expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::INVALID
       end
     end
   end
 
-  describe 'DUPLICATED credit' do
-    subject { described_class.handle_duplicated_credit(user, complaint_entry) }
+  describe 'DUPLICATE credit' do
+    subject { handler.handle_duplicate_credit }
 
     context 'when user does not have credits for the complaint entry' do
-      it 'adds DUPLICATED credit for the user' do
-        expect { subject }.to change { ComplaintEntryCredit }.to(1)
-        expect(user.complaint_entry_credits).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::DUPLICATED
+      it 'adds DUPLICATE credit for the user' do
+        expect { subject }.to change { ComplaintEntryCredit.count }.to(1)
+        expect(user.complaint_entry_credits.count).to be 1
+        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::DUPLICATE
       end
     end
 
@@ -134,10 +135,10 @@ describe ComplaintEntryCredits::CreditHandler do
         )
       end
 
-      it 'removes prevoius credit and adds the DUPLICATED credit' do
+      it 'removes prevoius credit and adds the DUPLICATE credit' do
         subject
-        expect(user.complaint_entry_credits).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::DUPLICATED
+        expect(user.complaint_entry_credits.count).to be 1
+        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::DUPLICATE
       end
     end
   end

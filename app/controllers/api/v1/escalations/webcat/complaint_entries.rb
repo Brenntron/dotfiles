@@ -22,10 +22,10 @@ module API
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
               optional :uri_as_categorized, type: String, desc: 'Value of the `Edit Uri` box at the time analyst submitted it'
+              optional :commit, type: String, desc: 'commit message'
             end
             post 'update'do
               std_api_v2 do
-
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
                 uri_as_categorized = permitted_params['uri_as_categorized'].blank? ? entry.uri : permitted_params['uri_as_categorized']
@@ -37,6 +37,9 @@ module API
                                        permitted_params['resolution_comment'],
                                        uri_as_categorized,
                                        current_user, "")
+                # add credit for the user contribution to the complaint entry
+                ComplaintEntryCredits::CreditProcessor.new(current_user, entry, permitted_params['commit']).process
+
                 Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
                   message = Bridge::ComplaintUpdateStatusEvent.new
@@ -87,6 +90,9 @@ module API
                                           '',
                                           current_user, submitted_complaint[:commit])
 
+                  # add credit for the user contribution to the complaint entry
+                  ComplaintEntryCredits::CreditProcessor.new(current_user, @entry, submitted_complaint[:commit]).process
+
                   if submitted_complaint[:commit] == 'decline'
                     category_data = @entry.current_category_data.to_a
 
@@ -113,10 +119,8 @@ module API
                     message = Bridge::ComplaintUpdateStatusEvent.new
                     message.post_complaint(@entry.complaint)
                   end
-
-
-
                 end
+
                 response = {entry_id: @entry.id, domain: @entry.domain, subdomain: @entry.subdomain, path: @entry.path,
                             categories: @entry.url_primary_category, uri: @entry.uri, status:@entry.status,
                             entry_resolution: params[:data][0]['commit'], was_dismissed: @entry.was_dismissed?}

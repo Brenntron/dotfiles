@@ -6,5 +6,5 @@ class ComplaintEntryCredit < ApplicationRecord
   UNCHANGED = 'unchanged'.freeze
   FIXED = 'fixed'.freeze
   INVALID = 'invalid'.freeze
-  DUPLICATED = 'duplicated'.freeze
+  DUPLICATE = 'duplicate'.freeze
 end
