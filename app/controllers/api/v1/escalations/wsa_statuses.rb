@@ -8,12 +8,14 @@ module API
 
           desc "Returns a list of wsa statuses based on device serial numbers"
           params do
-            requires :serials, type: Array
+            optional :serials, type: Array
+            optional :companies, type: Array
           end
           post "" do
             serials = params['serials']
+            companies = params['companies']
 
-            Wbrs::WsaStatus.check_statuses(serials)
+            Wbrs::WsaStatus.check_statuses(serials, companies)
           end
         end
       end
