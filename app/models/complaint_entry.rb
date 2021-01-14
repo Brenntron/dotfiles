@@ -726,7 +726,7 @@ class ComplaintEntry < ApplicationRecord
     relation = where(simple_params)
 
     if params['user_id'].present?
-      
+
       relation =
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
     end

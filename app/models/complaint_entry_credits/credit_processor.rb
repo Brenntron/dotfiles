@@ -1,0 +1,3 @@
+class ComplaintEntryCredits::CreditProcessor
+
+end
