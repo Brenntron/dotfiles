@@ -539,99 +539,131 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
       if i > 24
         $(this).remove()
 
+wsa_data = {}
 
 window.get_wsa_status = () ->
-  serials = $('#wsa_statuses').val();
-
-  if serials == ""
+  searches = $('#wsa_statuses').val();
+  if searches == ""
     std_msg_error("No Companies or Serial numbers entered.","")
     return
 
-  data_array =  serials.split(/[\s,;\t\n]+/);
+  # empty data everytime
+    wsa_data = {}
+  data_array = searches.split(',').map(Function.prototype.call, String.prototype.trim)
   $('.wsa-loader-wrapper').removeClass('hidden')
   $('#wsa-status-table').empty()
 
+  serials  = {'serials':data_array}
+  companies = {'companies': data_array}
 
-  $.ajax(
-    method: 'POST'
-    headers : {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    url: "/escalations/api/v1/escalations/wsa_statuses"
-    data:
-      serials: data_array
-    success: (response) ->
-      $('#wsa-status-table').removeClass('hidden')
-      { not_found, wsa_statuses } = response
-      wsa_div = document.getElementById('wsa-status-table')
-      status_table = ''
-      nf_div = ''
-      data_points = ["", "Serial","Company", "Modification Time", "Source", "WSA Version"]
 
-      status_table = document.createElement('table');
-      header_row = document.createElement('tr');
-      status_table.classList = 'wsa-table'
-      thead = document.createElement('thead');
-      tbody = document.createElement('tbody');
+  telemetry_call(serials, 'serials')
+  telemetry_call(companies, 'companies')
 
-      for header in data_points
-        th = document.createElement('th');
-        header_text = document.createTextNode(header);
-        th.appendChild(header_text );
-        header_row.appendChild(th);
-      thead.appendChild(header_row);
-      status_table.appendChild( thead);
+  telemetry_interval = setInterval ()->
+    if wsa_data.companies != undefined && wsa_data.serials != undefined
+      clearInterval(telemetry_interval)
+      build_wsa_table()
+  , 3000
 
-      if wsa_statuses.length > 0
-        for searched_serial in wsa_statuses
-          # limit amount of data displayed in table
-          { company, mtime, serial, source, wsa_version } = searched_serial
-          statuses = {serial, company, mtime, source, wsa_version}
-          status_tr_body = document.createElement('tr');
-          td = document.createElement('td');
-          status = document.createTextNode(v);
+window.build_wsa_table = ()->
+  $('#wsa-status-table').removeClass('hidden')
+  { not_found, companies, serials } = wsa_data
 
-          shared = document.createElement('td')
-          shared.classList = 'shared_data'
-          status_tr_body.appendChild(shared);
-          for k, v of statuses
-            td = document.createElement('td');
-            status = document.createTextNode(v);
-            td.appendChild(status);
-            status_tr_body.appendChild(td);
+  if typeof companies == 'array' && typeof serial == 'array'
+    wsa_statuses = companies.concat(serials)
 
-          tbody.appendChild(status_tr_body);
+  wsa_statuses = wsa_statuses.filter (status, index) => return wsa_statuses.indexOf(status) == index
 
-      if not_found.length > 0
-        for nf in not_found
-          tr_body = document.createElement('tr');
+  console.log wsa_statuses
 
-          not_shared = document.createElement('td')
-          not_shared.classList = 'not_shared_data'
-          tr_body.appendChild(not_shared);
+  wsa_div = document.getElementById('wsa-status-table')
+  data_points = ["", "Serial","Company", "Modification Time", "Source", "WSA Version"]
 
-          td = document.createElement('td');
-          td.appendChild( document.createTextNode(nf) );
-          lg_td = document.createElement('td');
-          lg_td.classList = 'nf_tds'
-          lg_td.setAttribute('colspan', '4')
+  status_table = document.createElement('table');
+  header_row = document.createElement('tr');
+  status_table.classList = 'wsa-table'
+  thead = document.createElement('thead');
+  tbody = document.createElement('tbody');
 
-          tr_body.appendChild(td)
-          tr_body.appendChild(lg_td)
-          tbody.appendChild(tr_body)
+  for header in data_points
+    th = document.createElement('th');
+    header_text = document.createTextNode(header);
+    th.appendChild(header_text );
+    header_row.appendChild(th);
+  thead.appendChild(header_row);
+  status_table.appendChild( thead);
 
-        status_table.appendChild(tbody)
+  if wsa_statuses.length > 0
+    for searched_serial in wsa_statuses
+# limit amount of data displayed in table
+      { company, mtime, serial, source, wsa_version } = searched_serial
+      statuses = {serial, company, mtime, source, wsa_version}
+      status_tr_body = document.createElement('tr');
+      td = document.createElement('td');
+      status = document.createTextNode(v);
 
-      wsa_div.appendChild(status_table)
-      $('.wsa-loader-wrapper').addClass('hidden')
+      shared = document.createElement('td')
+      shared.classList = 'shared_data'
+      status_tr_body.appendChild(shared);
+      for k, v of statuses
+        td = document.createElement('td');
+        status = document.createTextNode(v);
+        td.appendChild(status);
+        status_tr_body.appendChild(td);
 
-    error: (response) ->
-      $('.wsa-loader-wrapper').addClass('hidden')
-      console.log response
-  )
+      tbody.appendChild(status_tr_body);
 
-  window.select_or_deselect_cluster = (cluster_id)->
+  if not_found.length > 0
+    for nf in not_found
+      tr_body = document.createElement('tr');
+
+      not_shared = document.createElement('td')
+      not_shared.classList = 'not_shared_data'
+      tr_body.appendChild(not_shared);
+
+      td = document.createElement('td');
+      td.appendChild( document.createTextNode(nf) );
+      lg_td = document.createElement('td');
+      lg_td.classList = 'nf_tds'
+      lg_td.setAttribute('colspan', '4')
+
+      tr_body.appendChild(td)
+      tr_body.appendChild(lg_td)
+      tbody.appendChild(tr_body)
+
+    status_table.appendChild(tbody)
+
+  wsa_div.appendChild(status_table)
+  $('.wsa-loader-wrapper').addClass('hidden')
+
+window.telemetry_call = (data, type) ->
+    $.ajax(
+      headers : {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      url: "/escalations/api/v1/escalations/wsa_statuses"
+      method: 'POST'
+      data: data
+      success: (response) ->
+        {not_found, wsa_statuses} = response
+
+        if wsa_data.not_found != undefined
+          wsa_data.not_found.concat(not_found);
+        else
+          wsa_data.not_found = not_found
+        console.log ' heyyyy ', response
+        if typeof wsa_statuses != 'object'
+          wsa_data[type] = wsa_statuses
+        else
+          wsa_data[type] = []
+
+        return response
+      error: (response) ->
+        return response
+    )
+window.select_or_deselect_cluster = (cluster_id)->
     $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
 #
-  $('#cluster_filter_field').keyup (event) ->
+$('#cluster_filter_field').keyup (event) ->
     if event.keyCode == 13
       apply_filter_to_table()
     return
