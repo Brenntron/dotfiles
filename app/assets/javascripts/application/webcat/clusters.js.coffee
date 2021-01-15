@@ -283,13 +283,13 @@ window.copycat_dialog = () ->
   });
 
 window.open_wsa_status = () ->
+  $('#wsa_status_dialog').removeClass('hidden')
   $('#wsa_status_dialog').dialog({
     dialogClass: "wsa_tool_dialog",
     position: { my: "left+475 top+160", at: "left top", of: window },
     close: (event, ui) =>
       $('button.icon-wsa').removeClass('active')
       $('#wsa-status-table').empty()
-
   });
 
 
