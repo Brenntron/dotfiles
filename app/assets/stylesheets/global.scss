@@ -7521,6 +7521,7 @@ table.dispute-entry-table tbody tr.selected {
 
 .wsa_tool_dialog, #wsa_status_dialog{
   width: fit-content!important;
+  overflow: hidden;
 }
 
 .not-found-wsa {

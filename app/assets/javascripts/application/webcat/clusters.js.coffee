@@ -539,8 +539,9 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
       if i > 24
         $(this).remove()
 
-wsa_data = {}
-
+nf_data =''
+companies_data = ''
+serials_data = ''
 window.get_wsa_status = () ->
   searches = $('#wsa_statuses').val();
   if searches == ""
@@ -548,7 +549,11 @@ window.get_wsa_status = () ->
     return
 
   # empty data everytime
-    wsa_data = {}
+
+  nf_data = ''
+  companies_data = ''
+  serials_data = ''
+
   data_array = searches.split(',').map(Function.prototype.call, String.prototype.trim)
   $('.wsa-loader-wrapper').removeClass('hidden')
   $('#wsa-status-table').empty()
@@ -561,25 +566,34 @@ window.get_wsa_status = () ->
   telemetry_call(companies, 'companies')
 
   telemetry_interval = setInterval ()->
-    if wsa_data.companies != undefined && wsa_data.serials != undefined
+    if companies_data != {} && serials_data != {}
       clearInterval(telemetry_interval)
       build_wsa_table()
   , 3000
 
 window.build_wsa_table = ()->
   $('#wsa-status-table').removeClass('hidden')
-  { not_found, companies, serials } = wsa_data
 
-  if typeof companies == 'array' && typeof serial == 'array'
-    wsa_statuses = companies.concat(serials)
+  wsa_data = []
+  not_found = []
 
-  wsa_statuses = wsa_statuses.filter (status, index) => return wsa_statuses.indexOf(status) == index
+  #  have to stringify to compare objects and avoid duplicates
+  for data, i in companies_data
+    if  wsa_data.indexOf( JSON.stringify( companies_data[i]) ) == -1
+      wsa_data.push(JSON.stringify( data) )
 
-  console.log wsa_statuses
+  for data, i in serials_data
+    if  wsa_data.indexOf( JSON.stringify( serials_data[i]) ) == -1
+      wsa_data.push(JSON.stringify( data) )
 
-  wsa_div = document.getElementById('wsa-status-table')
+  for data, i in nf_data
+    if not_found.indexOf( nf_data[i]) == -1 && companies_data.company != data && serials_data.serial != data
+      not_found.push(data)
+
+  # limit data displayed to user
   data_points = ["", "Serial","Company", "Modification Time", "Source", "WSA Version"]
 
+  wsa_div = document.getElementById('wsa-status-table')
   status_table = document.createElement('table');
   header_row = document.createElement('tr');
   status_table.classList = 'wsa-table'
@@ -594,9 +608,10 @@ window.build_wsa_table = ()->
   thead.appendChild(header_row);
   status_table.appendChild( thead);
 
-  if wsa_statuses.length > 0
-    for searched_serial in wsa_statuses
-# limit amount of data displayed in table
+  if wsa_data.length > 0
+    for searched_serial in wsa_data
+      # limit amount of data displayed in table
+      searched_serial = JSON.parse( searched_serial )
       { company, mtime, serial, source, wsa_version } = searched_serial
       statuses = {serial, company, mtime, source, wsa_version}
       status_tr_body = document.createElement('tr');
@@ -616,8 +631,8 @@ window.build_wsa_table = ()->
 
   if not_found.length > 0
     for nf in not_found
-      tr_body = document.createElement('tr');
 
+      tr_body = document.createElement('tr');
       not_shared = document.createElement('td')
       not_shared.classList = 'not_shared_data'
       tr_body.appendChild(not_shared);
@@ -645,21 +660,20 @@ window.telemetry_call = (data, type) ->
       data: data
       success: (response) ->
         {not_found, wsa_statuses} = response
-
-        if wsa_data.not_found != undefined
-          wsa_data.not_found.concat(not_found);
+        switch type
+          when 'companies'
+            companies_data = wsa_statuses
+          when 'serials'
+            serials_data = wsa_statuses
+        if typeof nf_data == 'string'
+          nf_data = not_found
         else
-          wsa_data.not_found = not_found
-        console.log ' heyyyy ', response
-        if typeof wsa_statuses != 'object'
-          wsa_data[type] = wsa_statuses
-        else
-          wsa_data[type] = []
-
+          nf_data = nf_data.concat(not_found)
         return response
       error: (response) ->
         return response
     )
+
 window.select_or_deselect_cluster = (cluster_id)->
     $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
 #
