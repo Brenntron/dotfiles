@@ -286,7 +286,7 @@ window.open_wsa_status = () ->
   $('#wsa_status_dialog').removeClass('hidden')
   $('#wsa_status_dialog').dialog({
     dialogClass: "wsa_tool_dialog",
-    position: { my: "left+475 top+160", at: "left top", of: window },
+    position: { my: "left+275 top+160", at: "left top", of: window },
     close: (event, ui) =>
       $('button.icon-wsa').removeClass('active')
       $('#wsa-status-table').empty()
@@ -566,7 +566,7 @@ window.get_wsa_status = () ->
   telemetry_call(companies, 'companies')
 
   telemetry_interval = setInterval ()->
-    if companies_data != {} && serials_data != {}
+    if companies_data != '' && serials_data != ''
       clearInterval(telemetry_interval)
       build_wsa_table()
   , 3000
@@ -586,8 +586,19 @@ window.build_wsa_table = ()->
     if  wsa_data.indexOf( JSON.stringify( serials_data[i]) ) == -1
       wsa_data.push(JSON.stringify( data) )
 
+  console.log wsa_data
   for data, i in nf_data
-    if not_found.indexOf( nf_data[i]) == -1 && companies_data.company != data && serials_data.serial != data
+    is_company = false
+    is_serial = false
+    for company, i in companies_data
+      if company.company == data
+        is_company = true
+
+    for serial, i in serials_data
+      if serial.serial == data
+        is_serial = true
+
+    if not_found.indexOf( nf_data[i]) == -1 && !is_company  && !is_serial
       not_found.push(data)
 
   # limit data displayed to user
@@ -607,20 +618,20 @@ window.build_wsa_table = ()->
     header_row.appendChild(th);
   thead.appendChild(header_row);
   status_table.appendChild( thead);
-
   if wsa_data.length > 0
     for searched_serial in wsa_data
       # limit amount of data displayed in table
       searched_serial = JSON.parse( searched_serial )
+      console.log searched_serial
       { company, mtime, serial, source, wsa_version } = searched_serial
       statuses = {serial, company, mtime, source, wsa_version}
       status_tr_body = document.createElement('tr');
       td = document.createElement('td');
       status = document.createTextNode(v);
-
       shared = document.createElement('td')
       shared.classList = 'shared_data'
       status_tr_body.appendChild(shared);
+
       for k, v of statuses
         td = document.createElement('td');
         status = document.createTextNode(v);
@@ -646,7 +657,6 @@ window.build_wsa_table = ()->
       tr_body.appendChild(td)
       tr_body.appendChild(lg_td)
       tbody.appendChild(tr_body)
-
     status_table.appendChild(tbody)
 
   wsa_div.appendChild(status_table)
