@@ -576,7 +576,32 @@ class DisputeEntry < ApplicationRecord
   end
 
   def xbrs_data
-    find_xbrs[1]
+    # Current XBRS hits for a URL
+    # This method is different from `xbrs_history` because of https://jira.vrt.sourcefire.com/browse/WEB-6770
+    result = find_xbrs[1]
+    current_array = []
+    result['data'].each do |data|
+      if data.last == "full"
+        current_array << data
+      end
+    end
+    result['data'] = current_array
+    result
+
+  end
+
+  def xbrs_history
+    # XBRS history for a URL
+    # This method is different from `xbrs_data` because of https://jira.vrt.sourcefire.com/browse/WEB-6770
+    result = find_xbrs[1]
+    current_array = []
+    result['data'].each do |data|
+      if data.last != "full"
+        current_array << data
+      end
+    end
+    result['data'] = current_array
+    result
   end
 
   def umbrellaresult
