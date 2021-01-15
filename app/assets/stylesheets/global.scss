@@ -12799,3 +12799,7 @@ input.wl-bl-list-inline {
 .toolbar .lists-row div.dropdown-tool-grey-row li {
   padding: 2px 10px 5px;
 }
+
+#current-xbrs-table-head th:last-child, #current-xbrs-table-body td:last-child {
+  display: none;
+}

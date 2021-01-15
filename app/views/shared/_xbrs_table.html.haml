@@ -13,11 +13,11 @@
               No XBRS data available.
   - else
     %table{ :class => ("table-scrollable" if entry.xbrs_data['data'].count > 8)}
-      %thead
+      %thead{ :id => "current-xbrs-table-head"}
         %tr
           - entry.xbrs_data['legend'].each do |header|
             %th= header
-      %tbody
+      %tbody{ :id => "current-xbrs-table-body"}
         - unless entry.hostlookup.nil?
           - entry.xbrs_data['data'].each do |data|
             %tr
