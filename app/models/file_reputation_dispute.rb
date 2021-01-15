@@ -609,7 +609,7 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.product_version = message_payload[:payload][:product_version] unless message_payload[:payload][:product_version].blank?
         new_dispute.in_network = message_payload[:payload][:network] unless message_payload[:payload][:network].blank?
         new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
-        new_dispute.source = message_payload[:payload][:source]
+        new_dispute.source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
         new_dispute.platform = message_payload[:payload][:platform]
         new_dispute.sandbox_key = message_payload[:payload][:sandbox_key]
         new_dispute.ticket_source_key = message_payload[:source_key]
