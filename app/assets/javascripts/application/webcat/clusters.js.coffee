@@ -542,6 +542,11 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
 nf_data =''
 companies_data = ''
 serials_data = ''
+
+$(document).on 'keydown','#wsa_statuses', (event) ->
+  if (event.keyCode == 13)
+    get_wsa_status()
+
 window.get_wsa_status = () ->
   searches = $('#wsa_statuses').val();
   if searches == ""
@@ -570,6 +575,8 @@ window.get_wsa_status = () ->
       clearInterval(telemetry_interval)
       build_wsa_table()
   , 3000
+
+
 
 window.build_wsa_table = ()->
   $('#wsa-status-table').removeClass('hidden')
@@ -641,20 +648,41 @@ window.build_wsa_table = ()->
 
   if not_found.length > 0
     for nf in not_found
+      nf_type = 'company'
+      if nf.startsWith("F") && nf.length == 11
+        nf_type = 'serial'
+
       tr_body = document.createElement('tr');
       not_shared = document.createElement('td')
       not_shared.classList = 'not_shared_data'
       tr_body.appendChild(not_shared);
-
       td = document.createElement('td');
-      td.appendChild( document.createTextNode(nf) );
-      lg_td = document.createElement('td');
-      lg_td.classList = 'nf_tds'
-      lg_td.setAttribute('colspan', '4')
+      serial_td = document.createElement('td');
+      switch nf_type
+        when 'company'
+          td.appendChild( document.createTextNode(nf) );
+          lg_td = document.createElement('td');
+          serial_td.classList = 'nf_tds'
+          lg_td.classList = 'nf_tds'
 
-      tr_body.appendChild(td)
-      tr_body.appendChild(lg_td)
-      tbody.appendChild(tr_body)
+          lg_td.setAttribute('colspan', '3')
+
+          tr_body.appendChild(serial_td )
+          tr_body.appendChild(td)
+          tr_body.appendChild(lg_td)
+
+          tbody.appendChild(tr_body)
+        when 'serial'
+
+          td.appendChild( document.createTextNode(nf) );
+          lg_td = document.createElement('td');
+          lg_td.classList = 'nf_tds'
+          lg_td.setAttribute('colspan', '4')
+          tr_body.appendChild(td)
+          tr_body.appendChild(lg_td)
+          tbody.appendChild(tr_body)
+
+
 
   status_table.appendChild(tbody)
   wsa_div.appendChild(status_table)

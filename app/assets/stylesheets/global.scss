@@ -7479,16 +7479,24 @@ table.dispute-entry-table tbody tr.selected {
 
 #cluster_button_dialog .dialog-content-wrapper, #copycat_dialog .dialog-content-wrapper, #wsa_status_dialog .dialog-content-wrapper  {
   padding: 15px;
+  display: flex;
 }
 #cluster_comment_field{
-  padding: 0 3px 0 26px;
+  padding: 0 3px 0 3px;
   font-weight: 400;
+  height: 30px;
   border: 1px solid #ccc;
   border-radius: 2px;
+  color: #666
 }
 .cluster-comment-btn{
   white-space: nowrap;
-  min-width: 125px;
+  height: 30px;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: "Open Sans", sans-serif;
+  min-width: 154px;
+  font-size: 9.5pt!important;
 }
 .wsa-table{
   &{
@@ -7516,12 +7524,13 @@ table.dispute-entry-table tbody tr.selected {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-botton: 15px;
+  margin-bottom: 15px;
 }
 
 .wsa_tool_dialog, #wsa_status_dialog{
   width: fit-content!important;
   overflow: hidden;
+  min-height: unset!important;
 }
 
 .not-found-wsa {
@@ -8707,15 +8716,9 @@ td.text-center span {
 }
 .wsa_tool_dialog {
   min-width: 400px;
-  min-height: 135px;
+  min-height: unset!important;
+  display: initial;
   font-family: 'Open Sans', sans-serif !important;
-}
-#wsa_statuses{
-  width: 100%;
-  min-width: 368px;
-  border: 1px solid #dddddd !important;
-  padding: 0 5px !important;
-  height: 32px;
 }
 
 .wsa_tool_dialog .ui-dialog-titlebar {
@@ -8734,17 +8737,25 @@ td.text-center span {
   background-size: 15px;
   background-position: 10px center;
   color: #fff;
-  padding: 12px 20px 12px 35px;
+  padding: 9px 20px 12px 35px;
+  font-family: "Open Sans", sans-serif!important;
+  font-size: 9.5pt!important;
+  text-transform: uppercase;
+  font-weight: 600;
+  white-space: nowrap;
+  height: 30px;
 }
-.wsa-tool-footer {
-  display: flex;
-  justify-content: space-evenly;
-  padding: 0 25px 15px 25px;
-  font-size: 12px;
+
+#wsa_statuses{
+  width: 74%;
+  min-width: 250px;
+  border: 1px solid #dddddd !important;
+  padding: 0 5px !important;
+  margin-right: 10px;
+  height: 30px;
+  background-image: none;
+  color:#666
 }
-
-
-
 
 .open-in-tab-btn, .whois-btn, .google-btn {
   background-repeat: no-repeat;

@@ -86,8 +86,7 @@
 
 #wsa_status_dialog.hidden{title: 'WSA Telemetry Status'}
   .dialog-content-wrapper
-    %input#wsa_statuses.text_field{placeholder: "Search by Companies or Serial Numbers"}
-  .wsa-tool-footer
+    %input#wsa_statuses.search-box.text_field{placeholder: "Search by Companies or Serial Numbers"}
     %button.toolbar-button.wsa-search-status-btn.icon-search{'onclick': 'get_wsa_status()'} Search Statuses
   .wsa-loader-wrapper.hidden
     .gear-loader-wrapper
