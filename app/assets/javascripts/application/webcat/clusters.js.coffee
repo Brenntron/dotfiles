@@ -586,7 +586,6 @@ window.build_wsa_table = ()->
     if  wsa_data.indexOf( JSON.stringify( serials_data[i]) ) == -1
       wsa_data.push(JSON.stringify( data) )
 
-  console.log wsa_data
   for data, i in nf_data
     is_company = false
     is_serial = false
@@ -601,9 +600,7 @@ window.build_wsa_table = ()->
     if not_found.indexOf( nf_data[i]) == -1 && !is_company  && !is_serial
       not_found.push(data)
 
-  # limit data displayed to user
-  data_points = ["", "Serial","Company", "Modification Time", "Source", "WSA Version"]
-
+  data_header = ["", "Serial","Company", "Modification Time", "Source", "WSA Version"]
   wsa_div = document.getElementById('wsa-status-table')
   status_table = document.createElement('table');
   header_row = document.createElement('tr');
@@ -611,19 +608,21 @@ window.build_wsa_table = ()->
   thead = document.createElement('thead');
   tbody = document.createElement('tbody');
 
-  for header in data_points
+  for header in data_header
     th = document.createElement('th');
     header_text = document.createTextNode(header);
     th.appendChild(header_text );
     header_row.appendChild(th);
+
   thead.appendChild(header_row);
   status_table.appendChild( thead);
+
   if wsa_data.length > 0
-    for searched_serial in wsa_data
+    for searched in wsa_data
       # limit amount of data displayed in table
-      searched_serial = JSON.parse( searched_serial )
-      console.log searched_serial
-      { company, mtime, serial, source, wsa_version } = searched_serial
+      searched_el = JSON.parse( searched )
+      { company, mtime, serial, source, wsa_version } = searched_el
+
       statuses = {serial, company, mtime, source, wsa_version}
       status_tr_body = document.createElement('tr');
       td = document.createElement('td');
@@ -642,7 +641,6 @@ window.build_wsa_table = ()->
 
   if not_found.length > 0
     for nf in not_found
-
       tr_body = document.createElement('tr');
       not_shared = document.createElement('td')
       not_shared.classList = 'not_shared_data'
@@ -657,8 +655,8 @@ window.build_wsa_table = ()->
       tr_body.appendChild(td)
       tr_body.appendChild(lg_td)
       tbody.appendChild(tr_body)
-    status_table.appendChild(tbody)
 
+  status_table.appendChild(tbody)
   wsa_div.appendChild(status_table)
   $('.wsa-loader-wrapper').addClass('hidden')
 
