@@ -8748,13 +8748,14 @@ td.text-center span {
 
 #wsa_statuses{
   width: 74%;
+  font-family: "Open Sans";
   min-width: 250px;
   border: 1px solid #dddddd !important;
   padding: 0 5px !important;
   margin-right: 10px;
   height: 30px;
   background-image: none;
-  color:#666
+  color:#666!important;
 }
 
 .open-in-tab-btn, .whois-btn, .google-btn {
