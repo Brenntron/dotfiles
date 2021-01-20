@@ -8558,6 +8558,7 @@ td.text-center span {
     background-size: 26px;
     background-position: 8px center;
     margin-top: 10px;
+    min-width: 100px;
   }
 }
 
@@ -8715,6 +8716,8 @@ td.text-center span {
 .cluster-button{
   white-space: nowrap;
   background-color: $primary-section-color;
+  background-size: 19px!important;
+  background-position: 7px 5px;
   color: $content-bg-color;
   padding: 5px 33px;
   height: 30px;
@@ -8730,6 +8733,15 @@ td.text-center span {
   &:hover{
     background-color: darken($primary-section-color, 10%)!important;
   }
+}
+.icon-submit.cluster-button{
+  min-width: 135px;
+}
+.icon-search.cluster-button{
+  min-width: 110px;
+}
+.copycat-tool-footer .cluster-button{
+  width: 135px;
 }
 .copycat-clear-btn {
   background-color: $nav-toolbar-color;
