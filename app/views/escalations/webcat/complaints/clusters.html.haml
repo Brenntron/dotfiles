@@ -20,7 +20,7 @@
           .col-xs-9
             %input#cluster_filter_field.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
           .col-xs-3.no_pad
-            %button#cluster_filter_button.primary{onclick: 'apply_filter_to_table()', class:'apply-filter-btn icon-filter-white'}Apply Filter
+            %button.cluster-button{onclick: 'apply_filter_to_table()', class:'apply-filter-btn icon-filter-white'}Apply Filter
 
   .row
     .col-xs-7
@@ -37,7 +37,7 @@
         .content-label-sm Comment
         .card-body
           %input#cluster_comment_field.text_field
-          %button.toolbar-button.icon-submit.cluster-comment-btn{'onclick': 'categorize_clusters()'} Submit Changes
+          %button.toolbar-button.icon-submit.cluster-button{'onclick': 'categorize_clusters()'} Submit Changes
   .row
     .col-xs-12
       .toolbar.cluster-table-toolbar
@@ -81,13 +81,13 @@
     %select#copycat-categories.selectize{:multiple=>"multiple", :placeholder=>"Add Categories", :value=>"", :name=>""}
 
   .copycat-tool-footer
-    %button.toolbar-button.copycat-paste-btn.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
-    %button.toolbar-button.copycat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear All Categories
+    %button.toolbar-button.cluster-button.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
+    %button.toolbar-button.cluster-button.icon-clear{'onclick': 'copycat_clear()'} Clear All Categories
 
 #wsa_status_dialog.hidden{title: 'WSA Telemetry Status'}
   .dialog-content-wrapper
     %input#wsa_statuses.search-box.text_field{placeholder: "Search by Companies or Serial Numbers"}
-    %button.toolbar-button.wsa-search-status-btn.icon-search{'onclick': 'get_wsa_status()'} Search Statuses
+    %button.toolbar-button.cluster-button.icon-search{'onclick': 'get_wsa_status()'} Search Statuses
   .wsa-loader-wrapper.hidden
     .gear-loader-wrapper
       = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
