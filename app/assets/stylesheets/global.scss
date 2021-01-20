@@ -7479,6 +7479,8 @@ table.dispute-entry-table tbody tr.selected {
 
 #cluster_button_dialog .dialog-content-wrapper, #copycat_dialog .dialog-content-wrapper, #wsa_status_dialog .dialog-content-wrapper  {
   padding: 15px;
+}
+#wsa_status_dialog .dialog-content-wrapper  {
   display: flex;
 }
 #cluster_comment_field{
@@ -7489,15 +7491,7 @@ table.dispute-entry-table tbody tr.selected {
   border-radius: 2px;
   color: #666
 }
-.cluster-comment-btn{
-  white-space: nowrap;
-  height: 30px;
-  text-transform: uppercase;
-  font-weight: 600;
-  font-family: "Open Sans", sans-serif;
-  min-width: 154px;
-  font-size: 9.5pt!important;
-}
+
 .wsa-table{
   &{
     max-height: 250px;
@@ -8563,10 +8557,6 @@ td.text-center span {
     background-repeat: no-repeat;
     background-size: 26px;
     background-position: 8px center;
-    height: 30px;
-    padding-left: 40px !important;
-    padding-top: 5px;
-    padding-bottom: 5px;
     margin-top: 10px;
   }
 }
@@ -8733,10 +8723,10 @@ td.text-center span {
   font-weight: bold;
 }
 .wsa-search-status-btn{
-  background-color: #6dbcdb;
+  background-color: $primary-section-color;
   background-size: 15px;
   background-position: 10px center;
-  color: #fff;
+  color: $content-bg-color;
   padding: 9px 20px 12px 35px;
   font-family: "Open Sans", sans-serif!important;
   font-size: 9.5pt!important;
@@ -8745,17 +8735,32 @@ td.text-center span {
   white-space: nowrap;
   height: 30px;
 }
+.cluster-button{
+  white-space: nowrap;
+  background-color: $primary-section-color;
+  color: $content-bg-color;
+  padding: 5px 33px;
+  height: 30px;
+  border: none;
+  border-radius: 2px;
+  text-transform: capitalize;
+  font-weight: 500;
+  font-family: "Open Sans", sans-serif !important;
+  min-width: 154px;
+  width: fit-content;
+  font-size: 9pt !important;
+}
 
 #wsa_statuses{
   width: 74%;
-  font-family: "Open Sans";
+  font-family: "Open Sans", sans-serif !important;
   min-width: 250px;
   border: 1px solid #dddddd !important;
   padding: 0 5px !important;
   margin-right: 10px;
   height: 30px;
   background-image: none;
-  color:#666!important;
+  color:$type-lighter-color!important;
 }
 
 .open-in-tab-btn, .whois-btn, .google-btn {
