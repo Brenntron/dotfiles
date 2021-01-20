@@ -8644,6 +8644,7 @@ td.text-center span {
   min-width: 400px;
   min-height: 135px;
   font-family: 'Open Sans', sans-serif !important;
+
 }
 
 .copycat_tool_dialog .ui-dialog-titlebar {
@@ -8656,6 +8657,9 @@ td.text-center span {
   border: none;
   width: 100%;
   font-weight: bold;
+  .selectize-input{
+    font-size: 8.5pt;
+  }
 }
 
 #copycat-categories-selectized {
@@ -8670,33 +8674,6 @@ td.text-center span {
   justify-content: space-evenly;
   padding: 0 25px 15px 25px;
   font-size: 12px;
-
-  .copycat-paste-btn, .copycat-clear-btn {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 12px;
-    transition: background-color 0.2s;
-  }
-
-  .copycat-paste-btn {
-    background-color: $primary-section-color;
-    background-size: 15px;
-    background-position: 10px center;
-    color: $type-lightest;
-    padding: 12px 20px 12px 35px;
-    &:hover {
-      background-color: darken($primary-section-color, 10%)
-    }
-  }
-
-  .copycat-clear-btn {
-    background-color: $nav-toolbar-color;
-    background-size: 22px;
-    background-position: 10px center;
-    padding: 12px 20px 12px 45px;
-    &:hover {
-      background-color: darken($nav-toolbar-color, 10%)
-    }
-  }
 }
 
 
@@ -8749,8 +8726,19 @@ td.text-center span {
   min-width: 154px;
   width: fit-content;
   font-size: 9pt !important;
+  transition: background-color 0.2s!important;
+  &:hover{
+    background-color: darken($primary-section-color, 10%)!important;
+  }
 }
-
+.copycat-clear-btn {
+  background-color: $nav-toolbar-color;
+  color:unset;
+  transition: background-color 0.2s;
+  &:hover {
+    background-color: darken($nav-toolbar-color, 10%)!important;
+  }
+}
 #wsa_statuses{
   width: 74%;
   font-family: "Open Sans", sans-serif !important;

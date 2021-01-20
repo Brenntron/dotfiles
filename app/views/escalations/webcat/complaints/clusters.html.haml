@@ -82,12 +82,12 @@
 
   .copycat-tool-footer
     %button.toolbar-button.cluster-button.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
-    %button.toolbar-button.cluster-button.icon-clear{'onclick': 'copycat_clear()'} Clear All Categories
+    %button.toolbar-button.cluster-button.copycat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear All Categories
 
 #wsa_status_dialog.hidden{title: 'WSA Telemetry Status'}
   .dialog-content-wrapper
     %input#wsa_statuses.search-box.text_field{placeholder: "Search by Companies or Serial Numbers"}
-    %button.toolbar-button.cluster-button.icon-search{'onclick': 'get_wsa_status()'} Search Statuses
+    %button.toolbar-button.cluster-button.icon-search{'onclick': 'get_wsa_status()'} Search
   .wsa-loader-wrapper.hidden
     .gear-loader-wrapper
       = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
