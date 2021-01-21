@@ -8740,22 +8740,29 @@ td.text-center span {
   width: fit-content;
   font-size: 9pt !important;
   transition: background-color 0.2s!important;
+
   &:hover{
     background-color: darken($primary-section-color, 10%)!important;
   }
+
   &.icon-filter-white{
     padding: 0 15px 0 38px;
   }
+
   &.icon-submit{
     min-width: 135px;
   }
+
   &.icon-search{
     min-width: 110px;
   }
+  
 }
 
 .copycat-tool-footer .cluster-button{
   width: 135px;
+  background-size: 15px;
+
   &.copycat-clear-btn {
     background-color: $type-faint-accent;
     color: unset;
