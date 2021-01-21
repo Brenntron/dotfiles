@@ -8725,11 +8725,11 @@ td.text-center span {
   white-space: nowrap;
   height: 30px;
 }
+
 .cluster-button{
   white-space: nowrap;
   background-color: $primary-section-color;
   color: $content-bg-color;
-  padding: 5px 33px;
   height: 30px;
   border: none;
   border-radius: 2px;
@@ -8743,35 +8743,26 @@ td.text-center span {
   &:hover{
     background-color: darken($primary-section-color, 10%)!important;
   }
-}
-.icon-filter-white.cluster-button{
-  background-position: 6px 5px;
-  background-size: 25px !important;
+  &.icon-filter-white{
+    padding: 0 15px 0 38px;
+  }
+  &.icon-submit{
+    min-width: 135px;
+  }
+  &.icon-search{
+    min-width: 110px;
+  }
 }
 
-.icon-submit.cluster-button{
-  background-position: 7px 5px;
-  min-width: 135px;
-  background-size: 21px;
-}
-.icon-paste.cluster-button{
-  background-size: 26px!important;
-  background-position: 7px 5px;
-}
-.icon-search.cluster-button{
-  min-width: 110px;
-  background-size: 22px !important;
-  background-position: 7px 5px;
-}
 .copycat-tool-footer .cluster-button{
   width: 135px;
-  background-size: 20px !important;
-  background-position: 7px 5px;
   &.copycat-clear-btn {
-    background-color: #d7dadb;
+    background-color: $type-faint-accent;
     color: unset;
-    background-size: 22px !important;
-    background-position: 6px 4px;
+    background-size: 22px;
+    background-position: 10px center;
+    padding-left: 39px;
+    width: unset;
     &:hover {
       background-color: darken($nav-toolbar-color, 10%)!important;
     }
