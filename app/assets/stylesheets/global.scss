@@ -8556,12 +8556,23 @@ td.text-center span {
   .apply-filter-btn {
     background-repeat: no-repeat;
     background-size: 26px;
-    background-position: 8px center;
+    background-position: 6px center;
     margin-top: 10px;
     min-width: 100px;
   }
 }
-
+#wsa_statuses, #clusters-index_filter, #cluster_comment_field{
+  &:empty{
+    font-size: 8.5pt!important;
+  }
+  &::-webkit-input-placeholder, &::-moz-placeholder {
+    font-size: 8.5pt!important;
+    color: #303030!important;
+    font-family: inherit!important;
+    line-height: 18px!important;
+    -webkit-font-smoothing: inherit!important;
+  }
+}
 .current-cluster-info-wrapper {
   padding: 25px 0 10px;
   .result-label.vertical-separator {
@@ -8596,6 +8607,7 @@ td.text-center span {
   color: $type-lightest;
   display: block;
   height: 27px;
+  background-size: 19px!important;
 }
 
 .copycat-btn.active, .wsa-btn.active {
@@ -8716,8 +8728,6 @@ td.text-center span {
 .cluster-button{
   white-space: nowrap;
   background-color: $primary-section-color;
-  background-size: 19px!important;
-  background-position: 7px 5px;
   color: $content-bg-color;
   padding: 5px 33px;
   height: 30px;
@@ -8734,27 +8744,43 @@ td.text-center span {
     background-color: darken($primary-section-color, 10%)!important;
   }
 }
+.icon-filter-white.cluster-button{
+  background-position: 6px 5px;
+  background-size: 25px !important;
+}
+
 .icon-submit.cluster-button{
+  background-position: 7px 5px;
   min-width: 135px;
+  background-size: 21px;
+}
+.icon-paste.cluster-button{
+  background-size: 26px!important;
+  background-position: 7px 5px;
 }
 .icon-search.cluster-button{
   min-width: 110px;
+  background-size: 22px !important;
+  background-position: 7px 5px;
 }
 .copycat-tool-footer .cluster-button{
   width: 135px;
-}
-.copycat-clear-btn {
-  background-color: $nav-toolbar-color;
-  color:unset;
-  transition: background-color 0.2s;
-  &:hover {
-    background-color: darken($nav-toolbar-color, 10%)!important;
+  background-size: 20px !important;
+  background-position: 7px 5px;
+  &.copycat-clear-btn {
+    background-color: #d7dadb;
+    color: unset;
+    background-size: 22px !important;
+    background-position: 6px 4px;
+    &:hover {
+      background-color: darken($nav-toolbar-color, 10%)!important;
+    }
   }
 }
+
 #wsa_statuses{
-  width: 74%;
   font-family: "Open Sans", sans-serif !important;
-  min-width: 250px;
+  min-width: 300px;
   border: 1px solid #dddddd !important;
   padding: 0 5px !important;
   margin-right: 10px;
@@ -8855,7 +8881,7 @@ td.text-center span {
 }
 
 .cluster-mgt-loader-wrapper{
-  margin: 100px 37%;
+  margin: 90px 25%;
 }
 
 .webcat-loader-wrapper, .webrep-loader-wrapper {
