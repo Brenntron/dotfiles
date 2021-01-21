@@ -542,6 +542,9 @@ class ComplaintEntry < ApplicationRecord
       end
       new_complaint_entry.save
 
+      if user != User.where(display_name:"Vrt Incoming").first
+        ComplaintEntryCredits::CreditProcessor.new(user, new_complaint_entry, 'created').process
+      end
     rescue Exception => e
       raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end

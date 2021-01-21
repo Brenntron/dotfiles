@@ -26,6 +26,7 @@ module API
             end
             post 'update'do
               std_api_v2 do
+
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
                 uri_as_categorized = permitted_params['uri_as_categorized'].blank? ? entry.uri : permitted_params['uri_as_categorized']
@@ -120,7 +121,6 @@ module API
                     message.post_complaint(@entry.complaint)
                   end
                 end
-
                 response = {entry_id: @entry.id, domain: @entry.domain, subdomain: @entry.subdomain, path: @entry.path,
                             categories: @entry.url_primary_category, uri: @entry.uri, status:@entry.status,
                             entry_resolution: params[:data][0]['commit'], was_dismissed: @entry.was_dismissed?}

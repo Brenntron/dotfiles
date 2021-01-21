@@ -13,6 +13,8 @@ class ComplaintEntryCredits::CreditProcessor
     case status
     when 'fixed'
       credit_handler.handle_pending_credit
+    when 'created'
+      credit_handler.handle_pending_credit
     when 'unchanged'
       credit_handler.handle_unchanged_credit
     when 'commit'
