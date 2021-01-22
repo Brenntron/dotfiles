@@ -395,7 +395,7 @@
 
                   %td.dispute_rep_tools.rep-tools-cell
                     .webrep_auto_resolve{id:"webrep_auto_resolve-#{entry.id}", title:"Auto Resolve Log"}
-                      = entry.auto_resolve_log
+                      = (entry.auto_resolve_log.html_safe rescue "")
                     %span.dispute_rep_tools_wrapper
 
                       %button.dispute-inline-buttons.auto-resolve-button.esc-tooltipped{'data-entry-id': "#{entry.id}", title: 'View Auto Resolve Log', onclick:"show_webrep_auto_resolve(#{entry.id})"}
