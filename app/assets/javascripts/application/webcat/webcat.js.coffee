@@ -474,20 +474,24 @@ $ ->
 #               age column
                 width: '40px'
                 render: ( data, type, full, meta) ->
-                  { age } = full
+                  { age, status } = full
                   time = timeMatch(age)
-                  switch ( time )
-                    when 'minutes'
-                      age_class = ''
-                    when 'hours'
-                      hour = parseInt( age.split("h")[0] )
-                      if hour >= 3 && hour < 12
-                        age_class = 'ticket-age-over3hr'
-                      else if hour > 12
+                  unless status == 'COMPLETED' || status == 'RESOLVED'
+                    switch ( time )
+                      when 'minutes'
+                        age_class = ''
+                      when 'hours'
+                        hour = parseInt( age.split("h")[0] )
+                        if hour >= 3 && hour < 12
+                          age_class = 'ticket-age-over3hr'
+                        else if hour > 12
+                          age_class = 'ticket-age-over12hr'
+                      when 'exceeds time'
                         age_class = 'ticket-age-over12hr'
-                    when 'exceeds time'
-                      age_class = 'ticket-age-over12hr'
-                  return "<span class='#{age_class}'>#{age}</span>"
+                    return "<span class='#{age_class}'>#{age}</span>"
+                  # if status is "completed" or "resolved", no css class (orange/red) needed
+                  else
+                    return "<span>#{age}</span>"
               }
               {
                 data: 'status'
