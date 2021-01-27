@@ -9780,6 +9780,10 @@ hr.thin.form-divider {
   display: block !important;
 }
 
+.dispute-details {
+  padding-top: 10px;
+}
+
 .disp-negative {
   font-weight: 600;
   color: $warning-accent-color;
@@ -9798,6 +9802,7 @@ hr.thin.form-divider {
 .top-info-details {
   font-size: 8.5pt;
   line-height: 1.35em;
+  overflow-wrap: break-word;
 }
 
 .file-edit-buttons-wrapper {
