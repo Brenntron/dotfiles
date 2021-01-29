@@ -705,7 +705,7 @@ $ ->
         class: 'platform-col'
         render: (data, type, full, meta) ->
           if data == "N/A" || data == "Unknown" || data == "Missing" || data == ""
-            data = '<span class="missing-data">No Platform</span>'
+            data = '<span class="missing-data platform"></span>'
           return data
       }
       {

@@ -2395,7 +2395,9 @@ a.static-nav-item {
   color: lighten($type-lighter-color, 20%);
   font-style: italic;
 }
-
+.missing-data.platform:before{
+  content: 'No Platform'
+}
 .file-attachment {
   font-size: 9pt;
   margin-top: -10px;
