@@ -1033,7 +1033,7 @@ class FileReputationDispute < ApplicationRecord
     workbook = RubyXL::Workbook.new
     worksheet = workbook[0]
 
-    %w{Case\ ID Status Resolution File\ Name SHA256 File\ Size Platform\ Size Sample\ Type
+    %w{Case\ ID Status Resolution File\ Name SHA256 File\ Size Platform Sample\ Type
        AMP\ Disposition AMP\ Detection\ Name AMP\ Detection\ Last\ Set
        In\ Zoo Sandbox\ Score TG\ Score Reversing\ Labs\ Hits RL\ Scanners\ Total
        Suggested\ Disposition Dispute\ Summary/Details Time\ Submitted Submitter\ Type
