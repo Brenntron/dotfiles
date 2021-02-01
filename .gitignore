@@ -49,3 +49,5 @@ gems.tags*
 
 dump.rdb
 /websocket/node_modules
+
+.ruby-gemset
