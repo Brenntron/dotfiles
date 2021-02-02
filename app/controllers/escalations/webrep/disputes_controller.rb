@@ -486,6 +486,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           'Blacklist Status',
           'Blacklist Comment',
           'WL/BL',
+          'Platform',
           'Umbrella',
           'Referenced On',
           'Last Submitted'
@@ -507,6 +508,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
             entry.classifications.first && entry.blacklist.status,
             entry.classifications.first && entry.blacklist.metadata&.fetch('VRT', {})['comment'],
             entry.wbrs_list_type,
+            entry.platform,
             entry.umbrellaresult,
             entry.referenced_tickets.count,
             entry.last_submitted.to_s,
@@ -535,6 +537,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           'Blacklist Status',
           'Blacklist Comment',
           'WL/BL',
+          'Platform',
           'Umbrella',
           'Referenced On',
           'Last Submitted'
@@ -556,6 +559,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
             entry.classifications.first && entry.blacklist.status,
             entry.classifications.first && entry.blacklist.metadata&.fetch('VRT', {})['comment'],
             entry.wbrs_list_type,
+            entry.platform,
             entry.umbrellaresult,
             entry.referenced_tickets.count,
             entry.last_submitted.to_s,

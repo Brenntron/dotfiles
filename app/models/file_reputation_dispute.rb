@@ -1022,7 +1022,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def self.export_xlsx(search_params_json, current_user:)
-    fields = %w{id status resolution file_name sha256_hash file_size sample_type
+    fields = %w{id status resolution file_name sha256_hash file_size platform sample_type
                 disposition detection_name detection_last_set
                 in_zoo sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
                 disposition_suggested created_at submitter_type
@@ -1041,11 +1041,11 @@ class FileReputationDispute < ApplicationRecord
     workbook = RubyXL::Workbook.new
     worksheet = workbook[0]
 
-    %w{Case\ ID Status Resolution File\ Name SHA256 File\ Size Sample\ Type
-       AMP\ Disposition AMP\ Detection\ Name AMP\ Detection\ Created
+    %w{Case\ ID Status Resolution File\ Name SHA256 File\ Size Platform Sample\ Type
+       AMP\ Disposition AMP\ Detection\ Name AMP\ Detection\ Last\ Set
        In\ Zoo Sandbox\ Score TG\ Score Reversing\ Labs\ Hits RL\ Scanners\ Total
-       Suggested\ Disposition Time\ Submitted Submitter\ Type
-       Customer\ Name Customer\ Organization Customer\ email Assignee\ Dispute Summary/Details}.each_with_index do |field_name, col_index|
+       Suggested\ Disposition Dispute\ Summary/Details Time\ Submitted Submitter\ Type
+       Customer\ Name Customer\ Organization Customer\ Email Assignee}.each_with_index do |field_name, col_index|
       worksheet.add_cell(0, col_index, field_name)
       worksheet.sheet_data[0][col_index].change_font_bold(true)
     end
