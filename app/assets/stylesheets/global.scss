@@ -568,10 +568,6 @@ button {
   margin-right: 3px;
 }
 
-#webcat-index-toolbar div {
-  margin-right: 12px;
-}
-
 .toolbar div:last-child {
   //width: 100%;
   margin-right: 0 !important;
@@ -11808,8 +11804,8 @@ table > tbody > tr > td.no-padding {
 }
 
 #webcat_searchref_container {
-  margin-bottom: 10px;
-  padding: 6px 0;
+  margin-top: -3px;
+  padding: 0 0 6px 0;
 }
 
 // tooltipster adjustments for pinned toolbar tooltips
