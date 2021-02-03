@@ -1,7 +1,9 @@
 class AutoResolve
   include ActiveModel::Model
 
-  attr_accessor :address_type, :address, :resolved, :status, :rule_hits, :internal_comment, :resolution_comment, :auto_resolve_log
+  #attr_accessor :address_type, :address, :resolved, :status, :rule_hits, :internal_comment, :resolution_comment, :auto_resolve_log
+
+  attr_accessor :auto_resolve_log, :internal_comment, :resolution_comment, :status, :resolved
 
   ADDRESS_TYPE_IP           = 'IP'
   ADDRESS_TYPE_URI          = 'URI'
@@ -12,340 +14,385 @@ class AutoResolve
   STATUS_NONMALICIOUS       = 'CLEAR'
 
 
-  # @return (Boolean) true if address type is IP.
-  def ip?
-    ADDRESS_TYPE_IP == self.address_type
+  #entry point
+  def self.attempt_ai_conviction(rulehits, dispute_entry)
+
+    if auto_resolve_toggle
+      results = process_uri_interrogation(rulehits, dispute_entry)
+    else
+      results = {}
+      results[:action] = :do_not_resolve
+      results[:log] = ["auto resolution is turned off or is experiencing configuration error"]
+    end
+    dispute_entry = process_interrogation_results(results, dispute_entry)
+
+    dispute_entry
   end
 
-  # @return (Boolean) true if address type is a URL.
-  def uri?
-    ADDRESS_TYPE_URI == self.address_type
+  def self.process_uri_interrogation(rulehits, dispute_entry)
+
+    baseline_results = process_baseline_requirements(rulehits, dispute_entry)
+
+    if baseline_results[:action] == :do_not_resolve
+      return baseline_results
+    end
+
+    conviction_results = process_conviction_requirements(dispute_entry.hostlookup, baseline_results[:log])
+
+    return conviction_results
+
   end
 
-  # @return (Boolean) true if address type is a DNS domain name.
-  def domain?
-    ADDRESS_TYPE_DOMAIN == self.address_type
+  def self.process_baseline_requirements(rulehits, dispute_entry)
+    results = {}
+    results[:log ] = []
+    results[:action] = nil
+    begin
+
+      umbrella_popularity_result = check_umbrella_popularity(dispute_entry.hostlookup)
+      results[:log] << umbrella_popularity_result[:log]
+      if umbrella_popularity_result[:pass]
+        results[:action] = :do_not_resolve
+        return results
+      end
+
+      sds_result = check_sds_allow_list(rulehits)
+      results[:log] << sds_result[:log]
+
+      if sds_result[:pass]
+        results[:action] = :do_not_resolve
+        return results
+      end
+      
+      reptool_result = check_reptool_for_allow_list(dispute_entry.hostlookup)
+      results[:log] << reptool_result[:log]
+      if reptool_result[:pass]
+        results[:action] = :do_not_resolve
+        return results
+      end
+
+      results[:action] = :attempt_to_resolve
+    rescue Exception => e
+      Rails.logger.error(e.message)
+      results[:action] = :do_not_resolve
+      results[:log] << "there was an error in baseline requirements, halting auto conviction process"
+      results
+    end
+
+    results
+
   end
 
-  # @return [Boolean] true if auto resolve check is good and human needs to be in the loop.
-  def new?
-    STATUS_NEW == self.status
+  def self.process_conviction_requirements(entry, log)
+    results = {}
+    results[:log] = log
+    results[:action] = nil
+    begin
+      virustotal_results = check_virustotal_hits(entry)
+
+      trusted_hits = number_of_virustotal_trusted_hits(virustotal_results[:positive_scans])
+
+      results[:log] << "vt results: #{virustotal_results[:positive_scans].join(",")}\n"
+      results[:log] << "trusted vt hits: #{trusted_hits}\n"
+
+      if trusted_hits > 0
+        results[:action] = :commit_malware
+        return results
+      end
+
+      umbrella_rating_results = check_umbrella_rating(entry)
+      results[:log] << umbrella_rating_results[:log]
+      if umbrella_rating_results[:rating] == "malicious"
+        results[:action] = :commit_malware
+        return results
+      elsif umbrella_rating_results[:rating].blank?
+        results[:action] =  :do_not_resolve
+        return results
+      end
+
+
+      if virustotal_results[:positives] > 5
+        results[:action] = :commit_malware
+        results[:log] << "total vt hits > 5, committing to reptool."
+        return results
+      end
+
+      umbrella_domain_volume_results = check_umbrella_domain_volume(entry)
+      results[:log] << umbrella_domain_volume_results[:log]
+
+      if umbrella_domain_volume_results[:pass] == false
+        results[:action] = :commit_phishing
+
+        return results
+      end
+
+      results[:action] = :do_not_resolve
+
+    rescue Exception => e
+      Rails.logger.error(e.message)
+      results[:action] = :do_not_resolve
+      results[:log] << "there was an error in conviction requirements, halting auto conviction process"
+
+    end
+
+    results
   end
 
-  def resolved?
-    @resolved
+  def self.process_interrogation_results(result, dispute_entry)
+
+    action = result[:action]
+
+    if action == :do_not_resolve || action.blank?
+      dispute_entry.status = DisputeEntry::NEW
+    else
+      resolved_at = Time.now
+      reptool_result = commit_to_reptool(action, dispute_entry)
+      if reptool_result[:success]
+        dispute_entry.status = DisputeEntry::STATUS_RESOLVED
+        dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
+        dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+        dispute_entry.case_closed_at = resolved_at
+        dispute_entry.case_resolved_at = resolved_at
+      else
+        dispute_entry.status = DisputeEntry::NEW
+        result[:log] << "Error attempting to commit to reptool, setting status to NEW for manual review."
+      end
+    end
+
+    dispute_entry.auto_resolve_log = dispute_entry.auto_resolve_log.blank? ? result[:log].join("<br><br>") : dispute_entry.auto_resolve_log += result[:log].join("<br><br>")
+
+    dispute_entry.save
+
+    dispute_entry
   end
 
-  def auto_resolve_log
-    @auto_resolve_log
+  def self.number_of_virustotal_trusted_hits(hits)
+
+    total = 0
+    hits.each do |hit|
+      total += 1 if trusted_virustotal_hits.include?(hit)
+    end
+
+    total
   end
 
-  # @return [Boolean] true if auto resolve check is bad and entry auto resolves to malicious.
-  def malicious?
-    STATUS_MALICIOUS == self.status
+
+######################DATA CHECKS#############################
+
+  def self.auto_resolve_toggle
+    begin
+      Rails.configuration.auto_resolve.check_complaints
+    rescue Exception => e
+      Rails.logger.error(e.message)
+      false
+    end
   end
 
-  def append_comment(str)
-    @internal_comment ||= ''
-    @internal_comment += str
+  def self.check_umbrella_popularity(entry)
 
-    @resolution_comment ||= ''
-    @resolution_comment += str
+    result = {}
+    result[:pass] = true
+    result[:log] = ""
+
+    begin
+      response = Umbrella::SecurityInfo.query_info(address: entry)
+
+      if response.code == 200
+        data = JSON.parse(response.body)
+        popularity = data["popularity"]
+        if popularity.present?
+          if !(popularity > 0)
+            result[:pass] = false
+          else
+            result[:pass] = true
+          end
+          result[:log] = "Umbrella popularity rating: #{popularity}: result of pass: #{result[:pass]}"
+        else
+          result[:pass] = true
+          result[:log] = "Umbrella popularity value could not be found, sending for manual review."
+        end
+      else
+        result[:pass] = true
+        result[:log] = "Umbrella popularity api request failed. sending for manual review."
+      end
+
+      result
+    rescue
+      result[:rating] = nil
+      result[:log] = "there was an error checking umbrella popularity"
+      result
+    end
   end
 
-  def append_auto_resolve_log(str)
-    @auto_resolve_log ||= ''
-    @auto_resolve_log += str
+  def self.check_reptool_for_allow_list(entry)
+    result = {}
+    result[:pass] = true
+    result[:log] = ""
+    begin
+      rep_result = RepApi::Whitelist.get_whitelist_info({:entries => [entry]})
+      if rep_result[rep_result.keys.last]["status"] == "ACTIVE"
+        result[:pass] = true
+        result[:log] = "ACTIVE entry on Reptool whitelist, manual review."
+      else
+        result[:pass] = false
+        result[:log] = "#{rep_result[:status]} entry on Reptool whitelist, continuing."
+      end
+    rescue Exception => e
+      if e.exception.to_s == "HTTP response 404"
+        result[:pass] = false
+        result[:log] = "no entry with reptool whitelist, continuing."
+      else
+        result[:pass] = true
+        result[:log] = "unknown error with reptool, manual review."
+      end
+    end
+
+    result
+
   end
 
-  def good_mnem?(rule_hit)
+  def self.check_sds_allow_list(rulehits)
+    result = {}
+
+    pass = rulehits.any?{|rulehit| allow_listed?(rulehit)}
+
+    result[:pass] = pass
+    if pass
+      result[:log] = "allow list hits from SDS detected: #{rulehits.select{|rulehit| allow_listed?(rulehit)}.join(",")}"
+    else
+      result[:log] = "no sds rulehits detected against allow list"
+    end
+
+    result
+  end
+
+  def self.check_umbrella_domain_volume(entry)
+    result = {}
+    result[:pass] = true
+    result[:log] = ""
+
+    begin
+      response = Umbrella::DomainVolume.query_domain_volume(address: entry)
+
+      if response.code == 200
+        data = JSON.parse(response.body)["queries"]
+
+        total_queries = data.inject(0){|sum, x| sum + x }
+        result[:log] = "domain volume is zero, moving on."
+        if total_queries == 0
+          return result
+        end
+        result[:log] = "no suspicious data points found."
+        data.each do |data_point|
+          if data_point.to_i == 0
+            next
+          end
+          data_point_factor = (data_point.to_f / total_queries.to_f)
+          if data_point_factor > 0.1
+            result[:pass] = false
+            result[:log] = "suspicious data point found: #{data_point.to_f.to_s} / #{total_queries.to_f.to_s} = #{data_point_factor.to_s}"
+            return result
+          end
+
+        end
+
+      elsif response.code >= 300
+        result[:pass] = true
+        result[:log] = "bad http code from umbrella domain volume check, manual review needed."
+        return result
+      end
+
+      result
+    rescue
+      result[:pass] = true
+      result[:log] = "unknown error with domain volume check, manual review needed."
+      return result
+    end
+  end
+
+  def self.check_virustotal_hits(entry)
+    vt_results = Virustotal::Scan.scan_hashes(address: entry)
+
+    result = {}
+    result[:positives] = 0
+    result[:positive_scans] = []
+
+    if vt_results && vt_results['scans']
+      result[:positives] = vt_results["positives"]
+      if result[:positives] > 0
+        result[:positive_scans] = vt_results["scans"].keys.select {|key| vt_results["scans"][key]["detected"] == true}
+      end
+    end
+
+    result
+  end
+
+  def self.check_umbrella_rating(entry)
+
+    result = {}
+    result[:rating] = nil
+    result[:log] = ""
+    response = Umbrella::Scan.scan_result(address: entry)
+
+    if response.code == 200
+      data = JSON.parse(response.body)
+      result[:rating] = data[data.keys.first]["status"] == -1 ? "malicious" : "trusted"
+      result[:log] = "umbrella rating returned #{data[data.keys.first]["status"]}"
+    else
+      result[:rating] = nil
+      result[:log] = "umbrella rating failed for unknown reason. halting for manual review."
+    end
+
+    result
+  end
+
+
+
+  ###############################################################################################################
+
+
+  def self.commit_to_reptool(action, dispute_entry)
+
+    result = {}
+    result[:success] = false
+
+    author = "reptooluser"
+
+    classification = nil
+
+    case action
+      when :commit_malware
+        classification = "malware"
+      when :commit_phishing
+        classification = "phishing"
+    end
+
+    comment = "TE SecHub-Auto-#{dispute_entry.dispute_id}"
+    begin
+      if classification.present?
+        RepApi::Blacklist.add_from_hosts(hostnames: [ dispute_entry.hostlookup ],
+                                         classifications: [ classification ],
+                                         author: author,
+                                         comment: comment)
+
+        result[:success] = true
+      end
+
+    rescue Exception => e
+      Rails.logger.error(e.message)
+      result[:success] = false
+    end
+
+    result
+  end
+
+  def self.allow_listed?(rule_hit)
     %w{tuse a500 vsvd suwl wlw wlm wlh deli ciwl beaker_drl}.include?(rule_hit)
   end
 
-  # Checks our complaints system.
-  # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
-  def check_complaints(rule_hits:)
-    return false unless rule_hits&.any?
-    auto_resolve_log = "----------BLS Positive Hit Check-------------\n"
-    good_mnems = rule_hits.select{|rule_hit| good_mnem?(rule_hit)}
-    if good_mnems.any?
-      auto_resolve_log += "\nPositive Hits were found:\n"
-      auto_resolve_log += "data: #{good_mnems.inspect.to_s}\n"
-
-      append_comment("BLS positive hit(s): #{good_mnems.join(', ')}; ")
-      true
-    else
-      auto_resolve_log += "\nno Positive Hits were found\n"
-      append_comment('BLS: -; ')
-      false
-    end
-    append_auto_resolve_log(auto_resolve_log)
-  end
-
-  def virus_total_scan_names
+  def self.trusted_virustotal_hits
     %w{Kaspersky Sophos Avira Google\ Safebrowsing BitDefender}
   end
-
-  # Checks the Virus Total system.
-  # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
-  def check_virus_total(address: self.address)
-    result = Virustotal::Scan.scan_hashes(address: address)
-    if result && result['scans']
-      all_scans = result['scans']
-      scan_results = virus_total_scan_names.map do |scan_key|
-        all_scans[scan_key]&.merge('name' => scan_key)
-      end
-      scan_hits = scan_results.select do |scan|
-        scan && scan['detected']
-      end
-      if scan_hits.any?
-        hit_messages = scan_hits.map {|scan| "#{scan['name']}: #{scan['result']}"}
-        append_comment("#{hit_messages.join(', ')}; ")
-        return STATUS_MALICIOUS
-      else
-        append_comment('VT: -; ')
-        return STATUS_NONMALICIOUS
-      end
-    end
-  rescue
-    append_comment('VT: error; ')
-    return nil
-  end
-
-  def check_virus_total_from_preload(dispute_entry, address)
-    if dispute_entry&.dispute_entry_preload&.virustotal.present?
-      result = JSON.parse(dispute_entry.dispute_entry_preload.virustotal)
-    else
-      result = Virustotal::Scan.scan_hashes(address: address)
-    end
-
-    if result && result['scans']
-      all_scans = result['scans']
-      scan_results = virus_total_scan_names.map do |scan_key|
-        all_scans[scan_key]&.merge('name' => scan_key)
-      end
-      scan_hits = scan_results.select do |scan|
-        scan && scan['detected']
-      end
-      auto_resolve_log = "----------Virus Total Check-------------\n"
-      if scan_hits.any?
-        hit_messages = scan_hits.map {|scan| "#{scan['name']}: #{scan['result']}"}
-        auto_resolve_log += "there were scan hits for this dispute entry.\n"
-        auto_resolve_log += "scan hits: #{hit_messages.join(', ')}\n"
-        auto_resolve_log += "VT verdict: Malicious"
-        append_comment("#{hit_messages.join(', ')}; ")
-        return STATUS_MALICIOUS
-      else
-        auto_resolve_log += "there were no scan hits for this dispute entry.\n"
-        auto_resolve_log += "VT verdict: Non Malicious"
-        append_comment('VT: -; ')
-        return STATUS_NONMALICIOUS
-      end
-      auto_resolve_log += "\n---------------------------------------\n\n"
-      append_auto_resolve_log(auto_resolve_log)
-    end
-  rescue
-    append_auto_resolve_log("\nError in VT check\n")
-    append_comment('VT: error; ')
-    return nil
-  end
-
-  def call_umbrella(address: self.address)
-    response = Umbrella::Scan.scan_result(address: address)
-    case
-      when 300 <= response.code
-        Rails.logger.error("Umbrella http response #{response.code}")
-        return nil
-      when 200 != response.code
-        Rails.logger.warn("Umbrella http response #{response.code}")
-    end
-    JSON.parse(response.body)
-  end
-
-  # Checks the Umbrella system.
-  # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
-  def check_umbrella(address: self.address)
-    result = call_umbrella(address: address)
-    auto_resolve_log = "----------Umbrella Check-------------\n"
-    if result && result[address]
-      verdict = result[address]
-      if 0 > verdict['status']
-        auto_resolve_log += "Umbrella Verdict: Malicious\n"
-        append_comment('Umbrella: malicious domain.; ')
-        return STATUS_MALICIOUS
-      else
-        auto_resolve_log += "Umbrella Verdict: Non Malicious\n"
-        append_comment('Umbrella: -; ')
-        return STATUS_NONMALICIOUS
-      end
-    end
-    auto_resolve_log += "data: #{result.inspect.to_s}\n"
-    append_auto_resolve_log(auto_resolve_log)
-  rescue
-    append_auto_resolve_log("\nError in Umbrella check\n")
-    append_comment('Umbrella: error; ')
-    return nil
-  end
-
-  def check_umbrella_from_preload(dispute_entry, address)
-    if dispute_entry&.dispute_entry_preload&.umbrella.present?
-      result = dispute_entry.dispute_entry_preload.umbrella
-      auto_resolve_log = "----------Umbrella Check (preload)-------------\n"
-      if result == 'Malicious'
-        auto_resolve_log += "Umbrella Verdict: Malicious\n"
-        append_comment('Umbrella: malicious domain.; ')
-        return STATUS_MALICIOUS
-      else
-        auto_resolve_log += "Umbrella Verdict: Non Malicious\n"
-        append_comment('Umbrella: -; ')
-        return STATUS_NONMALICIOUS
-      end
-      auto_resolve_log += "data: #{result.inspect.to_s}\n"
-      append_auto_resolve_log(auto_resolve_log)
-    else
-      result = call_umbrella(address: address)
-      auto_resolve_log = "----------Umbrella Check-------------\n"
-      if result && result[address]
-        verdict = result[address]
-        if 0 > verdict['status']
-          auto_resolve_log += "Umbrella Verdict: Malicious\n"
-          append_comment('Umbrella: malicious domain.; ')
-          return STATUS_MALICIOUS
-        else
-          auto_resolve_log += "Umbrella Verdict: Non Malicious\n"
-          append_comment('Umbrella: -; ')
-          return STATUS_NONMALICIOUS
-        end
-      end
-      auto_resolve_log += "data: #{result.inspect.to_s}\n"
-      append_auto_resolve_log(auto_resolve_log)
-    end
-
-  rescue
-    append_comment('Umbrella: error; ')
-    return nil
-  end
-
-  def mark_malicious
-    self.resolved = true
-    self.status = STATUS_MALICIOUS
-    STATUS_MALICIOUS
-  end
-
-  def mark_nonmalicious
-    self.resolved = true
-    self.status = STATUS_NONMALICIOUS
-    STATUS_NONMALICIOUS
-  end
-
-  def mark_new
-    self.resolved = false
-    self.status = STATUS_NEW
-    STATUS_NEW
-  end
-
-  # Checks the remote systems.
-  # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
-  def check_sources(rule_hits:, dispute_entry:, address:)
-    wbrs_hits =
-        if Rails.configuration.auto_resolve.check_complaints
-          check_complaints(rule_hits: rule_hits)
-        else
-          nil
-        end
-
-    vt_status =
-        if Rails.configuration.auto_resolve.check_virus_total
-          check_virus_total_from_preload(dispute_entry, address)
-        else
-          nil
-        end
-
-    umbrella_status =
-        if Rails.configuration.auto_resolve.check_umbrella
-          check_umbrella_from_preload(dispute_entry, address)
-        else
-          nil
-        end
-
-
-    if wbrs_hits
-      return mark_new
-    end
-
-    if vt_status.nil?
-      if umbrella_status.nil?
-        mark_new
-      else
-        if STATUS_MALICIOUS == umbrella_status
-          mark_malicious
-        else
-          mark_new
-        end
-      end
-    else
-      if STATUS_MALICIOUS == vt_status
-        mark_malicious
-      else
-        if umbrella_status.nil?
-          mark_new
-        else
-          if STATUS_MALICIOUS == umbrella_status
-            mark_malicious
-          else
-            mark_nonmalicious
-          end
-        end
-      end
-    end
-
-    self.status
-  end
-
-  # @param [String] address_type: 'IP' or 'URI/DOMAIN'
-  # @param [String] address: ip address, uri, or domain
-  # @param [Array<String>] rule_hits: collection of our rule hits as strings of mnem values
-  def self.create_from_payload(address_type, address, rule_hits = nil, dispute_entry)
-    address_type_attr =
-        case
-          when 'IP' == address_type
-            ADDRESS_TYPE_IP
-          when /\A[[:alpha:]]+:/ =~ address
-            ADDRESS_TYPE_URI
-          else
-            ADDRESS_TYPE_DOMAIN
-        end
-
-    auto_resolve = new(address_type: address_type_attr, address: address, rule_hits: rule_hits)
-    auto_resolve.check_sources(rule_hits: rule_hits, dispute_entry: dispute_entry, address: address)
-    auto_resolve
-  end
-
-  def entry_attributes
-    {
-        status: self.status,
-        resolution: malicious? ? 'Fixed -FN' : '',
-        resolution_message: malicious? ? 'This URI/IP has been deemed malicious, and has been blacklisted.' : ''
-    }
-  end
-
-  # Save the blacklist object.
-  # @param [String] author: moniker of who is adding or updating this entry.
-  # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
-  def publish_to_rep_api(author: 'reptooluser', dispute_id: nil)
-    raise 'Cannot blacklist address which has not been marked malicious through auto-resolve.' unless malicious?
-    comment = ""
-    if dispute_id.present?
-      comment = "TE SecHub-Auto-#{dispute_id}"
-    else
-      comment = "TE SecHub-Auto"
-    end
-    RepApi::Blacklist.add_from_hosts(hostnames: [ self.address ],
-                                     classifications: [ 'malware' ],
-                                     author: author,
-                                     comment: comment)
-  end
-
 
   ########################################
   #for custom email based auto resolve
@@ -408,5 +455,24 @@ class AutoResolve
 
   end
 
+  ############################LEGACY SUPPORT SECTION###################################
+  #
+  # until such time they can be refactored, this is for supporting code that (should not) call methods
+  # from AutoResolve as part of their non-auto resolution related functionality
+
+  def call_umbrella(address: self.address)
+    response = Umbrella::Scan.scan_result(address: address)
+    case
+    when 300 <= response.code
+      Rails.logger.error("Umbrella http response #{response.code}")
+      return nil
+    when 200 != response.code
+      Rails.logger.warn("Umbrella http response #{response.code}")
+    end
+    JSON.parse(response.body)
+  end
+
+  #
+  # ####################################################################################
 
 end

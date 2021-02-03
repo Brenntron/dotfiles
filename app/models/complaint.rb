@@ -335,18 +335,22 @@ class Complaint < ApplicationRecord
 
 
           begin
-            #ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            # if we are generating a new screenshot then we need to remove the old one
+            unless new_complaint_entry.complaint_entry_screenshot.nil?
+              ComplaintEntryScreenshot.find(new_complaint_entry.complaint_entry_screenshot.id).delete
+            end
+            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
-            #ces.grab_screenshot
+            ces.grab_screenshot
           rescue Exception => e
-            #Rails.logger.error("#{e.message}")
-            #ces = ComplaintEntryScreenshot.new
-            #ces.error_message = e.message
-            #ces.complaint_entry_id = new_complaint_entry.id
-            #open("app/assets/images/failed_screenshot.jpg") do |f|
-            #  ces.screenshot = f.read
-            #end
-            #ces.save!
+            Rails.logger.error("#{e.message}")
+            ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
+            ces.complaint_entry_id = new_complaint_entry.id
+            open("app/assets/images/failed_screenshot.jpg") do |f|
+             ces.screenshot = f.read
+            end
+            ces.save!
           end
         end
 
@@ -389,17 +393,21 @@ class Complaint < ApplicationRecord
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
           begin
-            #ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            # if we are generating a new screenshot then we need to remove the old one
+            unless new_complaint_entry.complaint_entry_screenshot.nil?
+              ComplaintEntryScreenshot.find(new_complaint_entry.complaint_entry_screenshot.id).delete
+            end
+            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
-            #ces.grab_screenshot
+            ces.grab_screenshot
           rescue Exception => e
-            #ces = ComplaintEntryScreenshot.new
-            #ces.error_message = e.message
-            #ces.complaint_entry_id = new_complaint_entry.id
-            #open("app/assets/images/failed_screenshot.jpg") do |f|
-            #  ces.screenshot = f.read
-            #end
-            #ces.save!
+            ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
+            ces.complaint_entry_id = new_complaint_entry.id
+            open("app/assets/images/failed_screenshot.jpg") do |f|
+             ces.screenshot = f.read
+            end
+            ces.save!
           end
         end
 
@@ -569,7 +577,6 @@ class Complaint < ApplicationRecord
           IPs/URIs: #{ips_urls}
           Problem Summary: #{description}
     HEREDOC
-
     bug_attrs = {
         'product' => 'Escalations Console',
         'component' => 'Categorization',

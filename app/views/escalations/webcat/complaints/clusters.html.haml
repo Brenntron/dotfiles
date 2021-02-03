@@ -25,11 +25,10 @@
   .row
     .col-xs-7
       .current-cluster-info-wrapper
-        .result-label.vertical-separator
+        .result-label
           Current Cluster Entries:
           %span#total_results
-        -#    TODO Only show regex label and filter item if a regex has been used
-        .result-label
+        .result-label.regex-area.hidden
           Regex:
           %span#regex-filter
 

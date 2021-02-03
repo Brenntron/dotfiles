@@ -166,7 +166,6 @@ processSubmitNewURL = () ->
       isEmpty = false
 
   if !isEmpty
-
     std_msg_ajax(
       url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
       method: 'POST'
@@ -852,9 +851,9 @@ $(document).on 'click', ".screenshot-close-button", ->
 window.enlarge_image = (id,image,retake_in_progress)->
   image_content = ""
   if retake_in_progress
-    image_content = '<img src="' + image + '"><span class="screenshot-button screenshot-reload-button esc-tooltipped" title="Reload Page">Reload Page</span>'
+    image_content = '<img height=600 width=800 src="' + image + '"><span class="screenshot-button screenshot-reload-button esc-tooltipped" title="Reload Page">Reload Page</span>'
   else
-    image_content = '<img src="' + image + '"><span class="screenshot-button screenshot-retake-button esc-tooltipped" id="se_id_' + id + '" title="Retake Screenshot"></span><span class="screenshot-button screenshot-close-button"></span>'
+    image_content = '<img height=600 width=800 src="' + image + '"><span class="screenshot-button screenshot-retake-button esc-tooltipped" id="se_id_' + id + '" title="Retake Screenshot"></span><span class="screenshot-button screenshot-close-button"></span>'
 
   $('#screenshot_id_'+ id).popover(
     html: true
@@ -1048,7 +1047,6 @@ format = (complaint_entry_row) ->
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
-
   qual_subdomain = complaint_entry.domain
   if complaint_entry.subdomain
     qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
@@ -1142,7 +1140,7 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       row_id = JSON.parse(this.data).id
-      { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
+      { current_category_data : current_categories, master_categories, sds_category, sds_domain_category} = JSON.parse(response)
 
       sds_category == '' unless sds_category != null
 
@@ -1168,7 +1166,7 @@ format = (complaint_entry_row) ->
           tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + tooltip_table + tooltip_wrapper_end
 
           if key == '1.0'
-            category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td><td class=sds_category>' + sds_category + '</td></tr>'
+            category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td><td class=sds_category>' + sds_category + '</td><td class=sds_category>' + sds_domain_category + '</td></tr>'
             $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
           else
             category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
@@ -1189,14 +1187,15 @@ format = (complaint_entry_row) ->
       complaint_history = ''
 
   whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
-
   { entry_id, domain, complaint_id } = complaint_entry
   complaint_entry_html = ''
   input_cat = 'input_cat_' + entry_id
 
   if complaint_entry.status == "PENDING"
-
-    domain = complaint_entry.uri_as_categorized
+    if complaint_entry.uri_as_categorized  == ""
+      domain = complaint_entry.subdomain + "." + complaint_entry.domain
+    else
+      domain = complaint_entry.uri_as_categorized
     # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
 
     complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
@@ -1241,7 +1240,7 @@ format = (complaint_entry_row) ->
       "<label class='content-label-sm'>Customer Description</label>" +
       "<span class='nested-complaint-data'>#{customer_description}</span>" +
       "</div></div><div class='col-xs-7 col-with-divider'>" +
-      '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
+      '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-3">WBRS Categories</th><th class="col-sm-2">WBRS Certainty</th><th class="col-sm-3">SDS URI Category</th><th class="col-sm-3">SDS Domain Category</th></tr></thead>' +
       '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
@@ -1569,7 +1568,7 @@ window.click_table_buttons = (complaint_table, button)->
       $(td).addClass 'nested-complaint-data-wrapper'
     if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
       $( cat_select ).selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
@@ -1590,7 +1589,7 @@ window.click_table_buttons = (complaint_table, button)->
     else
       # need to initialize the selectize function but disable it here if entry is completed
       $completed_selectize = $( cat_select ).selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
@@ -1815,7 +1814,6 @@ window.triggerTooltips = (item) ->
 processSubmitMaster = () ->
 
   data = []
-
   $('.selected + tr td.nested-complaint-data-wrapper').each ->
     entry_id = $(this).find('tr').attr('entry_id')
     row_id = $(this).find('tr').attr('row_id')
@@ -1836,7 +1834,6 @@ processSubmitMaster = () ->
       comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
       resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
       uri_as_categorized = $(this).find("#complaint_prefix_#{entry_id}")[0].value
-
       if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if status == 'UNCHANGED' || status == 'INVALID'

@@ -498,16 +498,18 @@ class ComplaintEntry < ApplicationRecord
 
 
   def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
+    new_complaint_entry = ComplaintEntry.new
     begin
-      new_complaint_entry = ComplaintEntry.new
-      new_complaint_entry.complaint_id = complaint.id
-      new_complaint_entry.status = status
-
       wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
-
-
+    rescue Exception => e
+      Rails.logger.info (" Couldnt contact SBRS. #{e}")
+      new_complaint_entry.wbrs_score = 0
+    end
+    begin
+      new_complaint_entry.complaint_id = complaint.id
+      new_complaint_entry.status = status
       if is_ip?(ip_url)
         ip_url.chomp!("/")
         ip_network = ip_url.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0]
@@ -538,7 +540,6 @@ class ComplaintEntry < ApplicationRecord
         new_complaint_entry.url_primary_category = current_category
         new_complaint_entry.category = current_category
       end
-
       new_complaint_entry.save
 
     rescue Exception => e
@@ -549,28 +550,28 @@ class ComplaintEntry < ApplicationRecord
     max_wait_for_job = 15 #seconds
     begin
       #this is where screen grabs happen.
-      #screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
-      #screenshot_entry.grab_screenshot
+      screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
+      screenshot_entry.grab_screenshot
     rescue Timeout::Error => e
       #couldnt complete in time
-      #Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-      #ces = ComplaintEntryScreenshot.new
-      #ces.error_message = e.message
-      #ces.complaint_entry_id = new_complaint_entry.id
-      #open("app/assets/images/failed_screenshot.jpg") do |f|
-      #  ces.screenshot = f.read
-      #end
-      #ces.save!
+      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+      ces = ComplaintEntryScreenshot.new
+      ces.error_message = e.message
+      ces.complaint_entry_id = new_complaint_entry.id
+      open("app/assets/images/failed_screenshot.jpg") do |f|
+       ces.screenshot = f.read
+      end
+      ces.save!
     rescue Exception => e
-      #Rails.logger.error("#{e.message}")
-      #do nothing, it was worth a try. kittens are sad now
-      #ces = ComplaintEntryScreenshot.new
-      #ces.error_message = e.message
-      #ces.complaint_entry_id = new_complaint_entry.id
-      #open("app/assets/images/failed_screenshot.jpg") do |f|
-      #  ces.screenshot = f.read
-      #end
-      #ces.save!
+      Rails.logger.error("#{e.message}")
+      # do nothing, it was worth a try. kittens are sad now
+      ces = ComplaintEntryScreenshot.new
+      ces.error_message = e.message
+      ces.complaint_entry_id = new_complaint_entry.id
+      open("app/assets/images/failed_screenshot.jpg") do |f|
+       ces.screenshot = f.read
+      end
+      ces.save!
     end
   end
 

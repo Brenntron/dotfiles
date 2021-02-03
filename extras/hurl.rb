@@ -135,7 +135,7 @@ class HurlArgs
     set_defaults
     @args_pos = scan_args(args)
     if @git_auth_token.nil?
-      puts "You need a git auth token. Dont have on? try here https://git.vrt.sourcefire.com/settings/tokens"
+      puts "You need a git auth token. Dont have on? try here https://gitlab.vrt.sourcefire.com/settings/tokens"
       exit
     end
     if @user.nil?
@@ -248,7 +248,7 @@ class Hurl
     puts "* checkout #{git_label}"
     FileUtils.mkdir(build_base) unless File.directory?(build_base)
     FileUtils.rmtree(build_path) if File.directory?(build_path)
-    system "git clone https://git.vrt.sourcefire.com/talosweb/#{project}.git -b #{git_label} --single-branch #{build_path}"
+    system "git clone https://gitlab.vrt.sourcefire.com/talosweb/#{project}.git -b #{git_label} --single-branch #{build_path}"
   end
 
   def create_tar(args, build_base:, build_path:, base_dir:)
@@ -314,8 +314,10 @@ class Hurl
         output_tar_path = args.input_tar_path
       else
         output_tar_path = args.gen_output_tar_path
-        puts   "curl -Lku #{@args.user}:#{@args.git_auth_token}  https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
-        system "curl -Lku #{@args.user}:#{@args.git_auth_token}  https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        # puts   "curl -Lku #{@args.user}:#{@args.git_auth_token}  https://gitlab.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        # system "curl -Lku #{@args.user}:#{@args.git_auth_token}  https://gitlab.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        puts "curl --header 'PRIVATE-TOKEN:#{@args.git_auth_token}' 'https://gitlab.vrt.sourcefire.com/api/v4/projects/talosweb%2F#{args.project}/repository/archive.tar.gz?sha=#{args.base_dir}' > #{output_tar_path}"
+        system "curl --header 'PRIVATE-TOKEN:#{@args.git_auth_token}' 'https://gitlab.vrt.sourcefire.com/api/v4/projects/talosweb%2F#{args.project}/repository/archive.tar.gz?sha=#{args.base_dir}' > #{output_tar_path}"
       end
     end
 
