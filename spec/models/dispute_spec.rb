@@ -363,9 +363,9 @@ describe Dispute do
   let(:umbrella_clear_response) { double('HTTPI::Response', code: 200, body: umbrella_clear_json) }
   let(:manual_wlbl_response) { double('HTTPI::Response', code: 200, body: manual_wlbl_json) }
   let(:xbrs_domain_response) { double('HTTPI::Response', code: 200, body: xbrs_domain_json) }
-  let(:auto_resolve_new) { double('AutoResolve', resolved?: false, malicious?: nil) }
-  let(:auto_convict) { double('AutoResolve', resolved?: true, malicious?: true) }
-  let(:auto_acquit) { double('AutoResolve', resolved?: true, malicious?: false) }
+  let(:auto_resolve_new) { double('AutoResolve', resolved?: false, malicious?: nil, auto_resolve_log: "----------Fake log-------------\n") }
+  let(:auto_convict) { double('AutoResolve', resolved?: true, malicious?: true, auto_resolve_log: "----------Fake log-------------\n") }
+  let(:auto_acquit) { double('AutoResolve', resolved?: true, malicious?: false, auto_resolve_log: "----------Fake log-------------\n") }
   let(:bug_factory) do
     double('Bugzilla::Bug', create: { "id" => 101 })
   end
@@ -712,7 +712,7 @@ describe Dispute do
 
     args = {'uri' => "stupid.com\r\ndumb.com idiot.com", 'scope' => 'strict'}
     result = DisputeEntry.research_results(args)
-    expect(result.size).to eql(14)
+    expect(result.size).to eql(6)
 
   end
 
