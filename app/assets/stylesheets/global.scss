@@ -2395,7 +2395,9 @@ a.static-nav-item {
   color: lighten($type-lighter-color, 20%);
   font-style: italic;
 }
-
+.missing-data.platform:before{
+  content: 'No Platform'
+}
 .file-attachment {
   font-size: 9pt;
   margin-top: -10px;
@@ -9237,6 +9239,9 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   padding: 0 3px;
   font-size: 8pt;
 }
+.platform-col{
+  white-space: nowrap;
+}
 .col-tag{
   background: $faint-neutral-color;
   font-weight: 200;
@@ -9780,6 +9785,10 @@ hr.thin.form-divider {
   display: block !important;
 }
 
+.dispute-details {
+  padding-top: 10px;
+}
+
 .disp-negative {
   font-weight: 600;
   color: $warning-accent-color;
@@ -9798,6 +9807,7 @@ hr.thin.form-divider {
 .top-info-details {
   font-size: 8.5pt;
   line-height: 1.35em;
+  overflow-wrap: break-word;
 }
 
 .file-edit-buttons-wrapper {
@@ -12798,4 +12808,8 @@ input.wl-bl-list-inline {
 
 .toolbar .lists-row div.dropdown-tool-grey-row li {
   padding: 2px 10px 5px;
+}
+
+#current-xbrs-table-head th:last-child, #current-xbrs-table-body td:last-child {
+  display: none;
 }

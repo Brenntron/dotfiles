@@ -1,0 +1,52 @@
+.entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
+  %h5.entry-details-table-header
+    Current XBRS Hits
+    - unless entry.hostlookup.nil?
+      %span.nested-table-tally
+        = entry.xbrs_data['data'].count
+  - if entry.xbrs_data['data'].empty?
+    %table
+      %thead
+        %tr
+          %th
+            %span.missing-data
+              No XBRS data available.
+  - else
+    %table{ :class => ("table-scrollable" if entry.xbrs_data['data'].count > 8)}
+      %thead{ :id => "current-xbrs-table-head"}
+        %tr
+          - entry.xbrs_data['legend'].each do |header|
+            %th= header
+      %tbody{ :id => "current-xbrs-table-body"}
+        - unless entry.hostlookup.nil?
+          - entry.xbrs_data['data'].each do |data|
+            %tr
+              - data.each do |datapoint|
+                %td= datapoint
+
+
+.entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
+  %h5.entry-details-table-header
+    XBRS History
+    - unless entry.hostlookup.nil?
+      %span.nested-table-tally
+        = entry.xbrs_history['data'].count
+  - if entry.xbrs_history['data'].empty?
+    %table
+      %thead
+        %tr
+          %th
+            %span.missing-data
+              No XBRS history available.
+  - else
+    %table{ :class => ("table-scrollable" if entry.xbrs_history['data'].count > 8)}
+      %thead
+        %tr
+          - entry.xbrs_history['legend'].each do |header|
+            %th= header
+      %tbody
+        - unless entry.hostlookup.nil?
+          - entry.xbrs_history['data'].each do |data|
+            %tr
+              - data.each do |datapoint|
+                %td= datapoint

@@ -576,7 +576,32 @@ class DisputeEntry < ApplicationRecord
   end
 
   def xbrs_data
-    find_xbrs[1]
+    # Current XBRS hits for a URL
+    # This method is different from `xbrs_history` because of https://jira.vrt.sourcefire.com/browse/WEB-6770
+    result = find_xbrs[1]
+    current_array = []
+    result['data'].each do |data|
+      if data.last == "full"
+        current_array << data
+      end
+    end
+    result['data'] = current_array
+    result
+
+  end
+
+  def xbrs_history
+    # XBRS history for a URL
+    # This method is different from `xbrs_data` because of https://jira.vrt.sourcefire.com/browse/WEB-6770
+    result = find_xbrs[1]
+    current_array = []
+    result['data'].each do |data|
+      if data.last != "full"
+        current_array << data
+      end
+    end
+    result['data'] = current_array
+    result
   end
 
   def umbrellaresult
@@ -638,6 +663,12 @@ class DisputeEntry < ApplicationRecord
       if auto_resolve_verdict.malicious?
         self.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
         self.resolution = STATUS_RESOLVED_FIXED_FN
+        self.status = STATUS_RESOLVED
+        self.case_closed_at = resolved_at
+        self.case_resolved_at = resolved_at
+      else
+        self.resolution_comment = Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
+        self.resolution = STATUS_RESOLVED_UNCHANGED
         self.status = STATUS_RESOLVED
         self.case_closed_at = resolved_at
         self.case_resolved_at = resolved_at
