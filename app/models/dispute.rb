@@ -478,7 +478,7 @@ class Dispute < ApplicationRecord
         new_dispute.description = message_payload["payload"]["email_body"]
         new_dispute.problem_summary = message_payload["payload"]["problem"]
         new_dispute.ticket_source_key = message_payload["source_key"]
-        new_dispute.ticket_source = "talos-intelligence"
+        new_dispute.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
         new_dispute.ticket_source_type = message_payload["source_type"]
         new_dispute.product_platform = message_payload["payload"]["product_platform"] unless message_payload["payload"]["product_platform"].blank?
         new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?

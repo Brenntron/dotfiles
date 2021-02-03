@@ -279,7 +279,7 @@ class Complaint < ApplicationRecord
         new_complaint.id = bug_proxy.id
         new_complaint.description = message_payload["payload"]["problem"]
         new_complaint.ticket_source_key = message_payload["source_key"]
-        new_complaint.ticket_source = "talos-intelligence"
+        new_complaint.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
         new_complaint.ticket_source_type = message_payload["source_type"]
         customer = Customer.process_and_get_customer(message_payload)
         new_complaint.customer_id = customer&.id

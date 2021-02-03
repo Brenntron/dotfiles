@@ -46,6 +46,7 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
             file_reputation_dispute: {
                 source_key: 1001,
                 source_type: "FileReputationDispute",
+                source: "talos-intelligence-api",
                 payload: {
                     # sha256_hash: 'c01b39c7a35ccc3b081a3e83d2c71fa9a767ebfeb45c69f08e17dfe3ef375a7b',
                     sha256: 'efb947a43bfe6d0812d105f6afdeb9774f4d79254dd48f89f1e95ffdf8732928', #threatgrid
@@ -114,7 +115,7 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
     file_rep_dispute = FileReputationDispute.where(ticket_source_key: 1001).first
 
     expect(file_rep_dispute).to_not be_nil
-
+    expect(file_rep_dispute.source).to eql("talos-intelligence")
 
   end
 
@@ -130,7 +131,7 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
     file_rep_dispute = FileReputationDispute.where(ticket_source_key: 1001).first
 
     expect(file_rep_dispute).to_not be_nil
-
+    expect(file_rep_dispute.source).to eql("talos-intelligence-api")
     expect(file_rep_dispute.product_platform).to eql("test_platform")
     expect(file_rep_dispute.product_version).to eql("test_platform_version")
     expect(file_rep_dispute.in_network).to eql(nil)

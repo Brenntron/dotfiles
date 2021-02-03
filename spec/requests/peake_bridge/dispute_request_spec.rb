@@ -98,6 +98,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
             dispute: {
                 source_type: 'Dispute',
                 source_key: 1001,
+                source: 'talos-intelligence-api',
                 payload: {
                     investigate_ips: {
                         "64.70.56.99" => {
@@ -267,6 +268,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.dispute_entries.where(ip_address: '184.168.47.225')).to exist
     expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
     expect(dispute.dispute_entries.where(uri: 'thepretenders.com')).to exist
+    expect(dispute.ticket_source).to eql("talos-intelligence")
   end
 
   it 'receives dispute payload message from TI API not in-network' do
@@ -287,6 +289,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.product_platform).to eql("test_platform")
     expect(dispute.product_version).to eql("test_platform_version")
     expect(dispute.in_network).to eql(nil)
+    expect(dispute.ticket_source).to eql("talos-intelligence-api")
   end
 
   it 'receives dispute payload message from TI API in-network' do
