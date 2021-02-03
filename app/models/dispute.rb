@@ -1295,7 +1295,6 @@ class Dispute < ApplicationRecord
   #####FOR REPORTING#######
 
   def self.open_tickets_report(users, from, to)
-
     #from = "Mon, 4 Jul 2018 17:40:08 GMT"
 
     status_array = [STATUS_ASSIGNED, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ON_HOLD]
@@ -1357,7 +1356,6 @@ class Dispute < ApplicationRecord
                       :total_email_count => dispute_emails_count
       }
     end
-
     report_data
   end
 
@@ -1380,9 +1378,9 @@ class Dispute < ApplicationRecord
 
     report_data[:customer_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER }.size  #results.select {|result| result.submitter_type == SUBMITTER_TYPE_CUSTOMER}.size
     report_data[:guest_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submitter_type == SUBMITTER_TYPE_NONCUSTOMER }.size #results.select {|result| result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER}.size
-    report_data[:email_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'e' }.size #results.select {|result| result.submission_type.downcase == 'e'}.size
-    report_data[:web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'w' }.size#results.select {|result| result.submission_type.downcase == 'w'}.size
-    report_data[:email_web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'ew' }.size#results.select {|result| result.submission_type.downcase == 'ew'}.size
+    report_data[:email_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type&.downcase == 'e' }.size #results.select {|result| result.submission_type.downcase == 'e'}.size
+    report_data[:web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type&.downcase == 'w' }.size#results.select {|result| result.submission_type.downcase == 'w'}.size
+    report_data[:email_web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type&.downcase == 'ew' }.size#results.select {|result| result.submission_type.downcase == 'ew'}.size
 
 
 
@@ -1416,8 +1414,8 @@ class Dispute < ApplicationRecord
 
                       :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
 
-                      :submitter_type => result.submitter_type.downcase,
-                      :submission_type => result.submission_type.upcase,
+                      :submitter_type => result.submitter_type&.downcase,
+                      :submission_type => result.submission_type&.upcase,
                       :priority => result.priority,
                       :owner => ticket_user,
                       :last_email_date => result.dispute_emails&.last&.updated_at&.strftime("%FT%T"),
@@ -1467,7 +1465,7 @@ class Dispute < ApplicationRecord
           if day_result.status == DisputeEntry::STATUS_RESOLVED
             day_all_totals += 1
 
-            case day_result.dispute.submission_type.downcase
+            case day_result.dispute.submission_type&.downcase
               when 'e'
                 day_e_totals += 1
               when 'w'
