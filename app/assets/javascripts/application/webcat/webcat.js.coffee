@@ -635,18 +635,17 @@ $ ->
       element = $(this)
       innertext = $(this).text()
       copyToClipboard(innertext)
-      $(element).after( "<p id='copiedAlert'>Copied to clipboard!</p>" )
-      setTimeout (->
-        $("#copiedAlert").remove()
-      ), 1000
 
-    copyToClipboard = (text) ->
-      dummy = document.createElement('input')
-      document.body.appendChild dummy
-      dummy.setAttribute 'value', text
-      dummy.select()
-      document.execCommand 'copy'
-      document.body.removeChild dummy
+      html = "<div class='copied-container'>
+                <span class='copied-check'></span>
+                <p id='copiedAlert'>Copied to clipboard</p>
+              </div>"
+      $(element).after( html )
+      $('.copied-container').delay(1000).fadeOut(1000);
+      setTimeout (->
+          $(".copied-container").remove()
+        ), 2000
+
 
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
@@ -911,6 +910,13 @@ window.toggle_selectize_layer = (input, focus) ->
   else
     $(select_parent).css('z-index', '2')
 
+window.copyToClipboard = (text) ->
+  dummy = document.createElement('input')
+  document.body.appendChild dummy
+  dummy.setAttribute 'value', text
+  dummy.select()
+  document.execCommand 'copy'
+  document.body.removeChild dummy
 
 $ ->
   # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
