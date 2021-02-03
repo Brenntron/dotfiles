@@ -74,6 +74,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
         $('#refresh-working-msg').show()
         $('#refresh-working-msg').html('Table data updating correctly')
         $('#dispute-index-title').text(json['title'])
+
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
@@ -992,23 +993,17 @@ $ ->
       }
       {
         data: 'case_number'
-
         render: (data) ->
-
           '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
-
       }
       {
         data: 'priority'
         render: (data) ->
           '<span class="bug-priority p-' + data + '">' + data + '</span>'
-
       }
       { data: 'case_link' }
       { data: 'status' }
-      {
-        data: 'dispute_resolution'
-      }
+      { data: 'dispute_resolution' }
       {
         data: 'submission_type'
         render: (data) ->
@@ -1033,6 +1028,7 @@ $ ->
       {
         data: 'case_age'
         'render':(data,type,full,meta) ->
+          console.log data,type,full,meta
           if data != "<1 hr"
             dispute_duration = moment(full.case_opened_at).fromNow()
             if dispute_duration.includes('minute')
@@ -1062,6 +1058,15 @@ $ ->
             data
       }
       { data: 'source' }
+      {
+        data: null
+        class: 'platform-col'
+        render: (data,type,full,meta) ->
+          platform = full.dispute_entries[0].entry.platform
+          if  platform == "N/A" ||  platform == "Unknown" ||  platform == "Missing" ||  platform == "" ||  platform == null
+            platform = '<span class="missing-data platform"></span>'
+          return  platform
+      }
       { data: 'submitter_type'}
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
@@ -1073,7 +1078,6 @@ $ ->
         data: 'age_int'
         visible: false
       }
-
     ])
   $('#disputes-index_filter input').addClass('table-search-input');
 
@@ -1134,6 +1138,7 @@ $ ->
         sbrs_score = this.entry.sbrs_score
       else
         sbrs_score = missing_data
+
       entry_row = "<tr class='index-entry-row' data-case-id='0000#{dispute.id}'>
         <td>
           <input type='checkbox' onclick='toggleRow(this)' class='dispute-entry-checkbox dispute-entry-checkbox_#{dispute.id}' id='#{dispute_entry_id}'>
@@ -1418,6 +1423,7 @@ $ ->
       data['contact-email'] = $("#contact-email-checkbox").is(':checked')
       data['status-comment'] = $("#status-comment-checkbox").is(':checked')
       data['last-updated'] = $("#last-updated-checkbox").is(':checked')
+      data['platform'] = $("#platform-checkbox").is(':checked')
       std_msg_ajax(
         url: "/escalations/api/v1/escalations/user_preferences/update"
         method: 'POST'

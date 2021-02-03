@@ -183,7 +183,7 @@ class Sbrs::Base
       uri = URI.parse(request_string)
       request = Net::HTTP::Get.new(uri)
 
-      request["X-SDS-Categories-Version"] = "v8"     # <-- dude totally deal with this mess ::: SDS CATEGORY VERSION
+      request["X-SDS-Categories-Version"] = "v9"     # <-- dude totally deal with this mess ::: SDS CATEGORY VERSION
       request["X-Client-ID"] = "talosweb"
       request["X-Product-ID"] = "talosintelligence"
       req_options = {
@@ -256,7 +256,7 @@ class Sbrs::Base
     query_string = '/' + query_string if first_char != '/'
 
     request_string = "https://" + hostname + query_string
-    
+
     if request_type == 'wbrs' && params["uri_item"]
       request_string += params["uri_item"]
     end

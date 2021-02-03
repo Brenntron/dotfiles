@@ -396,7 +396,7 @@ $ ->
         $(vt_table).hide()
 
     if $(this).hasClass('xbrs-checkbox')
-      xbrs_table = $(entry_row).find('.xbrs-details-table')[0]
+      xbrs_table = $(entry_row).find('.xbrs-details-table')
       if $(this).prop('checked')
         $(xbrs_table).show()
       else
