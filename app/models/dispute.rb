@@ -1305,7 +1305,7 @@ class Dispute < ApplicationRecord
     report_data = {}
     report_data[:table_data] = []
     user_ids = users.pluck(:id)
-    results = Dispute.includes(:dispute_entries).where("disputes.created_at between '#{from}' and '#{to}'").where('disputes.user_id' => user_ids).where('disputes.status' => status_array)
+    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
 
     report_data[:ticket_count] = results.size
     report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status != DisputeEntry::STATUS_RESOLVED }.size
@@ -1372,7 +1372,7 @@ class Dispute < ApplicationRecord
     report_data = {}
     report_data[:table_data] = []
     user_ids = users.pluck(:id)
-    results = Dispute.includes(:dispute_entries).where("disputes.created_at between '#{from}' and '#{to}'").where('disputes.user_id' => user_ids).where('disputes.status' => status_array)
+    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
 
     report_data[:ticket_count] = results.size
     report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status == DisputeEntry::STATUS_RESOLVED }.size
