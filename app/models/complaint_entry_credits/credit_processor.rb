@@ -1,29 +1,35 @@
 class ComplaintEntryCredits::CreditProcessor
-  attr_reader :user, :complaint_entry, :status
+  attr_reader :user, :complaint_entry
 
-  def initialize(user, complaint_entry, status)
+  def initialize(user, complaint_entry)
     @user = user
     @complaint_entry = complaint_entry
-    @status = status.downcase
   end
 
   def process
     credit_handler = ComplaintEntryCredits::CreditHandler.new(user, complaint_entry)
 
-    case status
-    when 'fixed'
+    case complaint_entry.status
+    when 'PENDING'
       credit_handler.handle_pending_credit
-    when 'created'
-      credit_handler.handle_pending_credit
-    when 'unchanged'
+    when 'ASSIGNED'
       credit_handler.handle_unchanged_credit
-    when 'commit'
+    when 'COMPLETED'
+      process_completed_status(credit_handler)
+    end
+  end
+
+  private
+
+  def process_completed_status(credit_handler)
+    case complaint_entry.resolution
+    when "FIXED"
       credit_handler.handle_fixed_credit
-    when 'decline'
+    when "UNCHANGED"
       credit_handler.handle_unchanged_credit
-    when 'invalid'
+    when "INVALID"
       credit_handler.handle_invalid_credit
-    when 'duplicate'
+    when "DUPLICATE"
       credit_handler.handle_duplicate_credit
     end
   end

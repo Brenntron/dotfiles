@@ -237,7 +237,7 @@ class Complaint < ApplicationRecord
   end
 
   def self.create_complaint_entry_credit(entry)
-    ComplaintEntryCredits::CreditProcessor.new(nil, entry, 'duplicate').process
+    ComplaintEntryCredits::CreditProcessor.new(nil, entry).process
   end
 
   def build_ti_payload

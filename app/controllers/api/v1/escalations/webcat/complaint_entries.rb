@@ -22,7 +22,6 @@ module API
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
               optional :uri_as_categorized, type: String, desc: 'Value of the `Edit Uri` box at the time analyst submitted it'
-              optional :commit, type: String, desc: 'commit message'
             end
             post 'update'do
               std_api_v2 do
@@ -38,8 +37,6 @@ module API
                                        permitted_params['resolution_comment'],
                                        uri_as_categorized,
                                        current_user, "")
-                # add credit for the user contribution to the complaint entry
-                ComplaintEntryCredits::CreditProcessor.new(current_user, entry, permitted_params['commit']).process
 
                 Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
@@ -90,9 +87,6 @@ module API
                                           submitted_complaint[:resolution_comment],
                                           '',
                                           current_user, submitted_complaint[:commit])
-
-                  # add credit for the user contribution to the complaint entry
-                  ComplaintEntryCredits::CreditProcessor.new(current_user, @entry, submitted_complaint[:commit]).process
 
                   if submitted_complaint[:commit] == 'decline'
                     category_data = @entry.current_category_data.to_a
