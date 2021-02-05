@@ -23,8 +23,8 @@ class Sbrs::Base
     @sds_host ||= Rails.configuration.sds.host
   end
 
-  def self.cat_version
-    @cat_version ||= Rails.configuration.sds.cat_version
+  def self.category_version
+    @category_version ||= Rails.configuration.sds.category_version
   end
 
   def self.sds_v3_host
@@ -187,7 +187,7 @@ class Sbrs::Base
       uri = URI.parse(request_string)
       request = Net::HTTP::Get.new(uri)
 
-      request["X-SDS-Categories-Version"] = cat_version    # <-- dude totally deal with this mess ::: SDS CATEGORY VERSION
+      request["X-SDS-Categories-Version"] = category_version    # <-- dude totally deal with this mess ::: SDS CATEGORY VERSION
       request["X-Client-ID"] = "talosweb"
       request["X-Product-ID"] = "talosintelligence"
       req_options = {
