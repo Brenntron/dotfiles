@@ -115,6 +115,7 @@ Rails.configuration.sds                 = ApiRequester::ApiRequester.config_of(s
 Rails.configuration.sds.v3_host         = sds_config['v3_host']
 Rails.configuration.sds.cert_file       = sds_config['cert_file'] || sds_config['ca_cert_file']
 Rails.configuration.sds.pkey_file       = sds_config['pkey_file']
+Rails.configuration.sds.cat_version       = sds_config['category_version']
 
 talos_intelligence = env_config.fetch('talos_intelligence', {})
 Rails.configuration.talos_intelligence  = ApiRequester::ApiRequester.config_of(talos_intelligence)
