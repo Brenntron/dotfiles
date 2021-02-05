@@ -21,8 +21,8 @@
           %tr
             %th Pattern
             %th Example
-            %th Engine
             %th Engine Description
+            %th Public Engine Description
             %th Notes
             %th Public Facing Notes
             %th Point of Contact
@@ -39,17 +39,19 @@
                   = convention.example
                 %span.table-form-content
                   %input.example-input{type: 'text', value: "#{convention.example}"}
-              %td.amp-engine
-                %span.table-content
-                  = convention.engine
-                %span.table-form-content
-                  %input.engine-input{type: 'text', value: "#{convention.engine}"}
+
               %td.amp-engine-description
                 %span.table-content
                   = convention.engine_description
                 %span.table-form-content
                   %textarea.description-textarea
                     = convention.engine_description
+              %td.amp-public-engine-description
+                %span.table-content
+                  = convention.public_engine_description
+                %span.table-form-content
+                  %textarea.description-textarea
+                    = convention.public_engine_description
               %td.amp-notes
                 %span.table-content
                   = convention.notes

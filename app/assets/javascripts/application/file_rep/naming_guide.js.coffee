@@ -239,14 +239,14 @@ $ ->
       sequence = $(this).attr('data-sort-sequence')
       pattern = $($(this).find('.amp-pattern')[0]).find('.table-code').text()
       example = $($(this).find('.amp-example')[0]).find('.table-content').text()
-      engine = $($(this).find('.amp-engine')[0]).find('.table-content').text()
+      public_engine_desc = $($(this).find('.amp-public-engine-description')[0]).find('.table-content').text()
       engine_desc = $($(this).find('.amp-engine-description')[0]).find('.table-content').text()
       notes = $($(this).find('.amp-notes')[0]).find('.table-content').text()
       public_notes = $($(this).find('.amp-public-notes')[0]).find('.table-content').text()
       contact = $($(this).find('.amp-contact')[0]).find('.table-content').text()
 
       # Check to make sure no new rows are fully blank
-      if pattern == '' && example == '' && engine == '' && engine_desc == '' && notes == '' && public_notes == '' && contact == ''
+      if pattern == '' && example == '' && public_engine_desc == '' && engine_desc == '' && notes == '' && public_notes == '' && contact == ''
         $(this).remove()
 
       else
@@ -255,7 +255,7 @@ $ ->
             'id': id,
             'pattern': pattern,
             'example': example,
-            'engine': engine,
+            'public_engine_description': public_engine_desc,
             'engine_description': engine_desc,
             'notes': notes,
             'public_notes': public_notes,
@@ -267,7 +267,7 @@ $ ->
           rows_to_add.push(
             'pattern': pattern,
             'example': example,
-            'engine': engine,
+            'public_engine_description': public_engine_desc,
             'engine_description': engine_desc,
             'notes': notes,
             'public_notes': public_notes,
