@@ -1416,8 +1416,8 @@ class Dispute < ApplicationRecord
 
                       :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
 
-                      :submitter_type => result.submitter_type&.downcase,
-                      :submission_type => result.submission_type&.upcase,
+                      :submitter_type => result.submitter_type.downcase,
+                      :submission_type => result.submission_type.upcase,
                       :priority => result.priority,
                       :owner => ticket_user,
                       :last_email_date => result.dispute_emails&.last&.updated_at&.strftime("%FT%T"),
