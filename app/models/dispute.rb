@@ -1305,19 +1305,18 @@ class Dispute < ApplicationRecord
     report_data = {}
     report_data[:table_data] = []
     user_ids = users.pluck(:id)
-    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
+    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array).where.not(:submission_type => nil).where.not(:submitter_type => nil)
 
     report_data[:ticket_count] = results.size
     report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status != DisputeEntry::STATUS_RESOLVED }.size
 
     report_data[:customer_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER }.size  #results.select {|result| result.submitter_type == SUBMITTER_TYPE_CUSTOMER}.size
     report_data[:guest_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submitter_type == SUBMITTER_TYPE_NONCUSTOMER }.size #results.select {|result| result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER}.size
-    report_data[:email_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type&.downcase == 'e' }.size #results.select {|result| result.submission_type.downcase == 'e'}.size
-    report_data[:web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type&.downcase == 'w' }.size#results.select {|result| result.submission_type.downcase == 'w'}.size
-    report_data[:email_web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type&.downcase == 'ew' }.size#results.select {|result| result.submission_type.downcase == 'ew'}.size
+    report_data[:email_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'e' }.size #results.select {|result| result.submission_type.downcase == 'e'}.size
+    report_data[:web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'w' }.size#results.select {|result| result.submission_type.downcase == 'w'}.size
+    report_data[:email_web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'ew' }.size#results.select {|result| result.submission_type.downcase == 'ew'}.size
 
     results.each do |result|
-      next unless result.submission_type.present? && result.submitter_type.present?
       entry_count = result.dispute_entries.size
       entry_preview = []
       result.dispute_entries.each do |entry|
@@ -1372,21 +1371,20 @@ class Dispute < ApplicationRecord
     report_data = {}
     report_data[:table_data] = []
     user_ids = users.pluck(:id)
-    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
+    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array).where.not(:submission_type => nil).where.not(:submitter_type => nil)
 
     report_data[:ticket_count] = results.size
     report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status == DisputeEntry::STATUS_RESOLVED }.size
 
     report_data[:customer_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER }.size  #results.select {|result| result.submitter_type == SUBMITTER_TYPE_CUSTOMER}.size
     report_data[:guest_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submitter_type == SUBMITTER_TYPE_NONCUSTOMER }.size #results.select {|result| result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER}.size
-    report_data[:email_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type&.downcase == 'e' }.size #results.select {|result| result.submission_type.downcase == 'e'}.size
-    report_data[:web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type&.downcase == 'w' }.size#results.select {|result| result.submission_type.downcase == 'w'}.size
-    report_data[:email_web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type&.downcase == 'ew' }.size#results.select {|result| result.submission_type.downcase == 'ew'}.size
+    report_data[:email_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'e' }.size #results.select {|result| result.submission_type.downcase == 'e'}.size
+    report_data[:web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'w' }.size#results.select {|result| result.submission_type.downcase == 'w'}.size
+    report_data[:email_web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'ew' }.size#results.select {|result| result.submission_type.downcase == 'ew'}.size
 
 
 
     results.each do |result|
-      next unless result.submission_type.present? && result.submitter_type.present?
       if !result.case_resolved_at
         result.case_resolved_at = Time.now
       end
