@@ -71,5 +71,14 @@ describe ComplaintEntryCredits::CreditProcessor do
         subject
       end
     end
+
+    context 'when complaint entry has a blank resolution' do
+      let(:complaint_entry) { FactoryBot.create(:complaint_entry, status: 'COMPLETED', resolution: '') }
+
+      it 'calls FIXED credit processing' do
+        expect(credit_handler).to receive(:handle_fixed_credit)
+        subject
+      end
+    end
   end
 end

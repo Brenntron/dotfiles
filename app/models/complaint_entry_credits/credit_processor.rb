@@ -31,6 +31,8 @@ class ComplaintEntryCredits::CreditProcessor
       credit_handler.handle_invalid_credit
     when "DUPLICATE"
       credit_handler.handle_duplicate_credit
+    else
+      credit_handler.handle_fixed_credit
     end
   end
 end
