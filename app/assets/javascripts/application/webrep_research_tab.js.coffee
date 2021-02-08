@@ -263,7 +263,6 @@ $ ->
         ip_uris.push(entry_content)
 
         entry_comment = 'TE.ACE-' + entry_case_id
-        console.log 'yoy!', comment_array, entry_comment
         if comment_array.indexOf(entry_comment) == -1
           comment_array.push(entry_comment)
 
