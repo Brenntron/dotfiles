@@ -10,6 +10,7 @@ class Ability
 
 
     can [:read, :update_preferences, :manage_bugzilla_api], User, id: current_user.id
+    can [:read], AmpNamingConvention
 
     # roles are partitioned into org subsets (snort rules, snort escalations, web cat, web rep)
     # the current user can read the user records of other users in their subset.
