@@ -45,8 +45,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       submitter_type: { data: :submitter_type, source: 'FileReputationDispute.submitter_type', cond: :like},
       customer_name:      { data: :customer_name, source: 'FileReputationDispute.customer_name', cond: :like, orderable: false },
       customer_email:     { data: :customer_email, source: 'FileReputationDispute.customer_email', cond: :like, orderable: false },
-      customer_company_name: { data: :customer_company_name, source: 'FileReputationDispute.customer_company_name', cond: :like, orderable: false },
-      platform: {data: :platform, source: 'FileReputationDispute.platform', cond: :like}
+      customer_company_name: { data: :customer_company_name, source: 'FileReputationDispute.customer_company_name', cond: :like, orderable: false }
     }
   end
 
@@ -104,7 +103,6 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           customer_name:                file_rep.customer&.name,
           customer_email:               file_rep.customer&.email,
           customer_company_name:        file_rep.customer&.company&.name,
-          platform:                     file_rep.platform,
           DT_RowId:                     file_rep.id,
           current_user:                 @user.cvs_username
       }
