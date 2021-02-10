@@ -67,6 +67,10 @@ class Ability
                     DisputeEntry, EmailTemplate, Wbrs::ManualWlbl, ResolutionMessageTemplate]
     end
 
+    if role_names.include?('amp naming manager')
+      can :manage, AmpNamingConvention
+    end
+
     if role_names.include?('filerep manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
