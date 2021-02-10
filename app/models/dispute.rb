@@ -1295,7 +1295,6 @@ class Dispute < ApplicationRecord
   #####FOR REPORTING#######
 
   def self.open_tickets_report(users, from, to)
-
     #from = "Mon, 4 Jul 2018 17:40:08 GMT"
 
     status_array = [STATUS_ASSIGNED, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ON_HOLD]
@@ -1306,7 +1305,7 @@ class Dispute < ApplicationRecord
     report_data = {}
     report_data[:table_data] = []
     user_ids = users.pluck(:id)
-    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
+    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array).where.not(:submission_type => nil, :submitter_type => nil)
 
     report_data[:ticket_count] = results.size
     report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status != DisputeEntry::STATUS_RESOLVED }.size
@@ -1357,7 +1356,6 @@ class Dispute < ApplicationRecord
                       :total_email_count => dispute_emails_count
       }
     end
-
     report_data
   end
 
@@ -1373,7 +1371,7 @@ class Dispute < ApplicationRecord
     report_data = {}
     report_data[:table_data] = []
     user_ids = users.pluck(:id)
-    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
+    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array).where.not(:submission_type => nil, :submitter_type => nil)
 
     report_data[:ticket_count] = results.size
     report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status == DisputeEntry::STATUS_RESOLVED }.size
@@ -1440,7 +1438,7 @@ class Dispute < ApplicationRecord
     report_data = {}
 
     user_ids = users.pluck(:id)
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status in ('#{DisputeEntry::RESOLVED}', '#{DisputeEntry::STATUS_RESOLVED}')")
+    main_results = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status in ('#{DisputeEntry::RESOLVED}', '#{DisputeEntry::STATUS_RESOLVED}')")
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
@@ -1467,7 +1465,7 @@ class Dispute < ApplicationRecord
           if day_result.status == DisputeEntry::STATUS_RESOLVED
             day_all_totals += 1
 
-            case day_result.dispute.submission_type.downcase
+            case day_result.dispute.submission_type&.downcase
               when 'e'
                 day_e_totals += 1
               when 'w'
@@ -1502,7 +1500,7 @@ class Dispute < ApplicationRecord
     report_data[:ticket_numbers] = []
     report_data[:close_times] = []
 
-    main_results = Dispute.where(:user_id => user_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:status => status_array)
+    main_results = Dispute.where(:user_id => user_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:status => status_array).where.not(:submission_type => nil, :submitter_type => nil)
 
     main_results.each do |result|
       if !result.case_resolved_at
@@ -1528,9 +1526,9 @@ class Dispute < ApplicationRecord
     user_ids = users.pluck(:id)
 
     if submission_types.present?
-      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+      main_results = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     else
-      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+      main_results = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     end
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
@@ -1595,9 +1593,9 @@ class Dispute < ApplicationRecord
     vrt_id = vrt.id
 
     if submission_types.present?
-      closed_entries = Dispute.joins(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+      closed_entries = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     else
-      closed_entries = Dispute.joins(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+      closed_entries = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     end
 
     all_entries = closed_entries.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
@@ -1818,7 +1816,7 @@ class Dispute < ApplicationRecord
 
     user_ids = users.pluck(:id)
 
-    main_results = Dispute.joins(:dispute_entries).where("disputes.created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+    main_results = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where("disputes.created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where.not(:submission_type => nil, :submitter_type => nil).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
     report_data = {}
@@ -1863,7 +1861,7 @@ class Dispute < ApplicationRecord
       raw_data[user.cvs_username] = []
     end
 
-    main_results = Dispute.where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("disputes.status = '#{STATUS_RESOLVED}'")
+    main_results = Dispute.where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("disputes.status = '#{STATUS_RESOLVED}'").where.not(:submission_type => nil, :submitter_type => nil)
 
     main_results.each do |result|
       if !result.case_resolved_at
@@ -1898,7 +1896,7 @@ class Dispute < ApplicationRecord
 
     user_ids = users.pluck(:id)
 
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+    main_results = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where.not(:submission_type => nil, :submitter_type => nil).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.flatten.uniq
 
@@ -1959,7 +1957,7 @@ class Dispute < ApplicationRecord
 
     user_ids = users.pluck(:id)
 
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'")
+    main_results = Dispute.where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where.not(:submission_type => nil, :submitter_type => nil).includes(dispute_entries: :dispute_rule_hits)
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.flatten.uniq
 
@@ -2009,7 +2007,7 @@ class Dispute < ApplicationRecord
 
   def self.populate_top_banner()
 
-    main_results = Dispute.all
+    main_results = Dispute.includes(:dispute_entries)
 
     results = {}
     results[:valid_tickets_total] = 0
