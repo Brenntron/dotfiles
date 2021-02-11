@@ -1186,8 +1186,8 @@ format = (complaint_entry_row) ->
     else
       complaint_history = ''
 
-  whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
-  { entry_id, domain, complaint_id } = complaint_entry
+  { entry_id, domain, complaint_id, ip_address } = complaint_entry
+  whois_lookup = if ip_address then ip_address else domain
   complaint_entry_html = ''
   input_cat = 'input_cat_' + entry_id
 
@@ -1220,6 +1220,10 @@ format = (complaint_entry_row) ->
   retake_in_progress = false
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
+
+
+  edit_input = if domain != "" then domain else host #if the domain is empty, then display host for ips in edit input
+
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
@@ -1255,7 +1259,7 @@ format = (complaint_entry_row) ->
       '<div>' + host  + '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" data-domain="' + domain + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + domain +
+      '" type="text" data-domain="' + domain + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
       '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
