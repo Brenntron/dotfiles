@@ -2102,6 +2102,8 @@ a.static-nav-item {
 .icon-opened-selected {background-image: url(image_path('icon_open_selected.svg'));}
 .icon-open-all {background-image: url(image_path('icon_open_all.svg'));}
 .icon-copycat {background-image: url(image_path('icon_copycat.svg'));}
+.icon-telemetry {background-image: url(image_path('icon-telemetry.svg'));}
+.icon-search{background-image: url(image_path('icon_search_white.svg'));}
 .icon-paste {background-image: url(image_path('icon_paste.svg'));}
 .icon-clear {background-image: url(image_path('icon_clear.svg'));}
 .icon-submit{background-image: url("icon_submit_arrow.svg")}
@@ -7492,10 +7494,78 @@ table.dispute-entry-table tbody tr.selected {
   padding: 15px;
 }
 
-#cluster_button_dialog .dialog-content-wrapper, #copycat_dialog .dialog-content-wrapper {
+#cluster_button_dialog .dialog-content-wrapper, #copycat_dialog .dialog-content-wrapper, #wsa_status_dialog .dialog-content-wrapper  {
   padding: 15px;
 }
+#wsa_status_dialog .dialog-content-wrapper  {
+  display: flex;
+}
+#cluster_comment_field{
+  padding: 0 3px 0 3px;
+  font-weight: 400;
+  height: 30px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  color: #666
+}
 
+.wsa-table{
+  &{
+    max-height: 250px;
+    overflow-y: auto;
+    display: block;
+    margin: 20px 15px;
+  }
+  th, td {
+    padding: 10px 10px 10px 5px;
+    white-space: nowrap;
+    border-bottom: 1px solid #f2f2f2;
+  }
+}
+
+.shared_data{background: url(image_path('icon_success.svg')) no-repeat center;}
+.not_shared_data{background: url(image_path('icon_fail.svg'))no-repeat center; }
+.shared_data, .not_shared_data{
+  padding: 5px;
+}
+.nf_tds{
+  background-color: #d7dadb2b
+}
+.wsa-loader-wrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.wsa_tool_dialog, #wsa_status_dialog{
+  width: fit-content!important;
+  overflow: hidden;
+  min-height: unset!important;
+}
+
+.not-found-wsa {
+  & {
+    padding-top: 20px;
+    max-width: 500px;
+  }
+
+  .result-label {
+    font-weight: 700;
+    font-size: 8pt;
+    text-transform: uppercase;
+    margin-top: 0;
+    display: inline-block;
+    padding: 0 15px 0 5px;
+  }
+}
+.not-found-list{
+  display: block;
+  margin: 0 auto;
+  max-width: 500px;
+  max-height: 42px!important;
+  overflow-y: scroll;
+}
 .history-table {
   font-size: 8pt;
 }
@@ -8503,15 +8573,23 @@ td.text-center span {
   .apply-filter-btn {
     background-repeat: no-repeat;
     background-size: 26px;
-    background-position: 8px center;
-    height: 30px;
-    padding-left: 40px !important;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    background-position: 6px center;
     margin-top: 10px;
+    min-width: 100px;
   }
 }
-
+#wsa_statuses, #clusters-index_filter, #cluster_comment_field{
+  &:empty{
+    font-size: 8.5pt!important;
+  }
+  &::-webkit-input-placeholder, &::-moz-placeholder {
+    font-size: 8.5pt!important;
+    color: #303030!important;
+    font-family: inherit!important;
+    line-height: 18px!important;
+    -webkit-font-smoothing: inherit!important;
+  }
+}
 .current-cluster-info-wrapper {
   padding: 25px 0 10px;
   .result-label.vertical-separator {
@@ -8540,18 +8618,19 @@ td.text-center span {
 }
 
 
-.copycat-btn {
+.copycat-btn, .wsa-btn {
   margin: 4px 0 0 5px;
   background-color: $content-tab-color;
   color: $type-lightest;
   display: block;
   height: 27px;
+  background-size: 19px!important;
 }
 
-.copycat-btn.active {
+.copycat-btn.active, .wsa-btn.active {
   background-color: $primary-section-color;
 }
-.copycat-btn:hover {
+.copycat-btn:hover, .wsa-btn:hover  {
   background-color: $sidebar-nav-base;
 }
 
@@ -8595,6 +8674,7 @@ td.text-center span {
   min-width: 400px;
   min-height: 135px;
   font-family: 'Open Sans', sans-serif !important;
+
 }
 
 .copycat_tool_dialog .ui-dialog-titlebar {
@@ -8607,6 +8687,9 @@ td.text-center span {
   border: none;
   width: 100%;
   font-weight: bold;
+  .selectize-input{
+    font-size: 8.5pt;
+  }
 }
 
 #copycat-categories-selectized {
@@ -8621,33 +8704,105 @@ td.text-center span {
   justify-content: space-evenly;
   padding: 0 25px 15px 25px;
   font-size: 12px;
+}
 
-  .copycat-paste-btn, .copycat-clear-btn {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 12px;
-    transition: background-color 0.2s;
+
+// copycat tool dialog
+#wsa-status-dialog {
+  display: none;
+}
+.wsa_tool_dialog {
+  min-width: 400px;
+  min-height: unset!important;
+  display: initial;
+  font-family: 'Open Sans', sans-serif !important;
+}
+
+.wsa_tool_dialog .ui-dialog-titlebar {
+  background-color: $content-tab-color;
+  background-image: url(image_path('icon-telemetry.svg'));
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  background-size: 24px 24px;
+  padding-left: 40px;
+  border: none;
+  width: 100%;
+  font-weight: bold;
+}
+.wsa-search-status-btn{
+  background-color: $primary-section-color;
+  background-size: 15px;
+  background-position: 10px center;
+  color: $content-bg-color;
+  padding: 9px 20px 12px 35px;
+  font-family: "Open Sans", sans-serif!important;
+  font-size: 9.5pt!important;
+  text-transform: uppercase;
+  font-weight: 600;
+  white-space: nowrap;
+  height: 30px;
+}
+
+.cluster-button{
+  white-space: nowrap;
+  background-color: $primary-section-color;
+  background-position: 10px center;
+  color: $content-bg-color;
+  height: 30px;
+  border: none;
+  border-radius: 2px;
+  text-transform: capitalize;
+  font-weight: 500;
+  font-family: "Open Sans", sans-serif !important;
+  min-width: 154px;
+  width: fit-content;
+  font-size: 9pt !important;
+  transition: background-color 0.2s!important;
+  
+  &:hover{
+    background-color: darken($primary-section-color, 10%)!important;
   }
 
-  .copycat-paste-btn {
-    background-color: $primary-section-color;
-    background-size: 15px;
-    background-position: 10px center;
-    color: $type-lightest;
-    padding: 12px 20px 12px 35px;
-    &:hover {
-      background-color: darken($primary-section-color, 10%)
-    }
+  &.icon-filter-white{
+    padding: 0 15px 0 38px;
+    background-position: 7px center!important;
   }
 
-  .copycat-clear-btn {
-    background-color: $nav-toolbar-color;
+  &.icon-submit{
+    min-width: 135px;
+  }
+
+  &.icon-search{
+    min-width: 110px;
+    background-size: 17px;
+  }
+  
+}
+
+.copycat-tool-footer .cluster-button{
+  width: 135px;
+  background-size: 15px;
+  &.copycat-clear-btn {
+    background-color: $type-faint-accent;
+    color: unset;
     background-size: 22px;
-    background-position: 10px center;
-    padding: 12px 20px 12px 45px;
+    padding-left: 39px;
+    width: unset;
     &:hover {
-      background-color: darken($nav-toolbar-color, 10%)
+      background-color: darken($nav-toolbar-color, 10%)!important;
     }
   }
+}
+
+#wsa_statuses{
+  font-family: "Open Sans", sans-serif !important;
+  min-width: 300px;
+  border: 1px solid #dddddd !important;
+  padding: 0 5px !important;
+  margin-right: 10px;
+  height: 30px;
+  background-image: none;
+  color:$type-lighter-color!important;
 }
 
 .open-in-tab-btn, .whois-btn, .google-btn {
@@ -8742,7 +8897,7 @@ td.text-center span {
 }
 
 .cluster-mgt-loader-wrapper{
-  margin: 100px 37%;
+  margin: 90px 25%;
 }
 
 .webcat-loader-wrapper, .webrep-loader-wrapper {
