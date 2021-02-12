@@ -2397,7 +2397,9 @@ a.static-nav-item {
   color: lighten($type-lighter-color, 20%);
   font-style: italic;
 }
-
+.missing-data.platform:before{
+  content: 'No Platform'
+}
 .file-attachment {
   font-size: 9pt;
   margin-top: -10px;
@@ -5126,6 +5128,7 @@ table > tbody > tr > td.dispute_rep_tools {
 
 .dispute_entry_content_first {
   display: inline-block;
+  word-break: break-all;
 }
 
 .entry-count {
@@ -7383,10 +7386,24 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 #copiedAlert {
-  color: $communication-accent-color;
+  color: $success-color;
+  color: #5FB766;
   font-size: 80%;
+  display: inline;
+  vertical-align: top;
 }
-
+.nested-complaint-static-data .copied-container{
+  margin-top: -7px;
+}
+.copied-check{
+  height: 12px;
+  width: 10px;
+  display: inline-block;
+  background-image: url(image_path('icon_check_dark_green.svg'));
+}
+.copied-container{
+  position: absolute;
+}
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
   padding: 2px 6px;
   margin: 2px;
@@ -9392,6 +9409,9 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   padding: 0 3px;
   font-size: 8pt;
 }
+.platform-col{
+  white-space: nowrap;
+}
 .col-tag{
   background: $faint-neutral-color;
   font-weight: 200;
@@ -9935,6 +9955,10 @@ hr.thin.form-divider {
   display: block !important;
 }
 
+.dispute-details {
+  padding-top: 10px;
+}
+
 .disp-negative {
   font-weight: 600;
   color: $warning-accent-color;
@@ -9953,6 +9977,7 @@ hr.thin.form-divider {
 .top-info-details {
   font-size: 8.5pt;
   line-height: 1.35em;
+  overflow-wrap: break-word;
 }
 
 .file-edit-buttons-wrapper {
@@ -11949,8 +11974,8 @@ table > tbody > tr > td.no-padding {
 }
 
 #webcat_searchref_container {
-  margin-bottom: 10px;
-  padding: 6px 0;
+  margin-top: -3px;
+  padding: 0 0 6px 0;
 }
 
 // tooltipster adjustments for pinned toolbar tooltips
@@ -12953,4 +12978,8 @@ input.wl-bl-list-inline {
 
 .toolbar .lists-row div.dropdown-tool-grey-row li {
   padding: 2px 10px 5px;
+}
+
+#current-xbrs-table-head th:last-child, #current-xbrs-table-body td:last-child {
+  display: none;
 }

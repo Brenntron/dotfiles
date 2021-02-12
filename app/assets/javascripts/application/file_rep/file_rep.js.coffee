@@ -669,6 +669,7 @@ $ ->
       {
         data:'id'
         render: (data, type, full, meta) ->
+          console.log full
           return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" data-sha="' + full['sha256_hash'] + '"/>'
       }
       {
@@ -698,6 +699,14 @@ $ ->
         data: 'file_size'
         render: (data) ->
           return data + ' KB'
+      }
+      {
+        data: 'platform'
+        class: 'platform-col'
+        render: (data, type, full, meta) ->
+          if data == "N/A" || data == "Unknown" || data == "Missing" || data == ""
+            data = '<span class="missing-data platform"></span>'
+          return data
       }
       {
         data: 'sample_type'

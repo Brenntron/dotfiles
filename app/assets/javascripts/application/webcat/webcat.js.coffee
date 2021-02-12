@@ -432,7 +432,7 @@ $ ->
               orderData: 15
             }
             {
-              targets: [ 12 ]
+              targets: [ 13 ]
               className: 'submitter-col'
             }
           ]
@@ -445,6 +445,7 @@ $ ->
                 sortable: false
                 render: ( data ) ->
                   { entry_id } = data
+                  console.log data
                   return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
               }
               {
@@ -474,20 +475,24 @@ $ ->
 #               age column
                 width: '40px'
                 render: ( data, type, full, meta) ->
-                  { age } = full
+                  { age, status } = full
                   time = timeMatch(age)
-                  switch ( time )
-                    when 'minutes'
-                      age_class = ''
-                    when 'hours'
-                      hour = parseInt( age.split("h")[0] )
-                      if hour >= 3 && hour < 12
-                        age_class = 'ticket-age-over3hr'
-                      else if hour > 12
+                  unless status == 'COMPLETED' || status == 'RESOLVED'
+                    switch ( time )
+                      when 'minutes'
+                        age_class = ''
+                      when 'hours'
+                        hour = parseInt( age.split("h")[0] )
+                        if hour >= 3 && hour < 12
+                          age_class = 'ticket-age-over3hr'
+                        else if hour > 12
+                          age_class = 'ticket-age-over12hr'
+                      when 'exceeds time'
                         age_class = 'ticket-age-over12hr'
-                    when 'exceeds time'
-                      age_class = 'ticket-age-over12hr'
-                  return "<span class='#{age_class}'>#{age}</span>"
+                    return "<span class='#{age_class}'>#{age}</span>"
+                  # if status is "completed" or "resolved", no css class (orange/red) needed
+                  else
+                    return "<span>#{age}</span>"
               }
               {
                 data: 'status'
@@ -587,6 +592,14 @@ $ ->
                   return "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
               }
               {
+                data: 'platform'
+                class: 'platform-col'
+                render: (data, type, full, meta) ->
+                  if data == "N/A" || data == "Unknown" || data == "Missing" || data == ""
+                    data = '<span class="missing-data">No Platform</span>'
+                  return data
+              }
+              {
                 data: 'submitter_type'
                 render: (data) ->
                   if data == 'CUSTOMER'
@@ -622,18 +635,17 @@ $ ->
       element = $(this)
       innertext = $(this).text()
       copyToClipboard(innertext)
-      $(element).after( "<p id='copiedAlert'>Copied to clipboard!</p>" )
-      setTimeout (->
-        $("#copiedAlert").remove()
-      ), 1000
 
-    copyToClipboard = (text) ->
-      dummy = document.createElement('input')
-      document.body.appendChild dummy
-      dummy.setAttribute 'value', text
-      dummy.select()
-      document.execCommand 'copy'
-      document.body.removeChild dummy
+      html = "<div class='copied-container'>
+                <span class='copied-check'></span>
+                <p id='copiedAlert'>Copied to clipboard</p>
+              </div>"
+      $(element).after( html )
+      $('.copied-container').delay(1000).fadeOut(1000);
+      setTimeout (->
+          $(".copied-container").remove()
+        ), 2000
+
 
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
@@ -898,6 +910,13 @@ window.toggle_selectize_layer = (input, focus) ->
   else
     $(select_parent).css('z-index', '2')
 
+window.copyToClipboard = (text) ->
+  dummy = document.createElement('input')
+  document.body.appendChild dummy
+  dummy.setAttribute 'value', text
+  dummy.select()
+  document.execCommand 'copy'
+  document.body.removeChild dummy
 
 $ ->
   # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load

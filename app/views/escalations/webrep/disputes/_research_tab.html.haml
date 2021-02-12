@@ -170,7 +170,7 @@
                           .col-xs-4
                             %ul
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers', onclick: 'reptool_form_prep(this, "bulk")'}
+                                %input.reptool-class-cb.reptool-cb-attackers{type: 'checkbox', name: 'classification', value: 'attackers', onclick: 'reptool_form_prep(this, "bulk")'}
                                   attackers
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'banking_fraud', onclick: 'reptool_form_prep(this, "bulk")'}
@@ -395,7 +395,7 @@
 
                   %td.dispute_rep_tools.rep-tools-cell
                     .webrep_auto_resolve{id:"webrep_auto_resolve-#{entry.id}", title:"Auto Resolve Log"}
-                      = entry.auto_resolve_log
+                      = (entry.auto_resolve_log.html_safe rescue "")
                     %span.dispute_rep_tools_wrapper
 
                       %button.dispute-inline-buttons.auto-resolve-button.esc-tooltipped{'data-entry-id': "#{entry.id}", title: 'View Auto Resolve Log', onclick:"show_webrep_auto_resolve(#{entry.id})"}
@@ -928,44 +928,7 @@
                                       - else
                                         %td.unclean-site-result= virustotal[:result]
                         .col-sm-9
-                          .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header
-                              XBRS History
-                              - unless entry.hostlookup.nil?
-                                %span.nested-table-tally
-                                  = entry.find_xbrs[1]['data'].count
-                            - if entry.xbrs_data['data'].empty?
-                              %table
-                                %thead
-                                  %tr
-                                    %th
-                                      %span.missing-data
-                                        No XBRS data available.
-                            - elsif entry.find_xbrs[1]['data'].count < 8
-                              %table
-                                %thead
-                                  %tr
-                                    - entry.xbrs_data['legend'].each do |header|
-                                      %th= header
-                                %tbody
-                                  - unless entry.hostlookup.nil?
-                                    - entry.xbrs_data['data'].each do |data|
-                                      %tr
-                                        - data.each do |datapoint|
-                                          %td= datapoint
-                            - else
-                              %table.table-scrollable
-                                %thead
-                                  %tr
-                                    - entry.xbrs_data['legend'].each do |header|
-                                      %th= header
-                                %tbody
-                                  - unless entry.hostlookup.nil?
-                                    - entry.xbrs_data['data'].each do |data|
-                                      %tr
-                                        - data.each do |datapoint|
-                                          %td= datapoint
-
+                          = render 'shared/xbrs_table', :entry => entry
                           .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header
                               Cross-listed URLs

@@ -227,8 +227,7 @@ $ ->
 
   ##  Populating the toolbar Adjust RepTool BL dropdown
   window.bulk_get_current_reptool = (page) ->
-
-# Define the variables based on the page
+    # Define the variables based on the page
     if page == "show" || page == "research"
       checkbox = $('.dispute_check_box:checked')
     else if page == "index"
@@ -246,18 +245,34 @@ $ ->
     # Get all the checked entry urls
     if ($(checkbox).length > 0)
       ip_uris = []
+      comment_trail = ''
+      comment_array = []
       closed_status = false
       $(checkbox).each ->
         if page == "show" || page == "research"
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text().trim()
           entry_status = $(entry_row).find('.entry-data-status').text().trim()
+          entry_case_id = $('#dispute_id').text()
         else if page == "index"
           entry_row = $(this).parents('.index-entry-row')[0]
           entry_content = $(entry_row).find('.entry-col-content').text().trim()
           entry_status = $(entry_row).find('.entry-col-status').text().trim()
+          entry_case_id = $(entry_row).attr('data-case-id')
         # Send entry content to reptool
         ip_uris.push(entry_content)
+
+        entry_comment = 'TE.ACE-' + entry_case_id
+        if comment_array.indexOf(entry_comment) == -1
+          comment_array.push(entry_comment)
+
+        if page == "show"
+          comment_trail = 'AC INDIVIDUAL SUBMISSION: \n' + comment_array.join('\n')
+        else if page == "research"
+          comment_trail = 'AC Research Bulk Submission: \n' + ip_uris.join('\n')
+        else if page == "index"
+          comment_trail = 'AC Bulk Submission: \n' + comment_array.join('\n')
+
         if entry_status ==  "RESOLVED_CLOSED"
           closed_status = true
       if closed_status
@@ -280,6 +295,7 @@ $ ->
                 rep_class = ''
 
               tbody.append('<tr class="reptool-entry-row"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
+              $('.reptool-generated-comment').html(comment_trail)
           error: (response) ->
             std_api_error(response, "Error retrieving Reptool Data", reload: false)
         )
@@ -396,7 +412,7 @@ $ ->
         $(vt_table).hide()
 
     if $(this).hasClass('xbrs-checkbox')
-      xbrs_table = $(entry_row).find('.xbrs-details-table')[0]
+      xbrs_table = $(entry_row).find('.xbrs-details-table')
       if $(this).prop('checked')
         $(xbrs_table).show()
       else

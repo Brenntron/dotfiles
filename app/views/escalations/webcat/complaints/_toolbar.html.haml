@@ -22,24 +22,26 @@
             %input.domain-checkbox{type: 'checkbox', checked: true, id: 'domain-checkbox'} Domain / IP
           %li.toggle-vis-webcat{'data-column':'8'}
             %input.path-checkbox{type: 'checkbox', checked: true, id: 'path-checkbox'} Path
-
-        %ul
           %li.toggle-vis-webcat{'data-column':'9'}
             %input.primary-checkbox{type: 'checkbox', checked: true, id: 'primary-checkbox'} Primary Cat
+
+        %ul
           %li.toggle-vis-webcat{'data-column':'10'}
             %input.suggested-checkbox{type: 'checkbox', checked: true, id: 'suggested-checkbox' } Suggested Cat
           %li.toggle-vis-webcat{'data-column':'11'}
             %input.wbrs-checkbox{type: 'checkbox', checked: true, id: 'wbrs-checkbox'} WBRS
           %li.toggle-vis-webcat{'data-column':'12'}
-            %input.submittertype-checkbox{type: 'checkbox', checked: true, id: 'submittertype-checkbox'} Submitter Type
+            %input.platform-checkbox{type: 'checkbox', checked: true, id: 'platform-checkbox'} Platform
           %li.toggle-vis-webcat{'data-column':'13'}
-            %input.submitterorg-checkbox{type: 'checkbox', checked: true, id: 'submitterorg-checkbox'} Submitter Org
+            %input.submittertype-checkbox{type: 'checkbox', checked: true, id: 'submittertype-checkbox'} Submitter Type
           %li.toggle-vis-webcat{'data-column':'14'}
+            %input.submitterorg-checkbox{type: 'checkbox', checked: true, id: 'submitterorg-checkbox'} Submitter Org
+          %li.toggle-vis-webcat{'data-column':'15'}
             %input.assignee-checkbox{type: 'checkbox', checked: true, id: 'assignee-checkbox'} Assignee
 
   %div
     %label.toolbar-section-label
-      Open in New Tab
+      Open in Tab
     %button.toolbar-button.open-selected.esc-tooltipped.toolbar-button-spacer{onclick: 'open_selected()', type: 'button', title: 'Open Selected (alt + o)'}
       %span.toolbar-button-text Selected
     %button.toolbar-button.open-all.esc-tooltipped{onclick: 'open_all()', type: 'button', title: 'Open All (shift + alt + o)'}
@@ -106,4 +108,3 @@
   %div.toolbar-checkbox-wrapper
     %input{type: 'checkbox', checked: true, id:'self_review'}
       Allow Self Review
-

@@ -90,7 +90,7 @@ end
 
 And (/^I check the first checkbox with class "(.*?)"$/) do |cb_class|
   check(class: cb_class)
-end  
+end
 And(/^I check checkbox with class "(.*?)"$/) do |cb_class|
   check(class: cb_class)
 end
@@ -161,7 +161,7 @@ When(/^I "(.*?)" the url "(.*?)" with "(.*?)" data$/) do |method, url, model|
 end
 
 When(/^I PUT "(.*?)" with "(.*?)" data; column: "(.*?)" value: "(.*?)"$/) do |url, model, attribute, value|
-  page.driver.submit :put, url, {"#{model}".to_sym => {"#{attribute}".to_sym => "#{value}"} } 
+  page.driver.submit :put, url, {"#{model}".to_sym => {"#{attribute}".to_sym => "#{value}"} }
 end
 
 Given(/^I click "(.*?)" within the "(.*?)" row$/) do |target, row_number|
@@ -321,6 +321,12 @@ Then(/^I should see content "(.*?)" within "(.*?)"$/) do |content, target|
   end
 end
 
+Then(/^I should see content "(.*?)" within "(.*?)" at least once$/) do |content, target|
+  first(target) do
+    page.has_content?(content)
+  end
+end
+
 Then(/^I should see content "(.*?)" within first element of class "(.*?)"$/) do |content, target|
   within(target, match: :first) do
     page.has_content?(content)
@@ -333,7 +339,7 @@ Then(/^I should not see content "(.*?)" within "(.*?)"$/) do |content, target|
   end
 end
 
-Then(/^the "(.*?)" field should be "(.*?)"$/) do |name, value| 
+Then(/^the "(.*?)" field should be "(.*?)"$/) do |name, value|
   raise "Field \"#{name}\" is not \"#{value}\"" unless find_field(name).value == value
 end
 
@@ -433,17 +439,17 @@ Then(/^I search for bug id "(.*?)"$/) do |value|
   page.execute_script("$('#search_form').submit()")
 end
 
-Then(/^take a screenshot$/) do 
+Then(/^take a screenshot$/) do
   page.save_screenshot('/tmp/screenshot.png', :full => true)
   `open /tmp/screenshot.png`
 end
 
-Then(/^take a before screenshot$/) do 
+Then(/^take a before screenshot$/) do
   page.save_screenshot('/tmp/before_screenshot.png', :full => true)
   `open /tmp/before_screenshot.png`
 end
 
-Then(/^take an after screenshot$/) do 
+Then(/^take an after screenshot$/) do
   page.save_screenshot('/tmp/after_screenshot.png', :full => true)
   `open /tmp/after_screenshot.png`
 end
@@ -555,4 +561,3 @@ Given(/^I remove row "(.*?)"$/) do |element|
   field.native.clear
   field.send_keys [:backspace]
 end
-

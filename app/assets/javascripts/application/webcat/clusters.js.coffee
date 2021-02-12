@@ -120,37 +120,21 @@ $ ->
         ]
         orderable: false
         searchable: false
-      }
-      {
-        targets: [ 0 ]
-        className: 'expandable-row-column'
-      }
-      {
-        targets: [3]
-        className: 'domain-column'
-      }
-      {
-        targets: [6]
-        className: 'category-column'
+        sortable: false
       }
     ]
     columns: [
       {
         data: null
         width: '14px'
-        orderable: false
-        searchable: false
-        sortable: false
+        className: 'expandable-row-column'
         'render':(data,type,full,meta)->
-          return '<button class="expand-row-button-inline expand-row-button-' + data.cluster_id + '"></button>'
+          return "<button class='expand-row-button-inline expand-row-button-#{data.cluster_id}'></button>"
       }
       {
         data: null
-        orderable: false
-        searchable: false
-        sortable: false
         render: (data, type, full, meta) ->
-          return '<input type="checkbox" class="cluster-row-select" name="cluster_id_' + data.cluster_id + '" onclick="toggleRow(this)">'
+          return "<input type='checkbox' class='cluser-row-select' name='cluster_id_#{data.cluster_id}' onclick='toggleRow(#{this})'>"
       }
       {
         data: 'cluster_id'
@@ -158,11 +142,12 @@ $ ->
       }
       {
         data: null,
+        className: 'domain-column',
         render: (data) ->
-          html = ""
           {domain, cluster_size} = data  # get domain string and cluster_size out of the data
           is_ip = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
 
+          html = "<span ondblclick='copy_domain(\"#{domain}\", this)'> #{domain} </span>"
           # only show WHOIS lookup button for normal domains, not ip addresses
           if !is_ip.test(domain)
             html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='domain_whois(\"#{domain}\")'></button>"
@@ -170,9 +155,8 @@ $ ->
             html += "<button type='button' class='whois-btn right-margin domain-spacer'></button>"
 
           html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
-                    #{domain} <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>
-                    <span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
-
+                   <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>
+                   <span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
           return html
       }
       {
@@ -193,8 +177,9 @@ $ ->
       }
       {
         data: 'cluster_id'
+        className: 'category-column'
         render: (data) ->
-          '<select id="' + data + '_categories"' + 'class="form-control selectize cluster_categories" multiple="multiple" placeholder="Enter up to 5 categories" value="" name="">'
+          "<select id='#{data}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='' name=''>"
       }
     ]
   )
@@ -340,6 +325,18 @@ window.selectize_category_inputs = () ->
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions("##{this.id}"),
       }
+
+window.copy_domain = (domain, element) ->
+  copyToClipboard(domain)
+  html = "<div class='copied-container'>
+            <div class ='copied-check'></div>
+            <p id='copiedAlert'>Copied to clipboard</p>
+          </div>"
+  $(element).after( html )
+  $('.copied-container').delay(1000).fadeOut(1000);
+  setTimeout (->
+    $(".copied-container").remove()
+  ), 2000
 
 window.toggle_all_checkboxes = () ->
   if $('#clusters_check_box').prop('checked')
@@ -717,8 +714,6 @@ $('#cluster_filter_field').keyup (event) ->
     if event.keyCode == 13
       apply_filter_to_table()
     return
-
-
 
 $ ->
 # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
