@@ -10,7 +10,7 @@ class DisputeEntry < ApplicationRecord
   belongs_to :user, optional: true
   has_many :dispute_rule_hits
   has_one  :dispute_entry_preload
-
+  belongs_to :platform, optional: true
   RESOLVED = "RESOLVED"
   NEW = "NEW"
   ASSIGNED = "ASSIGNED"
