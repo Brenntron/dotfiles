@@ -1,5 +1,5 @@
 class AmpNamingConvention < ApplicationRecord
-  validates :pattern, :example, :engine, :engine_description, presence: true
+  validates :pattern, :example, :public_engine_description, :engine_description, presence: true
   validates :table_sequence, presence: true, numericality: { only_integer: true }
   # DB unique index enforces: validates :table_sequence, uniqueness: true
 
@@ -43,7 +43,7 @@ class AmpNamingConvention < ApplicationRecord
   # Note: pass timestamp argument to insure that timestamp is determined within transaction.
   def self.send_all_to_ti(timestamp:)
     amp_patterns = all.map do |record|
-      attrs = record.attributes.slice(*%w[pattern example engine_description public_notes table_sequence engine])
+      attrs = record.attributes.slice(*%w[pattern example engine_description public_notes table_sequence public_engine_description])
       attrs['notes'] = record.public_notes
       attrs['description'] = attrs.delete('engine_description')
       attrs['position'] = attrs.delete('table_sequence')
