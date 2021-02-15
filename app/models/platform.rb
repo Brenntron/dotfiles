@@ -31,7 +31,13 @@ class Platform < ApplicationRecord
   end
 
   def self.process_update(payload)
-    platform = Platform.find(payload["id"])
-    platform.update_attributes(payload)
+    platform = Platform.where(:id => payload["id"]).first
+    if platform.blank?
+      platform = Platform.new(payload)
+      platform.save
+    else
+      platform.update_attributes(payload)
+    end
+
   end
 end

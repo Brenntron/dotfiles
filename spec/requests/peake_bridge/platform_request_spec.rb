@@ -170,5 +170,37 @@ RSpec.describe "Peake-Bridge platform channel", type: :request do
     expect(platform).to be_nil
 
   end
+
+  it 'should create a new platform out of archive' do
+    guest_company
+
+    original_platform = Platform.new
+    original_platform.id = 2001
+    original_platform.public_name = "test"
+    original_platform.internal_name = "test internal"
+    original_platform.active = true
+    original_platform.webrep = true
+    original_platform.webcat = true
+    original_platform.filerep = true
+    original_platform.emailrep = true
+    original_platform.save
+
+    original_platform.reload
+
+    expect(original_platform.id).to eql(2001)
+    expect(original_platform.public_name).to eql('test')
+    expect(original_platform.internal_name).to eql('test internal')
+    #allow(FileReputationDispute).to receive(:threaded?).and_return(false)
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json,
+         params: platform_update_message_json
+
+    expect(response.code).to eql('200')
+    platform = Platform.where(:id => 1001).first
+    expect(platform).to_not be_nil
+    expect(platform.public_name).to eql('test2')
+    expect(platform.internal_name).to eql('test internal2')
+
+  end
 end
 
