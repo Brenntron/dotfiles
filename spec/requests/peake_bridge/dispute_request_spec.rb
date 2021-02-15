@@ -81,6 +81,8 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                     email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
                     user_ip: '64.70.56.99',
                     domain: '355toyota.com',
+                    product_platform: 1001,
+                    product_version: "test_platform_version"
                 }
             }
         }
@@ -159,7 +161,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                     email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
                     user_ip: '64.70.56.99',
                     domain: '355toyota.com',
-                    product_platform: "test_platform",
+                    product_platform: 1001,
                     product_version: "test_platform_version",
                     network: false
                 }
@@ -240,7 +242,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                     email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
                     user_ip: '64.70.56.99',
                     domain: '355toyota.com',
-                    product_platform: "test_platform",
+                    product_platform: 1001,
                     product_version: "test_platform_version",
                     network: true
 
@@ -251,7 +253,22 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
   end
 
+  before(:each) do
+    @original_platform = Platform.new
+    @original_platform.id = 1001
+    @original_platform.public_name = "test"
+    @original_platform.internal_name = "test internal"
+    @original_platform.active = true
+    @original_platform.webrep = true
+    @original_platform.webcat = true
+    @original_platform.filerep = true
+    @original_platform.emailrep = true
+    @original_platform.save
+  end
 
+  after(:each) do
+    Platform.destroy_all
+  end
 
   it 'receives dispute payload messages' do
     vrt_incoming
@@ -269,6 +286,9 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
     expect(dispute.dispute_entries.where(uri: 'thepretenders.com')).to exist
     expect(dispute.ticket_source).to eql("talos-intelligence")
+
+    expect(dispute.platform_id).to eql(1001)
+    expect(dispute.product_platform).to eql(nil)
   end
 
   it 'receives dispute payload message from TI API not in-network' do
@@ -286,10 +306,13 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.dispute_entries.where(ip_address: '184.168.47.225')).to exist
     expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
     expect(dispute.dispute_entries.where(uri: 'thepretenders.com')).to exist
-    expect(dispute.product_platform).to eql("test_platform")
+
     expect(dispute.product_version).to eql("test_platform_version")
     expect(dispute.in_network).to eql(nil)
     expect(dispute.ticket_source).to eql("talos-intelligence-api")
+
+    expect(dispute.platform_id).to eql(1001)
+    expect(dispute.product_platform).to eql(nil)
   end
 
   it 'receives dispute payload message from TI API in-network' do
@@ -307,12 +330,13 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.dispute_entries.where(ip_address: '184.168.47.225')).to exist
     expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
     expect(dispute.dispute_entries.where(uri: 'thepretenders.com')).to exist
-    expect(dispute.product_platform).to eql("test_platform")
+
     expect(dispute.product_version).to eql("test_platform_version")
     expect(dispute.in_network).to eql(true)
     expect(dispute.dispute_comments.size).to eql(1)
     expect(dispute.dispute_comments.first.comment).to include("Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ResearchBug.all.first.id}" )
-
+    expect(dispute.platform_id).to eql(1001)
+    expect(dispute.product_platform).to eql(nil)
     expect(ResearchBug.all.size).to eql(1)
 
   end

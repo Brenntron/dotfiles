@@ -466,7 +466,7 @@ class Dispute < ApplicationRecord
         bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
         if message_payload["payload"]["product_platform"].present?
-          platform = Platform.find(message_payload["payload"]["product_platform"].to_i)
+          platform = Platform.find(message_payload["payload"]["product_platform"].to_i) rescue nil
         end
         logger.debug "Creating dispute"
         new_dispute = Dispute.new
@@ -483,7 +483,7 @@ class Dispute < ApplicationRecord
         new_dispute.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
         new_dispute.ticket_source_type = message_payload["source_type"]
         new_dispute.platform_id = platform.id
-        new_dispute.product_platform = message_payload["payload"]["product_platform"] unless message_payload["payload"]["product_platform"].blank?
+        new_dispute.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
         new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
         new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
         new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
@@ -528,7 +528,7 @@ class Dispute < ApplicationRecord
           false_negative_claim = false
 
           if entry[:sbrs]["platform"].present?
-            entry_platform = Platform.find(entry[:sbrs]["platform"].to_i)
+            entry_platform = Platform.find(entry[:sbrs]["platform"].to_i) rescue nil
           end
 
           if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
@@ -557,8 +557,8 @@ class Dispute < ApplicationRecord
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
-          new_dispute_entry.platform_id = entry_platform.id
-          new_dispute_entry.platform = entry[:sbrs]["platform"] if entry[:sbrs]["platform"].present?
+          new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
+          new_dispute_entry.platform = entry[:sbrs]["platform"] if (entry[:sbrs]["platform"].present? && !entry[:sbrs]["platform"].kind_of?(Integer))
           new_dispute_entry.save!
 
           logger.info "fetching preload"
@@ -639,7 +639,7 @@ class Dispute < ApplicationRecord
           #grab xbrs, reptool stuff, wl/bl entries, virustotal
           #
           if entry["platform"].present?
-            entry_platform = Platform.find(entry["platform"].to_id)
+            entry_platform = Platform.find(entry["platform"].to_id) rescue nil
           end
 
           false_negative_claim = false
@@ -662,8 +662,8 @@ class Dispute < ApplicationRecord
           new_dispute_entry.is_important = is_important?(key)
           new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.assign_url_parts(key)
-          new_dispute_entry.platform = entry["platform"] if entry["platform"].present?
-          new_dispute_entry.platform_id = entry_platform.id
+          new_dispute_entry.platform = entry["platform"] if (entry["platform"].present? && !entry["platform"].kind_of?(Integer))
+          new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
 
           resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
           if resolved_ip.present?

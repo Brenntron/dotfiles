@@ -7,12 +7,12 @@ class Bridge::PlatformEvent < Bridge::BaseMessage
     @source_key = source_key
   end
 
-  def post(source_authority: @source_authority, source_key: @source_key, action: action)
+  def post(source_authority: @source_authority, source_key: @source_key, action_value: nil)
     super(message: {
                     source_authority: source_authority,
                     source_key: source_key,
                     source_type: "Platform",
-                    action: action
+                    action: action_value
     })
 
   end

@@ -1,8 +1,9 @@
 class Platform < ApplicationRecord
 
   def self.process_bridge_payload(message_payload)
+
     payload = message_payload[:attributes]
-    action = payload[:action]
+    action = message_payload[:action]
 
     case action
 

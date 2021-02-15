@@ -5,7 +5,7 @@ class ComplaintEntry < ApplicationRecord
 
   belongs_to :complaint
   belongs_to :user, optional: true
-  belongs_to :platform, optional: true
+  belongs_to :product_platform, :class_name => "Platform", :foreign_key => "platform_id", optional: true
   has_one :complaint_entry_screenshot
   has_one :complaint_entry_preload
 
