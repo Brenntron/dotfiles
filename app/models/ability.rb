@@ -67,7 +67,7 @@ class Ability
                     DisputeEntry, EmailTemplate, Wbrs::ManualWlbl, ResolutionMessageTemplate]
     end
 
-    if role_names.include?('amp naming manager')
+    if role_names.include?('amp pattern namer')
       can :manage, AmpNamingConvention
     end
 
