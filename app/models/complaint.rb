@@ -2,7 +2,7 @@ class Complaint < ApplicationRecord
   belongs_to :customer, optional: true
   has_many :complaint_entries, dependent: :restrict_with_exception
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
-  belongs_to :platform
+  belongs_to :platform, optional: true
   has_paper_trail on: [:update], ignore: [:updated_at]
 
   delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
@@ -289,7 +289,7 @@ class Complaint < ApplicationRecord
         new_complaint.customer_id = customer&.id
         new_complaint.status = NEW
         new_complaint.channel = TI_CHANNEL
-        new_complaint.platform_id = platform.id
+        new_complaint.platform_id = platform.id unless platform.blank?
         new_complaint.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
         new_complaint.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
         new_complaint.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?

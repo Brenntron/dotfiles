@@ -482,7 +482,7 @@ class Dispute < ApplicationRecord
         new_dispute.ticket_source_key = message_payload["source_key"]
         new_dispute.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
         new_dispute.ticket_source_type = message_payload["source_type"]
-        new_dispute.platform_id = platform.id
+        new_dispute.platform_id = platform.id unless platform.blank?
         new_dispute.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
         new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
         new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
@@ -639,7 +639,7 @@ class Dispute < ApplicationRecord
           #grab xbrs, reptool stuff, wl/bl entries, virustotal
           #
           if entry["platform"].present?
-            entry_platform = Platform.find(entry["platform"].to_id) rescue nil
+            entry_platform = Platform.find(entry["platform"].to_i) rescue nil
           end
 
           false_negative_claim = false
