@@ -1431,7 +1431,6 @@ window.history_dialog = (id, url) ->
 ## Fetches XBRS history of a url on click of the XBRS tab in history
 window.get_xbrs_history = (url, tab) ->
   wrapper = $(tab).parents('.dialog-content-wrapper')[0]
-  console.log wrapper
   xbrs_table = $("#webcat-xbrs-history")
   xbrs_msg = $(wrapper).find('.xbrs-no-data-msg')[0]
   # Clear table of residual data
@@ -1445,11 +1444,10 @@ window.get_xbrs_history = (url, tab) ->
     headers: headers
     data: {'url': url}
     success: (response) ->
-      console.log response, 'ininin'
       if response.data.length < 1
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
-        # Cycle through and assign index values to column headers
+# Cycle through and assign index values to column headers
         col_headers = []
         for col, i in response['columns']
           $(response['columns']).each ->
@@ -1462,17 +1460,16 @@ window.get_xbrs_history = (url, tab) ->
         ctime_index = ''
         thead = '<thead><tr>'
         $(col_headers).each ->
-          { column, index }= this
-          # We only want these specific columns
-          if column == "domain" || column == "subdomain" || column == "ctime" || column == "mtime" || column == "mnemonic" || column == "operation" || column == "path"
-            if column == "ctime"
+# We only want these specific columns
+          if this.column == "domain" || this.column == "subdomain" || this.column == "ctime" || this.column == "mtime" || this.column == "mnemonic" || this.column == "operation" || this.column == "path"
+            if this.column == "ctime"
               thead += '<th>Creation Time</th>'
-              ctime_index = index
-            else if column == "mtime"
+              ctime_index = this.index
+            else if this.column == "mtime"
               thead += '<th>Last Modified</th>'
             else
-              thead += "<th>#{column}</th>"
-            col_indexes.push( index)
+              thead += '<th>' + this.column + '</th>'
+            col_indexes.push(this.index)
         thead += '</tr></thead>'
 
         row_data = []
@@ -1507,8 +1504,7 @@ window.get_xbrs_history = (url, tab) ->
               if jQuery.type(col_content) == 'string' || jQuery.type(this) == 'number'
                 tbody += '<td>' + col_content + '</td>'
               else
-                # is null - prevents weird json objects getting through
-                console.log xbrs_table, tbody
+# is null - prevents weird json objects getting through
                 tbody += '<td> - </td>'
           tbody += '</tr>'
         tbody += '</tbody>'
@@ -1516,7 +1512,6 @@ window.get_xbrs_history = (url, tab) ->
         $(xbrs_table).append(thead)
         $(xbrs_table).append(tbody)
     error: (response) ->
-      console.log response, 'ininin'
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
