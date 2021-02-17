@@ -1062,7 +1062,14 @@ $ ->
         data: null
         class: 'platform-col'
         render: (data,type,full,meta) ->
-          platform = full.dispute_entries[0].entry.platform
+          if full.dispute_entries?
+            if full.dispute_entries.length == 0
+              platform = "Unknown"
+            else
+              platform = full.dispute_entries[0].entry.platform
+          else
+            platform = "Unknown"
+
           if  platform == "N/A" ||  platform == "Unknown" ||  platform == "Missing" ||  platform == "" ||  platform == null
             platform = '<span class="missing-data platform"></span>'
           return  platform

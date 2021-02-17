@@ -704,9 +704,13 @@ $ ->
         data: 'platform'
         class: 'platform-col'
         render: (data, type, full, meta) ->
-          if data == "N/A" || data == "Unknown" || data == "Missing" || data == ""
-            data = '<span class="missing-data platform"></span>'
-          return data
+          if data?
+            platform = data
+          else
+            platform = ""
+          if platform == "N/A" || platform == "Unknown" || platform == "Missing" || platform == ""
+            platform = '<span class="missing-data platform"></span>'
+          return platform
       }
       {
         data: 'sample_type'
