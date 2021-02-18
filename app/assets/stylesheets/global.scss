@@ -7497,6 +7497,16 @@ table.dispute-entry-table tbody tr.selected {
 #cluster_button_dialog .dialog-content-wrapper, #copycat_dialog .dialog-content-wrapper, #wsa_status_dialog .dialog-content-wrapper  {
   padding: 15px;
 }
+.tab-pane:not(.active){
+  display: none
+}
+.cat-history-dialog .tab-pane{
+  border: 1px solid #d9d9d9;
+  padding: 15px;
+}
+.xbrs-history-tab{
+  width: 121px;
+}
 #wsa_status_dialog .dialog-content-wrapper  {
   display: flex;
 }
