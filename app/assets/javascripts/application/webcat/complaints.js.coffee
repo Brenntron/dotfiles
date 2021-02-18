@@ -1447,57 +1447,47 @@ window.get_xbrs_history = (url, tab) ->
       if response.data.length < 1
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
-# Cycle through and assign index values to column headers
         { columns, data:current_data } = response
-        ctime_index = ''
-        thead = '<thead><tr>'
+        $(xbrs_table).append(document.createElement('thead'))
+        $(xbrs_table).append(document.createElement('tbody'))
+        thead = $(xbrs_table).find('thead')
+        tbody = $(xbrs_table).find('tbody')
         parsed_rows = []
+        thead_row = ''
+
         for row, i in current_data
-          parsed_rows[i] = { ctime:'', row_data: ''}
+          parsed_rows[i] = { ctime:'', row_data: '' }
 
         for col, index in columns
           # We only want the values/headers for these columns
           if col == "domain" || col == "subdomain" || col == "ctime" || col == "mtime" || col == "mnemonic" || col == "operation" || col == "path"
-            switch col
-              when "ctime"
-                thead += '<th>Creation Time</th>'
-                ctime_index = index
-              when "mtime"
-                thead += '<th>Last Modified</th>'
-              else
-                thead += "<th> #{col }</th>"
-
+            if col == "ctime" then col = "Creation Time"
+            if col == "mtime" then col = 'Last Modified'
+            thead_row += "<th> #{col }</th>"
             for row, i in current_data
-              if col == "ctime"
-                #set ctime value to check against for every row
+              if col == "Creation Time"
+                #set ctime/Creation Time value to check against for every row
                 parsed_rows[i].ctime = row[index]
-
-              # build cells for each row, if values are null or undefined set '-'
+              # build cells for each row corresponding data to proper column. if values are null or undefined set '-'
               parse_data = row[index]
               if parse_data == null || parse_data == undefined
                 parsed_rows[i].row_data += "<td> - </td>"
               else
                 parsed_rows[i].row_data += "<td>#{parse_data}</td>"
 
-        thead += '</tr></thead>'
-        $(xbrs_table).append(thead)
-
         #sort rows by ctime
         parsed_rows.sort (a,b) ->
-              a1 = a.ctime
-              b1 = b.ctime
-              if a1 == b1
-                return 0
-              if a1 > b1 then 1 else -1
+            if a.ctime == b.ctime then return 0
+            if a.ctime > b.ctime then 1 else -1
 
-        $(xbrs_table).append(document.createElement('tbody'))
+        #  add all rows to table
+        thead.append(thead_row)
         for key, value of parsed_rows
-          $(xbrs_table).find('tbody').append("<tr>#{value.row_data}</tr>")
+          tbody.append("<tr>#{value.row_data}</tr>")
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
-
 
 
 parse_lookup_dialog_content = (json) ->
