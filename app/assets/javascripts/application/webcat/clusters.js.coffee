@@ -256,7 +256,7 @@ window.copycat_dialog = () ->
       $('button.icon-copycat').removeClass('active')
     open: (event, ui) =>
       $('#copycat_dialog #copycat-categories').selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
@@ -316,7 +316,7 @@ window.selectize_category_inputs = () ->
 #          This is already selectized
     else
       $(this).selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
