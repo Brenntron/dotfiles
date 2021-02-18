@@ -335,7 +335,7 @@ format_domain_info = (info)->
 
 window.domain_whois = (IP_Domain) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  std_msg_ajax(
+  $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/domain_whois'
     method: 'POST'
     headers: headers
@@ -692,7 +692,7 @@ window.take_selected = ()->
     for row, i in selected_rows[0]
       entry_ids.push(selected_rows.data()[i].entry_id)
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    std_msg_ajax(
+    $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
       method: 'POST'
       headers: headers
@@ -783,7 +783,7 @@ window.return_selected = ()->
     for row, i in selected_rows[0]
       entry_ids.push(selected_rows.data()[i].entry_id)
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    std_msg_ajax(
+    $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
       method: 'POST'
       headers: headers
@@ -898,7 +898,6 @@ window.lookup_prefix = () ->
   )
 
 window.retrieve_history = (position) ->
-#  here here
   $(".cat-url-error").hide()
   loader = $('.lookup-drop-loader')
   loader.removeClass('hidden')
@@ -1633,7 +1632,7 @@ window.display_preview_window = (entry) ->
   if entry.path
     path = entry.path
   loc = "http://" + subdomain + domain + path
-  std_msg_ajax(
+  $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaints/test_url'
     method: 'GET'
     headers: headers
@@ -1768,7 +1767,7 @@ window.mark_for_commit = () ->
   }
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  std_msg_ajax(
+  $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaints/mark_for_commit'
     method: 'POST'
     headers: headers
@@ -1780,7 +1779,7 @@ window.mark_for_commit = () ->
 
 window.commit_marked = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  std_msg_ajax(
+  $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaints/commit_marked'
     method: 'POST'
     headers: headers
