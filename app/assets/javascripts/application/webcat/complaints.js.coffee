@@ -1448,69 +1448,52 @@ window.get_xbrs_history = (url, tab) ->
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
 # Cycle through and assign index values to column headers
-        col_headers = []
-        for col, i in response['columns']
-          $(response['columns']).each ->
-            col_defs = []
-            col_defs["index"] = i
-            col_defs["column"] = this.valueOf()
-            col_headers.push(col_defs)
-
-        col_indexes = []
+        { columns, data:current_data } = response
         ctime_index = ''
         thead = '<thead><tr>'
-        $(col_headers).each ->
-# We only want these specific columns
-          if this.column == "domain" || this.column == "subdomain" || this.column == "ctime" || this.column == "mtime" || this.column == "mnemonic" || this.column == "operation" || this.column == "path"
-            if this.column == "ctime"
-              thead += '<th>Creation Time</th>'
-              ctime_index = this.index
-            else if this.column == "mtime"
-              thead += '<th>Last Modified</th>'
-            else
-              thead += '<th>' + this.column + '</th>'
-            col_indexes.push(this.index)
-        thead += '</tr></thead>'
+        parsed_rows = []
+        for row, i in current_data
+          parsed_rows[i] = { ctime:'', row_data: ''}
 
-        row_data = []
-        # For each row of data, cycle through and assign index to each column
-        $(response['data']).each ->
-          col_data = []
-          for data, i in this
-            $(this).each ->
-              data = []
-              data["index"] = i
-              data["data"] = this.valueOf()
-              col_data.push(data)
-            row_data.push(col_data)
-
-        # Sort rows by ctime
-        row_data.sort (a,b) ->
-          a1 = a[ctime_index]
-          b1 = b[ctime_index]
-          if a1.data == b1.data
-            return 0
-          if a1.data > b1.data then 1 else -1
-
-        tbody = '<tbody>'
-        $(row_data).each ->
-          tbody += '<tr>'
-          row = this
-          $(row).each ->
-            col = this.index
-            col_content = this.data
-            # If our column header indexes and our column data indexes match we create the column in the table
-            if jQuery.inArray(col, col_indexes) != -1
-              if jQuery.type(col_content) == 'string' || jQuery.type(this) == 'number'
-                tbody += '<td>' + col_content + '</td>'
+        for col, index in columns
+          # We only want the values/headers for these columns
+          if col == "domain" || col == "subdomain" || col == "ctime" || col == "mtime" || col == "mnemonic" || col == "operation" || col == "path"
+            switch col
+              when "ctime"
+                thead += '<th>Creation Time</th>'
+                ctime_index = index
+              when "mtime"
+                thead += '<th>Last Modified</th>'
               else
-# is null - prevents weird json objects getting through
-                tbody += '<td> - </td>'
-          tbody += '</tr>'
-        tbody += '</tbody>'
+                thead += "<th> #{col }</th>"
 
+            for row, i in current_data
+              if col == "ctime"
+                #set ctime value to check against for every row
+                parsed_rows[i].ctime = row[index]
+
+              # build cells for each row, if values are null or undefined set '-'
+              parse_data = row[index]
+              if parse_data == null || parse_data == undefined
+                parsed_rows[i].row_data += "<td> - </td>"
+              else
+                parsed_rows[i].row_data += "<td>#{parse_data}</td>"
+
+        thead += '</tr></thead>'
         $(xbrs_table).append(thead)
-        $(xbrs_table).append(tbody)
+
+        #sort rows by ctime
+        parsed_rows.sort (a,b) ->
+              a1 = a.ctime
+              b1 = b.ctime
+              if a1 == b1
+                return 0
+              if a1 > b1 then 1 else -1
+
+        $(xbrs_table).append(document.createElement('tbody'))
+        for key, value of parsed_rows
+          $(xbrs_table).find('tbody').append("<tr>#{value.row_data}</tr>")
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
