@@ -540,9 +540,11 @@ class Dispute < ApplicationRecord
         new_entries_ips.each do |key, entry|
           false_negative_claim = false
 
-          if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
-            false_negative_claim = true
-          end
+          #if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
+          #  false_negative_claim = true
+          #end
+          #
+          claim = entry[:sbrs]["claim"]
 
           if entry && entry[:wbrs] && entry[:wbrs]["WBRS_Rule_Hits"]
             wbrs_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
@@ -567,6 +569,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
           new_dispute_entry.platform = entry[:sbrs]["platform"]
+          new_dispute_entry.suggested_threat_category = entry[:sbrs]["suggested_threat_category"] unless entry[:sbrs]["suggested_threat_category"].blank?
           new_dispute_entry.save!
 
           logger.info "fetching preload"
@@ -585,7 +588,7 @@ class Dispute < ApplicationRecord
 
           if !matching_disposition
 
-            if !false_negative_claim
+            if claim != "false negative"
               new_dispute_entry.status = DisputeEntry::NEW
 
               if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
@@ -634,11 +637,7 @@ class Dispute < ApplicationRecord
           #
 
 
-          false_negative_claim = false
-
-          if ["Suspicious sites", "High risk","Poor"].include?(entry["rep_sugg"])
-            false_negative_claim = true
-          end
+          claim = entry["claim"]
 
           #this is for return back to TI to populate its ticket show pages
 
@@ -655,6 +654,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.assign_url_parts(key)
           new_dispute_entry.platform = entry["platform"]
+          new_dispute_entry.suggested_threat_category = entry["suggested_threat_category"] unless entry["suggested_threat_category"].blank?
 
 
           resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
@@ -675,9 +675,8 @@ class Dispute < ApplicationRecord
 
           new_dispute_entry.save!
 
-
           if !matching_disposition
-            if !false_negative_claim
+            if claim != "false negative"
               new_dispute_entry.update(status: DisputeEntry::NEW)
             else
               new_dispute_entry = AutoResolve.attempt_ai_conviction(total_hits, new_dispute_entry)
