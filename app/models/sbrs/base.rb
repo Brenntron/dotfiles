@@ -24,7 +24,13 @@ class Sbrs::Base
   end
 
   def self.category_version
-    @category_version ||= Rails.configuration.sds.category_version
+    begin
+      category_list = JSON.parse(self.remote_call_sds('', 'webcat_labels'))
+      cat_version = category_list["META_CATEGORIES_VERSION"]["current_version"].to_s
+      "v#{cat_version}"
+    rescue
+      "v10"
+    end
   end
 
   def self.sds_v3_host
