@@ -313,6 +313,14 @@
                     %label Hostname
                     - unless entry[:hostname].nil?
                       = entry[:hostname]
+                  %td.sugg-tc-cell
+                    %label Suggested Threat Category
+                    - unless entry[:suggested_threat_category].nil?
+                      = entry[:suggested_threat_category].gsub(/,(?![ ])/, ', ')
+                  %td.sugg-cell
+                    %label Suggested Disposition
+                    - unless entry[:suggested_disposition].nil?
+                      = entry[:suggested_disposition]
                   %td.dual-edit-field.status-cell{'data-id': entry.id, 'data-field': 'status'}
                     %label Status
                     %span.entry-data.entry-data-status
@@ -320,7 +328,6 @@
                         NEW
                       - else
                         = entry[:status]
-
                     %span.dropdown
                       %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         - if entry[:status].nil?
