@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_01_133428) do
+ActiveRecord::Schema.define(version: 2021_02_05_152938) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_133428) do
     t.text "public_notes"
     t.string "contact"
     t.integer "table_sequence"
+    t.text "public_engine_description"
     t.index ["table_sequence"], name: "index_amp_naming_conventions_on_table_sequence", unique: true
   end
 
@@ -173,6 +174,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_133428) do
     t.text "internal_comment"
     t.boolean "was_dismissed", default: false
     t.text "uri_as_categorized"
+    t.string "platform"
     t.index ["complaint_id"], name: "index_complaint_entries_on_complaint_id"
     t.index ["status", "created_at"], name: "index_complaint_entries_on_status_and_created_at"
     t.index ["status", "domain"], name: "index_complaint_entries_on_status_and_domain"
@@ -371,6 +373,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_133428) do
     t.text "wbrs_threat_category"
     t.text "web_ips"
     t.text "auto_resolve_log"
+    t.string "platform"
     t.index ["dispute_id"], name: "index_dispute_entries_on_dispute_id"
   end
 
@@ -601,6 +604,13 @@ ActiveRecord::Schema.define(version: 2020_09_01_133428) do
     t.index ["sha256_hash"], name: "index_file_reputation_disputes_on_sha256_hash"
     t.index ["updated_at"], name: "index_file_reputation_disputes_on_updated_at"
     t.index ["user_id"], name: "index_file_reputation_disputes_on_user_id"
+  end
+
+  create_table "form_prefills", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "field"
+    t.text "text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "fp_file_refs", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -839,6 +849,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_133428) do
     t.boolean "edited", default: false
     t.string "type", default: "Snort2Rule"
     t.text "pre_normalized_rule"
+    t.integer "autoconvert", default: 0
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"
     t.index ["task_id"], name: "index_rules_on_task_id"
     t.index ["type", "gid", "sid"], name: "index_rules_on_type_and_gid_and_sid", unique: true
@@ -902,7 +913,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_133428) do
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end
 
-  create_table "test_queue_events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "test_queue_events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "unstarted"
@@ -913,6 +924,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_133428) do
     t.bigint "prior_event_id"
     t.bigint "task_id"
     t.string "task_type"
+    t.index ["prior_event_id"], name: "index_test_queue_events_on_prior_event_id"
   end
 
   create_table "test_reports", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
