@@ -75,7 +75,7 @@ gem 'whois-parser', '1.1.0'
 gem 'will_paginate', '3.1.6'
 
 gem 'jquery-datatables', '~> 1.10.19'
-gem "sassc", '2.0.1'
+gem "sassc", '2.4.0'
 gem "sassc-rails", '~> 2.0'
 gem 'ajax-datatables-rails', '~> 1.0.0'
 gem 'clipboard-rails', '1.7.1'
@@ -98,7 +98,7 @@ gem 'elasticsearch'
 gem 'hashie'
 
 group :development do
-  gem 'thin', '1.7.2'
+  gem 'thin', '1.8.0'
   gem 'puma', '3.12.0'
   gem 'awesome_print', '1.8.0'
   gem 'guard','2.14.2'
