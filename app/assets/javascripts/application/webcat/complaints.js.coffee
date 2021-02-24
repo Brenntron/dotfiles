@@ -908,40 +908,68 @@ window.retrieve_history = (position) ->
   url = $("#url_" + position).val()
 
   if url.length > 0
-
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
       method: 'POST'
       data: {'position': position, url: url}
-
       success: (response) ->
         loader.addClass('hidden')
         json = JSON.parse(response)
         if json.error
           std_msg_error("<p>Something went wrong: #{json.error}","")
         else
-          history_dialog_content = '<div class="dialog-content-wrapper">' +
-            '<h5>Domain History</h5>' +
-            '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
-            '<tbody>'
-
+          history_dialog_content =
+              "<div class='cat-history-dialog dialog-content-wrapper'>
+               <h4>#{url}</h4>
+               <ul class='nav nav-tabs dialog-tabs' role='tablist'>
+               <li class='nav-item active' role='presentation'>
+                <a class='nav-link' role='tab' data-toggle='tab' href='#domain-history-tab' aria-controls='domain-history-tab'>
+                   Domain History
+                </a>
+               </li>
+               <li class='nav-item' role='presentation'>
+                <a class='nav-link xbrs-history-tab' role='tab' data-toggle='tab' href='#xbrs-history-tab' aria-controls='xbrs-history-tab' onclick='get_xbrs_history(\"#{url}\", this)'>
+                  XBRS History
+                </a>
+               </li>
+               </ul>
+                <div class='tab-pane active' role='tabpanel' id='domain-history-tab'>
+                  <h5>Domain History</h5>
+                  <table class='history-table'>
+                    <thead>
+                       <tr>
+                        <th>Action</th>
+                        <th>Confidence</th>
+                        <th>Description</th>
+                        <th>Time</th>
+                        <th>User</th>
+                        <th>Category</th>
+                       </tr>
+                    </thead>
+                    <tbody>"
           for entry in json
-
-            entry_string = "" +
-              '<tr>' +
-              '<td>' + entry['action'] + '</td>' +
-              '<td>' + entry['confidence'] + '</td>' +
-              '<td>' + entry['description'] + '</td>' +
-              '<td>' + entry['time'] + '</td>' +
-              '<td>' + entry['user'] + '</td>' +
-              '<td>' + entry['category']['descr'] + '</td>' +
-              '</tr>'
+            { action, confidence, description, time, user, category } = entry
+            entry_string =
+              "<tr>
+                <td> #{action}</td>
+                <td> #{confidence}</td>
+                <td> #{description}</td>
+                <td> #{time} </td>
+                <td> #{user}</td>
+                <td> #{category.descr}</td>
+               </tr>"
 
             history_dialog_content += entry_string
 
-          history_dialog_content += '</tbody></table>'
+          history_dialog_content +=
+            "</tbody></table>
+             </div>
+             <div class='tab-pane' role='tabpanel' id='xbrs-history-tab'>
+                <h5>XBRS History</h5>
+                <table class='history-table xbrs-history-table' id='webcat-xbrs-history'></table>
+             </div>"
 
-          if $("#history_dialog").length
+          if $("history_dialog").length
             history_dialog = this
             $("#history_dialog").html(history_dialog_content)
             $('#history_dialog').dialog('open')
@@ -954,6 +982,7 @@ window.retrieve_history = (position) ->
               minWidth: 600
               position: { my: "right top", at: "right top", of: window }
             $('#history_dialog').dialog('open')
+            $('dialog_tabs').tabs();
 
       error: (response) ->
         $("#cat-url-error-message-#{position}").text("No history associated with this url.")
@@ -961,13 +990,14 @@ window.retrieve_history = (position) ->
         $("#cat-url-#{position}").show()
         $("#url_#{position}").css("border-width", "2px")
         $("#url_#{position}").css("border-color", "#E47433")
-
     , this)
   else
     $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
     $("#cat-url-#{position}").show()
     $("#url_#{position}").css("border-width", "2px")
     $("#url_#{position}").css("border-color", "#E47433")
+
+
 
 
 window.drop_current_categories = () ->
@@ -1287,8 +1317,9 @@ format = (complaint_entry_row) ->
 
 ## Complaint history dialog box. Includes tabs for domain history, complaint entry history, and xbrs history of the url.
 window.history_dialog = (id, url) ->
+#  here here
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
+  std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
     method: 'POST'
     headers: headers
@@ -1296,29 +1327,24 @@ window.history_dialog = (id, url) ->
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
         history_dialog_content =
-          '<div class="dialog-content-wrapper">' +
-          '<h4>' + url + '</h4>' +
-          # Tab navigation
-          '<ul class="nav nav-tabs dialog-tabs" role="tablist">' +
-          '<li class="nav-item active" role="presentation">' +
-          '<a class="nav-link" role="tab" data-toggle="tab" href="#domain-history-tab" aria-controls="domain-history-tab">Domain History</a>' +
-          '</li>' +
-          '<li class="nav-item" role="presentation">' +
-          '<a class="nav-link" role="tab" data-toggle="tab" href="#complaint-history-tab" aria-controls="complaint-history-tab">Complaint Entry History</a>' +
-          '</li>' +
-          '<li class="nav-item" role="presentation">' +
-          '<a class="nav-link" role="tab" data-toggle="tab" href="#xbrs-history-tab" aria-controls="xbrs-history-tab" onclick="get_xbrs_history(\'' + url + '\', this)">XBRS History</a>' +
-          '</li>' +
-          '</ul>' +
-
-          # Tab content - beginning markup of first tab
-          '<div class="tab-content dialog-tab-content">' +
-          '<div class="tab-pane active" role="tabpanel" id="domain-history-tab">' +
-          '<h5>Domain History</h5>'
+          "<ul class='nav nav-tabs dialog-tabs' role='tablist'>
+               <li class='nav-item active' role='presentation'>
+                <a class='nav-link' role='tab' data-toggle='tab' href='#domain-history-tab' aria-controls='domain-history-tab'>
+                   Domain History
+                </a>
+               </li>
+               <li class='nav-item' role='presentation'>
+                <a class='nav-link' role='tab' data-toggle='tab' href='#xbrs-history-tab' aria-controls='xbrs-history-tab' onclick='get_xbrs_history(\"#{url}\", this)'>
+                  XBRS History
+                </a>
+               </li>
+            </ul>
+            <div class='tab-content dialog-tab-content'>
+            <div class='tab-pane active' role='tabpanel' id='domain-history-tab'>
+            <h5>Domain History</h5>"
 
         if json.entry_history.domain_history.length < 1
           history_dialog_content += '<span class="missing-data">No domain history available.</span>'
@@ -1328,16 +1354,15 @@ window.history_dialog = (id, url) ->
           '<tbody>'
           # Build domain history table
           for entry in json.entry_history.domain_history
-            entry_string =
-            '<tr>' +
-            '<td>' + entry['action'] + '</td>' +
-            '<td>' + entry['confidence'] + '</td>' +
-            '<td>' + entry['description'] + '</td>' +
-            '<td>' + entry['time'] + '</td>' +
-            '<td>' + entry['user'] + '</td>' +
-            '<td>' + entry['category']['descr'] + '</td>' +
-            '</tr>'
-            history_dialog_content += entry_string
+            history_dialog_content +=
+              '<tr>' +
+              '<td>' + entry['action'] + '</td>' +
+              '<td>' + entry['confidence'] + '</td>' +
+              '<td>' + entry['description'] + '</td>' +
+              '<td>' + entry['time'] + '</td>' +
+              '<td>' + entry['user'] + '</td>' +
+              '<td>' + entry['category']['descr'] + '</td>' +
+              '</tr>'
           # End domain history table
           history_dialog_content += '</tbody></table>'
 
@@ -1370,9 +1395,8 @@ window.history_dialog = (id, url) ->
                     details_col += '<span class="bold">' + key + ":</span> " + value[0] + " - " + value[1] + "<br/>"
             entry_row += '<td>' + details_col + '</td></tr>'
             history_dialog_content += entry_row
-          history_dialog_content +=
-            # End complaint history table
-            '</tbody></table>'
+          # End complaint history table
+          history_dialog_content += '</tbody></table>'
 
         history_dialog_content +=
           # End complaint history table tab
@@ -1407,14 +1431,14 @@ window.history_dialog = (id, url) ->
 ## Fetches XBRS history of a url on click of the XBRS tab in history
 window.get_xbrs_history = (url, tab) ->
   wrapper = $(tab).parents('.dialog-content-wrapper')[0]
-  xbrs_table = $(wrapper).find('.xbrs-history-table')[0]
+  xbrs_table = $("#webcat-xbrs-history")
   xbrs_msg = $(wrapper).find('.xbrs-no-data-msg')[0]
   # Clear table of residual data
   $(xbrs_table).empty()
   if xbrs_msg?
     $(xbrs_msg).remove()
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
+  std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/xbrs'
     method: 'POST'
     headers: headers
@@ -1423,74 +1447,47 @@ window.get_xbrs_history = (url, tab) ->
       if response.data.length < 1
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
-        # Cycle through and assign index values to column headers
-        col_headers = []
-        for col, i in response['columns']
-          $(response['columns']).each ->
-            col_defs = []
-            col_defs["index"] = i
-            col_defs["column"] = this.valueOf()
-            col_headers.push(col_defs)
+        { columns, data:current_data } = response
+        $(xbrs_table).append(document.createElement('thead'))
+        $(xbrs_table).append(document.createElement('tbody'))
+        thead = $(xbrs_table).find('thead')
+        tbody = $(xbrs_table).find('tbody')
+        parsed_rows = []
+        thead_row = ''
 
-        col_indexes = []
-        ctime_index = ''
-        thead = '<thead><tr>'
-        $(col_headers).each ->
-          # We only want these specific columns
-          if this.column == "domain" || this.column == "subdomain" || this.column == "ctime" || this.column == "mtime" || this.column == "mnemonic" || this.column == "operation" || this.column == "path"
-            if this.column == "ctime"
-              thead += '<th>Creation Time</th>'
-              ctime_index = this.index
-            else if this.column == "mtime"
-              thead += '<th>Last Modified</th>'
-            else
-              thead += '<th>' + this.column + '</th>'
-            col_indexes.push(this.index)
-        thead += '</tr></thead>'
+        for row, i in current_data
+          parsed_rows[i] = { ctime:'', row_data: '' }
 
-        row_data = []
-        # For each row of data, cycle through and assign index to each column
-        $(response['data']).each ->
-          col_data = []
-          for data, i in this
-            $(this).each ->
-              data = []
-              data["index"] = i
-              data["data"] = this.valueOf()
-              col_data.push(data)
-            row_data.push(col_data)
-
-        # Sort rows by ctime
-        row_data.sort (a,b) ->
-          a1 = a[ctime_index]
-          b1 = b[ctime_index]
-          if a1.data == b1.data
-            return 0
-          if a1.data > b1.data then 1 else -1
-
-        tbody = '<tbody>'
-        $(row_data).each ->
-          tbody += '<tr>'
-          row = this
-          $(row).each ->
-            col = this.index
-            col_content = this.data
-            # If our column header indexes and our column data indexes match we create the column in the table
-            if jQuery.inArray(col, col_indexes) != -1
-              if jQuery.type(col_content) == 'string' || jQuery.type(this) == 'number'
-                tbody += '<td>' + col_content + '</td>'
+        for col, index in columns
+          # We only want the values/headers for these columns
+          if col == "domain" || col == "subdomain" || col == "ctime" || col == "mtime" || col == "mnemonic" || col == "operation" || col == "path"
+            if col == "ctime" then col = "Creation Time"
+            if col == "mtime" then col = 'Last Modified'
+            thead_row += "<th> #{col }</th>"
+            for row, i in current_data
+              if col == "Creation Time"
+                #set ctime/Creation Time value to check against for every row
+                parsed_rows[i].ctime = row[index]
+              # build cells for each row corresponding data to proper column. if values are null or undefined set '-'
+              parse_data = row[index]
+              if parse_data == null || parse_data == undefined
+                parsed_rows[i].row_data += "<td> - </td>"
               else
-                # is null - prevents weird json objects getting through
-                tbody += '<td> - </td>'
-          tbody += '</tr>'
-        tbody += '</tbody>'
+                parsed_rows[i].row_data += "<td>#{parse_data}</td>"
 
-        $(xbrs_table).append(thead)
-        $(xbrs_table).append(tbody)
+        #sort rows by ctime
+        parsed_rows.sort (a,b) ->
+            if a.ctime == b.ctime then return 0
+            if a.ctime > b.ctime then 1 else -1
+
+        #  add all rows to table
+        thead.append(thead_row)
+        for key, value of parsed_rows
+          tbody.append("<tr>#{value.row_data}</tr>")
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
-
 
 
 parse_lookup_dialog_content = (json) ->
