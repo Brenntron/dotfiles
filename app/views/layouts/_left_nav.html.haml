@@ -40,15 +40,15 @@
               %a.disabled-link= inline_svg 'icon_clam.svg'
           - if can?(:index, FileReputationDispute)
             %li{class: 'amp-link'}
-              %a{href: escalations_file_rep_disputes_path + "?f=open"}
+              %a{href: escalations_file_rep_disputes_path + "?f=open", id: 'amp-icon-link'}
                 = inline_svg 'icon_amp.svg'
           - if can?(:index, Dispute)
             %li{class: 'rep-link'}
-              %a{href: escalations_webrep_disputes_path}
+              %a{href: escalations_webrep_disputes_path, id: 'rep-icon-link'}
                 =inline_svg 'icon_rep.svg'
           - if can?(:index, Complaint)
             %li{class: 'cat-link'}
-              %a{href: escalations_webcat_complaints_path}
+              %a{href: escalations_webcat_complaints_path, id: 'cat-icon-link'}
                 =inline_svg 'icon_cat.svg'
     %li{class: 'nav-item nav-users'}
       %a{href: escalations_users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
@@ -120,13 +120,13 @@
                 %a.disabled-link Clam
             - if can?(:index, FileReputationDispute)
               %li{class: 'amp-link'}
-                %a{href: escalations_file_rep_disputes_path + "?f=open"} File Reputation
+                %a{href: escalations_file_rep_disputes_path + "?f=open", id: 'amp-link'} File Reputation
             - if can?(:index, Dispute)
               %li{class: 'rep-link'}
-                %a{href: escalations_webrep_disputes_path} Web Reputation
+                %a{href: escalations_webrep_disputes_path, id: 'rep-link'} Web Reputation
             - if can?(:index, Complaint)
               %li{class: 'cat-link'}
-                %a{href: escalations_webcat_complaints_path} Web Categorization
+                %a{href: escalations_webcat_complaints_path, id: 'cat-link'} Web Categorization
       %li{class: 'nav-users static-nav-item'}
         %a{href: escalations_users_path}
           Users

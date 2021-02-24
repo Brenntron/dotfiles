@@ -14,7 +14,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                           search_name: search_name,
                                           params: index_params,
                                           user: current_user)
-        export = DisputeExport.new(@disputes)
+        user_preferences = current_user.user_preferences.where(name: UserPreference::WEB_REP_COLUMNS).last
+        export = DisputeExport.new(@disputes, user_preferences)
 
         send_data export.to_s, filename: "disputes_search_#{Time.now.utc.iso8601}.xlsx", disposition: 'attachment'
       end
@@ -485,6 +486,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           'Blacklist Status',
           'Blacklist Comment',
           'WL/BL',
+          'Platform',
           'Umbrella',
           'Referenced On',
           'Last Submitted'
@@ -506,6 +508,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
             entry.classifications.first && entry.blacklist.status,
             entry.classifications.first && entry.blacklist.metadata&.fetch('VRT', {})['comment'],
             entry.wbrs_list_type,
+            entry.platform,
             entry.umbrellaresult,
             entry.referenced_tickets.count,
             entry.last_submitted.to_s,
@@ -534,6 +537,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           'Blacklist Status',
           'Blacklist Comment',
           'WL/BL',
+          'Platform',
           'Umbrella',
           'Referenced On',
           'Last Submitted'
@@ -555,6 +559,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
             entry.classifications.first && entry.blacklist.status,
             entry.classifications.first && entry.blacklist.metadata&.fetch('VRT', {})['comment'],
             entry.wbrs_list_type,
+            entry.platform,
             entry.umbrellaresult,
             entry.referenced_tickets.count,
             entry.last_submitted.to_s,
@@ -647,7 +652,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def export_selected_dispute_rows
     @disputes = Dispute.where(id: params[:ids])
 
-    export = DisputeExport.new(@disputes)
+    user_preferences = current_user.user_preferences.where(name: UserPreference::WEB_REP_COLUMNS).last
+    export = DisputeExport.new(@disputes, user_preferences)
 
     send_data export.to_s, filename: "disputes_search_#{Time.now.utc.iso8601}.xlsx", disposition: 'attachment'
   end

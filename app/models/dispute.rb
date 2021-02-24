@@ -65,6 +65,12 @@ class Dispute < ApplicationRecord
 
   AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
 
+  #labels for charts on webrep dashboard
+  LABEL_RESOLVED_FIXED_FP = "Fixed FP"
+  LABEL_RESOLVED_FIXED_FN = "Fixed FN"
+  LABEL_RESOLVED_UNCHANGED = "Unchanged"
+  LABEL_RESOLVED_OTHER = "Other"
+
   scope :open_disputes, -> { where(status: NEW) }
   scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
@@ -411,86 +417,112 @@ class Dispute < ApplicationRecord
   end
 
 
+  def build_ti_payload
+    payload = {}
+
+    dispute_entries.each do |entry|
+      payload[entry.hostlookup] = entry.new_payload_item
+      payload[entry.hostlookup]['sugg_type'] = entry.suggested_disposition
+    end
+
+    payload
+  end
+
   #
   #end dispute building instance methods
   #
   def self.process_bridge_payload(message_payload)
 
+    #check to see if ticket already exists in database to prevent accidental dupes
+    record_exists = Dispute.where(:ticket_source_key => message_payload["source_key"]).first
+
+    if record_exists.present?
+      conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id)
+      return_payload = record_exists.build_ti_payload
+      case_email = DisputeEmail.generate_case_email_address(record_exists.id)
+      return conn.post(return_payload, case_email)
+
+    end
+
     new_dispute = nil
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
     begin
-      ActiveRecord::Base.transaction do
-        guest = Company.where(:name => "Guest").first
-        opened_at = Time.now
-        resolved_at = Time.now
-        customer = Customer.process_and_get_customer(message_payload)
+
+      guest = Company.where(:name => "Guest").first
+      opened_at = Time.now
+      resolved_at = Time.now
+      customer = Customer.process_and_get_customer(message_payload)
 
 
-        logger.debug "Starting ticket create"
+      logger.debug "Starting ticket create"
 
-        #user = User.where(cvs_username:"vrtincom").first
+      #user = User.where(cvs_username:"vrtincom").first
 
-        #TODO: this should be put in a params method
-        new_entries_ips = message_payload["payload"]["investigate_ips"]
-        new_entries_urls = message_payload["payload"]["investigate_urls"]
+      #TODO: this should be put in a params method
+      new_entries_ips = message_payload["payload"]["investigate_ips"]
+      new_entries_urls = message_payload["payload"]["investigate_urls"]
 
-        return_payload = {}
+      return_payload = {}
 
-        #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
+      #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
 
-        bugzilla_rest_session = message_payload[:bugzilla_rest_session]
+      bugzilla_rest_session = message_payload[:bugzilla_rest_session]
 
-        summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+      summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-        full_description = <<~HEREDOC
+      full_description = <<~HEREDOC
           IPs: #{new_entries_ips.keys}
           URIs: #{new_entries_urls.keys}
           Problem Summary: #{message_payload["payload"]["problem"]}
-        HEREDOC
+      HEREDOC
 
-        bug_attrs = {
-            'product' => 'Escalations Console',
-            'component' => 'IP/Domain',
-            'summary' => summary,
-            'version' => 'unspecified', #self.version,
-            'description' => full_description,
-            # 'opsys' => self.os,
-            'priority' => 'Unspecified',
-            'classification' => 'unclassified',
-        }
-        logger.debug "Creating bugzilla bug"
+      bug_attrs = {
+          'product' => 'Escalations Console',
+          'component' => 'IP/Domain',
+          'summary' => summary,
+          'version' => 'unspecified', #self.version,
+          'description' => full_description,
+          # 'opsys' => self.os,
+          'priority' => 'Unspecified',
+          'classification' => 'unclassified',
+      }
+      logger.debug "Creating bugzilla bug"
 
-        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-        logger.debug "Creating dispute"
-        new_dispute = Dispute.new
+      logger.debug "Creating dispute"
+      new_dispute = Dispute.new
 
-        new_dispute.id = bug_proxy.id
-        new_dispute.user_id = user.id
-        new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
-        new_dispute.org_domain = message_payload["payload"]["domain"]
-        new_dispute.case_opened_at = opened_at
-        new_dispute.subject = message_payload["payload"]["email_subject"]
-        new_dispute.description = message_payload["payload"]["email_body"]
-        new_dispute.problem_summary = message_payload["payload"]["problem"]
-        new_dispute.ticket_source_key = message_payload["source_key"]
-        new_dispute.ticket_source = "talos-intelligence"
-        new_dispute.ticket_source_type = message_payload["source_type"]
-        new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
-        new_dispute.status = NEW
+      new_dispute.id = bug_proxy.id
+      new_dispute.user_id = user.id
+      new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
+      new_dispute.org_domain = message_payload["payload"]["domain"]
+      new_dispute.case_opened_at = opened_at
+      new_dispute.subject = message_payload["payload"]["email_subject"]
+      new_dispute.description = message_payload["payload"]["email_body"]
+      new_dispute.problem_summary = message_payload["payload"]["problem"]
+      new_dispute.ticket_source_key = message_payload["source_key"]
+      new_dispute.ticket_source = "talos-intelligence"
+      new_dispute.ticket_source_type = message_payload["source_type"]
+      new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
+      new_dispute.status = NEW
 
-        new_dispute.customer_id = customer&.id
-        new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+      new_dispute.customer_id = customer&.id
+      new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
-        if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
-          new_dispute.priority = "P3"
-        else
-          new_dispute.priority = "P4"
-        end
-        logger.debug "Saving Dispute"
+      if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
+        new_dispute.priority = "P3"
+      else
+        new_dispute.priority = "P4"
+      end
+      logger.debug "Saving Dispute"
 
-        new_dispute.save!
+      new_dispute.save!
+
+
+
+      ActiveRecord::Base.transaction do
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
 
@@ -506,7 +538,6 @@ class Dispute < ApplicationRecord
 
         logger.debug "Creating ip entries"
         new_entries_ips.each do |key, entry|
-
           false_negative_claim = false
 
           if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
@@ -535,7 +566,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
-
+          new_dispute_entry.platform = entry[:sbrs]["platform"]
           new_dispute_entry.save!
 
           logger.info "fetching preload"
@@ -544,10 +575,10 @@ class Dispute < ApplicationRecord
 
           matching_disposition = new_dispute_entry.is_disposition_matching?
 
-          initial_log = "--------Starting Data---------\n"
-          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
-          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
-          initial_log += "-----------------------------\n"
+          initial_log = "--------Starting Data---------<br>"
+          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}<br>"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}<br>"
+          initial_log += "-----------------------------<br>"
 
           new_dispute_entry.auto_resolve_log += initial_log
           new_dispute_entry.save!
@@ -563,24 +594,10 @@ class Dispute < ApplicationRecord
 
             else
               if new_dispute.submission_type == "w"
-                auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                                  total_hits: total_hits,
-                                                                                  resolved_at: resolved_at,
-                                                                                  dispute_entry: new_dispute_entry)
-
-                if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-                  verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-                end
-
-                if auto_resolve_verdict.present? && auto_resolve_verdict.auto_resolve_log.present?
-                  new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
-                end
-
+                new_dispute_entry = AutoResolve.attempt_ai_conviction(total_hits, new_dispute_entry)
               end
 
             end
-
-            new_dispute_entry.save!
 
           end
 
@@ -612,7 +629,6 @@ class Dispute < ApplicationRecord
         end
         logger.debug "Creating url entries"
         new_entries_urls.each do |key, entry|
-
           #placeholder for preloading stuff from Micah
           #grab xbrs, reptool stuff, wl/bl entries, virustotal
           #
@@ -638,6 +654,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.is_important = is_important?(key)
           new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.assign_url_parts(key)
+          new_dispute_entry.platform = entry["platform"]
 
 
           resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
@@ -656,12 +673,6 @@ class Dispute < ApplicationRecord
           complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => new_dispute_entry.uri})
           new_dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
 
-          initial_log = "--------Starting Data---------\n"
-          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
-          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
-          initial_log += "-----------------------------\n"
-
-          new_dispute_entry.auto_resolve_log += initial_log
           new_dispute_entry.save!
 
 
@@ -669,21 +680,8 @@ class Dispute < ApplicationRecord
             if !false_negative_claim
               new_dispute_entry.update(status: DisputeEntry::NEW)
             else
-              auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                                total_hits: total_hits,
-                                                                                resolved_at: resolved_at,
-                                                                                dispute_entry: new_dispute_entry)
-
-              if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-                verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-              end
-
-              if auto_resolve_verdict.present? && auto_resolve_verdict.auto_resolve_log.present?
-                new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
-              end
+              new_dispute_entry = AutoResolve.attempt_ai_conviction(total_hits, new_dispute_entry)
             end
-
-            new_dispute_entry.save!
 
           end
 
@@ -750,44 +748,6 @@ class Dispute < ApplicationRecord
       conn.post
 
       nil
-    end
-
-
-    verdicts_to_blacklist.each do |blacklist|
-      begin
-        auto_resolve_verdict = blacklist.first
-        if auto_resolve_verdict.malicious?
-          auto_resolve_verdict.publish_to_rep_api(dispute_id: blacklist.last.dispute_id)
-
-          dispute_entry = blacklist.last
-
-          args = {}
-          args[:dispute_id] = dispute_entry.dispute_id
-          args[:user_id] = user.id
-          args[:comment] = auto_resolve_verdict.internal_comment
-
-          DisputeComment.create(args)
-        end
-      rescue Exception => e
-        Rails.logger.error "Attempts at blacklisting a dispute entry with reptool failed. Check reptool:"
-        Rails.logger.error $!
-        Rails.logger.error $!.backtrace.join("\n")
-
-        dispute_entry = blacklist.last
-
-        dispute_entry.status = NEW
-        dispute_entry.resolution = ""
-        dispute_entry.resolution_comment = ""
-        dispute_entry.save
-
-        args = {}
-        args[:dispute_id] = dispute_entry.dispute_id
-        args[:user_id] = user&.id
-        args[:comment] = "Dispute Entry #{dispute_entry.hostlookup} was eligible for auto-resolution, but failed to connect to RepTool. Sending this to the analysts' queue"
-
-        DisputeComment.create(args)
-
-      end
     end
 
     new_dispute
@@ -1206,17 +1166,7 @@ class Dispute < ApplicationRecord
         end
       end
 
-      dispute_packet[:dispute_entry_content] = []
-      unless dispute.dispute_entries.blank?
-        dispute.dispute_entries.each do |entry|
-          unless entry[:ip_address].nil?
-            dispute_packet[:dispute_entry_content].push(entry[:ip_address])
-          end
-          unless entry[:uri].nil?
-            dispute_packet[:dispute_entry_content].push(entry[:uri])
-          end
-        end
-      end
+      dispute_packet[:dispute_entry_content] = entry_content_for(dispute)
       dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}
       dispute_packet[:submission_type] = dispute.submission_type
       dispute_packet[:d_entry_preview] = dispute_packet[:dispute_entry_content].first.to_s + "<span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
@@ -1264,6 +1214,23 @@ class Dispute < ApplicationRecord
 
       dispute_packet
     end
+  end
+
+  # collect entry content array for a specific disputes
+  # entry content is using to display data in UI and for disputes export
+  def self.entry_content_for(dispute)
+    entry_content = []
+    unless dispute.dispute_entries.blank?
+      dispute.dispute_entries.each do |entry|
+        unless entry[:ip_address].nil?
+          entry_content.push(entry[:ip_address])
+        end
+        unless entry[:uri].nil?
+          entry_content.push(entry[:uri])
+        end
+      end
+    end
+    entry_content
   end
 
   def peek(user:)
@@ -1328,7 +1295,6 @@ class Dispute < ApplicationRecord
   #####FOR REPORTING#######
 
   def self.open_tickets_report(users, from, to)
-
     #from = "Mon, 4 Jul 2018 17:40:08 GMT"
 
     status_array = [STATUS_ASSIGNED, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ON_HOLD]
@@ -1339,7 +1305,7 @@ class Dispute < ApplicationRecord
     report_data = {}
     report_data[:table_data] = []
     user_ids = users.pluck(:id)
-    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
+    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array).where.not(:submission_type => nil, :submitter_type => nil)
 
     report_data[:ticket_count] = results.size
     report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status != DisputeEntry::STATUS_RESOLVED }.size
@@ -1390,7 +1356,6 @@ class Dispute < ApplicationRecord
                       :total_email_count => dispute_emails_count
       }
     end
-
     report_data
   end
 
@@ -1406,7 +1371,7 @@ class Dispute < ApplicationRecord
     report_data = {}
     report_data[:table_data] = []
     user_ids = users.pluck(:id)
-    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
+    results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array).where.not(:submission_type => nil, :submitter_type => nil)
 
     report_data[:ticket_count] = results.size
     report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status == DisputeEntry::STATUS_RESOLVED }.size
@@ -1473,7 +1438,7 @@ class Dispute < ApplicationRecord
     report_data = {}
 
     user_ids = users.pluck(:id)
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status in ('#{DisputeEntry::RESOLVED}', '#{DisputeEntry::STATUS_RESOLVED}')")
+    main_results = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status in ('#{DisputeEntry::RESOLVED}', '#{DisputeEntry::STATUS_RESOLVED}')")
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
@@ -1500,7 +1465,7 @@ class Dispute < ApplicationRecord
           if day_result.status == DisputeEntry::STATUS_RESOLVED
             day_all_totals += 1
 
-            case day_result.dispute.submission_type.downcase
+            case day_result.dispute.submission_type&.downcase
               when 'e'
                 day_e_totals += 1
               when 'w'
@@ -1535,7 +1500,7 @@ class Dispute < ApplicationRecord
     report_data[:ticket_numbers] = []
     report_data[:close_times] = []
 
-    main_results = Dispute.where(:user_id => user_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:status => status_array)
+    main_results = Dispute.where(:user_id => user_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:status => status_array).where.not(:submission_type => nil, :submitter_type => nil)
 
     main_results.each do |result|
       if !result.case_resolved_at
@@ -1561,9 +1526,9 @@ class Dispute < ApplicationRecord
     user_ids = users.pluck(:id)
 
     if submission_types.present?
-      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+      main_results = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     else
-      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+      main_results = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     end
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
@@ -1595,24 +1560,200 @@ class Dispute < ApplicationRecord
       results[:chart_data][3] = 0
     end
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FP,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FP,
                              :percent => (results[:chart_data][2] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size
                              }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FN,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FN,
                              :percent => (results[:chart_data][0] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size
     }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_UNCHANGED,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_UNCHANGED,
                              :percent => (results[:chart_data][1] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size
     }
 
-    results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_OTHER,
+    results[:table_data] << {:resolution => LABEL_RESOLVED_OTHER,
                              :percent => (results[:chart_data][3] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size
+    }
+
+    results
+
+  end
+
+  def self.auto_ticket_entries_by_resolution_report(from, to, submission_types = nil)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    vrt =  User.where(cvs_username: 'vrtincom').first
+    vrt_id = vrt.id
+
+    if submission_types.present?
+      closed_entries = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+    else
+      closed_entries = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+    end
+
+    all_entries = closed_entries.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
+
+    entries_duplicates = all_entries.select {|entry| entry.resolution == "DUPLICATE"}
+    entries_fixed_fn = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}
+    entries_unchanged = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}
+
+    total_count = all_entries.size
+
+    results = {}
+    results[:chart_data] = []
+    results[:chart_labels] = ["Fixed FN", "Duplicates", "Unchanged" ]
+    results[:chart_data] << entries_fixed_fn.size.to_f / total_count.to_f
+    results[:chart_data] << entries_duplicates.size.to_f / total_count.to_f
+    results[:chart_data] << entries_unchanged.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
+    end
+
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
+    end
+
+    if results[:chart_data][2].nan?
+      results[:chart_data][2] = 0
+    end
+
+    results[:table_data] = []
+
+    results[:table_data] << {:resolution => LABEL_RESOLVED_FIXED_FN,
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => entries_fixed_fn.size
+    }
+
+    results[:table_data] << {:resolution => "Duplicates",
+                             :percent => (results[:chart_data][1] * 100).round(2),
+                             :count => entries_duplicates.size
+    }
+    results[:table_data] << {:resolution => LABEL_RESOLVED_UNCHANGED,
+                             :percent => (results[:chart_data][2] * 100).round(2),
+                             :count => entries_unchanged.size
+    }
+    results[:table_data] << {:resolution => "Total",
+                             :percent => 100,
+                             :count => total_count.to_f
+    }
+    results
+
+  end
+
+  def self.all_closed_tickets_manual_vs_auto_report(from, to, submission_types = nil)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    vrt =  User.where(cvs_username: 'vrtincom').first
+    vrt_id = vrt.id
+
+    if submission_types.present?
+      manual_results = Dispute.where.not(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
+
+    else
+      manual_results = Dispute.where.not(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
+    end
+
+    total_count = manual_results.size + auto_results.size
+
+    results = {}
+
+    results[:chart_data] = []
+    results[:chart_labels] = [ "Manually Resolved Tickets", "Automatically Resolved Tickets"]
+
+    results[:chart_data] << manual_results.size.to_f / total_count.to_f
+    results[:chart_data] << auto_results.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
+    end
+
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
+    end
+
+    results[:table_data] = []
+
+    results[:table_data] << {:resolution => "Automatically Resolved Tickets",
+                             :percent => (results[:chart_data][1] * 100).round(2),
+                             :count => auto_results.size
+    }
+
+    results[:table_data] << {:resolution => "Manually Closed Tickets",
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => manual_results.size.to_f
+    }
+
+    results[:table_data] << {:resolution => "Total Closed Tickets",
+                             :percent => 100,
+                             :count => total_count.to_f
+    }
+
+    results
+
+  end
+
+  def self.all_tickets_manual_vs_auto_close_report(from, to, submission_types = nil)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    vrt =  User.where(cvs_username: 'vrtincom').first
+    vrt_id = vrt.id
+
+    if submission_types.present?
+      all_results = Dispute.where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types)
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("status = '#{STATUS_RESOLVED}'")
+
+    else
+      all_results = Dispute.where("disputes.created_at between '#{from}' and '#{to}'")
+      auto_results = Dispute.where(:user_id => vrt_id).where("disputes.created_at between '#{from}' and '#{to}'").where("status = '#{STATUS_RESOLVED}'")
+    end
+
+    total_count = all_results.size
+
+    results = {}
+
+    results[:chart_data] = []
+    results[:chart_labels] = [ "All Tickets", "Automatically Resolved Tickets"]
+
+    results[:chart_data] << (all_results.size.to_f - auto_results.size.to_f)/ total_count.to_f
+    results[:chart_data] << auto_results.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
+    end
+
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
+    end
+
+    results[:table_data] = []
+
+    results[:table_data] << {:resolution => "Automatically Resolved Tickets",
+                             :percent => (results[:chart_data][1] * 100).round(2),
+                             :count => auto_results.size
+    }
+
+    results[:table_data] << {:resolution => "Non-auto resolved tickets",
+                             :percent => (results[:chart_data][0] * 100).round(2),
+                             :count => (all_results.size - auto_results.size)
+    }
+
+    results[:table_data] << {:resolution => "Total Submitted Tickets",
+                             :percent => 100,
+                             :count => all_results.size.to_f
     }
 
     results
@@ -1675,7 +1816,7 @@ class Dispute < ApplicationRecord
 
     user_ids = users.pluck(:id)
 
-    main_results = Dispute.joins(:dispute_entries).where("disputes.created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+    main_results = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where("disputes.created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where.not(:submission_type => nil, :submitter_type => nil).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
     report_data = {}
@@ -1720,7 +1861,7 @@ class Dispute < ApplicationRecord
       raw_data[user.cvs_username] = []
     end
 
-    main_results = Dispute.where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("disputes.status = '#{STATUS_RESOLVED}'")
+    main_results = Dispute.where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("disputes.status = '#{STATUS_RESOLVED}'").where.not(:submission_type => nil, :submitter_type => nil)
 
     main_results.each do |result|
       if !result.case_resolved_at
@@ -1755,7 +1896,7 @@ class Dispute < ApplicationRecord
 
     user_ids = users.pluck(:id)
 
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+    main_results = Dispute.joins(:dispute_entries).eager_load(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where.not(:submission_type => nil, :submitter_type => nil).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.flatten.uniq
 
@@ -1764,7 +1905,6 @@ class Dispute < ApplicationRecord
     results[:chart_data] = {}
     #results[:table_data] = []
     final_data = {}
-
     users.each do |user|
       results[:chart_data][user.cvs_username] = {}
       results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FP] = 0
@@ -1817,7 +1957,7 @@ class Dispute < ApplicationRecord
 
     user_ids = users.pluck(:id)
 
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'")
+    main_results = Dispute.where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where.not(:submission_type => nil, :submitter_type => nil).includes(dispute_entries: :dispute_rule_hits)
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.flatten.uniq
 
@@ -1867,7 +2007,7 @@ class Dispute < ApplicationRecord
 
   def self.populate_top_banner()
 
-    main_results = Dispute.all
+    main_results = Dispute.includes(:dispute_entries)
 
     results = {}
     results[:valid_tickets_total] = 0
@@ -1995,6 +2135,5 @@ class Dispute < ApplicationRecord
 
     return return_hash
   end
-
 end
 

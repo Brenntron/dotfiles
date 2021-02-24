@@ -139,6 +139,10 @@ raise 'config.yml missing virus_total section' unless virustotal
 Rails.configuration.virustotal.check    = virustotal['check']
 
 
+guard_rails = env_config.fetch('guard_rails', nil)
+Rails.configuration.guard_rails          = ApiRequester::ApiRequester.config_of(guard_rails)
+
+
 wbrs_config = env_config['wbrs']
 raise 'config.yml missing wbrs section' unless wbrs_config
 Rails.configuration.wbrs                = ApiRequester::ApiRequester.config_of(wbrs_config)

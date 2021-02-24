@@ -20,25 +20,24 @@
           .col-xs-9
             %input#cluster_filter_field.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
           .col-xs-3.no_pad
-            %button#cluster_filter_button.primary{onclick: 'apply_filter_to_table()', class:'apply-filter-btn icon-filter-white'}Apply Filter
+            %button.cluster-button{onclick: 'apply_filter_to_table()', class:'apply-filter-btn icon-filter-white'}Apply Filter
 
   .row
-    .col-xs-7
+    .col-xs-6
       .current-cluster-info-wrapper
-        .result-label.vertical-separator
+        .result-label
           Current Cluster Entries:
           %span#total_results
-        -#    TODO Only show regex label and filter item if a regex has been used
-        .result-label
+        .result-label.regex-area.hidden
           Regex:
           %span#regex-filter
 
-    .col-xs-5
+    .col-xs-6
       .card
         .content-label-sm Comment
         .card-body
-          %input#cluster_comment_field.text_field
-          %button.toolbar-button.icon-submit{'onclick': 'categorize_clusters()'} Submit Changes
+          %input#cluster_comment_field.text_field{placeholder: 'Reason for category (not public facing)'}
+          %button.toolbar-button.icon-submit.cluster-button{'onclick': 'categorize_clusters()'} Submit Changes
   .row
     .col-xs-12
       .toolbar.cluster-table-toolbar
@@ -60,7 +59,8 @@
             %span.toolbar-button-text Expand All
         %button.toolbar-button.copycat-btn.icon-copycat.esc-tooltipped{'onclick': 'copycat_dialog()', title: 'CopyCat Tool'}
           %span.toolbar-button-text CopyCat Tool
-
+        %button.toolbar-button.wsa-btn.icon-telemetry.esc-tooltipped{'onclick': 'open_wsa_status()', title: 'WSA Telemetry Status'}
+          %span.toolbar-button-text WSA Telemetry Status
   .row
     .col-xs-12
       %table.table.responsive#clusters-index
@@ -78,10 +78,20 @@
 
 #copycat_dialog{title: 'CopyCat Tool'}
   .dialog-content-wrapper
-    %select#copycat-categories.selectize{:multiple=>"multiple", :placeholder=>"Add Categories", :value=>"", :name=>""}
+    %select#copycat-categories.selectize{:multiple=>"multiple", :placeholder=>"Add categories", :value=>"", :name=>""}
 
   .copycat-tool-footer
-    %button.toolbar-button.copycat-paste-btn.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
-    %button.toolbar-button.copycat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear All Categories
+    %button.toolbar-button.cluster-button.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
+    %button.toolbar-button.cluster-button.copycat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear All Categories
+
+#wsa_status_dialog.hidden{title: 'WSA Telemetry Status'}
+  .dialog-content-wrapper
+    %input#wsa_statuses.text_field{placeholder: "Search by companies or serial numbers"}
+    %button.toolbar-button.cluster-button.icon-search{'onclick': 'get_wsa_status()'} Search
+  .wsa-loader-wrapper.hidden
+    .gear-loader-wrapper
+      = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    %span.loader-msg Loading data...
+  #wsa-status-table.hidden
 
 #whois_dialog{title: 'Domain Lookup Information'}

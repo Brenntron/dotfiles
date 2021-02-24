@@ -1,5 +1,10 @@
 window.apply_filter_to_table = () ->
   filter = $("#cluster_filter_field").val()
+
+  # if they have entered a regex, show the regex in upper-left area
+  if filter != '' then $('.regex-area').removeClass('hidden')
+  else $('.regex-area').addClass('hidden')
+
   $('#regex-filter').html(filter)
   populate_clusters_index_table(filter);
 
@@ -43,10 +48,17 @@ window.categorize_clusters = () ->
   user_id = $("#user_id").val()
   comment = $("#cluster_comment_field").val()
   #cluster_id comment category_ids
-  clusters_to_categorize = []
   clusters = $ '[id$=\'_categories\']'
   categories = []
+  if $('.cluster-row-select:checked').length == 0
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+    loader.addClass('hidden')
+    return
 
+  if comment == ''
+    std_msg_error('no comment added', ['Please make a comment to submit.'])
+    loader.addClass('hidden')
+    return
   data = {}
   data["comment"] = comment
   data["user_id"] = user_id
@@ -108,37 +120,21 @@ $ ->
         ]
         orderable: false
         searchable: false
-      }
-      {
-        targets: [ 0 ]
-        className: 'expandable-row-column'
-      }
-      {
-        targets: [3]
-        className: 'domain-column'
-      }
-      {
-        targets: [6]
-        className: 'category-column'
+        sortable: false
       }
     ]
     columns: [
       {
         data: null
         width: '14px'
-        orderable: false
-        searchable: false
-        sortable: false
+        className: 'expandable-row-column'
         'render':(data,type,full,meta)->
-          return '<button class="expand-row-button-inline expand-row-button-' + data.cluster_id + '"></button>'
+          return "<button class='expand-row-button-inline expand-row-button-#{data.cluster_id}'></button>"
       }
       {
         data: null
-        orderable: false
-        searchable: false
-        sortable: false
         render: (data, type, full, meta) ->
-          return '<input type="checkbox" name="cluster_id_' + data.cluster_id + '" onclick="toggleRow(this)">'
+          return "<input type='checkbox' class='cluser-row-select' name='cluster_id_#{data.cluster_id}' onclick='toggleRow(#{this})'>"
       }
       {
         data: 'cluster_id'
@@ -146,11 +142,22 @@ $ ->
       }
       {
         data: null,
+        className: 'domain-column',
         render: (data) ->
-          '<button type="button" class="whois-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data.domain + '\')"></button>' +
-            '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data.domain + '\')"></button>' +
-            data.domain + '<button type="button" onclick="window.open(\'https://' + data.domain + '\', \'_blank\') " class="open-in-tab-btn right-margin esc-tooltipped", title="Open ' + data.domain + ' in a new tab"></button>' +
-            '<span class="vertical-separator"></span><span class="entry-count">' + data.cluster_size + '</span>'
+          {domain, cluster_size} = data  # get domain string and cluster_size out of the data
+          is_ip = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+
+          html = "<span ondblclick='copy_domain(\"#{domain}\", this)'> #{domain} </span>"
+          # only show WHOIS lookup button for normal domains, not ip addresses
+          if !is_ip.test(domain)
+            html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='domain_whois(\"#{domain}\")'></button>"
+          else
+            html += "<button type='button' class='whois-btn right-margin domain-spacer'></button>"
+
+          html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
+                   <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>
+                   <span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
+          return html
       }
       {
         data: 'global_volume'
@@ -170,8 +177,9 @@ $ ->
       }
       {
         data: 'cluster_id'
+        className: 'category-column'
         render: (data) ->
-          '<select id="' + data + '_categories"' + 'class="form-control selectize cluster_categories" multiple="multiple" placeholder="Enter up to 5 categories" value="" name="">'
+          "<select id='#{data}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='' name=''>"
       }
     ]
   )
@@ -248,7 +256,7 @@ window.copycat_dialog = () ->
       $('button.icon-copycat').removeClass('active')
     open: (event, ui) =>
       $('#copycat_dialog #copycat-categories').selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
@@ -258,6 +266,17 @@ window.copycat_dialog = () ->
         options: AC.WebCat.createSelectOptions('#copycat_dialog #copycat-categories')
       }
   });
+
+window.open_wsa_status = () ->
+  $('#wsa_status_dialog').removeClass('hidden')
+  $('#wsa_status_dialog').dialog({
+    dialogClass: "wsa_tool_dialog",
+    position: { my: "left+275 top+160", at: "left top", of: window },
+    close: (event, ui) =>
+      $('button.icon-wsa').removeClass('active')
+      $('#wsa-status-table').empty()
+  });
+
 
 # delete copycat input content
 window.copycat_clear = () ->
@@ -297,7 +316,7 @@ window.selectize_category_inputs = () ->
 #          This is already selectized
     else
       $(this).selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
@@ -306,6 +325,18 @@ window.selectize_category_inputs = () ->
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions("##{this.id}"),
       }
+
+window.copy_domain = (domain, element) ->
+  copyToClipboard(domain)
+  html = "<div class='copied-container'>
+            <div class ='copied-check'></div>
+            <p id='copiedAlert'>Copied to clipboard</p>
+          </div>"
+  $(element).after( html )
+  $('.copied-container').delay(1000).fadeOut(1000);
+  setTimeout (->
+    $(".copied-container").remove()
+  ), 2000
 
 window.toggle_all_checkboxes = () ->
   if $('#clusters_check_box').prop('checked')
@@ -505,17 +536,184 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
       if i > 24
         $(this).remove()
 
+nf_data =''
+companies_data = ''
+serials_data = ''
+
+$(document).on 'keydown','#wsa_statuses', (event) ->
+  if (event.keyCode == 13)
+    get_wsa_status()
+
+window.get_wsa_status = () ->
+  searches = $('#wsa_statuses').val();
+  if searches == ""
+    std_msg_error("No Companies or Serial numbers entered.","")
+    return
+
+  # empty data everytime
+
+  nf_data = ''
+  companies_data = ''
+  serials_data = ''
+
+  data_array = searches.split(',').map(Function.prototype.call, String.prototype.trim)
+  $('.wsa-loader-wrapper').removeClass('hidden')
+  $('#wsa-status-table').empty()
+
+  serials  = {'serials':data_array}
+  companies = {'companies': data_array}
 
 
-  window.select_or_deselect_cluster = (cluster_id)->
+  telemetry_call(serials, 'serials')
+  telemetry_call(companies, 'companies')
+
+  telemetry_interval = setInterval ()->
+    if companies_data != '' && serials_data != ''
+      clearInterval(telemetry_interval)
+      build_wsa_table()
+  , 3000
+
+
+
+window.build_wsa_table = ()->
+  $('#wsa-status-table').removeClass('hidden')
+
+  wsa_data = []
+  not_found = []
+
+  #  have to stringify to compare objects and avoid duplicates
+  for data, i in companies_data
+    if  wsa_data.indexOf( JSON.stringify( companies_data[i]) ) == -1
+      wsa_data.push(JSON.stringify( data) )
+
+  for data, i in serials_data
+    if  wsa_data.indexOf( JSON.stringify( serials_data[i]) ) == -1
+      wsa_data.push(JSON.stringify( data) )
+
+  for data, i in nf_data
+    is_company = false
+    is_serial = false
+    for company, i in companies_data
+      if company.company == data
+        is_company = true
+
+    for serial, i in serials_data
+      if serial.serial == data
+        is_serial = true
+
+    if not_found.indexOf( nf_data[i]) == -1 && !is_company  && !is_serial
+      not_found.push(data)
+
+  data_header = ["", "Serial","Company", "Modification Time", "Source", "WSA Version"]
+  wsa_div = document.getElementById('wsa-status-table')
+  status_table = document.createElement('table');
+  header_row = document.createElement('tr');
+  status_table.classList = 'wsa-table'
+  thead = document.createElement('thead');
+  tbody = document.createElement('tbody');
+
+  for header in data_header
+    th = document.createElement('th');
+    header_text = document.createTextNode(header);
+    th.appendChild(header_text );
+    header_row.appendChild(th);
+
+  thead.appendChild(header_row);
+  status_table.appendChild( thead);
+
+  if wsa_data.length > 0
+    for searched in wsa_data
+      # limit amount of data displayed in table
+      searched_el = JSON.parse( searched )
+      { company, mtime, serial, source, wsa_version } = searched_el
+
+      statuses = {serial, company, mtime, source, wsa_version}
+      status_tr_body = document.createElement('tr');
+      td = document.createElement('td');
+      status = document.createTextNode(v);
+      shared = document.createElement('td')
+      shared.classList = 'shared_data'
+      status_tr_body.appendChild(shared);
+
+      for k, v of statuses
+        td = document.createElement('td');
+        status = document.createTextNode(v);
+        td.appendChild(status);
+        status_tr_body.appendChild(td);
+
+      tbody.appendChild(status_tr_body);
+
+  if not_found.length > 0
+    for nf in not_found
+      nf_type = 'company'
+      if nf.startsWith("F") && nf.length == 11
+        nf_type = 'serial'
+
+      tr_body = document.createElement('tr');
+      not_shared = document.createElement('td')
+      not_shared.classList = 'not_shared_data'
+      tr_body.appendChild(not_shared);
+      td = document.createElement('td');
+      serial_td = document.createElement('td');
+      switch nf_type
+        when 'company'
+          td.appendChild( document.createTextNode(nf) );
+          lg_td = document.createElement('td');
+          serial_td.classList = 'nf_tds'
+          lg_td.classList = 'nf_tds'
+
+          lg_td.setAttribute('colspan', '3')
+
+          tr_body.appendChild(serial_td )
+          tr_body.appendChild(td)
+          tr_body.appendChild(lg_td)
+
+          tbody.appendChild(tr_body)
+        when 'serial'
+
+          td.appendChild( document.createTextNode(nf) );
+          lg_td = document.createElement('td');
+          lg_td.classList = 'nf_tds'
+          lg_td.setAttribute('colspan', '4')
+          tr_body.appendChild(td)
+          tr_body.appendChild(lg_td)
+          tbody.appendChild(tr_body)
+
+
+
+  status_table.appendChild(tbody)
+  wsa_div.appendChild(status_table)
+  $('.wsa-loader-wrapper').addClass('hidden')
+
+window.telemetry_call = (data, type) ->
+    $.ajax(
+      headers : {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      url: "/escalations/api/v1/escalations/wsa_statuses"
+      method: 'POST'
+      data: data
+      success: (response) ->
+        {not_found, wsa_statuses} = response
+        switch type
+          when 'companies'
+            companies_data = wsa_statuses
+          when 'serials'
+            serials_data = wsa_statuses
+        if typeof nf_data == 'string'
+          nf_data = not_found
+        else
+          nf_data = nf_data.concat(not_found)
+        return response
+      error: (response) ->
+        return response
+    )
+
+window.select_or_deselect_cluster = (cluster_id)->
     $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
-
-  $('#cluster_filter_field').keyup (event) ->
+#
+$('#cluster_filter_field').keyup (event) ->
     if event.keyCode == 13
       apply_filter_to_table()
     return
-
-
 
 $ ->
 # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load

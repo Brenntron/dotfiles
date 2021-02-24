@@ -37,6 +37,8 @@ class Complaint < ApplicationRecord
 
   SOURCE_RULEUI = "RuleUI"
 
+  MAIN_WEBCAT_MANAGER_CONTACT = "admatter"
+
   scope :active_count , -> {where(status:ACTIVE).count}
   scope :completed_count , -> {where(status:COMPLETED).count}
   scope :new_count , -> {where(status:NEW).count}
@@ -233,60 +235,86 @@ class Complaint < ApplicationRecord
   end
 
 
+  def build_ti_payload
+    payload = {}
 
+    complaint_entries.each do |entry|
+      new_payload_item = {}
+      new_payload_item[:sugg_type] = entry.suggested_disposition
+      new_payload_item[:status] = entry.status
+      new_payload_item[:resolution_message] = entry.resolution_comment
+      new_payload_item[:resolution] = entry.resolution
+      new_payload_item[:company_dup] = Complaint.is_possible_company_duplicate(self, entry.hostlookup, entry.entry_type)
+
+      payload[entry.hostlookup] = new_payload_item
+      payload[entry.hostlookup]['sugg_type'] = entry.suggested_disposition
+    end
+
+    payload
+  end
 
   def self.process_bridge_payload(message_payload)
 
     begin
-      ActiveRecord::Base.transaction do
-        max_wait_for_job = 60 #seconds
 
-        user = User.where(cvs_username:"vrtincom").first
-        guest = Company.where(:name => "Guest").first
-        #TODO: this should be put in a params method
-        new_entries_ips = message_payload["payload"]["investigate_ips"]
-        new_entries_urls = message_payload["payload"]["investigate_urls"]
+      record_exists = Complaint.where(:ticket_source_key => message_payload["source_key"]).first
 
-        return_payload = {}
+      if record_exists.present?
+        return_payload = record_exists.build_ti_payload
+        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id)
+        return conn.post(return_payload)
+      end
 
-        #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
+      user = User.where(cvs_username:"vrtincom").first
+      guest = Company.where(:name => "Guest").first
+      #TODO: this should be put in a params method
+      new_entries_ips = message_payload["payload"]["investigate_ips"]
+      new_entries_urls = message_payload["payload"]["investigate_urls"]
 
-        summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+      return_payload = {}
 
-        full_description = <<~HEREDOC
+      #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
+
+      summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+      full_description = <<~HEREDOC
           IPs: #{new_entries_ips.keys.join(', ')}
           URIs: #{new_entries_urls.keys.join(', ')}
           Problem Summary: #{message_payload["payload"]["problem"]}
-        HEREDOC
+      HEREDOC
 
-        bug_attrs = {
-            'product' => 'Escalations Console',
-            'component' => 'Categorization',
-            'summary' => summary,
-            'version' => 'unspecified', #self.version,
-            'description' => full_description,
-            'priority' => 'Unspecified',
-            'classification' => 'unclassified',
-        }
+      bug_attrs = {
+          'product' => 'Escalations Console',
+          'component' => 'Categorization',
+          'summary' => summary,
+          'version' => 'unspecified', #self.version,
+          'description' => full_description,
+          'priority' => 'Unspecified',
+          'classification' => 'unclassified',
+      }
 
-        bugzilla_rest_session = message_payload[:bugzilla_rest_session]
-        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs, assigned_user: user)
+      bugzilla_rest_session = message_payload[:bugzilla_rest_session]
+      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs, assigned_user: user)
 
 
-        new_complaint = Complaint.new
-        new_complaint.submission_type = message_payload["payload"]["submission_type"]
-        new_complaint.id = bug_proxy.id
-        new_complaint.description = message_payload["payload"]["problem"]
-        new_complaint.ticket_source_key = message_payload["source_key"]
-        new_complaint.ticket_source = "talos-intelligence"
-        new_complaint.ticket_source_type = message_payload["source_type"]
-        customer = Customer.process_and_get_customer(message_payload)
-        new_complaint.customer_id = customer&.id
-        new_complaint.status = NEW
-        new_complaint.channel = TI_CHANNEL
-        new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+      new_complaint = Complaint.new
+      new_complaint.submission_type = message_payload["payload"]["submission_type"]
+      new_complaint.id = bug_proxy.id
+      new_complaint.description = message_payload["payload"]["problem"]
+      new_complaint.ticket_source_key = message_payload["source_key"]
+      new_complaint.ticket_source = "talos-intelligence"
+      new_complaint.ticket_source_type = message_payload["source_type"]
+      customer = Customer.process_and_get_customer(message_payload)
+      new_complaint.customer_id = customer&.id
+      new_complaint.status = NEW
+      new_complaint.channel = TI_CHANNEL
+      new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
-        new_complaint.save!
+      new_complaint.save!
+
+
+      ActiveRecord::Base.transaction do
+        max_wait_for_job = 60 #seconds
 
         response = is_possible_customer_duplicate?(new_complaint, new_entries_ips, new_entries_urls)
 
@@ -299,7 +327,6 @@ class Complaint < ApplicationRecord
         #TODO: investigate above to see if its worth refactoring, and refactor it if so.
 
         new_entries_ips.each do |key, entry|
-
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"] unless entry['wbrs']['cat_sugg'].blank?
@@ -316,7 +343,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
           new_complaint_entry.entry_type = "IP"
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",") unless entry['wbrs']['cat_sugg'].blank?
-
+          new_complaint_entry.platform = entry['wbrs']['platform']
           if prefix_response.first&.is_active == 1
             new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"] unless entry['wbrs']['current_cat'].blank?
           else
@@ -334,23 +361,26 @@ class Complaint < ApplicationRecord
 
 
           begin
-            #ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            # if we are generating a new screenshot then we need to remove the old one
+            unless new_complaint_entry.complaint_entry_screenshot.nil?
+              ComplaintEntryScreenshot.find(new_complaint_entry.complaint_entry_screenshot.id).delete
+            end
+            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
-            #ces.grab_screenshot
+            ces.grab_screenshot
           rescue Exception => e
-            #Rails.logger.error("#{e.message}")
-            #ces = ComplaintEntryScreenshot.new
-            #ces.error_message = e.message
-            #ces.complaint_entry_id = new_complaint_entry.id
-            #open("app/assets/images/failed_screenshot.jpg") do |f|
-            #  ces.screenshot = f.read
-            #end
-            #ces.save!
+            Rails.logger.error("#{e.message}")
+            ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
+            ces.complaint_entry_id = new_complaint_entry.id
+            open("app/assets/images/failed_screenshot.jpg") do |f|
+             ces.screenshot = f.read
+            end
+            ces.save!
           end
         end
 
         new_entries_urls.each do |key, entry|
-
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           url_parts = parse_url(key)
           new_complaint_entry = ComplaintEntry.new
@@ -360,7 +390,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
-
+          new_complaint_entry.platform = entry["platform"]
 
           if prefix_response.first&.is_active?
             new_complaint_entry.url_primary_category = entry["current_cat"] unless entry['current_cat'].blank?
@@ -389,17 +419,21 @@ class Complaint < ApplicationRecord
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
           begin
-            #ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            # if we are generating a new screenshot then we need to remove the old one
+            unless new_complaint_entry.complaint_entry_screenshot.nil?
+              ComplaintEntryScreenshot.find(new_complaint_entry.complaint_entry_screenshot.id).delete
+            end
+            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
-            #ces.grab_screenshot
+            ces.grab_screenshot
           rescue Exception => e
-            #ces = ComplaintEntryScreenshot.new
-            #ces.error_message = e.message
-            #ces.complaint_entry_id = new_complaint_entry.id
-            #open("app/assets/images/failed_screenshot.jpg") do |f|
-            #  ces.screenshot = f.read
-            #end
-            #ces.save!
+            ces = ComplaintEntryScreenshot.new
+            ces.error_message = e.message
+            ces.complaint_entry_id = new_complaint_entry.id
+            open("app/assets/images/failed_screenshot.jpg") do |f|
+             ces.screenshot = f.read
+            end
+            ces.save!
           end
         end
 
@@ -569,7 +603,6 @@ class Complaint < ApplicationRecord
           IPs/URIs: #{ips_urls}
           Problem Summary: #{description}
     HEREDOC
-
     bug_attrs = {
         'product' => 'Escalations Console',
         'component' => 'Categorization',

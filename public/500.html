@@ -1,66 +1,319 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>We're sorry, but something went wrong (500)</title>
+  <title>Analyst Console (500)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
   <style>
+
+  html, body{
+    margin: 0;
+    padding: 0;
+  }
+
+  html{
+    height: 100%;
+  }
+
   body {
-    background-color: #EFEFEF;
-    color: #2E2F30;
+    background-color: #edf1f2;
+    color: #333;
     text-align: center;
     font-family: arial, sans-serif;
-    margin: 0;
+    min-height: 100%;
+    position: relative;
   }
 
-  div.dialog {
-    width: 95%;
-    max-width: 33em;
-    margin: 4em auto 0;
+  #nav-banner{
+    background-color: #4E4E4E;
+    height: 44px;
+    overflow:hidden;
   }
 
-  div.dialog > div {
-    border: 1px solid #CCC;
-    border-right-color: #999;
-    border-left-color: #999;
-    border-bottom-color: #BBB;
-    border-top: #B00100 solid 4px;
-    border-top-left-radius: 9px;
-    border-top-right-radius: 9px;
-    background-color: white;
-    padding: 7px 12% 0;
-    box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
+  #bugzilla_icon{
+    height: 49px;
+    transform: rotate(25deg);
+    opacity: .3;
+    float: right;
+    margin: 13px 27px 0 0;
+  }
+
+  .bugzilla-fill-0{fill:#A5A5A5;}
+
+  #side-nav{
+    width: 44px;
+    height: 100%;
+    background-color: #2c3e50;
+    position: absolute;
+  }
+
+  #top-corner-square{
+    width: 100%;
+    background-color: #fff;
+    height: 44px;
+  }
+
+  #ac-logo{
+    height: 36px;
+    margin-top: 4px;
+  }
+
+  .ac-logo-0{fill:#EFB834;}
+  .ac-logo-1{fill:#A4AFB1;}
+  .ac-logo-2{fill:#2C3E50;}
+
+  #page-wrapper{
+    margin-left: 44px;
+  }
+
+  #page-content-wrapper{
+    display: block;
+    padding: 20px;
+  }
+
+  .content-wrapper{
+    background: #fff;
+    border-radius: 4px;
+    padding: 15px;
+    position: relative;
+    height: 100%;
+    -webkit-box-shadow: 2px 0 10px 1px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 2px 0 10px 1px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 0 10px 1px rgba(0, 0, 0, 0.1);
+  }
+
+
+  #h1-wrapper{
+    border-bottom: 1px solid #f2f2f2;
+    width: fit-content;
+    margin: auto;
+    padding-bottom: 4px;
   }
 
   h1 {
-    font-size: 100%;
-    color: #730E15;
+    font-size: 26px;
     line-height: 1.5em;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 100;
+    color: #666;
+    padding: 13px 0 0 0;
+    margin: 0;
   }
 
-  div.dialog > p {
-    margin: 0 0 1em;
-    padding: 1em;
-    background-color: #F7F7F7;
-    border: 1px solid #CCC;
-    border-right-color: #999;
-    border-left-color: #999;
-    border-bottom-color: #999;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    border-top-color: #DADADA;
-    color: #666;
-    box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
+  .h4-wrapper{
+    margin-bottom: 20px;
+    float: left;
+    width: 100%;
   }
+
+  h4{
+    text-transform: uppercase;
+    font-weight: 700 !important;
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+    float: left;
+  }
+
+  #expression-icon{
+    height: 40px;
+  }
+  .expression-icon-fill{
+    fill:#666;
+  }
+  #subheader {
+    margin: 0 0 1em;
+    padding: 9px 0 0 0;
+    color: #666;
+    width: fit-content;
+    margin: auto;
+    font-size: 14px;
+  }
+
+  .top-spacing{
+    margin-top: 15px;
+  }
+
+  #step-list{
+    padding-left: 15px;
+    font-size: 14px;
+  }
+
+  #step-list li {
+    margin-bottom: 7px;
+  }
+
+  #warning-icon{
+    height: 22px;
+    position: absolute;
+    top: -10px;
+    left: calc(50% - 11px);
+  }
+
+  .warning-icon-0{fill:#E57435;}
+  .warning-icon-1{fill:#FFFFFF;}
+
+  .left-aligned{
+    text-align: left;
+  }
+  .content-label-sm{
+    white-space: nowrap;
+    color: #999;
+    font-size: 7pt;
+    text-align: left;
+    padding: 4px 0 2px 0;
+    margin-bottom: 0;
+  }
+  .top-info-data{
+    margin-bottom: 10px;
+    line-height: 1.5em;
+    font-size: 14px;
+  }
+  .red-highlight{
+    color: #DE360A
+  }
+  .top-form-note{
+    margin: 2px 0 0 18px;
+    float: left;
+    padding: 0;
+  }
+  .clear{
+    clear:both;
+  }
+
   </style>
 </head>
 
 <body>
   <!-- This file lives in public/500.html -->
-  <div class="dialog">
-    <div>
-      <h1>We're sorry, but something went wrong.</h1>
+  <div id="side-nav">
+    <div id="top-corner-square">
+      <svg version="1.1" id="ac-logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+           viewBox="0 0 40 40" style="enable-background:new 0 0 40 40;" xml:space="preserve">
+        <g>
+        <path class="ac-logo-0" d="M30.7,25.3c-1-0.7-2.2-1.2-3.6,0.2c0.1,0.1,0.2,0.2,0.3,0.3c0.6,0.7,1.2,1.5,0.8,2.5c-1.2,0.3-2-0.3-2.9-1.1
+            l0.1-0.1l0,0c0,0-1.2,1.1-0.7,2.9c0.5,1.9,2.8,2.2,2.8,2.2s-0.3-1.6,0-2c1.1,2.1,3.6,2.9,5.7,1.5C31.6,30.4,32.4,26.7,30.7,25.3z"
+        />
+          <polygon class="ac-logo-1" points="13.3,10.9 10.9,13.2 19.4,38 23.1,34.3 21.4,29.3 21.5,29.3 19.8,24.7 19.8,24.7 17.2,17.2 24.8,19.7
+		21.1,23.4 22.8,27.9 29.4,21.4 34.4,23.1 38,19.5 	"/>
+        <g>
+		  <path class="ac-logo-2" d="M33.6,16.1C32.7,8.1,25.9,2,17.8,2C9.1,2,2,9.1,2,17.8c0,8.2,6.1,14.8,14.1,15.8l-1.7-5.1
+			C9.8,27,6.6,22.8,6.6,17.8c0-6.2,5.1-11.2,11.2-11.2c5,0,9.2,3.3,10.7,7.8L33.6,16.1z"/>
+        </g>
+        </g>
+      </svg>
     </div>
-    <p>If you are the application owner check the logs for more information.</p>
+  </div>
+  <div id="page-wrapper">
+    <div id="nav-banner">
+      <svg version="1.1" id="bugzilla_icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+           viewBox="0 0 20 20" xml:space="preserve">
+        <g>
+              <path class="bugzilla-fill-0" d="M18.2,0.6l-0.2,0c0,0-0.1,0-0.1,0c-1.3,0-3.7,0-6.1,1.7c-0.4,0.3-0.8,0.7-1.1,1.2c-0.5-0.2-1.1-0.2-1.6,0
+                  C8.9,3.1,8.6,2.7,8.1,2.3C5.8,0.6,3.4,0.6,2.1,0.6L2,0.6l-0.2,0c-0.1,0-0.2,0.1-0.2,0.2v0.6c0,0.1,0,0.1,0.1,0.2s0.1,0.1,0.2,0.1
+                  c0,0,0,0,0,0l0.2,0c1.3,0,3.4,0,5.4,1.5c0.4,0.3,0.7,0.6,0.9,1C7.8,4.8,7.5,5.7,7.5,6.6c0,0.1,0.1,0.2,0.2,0.2h4.6
+                  c0.1,0,0.2-0.1,0.2-0.2c0-0.9-0.3-1.8-0.9-2.4c0.2-0.4,0.5-0.7,0.9-1c2-1.5,4.1-1.5,5.4-1.5l0.1,0l0.2,0c0,0,0,0,0,0
+                  c0.1,0,0.1,0,0.2-0.1s0.1-0.1,0.1-0.2V0.8C18.5,0.7,18.4,0.6,18.2,0.6z"/>
+          <path class="bugzilla-fill-0" d="M16.5,9.3c0.1,0,0.1-0.1,0.2-0.2l0.7-1.9h0.9c0.1,0,0.2-0.1,0.2-0.2V6.4c0-0.1-0.1-0.2-0.2-0.2h-1.5
+                  c-0.1,0-0.2,0.1-0.2,0.2l-0.7,2l-0.9,0.2V7.9c0-0.1-0.1-0.2-0.2-0.2H5.4c-0.1,0-0.2,0.1-0.2,0.2v0.7L4.2,8.3l-0.7-2
+                  c0-0.1-0.1-0.2-0.2-0.2H1.8c-0.1,0-0.2,0.1-0.2,0.2V7c0,0.1,0.1,0.2,0.2,0.2h0.9l0.7,1.9c0,0.1,0.1,0.1,0.2,0.2l1.6,0.4v1l-1.5,0
+                  c-0.1,0-0.2,0.1-0.2,0.2l-0.7,1.6H1.8c-0.1,0-0.2,0.1-0.2,0.2v0.6c0,0.1,0.1,0.2,0.2,0.2h1.4c0.1,0,0.2-0.1,0.2-0.2l0.7-1.6l1,0
+                  c0,0.9,0,1.5,0.1,2.1l-1.8,0.6c-0.1,0-0.1,0.1-0.2,0.2l-0.7,3.2H1.8c-0.1,0-0.2,0.1-0.2,0.2v0.6c0,0.1,0.1,0.2,0.2,0.2h1.5
+                  c0.1,0,0.2-0.1,0.2-0.2l0.7-3.4l1.3-0.4c0.2,0.5,0.3,0.9,0.5,1.2C7.3,18,9.8,18.9,9.9,19c0,0,0.1,0,0.1,0c0,0,0.1,0,0.1,0
+                  c0.1,0,2.6-1,3.8-2.8c0.2-0.3,0.4-0.7,0.5-1.2l1.3,0.4l0.7,3.4c0,0.1,0.1,0.2,0.2,0.2h1.5c0.1,0,0.2-0.1,0.2-0.2v-0.6
+                  c0-0.1-0.1-0.2-0.2-0.2h-0.8l-0.7-3.2c0-0.1-0.1-0.2-0.2-0.2l-1.8-0.6c0.1-0.6,0.1-1.2,0.1-2.1l1,0l0.7,1.6c0,0.1,0.1,0.2,0.2,0.2
+                  h1.4c0.1,0,0.2-0.1,0.2-0.2v-0.6c0-0.1-0.1-0.2-0.2-0.2h-0.9l-0.7-1.6c0-0.1-0.1-0.2-0.2-0.2l-1.5,0v-1L16.5,9.3z M12.4,14.1
+                  c0.1,0.1,0.1,0.3,0,0.4l-0.7,0.7c0,0-0.1,0.1-0.2,0.1s-0.1,0-0.2-0.1L10,13.9l-1.3,1.3c-0.1,0.1-0.3,0.1-0.4,0l-0.7-0.7
+                  c-0.1-0.1-0.1-0.3,0-0.4l1.3-1.3l-1.3-1.3c-0.1-0.1-0.1-0.3,0-0.4l0.7-0.7c0.1-0.1,0.3-0.1,0.4,0l1.3,1.3l1.3-1.3
+                  c0.1-0.1,0.3-0.1,0.4,0l0.7,0.7c0.1,0.1,0.1,0.3,0,0.4l-1.3,1.3L12.4,14.1z"/>
+            </g>
+          </svg>
+    </div>
+    <div id="page-content-wrapper">
+      <div id="header" class="content-wrapper">
+        <svg version="1.1" id="warning-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+             viewBox="0 0 22 22" xml:space="preserve">
+          <g>
+              <g>
+                  <g>
+                      <circle class="warning-icon-0" cx="11" cy="11" r="9.1"/>
+                    <path class="warning-icon-1" d="M11,21.1C5.4,21.1,0.9,16.6,0.9,11S5.4,0.9,11,0.9S21.1,5.4,21.1,11S16.6,21.1,11,21.1z M11,2.9
+                          c-4.5,0-8.1,3.7-8.1,8.1c0,4.5,3.7,8.1,8.1,8.1c4.5,0,8.1-3.7,8.1-8.1C19.1,6.5,15.5,2.9,11,2.9z"/>
+                  </g>
+              </g>
+                    <path class="warning-icon-1" d="M11,15.9c-0.6,0-1.1-0.5-1.1-1.1c0-0.6,0.5-1.1,1.1-1.1s1.1,0.5,1.1,1.1C12.1,15.4,11.6,15.9,11,15.9z
+                 M10.2,6.1h1.7c0.1,0,0.2,0.1,0.2,0.2l-0.5,6.3c0,0.1-0.1,0.2-0.2,0.2h-0.7c-0.1,0-0.2-0.1-0.2-0.2L9.9,6.3
+                C9.9,6.2,10,6.1,10.2,6.1L10.2,6.1z"/>
+          </g>
+        </svg>
+
+        <div id="h1-wrapper">
+          <h1>Looks like something broke. Sorry!</h1>
+          <svg version="1.1" id="expression-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+             viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+            <g>
+              <path class="expression-icon-fill" d="M25,8.9C16.1,8.9,8.9,16.1,8.9,25S16.1,41.1,25,41.1S41.1,33.9,41.1,25S33.9,8.9,25,8.9z M25,39.1
+                  c-7.8,0-14.1-6.3-14.1-14.1S17.2,10.9,25,10.9S39.1,17.2,39.1,25S32.8,39.1,25,39.1z"/>
+              <path class="expression-icon-fill" d="M25,26.6c-2.3,0-4.2,1.9-4.2,4.2c0,2.3,1.9,4.2,4.2,4.2s4.2-1.9,4.2-4.2C29.2,28.5,27.3,26.6,25,26.6z"/>
+              <g>
+                <circle class="expression-icon-fill" cx="19.7" cy="20.4" r="1.4"/>
+                <circle class="expression-icon-fill" cx="30.3" cy="20.4" r="1.4"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <p id="subheader">Please report this to the Communities Development team asap.</p>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 top-spacing">
+          <div class="content-wrapper left-aligned">
+            <div id="step-container">
+              <div class="h4-wrapper">
+                <h4>Reporting Steps</h4>
+              </div>
+
+              <ol id="step-list" class="clear">
+                <li><a href="https://jira.vrt.sourcefire.com/secure/CreateIssue!default.jspa" target="_blank">Open this link to the Jira dashboard.</a></li>
+                <li>Carefully complete the form and submit a ticket. Be sure to include the required fields listed in the next section!</li>
+                <li>Save the url and/or the ticket number for your own convenience. We will update this ticket as we look into this issue.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-6 top-spacing">
+          <div class="content-wrapper left-aligned">
+            <div class="h4-wrapper">
+              <h4>JIRA Ticket Fields</h4>
+              <p class="content-label-sm top-form-note"><span class="red-highlight"> *</span> indicates a required field</p>
+            </div>
+
+            <div class="clear">
+              <p class="content-label-sm">Project<span class="red-highlight"> *</span></p>
+              <p class="top-info-data">TalosWeb (WEB)</p>
+
+              <p class="content-label-sm">Issue Type<span class="red-highlight"> *</span></p>
+              <p class="top-info-data">Bug</p>
+
+              <p class="content-label-sm">Summary<span class="red-highlight"> *</span></p>
+              <p class="top-info-data">ACE - 500 Error</p>
+
+              <p class="content-label-sm">Component/s<span class="red-highlight"> *</span></p>
+              <p class="top-info-data">Analyst Console Escalations</p>
+
+              <p class="content-label-sm">Description</p>
+              <p class="top-info-data">Please be as descriptive as possible - what action were you trying to take, what ticket or page was this action on, etc.</p>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
 </body>
 </html>

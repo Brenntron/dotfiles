@@ -227,8 +227,7 @@ $ ->
 
   ##  Populating the toolbar Adjust RepTool BL dropdown
   window.bulk_get_current_reptool = (page) ->
-
-# Define the variables based on the page
+    # Define the variables based on the page
     if page == "show" || page == "research"
       checkbox = $('.dispute_check_box:checked')
     else if page == "index"
@@ -246,38 +245,62 @@ $ ->
     # Get all the checked entry urls
     if ($(checkbox).length > 0)
       ip_uris = []
+      comment_trail = ''
+      comment_array = []
+      closed_status = false
       $(checkbox).each ->
         if page == "show" || page == "research"
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text().trim()
+          entry_status = $(entry_row).find('.entry-data-status').text().trim()
+          entry_case_id = $('#dispute_id').text()
         else if page == "index"
           entry_row = $(this).parents('.index-entry-row')[0]
           entry_content = $(entry_row).find('.entry-col-content').text().trim()
+          entry_status = $(entry_row).find('.entry-col-status').text().trim()
+          entry_case_id = $(entry_row).attr('data-case-id')
         # Send entry content to reptool
         ip_uris.push(entry_content)
 
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
-        method: 'POST'
-        data: { ip_uris: ip_uris }
-        success: (response) ->
-          response = JSON.parse(response)
+        entry_comment = 'TE.ACE-' + entry_case_id
+        if comment_array.indexOf(entry_comment) == -1
+          comment_array.push(entry_comment)
 
-          for entry in response
-            if entry['status'] == "ACTIVE"
-              rep_class_full = entry['classification'] + ' - ' + entry['expiration']
-              rep_class = entry['classification']
-            else
-              rep_class_full = '<span class="missing-data">No active classifications</span>'
-              rep_class = ''
+        if page == "show"
+          comment_trail = 'AC INDIVIDUAL SUBMISSION: \n' + comment_array.join('\n')
+        else if page == "research"
+          comment_trail = 'AC Research Bulk Submission: \n' + ip_uris.join('\n')
+        else if page == "index"
+          comment_trail = 'AC Bulk Submission: \n' + comment_array.join('\n')
 
-            tbody.append('<tr class="reptool-entry-row"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
-        error: (response) ->
-          std_api_error(response, "Error retrieving Reptool Data", reload: false)
-      )
+        if entry_status ==  "RESOLVED_CLOSED"
+          closed_status = true
+      if closed_status
+        std_msg_error('Error', ['Please reopen dispute before adjusting reptool.'])
+      else
+        std_msg_ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
+          method: 'POST'
+          data: { ip_uris: ip_uris }
+          success: (response) ->
+            console.log response
+            response = JSON.parse(response)
+
+            for entry in response
+              if entry['status'] == "ACTIVE"
+                rep_class_full = entry['classification'] + ' - ' + entry['expiration']
+                rep_class = entry['classification']
+              else
+                rep_class_full = '<span class="missing-data">No active classifications</span>'
+                rep_class = ''
+
+              tbody.append('<tr class="reptool-entry-row"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
+              $('.reptool-generated-comment').html(comment_trail)
+          error: (response) ->
+            std_api_error(response, "Error retrieving Reptool Data", reload: false)
+        )
     else
       std_msg_error('Error', ['Please select one row'])
-      $(dropdown).removeClass('open')
       return false
 
   ## WL/BL Form manipulation
@@ -389,7 +412,7 @@ $ ->
         $(vt_table).hide()
 
     if $(this).hasClass('xbrs-checkbox')
-      xbrs_table = $(entry_row).find('.xbrs-details-table')[0]
+      xbrs_table = $(entry_row).find('.xbrs-details-table')
       if $(this).prop('checked')
         $(xbrs_table).show()
       else

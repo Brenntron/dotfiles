@@ -328,6 +328,7 @@ $ ->
     new_url = '/escalations/file_rep/disputes'
 
     if href != undefined
+      localStorage.setItem('file_rep_search_name', href)
       window.location.replace(new_url + href)
 
     if !href && typeof parseInt(url_check) == 'number'
@@ -538,16 +539,9 @@ $ ->
       $('#filerep-index-title')[0].innerHTML = new_header
 
   window.export_file_rep_all = () ->
-    form = document.getElementById("disputes-index-export-form")
-    data = {
-      search_type: ''
-      search_name: ''
-      selected_cases: []
-    }
+    form = document.getElementById("file-rep-disputes-index-export-form")
 
-    $('.dispute_check_box').each ->
-      case_id =  $(this).attr('value')
-      data.selected_cases.push(case_id)
+    data = build_data()
 
     if 'advanced' == data.search_type
       data.search_name = null
@@ -558,11 +552,6 @@ $ ->
     form.onsubmit = () ->
       return false
 
-  $(document).on 'change', '.dispute_check_box', ->
-    # ensure this only runs in file rep, there are dispute checkboxes on webrep
-    if $('#disputes-index-export-form').length
-      document.getElementById("disputes-index-export-form").onsubmit = () ->
-        return false
   window.export_file_rep_selected = () ->
     data = build_data()
     if data.selected_cases.length <= 0
@@ -572,7 +561,7 @@ $ ->
       data.search_name = null
     data_json = JSON.stringify(data)
     $('#index-export-data-input').val(data_json)
-    document.getElementById("disputes-index-export-form").onsubmit = ""
+    document.getElementById("file-rep-disputes-index-export-form").onsubmit = ""
 
 
 
@@ -596,7 +585,7 @@ $ ->
         if search_type == 'advanced' && search_name_check && text_check
           ###
             creating temporary tr for the filter dropdown
-            attributes added then onclick events 
+            attributes added then onclick events
           ###
           new_tr = document.createElement('tr')
           new_td = document.createElement('td')
@@ -651,7 +640,12 @@ $ ->
       16
       'desc'
     ] ]
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     pagingType: 'full_numbers'
+    language: {
+      search: "_INPUT_"
+      searchPlaceholder: "Search within the table"
+    }
     keys:
       columns: ':not(:first-child)'
     columnDefs: [
@@ -675,6 +669,7 @@ $ ->
       {
         data:'id'
         render: (data, type, full, meta) ->
+          console.log full
           return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" data-sha="' + full['sha256_hash'] + '"/>'
       }
       {
@@ -704,6 +699,18 @@ $ ->
         data: 'file_size'
         render: (data) ->
           return data + ' KB'
+      }
+      {
+        data: 'platform'
+        class: 'platform-col'
+        render: (data, type, full, meta) ->
+          if data?
+            platform = data
+          else
+            platform = ""
+          if platform == "N/A" || platform == "Unknown" || platform == "Missing" || platform == ""
+            platform = '<span class="missing-data platform"></span>'
+          return platform
       }
       {
         data: 'sample_type'
@@ -1436,6 +1443,8 @@ $ ->
         error: () ->
       )
 
+    $('#file-rep-datatable_filter input').addClass('table-search-input');
+    $('#file-rep-datatable_filter label').addClass('table-search-label');
 
 # file rep index - toggle all cb's and highlight rows
 window.file_rep_select_all = () ->
@@ -1465,3 +1474,20 @@ $ ->
       'tooltipster-borderless'
       'tooltipster-borderless-customized'
     ]
+
+$ ->
+  set_file_rep_link = () ->
+    url = '/escalations/file_rep/disputes'
+    search = if window.location.pathname == url # only if we're on index page
+               window.location.search
+             else
+               localStorage.file_rep_search_name
+
+    if search && window.location.href.indexOf('file_rep') > 0
+      localStorage.setItem('file_rep_search_name', search)
+      link = url + search
+      $('#amp-link').attr('href', link)
+      $('#amp-icon-link').attr('href', link)
+      $('#queue').attr('href', link)
+
+  set_file_rep_link()

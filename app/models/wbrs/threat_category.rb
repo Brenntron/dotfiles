@@ -29,7 +29,8 @@ class Wbrs::ThreatCategory < Wbrs::Base
       response = call_json_request(:get, '/v1/rep/thrtcats', body: '')
 
       response_body = JSON.parse(response.body)
-      @all = response_body['data'].map {|datum| new_from_datum(datum)}
+      active = response_body['data'].select {|cat| cat["is_active"] == 1}
+      @all = active.map {|datum| new_from_datum(datum)}
     end
     @all
   end

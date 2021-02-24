@@ -3,6 +3,15 @@ require "rails_helper"
 RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
   let(:vrt_incoming) { FactoryBot.create(:vrt_incoming_user) }
   let(:guest_company) { FactoryBot.create(:guest_company) }
+  let(:company_name) { 'WRMC' }
+  let(:customer_name) { '3-Support Support' }
+  let(:customer_email) { 'webmaster@cmim.org' }
+  let(:existing_company) { FactoryBot.create(:company, name: company_name) }
+  let(:existing_customer) do
+    FactoryBot.create(:customer, name: customer_name, email: customer_email, company: existing_company)
+  end
+
+
   let(:complaint_payload) do
     {
         investigate_ips: {
@@ -122,6 +131,23 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
     complaint = Complaint.where(ticket_source_key: 1001).first
     expect(complaint).to be_nil
   end
+
+  it 'should short circuit ticket creation from payload if the ticket already exists (to prevent dupes)' do
+    vrt_incoming
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+    Complaint.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :status => "NEW")
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: complaint_message_json
+
+    expect(response).to be_successful
+    complaint = Complaint.where(ticket_source_key: 1001).first
+
+    expect(complaint).to_not be_nil
+    expect(Complaint.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+  end
+
 end
 
 # expect(response.code).to be_successful
