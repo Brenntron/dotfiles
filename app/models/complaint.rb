@@ -2,7 +2,7 @@ class Complaint < ApplicationRecord
   belongs_to :customer, optional: true
   has_many :complaint_entries, dependent: :restrict_with_exception
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
-
+  belongs_to :platform, optional: true
   has_paper_trail on: [:update], ignore: [:updated_at]
 
   delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
@@ -274,6 +274,10 @@ class Complaint < ApplicationRecord
 
         internal_comment = nil
 
+        if message_payload["payload"]["product_platform"].present?
+          platform = Platform.find(message_payload["payload"]["product_platform"].to_i) rescue nil
+        end
+
         new_complaint = Complaint.new
         new_complaint.submission_type = message_payload["payload"]["submission_type"]
         new_complaint.id = bug_proxy.id
@@ -285,8 +289,8 @@ class Complaint < ApplicationRecord
         new_complaint.customer_id = customer&.id
         new_complaint.status = NEW
         new_complaint.channel = TI_CHANNEL
-
-        new_complaint.product_platform = message_payload["payload"]["product_platform"] unless message_payload["payload"]["product_platform"].blank?
+        new_complaint.platform_id = platform.id unless platform.blank?
+        new_complaint.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
         new_complaint.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
         new_complaint.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
 
@@ -312,6 +316,9 @@ class Complaint < ApplicationRecord
         #TODO: investigate above to see if its worth refactoring, and refactor it if so.
 
         new_entries_ips.each do |key, entry|
+          if entry['wbrs']['platform'].present?
+            entry_platform = Platform.find(entry['wbrs']['platform'].to_i) rescue nil
+          end
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"] unless entry['wbrs']['cat_sugg'].blank?
@@ -328,7 +335,8 @@ class Complaint < ApplicationRecord
           new_complaint_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
           new_complaint_entry.entry_type = "IP"
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",") unless entry['wbrs']['cat_sugg'].blank?
-          new_complaint_entry.platform = entry['wbrs']['platform']
+          new_complaint_entry.platform = entry['wbrs']['platform'] if (entry['wbrs']['platform'].present? && !entry['wbrs']['platform'].kind_of?(Integer))
+          new_complaint_entry.platform_id = entry_platform.id unless entry_platform.blank?
           if prefix_response.first&.is_active == 1
             new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"] unless entry['wbrs']['current_cat'].blank?
           else
@@ -367,6 +375,9 @@ class Complaint < ApplicationRecord
         end
 
         new_entries_urls.each do |key, entry|
+          if entry['platform'].present?
+            entry_platform = Platform.find(entry['platform'].to_i) rescue nil
+          end
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           url_parts = parse_url(key)
           new_complaint_entry = ComplaintEntry.new
@@ -376,14 +387,14 @@ class Complaint < ApplicationRecord
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
-          new_complaint_entry.platform = entry["platform"]
+          new_complaint_entry.platform = entry["platform"] if (entry["platform"].present? && !entry['platform'].kind_of?(Integer))
 
           if prefix_response.first&.is_active?
             new_complaint_entry.url_primary_category = entry["current_cat"] unless entry['current_cat'].blank?
           else
             new_complaint_entry.url_primary_category = nil
           end
-
+          new_complaint_entry.platform_id = entry_platform.id unless entry_platform.blank?
           new_complaint_entry.subdomain = url_parts[:subdomain]
           new_complaint_entry.domain = url_parts[:domain]
           new_complaint_entry.path = url_parts[:path]

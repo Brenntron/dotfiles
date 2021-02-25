@@ -27,7 +27,9 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
                   company_name: "Microsoft",
                   disposition_suggested: 'Malicious',
                   summary_description: "What do i do to improve the reputation",
-                  sandbox_key: "TI-Form"
+                  sandbox_key: "TI-Form",
+                  product_platform: 1001
+
                 }
             }
 
@@ -56,7 +58,7 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
                     disposition_suggested: 'Malicious',
                     summary_description: "What do i do to improve the reputation",
                     sandbox_key: "TI-Form",
-                    product_platform: "test_platform",
+                    product_platform: 1001,
                     product_version: "test_platform_version",
                     network: false
                 }
@@ -86,7 +88,7 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
                     disposition_suggested: 'Malicious',
                     summary_description: "What do i do to improve the reputation",
                     sandbox_key: "TI-Form",
-                    product_platform: "test_platform",
+                    product_platform: 1001,
                     product_version: "test_platform_version",
                     network: true
                 }
@@ -103,6 +105,23 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
     Bug.destroy_all
   end
 
+  before(:each) do
+    @original_platform = Platform.new
+    @original_platform.id = 1001
+    @original_platform.public_name = "test"
+    @original_platform.internal_name = "test internal"
+    @original_platform.active = true
+    @original_platform.webrep = true
+    @original_platform.webcat = true
+    @original_platform.filerep = true
+    @original_platform.emailrep = true
+    @original_platform.save
+  end
+
+  after(:each) do
+    Platform.destroy_all
+  end
+
   it 'receives file rep create messages' do
     guest_company
 
@@ -116,7 +135,8 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
 
     expect(file_rep_dispute).to_not be_nil
     expect(file_rep_dispute.source).to eql("talos-intelligence")
-
+    expect(file_rep_dispute.platform_id).to eql(1001)
+    expect(file_rep_dispute.ti_product_platform).to eql(@original_platform)
   end
 
   it 'receives file rep payload from TI API not in-network' do
@@ -132,9 +152,10 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
 
     expect(file_rep_dispute).to_not be_nil
     expect(file_rep_dispute.source).to eql("talos-intelligence-api")
-    expect(file_rep_dispute.product_platform).to eql("test_platform")
+    expect(file_rep_dispute.product_platform).to eql(nil)
     expect(file_rep_dispute.product_version).to eql("test_platform_version")
     expect(file_rep_dispute.in_network).to eql(nil)
+    expect(file_rep_dispute.platform_id).to eql(1001)
   end
 
   it 'receives file rep payload from TI API in-network' do
@@ -150,12 +171,12 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
 
     expect(file_rep_dispute).to_not be_nil
 
-    expect(file_rep_dispute.product_platform).to eql("test_platform")
+    expect(file_rep_dispute.product_platform).to eql(nil)
     expect(file_rep_dispute.product_version).to eql("test_platform_version")
     expect(file_rep_dispute.in_network).to eql(true)
     expect(file_rep_dispute.file_rep_comments.size).to eql(1)
     expect(file_rep_dispute.file_rep_comments.first.comment).to include("Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ResearchBug.all.first.id}" )
-
+    expect(file_rep_dispute.platform_id).to eql(1001)
     expect(ResearchBug.all.size).to eql(1)
 
   end

@@ -9,7 +9,7 @@ class FileReputationDispute < ApplicationRecord
   has_many :digital_signers
   has_many :file_rep_comments
   has_many :dispute_emails
-
+  belongs_to :ti_product_platform, :class_name => "Platform", :foreign_key => "platform_id", optional: true
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
   STATUS_NEW                = 'NEW'
@@ -599,18 +599,26 @@ class FileReputationDispute < ApplicationRecord
         logger.debug "Creating dispute"
         new_dispute = FileReputationDispute.new
 
+        if message_payload[:payload][:product_platform].present?
+          platform = Platform.find(message_payload[:payload][:product_platform].to_i) rescue nil
+        end
+        if message_payload[:payload][:platform].present?
+          platform = Platform.find(message_payload[:payload][:platform].to_i) rescue nil
+        end
+
         new_dispute.id = bug_proxy.id
         new_dispute.user_id = user.id
         new_dispute.sha256_hash = message_payload[:payload][:sha256]
         new_dispute.status = STATUS_NEW
         new_dispute.file_name = message_payload[:payload][:file_name]
         new_dispute.customer_id = customer.id
-        new_dispute.product_platform = message_payload[:payload][:product_platform] unless message_payload[:payload][:product_platform].blank?
+        new_dispute.product_platform = message_payload[:payload][:product_platform] unless (message_payload[:payload][:product_platform].blank? || message_payload[:payload][:product_platform].kind_of?(Integer))
         new_dispute.product_version = message_payload[:payload][:product_version] unless message_payload[:payload][:product_version].blank?
         new_dispute.in_network = message_payload[:payload][:network] unless message_payload[:payload][:network].blank?
         new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
         new_dispute.source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
-        new_dispute.platform = message_payload[:payload][:platform]
+        new_dispute.platform = message_payload[:payload][:platform] unless (message_payload[:payload][:platform].blank? || message_payload[:payload][:platform].kind_of?(Integer))
+        new_dispute.platform_id = platform.id unless platform.blank?
         new_dispute.sandbox_key = message_payload[:payload][:sandbox_key]
         new_dispute.ticket_source_key = message_payload[:source_key]
         new_dispute.description = message_payload[:payload][:summary_description]
