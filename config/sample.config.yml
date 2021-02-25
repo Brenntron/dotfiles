@@ -33,6 +33,14 @@ development:
       AC-Form: "redacted"
       TI-Form: "redacted"
       TI-API: "redacted"
+  guard_rails:
+    host: "fmd-guard-01tst.vrt.sourcefire.com"
+    #host: "10.7.30.135"
+    port: 443
+    verify_mode: "verify-none"
+    tls_mode: "verify-none"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    gssnegotiate: true
   magic_api:
     host: "magic.vrt.sourcefire.com"
     port: 80
@@ -41,7 +49,6 @@ development:
     port: 2966
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
-    #ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     uri_base: "/peakebridge/channels"
     sources:
       "snort-org":
@@ -61,20 +68,23 @@ development:
     host: 'ticloud-cdn-api.reversinglabs.com'
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-none"
+    url: "https://ticloud-cdn-api.reversinglabs.com/"
     username: "u/sourcefire"
     password: "redacted"
   sds:
-    host: "v2.sds.cisco.com"
-    v3_host: "v3-web-intel-rest.talos.cisco.com"
+    #host: "v2.sds.cisco.com"
+    host: "v3-cat2020.sds.cisco.com"
+    cert_file: "/usr/local/etc/sds-certificate.pem"
     ca_cert_file: "/usr/local/etc/sds-certificate.pem"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
-    username: "tidev"
-    password: "REDACTED"
-  talos_intelligence:
-    host: "localhost"
-    port: 3000
-    verify_mode: "no-tls"
-    api_key: "redacted"
+    user: "tidev"
+    pass: "redacted"
+  sds_v3:
+    host: "v3.sds.cisco.com"
+    cert_file: "/usr/local/etc/sds-certificate.pem"
+    pkey_file: "/usr/local/etc/sds-pkey.pem"
+    user: "tidev"
+    pass: "redacted"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
@@ -89,18 +99,19 @@ development:
     host: "www.virustotal.com"
     port: 443
     api_key: "redacted"
-  wbrs:
-    host: "test-wbrsruleapi-app1.vega.ironport.com"
-    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "verify-none"
-    gssnegotiate: false
-    auth_token: "redacted"
   xbrs:
     host: "prod-xbrs.vega.ironport.com"
     port: 80
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  wbrs:
+    driver: "http"
+    host: "test-wbrsruleapi-app1.vega.ironport.com"
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-none"
+    gssnegotiate: false
+    auth_token: "redacted"
 
 test:
   api_timeout:
@@ -131,11 +142,20 @@ test:
     password: ""
   file_reputation_sandbox:
     host: "intel.api.sourcefire.com"
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-none"
     api_keys:
       AC-Form: "redacted"
       TI-Form: "redacted"
       TI-API: "redacted"
+  guard_rails:
+    host: "fmd-guard-01tst.vrt.sourcefire.com"
+    #host: "10.7.30.135"
+    port: 443
+    verify_mode: "verify-none"
+    tls_mode: "verify-none"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    gssnegotiate: true
   magic_api:
     host: "magic.vrt.sourcefire.com"
     port: 80
@@ -153,35 +173,32 @@ test:
         aws_region: "us-east-1"
         aws_bucket: "redacted"
   rep_api:
-    #host: "localhost"
-    #port: 2944                          #default port for wbrs_stub
-    #verify_mode: "no-tls"
-    #gssnegotiate: true
     host: "fmdreputation.vrt.sourcefire.com"
     port: 443
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-none"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     gssnegotiate: true
   reversing_labs:
+    host: 'ticloud-cdn-api.reversinglabs.com'
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-none"
     url: "https://ticloud-cdn-api.reversinglabs.com/"
     username: "u/sourcefire"
     password: "redacted"
   sds:
     host: "v2.sds.cisco.com"
+    cert_file: "/usr/local/etc/sds-certificate.pem"
     ca_cert_file: "/usr/local/etc/sds-certificate.pem"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
-    username: "tidev"
-    password: "REDACTED"
-  snort_doc_max_fails: 1
-  snort_org:
-    host: "localhost"
-    port: 3000
-    api_key: "redacted"
-  talos_intelligence:
-    host: "localhost"
-    port: 3000
-    verify_mode: "no-tls"
-    api_key: "redacted"
+    user: "tidev"
+    pass: "redacted"
+  sds_v3:
+    host: "v3.sds.cisco.com"
+    cert_file: "/usr/local/etc/sds-certificate.pem"
+    pkey_file: "/usr/local/etc/sds-pkey.pem"
+    user: "tidev"
+    pass: "redacted"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
@@ -194,13 +211,13 @@ test:
   virustotal:
     url: "https://www.virustotal.com/vtapi/v2/url/report"
     host: "www.virustotal.com"
-    port: 443
+    verify_mode: "verify-none"
     api_key: "redacted"
   wbrs:
+    driver: "http"
     host: "test-wbrsruleapi-app1.vega.ironport.com"
-    port: 80
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "no-tls"
+    verify_mode: "verify-none"
     gssnegotiate: false
     auth_token: "redacted"
   xbrs:
@@ -211,6 +228,10 @@ test:
     gssnegotiate: false
 
 staging:
+  amp_poke:
+    host: "localhost"
+    #host: "poke.vrt.sourcefire.com"
+    verify_mode: "verify-none"
   api_timeout:
     timeout: 15
   auto_resolve:
@@ -221,33 +242,47 @@ staging:
     umbrella:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
+      # umbrella always uses https and verify peer
       api_key: "redacted"
   bls:
     host: "stage-bls-vip.sv4.ironport.com"
     port: 443
   bugzilla:
     host: "fmd-bugzil-01stg.vrt.sourcefire.com"
+    login: "talosweb@cisco.com"
+    password: "redacted"
     api_key: "redacted"
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   elastic:
-    host: "ava-esqulb-01prd.vrt.sourcefire.com"
+    host: "moaec-query.vrt.sourcefire.com"
     port: 443
     verify_mode: "verify-peer"
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
-    username: ""
-    password: ""
+    username: "redacted"
+    password: "redacted"
   file_reputation_sandbox:
     host: "intel.api.sourcefire.com"
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-none"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     api_keys:
       AC-Form: "redacted"
       TI-Form: "redacted"
       TI-API: "redacted"
+  guard_rails:
+    host: "fmd-guard-01tst.vrt.sourcefire.com"
+    #host: "10.7.30.135"
+    port: 443
+    verify_mode: "verify-none"
+    tls_mode: "verify-none"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    gssnegotiate: true
   magic_api:
     host: "magic.vrt.sourcefire.com"
-    port: 80
+    port: 443
+    verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
   peakebridge:
     host: "stevensville-stage.vrt.sourcefire.com"
     port: 443
@@ -271,20 +306,19 @@ staging:
   reversing_labs:
     host: 'ticloud-cdn-api.reversinglabs.com'
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "verify-peer"
+    verify_mode: "verify-none"
     username: "u/sourcefire"
     password: "redacted"
   sds:
-    host: "v2.sds.cisco.com"
-    cert_file: "/usr/local/etc/sds-certificate.pem"
-    pkey_file: "/usr/local/etc/sds-pkey.pem"
-    username: "tidev"
-    passname: "redacted"
-  talos_intelligence:
-    host: "localhost"
-    port: 3000
-    verify_mode: "no-tls"
-    api_key: "redacted"
+    category_version: "v10"
+    # Old host name -> host: "v2.beta.sds.cisco.com"
+    #host: "v3-cat2020.sds.cisco.com"
+    host: "v2.beta.sds.cisco.com"
+    ca_cert_file: "/usr/local/etc/analyst-console-escalations/sds-certificate.pem"
+    pkey_file: "/usr/local/etc/analyst-console-escalations/sds-pkey.pem"
+    v3_host: "v3-web-intel-rest-integration.talos.cisco.com"
+    username: "redacted"
+    password: "redacted"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
@@ -302,24 +336,26 @@ staging:
     port: 443
     api_key: "redacted"
   wbrs:
-    host: "stage-wbrsruleapi-vip.vega.ironport.com"
-    port: 80
+    auth_token: "redacted"
+    host: "test-wbrsruleapi-app1.vega.ironport.com"
+    port: 80 
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-    auth_token: "redacted"
   xbrs:
     host: "prod-xbrs.vega.ironport.com"
+    consumer_key: "TEST"
     port: 80
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
 
 production:
-  #amp_poke:
-  #  host: "redacted"
-  #  # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-  #  verify_mode: "verify-peer"
+  amp_poke: 
+    host: "poke.vrt.sourcefire.com"
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
   api_timeout:
     timeout: 15
   auto_resolve:
@@ -330,38 +366,51 @@ production:
     umbrella:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
+      # umbrella always uses https and verify peer
       api_key: "redacted"
   bls:
-    host: "stage-bls-vip.sv4.ironport.com"
+    host: "prod-bls-vip.sv4.ironport.com"
     port: 443
   bugzilla:
     host: "bugzilla.vrt.sourcefire.com"
-    api_key: "redacted"
+    login: "redacted"
+    password: "redacted"
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   elastic:
-    host: "ava-esqulb-01prd.vrt.sourcefire.com"
+    host: "moaec-query.vrt.sourcefire.com"
     port: 443
     verify_mode: "verify-peer"
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
-    username: ""
-    password: ""
+    username: "redacted"
+    password: "redacted"
   file_reputation_sandbox:
     host: "intel.api.sourcefire.com"
+    port: 443
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "verify-none"
+    verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     api_keys:
       AC-Form: "redacted"
       TI-Form: "redacted"
       TI-API: "redacted"
+  guard_rails:
+    host: "ava-guard-01prd.vrt.sourcefire.com"
+    port: 443
+    verify_mode: "verify-none"
+    tls_mode: "verify-none"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    gssnegotiate: true
   magic_api:
     host: "magic.vrt.sourcefire.com"
-    port: 80
+    port: 443
+    verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
   peakebridge:
     host: "stevensville.vrt.sourcefire.com"
     port: 443
     ssl_mode: "verify-peer"
-    ca_file: "/usr/local/etc/trusted-certificates.pem"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     uri_base: "/peakebridge/channels"
     sources:
       "snort-org":
@@ -369,14 +418,6 @@ production:
         aws_secret_access_key: "redacted"
         aws_region: "us-east-1"
         aws_bucket: "redacted"
-  perl:
-    cmd: "/usr/local/bin/perl"
-    canvas_root: "extras"
-    extras_dir: 'extras'
-    visruleparser_path: "extras/visruleparser.pl"
-    snort_json_path: 'extras/snort_json_parser.pl'
-    cve2x_path: "extras/cve2x.pl"
-    rule2yaml_path: "extras/rule2yaml.pl"
   rep_api:
     host: "reputation.vrt.sourcefire.com"
     port: 443
@@ -390,33 +431,36 @@ production:
     verify_mode: "verify-peer"
     username: "u/sourcefire"
     password: "redacted"
+    url: "https://ticloud-cdn-api.reversinglabs.com/"
   sds:
     host: "v2.sds.cisco.com"
-    cert_file: "/usr/local/etc/sds-certificate.pem"
-    pkey_file: "/usr/local/etc/sds-pkey.pem"
-    username: "tidev"
-    passname: "redacted"
-  talos_intelligence:
-    host: "localhost"
-    port: 3000
-    verify_mode: "no-tls"
-    api_key: "redacted"
+    v3_host: "v3-web-intel-rest.talos.cisco.com"
+    ca_cert_file: "/usr/local/etc/analyst-console-escalations/sds-certificate.pem"
+    category_version: "v10"
+    pkey_file: "/usr/local/etc/analyst-console-escalations/sds-pkey.pem"
+    user: "talosintel" 
+    pass: "redacted"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     api_key: "redacted"
   ticloud:
     host: "ticloud-cdn-api.reversinglabs.com"
     port: 443
-    verify_mode: "verify-none"
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
   virustotal:
     url: "https://www.virustotal.com/vtapi/v2/url/report"
     host: "www.virustotal.com"
     port: 443
+    # virustotal always uses https and verify peer
     api_key: "redacted"
   wbrs:
+    auth_token: "redacted"
     host: "prod-wbrsruleapi-vip.vega.ironport.com"
     port: 80
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }

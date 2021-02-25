@@ -239,14 +239,14 @@ class Complaint < ApplicationRecord
     payload = {}
 
     complaint_entries.each do |entry|
-      payload_item = {}
-      new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"] unless entry['wbrs']['cat_sugg'].blank?
+      new_payload_item = {}
+      new_payload_item[:sugg_type] = entry.suggested_disposition
       new_payload_item[:status] = entry.status
       new_payload_item[:resolution_message] = entry.resolution_comment
       new_payload_item[:resolution] = entry.resolution
-      new_payload_item[:company_dup] = self.is_possible_company_duplicate(self, entry.hostlookup, entry.entry_type)
+      new_payload_item[:company_dup] = Complaint.is_possible_company_duplicate(self, entry.hostlookup, entry.entry_type)
 
-      payload[entry.hostlookup] = payload_item
+      payload[entry.hostlookup] = new_payload_item
       payload[entry.hostlookup]['sugg_type'] = entry.suggested_disposition
     end
 
