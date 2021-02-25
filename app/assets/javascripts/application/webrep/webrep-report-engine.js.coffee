@@ -81,6 +81,9 @@ window.refresh_visible_report_tab = ()->
     window.build_multi_entries_closed_by_day_chart()
     window.build_multi_ticket_resolution_by_owner_chart()
     window.build_single_time_to_close_linechart()
+    window.build_auto_resolve_web_entries_resolution_piechart()
+    window.build_all_closed_tickets_manual_vs_auto_piechart()
+    window.build_all_tickets_vs_auto_close_piechart()
 
 window.refresh_single_open_tickets_table = (user_id)->
   from = localStorage.getItem('webrep_report_range_from')
@@ -679,6 +682,217 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
       console.log(response, 'Error building chart')
   )
 
+window.build_auto_resolve_web_entries_resolution_piechart = () ->
+
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+
+  data = {
+    from: from,
+    to: to,
+    users: [user_id],
+    submission_types: ["w"]
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/auto_ticket_entries_by_resolution_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)["data"]
+
+      emailEntryResolutionLabels = json["chart_labels"]
+      emailEntryData = json["chart_data"]
+
+      tableData = json["table_data"]
+
+      web_piechart_table = $('#auto-resolved-web-entries-table tbody')
+      $(web_piechart_table).empty()
+
+      $(tableData).each ->
+        $(web_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
+
+
+      new Chart($('#auto-resolved-web-entries-piechart'),
+        type: 'pie'
+        data:
+          labels: emailEntryResolutionLabels
+          datasets: [ {
+            label: 'close-email-entries'
+            backgroundColor: [
+              '#3e5a72'
+              '#b5ebff'
+              '#666'
+            ]
+            data: emailEntryData
+          } ]
+        options:
+          hover:
+            mode: null
+          responsive: true
+          maintainAspectRatio: false
+          legend: false
+          pieceLabel:
+            render: (args) ->
+              pieChartLabelFormat(args.percentage)
+            position: 'outside'
+            segment: false
+            precision: 2
+            showZero: true
+            fontStyle: 'bolder'
+            overlap: false
+            showActualPercentages: true
+      )
+
+    error: (response) ->
+      console.log(response, 'Error building chart')
+  )
+
+window.build_all_closed_tickets_manual_vs_auto_piechart = () ->
+
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+
+  data = {
+    from: from,
+    to: to,
+    users: [user_id],
+    submission_types: ["w"]
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/all_closed_tickets_manual_vs_auto_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)["data"]
+
+      emailEntryResolutionLabels = json["chart_labels"]
+      emailEntryData = json["chart_data"]
+
+      tableData = json["table_data"]
+
+      web_piechart_table = $('#all-web-entries-vs-closed-table tbody')
+      $(web_piechart_table).empty()
+
+      $(tableData).each ->
+        $(web_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
+
+      new Chart($('#all-web-entries-vs-closed-piechart'),
+        type: 'pie'
+        data:
+          labels: emailEntryResolutionLabels
+          datasets: [ {
+            label: 'close-email-entries'
+            backgroundColor: [
+              '#3e5a72'
+              '#b5ebff'
+              '#666'
+            ]
+            data: emailEntryData
+          } ]
+        options:
+          hover:
+            mode: null
+          responsive: true
+          maintainAspectRatio: false
+          legend: false
+          pieceLabel:
+            render: (args) ->
+              pieChartLabelFormat(args.percentage)
+            position: 'outside'
+            segment: false
+            precision: 2
+            showZero: true
+            fontStyle: 'bolder'
+            overlap: false
+            showActualPercentages: true
+      )
+
+    error: (response) ->
+      console.log(response, 'Error building chart')
+  )
+
+window.build_all_tickets_vs_auto_close_piechart = () ->
+
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+
+  data = {
+    from: from,
+    to: to,
+    users: [user_id],
+    submission_types: ["w"]
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/all_tickets_manual_vs_auto_close_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)["data"]
+
+      emailEntryResolutionLabels = json["chart_labels"]
+      emailEntryData = json["chart_data"]
+
+      tableData = json["table_data"]
+
+      web_piechart_table = $('#all-tickets-vs-closed-table tbody')
+      $(web_piechart_table).empty()
+
+      $(tableData).each ->
+        $(web_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
+
+
+      new Chart($('#all-tickets-vs-closed-piechart'),
+        type: 'pie'
+        data:
+          labels: emailEntryResolutionLabels
+          datasets: [ {
+            label: 'close-email-entries'
+            backgroundColor: [
+              '#3e5a72'
+              '#b5ebff'
+              '#666'
+            ]
+            data: emailEntryData
+          } ]
+        options:
+          hover:
+            mode: null
+          responsive: true
+          maintainAspectRatio: false
+          legend: false
+          pieceLabel:
+            render: (args) ->
+              pieChartLabelFormat(args.percentage)
+            position: 'outside'
+            segment: false
+            precision: 2
+            showZero: true
+            fontStyle: 'bolder'
+            overlap: false
+            showActualPercentages: false
+      )
+
+    error: (response) ->
+      console.log(response, 'Error building chart')
+  )
 #######
 
 window.build_multi_closed_email_entries_resolution_piechart = () ->

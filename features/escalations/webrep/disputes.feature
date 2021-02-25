@@ -54,7 +54,7 @@ Feature: Disputes
     Given an empty dispute exists
     When I go to "/escalations/webrep/disputes"
     Then I should see content "0000000001" within "#disputes-index"
-    
+
   @javascript
   Scenario: A user cannot create a duplicate IP Dispute
     Given a user with role "webrep user" exists and is logged in
@@ -1157,4 +1157,39 @@ Feature: Disputes
     Then I should see "Loading data..."
     And I wait for "1" seconds
     Then I should not see "Loading data..."
+
+  @javascript
+  Scenario: left nav links should apply filter if the filter was set before
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |  id       |  status         | user_id |
+      | 000001    | ASSIGNED        |    1    |
+      | 000002    | RESOLVED_CLOSED |    1    |
+    When I goto "/escalations/webrep/disputes?f=open"
+    Then I should see "000001"
+    And I should not see "000002"
+    When I click "#nav-trigger-label"
+    And I click "Escalations"
+    And I click "#rep-icon-link"
+    Then I should see "000001"
+    And I should not see "000002"
+    When I click "#nav-trigger-label"
+    And I click "Escalations"
+    And I click "#rep-link"
+    Then I should see "000001"
+    And I should not see "000002"
+
+  @javascript
+  Scenario: top nav links should apply filter if the filter was set before
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |  id       |  status         | user_id |
+      | 000001    | ASSIGNED        |    1    |
+      | 000002    | RESOLVED_CLOSED |    1    |
+    When I goto "/escalations/webrep/disputes?f=open"
+    Then I should see "000001"
+    And I should not see "000002"
+    When I click "#queue"
+    Then I should see "000001"
+    And I should not see "000002"
 

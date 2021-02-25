@@ -1023,23 +1023,7 @@
                                         - else
                                           %td.unclean-site-result= virustotal[:result]
                           .col-sm-9
-                            .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
-                              %h5.entry-details-table-header
-                                XBRS History
-                                %span.nested-table-tally
-                                  - unless entry.hostlookup.nil?
-                                    = entry.find_xbrs[1]['data'].count
-                              - if entry.find_xbrs[1]['data'].empty?
-                                %table
-                                  %thead
-                                    %tr
-                                      %th
-                                        %span.missing-data
-                                          No XBRS data available.
-                              - else
-                                %table
-
-
+                            = render 'shared/xbrs_table', :entry => entry
                             .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header
                                 Cross-listed URLs

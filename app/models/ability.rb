@@ -10,6 +10,7 @@ class Ability
 
 
     can [:read, :update_preferences, :manage_bugzilla_api], User, id: current_user.id
+    can [:read], AmpNamingConvention
 
     # roles are partitioned into org subsets (snort rules, snort escalations, web cat, web rep)
     # the current user can read the user records of other users in their subset.
@@ -64,6 +65,10 @@ class Ability
     if role_names.include?('webrep user')
       can :manage, [Dispute, DisputeComment, DisputeEmail, DisputeEmailAttachment,
                     DisputeEntry, EmailTemplate, Wbrs::ManualWlbl, ResolutionMessageTemplate]
+    end
+
+    if role_names.include?('amp pattern namer')
+      can :manage, AmpNamingConvention
     end
 
     if role_names.include?('filerep manager')

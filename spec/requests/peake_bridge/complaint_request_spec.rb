@@ -11,7 +11,8 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
     FactoryBot.create(:customer, name: customer_name, email: customer_email, company: existing_company)
   end
 
-  let(:reference_payload) do
+  let(:complaint_payload) do
+
     {
         investigate_ips: {
             '72.52.134.84' => {
@@ -339,6 +340,23 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
     # expect(response).to be_error
     complaint = Complaint.where(ticket_source_key: 1001).first
     expect(complaint).to be_nil
+  end
+
+
+  it 'should short circuit ticket creation from payload if the ticket already exists (to prevent dupes)' do
+    vrt_incoming
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+    Complaint.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :status => "NEW")
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: complaint_message_json
+
+    expect(response).to be_successful
+    complaint = Complaint.where(ticket_source_key: 1001).first
+
+    expect(complaint).to_not be_nil
+    expect(Complaint.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
   end
 
 end

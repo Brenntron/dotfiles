@@ -115,6 +115,7 @@ Rails.configuration.sds                 = ApiRequester::ApiRequester.config_of(s
 Rails.configuration.sds.v3_host         = sds_config['v3_host']
 Rails.configuration.sds.cert_file       = sds_config['cert_file'] || sds_config['ca_cert_file']
 Rails.configuration.sds.pkey_file       = sds_config['pkey_file']
+Rails.configuration.sds.category_version       = sds_config['category_version']
 
 talos_intelligence = env_config.fetch('talos_intelligence', {})
 Rails.configuration.talos_intelligence  = ApiRequester::ApiRequester.config_of(talos_intelligence)
@@ -136,6 +137,10 @@ Rails.configuration.virustotal.url      = virustotal['url']
 virustotal = env_config.fetch('auto_resolve',{}).fetch('virus_total', nil)
 raise 'config.yml missing virus_total section' unless virustotal
 Rails.configuration.virustotal.check    = virustotal['check']
+
+
+guard_rails = env_config.fetch('guard_rails', nil)
+Rails.configuration.guard_rails          = ApiRequester::ApiRequester.config_of(guard_rails)
 
 
 wbrs_config = env_config['wbrs']

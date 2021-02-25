@@ -26,7 +26,7 @@
               %input{type: 'checkbox', checked: true, id: 'owner-checkbox'} Assignee
             %li.toggle-vis{'data-column':'9'}
               %input{type: 'checkbox', checked: true, id: 'time-submitted-checkbox'} Time Submitted
-            %li.toggle-vis{'data-column':'18'}
+            %li.toggle-vis{'data-column':'19'}
               %input{type: 'checkbox', checked: true, id: 'last-updated-checkbox'} Last Updated
 
           %ul
@@ -35,17 +35,20 @@
             %li.toggle-vis{'data-column':'11'}
               %input{type: 'checkbox', id: 'case-origin-checkbox'} Case Origin
             %li.toggle-vis{'data-column':'12'}
-              %input{type: 'checkbox', id: 'submitter-type-checkbox'} Submitter Type
+              %input{type: 'checkbox', id: 'platform-checkbox'} Platform
             %li.toggle-vis{'data-column':'13'}
-              %input{type: 'checkbox', id: 'submitter-org-checkbox'} Submitter Org
+              %input{type: 'checkbox', id: 'submitter-type-checkbox'} Submitter Type
             %li.toggle-vis{'data-column':'14'}
-              %input{type: 'checkbox', id: 'submitter-domain-checkbox'} Submitter Domain
+              %input{type: 'checkbox', id: 'submitter-org-checkbox'} Submitter Org
             %li.toggle-vis{'data-column':'15'}
-              %input{type: 'checkbox', id: 'contact-name-checkbox'} Contact Name
+              %input{type: 'checkbox', id: 'submitter-domain-checkbox'} Submitter Domain
             %li.toggle-vis{'data-column':'16'}
-              %input{type: 'checkbox', id: 'contact-email-checkbox'} Contact Email
+              %input{type: 'checkbox', id: 'contact-name-checkbox'} Contact Name
             %li.toggle-vis{'data-column':'17'}
+              %input{type: 'checkbox', id: 'contact-email-checkbox'} Contact Email
+            %li.toggle-vis{'data-column':'18'}
               %input{type: 'checkbox', id: 'status-comment-checkbox'} Status Comment
+
 
         .dropdown-menu-content-block
           .dropdown-menu-toolbar-header.entry-showcol-header Dispute Entry Details
@@ -75,13 +78,13 @@
             %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-rules'}
               %input{type: 'checkbox', id: 'sbrs-rules-checkbox'} SBRS Rules
 
-    %button.toolbar-button.expand-row-button#expand-all-index-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
+    %button.toolbar-button.expand-row-button#expand-all-index-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows (alt + g)'}
       %span.toolbar-button-text Expand All Rows
-    %button.toolbar-button.collapse-button#collapse-all-index-rows.esc-tooltipped{title: 'Collapse All Rows'}
+    %button.toolbar-button.collapse-button#collapse-all-index-rows.esc-tooltipped{title: 'Collapse All Rows (alt + h)'}
       %span.toolbar-button-text Collapse All Rows
 
   %div
-    %button.take-ticket-button#index_ticket_assign.esc-tooltipped{title: 'Assign to me', onclick: 'take_disputes();'}
+    %button.take-ticket-button#index_ticket_assign.esc-tooltipped{title: 'Assign to me (alt + t)', onclick: 'take_disputes();'}
       %span.toolbar-button-text
 
   %div
@@ -462,12 +465,12 @@
   %div.line-up
     %label.toolbar-section-label
       File
-    %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :xlsx), method: :get}
+    %form#webrep-disputes-index-export-form{action: escalations_webrep_disputes_path(format: :xlsx), method: :get}
       = hidden_field_tag('data_json', '{}', id: 'disputes-index-export-data-input')
-      %button.toolbar-button.dropdown-button-margin-right.export-button.export-all-btn.esc-tooltipped{title: 'Export to CSV'}
+      %button.toolbar-button.dropdown-button-margin-right.export-button.export-all-btn.esc-tooltipped{title: 'Export (alt + ctrl + shift + p)'}
         %span.toolbar-button-text
-          Export to CSV
-    %button.toolbar-button.export-button.export-selected-btn.esc-tooltipped{title: 'Export Selected to CSV', onclick: 'webrep_export_selected_rows();'}
+          Export
+    %button.toolbar-button.export-button.export-selected-btn.esc-tooltipped{title: 'Export Selected (alt + ctrl + p)', onclick: 'webrep_export_selected_rows();'}
       %span.toolbar-button-text
-        Export Selected to CSV
+        Export Selected
 

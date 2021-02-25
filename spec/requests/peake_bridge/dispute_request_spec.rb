@@ -420,6 +420,28 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
     expect(dispute.dispute_entries.where(uri: 'thepretenders.com')).to exist
   end
+
+
+
+
+  it 'should short circuit ticket creation from payload if the ticket already exists (to prevent dupes)' do
+    vrt_incoming
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+    Dispute.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :user_id => User.all.first.id, :status => "NEW")
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_json
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(Dispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+  end
+
+
 end
 
 # expect(response.code).to be_successful

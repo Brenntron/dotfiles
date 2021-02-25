@@ -93,9 +93,9 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
                     network: true
                 }
             }
-
         }
     }
+
   end
 
   before(:all) do
@@ -178,6 +178,24 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
     expect(file_rep_dispute.file_rep_comments.first.comment).to include("Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ResearchBug.all.first.id}" )
     expect(file_rep_dispute.platform_id).to eql(1001)
     expect(ResearchBug.all.size).to eql(1)
+
+  end
+
+  it 'should short circuit ticket creation from payload if the ticket already exists (to prevent dupes)' do
+
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+    FileReputationDispute.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :user_id => User.all.first.id, :status => "NEW", :disposition_suggested => "Malicious", :sha256_hash => "efb947a43bfe6d0812d105f6afdeb9774f4d79254dd48f89f1e95ffdf8732928")
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json,
+         params: file_rep_create_message_json
+
+    expect(response).to be_successful
+    dispute = FileReputationDispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(FileReputationDispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
 
   end
 end

@@ -28,13 +28,14 @@ module API
 
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
+                uri_as_categorized = permitted_params['uri_as_categorized'].blank? ? entry.uri : permitted_params['uri_as_categorized']
                 entry.change_category( permitted_params['prefix'],
                                        permitted_params['categories'],
                                        permitted_params['category_names'],
                                        permitted_params['status'],
                                        permitted_params['comment'],
                                        permitted_params['resolution_comment'],
-                                       permitted_params['uri_as_categorized'],
+                                       uri_as_categorized,
                                        current_user, "")
                 Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
@@ -122,6 +123,8 @@ module API
                 response.to_json
 
               rescue Exception => e
+                Rails.logger.error(e)
+                Rails.logger.error e.backtrace.join("\n")
                 e.to_json
               end
             end
@@ -148,15 +151,15 @@ module API
                 end
                 unless error_entry_ids.keys.empty?
                   if error_count == permitted_params['complaint_entry_ids'].count
-                    error_message = ["---The following entrys could not be taken because---"]
+                    error_message = ["The following entries could not be taken:"]
                   else
-                    error_message = ["---Some entries were taken however, The following entrys could not be taken because---"]
+                    error_message = ["Some entries were successfully taken, but the following entries could not be taken:"]
                   end
                   error_entry_ids.keys.each do |key|
-                    error_message << "#{key}: entry IDs -> #{error_entry_ids[key].to_sentence}"
+                    error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
                   end
                   unless error_count == permitted_params['complaint_entry_ids'].count
-                    error_message << "Please refresh the page to pickup the latest changes."
+                    error_message << "Refresh the page to pickup the latest changes."
                   end
                   return {:error => error_message}.to_json
                 end
@@ -178,7 +181,7 @@ module API
                 error_entry_ids = {}
                 error_count = 0
                 permitted_params['complaint_entry_ids'].each do |id|
-                  status = ComplaintEntry.find(id).return_complaint
+                  status = ComplaintEntry.find(id).return_complaint(current_user)
                   if status != "Complaint returned"
                     error_count += 1
                     if error_entry_ids[status].nil?
@@ -190,15 +193,15 @@ module API
                 end
                 unless error_entry_ids.keys.empty?
                   if error_count == permitted_params['complaint_entry_ids'].count
-                    error_message = ["---The following entrys could not be returned because---"]
+                    error_message = ["The following entries could not be returned:"]
                   else
-                    error_message = ["---Some entries were returned however, The following entrys could not be returned because---"]
+                    error_message = ["Some entries were successfully returned, but the following entries could not be returned:"]
                   end
                   error_entry_ids.keys.each do |key|
-                    error_message << "#{key}: entry IDs -> #{error_entry_ids[key].to_sentence}"
+                    error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
                   end
                   unless error_count == permitted_params['complaint_entry_ids'].count
-                    error_message << "Please refresh the page to pickup the latest changes."
+                    error_message << "Refresh the page to pickup the latest changes."
                   end
                   return {:error => error_message}.to_json
                 end
@@ -208,6 +211,7 @@ module API
                 return {:error => error}.to_json
               end
               {name:current_user.display_name}.to_json
+
             end
 
 
@@ -377,6 +381,9 @@ module API
               std_api_v2 do
                 entry = ComplaintEntry.find(params[:complaint_entry_id])
                 ces = entry.complaint_entry_screenshot
+                unless ces
+                  ces = ComplaintEntryScreenshot.create(complaint_entry_id: entry.id )
+                end
                 ces.update(error_message:"Retaking screenshot please wait.", screenshot:nil)
                 ces.grab_screenshot
               end
@@ -396,21 +403,37 @@ module API
                   master_categories = []
                 end
 
-                wbrs_categories = complaint_entry.current_category_data
-
+                begin
+                  wbrs_categories = complaint_entry.current_category_data
+                rescue Exception => e
+                  raise("having trouble with WBRS setting category to empty string : #{e.message}")
+                end
                 # Pull category from SDS
                 sds_params = {}
 
                 if complaint_entry.entry_type == 'URI/DOMAIN'
+                  # get category for full uri
                   sds_params['url'] = complaint_entry.uri
                 elsif complaint_entry.entry_type == 'IP'
                   sds_params['url'] = complaint_entry.ip_address
                 end
 
-                sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+                begin
+                  Rails.logger.info("This is where the sbrs call is")
+                  sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+                  Rails.logger.info("got it!")
+                rescue Exception => e
+                  raise("having trouble with SDS setting category to empty string : #{e.message}")
+                end
 
+                sds_domain_category = ""
+                if complaint_entry.entry_type == 'URI/DOMAIN'
+                  # get category for domain
+                  sds_params['url'] = complaint_entry.domain
+                  sds_domain_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+                end
                 {master_categories: master_categories, current_category_data: wbrs_categories,
-                 sds_category: sds_category}.to_json
+                 sds_category: sds_category, sds_domain_category: sds_domain_category}.to_json
               end
             end
 
@@ -482,13 +505,14 @@ module API
                   begin
                     if entry['error'] == false
                       complaint_entry = ComplaintEntry.find(entry['entry_id'])
+                      uri_as_categorized = entry['uri_as_categorized'].blank? ? complaint_entry.uri : entry['uri_as_categorized']
                       complaint_entry.change_category( entry['prefix'],
                                                        entry['categories'],
                                                        entry['category_names'],
                                                        entry['status'],
                                                        entry['comment'],
                                                        entry['resolution_comment'],
-                                                       entry['uri_as_categorized'],
+                                                       uri_as_categorized,
                                                        current_user, "")
 
                       Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry) }

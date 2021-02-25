@@ -49,6 +49,18 @@ class DisputeEntry < ApplicationRecord
     where(case_resolved_at: (date_from..date_to))
   }
 
+  after_initialize do |dispute_entry|
+    is_ip_address = !!(dispute_entry.uri =~ Resolv::IPv4::Regex)
+
+    if is_ip_address
+      dispute_entry.ip_address = dispute_entry.uri
+      dispute_entry.uri = nil
+      dispute_entry.entry_type = "IP"
+      dispute_entry.hostname = nil
+    end
+
+  end
+
   def self.create_dispute_entry(dispute, ip_url, status = NEW)
     begin
       params = {}
@@ -447,7 +459,30 @@ class DisputeEntry < ApplicationRecord
       end
 
       formatted_data.last['data'] << datum
+
     end
+
+    columns_to_remove = %w(rule_id row_id genid cidr exclusion ip proto userpass port query fragment attr attr_truncated path_truncated query_truncated unique_hash)
+    is_ip_address = !!(self.uri  =~ Resolv::IPv4::Regex)
+    if is_ip_address
+      # If this is an IP address, we can also remove the 'subdomain' and 'path' headers
+      columns_to_remove << 'subdomain'
+      columns_to_remove << 'path'
+    end
+
+
+    indices_to_delete = []
+    formatted_data[1]['legend'].each_with_index do |name, index|
+      if columns_to_remove.include? name
+        indices_to_delete << index
+      end
+    end
+
+    formatted_data[1]['legend'] = formatted_data[1]['legend'].reject.with_index { |e, i| indices_to_delete.include? i }
+    formatted_data[1]['data'].each_with_index do |d, index|
+      formatted_data[1]['data'][index] = d.reject.with_index { |e, i| indices_to_delete.include? i}
+    end
+
 
     formatted_data
 
@@ -541,7 +576,32 @@ class DisputeEntry < ApplicationRecord
   end
 
   def xbrs_data
-    find_xbrs[1]
+    # Current XBRS hits for a URL
+    # This method is different from `xbrs_history` because of https://jira.vrt.sourcefire.com/browse/WEB-6770
+    result = find_xbrs[1]
+    current_array = []
+    result['data'].each do |data|
+      if data.last == "full"
+        current_array << data
+      end
+    end
+    result['data'] = current_array
+    result
+
+  end
+
+  def xbrs_history
+    # XBRS history for a URL
+    # This method is different from `xbrs_data` because of https://jira.vrt.sourcefire.com/browse/WEB-6770
+    result = find_xbrs[1]
+    current_array = []
+    result['data'].each do |data|
+      if data.last != "full"
+        current_array << data
+      end
+    end
+    result['data'] = current_array
+    result
   end
 
   def umbrellaresult
@@ -603,6 +663,12 @@ class DisputeEntry < ApplicationRecord
       if auto_resolve_verdict.malicious?
         self.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
         self.resolution = STATUS_RESOLVED_FIXED_FN
+        self.status = STATUS_RESOLVED
+        self.case_closed_at = resolved_at
+        self.case_resolved_at = resolved_at
+      else
+        self.resolution_comment = Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
+        self.resolution = STATUS_RESOLVED_UNCHANGED
         self.status = STATUS_RESOLVED
         self.case_closed_at = resolved_at
         self.case_resolved_at = resolved_at
@@ -870,7 +936,9 @@ class DisputeEntry < ApplicationRecord
 
   ######################################################################################
   def self.process_research_for_uri(research_params)
+
     url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
+
     domain_of_url = DisputeEntry.domain_of(url)
     entries = entries_of_url(url)
 
@@ -888,7 +956,7 @@ class DisputeEntry < ApplicationRecord
     # Make sure there will always be a "www" and "non-www" form to an inputted URL
 
     if !url.include?("www.")
-      unless entries.find{|entry| url == "www." + entry.uri}
+      unless entries.find{|entry| url == "www." + entry.uri} || (url =~ Resolv::IPv4::Regex)
         entries.prepend DisputeEntry.new(uri: "www."+ url)
       end
     elsif url.include?("www.")

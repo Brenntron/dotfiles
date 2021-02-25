@@ -563,90 +563,95 @@ class FileReputationDispute < ApplicationRecord
         customer_email: message_payload[:payload][:customer_email],
         company_name: message_payload[:payload][:company_name]
     }
+
+    #check to see if ticket already exists in database to prevent accidental dupes
+    record_exists = FileReputationDispute.where(:ticket_source_key => message_payload[:source_key]).first
+
+    if record_exists.present?
+      record_exists.send_created_ack
+      return record_exists
+    end
+
     is_duplicate = false
     user = User.where(cvs_username:"vrtincom").first
-      ActiveRecord::Base.transaction do
 
-        guest = Company.where(:name => "Guest").first
-        opened_at = Time.now
+    guest = Company.where(:name => "Guest").first
+    opened_at = Time.now
 
-        customer = Customer.file_rep_process_and_get_customer(customer_payload)
+    customer = Customer.file_rep_process_and_get_customer(customer_payload)
 
-        bugzilla_rest_session = message_payload[:bugzilla_rest_session]
+    bugzilla_rest_session = message_payload[:bugzilla_rest_session]
 
-        summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+    summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-        full_description = <<~HEREDOC
-          File name: #{message_payload[:payload][:file_name]}
-          File Rep Sha: #{message_payload[:payload][:sha256]}
-          
+    full_description = <<~HEREDOC
+      File name: #{message_payload[:payload][:file_name]}
+      File Rep Sha: #{message_payload[:payload][:sha256]}
+      
 
-        HEREDOC
-
-        bug_attrs = {
-            'product' => 'Escalations Console',
-            'component' => 'AMP Disputes',
-            'summary' => summary,
-            'version' => 'unspecified', #self.version,
-            'description' => full_description,
-            'priority' => 'Unspecified',
-            'classification' => 'unclassified',
-        }
-        logger.debug "Creating bugzilla bug"
-
-        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
-
-        logger.debug "Creating dispute"
-        new_dispute = FileReputationDispute.new
-
-        if message_payload[:payload][:product_platform].present?
-          platform = Platform.find(message_payload[:payload][:product_platform].to_i) rescue nil
-        end
-        if message_payload[:payload][:platform].present?
-          platform = Platform.find(message_payload[:payload][:platform].to_i) rescue nil
-        end
-
-        new_dispute.id = bug_proxy.id
-        new_dispute.user_id = user.id
-        new_dispute.sha256_hash = message_payload[:payload][:sha256]
-        new_dispute.status = STATUS_NEW
-        new_dispute.file_name = message_payload[:payload][:file_name]
-        new_dispute.customer_id = customer.id
-        new_dispute.product_platform = message_payload[:payload][:product_platform] unless (message_payload[:payload][:product_platform].blank? || message_payload[:payload][:product_platform].kind_of?(Integer))
-        new_dispute.product_version = message_payload[:payload][:product_version] unless message_payload[:payload][:product_version].blank?
-        new_dispute.in_network = message_payload[:payload][:network] unless message_payload[:payload][:network].blank?
-        new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
-        new_dispute.source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
-        new_dispute.platform = message_payload[:payload][:platform] unless (message_payload[:payload][:platform].blank? || message_payload[:payload][:platform].kind_of?(Integer))
-        new_dispute.platform_id = platform.id unless platform.blank?
-        new_dispute.sandbox_key = message_payload[:payload][:sandbox_key]
-        new_dispute.ticket_source_key = message_payload[:source_key]
-        new_dispute.description = message_payload[:payload][:summary_description]
-        new_dispute.customer_id = customer&.id
-        new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
-        new_dispute.auto_resolve_log = ""
-
-        check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
-        if check_for_duplicate.any?
-          auto_resolve_on_duplicate(new_dispute)
-          is_duplicate = true
-        else
-
-          new_dispute.save
-        end
-
-        if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
-          ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
-          linked_dispute_comment = FileRepComment.new
-          linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
-          linked_dispute_comment.user_id = user.id
-          linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
-          linked_dispute_comment.save(:validate => false)
-
-        end
+    HEREDOC
 
 
-      end #transaction
+    bug_attrs = {
+        'product' => 'Escalations Console',
+        'component' => 'AMP Disputes',
+        'summary' => summary,
+        'version' => 'unspecified', #self.version,
+        'description' => full_description,
+        'priority' => 'Unspecified',
+        'classification' => 'unclassified',
+    }
+    logger.debug "Creating bugzilla bug"
+
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    logger.debug "Creating dispute"
+    new_dispute = FileReputationDispute.new
+
+    if message_payload[:payload][:product_platform].present?
+      platform = Platform.find(message_payload[:payload][:product_platform].to_i) rescue nil
+    end
+    if message_payload[:payload][:platform].present?
+      platform = Platform.find(message_payload[:payload][:platform].to_i) rescue nil
+    end
+
+    new_dispute.id = bug_proxy.id
+    new_dispute.user_id = user.id
+    new_dispute.sha256_hash = message_payload[:payload][:sha256]
+    new_dispute.status = STATUS_NEW
+    new_dispute.file_name = message_payload[:payload][:file_name]
+    new_dispute.product_platform = message_payload[:payload][:product_platform] unless (message_payload[:payload][:product_platform].blank? || message_payload[:payload][:product_platform].kind_of?(Integer))
+    new_dispute.product_version = message_payload[:payload][:product_version] unless message_payload[:payload][:product_version].blank?
+    new_dispute.in_network = message_payload[:payload][:network] unless message_payload[:payload][:network].blank?
+    new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
+    new_dispute.source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
+    new_dispute.platform = message_payload[:payload][:platform] unless (message_payload[:payload][:platform].blank? || message_payload[:payload][:platform].kind_of?(Integer))
+    new_dispute.platform_id = platform.id unless platform.blank?
+    new_dispute.sandbox_key = message_payload[:payload][:sandbox_key]
+    new_dispute.ticket_source_key = message_payload[:source_key]
+    new_dispute.description = message_payload[:payload][:summary_description]
+    new_dispute.customer_id = customer&.id
+    new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+    new_dispute.auto_resolve_log = ""
+
+    check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
+    if check_for_duplicate.any?
+      auto_resolve_on_duplicate(new_dispute)
+      is_duplicate = true
+    else
+      new_dispute.save
+    end
+
+    if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
+      ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
+      linked_dispute_comment = FileRepComment.new
+      linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
+      linked_dispute_comment.user_id = user.id
+      linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+      linked_dispute_comment.save(:validate => false)
+
+    end
+
     if is_duplicate == true
       return new_dispute
     end
@@ -1037,7 +1042,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def self.export_xlsx(search_params_json, current_user:)
-    fields = %w{id status resolution file_name sha256_hash file_size sample_type
+    fields = %w{id status resolution file_name sha256_hash file_size platform sample_type
                 disposition detection_name detection_last_set
                 in_zoo sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
                 disposition_suggested created_at submitter_type
@@ -1056,11 +1061,11 @@ class FileReputationDispute < ApplicationRecord
     workbook = RubyXL::Workbook.new
     worksheet = workbook[0]
 
-    %w{Case\ ID Status Resolution File\ Name SHA256 File\ Size Sample\ Type
-       AMP\ Disposition AMP\ Detection\ Name AMP\ Detection\ Created
+    %w{Case\ ID Status Resolution File\ Name SHA256 File\ Size Platform Sample\ Type
+       AMP\ Disposition AMP\ Detection\ Name AMP\ Detection\ Last\ Set
        In\ Zoo Sandbox\ Score TG\ Score Reversing\ Labs\ Hits RL\ Scanners\ Total
-       Suggested\ Disposition Time\ Submitted Submitter\ Type
-       Customer\ Name Customer\ Organization Customer\ email Assignee\ Dispute Summary/Details}.each_with_index do |field_name, col_index|
+       Suggested\ Disposition Dispute\ Summary/Details Time\ Submitted Submitter\ Type
+       Customer\ Name Customer\ Organization Customer\ Email Assignee}.each_with_index do |field_name, col_index|
       worksheet.add_cell(0, col_index, field_name)
       worksheet.sheet_data[0][col_index].change_font_bold(true)
     end

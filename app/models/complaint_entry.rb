@@ -93,16 +93,23 @@ class ComplaintEntry < ApplicationRecord
         return("Already completed")
       end
     else
-      return("Someone elses complaint")
+      return("Currently assigned to someone else")
     end
     return("Complaint taken")
   end
-  def return_complaint
+
+  def return_complaint(current_user)
+
     if self.user != User.where(display_name: 'Vrt Incoming').first
+
       if !self.is_important
         if status!="COMPLETED"
-          self.update(user: User.vrtincoming, status:"NEW")
-          complaint.set_status("NEW")
+          if self.user.id != current_user.id
+            return("Currently assigned to someone else")
+          else
+            self.update(user: User.vrtincoming, status:"NEW")
+            complaint.set_status("NEW")
+          end
         else
           return("Already completed")
         end
@@ -156,38 +163,97 @@ class ComplaintEntry < ApplicationRecord
                       current_user,
                       commit_pending)
     ActiveRecord::Base.transaction do
+
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
       if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
         if self.status == "PENDING"
           if commit_pending == "commit"
             # commit from pending of important case
 
-            current_status = "COMPLETED"
-            self.case_assigned_at ||= Time.now
-            # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
-            update!(status:current_status,
-                   category: categories_string,
-                   internal_comment: comment,
-                   resolution_comment: resolution_comment,
-                   uri_as_categorized: uri_as_categorized,
-                   case_resolved_at: Time.now,
-                   user:current_user)
-            complaint.set_status(current_status)
-            #this is where we should send off the category to the API
-            if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
-              existing_prefixes = remote_prefixes(prefix_given: prefix)
-              commit_category(existing_prefixes,
-                              ip_or_uri: prefix,
-                              categories_string: categories_string,
-                              description: comment,
-                              user: current_user.email,
-                              casenumber: self.complaint.id)
-              update!(url_primary_category: category_names_string, category: category_names_string)
-            else
-              # TODO Do we need to update the record when we are not making a change?
-              existing_prefixes = remote_prefixes(prefix_given: prefix)
-              cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
-              update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+            ###############################################################################################################################################################
+            ###guard rails
+            verdict_pass = true
+            verdict_reasons = []
+            if categories_string.blank?
+              raise "categories string is empty"
+            end
+            begin
+              all_cats = Wbrs::Category.all
+
+              category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
+
+              cats_by_short = []
+
+              category_ids_array.each do |cat_id|
+                all_cats.each do |base_cat|
+                  if base_cat.category_id == cat_id
+                    cats_by_short << base_cat.mnem
+                  end
+                end
+              end
+
+              cats_by_short.each do |cat|
+                result = JSON.parse(Webcat::GuardRails.verdict_for_entry(prefix, cat).body)
+
+                verdict_data = result[prefix]
+
+                if verdict_data["color"] != Webcat::GuardRails::PASS
+                  verdict_pass = false
+                  verdict_reason = "|#{cat} = #{verdict_data["color"]}:"
+                  verdict_reason += "#{verdict_data["why"]["reason"].pluck("reason").join(",")} \n" rescue "no reasons data\n"
+                  verdict_reasons << verdict_reason
+                end
+
+              end
+            rescue Exception => e
+              Rails.logger.error(e.message)
+              verdict_pass = false
+              verdict_reasons << "there was an api call failure, erring to manager review"
+            end
+
+            ###############################################################################################################################################################
+            if verdict_pass == true || current_user.is_webcat_manager?
+
+              #################################################
+              current_status = "COMPLETED"
+              self.case_assigned_at ||= Time.now
+              # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
+              update!(status:current_status,
+                     category: categories_string,
+                     internal_comment: comment,
+                     resolution_comment: resolution_comment,
+                     uri_as_categorized: uri_as_categorized,
+                     case_resolved_at: Time.now,
+                     user:current_user)
+              complaint.set_status(current_status)
+              #this is where we should send off the category to the API
+
+              if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
+                existing_prefixes = remote_prefixes(prefix_given: prefix)
+                commit_category(existing_prefixes,
+                                ip_or_uri: prefix,
+                                categories_string: categories_string,
+                                description: comment,
+                                user: current_user.email,
+                                casenumber: self.complaint.id)
+                update!(url_primary_category: category_names_string, category: category_names_string)
+              else
+                # TODO Do we need to update the record when we are not making a change?
+                existing_prefixes = remote_prefixes(prefix_given: prefix)
+                cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
+                update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+              end
+              ###################################################
+            end
+
+            if !current_user.is_webcat_manager?
+              if verdict_pass == false
+                manager_user = User.where(:cvs_username => Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
+                guard_rails_reasons = verdict_reasons.join(";")
+                update!(user: manager_user,
+                              internal_comment: "FAILED GUARDRAILS! Reason: #{guard_rails_reasons}"
+                )
+              end
             end
           else
             # dismiss from pending of important case
@@ -432,16 +498,18 @@ class ComplaintEntry < ApplicationRecord
 
 
   def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
+    new_complaint_entry = ComplaintEntry.new
     begin
-      new_complaint_entry = ComplaintEntry.new
-      new_complaint_entry.complaint_id = complaint.id
-      new_complaint_entry.status = status
-
       wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
-
-
+    rescue Exception => e
+      Rails.logger.info (" Couldnt contact SBRS. #{e}")
+      new_complaint_entry.wbrs_score = 0
+    end
+    begin
+      new_complaint_entry.complaint_id = complaint.id
+      new_complaint_entry.status = status
       if is_ip?(ip_url)
         ip_url.chomp!("/")
         ip_network = ip_url.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0]
@@ -472,7 +540,6 @@ class ComplaintEntry < ApplicationRecord
         new_complaint_entry.url_primary_category = current_category
         new_complaint_entry.category = current_category
       end
-
       new_complaint_entry.save
 
     rescue Exception => e
@@ -483,28 +550,28 @@ class ComplaintEntry < ApplicationRecord
     max_wait_for_job = 15 #seconds
     begin
       #this is where screen grabs happen.
-      #screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
-      #screenshot_entry.grab_screenshot
+      screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
+      screenshot_entry.grab_screenshot
     rescue Timeout::Error => e
       #couldnt complete in time
-      #Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-      #ces = ComplaintEntryScreenshot.new
-      #ces.error_message = e.message
-      #ces.complaint_entry_id = new_complaint_entry.id
-      #open("app/assets/images/failed_screenshot.jpg") do |f|
-      #  ces.screenshot = f.read
-      #end
-      #ces.save!
+      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+      ces = ComplaintEntryScreenshot.new
+      ces.error_message = e.message
+      ces.complaint_entry_id = new_complaint_entry.id
+      open("app/assets/images/failed_screenshot.jpg") do |f|
+       ces.screenshot = f.read
+      end
+      ces.save!
     rescue Exception => e
-      #Rails.logger.error("#{e.message}")
-      #do nothing, it was worth a try. kittens are sad now
-      #ces = ComplaintEntryScreenshot.new
-      #ces.error_message = e.message
-      #ces.complaint_entry_id = new_complaint_entry.id
-      #open("app/assets/images/failed_screenshot.jpg") do |f|
-      #  ces.screenshot = f.read
-      #end
-      #ces.save!
+      Rails.logger.error("#{e.message}")
+      # do nothing, it was worth a try. kittens are sad now
+      ces = ComplaintEntryScreenshot.new
+      ces.error_message = e.message
+      ces.complaint_entry_id = new_complaint_entry.id
+      open("app/assets/images/failed_screenshot.jpg") do |f|
+       ces.screenshot = f.read
+      end
+      ces.save!
     end
   end
 
@@ -582,6 +649,8 @@ class ComplaintEntry < ApplicationRecord
         open.where(user_id: user.id)
       when "MY CLOSED COMPLAINTS"
         closed.where(user_id: user.id)
+      when "MANAGER QUEUE"
+        joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
       when "ALL"
         all
       else
@@ -844,7 +913,7 @@ class ComplaintEntry < ApplicationRecord
       parsed_uri['path'] = '' unless parsed_uri['path'].present?
       parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
 
-      qualified_prefixes = prefix_results.find_all do
+      qualified_prefixes = prefix_results.find_all do |prefix_result|
         ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
       end
 

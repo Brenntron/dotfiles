@@ -166,7 +166,6 @@ processSubmitNewURL = () ->
       isEmpty = false
 
   if !isEmpty
-
     std_msg_ajax(
       url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
       method: 'POST'
@@ -702,7 +701,7 @@ window.take_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('take error', json.error)
+          std_msg_error('Error Taking Entries', json.error)
         else
           for row, i in selected_rows[0]
             selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
@@ -793,7 +792,7 @@ window.return_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('return error', json.error)
+          std_msg_error('Error Returning Entries', json.error)
         else
           for row, i in selected_rows[0]
             selected_rows.data().cell(row,14).data("Vrt Incoming").draw()
@@ -852,9 +851,9 @@ $(document).on 'click', ".screenshot-close-button", ->
 window.enlarge_image = (id,image,retake_in_progress)->
   image_content = ""
   if retake_in_progress
-    image_content = '<img src="' + image + '"><span class="screenshot-button screenshot-reload-button esc-tooltipped" title="Reload Page">Reload Page</span>'
+    image_content = '<img height=600 width=800 src="' + image + '"><span class="screenshot-button screenshot-reload-button esc-tooltipped" title="Reload Page">Reload Page</span>'
   else
-    image_content = '<img src="' + image + '"><span class="screenshot-button screenshot-retake-button esc-tooltipped" id="se_id_' + id + '" title="Retake Screenshot"></span><span class="screenshot-button screenshot-close-button"></span>'
+    image_content = '<img height=600 width=800 src="' + image + '"><span class="screenshot-button screenshot-retake-button esc-tooltipped" id="se_id_' + id + '" title="Retake Screenshot"></span><span class="screenshot-button screenshot-close-button"></span>'
 
   $('#screenshot_id_'+ id).popover(
     html: true
@@ -909,40 +908,68 @@ window.retrieve_history = (position) ->
   url = $("#url_" + position).val()
 
   if url.length > 0
-
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
       method: 'POST'
       data: {'position': position, url: url}
-
       success: (response) ->
         loader.addClass('hidden')
         json = JSON.parse(response)
         if json.error
           std_msg_error("<p>Something went wrong: #{json.error}","")
         else
-          history_dialog_content = '<div class="dialog-content-wrapper">' +
-            '<h5>Domain History</h5>' +
-            '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
-            '<tbody>'
-
+          history_dialog_content =
+              "<div class='cat-history-dialog dialog-content-wrapper'>
+               <h4>#{url}</h4>
+               <ul class='nav nav-tabs dialog-tabs' role='tablist'>
+               <li class='nav-item active' role='presentation'>
+                <a class='nav-link' role='tab' data-toggle='tab' href='#domain-history-tab' aria-controls='domain-history-tab'>
+                   Domain History
+                </a>
+               </li>
+               <li class='nav-item' role='presentation'>
+                <a class='nav-link xbrs-history-tab' role='tab' data-toggle='tab' href='#xbrs-history-tab' aria-controls='xbrs-history-tab' onclick='get_xbrs_history(\"#{url}\", this)'>
+                  XBRS History
+                </a>
+               </li>
+               </ul>
+                <div class='tab-pane active' role='tabpanel' id='domain-history-tab'>
+                  <h5>Domain History</h5>
+                  <table class='history-table'>
+                    <thead>
+                       <tr>
+                        <th>Action</th>
+                        <th>Confidence</th>
+                        <th>Description</th>
+                        <th>Time</th>
+                        <th>User</th>
+                        <th>Category</th>
+                       </tr>
+                    </thead>
+                    <tbody>"
           for entry in json
-
-            entry_string = "" +
-              '<tr>' +
-              '<td>' + entry['action'] + '</td>' +
-              '<td>' + entry['confidence'] + '</td>' +
-              '<td>' + entry['description'] + '</td>' +
-              '<td>' + entry['time'] + '</td>' +
-              '<td>' + entry['user'] + '</td>' +
-              '<td>' + entry['category']['descr'] + '</td>' +
-              '</tr>'
+            { action, confidence, description, time, user, category } = entry
+            entry_string =
+              "<tr>
+                <td> #{action}</td>
+                <td> #{confidence}</td>
+                <td> #{description}</td>
+                <td> #{time} </td>
+                <td> #{user}</td>
+                <td> #{category.descr}</td>
+               </tr>"
 
             history_dialog_content += entry_string
 
-          history_dialog_content += '</tbody></table>'
+          history_dialog_content +=
+            "</tbody></table>
+             </div>
+             <div class='tab-pane' role='tabpanel' id='xbrs-history-tab'>
+                <h5>XBRS History</h5>
+                <table class='history-table xbrs-history-table' id='webcat-xbrs-history'></table>
+             </div>"
 
-          if $("#history_dialog").length
+          if $("history_dialog").length
             history_dialog = this
             $("#history_dialog").html(history_dialog_content)
             $('#history_dialog').dialog('open')
@@ -955,6 +982,7 @@ window.retrieve_history = (position) ->
               minWidth: 600
               position: { my: "right top", at: "right top", of: window }
             $('#history_dialog').dialog('open')
+            $('dialog_tabs').tabs();
 
       error: (response) ->
         $("#cat-url-error-message-#{position}").text("No history associated with this url.")
@@ -962,13 +990,14 @@ window.retrieve_history = (position) ->
         $("#cat-url-#{position}").show()
         $("#url_#{position}").css("border-width", "2px")
         $("#url_#{position}").css("border-color", "#E47433")
-
     , this)
   else
     $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
     $("#cat-url-#{position}").show()
     $("#url_#{position}").css("border-width", "2px")
     $("#url_#{position}").css("border-color", "#E47433")
+
+
 
 
 window.drop_current_categories = () ->
@@ -1048,7 +1077,6 @@ format = (complaint_entry_row) ->
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
-
   qual_subdomain = complaint_entry.domain
   if complaint_entry.subdomain
     qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
@@ -1142,7 +1170,7 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       row_id = JSON.parse(this.data).id
-      { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
+      { current_category_data : current_categories, master_categories, sds_category, sds_domain_category} = JSON.parse(response)
 
       sds_category == '' unless sds_category != null
 
@@ -1168,7 +1196,7 @@ format = (complaint_entry_row) ->
           tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + tooltip_table + tooltip_wrapper_end
 
           if key == '1.0'
-            category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td><td class=sds_category>' + sds_category + '</td></tr>'
+            category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td><td class=sds_category>' + sds_category + '</td><td class=sds_category>' + sds_domain_category + '</td></tr>'
             $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
           else
             category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
@@ -1188,15 +1216,16 @@ format = (complaint_entry_row) ->
     else
       complaint_history = ''
 
-  whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
-
-  { entry_id, domain, complaint_id } = complaint_entry
+  { entry_id, domain, complaint_id, ip_address } = complaint_entry
+  whois_lookup = if ip_address then ip_address else domain
   complaint_entry_html = ''
   input_cat = 'input_cat_' + entry_id
 
   if complaint_entry.status == "PENDING"
-
-    domain = complaint_entry.uri_as_categorized
+    if complaint_entry.uri_as_categorized  == ""
+      domain = complaint_entry.subdomain + "." + complaint_entry.domain
+    else
+      domain = complaint_entry.uri_as_categorized
     # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
 
     complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
@@ -1221,6 +1250,10 @@ format = (complaint_entry_row) ->
   retake_in_progress = false
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
+
+
+  edit_input = if domain != "" then domain else host #if the domain is empty, then display host for ips in edit input
+
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
@@ -1241,7 +1274,7 @@ format = (complaint_entry_row) ->
       "<label class='content-label-sm'>Customer Description</label>" +
       "<span class='nested-complaint-data'>#{customer_description}</span>" +
       "</div></div><div class='col-xs-7 col-with-divider'>" +
-      '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
+      '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-3">WBRS Categories</th><th class="col-sm-2">WBRS Certainty</th><th class="col-sm-3">SDS URI Category</th><th class="col-sm-3">SDS Domain Category</th></tr></thead>' +
       '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
@@ -1256,7 +1289,7 @@ format = (complaint_entry_row) ->
       '<div>' + host  + '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" onclick="this.select()" data-domain="' + domain + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + domain +
+      '" type="text" data-domain="' + domain + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
       '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
@@ -1270,9 +1303,9 @@ format = (complaint_entry_row) ->
       '<button class="secondary inline-button" onclick="inheritCategories(' + entry_id + ')">Inherit</button><br/>' +
       '</div>' +'</div><div class="col-xs-8">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + entry_id + '" type="text" onclick="this.select()" data-domain="' + domain + '" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + entry_id + '" type="text" data-domain="' + domain + '" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" onclick="this.select()" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div>' +
       '<div class="col-xs-4">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
@@ -1284,8 +1317,9 @@ format = (complaint_entry_row) ->
 
 ## Complaint history dialog box. Includes tabs for domain history, complaint entry history, and xbrs history of the url.
 window.history_dialog = (id, url) ->
+#  here here
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
+  std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
     method: 'POST'
     headers: headers
@@ -1293,29 +1327,24 @@ window.history_dialog = (id, url) ->
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
         history_dialog_content =
-          '<div class="dialog-content-wrapper">' +
-          '<h4>' + url + '</h4>' +
-          # Tab navigation
-          '<ul class="nav nav-tabs dialog-tabs" role="tablist">' +
-          '<li class="nav-item active" role="presentation">' +
-          '<a class="nav-link" role="tab" data-toggle="tab" href="#domain-history-tab" aria-controls="domain-history-tab">Domain History</a>' +
-          '</li>' +
-          '<li class="nav-item" role="presentation">' +
-          '<a class="nav-link" role="tab" data-toggle="tab" href="#complaint-history-tab" aria-controls="complaint-history-tab">Complaint Entry History</a>' +
-          '</li>' +
-          '<li class="nav-item" role="presentation">' +
-          '<a class="nav-link" role="tab" data-toggle="tab" href="#xbrs-history-tab" aria-controls="xbrs-history-tab" onclick="get_xbrs_history(\'' + url + '\', this)">XBRS History</a>' +
-          '</li>' +
-          '</ul>' +
-
-          # Tab content - beginning markup of first tab
-          '<div class="tab-content dialog-tab-content">' +
-          '<div class="tab-pane active" role="tabpanel" id="domain-history-tab">' +
-          '<h5>Domain History</h5>'
+          "<ul class='nav nav-tabs dialog-tabs' role='tablist'>
+               <li class='nav-item active' role='presentation'>
+                <a class='nav-link' role='tab' data-toggle='tab' href='#domain-history-tab' aria-controls='domain-history-tab'>
+                   Domain History
+                </a>
+               </li>
+               <li class='nav-item' role='presentation'>
+                <a class='nav-link' role='tab' data-toggle='tab' href='#xbrs-history-tab' aria-controls='xbrs-history-tab' onclick='get_xbrs_history(\"#{url}\", this)'>
+                  XBRS History
+                </a>
+               </li>
+            </ul>
+            <div class='tab-content dialog-tab-content'>
+            <div class='tab-pane active' role='tabpanel' id='domain-history-tab'>
+            <h5>Domain History</h5>"
 
         if json.entry_history.domain_history.length < 1
           history_dialog_content += '<span class="missing-data">No domain history available.</span>'
@@ -1325,16 +1354,15 @@ window.history_dialog = (id, url) ->
           '<tbody>'
           # Build domain history table
           for entry in json.entry_history.domain_history
-            entry_string =
-            '<tr>' +
-            '<td>' + entry['action'] + '</td>' +
-            '<td>' + entry['confidence'] + '</td>' +
-            '<td>' + entry['description'] + '</td>' +
-            '<td>' + entry['time'] + '</td>' +
-            '<td>' + entry['user'] + '</td>' +
-            '<td>' + entry['category']['descr'] + '</td>' +
-            '</tr>'
-            history_dialog_content += entry_string
+            history_dialog_content +=
+              '<tr>' +
+              '<td>' + entry['action'] + '</td>' +
+              '<td>' + entry['confidence'] + '</td>' +
+              '<td>' + entry['description'] + '</td>' +
+              '<td>' + entry['time'] + '</td>' +
+              '<td>' + entry['user'] + '</td>' +
+              '<td>' + entry['category']['descr'] + '</td>' +
+              '</tr>'
           # End domain history table
           history_dialog_content += '</tbody></table>'
 
@@ -1367,9 +1395,8 @@ window.history_dialog = (id, url) ->
                     details_col += '<span class="bold">' + key + ":</span> " + value[0] + " - " + value[1] + "<br/>"
             entry_row += '<td>' + details_col + '</td></tr>'
             history_dialog_content += entry_row
-          history_dialog_content +=
-            # End complaint history table
-            '</tbody></table>'
+          # End complaint history table
+          history_dialog_content += '</tbody></table>'
 
         history_dialog_content +=
           # End complaint history table tab
@@ -1404,14 +1431,14 @@ window.history_dialog = (id, url) ->
 ## Fetches XBRS history of a url on click of the XBRS tab in history
 window.get_xbrs_history = (url, tab) ->
   wrapper = $(tab).parents('.dialog-content-wrapper')[0]
-  xbrs_table = $(wrapper).find('.xbrs-history-table')[0]
+  xbrs_table = $("#webcat-xbrs-history")
   xbrs_msg = $(wrapper).find('.xbrs-no-data-msg')[0]
   # Clear table of residual data
   $(xbrs_table).empty()
   if xbrs_msg?
     $(xbrs_msg).remove()
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
+  std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/xbrs'
     method: 'POST'
     headers: headers
@@ -1420,74 +1447,47 @@ window.get_xbrs_history = (url, tab) ->
       if response.data.length < 1
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
-        # Cycle through and assign index values to column headers
-        col_headers = []
-        for col, i in response['columns']
-          $(response['columns']).each ->
-            col_defs = []
-            col_defs["index"] = i
-            col_defs["column"] = this.valueOf()
-            col_headers.push(col_defs)
+        { columns, data:current_data } = response
+        $(xbrs_table).append(document.createElement('thead'))
+        $(xbrs_table).append(document.createElement('tbody'))
+        thead = $(xbrs_table).find('thead')
+        tbody = $(xbrs_table).find('tbody')
+        parsed_rows = []
+        thead_row = ''
 
-        col_indexes = []
-        ctime_index = ''
-        thead = '<thead><tr>'
-        $(col_headers).each ->
-          # We only want these specific columns
-          if this.column == "domain" || this.column == "subdomain" || this.column == "ctime" || this.column == "mtime" || this.column == "mnemonic" || this.column == "operation" || this.column == "path"
-            if this.column == "ctime"
-              thead += '<th>Creation Time</th>'
-              ctime_index = this.index
-            else if this.column == "mtime"
-              thead += '<th>Last Modified</th>'
-            else
-              thead += '<th>' + this.column + '</th>'
-            col_indexes.push(this.index)
-        thead += '</tr></thead>'
+        for row, i in current_data
+          parsed_rows[i] = { ctime:'', row_data: '' }
 
-        row_data = []
-        # For each row of data, cycle through and assign index to each column
-        $(response['data']).each ->
-          col_data = []
-          for data, i in this
-            $(this).each ->
-              data = []
-              data["index"] = i
-              data["data"] = this.valueOf()
-              col_data.push(data)
-            row_data.push(col_data)
-
-        # Sort rows by ctime
-        row_data.sort (a,b) ->
-          a1 = a[ctime_index]
-          b1 = b[ctime_index]
-          if a1.data == b1.data
-            return 0
-          if a1.data > b1.data then 1 else -1
-
-        tbody = '<tbody>'
-        $(row_data).each ->
-          tbody += '<tr>'
-          row = this
-          $(row).each ->
-            col = this.index
-            col_content = this.data
-            # If our column header indexes and our column data indexes match we create the column in the table
-            if jQuery.inArray(col, col_indexes) != -1
-              if jQuery.type(col_content) == 'string' || jQuery.type(this) == 'number'
-                tbody += '<td>' + col_content + '</td>'
+        for col, index in columns
+          # We only want the values/headers for these columns
+          if col == "domain" || col == "subdomain" || col == "ctime" || col == "mtime" || col == "mnemonic" || col == "operation" || col == "path"
+            if col == "ctime" then col = "Creation Time"
+            if col == "mtime" then col = 'Last Modified'
+            thead_row += "<th> #{col }</th>"
+            for row, i in current_data
+              if col == "Creation Time"
+                #set ctime/Creation Time value to check against for every row
+                parsed_rows[i].ctime = row[index]
+              # build cells for each row corresponding data to proper column. if values are null or undefined set '-'
+              parse_data = row[index]
+              if parse_data == null || parse_data == undefined
+                parsed_rows[i].row_data += "<td> - </td>"
               else
-                # is null - prevents weird json objects getting through
-                tbody += '<td> - </td>'
-          tbody += '</tr>'
-        tbody += '</tbody>'
+                parsed_rows[i].row_data += "<td>#{parse_data}</td>"
 
-        $(xbrs_table).append(thead)
-        $(xbrs_table).append(tbody)
+        #sort rows by ctime
+        parsed_rows.sort (a,b) ->
+            if a.ctime == b.ctime then return 0
+            if a.ctime > b.ctime then 1 else -1
+
+        #  add all rows to table
+        thead.append(thead_row)
+        for key, value of parsed_rows
+          tbody.append("<tr>#{value.row_data}</tr>")
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
-
 
 
 parse_lookup_dialog_content = (json) ->
@@ -1569,7 +1569,7 @@ window.click_table_buttons = (complaint_table, button)->
       $(td).addClass 'nested-complaint-data-wrapper'
     if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
       $( cat_select ).selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
@@ -1590,7 +1590,7 @@ window.click_table_buttons = (complaint_table, button)->
     else
       # need to initialize the selectize function but disable it here if entry is completed
       $completed_selectize = $( cat_select ).selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
@@ -1815,7 +1815,6 @@ window.triggerTooltips = (item) ->
 processSubmitMaster = () ->
 
   data = []
-
   $('.selected + tr td.nested-complaint-data-wrapper').each ->
     entry_id = $(this).find('tr').attr('entry_id')
     row_id = $(this).find('tr').attr('row_id')
@@ -1836,7 +1835,6 @@ processSubmitMaster = () ->
       comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
       resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
       uri_as_categorized = $(this).find("#complaint_prefix_#{entry_id}")[0].value
-
       if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if status == 'UNCHANGED' || status == 'INVALID'
@@ -2178,3 +2176,19 @@ $ ->
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
+$ ->
+  set_complaints_link = () ->
+    url = '/escalations/webcat/complaints'
+    search = if window.location.pathname == url # only if we're on index page
+      window.location.search
+    else
+      localStorage.webcat_search_name
+
+    if search && window.location.href.indexOf('webcat') > 0
+      localStorage.setItem('webcat_search_name', search)
+      link = url + search
+      $('#cat-link').attr('href', link)
+      $('#cat-icon-link').attr('href', link)
+      $('#complaints').attr('href', link)
+
+  set_complaints_link()

@@ -39,6 +39,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
         tags:               {source: "ComplaintEntry.tags", data: :tags, searchable: false, orderable: false},
         submitter_type:     {source: "ComplaintEntry.submitter_type", data: :submitter_type, cond: :string_eq},
         description:        {source: "ComplaintEntry.description", data: :description, cond: :like},
+        platform:           {source: "ComplaintEntry.platform", data: :platform, cond: :like}
     }
   end
 
@@ -79,6 +80,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           submitter_type:   complaint.submitter_type,
           description:      complaint.description,
           uri_as_categorized: complaint_entry.uri_as_categorized,
+          platform:         complaint_entry.platform,
 
           DT_RowId:         complaint_entry.id,
       }
