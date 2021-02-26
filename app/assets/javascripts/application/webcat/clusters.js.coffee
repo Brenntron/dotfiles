@@ -55,10 +55,10 @@ window.categorize_clusters = () ->
     loader.addClass('hidden')
     return
 
-  if comment == ''
-    std_msg_error('no comment added', ['Please make a comment to submit.'])
-    loader.addClass('hidden')
-    return
+#  if comment == ''
+#    std_msg_error('no comment added', ['Please make a comment to submit.'])
+#    loader.addClass('hidden')
+#    return
   data = {}
   data["comment"] = comment
   data["user_id"] = user_id
