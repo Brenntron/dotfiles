@@ -23,19 +23,21 @@ class Webcat::ClustersFetcher
 
   def filter_clusters(clusters)
     case filter
+    when 'all'
+      clusters
     when 'my'
       filter_assigned_to_user(clusters)
     when 'unassigned'
       filter_unassigned(clusters)
     else
-      clusters
+      filter_by_default(clusters)
     end
   end
 
   def filter_assigned_to_user(data)
     user_clusters = ClusterAssignment.fetch_assignments_for(user: user)
     data['data'].filter! do |cluster|
-      user_clusters.find { |user_cluster| user_cluster.cluster_id == cluster['cluster_id'].to_i }
+      cluster_assigned_to_user?(user_clusters, cluster)
     end
     data
   end
@@ -43,9 +45,27 @@ class Webcat::ClustersFetcher
   def filter_unassigned(data)
     assigned_cluster_ids = ClusterAssignment.fetch_all_assignments.pluck(:cluster_id)
     data['data'].filter! do |cluster|
-      !assigned_cluster_ids.include?(cluster['cluster_id'].to_i)
+      cluster_unassigned?(assigned_cluster_ids, cluster)
     end
     data
+  end
+
+  def filter_by_default(data)
+    # assigned to user + unassigned
+    user_clusters = ClusterAssignment.fetch_assignments_for(user: user)
+    assigned_cluster_ids = ClusterAssignment.fetch_all_assignments.pluck(:cluster_id)
+    data['data'].filter! do |cluster|
+      cluster_unassigned?(assigned_cluster_ids, cluster) || cluster_assigned_to_user?(user_clusters, cluster)
+    end
+    data
+  end
+
+  def cluster_assigned_to_user?(user_clusters, cluster)
+    user_clusters.find { |user_cluster| user_cluster.cluster_id == cluster['cluster_id'].to_i }
+  end
+
+  def cluster_unassigned?(assigned_cluster_ids, cluster)
+    !assigned_cluster_ids.include?(cluster['cluster_id'].to_i)
   end
 
   def parse_api_response(clusters_response)

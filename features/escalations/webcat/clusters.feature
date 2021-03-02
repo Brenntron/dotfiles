@@ -6,18 +6,25 @@ Feature: Webcat clusters
     Given a guest company exists
 
   @javascript
-  Scenario: a user should see clusters
-    Given a user with role "webcat user" exists and is logged in
+  Scenario: a user should not see clusters assigned to another users in default view
+    Given a user with id "1" has a role "webcat user" and is logged in
+    And the following users exist
+      |id|
+      |2 |
     And WBRS Cluster returns the following stubbed clusters:
       |id|  domain      |
       |1 | food.com     |
       |2 | blah.com     |
       |3 | imhungry.com |
+    And the following cluster assignments exists:
+      |id| user_id | cluster_id |
+      |1 |    1    |     1      |
+      |2 |    2    |     3      |
     When I goto "/escalations/webcat/clusters"
     And I wait for "3" seconds
     Then I should see "food.com"
     And I should see "blah.com"
-    And I should see "imhungry.com"
+    And I should not see "imhungry.com"
 
   @javascript
   Scenario: a user should be able to assign cluster
