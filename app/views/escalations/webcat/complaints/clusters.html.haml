@@ -45,8 +45,14 @@
           %label.toolbar-section-label View
           %button.toolbar-button.icon-opened-selected.esc-tooltipped.toolbar-button-spacer{title: 'Open Viewable', onclick: 'open_selected_clusters()'}
             %span.toolbar-button-text Open Selected
-          %button.toolbar-button.icon-open-all.esc-tooltipped{title: 'Open All', onclick: 'open_all_clusters()'}
+          %button.toolbar-button.icon-open-all.esc-tooltipped.toolbar-button-spacer{title: 'Open All', onclick: 'open_all_clusters()'}
             %span.toolbar-button-text Open All
+        %div
+          %label.toolbar-section-label Edit
+          %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped.toolbar-button-spacer{onclick: 'take_selected_clusters()', type: 'button', title: 'Take selected'}
+            %span.toolbar-button-text Take
+          %button.toolbar-button.return-ticket-toolbar-button.esc-tooltipped{onclick: 'return_selected_clusters()', type: 'button', title: 'Return selected'}
+            %span.toolbar-button-text Return
         %div
           %label.toolbar-section-label View Nested Data
           %button.toolbar-button.collapse-button.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_selected_clusters("clusters-index")', type: 'button', title: 'Collapse Selected'}
@@ -74,6 +80,7 @@
             %th Cluster Domain
             %th Global Volume
             %th WBRS Score
+            %th Assignee
             %th Categories
 
 #copycat_dialog{title: 'CopyCat Tool'}

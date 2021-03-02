@@ -51,49 +51,16 @@ module API
 
             end
 
-
             desc 'get all clusters'
             params do
+              optional :f, type: String, desc: 'filter'
             end
 
-            get "" do
+            get do
               authorize!(:index, Complaint)
+              clusters = ::Webcat::ClustersFetcher.new(params[:f], params[:regex], current_user).fetch
 
-              json_packet = []
-
-
-              if params[:regex].present?
-                cluster_data = Wbrs::Cluster.where({:regex => params[:regex]})
-                clusters = cluster_data["data"]
-                meta = cluster_data["meta"]
-              else
-                cluster_data = Wbrs::Cluster.all()
-                clusters = cluster_data["data"]
-                meta = cluster_data["meta"]
-              end
-
-              if clusters
-                beaker_urls_list = []
-                clusters.each do |cluster|
-                  beaker_urls_list << {"url" => cluster["domain"]}
-                end
-
-                beaker_verdicts = Beaker::Verdicts.verdicts(beaker_urls_list)
-
-                clusters.each_with_index do |cluster, index|
-                  cluster_packet = {}
-                  cluster_packet[:cluster_id] = cluster["cluster_id"]
-                  cluster_packet[:domain] = cluster["domain"]
-                  cluster_packet[:global_volume] = cluster["glob_volume"]
-                  cluster_packet[:ctime] = cluster["ctime"]
-                  cluster_packet[:cluster_size] = cluster["cluster_size"] unless cluster["cluster_size"].blank?
-                  cluster_packet[:age] = distance_of_time_in_words(Time.now, Time.parse(cluster["ctime"]))
-                  cluster_packet[:wbrs_score] = beaker_verdicts[index]["response"]["thrt"]["scor"] if beaker_verdicts[index]["response"].present? && beaker_verdicts[index]["response"]["thrt"].present?
-                  json_packet << cluster_packet
-                end
-              end
-              {:status => "success", :data => json_packet, :meta => meta}.to_json
-
+              {:status => "success", :data => clusters[:data], :meta => clusters[:meta]}.to_json
             end
 
             #returns an array of hashes about urls associated with a cluster_id
@@ -119,6 +86,40 @@ module API
               sorted_limited_cluster_info = cluster_info.sort { |x,y| y["glob_volume"] <=> x["glob_volume"] }.first(300)
 
               {:status => "success", :data => sorted_limited_cluster_info}.to_json
+            end
+
+            desc "assign cluster to the user"
+            params do
+            end
+            post 'take' do
+              cluster_ids = params[:cluster_ids]
+              ClusterAssignment.assign(cluster_ids, current_user)
+              # binding.pry
+              {
+                status: "success",
+                username: current_user.cvs_username,
+                cluster_ids: cluster_ids
+              }.to_json
+
+            rescue Exception => e
+              {
+                status: 'failed',
+                error: e.message
+              }.to_json
+            end
+
+            desc "unassign cluster from the user"
+            params do
+            end
+            post 'return' do
+              cluster_ids = params[:cluster_ids]
+              ClusterAssignment.unassign(cluster_ids, current_user)
+              return {:status => "success"}.to_json
+            rescue Exception => e
+              {
+                status: 'failed',
+                error: e.message
+              }.to_json
             end
           end
         end

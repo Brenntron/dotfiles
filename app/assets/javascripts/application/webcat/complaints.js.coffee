@@ -2136,15 +2136,22 @@ $ ->
 
   $(document).ready ->
     if window.location.pathname != '/escalations/webcat/complaints'
-      $('#filter-complaints').hide()
+      $('#filter-complaints-nav').hide()
       $('#fetch').hide()
       $('#web-cat-search').hide()
       $('#new-complaint').hide()
+      $('#filter-clusters-nav').hide()
     else
       $('#filter-complaints').show()
       $('#fetch').show()
       $('#web-cat-search').show()
       $('#new-complaint').show()
+      $('#filter-clusters-nav').hide()
+
+    if window.location.pathname == '/escalations/webcat/clusters'
+      $('#filter-complaints-nav').hide()
+      $('#filter-clusters-nav').show()
+
 
   # If a stupidly long email address is returned it will wrap
   # rather than pushing the column into the column beside it

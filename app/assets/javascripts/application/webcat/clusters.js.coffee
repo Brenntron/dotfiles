@@ -12,9 +12,12 @@ window.populate_clusters_index_table = (filter) ->
   if $('#clusters-index_wrapper').length > 0
     loader = $('.cluster-mgt-loader-wrapper')
     loader.removeClass('hidden')
-    filter_param = ""
+    filter_param = window.location.search
     if filter
-      filter_param = "?regex=" + filter
+      if filter_param
+        filter_param += "&regex=" + filter
+      else
+        filter_param = "?regex=" + filter
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
@@ -174,6 +177,12 @@ $ ->
           tooltip_rep = wbrs_rep.toUpperCase()
           icon = "<span class='reputation-icon icon-#{wbrs_rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
           return "<div class='reputation-icon-container'>#{icon}<span>#{wbrs_score}</span></div>"
+      }
+      {
+        data: 'assigned_to'
+        className: "alt-col assignee-col"
+        render: (data, type, full, meta) ->
+          return "<span id='owner_#{full.cluster_id}'> #{data} </span>"
       }
       {
         data: 'cluster_id'
@@ -725,3 +734,58 @@ $ ->
         'tooltipster-borderless'
         'tooltipster-borderless-customized'
       ]
+
+window.take_selected_clusters = ()->
+  selected_rows = $('.cluser-row-select:checkbox:checked')
+  if selected_rows.length > 0
+    entry_ids = selected_rows.map(() ->
+      Number(this.name.split('cluster_id_')[1])
+    ).toArray()
+    console.log entry_ids
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/clusters/take'
+      method: 'POST'
+      headers: headers
+      data: 'cluster_ids': entry_ids
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          std_msg_error('Error Taking Clusters', [json.error])
+        else
+          for id, i in json.cluster_ids
+            $("#owner_#{id}").text(json.username)
+
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+    , this)
+  else
+    std_msg_error('No rows selected', ['Please select at least one row.'])
+
+window.return_selected_clusters = ()->
+  selected_rows = $('.cluser-row-select:checkbox:checked')
+  if selected_rows.length > 0
+    entry_ids = selected_rows.map(() ->
+      Number(this.name.split('cluster_id_')[1])
+    ).toArray()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/clusters/return'
+      method: 'POST'
+      headers: headers
+      data: 'cluster_ids': entry_ids
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          std_msg_error('Error Returning Entries', [json.error])
+        else
+          for id, i in entry_ids
+            $("#owner_#{id}").text('')
+
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+    , this)
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
