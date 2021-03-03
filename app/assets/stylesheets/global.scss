@@ -4545,6 +4545,7 @@ button.tertiary {
   border-bottom: 1px solid $faint-neutral-color;
   display: inline-block;
   width: 100%;
+  margin: 0px -5px;
 }
 
 #search-criteria-options input[type='checkbox'] {
@@ -4557,6 +4558,9 @@ button.tertiary {
 .search-criteria-label {
   padding: 6px 0 1px 0;
   width: 100%;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .multicol-2 {

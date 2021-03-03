@@ -52,6 +52,7 @@ $ ->
 
   $('#filter-cases-list a').on 'click', (e)->
     localStorage.setItem('webcat_reset_page', true)
+
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
@@ -686,6 +687,8 @@ $ ->
       create: false
       valueField: 'name',
       labelField: 'name',
+      create:true,
+      createOnBlur: true,
       options: createSelectOptions()
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
@@ -695,6 +698,8 @@ $ ->
         return (item) ->
           item.name.toLowerCase().startsWith( search.toLowerCase() ) ? 1 : 0;
     }
+    $('#tags-input-selectized').on 'keyup', ()->
+      console.log 'ininin', $(this), tag_input[0].selectize.getValue();
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,
