@@ -66,7 +66,6 @@ $ ->
     channels = $('#channel-input')[0].selectize.items
     entry_ids = $('#entryid-input')[0].selectize.items
     complaint_ids = $('#complaintid-input')[0].selectize.items
-    debugger
     if tags.length
       form['tags'] = tags.join(', ')
     if items.length
@@ -215,7 +214,6 @@ $ ->
     search_condition_tooltip = []
 
     for condition_name, condition of subheader
-      console.log condition_name, condition
       if condition != ''
         if condition_name == 'id'
           condition_name = 'Entry Id'
