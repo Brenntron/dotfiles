@@ -188,7 +188,7 @@ $ ->
   for select in $('select.cat_new_url')
 
     $(select).selectize {
-      persist: false,
+      persist: true,
       create: false,
       maxItems: 5,
       closeAfterSelect: true,

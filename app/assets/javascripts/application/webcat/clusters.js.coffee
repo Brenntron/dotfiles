@@ -50,15 +50,15 @@ window.categorize_clusters = () ->
   #cluster_id comment category_ids
   clusters = $ '[id$=\'_categories\']'
   categories = []
-  if $('.cluster-row-select:checked').length == 0
+  if $('#clusters-index').find('input:checked').length == 0
     std_msg_error('no rows selected', ['Please select at least one row.'])
     loader.addClass('hidden')
     return
 
-  if comment == ''
-    std_msg_error('no comment added', ['Please make a comment to submit.'])
-    loader.addClass('hidden')
-    return
+#  if comment == ''
+#    std_msg_error('no comment added', ['Please make a comment to submit.'])
+#    loader.addClass('hidden')
+#    return
   data = {}
   data["comment"] = comment
   data["user_id"] = user_id
@@ -256,7 +256,7 @@ window.copycat_dialog = () ->
       $('button.icon-copycat').removeClass('active')
     open: (event, ui) =>
       $('#copycat_dialog #copycat-categories').selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
@@ -316,7 +316,7 @@ window.selectize_category_inputs = () ->
 #          This is already selectized
     else
       $(this).selectize {
-        persist: false,
+        persist: true,
         create: false,
         maxItems: 5,
         closeAfterSelect: true,
