@@ -687,7 +687,7 @@ $ ->
       create: false
       valueField: 'name',
       labelField: 'name',
-      create:true,
+      create: true,
       createOnBlur: true,
       options: createSelectOptions()
       onFocus: () ->
