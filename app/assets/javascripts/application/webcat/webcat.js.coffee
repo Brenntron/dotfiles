@@ -698,8 +698,7 @@ $ ->
         return (item) ->
           item.name.toLowerCase().startsWith( search.toLowerCase() ) ? 1 : 0;
     }
-    $('#tags-input-selectized').on 'keyup', ()->
-      console.log 'ininin', $(this), tag_input[0].selectize.getValue();
+  
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,
