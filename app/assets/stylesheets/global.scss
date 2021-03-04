@@ -4529,7 +4529,7 @@ button.tertiary {
 #search-criteria-options {
   color: $type-base-color;
   border: 1px solid $faint-neutral-color;
-  padding: 6px 12px;
+  padding: 6px 20px;
   font-weight: 300;
   font-size: 9pt;
   position: absolute;
@@ -4544,9 +4544,13 @@ button.tertiary {
 #search-criteria-options li {
   border-bottom: 1px solid $faint-neutral-color;
   display: inline-block;
-  width: 100%;
+  width: 107%;
+  margin: 0px -10px;
+  padding-right: 17px;
 }
-
+.create.active{
+  display: none;
+}
 #search-criteria-options input[type='checkbox'] {
   box-shadow: none !important;
   outline: none !important;
@@ -4557,6 +4561,10 @@ button.tertiary {
 .search-criteria-label {
   padding: 6px 0 1px 0;
   width: 100%;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  height: 30px;
 }
 
 .multicol-2 {

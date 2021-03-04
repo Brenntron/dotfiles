@@ -52,6 +52,7 @@ $ ->
 
   $('#filter-cases-list a').on 'click', (e)->
     localStorage.setItem('webcat_reset_page', true)
+
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
@@ -66,7 +67,6 @@ $ ->
     channels = $('#channel-input')[0].selectize.items
     entry_ids = $('#entryid-input')[0].selectize.items
     complaint_ids = $('#complaintid-input')[0].selectize.items
-
     if tags.length
       form['tags'] = tags.join(', ')
     if items.length
@@ -117,7 +117,6 @@ $ ->
       modified_older: form.date_modified_newer
       modified_newer: form.date_modified_older
     )
-
     refresh_url()
 
   window.webcat_refresh = ()->
@@ -150,6 +149,7 @@ $ ->
           search_name : webcat_search_name
           search_conditions: JSON.parse(webcat_search_conditions)
         }
+
       when 'contains'
         data = {
           search_type: webcat_search_type
@@ -213,6 +213,7 @@ $ ->
 
     container = $('#webcat_searchref_container')
     search_condition_tooltip = []
+
     for condition_name, condition of subheader
       if condition != ''
         if condition_name == 'id'
@@ -686,12 +687,18 @@ $ ->
       create: false
       valueField: 'name',
       labelField: 'name',
+      create: true,
+      createOnBlur: true,
       options: createSelectOptions()
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
+      score: (search) ->
+        return (item) ->
+          item.name.toLowerCase().startsWith( search.toLowerCase() ) ? 1 : 0;
     }
+  
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,
