@@ -4545,7 +4545,8 @@ button.tertiary {
   border-bottom: 1px solid $faint-neutral-color;
   display: inline-block;
   width: 107%;
-  margin: 0px -5px;
+  margin: 0px -10px;
+  padding-right: 17px;
 }
 .create.active{
   display: none;
@@ -4563,6 +4564,7 @@ button.tertiary {
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
+  height: 30px;
 }
 
 .multicol-2 {
