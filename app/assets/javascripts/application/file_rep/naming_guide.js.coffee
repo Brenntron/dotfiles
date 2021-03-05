@@ -23,7 +23,7 @@ $ ->
         if  contact.match("https(.*)")!= null
           url =  contact.match("https(.*)")[0]
           contact = contact.replace("#{url}", "")
-          url = "<a href='#{url}' class='amp-url'>#{url}</a>"
+          url = "<a href='#{url}' class='amp-url' target='_blank'>#{url}</a>"
           contact += url
 
         $(this).html(contact)
