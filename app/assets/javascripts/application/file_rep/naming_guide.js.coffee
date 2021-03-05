@@ -2,15 +2,34 @@ $ ->
   # dbinebri: file rep, naming guide dialog. includes fix for height resizing bug.
   $('#naming-guide-dialog').dialog
     autoOpen: false
-    width: 800
-    minWidth: 700
+    width: 930
+    minWidth: 930
     height: 500
     minHeight: 300
     position:
       at: "right top"
+    open:  () ->
+      $('.contact-col').each ->
+        contact = this.textContent;
+        email = contact.match(/\S+[a-z0-9]@[a-z0-9\.]+/img );
+
+        if email != null
+          email = email[0].replace(/<|\(/g, '')
+          contact = contact.replace("#{email}", "")
+          new_email = "<span class='amp-email'>#{email}</span>"
+          contact = contact.replace('()', '').replace('<>', '')
+          contact += new_email
+
+        if  contact.match("https(.*)")!= null
+          url =  contact.match("https(.*)")[0]
+          contact = contact.replace("#{url}", "")
+          url = "<a href='#{url}' class='amp-url'>#{url}</a>"
+          contact += url
+
+        $(this).html(contact)
+
     resize: () ->
       $('#naming-guide-dialog').css('height', 'calc(100% - 40px)')
-
 
 
 

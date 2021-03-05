@@ -11220,6 +11220,13 @@ table.rl-content {
 
 // fix to ensure there is no flash of dialog text on page load
 #naming-guide-dialog {
+  .amp-url, .amp-email{
+    display:block!important;
+    white-space: pre!important;
+  }
+  .amp-url{
+    color: #333;
+  }
   display: none;
 }
 
