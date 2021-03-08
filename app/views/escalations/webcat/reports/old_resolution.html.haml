@@ -13,7 +13,6 @@
       %thead
         %tr
           %th
-          %th Pending Complaints
           %th Fixed Complaints
           %th Invalid Complaints
           %th Unchanged Complaints
@@ -23,10 +22,9 @@
           %th Dept Ave
           %th Dept Max
       %tbody
-        - @report.each_engineer do |counts|
+        - @report.each_engineer_old do |counts|
           %tr
             %td= counts.username
-            %td= counts.pending
             %td.total-fixed= counts.fixed
             %td= counts.invalid
             %td= counts.unchanged

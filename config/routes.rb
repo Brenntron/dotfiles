@@ -52,6 +52,7 @@ Rails.application.routes.draw do
       resources :reports, only: [:index] do
         collection do
           get :index
+          get :old_resolution
           get :resolution
           get :export_resolution
           get :complaint_entry
