@@ -9,6 +9,36 @@ namespace :escalations do
   task :check_and_unsubscribe do
     FileReputationDispute.check_and_unsubscribe
   end
+
+  task :populate_complaint_entry_credits => :environment do
+    resolutions = ['INVALID', 'FIXED', 'UNCHANGED', 'DUPLICATE']
+    resolutions_mapping = {
+      'INVALID' => ComplaintEntryCredit::INVALID,
+      'FIXED' => ComplaintEntryCredit::FIXED,
+      'UNCHANGED' => ComplaintEntryCredit::UNCHANGED,
+      'DUPLICATE' => ComplaintEntryCredit::DUPLICATE
+    }
+
+    total_complaints = ComplaintEntry.where(resolution: resolutions)
+    total_count = total_complaints.count
+    processed = 0
+    total_complaints.each do |entry|
+      if entry.case_resolved_at.nil?
+        processed += 1
+        puts "#{processed} of #{total_count} processed"
+        next
+      end
+      # binding.pry if entry.resolution == 'DUPLICATE'
+      ComplaintEntryCredit.find_or_create_by(
+        user_id: entry.user_id,
+        complaint_entry_id: entry.id,
+        credit: resolutions_mapping[entry.resolution],
+        created_at: entry.case_resolved_at)
+
+      processed += 1
+      puts "#{processed} of #{total_count} processed"
+    end
+  end
 end
 
 namespace :bugs do
