@@ -41,7 +41,7 @@ $ ->
     { keyCode } = e
     { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
     if keyCode == 13
-      webcat_search_string = $('#web-cat-search .search-box').val()
+      webcat_search_string = $('#web-cat-search .search-box').val().trim()
       if webcat_search_string == ''
        refresh_localStorage()
       else
@@ -698,7 +698,7 @@ $ ->
         return (item) ->
           item.name.toLowerCase().startsWith( search.toLowerCase() ) ? 1 : 0;
     }
-  
+
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,

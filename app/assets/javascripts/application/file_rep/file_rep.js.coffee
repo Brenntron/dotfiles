@@ -346,7 +346,7 @@ $ ->
     refresh_url()
 
   window.build_contains_search = () ->
-    search_string = $('#file-rep-search .search-box').val()
+    search_string = $('#file-rep-search .search-box').val().trim()
     if search_string == ''
       refresh_localStorage()
       refresh_url()
