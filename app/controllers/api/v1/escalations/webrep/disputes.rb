@@ -1068,6 +1068,18 @@ module API
               {:status => "success", :data => result, :checked_ips => ips}
             end
 
+            desc 'convert ticket from dispute to complaint'
+
+            params do
+              requires :dispute_id, type: Integer
+              requires :suggested_categories, type: String
+              optional :summary, type: String
+            end
+
+            post 'convert_ticket' do
+              Dispute.convert_to_complaint(permitted_params)
+            end
+
           end
         end
       end

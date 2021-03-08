@@ -413,6 +413,19 @@ module API
               SbApi.category_lookup
             end
 
+            desc 'convert ticket from complaint to dispute'
+
+            params do
+              requires :dispute_id, type: Integer
+              requires :suggested_categories, type: String
+              requires :submission_type, type: String
+              optional :summary, type: String
+            end
+
+            post 'convert_ticket' do
+              Dispute.convert_to_complaint(permitted_params)
+            end
+
           end
         end
       end

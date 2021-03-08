@@ -653,6 +653,42 @@ class Complaint < ApplicationRecord
     message = Bridge::ComplaintUpdateStatusEvent.new
     message.post_complaint(self)
   end
+
+  def self.convert_to_dispute(params, current_user)
+    complaint = Complaint.find(params[:complaint_id])
+    suggested_disposition_entries = JSON.parse(params[:suggested_dispositions])
+    package = {}
+    package[:entries] = []
+    package[:convert_to] = "Dispute"
+    package[:submission_type] = params[:submission_type]
+    package[:email] = dispute&.customer&.email
+    package[:name] = dispute&.customer&.name
+    package[company_name] = dispute&.customer&.company&.name
+    package[:internal_message] = params[:summary] + " | " + "original analyst console webcat ticket: #{complaint.id.to_s}"
+    suggested_disposition_entries.each do |sugg|
+      entry = {}
+      entry[:entry] = sugg[:entry]
+      #needs to be either 'fp' or 'fn'
+      entry[:suggested_disposition] = sugg[:suggested_disposition]
+      entry[:platform_id] = "" #need platform id check here
+      package[:entries] << entry
+    end
+
+    conn = ::Bridge::TicketConversionEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.source_key, ac_id: dispute.id)
+    conn.post(package)
+
+    complaint.internal_comment += " | User: #{current_user&.cvs_username} converted SDO ticket to webrep TE ticket on #{Time.now.to_s}"
+
+    #set status and resolution here with a message
+    #send update to bridge
+
+    complaint.save
+    return true
+
+  end
+
+
+
 end
 
 
