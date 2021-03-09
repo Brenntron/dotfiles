@@ -28,7 +28,7 @@ RSpec.describe "complaint conversion to disputes", type: :request do
     @complaint_entry.save
     conversion_params = {}
     conversion_params[:complaint_id] = Complaint.all.first.id
-    conversion_params[:suggested_dispositions] = "[{\"test\":1},{\"test2\":2}]"
+    conversion_params[:suggested_dispositions] = "[{\"entry\":\"2.3.4.5\",\"suggested_disposition\":\"fn\",\"platform_id\":1},{\"entry\":\"www.test.com\",\"suggested_disposition\":\"fp\",\"platform_id\":1}]"
     conversion_params[:summary] = "test summary"
 
     post '/escalations/api/v1/escalations/webcat/complaints/convert_ticket', params: conversion_params
@@ -36,6 +36,10 @@ RSpec.describe "complaint conversion to disputes", type: :request do
     expect(response).to be_successful
     expect(DelayedJob.all.size).to eql(2)
     complaint = Complaint.where(ticket_source_key: 1001).first
+    expect(complaint.status).to eql("COMPLETED")
+    expect(complaint.complaint_entries.first.status).to eql("COMPLETED")
+    expect(complaint.complaint_entries.first.resolution).to eql("INVALID")
+
 
     #check to make sure package is correct
     #check to make sure dispute and dispute entries all have correct column values saved

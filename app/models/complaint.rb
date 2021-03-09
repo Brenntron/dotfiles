@@ -666,11 +666,20 @@ class Complaint < ApplicationRecord
     package[:company_name] = complaint&.customer&.company&.name
     package[:internal_message] = params[:summary] + " | " + "original analyst console webcat ticket: #{complaint.id.to_s}"
     suggested_disposition_entries.each do |sugg|
+      if complaint.platform_id.present?
+        platform_id = complaint.platform_id
+      else
+        comp_entry = complaint.complaint_entries.select {|c| c.hostlookup == sugg[:entry]}.first
+        if comp_entry.present?
+          platform_id = comp_entry.platform_id
+        end
+      end
+
       entry = {}
       entry[:entry] = sugg[:entry]
       #needs to be either 'fp' or 'fn'
       entry[:suggested_disposition] = sugg[:suggested_disposition]
-      entry[:platform_id] = "" #need platform id check here
+      entry[:platform_id] = platform_id.to_s
       package[:entries] << entry
     end
 

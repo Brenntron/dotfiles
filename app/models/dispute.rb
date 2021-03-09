@@ -2148,10 +2148,18 @@ class Dispute < ApplicationRecord
     package[:name] = dispute&.customer&.name
     package[:company_name] = dispute&.customer&.company&.name
     suggested_category_entries.each do |sugg|
+      if dispute.platform_id.present?
+        platform_id = dispute.platform_id
+      else
+        disp_entry = dispute.dispute_entries.select {|c| c.hostlookup == sugg[:entry]}.first
+        if disp_entry.present?
+          platform_id = disp_entry.platform_id
+        end
+      end
       entry = {}
       entry[:entry] = sugg[:entry]
-      entry[:suggested_categories] = sugg[:suggested_categories]
-      entry[:platform_id] = "" #need platform id check here
+      entry[:suggested_categories] = sugg[:suggested_categories].split(",")
+      entry[:platform_id] = platform_id.to_s
       package[:entries] << entry
     end
 
