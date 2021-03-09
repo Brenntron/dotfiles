@@ -2139,13 +2139,14 @@ class Dispute < ApplicationRecord
   def self.convert_to_complaint(params, current_user)
     dispute = Dispute.find(params[:dispute_id])
     suggested_category_entries = JSON.parse(params[:suggested_categories])
+
     package = {}
     package[:entries] = []
     package[:convert_to] = "Complaint"
     package[:internal_message] = params[:summary] + " | " + "original analyst console webrep ticket: #{dispute.id.to_s}"
     package[:email] = dispute&.customer&.email
     package[:name] = dispute&.customer&.name
-    package[company_name] = dispute&.customer&.company&.name
+    package[:company_name] = dispute&.customer&.company&.name
     suggested_category_entries.each do |sugg|
       entry = {}
       entry[:entry] = sugg[:entry]
@@ -2154,7 +2155,7 @@ class Dispute < ApplicationRecord
       package[:entries] << entry
     end
 
-    conn = ::Bridge::TicketConverstionEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.source_key, ac_id: dispute.id)
+    conn = ::Bridge::TicketConversionEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.ticket_source_key, ac_id: dispute.id)
     conn.post(package)
 
     new_comment = DisputeComment.new

@@ -661,9 +661,9 @@ class Complaint < ApplicationRecord
     package[:entries] = []
     package[:convert_to] = "Dispute"
     package[:submission_type] = params[:submission_type]
-    package[:email] = dispute&.customer&.email
-    package[:name] = dispute&.customer&.name
-    package[company_name] = dispute&.customer&.company&.name
+    package[:email] = complaint&.customer&.email
+    package[:name] = complaint&.customer&.name
+    package[:company_name] = complaint&.customer&.company&.name
     package[:internal_message] = params[:summary] + " | " + "original analyst console webcat ticket: #{complaint.id.to_s}"
     suggested_disposition_entries.each do |sugg|
       entry = {}
@@ -674,22 +674,24 @@ class Complaint < ApplicationRecord
       package[:entries] << entry
     end
 
-    conn = ::Bridge::TicketConversionEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.source_key, ac_id: dispute.id)
+    conn = ::Bridge::TicketConversionEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: complaint.ticket_source_key, ac_id: complaint.id)
     conn.post(package)
-
-    complaint.internal_comment += " | User: #{current_user&.cvs_username} converted SDO ticket to webrep TE ticket on #{Time.now.to_s}"
 
     #set status and resolution here with a message
     #send update to bridge
 
     complaint.status = Complaint::COMPLETED
-    complaint.resolution_message = ""
+    complaint.resolution_comment = ""
     complaint.save
 
     complaint.complaint_entries.each do |c_entry|
+      if c_entry.internal_comment.blank?
+        c_entry.internal_comment = ""
+      end
       c_entry.status = ComplaintEntry::STATUS_COMPLETED
       c_entry.resolution = ComplaintEntry::STATUS_RESOLVED_FIXED_INVALID
       c_entry.resolution_comment = ""
+      c_entry.internal_comment += " | User: #{current_user&.cvs_username} converted SDO ticket to webrep TE ticket on #{Time.now.to_s}"
       c_entry.save
     end
 

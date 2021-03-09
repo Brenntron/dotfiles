@@ -11,7 +11,6 @@ class Bridge::TicketConversionEvent < Bridge::BaseMessage
     super(message: {source_authority: source_authority,
                     source_key: source_key,
                     ticket_information: payload,
-                    case_email: case_email,
                     ac_id: ac_id
     })
   end

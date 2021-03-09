@@ -1073,11 +1073,12 @@ module API
             params do
               requires :dispute_id, type: Integer
               requires :suggested_categories, type: String
-              optional :summary, type: String
+              requires :summary, type: String
             end
 
             post 'convert_ticket' do
-              Dispute.convert_to_complaint(permitted_params)
+              binding.pry
+              Dispute.convert_to_complaint(permitted_params, current_user)
             end
 
           end

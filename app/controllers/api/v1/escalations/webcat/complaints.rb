@@ -416,14 +416,13 @@ module API
             desc 'convert ticket from complaint to dispute'
 
             params do
-              requires :dispute_id, type: Integer
-              requires :suggested_categories, type: String
-              requires :submission_type, type: String
-              optional :summary, type: String
+              requires :complaint_id, type: Integer
+              requires :suggested_dispositions, type: String
+              requires :summary, type: String
             end
 
             post 'convert_ticket' do
-              Dispute.convert_to_complaint(permitted_params)
+              Complaint.convert_to_dispute(permitted_params, current_user)
             end
 
           end
