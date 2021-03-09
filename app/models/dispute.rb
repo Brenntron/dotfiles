@@ -2166,6 +2166,21 @@ class Dispute < ApplicationRecord
     #set status and resolution here with a message
     #send update to bridge
 
+    dispute.status = STATUS_RESOLVED
+    dispute.resolution = STATUS_RESOLVED_INVALID
+    dispute.resolution_comment = "NEED MESSAGE HERE"
+    dispute.save
+
+    dispute.dispute_entries.each do |d_entry|
+      d_entry.status = DisputeEntry::STATUS_RESOLVED
+      d_entry.resolution = DisputeEntry::STATUS_RESOLVED_INVALID
+      d_entry.resolution_comment = "NEED MESSAGE HERE"
+      d_entry.save
+    end
+
+    message = Bridge::DisputeEntryUpdateStatusEvent.new
+    message.post_entries(dispute.dispute_entries)
+
     return true
 
   end

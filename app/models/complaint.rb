@@ -682,9 +682,21 @@ class Complaint < ApplicationRecord
     #set status and resolution here with a message
     #send update to bridge
 
+    complaint.status = Complaint::COMPLETED
+    complaint.resolution_message = ""
     complaint.save
-    return true
 
+    complaint.complaint_entries.each do |c_entry|
+      c_entry.status = ComplaintEntry::STATUS_COMPLETED
+      c_entry.resolution = ComplaintEntry::STATUS_RESOLVED_FIXED_INVALID
+      c_entry.resolution_comment = ""
+      c_entry.save
+    end
+
+    bridge_message = Bridge::ComplaintUpdateStatusEvent.new
+    bridge_message.post_complaint(complaint)
+
+    return true
   end
 
 
