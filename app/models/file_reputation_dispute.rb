@@ -631,6 +631,61 @@ class FileReputationDispute < ApplicationRecord
       new_dispute.save
     end
 
+    bug_attrs = {
+        'product' => 'Escalations Console',
+        'component' => 'AMP Disputes',
+        'summary' => summary,
+        'version' => 'unspecified', #self.version,
+        'description' => full_description,
+        'priority' => 'Unspecified',
+        'classification' => 'unclassified',
+    }
+    logger.debug "Creating bugzilla bug"
+
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    logger.debug "Creating dispute"
+    new_dispute = FileReputationDispute.new
+
+    new_dispute.id = bug_proxy.id
+    new_dispute.user_id = user.id
+    new_dispute.sha256_hash = message_payload[:payload][:sha256]
+    new_dispute.status = STATUS_NEW
+    new_dispute.file_name = message_payload[:payload][:file_name]
+    new_dispute.customer_id = customer.id
+    new_dispute.product_platform = message_payload[:payload][:product_platform] unless message_payload[:payload][:product_platform].blank?
+    new_dispute.product_version = message_payload[:payload][:product_version] unless message_payload[:payload][:product_version].blank?
+    new_dispute.in_network = message_payload[:payload][:network] unless message_payload[:payload][:network].blank?
+    new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
+    new_dispute.source = message_payload[:payload][:source]
+    new_dispute.platform = message_payload[:payload][:platform]
+    new_dispute.sandbox_key = message_payload[:payload][:sandbox_key]
+    new_dispute.ticket_source_key = message_payload[:source_key]
+    new_dispute.description = message_payload[:payload][:summary_description]
+    new_dispute.customer_id = customer&.id
+    new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+    new_dispute.auto_resolve_log = ""
+
+    check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
+    if check_for_duplicate.any?
+      auto_resolve_on_duplicate(new_dispute)
+      is_duplicate = true
+    else
+
+      new_dispute.save
+    end
+
+    if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
+      ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
+      linked_dispute_comment = FileRepComment.new
+      linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
+      linked_dispute_comment.user_id = user.id
+      linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+      linked_dispute_comment.save(:validate => false)
+
+    end
+
+
 
     if is_duplicate == true
       return new_dispute
@@ -1153,6 +1208,30 @@ class FileReputationDispute < ApplicationRecord
     candidates.each do |candidate|
       FileReputationApi::ReversingLabs.unsubscribe(candidate.sha256_hash)
     end
+  end
+
+
+  def self.build_ips_bug(bugzilla_rest_session, filename, sha256, problem, original_bug_id)
+    summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = <<~HEREDOC
+          File name: #{filename}
+          File Rep Sha: #{sha256}
+
+          Summary: #{problem}
+    HEREDOC
+
+    bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
+    logger.debug "Creating bugzilla bug"
+
+    research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
+    linked_bug_proxy.save!
+
+    new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
+
+    research_bug_proxy
   end
 
 end

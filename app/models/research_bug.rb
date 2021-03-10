@@ -1,0 +1,2 @@
+class ResearchBug < Bug
+end

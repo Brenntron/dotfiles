@@ -315,7 +315,7 @@ class Dispute < ApplicationRecord
   def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
     resolved_at = Time.now
     dispute.status = Dispute::RESOLVED
-    dispute.related_id = authority_dispute.id
+    dispute.related_id = authority_dispute.id unless authority_dispute.blank?
     dispute.related_at = Time.now
     dispute.resolution = Dispute::DUPLICATE
     dispute.case_closed_at = Time.now
@@ -329,7 +329,7 @@ class Dispute < ApplicationRecord
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
       new_payload_item[:status] = TI_RESOLVED
-      new_payload_item[:sugg_type] = entry["rep_sugg"]
+      new_payload_item[:sugg_type] = entry[:sbrs]["rep_sugg"]
       return_payload[ip] = new_payload_item
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = dispute.id
@@ -337,6 +337,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.entry_type = "IP"
       new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
+      new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
       new_dispute_entry.case_closed_at = resolved_at
       new_dispute_entry.case_resolved_at = resolved_at
       new_dispute_entry.save
@@ -352,6 +353,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.uri = url
       new_dispute_entry.entry_type = "URI/DOMAIN"
+      new_dispute_entry.suggested_disposition = entry["rep_sugg"]
       new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
       new_dispute_entry.case_closed_at = resolved_at
@@ -475,57 +477,70 @@ class Dispute < ApplicationRecord
           IPs: #{new_entries_ips.keys}
           URIs: #{new_entries_urls.keys}
           Problem Summary: #{message_payload["payload"]["problem"]}
-      HEREDOC
+        HEREDOC
 
-      bug_attrs = {
-          'product' => 'Escalations Console',
-          'component' => 'IP/Domain',
-          'summary' => summary,
-          'version' => 'unspecified', #self.version,
-          'description' => full_description,
-          # 'opsys' => self.os,
-          'priority' => 'Unspecified',
-          'classification' => 'unclassified',
-      }
-      logger.debug "Creating bugzilla bug"
+        bug_attrs = {
+            'product' => 'Escalations Console',
+            'component' => 'IP/Domain',
+            'summary' => summary,
+            'version' => 'unspecified', #self.version,
+            'description' => full_description,
+            # 'opsys' => self.os,
+            'priority' => 'Unspecified',
+            'classification' => 'unclassified',
+        }
+        logger.debug "Creating bugzilla bug"
 
-      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-      logger.debug "Creating dispute"
-      new_dispute = Dispute.new
 
-      new_dispute.id = bug_proxy.id
-      new_dispute.user_id = user.id
-      new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
-      new_dispute.org_domain = message_payload["payload"]["domain"]
-      new_dispute.case_opened_at = opened_at
-      new_dispute.subject = message_payload["payload"]["email_subject"]
-      new_dispute.description = message_payload["payload"]["email_body"]
-      new_dispute.problem_summary = message_payload["payload"]["problem"]
-      new_dispute.ticket_source_key = message_payload["source_key"]
-      new_dispute.ticket_source = "talos-intelligence"
-      new_dispute.ticket_source_type = message_payload["source_type"]
-      new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
-      new_dispute.status = NEW
+        logger.debug "Creating dispute"
+        new_dispute = Dispute.new
 
-      new_dispute.customer_id = customer&.id
-      new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+        new_dispute.id = bug_proxy.id
+        new_dispute.user_id = user.id
+        new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
+        new_dispute.org_domain = message_payload["payload"]["domain"]
+        new_dispute.case_opened_at = opened_at
+        new_dispute.subject = message_payload["payload"]["email_subject"]
+        new_dispute.description = message_payload["payload"]["email_body"]
+        new_dispute.problem_summary = message_payload["payload"]["problem"]
+        new_dispute.ticket_source_key = message_payload["source_key"]
+        new_dispute.ticket_source = "talos-intelligence"
+        new_dispute.ticket_source_type = message_payload["source_type"]
+        new_dispute.product_platform = message_payload["payload"]["product_platform"] unless message_payload["payload"]["product_platform"].blank?
+        new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
+        new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
+        new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
+        new_dispute.status = NEW
 
-      if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
-        new_dispute.priority = "P3"
-      else
-        new_dispute.priority = "P4"
-      end
-      logger.debug "Saving Dispute"
+        new_dispute.customer_id = customer&.id
+        new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
-      new_dispute.save!
+        if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
+          new_dispute.priority = "P3"
+        else
+          new_dispute.priority = "P4"
+        end
+        logger.debug "Saving Dispute"
+
 
 
 
       ActiveRecord::Base.transaction do
 
-        response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
+        if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
+          ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
+          linked_dispute_comment = DisputeComment.new
+          linked_dispute_comment.dispute_id = new_dispute.id
+          linked_dispute_comment.user_id = user.id
+          linked_dispute_comment.comment = "Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+          linked_dispute_comment.save(:validate => false)
 
+        end
+
+        response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
+        
         if response[:is_dupe] == true && response[:all_resolved] == false
           manage_duplicate_dispute(new_dispute, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
           return
@@ -721,8 +736,9 @@ class Dispute < ApplicationRecord
 
 
         case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
-        logger.debug("Sending reply to bridge")
+        Rails.logger.info "_+_+_+_+_+_+_+_+_Setting up Bridge post_+_+_+_+_+_+_+_+_"
         conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_dispute.id)
+        Rails.logger.info "_+_+_+_+_+_+_+_+_Running Connection POST_+_+_+_+_+_+_+_+_"
         conn.post(return_payload, case_email)
 
       end
@@ -2191,6 +2207,28 @@ class Dispute < ApplicationRecord
     message.post_entries(dispute.dispute_entries)
 
     return true
+  end
+
+  def self.build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, problem, original_bug_id)
+    summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = <<~HEREDOC
+          IPs: #{new_entries_ips.keys}
+          URIs: #{new_entries_urls.keys}
+          Problem Summary: #{problem}
+    HEREDOC
+
+    bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
+    logger.debug "Creating bugzilla bug"
+
+    research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
+    linked_bug_proxy.save!
+
+    new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
+
+    research_bug_proxy
 
   end
 end
