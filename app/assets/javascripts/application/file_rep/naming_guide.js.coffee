@@ -1,5 +1,33 @@
 $ ->
   # dbinebri: file rep, naming guide dialog. includes fix for height resizing bug.
+
+  window.format_amp_contacts = (contacts) ->
+    contacts.each ->
+      contact = this.textContent;
+      if contact == ''
+        contact = this.attr('data')
+      email = contact.match(/\S+[a-z0-9]@[a-z0-9\.]+/img );
+      if email != null
+        email = email[0].replace(/<|\(/g, '')
+        contact = contact.replace("#{email}", "")
+        new_email = "<span class='amp-email'>#{email}</span>"
+        contact = contact.replace('()', '').replace('<>', '')
+        contact += new_email
+
+      if  contact.match("https(.*)")!= null
+        url =  contact.match("https(.*)")[0]
+        contact = contact.replace("#{url}", "")
+        url = "<a href='#{url}' class='amp-url' target='_blank'>#{url}</a>"
+        contact += url
+      if $(this).hasClass('contact-col')
+        $(this).html(contact)
+       else
+        $(this).find('.formatted-contact').append(contact)
+
+  if location.pathname == "/escalations/file_rep/naming_guide"
+    contacts = $('.amp-contact')
+    format_amp_contacts(contacts)
+
   $('#naming-guide-dialog').dialog
     autoOpen: false
     width: 930
@@ -9,25 +37,8 @@ $ ->
     position:
       at: "right top"
     open:  () ->
-      $('.contact-col').each ->
-        contact = this.textContent;
-        email = contact.match(/\S+[a-z0-9]@[a-z0-9\.]+/img );
-
-        if email != null
-          email = email[0].replace(/<|\(/g, '')
-          contact = contact.replace("#{email}", "")
-          new_email = "<span class='amp-email'>#{email}</span>"
-          contact = contact.replace('()', '').replace('<>', '')
-          contact += new_email
-
-        if  contact.match("https(.*)")!= null
-          url =  contact.match("https(.*)")[0]
-          contact = contact.replace("#{url}", "")
-          url = "<a href='#{url}' class='amp-url' target='_blank'>#{url}</a>"
-          contact += url
-
-        $(this).html(contact)
-
+      contacts = $('.contact-col')
+      format_amp_contacts(contacts)
     resize: () ->
       $('#naming-guide-dialog').css('height', 'calc(100% - 40px)')
 
@@ -57,6 +68,7 @@ $ ->
     input_new = ''
 
     $('#amp-edit-button').hide()
+    $('.formatted-contact').hide()
     $('.active-editing-buttons').show()
     window.get_original_sort_array()
 
@@ -99,6 +111,7 @@ $ ->
     $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
     $('.delete-patterns-area').addClass('hidden')
     $('.delete-patterns-queue').empty()
+    $('.formatted-contact').show()
 
     # Delete any new rows that were not saved
     rows = $('#amp-naming-details-table tbody').find('tr')
@@ -124,10 +137,9 @@ $ ->
       $(cells).each ->
         if $($(this).find('input')).length > 0
           input = $($(this).find('input')).val()
+          content = $($(this).find('.table-content')).text()
           if $(this).hasClass('amp-pattern')
             content = $($(this).find('.table-code')).text()
-          else
-            content = $($(this).find('.table-content')).text()
           input == content
         else
           textarea = $($(this).find('textarea')).val()
@@ -382,7 +394,7 @@ $ ->
     response_data = ""
     if data.length > 1
       $(data).each ->
-        response_data += "'" + this.pattern + "', "
+        response_data += "'#{this.pattern}', "
     else
       response_data = data[0].pattern
 
