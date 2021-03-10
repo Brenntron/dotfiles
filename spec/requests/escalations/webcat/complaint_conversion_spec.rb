@@ -11,9 +11,21 @@ RSpec.describe "complaint conversion to disputes", type: :request do
   let(:existing_customer) do
     FactoryBot.create(:customer, name: customer_name, email: customer_email, company: existing_company)
   end
-
+  before :each do
+    @original_platform = Platform.new
+    @original_platform.id = 1001
+    @original_platform.public_name = "test"
+    @original_platform.internal_name = "test internal"
+    @original_platform.active = true
+    @original_platform.webrep = true
+    @original_platform.webcat = true
+    @original_platform.filerep = true
+    @original_platform.emailrep = true
+    @original_platform.save
+  end
   after :each do
     DelayedJob.destroy_all
+    Platform.destroy_all
   end
   it 'should receive a call to convert a dispute with proper params' do
     vrt_incoming
@@ -24,10 +36,15 @@ RSpec.describe "complaint conversion to disputes", type: :request do
     @complaint = Complaint.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :status => "NEW")
     @complaint_entry = ComplaintEntry.new
     @complaint_entry.complaint_id = @complaint.id
-    @complaint_entry.uri = "test.com"
+    @complaint_entry.ip_address = "2.3.4.5"
     @complaint_entry.save
+    @complaint_entry2 = ComplaintEntry.new
+    @complaint_entry2.complaint_id = @complaint.id
+    @complaint_entry2.uri = "www.test.com"
+    @complaint_entry2.save
     conversion_params = {}
     conversion_params[:complaint_id] = Complaint.all.first.id
+    conversion_params[:submission_type] = "e"
     conversion_params[:suggested_dispositions] = "[{\"entry\":\"2.3.4.5\",\"suggested_disposition\":\"fn\",\"platform_id\":1},{\"entry\":\"www.test.com\",\"suggested_disposition\":\"fp\",\"platform_id\":1}]"
     conversion_params[:summary] = "test summary"
 

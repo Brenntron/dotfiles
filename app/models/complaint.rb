@@ -687,6 +687,7 @@ class Complaint < ApplicationRecord
     package[:name] = complaint&.customer&.name
     package[:company_name] = complaint&.customer&.company&.name
     package[:internal_message] = params[:summary] + " | " + "original analyst console webcat ticket: #{complaint.id.to_s}"
+    binding.pry
     suggested_disposition_entries.each do |sugg|
       if complaint.platform_id.present?
         platform_id = complaint.platform_id
@@ -728,7 +729,7 @@ class Complaint < ApplicationRecord
 
     bridge_message = Bridge::ComplaintUpdateStatusEvent.new
     bridge_message.post_complaint(complaint)
-
+    binding.pry
     return true
 
   end
