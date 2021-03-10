@@ -50,15 +50,15 @@ window.categorize_clusters = () ->
   #cluster_id comment category_ids
   clusters = $ '[id$=\'_categories\']'
   categories = []
-  if $('.cluster-row-select:checked').length == 0
+  if $('#clusters-index').find('input:checked').length == 0
     std_msg_error('no rows selected', ['Please select at least one row.'])
     loader.addClass('hidden')
     return
 
-  if comment == ''
-    std_msg_error('no comment added', ['Please make a comment to submit.'])
-    loader.addClass('hidden')
-    return
+#  if comment == ''
+#    std_msg_error('no comment added', ['Please make a comment to submit.'])
+#    loader.addClass('hidden')
+#    return
   data = {}
   data["comment"] = comment
   data["user_id"] = user_id
