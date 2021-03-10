@@ -213,7 +213,7 @@ window.named_webrep_index_table = (search_name) ->
 window.call_contains_search = (search_form) ->
   data = {
     search_type: 'contains'
-    value: search_form.querySelector('input.search-box').value
+    value: search_form.querySelector('input.search-box').value.trim()
   }
   window.current_search_data = data
   window.populate_webrep_index_table(data)
