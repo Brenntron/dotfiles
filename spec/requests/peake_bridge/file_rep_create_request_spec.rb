@@ -20,15 +20,15 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
                 source_key: 1001,
                 source_type: "FileReputationDispute",
                 payload: {
-                    # sha256_hash: 'c01b39c7a35ccc3b081a3e83d2c71fa9a767ebfeb45c69f08e17dfe3ef375a7b',
-                    sha256: 'efb947a43bfe6d0812d105f6afdeb9774f4d79254dd48f89f1e95ffdf8732928', #threatgrid
-                    customer_email: 'steve@arora.org',
-                    customer_name: 'George',
-                    company_name: "Microsoft",
-                    disposition_suggested: 'Malicious',
-                    summary_description: "What do i do to improve the reputation",
-                    sandbox_key: "TI-Form",
-                    product_platform: 1001
+                  # sha256_hash: 'c01b39c7a35ccc3b081a3e83d2c71fa9a767ebfeb45c69f08e17dfe3ef375a7b',
+                  sha256: 'efb947a43bfe6d0812d105f6afdeb9774f4d79254dd48f89f1e95ffdf8732928', #threatgrid
+                  customer_email: 'steve@arora.org',
+                  customer_name: 'George',
+                  company_name: "Microsoft",
+                  disposition_suggested: 'Malicious',
+                  summary_description: "What do i do to improve the reputation",
+                  sandbox_key: "TI-Form",
+                  product_platform: 1001
 
                 }
             }

@@ -6,7 +6,7 @@ class Dispute < ApplicationRecord
   belongs_to :customer
   belongs_to :user, :optional => true
   belongs_to :related_dispute, class_name: 'Dispute', foreign_key: :related_id, required: false
-
+  belongs_to :platform, :optional => true
   has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id, dependent: :nullify
   has_many :dispute_comments, dependent: :destroy
   has_many :dispute_emails, dependent: :destroy
@@ -493,7 +493,9 @@ class Dispute < ApplicationRecord
 
         bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-
+        if message_payload["payload"]["product_platform"].present?
+          platform = Platform.find(message_payload["payload"]["product_platform"].to_i) rescue nil
+        end
         logger.debug "Creating dispute"
         new_dispute = Dispute.new
 
@@ -506,9 +508,10 @@ class Dispute < ApplicationRecord
         new_dispute.description = message_payload["payload"]["email_body"]
         new_dispute.problem_summary = message_payload["payload"]["problem"]
         new_dispute.ticket_source_key = message_payload["source_key"]
-        new_dispute.ticket_source = "talos-intelligence"
+        new_dispute.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
         new_dispute.ticket_source_type = message_payload["source_type"]
-        new_dispute.product_platform = message_payload["payload"]["product_platform"] unless message_payload["payload"]["product_platform"].blank?
+        new_dispute.platform_id = platform.id unless platform.blank?
+        new_dispute.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
         new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
         new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
         new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
@@ -523,9 +526,6 @@ class Dispute < ApplicationRecord
           new_dispute.priority = "P4"
         end
         logger.debug "Saving Dispute"
-
-
-
 
       ActiveRecord::Base.transaction do
 
@@ -555,6 +555,10 @@ class Dispute < ApplicationRecord
         new_entries_ips.each do |key, entry|
           false_negative_claim = false
 
+          if entry[:sbrs]["platform"].present?
+            entry_platform = Platform.find(entry[:sbrs]["platform"].to_i) rescue nil
+          end
+
           if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
             false_negative_claim = true
           end
@@ -581,7 +585,8 @@ class Dispute < ApplicationRecord
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
-          new_dispute_entry.platform = entry[:sbrs]["platform"]
+          new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
+          new_dispute_entry.platform = entry[:sbrs]["platform"] if (entry[:sbrs]["platform"].present? && !entry[:sbrs]["platform"].kind_of?(Integer))
           new_dispute_entry.save!
 
           logger.info "fetching preload"
@@ -647,7 +652,9 @@ class Dispute < ApplicationRecord
           #placeholder for preloading stuff from Micah
           #grab xbrs, reptool stuff, wl/bl entries, virustotal
           #
-
+          if entry["platform"].present?
+            entry_platform = Platform.find(entry["platform"].to_i) rescue nil
+          end
 
           false_negative_claim = false
 
@@ -669,8 +676,8 @@ class Dispute < ApplicationRecord
           new_dispute_entry.is_important = is_important?(key)
           new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.assign_url_parts(key)
-          new_dispute_entry.platform = entry["platform"]
-
+          new_dispute_entry.platform = entry["platform"] if (entry["platform"].present? && !entry["platform"].kind_of?(Integer))
+          new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
 
           resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
           if resolved_ip.present?
@@ -2152,6 +2159,7 @@ class Dispute < ApplicationRecord
     return return_hash
   end
 
+
   def self.convert_to_complaint(params, current_user)
     dispute = Dispute.find(params[:dispute_id])
     suggested_category_entries = JSON.parse(params[:suggested_categories])
@@ -2209,6 +2217,7 @@ class Dispute < ApplicationRecord
     return true
   end
 
+
   def self.build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, problem, original_bug_id)
     summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -2231,5 +2240,6 @@ class Dispute < ApplicationRecord
     research_bug_proxy
 
   end
+
 end
 

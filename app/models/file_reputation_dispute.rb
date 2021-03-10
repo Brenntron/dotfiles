@@ -9,7 +9,7 @@ class FileReputationDispute < ApplicationRecord
   has_many :digital_signers
   has_many :file_rep_comments
   has_many :dispute_emails
-
+  belongs_to :ti_product_platform, :class_name => "Platform", :foreign_key => "platform_id", optional: true
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
   STATUS_NEW                = 'NEW'
@@ -591,6 +591,7 @@ class FileReputationDispute < ApplicationRecord
 
     HEREDOC
 
+
     bug_attrs = {
         'product' => 'Escalations Console',
         'component' => 'AMP Disputes',
@@ -607,58 +608,25 @@ class FileReputationDispute < ApplicationRecord
     logger.debug "Creating dispute"
     new_dispute = FileReputationDispute.new
 
-    new_dispute.id = bug_proxy.id
-    new_dispute.user_id = user.id
-    new_dispute.sha256_hash = message_payload[:payload][:sha256]
-    new_dispute.status = STATUS_NEW
-    new_dispute.file_name = message_payload[:payload][:file_name]
-    new_dispute.customer_id = customer.id
-    new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
-    new_dispute.source = message_payload[:payload][:source]
-    new_dispute.platform = message_payload[:payload][:platform]
-    new_dispute.sandbox_key = message_payload[:payload][:sandbox_key]
-    new_dispute.ticket_source_key = message_payload[:source_key]
-    new_dispute.description = message_payload[:payload][:summary_description]
-    new_dispute.customer_id = customer&.id
-    new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
-    new_dispute.auto_resolve_log = ""
-
-    check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
-    if check_for_duplicate.any?
-      auto_resolve_on_duplicate(new_dispute)
-      is_duplicate = true
-    else
-      new_dispute.save
+    if message_payload[:payload][:product_platform].present?
+      platform = Platform.find(message_payload[:payload][:product_platform].to_i) rescue nil
+    end
+    if message_payload[:payload][:platform].present?
+      platform = Platform.find(message_payload[:payload][:platform].to_i) rescue nil
     end
 
-    bug_attrs = {
-        'product' => 'Escalations Console',
-        'component' => 'AMP Disputes',
-        'summary' => summary,
-        'version' => 'unspecified', #self.version,
-        'description' => full_description,
-        'priority' => 'Unspecified',
-        'classification' => 'unclassified',
-    }
-    logger.debug "Creating bugzilla bug"
-
-    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
-
-    logger.debug "Creating dispute"
-    new_dispute = FileReputationDispute.new
-
     new_dispute.id = bug_proxy.id
     new_dispute.user_id = user.id
     new_dispute.sha256_hash = message_payload[:payload][:sha256]
     new_dispute.status = STATUS_NEW
     new_dispute.file_name = message_payload[:payload][:file_name]
-    new_dispute.customer_id = customer.id
-    new_dispute.product_platform = message_payload[:payload][:product_platform] unless message_payload[:payload][:product_platform].blank?
+    new_dispute.product_platform = message_payload[:payload][:product_platform] unless (message_payload[:payload][:product_platform].blank? || message_payload[:payload][:product_platform].kind_of?(Integer))
     new_dispute.product_version = message_payload[:payload][:product_version] unless message_payload[:payload][:product_version].blank?
     new_dispute.in_network = message_payload[:payload][:network] unless message_payload[:payload][:network].blank?
     new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
-    new_dispute.source = message_payload[:payload][:source]
-    new_dispute.platform = message_payload[:payload][:platform]
+    new_dispute.source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
+    new_dispute.platform = message_payload[:payload][:platform] unless (message_payload[:payload][:platform].blank? || message_payload[:payload][:platform].kind_of?(Integer))
+    new_dispute.platform_id = platform.id unless platform.blank?
     new_dispute.sandbox_key = message_payload[:payload][:sandbox_key]
     new_dispute.ticket_source_key = message_payload[:source_key]
     new_dispute.description = message_payload[:payload][:summary_description]
@@ -671,7 +639,6 @@ class FileReputationDispute < ApplicationRecord
       auto_resolve_on_duplicate(new_dispute)
       is_duplicate = true
     else
-
       new_dispute.save
     end
 
@@ -684,8 +651,6 @@ class FileReputationDispute < ApplicationRecord
       linked_dispute_comment.save(:validate => false)
 
     end
-
-
 
     if is_duplicate == true
       return new_dispute
