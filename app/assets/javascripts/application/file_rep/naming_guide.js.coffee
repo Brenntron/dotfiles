@@ -3,8 +3,9 @@ $ ->
 
   window.format_amp_contacts = (contacts) ->
     contacts.each ->
-      contact = this.textContent;
-      if contact == ''
+      if $(this).hasClass('table-content') || contact != ''
+        contact = this.textContent
+      else
         contact = this.attr('data')
       email = contact.match(/\S+[a-z0-9]@[a-z0-9\.]+/img );
       if email != null
@@ -21,8 +22,10 @@ $ ->
         contact += url
       if $(this).hasClass('contact-col')
         $(this).html(contact)
-       else
+      else if $(this).find('.formatted-contact').length > 0
         $(this).find('.formatted-contact').append(contact)
+      else
+        $(this).html(contact)
 
   if location.pathname == "/escalations/file_rep/naming_guide"
     contacts = $('.amp-contact')
@@ -404,6 +407,8 @@ $ ->
       data: { patterns: data }
       success: (response) ->
         std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: true)
+        contacts = $('.amp-contact .table-content')
+        format_amp_contacts(contacts)
       error: (response) ->
         window.get_original_sort_array()
         window.restore_input_values()
