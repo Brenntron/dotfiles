@@ -12,8 +12,21 @@ RSpec.describe "dispute conversion to complaints", type: :request do
     FactoryBot.create(:customer, name: customer_name, email: customer_email, company: existing_company)
   end
 
+  before :each do
+    @original_platform = Platform.new
+    @original_platform.id = 1001
+    @original_platform.public_name = "test"
+    @original_platform.internal_name = "test internal"
+    @original_platform.active = true
+    @original_platform.webrep = true
+    @original_platform.webcat = true
+    @original_platform.filerep = true
+    @original_platform.emailrep = true
+    @original_platform.save
+  end
   after :each do
     DelayedJob.destroy_all
+    Platform.destroy_all
   end
   it 'should receive a call to convert a dispute with proper params' do
     vrt_incoming
@@ -26,10 +39,19 @@ RSpec.describe "dispute conversion to complaints", type: :request do
     @dispute_entry.dispute_id = @dispute.id
     @dispute_entry.uri = "test.com"
     @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.platform_id = 1001
     @dispute_entry.save
+
+    @dispute_entry2 = DisputeEntry.new
+    @dispute_entry2.dispute_id = @dispute.id
+    @dispute_entry2.uri = "test2.com"
+    @dispute_entry2.entry_type = "URI/DOMAIN"
+    @dispute_entry2.platform_id = 1001
+    @dispute_entry2.save
+
     conversion_params = {}
     conversion_params[:dispute_id] = Dispute.all.first.id
-    conversion_params[:suggested_categories] = "[{\"test\":1},{\"test2\":2}]"
+    conversion_params[:suggested_categories] = "[{\"entry\":\"test.com\",\"suggested_categories\":\"Alcohol,Adult\"},{\"entry\":\"test2.com\",\"suggested_categories\":\"Alcohol,Adult\"}]"
     conversion_params[:summary] = "test summary"
 
     post '/escalations/api/v1/escalations/webrep/disputes/convert_ticket', params: conversion_params

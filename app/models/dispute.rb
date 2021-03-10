@@ -2175,15 +2175,15 @@ class Dispute < ApplicationRecord
       if dispute.platform_id.present?
         platform_id = dispute.platform_id
       else
-        disp_entry = dispute.dispute_entries.select {|c| c.hostlookup == sugg[:entry]}.first
+        disp_entry = dispute.dispute_entries.select {|c| c.hostlookup == sugg["entry"]}.first
         if disp_entry.present?
           platform_id = disp_entry.platform_id
         end
       end
       entry = {}
-      entry[:entry] = sugg[:entry]
-      entry[:suggested_categories] = sugg[:suggested_categories].split(",")
-      entry[:platform_id] = platform_id.to_s
+      entry[:entry] = sugg["entry"]
+      entry[:suggested_categories] = sugg["suggested_categories"].split(",")
+      entry[:platform_id] = platform_id
       package[:entries] << entry
     end
 

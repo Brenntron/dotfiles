@@ -37,15 +37,17 @@ RSpec.describe "complaint conversion to disputes", type: :request do
     @complaint_entry = ComplaintEntry.new
     @complaint_entry.complaint_id = @complaint.id
     @complaint_entry.ip_address = "2.3.4.5"
+    @complaint_entry.platform_id = 1001
     @complaint_entry.save
     @complaint_entry2 = ComplaintEntry.new
     @complaint_entry2.complaint_id = @complaint.id
     @complaint_entry2.uri = "www.test.com"
+    @complaint_entry2.platform_id = 1001
     @complaint_entry2.save
     conversion_params = {}
     conversion_params[:complaint_id] = Complaint.all.first.id
     conversion_params[:submission_type] = "e"
-    conversion_params[:suggested_dispositions] = "[{\"entry\":\"2.3.4.5\",\"suggested_disposition\":\"fn\",\"platform_id\":1},{\"entry\":\"www.test.com\",\"suggested_disposition\":\"fp\",\"platform_id\":1}]"
+    conversion_params[:suggested_dispositions] = "[{\"entry\":\"2.3.4.5\",\"suggested_disposition\":\"fn\"},{\"entry\":\"www.test.com\",\"suggested_disposition\":\"fp\"}]"
     conversion_params[:summary] = "test summary"
 
     post '/escalations/api/v1/escalations/webcat/complaints/convert_ticket', params: conversion_params

@@ -1077,7 +1077,6 @@ module API
             end
 
             post 'convert_ticket' do
-              binding.pry
               Dispute.convert_to_complaint(permitted_params, current_user)
             end
 
