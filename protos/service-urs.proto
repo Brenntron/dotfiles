@@ -1,0 +1,85 @@
+/*
+ * Service definition for URL Reputation
+ */
+
+syntax = "proto3";
+
+import "talos.proto";
+import "urs.proto";
+
+package Talos.Service;
+
+option go_package = "cisco.com/grpc/talos/service";
+option java_package = "talos.service";
+
+/*
+ * URL Reputation and Context
+ *
+ * There is one main service definition for requesting reputation
+ * information and contextual information about a URL (`QueryReputationV2`).
+ * There are three more services for requesting mappings (the `Query*Map`
+ * methods) with meta data for those fields that just contain IDs.
+ *
+ * Refer to the
+ * [Talos Intelligence Usage Guidance](https://wiki.cisco.com/x/P3vGH)
+ * for how to use and display data in responses.
+ */
+service URS {
+    // Request reputation and context for a list of URLs. See the
+    // `ReputationRequest` and `ReputationReplyV2` messages in `urs.proto` for
+    // the structure of the request and response.
+    rpc QueryReputationV2 (Talos.URS.ReputationRequest)
+        returns (Talos.URS.ReputationReplyV2);
+
+    // Deprecated: do not use in new integrations, as it returns an
+    // undesireable recursive data structure in the reply. Existing
+    // integrators must change their code to call `QueryReputationV2` as soon
+    // as is feasible.
+    rpc QueryReputation (Talos.URS.ReputationRequest)
+        returns (Talos.URS.ReputationReply) {
+            option deprecated = true;
+        }
+
+    // Request a mapping of threat category ID to mnemonic and description.
+    // This should be called whenever `threat_cat_map_version` in a response
+    // from a `QueryReputation` or `QueryReputationV2` service method call is
+    // larger than the version of the Threat Category Map that you have
+    // cached. For details on the structure of the Threat Category Map, see
+    // the `ThreatCategoryMap` message in `talos.proto`.
+    rpc QueryThreatCatMap (Talos.URS.ThreatCatMapRequest)
+        returns (Talos.ThreatCategoryMap);
+
+    // Request a mapping of AUP category ID to mnemonic and description.
+    // This should be called whenever `aup_cat_map_version` in a response
+    // from a `QueryReputation` or `QueryReputationV2` service method call is
+    // larger than the version of the AUP Category Map that you have
+    // cached. For details on the structure of the AUP Category Map, see
+    // the `AUPCategoryMap` message in `talos.proto`.
+    rpc QueryAUPCatMap (Talos.URS.AUPCatMapRequest)
+        returns (Talos.AUPCategoryMap);
+
+    // Request a mapping of threat level IDs to names, descriptions, and
+    // thresholds. This should be called whenever `threat_level_version` in a
+    // response from a `QueryReputation` service method call is larger than
+    // the version of the Threat Level Map that you have cached. For details
+    // on the structure of the Threat Level Map, see the `ThreatLevelMap`
+    // message in `talos.proto`.
+    rpc QueryThreatLevelMap (Talos.URS.ThreatLevelMapRequest)
+        returns (Talos.ThreatLevelMap);
+
+    // Deprecated: do not use in new integrations.
+    // Request a mapping of tag IDs to mnemonics and descriptions.
+    rpc QueryTagMap (Talos.URS.TagMapRequest)
+        returns (Talos.TagMap);
+}
+
+/*
+ * This is an internal API to support a services mesh for Legacy products.
+ * This should be ignored by non Talos developers. If you do not know what
+ * this means, then you should not be using this particular service.
+ */
+service PrivateURS {
+    // Talos-internal reputation query.
+    rpc QueryReputation (Talos.URS.ReputationRequest)
+        returns (Talos.URS.PrivateReputationReply);
+}

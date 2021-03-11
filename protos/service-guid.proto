@@ -1,0 +1,17 @@
+/*
+ * Service definition for GUID generation
+ */
+
+syntax = "proto3";
+
+import "guid.proto";
+
+package Talos.Service;
+
+option go_package = "cisco.com/grpc/talos/service";
+option java_package = "talos.service";
+
+service GUID {
+    // Generate a GUID for use as context IDs.
+    rpc GenGUID (Talos.GUID.Request) returns (Talos.GUID.Reply);
+}

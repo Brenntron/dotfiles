@@ -1,0 +1,363 @@
+/*
+ * Sender IP Reputation
+ */
+
+syntax = "proto3";
+
+import "talos.proto";
+
+package Talos.IPD;
+
+option go_package = "cisco.com/grpc/talos/ipd";
+option java_package = "talos.ipd";
+
+// The structure of a sender IP address reputation query.
+message ReputationRequest {
+    // Information about the querying appliance and/or application.
+    Talos.AppInfo app_info = 1;
+
+    // IPs for which sender IP reputation is requested. The first IP address
+    // is expected to be the sender IP address. The remaining IP addresses may
+    // be IP addresses appearing in email `Received` headers representing hops
+    // between mail tranfer agents the message took during delivery (useful
+    // for filtering on geolocation information, for example). Batches of 25
+    // IP addresses or less are recommended for optimum query latency.
+    repeated Talos.IPEndpoint endpoint = 2;
+
+    // Connection details. This field contains information for the IP address
+    // connecting to the appliance and/or application, and maintains the
+    // connection GUID. If no connection GUID is provided, IPD will generate
+    // one and return it in the reply.
+    Talos.IPConnection connection = 3;
+}
+
+// The structure of the reply to a sender IP address reputation query.
+message ReputationReply {
+    // GUID assigned to this connection. This must be preserved and included
+    // in related requests to other services. The GUID is used by Talos for
+    // correlating results from multiple engines to improve efficacy and to
+    // implement certain features, such as CUA (Cloud URL Analysis).
+    bytes connection_guid = 1;
+
+    // Result set. One result will be provided for each endpoint
+    // queried.
+    repeated IPResult result = 2;
+
+    // Reputation Rule Map version. This provides context for the rule hit IDs
+    // (rep_rule_id) in IPResult. If this version is higher than the version
+    // of the Reputation Rule Map you have cached, you must update your copy.
+    // For how and when to pull the Reputation Rule Map see the `QueryRuleMap`
+    // service method in `service-ipd.proto`. For the structure of the
+    // Reputation Rule Map, see the `ReputationRuleMap` message in
+    // `talos.proto`.
+    uint32 rule_map_version = 3;
+
+    // Threat Category Map version. This provides context for the threat
+    // category IDs (`threat_cat_id`) in IPResult. If this version is higher
+    // than the version of the Threat Category Map you have cached, you must
+    // update your copy. For how and when to pull the Threat Category Map see
+    // the `QueryThreatCatMap` service method in `service-ipd.proto`. For the
+    // structure of the Threat Category Map, see the `ThreatCategoryMap`
+    // message in `talos.proto`.
+    uint32 threat_cat_map_version = 4;
+
+    // Threat level map version. This provides context for the threat level
+    // IDs (threat_level_id) in IPResult. If this version is higher than the
+    // version of the Threat Level Map you have cached, you must update your
+    // copy. For how and when to pull the Threat Level Map see the
+    // `QueryThreatLevelMap` service method in `service-ipd.proto`. For the
+    // structure of the Threat Level Map, see the `ThreatLevelMap` message in
+    // `talos.proto`.
+    uint32 threat_level_version = 5;
+}
+
+// The query results for a single IP address.
+message IPResult {
+    // Deprecated: do not use the score in new integrations, as the score will
+    // be removed in a future version. Use the the threat level
+    // (`threat_level_id`) instead.
+    // The sender IP reputation score encoded at 10x to facilitate integer
+    // encoding. Clients are expected to convert back to single-decimal place
+    // by multiplying by 10. For legacy integrations, refer to the [Talos
+    // Intelligence Usage Guidance](https://wiki.cisco.com/x/P3vGH) document
+    // for how to use and display the reputation score.
+    sint32 reputation_x10 = 1;
+
+    // If true, there is no reputation score (the legacy "None"
+    // value), meaning the reputation_x10 and spam_prob_x10000 fields
+    // should be ignored.
+    bool no_score = 2;
+
+    // ID representing the threat level for this response. The Threat Level
+    // map provides the mapping of the threat level ID to mnemonic and
+    // description. For how and when to pull the Threat Level Map, see the
+    // `QueryThreatLevelMap` service method in `service-ipd.proto`. For the
+    // structure of the Threat Level Map, see the `ThreatLevelMap` message in
+    // `talos.proto`.
+    uint32 threat_level_id = 3;
+
+    // IDs representing the Talos reputation rule hits associated with this IP
+    // address. The Reputation Rule Map provides the mapping of the reputation
+    // rule ID to mnemonic (needed by CASE). Reputation rule hits are for
+    // internal Talos use only, and no descriptions are povided. Non-Talos
+    // consumers are to ignore this field, other than to pass it on to Talos
+    // engines upon request. For how and when to pull the Reputation Rule Map,
+    // see the `QueryRuleMap` service method in `service-ipd.proto`. For the
+    // structure of the Reputation Rule Map, see the `ReputationRuleMap`
+    // message in `talos.proto`.
+    repeated uint32 rep_rule_id = 4;
+
+    // IDs representing the threat categories for this response. The Threat
+    // Category Map provides the mapping of the threat category ID to
+    // mnemonic, name, and description. For how and when to pull the Threat
+    // Category Map, see the `QueryThreatCatMap` service method in
+    // `service-ipd.proto`. For the structure of the Threat Category Map, see
+    // the `ThreatCategoryMap` message in `talos.proto`. There is no limit set
+    // on the number of threat category IDs returned.
+    repeated uint32 threat_cat_id = 5;
+
+    // Spam probability (range: 0.0000 to 1.0000). This value is multiplied by
+    // 10,000 to facilitate integer encoding. Clients must divide by 10,000 to
+    // compute the actual value. This is provided for legacy purposes only and
+    // must not be used in future integrations.
+    uint32 spam_prob_x10000 = 6;
+
+    // Geolocation information pertaining to the IP address (region
+    // information other than the actual geocoordinates). Any of the fields in
+    // the GeoLocation object may be missing (empty string) if Talos does not
+    // have the corresponding data. If all fields are empty, `geo_location`
+    // may be absent from the response.
+    Talos.GeoLocation geo_location = 7;
+
+    // Geocoordinates for the IP address.
+    Talos.GeoCoords geo_coords = 8;
+
+    // Deprecated: Do not use in new integrations.
+    // RVS/Stochastic Sampling sampling rate. If set, this is used by the
+    // appliance and/or application to determine whether or not to have CASE
+    // scan the message regardless of whether the message is blocked by IP
+    // reputation.
+    double rvs_rate = 9;
+
+    // If no_rvs_rate is true, ignore the rvs_rate field.
+    bool no_rvs_rate = 10;
+
+    // Network information for the IP address in the query.
+    NetInfo network_info = 11;
+
+    // Statistics about the organization associated with the IP address in the
+    // query.
+    OrgStats org_stats = 12;
+
+    // Reverse DNS name of the IP address in the query (PTR record). This is
+    // retrieved from a cache, as opposed to a real-time DNS lookup. The cache
+    // is updated daily, regardless of the TTL set on the PTR records.
+    string hostname = 13;
+
+    // Magnitude of email volume for the host name associated (by our
+    // provider) with the IP address in the query. A null value indicates that
+    // Talos has no corresponding data. This value is computed daily by
+    // rolling up the volume for each IP address associated with the domain.
+    MagnitudeInfo domain_magnitude = 14;
+
+    // Enumeration for IPD processing errors.
+    enum IPDError {
+        // No error.
+        IPDERROR_NONE = 0;
+
+        // Unknown errror occurred.
+        IPDERROR_UNKNOWN = 1;
+
+        // Input error indicates client specified an invalid argument which is
+        // problematic regardless of the state of the system.
+        IPDERROR_INPUT = 2;
+
+        // Cache error where the information could not be decoded. This would
+        // probably be caused by a bad deployment of mismatched database
+        // versions.
+        IPDERROR_CACHE_DECODE = 3;
+
+        // Cache error where information could not be retrieved, most likely
+        // due to network connectivity issues.
+        IPDERROR_CACHE = 4;
+
+        // Cache is not available because it is in the process of being
+        // initialized.
+        IPDERROR_CACHE_NOT_INITIALIZED = 5;
+
+        // Error retrieving information from the rule map. Cache is
+        // inaccessible.
+        IPDERROR_RULE_MAP = 6;
+    }
+
+    // Error from processing the reputation request, if any. A value of zero
+    // (`IPDERROR_NONE`) means no error.
+    IPDError ipd_error = 15;
+
+    // If an error occured, indicates the error is temporary and
+    // suggests that the operation can be retried at your discrection.
+    bool error_is_temporary = 16;
+}
+
+// Email volume magnitude information.
+message MagnitudeInfo {
+    // Daily magnitude multiples by 10 to facilitate integer encoding. Clients
+    // must divide by 10 to compute the actual value.
+    uint32 daily_x10 = 1;
+
+    // Monthly magnitude multiples by 10 to facilitate integer encoding.
+    // Clients must divide by 10 to compute the actual value.
+    uint32 monthly_x10 = 2;
+}
+
+// The structure containing the name and/or ID of an organization.
+message OrgInfo {
+    // Name of the organization.
+    string org_name = 1;
+
+    // ID corresponding to an organization name.
+    uint32 org_id = 2;
+}
+
+// The structure of a request for information about an organization.
+message OrgInfoRequest {
+    // Information about the querying appliance and/or application.
+    Talos.AppInfo app_info = 1;
+
+    // Organization information.
+    OrgInfo org_info = 2;
+}
+
+// The structure of a request for information about a domain.
+message DomainInfoRequest {
+    // Information about the querying appliance and/or application.
+    Talos.AppInfo app_info = 1;
+
+    // Domain Name.
+    string name = 2;
+}
+
+// The structure of the response to a query about a domain.
+message DomainInfoReply {
+    // Domain name.  If domain_name is empty, the domain was not found.
+    string domain_name = 1;
+
+    // ID corresponding to domain name, as mapped in the database.
+    uint32 domain_id = 2;
+
+    // This is deprecated: do not use in future integrations.
+    // Email volume magnitude information for this domain. This value is
+    // computed daily by rolling up the volume for each IP address associated
+    // with the domain.
+    MagnitudeInfo magnitude = 3;
+
+    // Deprecated: do not use in new integrations.
+    // Timestamp of first message from this domain. A value of zero indicates
+    // that Talos does not have data for this query.
+    uint64 first_occurence = 4;
+
+    // Organization information.
+    OrgStats org_stats = 5;
+}
+
+// Network information associated with IP/domain/org in the query.
+message NetInfo {
+    // IPv4 Network prefix (CIDR bit count) associated with this network.
+    uint32 cidr_range = 1;
+
+    // IPv4 Network Subnet (CIDR bit count, forced to be at least 24).
+    uint32 subdivision_mask = 2;
+
+    // Deprecated: do not use in new integrations.
+    // Email volume magnitude information for this network.
+    MagnitudeInfo magnitude = 3;
+
+    // Deprecated: do not use in new integrations.
+    // IPv4 address average magnitude multiples by 10 to facilitate integer
+    // encoding. Clients must divide by 10 to compute the actual value.
+    uint32 average_magnitude_x10 = 4;
+
+    // Obsoleted: do not use in new integrations.
+    // Formerly a uint32 field that is no longer applicable. Can be removed
+    // when it has been confirmed volume_30_days_x10 is no longer accessed.
+    reserved 5;
+}
+
+// Wrapper for the organization the IPv4 address is related to.
+message OrgStats {
+    // Organization info. If org_info is empty, the organization was not
+    // found.
+    OrgInfo org_info = 1;
+
+    // Deprecated: do not use in future integrations.
+    // Email volume magnitude information computed daily for this
+    // organization.
+    MagnitudeInfo magnitude = 2;
+
+    // Deprecated: do not use in future integrations.
+    // Timestamp of the first message from this organization. A value of zero
+    // indicates that Talos does not have this data for this query.
+    uint64 first_occurence = 3;
+
+    // Number of domains in this organization. This is derived from third
+    // party data.
+    uint32 num_domains = 4;
+
+    // Number of IP addresses controlled by this organization. A value of zero
+    // indicates that Talos does not have this data for this query. This data
+    // comes from a third party.
+    uint32 num_ip_controlled = 5;
+
+    // Number of IPs in organization being used to send email. A value of zero
+    // indicates that Talos does not have this data for this query. This is
+    // generated from the intersection of the list of IPs associated with this
+    // organization (according to our provider) with IP addresses for which
+    // Talos sees indications of email being sent.
+    uint32 num_ip_email_senders = 6;
+
+    // Deprecated: do not use in new integrations.
+    // Lifetime email volume: total volume of email sent from the
+    // organization.
+    uint64 volume_forever = 7;
+}
+
+// Used for requesting a mapping of rule hit ID to tag. This is intended to
+// only be called by CASE and Talos internal systems. The Reputation Rule Map
+// for IPD only contains IDs and mnemonics (no descriptions).
+message RuleMapRequest {
+    // Information about the querying appliance and/or application.
+    Talos.AppInfo app_info = 1;
+}
+
+// Structure of a request for the threat category mapping.
+message ThreatCatMapRequest {
+    // Information about the querying appliance and/or application.
+    Talos.AppInfo app_info = 1;
+}
+
+// Structure of a request for the threat level mapping.
+message ThreatLevelMapRequest {
+    // Information about the querying appliance and/or application.
+    Talos.AppInfo app_info = 1;
+}
+
+// Talos Internal Use Only.
+message PrivateLog {
+    // The structure of a sender IP address reputation query.
+    ReputationRequest request = 1;
+
+    // The structure of the reply to a sender IP address reputation query.
+    ReputationReply reply = 2;
+
+    // Querying IP Address.
+    Talos.IPEndpoint client = 3;
+
+    // Elapsed time, since epoch in milliseconds, the request was received.
+    uint64 request_received_ts = 4;
+
+    // Elapsed time, since epoch in milliseconds, the response was sent.
+    uint64 response_sent_ts = 5;
+
+    // gRPC status code of the reply.
+    uint32 grpc_status_code = 6;
+}

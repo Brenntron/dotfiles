@@ -1,0 +1,80 @@
+/*
+ * Service definition for sender IP Reputation
+ */
+
+syntax = "proto3";
+
+import "talos.proto";
+import "ipd.proto";
+
+package Talos.Service;
+
+option go_package = "cisco.com/grpc/talos/service";
+option java_package = "talos.service";
+
+/*
+ * Sender IP Reputation
+ *
+ * Reputation service definitions.  The result from a reputation query
+ * contains some numeric IDs (for rule hits and threat categories). The three
+ * mapping services return maps that provide meta data for those IDs, such as
+ * tag/mnemonic, and description, as appropriate. These services should be
+ * called when the corresponding `_version` field in the response from a call
+ * to `QueryReputation` is greater than the version of the map you have
+ * cached.
+ *
+ * What is a sender IP? The sender IP address is generally the IP address
+ * of the last hop in delivering an email address to the receiving Mail
+ * Tranfer Agent (e.g., ESA, or Office 365, in the case of CMD).
+ */
+
+service IPD {
+    // Request reputation and owner information for an IP address. The first
+    // IP address is expected to be the sender IP address. The remaining IP
+    // addresses may be IP addresses appearing in email `Received` headers
+    // representing hops between mail tranfer agents the message took during
+    // delivery (useful for filtering on geolocation information, for
+    // example). Batches of 25 IP addresses or less are recommended for
+    // optimum query latency.
+    rpc QueryReputation (Talos.IPD.ReputationRequest) returns
+        (Talos.IPD.ReputationReply);
+
+    // Request a mapping of reputation rule IDs to mnemonics. No descriptions
+    // are provided, due to confidentiality concerns. This should be called
+    // whenever `rule_map_version` in a response from a `QueryReputation`
+    // service method call is larger than the version of the Reputation Rule
+    // Map that you have cached. For details on the structure of the
+    // Reputation Rule Map, see the `ReputationRuleMap` message in
+    // `talos.proto`.
+    rpc QueryRuleMap (Talos.IPD.RuleMapRequest) returns
+        (Talos.ReputationRuleMap);
+
+    // Request a mapping of threat category ID to mnemonic and description.
+    // This should be called whenever `threat_cat_map_version` in a response
+    // from a `QueryReputation` service method call is larger than the version
+    // of the Threat Category Map that you have cached. For details on the
+    // structure of the Threat Category Map, see the `ThreatCategoryMap`
+    // message in `talos.proto`.
+    rpc QueryThreatCatMap (Talos.IPD.ThreatCatMapRequest) returns
+        (Talos.ThreatCategoryMap);
+
+    // Request a mapping of threat level IDs to names, descriptions, and
+    // thresholds. This should be called whenever `threat_level_version` in a
+    // response from a `QueryReputation` service method call is larger than
+    // the version of the Threat Level Map that you have cached. For details
+    // on the structure of the Threat Level Map, see the `ThreatLevelMap`
+    // message in `talos.proto`.
+    rpc QueryThreatLevelMap (Talos.IPD.ThreatLevelMapRequest) returns
+        (Talos.ThreatLevelMap);
+
+    // Request organization information based on domain. See the
+    // `DomainInfoRequest` and `DomainInfoReply` messages in `ipd.proto` for
+    // details on the structure of the request and response.
+    rpc QueryDomainInfo (Talos.IPD.DomainInfoRequest) returns
+        (Talos.IPD.DomainInfoReply);
+
+    // Request information about an organization, either by ID or by name. See
+    // the `OrgInfoRequest` and `OrgStats` messages in `ipd.proto` for details
+    // of the structure of the request and response.
+    rpc QueryOrgInfo (Talos.IPD.OrgInfoRequest) returns (Talos.IPD.OrgStats);
+}

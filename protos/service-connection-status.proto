@@ -1,0 +1,17 @@
+/*
+ * Service definition for Connection status
+ */
+
+syntax = "proto3";
+
+import "connection-status.proto";
+
+package Talos.Service;
+
+option go_package = "cisco.com/grpc/talos/service";
+option java_package = "talos.service";
+
+service ConnectionStatus {
+    // Request a Connection Status message.
+    rpc ConnectionStatus (Talos.ConnectionStatus.Request) returns (Talos.ConnectionStatus.Reply);
+}
