@@ -11220,16 +11220,15 @@ table.rl-content {
 
 // fix to ensure there is no flash of dialog text on page load
 #naming-guide-dialog {
-  .amp-url, .amp-email{
-    display:block!important;
-    white-space: pre!important;
-  }
-  .amp-url{
-    color: #333;
-  }
   display: none;
 }
-
+.amp-url, .amp-email{
+  display:block!important;
+  white-space: pre!important;
+}
+.amp-url{
+  color: #333;
+}
 // ensure AMP disposition on File Rep > Show is capitalized in all 3 instances
 #create-detection-dialog .top-info-data,
 .amp-area label:first-of-type + div,
