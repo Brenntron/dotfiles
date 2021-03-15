@@ -610,7 +610,10 @@ $ ->
                   if data == 'CUSTOMER'
                     '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
                   else
-                    data
+                    '<button class="complaint-submitter-type icon-guest-user esc-tooltipped" title="Guest"></button>'
+              }
+              {
+                data: 'customer_email'
               }
               {
                 data: 'company_name'

@@ -38,6 +38,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
         complaint_id:       {source: "ComplaintEntry.complaint_id", data: :complaint_id, cond: :like},
         tags:               {source: "ComplaintEntry.tags", data: :tags, searchable: false, orderable: false},
         submitter_type:     {source: "ComplaintEntry.submitter_type", data: :submitter_type, cond: :string_eq},
+        customer_email:     {source: 'ComplaintEntry.customer_email', data: :customer_email, cond: :like, orderable: false },
         description:        {source: "ComplaintEntry.description", data: :description, cond: :like},
         platform:           {source: "ComplaintEntry.platform", data: :platform, cond: :like}
     }
@@ -65,6 +66,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           wbrs_score:       complaint_entry.wbrs_score ? complaint_entry.wbrs_score.to_d.truncate(2).to_s : '',
           customer_name:    complaint_entry.customer_name,
           company_name:     complaint_entry.customer_company_name,
+          customer_email:   complaint_entry.customer_email,
           assigned_to:      complaint_entry.user&.display_name,
 
           uri:              complaint_entry.uri,
