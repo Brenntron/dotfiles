@@ -10,6 +10,9 @@ development:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  beaker:
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    hostport: "annapolis-stage.vrt.sourcefire.com:4252"
   bls:
     host: "stage-bls-vip.sv4.ironport.com"
     port: 443
@@ -125,6 +128,9 @@ test:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  beaker:
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    hostport: "annapolis-stage.vrt.sourcefire.com:4252"
   bls:
     host: "stage-bls-vip.sv4.ironport.com"
     port: 443
@@ -244,6 +250,9 @@ staging:
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       # umbrella always uses https and verify peer
       api_key: "redacted"
+  beaker:
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    hostport: "annapolis-stage.vrt.sourcefire.com:4252"
   bls:
     host: "stage-bls-vip.sv4.ironport.com"
     port: 443
@@ -368,6 +377,9 @@ production:
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       # umbrella always uses https and verify peer
       api_key: "redacted"
+  beaker:
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    hostport: "annapolis.vrt.sourcefire.com:4252"
   bls:
     host: "prod-bls-vip.sv4.ironport.com"
     port: 443
