@@ -551,7 +551,7 @@ class ComplaintEntry < ApplicationRecord
     begin
       #this is where screen grabs happen.
       screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
-      #screenshot_entry.grab_screenshot
+      screenshot_entry.grab_screenshot
     rescue Timeout::Error => e
       #couldnt complete in time
       Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")

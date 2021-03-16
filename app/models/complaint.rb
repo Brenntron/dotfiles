@@ -392,7 +392,7 @@ class Complaint < ApplicationRecord
             end
             ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
-            #ces.grab_screenshot
+            ces.grab_screenshot
           rescue Exception => e
             Rails.logger.error("#{e.message}")
             ces = ComplaintEntryScreenshot.new
@@ -458,7 +458,7 @@ class Complaint < ApplicationRecord
             end
             ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
-            #ces.grab_screenshot
+            ces.grab_screenshot
           rescue Exception => e
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message

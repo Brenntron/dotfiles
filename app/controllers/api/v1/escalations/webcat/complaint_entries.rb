@@ -385,7 +385,7 @@ module API
                   ces = ComplaintEntryScreenshot.create(complaint_entry_id: entry.id )
                 end
                 ces.update(error_message:"Retaking screenshot please wait.", screenshot:nil)
-                #ces.grab_screenshot
+                ces.grab_screenshot
               end
             end
 
