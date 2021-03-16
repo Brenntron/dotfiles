@@ -530,18 +530,21 @@ class Complaint < ApplicationRecord
         all_complaints.each do |new_ui_complaint|
           if new_ui_complaint['add_channel'] == WBNP_CHANNEL
             begin
+              ActiveRecord::Base.connection.reconnect!
               rule_ui_wbnp_create_action(new_ui_complaint, new_report, bugzilla_rest_session: bugzilla_rest_session)
             rescue => e
+              ActiveRecord::Base.connection.reconnect!
               new_report.cases_failed += 1
               new_report.notes += "SWP \n uri: #{new_ui_complaint.inspect} | failure: #{e.message} #{e.backtrace.join("\n")}\n"
               new_report.save
             end
           end
         end
-
+        ActiveRecord::Base.connection.reconnect!
         new_report.status = WbnpReport::COMPLETE
         new_report.save
       rescue => e
+        ActiveRecord::Base.connection.reconnect!
         new_report.status = WbnpReport::ERROR
         new_report.notes += "\n\n----------\nPull suddenly ended with error: #{e.message} #{e.backtrace.join("\n")}\n\n"
         new_report.save
@@ -593,8 +596,9 @@ class Complaint < ApplicationRecord
     }
 
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
-
+    ActiveRecord::Base.connection.reconnect!
     cust = Customer.customer_from_ruleui(rule_ui_complaint)
+    ActiveRecord::Base.connection.reconnect!
     new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
                                      customer_id: cust ? cust.id : nil,
@@ -603,7 +607,7 @@ class Complaint < ApplicationRecord
                                      ticket_source_type: 'Complaint',
                                      ticket_source: Complaint::SOURCE_RULEUI,
                                      ticket_source_key: rule_ui_complaint["complaint_id"])
-
+    ActiveRecord::Base.connection.reconnect!
     begin
       category_data = ComplaintEntry.get_category_data(uri)
     rescue
@@ -616,7 +620,9 @@ class Complaint < ApplicationRecord
       primary_category = category_data[:category_names][0]
     end
     begin
+      ActiveRecord::Base.connection.reconnect!
       ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category)
+      ActiveRecord::Base.connection.reconnect!
       Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
       wbnp_report.cases_imported += 1
 
@@ -624,7 +630,7 @@ class Complaint < ApplicationRecord
       wbnp_report.cases_failed += 1
       wbnp_report.notes += "\n\nRUWCA\n uri: #{uri} | failure: #{e.message} \n #{e.backtrace.join("\n")}"
     end
-
+    ActiveRecord::Base.connection.reconnect!
     wbnp_report.save
   end
 
