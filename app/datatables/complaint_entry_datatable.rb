@@ -66,7 +66,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           wbrs_score:       complaint_entry.wbrs_score ? complaint_entry.wbrs_score.to_d.truncate(2).to_s : '',
           customer_name:    complaint_entry.customer_name,
           company_name:     complaint_entry.customer_company_name,
-          customer_email:   complaint_entry.customer_email,
+          customer_email:   complaint&.customer&.email,
           assigned_to:      complaint_entry.user&.display_name,
 
           uri:              complaint_entry.uri,
