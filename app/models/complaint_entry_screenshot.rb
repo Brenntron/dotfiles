@@ -34,14 +34,14 @@ class ComplaintEntryScreenshot < ApplicationRecord
 
       #TEMPorarially shut down screenshots
       file_data = File.open("app/assets/images/failed_screenshot.jpg").read()
-      self.update(screenshot: file_data, error_message: ex.message.truncate(1000000))
+      self.update(screenshot: file_data, error_message: "Screenshots have been temporarily disabled")
 
     rescue Net::ReadTimeout => ex
       Rails.logger.error ("Hey! There was a Net Read Timeout error")
       file_data = File.open("app/assets/images/timeout_screenshot.jpg").read()
       self.update(screenshot: file_data, error_message: ex.message)
     rescue Exception => ex
-      driver.close unless driver.nil?
+      # driver.close unless driver.nil?
       puts ("oops there was a screen capture error")
       puts ("#{ex.class}: #{ex.message}")
       Rails.logger.error ("oops there was a screen capture error")
