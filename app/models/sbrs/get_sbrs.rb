@@ -5,37 +5,15 @@ class Sbrs::GetSbrs < Sbrs::Base
   API_RETRY_LIMIT = 5
   API_SOURCE = "www.senderbase.org"
 
-  def self.load_from_prefetch(data)
-    response_body = JSON.parse(data)
-    response_body
-  end
-
-  def self.all
-    call_sbrs_request(:get, "/v1/rules", body: {})
-  end
-
-  def self.by_domain(name, raw = false)
-    call_sbrs_request(:get, "/v1/domain/#{name}", {}, raw )
-  end
-
-  def self.by_mnemonic(name, raw = false)
-    call_sbrs_request(:get, "/v1/rules/#{name}", {}, raw)
-  end
-
-  def self.by_ip4(name, raw = false)
-    call_sbrs_request(:get, "/v1/ip/#{name}", {}, raw)
-  end
-
-  def self.system_stats
-    call_sbrs_request(:get, "/v1/status", body: {})
-  end
-
 
   def self.get_sbrs_rules_for_ip(ip)
     response = query_lookup(build_sbapi_request(ip))
     parse_ip_rules(JSON.parse(response))
   end
 
+
+
+  protected   ##########################################################################################################
 
   def self.parse_ip_rules(rep_data)
     ip_rules = []
@@ -86,9 +64,6 @@ class Sbrs::GetSbrs < Sbrs::Base
       build_request_otherwise(request_params, request_host, request_json)
     end
   end
-
-
-
 
 
 
@@ -177,7 +152,7 @@ class Sbrs::GetSbrs < Sbrs::Base
       token_hash = Digest::SHA256.hexdigest secret+date
       digest = OpenSSL::Digest.new('sha512')
       hmac = OpenSSL::HMAC.hexdigest(digest, token_hash, query)
-      header = public+":"+hmac
+      public+":"+hmac
     end
   end
 
@@ -205,7 +180,4 @@ class Sbrs::GetSbrs < Sbrs::Base
     end
     ip_rules
   end
-
-
-
 end

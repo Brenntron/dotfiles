@@ -5,6 +5,72 @@ class SbApi < ApplicationRecord
   API_RETRY_LIMIT = 5
   API_SOURCE = "www.senderbase.org"
 
+  def self.query_lookup(params, retries = nil)
+    host = API_SOURCE
+    #this line will pretty much only fire once...it's to bring retries variable into existence on the first failed attempt
+    retries ||= 0
+
+    begin
+      json_response = self.get_auth_key(Rails.configuration.sds.username,Rails.configuration.sds.password, params["retried"])
+      lookup_data = self.build_request(params, host, json_response)
+      uri = lookup_data[:uri]
+      header = lookup_data[:header]
+
+      request = Net::HTTP::Get.new(uri)
+      request["Authorization"] = "#{header}" #add the request header
+      req_options = {
+          use_ssl: uri.scheme == "https",
+      }
+
+      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        http.request(request)
+      end
+      #retry the look up at least once if it fails
+
+      if response.code == "401" && (retries.present? && retries <= API_RETRY_LIMIT)
+
+        params["retried"] = true
+        #this is the actual line that will increment retries until it hits the max attempt as defined by API_RETRY_LIMIT
+        retries += 1
+        response = query_lookup(params, retries)
+      else
+        response.body
+      end
+    rescue
+      '{}'
+    end
+  end
+
+  def self.remote_call_sds(sds_item, sds_type, full_response = false)
+    self.remote_lookup_sds(self.build_sds_request(sds_item, sds_type, full_response))
+  end
+
+  def self.remote_call_sds_v3(sds_item, sds_type)
+    self.remote_lookup_sds_v3(self.build_sds_v3_request(sds_item, sds_type))
+  end
+
+  def self.category_lookup
+    lookup_list = {}
+    begin
+      full_data = remote_call_sds_v3('', 'webcat_labels')
+      json = JSON.parse(full_data)
+      json = json.reject { |_, attributes| attributes['is_deprecated'] == 1 }
+      if json.key?("META_CATEGORIES_VERSION")
+        json.keys.each do |key|
+          if key.to_i > 0
+            hash_key = json[key]["name"] + " - " + json[key]["mnemonic"]
+            lookup_list[hash_key] = key.to_i
+          end
+        end
+      end
+    rescue
+      {}
+    end
+    lookup_list.sort.to_h
+  end
+
+
+
   def self.sds_host
     @sds_host ||= Rails.configuration.sds.host
   end
@@ -12,7 +78,11 @@ class SbApi < ApplicationRecord
   def self.sds_v3_host
     @sds_v3_host ||= Rails.configuration.sds.v3_host
   end
-  
+
+
+
+  protected   ##########################################################################################################
+
   def self.get_auth_key(user,pass,retried = nil)
 
     if Rails.cache.read(:auth_token).present? and retried.blank?
@@ -81,42 +151,6 @@ class SbApi < ApplicationRecord
       digest = OpenSSL::Digest.new('sha512')
       hmac = OpenSSL::HMAC.hexdigest(digest, token_hash, query)
       header = public+":"+hmac
-    end
-  end
-
-  def self.query_lookup(params, retries = nil)
-    host = API_SOURCE
-    #this line will pretty much only fire once...it's to bring retries variable into existence on the first failed attempt
-    retries ||= 0
-
-    begin
-      json_response = self.get_auth_key(Rails.configuration.sds.username,Rails.configuration.sds.password, params["retried"])
-      lookup_data = self.build_request(params, host, json_response)
-      uri = lookup_data[:uri]
-      header = lookup_data[:header]
-
-      request = Net::HTTP::Get.new(uri)
-      request["Authorization"] = "#{header}" #add the request header
-      req_options = {
-          use_ssl: uri.scheme == "https",
-      }
-
-      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-        http.request(request)
-      end
-      #retry the look up at least once if it fails
-
-      if response.code == "401" && (retries.present? && retries <= API_RETRY_LIMIT)
-
-        params["retried"] = true
-        #this is the actual line that will increment retries until it hits the max attempt as defined by API_RETRY_LIMIT
-        retries += 1
-        response = query_lookup(params, retries)
-      else
-        response.body
-      end
-    rescue
-      '{}'
     end
   end
 
@@ -370,18 +404,6 @@ class SbApi < ApplicationRecord
     parsed_response.to_json
   end
 
-  def self.pluck_sds_v3_webcat_code(response)
-    begin
-      parsed_json = JSON.parse(response.body)
-      parsed_json.dig('rsp','aupc').to_a
-      webcat_code = JSON.parse(response.body)['rsp']['aupc'].to_a
-    rescue
-      webcat_code = []
-    end
-
-    webcat_code
-  end
-
   def self.pluck_sds_v3_threat_category_codes(response)
     begin
       parsed_json = JSON.parse(response.body)
@@ -391,34 +413,6 @@ class SbApi < ApplicationRecord
     end
 
     threat_categories
-  end
-
-  def self.remote_call_sds(sds_item, sds_type, full_response = false)
-    self.remote_lookup_sds(self.build_sds_request(sds_item, sds_type, full_response))
-  end
-
-  def self.remote_call_sds_v3(sds_item, sds_type)
-    self.remote_lookup_sds_v3(self.build_sds_v3_request(sds_item, sds_type))
-  end
-
-  def self.category_lookup
-    lookup_list = {}
-    begin
-      full_data = remote_call_sds_v3('', 'webcat_labels')
-      json = JSON.parse(full_data)
-      json = json.reject { |_, attributes| attributes['is_deprecated'] == 1 }
-      if json.key?("META_CATEGORIES_VERSION")
-        json.keys.each do |key|
-          if key.to_i > 0
-            hash_key = json[key]["name"] + " - " + json[key]["mnemonic"]
-            lookup_list[hash_key] = key.to_i
-          end
-        end
-      end
-    rescue
-      {}
-    end
-    lookup_list.sort.to_h
   end
 
   def self.score_to_text(original_score, score_type = "wbrs")
