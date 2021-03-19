@@ -74,6 +74,7 @@ module ApiRequester::ApiRequester
       struct.send((key + '=').to_sym, value)
     end
     struct.verify_mode = hash['verify_mode'] || hash['tls_mode'] || hash['ssl_mode']
+    struct.gssnegotiate = hash['gssnegotiate'] || true
     struct.tls =
         case struct.verify_mode
         when 'verify-none', 'verify-peer'
@@ -215,8 +216,9 @@ module ApiRequester::ApiRequester
     def new_request(path, query = nil)
 
       request = HTTPI::Request.new(uri(path, query))
-      request.auth.gssnegotiate
-
+      if gssnegotiate?
+        request.auth.gssnegotiate
+      end
       request.read_timeout = read_timeout
       request.open_timeout = open_timeout
 
@@ -346,7 +348,6 @@ module ApiRequester::ApiRequester
           else
             raise 'Unknown request type, must be :json, :query_string, or :query_body'
           end
-
       request_error_handling(call_by_method(method, request))
     end
 
