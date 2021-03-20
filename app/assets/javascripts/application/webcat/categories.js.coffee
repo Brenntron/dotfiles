@@ -27,6 +27,16 @@ namespace 'AC.WebCat', (exports) ->
 
     else return
 
+  exports.createSelectOptionsForIds = (ids) ->
+    AC.WebCat.getAUPCategories().then( (categories) =>
+      webcat_options = []
+      for key, value of categories
+        cat_code = key.split(' - ')[1]
+        value_name = key.split(' - ')[0]
+        webcat_options.push {category_id: value, category_name: value_name, category_code: cat_code}
+      for id in ids
+        $(id)[0].selectize.addOption(webcat_options)
+    )
 
   exports.getCategoryIds = (category_names, id) ->
 

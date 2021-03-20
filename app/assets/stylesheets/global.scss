@@ -8778,7 +8778,7 @@ td.text-center span {
   width: fit-content;
   font-size: 9pt !important;
   transition: background-color 0.2s!important;
-  
+
   &:hover{
     background-color: darken($primary-section-color, 10%)!important;
   }
@@ -8796,7 +8796,7 @@ td.text-center span {
     min-width: 110px;
     background-size: 17px;
   }
-  
+
 }
 
 .copycat-tool-footer .cluster-button{
@@ -13008,4 +13008,8 @@ input.wl-bl-list-inline {
 
 #current-xbrs-table-head th:last-child, #current-xbrs-table-body td:last-child {
   display: none;
+}
+
+.cluster-submit-button {
+  background-color: #6dbcdb
 }

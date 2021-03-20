@@ -33,6 +33,14 @@ class ClusterAssignment < ApplicationRecord
       end
     end
 
+    def assign!(cluster_ids, user)
+      destroy_expired_assignments!
+      where(cluster_id: cluster_ids).destroy_all
+      cluster_ids.each do |cluster_id|
+        create(cluster_id: cluster_id, user_id: user.id)
+      end
+    end
+
     def unassign(cluster_ids, user)
       where(cluster_id: cluster_ids, user_id: user).destroy_all
     end

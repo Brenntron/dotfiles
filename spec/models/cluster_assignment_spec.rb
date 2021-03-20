@@ -123,6 +123,28 @@ describe ClusterAssignment do
     end
   end
 
+  describe '#assign!' do
+    subject { described_class.assign!(cluster_ids, user) }
+    let(:cluster_ids) { [1] }
+
+    context 'when cluster is not assigned' do
+      it 'assigns cluster to the user' do
+        expect { subject }.to change { ClusterAssignment.count }.to(1)
+      end
+    end
+
+    context 'when cluster is already assigned' do
+      before { FactoryBot.create(:cluster_assignment, user_id: another_user.id, cluster_id: cluster_ids.first) }
+
+      let(:another_user) { FactoryBot.create(:user) }
+
+      it 'assigns cluster to the user anyway and drops previous assignment' do
+        expect { subject }.to_not change { ClusterAssignment.count }
+        expect(ClusterAssignment.where(user_id: user.id).count).to be 1
+      end
+    end
+  end
+
   describe '#unassign' do
     subject { described_class.unassign(cluster_ids, user) }
     let(:cluster_ids) { ['1'] }
