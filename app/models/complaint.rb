@@ -498,7 +498,7 @@ class Complaint < ApplicationRecord
 
       new_report = WbnpReport.new
 
-      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
+      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(1)
 
       #all_complaints.each do |rule_ui_complaint|
       #  uri_to_test = compile_parts_to_uri(rule_ui_complaint)
@@ -508,50 +508,79 @@ class Complaint < ApplicationRecord
       #    new_complaints << rule_ui_complaint
       #  end
       #end
+      #
+      logger_token = SecureRandom.uuid
       new_report.notes = ""
       new_report.cases_imported = 0
       new_report.cases_failed = 0
       new_report.total_new_cases = all_complaints.size
       new_report.status = WbnpReport::ACTIVE
+      new_report.notes += "logger_token: #{logger_token} <br />"
       new_report.save
 
-      start_wbnp_pull(new_report.id)
+      kick_off_wbnp_pull(new_report.id, logger_token)
 
       new_report
 
   end
 
   class << self
-    def start_wbnp_pull(new_report_id)
+
+    def kick_off_wbnp_pull(new_report_id, logger_token)
+      start_wbnp_pull(new_report_id, logger_token)
+    end
+
+    #handle_asynchronously :kick_off_wbnp_pull, :queue => "wbnp_pull", :priority => 2
+
+    def start_wbnp_pull(new_report_id, logger_token)
+
       new_report = WbnpReport.find(new_report_id)
       begin
-        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
+        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(1)
+        total_entries = all_complaints.size
+        entry_num = 1
         bugzilla_rest_session = BugzillaRest::Session.default_session
         all_complaints.each do |new_ui_complaint|
           if new_ui_complaint['add_channel'] == WBNP_CHANNEL
             begin
-              ActiveRecord::Base.connection.reconnect!
-              rule_ui_wbnp_create_action(new_ui_complaint, new_report, bugzilla_rest_session: bugzilla_rest_session)
-            rescue => e
-              ActiveRecord::Base.connection.reconnect!
-              new_report.cases_failed += 1
-              new_report.notes += "SWP \n uri: #{new_ui_complaint.inspect} | failure: #{e.message} #{e.backtrace.join("\n")}\n"
+              uri = compile_parts_to_uri(new_ui_complaint)
+              new_report.notes += "<br />working (#{entry_num}/#{total_entries}) uri: #{uri}."
               new_report.save
+              pass = validate_url(uri)
+              new_report.notes += "<br />validation pass: #{pass.to_s}."
+              new_report.save
+              if pass
+                rule_ui_wbnp_create_action(uri, new_ui_complaint, new_report, logger_token, bugzilla_rest_session: bugzilla_rest_session)
+              else
+                reject_complaint(uri, new_ui_complaint, new_report, logger_token)
+              end
+            rescue => e
+
+              new_report.cases_failed += 1
+              new_report.notes += "<br />SWP uri: #{new_ui_complaint.inspect} | log token: #{logger_token} | failure: #{e.message}<br />"
+              new_report.save
+
+              Rails.logger.error "#{logger_token} | " + e.message
+              Rails.logger.error "#{logger_token} | " + e.backtrace.join("\n")
             end
+            entry_num += 1
           end
         end
-        ActiveRecord::Base.connection.reconnect!
+
         new_report.status = WbnpReport::COMPLETE
         new_report.save
       rescue => e
-        ActiveRecord::Base.connection.reconnect!
+        #ActiveRecord::Base.connection.reconnect!
         new_report.status = WbnpReport::ERROR
-        new_report.notes += "\n\n----------\nPull suddenly ended with error: #{e.message} #{e.backtrace.join("\n")}\n\n"
+        new_report.notes += "<br />--------<br />Pull suddenly ended with error: #{e.message} #{e.backtrace.join("\n")}<br />"
         new_report.save
+
+        Rails.logger.error "#{logger_token} | " + e.message
+        Rails.logger.error "#{logger_token} | " + e.backtrace.join("\n")
       end
 
     end
-    handle_asynchronously :start_wbnp_pull
+
 
   end
 
@@ -566,14 +595,44 @@ class Complaint < ApplicationRecord
     URI.escape(uri)
   end
 
-  def self.rule_ui_wbnp_create_action(rule_ui_complaint, wbnp_report, bugzilla_rest_session:)
+  def self.validate_url(uri)
+    begin
+      URI.parse(uri.strip)
+      clean_url = Addressable::URI.parse(uri.strip)
+      valid = clean_url.host.present?
+    rescue
+      valid = false
+    end
+
+    valid
+  end
+
+  def self.reject_complaint(uri, new_ui_complaint, new_report, logger_token)
+
+    new_report.notes += "rejecting uri: #{uri}"
+    new_report.save
+
+    complaint_id = new_ui_complaint["complaint_id"]
+
+    params = {:complaint_id => complaint_id, :new_tag => "invalid"}
+    response = Wbrs::RuleUiComplaint.tag_complaint(params)
+    if response == "Complaint's tag was updated successfully."
+      new_report.notes += "<br />uri rejected on ruleAPI"
+    else
+      new_report.notes += "<br />uri was not rejected on ruleAPI (error) | log token #{logger_token}"
+      Rails.logger.error "#{logger_token} | response from tagging for uri: #{uri} | " + response
+    end
+
+    new_report.cases_failed += 1
+    new_report.save
+  end
+
+  def self.rule_ui_wbnp_create_action(uri, rule_ui_complaint, wbnp_report, logger_token, bugzilla_rest_session:)
     #"#{{"add_channel"=>"wbnp", "comment"=>"", "complaint_id"=>105, "complaint_type"=>"unknown", "customer_name"=>"ORANGE BUSINES SERVICES", "description"=>"",
     # "domain"=>"fmp-usmba.ac.ma", "path"=>"/cdim/mediatheque/e_theses/257-16.pdf", "port"=>0, "protocol"=>"http", "region"=>"", "resolution"=>nil, "state"=>"new",
     # "subdomain"=>"scolarite", "tag"=>nil, "url_query_string"=>"", "when_added"=>"Thu, 30 Aug 2018 15:00:05 GMT", "when_last_updated"=>"Thu, 30 Aug 2018 15:00:05 GMT",
     # "who_updated"=>""}}"
 
-
-    uri = compile_parts_to_uri(rule_ui_complaint)
     description = "WBNP Sourced Complaint"
 
     user = User.where(cvs_username:"vrtincom").first
@@ -594,11 +653,11 @@ class Complaint < ApplicationRecord
         'priority' => 'Unspecified',
         'classification' => 'unclassified',
     }
-
+    Rails.logger.error "#{logger_token} building bugzilla bug for uri: #{uri}\n"
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
-    ActiveRecord::Base.connection.reconnect!
+
     cust = Customer.customer_from_ruleui(rule_ui_complaint)
-    ActiveRecord::Base.connection.reconnect!
+
     new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
                                      customer_id: cust ? cust.id : nil,
@@ -607,8 +666,9 @@ class Complaint < ApplicationRecord
                                      ticket_source_type: 'Complaint',
                                      ticket_source: Complaint::SOURCE_RULEUI,
                                      ticket_source_key: rule_ui_complaint["complaint_id"])
-    ActiveRecord::Base.connection.reconnect!
+    Rails.logger.error "#{logger_token} built and saved bugzilla bug for uri: #{uri}\n"
     begin
+      Rails.logger.error "#{logger_token} getting category data for uri: #{uri}\n"
       category_data = ComplaintEntry.get_category_data(uri)
     rescue
       category_data = []
@@ -620,17 +680,20 @@ class Complaint < ApplicationRecord
       primary_category = category_data[:category_names][0]
     end
     begin
-      ActiveRecord::Base.connection.reconnect!
-      ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category)
-      ActiveRecord::Base.connection.reconnect!
+      Rails.logger.error "#{logger_token} building complaint entry for uri: #{uri}\n"
+      ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category, logger_token)
+      Rails.logger.error "#{logger_token} complaint entry build complete for uri: #{uri}\n"
       Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
       wbnp_report.cases_imported += 1
 
     rescue Exception => e
       wbnp_report.cases_failed += 1
-      wbnp_report.notes += "\n\nRUWCA\n uri: #{uri} | failure: #{e.message} \n #{e.backtrace.join("\n")}"
+      wbnp_report.notes += "<br />RUWCA uri: #{uri} | log token: #{logger_token} | failure: #{e.message}<br />"
+
+      Rails.logger.error "#{logger_token} | " + e.message
+      Rails.logger.error "#{logger_token} | " + e.backtrace.join("\n")
     end
-    ActiveRecord::Base.connection.reconnect!
+
     wbnp_report.save
   end
 

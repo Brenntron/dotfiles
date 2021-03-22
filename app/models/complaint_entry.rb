@@ -398,17 +398,19 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def self.create_wbnp_complaint_entry(complaint, ip_url, url_parts, user = nil, status = NEW, categories = nil)
+  def self.create_wbnp_complaint_entry(complaint, ip_url, url_parts, user = nil, status = NEW, categories = nil, logger_token)
 
     new_complaint_entry = ComplaintEntry.new
     new_complaint_entry.complaint_id = complaint.id
     new_complaint_entry.status = status
 
     begin
+      Rails.logger.error "#{logger_token} getting sbrs data for uri: #{ip_url}\n"
       wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
     rescue
+      Rails.logger.error "#{logger_token} failed getting sbrs data for uri: #{ip_url}\n"
       # do nothing continue with saving the entry
     end
 
@@ -425,6 +427,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.entry_type = "URI/DOMAIN"
 
       # Parse the ip_url
+      Rails.logger.error "#{logger_token} parsing url for uri: #{ip_url}\n"
       parsed_url = Complaint.parse_url(ip_url)
 
       new_complaint_entry.subdomain = parsed_url[:subdomain]
@@ -434,6 +437,7 @@ class ComplaintEntry < ApplicationRecord
     # lets query the top url API endpoint to determine if this is an important site or not
     # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
     begin
+      Rails.logger.error "#{logger_token} getting importance for uri: #{ip_url}\n"
       importance = self_importance(ip_url)
       new_complaint_entry.is_important = importance if importance
     rescue
@@ -442,6 +446,7 @@ class ComplaintEntry < ApplicationRecord
     new_complaint_entry.user = user
     new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
 
+    Rails.logger.error "#{logger_token} setting categories for dispute entry for uri: #{ip_url}\n"
     if status == PENDING # occurs when attempt to categorized a Top URl without a complaint
       new_complaint_entry.url_primary_category = categories
       new_complaint_entry.category = categories
@@ -452,10 +457,10 @@ class ComplaintEntry < ApplicationRecord
     end
 
     new_complaint_entry.save
-
+    Rails.logger.error "#{logger_token} generating preload for dispute entry #{new_complaint_entry.id.to_s} uri: #{ip_url}\n"
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-
-    delay.capture_screenshot(new_complaint_entry.hostlookup, new_complaint_entry.id)
+    #turning this off for the time being, until we know for sure screenshots are fully functional, plus this is the wrong screenshot capture anyways
+    #delay.capture_screenshot(new_complaint_entry.hostlookup, new_complaint_entry.id)
   end
 
   class << self
@@ -493,7 +498,7 @@ class ComplaintEntry < ApplicationRecord
       end
 
     end
-    handle_asynchronously :capture_screenshot
+    #handle_asynchronously :capture_screenshot
   end
 
 
