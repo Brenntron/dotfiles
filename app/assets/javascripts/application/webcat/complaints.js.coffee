@@ -1251,6 +1251,7 @@ format = (complaint_entry_row) ->
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
 
+  if domain.charAt(0) == "." then domain = domain.substring(1)  # ensure no extraneous prepended dots per domain
 
   edit_input = if domain != "" then domain else host #if the domain is empty, then display host for ips in edit input
 
