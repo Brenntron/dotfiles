@@ -31,6 +31,11 @@ class Beaker::ReputationRuleMap < Beaker::BeakerBase
     remote_stub.query_rule_map(rule_map_request)
   end
 
+  def load_rule_map
+    @reputation_rule_lookup = Rails.cache.read("reputation_rule_lookup")
+    @lookup_version = Rails.cache.read("reputation_rule_map_version")
+  end
+
   def cache_rule_map
     reputation_rule_map = query_rule_map
     reputation_rule_map_json = Talos::ReputationRuleMap.encode_json(reputation_rule_map)
@@ -61,6 +66,9 @@ class Beaker::ReputationRuleMap < Beaker::BeakerBase
   # @param [Integer] version the version number that the id belongs to.
   # @return [String] the mnemonic for the reputation rule.
   def mnemonic(reputation_rule_id, version:)
+    if reputation_rule_lookup.nil? || lookup_version < version
+      load_rule_map
+    end
     if reputation_rule_lookup.nil? || lookup_version < version
       cache_rule_map
     end
