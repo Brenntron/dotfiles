@@ -94,7 +94,6 @@ module API
             post 'take' do
               cluster_ids = params[:cluster_ids]
               ClusterAssignment.assign(cluster_ids, current_user)
-              # binding.pry
               {
                 status: "success",
                 username: current_user.cvs_username,

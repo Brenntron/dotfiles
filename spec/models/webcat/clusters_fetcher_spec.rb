@@ -1,7 +1,7 @@
 describe Webcat::ClustersFetcher do
   subject { described_class.new(filter, regex, user) }
 
-  before { Timecop.freeze(Time.local(2019)) }  # freeze time to test time-related fields
+  before { Timecop.freeze(Time.zone.local(2019).in_time_zone('EST')) }  # freeze time to test time-related fields
   after { Timecop.unfreeze }
 
   describe '.fetch' do
@@ -110,7 +110,7 @@ describe Webcat::ClustersFetcher do
               :global_volume=>7637758,
               :ctime=>"Fri, 21 Sep 2018 12:53:40 GMT",
               :cluster_size=>2,
-              :age=>"3 months, 1 week, 3 days, 9 hours, and 6 minutes",
+              :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
               :wbrs_score=>-3.0,
               :assigned_to=>"user1"
             },
@@ -120,7 +120,7 @@ describe Webcat::ClustersFetcher do
               :global_volume=>7637759,
               :ctime=>"Sat, 22 Sep 2018 12:53:40 GMT",
               :cluster_size=>2,
-              :age=>"3 months, 1 week, 2 days, 9 hours, and 6 minutes",
+              :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
               :wbrs_score=>-3.0,
               :assigned_to=>""
             }
@@ -171,7 +171,7 @@ describe Webcat::ClustersFetcher do
               :global_volume=>7637758,
               :ctime=>"Fri, 21 Sep 2018 12:53:40 GMT",
               :cluster_size=>2,
-              :age=>"3 months, 1 week, 3 days, 9 hours, and 6 minutes",
+              :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
               :wbrs_score=>-3.0,
               :assigned_to=>""
             }
@@ -198,7 +198,7 @@ describe Webcat::ClustersFetcher do
                 :global_volume=>7637758,
                 :ctime=>"Fri, 21 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
-                :age=>"3 months, 1 week, 3 days, 9 hours, and 6 minutes",
+                :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
                 :assigned_to=>""
               },
@@ -208,7 +208,7 @@ describe Webcat::ClustersFetcher do
                 :global_volume=>7637759,
                 :ctime=>"Sat, 22 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
-                :age=>"3 months, 1 week, 2 days, 9 hours, and 6 minutes",
+                :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
                 :assigned_to=>""
               }
@@ -235,7 +235,7 @@ describe Webcat::ClustersFetcher do
                 :global_volume=>7637758,
                 :ctime=>"Fri, 21 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
-                :age=>"3 months, 1 week, 3 days, 9 hours, and 6 minutes",
+                :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
                 :assigned_to=>user.cvs_username
               }
@@ -263,7 +263,7 @@ describe Webcat::ClustersFetcher do
                 :global_volume=>7637759,
                 :ctime=>"Sat, 22 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
-                :age=>"3 months, 1 week, 2 days, 9 hours, and 6 minutes",
+                :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
                 :assigned_to=>""
               }
@@ -293,7 +293,7 @@ describe Webcat::ClustersFetcher do
                 :global_volume=>7637758,
                 :ctime=>"Fri, 21 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
-                :age=>"3 months, 1 week, 3 days, 9 hours, and 6 minutes",
+                :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
                 :assigned_to=>user.cvs_username
               }
@@ -317,7 +317,7 @@ describe Webcat::ClustersFetcher do
                 :global_volume=>7637758,
                 :ctime=>"Fri, 21 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
-                :age=>"3 months, 1 week, 3 days, 9 hours, and 6 minutes",
+                :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
                 :assigned_to=>""
               },
@@ -327,7 +327,7 @@ describe Webcat::ClustersFetcher do
                 :global_volume=>7637759,
                 :ctime=>"Sat, 22 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
-                :age=>"3 months, 1 week, 2 days, 9 hours, and 6 minutes",
+                :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
                 :assigned_to=>""
               }
