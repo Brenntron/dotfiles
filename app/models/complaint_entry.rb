@@ -455,7 +455,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.url_primary_category = current_category
       new_complaint_entry.category = current_category
     end
-
+    ActiveRecord::Base.connection.reconnect!
     new_complaint_entry.save
     Rails.logger.error "#{logger_token} generating preload for dispute entry #{new_complaint_entry.id.to_s} uri: #{ip_url}\n"
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)

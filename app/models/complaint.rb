@@ -542,6 +542,7 @@ class Complaint < ApplicationRecord
         bugzilla_rest_session = BugzillaRest::Session.default_session
 
         all_complaints.each do |new_ui_complaint|
+          ActiveRecord::Base.connection.reconnect!
           if new_ui_complaint['add_channel'] == WBNP_CHANNEL
             begin
               uri = compile_parts_to_uri(new_ui_complaint)
