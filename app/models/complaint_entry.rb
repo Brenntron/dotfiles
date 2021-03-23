@@ -860,7 +860,7 @@ class ComplaintEntry < ApplicationRecord
       if prefix_results.first&.is_active == 1
 
         qualified_prefixes =
-            prefix_results.find_all {|result| result.path == self.path && cat.subdomain == self.subdomain}
+            prefix_results.find_all {|result| result.path == self.path && result.subdomain == self.subdomain}
         category_names = Wbrs::Prefix.category_names(qualified_prefixes)
 
         self.url_primary_category = category_names

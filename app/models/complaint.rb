@@ -498,7 +498,7 @@ class Complaint < ApplicationRecord
 
       new_report = WbnpReport.new
 
-      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(1)
+      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
       #all_complaints.each do |rule_ui_complaint|
       #  uri_to_test = compile_parts_to_uri(rule_ui_complaint)
@@ -530,23 +530,24 @@ class Complaint < ApplicationRecord
       start_wbnp_pull(new_report_id, logger_token)
     end
 
-    #handle_asynchronously :kick_off_wbnp_pull, :queue => "wbnp_pull", :priority => 2
+    handle_asynchronously :kick_off_wbnp_pull, :queue => "wbnp_pull", :priority => 2
 
     def start_wbnp_pull(new_report_id, logger_token)
 
       new_report = WbnpReport.find(new_report_id)
       begin
-        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(1)
+        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
         total_entries = all_complaints.size
         entry_num = 1
         bugzilla_rest_session = BugzillaRest::Session.default_session
+
         all_complaints.each do |new_ui_complaint|
           if new_ui_complaint['add_channel'] == WBNP_CHANNEL
             begin
               uri = compile_parts_to_uri(new_ui_complaint)
               new_report.notes += "<br />working (#{entry_num}/#{total_entries}) uri: #{uri}."
               new_report.save
-              pass = validate_url(uri)
+              pass = validate_url(uri, new_ui_complaint)
               new_report.notes += "<br />validation pass: #{pass.to_s}."
               new_report.save
               if pass
@@ -572,7 +573,7 @@ class Complaint < ApplicationRecord
       rescue => e
         #ActiveRecord::Base.connection.reconnect!
         new_report.status = WbnpReport::ERROR
-        new_report.notes += "<br />--------<br />Pull suddenly ended with error: #{e.message} #{e.backtrace.join("\n")}<br />"
+        new_report.notes += "<br />--------<br />token: #{logger_token} Pull suddenly ended with error: #{e.message}<br />"
         new_report.save
 
         Rails.logger.error "#{logger_token} | " + e.message
@@ -595,11 +596,27 @@ class Complaint < ApplicationRecord
     URI.escape(uri)
   end
 
-  def self.validate_url(uri)
+  def self.validate_url(uri, new_ui_complaint)
     begin
       URI.parse(uri.strip)
-      clean_url = Addressable::URI.parse(uri.strip)
-      valid = clean_url.host.present?
+
+      first_test_url = URI.escape(uri)
+      first_test_uri = URI.parse(URI.parse(first_test_url).scheme.nil? ? "http://#{first_test_url}" : first_test_url)
+      first_test_domain = PublicSuffix.parse(first_test_uri.host, :ignore_private => true)
+      first_test_uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{first_test_domain.domain}$"), '')
+
+      if new_ui_complaint["protocol"].present?
+        test_uri = "#{new_ui_complaint["protocol"]}://#{uri.strip}"
+      else
+        test_uri = "http://#{uri.strip}"
+      end
+      clean_url = Addressable::URI.parse(test_uri)
+      if clean_url.host.blank? || clean_url.host == "http.com" || clean_url.host == "https.com"
+        valid = false
+      else
+        valid = true
+      end
+
     rescue
       valid = false
     end
@@ -617,10 +634,26 @@ class Complaint < ApplicationRecord
     params = {:complaint_id => complaint_id, :new_tag => "invalid"}
     response = Wbrs::RuleUiComplaint.tag_complaint(params)
     if response == "Complaint's tag was updated successfully."
-      new_report.notes += "<br />uri rejected on ruleAPI"
+      new_report.notes += "<br />uri tagged as invalid on ruleAPI"
     else
+      #{"data"=>[]} might usually mean HTTP response 400 Complaint with ID [some id] not found.
       new_report.notes += "<br />uri was not rejected on ruleAPI (error) | log token #{logger_token}"
       Rails.logger.error "#{logger_token} | response from tagging for uri: #{uri} | " + response
+    end
+    begin
+      response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [complaint_id], :user => "admatter"})
+      if response["assigned"] == [complaint_id]
+        new_report.notes += "<br />invalid uri assigned(rejected) on ruleAPI"
+      else
+        new_report.notes += "<br />something went wrong with rejection assignment: #{response.to_s}"
+      end
+      new_report.save
+    rescue => e
+      new_report.notes += "<br />--------<br />Exception when assigning ticket #{complaint_id} to admatter - error: #{e.message}<br />"
+      new_report.save
+
+      Rails.logger.error "#{logger_token} | " + e.message
+      Rails.logger.error "#{logger_token} | " + e.backtrace.join("\n")
     end
 
     new_report.cases_failed += 1
@@ -683,7 +716,23 @@ class Complaint < ApplicationRecord
       Rails.logger.error "#{logger_token} building complaint entry for uri: #{uri}\n"
       ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category, logger_token)
       Rails.logger.error "#{logger_token} complaint entry build complete for uri: #{uri}\n"
-      Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
+
+      begin
+        response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
+        if response["assigned"] == [rule_ui_complaint["complaint_id"]]
+          wbnp_report.notes += "<br />valid uri assigned on ruleAPI"
+        else
+          wbnp_report.notes += "<br />something went wrong with assignment: #{response.to_s}"
+        end
+        wbnp_report.save
+      rescue => e
+        wbnp_report.notes += "<br />--------<br />Exception when assigning ticket #{complaint_id} to admatter - error: #{e.message}<br />"
+        wbnp_report.save
+
+        Rails.logger.error "#{logger_token} | " + e.message
+        Rails.logger.error "#{logger_token} | " + e.backtrace.join("\n")
+      end
+
       wbnp_report.cases_imported += 1
 
     rescue Exception => e
