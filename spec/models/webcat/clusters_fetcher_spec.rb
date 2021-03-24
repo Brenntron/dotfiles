@@ -322,7 +322,7 @@ describe Webcat::ClustersFetcher do
                 :global_volume=>7637759,
                 :ctime=>"Sat, 22 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
-                :age=>"3 months, 1 week, 2 days, 9 hours, and 6 minutes",
+                :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
                 :assigned_to=>"",
                 :is_important=>true,
