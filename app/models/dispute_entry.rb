@@ -69,9 +69,9 @@ class DisputeEntry < ApplicationRecord
 
       if is_ip?(ip_url)
 
-        sbrs_api_rulehit_response =  Sbrs::GetSbrs.get_sbrs_rules_for_ip(ip_url)
         wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
         sbrs_api_response = Sbrs::ManualSbrs.call_sbrs('ip' => ip_url)
+        sbrs_api_rulehits = Beaker::Ipd.new.reputation_ip(ip_url)
 
 
 
