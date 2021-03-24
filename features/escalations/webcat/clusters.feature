@@ -328,3 +328,21 @@ Feature: Webcat clusters
     And I wait for "5" seconds
     Then I should not see button with class "cluster-submit-button"
     And I should not see button with class "cluster-cancel-button"
+
+  @javascript
+    Scenario: a user should not be able to see clusters if there is related complaint
+      Given a user with id "1" has a role "webcat user" and is logged in
+      And WBRS Cluster returns the following stubbed clusters:
+        |id|  domain      |
+        |1 | food.com     |
+        |2 | blah.com     |
+        |3 | 127.0.0.1    |
+      And the following complaint entries exist:
+        |id|  domain  | status  | ip_address |
+        |1 | blah.com | PENDING |            |
+        |2 |          | PENDING | 127.0.0.1  |
+      When I goto "/escalations/webcat/clusters"
+      And I wait for "3" seconds
+      Then I should see "food.com"
+      And I should not see "blah.com"
+      And I should not see "127.0.0.1"
