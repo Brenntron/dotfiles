@@ -67,6 +67,7 @@ class DisputeEntry < ApplicationRecord
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.status = status
 
+      sbrs_api_rulehits = nil
       if is_ip?(ip_url)
 
         wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
