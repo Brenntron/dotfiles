@@ -188,3 +188,19 @@ Given(/^a user with role "(.*?)" exists within org subset "(.*?)" and is logged 
   @user.roles << FactoryBot.create(:role, role: role, org_subset_id: 1)
   sign_in_user
 end
+
+Then(/^I should see my username in element "(.*?)"$/) do |element|
+  user_attrs = FactoryBot.attributes_for(:current_user)
+  username = User.where(cvs_username: user_attrs[:cvs_username]).first.cvs_username
+  within element do
+    page.has_content?(username)
+  end
+end
+
+Then(/^I should not see my username in element "(.*?)"$/) do |element|
+  user_attrs = FactoryBot.attributes_for(:current_user)
+  username = User.where(cvs_username: user_attrs[:cvs_username]).first.cvs_username
+  within element do
+    !page.has_content?(username)
+  end
+end
