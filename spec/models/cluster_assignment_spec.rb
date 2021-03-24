@@ -33,7 +33,7 @@ describe ClusterAssignment do
     context 'fetching cluster assignments' do
       subject { described_class.fetch_assignments_for(clusters: cluster_ids) }
 
-      let(:cluster_ids) { [1, 2, 3] }
+      let(:cluster_ids) { ['1', '2', '3'] }
 
       context 'when all assignments created less than 1 hour ago' do
         before do
@@ -93,7 +93,7 @@ describe ClusterAssignment do
 
   describe '#assign' do
     subject { described_class.assign(cluster_ids, user) }
-    let(:cluster_ids) { [1] }
+    let(:cluster_ids) { ['1'] }
 
     context 'when cluster is not assigned' do
       it 'assigns cluster to the user' do
@@ -125,7 +125,7 @@ describe ClusterAssignment do
 
   describe '#unassign' do
     subject { described_class.unassign(cluster_ids, user) }
-    let(:cluster_ids) { [1] }
+    let(:cluster_ids) { ['1'] }
 
     before { FactoryBot.create(:cluster_assignment, user_id: user.id, cluster_id: cluster_ids.first) }
 

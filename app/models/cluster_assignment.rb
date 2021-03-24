@@ -27,7 +27,7 @@ class ClusterAssignment < ApplicationRecord
 
       assignments = where(cluster_id: cluster_ids)
       cluster_ids.each do |cluster_id|
-        raise 'Cluster already assigned to someone else' if assignments.find { |a| a.cluster_id == cluster_id }
+        raise 'Cluster already assigned to someone else' if assignments.find { |a| a.cluster_id == cluster_id.to_i }
 
         create(cluster_id: cluster_id, user_id: user.id)
       end
