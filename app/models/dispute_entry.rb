@@ -63,18 +63,15 @@ class DisputeEntry < ApplicationRecord
 
   def self.create_dispute_entry(dispute, ip_url, status = NEW)
     begin
-      params = {}
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.status = status
 
       if is_ip?(ip_url)
-        params['ip'] = ip_url
 
-        wbrs_api_response = Sbrs::Base.remote_call_sds_v3(params['ip'], "wbrs")
-        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params)
         sbrs_api_rulehit_response =  Sbrs::GetSbrs.get_sbrs_rules_for_ip(ip_url)
-        wbrs_prefix_response = ComplaintEntry.get_category(params['ip'])
+        wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
+        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs('ip' => ip_url)
 
 
 
@@ -98,7 +95,6 @@ class DisputeEntry < ApplicationRecord
         end
 
       else
-        params['url'] = ip_url
 
         resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(ip_url)) rescue nil
         if resolved_ip.present?
@@ -108,8 +104,7 @@ class DisputeEntry < ApplicationRecord
 
 
         wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
-        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params, type: 'wbrs')
-        wbrs_prefix_response = ComplaintEntry.get_category(params['url'])
+        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs({'url' => ip_url}, type: 'wbrs')
 
         url_parts = Complaint.parse_url(ip_url)
         new_dispute_entry.uri = ip_url
@@ -183,8 +178,8 @@ class DisputeEntry < ApplicationRecord
         end
       end
 
-      if sbrs_api_rulehit_response.present?
-        sbrs_api_rulehit_response.each do |rule_hit|
+      if sbrs_api_rulehits.present?
+        sbrs_api_rulehits.each do |rule_hit|
           DisputeRuleHit.create(rule_type:'SBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
         end
       end
