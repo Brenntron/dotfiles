@@ -66,7 +66,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           wbrs_score:       complaint_entry.wbrs_score ? complaint_entry.wbrs_score.to_d.truncate(2).to_s : '',
           customer_name:    complaint_entry.customer_name,
           company_name:     complaint_entry.customer_company_name,
-          customer_email:   complaint&.customer&.email,
+          customer_email:   complaint.customer&.email,
           assigned_to:      complaint_entry.user&.display_name,
 
           uri:              complaint_entry.uri,
@@ -118,6 +118,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
       records.left_joins(:complaint).order("complaints.submitter_type #{datatable.orders.first.direction}")
     when 'complaint_entries.company_name'
       records.left_joins(complaint: {customer: :company}).order("companies.name #{datatable.orders.first.direction}")
+    when 'complaint_entries.customer_email'
+      records.left_joins(complaint: :customer).order("customers.email #{datatable.orders.first.direction}")
     when 'complaint_entries.assigned_to'
       records.left_joins(:user).order("users.display_name #{datatable.orders.first.direction}")
     else
