@@ -89,6 +89,7 @@ development:
     host: "panacea.threatgrid.com"
     port: 443
     verify_mode: "verify-none"
+    gssnegotiate: false
     api_key: "redacted"
   ticloud:
     host: "ticloud-cdn-api.reversinglabs.com"
@@ -203,6 +204,7 @@ test:
     host: "panacea.threatgrid.com"
     port: 443
     verify_mode: "verify-none"
+    gssnegotiate: false
     api_key: "redacted"
   ticloud:
     host: "ticloud-cdn-api.reversinglabs.com"
@@ -324,6 +326,7 @@ staging:
     port: 443
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-peer"
+    gssnegotiate: false
     api_key: "redacted"
   ticloud:
     host: "ticloud-cdn-api.reversinglabs.com"
@@ -445,6 +448,7 @@ production:
     port: 443
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-peer"
+    gssnegotiate: false
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     api_key: "redacted"
   ticloud:
