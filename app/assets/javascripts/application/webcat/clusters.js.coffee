@@ -39,6 +39,8 @@ window.populate_clusters_index_table = (filter) ->
           selectize_category_inputs();
 
           $("#total_results").html(json.meta.rows_found)
+          populate_cat_select(json.data)
+
 
       error: (response) ->
         loader.addClass('hidden')
@@ -65,17 +67,29 @@ window.categorize_clusters = () ->
   data = {}
   data["comment"] = comment
   data["user_id"] = user_id
-  $(clusters).each ->
-    id =  $(this).attr('id').split('_')[0]
-    categories = $(this).find('option')
+  selected_rows = $("#clusters-index").DataTable().rows('.selected').data()
+  clusters = []
+  for selected_row in selected_rows
+    cluster_data = {}
+    cluster_data["cluster_id"] = selected_row.cluster_id
+    cluster_data["domain"] = selected_row.domain
+    cluster_data["is_important"] = selected_row.is_important
+    cluster_data["comment"] = comment
+    cluster_data["user_id"] = user_id
 
-    if categories? and categories.length > 0
-      category_values = []
-      $(categories).each ->
-        value = $(this).attr('value')
-        category_values.push value
+    $("##{selected_row.cluster_id}_categories").each ->
+      # collect selected categories
+      categories = $(this).find('option')
 
-      data["cluster_id_" + id.toString()] = category_values
+      if categories? and categories.length > 0
+        category_values = []
+        $(categories).each ->
+          value = $(this).attr('value')
+          category_values.push value
+        cluster_data["categories"] = category_values
+    clusters.push(cluster_data)
+
+  data["clusters"] = JSON.stringify(clusters)
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -110,7 +124,7 @@ $ ->
       searchPlaceholder: "Search within table"
     }
     order: [ [
-      2
+      3
       'asc'
     ] ]
     lengthMenu: [50, 100, 500, 1000]
@@ -119,11 +133,19 @@ $ ->
         targets: [
           0
           1
+          2
           6
+          9
         ]
         orderable: false
         searchable: false
         sortable: false
+      }
+      {
+        targets: [2]
+        className: 'important-flag-col'
+        searchable: false
+        orderable: false
       }
     ]
     columns: [
@@ -137,14 +159,24 @@ $ ->
       {
         data: null
         render: (data, type, full, meta) ->
-          return "<input type='checkbox' class='cluser-row-select' name='cluster_id_#{data.cluster_id}' onclick='toggleRow(#{this})'>"
+          element_id = "cluster_id_#{data.cluster_id}"
+          return "<input type='checkbox' class='cluser-row-select' name='#{element_id}' id='#{element_id}' onclick='window.selectRow(#{element_id})'>"
+      }
+      {
+        data: null
+        width: '10px'
+        defaultContent: '<span></span>'
+        render: ( data )->
+          { is_important } = data
+          if is_important
+            '<span class="entry-important-flag esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
       }
       {
         data: 'cluster_id'
         width: '100px'
       }
       {
-        data: null,
+        data: null
         className: 'domain-column',
         render: (data) ->
           {domain, cluster_size} = data  # get domain string and cluster_size out of the data
@@ -187,13 +219,37 @@ $ ->
       {
         data: 'cluster_id'
         className: 'category-column'
-        render: (data) ->
-          "<select id='#{data}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='' name=''>"
+        render: (data, type, full, meta) ->
+          "<select id='#{data}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='6' name='' #{if full.is_pending then 'disabled'}>"
+      }
+      {
+        data: 'cluster_id'
+        className: "alt-col"
+        width: '70px'
+        defaultContent: '<span></span>'
+        render: (data, type, full, meta) ->
+          if full.is_pending
+            return "<div class='cluster-btn-container'>
+                      <button class='toolbar-button icon-submit toolbar-button-spacer cluster-submit-button tooltipped' onclick='window.approve_cluster(#{data})' type='button' title='Confirm Changes' />
+                      <button class='toolbar-button cluster-cancel-button tooltipped' onclick='window.decline_cluster(#{data})' type='button' title='Decline Updates' />
+                    </div>"
       }
     ]
+    initComplete: ->
+      setTimeout (->
+#         ensure the tooltips on cluster categories buttons appear on init and redraw, deal with lag
+        $('#clusters-index .tooltipped').tooltipster
+          theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+      ), 500
+    drawCallback: ->
+      setTimeout (->
+        $('#clusters-index .tooltipped').tooltipster
+          theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+      ), 500
   )
   $('#clusters-index_filter input').addClass('table-search-input');
   window.populate_clusters_index_table()
+
 
 $ ->
   $(document).ready ->
@@ -312,18 +368,17 @@ window.copycat_paste = () ->
       rowSelectize = $(row).find('.category-column .selectize')[0].selectize
       rowSelectize.setValue(selectedValues, true)
 
-
-
-window.toggleRow = (el) ->
+window.selectRow = (el) ->
   $(el).closest('tr').toggleClass('selected')
-
 
 window.selectize_category_inputs = () ->
   category_inputs = $("select.cluster_categories")
+  input_ids = []
   $(category_inputs).each ->
     if $(this).next("div").hasClass("selectize-control")
 #          This is already selectized
     else
+      input_ids.push("##{this.id}")
       $(this).selectize {
         persist: true,
         create: false,
@@ -332,8 +387,18 @@ window.selectize_category_inputs = () ->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions("##{this.id}"),
       }
+  AC.WebCat.createSelectOptionsForIds(input_ids)
+
+window.populate_cat_select = ->
+  setTimeout (->
+    data = $("#clusters-index").DataTable().data()
+    for cluster in data
+      if cluster.is_pending
+        cat_select = $("##{cluster.cluster_id}_categories")[0]
+        if cat_select
+          $("##{cluster.cluster_id}_categories")[0].selectize.setValue(cluster.categories)
+  ), 2000
 
 window.copy_domain = (domain, element) ->
   copyToClipboard(domain)
@@ -370,9 +435,12 @@ $ ->
   $("#clusters-index").on 'draw.dt', ->
     selectize_category_inputs()
     toggle_all_checkboxes()
+    populate_cat_select()
+
 
   $("#clusters-index").on 'order.dt', ->
     selectize_category_inputs()
+    populate_cat_select()
 
   #  Expand cluster rows
   $('#clusters-index tbody').on 'click', 'td.expandable-row-column, .entry-count', ->
@@ -741,7 +809,6 @@ window.take_selected_clusters = ()->
     entry_ids = selected_rows.map(() ->
       Number(this.name.split('cluster_id_')[1])
     ).toArray()
-    console.log entry_ids
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/clusters/take'
@@ -789,3 +856,40 @@ window.return_selected_clusters = ()->
     , this)
   else
     std_msg_error('no rows selected', ['Please select at least one row.'])
+
+
+window.approve_cluster = (cluster_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webcat/clusters/proccess'
+    method: 'POST'
+    headers: headers
+    data: 'cluster_ids': [cluster_id]
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        std_msg_error('Error Returning Entries', [json.error])
+      else
+        std_msg_success("cluster was submitted.", '', reload: true)
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
+
+window.decline_cluster = (cluster_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webcat/clusters/decline'
+    method: 'POST'
+    headers: headers
+    data: 'cluster_ids': [cluster_id]
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        std_msg_error('Error Returning Entries', [json.error])
+      else
+        std_msg_success("cluster categories were declined.", '',reload: true)
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)

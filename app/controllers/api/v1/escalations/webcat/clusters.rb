@@ -15,40 +15,36 @@ module API
             params do
               optional :comment, type: String, desc: 'comment to associate with rule'
               requires :user_id, type: Integer
+              requires :clusters, type: String, desc: 'stringified json with clusters data'
             end
 
             post "process_cluster" do
-
               cluster_process_array = []
 
+              JSON.parse(params[:clusters]).each do |cluster|
+                conditions = {}
 
-              params.keys.each do |key|
-                if key.include?("cluster_id_")
-                  conditions = {}
+                total_cats = cluster["categories"].size
 
-                  total_cats = params[key].to_a.size
+                conditions[:comment] = params[:comment] unless params[:comment].blank?
+                conditions[:user] = User.find(params[:user_id]).cvs_username
+                conditions[:cluster_id] = cluster["cluster_id"]
+                conditions[:cat_ids] = Wbrs::Category.get_category_ids(cluster["categories"])
+                conditions[:domain] = cluster["domain"]
+                conditions[:is_important] = cluster["is_important"]
 
-                  conditions[:comment] = params[:comment] unless params[:comment].blank?
-                  conditions[:user] = User.find(params[:user_id]).cvs_username
-                  conditions[:cluster_id] = key.gsub("cluster_id_", "").to_i
-                  conditions[:cat_ids] = Wbrs::Category.get_category_ids(params[key].to_a)
-
-                  if conditions[:cat_ids].blank? || conditions[:cat_ids].size != total_cats || !conditions[:cat_ids].all? {|i| i.is_a?(Integer)}
-                    raise "could not resolve categories (#{params[key].to_a}) for cluster id #{conditions[:cluster_id]}, stopping process."
-                  end
-                  cluster_process_array << conditions
+                if conditions[:cat_ids].blank? || conditions[:cat_ids].size != total_cats || !conditions[:cat_ids].all? {|i| i.is_a?(Integer)}
+                  raise "could not resolve categories (#{cluster["categories"]}) for cluster id #{conditions[:cluster_id]}, stopping process."
                 end
+                cluster_process_array << conditions
               end
 
               if cluster_process_array.blank?
                 raise "no categories were selected for any cluster, nothing happened."
               end
 
-              cluster_process_array.each do |conds|
-                Wbrs::Cluster.process(conds)
-              end
+              ::Webcat::ClustersProcessor.process(cluster_process_array, current_user)
               return {:status => "success"}.to_json
-
             end
 
             desc 'get all clusters'
@@ -113,6 +109,34 @@ module API
             post 'return' do
               cluster_ids = params[:cluster_ids]
               ClusterAssignment.unassign(cluster_ids, current_user)
+              return {:status => "success"}.to_json
+            rescue Exception => e
+              {
+                status: 'failed',
+                error: e.message
+              }.to_json
+            end
+
+            desc "process important clusters"
+            params do
+            end
+            post 'proccess' do
+              cluster_ids = params[:cluster_ids]
+              ::Webcat::ClustersProcessor.process!(cluster_ids)
+              return {:status => "success"}.to_json
+            rescue Exception => e
+              {
+                status: 'failed',
+                error: e.message
+              }.to_json
+            end
+
+            desc "decline important clusters categorization"
+            params do
+            end
+            post 'decline' do
+              cluster_ids = params[:cluster_ids]
+              ::Webcat::ClustersProcessor.decline!(cluster_ids, current_user)
               return {:status => "success"}.to_json
             rescue Exception => e
               {

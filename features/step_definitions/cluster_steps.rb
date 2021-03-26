@@ -30,3 +30,14 @@ Given(/^the following cluster assignments exists:$/) do |cluster_assignments|
     FactoryBot.create(:cluster_assignment, cluster_assignment)
   end
 end
+
+Given(/^WBRS TopUrl API call is stubbed with:$/) do |top_urls|
+  response = []
+  top_urls.hashes.each do |top_url|
+    response.push(Wbrs::TopUrl.new_from_datum(
+      url: top_url["url"],
+      is_important: top_url["is_important"] == 'true'
+    ))
+  end
+  Wbrs::TopUrl.stub(:check_urls).and_return(response)
+end
