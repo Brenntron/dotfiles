@@ -229,12 +229,23 @@ $ ->
         defaultContent: '<span></span>'
         render: (data, type, full, meta) ->
           if full.is_pending
-            return "<div>
-                      <button class='toolbar-button icon-submit toolbar-button-spacer cluster-submit-button' onclick='window.approve_cluster(#{data})' type='button' title='Submit' />
-                      <button class='toolbar-button adjust-reptool-button' onclick='window.decline_cluster(#{data})' type='button' title='Decline' />
+            return "<div class='cluster-btn-container'>
+                      <button class='toolbar-button icon-submit toolbar-button-spacer cluster-submit-button tooltipped' onclick='window.approve_cluster(#{data})' type='button' title='Confirm Changes' />
+                      <button class='toolbar-button cluster-cancel-button tooltipped' onclick='window.decline_cluster(#{data})' type='button' title='Decline Updates' />
                     </div>"
       }
     ]
+    initComplete: ->
+      setTimeout (->
+#         ensure the tooltips on cluster categories buttons appear on init and redraw, deal with lag
+        $('#clusters-index .tooltipped').tooltipster
+          theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+      ), 500
+    drawCallback: ->
+      setTimeout (->
+        $('#clusters-index .tooltipped').tooltipster
+          theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+      ), 500
   )
   $('#clusters-index_filter input').addClass('table-search-input');
   window.populate_clusters_index_table()

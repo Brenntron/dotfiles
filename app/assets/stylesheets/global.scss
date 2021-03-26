@@ -13010,6 +13010,45 @@ input.wl-bl-list-inline {
   display: none;
 }
 
-.cluster-submit-button {
-  background-color: #6dbcdb
+// clusters page categories styles
+.cluster-btn-container {
+  width: max-content;
+  button {
+    width: 30px;
+    background-position-x: 5px;
+  }
+  .cluster-submit-button {
+    background-color: $primary-section-color;
+  }
+  .cluster-cancel-button {
+    background-image: url(image_path('icon_blacklist_grey.svg'));
+    background-size: 18px 18px;
+  }
+}
+
+// selectizes need overrides > clusters categories
+.category-column .form-control.selectize {
+  display: inline-block;
+  padding: 0;
+  border-width: 1px;
+}
+
+.cluster_categories .selectize-input {
+  padding-bottom: 2px !important;
+  margin: 0 !important;
+  min-height: 30px !important;
+  overflow: visible;
+  border-radius: 0;
+  outline: solid 1px $disabled-bg;
+  input {
+    height: 25px;
+    padding-left: 4px !important;
+  }
+}
+
+.cluster_categories .selectize-input.disabled {
+  background-color: lighten($primary-section-color, 30%);
+}
+.category-column .selectize-control.multi .selectize-input .item {
+  margin: 3px 0 0 4px !important;
 }
