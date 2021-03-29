@@ -30,6 +30,29 @@ namespace 'WebCat.RepLookup', (exports) ->
 
     }, this
 
+  exports.getWhoisLookup = (query_entry) ->
+
+    if sort_column == 'domain'
+      sort_column = 'name'
+
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/cloud_intel/whois/lookup'
+      data:
+        name: query_entry
+      success: (response) ->
+        debugger
+        response
+      error: (response) ->
+        debugger
+        if response != null
+          console.log response
+          return $.each(response.responseJSON, (key, value) ->
+            console.log value
+          )
+        return
+    )
+
   exports.queryWhoIs = (entry_id, query_entry) ->
     successFunction = (result) ->
       if result != null
@@ -55,5 +78,5 @@ namespace 'WebCat.RepLookup', (exports) ->
       std_msg_error("Error retrieving WHOIS query.","")
 
 
-    WebCat.RepLookup.getLookup('/api/v2/whois/', query_entry).then successFunction, errorFunction
+    WebCat.RepLookup.getWhoisLookup(query_entry).then successFunction, errorFunction
     return
