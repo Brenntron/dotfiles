@@ -1269,21 +1269,21 @@ class DisputeEntry < ApplicationRecord
     verdict = ""
 
     begin
-      if is_float(score)         # failing this should include "noscore"
-        score = score.to_f
-        case
-        when score >= 1.0                 # Good is +1.0 to +10
-          verdict = 'Good'
-        when score > -2.0                 # Neutral is -1.9 to 0.9
-          verdict = 'Neutral'
-        when score <= -2.0                # Poor is -10 to -2.0
-          verdict = 'Poor'
-        else
-          verdict = ''
-        end
-      end
-    rescue
 
+      score = Float(score)
+      case
+      when score >= 1.0                 # Good is +1.0 to +10
+        verdict = 'Good'
+      when score > -2.0                 # Neutral is -1.9 to 0.9
+        verdict = 'Neutral'
+      when score <= -2.0                # Poor is -10 to -2.0
+        verdict = 'Poor'
+      else
+        verdict = ''
+      end
+
+    rescue
+      verdict = ''
     end
 
     verdict

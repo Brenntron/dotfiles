@@ -129,6 +129,86 @@ RSpec.describe "Talos Intelligence poll-from-bridge channel", type: :request do
   end
 
 
+  let(:bridge_message_complaint) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            complaint: {
+                source_type: 'Complaint',
+                source_key: 1001,
+                payload: {
+                    investigate_ips: {
+                        '72.52.134.84' => {
+                            "wbrs" => {
+                                "WBRS_SCORE"=>"-3.55",
+                                "WBRS_Rule_Hits"=>"dotq",
+                                "Hostname_ips"=>"",
+                                "current_cat"=>"Not in our list",
+                                "cat_sugg"=>["Business and Industry"]
+                            },
+                            "sbrs" => {
+                                "SBRS_SCORE"=>"No score",
+                                "SBRS_Rule_Hits"=>"",
+                                "Hostname"=>"server-52-84-141-37.yto50.r.cloudfront.net",
+                                "current_cat"=>"Not in our list",
+                                "cat_sugg"=>["Business and Industry"]
+                            }
+                        },
+                        '72.52.134.51' => {
+                            "wbrs" => {
+                                "WBRS_SCORE"=>"-3.55",
+                                "WBRS_Rule_Hits"=>"dotq",
+                                "Hostname_ips"=>"",
+                                "current_cat"=>"Search Engines and Portals",
+                                "cat_sugg"=>["Search Engines and Portals", "Adult"]
+                            },
+                            "sbrs"=>{"SBRS_SCORE"=>"No score",
+                                     "SBRS_Rule_Hits"=>"",
+                                     "Hostname"=>"redirect-v225.secureserver.net",
+                                     "current_cat"=>"Search Engines and Portals",
+                                     "cat_sugg"=>["Search Engines and Portals", "Adult"]
+                            }
+                        }
+                    },
+                    investigate_urls: {
+                        "355toyota.com" => {
+                            "WBRS_SCORE"=>"noscore",
+                            "WBRS_Rule_Hits"=>"",
+                            "Hostname_ips"=>"",
+                            "current_cat"=>"Science and Technology",
+                            "cat_sugg"=>["Science and Technology", "Business and Industry"]
+                        },
+                        "nsf.gov" => {
+                            "WBRS_SCORE"=>"noscore",
+                            "WBRS_Rule_Hits"=>"",
+                            "Hostname_ips"=>"",
+                            "current_cat"=>"Science and Technology",
+                            "cat_sugg"=>["Science and Technology", "Business and Industry"]
+                        }
+                    },
+                    problem: 'What do I need to do to improve the reputation',
+                    submission_type: 'w',
+                    name: customer_name,
+                    user_company: company_name,
+                    email: 'webmaster@cmim.org',
+                    email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
+                    email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
+                    user_ip: '64.70.56.99',
+                    domain: '355toyota.com',
+                    product_platform: 1001,
+                    product_version: "test_platform_version"
+                }
+            }
+        }
+    }
+
+  end
+
+
 
 
   before(:each) do
@@ -204,12 +284,48 @@ RSpec.describe "Talos Intelligence poll-from-bridge channel", type: :request do
   end
 
 
-  xit 'receives a complaint message and creates a complaint record with all relevant records successfully' do
+  it 'receives a complaint message and creates a complaint record with all relevant records successfully' do
 
-    post '/escalations/peake_bridge/channels/ticket-event/messages', headers: { 'Content-Type': 'application/json' },
-         params: complaint_message.to_json
+    vrt_incoming
+    guest_company
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: bridge_message_complaint
 
     expect(response.code).to eq('200')
+
+    complaint = Complaint.where(ticket_source_key: 1001).first
+
+    complaint_entry_1 = complaint.complaint_entries.where(ip_address: '72.52.134.84').first
+    complaint_entry_2 = complaint.complaint_entries.where(uri: 'nsf.gov').first
+
+    expect(complaint).to_not be_nil
+
+    expect(complaint.status).to eql(Complaint::NEW)
+
+    expect(complaint_entry_1.wbrs_score).to eql(-3.55)
+    expect(complaint_entry_1.suggested_disposition).to eql("Business and Industry")
+    expect(complaint_entry_1.url_primary_category).to eql(nil)
+    expect(complaint_entry_1.is_important).to eql(false)
+    expect(complaint_entry_1.internal_comment).to eql(nil)
+
+    expect(complaint_entry_2.wbrs_score).to eql(0.0)
+    expect(complaint_entry_2.suggested_disposition).to eql("Science and Technology,Business and Industry")
+    expect(complaint_entry_2.url_primary_category).to eql("Science and Technology")
+    expect(complaint_entry_2.is_important).to eql(true)
+    expect(complaint_entry_2.internal_comment).to eql(nil)
+
+    expect(complaint.complaint_entries.count).to eq(4)
+    expect(complaint.complaint_entries.where(ip_address: '72.52.134.84')).to exist
+    expect(complaint.complaint_entries.where(ip_address: '72.52.134.51')).to exist
+    expect(complaint.complaint_entries.where(uri: '355toyota.com')).to exist
+    expect(complaint.complaint_entries.where(uri: 'nsf.gov')).to exist
+    expect(complaint.ticket_source).to eql("talos-intelligence")
+
+    expect(DelayedJob.all.size).to eql(5)
+    expect(ComplaintEntryPreload.all.size).to eql(4)
+
+    expect(complaint.platform_id).to eql(1001)
+    expect(complaint.product_platform).to eql(nil)
   end
 
 

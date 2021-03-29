@@ -479,53 +479,56 @@ class Dispute < ApplicationRecord
         Problem Summary: #{message_payload["payload"]["problem"]}
         HEREDOC
 
-        bug_attrs = {
-            'product' => 'Escalations Console',
-            'component' => 'IP/Domain',
-            'summary' => summary,
-            'version' => 'unspecified', #self.version,
-            'description' => full_description,
-            # 'opsys' => self.os,
-            'priority' => 'Unspecified',
-            'classification' => 'unclassified',
-        }
-        logger.debug "Creating bugzilla bug"
+      bug_attrs = {
+          'product' => 'Escalations Console',
+          'component' => 'IP/Domain',
+          'summary' => summary,
+          'version' => 'unspecified', #self.version,
+          'description' => full_description,
+          # 'opsys' => self.os,
+          'priority' => 'Unspecified',
+          'classification' => 'unclassified',
+      }
+      logger.debug "Creating bugzilla bug"
 
-        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-        if message_payload["payload"]["product_platform"].present?
-          platform = Platform.find(message_payload["payload"]["product_platform"].to_i) rescue nil
-        end
-        logger.debug "Creating dispute"
-        new_dispute = Dispute.new
+      if message_payload["payload"]["product_platform"].present?
+        platform = Platform.find(message_payload["payload"]["product_platform"].to_i) rescue nil
+      end
+      logger.debug "Creating dispute"
+      new_dispute = Dispute.new
 
-        new_dispute.id = bug_proxy.id
-        new_dispute.user_id = user.id
-        new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
-        new_dispute.org_domain = message_payload["payload"]["domain"]
-        new_dispute.case_opened_at = opened_at
-        new_dispute.subject = message_payload["payload"]["email_subject"]
-        new_dispute.description = message_payload["payload"]["email_body"]
-        new_dispute.problem_summary = message_payload["payload"]["problem"]
-        new_dispute.ticket_source_key = message_payload["source_key"]
-        new_dispute.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
-        new_dispute.ticket_source_type = message_payload["source_type"]
-        new_dispute.platform_id = platform.id unless platform.blank?
-        new_dispute.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
-        new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
-        new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
-        new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
-        new_dispute.status = NEW
+      new_dispute.bridge_packet = message_payload.to_json
 
-        new_dispute.customer_id = customer&.id
-        new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
-        if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
-          new_dispute.priority = "P3"
-        else
-          new_dispute.priority = "P4"
-        end
-        logger.debug "Saving Dispute"
+      new_dispute.id = bug_proxy.id
+      new_dispute.user_id = user.id
+      new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
+      new_dispute.org_domain = message_payload["payload"]["domain"]
+      new_dispute.case_opened_at = opened_at
+      new_dispute.subject = message_payload["payload"]["email_subject"]
+      new_dispute.description = message_payload["payload"]["email_body"]
+      new_dispute.problem_summary = message_payload["payload"]["problem"]
+      new_dispute.ticket_source_key = message_payload["source_key"]
+      new_dispute.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
+      new_dispute.ticket_source_type = message_payload["source_type"]
+      new_dispute.platform_id = platform.id unless platform.blank?
+      new_dispute.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
+      new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
+      new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
+      new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
+      new_dispute.status = NEW
+
+      new_dispute.customer_id = customer&.id
+      new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+
+      if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
+        new_dispute.priority = "P3"
+      else
+        new_dispute.priority = "P4"
+      end
+      logger.debug "Saving Dispute"
 
 
       new_dispute.save!
@@ -679,91 +682,111 @@ class Dispute < ApplicationRecord
       ######record creation completed######
 
       ######AUTO RESOLVE LOGIC########
-      new_dispute.dispute_entries.each do |dispute_entry|
-        false_negative_claim = false
+      begin
+        new_dispute.dispute_entries.each do |dispute_entry|
+          false_negative_claim = false
 
-        matching_disposition = dispute_entry.is_disposition_matching?
+          matching_disposition = dispute_entry.is_disposition_matching?
 
-        initial_log = "--------Starting Data---------<br>"
-        initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}<br>"
-        initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}<br>"
-        initial_log += "-----------------------------<br>"
+          initial_log = "--------Starting Data---------<br>"
+          initial_log += "suggested disposition: #{dispute_entry.suggested_disposition}<br>"
+          initial_log += "effective disposition info: #{dispute_entry.running_verdict.inspect.to_s}<br>"
+          initial_log += "-----------------------------<br>"
 
-        dispute_entry.auto_resolve_log += initial_log
-        dispute_entry.save!
-
-        ########Auto Resolve for IP addressses (email)##############
-        if dispute_entry.entry_type == "IP"
-          if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
-            false_negative_claim = true
-          end
-
-          if !matching_disposition
-
-            if !false_negative_claim
-              dispute_entry.status = DisputeEntry::NEW
-
-              if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
-                AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
-              end
-
-            else
-              if new_dispute.submission_type == "w"
-                dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
-              end
-
-            end
-
-          end
-          return_payload[key] = new_dispute_entry.new_payload_item
-          return_payload[key]['sugg_type'] = dispute_entry.suggested_disposition
-
-        end
-
-
-        ############################################################
-        #########Auto Resolve for URLs (web)########################
-        if dispute_entry.entry_type == "URI/DOMAIN"
-          if ["Suspicious sites", "High risk","Poor"].include?(entry["rep_sugg"])
-            false_negative_claim = true
-          end
-
-          logger.info "fetching preload (turned off)"
-          #let's turn this off for awhile and see how that behaves
-          #::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
-
-          #threat cats for urls
-          begin
-            complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => dispute_entry.uri})
-            dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
-          rescue => e
-            Rails.logger.warn e
-            Rails.logger.warn e.backtrace.join("\n")
-          end
-
-          begin
-            dispute_entry.is_important = is_important?(key)
-          rescue => e
-            Rails.logger.warn e
-            Rails.logger.warn e.backtrace.join("\n")
-          end
-
+          dispute_entry.auto_resolve_log += initial_log
           dispute_entry.save!
 
-          if !matching_disposition
-            if !false_negative_claim
-              dispute_entry.update(status: DisputeEntry::NEW)
-            else
-              dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+          ########Auto Resolve for IP addressses (email)##############
+          if dispute_entry.entry_type == "IP"
+            if ["Suspicious sites", "High risk","Poor"].include?(dispute_entry.suggested_disposition)
+              false_negative_claim = true
             end
+
+            logger.info "fetching preload"
+
+            begin
+              ::Preloader::Base.fetch_all_api_data(dispute_entry.hostlookup, dispute_entry.id)
+            rescue => e
+              Rails.logger.error e
+              Rails.logger.error e.backtrace.join("\n")
+            end
+
+            if !matching_disposition
+
+              if !false_negative_claim
+                dispute_entry.status = DisputeEntry::NEW
+
+                if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
+                  AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
+                end
+
+              else
+                if new_dispute.submission_type == "w"
+                  dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                end
+                dispute_entry.save
+              end
+
+            end
+            return_payload[dispute_entry.hostlookup] = dispute_entry.new_payload_item
+            return_payload[dispute_entry.hostlookup]['sugg_type'] = dispute_entry.suggested_disposition
 
           end
 
-          return_payload[key] = dispute_entry.new_payload_item
-          return_payload[key]['sugg_type'] = dispute_entry.suggested_disposition
+
+          ############################################################
+          #########Auto Resolve for URLs (web)########################
+          if dispute_entry.entry_type == "URI/DOMAIN"
+            if ["Suspicious sites", "High risk","Poor"].include?(dispute_entry.suggested_disposition)
+              false_negative_claim = true
+            end
+
+            logger.info "fetching preload"
+
+            begin
+              ::Preloader::Base.fetch_all_api_data(dispute_entry.hostlookup, dispute_entry.id)
+            rescue => e
+              Rails.logger.error e
+              Rails.logger.error e.backtrace.join("\n")
+            end
+
+            #threat cats for urls
+            begin
+              complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => dispute_entry.uri})
+              dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
+            rescue => e
+              Rails.logger.error e
+              Rails.logger.error e.backtrace.join("\n")
+            end
+
+            begin
+              dispute_entry.is_important = is_important?(key)
+            rescue => e
+              Rails.logger.error e
+              Rails.logger.error e.backtrace.join("\n")
+            end
+
+            dispute_entry.save!
+
+            if !matching_disposition
+
+              if !false_negative_claim
+                dispute_entry.update(status: DisputeEntry::NEW)
+              else
+                dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+              end
+              dispute_entry.save
+            end
+
+            return_payload[dispute_entry.hostlookup] = dispute_entry.new_payload_item
+            return_payload[dispute_entry.hostlookup]['sugg_type'] = dispute_entry.suggested_disposition
+          end
+
         end
+      rescue Exception => e
 
-
+        Rails.logger.error e
+        Rails.logger.error e.backtrace.join("\n")
       end
 
       new_dispute.reload
@@ -795,10 +818,20 @@ class Dispute < ApplicationRecord
       Rails.logger.error $!
       Rails.logger.error $!.backtrace.join("\n")
       new_dispute.reload
+      new_dispute.dispute_entries.destroy_all
       new_dispute.destroy
       conn = ::Bridge::DisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post
 
+      nil
+    end
+
+    new_dispute.reload
+    if new_dispute.dispute_entries.blank?
+      new_dispute.dispute_entries.destroy_all
+      new_dispute.destroy
+      conn = ::Bridge::DisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+      conn.post
       nil
     end
 
