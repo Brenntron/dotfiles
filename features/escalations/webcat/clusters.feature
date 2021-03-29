@@ -190,7 +190,7 @@ Feature: Webcat clusters
     Then I click "Submit Changes"
     And I wait for "5" seconds
     Then I should see button with class "cluster-submit-button"
-    And I should see button with class "adjust-reptool-button"
+    And I should see button with class "cluster-cancel-button"
 
   @javascript
   Scenario: a user should be able to see "waiting for review" clusters
@@ -246,7 +246,7 @@ Feature: Webcat clusters
     And I click "#msg-modal"
     And I wait for "5" seconds
     Then I should not see button with class "cluster-submit-button"
-    And I should not see button with class "adjust-reptool-button"
+    And I should not see button with class "cluster-cancel-button"
 
   @javascript
   Scenario: user can decline cluster categorization on 2nd person review
@@ -269,13 +269,13 @@ Feature: Webcat clusters
     And I fill in selectized of element "#1_categories" with "[6]"
     Then I click "Submit Changes"
     And I wait for "5" seconds
-    Then I click button with class "adjust-reptool-button"
+    Then I click button with class "cluster-cancel-button"
     And I wait for "5" seconds
     Then I should see "CLUSTER CATEGORIES WERE DECLINED."
     And I click "#msg-modal"
     And I wait for "5" seconds
     Then I should not see button with class "cluster-submit-button"
-    And I should not see button with class "adjust-reptool-button"
+    And I should not see button with class "cluster-cancel-button"
 
   @javascript
   Scenario: cluster should be assigned to the user who declined categorization
@@ -298,7 +298,7 @@ Feature: Webcat clusters
     And I fill in selectized of element "#1_categories" with "[6]"
     Then I click "Submit Changes"
     And I wait for "5" seconds
-    Then I click button with class "adjust-reptool-button"
+    Then I click button with class "cluster-cancel-button"
     And I wait for "5" seconds
     Then I should see "CLUSTER CATEGORIES WERE DECLINED."
     And I click "#msg-modal"
@@ -327,4 +327,4 @@ Feature: Webcat clusters
     Then I click "Submit Changes"
     And I wait for "5" seconds
     Then I should not see button with class "cluster-submit-button"
-    And I should not see button with class "adjust-reptool-button"
+    And I should not see button with class "cluster-cancel-button"
