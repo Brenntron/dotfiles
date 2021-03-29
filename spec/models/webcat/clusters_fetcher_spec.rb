@@ -47,7 +47,7 @@ describe Webcat::ClustersFetcher do
     let(:top_urls) do
       [
         Wbrs::TopUrl.new_from_datum(url: 'googletest.com', is_important: true),
-        Wbrs::TopUrl.new_from_datum(url: 'googletest1.com', is_important: true),
+        Wbrs::TopUrl.new_from_datum(url: '127.0.0.1', is_important: true),
         Wbrs::TopUrl.new_from_datum(url: 'googletest2.com', is_important: true)
       ]
     end
@@ -220,7 +220,10 @@ describe Webcat::ClustersFetcher do
                   :cluster_size=>2,
                   :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
                   :wbrs_score=>-3.0,
-                  :assigned_to=>""
+                  :assigned_to=>"",
+                  :is_important=>true,
+                  :is_pending=>false,
+                  :categories=>[]
                 }
               ]
             }
@@ -246,7 +249,10 @@ describe Webcat::ClustersFetcher do
                   :cluster_size=>2,
                   :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
                   :wbrs_score=>-3.0,
-                  :assigned_to=>""
+                  :assigned_to=>"",
+                  :is_important=>true,
+                  :is_pending=>false,
+                  :categories=>[]
                 }
               ]
             }
@@ -374,7 +380,7 @@ describe Webcat::ClustersFetcher do
             data: [
               {
                 :cluster_id=>2,
-                :domain=>"googletest1.com",
+                :domain=>"127.0.0.1",
                 :global_volume=>7637759,
                 :ctime=>"Sat, 22 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
