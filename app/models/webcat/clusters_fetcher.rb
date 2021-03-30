@@ -22,6 +22,10 @@ class Webcat::ClustersFetcher
   end
 
   def filter_clusters(clusters)
+    # general filters - always applies for all clusters
+    clusters = filter_by_categorized(clusters)
+
+    # user specific filters - filters, selected by users
     case filter
     when 'all'
       clusters
@@ -34,6 +38,19 @@ class Webcat::ClustersFetcher
     else
       filter_by_default(clusters)
     end
+  end
+
+  def filter_by_categorized(data)
+    # filters out clusters if they have Complaint equivalent
+    clusters_domains = data['data'].map { |cluster| cluster['domain'] }
+    complaint_entries = ComplaintEntry.where(domain: clusters_domains).or(ComplaintEntry.where(ip_address: clusters_domains))
+    data['data'].filter! do |cluster|
+      complaint_entries.find do |complaint_entry|
+        complaint_entry.domain == cluster['domain'] ||
+          complaint_entry.ip_address == cluster['domain']
+      end.nil?
+    end
+    data
   end
 
   def filter_assigned_to_user(data)
