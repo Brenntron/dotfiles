@@ -550,6 +550,7 @@ class Complaint < ApplicationRecord
               new_report.save
               pass = validate_url(uri, new_ui_complaint)
               new_report.notes += "<br />validation pass: #{pass.to_s}."
+              ActiveRecord::Base.connection.reconnect!
               new_report.save
               if pass
                 rule_ui_wbnp_create_action(uri, new_ui_complaint, new_report, logger_token, bugzilla_rest_session: bugzilla_rest_session)
@@ -560,6 +561,7 @@ class Complaint < ApplicationRecord
 
               new_report.cases_failed += 1
               new_report.notes += "<br />SWP uri: #{new_ui_complaint.inspect} | log token: #{logger_token} | failure: #{e.message}<br />"
+              ActiveRecord::Base.connection.reconnect!
               new_report.save
 
               Rails.logger.error "#{logger_token} | " + e.message
@@ -572,7 +574,7 @@ class Complaint < ApplicationRecord
         new_report.status = WbnpReport::COMPLETE
         new_report.save
       rescue => e
-        #ActiveRecord::Base.connection.reconnect!
+        ActiveRecord::Base.connection.reconnect!
         new_report.status = WbnpReport::ERROR
         new_report.notes += "<br />--------<br />token: #{logger_token} Pull suddenly ended with error: #{e.message}<br />"
         new_report.save
@@ -648,9 +650,11 @@ class Complaint < ApplicationRecord
       else
         new_report.notes += "<br />something went wrong with rejection assignment: #{response.to_s}"
       end
+      ActiveRecord::Base.connection.reconnect!
       new_report.save
     rescue => e
       new_report.notes += "<br />--------<br />Exception when assigning ticket #{complaint_id} to admatter - error: #{e.message}<br />"
+      ActiveRecord::Base.connection.reconnect!
       new_report.save
 
       Rails.logger.error "#{logger_token} | " + e.message
@@ -658,6 +662,7 @@ class Complaint < ApplicationRecord
     end
 
     new_report.cases_failed += 1
+    ActiveRecord::Base.connection.reconnect!
     new_report.save
   end
 
@@ -691,7 +696,7 @@ class Complaint < ApplicationRecord
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
     cust = Customer.customer_from_ruleui(rule_ui_complaint)
-
+    ActiveRecord::Base.connection.reconnect!
     new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
                                      customer_id: cust ? cust.id : nil,
@@ -725,9 +730,11 @@ class Complaint < ApplicationRecord
         else
           wbnp_report.notes += "<br />something went wrong with assignment: #{response.to_s}"
         end
+        ActiveRecord::Base.connection.reconnect!
         wbnp_report.save
       rescue => e
         wbnp_report.notes += "<br />--------<br />Exception when assigning ticket #{complaint_id} to admatter - error: #{e.message}<br />"
+        ActiveRecord::Base.connection.reconnect!
         wbnp_report.save
 
         Rails.logger.error "#{logger_token} | " + e.message
@@ -743,7 +750,7 @@ class Complaint < ApplicationRecord
       Rails.logger.error "#{logger_token} | " + e.message
       Rails.logger.error "#{logger_token} | " + e.backtrace.join("\n")
     end
-
+    ActiveRecord::Base.connection.reconnect!
     wbnp_report.save
   end
 
