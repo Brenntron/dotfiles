@@ -828,6 +828,8 @@ button {
 .open-all {background-image: url(image_path('icon_open_all.svg'));}
 .take-ticket-toolbar-button {background-image: url(image_path('icon_take.svg'));}
 .return-ticket-toolbar-button {background-image: url(image_path('icon_return.svg'));}
+.convert-ticket-button{background-image: url(image_path('icon_convert_ticket_grey.svg'));}
+.open .convert-ticket-button {background-image: url(image_path('icon_convert_ticket.svg'))};
 .collapse-all {background-image: url(image_path('icon_collapse_all.svg'));}
 .expand-all {background-image: url(image_path('icon_expand_all.svg'));}
 .dropdown.open .mark-related-button {background-image: url(image_path('icon_related_white.svg'));}
@@ -840,6 +842,52 @@ button {
   cursor: pointer;
   width: 20px !important;
   margin-top: -15px;
+}
+
+#convert-ticket-dropdown {
+  border-top-right-radius: 4px;
+  min-width: 300px;
+
+  .primary-text-divider {
+    border-top-right-radius: 4px;
+  }
+  .inline-tool-content-wrapper {
+    padding: 8px;
+  }
+  select.form-control {
+    margin-left: 0;
+    margin-top: 0;
+  }
+  .form-group {
+    margin-bottom: 4px;
+  }
+  #complaint-id-to-convert, #dispute-id-to-convert {
+    color: $type-base-color;
+  }
+  hr.thin {
+    margin: 0 4px;
+  }
+  .selectize-control {
+    border: none !important;
+    outline: 1px solid darken($faint-neutral-color, 5%);
+    min-height: 33px;
+    margin-bottom: 8px;
+
+    .selectize-input {
+      background-color: transparent;
+      margin: -1px 0 -4px -2px !important;
+    }
+
+    .item {
+      margin-top: 2px !important;
+      margin-bottom: 2px !important;
+    }
+
+    .select-multiple {
+      margin: 4px !important;
+      color: lighten($type-lighter-color, 5%);
+    }
+  }
 }
 
 .delete-search img {

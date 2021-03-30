@@ -51,8 +51,34 @@
       Edit
     %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped.toolbar-button-spacer{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)'}
       %span.toolbar-button-text Take
-    %button.toolbar-button.return-ticket-toolbar-button.esc-tooltipped{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
+    %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
       %span.toolbar-button-text Return
+    %span.dropdown
+      %button.toolbar-button.convert-ticket-button#convert-ticket-button.esc-tooltipped.dropdown-toggle{onclick: 'convert_to_webrep()', type: 'button', title: 'Convert ticket to web reputation ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text Convert to Webrep
+      .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'convert-ticket-button'}
+        .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
+        .inline-tool-content-wrapper
+          %label.content-label-sm
+            Complaint ID to convert:
+            %span#complaint-id-to-convert
+
+          .form-group
+            %label.content-label-sm Suggested Disposition
+            %select.form-control#complaint-suggested-disposition
+              %option Good
+              %option Poor
+              %option Malicious
+              %option Non-Malicious
+              %option Unknown
+          %hr.thin
+          .comment-wrapper
+            %label.content-label-sm Comment
+            %textarea.dropdown-comment.note-input
+          .button-row-center
+            %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_to_webrep_submit(this)'}
+              Convert Ticket
+
   %div
     %label.toolbar-section-label
       Collapse
