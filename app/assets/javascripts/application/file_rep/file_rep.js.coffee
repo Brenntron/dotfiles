@@ -1363,6 +1363,7 @@ $ ->
       data['file-name'] = $("#file-name-checkbox").is(':checked')
 #      data['sha256'] = $("#sha256-checkbox").is(':checked')
       data['file-size'] = $("#file-size-checkbox").is(':checked')
+      data['platform'] = $("#platform-checkbox").is(':checked')
       data['sample-type'] = $("#sample-type-checkbox").is(':checked')
       data['amp-disp'] = $("#amp-disp-checkbox").is(':checked')
       data['amp-name'] = $("#amp-name-checkbox").is(':checked')
