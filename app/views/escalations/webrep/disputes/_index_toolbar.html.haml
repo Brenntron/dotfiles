@@ -183,6 +183,28 @@
             %button.primary#set-related-dispute-submit-button{type:'button', id: 'button_related_dispute', onclick:'related_disputes();'}
               Submit
 
+    %span.dropdown
+      %button.toolbar-button.convert-ticket-button#move-to-webcat.esc-tooltipped.dropdown-toggle{onclick: 'convert_to_webcat()', type: 'button', title: 'Convert ticket to web categorization ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text Convert to Webcat
+      .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'move-to-webcat'}
+        .dropdown-tool-text-divider.primary-text-divider Convert to Categorization Complaint
+        .inline-tool-content-wrapper
+          %label.content-label-sm
+            Entry ID to convert:
+            %span#dispute-id-to-convert
+
+          .form-group
+            %label.content-label-sm Suggested Categories
+            %select#suggested-categories.selectize{:multiple=>"multiple", :placeholder=>"Add Categories", :value=>"", :name=>""}
+
+          %hr.thin
+          .comment-wrapper
+            %label.content-label-sm Comment
+            %textarea.dropdown-comment.note-input
+          .button-row-center
+            %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_to_webcat_submit(this)'}
+              Convert Ticket
+
   %div
     %label.toolbar-section-label
       Edit Dispute Entry
@@ -462,27 +484,6 @@
               .button-row-center
                 %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool()', disabled: true}
                   Submit Changes
-    %span.dropdown
-      %button.toolbar-button.convert-ticket-button#move-to-webcat.esc-tooltipped.dropdown-toggle{onclick: 'convert_to_webcat()', type: 'button', title: 'Convert ticket to web categorization ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-        %span.toolbar-button-text Convert to Webcat
-      .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'move-to-webcat'}
-        .dropdown-tool-text-divider.primary-text-divider Convert to Categorization Complaint
-        .inline-tool-content-wrapper
-          %label.content-label-sm
-            Entry ID to convert:
-            %span#dispute-id-to-convert
-
-          .form-group
-            %label.content-label-sm Suggested Categories
-            %select#suggested-categories.selectize{:multiple=>"multiple", :placeholder=>"Add Categories", :value=>"", :name=>""}
-
-          %hr.thin
-          .comment-wrapper
-            %label.content-label-sm Comment
-            %textarea.dropdown-comment.note-input
-          .button-row-center
-            %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_to_webcat_submit(this)'}
-              Convert Ticket
 
   %div.line-up
     %label.toolbar-section-label

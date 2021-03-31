@@ -847,12 +847,26 @@ button {
 #convert-ticket-dropdown {
   border-top-right-radius: 4px;
   min-width: 300px;
+  margin-top: 0;
+  margin-left: 0;
 
   .primary-text-divider {
     border-top-right-radius: 4px;
+    background-color: $bug-section-color;
+    margin-right: 0 !important;
+    font-size: 9.5pt;
+    font-weight: 600;
+    padding: 8px 12px !important;
   }
   .inline-tool-content-wrapper {
-    padding: 8px;
+    padding: 8px 10px;
+  }
+  .inline-radio-wrapper {
+    width: 100%;
+    label, input {
+      display: inline-block;
+      margin: 0 2px;
+    }
   }
   select.form-control {
     margin-left: 0;

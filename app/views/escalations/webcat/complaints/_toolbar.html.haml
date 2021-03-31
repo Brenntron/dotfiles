@@ -60,17 +60,22 @@
         .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
         .inline-tool-content-wrapper
           %label.content-label-sm
-            Complaint ID to convert:
+            Ticket ID to convert:
             %span#complaint-id-to-convert
+          %label.content-label-sm
+            Ticket Entries:
+          %table#entries-to-convert
 
           .form-group
             %label.content-label-sm Suggested Disposition
-            %select.form-control#complaint-suggested-disposition
-              %option Good
-              %option Poor
-              %option Malicious
-              %option Non-Malicious
-              %option Unknown
+            .inline-radio-wrapper.row
+              .col-xs-6
+                %label{for: 'false-pos-radio'} False Positive
+                %input#false-pos-radio{type: 'radio', name: 'disposition', value: 'fp'}
+              .col-xs-6
+                %label{for: 'false-neg-radio'} False Negative
+                %input#false-neg-radio{type: 'radio', name: 'disposition', value: 'fn'}
+
           %hr.thin
           .comment-wrapper
             %label.content-label-sm Comment
