@@ -455,10 +455,12 @@ class FileReputationDispute < ApplicationRecord
   def update_threadgrid_score
     if self.sha256_hash.present?
       threatgrid_response = Threatgrid::Search.query(self.sha256_hash)
-
+      n_auto_resolve_log = "<br />---------------------<br />THREATGRID<br /> score: [#{threatgrid_response[:threatgrid_score]}] threshold: [#{threatgrid_response[:threatgrid_threshold]}] private: [#{threatgrid_response[:threatgrid_private]}]<br />Recorded at: #{Time.now.to_s}<br /> "
+      new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
       self.threatgrid_score = threatgrid_response[:threatgrid_score]
       self.threatgrid_private = threatgrid_response[:threatgrid_private]
       self.threatgrid_threshold = threatgrid_response[:threatgrid_threshold]
+      self.auto_resolve_log += new_auto_resolve_log
       save!
     end
 
@@ -495,15 +497,19 @@ class FileReputationDispute < ApplicationRecord
   def update_sandbox_score(api_key_type: self.sandbox_key)
     sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash, api_key_type: api_key_type)
     sandbox_threshold = self.pdf? ? 90.0 : 61.0
-    update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
+    n_auto_resolve_log = "<br />---------------------<br />SANDBOX<br /> score: [#{sandbox_score}] threshold: [#{sandbox_threshold}]<br />Recorded at: #{Time.now.to_s}<br /> "
+    new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
+    update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold, auto_resolve_log: new_auto_resolve_log)
   rescue => except
     Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
   end
 
   def update_amp_disposition
-    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
 
-    update!(disposition: detection.disposition, detection_name: detection.name)
+    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
+    n_auto_resolve_log = "<br />---------------------<br />AMP<br /> disp: [#{detection.disposition}] name: [#{detection.name}]<br />Recorded at: #{Time.now.to_s}<br /> "
+    new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
+    update!(disposition: detection.disposition, detection_name: detection.name, auto_resolve_log: new_auto_resolve_log)
 
   rescue => except
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
