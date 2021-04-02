@@ -12077,7 +12077,7 @@ table > tbody > tr > td.no-padding {
     width: 20px;
   }
   .url-cell {
-    width: 350px;
+    width: 340px;
     padding-right: 10px;
     vertical-align: top;
     span.entry-data-content {
@@ -12091,17 +12091,17 @@ table > tbody > tr > td.no-padding {
   }
 }
 
-// FIRST ROW - BFRP SPECIFIC
+// first row - bfrp specific
 .research-action .research-first-row {
   .url-cell {
     width: 40%;
   }
 }
 
-// SECOND ROW of each entry
+// second row of each entry, do widths below in better way when time avail
 .research-overview-row {
   background: $faint-neutral-color;
-  // PRIMARY CELL WIDTHS, NEEDS PRECISE FIXED + FLUID WIDTHS
+  // primary cell widths, needs precise fixed + fluid widths
   .wbrs-score-label-cell {
     width: 3%;
     max-width: 50px;
