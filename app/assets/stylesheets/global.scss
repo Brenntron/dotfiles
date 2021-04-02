@@ -12067,46 +12067,27 @@ table > tbody > tr > td.no-padding {
   margin-top: 0;
 }
 
-// FIRST ROW of each entry (contains the URL + category)
+// webrep research tab and bfrp results page
 .research-first-row {
   margin-top: 120px;
-  // PRIMARY CELL WIDTHS, NEEDS PRECISE FIXED + FLUID WIDTHS
   .expandable-cell {
-    width: 1.2%;
-    max-width: 10px;
+    width: 20px;
   }
   .cb-cell {
-    width: 1.5%;
-    max-width: 20px;
+    width: 20px;
   }
   .url-cell {
-    width: 20%;
+    width: 350px;
     padding-right: 10px;
     vertical-align: top;
     span.entry-data-content {
       display: inline-block;
       word-break: break-all;
+      line-height: 11pt;
     }
   }
-  .category-cell {
-    width: 300px;
-  }
-  .hostname-cell {
-    width: 200px;
-  }
-  .status-cell {
-    width: 150px;
-  }
-  .resolution-cell {
-    width: 200px;
-  }
-  .date-time-cell {
-    width: 200px;
-  }
-  .rep-tools-cell {
-    button {
-      margin-right: 0;
-    }
+  .rep-tools-cell button {
+    margin-right: 0;
   }
 }
 

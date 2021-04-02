@@ -302,13 +302,20 @@
                   - else
                     %td.no-padding
 
-
                   %td.category-cell
                     %label Category
                     - if entry[:primary_category] != '{}' && !entry[:primary_category].nil?
                       = entry[:primary_category]
                     - else
                       %span.missing-data No assigned categories
+
+                  %td.platform-cell
+                    %label Platform
+                    - if !entry[:platform].nil?
+                      = entry[:platform]
+                    - else
+                      %span.missing-data No platform
+\
                   %td.hostname-cell
                     %label Hostname
                     - unless entry[:hostname].nil?
@@ -621,7 +628,7 @@
                   %td
                     -#Expander area
 
-                  %td.research-table-details-wrapper{colspan: '9'}
+                  %td.research-table-details-wrapper{colspan: '10'}
                     %table
                       %tr
                         %td.input-col.wbrs-input-wrapper
@@ -786,7 +793,7 @@
                       %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses'}
 
                   %tr.research-uri-ip-data-row
-                    %td.research-table-details-wrapper{colspan: '8'}
+                    %td.research-table-details-wrapper{colspan: '9'}
                       %table
                         %tr.single-details-row
                           %td
