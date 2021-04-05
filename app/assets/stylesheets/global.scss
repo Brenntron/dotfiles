@@ -5276,6 +5276,15 @@ table > tbody > tr > td.dispute_rep_tools {
   border-color: $table-dark-header;
 }
 
+.dispute-entry-table thead tr th {
+  vertical-align: middle;
+  padding-top: 8px;
+}
+
+.dispute-entry-table tbody tr td {
+  padding-bottom: 5px;
+}
+
 .cluster-path-table tbody tr td {
   padding: 4px;
   font-size: 8.5pt;
@@ -11807,8 +11816,8 @@ span.threat-cat-no-data {
   td{
     border-color: $table-dark-header;
   }
-  th.entry-col-wbrs-score{
-    display: block;
+  th {
+    vertical-align: middle;
   }
 }
 .reputation-icon-container{
@@ -12070,11 +12079,12 @@ table > tbody > tr > td.no-padding {
 // webrep research tab and bfrp results page
 .research-first-row {
   margin-top: 120px;
-  .expandable-cell {
+  .expandable-cell, .cb-cell {
     width: 20px;
   }
-  .cb-cell {
-    width: 20px;
+  .cb-cell input {
+    position: relative;
+    bottom: 2px;
   }
   .url-cell {
     width: 340px;
