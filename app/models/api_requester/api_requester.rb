@@ -219,6 +219,7 @@ module ApiRequester::ApiRequester
       if gssnegotiate?
         request.auth.gssnegotiate
       end
+
       request.read_timeout = read_timeout
       request.open_timeout = open_timeout
 
