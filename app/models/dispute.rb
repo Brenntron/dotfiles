@@ -851,8 +851,6 @@ class Dispute < ApplicationRecord
     relation = where(dispute_fields)
 
 
-
-
     if params['submitted_newer'].present?
       relation =
           relation.where('case_opened_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
@@ -909,7 +907,10 @@ class Dispute < ApplicationRecord
       end
     end
 
-
+    if params['platform'].present?
+      ids = params['platform'].split(',').map {|m| m.to_i}
+      relation = relation.joins(:dispute_entries).where("disputes.platform_id in (:ids) or dispute_entries.platform_id in (:ids)", ids: ids)
+    end
 
     company_name = nil
     customer_params = params.fetch('customer', {}).slice(*%w{name email company_name})
