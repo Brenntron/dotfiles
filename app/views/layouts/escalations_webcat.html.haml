@@ -212,6 +212,10 @@
           %a{href: '?f=unassigned'}
             %span.nav-dropdown-icon.icon-open-bugs
             Unassigned Clusters
+        %li{class: ("selected" if params[:f] == "pending")}
+          %a{href: '?f=pending'}
+            %span.nav-dropdown-icon.icon-pending-bugs
+            Waiting For Review
         %li{class: ("selected" if params[:f] == "all")}
           %a{href: '?f=all'}
             %span.nav-dropdown-icon.icon-recently-viewed

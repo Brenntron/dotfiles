@@ -1,0 +1,10 @@
+ALTER TABLE `disputes` ADD `product_platform` varchar(255);
+ALTER TABLE `complaints` ADD `product_platform` varchar(255);
+ALTER TABLE `file_reputation_disputes` ADD `product_platform` varchar(255);
+ALTER TABLE `disputes` ADD `product_version` varchar(255);
+ALTER TABLE `complaints` ADD `product_version` varchar(255);
+ALTER TABLE `file_reputation_disputes` ADD `product_version` varchar(255);
+ALTER TABLE `disputes` ADD `in_network` tinyint(1);
+ALTER TABLE `complaints` ADD `in_network` tinyint(1);
+ALTER TABLE `file_reputation_disputes` ADD `in_network` tinyint(1);
+INSERT INTO `schema_migrations` (`version`) VALUES ('20200923144138');

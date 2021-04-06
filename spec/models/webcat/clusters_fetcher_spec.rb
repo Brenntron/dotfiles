@@ -8,6 +8,7 @@ describe Webcat::ClustersFetcher do
     before do
       allow(Wbrs::Cluster).to receive(:all).and_return(clusters)
       allow(Wbrs::Cluster).to receive(:where).and_return(clusters)
+      allow(Wbrs::TopUrl).to receive(:check_urls).and_return(top_urls)
       allow(Beaker::Verdicts).to receive(:verdicts).and_return(verdicts)
     end
 
@@ -29,7 +30,7 @@ describe Webcat::ClustersFetcher do
           },
           {
             'cluster_id'=>2,
-            'domain'=>"googletest1.com",
+            'domain'=>"127.0.0.1",
             'ctime'=>"Sat, 22 Sep 2018 12:53:40 GMT",
             'mtime'=>"Sat, 22 Sep 2018 12:53:40 GMT",
             'apac_volume'=>0,
@@ -41,6 +42,14 @@ describe Webcat::ClustersFetcher do
           }
         ]
       }
+    end
+
+    let(:top_urls) do
+      [
+        Wbrs::TopUrl.new_from_datum(url: 'googletest.com', is_important: true),
+        Wbrs::TopUrl.new_from_datum(url: '127.0.0.1', is_important: true),
+        Wbrs::TopUrl.new_from_datum(url: 'googletest2.com', is_important: true)
+      ]
     end
 
     let(:verdicts) do
@@ -74,7 +83,7 @@ describe Webcat::ClustersFetcher do
             },
             {
               'cluster_id'=>2,
-              'domain'=>"googletest1.com",
+              'domain'=>"127.0.0.1",
               'ctime'=>"Sat, 22 Sep 2018 12:53:40 GMT",
               'mtime'=>"Sat, 22 Sep 2018 12:53:40 GMT",
               'apac_volume'=>0,
@@ -112,7 +121,10 @@ describe Webcat::ClustersFetcher do
               :cluster_size=>2,
               :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
               :wbrs_score=>-3.0,
-              :assigned_to=>"user1"
+              :assigned_to=>"user1",
+              :is_important=>true,
+              :is_pending=>false,
+              :categories=>[]
             },
             {
               :cluster_id=>3,
@@ -122,7 +134,10 @@ describe Webcat::ClustersFetcher do
               :cluster_size=>2,
               :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
               :wbrs_score=>-3.0,
-              :assigned_to=>""
+              :assigned_to=>"",
+              :is_important=>true,
+              :is_pending=>false,
+              :categories=>[]
             }
           ]
         }
@@ -173,7 +188,10 @@ describe Webcat::ClustersFetcher do
               :cluster_size=>2,
               :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
               :wbrs_score=>-3.0,
-              :assigned_to=>""
+              :assigned_to=>"",
+              :is_important=>true,
+              :is_pending=>false,
+              :categories=>[]
             }
           ]
         }
@@ -185,7 +203,69 @@ describe Webcat::ClustersFetcher do
       end
     end
 
-    describe 'filters' do
+    describe 'general filters' do
+      describe 'filter by categorized clusters' do
+        context 'when there is existing categorized domain' do
+          before { FactoryBot.create(:complaint_entry, domain: 'googletest.com') }
+
+          let(:expected_response) do
+            {
+              meta: {"limit"=>1000, "rows_found"=>15161},
+              data: [
+                {
+                  :cluster_id=>2,
+                  :domain=>"127.0.0.1",
+                  :global_volume=>7637759,
+                  :ctime=>"Sat, 22 Sep 2018 12:53:40 GMT",
+                  :cluster_size=>2,
+                  :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
+                  :wbrs_score=>-3.0,
+                  :assigned_to=>"",
+                  :is_important=>true,
+                  :is_pending=>false,
+                  :categories=>[]
+                }
+              ]
+            }
+          end
+
+          it 'does not return categorized domain' do
+            expect(subject.fetch).to eq(expected_response)
+          end
+        end
+
+        context 'when there is existing categorized ip address' do
+          before { FactoryBot.create(:complaint_entry, ip_address: '127.0.0.1') }
+
+          let(:expected_response) do
+            {
+              meta: {"limit"=>1000, "rows_found"=>15161},
+              data: [
+                {
+                  :cluster_id=>1,
+                  :domain=>"googletest.com",
+                  :global_volume=>7637758,
+                  :ctime=>"Fri, 21 Sep 2018 12:53:40 GMT",
+                  :cluster_size=>2,
+                  :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
+                  :wbrs_score=>-3.0,
+                  :assigned_to=>"",
+                  :is_important=>true,
+                  :is_pending=>false,
+                  :categories=>[]
+                }
+              ]
+            }
+          end
+
+          it 'does not return categorized domain' do
+            expect(subject.fetch).to eq(expected_response)
+          end
+        end
+      end
+    end
+
+    describe 'user specific filters' do
       describe 'all filter' do
         let(:filter) { 'all' }
         let(:expected_response) do
@@ -200,17 +280,23 @@ describe Webcat::ClustersFetcher do
                 :cluster_size=>2,
                 :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
-                :assigned_to=>""
+                :assigned_to=>"",
+                :is_important=>true,
+                :is_pending=>false,
+                :categories=>[]
               },
               {
                 :cluster_id=>2,
-                :domain=>"googletest1.com",
+                :domain=>"127.0.0.1",
                 :global_volume=>7637759,
                 :ctime=>"Sat, 22 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
                 :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
-                :assigned_to=>""
+                :assigned_to=>"",
+                :is_important=>true,
+                :is_pending=>false,
+                :categories=>[]
               }
             ]
           }
@@ -220,6 +306,7 @@ describe Webcat::ClustersFetcher do
           expect(subject.fetch).to eq(expected_response)
         end
       end
+
       describe 'my filter' do
         before { FactoryBot.create(:cluster_assignment, user_id: user.id, cluster_id: 1) }
 
@@ -237,7 +324,10 @@ describe Webcat::ClustersFetcher do
                 :cluster_size=>2,
                 :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
-                :assigned_to=>user.cvs_username
+                :assigned_to=>user.cvs_username,
+                :is_important=>true,
+                :is_pending=>false,
+                :categories=>[]
               }
             ]
           }
@@ -259,19 +349,53 @@ describe Webcat::ClustersFetcher do
             data: [
               {
                 :cluster_id=>2,
-                :domain=>"googletest1.com",
+                :domain=>"127.0.0.1",
                 :global_volume=>7637759,
                 :ctime=>"Sat, 22 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
                 :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
-                :assigned_to=>""
+                :assigned_to=>"",
+                :is_important=>true,
+                :is_pending=>false,
+                :categories=>[]
               }
             ]
           }
         end
 
         it 'returns only unassigned clusters' do
+          expect(subject.fetch).to eq(expected_response)
+        end
+      end
+
+      describe 'pending filter' do
+        before { FactoryBot.create(:cluster_categorization, user_id: user.id, cluster_id: 2) }
+
+        let(:filter) { 'pending' }
+        let(:user) { FactoryBot.create(:user) }
+        let(:expected_response) do
+          {
+            meta: {"limit"=>1000, "rows_found"=>15161},
+            data: [
+              {
+                :cluster_id=>2,
+                :domain=>"127.0.0.1",
+                :global_volume=>7637759,
+                :ctime=>"Sat, 22 Sep 2018 12:53:40 GMT",
+                :cluster_size=>2,
+                :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
+                :wbrs_score=>-3.0,
+                :assigned_to=>"",
+                :is_important=>true,
+                :is_pending=>true,
+                :categories=>[1,2]
+              }
+            ]
+          }
+        end
+
+        it 'returns only clusters with categorization' do
           expect(subject.fetch).to eq(expected_response)
         end
       end
@@ -295,7 +419,10 @@ describe Webcat::ClustersFetcher do
                 :cluster_size=>2,
                 :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
-                :assigned_to=>user.cvs_username
+                :assigned_to=>user.cvs_username,
+                :is_important=>true,
+                :is_pending=>false,
+                :categories=>[]
               }
             ]
           }
@@ -319,17 +446,23 @@ describe Webcat::ClustersFetcher do
                 :cluster_size=>2,
                 :age=>"3 months, 1 week, 3 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
-                :assigned_to=>""
+                :assigned_to=>"",
+                :is_important=>true,
+                :is_pending=>false,
+                :categories=>[]
               },
               {
                 :cluster_id=>2,
-                :domain=>"googletest1.com",
+                :domain=>"127.0.0.1",
                 :global_volume=>7637759,
                 :ctime=>"Sat, 22 Sep 2018 12:53:40 GMT",
                 :cluster_size=>2,
                 :age=>"3 months, 1 week, 2 days, 11 hours, and 6 minutes",
                 :wbrs_score=>-3.0,
-                :assigned_to=>""
+                :assigned_to=>"",
+                :is_important=>true,
+                :is_pending=>false,
+                :categories=>[]
               }
             ]
           }

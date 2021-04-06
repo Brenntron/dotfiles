@@ -2,9 +2,11 @@ class Bridge::FileRepUpdateStatusEvent < Bridge::BaseMessage
   def initialize(sender_data)
     super(channel: 'update-ticket',
           addressee: 'talos-intelligence')
+    Delayed::Worker.logger.info("FileRep update init")
   end
 
   def post(dispute, source_authority: @source_authority, source_key: @source_key)
+    Delayed::Worker.logger.info("FileRep update send to bridge")
     return_payload = {}
     return_payload[dispute.sha256_hash] = {
         ac_id: dispute.id,

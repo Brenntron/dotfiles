@@ -200,8 +200,9 @@ class User < ApplicationRecord
 
   # Search by email, then search by cvs_username, then create
   def self.user_by_email(email)
+    return nil if email.blank?
     User.where(email: email).first ||
-        User.where(cvs_username: email.sub(/@.*$/, '')).first ||
+        User.where(cvs_username: email.gsub(/@.*$/, '')).first ||
         User.create_by_email(email)
   end
 

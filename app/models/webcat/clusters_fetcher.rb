@@ -22,6 +22,10 @@ class Webcat::ClustersFetcher
   end
 
   def filter_clusters(clusters)
+    # general filters - always applies for all clusters
+    clusters = filter_by_categorized(clusters)
+
+    # user specific filters - filters, selected by users
     case filter
     when 'all'
       clusters
@@ -29,9 +33,24 @@ class Webcat::ClustersFetcher
       filter_assigned_to_user(clusters)
     when 'unassigned'
       filter_unassigned(clusters)
+    when 'pending'
+      filter_pending(clusters)
     else
       filter_by_default(clusters)
     end
+  end
+
+  def filter_by_categorized(data)
+    # filters out clusters if they have Complaint equivalent
+    clusters_domains = data['data'].map { |cluster| cluster['domain'] }
+    complaint_entries = ComplaintEntry.where(domain: clusters_domains).or(ComplaintEntry.where(ip_address: clusters_domains))
+    data['data'].filter! do |cluster|
+      complaint_entries.find do |complaint_entry|
+        complaint_entry.domain == cluster['domain'] ||
+          complaint_entry.ip_address == cluster['domain']
+      end.nil?
+    end
+    data
   end
 
   def filter_assigned_to_user(data)
@@ -46,6 +65,14 @@ class Webcat::ClustersFetcher
     assigned_cluster_ids = ClusterAssignment.fetch_all_assignments.pluck(:cluster_id)
     data['data'].filter! do |cluster|
       cluster_unassigned?(assigned_cluster_ids, cluster)
+    end
+    data
+  end
+
+  def filter_pending(data)
+    pending_clusters = fetch_pending_clusters(data['data'])
+    data['data'].filter! do |cluster|
+      cluster_pending?(cluster, pending_clusters)
     end
     data
   end
@@ -68,12 +95,24 @@ class Webcat::ClustersFetcher
     !assigned_cluster_ids.include?(cluster['cluster_id'].to_i)
   end
 
+  def cluster_pending?(cluster, pending_clusters)
+    pending_clusters.find { |pending_cluster| pending_cluster.cluster_id == cluster['cluster_id'].to_i }.present?
+  end
+
+  def cluster_categories(cluster, pending_clusters)
+    pending_cluster = pending_clusters.find { |pending_cluster| pending_cluster.cluster_id == cluster['cluster_id'] }
+    return JSON.parse(pending_cluster.category_ids) if pending_cluster
+    []
+  end
+
   def parse_api_response(clusters_response)
     meta = clusters_response['meta']
     clusters = clusters_response['data']
 
     wbrs_score = get_wbrs_scores(clusters)
     assignments = fetch_cluster_assignments(clusters)
+    top_urls = fetch_top_urls(clusters)
+    pending_clusters = fetch_pending_clusters(clusters)
 
     parsed_clusters = []
     clusters.each_with_index do |cluster, index|
@@ -82,6 +121,9 @@ class Webcat::ClustersFetcher
         parsed_cluster[:wbrs_score] = wbrs_score[index]['response']['thrt']['scor']
       end
       parsed_cluster[:assigned_to] = cluster_assignee(cluster, assignments)
+      parsed_cluster[:is_important] = cluster_important?(cluster, top_urls)
+      parsed_cluster[:is_pending] = cluster_pending?(cluster, pending_clusters)
+      parsed_cluster[:categories] = cluster_categories(cluster, pending_clusters)
       parsed_clusters << parsed_cluster
     end
 
@@ -116,8 +158,23 @@ class Webcat::ClustersFetcher
     ClusterAssignment.fetch_assignments_for(clusters: cluster_ids)
   end
 
+  def fetch_top_urls(clusters)
+    cluster_domains = clusters.map { |cluster| cluster['domain'] }
+    Wbrs::TopUrl.check_urls(cluster_domains)
+  end
+
+  def fetch_pending_clusters(clusters)
+    cluster_ids = clusters.map { |cluster| cluster['cluster_id'].to_i }
+    ClusterCategorization.where(cluster_id: cluster_ids)
+  end
+
   def cluster_assignee(cluster, assignments)
     cluster_assignment = assignments.filter { |assignment| assignment.cluster_id == cluster['cluster_id'] }
     cluster_assignment.first&.user&.cvs_username || ''
+  end
+
+  def cluster_important?(cluster, top_urls)
+    top_url_clusters = top_urls.filter { |top_url| top_url.url == cluster['domain'] }
+    top_url_clusters.first&.is_important
   end
 end

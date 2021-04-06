@@ -49,7 +49,7 @@ RailsAdmin.config do |config|
   config.main_app_name = ["Analyst Console Escalations", "#{version}"]
 
 
-  config.included_models = ["Company", "Complaint", "ComplaintEntry", "Customer", "DelayedJob", "Dispute", "DisputeComment", "DisputeEntry", "EmailTemplate", "DisputeEmailAttachment", "DisputeRule", "DisputeRuleHit", "ResolutionMessageTemplate", "User", "UserApiKey", "UserPreference", "DisputeEntryPreload", "ComplaintEntryScreenshot", "ComplaintEntryPreload", "DisputePeek", "ClusterAssignment" ]
+  config.included_models = ["Company", "Complaint", "ComplaintEntry", "Customer", "DelayedJob", "Dispute", "DisputeComment", "DisputeEntry", "EmailTemplate", "DisputeEmailAttachment", "DisputeRule", "DisputeRuleHit", "ResolutionMessageTemplate", "User", "UserApiKey", "UserPreference", "DisputeEntryPreload", "ComplaintEntryScreenshot", "ComplaintEntryPreload", "DisputePeek", "ClusterAssignment", "ClusterCategorization" ]
 
   config.actions do
     dashboard

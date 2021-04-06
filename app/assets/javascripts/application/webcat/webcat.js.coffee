@@ -610,10 +610,13 @@ $ ->
                   if data == 'CUSTOMER'
                     '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
                   else
-                    data
+                    '<button class="complaint-submitter-type icon-guest-user esc-tooltipped" title="Guest"></button>'
               }
               {
                 data: 'company_name'
+              }
+              {
+                data: 'customer_email'
               }
               {
                 data: 'assigned_to'
@@ -874,8 +877,10 @@ $ ->
     data['primary'] = $("#primary-checkbox").is(':checked')
     data['suggested'] = $("#suggested-checkbox").is(':checked')
     data['wbrs'] = $("#wbrs-checkbox").is(':checked')
+    data['platform'] = $("#platform-checkbox").is(':checked')
     data['submittertype'] = $("#submittertype-checkbox").is(':checked')
     data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
+    data['submitteremail'] = $("#submitteremail-checkbox").is(':checked')
     data['assignee'] = $("#assignee-checkbox").is(':checked')
 
     std_msg_ajax(
