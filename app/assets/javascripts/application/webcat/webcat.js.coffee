@@ -66,6 +66,7 @@ $ ->
     channels = $('#channel-input')[0].selectize.items
     entry_ids = $('#entryid-input')[0].selectize.items
     complaint_ids = $('#complaintid-input')[0].selectize.items
+    platform_ids = $('#platform-input')[0].selectize.items
 
     if tags.length
       form['tags'] = tags.join(', ')
@@ -89,6 +90,8 @@ $ ->
       form['complaint_id'] = complaint_ids.join(', ')
     if user_id.length
       form['user_id'] = user_id.join(', ')
+    if platform_ids.length
+      form['platform_ids'] = platform_ids.join(',')
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
@@ -112,6 +115,7 @@ $ ->
       domain: form.domain
       tags: form.tags
       user_id: form.user_id
+      platform_ids: form.platform_ids
       submitted_older: form.date_submitted_older
       submitted_newer: form.date_submitted_newer
       modified_older: form.date_modified_newer

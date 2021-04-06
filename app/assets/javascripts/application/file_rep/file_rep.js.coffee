@@ -398,6 +398,7 @@ $ ->
       customer_name: form.find('input[id="customer-name-input"]').val()
       customer_email: form.find('input[id="customer-email-input"]').val()
       customer_company_name: form.find('input[id="customer-company-input"]').val()
+      platform: form.find('input[id="platform-input"]').val()
     )
 
     refresh_url()
