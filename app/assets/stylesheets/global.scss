@@ -2399,7 +2399,7 @@ a.static-nav-item {
   font-style: italic;
 }
 .missing-data.platform:before{
-  content: 'No Platform'
+  content: 'No platform'
 }
 .file-attachment {
   font-size: 9pt;
@@ -5274,6 +5274,15 @@ table > tbody > tr > td.dispute_rep_tools {
 
 .dispute-entry-table tbody tr td, .dispute-entry-table thead tr th, .cluster-path-table thead tr th, .cluster-path-table tbody tr td {
   border-color: $table-dark-header;
+}
+
+.dispute-entry-table thead tr th {
+  vertical-align: middle;
+  padding-top: 8px;
+}
+
+.dispute-entry-table tbody tr td {
+  padding-bottom: 5px;
 }
 
 .cluster-path-table tbody tr td {
@@ -11807,8 +11816,8 @@ span.threat-cat-no-data {
   td{
     border-color: $table-dark-header;
   }
-  th.entry-col-wbrs-score{
-    display: block;
+  th {
+    vertical-align: middle;
   }
 }
 .reputation-icon-container{
@@ -12067,60 +12076,42 @@ table > tbody > tr > td.no-padding {
   margin-top: 0;
 }
 
-// FIRST ROW of each entry (contains the URL + category)
+// webrep research tab and bfrp results page
 .research-first-row {
   margin-top: 120px;
-  // PRIMARY CELL WIDTHS, NEEDS PRECISE FIXED + FLUID WIDTHS
-  .expandable-cell {
-    width: 1.2%;
-    max-width: 10px;
+  .expandable-cell, .cb-cell {
+    width: 20px;
   }
-  .cb-cell {
-    width: 1.5%;
-    max-width: 20px;
+  .cb-cell input {
+    position: relative;
+    bottom: 2px;
   }
   .url-cell {
-    width: 20%;
+    width: 340px;
     padding-right: 10px;
     vertical-align: top;
     span.entry-data-content {
       display: inline-block;
       word-break: break-all;
+      line-height: 11pt;
     }
   }
-  .category-cell {
-    width: 300px;
-  }
-  .hostname-cell {
-    width: 200px;
-  }
-  .status-cell {
-    width: 150px;
-  }
-  .resolution-cell {
-    width: 200px;
-  }
-  .date-time-cell {
-    width: 200px;
-  }
-  .rep-tools-cell {
-    button {
-      margin-right: 0;
-    }
+  .rep-tools-cell button {
+    margin-right: 0;
   }
 }
 
-// FIRST ROW - BFRP SPECIFIC
+// first row - bfrp specific
 .research-action .research-first-row {
   .url-cell {
     width: 40%;
   }
 }
 
-// SECOND ROW of each entry
+// second row of each entry, do widths below in better way when time avail
 .research-overview-row {
   background: $faint-neutral-color;
-  // PRIMARY CELL WIDTHS, NEEDS PRECISE FIXED + FLUID WIDTHS
+  // primary cell widths, needs precise fixed + fluid widths
   .wbrs-score-label-cell {
     width: 3%;
     max-width: 50px;
@@ -13051,4 +13042,8 @@ input.wl-bl-list-inline {
 }
 .category-column .selectize-control.multi .selectize-input .item {
   margin: 3px 0 0 4px !important;
+}
+
+.toggle-vis, .toggle-vis-nested {
+  cursor: default;
 }

@@ -1089,12 +1089,28 @@ $ ->
   $('#disputes-index_filter input').addClass('table-search-input');
 
   window.format = (dispute) ->
-    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input class="dispute_entry_select_all" type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-res">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
+    table_head =
+      "<table class='table dispute-entry-table'><thead><tr>
+       <th><input class='dispute_entry_select_all' type='checkbox' onclick='select_or_deselect_all(#{dispute.id})' id='#{dispute.id}' /></th>
+       <th class='entry-col-content'>Dispute Entry</th>
+       <th class='entry-col-status'>Dispute Entry Status</th>
+       <th class='entry-col-res'>Dispute Entry Resolution</th>
+       <th class='entry-col-disp'>Suggested Disposition</th>
+       <th class='entry-col-cat'>Category</th>
+       <th class='entry-col-platform-entry'>Platform</th>
+       <th class='entry-col-wbrs-score'>WBRS Score</th>
+       <th class='entry-col-wbrs-hits'>WBRS Total Rule Hits</th>
+       <th class='entry-col-wbrs-rules'>WBRS Rules</th>
+       <th class='entry-col-sbrs-score'>SBRS Score</th>
+       <th class='entry-col-sbrs-hits'>SBRS Total Rule Hits</th>
+       <th class='entry-col-sbrs-rules'>SBRS Rules</th></tr></thead><tbody>"
+
     entry = dispute.dispute_entries
     missing_data = '<span class="missing-data">Missing data</span>'
     entry_rows = []
+
     $(entry).each ->
-      { ip_address, uri, primary_category} = this.entry
+      { ip_address, uri, primary_category, platform} = this.entry
       entry_content = missing_data
       if ip_address != null
         entry_content = ip_address
@@ -1103,6 +1119,9 @@ $ ->
       category = '<span class="missing-data">No assigned categories</span>'
       if this.entry.primary_category != null && this.entry.primary_category != '{}'
         category = this.entry.primary_category
+
+      if platform == null
+        platform = "<span class='missing-data'>No platform</span>"
 
       status = missing_data
       if this.entry.status != null
@@ -1155,6 +1174,7 @@ $ ->
         #{resolution_col}
         <td class='entry-col-disp'>#{suggested_disposition}</td>
         <td class='entry-col-cat'>#{category}</td>
+        <td class='entry-col-platform-entry'>#{platform}</td>
         <td class='entry-col-wbrs-score'>
           <div class='reputation-icon-container'>
             <span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>
@@ -1446,6 +1466,7 @@ $ ->
       data['entry-resolution'] = $("#entry-resolution-checkbox").is(':checked')
       data['suggested-disposition'] = $("#suggested-disposition-checkbox").is(':checked')
       data['category'] = $("#category-checkbox").is(':checked')
+      data['platform-entry'] = $("#platform-entry-checkbox").is(':checked')
       data['wbrs-score'] = $("#wbrs-score-checkbox").is(':checked')
       data['wbrs-total-rule-hits'] = $("#wbrs-total-rule-hits-checkbox").is(':checked')
       data['wbrs-rules'] = $("#wbrs-rules-checkbox").is(':checked')
