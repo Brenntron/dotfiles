@@ -1192,17 +1192,3 @@ Feature: Disputes
     When I click "#queue"
     Then I should see "000001"
     And I should not see "000002"
-
-  @javascript
-  Scenario: A user views the platform information for a dispute
-    Given a user with role "admin" exists and is logged in
-    And the following disputes exist and have entries:
-      | id |
-      | 1  |
-      | 2  |
-    Then I go to "/escalations/webrep/disputes/1"
-    And I click ".close"
-    And I click "#research-tab-link"
-    And I wait for "3" seconds
-    Then I should see "Research Data"
-    Then I should see "No platform"

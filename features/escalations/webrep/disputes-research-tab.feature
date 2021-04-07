@@ -200,3 +200,23 @@ Feature: Disputes index, Research tab
     Then I click "#research-tab-link"
     And  take a screenshot
     And  I should not see element with class "add-ip-button"
+
+
+  @javascript
+  Scenario: A user views the platform information for a dispute entry
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      | id |
+      | 5  |
+    # need pending column added for test env?
+    Then pending
+    And the following dispute_entries exist:
+      | id | dispute_id | uri                | entry_type | platform      |
+      | 1  | 5          | 1234computer.com   | URI/DOMAIN | TestPlatform  |
+    And I go to "escalations/webrep/disputes/5"
+    And I wait for "1" seconds
+    And I click ".close"
+    And I click "#research-tab-link"
+    And I wait for "1" seconds
+    Then I should see "Research Data"
+    Then I should see "TestPlatform"
