@@ -13043,3 +13043,7 @@ input.wl-bl-list-inline {
 .category-column .selectize-control.multi .selectize-input .item {
   margin: 3px 0 0 4px !important;
 }
+
+.toggle-vis, .toggle-vis-nested {
+  cursor: default;
+}

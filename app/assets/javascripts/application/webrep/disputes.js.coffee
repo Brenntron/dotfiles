@@ -1174,7 +1174,7 @@ $ ->
         #{resolution_col}
         <td class='entry-col-disp'>#{suggested_disposition}</td>
         <td class='entry-col-cat'>#{category}</td>
-        <td class='entry-col-plat'>#{platform}</td>
+        <td class='entry-col-platform'>#{platform}</td>
         <td class='entry-col-wbrs-score'>
           <div class='reputation-icon-container'>
             <span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>
@@ -1466,6 +1466,7 @@ $ ->
       data['entry-resolution'] = $("#entry-resolution-checkbox").is(':checked')
       data['suggested-disposition'] = $("#suggested-disposition-checkbox").is(':checked')
       data['category'] = $("#category-checkbox").is(':checked')
+      data['platform'] = $("#platform-checkbox").is(':checked')
       data['wbrs-score'] = $("#wbrs-score-checkbox").is(':checked')
       data['wbrs-total-rule-hits'] = $("#wbrs-total-rule-hits-checkbox").is(':checked')
       data['wbrs-rules'] = $("#wbrs-rules-checkbox").is(':checked')

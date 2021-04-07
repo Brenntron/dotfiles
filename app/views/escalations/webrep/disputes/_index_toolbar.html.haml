@@ -8,7 +8,7 @@
           Show/Hide Columns
       .dropdown-menu.toolbar-dropdown#table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button'}
         .dropdown-menu-content-block
-          .dropdown-menu-toolbar-header.ticket-showcol-header Ticket Entry Details
+          .dropdown-menu-toolbar-header.ticket-showcol-header Ticket Columns
           %ul
             %li.toggle-vis{'data-column':'2'}
               %input{type: 'checkbox', checked: true, id: 'priority-checkbox'} Priority
@@ -51,7 +51,7 @@
 
 
         .dropdown-menu-content-block
-          .dropdown-menu-toolbar-header.entry-showcol-header Dispute Entry Details
+          .dropdown-menu-toolbar-header.entry-showcol-header Dispute Entry Columns
           %ul
             %li.toggle-vis-nested{'data-column': 'entry-col-content'}
               %input{type: 'checkbox', checked: true, id: 'dispute-entry-checkbox'} Dispute Entry
@@ -63,6 +63,8 @@
               %input{type: 'checkbox', checked: true, id: 'suggested-disposition-checkbox'} Suggested Disposition
             %li.toggle-vis-nested{'data-column': 'entry-col-cat'}
               %input{type: 'checkbox', checked: true, id: 'category-checkbox'} Category
+            %li.toggle-vis-nested{'data-column': 'entry-col-platform'}
+              %input{type: 'checkbox', checked: true, id: 'platform-checkbox'} Platform
             %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-score'}
               %input{type: 'checkbox', checked: true, id: 'wbrs-score-checkbox'} WBRS Score
             %li.toggle-vis-nested{'data-column': 'entry-col-wbrs-hits'}
