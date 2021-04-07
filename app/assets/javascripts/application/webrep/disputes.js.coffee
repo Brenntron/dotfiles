@@ -450,8 +450,10 @@ window.toolbar_show_change_assignee = () ->
     data: data
     dataType: 'json'
     success: (response) ->
+      show_message('success', 'Ticket assignment has been updated!', 5)
       window.location.reload()
     error: (response) ->
+      show_message('error', 'Ticket assignment could not be updated.', 5)
       std_msg_error('No Tickets Selected', ['Select at least one ticket to assign to yourself.'])
   )
 
@@ -636,6 +638,13 @@ window.take_single_dispute = (id) ->
     data: { dispute_ids: dispute_ids }
     error_prefix: 'Error updating ticket.'
     success_reload: true
+    success: (response) ->
+      if response.dispute_ids.length > 0
+        show_message('success', 'Ticket assignment has been updated!', 5)
+        location.reload()
+      else
+        show_message('error', 'Ticket assnigment could not be updated.', 5)
+        location.reload()
   )
 
 window.return_dispute = (dispute_id) ->

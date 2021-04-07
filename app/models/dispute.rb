@@ -1280,7 +1280,10 @@ class Dispute < ApplicationRecord
 
     disputes_ary = []
     Dispute.transaction do
-      disputes = Dispute.where(id: dispute_ids, status: [Dispute::STATUS_NEW, Dispute::STATUS_REOPENED])
+      disputes = Dispute.where(id: dispute_ids).where.not(status: [
+        Dispute::TI_NEW, Dispute::STATUS_RESOLVED, Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN,
+        Dispute::STATUS_RESOLVED_UNCHANGED
+      ])
       disputes_ary = disputes.all.to_a
       disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
 
