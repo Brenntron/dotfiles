@@ -78,6 +78,11 @@ class Customer < ApplicationRecord
       customer_exists = Customer.thread_safe_find_or_create_by(email: "guest@cisco.com", name: "Guest", company:Company.find_by_name("Guest"))
     end
 
+    if customer_exists.company.blank?
+      customer_exists.company_id = Company.find_by_name("Guest").id
+      customer_exists.save(:validate => false)
+    end
+
     customer_exists
   end
 

@@ -23,9 +23,9 @@
             %th Example
             %th Engine Description
             %th Public Engine Description
+            %th Point of Contact
             %th Notes
             %th Public Facing Notes
-            %th Point of Contact
         %tbody
           - @conventions.each do |convention|
             %tr.amp-naming-row{'data-sort-sequence': "#{convention.table_sequence}", 'data-id': "#{convention.id}"}
@@ -52,6 +52,13 @@
                 %span.table-form-content
                   %textarea.description-textarea
                     = convention.public_engine_description
+              %td.amp-contact
+                %span.table-content{data: "#{convention.contact}"}
+                  %span.formatted-contact
+                %span.table-form-content
+                  %textarea.contact-textarea
+                    = convention.contact
+                  %span.delete-button{onclick: "delete_amp_naming_convention(#{convention.id}, '#{convention.pattern}');"}
               %td.amp-notes
                 %span.table-content
                   = convention.notes
@@ -64,10 +71,3 @@
                 %span.table-form-content
                   %textarea.notes-public-textarea
                     = convention.public_notes
-              %td.amp-contact
-                %span.table-content
-                  = convention.contact
-                %span.table-form-content
-                  %textarea.contact-textarea
-                    = convention.contact
-                  %span.delete-button{onclick: "delete_amp_naming_convention(#{convention.id}, '#{convention.pattern}');"}

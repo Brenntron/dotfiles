@@ -7,6 +7,7 @@ class Bridge::GenericAck < Bridge::BaseMessage
 
   def post
     super(message: {sender_data: @sender_data})
+    Delayed::Worker.logger.info("Generic Ack sending reply to bridge")
   end
   # handle_asynchronously :post, :queue => "generic_ack"
 end

@@ -36,6 +36,7 @@ module API
                   complaint_packet[:status] = complaint.status
                   complaint_packet[:created_at] = complaint.created_at.strftime('%Y-%m-%d %H:%M:%S')
                   complaint_packet[:customer_name] = complaint.customer.name # Customer name
+                  complaint_packet[:customer_email] = complaint.customer.email # Submitter email
                   complaint_packet[:complaint_entries] = complaint.complaint_entries
                   complaint_packet[:complaint_entries_count] = complaint.complaint_entries.count
 

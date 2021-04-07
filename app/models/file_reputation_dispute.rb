@@ -10,6 +10,9 @@ class FileReputationDispute < ApplicationRecord
   has_many :file_rep_comments
   has_many :dispute_emails
 
+  after_save :update_amp_detection
+
+  belongs_to :ti_product_platform, :class_name => "Platform", :foreign_key => "platform_id", optional: true
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
   STATUS_NEW                = 'NEW'
@@ -591,6 +594,7 @@ class FileReputationDispute < ApplicationRecord
 
     HEREDOC
 
+
     bug_attrs = {
         'product' => 'Escalations Console',
         'component' => 'AMP Disputes',
@@ -607,15 +611,25 @@ class FileReputationDispute < ApplicationRecord
     logger.debug "Creating dispute"
     new_dispute = FileReputationDispute.new
 
+    if message_payload[:payload][:product_platform].present?
+      platform = Platform.find(message_payload[:payload][:product_platform].to_i) rescue nil
+    end
+    if message_payload[:payload][:platform].present?
+      platform = Platform.find(message_payload[:payload][:platform].to_i) rescue nil
+    end
+
     new_dispute.id = bug_proxy.id
     new_dispute.user_id = user.id
     new_dispute.sha256_hash = message_payload[:payload][:sha256]
     new_dispute.status = STATUS_NEW
     new_dispute.file_name = message_payload[:payload][:file_name]
-    new_dispute.customer_id = customer.id
+    new_dispute.product_platform = message_payload[:payload][:product_platform] unless (message_payload[:payload][:product_platform].blank? || message_payload[:payload][:product_platform].kind_of?(Integer))
+    new_dispute.product_version = message_payload[:payload][:product_version] unless message_payload[:payload][:product_version].blank?
+    new_dispute.in_network = message_payload[:payload][:network] unless message_payload[:payload][:network].blank?
     new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
-    new_dispute.source = message_payload[:payload][:source]
-    new_dispute.platform = message_payload[:payload][:platform]
+    new_dispute.source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
+    new_dispute.platform = message_payload[:payload][:platform] unless (message_payload[:payload][:platform].blank? || message_payload[:payload][:platform].kind_of?(Integer))
+    new_dispute.platform_id = platform.id unless platform.blank?
     new_dispute.sandbox_key = message_payload[:payload][:sandbox_key]
     new_dispute.ticket_source_key = message_payload[:source_key]
     new_dispute.description = message_payload[:payload][:summary_description]
@@ -631,6 +645,15 @@ class FileReputationDispute < ApplicationRecord
       new_dispute.save
     end
 
+    if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
+      ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
+      linked_dispute_comment = FileRepComment.new
+      linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
+      linked_dispute_comment.user_id = user.id
+      linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+      linked_dispute_comment.save(:validate => false)
+
+    end
 
     if is_duplicate == true
       return new_dispute
@@ -1154,5 +1177,65 @@ class FileReputationDispute < ApplicationRecord
       FileReputationApi::ReversingLabs.unsubscribe(candidate.sha256_hash)
     end
   end
+
+
+  def update_amp_detection
+    # Check whether AMP API is disabled
+    if Rails.configuration.amp_poke.host.blank?
+      raise "AMP Poke API is disabled or not configured"
+      # If we're on staging, test to see whether AMP API is enabled
+    elsif Rails.env == 'staging'
+      begin
+        FileReputationApi::Detection.get_bulk('1eba23049d725aabd84b63f8cd4b079c78f26cde6f7bb8be1d2477df0c0d1234')
+      rescue Exception
+        raise "AMP Poke API is currently disabled on staging"
+      end
+    end
+
+    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
+    detection_last_set = FileReputationApi::ElasticSearch.query(self.sha256_hash)
+    last_fetched = Time.now.utc
+
+    begin
+      file_rep_disputes = FileReputationDispute.where(sha256_hash: detection.sha256_hash)
+      file_rep_dispute = file_rep_disputes.first
+      if detection_last_set == 'No history to display' && !file_rep_dispute.detection_last_set.nil?
+        detection_last_set = file_rep_dispute.detection_last_set
+      end
+      # TODO: I don't necessarily know that we need to .update_all on an after_save callback,
+      # but leaving it in here just to be safe. If this method causes performance problems,
+      # change this line first. Update only `self` instead of updating everything.
+      file_rep_disputes.update_all(disposition: detection.disposition,
+                                   detection_name: detection.name,
+                                   detection_last_set: detection_last_set,
+                                   last_fetched: last_fetched)
+    rescue
+      Rails.logger.error("Error saving updated detection information -- #{$!.message}")
+    end
+  end
+
+  def self.build_ips_bug(bugzilla_rest_session, filename, sha256, problem, original_bug_id)
+    summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = <<~HEREDOC
+          File name: #{filename}
+          File Rep Sha: #{sha256}
+
+          Summary: #{problem}
+    HEREDOC
+
+    bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
+    logger.debug "Creating bugzilla bug"
+
+    research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
+    linked_bug_proxy.save!
+
+    new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
+
+    research_bug_proxy
+  end
+
 
 end

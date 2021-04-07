@@ -41,7 +41,7 @@ $ ->
     { keyCode } = e
     { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
     if keyCode == 13
-      webcat_search_string = $('#web-cat-search .search-box').val()
+      webcat_search_string = $('#web-cat-search .search-box').val().trim()
       if webcat_search_string == ''
        refresh_localStorage()
       else
@@ -52,6 +52,7 @@ $ ->
 
   $('#filter-cases-list a').on 'click', (e)->
     localStorage.setItem('webcat_reset_page', true)
+
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
@@ -66,7 +67,6 @@ $ ->
     channels = $('#channel-input')[0].selectize.items
     entry_ids = $('#entryid-input')[0].selectize.items
     complaint_ids = $('#complaintid-input')[0].selectize.items
-
     if tags.length
       form['tags'] = tags.join(', ')
     if items.length
@@ -117,7 +117,6 @@ $ ->
       modified_older: form.date_modified_newer
       modified_newer: form.date_modified_older
     )
-
     refresh_url()
 
   window.webcat_refresh = ()->
@@ -150,6 +149,7 @@ $ ->
           search_name : webcat_search_name
           search_conditions: JSON.parse(webcat_search_conditions)
         }
+
       when 'contains'
         data = {
           search_type: webcat_search_type
@@ -213,6 +213,7 @@ $ ->
 
     container = $('#webcat_searchref_container')
     search_condition_tooltip = []
+
     for condition_name, condition of subheader
       if condition != ''
         if condition_name == 'id'
@@ -609,10 +610,13 @@ $ ->
                   if data == 'CUSTOMER'
                     '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
                   else
-                    data
+                    '<button class="complaint-submitter-type icon-guest-user esc-tooltipped" title="Guest"></button>'
               }
               {
                 data: 'company_name'
+              }
+              {
+                data: 'customer_email'
               }
               {
                 data: 'assigned_to'
@@ -686,12 +690,18 @@ $ ->
       create: false
       valueField: 'name',
       labelField: 'name',
+      create: true,
+      createOnBlur: true,
       options: createSelectOptions()
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
+      score: (search) ->
+        return (item) ->
+          item.name.toLowerCase().startsWith( search.toLowerCase() ) ? 1 : 0;
     }
+
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,
@@ -867,8 +877,10 @@ $ ->
     data['primary'] = $("#primary-checkbox").is(':checked')
     data['suggested'] = $("#suggested-checkbox").is(':checked')
     data['wbrs'] = $("#wbrs-checkbox").is(':checked')
+    data['platform'] = $("#platform-checkbox").is(':checked')
     data['submittertype'] = $("#submittertype-checkbox").is(':checked')
     data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
+    data['submitteremail'] = $("#submitteremail-checkbox").is(':checked')
     data['assignee'] = $("#assignee-checkbox").is(':checked')
 
     std_msg_ajax(

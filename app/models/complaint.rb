@@ -2,7 +2,7 @@ class Complaint < ApplicationRecord
   belongs_to :customer, optional: true
   has_many :complaint_entries, dependent: :restrict_with_exception
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
-
+  belongs_to :platform, optional: true
   has_paper_trail on: [:update], ignore: [:updated_at]
 
   delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
@@ -85,7 +85,7 @@ class Complaint < ApplicationRecord
   def self.parse_url(url)
     if !url.starts_with?("http")
       url = "http://" + url
-    end  
+    end
     url = URI.escape(url)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
@@ -136,7 +136,7 @@ class Complaint < ApplicationRecord
     top_url = Wbrs::TopUrl.check_urls([ip_or_uri]).first.is_important
     if top_url
       #create a complaint/complaint entry and set to pending
-      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, category_names_string)
+      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, category_names_string, user)
     else
       # Look for existing prefix
       existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
@@ -207,6 +207,7 @@ class Complaint < ApplicationRecord
       new_complaint_entry.resolution = ComplaintEntry::STATUS_RESOLVED_DUPLICATE
       new_complaint_entry.case_resolved_at = resolved_at
       new_complaint_entry.save
+      create_complaint_entry_credit(new_complaint_entry)
     end
     new_entries_urls.each do |url, entry|
       new_payload_item = {}
@@ -227,6 +228,7 @@ class Complaint < ApplicationRecord
       new_complaint_entry.domain = url_parts[:domain]
       new_complaint_entry.path = url_parts[:path]
       new_complaint_entry.save
+      create_complaint_entry_credit(new_complaint_entry)
     end
 
     conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: complaint.id)
@@ -234,6 +236,9 @@ class Complaint < ApplicationRecord
 
   end
 
+  def self.create_complaint_entry_credit(entry)
+    ComplaintEntryCredits::CreditProcessor.new(nil, entry).process
+  end
 
   def build_ti_payload
     payload = {}
@@ -281,7 +286,7 @@ class Complaint < ApplicationRecord
           IPs: #{new_entries_ips.keys.join(', ')}
           URIs: #{new_entries_urls.keys.join(', ')}
           Problem Summary: #{message_payload["payload"]["problem"]}
-      HEREDOC
+        HEREDOC
 
       bug_attrs = {
           'product' => 'Escalations Console',
@@ -296,22 +301,38 @@ class Complaint < ApplicationRecord
       bugzilla_rest_session = message_payload[:bugzilla_rest_session]
       bug_proxy = bugzilla_rest_session.create_bug(bug_attrs, assigned_user: user)
 
+      internal_comment = nil
+
+      if message_payload["payload"]["product_platform"].present?
+        platform = Platform.find(message_payload["payload"]["product_platform"].to_i) rescue nil
+      end
 
       new_complaint = Complaint.new
       new_complaint.submission_type = message_payload["payload"]["submission_type"]
       new_complaint.id = bug_proxy.id
       new_complaint.description = message_payload["payload"]["problem"]
       new_complaint.ticket_source_key = message_payload["source_key"]
-      new_complaint.ticket_source = "talos-intelligence"
+      new_complaint.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
       new_complaint.ticket_source_type = message_payload["source_type"]
       customer = Customer.process_and_get_customer(message_payload)
       new_complaint.customer_id = customer&.id
       new_complaint.status = NEW
       new_complaint.channel = TI_CHANNEL
+      new_complaint.platform_id = platform.id unless platform.blank?
+      new_complaint.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
+      new_complaint.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
+      new_complaint.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
+
       new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
-      new_complaint.save!
+      if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
+        ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
 
+        internal_comment = "Complaint is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+
+      end
+
+      new_complaint.save!
 
       ActiveRecord::Base.transaction do
         max_wait_for_job = 60 #seconds
@@ -327,6 +348,9 @@ class Complaint < ApplicationRecord
         #TODO: investigate above to see if its worth refactoring, and refactor it if so.
 
         new_entries_ips.each do |key, entry|
+          if entry['wbrs']['platform'].present?
+            entry_platform = Platform.find(entry['wbrs']['platform'].to_i) rescue nil
+          end
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"] unless entry['wbrs']['cat_sugg'].blank?
@@ -343,7 +367,8 @@ class Complaint < ApplicationRecord
           new_complaint_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
           new_complaint_entry.entry_type = "IP"
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",") unless entry['wbrs']['cat_sugg'].blank?
-          new_complaint_entry.platform = entry['wbrs']['platform']
+          new_complaint_entry.platform = entry['wbrs']['platform'] if (entry['wbrs']['platform'].present? && !entry['wbrs']['platform'].kind_of?(Integer))
+          new_complaint_entry.platform_id = entry_platform.id unless entry_platform.blank?
           if prefix_response.first&.is_active == 1
             new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"] unless entry['wbrs']['current_cat'].blank?
           else
@@ -355,6 +380,11 @@ class Complaint < ApplicationRecord
           # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
           importance = Wbrs::TopUrl.check_urls([key]).first.is_important
           new_complaint_entry.is_important = importance if !!importance == importance #making sure importance is a boolean
+
+          if internal_comment.present?
+            new_complaint_entry.internal_comment = internal_comment
+          end
+
           new_complaint_entry.save!
 
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
@@ -381,6 +411,9 @@ class Complaint < ApplicationRecord
         end
 
         new_entries_urls.each do |key, entry|
+          if entry['platform'].present?
+            entry_platform = Platform.find(entry['platform'].to_i) rescue nil
+          end
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           url_parts = parse_url(key)
           new_complaint_entry = ComplaintEntry.new
@@ -390,14 +423,14 @@ class Complaint < ApplicationRecord
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
-          new_complaint_entry.platform = entry["platform"]
+          new_complaint_entry.platform = entry["platform"] if (entry["platform"].present? && !entry['platform'].kind_of?(Integer))
 
           if prefix_response.first&.is_active?
             new_complaint_entry.url_primary_category = entry["current_cat"] unless entry['current_cat'].blank?
           else
             new_complaint_entry.url_primary_category = nil
           end
-
+          new_complaint_entry.platform_id = entry_platform.id unless entry_platform.blank?
           new_complaint_entry.subdomain = url_parts[:subdomain]
           new_complaint_entry.domain = url_parts[:domain]
           new_complaint_entry.path = url_parts[:path]
@@ -406,6 +439,11 @@ class Complaint < ApplicationRecord
           # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
           importance = Wbrs::TopUrl.check_urls([key]).first.is_important
           new_complaint_entry.is_important = !!importance #making sure importance is a boolean
+
+          if internal_comment.present?
+            new_complaint_entry.internal_comment = internal_comment
+          end
+
           new_complaint_entry.save!
 
           new_payload_item = {}
@@ -497,18 +535,21 @@ class Complaint < ApplicationRecord
         all_complaints.each do |new_ui_complaint|
           if new_ui_complaint['add_channel'] == WBNP_CHANNEL
             begin
+              ActiveRecord::Base.connection.reconnect!
               rule_ui_wbnp_create_action(new_ui_complaint, new_report, bugzilla_rest_session: bugzilla_rest_session)
             rescue => e
+              ActiveRecord::Base.connection.reconnect!
               new_report.cases_failed += 1
               new_report.notes += "SWP \n uri: #{new_ui_complaint.inspect} | failure: #{e.message} #{e.backtrace.join("\n")}\n"
               new_report.save
             end
           end
         end
-
+        ActiveRecord::Base.connection.reconnect!
         new_report.status = WbnpReport::COMPLETE
         new_report.save
       rescue => e
+        ActiveRecord::Base.connection.reconnect!
         new_report.status = WbnpReport::ERROR
         new_report.notes += "\n\n----------\nPull suddenly ended with error: #{e.message} #{e.backtrace.join("\n")}\n\n"
         new_report.save
@@ -560,8 +601,9 @@ class Complaint < ApplicationRecord
     }
 
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
-
+    ActiveRecord::Base.connection.reconnect!
     cust = Customer.customer_from_ruleui(rule_ui_complaint)
+    ActiveRecord::Base.connection.reconnect!
     new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
                                      customer_id: cust ? cust.id : nil,
@@ -570,7 +612,7 @@ class Complaint < ApplicationRecord
                                      ticket_source_type: 'Complaint',
                                      ticket_source: Complaint::SOURCE_RULEUI,
                                      ticket_source_key: rule_ui_complaint["complaint_id"])
-
+    ActiveRecord::Base.connection.reconnect!
     begin
       category_data = ComplaintEntry.get_category_data(uri)
     rescue
@@ -583,7 +625,9 @@ class Complaint < ApplicationRecord
       primary_category = category_data[:category_names][0]
     end
     begin
+      ActiveRecord::Base.connection.reconnect!
       ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category)
+      ActiveRecord::Base.connection.reconnect!
       Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
       wbnp_report.cases_imported += 1
 
@@ -591,11 +635,11 @@ class Complaint < ApplicationRecord
       wbnp_report.cases_failed += 1
       wbnp_report.notes += "\n\nRUWCA\n uri: #{uri} | failure: #{e.message} \n #{e.backtrace.join("\n")}"
     end
-
+    ActiveRecord::Base.connection.reconnect!
     wbnp_report.save
   end
 
-  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil)
+  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil, user_email = nil)
 
     summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -626,8 +670,14 @@ class Complaint < ApplicationRecord
 
     handle_tags(new_complaint, tags) if tags
 
+    user = if user_email
+      User.find_by_email(user_email)
+    else
+      User.where(display_name:"Vrt Incoming").first
+    end
+
     ips_urls.split(' ').each do |ip_url|
-      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, User.where(display_name:"Vrt Incoming").first, status, categories)
+      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, user, status, categories)
     end
 
     bug_proxy
@@ -653,7 +703,31 @@ class Complaint < ApplicationRecord
     message = Bridge::ComplaintUpdateStatusEvent.new
     message.post_complaint(self)
   end
+
+
+
+  def self.build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, problem, original_bug_id)
+    summary = "New Web Content Categorization Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = <<~HEREDOC
+          IPs: #{new_entries_ips.keys}
+          URIs: #{new_entries_urls.keys}
+          Problem Summary: #{problem}
+    HEREDOC
+
+    bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
+    logger.debug "Creating bugzilla bug"
+
+    research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
+    linked_bug_proxy.save!
+
+    new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
+
+    research_bug_proxy
+  end
+
+
+
 end
-
-
-

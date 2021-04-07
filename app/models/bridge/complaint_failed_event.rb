@@ -7,6 +7,7 @@ class Bridge::ComplaintFailedEvent < Bridge::BaseMessage
   end
 
   def post(source_key: @source_key, ac_status: Complaint::AC_FAILED)
+    Delayed::Worker.logger.info("Complaint failed event sending reply to bridge")
     super(message: {source_key: source_key,
                     ac_status: ac_status})
   end

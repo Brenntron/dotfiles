@@ -35,6 +35,21 @@ class AdminTask
 
   #### REAL TASKS BELOW #######
 
+  def remove_screenshot_jobs(morsel_id, args)
+    morsel = Morsel.find(morsel_id)
+    low_priority_jobs = DelayedJob.where(:queue => "screen_grab")
+    morsel.output += "############################################\n"
+    morsel.output += "starting removal of old screenshot jobs now.\n"
+    morsel.output += "total entries found: #{low_priority_jobs.size.to_s}\n"
+    morsel.output += "running.....\n"
+    morsel.save
+    low_priority_jobs.destroy_all
+    morsel.output += "completed.\n"
+    morsel.output += "############################################\n"
+    morsel.save
+
+  end
+
   def sync_disputes_with_ti(morsel_id, is_current: true)
 
     rep_disputes = is_current ? Dispute.where.not(status: ::Dispute::RESOLVED) : Dispute.all

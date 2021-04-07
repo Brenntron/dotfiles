@@ -11,7 +11,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 
-ActiveRecord::Schema.define(version: 2021_02_05_152938) do
+ActiveRecord::Schema.define(version: 2021_02_14_014754) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -176,7 +176,6 @@ ActiveRecord::Schema.define(version: 2021_02_05_152938) do
     t.text "uri_as_categorized"
     t.string "platform"
     t.integer "platform_id"
-
     t.index ["complaint_id"], name: "index_complaint_entries_on_complaint_id"
     t.index ["status", "created_at"], name: "index_complaint_entries_on_status_and_created_at"
     t.index ["status", "domain"], name: "index_complaint_entries_on_status_and_domain"
@@ -962,6 +961,31 @@ ActiveRecord::Schema.define(version: 2021_02_05_152938) do
     t.string "policy"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+  
+  create_table "ticket_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "ticket_email_id"
+    t.integer "bugzilla_attachment_id"
+    t.string "file_name"
+    t.text "direct_upload_url"
+    t.integer "size"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "ticket_emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "bugzilla_id"
+    t.text "email_headers"
+    t.text "from"
+    t.text "to"
+    t.text "subject"
+    t.text "body", limit: 16777215
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "parse_report", limit: 16777215
+    t.text "simulation_results", limit: 16777215
+    t.boolean "is_simulation"
   end
 
   create_table "ticket_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
