@@ -453,7 +453,7 @@ window.toolbar_show_change_assignee = () ->
       show_message('success', 'Ticket assignment has been updated!', 5)
       window.location.reload()
     error: (response) ->
-      show_message('error', 'Ticket assnigment could not be updated.', 5)
+      show_message('error', 'Ticket assignment could not be updated.', 5)
       std_msg_error('No Tickets Selected', ['Select at least one ticket to assign to yourself.'])
   )
 
