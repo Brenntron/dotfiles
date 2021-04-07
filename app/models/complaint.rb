@@ -303,6 +303,9 @@ class Complaint < ApplicationRecord
       end
 
       new_complaint = Complaint.new
+
+      new_complaint.bridge_packet = message_payload.to_json
+
       new_complaint.submission_type = message_payload["payload"]["submission_type"]
       new_complaint.id = bug_proxy.id
       new_complaint.description = message_payload["payload"]["problem"]
@@ -329,31 +332,33 @@ class Complaint < ApplicationRecord
 
       new_complaint.save!
 
-      ActiveRecord::Base.transaction do
-        max_wait_for_job = 60 #seconds
+      max_wait_for_job = 60 #seconds
 
+      ActiveRecord::Base.transaction do
         response = is_possible_customer_duplicate?(new_complaint, new_entries_ips, new_entries_urls)
 
         if response[:is_dupe] == true
-          manage_duplicate_complaint(new_complaint, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
-          return
+          begin
+            manage_duplicate_complaint(new_complaint, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
+            return
+          rescue => e
+            Rails.logger.error e
+            Rails.logger.error e.backtrace.join("\n")
+
+            conn = ::Bridge::ComplaintFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+            conn.post
+            return
+          end
+
         end
+      end
 
-        #IP based and DOMAIN based entry creation is similar enough that it might be worth investigating refactoring into a common method
-        #TODO: investigate above to see if its worth refactoring, and refactor it if so.
-
+      ActiveRecord::Base.transaction do
+        #########################################################################################
         new_entries_ips.each do |key, entry|
           if entry['wbrs']['platform'].present?
             entry_platform = Platform.find(entry['wbrs']['platform'].to_i) rescue nil
           end
-          prefix_response = Wbrs::Prefix.where({:urls => [key]})
-          new_payload_item = {}
-          new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"] unless entry['wbrs']['cat_sugg'].blank?
-          new_payload_item[:status] = TI_NEW
-          new_payload_item[:resolution_message] = ""
-          new_payload_item[:resolution] = ""
-          new_payload_item[:company_dup] = is_possible_company_duplicate(new_complaint, key, "IP")
-          return_payload[key] = new_payload_item
 
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
@@ -364,53 +369,21 @@ class Complaint < ApplicationRecord
           new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",") unless entry['wbrs']['cat_sugg'].blank?
           new_complaint_entry.platform = entry['wbrs']['platform'] if (entry['wbrs']['platform'].present? && !entry['wbrs']['platform'].kind_of?(Integer))
           new_complaint_entry.platform_id = entry_platform.id unless entry_platform.blank?
-          if prefix_response.first&.is_active == 1
-            new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"] unless entry['wbrs']['current_cat'].blank?
-          else
-            new_complaint_entry.url_primary_category = nil
-          end
-
           new_complaint_entry.status = ComplaintEntry::NEW
-          #lets query the top url API endpoint to determine if this is an important site or not
-          # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
-          importance = Wbrs::TopUrl.check_urls([key]).first.is_important
-          new_complaint_entry.is_important = importance if !!importance == importance #making sure importance is a boolean
-
           if internal_comment.present?
             new_complaint_entry.internal_comment = internal_comment
           end
-
+          new_complaint_entry.url_primary_category = entry["current_cat"] unless entry['current_cat'].blank?
           new_complaint_entry.save!
 
-          ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-
-
-          begin
-            # if we are generating a new screenshot then we need to remove the old one
-            unless new_complaint_entry.complaint_entry_screenshot.nil?
-              ComplaintEntryScreenshot.find(new_complaint_entry.complaint_entry_screenshot.id).delete
-            end
-            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
-            # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
-            ces.grab_screenshot
-          rescue Exception => e
-            Rails.logger.error("#{e.message}")
-            ces = ComplaintEntryScreenshot.new
-            ces.error_message = e.message
-            ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
-             ces.screenshot = f.read
-            end
-            ces.save!
-          end
         end
 
+        #########################################################################################
         new_entries_urls.each do |key, entry|
           if entry['platform'].present?
             entry_platform = Platform.find(entry['platform'].to_i) rescue nil
           end
-          prefix_response = Wbrs::Prefix.where({:urls => [key]})
-          url_parts = parse_url(key)
+
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
           new_complaint_entry.user_id = user.id
@@ -419,21 +392,11 @@ class Complaint < ApplicationRecord
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
           new_complaint_entry.platform = entry["platform"] if (entry["platform"].present? && !entry['platform'].kind_of?(Integer))
-
-          if prefix_response.first&.is_active?
-            new_complaint_entry.url_primary_category = entry["current_cat"] unless entry['current_cat'].blank?
-          else
-            new_complaint_entry.url_primary_category = nil
-          end
           new_complaint_entry.platform_id = entry_platform.id unless entry_platform.blank?
-          new_complaint_entry.subdomain = url_parts[:subdomain]
-          new_complaint_entry.domain = url_parts[:domain]
-          new_complaint_entry.path = url_parts[:path]
           new_complaint_entry.status = ComplaintEntry::NEW
+          new_complaint_entry.url_primary_category = entry["current_cat"] unless entry['current_cat'].blank?
           #lets query the top url API endpoint to determine if this is an important site or not
           # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
-          importance = Wbrs::TopUrl.check_urls([key]).first.is_important
-          new_complaint_entry.is_important = !!importance #making sure importance is a boolean
 
           if internal_comment.present?
             new_complaint_entry.internal_comment = internal_comment
@@ -441,38 +404,86 @@ class Complaint < ApplicationRecord
 
           new_complaint_entry.save!
 
+        end
+      end
+
+      new_complaint.reload
+
+      begin
+        new_complaint.complaint_entries.each do |complaint_entry|
+          prefix_response = Wbrs::Prefix.where({:urls => [complaint_entry.hostlookup]})
+
+          if !prefix_response.first&.is_active?
+            complaint_entry.url_primary_category = nil
+          end
+
+          importance = Wbrs::TopUrl.check_urls([complaint_entry.hostlookup]).first.is_important
+          complaint_entry.is_important = importance if !!importance == importance
+
           new_payload_item = {}
-          new_payload_item[:sugg_type] = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
+          new_payload_item[:sugg_type] = complaint_entry.suggested_disposition unless complaint_entry.suggested_disposition.blank?
           new_payload_item[:status] = TI_NEW
           new_payload_item[:resolution_message] = ""
           new_payload_item[:resolution] = ""
-          new_payload_item[:company_dup] = is_possible_company_duplicate(new_complaint, key, "URI/DOMAIN")
-          return_payload[key] = new_payload_item
 
-          ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+          if complaint_entry.entry_type == "IP"
+            new_payload_item[:company_dup] = is_possible_company_duplicate(new_complaint, complaint_entry.hostlookup, "IP")
+            return_payload[complaint_entry.hostlookup] = new_payload_item
+
+          end
+
+          if complaint_entry.entry_type == "URI/DOMAIN"
+            url_parts = parse_url(complaint_entry.hostlookup)
+            complaint_entry.subdomain = url_parts[:subdomain]
+            complaint_entry.domain = url_parts[:domain]
+            complaint_entry.path = url_parts[:path]
+
+            new_payload_item[:company_dup] = is_possible_company_duplicate(new_complaint, complaint_entry.hostlookup, "URI/DOMAIN")
+            return_payload[complaint_entry.hostlookup] = new_payload_item
+          end
+
+          complaint_entry.save
+
+          ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry)
 
           begin
             # if we are generating a new screenshot then we need to remove the old one
-            unless new_complaint_entry.complaint_entry_screenshot.nil?
-              ComplaintEntryScreenshot.find(new_complaint_entry.complaint_entry_screenshot.id).delete
+            unless complaint_entry.complaint_entry_screenshot.nil?
+              ComplaintEntryScreenshot.find(complaint_entry.complaint_entry_screenshot.id).delete
             end
-            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            ces = ComplaintEntryScreenshot.create(complaint_entry_id: complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
             ces.grab_screenshot
           rescue Exception => e
+            Rails.logger.error("#{e.message}")
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message
-            ces.complaint_entry_id = new_complaint_entry.id
+            ces.complaint_entry_id = complaint_entry.id
             open("app/assets/images/failed_screenshot.jpg") do |f|
-             ces.screenshot = f.read
+              ces.screenshot = f.read
             end
             ces.save!
           end
-        end
 
+        end
+      rescue => e
+        Rails.logger.error e
+        Rails.logger.error e.backtrace.join("\n")
+      end
+
+      new_complaint.reload
+      if new_complaint.complaint_entries.blank?
+        new_complaint.destroy
+
+        conn = ::Bridge::ComplaintFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+        conn.post
+        return
+      else
         conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_complaint.id)
         conn.post(return_payload)
+      end
 
+      #################################################################################################
         #change this
         #return_message = {
         #    "envelope":
@@ -483,11 +494,14 @@ class Complaint < ApplicationRecord
         #        },
         #    "message": {"source_key":params["source_key"],"ac_status":"CREATE_ACK", "ticket_entries": return_payload, "case_email": nil}
         #}
-      end
+
     rescue Exception => e
       Rails.logger.error "Complaint failed to save, backing out all DB changes."
       Rails.logger.error $!
       Rails.logger.error $!.backtrace.join("\n")
+      new_complaint.reload
+      new_complaint.complaint_entries.destroy_all
+      new_complaint.destroy
 
       conn = ::Bridge::ComplaintFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post
