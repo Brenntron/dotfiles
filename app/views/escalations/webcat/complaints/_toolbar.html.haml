@@ -54,14 +54,15 @@
     %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
       %span.toolbar-button-text Return
     %span.dropdown
-      %button.toolbar-button.convert-ticket-button#convert-ticket-button.esc-tooltipped.dropdown-toggle{onclick: 'convert_to_webrep()', type: 'button', title: 'Convert ticket to web reputation ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button.toolbar-button.convert-ticket-button#convert-ticket-button.esc-tooltipped.dropdown-toggle{type: 'button', title: 'Convert ticket to web reputation ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled', onclick: 'prep_complaint_to_convert();'}
         %span.toolbar-button-text Convert to Webrep
       .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'convert-ticket-button'}
         .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
         .inline-tool-content-wrapper
           %label.content-label-sm
-            Ticket ID to convert:
+            Ticket ID to Convert:
             %span#complaint-id-to-convert
+          %br
           %label.content-label-sm
             Ticket Entries:
           %table#entries-to-convert
@@ -78,10 +79,10 @@
 
           %hr.thin
           .comment-wrapper
-            %label.content-label-sm Comment
-            %textarea.dropdown-comment.note-input
+            %label.content-label-sm Ticket Summary
+            %textarea#convert-ticket-summary.dropdown-comment.note-input
           .button-row-center
-            %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_to_webrep_submit(this)'}
+            %button.primary.dropdown-submit-button{type: 'button'}
               Convert Ticket
 
   %div

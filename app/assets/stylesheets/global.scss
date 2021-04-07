@@ -844,6 +844,11 @@ button {
   margin-top: -15px;
 }
 
+.convert-ticket-button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
 #convert-ticket-dropdown {
   border-top-right-radius: 4px;
   min-width: 300px;
