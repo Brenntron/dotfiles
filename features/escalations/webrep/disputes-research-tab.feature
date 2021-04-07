@@ -208,8 +208,6 @@ Feature: Disputes index, Research tab
     And the following disputes exist:
       | id |
       | 5  |
-    # need pending column added for test env?
-    Then pending
     And the following dispute_entries exist:
       | id | dispute_id | uri                | entry_type | platform      |
       | 1  | 5          | 1234computer.com   | URI/DOMAIN | TestPlatform  |
