@@ -213,7 +213,6 @@ Feature: Disputes index, Research tab
       | 1  | 5          | 1234computer.com   | URI/DOMAIN | TestPlatform  |
     And I go to "escalations/webrep/disputes/5"
     And I wait for "1" seconds
-    And I click ".close"
     And I click "#research-tab-link"
     And I wait for "1" seconds
     Then I should see "Research Data"
