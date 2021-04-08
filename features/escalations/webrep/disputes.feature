@@ -519,7 +519,7 @@ Feature: Disputes
     And I click "#add-search-items-button"
     And I click "#platform-cb"
     And I wait for "5" seconds
-    And I fill in selectized of element "#platform-input" with "['1', '2']"
+    And I fill in selectized of element "#platform-input" with "['All', 'Webrep']"
     Then I click "#cancel-add-criteria"
     Then I click "#submit-advanced-search"
     And I wait for "3" seconds

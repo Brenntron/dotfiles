@@ -200,7 +200,7 @@ Feature: WebCat Advanced Search
     And I click "#platform-cb"
     And I click "#cancel-add-criteria"
     And I wait for "5" seconds
-    And I fill in selectized of element "#platform-input" with "['1','4']"
+    And I fill in selectized of element "#platform-input" with "['All','Webcat']"
     And I click "#submit-advanced-search"
     Then I should see tr element with id "1"
     Then I should see tr element with id "3"

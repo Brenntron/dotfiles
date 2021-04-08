@@ -23,7 +23,7 @@ module API
               optional :resolution, type: String
               optional :submission_type, type: Array[String]
               optional :submitter_type, type: String
-              optional :platform, type: String
+              optional :platforms, type: String
               optional :submitted_older, type: Date
               optional :submitted_newer, type: Date
               optional :age_older, type: String

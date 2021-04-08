@@ -398,7 +398,7 @@ $ ->
       customer_name: form.find('input[id="customer-name-input"]').val()
       customer_email: form.find('input[id="customer-email-input"]').val()
       customer_company_name: form.find('input[id="customer-company-input"]').val()
-      platform: form.find('input[id="platform-input"]').val()
+      platforms: form.find('input[id="platform-input"]').val()
     )
 
     refresh_url()
@@ -487,7 +487,6 @@ $ ->
           '<div>Results for Advanced Search ' +
             reset_icon +
             '</div>'
-
         for condition_name, condition of search_conditions
           if condition != ''
             condition_name = condition_name.replace(/_/g, " ").toUpperCase()

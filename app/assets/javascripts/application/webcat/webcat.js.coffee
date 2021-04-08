@@ -66,7 +66,7 @@ $ ->
     channels = $('#channel-input')[0].selectize.items
     entry_ids = $('#entryid-input')[0].selectize.items
     complaint_ids = $('#complaintid-input')[0].selectize.items
-    platform_ids = $('#platform-input')[0].selectize.items
+    platforms = $('#platform-input')[0].selectize.items
 
     if tags.length
       form['tags'] = tags.join(', ')
@@ -90,8 +90,8 @@ $ ->
       form['complaint_id'] = complaint_ids.join(', ')
     if user_id.length
       form['user_id'] = user_id.join(', ')
-    if platform_ids.length
-      form['platform_ids'] = platform_ids.join(',')
+    if platforms.length
+      form['platforms'] = platforms.join(',')
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
@@ -115,7 +115,7 @@ $ ->
       domain: form.domain
       tags: form.tags
       user_id: form.user_id
-      platform_ids: form.platform_ids
+      platforms: form.platforms
       submitted_older: form.date_submitted_older
       submitted_newer: form.date_submitted_newer
       modified_older: form.date_modified_newer
@@ -211,7 +211,6 @@ $ ->
     refresh_url()
 
   build_subheader = (subheader) ->
-
     if typeof subheader == 'string'
       subheader = JSON.parse(subheader)
 
@@ -225,7 +224,6 @@ $ ->
           condition_name = 'Assignee'
         condition_name = condition_name.replace(/_/g, " ").toUpperCase()
         condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
-
         if typeof condition == 'object'
           condition_HTML = '<span>' + condition.from  + ' - ' + condition.to+ '</span>'
         else

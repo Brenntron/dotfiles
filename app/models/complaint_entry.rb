@@ -730,8 +730,9 @@ class ComplaintEntry < ApplicationRecord
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
     end
 
-    if params['platform_ids'].present?
-      ids = params['platform_ids'].split(',').map {|m| m.to_i}
+    if params['platforms'].present?
+      platforms = Platform.where(public_name: params['platforms'].split(',')).select(:id)
+      ids = platforms.map {|m| m.id}
       relation = relation.joins(:complaint).where("complaints.platform_id in (:ids) or complaint_entries.platform_id in (:ids)", ids: ids)
     end
 
