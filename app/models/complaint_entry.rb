@@ -172,6 +172,8 @@ class ComplaintEntry < ApplicationRecord
 
             ###############################################################################################################################################################
             ###guard rails
+
+            # TODO: this code should be refactored to use Webcat::EntryVerdictChecker class
             verdict_pass = true
             verdict_reasons = []
             if categories_string.blank?

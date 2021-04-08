@@ -3,6 +3,8 @@ class ClusterAssignment < ApplicationRecord
 
   EXPIRED_TIMEOUT = 60 # minutes
 
+  scope :temporary, -> { where(permanent: false) }
+
   class << self
     # all assignments are valid during EXPIRED_TIMEOUT
     # so we need to clear exipred assignments before each action
@@ -41,6 +43,14 @@ class ClusterAssignment < ApplicationRecord
       end
     end
 
+    def assign_pemanent!(cluster_ids, user)
+      destroy_expired_assignments!
+      where(cluster_id: cluster_ids).destroy_all
+      cluster_ids.each do |cluster_id|
+        create(cluster_id: cluster_id, user_id: user.id, permanent: true)
+      end
+    end
+
     def unassign(cluster_ids, user)
       where(cluster_id: cluster_ids, user_id: user).destroy_all
     end
@@ -48,7 +58,7 @@ class ClusterAssignment < ApplicationRecord
     private
 
     def destroy_expired_assignments!
-      where('created_at < ?', EXPIRED_TIMEOUT.minutes.ago).destroy_all
+      temporary.where('created_at < ?', EXPIRED_TIMEOUT.minutes.ago).destroy_all
     end
   end
 end

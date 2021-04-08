@@ -66,6 +66,13 @@ Given(/^a manager exists and is logged in$/) do
   sign_in_user
 end
 
+Given(/^a webcat manager with id "(.*?)" exists and is logged in$/) do |user_id|
+  @user = FactoryBot.create(:current_user, confirmed: true, id: user_id)
+  @user.roles << FactoryBot.create(:role, role: 'webcat manager')
+  @user.roles << FactoryBot.create(:role, role: 'webcat user')
+  sign_in_user
+end
+
 Given(/^current user exists$/) do
   @user = FactoryBot.create(:current_user, confirmed: true)
 end
