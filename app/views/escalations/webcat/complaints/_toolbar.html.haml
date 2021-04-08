@@ -54,7 +54,7 @@
     %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
       %span.toolbar-button-text Return
     %span.dropdown
-      %button.toolbar-button.convert-ticket-button#convert-ticket-button.esc-tooltipped.dropdown-toggle{type: 'button', title: 'Convert ticket to web reputation ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled', onclick: 'prep_complaint_to_convert();'}
+      %button#convert-ticket-button.toolbar-button.convert-ticket-button.esc-tooltipped.dropdown-toggle{type: 'button', title: 'Convert ticket to web reputation ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled', onclick: 'prep_complaint_to_convert();'}
         %span.toolbar-button-text Convert to Webrep
       .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'convert-ticket-button'}
         .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
@@ -66,6 +66,16 @@
           %label.content-label-sm
             Ticket Entries:
           %table#entries-to-convert
+
+          .form-group
+            %label.content-label-sm Reputation Ticket Type
+            .inline-radio-wrapper.row
+              .col-xs-6
+                %label{for: 'web-ticket-type'} Web
+                %input#web-ticket-type{type: 'radio', name: 'ticket-type', value: 'web'}
+              .col-xs-6
+                %label{for: 'email-ticket-type'} Email
+                %input#email-ticket-type{type: 'radio', name: 'ticket-type', value: 'email'}
 
           .form-group
             %label.content-label-sm Suggested Disposition

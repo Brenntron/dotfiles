@@ -1651,6 +1651,11 @@ window.populate_resolution_dropdown = (dispute_id) ->
 
 window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
+  row = $('.dispute_check_box').parents('tr')
+  if $('.dispute_check_box').prop('checked') == true
+    $(row).addClass('selected')
+  else
+    $(row).removeClass('selected')
 
 window.webrep_export_selected_rows = () ->
   checked_boxes = $('.dispute_check_box:checked').get()
@@ -2380,3 +2385,39 @@ $ ->
       $('#queue').attr('href', link)
 
   set_disputes_link()
+
+
+# Convert webrep to webcat
+# Enable / disable button to attempt based on if anything is selected
+$(document).on 'click', '#disputes-index tr, #disputes-index .dispute_check_box, #disputes_check_box', ->
+  if $('tr.selected').length > 0
+    $('#convert-ticket-button').removeAttr('disabled')
+  else
+    $('#convert-ticket-button').attr('disabled', 'disabled')
+
+
+# Prepare ticket for converting
+window.prep_dispute_to_convert = () ->
+  if $('tr.selected').length > 1
+    std_api_error('Can only convert 1 complaint at a time.')
+  else
+    # get all data associated with the selected row
+    dispute_row = $('tr.selected')[0]
+    row_data = $('#disputes-index').DataTable().row(dispute_row).data()
+    dispute_id = row_data.id
+    entries = row_data.dispute_entries
+    summay = # this isnt' in the data on the table - need to add it
+
+    $('#dispute-id-to-convert').text(dispute_id)
+    entry_table = $('#entries-to-convert')
+    # clear out previous data
+    $(entry_table).empty()
+    $(entries).each ->
+      debugger
+      entry_content = ''
+      if this.entry.uri?
+        entry_content = this.entry.uri
+      else
+        entry_content = this.entry.ip_address
+      entry_row = '<tr><td>' + this.entry.id + '</td><td>' + entry_content + '</td></tr>'
+      $(entry_table).append(entry_row)

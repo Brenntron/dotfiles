@@ -171,7 +171,7 @@
                 Submit
 
     %span#mark-as-related.dropdown
-      %button#index_mark_related.toolbar-button.mark-related-button.esc-tooltipped{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_mark_related.toolbar-button.mark-related-button.esc-tooltipped.toolbar-button-spacer{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Mark as Related
       .dropdown-menu.toolbar-dropdown#set-related-dispute-div{'aria-labelledby': 'index_mark_related'}
@@ -184,14 +184,18 @@
               Submit
 
     %span.dropdown
-      %button.toolbar-button.convert-ticket-button#move-to-webcat.esc-tooltipped.dropdown-toggle{onclick: 'convert_to_webcat()', type: 'button', title: 'Convert ticket to web categorization ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#convert-ticket-button.toolbar-button.convert-ticket-button.esc-tooltipped.dropdown-toggle{onclick: 'prep_dispute_to_convert();', type: 'button', title: 'Convert ticket to web categorization ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled'}
         %span.toolbar-button-text Convert to Webcat
       .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'move-to-webcat'}
         .dropdown-tool-text-divider.primary-text-divider Convert to Categorization Complaint
         .inline-tool-content-wrapper
           %label.content-label-sm
-            Entry ID to convert:
+            Ticket ID to Convert:
             %span#dispute-id-to-convert
+          %br
+          %label.content-label-sm
+            Ticket Entries:
+          %table#entries-to-convert
 
           .form-group
             %label.content-label-sm Suggested Categories
@@ -199,8 +203,8 @@
 
           %hr.thin
           .comment-wrapper
-            %label.content-label-sm Comment
-            %textarea.dropdown-comment.note-input
+            %label.content-label-sm Ticket Summary
+            %textarea#convert-ticket-summary.dropdown-comment.note-input
           .button-row-center
             %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_to_webcat_submit(this)'}
               Convert Ticket
