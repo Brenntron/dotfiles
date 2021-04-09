@@ -90,12 +90,12 @@ $ ->
       form['complaint_id'] = complaint_ids.join(', ')
     if user_id.length
       form['user_id'] = user_id.join(', ')
+
+    form['platform_display'] = []
     if platform_ids.length
       form['platform_ids'] = platform_ids.join(',')
-      platform_display = []
       for id in platform_ids
-        platform_display.push($('#platform-input')[0].selectize.options[id].public_name)
-      form['platform_display'] = platform_display.join(', ')
+        form['platform_display'].push($('#platform-input')[0].selectize.options[id].public_name)
 
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
@@ -121,7 +121,7 @@ $ ->
       tags: form.tags
       user_id: form.user_id
       platform_ids: form.platform_ids
-      platforms: form.platform_display
+      platforms: form.platform_display.join(', ')
       submitted_older: form.date_submitted_older
       submitted_newer: form.date_submitted_newer
       modified_older: form.date_modified_newer

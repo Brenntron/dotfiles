@@ -374,9 +374,8 @@ $ ->
       time_submitted = {}
 
     platforms = $('#platform-input')[0].selectize.items
-
+    platform_display = []
     if platforms.length
-      platform_display = []
       for platform in platforms
         platform_display.push($('#platform-input')[0].selectize.options[platform].public_name)
 
