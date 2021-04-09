@@ -24,7 +24,13 @@ class Sbrs::Base
   end
 
   def self.category_version
-    @category_version ||= Rails.configuration.sds.category_version
+    begin
+      category_list = JSON.parse(self.remote_call_sds('', 'webcat_labels'))
+      cat_version = category_list["META_CATEGORIES_VERSION"]["current_version"].to_s
+      "v#{cat_version}"
+    rescue
+      "v10"
+    end
   end
 
   def self.sds_v3_host
@@ -186,8 +192,8 @@ class Sbrs::Base
 
       uri = URI.parse(request_string)
       request = Net::HTTP::Get.new(uri)
-      
-      request["X-SDS-Categories-Version"] = category_version    # <-- dude totally deal with this mess ::: SDS CATEGORY VERSION
+
+      request["X-SDS-Categories-Version"] = category_version
       request["X-Client-ID"] = "talosweb"
       request["X-Product-ID"] = "talosintelligence"
       req_options = {

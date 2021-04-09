@@ -308,6 +308,10 @@ class ComplaintEntry < ApplicationRecord
           update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
         end
       end
+
+      # add credit for user's contribution to complaint entry
+      ComplaintEntryCredits::CreditProcessor.new(current_user, self).process
+
       if self.status == "COMPLETED" && self.complaint_entry_screenshot.present?
         self.complaint_entry_screenshot.destroy
       end
@@ -344,6 +348,7 @@ class ComplaintEntry < ApplicationRecord
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"
     end
+
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
       prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
@@ -542,6 +547,9 @@ class ComplaintEntry < ApplicationRecord
       end
       new_complaint_entry.save
 
+      if user != User.where(display_name:"Vrt Incoming").first
+        ComplaintEntryCredits::CreditProcessor.new(user, new_complaint_entry).process
+      end
     rescue Exception => e
       raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
@@ -725,7 +733,7 @@ class ComplaintEntry < ApplicationRecord
     relation = where(simple_params)
 
     if params['user_id'].present?
-      
+
       relation =
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
     end

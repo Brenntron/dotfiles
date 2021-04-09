@@ -85,7 +85,7 @@ class Complaint < ApplicationRecord
   def self.parse_url(url)
     if !url.starts_with?("http")
       url = "http://" + url
-    end  
+    end
     url = URI.escape(url)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
@@ -136,7 +136,7 @@ class Complaint < ApplicationRecord
     top_url = Wbrs::TopUrl.check_urls([ip_or_uri]).first.is_important
     if top_url
       #create a complaint/complaint entry and set to pending
-      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, category_names_string)
+      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, category_names_string, user)
     else
       # Look for existing prefix
       existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
@@ -207,6 +207,7 @@ class Complaint < ApplicationRecord
       new_complaint_entry.resolution = ComplaintEntry::STATUS_RESOLVED_DUPLICATE
       new_complaint_entry.case_resolved_at = resolved_at
       new_complaint_entry.save
+      create_complaint_entry_credit(new_complaint_entry)
     end
     new_entries_urls.each do |url, entry|
       new_payload_item = {}
@@ -227,6 +228,7 @@ class Complaint < ApplicationRecord
       new_complaint_entry.domain = url_parts[:domain]
       new_complaint_entry.path = url_parts[:path]
       new_complaint_entry.save
+      create_complaint_entry_credit(new_complaint_entry)
     end
 
     conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: complaint.id)
@@ -234,6 +236,9 @@ class Complaint < ApplicationRecord
 
   end
 
+  def self.create_complaint_entry_credit(entry)
+    ComplaintEntryCredits::CreditProcessor.new(nil, entry).process
+  end
 
   def build_ti_payload
     payload = {}
@@ -634,7 +639,7 @@ class Complaint < ApplicationRecord
     wbnp_report.save
   end
 
-  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil)
+  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil, user_email = nil)
 
     summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -665,8 +670,14 @@ class Complaint < ApplicationRecord
 
     handle_tags(new_complaint, tags) if tags
 
+    user = if user_email
+      User.find_by_email(user_email)
+    else
+      User.where(display_name:"Vrt Incoming").first
+    end
+
     ips_urls.split(' ').each do |ip_url|
-      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, User.where(display_name:"Vrt Incoming").first, status, categories)
+      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, user, status, categories)
     end
 
     bug_proxy
@@ -720,6 +731,3 @@ class Complaint < ApplicationRecord
 
 
 end
-
-
-

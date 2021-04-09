@@ -65,3 +65,35 @@ $ ->
     html = $('.csv_exportable')[0].outerHTML
     export_table_to_csv html, 'table.csv'
     return
+
+window.show_message = (status, content, timer, selector) ->
+  $('#flash_modal').modal('hide')  # hide residuals
+  $('.alert-dismissable').remove()
+  $('.inline-loader-wrapper:not(.upper-left)').addClass('hidden')  # hide residual gears
+
+  switch status
+    when "success" then div_start = "<div class='alert alert-success alert-dismissable'>"
+    when "error" then div_start = "<div class='alert alert-danger alert-dismissable'>"
+    when "info" then div_start = "<div class='alert alert-info alert-dismissable'>"
+
+  div_start = div_start.replace('alert-dismissable', 'alert-dismissable alert-streamlined')
+  div_end = "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a></div>"
+  div_full = "#{div_start} #{content} #{div_end}"
+
+  # default alert placement here is near top-center, to right of h1
+  if selector != undefined
+    $(selector).before(div_full)
+  else
+    $('#flash-modal-title').after(div_full)   # place the alert
+
+  $('#flash_modal').modal('show')
+  # if timer is defined, auto-dismiss the alert. if timer not defined (or false), leave alerts alone
+  if timer != undefined && timer != false
+    timer = parseInt(timer) * 1000  # 5 sec == 5000 ms
+    setTimeout ->
+      $('.alert-dismissable').fadeOut()
+    , timer
+
+  # after activated, toolbar buttons should hide residual alerts
+  $('.toolbar-button').mouseup ->
+    $('.alert-dismissable').remove()  # use mouseup() above instead of click()

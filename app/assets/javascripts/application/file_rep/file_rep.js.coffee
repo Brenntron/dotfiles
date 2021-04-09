@@ -346,7 +346,7 @@ $ ->
     refresh_url()
 
   window.build_contains_search = () ->
-    search_string = $('#file-rep-search .search-box').val()
+    search_string = $('#file-rep-search .search-box').val().trim()
     if search_string == ''
       refresh_localStorage()
       refresh_url()
@@ -1372,6 +1372,7 @@ $ ->
       data['file-name'] = $("#file-name-checkbox").is(':checked')
 #      data['sha256'] = $("#sha256-checkbox").is(':checked')
       data['file-size'] = $("#file-size-checkbox").is(':checked')
+      data['platform'] = $("#platform-checkbox").is(':checked')
       data['sample-type'] = $("#sample-type-checkbox").is(':checked')
       data['amp-disp'] = $("#amp-disp-checkbox").is(':checked')
       data['amp-name'] = $("#amp-name-checkbox").is(':checked')

@@ -1218,4 +1218,3 @@ Feature: Disputes
     When I click "#queue"
     Then I should see "000001"
     And I should not see "000002"
-

@@ -9,6 +9,9 @@ class FileReputationDispute < ApplicationRecord
   has_many :digital_signers
   has_many :file_rep_comments
   has_many :dispute_emails
+
+  after_save :update_amp_detection
+
   belongs_to :ti_product_platform, :class_name => "Platform", :foreign_key => "platform_id", optional: true
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
@@ -1181,6 +1184,41 @@ class FileReputationDispute < ApplicationRecord
   end
 
 
+  def update_amp_detection
+    # Check whether AMP API is disabled
+    if Rails.configuration.amp_poke.host.blank?
+      raise "AMP Poke API is disabled or not configured"
+      # If we're on staging, test to see whether AMP API is enabled
+    elsif Rails.env == 'staging'
+      begin
+        FileReputationApi::Detection.get_bulk('1eba23049d725aabd84b63f8cd4b079c78f26cde6f7bb8be1d2477df0c0d1234')
+      rescue Exception
+        raise "AMP Poke API is currently disabled on staging"
+      end
+    end
+
+    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
+    detection_last_set = FileReputationApi::ElasticSearch.query(self.sha256_hash)
+    last_fetched = Time.now.utc
+
+    begin
+      file_rep_disputes = FileReputationDispute.where(sha256_hash: detection.sha256_hash)
+      file_rep_dispute = file_rep_disputes.first
+      if detection_last_set == 'No history to display' && !file_rep_dispute.detection_last_set.nil?
+        detection_last_set = file_rep_dispute.detection_last_set
+      end
+      # TODO: I don't necessarily know that we need to .update_all on an after_save callback,
+      # but leaving it in here just to be safe. If this method causes performance problems,
+      # change this line first. Update only `self` instead of updating everything.
+      file_rep_disputes.update_all(disposition: detection.disposition,
+                                   detection_name: detection.name,
+                                   detection_last_set: detection_last_set,
+                                   last_fetched: last_fetched)
+    rescue
+      Rails.logger.error("Error saving updated detection information -- #{$!.message}")
+    end
+  end
+
   def self.build_ips_bug(bugzilla_rest_session, filename, sha256, problem, original_bug_id)
     summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -1203,5 +1241,6 @@ class FileReputationDispute < ApplicationRecord
 
     research_bug_proxy
   end
+
 
 end

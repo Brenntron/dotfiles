@@ -5,7 +5,7 @@
         %tr
           %th Pattern
           %th Example
-          %th Engine Description
+          %th Contact
           %th.text-center Notes
       %tbody
         - @conventions.each do |convention|
@@ -13,7 +13,8 @@
             %td
               %span= convention.pattern
             %td= convention.example
-            %td= convention.engine_description
+            %td.contact-col
+              = convention.contact
             %td.text-center
               - if convention.notes
                 %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped', title: "#{convention.notes}"}

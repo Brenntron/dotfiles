@@ -349,7 +349,6 @@ module ApiRequester::ApiRequester
           else
             raise 'Unknown request type, must be :json, :query_string, or :query_body'
           end
-
       request_error_handling(call_by_method(method, request))
     end
 
