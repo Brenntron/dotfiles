@@ -55,7 +55,7 @@ module API
 
             get "" do
 
-              customers = Customer.all.includes(:company).map{ |customer| "#{customer.company.name}"}
+              customers = Customer.all.includes(:company).map{ |customer| "#{customer.company&.name}"}
               {:data => customers}
 
             end

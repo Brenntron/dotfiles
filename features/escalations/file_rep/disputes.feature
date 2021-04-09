@@ -689,3 +689,23 @@ Feature: Disputes
     Then I should see "000001"
     Then I should not see "000002"
 
+  @javascript
+  Scenario: a user uses advanced search with 'Platform' as a search criteria
+    Given a user with role "filerep user" exists and is logged in
+    And platforms with all traits exist
+    And the following FileRep disputes exist:
+      | sha256_hash                                                       | platform_id |
+      | 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54  | 5           |
+      | addd44ee803082c4667bae68284e316f1a799b72ecbdaae38097ba2c4ccb9d16  | 1           |
+    When I goto "escalations/file_rep/disputes?f=open"
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#platform-cb"
+    And I wait for "5" seconds
+    And I fill in selectized of element "#platform-input" with "['5']"
+    Then I click "#cancel-add-criteria"
+    Then I click "#submit-advanced-search"
+    And I should see "PLATFORMS: Filerep"
+    Then I should see "000001"
+    And I should not see "000002"
+

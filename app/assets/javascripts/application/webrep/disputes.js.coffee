@@ -180,6 +180,7 @@ window.advanced_webrep_index_table = () ->
     resolution: form.find('input[id="resolution-input"]').val()
     submission_type: submission_types
     submitter_type: form.find('input[id="submitter-input"]').val()
+    platform_ids: form.find('input[id="platform-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
     submitted_newer: form.find('input[id="submitted-newer-input"]').val()
     age_older: form.find('input[id="age-older-input"]').val()
@@ -1365,6 +1366,7 @@ $ ->
     )
 
   $('#advanced-search-button').click ->
+
     std_msg_ajax(
       method: 'GET'
       url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
@@ -1378,6 +1380,17 @@ $ ->
         $('#company-list').empty()
         $('#resolution-list').empty()
 
+        $('#platform-input').selectize {
+          persist: false
+          create: false
+          valueField: 'id',
+          labelField: 'public_name',
+          options: response.json.platforms[$('#platform-input').attr('data')]
+          onFocus: () ->
+            window.toggle_selectize_layer(this, 'true')
+          onBlur: () ->
+            window.toggle_selectize_layer(this, 'false')
+        }
 
         for user in response.json.case_owners
           $('#user-list').append '<option value=\'' + user.cvs_username + '\'></option>'

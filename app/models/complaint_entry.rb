@@ -698,7 +698,6 @@ class ComplaintEntry < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-
     present_params = params.select{|ignore_key, value| value.present?}
 
     if present_params['status'].present?
@@ -737,6 +736,11 @@ class ComplaintEntry < ApplicationRecord
 
       relation =
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
+    end
+
+    if params['platform_ids'].present?
+      ids = params['platform_ids'].split(',').map {|m| m.to_i}
+      relation = relation.joins(:complaint).where("complaints.platform_id in (:ids) or complaint_entries.platform_id in (:ids)", ids: ids)
     end
 
     if params['submitted_newer'].present?
