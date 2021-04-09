@@ -907,9 +907,8 @@ class Dispute < ApplicationRecord
       end
     end
 
-    if params['platforms'].present?
-      platforms = Platform.where(public_name: params['platforms'].split(',')).select(:id)
-      ids = platforms.map {|m| m.id}
+    if params['platform_ids'].present?
+      ids = params['platform_ids'].split(',').map {|m| m.to_i}
       relation = relation.joins(:dispute_entries).where("disputes.platform_id in (:ids) or dispute_entries.platform_id in (:ids)", ids: ids)
     end
 

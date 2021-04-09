@@ -66,7 +66,7 @@ $ ->
     channels = $('#channel-input')[0].selectize.items
     entry_ids = $('#entryid-input')[0].selectize.items
     complaint_ids = $('#complaintid-input')[0].selectize.items
-    platforms = $('#platform-input')[0].selectize.items
+    platform_ids = $('#platform-input')[0].selectize.items
 
     if tags.length
       form['tags'] = tags.join(', ')
@@ -90,8 +90,13 @@ $ ->
       form['complaint_id'] = complaint_ids.join(', ')
     if user_id.length
       form['user_id'] = user_id.join(', ')
-    if platforms.length
-      form['platforms'] = platforms.join(',')
+    if platform_ids.length
+      form['platform_ids'] = platform_ids.join(',')
+      platform_display = []
+      for id in platform_ids
+        platform_display.push($('#platform-input')[0].selectize.options[id].public_name)
+      form['platform_display'] = platform_display.join(', ')
+
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
@@ -115,7 +120,8 @@ $ ->
       domain: form.domain
       tags: form.tags
       user_id: form.user_id
-      platforms: form.platforms
+      platform_ids: form.platform_ids
+      platforms: form.platform_display
       submitted_older: form.date_submitted_older
       submitted_newer: form.date_submitted_newer
       modified_older: form.date_modified_newer
@@ -218,6 +224,8 @@ $ ->
     search_condition_tooltip = []
     for condition_name, condition of subheader
       if condition != ''
+        if condition_name == 'platform_ids'
+          continue
         if condition_name == 'id'
           condition_name = 'Entry Id'
         if condition_name == 'user_id'

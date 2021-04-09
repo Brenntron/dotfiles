@@ -519,10 +519,9 @@ Feature: Disputes
     And I click "#add-search-items-button"
     And I click "#platform-cb"
     And I wait for "5" seconds
-    And I fill in selectized of element "#platform-input" with "['All', 'Webrep']"
+    And I fill in selectized of element "#platform-input" with "['1', '2']"
     Then I click "#cancel-add-criteria"
     Then I click "#submit-advanced-search"
-    And I wait for "3" seconds
     Then I should see "0000000001"
     And I should see "0000000002"
     And I should not see "0000000003"

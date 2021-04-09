@@ -373,6 +373,13 @@ $ ->
     if $('last-updated-input').closest('.form-group').hasClass('.hidden')
       time_submitted = {}
 
+    platforms = $('#platform-input')[0].selectize.items
+
+    if platforms.length
+      platform_display = []
+      for platform in platforms
+        platform_display.push($('#platform-input')[0].selectize.options[platform].public_name)
+
     localStorage.search_type = 'advanced'
     localStorage.search_name = form.find('input[name="search_name"]').val()
     localStorage.search_conditions = JSON.stringify(
@@ -398,7 +405,8 @@ $ ->
       customer_name: form.find('input[id="customer-name-input"]').val()
       customer_email: form.find('input[id="customer-email-input"]').val()
       customer_company_name: form.find('input[id="customer-company-input"]').val()
-      platforms: form.find('input[id="platform-input"]').val()
+      platform_ids: form.find('input[id="platform-input"]').val()
+      platforms: platform_display.join(', ')
     )
 
     refresh_url()
@@ -488,6 +496,8 @@ $ ->
             reset_icon +
             '</div>'
         for condition_name, condition of search_conditions
+          if condition_name == 'platform_ids'
+            continue
           if condition != ''
             condition_name = condition_name.replace(/_/g, " ").toUpperCase()
             condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'

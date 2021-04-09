@@ -297,7 +297,7 @@ class FileReputationDispute < ApplicationRecord
     search_hash = non_blank_fields(params)
     sha256_hash = search_hash.delete('sha256_hash')
     file_name = search_hash.delete('file_name')
-    platforms = search_hash.delete('platforms')
+    platform_ids = search_hash.delete('platform_ids')
     threatgrid_range = search_hash.delete('threatgrid_score') || {}
     sandbox_range = search_hash.delete('sandbox_score') || {}
     created_at_range = search_hash.delete('created_at') || {}
@@ -314,9 +314,8 @@ class FileReputationDispute < ApplicationRecord
       relation = relation.where('file_name like :file_name', file_name: "%#{sanitize_sql_like(file_name)}%")
     end
 
-    if platforms.present?
-      platform_query = Platform.where(public_name: platforms.split(',')).select(:id)
-      ids = platform_query.map {|m| m.id}
+    if platform_ids.present?
+      ids = platform_ids.split(',').map {|m| m.to_i}
       relation = relation.where(platform_id: ids)
     end
 

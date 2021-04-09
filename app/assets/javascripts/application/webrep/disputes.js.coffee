@@ -180,7 +180,7 @@ window.advanced_webrep_index_table = () ->
     resolution: form.find('input[id="resolution-input"]').val()
     submission_type: submission_types
     submitter_type: form.find('input[id="submitter-input"]').val()
-    platforms: form.find('input[id="platform-input"]').val()
+    platform_ids: form.find('input[id="platform-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
     submitted_newer: form.find('input[id="submitted-newer-input"]').val()
     age_older: form.find('input[id="age-older-input"]').val()
@@ -1354,7 +1354,7 @@ $ ->
         $('#platform-input').selectize {
           persist: false
           create: false
-          valueField: 'public_name',
+          valueField: 'id',
           labelField: 'public_name',
           options: response.json.platforms[$('#platform-input').attr('data')]
           onFocus: () ->
