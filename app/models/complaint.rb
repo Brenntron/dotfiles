@@ -537,8 +537,9 @@ class Complaint < ApplicationRecord
       new_report.notes += "logger_token: #{logger_token} <br />"
       new_report.save
 
-      kick_off_wbnp_pull(new_report.id, logger_token)
-
+      Thread.new do
+        kick_off_wbnp_pull(new_report.id, logger_token)
+      end
       new_report
 
   end
@@ -549,7 +550,7 @@ class Complaint < ApplicationRecord
       start_wbnp_pull(new_report_id, logger_token)
     end
 
-    handle_asynchronously :kick_off_wbnp_pull, :queue => "wbnp_pull", :priority => 2
+    #handle_asynchronously :kick_off_wbnp_pull, :queue => "wbnp_pull", :priority => 2
 
     def start_wbnp_pull(new_report_id, logger_token)
 
@@ -693,7 +694,9 @@ class Complaint < ApplicationRecord
 
     description = "WBNP Sourced Complaint"
 
-    user = User.where(cvs_username:"vrtincom").first
+    ActiveRecord::Base.connection.reconnect!
+    #user = User.where(cvs_username:"vrtincom").first
+    user = User.vrtincoming
 
     summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
