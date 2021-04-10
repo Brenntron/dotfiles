@@ -1028,7 +1028,6 @@ $ ->
       {
         data: 'case_age'
         'render':(data,type,full,meta) ->
-          console.log data,type,full,meta
           if data != "<1 hr"
             dispute_duration = moment(full.case_opened_at).fromNow()
             if dispute_duration.includes('minute')
