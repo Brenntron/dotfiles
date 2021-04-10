@@ -1170,6 +1170,7 @@ class Dispute < ApplicationRecord
       dispute_packet[:submitter_domain] = dispute.org_domain
       dispute_packet[:submitter_name] = dispute.customer_name
       dispute_packet[:submitter_email] = dispute.customer_email
+      dispute_packet[:dispute_summary] = dispute.problem_summary
       dispute_packet[:dispute_domain] = dispute.org_domain
       dispute_packet[:updated_at] = dispute.updated_at&.strftime("%F %T")
       unless dispute.dispute_entries.blank?

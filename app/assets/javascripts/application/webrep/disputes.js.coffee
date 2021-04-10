@@ -2397,27 +2397,55 @@ $(document).on 'click', '#disputes-index tr, #disputes-index .dispute_check_box,
 
 
 # Prepare ticket for converting
-window.prep_dispute_to_convert = () ->
+window.prep_dispute_to_convert = (event) ->
   if $('tr.selected').length > 1
-    std_api_error('Can only convert 1 complaint at a time.')
+    std_msg_error('Too many rows selected', ['Please select only one row.'])
   else
     # get all data associated with the selected row
     dispute_row = $('tr.selected')[0]
     row_data = $('#disputes-index').DataTable().row(dispute_row).data()
     dispute_id = row_data.id
     entries = row_data.dispute_entries
-    summay = # this isnt' in the data on the table - need to add it
+    summary = row_data.dispute_summary
 
     $('#dispute-id-to-convert').text(dispute_id)
+    $('#convert-ticket-summary').text(summary)
     entry_table = $('#entries-to-convert')
     # clear out previous data
     $(entry_table).empty()
     $(entries).each ->
-      debugger
       entry_content = ''
       if this.entry.uri?
         entry_content = this.entry.uri
       else
         entry_content = this.entry.ip_address
-      entry_row = '<tr><td>' + this.entry.id + '</td><td>' + entry_content + '</td></tr>'
+      entry_row = '<tr><td>' + this.entry.id + '</td><td class="entry-content-cell"><span class="input-truncate">' + entry_content + '</span></td></tr>'
       $(entry_table).append(entry_row)
+
+    $('#suggested-categories').selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      closeAfterSelect: true,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: AC.WebCat.createSelectOptions('#suggested-categories')
+    }
+
+
+window.convert_dispute_to_webcat = () ->
+  data = {}
+  data.dispute_id = $('#dispute-id-to-convert').text()
+  data.summary = $('#convert-ticket-summary').val()
+  data.suggested_categories = $('#suggested-categories').val()
+  # Need some kind of loader this thing takes forever
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/convert_ticket'
+    method: 'POST'
+    data: data
+    success: (response) ->
+      console.log response
+    error: (response) ->
+      console.log response
+  )
