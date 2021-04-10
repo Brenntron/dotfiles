@@ -13093,10 +13093,13 @@ input.wl-bl-list-inline {
   .selectize-input {
     width: 100%;
     min-height: 30px;
-    font-size: 8.5pt;
-    input:focus {
-      box-shadow: none !important;
-      border: none !important;
+    input {
+      font-size: 8.5pt;
+      padding: 1px 5px !important;
+      &:focus{
+        box-shadow: none !important;
+        border: none !important;
+      }
     }
   }
   .selectize-dropdown {
