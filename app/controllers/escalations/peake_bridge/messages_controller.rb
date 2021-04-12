@@ -28,7 +28,7 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
         message_payload[:current_user] = current_user
 
         # This is so the tests can stub out the `threaded?` method and test synchronously.
-        if self.class.threaded?
+        if self.class.threaded? && Rails.env != "test"
           Thread.new do
             obj_type.constantize.process_bridge_payload(message_payload)
           end
