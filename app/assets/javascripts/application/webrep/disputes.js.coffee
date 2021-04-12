@@ -2386,6 +2386,7 @@ $ ->
   set_disputes_link()
 
 
+
 # Convert webrep to webcat
 # Enable / disable button to attempt based on if anything is selected
 $(document).on 'click', '#disputes-index tr, #disputes-index .dispute_check_box, #disputes_check_box', ->
@@ -2393,6 +2394,7 @@ $(document).on 'click', '#disputes-index tr, #disputes-index .dispute_check_box,
     $('#convert-ticket-button').removeAttr('disabled')
   else
     $('#convert-ticket-button').attr('disabled', 'disabled')
+
 
 
 # Prepare ticket for converting
@@ -2421,7 +2423,7 @@ window.prep_dispute_to_convert = (event) ->
       entry_row = '<tr><td>' + this.entry.id + '</td><td class="entry-content-cell"><span class="input-truncate">' + entry_content + '</span></td></tr>'
       $(entry_table).append(entry_row)
 
-    $('#suggested-categories').selectize {
+    $selected_cats = $('#suggested-categories').selectize {
       persist: false,
       create: false,
       maxItems: 5,
@@ -2432,19 +2434,30 @@ window.prep_dispute_to_convert = (event) ->
       options: AC.WebCat.createSelectOptions('#suggested-categories')
     }
 
+    cats_controller = $selected_cats[0].selectize
+    cats_controller.on 'change', ->
+      cats = $('#suggested-categories').val()
+      if cats == '' || cats == null
+        $('#convert-ticket-dropdown .dropdown-submit-button').attr('disabled', 'disabled')
+      else
+        $('#convert-ticket-dropdown .dropdown-submit-button').removeAttr('disabled')
+
 
 window.convert_dispute_to_webcat = () ->
+  $('#convert-ticket-dropdown .dropdown-loader-wrapper').removeClass('hidden')
   data = {}
   data.dispute_id = $('#dispute-id-to-convert').text()
   data.summary = $('#convert-ticket-summary').val()
   data.suggested_categories = $('#suggested-categories').val()
-  # Need some kind of loader this thing takes forever
+
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/convert_ticket'
     method: 'POST'
     data: data
     success: (response) ->
       console.log response
+      $('#convert-ticket-dropdown .dropdown-loader-wrapper').addClass('hidden')
     error: (response) ->
       console.log response
+      $('#convert-ticket-dropdown .dropdown-loader-wrapper').addClass('hidden')
   )

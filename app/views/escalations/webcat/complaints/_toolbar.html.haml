@@ -59,10 +59,12 @@
       .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'convert-ticket-button'}
         .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
         .inline-tool-content-wrapper
+          .dropdown-loader-wrapper.hidden
+            Converting...
           %label.content-label-sm
             Ticket ID to Convert:
-            %span#complaint-id-to-convert
-          %br
+          %span.ticket-id-to-convert#complaint-id-to-convert
+
           %label.content-label-sm
             Ticket Entries:
           %table#entries-to-convert

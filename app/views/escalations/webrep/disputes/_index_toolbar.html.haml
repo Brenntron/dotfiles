@@ -189,10 +189,15 @@
       .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'move-to-webcat'}
         .dropdown-tool-text-divider.primary-text-divider Convert to Categorization Dispute
         .inline-tool-content-wrapper
+          .dropdown-loader-wrapper.hidden
+            .gear-loader-wrapper
+              = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+            %span.loader-msg Converting to Webcat...
+
           %label.content-label-sm
             Ticket ID to Convert:
-            %span#dispute-id-to-convert
-          %br
+          %span.ticket-id-to-convert#dispute-id-to-convert
+
           %label.content-label-sm
             Ticket Entries:
           %table#entries-to-convert
@@ -204,7 +209,7 @@
             %label.content-label-sm Suggested Categories
             %select#suggested-categories.selectize{:multiple=>"multiple", :placeholder=>"Add Categories"}
           .button-row-center
-            %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();'}
+            %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
               Convert Ticket
 
   %div
