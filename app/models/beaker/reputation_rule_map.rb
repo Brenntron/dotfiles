@@ -1,14 +1,6 @@
-class Beaker::ReputationRuleMap < Beaker::BeakerBase
+class Beaker::ReputationRuleMap
 
   private
-
-  def self.remote_stub
-    @remote_stub ||= Talos::Service::IPD::Stub.new(hostport, creds)
-  end
-
-  def remote_stub
-    self.class.remote_stub
-  end
 
   def lookup_version
     @lookup_version ||= Rails.cache.read("reputation_rule_map_version")
@@ -18,26 +10,13 @@ class Beaker::ReputationRuleMap < Beaker::BeakerBase
     @reputation_rule_lookup ||= Rails.cache.read("reputation_rule_lookup")
   end
 
-  # Request a mapping of reputation rule IDs to mnemonics. No descriptions
-  # are provided, due to confidentiality concerns. This should be called
-  # whenever `rule_map_version` in a response from a `QueryReputation`
-  # service method call is larger than the version of the Reputation Rule
-  # Map that you have cached. For details on the structure of the
-  # Reputation Rule Map, see the `ReputationRuleMap` message in
-  # `talos.proto`.
-  # rpc :QueryRuleMap, ::Talos::IPD::RuleMapRequest, ::Talos::ReputationRuleMap
-  def query_rule_map
-    rule_map_request = Talos::IPD::RuleMapRequest.new(app_info: get_app_info)
-    remote_stub.query_rule_map(rule_map_request)
-  end
-
   def load_rule_map
     @reputation_rule_lookup = Rails.cache.read("reputation_rule_lookup")
     @lookup_version = Rails.cache.read("reputation_rule_map_version")
   end
 
   def cache_rule_map
-    reputation_rule_map = query_rule_map
+    reputation_rule_map = Beaker::Ipd.query_rule_map
     reputation_rule_map_json = Talos::ReputationRuleMap.encode_json(reputation_rule_map)
     rule_map_data = reputation_rule_map.to_h
     @lookup_version = rule_map_data[:version]

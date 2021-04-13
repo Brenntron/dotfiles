@@ -12,13 +12,17 @@ class Beaker::BeakerBase
     @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert)
   end
 
-  def get_app_info
+  def self.get_app_info
     Talos::AppInfo.new(
         device_id: ENV['DEVICE_ID'],
         product_family: ENV['PRODUCT_FAMILY'],
         product_id: ENV['PRODUCT_ID'],
         product_version: ENV['PRODUCT_VERSION']
     )
+  end
+
+  def get_app_info
+    self.class.get_app_info
   end
 
   def get_connection(guid=nil)
