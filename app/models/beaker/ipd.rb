@@ -18,7 +18,7 @@ class Beaker::Ipd < Beaker::BeakerBase
   # example). Batches of 25 IP addresses or less are recommended for
   # optimum query latency.
   # rpc :QueryReputation, ::Talos::IPD::ReputationRequest, ::Talos::IPD::ReputationReply
-  def query_reputation(ips)
+  def self.query_reputation(ips)
     endpoints = ips.map { |ip| get_ip_endpoint(ip) }
     reputation_request = Talos::IPD::ReputationRequest.new(app_info: get_app_info, endpoint: endpoints, connection: get_connection)
 
@@ -43,7 +43,7 @@ class Beaker::Ipd < Beaker::BeakerBase
   # Gets mnemonics of IP address
   # @param [String] ip the IP address, e.g. "2.3.4.5"
   # @return [Array<String>] array of mnemonics for that IP address
-  def reputation_ip(ip)
+  def self.reputation_ip(ip)
     reply = query_reputation([ip])
     rep_rule_ids = reply.result.map { |ip_result| ip_result.rep_rule_id }.flatten
     rep_rule_ids.map { |rep_rule_id| Beaker::ReputationRuleMap.mnemonic(rep_rule_id, version: reply.rule_map_version) }
@@ -53,7 +53,7 @@ class Beaker::Ipd < Beaker::BeakerBase
   # `DomainInfoRequest` and `DomainInfoReply` messages in `ipd.proto` for
   # details on the structure of the request and response.
   # rpc :QueryDomainInfo, ::Talos::IPD::DomainInfoRequest, ::Talos::IPD::DomainInfoReply
-  def query_domain_info(name)
+  def self.query_domain_info(name)
     remote_stub.query_domain_info(Talos::IPD::DomainInfoRequest.new(name: name))
   end
 

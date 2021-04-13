@@ -25,7 +25,7 @@ class Beaker::BeakerBase
     self.class.get_app_info
   end
 
-  def get_connection(guid=nil)
+  def self.get_connection(guid=nil)
     Talos::IPConnection.new(
         direction: Talos::IPConnection::Direction::IP_DIR_OUT,
         proto: Talos::IPConnection::Protocol::IP_PROTO_TCP,
@@ -33,7 +33,7 @@ class Beaker::BeakerBase
     )
   end
 
-  def get_ip_endpoint(ip)
+  def self.get_ip_endpoint(ip)
     if ip.kind_of?(Integer)
       Talos::IPEndpoint.new(ipv4_addr: ip)
     else
