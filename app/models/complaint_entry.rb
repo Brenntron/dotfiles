@@ -1176,4 +1176,54 @@ class ComplaintEntry < ApplicationRecord
     end
     confirmation
   end
+
+  def resubmit_to_rule_api
+    log_messages = []
+    #do some sanity checks ot make sure it's not already categorized
+
+    if !["completed","resolved"].include?(self.status.downcase)
+      log_messages << "complaint entry #{self.id} : #{self.hostlookup} is not resolved yet, not attempting resend"
+      return log_messages
+    end
+    all_cats = Wbrs::Category.all
+    if self.category.blank?
+      log_messages << "complaint entry #{self.id} : #{self.hostlookup} has no categories saved, cannot attempt resubmit"
+      return log_messages
+    end
+    cat_string = self.category.split(",").map {|cat| cat.strip }
+    cat_ids_array = []
+
+    cat_string.each do |cat_s|
+      possible_cat = all_cats.select {|cat| cat.descr == cat_s}
+      if possible_cat.present?
+        cat_ids_array << possible_cat.first.category_id
+      end
+    end
+    cat_ids_string = cat_ids_array.join(",")
+
+    current_cats = Wbrs::Prefix.where({:urls => [URI.escape(self.uri_as_categorized)]}).map {|result| result.category_id}
+
+    if current_cats.sort == cat_ids_array.sort
+      log_messages << "#{self.id} : #{self.hostlookup} current cat ids appear to match cat ids in ruleAPI, aborting resubmit"
+      return log_messages
+    end
+    final_prefix = ""
+    if self.uri_as_categorized.present?
+      log_messages << "#{self.id} : #{self.hostlookup} using uri_as_categorized: #{self.uri_as_categorized}"
+      final_prefix = self.uri_as_categorized
+    else
+      log_messages << "#{self.id} : #{self.hostlookup} could not find uri_as_categorized, using hostlookup"
+      final_prefix = self.hostlookup
+    end
+    #setup for call to ruleAPI
+    existing_prefixes = Wbrs::Prefix.where({:urls => [URI.escape(self.uri_as_categorized)]})
+    prefix = self.uri_as_categorized
+    final_cat_string = cat_ids_string
+    comment = self.internal_comment + " -- automated re-attempt at categorization"
+    ticket_user = User.find(self.user_id)
+    log_messages << "#{self.id} : #{self.hostlookup} committing category #{cat_string} : #{cat_ids_string} to ruleAPI"
+    commit_category(existing_prefixes, ip_or_uri: prefix, categories_string: final_cat_string, description: comment, user: ticket_user.email, casenumber: self.complaint.id)
+
+    return log_messages
+  end
 end
