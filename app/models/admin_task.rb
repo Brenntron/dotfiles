@@ -100,4 +100,52 @@ class AdminTask
     morsel.save
     # no need to handle asynchronously since the bridge jobs already do this
   end
+
+  def resubmit_category_tickets(morsel_id, args)
+    range_from = args[:from]  #must be in format yyyy-mm-dd 2020-12-24
+    range_to = args[:to]
+
+    id_range_from = args[:id_from]  #id range  {"id_from":"100000","id_to":"100100"}
+    id_range_to = args[:id_to]
+
+    url_range = args[:url]  #{"uri":"www.google.com, www.yahoo.com, www.msn.com"}
+
+    morsel = Morsel.find(morsel_id)
+    if range_from.present? && range_to.present?
+      complaint_entries = ComplaintEntry.where("updated_at >= '#{range_from}' and updated_at <= '#{range_to}'").where(:status => ['COMPLETED','RESOLVED','CLOSED'])
+    end
+    if id_range_from.present? && id_range_to.present?
+      complaint_entries = ComplaintEntry.where("id >= '#{id_range_from}' and id <= '#{id_range_to}'").where(:status => ['COMPLETED','RESOLVED','CLOSED'])
+    end
+    if url_range.present?
+      url_list = url_range.split(",").map {|url| url.strip}
+      complaint_entries = []
+
+      url_list.each do |url|
+        entries_found = ComplaintEntry.where(:uri_as_categorized => url).where(:status => ['COMPLETED','RESOLVED','CLOSED']).order("case_resolved_at DESC")
+        if entries_found.present?
+          complaint_entries << entries_found.first
+        end
+      end
+    end
+
+
+    morsel.output += "total entries: #{complaint_entries.size} \n\n"
+    Thread.new do
+      complaint_entries.each do |complaint_entry|
+        puts "running complaint entry: #{complaint_entry.id} : #{complaint_entry.hostlookup}\n"
+        morsel.output += "running complaint entry: #{complaint_entry.id} : #{complaint_entry.hostlookup}\n"
+        morsel.save
+        log = complaint_entry.resubmit_to_rule_api
+        log.each do |l_entry|
+          morsel.output += l_entry + "\n"
+        end
+        morsel.save
+      end
+      morsel.output += "\nCompleted task."
+      morsel.save
+    end
+
+    morsel
+  end
 end
