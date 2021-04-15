@@ -1,0 +1,1 @@
+class NgfwCluster < ApplicationRecord; end
