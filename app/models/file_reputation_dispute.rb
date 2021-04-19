@@ -461,10 +461,12 @@ class FileReputationDispute < ApplicationRecord
   def update_threadgrid_score
     if self.sha256_hash.present?
       threatgrid_response = Threatgrid::Search.query(self.sha256_hash)
-
+      n_auto_resolve_log = "<br />---------------------<br />THREATGRID<br /> score: [#{threatgrid_response[:threatgrid_score]}] threshold: [#{threatgrid_response[:threatgrid_threshold]}] private: [#{threatgrid_response[:threatgrid_private]}]<br />Recorded at: #{Time.now.to_s}<br /> "
+      new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
       self.threatgrid_score = threatgrid_response[:threatgrid_score]
       self.threatgrid_private = threatgrid_response[:threatgrid_private]
       self.threatgrid_threshold = threatgrid_response[:threatgrid_threshold]
+      self.auto_resolve_log = new_auto_resolve_log
       save!
     end
 
@@ -501,15 +503,19 @@ class FileReputationDispute < ApplicationRecord
   def update_sandbox_score(api_key_type: self.sandbox_key)
     sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash, api_key_type: api_key_type)
     sandbox_threshold = self.pdf? ? 90.0 : 61.0
-    update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
+    n_auto_resolve_log = "<br />---------------------<br />SANDBOX<br /> score: [#{sandbox_score}] threshold: [#{sandbox_threshold}]<br />Recorded at: #{Time.now.to_s}<br /> "
+    new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
+    update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold, auto_resolve_log: new_auto_resolve_log)
   rescue => except
     Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
   end
 
   def update_amp_disposition
-    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
 
-    update!(disposition: detection.disposition, detection_name: detection.name)
+    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
+    n_auto_resolve_log = "<br />---------------------<br />AMP<br /> disp: [#{detection.disposition}] name: [#{detection.name}]<br />Recorded at: #{Time.now.to_s}<br /> "
+    new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
+    update!(disposition: detection.disposition, detection_name: detection.name, auto_resolve_log: new_auto_resolve_log)
 
   rescue => except
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
@@ -529,6 +535,9 @@ class FileReputationDispute < ApplicationRecord
     zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
     begin
       attributes = FileReputationApi::SampleZoo.query_from_data(zoo_response)
+      n_auto_resolve_log = "<br />--------------------<br />ZOO<br /> in zoo: #{attributes[:in_zoo]}<br />Recorded at: #{Time.now.to_s}<br />"
+      new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
+      attributes[:auto_resolve_log] = new_auto_resolve_log
       update!(attributes)
     rescue Exception => except
       Rails.logger.error("Error updating sample zoo flag for id #{self.id} -- #{except.message}")
@@ -640,7 +649,7 @@ class FileReputationDispute < ApplicationRecord
     new_dispute.description = message_payload[:payload][:summary_description]
     new_dispute.customer_id = customer&.id
     new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
-    new_dispute.auto_resolve_log = ""
+    new_dispute.auto_resolve_log = "Ticket generated at: #{Time.now.to_s}<br />----------<br />"
 
     check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
     if check_for_duplicate.any?
