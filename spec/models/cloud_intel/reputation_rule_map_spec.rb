@@ -7,8 +7,14 @@ RSpec.describe CloudIntel::ReputationRuleMap do
     let (:first_rep_rule_id) {reputation_rule_map.rules.first.rep_rule_id}
     let (:first_rule_mnemonic) {reputation_rule_map.rules.first.rule_mnemonic}
 
+    let (:ipd_stub) {Talos::Service::IPD::Stub.new('nosuchaddress.com:9000', :this_channel_is_insecure)}
+
     it "should return a mnemonic from rep_rule_id" do
-      allow_any_instance_of(Talos::Service::IPD::Stub).to receive(:query_rule_map).and_return(reputation_rule_map)
+      Rails.cache.delete("reputation_rule_map")
+      Rails.cache.delete("reputation_rule_lookup")
+      Rails.cache.delete("reputation_rule_map_version")
+      allow(Beaker::Ipd).to receive(:remote_stub).and_return(ipd_stub)
+      allow(ipd_stub).to receive(:query_rule_map).and_return(reputation_rule_map)
 
       mnemonic = CloudIntel::ReputationRuleMap.mnemonic(first_rep_rule_id, version: reputation_rule_map_version)
 
