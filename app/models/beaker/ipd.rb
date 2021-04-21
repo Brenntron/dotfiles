@@ -1,5 +1,6 @@
 require 'service-ipd_services_pb'
 
+# Wrapper for Beaker/Ipedia Ipd class to make gRPC calls.
 class Beaker::Ipd < Beaker::BeakerBase
 
   def self.remote_stub

@@ -1,3 +1,9 @@
+# Class to manage mapping of reputation ids to their information such as mnemonic.
+#
+# Singleton pattern with instance method.
+# Responsible for caching mapping in memcache and in class instance variable.
+# Self populates from source of truth resource.
+# Has self knowledge of where to delegate call to source of truth.
 class CloudIntel::ReputationRuleMap
 
   private
