@@ -1125,7 +1125,7 @@ class Dispute < ApplicationRecord
     end
   end
 
-  # @param [Array<Dispute>] disputes colleciton of dispute objects
+  # @param [Array<Dispute>] disputes collection of dispute objects
   # @return [Array<Array>] data output for data tables.
 
   def self.to_data_packet(disputes, user:)

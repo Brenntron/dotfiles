@@ -1,5 +1,5 @@
 # A class for an instance of the reputation of one network address.
-# Has self knowledge of where to get the reputaiton from source of truth service.
+# Has self knowledge of where to get the reputation from source of truth service.
 class CloudIntel::Reputation
   attr_reader :version
 
@@ -42,7 +42,7 @@ class CloudIntel::Reputation
   # Gets mnemonics of multiple IP addresses
   #
   # example:
-  #   ReputiationHit.mnemonics_ips(["2.3.4.5", "35.236.52.109"])
+  #   Reputation.reputation_ips(["2.3.4.5", "35.236.52.109"])
   #   => { "2.3.4.5" => {reputation: Reputation},
   #        "35.236.52.109" => {reputation: Reputation}
   #
@@ -60,7 +60,7 @@ class CloudIntel::Reputation
   # Gets mnemonics of multiple IP addresses
   #
   # example:
-  #   ReputiationHit.mnemonics_ips(["2.3.4.5", "35.236.52.109"])
+  #   Reputation.mnemonics_ips(["2.3.4.5", "35.236.52.109"])
   #   => { "2.3.4.5" => {mnemonics: ['Pbl']},
   #        "35.236.52.109" => {mnemonics: ['Smd']}}
   #
@@ -77,7 +77,7 @@ class CloudIntel::Reputation
   # Gets mnemonics of single IP addresses
   #
   # example:
-  #   ReputiationHit.mnemonics_ip("2.3.4.5")
+  #   Reputation.mnemonics_ip("2.3.4.5")
   #   => ['Pbl', 'Smd']
   #
   # @param [String] ip the IP address, e.g. "2.3.4.5"
