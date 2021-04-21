@@ -1,4 +1,4 @@
-class Beaker::ReputationRuleMap
+class CloudIntel::ReputationRuleMap
 
   private
 
