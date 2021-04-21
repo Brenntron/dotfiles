@@ -25,21 +25,6 @@ class Beaker::Ipd < Beaker::BeakerBase
     remote_stub.query_reputation(reputation_request)
   end
 
-  # Gets mnemonics of multiple IP addresses
-  # @param [Array<String>] ips the IP addresses, e.g. ["2.3.4.5", "35.236.52.109"]
-  # @return [Hash] keys are inputted IP addresses, values are array of mnemonics
-  def reputation_ips(ips)
-    reply = query_reputation(ips)
-    reply.result.each_with_index.inject({}) do |mnemonic_map, (ip_results, index)|
-      mnemonics =
-          ip_results.rep_rule_id.map do |rep_rule_id|
-            Beaker::ReputationRuleMap.mnemonic(rep_rule_id, version: reply.rule_map_version)
-          end
-      mnemonic_map[ips[index]] = mnemonics
-      mnemonic_map
-    end
-  end
-
   # Gets mnemonics of IP address
   # @param [String] ip the IP address, e.g. "2.3.4.5"
   # @return [Array<String>] array of mnemonics for that IP address
