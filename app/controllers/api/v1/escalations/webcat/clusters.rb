@@ -52,11 +52,11 @@ module API
             end
 
 
-            desc 'get all clusters'
-            params do
-            end
-
             # # Commented out because developement of Beaker broke the call to `Beaker::Verdicts.verdicts`
+            # desc 'get all clusters'
+            # params do
+            # end
+            #
             # get "" do
             #   authorize!(:index, Complaint)
             #
