@@ -25,23 +25,6 @@ class Beaker::Ipd < Beaker::BeakerBase
     remote_stub.query_reputation(reputation_request)
   end
 
-  # Gets mnemonics of IP address
-  # @param [String] ip the IP address, e.g. "2.3.4.5"
-  # @return [Array<String>] array of mnemonics for that IP address
-  def self.reputation_ip(ip)
-    reply = query_reputation([ip])
-    rep_rule_ids = reply.result.map { |ip_result| ip_result.rep_rule_id }.flatten
-    rep_rule_ids.map { |rep_rule_id| Beaker::ReputationRuleMap.mnemonic(rep_rule_id, version: reply.rule_map_version) }
-  end
-
-  # Request organization information based on domain. See the
-  # `DomainInfoRequest` and `DomainInfoReply` messages in `ipd.proto` for
-  # details on the structure of the request and response.
-  # rpc :QueryDomainInfo, ::Talos::IPD::DomainInfoRequest, ::Talos::IPD::DomainInfoReply
-  def self.query_domain_info(name)
-    remote_stub.query_domain_info(Talos::IPD::DomainInfoRequest.new(name: name))
-  end
-
   # Request a mapping of reputation rule IDs to mnemonics. No descriptions
   # are provided, due to confidentiality concerns. This should be called
   # whenever `rule_map_version` in a response from a `QueryReputation`
