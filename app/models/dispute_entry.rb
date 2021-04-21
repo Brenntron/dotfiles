@@ -72,7 +72,7 @@ class DisputeEntry < ApplicationRecord
 
         wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
         sbrs_api_response = Sbrs::ManualSbrs.call_sbrs('ip' => ip_url)
-        sbrs_api_rulehits = Beaker::Ipd.reputation_ip(ip_url)
+        sbrs_api_rulehits = CloudIntel::Reputation.mnemonics_ip(ip_url)
 
 
 
@@ -842,7 +842,7 @@ class DisputeEntry < ApplicationRecord
 
     if self.entry_type == "IP"
       sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => self.hostlookup})
-      sbrs_stuff_rules = Beaker::Ipd.reputation_ip(self.hostlookup)
+      sbrs_stuff_rules = CloudIntel::Reputation.mnemonics_ip(self.hostlookup)
 
 
       self.sbrs_score = sbrs_stuff["sbrs"]["score"]
@@ -1079,7 +1079,7 @@ class DisputeEntry < ApplicationRecord
       if is_ip_address === true
         sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
         entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
-        sbrs_stuff_rules = Beaker::Ipd.reputation_ip(entry.uri)
+        sbrs_stuff_rules = CloudIntel::Reputation.mnemonics_ip(entry.uri)
 
         sbrs_stuff_rules.each do |rule_hit|
           new_rule_hit = DisputeRuleHit.new
