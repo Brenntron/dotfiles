@@ -27,7 +27,6 @@ FactoryBot.define do
   end
 
   factory :grpc_reputation_reply, class: Talos::IPD::ReputationReply do
-  # factory :grpc_reputation_reply, class: Talos.IPD.IPResult do
     transient do
       reputation_given {[[558]]}
     end
@@ -40,7 +39,3 @@ FactoryBot.define do
     end
   end
 end
-
-# reply.result.first.rep_rule_id.first.class
-# => Integer
-
