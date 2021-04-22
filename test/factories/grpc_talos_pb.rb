@@ -19,17 +19,24 @@ FactoryBot.define do
   end
 
   factory :gprc_ip_results, class: Talos::IPD::IPResult do
+    transient do
+      rep_rule_id_given {[558]}
+    end
     spam_prob_x10000 { 5000 }
-    rep_rule_id {Google::Protobuf::RepeatedField.new(:uint32, [558])}
+    rep_rule_id {Google::Protobuf::RepeatedField.new(:uint32, rep_rule_id_given)}
   end
 
   factory :grpc_reputation_reply, class: Talos::IPD::ReputationReply do
   # factory :grpc_reputation_reply, class: Talos.IPD.IPResult do
+    transient do
+      reputation_given {[[558]]}
+    end
     rule_map_version { 890470006 }
     result do
-      Google::Protobuf::RepeatedField.new(:message, Talos::IPD::IPResult,
-                                          [ build(:gprc_ip_results) ])
-
+      reputation_local = reputation_given.map do |reputation_hits|
+        build(:gprc_ip_results, rep_rule_id_given: reputation_hits)
+      end
+      Google::Protobuf::RepeatedField.new(:message, Talos::IPD::IPResult, reputation_local)
     end
   end
 end
