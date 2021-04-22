@@ -4,7 +4,6 @@ RSpec.describe CloudIntel::Reputation do
   let (:ipd_stub) {Talos::Service::IPD::Stub.new('nosuchaddress.com:9000', :this_channel_is_insecure)}
 
   context "Normal reputation reply" do
-    let (:input_ips) { ["2.3.4.5", "35.236.52.109"] }
     let (:reputation_reply) do
       FactoryBot.build(:grpc_reputation_reply, reputation_given: [[558, 564], [579]])
     end
