@@ -31,10 +31,10 @@ RSpec.describe CloudIntel::Reputation do
       Rails.cache.clear
       allow(Beaker::Ipd).to receive(:remote_stub).and_return(ipd_stub)
       allow(ipd_stub).to receive(:query_rule_map).and_return(reputation_rule_map)
-      byebug
       allow(ipd_stub).to receive(:query_reputation).and_return(reputation_reply)
 
-      reputations = Reputation.reputation_ips(["2.3.4.5", "35.236.52.109"])
+      byebug
+      reputations = CloudIntel::Reputation.reputation_ips(["2.3.4.5", "35.236.52.109"])
 
       reputation = reputations["2.3.4.5"][:reputation]
       reputation = reputations["35.236.52.109"][:reputation]
