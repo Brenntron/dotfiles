@@ -1,1 +1,2 @@
-server_url: <%= Rails.configuration.elastic_apm.server_url %>
+server_url: <%= ENV["ELASTIC_APM_SERVER_URL"] %>
+service_name: 'analyst-console-escalations'
