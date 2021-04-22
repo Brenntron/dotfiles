@@ -22,6 +22,7 @@ Feature: Webcat clusters
       |2 |    2    |     3      |
     When I goto "/escalations/webcat/clusters"
     And I wait for "3" seconds
+    Then I should see "Current Clusters"
     Then I should see "food.com"
     And I should see "blah.com"
     And I should not see "imhungry.com"
@@ -83,6 +84,7 @@ Feature: Webcat clusters
     Then I click "#filter-clusters"
     And I click link "My Clusters"
     Then I wait for "3" seconds
+    Then I should see "My Clusters"
     Then I should see "food.com"
     And I should see "blah.com"
     And I should not see "imhungry.com"
@@ -104,6 +106,7 @@ Feature: Webcat clusters
     Then I click "#filter-clusters"
     And I click link "Unassigned Clusters"
     Then I wait for "3" seconds
+    And I should see "Unassigned Clusters"
     Then I should not see "food.com"
     And I should not see "blah.com"
     And I should see "imhungry.com"
@@ -125,6 +128,7 @@ Feature: Webcat clusters
     Then I click "#filter-clusters"
     And I click link "All Clusters"
     Then I wait for "3" seconds
+    And I should see "All Clusters"
     Then I should see "food.com"
     And I should see "blah.com"
     And I should see "imhungry.com"
@@ -216,6 +220,7 @@ Feature: Webcat clusters
     Then I click "#filter-clusters"
     And I click link "Waiting For Review"
     Then I wait for "3" seconds
+    Then I should see "Pending Clusters"
     Then I should see "food.com"
     And I should not see "blah.com"
 
