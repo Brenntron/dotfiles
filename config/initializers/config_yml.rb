@@ -53,6 +53,11 @@ Rails.configuration.bugzilla_password   = ENV['Bugzilla_secret'] || env_config['
 raise "config.yml missing cert section" unless env_config['cert']
 Rails.configuration.cert_file           = env_config['cert']['vrt'] # bugzilla cert file
 
+elastic_apm_config = env_config.fetch('elastic_apm', nil)
+raise 'config.yml missing elastic_apm section' unless elastic_apm_config
+Rails.configuration.elastic_apm.server_url                  = elastic_apm_config['server_url']
+Rails.configuration.elastic_apm.service_name                = elastic_apm_config['service_name']
+
 
 elastic_config = env_config.fetch('elastic', nil)
 raise 'config.yml missing elastic section' unless elastic_config

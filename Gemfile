@@ -53,6 +53,7 @@ gem 'with_advisory_lock', '~> 4.0'
 gem 'delayed_job', '4.1.5'
 gem 'delayed_job_active_record', '4.1.3'
 gem 'delayed_job_web', '1.4.3'
+gem 'elastic-apm', '~> 3.15', '>= 3.15.1'
 
 # Micellaneous
 gem 'pry', '0.12.2'

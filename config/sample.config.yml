@@ -18,6 +18,9 @@ development:
     api_key: "redacted"
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
+  elastic_apm:
+    server_url: "https://fmd-vrtelk-01dev.vrt.sourcefire.com:9100"
+    service_name: "analyst-console-escalations"
   elastic:
     host: "ava-esqulb-01prd.vrt.sourcefire.com"
     port: 443
