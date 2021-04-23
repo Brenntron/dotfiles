@@ -500,6 +500,32 @@ Feature: Disputes
     Then I should see "0000000001"
     Then I should see "Bobs Burgers"
 
+  @javascript
+  Scenario: a user uses advanced search with 'Platform' as a search criteria
+    Given a user with role "webrep user" exists and is logged in
+    And platforms with all traits exist
+    Given the following disputes exist:
+      | id | submission_type | platform_id |
+      | 1  |        w        |  1          |
+      | 2  |        w        |             |
+      | 3  |        e        |  3          |
+    Given the following dispute_entries exist:
+      | id | ip_address   | dispute_id | platform_id |
+      | 1  | 123.63.22.24 |  1         |             |
+      | 2  | 724.35.87.12 |  2         | 2           |
+      | 3  | 876.25.65.34 |  3         |             |
+    When I goto "escalations/webrep/disputes?f=all"
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#platform-cb"
+    And I wait for "5" seconds
+    And I fill in selectized of element "#platform-input" with "['1', '2']"
+    Then I click "#cancel-add-criteria"
+    Then I click "#submit-advanced-search"
+    Then I should see "0000000001"
+    And I should see "0000000002"
+    And I should not see "0000000003"
+
 
   @javascript
   Scenario: a user wants to do an advanced search and ensure those previous values are cleared on subsequent search

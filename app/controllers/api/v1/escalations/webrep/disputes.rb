@@ -23,6 +23,7 @@ module API
               optional :resolution, type: String
               optional :submission_type, type: Array[String]
               optional :submitter_type, type: String
+              optional :platform_ids, type: String
               optional :submitted_older, type: Date
               optional :submitted_newer, type: Date
               optional :age_older, type: String
@@ -43,7 +44,6 @@ module API
 
             get "" do
               authorize!(:index, Dispute)
-
               disputes = Dispute.robust_search(permitted_params['search_type'],
                                                search_name: permitted_params['search_name'],
                                                params: permitted_params,
@@ -937,9 +937,12 @@ module API
               companies = Company.all.order(name: :asc)
               resolutions = [Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN, Dispute::STATUS_RESOLVED_UNCHANGED,
                              Dispute::STATUS_RESOLVED_INVALID, Dispute::STATUS_RESOLVED_TEST, Dispute::STATUS_RESOLVED_OTHER]
-
+              webrep_platforms = Platform.where('webrep = true or emailrep = true').where(active: true).map {|m| {id: m.id, public_name: m.public_name}}
+              webcat_platforms = Platform.where(webcat: true, active: true).map {|m| {id: m.id, public_name: m.public_name}}
+              filerep_platforms = Platform.where(filerep: true, active: true).map {|m| {id: m.id, public_name: m.public_name}}
               render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
-                            contacts: contacts, companies: companies, resolutions: resolutions }
+                            contacts: contacts, companies: companies, resolutions: resolutions,
+                            platforms: {webrep: webrep_platforms, webcat: webcat_platforms, filerep: filerep_platforms}}
             end
 
             desc 'Auto-populate fields on New Dispute'

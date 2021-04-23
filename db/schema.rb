@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 2021_02_14_014754) do
+ActiveRecord::Schema.define(version: 2021_03_26_174523) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -235,6 +234,9 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
+    t.text "bridge_packet", limit: 16777215
+    t.text "import_log", limit: 16777215
+
     t.index ["channel", "customer_id"], name: "index_complaints_on_channel_and_customer_id"
     t.index ["customer_id"], name: "index_complaints_on_customer_id"
     t.index ["status", "customer_id"], name: "index_complaints_on_status_and_customer_id"
@@ -466,6 +468,8 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
+    t.text "bridge_packet", limit: 16777215
+    t.text "import_log", limit: 16777215
     t.index ["customer_id"], name: "index_disputes_on_customer_id"
   end
 
@@ -617,18 +621,13 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
+    t.text "bridge_packet", limit: 16777215
+    t.text "import_log", limit: 16777215
     t.index ["created_at"], name: "index_file_reputation_disputes_on_created_at"
     t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
     t.index ["sha256_hash"], name: "index_file_reputation_disputes_on_sha256_hash"
     t.index ["updated_at"], name: "index_file_reputation_disputes_on_updated_at"
     t.index ["user_id"], name: "index_file_reputation_disputes_on_user_id"
-  end
-
-  create_table "form_prefills", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.string "field"
-    t.text "text"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "fp_file_refs", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -928,7 +927,6 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end
 
-
   create_table "test_queue_events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -942,7 +940,7 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "task_type"
     t.index ["prior_event_id"], name: "index_test_queue_events_on_prior_event_id"
   end
-  
+
   create_table "test_reports", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -962,7 +960,7 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
-  
+
   create_table "ticket_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "ticket_email_id"
     t.integer "bugzilla_attachment_id"
