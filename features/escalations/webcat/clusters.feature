@@ -4,6 +4,13 @@ Feature: Webcat clusters
 
   Background:
     Given a guest company exists
+    And Beaker Verdicts is stubbed with some response
+    And WBRS Category is stubbed with some response
+    And WBRS Cluster processing is stubbed with some response
+    And WBRS TopUrl API call is stubbed with:
+      |   url   | is_important |
+      | food.com|     true     |
+      | blah.com|     false    |
 
   @javascript
   Scenario: a user should not see clusters assigned to another users in default view
@@ -136,10 +143,6 @@ Feature: Webcat clusters
   @javascript
   Scenario: user should see important label if there is important clusters
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
     And WBRS Cluster returns the following stubbed clusters:
       |id|  domain      |
       |1 | food.com     |
@@ -175,10 +178,6 @@ Feature: Webcat clusters
   @javascript
   Scenario: an important cluster should go to 2nd person review after categorization
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
     And WBRS Cluster returns the following stubbed clusters:
       |id|  domain      |
       |1 | food.com     |
@@ -199,10 +198,6 @@ Feature: Webcat clusters
   @javascript
   Scenario: a user should be able to see "waiting for review" clusters
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
     And WBRS Cluster returns the following stubbed clusters:
       |id|  domain      |
       |1 | food.com     |
@@ -227,10 +222,6 @@ Feature: Webcat clusters
   @javascript
   Scenario: user can submit cluster on 2nd person review
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
     And WBRS Cluster returns the following stubbed clusters:
       |id|  domain      |
       |1 | food.com     |
@@ -256,10 +247,6 @@ Feature: Webcat clusters
   @javascript
   Scenario: user can decline cluster categorization on 2nd person review
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
     And WBRS Cluster returns the following stubbed clusters:
       |id|  domain      |
       |1 | food.com     |
@@ -273,7 +260,7 @@ Feature: Webcat clusters
     Then I check "cluster_id_1"
     And I fill in selectized of element "#1_categories" with "[6]"
     Then I click "Submit Changes"
-    And I wait for "5" seconds
+    And I wait for "10" seconds
     Then I click button with class "cluster-cancel-button"
     And I wait for "5" seconds
     Then I should see "CLUSTER CATEGORIES WERE DECLINED."
@@ -285,10 +272,6 @@ Feature: Webcat clusters
   @javascript
   Scenario: cluster should be assigned to the user who declined categorization
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
     And WBRS Cluster returns the following stubbed clusters:
       |id|  domain      |
       |1 | food.com     |
@@ -302,7 +285,7 @@ Feature: Webcat clusters
     Then I check "cluster_id_1"
     And I fill in selectized of element "#1_categories" with "[6]"
     Then I click "Submit Changes"
-    And I wait for "5" seconds
+    And I wait for "10" seconds
     Then I click button with class "cluster-cancel-button"
     And I wait for "5" seconds
     Then I should see "CLUSTER CATEGORIES WERE DECLINED."
@@ -313,10 +296,6 @@ Feature: Webcat clusters
   @javascript
   Scenario: non important complaints should be submitted without 2nd person review
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
     And WBRS Cluster returns the following stubbed clusters:
       |id|  domain      |
       |1 | food.com     |
