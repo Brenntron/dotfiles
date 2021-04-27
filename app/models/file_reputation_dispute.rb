@@ -633,6 +633,7 @@ class FileReputationDispute < ApplicationRecord
     end
 
     new_dispute.id = bug_proxy.id
+    new_dispute.meta_data = message_payload[:payload][:meta_data]
     new_dispute.user_id = user.id
     new_dispute.sha256_hash = message_payload[:payload][:sha256]
     new_dispute.status = STATUS_NEW

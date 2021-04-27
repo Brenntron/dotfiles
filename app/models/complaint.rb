@@ -313,6 +313,7 @@ class Complaint < ApplicationRecord
 
       new_complaint.submission_type = message_payload["payload"]["submission_type"]
       new_complaint.id = bug_proxy.id
+      new_complaint.meta_data = message_payload["payload"]["meta_data"]
       new_complaint.description = message_payload["payload"]["problem"]
       new_complaint.ticket_source_key = message_payload["source_key"]
       new_complaint.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
