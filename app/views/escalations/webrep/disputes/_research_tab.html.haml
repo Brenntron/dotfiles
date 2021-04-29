@@ -705,13 +705,17 @@
                                 = "#{entry.referenced_tickets.count} ticket(s)"
                               .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
                                 %table
-                                  - entry.referenced_tickets.each do |reference|
-                                    %tr
-                                      %td
-                                        %a{href: escalations_webrep_dispute_path(reference.id)}
-                                          = reference.id
-                                      %td
-                                        = reference.case_opened_at
+                                  %thead
+                                    %th Case ID
+                                    %th Date/Time Submitted
+                                  %tbody
+                                    - entry.referenced_tickets.each do |reference|
+                                      %tr
+                                        %td
+                                          %a{href: escalations_webrep_dispute_path(reference.id)}
+                                            = reference.id
+                                        %td
+                                          = reference.case_opened_at
                       %tr
                         %td.input-col.sbrs-input-wrapper
                           %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
