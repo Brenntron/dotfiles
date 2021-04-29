@@ -663,6 +663,7 @@ window.return_dispute = (dispute_id) ->
 
 window.save_dispute_entries = () ->
   data = {}
+  changes_made = false
   $('#disputes-research-table').find('tr.research-table-row').each(() ->
     $(this).find('.dual-edit-field').map(() ->
       {id, field} = this.dataset
@@ -683,6 +684,7 @@ window.save_dispute_entries = () ->
         if new_value == undefined then new_value = old_value
 
         if new_value != old_value
+          changes_made = true
           if new_value == "RESOLVED_CLOSED"
             resolution_data = {
               id: id
@@ -706,17 +708,19 @@ window.save_dispute_entries = () ->
             data[id].push( new_data )
     )
   )
-
-  if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
-    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+  if !changes_made
+    std_msg_error('No changes made', [])
   else
-    std_msg_ajax(
-      method: 'PATCH'
-      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-      data: { 'field_data': data }
-      success_reload: true
-      error_prefix: 'Error updating data.'
-    )
+    if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+    else
+      std_msg_ajax(
+        method: 'PATCH'
+        url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+        data: { 'field_data': data }
+        success_reload: true
+        error_prefix: 'Error updating data.'
+      )
 
 
 
