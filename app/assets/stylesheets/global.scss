@@ -6730,7 +6730,7 @@ td.ticket-total::before {
 }
 
 .references-dropdown table td {
-  background-color: $bug-section-color;
+  background-color: transparent!important;
   color: $content-bg-color;
   border-bottom-color: $faint-accent-color;
 }
