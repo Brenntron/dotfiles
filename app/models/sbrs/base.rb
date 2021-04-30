@@ -3,6 +3,15 @@ class Sbrs::Base
   TEST_URL = "www.google.com"
   #TODO: all of this needs to be refactored and improved.  Finished up quickly because of deadline.
 
+  def self.log_exception(exception = $!)
+    Rails.logger.error(exception.message)
+    Rails.logger.error(exception.backtrace[0])
+    Rails.logger.error(exception.backtrace[1])
+    Rails.logger.error(exception.backtrace[2])
+    Rails.logger.error(exception.backtrace[3])
+    Rails.logger.error(exception.backtrace[4])
+  end
+
   def self.load_rules_matchup
     # a single call to the authority list of number==>rule data (used after SDS calls)
 
@@ -216,7 +225,8 @@ class Sbrs::Base
         else
           response # was: response.body per T/I source code
         end
-      rescue
+      rescue => exception
+        log_exception(exception)
         '{"response": "request failed"}'
       end
     elsif /\/labels\// =~ query_string ? true : false
@@ -242,7 +252,8 @@ class Sbrs::Base
         else
           response # was: response.body per T/I source code
         end
-      rescue
+      rescue => exception
+        log_exception(exception)
         '{"response": "request failed"}'
       end
 
