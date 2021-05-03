@@ -38,7 +38,7 @@ window.populate_clusters_index_table = (filter) ->
           datatable.draw();
           selectize_category_inputs();
 
-          $("#total_results").html(json.meta.rows_found)
+          # $("#total_results").html(json.meta.rows_found)
           populate_cat_select(json.data)
 
 
@@ -70,13 +70,7 @@ window.categorize_clusters = () ->
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data()
   clusters = []
   for selected_row in selected_rows
-    cluster_data = {}
-    cluster_data["cluster_id"] = selected_row.cluster_id
-    cluster_data["domain"] = selected_row.domain
-    cluster_data["is_important"] = selected_row.is_important
-    cluster_data["comment"] = comment
-    cluster_data["user_id"] = user_id
-
+    selected_row["comment"] = comment
     $("##{selected_row.cluster_id}_categories").each ->
       # collect selected categories
       categories = $(this).find('option')
@@ -86,8 +80,8 @@ window.categorize_clusters = () ->
         $(categories).each ->
           value = $(this).attr('value')
           category_values.push value
-        cluster_data["categories"] = category_values
-    clusters.push(cluster_data)
+        selected_row["categories"] = category_values
+    clusters.push(selected_row)
 
   data["clusters"] = JSON.stringify(clusters)
 
@@ -134,8 +128,7 @@ $ ->
           0
           1
           2
-          6
-          9
+          8
         ]
         orderable: false
         searchable: false
@@ -196,19 +189,6 @@ $ ->
       }
       {
         data: 'global_volume'
-      }
-      {
-        data: 'wbrs_score'
-        width: '75px'
-        render: ( data ) ->
-          if data == undefined then data = ''
-          wbrs_rep = wbrs_display(data)
-          wbrs_score = parseFloat(data).toFixed(1)
-          if wbrs_rep == undefined then wbrs_rep = 'unknown'
-          if wbrs_rep == 'unknown'then wbrs_score = '--'
-          tooltip_rep = wbrs_rep.toUpperCase()
-          icon = "<span class='reputation-icon icon-#{wbrs_rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
-          return "<div class='reputation-icon-container'>#{icon}<span>#{wbrs_score}</span></div>"
       }
       {
         data: 'assigned_to'
@@ -805,25 +785,23 @@ $ ->
       ]
 
 window.take_selected_clusters = ()->
-  selected_rows = $('.cluser-row-select:checkbox:checked')
+  selected_rows = $("#clusters-index").DataTable().rows('.selected').data().toArray()
   if selected_rows.length > 0
-    entry_ids = selected_rows.map(() ->
-      Number(this.name.split('cluster_id_')[1])
-    ).toArray()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/clusters/take'
       method: 'POST'
       headers: headers
-      data: 'cluster_ids': entry_ids
+      data: 'clusters': JSON.stringify(selected_rows)
       success: (response) ->
         json = $.parseJSON(response)
+        console.log json
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Taking Clusters', [json.error])
         else
-          for id, i in json.cluster_ids
-            $("#owner_#{id}").text(json.username)
+          for cluster, i in json.clusters
+            $("#owner_#{cluster.cluster_id}").text(json.username)
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -832,25 +810,22 @@ window.take_selected_clusters = ()->
     std_msg_error('No rows selected', ['Please select at least one row.'])
 
 window.return_selected_clusters = ()->
-  selected_rows = $('.cluser-row-select:checkbox:checked')
+  selected_rows = $("#clusters-index").DataTable().rows('.selected').data().toArray()
   if selected_rows.length > 0
-    entry_ids = selected_rows.map(() ->
-      Number(this.name.split('cluster_id_')[1])
-    ).toArray()
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/clusters/return'
       method: 'POST'
       headers: headers
-      data: 'cluster_ids': entry_ids
+      data: 'clusters': JSON.stringify(selected_rows)
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Returning Clusters', [json.error])
         else
-          for id, i in entry_ids
-            $("#owner_#{id}").text('')
+          for entry, i in selected_rows
+            $("#owner_#{entry.cluster_id}").text('')
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -861,11 +836,13 @@ window.return_selected_clusters = ()->
 
 window.approve_cluster = (cluster_id) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  cluster = window.get_cluster_by_id(cluster_id)
+  console.log cluster
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/clusters/proccess'
     method: 'POST'
     headers: headers
-    data: 'cluster_ids': [cluster_id]
+    data: 'cluster': cluster
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
@@ -879,11 +856,12 @@ window.approve_cluster = (cluster_id) ->
 
 window.decline_cluster = (cluster_id) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  cluster = window.get_cluster_by_id(cluster_id)
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/clusters/decline'
     method: 'POST'
     headers: headers
-    data: 'cluster_ids': [cluster_id]
+    data: 'cluster': cluster
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
