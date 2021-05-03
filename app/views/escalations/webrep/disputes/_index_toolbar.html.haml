@@ -87,7 +87,7 @@
 
   %div
     %label.toolbar-section-label
-      Edit Ticket
+      Assignee
 
     %button.take-ticket-toolbar-button#index_ticket_assign.toolbar-button.esc-tooltipped.toolbar-button-spacer{title: 'Assign to me (alt + t)', onclick: 'take_disputes();'}
       %span.toolbar-button-text
@@ -107,6 +107,10 @@
                   = u.cvs_username
           %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
             Assign
+
+  %div
+    %label.toolbar-section-label
+      Edit Ticket
 
     %span.dropdown
       %button#index_ticket_status.toolbar-button.ticket-status-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
