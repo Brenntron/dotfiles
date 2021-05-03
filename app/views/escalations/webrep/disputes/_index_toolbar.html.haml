@@ -86,12 +86,12 @@
       %span.toolbar-button-text Collapse All Rows
 
   %div
-    %button.take-ticket-button#index_ticket_assign.esc-tooltipped{title: 'Assign to me (alt + t)', onclick: 'take_disputes();'}
-      %span.toolbar-button-text
-
-  %div
     %label.toolbar-section-label
       Edit Ticket
+
+    %button.take-ticket-toolbar-button#index_ticket_assign.toolbar-button.esc-tooltipped.toolbar-button-spacer{title: 'Assign to me (alt + t)', onclick: 'take_disputes();'}
+      %span.toolbar-button-text
+        Take Ticket
 
     %span.dropdown
       %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
