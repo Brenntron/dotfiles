@@ -4006,7 +4006,12 @@ input.communication-subject {
   position: absolute;
 }
 
-.select-a-template{
+//bump up button when next to duplicate status
+.duplicate-status-notice + .mng-resolution-message-templates-button {
+  top: 15px;
+}
+
+.select-a-template{å
   margin-left: 26px;
   margin-top: 2px;
   color: $type-base-color;
