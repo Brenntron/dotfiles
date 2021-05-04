@@ -1251,5 +1251,33 @@ class FileReputationDispute < ApplicationRecord
     research_bug_proxy
   end
 
+  def get_email_meta_data
+
+    response = {}
+    if self.meta_data.present?
+      begin
+        meta_data = JSON.parse(self.meta_data).deep_symbolize_keys
+
+        meta_cc = nil
+        if meta_data[:ticket].present? && meta_data[:ticket][:cc].present?
+          meta_cc = meta_data[:ticket][:cc]
+        end
+
+        if meta_data[:entry].present? && meta_data[:entry][:cc].present?
+          meta_cc = meta_data[:entry][:cc]
+        end
+
+        if meta_cc.present?
+          response[:cc] = meta_cc
+        end
+      rescue
+        response = {}
+      end
+
+    end
+
+    response
+
+  end
 
 end
