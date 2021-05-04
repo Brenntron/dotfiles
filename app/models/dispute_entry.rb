@@ -185,8 +185,9 @@ class DisputeEntry < ApplicationRecord
         end
       end
       return new_dispute_entry
-    rescue Exception => e
-      raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{e}}}")
+    rescue Exception => ex
+      log_exception(ex)
+      raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{ex}}}")
     end
 
 
