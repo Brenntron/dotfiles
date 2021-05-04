@@ -9246,7 +9246,11 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 .manage-child-row .user-displayname-col {
   padding-left: 16px !important;
 }
-
+.sugg-tc-cell, .sugg-cell{
+  label{
+    white-space: nowrap;
+  }
+}
 .manage-grandchild-row .user-displayname-col {
   padding-left: 26px !important
 }
