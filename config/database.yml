@@ -5,6 +5,7 @@ development:
   database: ac_dev
   username: root
   host: localhost
+  reconnect: true
 
 profile:
   adapter: mysql2

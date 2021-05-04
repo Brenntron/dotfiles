@@ -1,16 +1,49 @@
 $ ->
   # dbinebri: file rep, naming guide dialog. includes fix for height resizing bug.
+
+  window.format_amp_contacts = (contacts) ->
+    contacts.each ->
+      if $(this).hasClass('table-content') || contact != ''
+        contact = this.textContent
+      else
+        contact = this.attr('data')
+      email = contact.match(/\S+[a-z0-9]@[a-z0-9\.]+/img );
+      if email != null
+        email = email[0].replace(/<|\(/g, '')
+        contact = contact.replace("#{email}", "")
+        new_email = "<span class='amp-email'>#{email}</span>"
+        contact = contact.replace('()', '').replace('<>', '')
+        contact += new_email
+
+      if  contact.match("https(.*)")!= null
+        url =  contact.match("https(.*)")[0]
+        contact = contact.replace("#{url}", "")
+        url = "<a href='#{url}' class='amp-url' target='_blank'>#{url}</a>"
+        contact += url
+      if $(this).hasClass('contact-col')
+        $(this).html(contact)
+      else if $(this).find('.formatted-contact').length > 0
+        $(this).find('.formatted-contact').append(contact)
+      else
+        $(this).html(contact)
+
+  if location.pathname == "/escalations/file_rep/naming_guide"
+    contacts = $('.amp-contact')
+    format_amp_contacts(contacts)
+
   $('#naming-guide-dialog').dialog
     autoOpen: false
-    width: 800
-    minWidth: 700
+    width: 930
+    minWidth: 930
     height: 500
     minHeight: 300
     position:
       at: "right top"
+    open:  () ->
+      contacts = $('.contact-col')
+      format_amp_contacts(contacts)
     resize: () ->
       $('#naming-guide-dialog').css('height', 'calc(100% - 40px)')
-
 
 
 
@@ -38,6 +71,7 @@ $ ->
     input_new = ''
 
     $('#amp-edit-button').hide()
+    $('.formatted-contact').hide()
     $('.active-editing-buttons').show()
     window.get_original_sort_array()
 
@@ -80,6 +114,7 @@ $ ->
     $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
     $('.delete-patterns-area').addClass('hidden')
     $('.delete-patterns-queue').empty()
+    $('.formatted-contact').show()
 
     # Delete any new rows that were not saved
     rows = $('#amp-naming-details-table tbody').find('tr')
@@ -105,10 +140,9 @@ $ ->
       $(cells).each ->
         if $($(this).find('input')).length > 0
           input = $($(this).find('input')).val()
+          content = $($(this).find('.table-content')).text()
           if $(this).hasClass('amp-pattern')
             content = $($(this).find('.table-code')).text()
-          else
-            content = $($(this).find('.table-content')).text()
           input == content
         else
           textarea = $($(this).find('textarea')).val()
@@ -363,7 +397,7 @@ $ ->
     response_data = ""
     if data.length > 1
       $(data).each ->
-        response_data += "'" + this.pattern + "', "
+        response_data += "'#{this.pattern}', "
     else
       response_data = data[0].pattern
 
@@ -373,6 +407,8 @@ $ ->
       data: { patterns: data }
       success: (response) ->
         std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: true)
+        contacts = $('.amp-contact .table-content')
+        format_amp_contacts(contacts)
       error: (response) ->
         window.get_original_sort_array()
         window.restore_input_values()

@@ -7,6 +7,7 @@ class Bridge::AmpFpCreatedEvent < Bridge::BaseMessage
   end
 
   def post(payload, source_authority: @source_authority, source_key: @source_key)
+    Delayed::Worker.logger.info("AmpFp created event sending reply to bridge")
     super(message: {source_authority: source_authority,
                     source_key: source_key,
                     ticket_entries: payload,

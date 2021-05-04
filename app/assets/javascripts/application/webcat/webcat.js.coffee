@@ -41,7 +41,7 @@ $ ->
     { keyCode } = e
     { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
     if keyCode == 13
-      webcat_search_string = $('#web-cat-search .search-box').val()
+      webcat_search_string = $('#web-cat-search .search-box').val().trim()
       if webcat_search_string == ''
        refresh_localStorage()
       else
@@ -67,6 +67,8 @@ $ ->
     channels = $('#channel-input')[0].selectize.items
     entry_ids = $('#entryid-input')[0].selectize.items
     complaint_ids = $('#complaintid-input')[0].selectize.items
+    platform_ids = $('#platform-input')[0].selectize.items
+
     if tags.length
       form['tags'] = tags.join(', ')
     if items.length
@@ -90,6 +92,13 @@ $ ->
     if user_id.length
       form['user_id'] = user_id.join(', ')
 
+    form['platform_display'] = []
+    if platform_ids.length
+      form['platform_ids'] = platform_ids.join(',')
+      for id in platform_ids
+        form['platform_display'].push($('#platform-input')[0].selectize.options[id].public_name)
+
+
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
       name = name.toLowerCase().replace(/-/g, '_')
@@ -112,6 +121,8 @@ $ ->
       domain: form.domain
       tags: form.tags
       user_id: form.user_id
+      platform_ids: form.platform_ids
+      platforms: form.platform_display.join(', ')
       submitted_older: form.date_submitted_older
       submitted_newer: form.date_submitted_newer
       modified_older: form.date_modified_newer
@@ -207,7 +218,6 @@ $ ->
     refresh_url()
 
   build_subheader = (subheader) ->
-
     if typeof subheader == 'string'
       subheader = JSON.parse(subheader)
 
@@ -216,13 +226,14 @@ $ ->
 
     for condition_name, condition of subheader
       if condition != ''
+        if condition_name == 'platform_ids'
+          continue
         if condition_name == 'id'
           condition_name = 'Entry Id'
         if condition_name == 'user_id'
           condition_name = 'Assignee'
         condition_name = condition_name.replace(/_/g, " ").toUpperCase()
         condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
-
         if typeof condition == 'object'
           condition_HTML = '<span>' + condition.from  + ' - ' + condition.to+ '</span>'
         else
@@ -610,10 +621,13 @@ $ ->
                   if data == 'CUSTOMER'
                     '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
                   else
-                    data
+                    '<button class="complaint-submitter-type icon-guest-user esc-tooltipped" title="Guest"></button>'
               }
               {
                 data: 'company_name'
+              }
+              {
+                data: 'customer_email'
               }
               {
                 data: 'assigned_to'
@@ -698,7 +712,7 @@ $ ->
         return (item) ->
           item.name.toLowerCase().startsWith( search.toLowerCase() ) ? 1 : 0;
     }
-  
+
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,
@@ -874,8 +888,10 @@ $ ->
     data['primary'] = $("#primary-checkbox").is(':checked')
     data['suggested'] = $("#suggested-checkbox").is(':checked')
     data['wbrs'] = $("#wbrs-checkbox").is(':checked')
+    data['platform'] = $("#platform-checkbox").is(':checked')
     data['submittertype'] = $("#submittertype-checkbox").is(':checked')
     data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
+    data['submitteremail'] = $("#submitteremail-checkbox").is(':checked')
     data['assignee'] = $("#assignee-checkbox").is(':checked')
 
     std_msg_ajax(

@@ -180,6 +180,7 @@ window.advanced_webrep_index_table = () ->
     resolution: form.find('input[id="resolution-input"]').val()
     submission_type: submission_types
     submitter_type: form.find('input[id="submitter-input"]').val()
+    platform_ids: form.find('input[id="platform-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
     submitted_newer: form.find('input[id="submitted-newer-input"]').val()
     age_older: form.find('input[id="age-older-input"]').val()
@@ -213,7 +214,7 @@ window.named_webrep_index_table = (search_name) ->
 window.call_contains_search = (search_form) ->
   data = {
     search_type: 'contains'
-    value: search_form.querySelector('input.search-box').value
+    value: search_form.querySelector('input.search-box').value.trim()
   }
   window.current_search_data = data
   window.populate_webrep_index_table(data)
@@ -450,8 +451,10 @@ window.toolbar_show_change_assignee = () ->
     data: data
     dataType: 'json'
     success: (response) ->
+      show_message('success', 'Ticket assignment has been updated!', 5)
       window.location.reload()
     error: (response) ->
+      show_message('error', 'Ticket assignment could not be updated.', 5)
       std_msg_error('No Tickets Selected', ['Select at least one ticket to assign to yourself.'])
   )
 
@@ -636,6 +639,13 @@ window.take_single_dispute = (id) ->
     data: { dispute_ids: dispute_ids }
     error_prefix: 'Error updating ticket.'
     success_reload: true
+    success: (response) ->
+      if response.dispute_ids.length > 0
+        show_message('success', 'Ticket assignment has been updated!', 5)
+        location.reload()
+      else
+        show_message('error', 'Ticket assnigment could not be updated.', 5)
+        location.reload()
   )
 
 window.return_dispute = (dispute_id) ->
@@ -1089,12 +1099,28 @@ $ ->
   $('#disputes-index_filter input').addClass('table-search-input');
 
   window.format = (dispute) ->
-    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input class="dispute_entry_select_all" type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-res">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
+    table_head =
+      "<table class='table dispute-entry-table'><thead><tr>
+       <th><input class='dispute_entry_select_all' type='checkbox' onclick='select_or_deselect_all(#{dispute.id})' id='#{dispute.id}' /></th>
+       <th class='entry-col-content'>Dispute Entry</th>
+       <th class='entry-col-status'>Dispute Entry Status</th>
+       <th class='entry-col-res'>Dispute Entry Resolution</th>
+       <th class='entry-col-disp'>Suggested Disposition</th>
+       <th class='entry-col-cat'>Category</th>
+       <th class='entry-col-platform-entry'>Platform</th>
+       <th class='entry-col-wbrs-score'>WBRS Score</th>
+       <th class='entry-col-wbrs-hits'>WBRS Total Rule Hits</th>
+       <th class='entry-col-wbrs-rules'>WBRS Rules</th>
+       <th class='entry-col-sbrs-score'>SBRS Score</th>
+       <th class='entry-col-sbrs-hits'>SBRS Total Rule Hits</th>
+       <th class='entry-col-sbrs-rules'>SBRS Rules</th></tr></thead><tbody>"
+
     entry = dispute.dispute_entries
     missing_data = '<span class="missing-data">Missing data</span>'
     entry_rows = []
+
     $(entry).each ->
-      { ip_address, uri, primary_category} = this.entry
+      { ip_address, uri, primary_category, platform} = this.entry
       entry_content = missing_data
       if ip_address != null
         entry_content = ip_address
@@ -1103,6 +1129,9 @@ $ ->
       category = '<span class="missing-data">No assigned categories</span>'
       if this.entry.primary_category != null && this.entry.primary_category != '{}'
         category = this.entry.primary_category
+
+      if platform == null
+        platform = "<span class='missing-data'>No platform</span>"
 
       status = missing_data
       if this.entry.status != null
@@ -1155,6 +1184,7 @@ $ ->
         #{resolution_col}
         <td class='entry-col-disp'>#{suggested_disposition}</td>
         <td class='entry-col-cat'>#{category}</td>
+        <td class='entry-col-platform-entry'>#{platform}</td>
         <td class='entry-col-wbrs-score'>
           <div class='reputation-icon-container'>
             <span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>
@@ -1336,6 +1366,7 @@ $ ->
     )
 
   $('#advanced-search-button').click ->
+
     std_msg_ajax(
       method: 'GET'
       url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
@@ -1349,6 +1380,17 @@ $ ->
         $('#company-list').empty()
         $('#resolution-list').empty()
 
+        $('#platform-input').selectize {
+          persist: false
+          create: false
+          valueField: 'id',
+          labelField: 'public_name',
+          options: response.json.platforms[$('#platform-input').attr('data')]
+          onFocus: () ->
+            window.toggle_selectize_layer(this, 'true')
+          onBlur: () ->
+            window.toggle_selectize_layer(this, 'false')
+        }
 
         for user in response.json.case_owners
           $('#user-list').append '<option value=\'' + user.cvs_username + '\'></option>'
@@ -1446,6 +1488,7 @@ $ ->
       data['entry-resolution'] = $("#entry-resolution-checkbox").is(':checked')
       data['suggested-disposition'] = $("#suggested-disposition-checkbox").is(':checked')
       data['category'] = $("#category-checkbox").is(':checked')
+      data['platform-entry'] = $("#platform-entry-checkbox").is(':checked')
       data['wbrs-score'] = $("#wbrs-score-checkbox").is(':checked')
       data['wbrs-total-rule-hits'] = $("#wbrs-total-rule-hits-checkbox").is(':checked')
       data['wbrs-rules'] = $("#wbrs-rules-checkbox").is(':checked')

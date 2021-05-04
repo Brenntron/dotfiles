@@ -302,17 +302,32 @@
                   - else
                     %td.no-padding
 
-
                   %td.category-cell
                     %label Category
                     - if entry[:primary_category] != '{}' && !entry[:primary_category].nil?
                       = entry[:primary_category]
                     - else
                       %span.missing-data No assigned categories
+
+                  %td.platform-cell
+                    %label Platform
+                    - if !entry[:platform].nil?
+                      = entry[:platform]
+                    - else
+                      %span.missing-data No platform
+
                   %td.hostname-cell
                     %label Hostname
                     - unless entry[:hostname].nil?
                       = entry[:hostname]
+                  %td.sugg-tc-cell
+                    %label Suggested Threat Category
+                    - unless entry[:suggested_threat_category].nil?
+                      = entry[:suggested_threat_category].gsub(/,(?![ ])/, ', ')
+                  %td.sugg-cell
+                    %label Suggested Disposition
+                    - unless entry[:suggested_disposition].nil?
+                      = entry[:suggested_disposition]
                   %td.dual-edit-field.status-cell{'data-id': entry.id, 'data-field': 'status'}
                     %label Status
                     %span.entry-data.entry-data-status
@@ -320,7 +335,6 @@
                         NEW
                       - else
                         = entry[:status]
-
                     %span.dropdown
                       %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         - if entry[:status].nil?
@@ -621,7 +635,7 @@
                   %td
                     -#Expander area
 
-                  %td.research-table-details-wrapper{colspan: '9'}
+                  %td.research-table-details-wrapper{colspan: '10'}
                     %table
                       %tr
                         %td.input-col.wbrs-input-wrapper
@@ -786,7 +800,7 @@
                       %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses'}
 
                   %tr.research-uri-ip-data-row
-                    %td.research-table-details-wrapper{colspan: '8'}
+                    %td.research-table-details-wrapper{colspan: '9'}
                       %table
                         %tr.single-details-row
                           %td
