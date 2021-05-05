@@ -766,7 +766,7 @@ class Dispute < ApplicationRecord
             end
 
             begin
-              dispute_entry.is_important = is_important?(key)
+              dispute_entry.is_important = is_important?(dispute_entry.hostlookup)
             rescue => e
               Rails.logger.error e
               Rails.logger.error e.backtrace.join("\n")

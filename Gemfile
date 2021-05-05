@@ -97,6 +97,10 @@ gem 'dotiw'
 gem 'elasticsearch'
 gem 'hashie'
 
+group :production, :staging do
+  gem 'elastic-apm', '~> 3.15', '>= 3.15.1'
+end
+
 group :development do
   gem 'thin', '1.8.0'
   gem 'puma', '3.12.0'
