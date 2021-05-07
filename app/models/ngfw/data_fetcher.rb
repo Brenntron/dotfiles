@@ -21,7 +21,7 @@ class Ngfw::DataFetcher
         traffic_hits: count.to_i
       }
     rescue StandardError
-      Rails.logger.error "Failed to parse NGFW doman #{domain}"
+      Rails.logger.error "Failed to parse NGFW domain #{domain}"
     end
   end
 end

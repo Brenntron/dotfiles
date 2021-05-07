@@ -51,6 +51,9 @@ namespace :escalations do
         complaint.complaint_entries.update_all(platform_id: ngfw_platform.id)
       end
     end
+
+  task :run_ngfw_import => :environment do
+    Ngfw::Importer.import
   end
 end
 

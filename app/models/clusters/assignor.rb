@@ -1,10 +1,6 @@
 class Clusters::Assignor
   attr_reader :clusters, :user
 
-  PLATROFM_PROVIDERS = {
-    'WSA' => Clusters::Wbnp::Assignor
-  }
-
   def initialize(clusters, user)
     @clusters = clusters
     @user = user
@@ -12,13 +8,13 @@ class Clusters::Assignor
 
   def assign
     clusters.each do |cluster|
-      PLATROFM_PROVIDERS[cluster[:platform]].new(cluster, user).assign
+      ClusterAssignment.assign(cluster[:domain], user)
     end
   end
 
   def unassign
     clusters.each do |cluster|
-      PLATROFM_PROVIDERS[cluster[:platform]].new(cluster, user).unassign
+      ClusterAssignment.unassign(cluster[:domain], user)
     end
   end
 end

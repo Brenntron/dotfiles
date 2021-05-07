@@ -35,21 +35,8 @@ describe Clusters::Wbnp::Processor do
     end
   end
 
-  describe 'process!' do
-    subject { processor.process! }
-
-    before do
-      FactoryBot.create(:cluster_categorization, cluster_id: 1, user_id: user.id)
-    end
-
-    it 'processes cluster with no conditions' do
-      expect(Wbrs::Cluster).to receive(:process)
-      expect { subject }.to change { ClusterCategorization.count }.to(0)
-    end
-  end
-
-  describe 'decline!' do
-    subject { processor.decline! }
+  describe 'decline' do
+    subject { processor.decline }
 
     before do
       FactoryBot.create(:cluster_categorization, cluster_id: 1, user_id: user.id)

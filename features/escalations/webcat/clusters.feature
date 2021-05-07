@@ -11,6 +11,13 @@ Feature: Webcat clusters
       |   url   | is_important |
       | food.com|     true     |
       | blah.com|     false    |
+    And WBRS Cluster returns the following stubbed clusters:
+      |id|  domain      | global_volume |
+      |1 | food.com     |       1       |
+      |3 | imhungry.com |       3       |
+    And the following ngfw clusters exist:
+      | id |  domain  | traffic_hits |
+      | 1  | blah.com |      2       |
 
   @javascript
   Scenario: a user should not see clusters assigned to another users in default view
@@ -18,15 +25,10 @@ Feature: Webcat clusters
     And the following users exist
       |id|
       |2 |
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-      |3 | imhungry.com |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    2    |     3      |
+      |id| user_id |    domain    |
+      |1 |    1    | food.com     |
+      |2 |    2    | imhungry.com |
     When I goto "/escalations/webcat/clusters"
     And I wait for "3" seconds
     Then I should see "Current Clusters"
@@ -37,57 +39,37 @@ Feature: Webcat clusters
   @javascript
   Scenario: a user should be able to assign cluster
     Given a user with role "webcat user" exists and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-      |3 | imhungry.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
-    Then I check "cluster_id_1"
-    And I check "cluster_id_2"
+    Then I check "cluster_row_0"
+    And I check "cluster_row_1"
     Then I click ".take-ticket-toolbar-button"
-    And I wait for "2" seconds
-    Then I should see my username in element "#owner_1"
-    And I should see my username in element "#owner_2"
+    Then I should see my username in element "#owner_food_com"
+    And I should see my username in element "#owner_blah_com"
 
   @javascript
   Scenario: a user should be able to unassign cluster
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-      |3 | imhungry.com |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
-    Then I should see my username in element "#owner_1"
-    And I should see my username in element "#owner_2"
-    Then I check "cluster_id_1"
-    And I check "cluster_id_2"
+    Then I should see my username in element "#owner_food_com"
+    And I should see my username in element "#owner_blah_com"
+    Then I check "cluster_row_0"
+    And I check "cluster_row_1"
     Then I click ".return-ticket-toolbar-button"
-    And I wait for "2" seconds
-    Then I should not see my username in element "#owner_1"
-    And I should not see my username in element "#owner_2"
+    Then I should not see my username in element "#owner_food_com"
+    And I should not see my username in element "#owner_blah_com"
 
   @javascript
   Scenario: a user should be able to see "my" clusters
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-      |3 | imhungry.com |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
     Then I click "#filter-clusters"
     And I click link "My Clusters"
     Then I wait for "3" seconds
@@ -99,17 +81,11 @@ Feature: Webcat clusters
   @javascript
   Scenario: a user should be able to see "unassigned" clusters
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-      |3 | imhungry.com |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
     Then I click "#filter-clusters"
     And I click link "Unassigned Clusters"
     Then I wait for "3" seconds
@@ -121,17 +97,11 @@ Feature: Webcat clusters
   @javascript
   Scenario: a user should be able to see "all" clusters
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-      |3 | imhungry.com |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
     Then I click "#filter-clusters"
     And I click link "All Clusters"
     Then I wait for "3" seconds
@@ -147,12 +117,15 @@ Feature: Webcat clusters
       |id|  domain      |
       |1 | food.com     |
       |2 | blah.com     |
+    And WBRS TopUrl API call is stubbed with:
+      |   url   | is_important |
+      | food.com|     true     |
+      | blah.com|     false    |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
     And I should see element ".is-important"
 
 
@@ -163,16 +136,11 @@ Feature: Webcat clusters
       |   url   | is_important |
       | food.com|     false    |
       | blah.com|     false    |
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
     And I should not see element ".is-important"
 
   @javascript
@@ -182,16 +150,18 @@ Feature: Webcat clusters
       |id|  domain      |
       |1 | food.com     |
       |2 | blah.com     |
+    And WBRS TopUrl API call is stubbed with:
+      |   url   | is_important |
+      | food.com|     true     |
+      | blah.com|     false    |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
-    Then I check "cluster_id_1"
-    And I fill in selectized of element "#1_categories" with "[6]"
+    Then I check "cluster_row_0"
+    And I fill in selectized of element "#food_com_categories" with "[6]"
     Then I click "Submit Changes"
-    And I wait for "5" seconds
     Then I should see button with class "cluster-submit-button"
     And I should see button with class "cluster-cancel-button"
 
@@ -202,16 +172,18 @@ Feature: Webcat clusters
       |id|  domain      |
       |1 | food.com     |
       |2 | blah.com     |
+    And WBRS TopUrl API call is stubbed with:
+      |   url   | is_important |
+      | food.com|     true     |
+      | blah.com|     false    |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
-    Then I check "cluster_id_1"
-    And I fill in selectized of element "#1_categories" with "[6]"
+    Then I check "cluster_row_0"
+    And I fill in selectized of element "#food_com_categories" with "[6]"
     Then I click "Submit Changes"
-    And I wait for "5" seconds
     Then I click "#filter-clusters"
     And I click link "Waiting For Review"
     Then I wait for "3" seconds
@@ -226,21 +198,22 @@ Feature: Webcat clusters
       |id|  domain      |
       |1 | food.com     |
       |2 | blah.com     |
+    And WBRS TopUrl API call is stubbed with:
+      |   url   | is_important |
+      | food.com|     true     |
+      | blah.com|     false    |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
     And I wait for "3" seconds
-    Then I check "cluster_id_1"
-    And I fill in selectized of element "#1_categories" with "[6]"
+    Then I check "cluster_row_0"
+    And I fill in selectized of element "#food_com_categories" with "[6]"
     Then I click "Submit Changes"
-    And I wait for "5" seconds
     Then I click button with class "cluster-submit-button"
-    And I wait for "5" seconds
     Then I should see "CLUSTER WAS SUBMITTED."
     And I click "#msg-modal"
-    And I wait for "5" seconds
     Then I should not see button with class "cluster-submit-button"
     And I should not see button with class "cluster-cancel-button"
 
@@ -251,21 +224,22 @@ Feature: Webcat clusters
       |id|  domain      |
       |1 | food.com     |
       |2 | blah.com     |
+    And WBRS TopUrl API call is stubbed with:
+      |   url   | is_important |
+      | food.com|     true     |
+      | blah.com|     false    |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
-    Then I check "cluster_id_1"
-    And I fill in selectized of element "#1_categories" with "[6]"
+    Then I check "cluster_row_0"
+    And I fill in selectized of element "#food_com_categories" with "[6]"
     Then I click "Submit Changes"
-    And I wait for "10" seconds
     Then I click button with class "cluster-cancel-button"
-    And I wait for "5" seconds
+    And I wait for "1" seconds
     Then I should see "CLUSTER CATEGORIES WERE DECLINED."
     And I click "#msg-modal"
-    And I wait for "5" seconds
     Then I should not see button with class "cluster-submit-button"
     And I should not see button with class "cluster-cancel-button"
 
@@ -276,22 +250,23 @@ Feature: Webcat clusters
       |id|  domain      |
       |1 | food.com     |
       |2 | blah.com     |
+    And WBRS TopUrl API call is stubbed with:
+      |   url   | is_important |
+      | food.com|     true     |
+      | blah.com|     false    |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
-    Then I check "cluster_id_1"
-    And I fill in selectized of element "#1_categories" with "[6]"
+    Then I check "cluster_row_0"
+    And I fill in selectized of element "#food_com_categories" with "[6]"
     Then I click "Submit Changes"
-    And I wait for "10" seconds
     Then I click button with class "cluster-cancel-button"
-    And I wait for "5" seconds
+    And I wait for "1" seconds
     Then I should see "CLUSTER CATEGORIES WERE DECLINED."
     And I click "#msg-modal"
-    And I wait for "5" seconds
-    Then I should see my username in element "#owner_1"
+    Then I should see my username in element "#owner_food_com"
 
   @javascript
   Scenario: non important complaints should be submitted without 2nd person review
@@ -300,36 +275,20 @@ Feature: Webcat clusters
       |id|  domain      |
       |1 | food.com     |
       |2 | blah.com     |
+    And WBRS TopUrl API call is stubbed with:
+      |   url   | is_important |
+      | food.com|     true     |
+      | blah.com|     false    |
     And the following cluster assignments exists:
-      |id| user_id | cluster_id |
-      |1 |    1    |     1      |
-      |2 |    1    |     2      |
+      |id| user_id |  domain  |
+      |1 |    1    | food.com |
+      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
-    Then I check "cluster_id_2"
-    And I fill in selectized of element "#2_categories" with "[6]"
+    Then I check "cluster_row_1"
+    And I fill in selectized of element "#blah_com_categories" with "[6]"
     Then I click "Submit Changes"
-    And I wait for "5" seconds
     Then I should not see button with class "cluster-submit-button"
     And I should not see button with class "cluster-cancel-button"
-
-  @javascript
-    Scenario: a user should not be able to see clusters if there is related complaint
-      Given a user with id "1" has a role "webcat user" and is logged in
-      And WBRS Cluster returns the following stubbed clusters:
-        |id|  domain      |
-        |1 | food.com     |
-        |2 | blah.com     |
-        |3 | 127.0.0.1    |
-      And the following complaint entries exist:
-        |id|  domain  | status  | ip_address |
-        |1 | blah.com | PENDING |            |
-        |2 |          | PENDING | 127.0.0.1  |
-      When I goto "/escalations/webcat/clusters"
-      And I wait for "3" seconds
-      Then I should see "food.com"
-      And I should not see "blah.com"
-      And I should not see "127.0.0.1"
 
   @javascript
   Scenario: a cluster should go to 3rd person review

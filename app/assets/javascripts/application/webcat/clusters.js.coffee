@@ -71,7 +71,8 @@ window.categorize_clusters = () ->
   clusters = []
   for selected_row in selected_rows
     selected_row["comment"] = comment
-    $("##{selected_row.cluster_id}_categories").each ->
+    escaped_domain = selected_row.domain.replaceAll('.', '_')
+    $("##{escaped_domain}_categories").each ->
       # collect selected categories
       categories = $(this).find('option')
 
@@ -118,8 +119,8 @@ $ ->
       searchPlaceholder: "Search within table"
     }
     order: [ [
-      3
-      'asc'
+      5
+      'desc'
     ] ]
     lengthMenu: [50, 100, 500, 1000]
     columnDefs: [
@@ -128,7 +129,8 @@ $ ->
           0
           1
           2
-          8
+          9
+          10
         ]
         orderable: false
         searchable: false
@@ -147,12 +149,15 @@ $ ->
         width: '14px'
         className: 'expandable-row-column'
         'render':(data,type,full,meta)->
-          return "<button class='expand-row-button-inline expand-row-button-#{data.cluster_id}'></button>"
+          if full.platform == 'WSA'
+            return "<button class='expand-row-button-inline expand-row-button-#{data.cluster_id}'></button>"
+          else
+            return "<span />"
       }
       {
         data: null
         render: (data, type, full, meta) ->
-          element_id = "cluster_id_#{data.cluster_id}"
+          element_id = "cluster_row_#{meta.row}"
           return "<input type='checkbox' class='cluser-row-select' name='#{element_id}' id='#{element_id}' onclick='window.selectRow(#{element_id})'>"
       }
       {
@@ -172,7 +177,7 @@ $ ->
         data: null
         className: 'domain-column',
         render: (data) ->
-          {domain, cluster_size} = data  # get domain string and cluster_size out of the data
+          {domain, cluster_size, platform} = data  # get domain string and cluster_size out of the data
           is_ip = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
 
           html = "<span ondblclick='copy_domain(\"#{domain}\", this)'> #{domain} </span>"
@@ -183,24 +188,33 @@ $ ->
             html += "<button type='button' class='whois-btn right-margin domain-spacer'></button>"
 
           html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
-                   <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>
-                   <span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
+                   <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
+          if platform != 'NGFW'
+            html += "<span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
           return html
       }
       {
         data: 'global_volume'
       }
       {
+        data: 'wbrs_score'
+      }
+      {
+        data: 'platform'
+      }
+      {
         data: 'assigned_to'
         className: "alt-col assignee-col"
         render: (data, type, full, meta) ->
-          return "<span id='owner_#{full.cluster_id}'> #{data} </span>"
+          escaped_domain = full.domain.replaceAll('.', '_') # jquery doesn't like dots in id
+          return "<span id='owner_#{escaped_domain}'> #{data} </span>"
       }
       {
         data: 'cluster_id'
         className: 'category-column'
         render: (data, type, full, meta) ->
-          "<select id='#{data}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='6' name='' #{if full.is_pending then 'disabled'}>"
+          escaped_domain = full.domain.replaceAll('.', '_') # jquery doesn't like dots in id
+          "<select id='#{escaped_domain}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='6' name='' #{if full.is_pending then 'disabled'}>"
       }
       {
         data: 'cluster_id'
@@ -210,8 +224,8 @@ $ ->
         render: (data, type, full, meta) ->
           if full.is_pending
             return "<div class='cluster-btn-container'>
-                      <button class='toolbar-button icon-submit toolbar-button-spacer cluster-submit-button tooltipped' onclick='window.approve_cluster(#{data})' type='button' title='Confirm Changes' />
-                      <button class='toolbar-button cluster-cancel-button tooltipped' onclick='window.decline_cluster(#{data})' type='button' title='Decline Updates' />
+                      <button class='toolbar-button icon-submit toolbar-button-spacer cluster-submit-button tooltipped' onclick='window.approve_cluster(#{meta.row})' type='button' title='Confirm Changes' />
+                      <button class='toolbar-button cluster-cancel-button tooltipped' onclick='window.decline_cluster(#{meta.row})' type='button' title='Decline Updates' />
                     </div>"
       }
     ]
@@ -350,6 +364,7 @@ window.copycat_paste = () ->
       rowSelectize.setValue(selectedValues, true)
 
 window.selectRow = (el) ->
+  console.log el
   $(el).closest('tr').toggleClass('selected')
 
 window.selectize_category_inputs = () ->
@@ -359,6 +374,7 @@ window.selectize_category_inputs = () ->
     if $(this).next("div").hasClass("selectize-control")
 #          This is already selectized
     else
+      console.log(this.id)
       input_ids.push("##{this.id}")
       $(this).selectize {
         persist: true,
@@ -376,9 +392,10 @@ window.populate_cat_select = ->
     data = $("#clusters-index").DataTable().data()
     for cluster in data
       if cluster.is_pending
-        cat_select = $("##{cluster.cluster_id}_categories")[0]
+        escaped_domain = cluster.domain.replaceAll('.', '_')
+        cat_select = $("##{escaped_domain}_categories")[0]
         if cat_select
-          $("##{cluster.cluster_id}_categories")[0].selectize.setValue(cluster.categories)
+          $("##{escaped_domain}_categories")[0].selectize.setValue(cluster.categories)
   ), 2000
 
 window.copy_domain = (domain, element) ->
@@ -765,9 +782,6 @@ window.telemetry_call = (data, type) ->
         return response
     )
 
-window.select_or_deselect_cluster = (cluster_id)->
-    $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
-#
 $('#cluster_filter_field').keyup (event) ->
     if event.keyCode == 13
       apply_filter_to_table()
@@ -801,7 +815,8 @@ window.take_selected_clusters = ()->
           std_msg_error('Error Taking Clusters', [json.error])
         else
           for cluster, i in json.clusters
-            $("#owner_#{cluster.cluster_id}").text(json.username)
+            escaped_domain = cluster.domain.replaceAll('.', '_')
+            $("#owner_#{escaped_domain}").text(json.username)
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -825,7 +840,8 @@ window.return_selected_clusters = ()->
           std_msg_error('Error Returning Clusters', [json.error])
         else
           for entry, i in selected_rows
-            $("#owner_#{entry.cluster_id}").text('')
+            escaped_domain = entry.domain.replaceAll('.', '_')
+            $("#owner_#{escaped_domain}").text('')
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -834,9 +850,9 @@ window.return_selected_clusters = ()->
     std_msg_error('no rows selected', ['Please select at least one row.'])
 
 
-window.approve_cluster = (cluster_id) ->
+window.approve_cluster = (cluster_row_id) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  cluster = window.get_cluster_by_id(cluster_id)
+  cluster = window.get_cluster_by_row_id(cluster_row_id)
   console.log cluster
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/clusters/proccess'
@@ -854,9 +870,9 @@ window.approve_cluster = (cluster_id) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
-window.decline_cluster = (cluster_id) ->
+window.decline_cluster = (cluster_row_id) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  cluster = window.get_cluster_by_id(cluster_id)
+  cluster = window.get_cluster_by_row_id(cluster_row_id)
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/clusters/decline'
     method: 'POST'
@@ -872,6 +888,13 @@ window.decline_cluster = (cluster_id) ->
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
+
+window.get_cluster_by_row_id = (row_id) ->
+  $("#clusters-index").DataTable().row(row_id).data()
+  # $("#clusters-index").DataTable().rows((idx, data, node) ->
+  #   debugger
+  #   return data.cluster_id == cluster_id.toString() ? true : false
+  # ).data()[0];
 
 window.build_clusters_header = () ->
   return if $('#clusters-index_wrapper').length == 0

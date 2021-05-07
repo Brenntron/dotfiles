@@ -1,4 +1,4 @@
-class Clusters::Wbnp::Processor
+class Clusters::Wbnp::Processor < Clusters::Templates::Processor
   attr_reader :cluster, :user
 
   def initialize(cluster, user)
@@ -20,36 +20,18 @@ class Clusters::Wbnp::Processor
   end
 
   def process
-    proccess_on_wbrs(
+    Wbrs::Cluster.process(
       comment: cluster[:comment],
       user: user.cvs_username,
       cluster_id: cluster[:cluster_id],
       cat_ids: cluster[:categories].map(&:to_i)
     )
+    ClusterCategorization.where(cluster_id: cluster[:cluster_id]).destroy_all
   end
 
-  def process!
-    ClusterCategorization.where(cluster_id: cluster[:cluster_id]).each do |cluster_categorization|
-      proccess_on_wbrs(
-        comment: cluster_categorization.comment,
-        user: cluster_categorization.user.cvs_username,
-        cluster_id: cluster_categorization.cluster_id,
-        cat_ids: JSON.parse(cluster_categorization.category_ids) # mysql can't store arrays =(
-      )
-      cluster_categorization.destroy
-    end
-  end
-
-  def decline!
+  def decline
     ClusterCategorization.where(cluster_id: cluster[:cluster_id]).destroy_all
     # assign clusters to the person who declined current categorization
-    Clusters::Wbnp::Assignor.new(cluster, user).assign!
-  end
-
-  private
-
-  def proccess_on_wbrs(data)
-    # binding.pry
-    Wbrs::Cluster.process(data)
+    ClusterAssignment.assign!(cluster[:domain], user)
   end
 end

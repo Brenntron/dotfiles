@@ -2,18 +2,19 @@ describe Clusters::Processor do
   subject { described_class.new(clusters, user) }
 
   before do
-    allow(Clusters::Wbnp::Processor).to receive_message_chain(:new).and_return(
-      double(
-        processable?: processable,
-        process_2nd_person_review: double,
-        process: double,
-        process!: double,
-        decline!: double
-      )
-    )
+    allow(Clusters::Wbnp::Processor).to receive_message_chain(:new).and_return(processor_stub)
+    allow(Clusters::Ngfw::Processor).to receive_message_chain(:new).and_return(processor_stub)
   end
 
   let(:user) { FactoryBot.create(:user) }
+  let(:processor_stub) do
+    double(
+      processable?: processable,
+      process_2nd_person_review: double,
+      process: double,
+      decline: double
+    )
+  end
   let(:processable) { true }
   let(:is_important) { false }
 
@@ -47,6 +48,14 @@ describe Clusters::Processor do
             subject.process
           end
         end
+
+        context 'NGFW clusters' do
+          let(:platform) { 'NGFW' }
+          it 'process cluster to 2nd person review' do
+            expect(Clusters::Ngfw::Processor).to receive_message_chain(:new, :process_2nd_person_review)
+            subject.process
+          end
+        end
       end
 
       context 'when clusters are not important' do
@@ -55,6 +64,14 @@ describe Clusters::Processor do
 
           it 'processes clusters' do
             expect(Clusters::Wbnp::Processor).to receive_message_chain(:new, :process)
+            subject.process
+          end
+        end
+        context 'NGFW clusters' do
+          let(:platform) { 'NGFW' }
+
+          it 'processes clusters' do
+            expect(Clusters::Ngfw::Processor).to receive_message_chain(:new, :process)
             subject.process
           end
         end
@@ -74,6 +91,17 @@ describe Clusters::Processor do
           subject.process
         end
       end
+
+      context 'NGFW clusters' do
+        let(:platform) { 'NGFW' }
+
+        it 'does not call any processor' do
+          wbnp_processor = Clusters::Ngfw::Processor.new(clusters, user)
+          expect(wbnp_processor).not_to receive(:process_2nd_person_review)
+          expect(wbnp_processor).not_to receive(:process)
+          subject.process
+        end
+      end
     end
   end
 
@@ -81,7 +109,14 @@ describe Clusters::Processor do
     context 'WBNP clusters' do
       let(:platform) { 'WSA' }
       it 'calls process! for wbnp processor' do
-        expect(Clusters::Wbnp::Processor).to receive_message_chain(:new, :process!)
+        expect(Clusters::Wbnp::Processor).to receive_message_chain(:new, :process)
+        subject.process!
+      end
+    end
+    context 'NGFW clusters' do
+      let(:platform) { 'WSA' }
+      it 'calls process! for ngfw processor' do
+        expect(Clusters::Ngfw::Processor).to receive_message_chain(:new, :process)
         subject.process!
       end
     end
@@ -91,8 +126,15 @@ describe Clusters::Processor do
     context 'WBNP clusters' do
       let(:platform) { 'WSA' }
       it 'calls decline! for wbnp processor' do
-        expect(Clusters::Wbnp::Processor).to receive_message_chain(:new, :decline!)
-        subject.decline!
+        expect(Clusters::Wbnp::Processor).to receive_message_chain(:new, :decline)
+        subject.decline
+      end
+    end
+    context 'NGFW clusters' do
+      let(:platform) { 'NGFW' }
+      it 'calls decline! for ngfw processor' do
+        expect(Clusters::Ngfw::Processor).to receive_message_chain(:new, :decline)
+        subject.decline
       end
     end
   end

@@ -16,37 +16,37 @@ class ClusterAssignment < ApplicationRecord
       all
     end
 
-    def fetch_assignments_for(user: nil, clusters: nil)
+    def fetch_assignments_for(user: nil, domains: nil)
       destroy_expired_assignments!
 
-      return includes(:user).where(cluster_id: clusters) if clusters
+      return includes(:user).where(domain: domains) if domains
 
       return includes(:user).where(user_id: user.id) if user
     end
 
-    def assign(cluster_id, user)
+    def assign(domain, user)
       destroy_expired_assignments!
 
-      assignments = where(cluster_id: cluster_id)
+      assignments = where(domain: domain)
       raise 'Cluster already assigned to someone else' if assignments.any?
 
-      create(cluster_id: cluster_id, user_id: user.id)
+      create(domain: domain, user_id: user.id)
     end
 
-    def assign!(cluster_id, user)
+    def assign!(domain, user)
       destroy_expired_assignments!
-      where(cluster_id: cluster_id).destroy_all
-      create(cluster_id: cluster_id, user_id: user.id)
+      where(domain: domain).destroy_all
+      create(domain: domain, user_id: user.id)
     end
 
-    def assign_pemanent!(cluster_id, user)
+    def assign_pemanent!(domain, user)
       destroy_expired_assignments!
-      where(cluster_id: cluster_id).destroy_all
-      create(cluster_id: cluster_id, user_id: user.id, permanent: true)
+      where(domain: domain).destroy_all
+      create(domain: domain, user_id: user.id, permanent: true)
     end
 
-    def unassign(cluster_id, user)
-      where(cluster_id: cluster_id, user_id: user).destroy_all
+    def unassign(domain, user)
+      where(domain: domain, user_id: user).destroy_all
     end
 
     private
