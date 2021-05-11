@@ -163,7 +163,8 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                     domain: '355toyota.com',
                     product_platform: 1001,
                     product_version: "test_platform_version",
-                    network: false
+                    network: false,
+                    meta_data: "{\"ticket\":{\"testing_ticket\":123},\"entry\":{\"testing_entry\":123}}"
                 }
             }
         }
@@ -286,7 +287,6 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
     expect(dispute.dispute_entries.where(uri: 'thepretenders.com')).to exist
     expect(dispute.ticket_source).to eql("talos-intelligence")
-
     expect(dispute.platform_id).to eql(1001)
     expect(dispute.product_platform).to eql(nil)
   end
@@ -310,7 +310,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.product_version).to eql("test_platform_version")
     expect(dispute.in_network).to eql(nil)
     expect(dispute.ticket_source).to eql("talos-intelligence-api")
-
+    expect(dispute.meta_data).to eql("{\"ticket\":{\"testing_ticket\":123},\"entry\":{\"testing_entry\":123}}")
     expect(dispute.platform_id).to eql(1001)
     expect(dispute.product_platform).to eql(nil)
   end
