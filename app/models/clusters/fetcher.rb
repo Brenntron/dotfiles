@@ -18,7 +18,7 @@ class Clusters::Fetcher
     clusters_data = fetch_clusters
     clusters_data = populate_3rd_party_clusters_data(clusters_data)
     filtered_clusters = Clusters::Filter.new(clusters_data, filter, user).filter
-    filtered_clusters.sort_by { |cluster| cluster[:global_volume] }.first(CLUSTERS_PAGE_LIMIT)
+    filtered_clusters.sort_by { |cluster| cluster[:global_volume] }.reverse.first(CLUSTERS_PAGE_LIMIT)
   end
 
   private
