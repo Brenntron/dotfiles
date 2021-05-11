@@ -16,6 +16,11 @@ class Clusters::Ngfw::Processor < Clusters::Templates::Processor
   end
 
   def process
+    unless ngfw_cluster.pending?
+      # update cluster data from user input
+      ngfw_cluster.update_attributes(category_ids: cluster[:categories].to_json, comment: cluster[:comment])
+    end
+
     # process in the same way as complaint entries
     Wbrs::Prefix.create_from_url(
       url: ngfw_cluster.domain,
@@ -36,6 +41,6 @@ class Clusters::Ngfw::Processor < Clusters::Templates::Processor
   private
 
   def ngfw_cluster
-    @ngfw_cluster = NgfwCluster.find_by(domain: cluster[:domain])
+    @ngfw_cluster ||= NgfwCluster.find_by(domain: cluster[:domain])
   end
 end

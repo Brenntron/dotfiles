@@ -20,7 +20,9 @@ class Ngfw::Importer
     end
 
     def import_new_clusters
-      platform = Platform.find_by(internal_name: 'ngfw')
+      platform = Platform.where('LOWER(internal_name) LIKE ?', '%ngfw%').first # there is no ILIKE in mysql...
+      raise 'NGFW platform not found' if platform.blank?
+
       pending_clusters = NgfwCluster.pluck(:domain) # all the rest clusters were deleted by destroy_existing_clusters!
 
       Ngfw::DataFetcher.fetch.each do |ngfw_record|

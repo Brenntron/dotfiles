@@ -6,6 +6,11 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
   # and parse all NGFW records.
   # Clusters::ClustersFetcher::CLUSTERS_PAGE_LIMIT can be a source for DATA_LIMIT value
   DATA_LIMIT = 1000
+  # NgfwCluster has a relation to Platform which should be set to Ngfw
+  # But platforms are managed by Talos Intelligence app and can be edited there
+  # Since clusters processing are using platform name as an identifier
+  # we use hardcoded value to be isolated from potential category name change on TI side
+  DATA_PATFORM = 'NGFW'.freeze
 
   def initialize(regex)
     @regex = regex
@@ -24,7 +29,7 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
            else
              NgfwCluster.visible
            end
-    data.includes(:platform).order(traffic_hits: :desc).first(DATA_LIMIT)
+    data.order(traffic_hits: :desc).first(DATA_LIMIT)
   end
 
   def parse_response(clusters)
@@ -36,7 +41,7 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
         global_volume: cluster.traffic_hits,
         is_pending: cluster.pending?,
         categories: cluster.category_ids.present? ? JSON.parse(cluster.category_ids) : [], # mysql can't store arrays =(
-        platform: cluster.platform.public_name
+        platform: DATA_PATFORM
       }
     end
   end
