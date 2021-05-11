@@ -276,14 +276,13 @@
                     %button.expand-row-button-inline{'data-entry-id': "#{entry.id}"}
                   %td.cb-cell
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}", class: "dispute-entry-cb-#{entry.id}"}
+                  -if entry[:is_important]
+                    %td
+                      %span.entry-important-flag
                   %td.dual-edit-field.url-cell{'data-id': entry.id, 'data-field': 'host'}
-                    - if entry[:is_important]
-                      %span.entry-data.entry-data-content.entry-important-flag
-                        = entry.hostlookup
-                    - else
-                      %span.entry-data.entry-data-content
-                        = entry.hostlookup
-                      %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
+                    %span.entry-data.entry-data-content
+                      = entry.hostlookup
+                    %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
 
                   -# if entry = uri and there are no resolved ips
                   - if entry.uri? && entry[:web_ips].blank?
@@ -712,13 +711,17 @@
                                 = "#{entry.referenced_tickets.count} ticket(s)"
                               .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
                                 %table
-                                  - entry.referenced_tickets.each do |reference|
-                                    %tr
-                                      %td
-                                        %a{href: escalations_webrep_dispute_path(reference.id)}
-                                          = reference.id
-                                      %td
-                                        = reference.case_opened_at
+                                  %thead
+                                    %th Case ID
+                                    %th Date/Time Submitted
+                                  %tbody
+                                    - entry.referenced_tickets.each do |reference|
+                                      %tr
+                                        %td
+                                          %a{name:"#{reference.id}_link", href: escalations_webrep_dispute_path(reference.id)}
+                                            = reference.id
+                                        %td
+                                          = reference.case_opened_at
                       %tr
                         %td.input-col.sbrs-input-wrapper
                           %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}

@@ -6730,23 +6730,14 @@ td.ticket-total::before {
   border: none;
   border-radius: 2px 0 2px 2px;
   width: 250px;
-  background-color: $bug-section-color;
   padding: 3px 6px;
-}
-
-.references-dropdown table td {
-  background-color: $bug-section-color;
-  color: $content-bg-color;
-  border-bottom-color: $faint-accent-color;
-}
-
-.references-dropdown table tr:last-of-type td {
-  border-bottom: none;
-}
-
-.references-dropdown table td a {
-  color: $content-bg-color;
-  text-decoration: underline;
+  table td {
+    background-color: transparent!important;
+    padding: 3px 10px!important;
+    a {
+      text-decoration: underline;
+    }
+  }
 }
 
 .referenced-tickets-col .dropdown.open {
@@ -12098,7 +12089,7 @@ table > tbody > tr > td.no-padding {
   .url-cell {
     width: 340px;
     padding-right: 10px;
-    vertical-align: top;
+    vertical-align: middle;
     span.entry-data-content {
       display: inline-block;
       word-break: break-all;
