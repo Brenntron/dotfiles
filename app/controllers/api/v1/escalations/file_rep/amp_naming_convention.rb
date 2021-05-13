@@ -52,7 +52,7 @@ module API
                   timestamp = Time.now
                   Rails.logger.debug("\n\n*** PATCH #{params['patterns']}\n\n")
                   ::AmpNamingConvention.save_from_params(params['patterns'])
-                  # ::AmpNamingConvention.send_all_to_ti(timestamp: timestamp)
+                  ::AmpNamingConvention.send_all_to_ti(timestamp: timestamp)
                 end
 
                 render json: {status: 'Success'}
