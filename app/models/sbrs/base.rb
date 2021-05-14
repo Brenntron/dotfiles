@@ -25,7 +25,7 @@ class Sbrs::Base
 
   def self.category_version
     begin
-      category_list = JSON.parse(self.remote_call_sds('', 'webcat_labels'))
+      category_list = JSON.parse(SbApi.remote_call_sds('', 'webcat_labels'))
       cat_version = category_list["META_CATEGORIES_VERSION"]["current_version"].to_s
       "v#{cat_version}"
     rescue
@@ -402,7 +402,7 @@ class Sbrs::Base
     request_error_handling(make_post_request(path: path, body: body))
   end
 
-  def self.health_check
+  def self.health_check_sdsv3
     health_report = {}
 
     times_to_try = 3
@@ -415,6 +415,43 @@ class Sbrs::Base
       begin
         result = combo_call_sds_v3(TEST_URL,[])
         if result["wbrs"].present?
+          times_successful += 1
+        else
+          times_failed += 1
+        end
+        times_tried += 1
+      rescue
+        times_failed += 1
+        times_tried += 1
+      end
+
+    end
+
+    if times_successful > times_failed
+      is_healthy = true
+    end
+
+    health_report[:times_tried] = times_tried
+    health_report[:times_successful] = times_successful
+    health_report[:times_failed] = times_failed
+    health_report[:is_healthy] = is_healthy
+
+    health_report
+  end
+
+  def self.health_check_sdsv2
+    health_report = {}
+
+    times_to_try = 3
+    times_tried = 0
+    times_successful = 0
+    times_failed = 0
+    is_healthy = false
+
+    (1..times_to_try).each do |i|
+      begin
+        result = SbApi.remote_call_sds('', 'webcat_labels')
+        if result["META_CATEGORIES_VERSION"].present?
           times_successful += 1
         else
           times_failed += 1
