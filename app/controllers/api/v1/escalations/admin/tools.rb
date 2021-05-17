@@ -174,6 +174,7 @@ module API
               status_response[:servers][:reptool] = Rails.configuration.rep_api.host
               status_response[:servers][:rule_api] = Rails.configuration.wbrs.host
               status_response[:servers][:sds_v3] = Sbrs::Base.sds_v3_host
+              status_response[:servers][:sds_v2] = Sbrs::Base.sds_host
               status_response[:servers][:threatgrid] = Rails.configuration.threatgrid.host
               status_response[:servers][:reversing_lab] = Rails.configuration.reversing_labs.host
               status_response[:servers][:sandbox] = Rails.configuration.file_reputation_sandbox.host
@@ -185,7 +186,8 @@ module API
               begin
                 status_response[:reptool] = RepApi::Blacklist.health_check
                 status_response[:rule_api] = Wbrs::ThreatCategory.health_check
-                status_response[:sds_v3] = Sbrs::Base.health_check
+                status_response[:sds_v3] = Sbrs::Base.health_check_sdsv3
+                status_response[:sds_v2] = Sbrs::Base.health_check_sdsv2
                 status_response[:threatgrid] = Threatgrid::Search.health_check
                 status_response[:reversing_lab] = FileReputationApi::ReversingLabs.health_check
                 status_response[:sandbox] = FileReputationApi::Sandbox.health_check
