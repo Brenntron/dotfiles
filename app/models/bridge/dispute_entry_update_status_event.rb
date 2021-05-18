@@ -2,6 +2,7 @@ class Bridge::DisputeEntryUpdateStatusEvent < Bridge::BaseMessage
   def initialize
     super(channel: 'update-ticket',
           addressee: 'talos-intelligence')
+    Delayed::Worker.logger.info("DisputeEntry update init")
   end
 
   def post_entries(entries)
@@ -27,6 +28,7 @@ class Bridge::DisputeEntryUpdateStatusEvent < Bridge::BaseMessage
   handle_asynchronously :post_entries, :queue => "dispute_update", :priority => 2
 
   def post_entry(entry)
+    Delayed::Worker.logger.info("DisputeEntry update event sending reply to bridge")
     post_entries([ entry ])
   end
 

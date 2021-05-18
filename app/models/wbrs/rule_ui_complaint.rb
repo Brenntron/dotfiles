@@ -67,4 +67,11 @@ class Wbrs::RuleUiComplaint < Wbrs::Base
     response_body
   end
 
+  def self.tag_complaint(params)
+    response = post_request(path: '/v1/cat/complaints/tag', body: stringkey_params(params))
+
+    response_body = JSON.parse(response.body)
+    response_body
+  end
+
 end

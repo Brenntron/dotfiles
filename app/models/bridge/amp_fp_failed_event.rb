@@ -7,6 +7,7 @@ class Bridge::AmpFpFailedEvent < Bridge::BaseMessage
   end
 
   def post(source_key: @source_key, ac_status: AmpFalsePositive::AC_FAILED)
+    Delayed::Worker.logger.info("AmpFp Failed event sending reply to bridge")
     super(message: {source_key: source_key,
                     ac_status: ac_status})
   end
