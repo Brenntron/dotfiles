@@ -272,9 +272,9 @@
             %td.research-table-row-wrapper
               %table
                 %tr.research-first-row
-                  %td.expandable-row-column.expandable-cell
+                  %td.expandable-row-column.expandable-cell{rowspan: '2'}
                     %button.expand-row-button-inline{'data-entry-id': "#{entry.id}"}
-                  %td.cb-cell
+                  %td.cb-cell{rowspan: '2'}
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}", class: "dispute-entry-cb-#{entry.id}"}
                   %td.dual-edit-field.url-cell{'data-id': entry.id, 'data-field': 'host'}
                     - if entry[:is_important]
@@ -302,17 +302,24 @@
                   - else
                     %td.no-padding
 
-
-                  %td.category-cell
-                    %label Category
-                    - if entry[:primary_category] != '{}' && !entry[:primary_category].nil?
-                      = entry[:primary_category]
-                    - else
-                      %span.missing-data No assigned categories
                   %td.hostname-cell
-                    %label Hostname
                     - unless entry[:hostname].nil?
+                      %label Hostname
                       = entry[:hostname]
+
+                  %td.platform-cell
+                    %label Platform
+                    - if @dispute.platform.present?
+                      =@dispute.platform.public_name
+                    - else
+                      - if entry.platform_id.present?
+                        =entry.product_platform.public_name
+                      - elsif entry.platform.present?
+                        =entry.platform
+                      - else
+                        %span.missing-data No platform
+
+
                   %td.dual-edit-field.status-cell{'data-id': entry.id, 'data-field': 'status'}
                     %label Status
                     %span.entry-data.entry-data-status
@@ -393,7 +400,7 @@
                     %label As of
                     = entry.dispute_entry_preload&.created_at&.strftime('%F %T')
 
-                  %td.dispute_rep_tools.rep-tools-cell
+                  %td.dispute_rep_tools.rep-tools-cell{rowpan: '2'}
                     .webrep_auto_resolve{id:"webrep_auto_resolve-#{entry.id}", title:"Auto Resolve Log"}
                       = (entry.auto_resolve_log.html_safe rescue "")
                     %span.dispute_rep_tools_wrapper
@@ -616,12 +623,32 @@
                                   %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_individual_reptool(this)', disabled: true}
                                     Submit Changes
 
+                %tr.research-second-row
+                  %td{colspan: '2'}
+                  //placeholder cell
+                  %td.category-cell
+                    %label Category
+                    - if entry[:primary_category] != '{}' && !entry[:primary_category].nil?
+                      = entry[:primary_category]
+                    - else
+                      %span.missing-data No assigned categories
+
+                  %td.sugg-tc-cell{colspan: '2'}
+                    %label Suggested Threat Category
+                    - unless entry[:suggested_threat_category].nil?
+                      = entry[:suggested_threat_category].gsub(/,(?![ ])/, ', ')
+                  %td.sugg-cell{colspan: '2'}
+                    %label Suggested Disposition
+                    - unless entry[:suggested_disposition].nil?
+                      = entry[:suggested_disposition]
+                  %td
+                  -#//placeholder cell
 
                 %tr.research-overview-row
                   %td
                     -#Expander area
 
-                  %td.research-table-details-wrapper{colspan: '9'}
+                  %td.research-table-details-wrapper{colspan: '12'}
                     %table
                       %tr
                         %td.input-col.wbrs-input-wrapper

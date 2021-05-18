@@ -83,7 +83,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           disposition_suggested:        file_rep.disposition_suggested,
           description:                  file_rep.description,
           source:                       file_rep.source,
-          platform:                     file_rep.platform,
+          platform:                     file_rep.determine_platform,
           sandbox_score:                file_rep.sandbox_score,
           sandbox_threshold:            file_rep.sandbox_threshold,
           sandbox_under:                sandbox_under,

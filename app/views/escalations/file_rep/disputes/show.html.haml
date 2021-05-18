@@ -125,9 +125,16 @@
               %label.content-label-sm
                 Suggested Disposition
               - if @file_rep_dispute.suggested_malicious?
-                .suggested-disposition.disp-negative= @file_rep_dispute.disposition_suggested
+                .suggested-disposition.disp-negative.top-info-data= @file_rep_dispute.disposition_suggested
               - else
-                .suggested-disposition= @file_rep_dispute.disposition_suggested
+                .suggested-disposition.top-info-data= @file_rep_dispute.disposition_suggested
+
+              %label.content-label-sm
+                Platform
+              - if @platform_name.blank?
+                .top-info-data.missing-data No platform
+              - else
+                .top-info-data=@platform_name
 
         .col-xs-12.col-sm-12.col-md-12.col-lg-7.col-with-divider.col-ticket-right
           .row
