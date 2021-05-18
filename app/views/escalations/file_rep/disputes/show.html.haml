@@ -131,7 +131,7 @@
 
               %label.content-label-sm
                 Platform
-              - if @platform_name == ''
+              - if @platform_name.blank?
                 .top-info-data.missing-data No platform
               - else
                 .top-info-data=@platform_name
