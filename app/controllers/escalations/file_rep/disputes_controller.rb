@@ -20,14 +20,8 @@ class Escalations::FileRep::DisputesController < ApplicationController
   def show
     @file_rep_dispute = FileReputationDispute.find(params[:id])
 
-    if @file_rep_dispute.platform_id?
-      @platform_name = @file_rep_dispute.ti_product_platform.public_name
-    elsif @file_rep_dispute.platform?
-      @platform_name = @file_rep_dispute.platform
-    else
-      @platform_name = ''
-    end
-
+    @platform_name = @file_rep_dispute.determine_platform
+    
     @versioned_items = @file_rep_dispute.compose_versioned_items
     @conventions = AmpNamingConvention.order(:table_sequence).all
   end
