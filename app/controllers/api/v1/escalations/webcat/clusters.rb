@@ -56,6 +56,7 @@ module API
             params do
             end
 
+            # Uses class Beaker::Verdicts in old Beaker namespace.
             get "" do
               authorize!(:index, Complaint)
 
