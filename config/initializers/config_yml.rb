@@ -37,6 +37,13 @@ Rails.configuration.auto_resolve.check_virus_total = auto_resolve['virus_total']
 Rails.configuration.auto_resolve.check_umbrella = auto_resolve['umbrella'] && auto_resolve['umbrella']['check']
 
 
+beaker_config = env_config['beaker']
+raise "config.yml missing beaker section" unless beaker_config
+Rails.configuration.beaker              = OpenStruct.new
+Rails.configuration.beaker.ca_cert_file = beaker_config['ca_cert_file']
+Rails.configuration.beaker.hostport     = beaker_config['hostport']     # identifier hostport from RFC 1738
+
+
 bls_config = env_config.fetch('bls', {})
 raise 'config.yml missing bls section' unless bls_config
 Rails.configuration.bls                 = ApiRequester::ApiRequester.config_of(bls_config)
@@ -115,7 +122,6 @@ Rails.configuration.sds                 = ApiRequester::ApiRequester.config_of(s
 Rails.configuration.sds.v3_host         = sds_config['v3_host']
 Rails.configuration.sds.cert_file       = sds_config['cert_file'] || sds_config['ca_cert_file']
 Rails.configuration.sds.pkey_file       = sds_config['pkey_file']
-Rails.configuration.sds.category_version       = sds_config['category_version']
 
 talos_intelligence = env_config.fetch('talos_intelligence', {})
 Rails.configuration.talos_intelligence  = ApiRequester::ApiRequester.config_of(talos_intelligence)

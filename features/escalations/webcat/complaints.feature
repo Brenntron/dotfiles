@@ -511,7 +511,7 @@ Feature: Webcat complaints
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click ".expand-row-button-inline"
     And I wait for "8" seconds
-    Then I should see content "Nature" within ".sds_category"
+    Then I should see content "Nature and Conservation" within first element of class ".sds_category"
 
   @javascript
   Scenario: when a complaint in the WBNP queue is resolved,
