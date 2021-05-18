@@ -1204,4 +1204,16 @@ class FileReputationDispute < ApplicationRecord
     research_bug_proxy
   end
 
+  def determine_platform
+    if self.platform_id.present?
+      return self.ti_product_platform.public_name
+    end
+
+    if self.platform.present?
+      return self.platform
+    end
+
+    return nil
+  end
+
 end

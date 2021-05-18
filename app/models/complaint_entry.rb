@@ -1230,4 +1230,18 @@ class ComplaintEntry < ApplicationRecord
 
     return log_messages
   end
+
+  def determine_platform
+    if self.platform_id.present?
+      return self.product_platform.public_name
+    end
+    if self.complaint.platform_id.present?
+      return self.complaint.platform.public_name
+    end
+    if self.platform.present?
+      return self.platform
+    end
+
+    return nil
+  end
 end

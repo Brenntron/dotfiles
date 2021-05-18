@@ -1060,16 +1060,10 @@ $ ->
       }
       { data: 'source' }
       {
-        data: null
+        data: 'platform'
         class: 'platform-col'
         render: (data,type,full,meta) ->
-          if full.dispute_entries?
-            if full.dispute_entries.length == 0
-              platform = "Unknown"
-            else
-              platform = full.dispute_entries[0].entry.platform
-          else
-            platform = "Unknown"
+          platform = full.platform
 
           if  platform == "N/A" ||  platform == "Unknown" ||  platform == "Missing" ||  platform == "" ||  platform == null
             platform = '<span class="missing-data platform"></span>'
@@ -1094,8 +1088,10 @@ $ ->
     entry = dispute.dispute_entries
     missing_data = '<span class="missing-data">Missing data</span>'
     entry_rows = []
+
     $(entry).each ->
-      { ip_address, uri, primary_category} = this.entry
+      {ip_address, uri, primary_category} = this.entry
+      platform = this.rendered_platform
       entry_content = missing_data
       if ip_address != null
         entry_content = ip_address
