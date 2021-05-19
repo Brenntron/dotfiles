@@ -2208,3 +2208,15 @@ $ ->
       $('#complaints').attr('href', link)
 
   set_complaints_link()
+
+  $('#wbnp-full-report').dialog
+    autoOpen: false
+    width: 930
+    minWidth: 930
+    height: 500
+    minHeight: 300
+    position:
+      at: "right top"
+
+  $('.wbnp-full-report').click ->
+    $('#wbnp-full-report').dialog('open')

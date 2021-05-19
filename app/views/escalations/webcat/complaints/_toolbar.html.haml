@@ -73,8 +73,9 @@
     %label.toolbar-section-label Fetch Data
     %button.toolbar-button.sync-button#fetch.esc-tooltipped.toolbar-button-spacer{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
       %span.toolbar-button-text Complaints
-    %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
-      %span.toolbar-button-text WBNP Data
+    - if current_user.is_webcat_manager?
+      %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
+        %span.toolbar-button-text WBNP Data
   %div
     %label.toolbar-section-label Bulk
     - if params[:f] != "REVIEW"
