@@ -2252,7 +2252,7 @@ class Dispute < ApplicationRecord
     end
     if self.dispute_entries.present?
       if self.dispute_entries.first.platform_id.present?
-        return self.dispute_entries.map{|d_e| d_e.product_platform.public_name}.uniq.join(",")
+        return self.dispute_entries.map{|d_e| d_e.product_platform.public_name rescue 'No Data'}.uniq.join(",")
       end
     end
     return nil
