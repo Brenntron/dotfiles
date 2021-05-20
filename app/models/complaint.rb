@@ -525,12 +525,12 @@ class Complaint < ApplicationRecord
     if last_report.status == WbnpReport::ACTIVE
       if last_report.attempts < max_attempts
         last_report.attempts += 1
-        last_report.status_message = "Attempted to start a new report, #{last_report.attempts} tries out of #{max_attempts}"
+        last_report.status_message = "Attempting to finish a running report, #{last_report.attempts} tries out of #{max_attempts}"
         last_report.save
         return last_report
       end
 
-      if last_report.attempts > max_attempts
+      if last_report.attempts >= max_attempts
         last_report.status = WbnpReport::Error
         last_report.status_message = "waited #{last_report.attempts} times for pull to complete, closing report and starting a new one"
         last_report.save
