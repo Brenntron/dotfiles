@@ -57,6 +57,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/wbnp_report_status"
     data: {wbnp_report_id: wbnp_report_id }
     success: (response) ->
+      console.log response
       total_new_cases = response.data.total_new_cases
       cases_imported = response.data.cases_imported
       cases_failed = response.data.cases_failed
@@ -80,6 +81,10 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
       else
         $('#fetch_wbnp').attr('disabled', false)
         $('#fetch_wbnp').addClass('esc-tooltipped')
+
+      # Build the full report for webcat managers
+      wbnp_dialog = $('#wbnp-full-report')
+
 
     error: (response) ->
       $('.wbnp-loading-spinner').hide()
@@ -2216,7 +2221,10 @@ $ ->
     height: 500
     minHeight: 300
     position:
-      at: "right top"
+      my: "right top"
+      at: "right top+120"
+      of: window
+
 
   $('.wbnp-full-report').click ->
     $('#wbnp-full-report').dialog('open')
