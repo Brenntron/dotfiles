@@ -109,8 +109,9 @@ module API
                                                       permitted_params[:assignee],
                                                       permitted_params[:priority],
                                                       permitted_params[:ticket_type])
-                    rescue Exception => e
-                      raise ("Could not create the Dispute because of this error: #{e.message}")
+                    rescue Exception => ex
+                      Dispute.log_exception(ex)
+                      raise ("Could not create the Dispute because of this error: #{ex.message}")
                     end
                     render json: {status: 'Success', case_id: dispute.id, errors: duplicates}
 

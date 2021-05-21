@@ -52,7 +52,8 @@ module API
               optional :f, type: String, desc: 'filter'
             end
 
-            get do
+            # Uses class Beaker::Verdicts in old Beaker namespace.
+            get "" do
               authorize!(:index, Complaint)
               clusters = ::Webcat::ClustersFetcher.new(params[:f], params[:regex], current_user).fetch
 
