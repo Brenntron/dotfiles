@@ -34,7 +34,6 @@ window.fetch_wbnp_data = () ->
     url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
     data: {}
     success: (response) ->
-      debugger
       json = $.parseJSON(response)
       wbnp_report_id = json.wbnp_report_id
       check_wbnp_status(wbnp_report_id)
