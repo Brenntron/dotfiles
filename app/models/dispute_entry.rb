@@ -1222,10 +1222,9 @@ class DisputeEntry < ApplicationRecord
 
         wbrs_rule_hits.each do |rule_hit|
           DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id, is_multi_ip_rulehit: true)
-
-          rule_hit_data = all_rulehits.find {|rulehit| rulehit.mnemonic == rulehit}
+          rule_hit_data = all_rulehits.find {|rulehit| rulehit.mnemonic == rule_hit}
           if rule_hit_data.present?
-            rule_hit_info << {:mnemonic => rule_hit, :malware_probability => rule_hit_data.probability, :description => rule_hit_data.desc_long}
+            rule_hit_info << {:mnemonic => rule_hit, :malware_probability => rule_hit_data.probability, :description => rule_hit_data.description}
           else
             rule_hit_info << {:mnemonic => rule_hit}
           end
