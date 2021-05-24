@@ -1233,13 +1233,13 @@ class ComplaintEntry < ApplicationRecord
 
   def determine_platform
     if self.platform_id.present?
-      return self.product_platform.public_name
+      return (self.product_platform.public_name rescue "No Data")
     end
     if self.complaint.platform_id.present?
-      return self.complaint.platform.public_name
+      return (self.complaint.platform.public_name rescue "No Data")
     end
     if self.platform.present?
-      return self.platform
+      return (self.platform rescue "No Data")
     end
 
     return nil
