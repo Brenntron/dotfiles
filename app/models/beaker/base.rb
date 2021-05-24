@@ -1,3 +1,4 @@
+# Restored old Beaker namespace for cluster management
 class Beaker::Base
   include ActiveModel::Model
 

@@ -3989,21 +3989,25 @@ input.communication-subject {
 }
 
 .mng-resolution-message-templates-button {
-  background-image: url(image_path('icon_comment_template.svg'));
+  background-image: url(image_path('icon_comment_template_white.svg'));
+  background-color: darken($nav-toolbar-color, 10%);
   background-repeat: no-repeat;
-  background-position: 0 2px;
-  background-size: 18px 18px;
-  height: 24px;
+  background-position: center center;
+  background-size: 14px 15px;
+  border-radius: 2px;
+  height: 20px;
+  width: 22px;
   display: inline-block;
-  background-color: transparent;
+  float: right;
   border: none;
-  padding-left: 22px;
   padding-right: 0;
-  margin-left: 42px;
+  margin-top: 1px;
+  margin-left: 12px;
   font-weight: 300;
   font-size: 9pt;
-  top: 23px;
-  position: absolute;
+  &:hover {
+    background-color: $primary-section-color !important;
+  }
 }
 
 //bump up button when next to duplicate status
@@ -4888,7 +4892,7 @@ input.file_attachment {
 
 table > tbody > tr > td.dispute_rep_tools {
   width: 116px;
-  padding: 0 0 8px 0 !important;
+  padding: 0 !important;
   text-align: right;
 }
 
@@ -5188,6 +5192,9 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: transparent;
 }
 
+.dispute-status-col-wrapper {
+  margin-top: 5px;
+}
 
 .status-comment-button {
   background-image: url(image_path('icon_status_comment.svg'));
@@ -5197,9 +5204,9 @@ table > tbody > tr > td.dispute_rep_tools {
   display: inline-block;
   border: none;
   background-color: transparent;
-  margin-left: 15px;
+  margin-left: 8px;
   position: absolute;
-  margin-top: 3px;
+  margin-top: 2px;
 }
 
 .dropdown-menu-content-block {
@@ -6654,21 +6661,22 @@ td.ticket-total::before {
   margin-bottom: 5px;
 }
 .secondary.ticket-owner-unassigned-button{
-  margin: 0;
-  margin-top: 13px;
   background-color: darken($nav-toolbar-color, 10%);
-  font-weight: 400;
-  text-transform: inherit;
+  margin: 0 0 0 5px;
   text-transform: none;
   display: inline-block;
-  padding: 8px 20px;
-  font-weight: 400;
+  padding: 0 20px;
+  height: 20px;
+  font-size: 11px;
+  line-height: .75em;
+  font-weight: 600;
+  &:hover {
+    background-color: $bug-section-color !important;
+  }
 }
 .container_unassign{
-  display: flex;
-  margin: 6% 0;
-  padding-top: 1%;
-  border-top: 1px solid $faint-neutral-color;
+  display: inline-block;
+  float: right;
 }
 #index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
   margin-top: 6px;
@@ -6876,8 +6884,6 @@ table.dispute-entry-table tbody tr.selected {
   display: inline-block;
   margin-top: -4px;
   margin-left: 10px;
-  width: 50px;
-  float: right;
 }
 
 .dispute-owner-buttons-wrapper .dropdown.open {
@@ -6886,6 +6892,9 @@ table.dispute-entry-table tbody tr.selected {
 
 .dispute-owner-buttons-wrapper .ticket-owner-button {
   background-image: url(image_path('icon_user_white.svg'));
+  &:hover {
+    background-color: $primary-section-color !important;
+  }
 }
 
 .dispute-owner-buttons-wrapper .dropdown-menu {
@@ -6899,6 +6908,11 @@ table.dispute-entry-table tbody tr.selected {
 
 .dispute-owner-buttons-wrapper h3 {
   padding: 2px 10px !important;
+}
+
+#dispute-assignee {
+  margin-top: 0;
+  float: left;
 }
 
 #button_reassign{
@@ -6954,10 +6968,6 @@ table.dispute-entry-table tbody tr.selected {
   min-height: 127px;
   padding: 20px 0;
   border-radius: 0 4px 4px 0;
-}
-
-.disposition-wrapper {
-  margin-top: 12px;
 }
 
 #dispute-priority-select {
@@ -11847,7 +11857,6 @@ span.threat-cat-no-data {
 
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
 .dispute-count {
-
   border-radius: 5px;
   padding: 1px 5px;
   position: absolute;
@@ -11867,17 +11876,14 @@ span.threat-cat-no-data {
 /* handles existing bug for wl/bl list duplicate entries (a.com issue) */
 .wlbl-table-result {
   display: inline-block;
-  min-width: 0;
   max-width: 150px;
   max-height: 45px;
   overflow-y: hidden;
-  padding-top: 1px;
-  padding-right: 5px;
   vertical-align: middle;
 }
 
 .ip-label-col {
-  width: 28px;
+  width: 32px;
   background-color: #CCCCCC;
   background-repeat: no-repeat;
   background-image: url(image_path('icon_plus_ip_grey.svg'));
@@ -12064,7 +12070,6 @@ table > tbody > tr > td.no-padding {
   padding: 6px 6px 6px 9px;
   text-align: center;
   width: 2%;
-  max-width: 10px;
   vertical-align: middle;
 }
 
@@ -12079,6 +12084,9 @@ table > tbody > tr > td.no-padding {
 // webrep research tab and bfrp results page
 .research-first-row {
   margin-top: 120px;
+  td label {
+    font-size: 11px;
+  }
   .expandable-cell, .cb-cell {
     width: 20px;
   }
@@ -12098,6 +12106,22 @@ table > tbody > tr > td.no-padding {
   }
   .rep-tools-cell button {
     margin-right: 0;
+  }
+}
+
+#research_tab {
+  .research-first-row {
+    td {
+      padding-bottom: 2px !important;
+    }
+  }
+  .research-second-row {
+    td {
+      padding-top: 2px !important;
+      label {
+        font-size: 11px;
+      }
+    }
   }
 }
 
@@ -12154,7 +12178,7 @@ table > tbody > tr > td.no-padding {
     width: 5%;
   }
   .history-button-cell {
-    padding: 6px 0;
+    padding: 6px 0 0 0;
     width: 2%;
     max-width: 20px;
     button {
@@ -12222,14 +12246,11 @@ table > tbody > tr > td.no-padding {
   vertical-align: middle;
 }
 
-
-
 .wlbl-tc-research-span {
-  display: inline;
-  padding-top: 1px;
-  min-width: 0;
-  max-width: 150px;
-  vertical-align: middle;
+  display: inline-block;
+  float: right;
+  white-space: nowrap;
+  padding-left: 5px;
 }
 
 .research-table-details-wrapper .history-button {

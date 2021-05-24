@@ -12,7 +12,7 @@ module API
               requires :file_name, type: String, desc: 'Name of the file'
               requires :file_size, type: Integer, desc: 'File size'
               requires :sample_type, type: String, desc: 'Sample type'
-              requires :disposition_suggested, type: String, desc: 'What should the disposiiton be'
+              requires :disposition_suggested, type: String, desc: 'What should the disposition be'
               requires :platform, type: String, desc: 'Platform'
               requires :sha256_checksum, type: String, desc: 'SHA256 checksum'
 
