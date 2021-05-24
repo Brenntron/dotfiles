@@ -1211,7 +1211,7 @@ class Dispute < ApplicationRecord
     end
   end
 
-  # @param [Array<Dispute>] disputes colleciton of dispute objects
+  # @param [Array<Dispute>] disputes collection of dispute objects
   # @return [Array<Array>] data output for data tables.
 
   def self.to_data_packet(disputes, user:)
@@ -1219,7 +1219,7 @@ class Dispute < ApplicationRecord
 
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
-      dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status} </span>"
+      dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status}</span>"
       if dispute.status_comment.present?
         dispute_packet[:status_comment] = dispute.status_comment
       elsif dispute.resolution_comment.present?
@@ -1253,7 +1253,7 @@ class Dispute < ApplicationRecord
       end
 
       dispute_packet[:dispute_entry_content] = entry_content_for(dispute)
-      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}
+      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, rendered_platform: de.determine_platform, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}
       dispute_packet[:submission_type] = dispute.submission_type
       dispute_packet[:d_entry_preview] = dispute_packet[:dispute_entry_content].first.to_s + "<span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
       case
@@ -1294,6 +1294,7 @@ class Dispute < ApplicationRecord
       end
       dispute_packet[:wbrs_rule_hits] = dispute_packet[:wbrs_rule_hits].join(", ")
 
+      dispute_packet[:platform] = dispute.determine_platform
       dispute_packet.each do |k, v|
         dispute_packet[k] = '' if dispute_packet[k].nil?
       end
@@ -2245,5 +2246,16 @@ class Dispute < ApplicationRecord
     research_bug_proxy
   end
 
+  def determine_platform
+    if self.platform_id.present?
+      return self.platform.public_name
+    end
+    if self.dispute_entries.present?
+      if self.dispute_entries.first.platform_id.present?
+        return self.dispute_entries.map{|d_e| d_e.product_platform.public_name rescue 'No Data'}.uniq.join(",")
+      end
+    end
+    return nil
+  end
 end
 

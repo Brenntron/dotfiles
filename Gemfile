@@ -34,6 +34,8 @@ gem 'peake-bridge-client', '>= 0.0.9.0', git: "https://gitlab.vrt.sourcefire.com
 gem 'stomp', '1.4.6'
 gem 'aws-sdk', '2.11.170'
 gem 'nokogiri' ,'1.10.4'
+gem 'grpc', '1.30.2'
+gem 'grpc-tools', '1.30.2'
 
 gem 'mysql2', '0.5.2'
 gem 'rmagick', '~> 2.16.0'
@@ -96,6 +98,10 @@ gem 'dotiw'
 
 gem 'elasticsearch'
 gem 'hashie'
+
+group :production, :staging do
+  gem 'elastic-apm', '~> 3.15', '>= 3.15.1'
+end
 
 group :development do
   gem 'thin', '1.8.0'

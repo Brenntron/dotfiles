@@ -80,7 +80,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           submitter_type:   complaint.submitter_type,
           description:      complaint.description,
           uri_as_categorized: complaint_entry.uri_as_categorized,
-          platform:         complaint_entry.platform,
+          platform:         complaint_entry.determine_platform,
 
           DT_RowId:         complaint_entry.id,
       }
