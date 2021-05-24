@@ -310,10 +310,10 @@
                   %td.platform-cell
                     %label Platform
                     - if @dispute.platform.present?
-                      =@dispute.platform.public_name
+                      =(@dispute.platform.public_name rescue "No Data")
                     - else
                       - if entry.platform_id.present?
-                        =entry.product_platform.public_name
+                        =(entry.product_platform.public_name rescue "No Data")
                       - elsif entry.platform.present?
                         =entry.platform
                       - else

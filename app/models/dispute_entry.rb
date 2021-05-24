@@ -1341,13 +1341,13 @@ class DisputeEntry < ApplicationRecord
 
   def determine_platform
     if self.platform_id.present?
-      return self.product_platform.public_name
+      return (self.product_platform.public_name rescue "No Data")
     end
     if self.dispute.platform_id.present?
-      return self.dispute.platform.public_name
+      return (self.dispute.platform.public_name rescue "No Data")
     end
     if self.platform.present?
-      return self.platform
+      return (self.platform rescue "No Data")
     end
 
     return nil
