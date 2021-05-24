@@ -2261,7 +2261,7 @@ class Dispute < ApplicationRecord
 
   def determine_platform
     if self.platform_id.present?
-      return self.platform.public_name
+      return (self.platform.public_name rescue 'No Data')
     end
     if self.dispute_entries.present?
       if self.dispute_entries.first.platform_id.present?

@@ -1253,7 +1253,7 @@ class FileReputationDispute < ApplicationRecord
 
   def determine_platform
     if self.platform_id.present?
-      return self.ti_product_platform.public_name
+      return (self.ti_product_platform.public_name rescue "No Data")
     end
 
     if self.platform.present?
