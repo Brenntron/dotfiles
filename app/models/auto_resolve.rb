@@ -412,15 +412,27 @@ class AutoResolve
   end
 
   def self.bad_email_mnem?(rule_hit)
-    ["Sbl", "Pbl", "Cbl", "IaH", "DhL"].include?(rule_hit)
+
+    if ["Sbl", "Pbl", "Cbl"].include?(rule_hit)
+      return true
+    end
+
+    if rule_hit.downcase.strip.starts_with?("dh")
+      return true
+    end
+
+    if rule_hit.downcase.strip.starts_with?("ia")
+      return true
+    end
+
   end
 
   def self.build_resolution_message(rule_hits)
-
     message = ""
-    if rule_hits.include?("IaH") || rule_hits.include?("DhL")
+    #if rule_hits.include?("IaH") || rule_hits.include?("DhL")
+    if rule_hits.select{|rulehit| rulehit.downcase.strip.starts_with?("ia") }.present? || rule_hits.select{|rulehit| rulehit.downcase.strip.starts_with?("dh") }.present?
       message += "Our worldwide sensor network indicates that spam originated from your IP. "
-      if rule_hits.include?("DhL")
+      if rule_hits.select{|rulehit| rulehit.downcase.strip.starts_with?("dh") }.present?
         message += "] In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. "
       end
       message += "It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP.In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence."
