@@ -69,10 +69,12 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
       # Turn of loader indicator
       $('.wbnp-loading-spinner').hide()
 
-
       if full_report == true
         # Clear old data
-        $('.wbnp-status', '.wbnp-status-msg', '.wbnp-full-report-table', '.wbnp-notes').empty()
+        $('.wbnp-status').empty();
+        $('.wbnp-status-msg').empty();
+        $('.wbnp-full-report-table tbody').empty();
+        $('.wbnp-notes').empty();
 
         curr_report = response.data[0]
         last_report = response.data[1]
