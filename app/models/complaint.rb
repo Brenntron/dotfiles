@@ -521,7 +521,6 @@ class Complaint < ApplicationRecord
     #attempts
 
     last_report = WbnpReport.order("id DESC").first
-
     if last_report.status == WbnpReport::ACTIVE
       if last_report.attempts < max_attempts
         last_report.attempts += 1
@@ -531,7 +530,7 @@ class Complaint < ApplicationRecord
       end
 
       if last_report.attempts >= max_attempts
-        last_report.status = WbnpReport::Error
+        last_report.status = WbnpReport::ERROR
         last_report.status_message = "waited #{last_report.attempts} times for pull to complete, closing report and starting a new one"
         last_report.save
       end
@@ -542,15 +541,6 @@ class Complaint < ApplicationRecord
 
     all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
-    #all_complaints.each do |rule_ui_complaint|
-    #  uri_to_test = compile_parts_to_uri(rule_ui_complaint)
-    #  rule_ui_complaint_exists = ComplaintEntry.where("uri like ?", "%" + uri_to_test + "%")
-
-    #  if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
-    #    new_complaints << rule_ui_complaint
-    #  end
-    #end
-    #
     logger_token = SecureRandom.uuid
     new_report.notes = ""
     new_report.cases_imported = 0
@@ -562,9 +552,9 @@ class Complaint < ApplicationRecord
     new_report.notes += "logger_token: #{logger_token} <br />"
     new_report.save
 
-    #Thread.new do
+    Thread.new do
       kick_off_wbnp_pull(new_report.id, logger_token)
-    #end
+    end
     new_report
 
   end
