@@ -15,11 +15,9 @@ $ ->
           $('#customerList').append '<option value="' + data + '"></option>'
     )
 
-    $.ajax(
+    std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/platforms_names'
       method: 'GET'
-      dataType: 'json'
-      headers: headers
       success: (response) ->
         $('#platformList').empty()
         for platform in response.data
