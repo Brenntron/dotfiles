@@ -8,8 +8,14 @@ Bundler.require(*Rails.groups)
 
 module AnalystConsoleEscalations
   class Application < Rails::Application
+
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.1
+
+    config.web_console.development_only = false
+    #allow access from talosnet only
+    config.web_console.permissions = '10.7.0.0/16'
+    config.web_console.template_paths = 'app/assets/stylesheets/web_console'
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

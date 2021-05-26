@@ -676,7 +676,7 @@ DEPENDENCIES
   timecop
   turbolinks (= 5.2.0)
   uglifier (= 4.1.20)
-  web-console (~> 3.7.0)
+  web-console
   whois (= 4.0.7)
   whois-parser (= 1.1.0)
   will_paginate (= 3.1.6)

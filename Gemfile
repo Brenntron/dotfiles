@@ -56,10 +56,11 @@ gem 'delayed_job', '4.1.5'
 gem 'delayed_job_active_record', '4.1.3'
 gem 'delayed_job_web', '1.4.3'
 
+
 # Micellaneous
 gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
-
+gem 'web-console'
 
 gem 'jbuilder', '2.8.0'
 gem 'diffy', '3.2.1'
@@ -108,7 +109,7 @@ group :development do
   gem 'puma', '3.12.0'
   gem 'awesome_print', '1.8.0'
   gem 'guard','2.14.2'
-  gem 'web-console', '~> 3.7.0'
+
 end
 
 group :development, :test do
