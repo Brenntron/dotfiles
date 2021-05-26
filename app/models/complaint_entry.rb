@@ -1238,4 +1238,18 @@ class ComplaintEntry < ApplicationRecord
 
     return log_messages
   end
+
+  def determine_platform
+    if self.platform_id.present?
+      return (self.product_platform.public_name rescue "No Data")
+    end
+    if self.complaint.platform_id.present?
+      return (self.complaint.platform.public_name rescue "No Data")
+    end
+    if self.platform.present?
+      return (self.platform rescue "No Data")
+    end
+
+    return nil
+  end
 end

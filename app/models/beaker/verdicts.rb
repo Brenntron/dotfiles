@@ -1,3 +1,4 @@
+# Restored old Beaker namespace for cluster management
 class Beaker::Verdicts < Beaker::Base
 
   def self.verdicts(domains, raw = false)

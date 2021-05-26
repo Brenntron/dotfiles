@@ -451,6 +451,8 @@ class Dispute < ApplicationRecord
     user = User.where(cvs_username:"vrtincom").first
     begin
 
+      entry_claims = {}
+
       guest = Company.where(:name => "Guest").first
       opened_at = Time.now
       resolved_at = Time.now
@@ -559,6 +561,14 @@ class Dispute < ApplicationRecord
 
         new_entries_ips.each do |ip, entry|
 
+
+          #if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
+          #  false_negative_claim = true
+          #end
+          #
+          claim = entry[:sbrs]["claim"]
+          entry_claims[ip] = claim
+
           if entry[:sbrs]["platform"].present?
             entry_platform = Platform.find(entry[:sbrs]["platform"].to_i) rescue nil
           end
@@ -572,6 +582,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.status = DisputeEntry::NEW
           new_dispute_entry.resolution = ""
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
+          new_dispute_entry.suggested_threat_category = entry[:sbrs]["suggested_threat_category"] unless entry[:sbrs]["suggested_threat_category"].blank?
           new_dispute_entry.case_closed_at = resolved_at
           new_dispute_entry.case_resolved_at = resolved_at
 
@@ -581,7 +592,6 @@ class Dispute < ApplicationRecord
           new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
           new_dispute_entry.platform = entry[:sbrs]["platform"] if (entry[:sbrs]["platform"].present? && !entry[:sbrs]["platform"].kind_of?(Integer))
           new_dispute_entry.save!
-
 
           if entry && entry[:wbrs] && entry[:wbrs]["WBRS_Rule_Hits"]
             wbrs_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
@@ -598,6 +608,7 @@ class Dispute < ApplicationRecord
           end
 
           #total_hits = (wbrs_hits + sbrs_hits).uniq
+
 
           sbrs_hits.each do |rule_hit|
             new_rule_hit = DisputeRuleHit.new
@@ -617,9 +628,10 @@ class Dispute < ApplicationRecord
 
         end
 
-
-
         new_entries_urls.each do |url, entry|
+
+          claim = entry["claim"]
+          entry_claims[url] = claim
 
           if entry["platform"].present?
             entry_platform = Platform.find(entry["platform"].to_i) rescue nil
@@ -634,7 +646,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.resolution = ""
           new_dispute_entry.case_closed_at = resolved_at
           new_dispute_entry.case_resolved_at = resolved_at
-
+          new_dispute_entry.suggested_threat_category = entry["suggested_threat_category"] unless entry["suggested_threat_category"].blank?
           new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
 
@@ -679,7 +691,6 @@ class Dispute < ApplicationRecord
 
       end
 
-
       ######record creation completed######
 
       ######AUTO RESOLVE LOGIC########
@@ -699,9 +710,7 @@ class Dispute < ApplicationRecord
 
           ########Auto Resolve for IP addressses (email)##############
           if dispute_entry.entry_type == "IP"
-            if ["Suspicious sites", "High risk","Poor"].include?(dispute_entry.suggested_disposition)
-              false_negative_claim = true
-            end
+            entry_claim = entry_claims[dispute_entry.hostlookup]
 
             logger.info "fetching preload"
 
@@ -714,7 +723,7 @@ class Dispute < ApplicationRecord
 
             if !matching_disposition
 
-              if !false_negative_claim
+              if entry_claim != "false negative"
                 dispute_entry.status = DisputeEntry::NEW
 
                 if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
@@ -734,13 +743,10 @@ class Dispute < ApplicationRecord
 
           end
 
-
           ############################################################
           #########Auto Resolve for URLs (web)########################
           if dispute_entry.entry_type == "URI/DOMAIN"
-            if ["Suspicious sites", "High risk","Poor"].include?(dispute_entry.suggested_disposition)
-              false_negative_claim = true
-            end
+            entry_claim = entry_claims[dispute_entry.hostlookup]
 
             logger.info "fetching preload"
 
@@ -761,7 +767,7 @@ class Dispute < ApplicationRecord
             end
 
             begin
-              dispute_entry.is_important = is_important?(key)
+              dispute_entry.is_important = is_important?(dispute_entry.hostlookup)
             rescue => e
               Rails.logger.error e
               Rails.logger.error e.backtrace.join("\n")
@@ -771,7 +777,7 @@ class Dispute < ApplicationRecord
 
             if !matching_disposition
 
-              if !false_negative_claim
+              if entry_claim != "false negative"
                 dispute_entry.update(status: DisputeEntry::NEW)
               else
                 dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
@@ -818,13 +824,17 @@ class Dispute < ApplicationRecord
       Rails.logger.error "Dispute failed to save, backing out all DB changes."
       Rails.logger.error $!
       Rails.logger.error $!.backtrace.join("\n")
-      new_dispute.reload
-      new_dispute.dispute_entries.destroy_all
-      new_dispute.destroy
-      conn = ::Bridge::DisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
-      conn.post
+      if new_dispute.present?
+        new_dispute.reload
+        new_dispute.dispute_entries.destroy_all
+        new_dispute.destroy
+      end
+      if message_payload["source_key"].present?
+        conn = ::Bridge::DisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+        conn.post
+      end
 
-      nil
+      return nil
     end
 
     new_dispute.reload
@@ -833,7 +843,7 @@ class Dispute < ApplicationRecord
       new_dispute.destroy
       conn = ::Bridge::DisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post
-      nil
+      return nil
     end
 
     new_dispute
@@ -1212,7 +1222,7 @@ class Dispute < ApplicationRecord
     end
   end
 
-  # @param [Array<Dispute>] disputes colleciton of dispute objects
+  # @param [Array<Dispute>] disputes collection of dispute objects
   # @return [Array<Array>] data output for data tables.
 
   def self.to_data_packet(disputes, user:)
@@ -1220,7 +1230,7 @@ class Dispute < ApplicationRecord
 
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
-      dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status} </span>"
+      dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status}</span>"
       if dispute.status_comment.present?
         dispute_packet[:status_comment] = dispute.status_comment
       elsif dispute.resolution_comment.present?
@@ -1254,7 +1264,7 @@ class Dispute < ApplicationRecord
       end
 
       dispute_packet[:dispute_entry_content] = entry_content_for(dispute)
-      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}
+      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, rendered_platform: de.determine_platform, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}
       dispute_packet[:submission_type] = dispute.submission_type
       dispute_packet[:d_entry_preview] = dispute_packet[:dispute_entry_content].first.to_s + "<span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
       case
@@ -1295,6 +1305,7 @@ class Dispute < ApplicationRecord
       end
       dispute_packet[:wbrs_rule_hits] = dispute_packet[:wbrs_rule_hits].join(", ")
 
+      dispute_packet[:platform] = dispute.determine_platform
       dispute_packet.each do |k, v|
         dispute_packet[k] = '' if dispute_packet[k].nil?
       end
@@ -2249,5 +2260,16 @@ class Dispute < ApplicationRecord
     research_bug_proxy
   end
 
+  def determine_platform
+    if self.platform_id.present?
+      return (self.platform.public_name rescue 'No Data')
+    end
+    if self.dispute_entries.present?
+      if self.dispute_entries.first.platform_id.present?
+        return self.dispute_entries.map{|d_e| d_e.product_platform.public_name rescue 'No Data'}.uniq.join(",")
+      end
+    end
+    return nil
+  end
 end
 

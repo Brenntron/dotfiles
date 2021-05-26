@@ -39,14 +39,17 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
                             "rep_sugg"=>"Good",
-                            "category"=>"Not in our list"
+                            "category"=>"Not in our list",
+                            "claim" => "false positive",
+                            "suggested_threat_category" => "malware"
                         },
                         "thepretenders.com" => {
                             "WBRS_SCORE"=>"noscore",
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
                             "rep_sugg"=>"Good",
-                            "category"=>"Entertainment"
+                            "category"=>"Entertainment",
+                            "claim" => "false positive"
                         }
                     },
                     investigate_ips:{},
@@ -84,6 +87,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
                             "rep_sugg"=>"Poor",
+                            "claim" => "false negative",
                             "category"=>"Not in our list"
                         }
                     },
@@ -122,6 +126,8 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                             "WBRS_Rule_Hits"=>"wlw, wlm, wlh",
                             "Hostname_ips"=>"",
                             "rep_sugg"=>"Poor",
+                            "suggested_threat_category" => "malware",
+                            "claim" => "false negative",
                             "category"=>"Not in our list"
                         }
                     },
@@ -159,8 +165,9 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     dispute_entry_2 = DisputeEntry.where(:uri => 'thepretenders.com').first
 
     expect(dispute_entry_1.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry_1.suggested_threat_category).to eql("malware")
     expect(dispute_entry_2.status).to eql(DisputeEntry::NEW)
-
+    expect(dispute_entry_2.suggested_threat_category).to eql(nil)
 
   end
 
@@ -228,8 +235,10 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     dispute_entry_1 = DisputeEntry.where(:uri => '355toyota.com').first
 
     expect(dispute_entry_1.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry_1.suggested_threat_category).to eql('malware')
     expect(dispute_entry_1.resolution).to eql("")
     expect(dispute_entry_1.auto_resolve_log).to eql("--------Starting Data---------<br>suggested disposition: Poor<br>effective disposition info: \"Neutral\"<br>-----------------------------<br>Umbrella popularity rating: 0.0: result of pass: false<br><br>allow list hits from SDS detected: wlw,wlm,wlh")
+
 
 
   end
