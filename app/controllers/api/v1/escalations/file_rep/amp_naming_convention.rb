@@ -13,7 +13,7 @@ module API
                 requires :pattern, type: String
                 requires :example, type: String
                 optional :engine_description, type: String
-                optional :public_engine_description, type: String
+                optional :private_engine_description, type: String
                 optional :notes, type: String
                 optional :public_notes, type: String
                 optional :contact, type: String
@@ -21,6 +21,7 @@ module API
               end
             end
             post "" do
+              
               std_api_v2 do
                 ::AmpNamingConvention.transaction do
                   timestamp = Time.now

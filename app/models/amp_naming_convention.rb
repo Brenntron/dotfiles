@@ -1,6 +1,7 @@
 class AmpNamingConvention < ApplicationRecord
-  validates :pattern, :example, :public_engine_description, :engine_description, presence: true
+  validates :pattern, :example, :private_engine_description, :engine_description, presence: true
   validates :table_sequence, presence: true, numericality: { only_integer: true }
+  after_destroy :ensure_valid_table_sequence
   # DB unique index enforces: validates :table_sequence, uniqueness: true
 
   def self.from_params(pattern_params_ary)
@@ -43,8 +44,9 @@ class AmpNamingConvention < ApplicationRecord
   # Note: pass timestamp argument to insure that timestamp is determined within transaction.
   def self.send_all_to_ti(timestamp:)
     amp_patterns = all.map do |record|
-      attrs = record.attributes.slice(*%w[pattern example engine_description public_notes table_sequence public_engine_description])
+      attrs = record.attributes.slice(*%w[pattern example engine_description public_notes table_sequence private_engine_description])
       attrs['notes'] = record.public_notes
+      attrs['private_engine_description'] = record.engine_description # DO NOT actually send the private description, this is only here because the field can't be blank
       attrs['description'] = attrs.delete('engine_description')
       attrs['position'] = attrs.delete('table_sequence')
       attrs['message_timestamp'] = timestamp.utc.iso8601
@@ -57,6 +59,16 @@ class AmpNamingConvention < ApplicationRecord
       raise
     else
       raise ex.class, ex.class.name
+    end
+  end
+
+  private
+
+  def ensure_valid_table_sequence
+    records = AmpNamingConvention.all.order(table_sequence: :asc)
+    records.each_with_index do |rec, index|
+      rec.table_sequence = index + 1
+      rec.save!
     end
   end
 end

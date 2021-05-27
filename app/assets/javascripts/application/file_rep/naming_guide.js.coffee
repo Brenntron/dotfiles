@@ -179,13 +179,18 @@ $ ->
       '<span class="table-content"></span>' +
       '<span class="table-form-content"><input class="example-input" type="text"></input></span>' +
       '</td>' +
-      '<td class="amp-engine">' +
+      '<td class="engine-description">' +
       '<span class="table-content"></span>' +
-      '<span class="table-form-content"><input class="engine-input" type="text"></input></span>' +
+      '<span class="table-form-content"><textarea class="engine-description-textarea" type="text"></textarea></span>' +
       '</td>' +
-      '<td class="amp-engine-description">' +
+      '<td class="private-engine-description">' +
       '<span class="table-content"></span>' +
-      '<span class="table-form-content"><textarea class="description-textarea" ></textarea></span>' +
+      '<span class="table-form-content"><textarea class="private-engine-description-textarea" ></textarea></span>' +
+      '</td>' +
+      '<td class="amp-contact">' +
+      '<span class="table-content"></span>' +
+      '<span class="table-form-content"><textarea class="contact-textarea"></textarea></span>' +
+      '<span class="delete-button" onclick="delete_amp_naming_convention(' + new_sequence_number + ', \'\')"></span>' +
       '</td>' +
       '<td class="amp-notes">' +
       '<span class="table-content"></span>' +
@@ -194,11 +199,6 @@ $ ->
       '<td class="amp-public-notes">' +
       '<span class="table-content"></span>' +
       '<span class="table-form-content"><textarea class="notes-public-textarea"></textarea></span>' +
-      '</td>' +
-      '<td class="amp-contact">' +
-      '<span class="table-content"></span>' +
-      '<span class="table-form-content"><textarea class="contact-textarea"></textarea></span>' +
-      '<span class="delete-button" onclick="delete_amp_naming_convention(' + new_sequence_number + ', \'\')"></span>' +
       '</td>' +
       '</tr>'
 
@@ -273,14 +273,14 @@ $ ->
       sequence = $(this).attr('data-sort-sequence')
       pattern = $($(this).find('.amp-pattern')[0]).find('.table-code').text()
       example = $($(this).find('.amp-example')[0]).find('.table-content').text()
-      public_engine_desc = $($(this).find('.amp-public-engine-description')[0]).find('.table-content').text()
-      engine_desc = $($(this).find('.amp-engine-description')[0]).find('.table-content').text()
-      notes = $($(this).find('.amp-notes')[0]).find('.table-content').text()
-      public_notes = $($(this).find('.amp-public-notes')[0]).find('.table-content').text()
+      private_engine_desc = $($(this).find('.private-engine-description')[0]).find('.table-content').text()
+      engine_desc = $($(this).find('.engine-description')[0]).find('.table-content').text()
       contact = $($(this).find('.amp-contact')[0]).find('.table-content').text()
+      notes = $($(this).find('.amp-notes')[0]).find('.table-content').text()
+      public_notes  = $($(this).find('.amp-public-notes')[0]).find('.table-content').text()
 
       # Check to make sure no new rows are fully blank
-      if pattern == '' && example == '' && public_engine_desc == '' && engine_desc == '' && notes == '' && public_notes == '' && contact == ''
+      if pattern == '' && example == '' && private_engine_desc == '' && engine_desc == '' && notes == '' && public_notes == '' && contact == ''
         $(this).remove()
 
       else
@@ -289,7 +289,7 @@ $ ->
             'id': id,
             'pattern': pattern,
             'example': example,
-            'public_engine_description': public_engine_desc,
+            'private_engine_description': private_engine_desc,
             'engine_description': engine_desc,
             'notes': notes,
             'public_notes': public_notes,
@@ -301,7 +301,7 @@ $ ->
           rows_to_add.push(
             'pattern': pattern,
             'example': example,
-            'public_engine_description': public_engine_desc,
+            'private_engine_description': private_engine_desc,
             'engine_description': engine_desc,
             'notes': notes,
             'public_notes': public_notes,
@@ -379,7 +379,6 @@ $ ->
         response_data += "'" + this.pattern + "', "
     else
       response_data = data[0].pattern
-
     std_msg_ajax(
       method: 'POST'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
