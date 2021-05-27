@@ -11,7 +11,11 @@ class WbnpReport < ApplicationRecord
   end
 
   def self.get_last_reports
-    reports = WbnpReport.order('id desc').first(2)
+    if WbnpReport.all.size > 1
+      reports = WbnpReport.order('id desc').first(2)
+    else
+      reports = WbnpReport.order('id desc')
+    end
 
     reports
   end
