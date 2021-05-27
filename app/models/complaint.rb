@@ -521,7 +521,7 @@ class Complaint < ApplicationRecord
     #attempts
 
     last_report = WbnpReport.order("id DESC").first
-    if last_report.status == WbnpReport::ACTIVE
+    if last_report.present? && last_report.status == WbnpReport::ACTIVE
       if last_report.attempts < max_attempts
         last_report.attempts += 1
         last_report.status_message = "Attempting to finish a running report, #{last_report.attempts} tries out of #{max_attempts}"
