@@ -1092,6 +1092,8 @@ class FileReputationDispute < ApplicationRecord
 
         cell_data =
             case field_name
+            when 'platform'
+              fr_dispute.determine_platform
             when 'detection_last_set'
               fr_dispute.detection_last_set&.utc&.iso8601
             when 'in_zoo'
