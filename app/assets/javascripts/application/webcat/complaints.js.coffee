@@ -49,11 +49,17 @@ window.fetch_wbnp_data = () ->
 
 # WBNP - Check report info
 check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
-
   if $('#wbnp-full-report').length > 0
     # this is a webcat manager and they get the full WBNP report
     data = {}
     full_report = true
+    # Turn on the checking message if needed
+    unless $('#current-wbnp-report .wbnp-status').hasClass('status_complete')
+      wbnp_check = $('.wbnp-full-report-title-status')[0]
+      $(wbnp_check).addClass('active')
+      wbnp_status = 'Checking report status...'
+      $(wbnp_check).text(wbnp_status)
+
   else
     data = {wbnp_report_id: wbnp_report_id}
     full_report = false
@@ -100,32 +106,27 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
         $('#current-wbnp-report .wbnp-notes').html(curr_report.notes)
 
         # Previous report:
-        if curr_report.status == 'complete'
-          $('#previous-wbnp-report .wbnp-status').addClass('status_complete')
-        else
-          $('#previous-wbnp-report .wbnp-status').removeClass('status_complete')
-        $('#previous-wbnp-report .wbnp-status').text(last_report.status)
-        $('#previous-wbnp-report .wbnp-status-msg').text(last_report.status_message)
-        prev_table = $('#previous-wbnp-report .wbnp-full-report-table')
-        prev_table_content = '<tr><td>' + last_report.id + '</td><td>' + last_report.attempts + '</td><td>' + last_report.total_new_cases + '</td><td>' + last_report.cases_failed + '</td><td>' + last_report.cases_imported + '</td><td>' + last_report.created_at + '</td><td>' + last_report.updated_at + '</td></tr>'
-        $(prev_table).append(prev_table_content)
-        $('#previous-wbnp-report .wbnp-notes').html(last_report.notes)
+        if last_report?
+          if last_report.status == 'complete'
+            $('#previous-wbnp-report .wbnp-status').addClass('status_complete')
+          else
+            $('#previous-wbnp-report .wbnp-status').removeClass('status_complete')
+          $('#previous-wbnp-report .wbnp-status').text(last_report.status)
+          $('#previous-wbnp-report .wbnp-status-msg').text(last_report.status_message)
+          prev_table = $('#previous-wbnp-report .wbnp-full-report-table')
+          prev_table_content = '<tr><td>' + last_report.id + '</td><td>' + last_report.attempts + '</td><td>' + last_report.total_new_cases + '</td><td>' + last_report.cases_failed + '</td><td>' + last_report.cases_imported + '</td><td>' + last_report.created_at + '</td><td>' + last_report.updated_at + '</td></tr>'
+          $(prev_table).append(prev_table_content)
+          $('#previous-wbnp-report .wbnp-notes').html(last_report.notes)
 
-        debugger
         # Keep checking / updating if Current report is unfinished
         if curr_report.status != 'complete'
           if $('.wbnp-full-report-title-status').length == 0
             $('.ui-dialog .ui-dialog-title').append('<span class="wbnp-full-report-title-status"></span>')
-          wbnp_check = $('.wbnp-full-report-title-status')
-          if curr_report.status == 'active'
-            wbnp_status = 'Checking report status...'
-            $(wbnp_check).addClass('active')
-          else
-            wbnp_status = 'Checking report status in 45 seconds...'
-            $(wbnp_check).removeClass('active')
-
+          wbnp_check = $('.wbnp-full-report-title-status')[0]
+          wbnp_status = 'Checking report status in 45 seconds...'
+          $(wbnp_check).removeClass('active')
           $(wbnp_check).text(wbnp_status)
-          setTimeout(check_wbnp, 4500)
+          setTimeout(check_wbnp, 45000)
         else
           $('.wbnp-full-report-title-status').remove()
 
