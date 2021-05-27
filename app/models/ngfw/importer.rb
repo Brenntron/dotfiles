@@ -9,7 +9,7 @@ class Ngfw::Importer
     def handle_import
       destroy_existing_clusters!
       import_new_clusters
-      handle_import
+      handle_import if no_other_import_jobs?
     end
 
     def destroy_existing_clusters!
@@ -35,6 +35,10 @@ class Ngfw::Importer
           platform_id: platform.id
         )
       end
+    end
+
+    def no_other_import_jobs?
+      DelayedJob.where('handler LIKE ?', "%#{self.name}%").empty?
     end
 
     handle_asynchronously :handle_import, run_at: Proc.new { Time.zone.tomorrow.beginning_of_day + 16.hours } # run at 4pm next day

@@ -441,7 +441,7 @@ $ ->
     populate_cat_select()
 
   #  Expand cluster rows
-  $('#clusters-index tbody').on 'click', 'td.expandable-row-column, .entry-count', ->
+  $('#clusters-index tbody').on 'click', '.expand-row-button-inline, .entry-count', ->
     tr = $(this).closest('tr')
     row = window.clusters_table.row(tr)
     if row.child.isShown()

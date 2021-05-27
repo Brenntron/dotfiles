@@ -1,7 +1,7 @@
 class Clusters::Processor
   attr_reader :clusters, :user
 
-  PLATROFM_PROVIDERS = {
+  PLATFORM_PROVIDERS = {
     'WSA' => Clusters::Wbnp::Processor,
     'NGFW' => Clusters::Ngfw::Processor
   }
@@ -13,7 +13,7 @@ class Clusters::Processor
 
   def process
     clusters.each do |cluster|
-      cluster_processor = PLATROFM_PROVIDERS[cluster[:platform]].new(cluster, user)
+      cluster_processor = PLATFORM_PROVIDERS[cluster[:platform]].new(cluster, user)
       next unless cluster_processor.processable?
 
       if cluster[:is_important]
@@ -29,14 +29,14 @@ class Clusters::Processor
 
   def process!
     clusters.each do |cluster|
-      PLATROFM_PROVIDERS[cluster[:platform]].new(cluster, user).process
+      PLATFORM_PROVIDERS[cluster[:platform]].new(cluster, user).process
       # TODO: add credit to the user
     end
   end
 
   def decline
     clusters.each do |cluster|
-      PLATROFM_PROVIDERS[cluster[:platform]].new(cluster, user).decline
+      PLATFORM_PROVIDERS[cluster[:platform]].new(cluster, user).decline
       # TODO: add credit to the user
     end
   end
