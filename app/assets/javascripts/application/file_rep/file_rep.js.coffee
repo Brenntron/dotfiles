@@ -46,7 +46,7 @@ window.update_file_rep_status = () ->
         std_msg_success('File Reputation Ticket statuses updated', [])
       window.location.reload()
     error: (response) ->
-      std_msg_error('Unable to update File Reputation Ticket status.')
+      std_msg_error('Unable to update File Reputation Ticket status.', [response.responseJSON.message])
   )
 
 window.update_file_rep_status_on_show = () ->
@@ -80,7 +80,7 @@ window.update_file_rep_status_on_show = () ->
       std_msg_success('File Reputation Ticket status updated', [])
       window.location.reload()
     error: (response) ->
-      std_msg_error('Unable to update File Reputation Ticket status.', [])
+      std_msg_error('Unable to update File Reputation Ticket status.', [response.responseJSON.message])
   )
 
 
