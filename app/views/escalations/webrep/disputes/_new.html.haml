@@ -6,6 +6,10 @@
     %input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
 
   .form-group
+    .dispute-error-inline.hidden
+      Invalid URL detected, please remove spaces from all entries and try again.
+      %a.new-dispute-close.close ×
+
     %label.content-label-sm URLs / IP Addresses
     %textarea.ips_urls{required: true, name:'ips_urls', placeholder:'Separate by commas or newlines for multiple entries', spellcheck: false}
     .ips_urls_div.hidden

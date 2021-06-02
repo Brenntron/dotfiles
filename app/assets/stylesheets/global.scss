@@ -13075,6 +13075,32 @@ input.wl-bl-list-inline {
   padding: 6px;
   &::placeholder {
     font-size: 8.5pt;
-    color: #999;  // MOVE TO FILE
+    color: $content-label-color;
+  }
+}
+
+#new-dispute-wrapper .dispute-error-inline {
+  font-size: 9pt;
+  font-weight: 500;
+  background-color: #fdf0e2;  // one-off needed
+  color: #a2590b;  // one-off needed
+  padding: 7px 40px 7px 32px;
+  border-radius: 3px;
+  background-image: url(image_path('icon_error.svg'));
+  background-repeat: no-repeat;
+  background-position: 6px 5px;
+  background-size: 18px 20px;
+  margin-bottom: 10px;
+  .close {
+    float: right;
+    position: relative;
+    width: 20px;
+    left: 35px;
+    bottom: 20px;
+    color: $type-base-color;
+    font-size: 18pt;
+    background-color: transparent !important;
+    filter: alpha(opacity=20);
+    opacity: 0.2;
   }
 }

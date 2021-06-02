@@ -13,6 +13,7 @@ $ ->
 
   window.submit_new_dispute = (submit_btn) ->
     data = {}
+    urls_array = []   # used for url validation
 
     form = $(submit_btn).closest('form')
     form_values = form.serializeArray()
@@ -24,42 +25,24 @@ $ ->
       if name != 'token' && name != 'xml_token' && name != 'current_user'
         data[name] = value
 
-
-
-
-
-
-
-    console.clear()
-    urls_array = []
-
     # entries will be either separated by commas or newlines
-    if data.ips_urls.indexOf(',') > 0
+    if data.ips_urls.indexOf(',')
       urls_array = data.ips_urls.split(',')
-    else if data.ips_urls.indexOf('\n') > 0
+    else if data.ips_urls.indexOf('\n')
       urls_array = data.ips_urls.split('\n')
     else
       urls_array.push(data.ips_urls)
 
-    console.log urls_array
-
-    # check each url or ip for spaces
+    # ensure each url/ip has no spaces (edge case)
     $(urls_array).each ->
       curr_url = this
-      curr_url = curr_url.trim()
-      curr_url = curr_url.replace(/\r/g, '')  # extraneous carriage returns
-      console.log curr_url
+      curr_url = curr_url.trim().replace(/\r/g, '')  # carriage returns
 
-      if curr_url.includes(' ')
-        std_msg_error("Invalid URI detected", ["Please remove spaces from all URI's and try again."])
+      if curr_url.indexOf(' ')
+        $('.dispute-error-inline').removeClass('hidden')  # show err msg about spaces
+        return  # exit the function
 
-    console.log 'DONE'
-    return  # REMOVE THIS DEBUGGING RETURN
-
-
-
-
-
+    $('.dispute-error-inline').addClass('hidden')  # ensure inline message is not showing
 
     if data.ips_urls.trim().length > 0
       data.ips_urls = data.ips_urls.replace(/,/g, '').replace(/\n/g, ' ')
@@ -115,4 +98,7 @@ $ ->
   $('.cancel_dispute').on 'click', ->
     $(this).find('.ips_urls').val('')
     $(this).find('.assignee').val('')
-    $(dropdown).dropdown 'toggle'
+    $('#new-dispute').dropdown 'toggle'
+
+  $('.new-dispute-close').click ->
+    $('.dispute-error-inline').addClass('hidden')
