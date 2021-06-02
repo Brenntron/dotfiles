@@ -44,9 +44,8 @@ class AmpNamingConvention < ApplicationRecord
   # Note: pass timestamp argument to insure that timestamp is determined within transaction.
   def self.send_all_to_ti(timestamp:)
     amp_patterns = all.map do |record|
-      attrs = record.attributes.slice(*%w[pattern example engine_description public_notes table_sequence private_engine_description])
+      attrs = record.attributes.slice(*%w[pattern example engine_description table_sequence])
       attrs['notes'] = record.public_notes
-      attrs['private_engine_description'] = record.engine_description # DO NOT actually send the private description, this is only here because the field can't be blank
       attrs['description'] = attrs.delete('engine_description')
       attrs['position'] = attrs.delete('table_sequence')
       attrs['message_timestamp'] = timestamp.utc.iso8601

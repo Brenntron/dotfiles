@@ -405,7 +405,7 @@ $ ->
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
       data: { patterns: data }
       success: (response) ->
-        std_msg_success('AMP Naming Conventions Have Been Updated', "Relevant changes have also been sent to TI.", reload: true)
+        std_msg_success('AMP Naming Conventions Have Been Updated', ["Relevant changes have also been sent to TI."], reload: true)
         contacts = $('.amp-contact .table-content')
         format_amp_contacts(contacts)
       error: (response) ->
