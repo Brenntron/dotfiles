@@ -41,13 +41,14 @@ namespace :escalations do
   end
 
   task :populate_ngfw_platform => :environment do
-    ngfw_complaints = ComplaintTag.find_by_name('ngfw uncat telemetry')&.complaints
     ngfw_platform = Platform.where('LOWER(internal_name) LIKE ?', '%ngfw%').first # there is no ILIKE in mysql...
 
-    ngfw_complaints.each do |complaint|
-      complaint.update_attributes(platform_id: ngfw_platform.id)
-      complaint.complaint_entries.each do |complaint_entry|
-        complaint_entry.update_attributes(platform_id: ngfw_platform.id)
+    ComplaintTag.where('LOWER(name) LIKE ?', '%ngfw%').each do |tag|
+      puts tag.name
+      tag.complaints.each do |complaint|
+        puts "processing #{complaint.complaint_entries.count} entries for complaint id #{complaint.id}"
+        complaint.update_attributes(platform_id: ngfw_platform.id)
+        complaint.complaint_entries.update_all(platform_id: ngfw_platform.id)
       end
     end
   end
