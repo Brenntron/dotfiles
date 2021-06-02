@@ -13068,3 +13068,13 @@ input.wl-bl-list-inline {
 .toggle-vis, .toggle-vis-nested {
   cursor: default;
 }
+
+// webrep create new dispute - textarea
+#new-dispute-wrapper textarea, #new-dispute-wrapper textarea:focus {
+  border: none;
+  padding: 6px;
+  &::placeholder {
+    font-size: 8.5pt;
+    color: #999;  // MOVE TO FILE
+  }
+}

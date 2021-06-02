@@ -24,6 +24,43 @@ $ ->
       if name != 'token' && name != 'xml_token' && name != 'current_user'
         data[name] = value
 
+
+
+
+
+
+
+    console.clear()
+    urls_array = []
+
+    # entries will be either separated by commas or newlines
+    if data.ips_urls.indexOf(',') > 0
+      urls_array = data.ips_urls.split(',')
+    else if data.ips_urls.indexOf('\n') > 0
+      urls_array = data.ips_urls.split('\n')
+    else
+      urls_array.push(data.ips_urls)
+
+    console.log urls_array
+
+    # check each url or ip for spaces
+    $(urls_array).each ->
+      curr_url = this
+      curr_url = curr_url.trim()
+      curr_url = curr_url.replace(/\r/g, '')  # extraneous carriage returns
+      console.log curr_url
+
+      if curr_url.includes(' ')
+        std_msg_error("Invalid URI detected", ["Please remove spaces from all URI's and try again."])
+
+    console.log 'DONE'
+    return  # REMOVE THIS DEBUGGING RETURN
+
+
+
+
+
+
     if data.ips_urls.trim().length > 0
       data.ips_urls = data.ips_urls.replace(/,/g, '').replace(/\n/g, ' ')
 
