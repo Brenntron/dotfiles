@@ -650,6 +650,10 @@ class FileReputationDispute < ApplicationRecord
     new_dispute.description = message_payload[:payload][:summary_description]
     new_dispute.customer_id = customer&.id
     new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+    if message_payload[:payload][:api_customer].present? && message_payload[:payload][:api_customer] == true
+      new_dispute.submitter_type = SUBMITTER_TYPE_CUSTOMER
+    end
+
     new_dispute.auto_resolve_log = "Ticket generated at: #{Time.now.to_s}<br />----------<br />"
 
     check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
