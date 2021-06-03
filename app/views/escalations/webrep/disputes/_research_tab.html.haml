@@ -301,13 +301,6 @@
                   - else
                     %td.no-padding
 
-                  %td.category-cell
-                    %label Category
-                    - if entry[:primary_category] != '{}' && !entry[:primary_category].nil?
-                      = entry[:primary_category]
-                    - else
-                      %span.missing-data No assigned categories
-
                   %td.platform-cell
                     %label Platform
                     - if !entry[:platform].nil?
@@ -319,16 +312,6 @@
                     - unless entry[:hostname].nil?
                       %label Hostname
                       = entry[:hostname]
-
-                  %td.sugg-tc-cell
-                    %label Suggested Threat Category
-                    - unless entry[:suggested_threat_category].nil?
-                      = entry[:suggested_threat_category].gsub(/,(?![ ])/, ', ')
-                      
-                  %td.sugg-cell
-                    %label Suggested Disposition
-                    - unless entry[:suggested_disposition].nil?
-                      = entry[:suggested_disposition]
 
                   %td.platform-cell
                     %label Platform
