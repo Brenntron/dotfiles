@@ -299,7 +299,8 @@
                               .button-row-center
                                 %button.primary.dropdown-submit-button{type: 'button', onclick: 'add_host_ips(this)', 'data-entry-id': "#{entry.id}"} Submit Query
                   - else
-                    %td.no-padding
+                    - if !entry[:is_important]
+                      %td.no-padding
                     - if !entry[:hostname].nil?
                       %td.hostname-cell
                         %label Hostname
