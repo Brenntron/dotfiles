@@ -4012,7 +4012,8 @@ input.communication-subject {
 
 //bump up button when next to duplicate status
 .duplicate-status-notice + .mng-resolution-message-templates-button {
-  top: 15px;
+  position: relative;
+  bottom: 5px;
 }
 
 .select-a-template{
