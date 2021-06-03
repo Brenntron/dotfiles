@@ -58,7 +58,7 @@ window.update_file_rep_status_on_show = () ->
   comment = $('.ticket-status-comment').val()
 
   if status == "RESOLVED_CLOSED"
-    if $('#show-edit-ticket-status-dropdown').find('#file-status-closed').is(':checked')
+    if $('.ticket-resolution-radio:checked').length > 0
       resolution = $('input[name=dispute-resolution]:checked').val()
     else
       std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
