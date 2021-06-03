@@ -38,7 +38,6 @@ $ ->
     $(urls_array).each ->
       curr_url = this
       curr_url = curr_url.trim().replace(/\r/g, '')  # carriage returns
-      console.log curr_url
 
       if curr_url.includes(' ')
         $('.dispute-error-inline').removeClass('hidden')  # show error msg about spaces
