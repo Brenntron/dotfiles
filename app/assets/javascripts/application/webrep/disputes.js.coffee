@@ -663,7 +663,7 @@ window.return_dispute = (dispute_id) ->
 
 window.save_dispute_entries = () ->
   data = {}
-  $('#disputes-research-table').find('tr.research-table-row').each(() ->
+  $('#disputes-research-table').find('tr.research-table-row .research-first-row').each(() ->
     result = {}
     fielddata = $(this).find('.dual-edit-field').map(() ->
       new_value = switch (this.dataset.field)
