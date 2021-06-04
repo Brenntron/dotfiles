@@ -161,6 +161,21 @@
           Suggested Disposition
         .disposition.disp-negative
           = @dispute.suggested_d
+        %br
+      .dispute-source-wrapper
+        %label.content-label-sm
+          Source
+        %div
+          - if @dispute.ticket_source?
+            - if @dispute.ticket_source == 'talos-intelligence'
+              TI Webform
+            - elsif @dispute.ticket_source == 'talos-intelligence-api'
+              TI API
+            - else
+              = @dispute.ticket_source
+          - else
+            %span.missing-data 'No source available'
+
 
     .col-xs-3.col-with-divider
       %label.content-label-sm
