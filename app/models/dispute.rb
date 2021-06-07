@@ -79,6 +79,8 @@ class Dispute < ApplicationRecord
   scope :sbrs_disputes, -> { where(submission_type: ['e', 'ew'])}
   scope :wbrs_disputes, -> { where(submission_type: ['w', 'ew'])}
 
+  validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
+
   validates_with DisputeValidator
 
   def self.create_action(bugzilla_rest_session, ips_urls, assignee, priority, ticket_type, status=NEW, categories = nil)

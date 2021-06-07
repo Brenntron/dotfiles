@@ -30,6 +30,7 @@ class ComplaintEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_INVALID = "INVALID"
   STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
+  validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
 
   def self.what_time_is_it(value)
     distance_of_time_in_words(value)
