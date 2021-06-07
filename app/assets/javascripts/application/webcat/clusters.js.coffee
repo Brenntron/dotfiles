@@ -37,8 +37,6 @@ window.populate_clusters_index_table = (filter) ->
           datatable.rows.add(json.data);
           datatable.draw();
           selectize_category_inputs();
-
-          # $("#total_results").html(json.meta.rows_found)
           populate_cat_select(json.data)
 
 
@@ -364,7 +362,6 @@ window.copycat_paste = () ->
       rowSelectize.setValue(selectedValues, true)
 
 window.selectRow = (el) ->
-  console.log el
   $(el).closest('tr').toggleClass('selected')
 
 window.selectize_category_inputs = () ->
@@ -374,7 +371,6 @@ window.selectize_category_inputs = () ->
     if $(this).next("div").hasClass("selectize-control")
 #          This is already selectized
     else
-      console.log(this.id)
       input_ids.push("##{this.id}")
       $(this).selectize {
         persist: true,
@@ -809,7 +805,6 @@ window.take_selected_clusters = ()->
       data: 'clusters': JSON.stringify(selected_rows)
       success: (response) ->
         json = $.parseJSON(response)
-        console.log json
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Taking Clusters', [json.error])
@@ -853,7 +848,6 @@ window.return_selected_clusters = ()->
 window.approve_cluster = (cluster_row_id) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   cluster = window.get_cluster_by_row_id(cluster_row_id)
-  console.log cluster
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/clusters/proccess'
     method: 'POST'
@@ -891,10 +885,6 @@ window.decline_cluster = (cluster_row_id) ->
 
 window.get_cluster_by_row_id = (row_id) ->
   $("#clusters-index").DataTable().row(row_id).data()
-  # $("#clusters-index").DataTable().rows((idx, data, node) ->
-  #   debugger
-  #   return data.cluster_id == cluster_id.toString() ? true : false
-  # ).data()[0];
 
 window.build_clusters_header = () ->
   return if $('#clusters-index_wrapper').length == 0

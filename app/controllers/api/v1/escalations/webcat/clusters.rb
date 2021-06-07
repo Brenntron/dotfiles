@@ -68,9 +68,6 @@ module API
             params do
             end
             post 'take' do
-              # cluster_ids = params[:cluster_ids]
-              # ClusterAssignment.assign(cluster_ids, current_user)
-
               clusters = JSON.parse(params[:clusters], symbolize_names: true)
               ::Clusters::Assignor.new(clusters, current_user).assign
               {
@@ -90,8 +87,6 @@ module API
             params do
             end
             post 'return' do
-              # cluster_ids = params[:cluster_ids]
-              # ClusterAssignment.unassign(cluster_ids, current_user)
               clusters = JSON.parse(params[:clusters], symbolize_names: true)
               ::Clusters::Assignor.new(clusters, current_user).unassign
               return {:status => "success"}.to_json

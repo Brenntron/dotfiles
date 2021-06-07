@@ -40,8 +40,6 @@ class ApplicationController < ActionController::Base
       # force re-authentication
       nil
     end
-
-    # User.find(523)
   end
 
   def xml_token
