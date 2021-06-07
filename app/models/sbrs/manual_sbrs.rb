@@ -27,47 +27,6 @@ class Sbrs::ManualSbrs < Sbrs::Base
     super
   end
 
-  def self.new_from_attributes(attributes)
-    new(attributes)
-  end
-
-  # Get all the manual SBRS/SDS entries.
-  #   >> This has no analogy to SBRS/SDS, so leaving as a stub.
-  def self.types
-  end
-
-  # @param [Integer] id the WL/BL
-  # @return [Wbrs::Prefix] the WL/BL
-  def self.find(id)
-    response = call_json_request(:get, "/v1/rep/sbrs/get/#{id}", body: {})
-
-    response_body = JSON.parse(response.body)
-    new_from_attributes(response_body)
-  end
-
-  def self.load_from_prefetch(data)
-    data = JSON.parse(data)
-    data['data'].map {|datum| new_from_attributes(datum)}
-  end
-
-  def self.parse_sbrs(sbrs_response)
-    sbrs_return = JSON.parse(sbrs_response.body)
-    sbrs_return = sbrs_return[0]['response']
-
-    sbrs_return
-  end
-
-  def self.parse_wbrs(wbrs_response)
-    wbrs_return = JSON.parse(wbrs_response.body)
-    #sometimes we get responses back that are arrays
-    #sometimes we get responses that are hashes...
-    #i hate the wubya bee arr ess API
-    if wbrs_return.kind_of?(Array)
-      wbrs_return = wbrs_return[0]['response']
-    end
-    wbrs_return
-  end
-
   def self.call_sbrs(params, type: nil)
     parse_sbrs(request_sds(path: '/score/sbrs/json?ip=', body: params, type: type))
   end
@@ -85,14 +44,6 @@ class Sbrs::ManualSbrs < Sbrs::Base
     else
       webcatlist["#{sds_response["webcat"]["cat"]}"]["name"]
     end
-  end
-
-  def self.where(conditions = {}, raw = false)
-    params = stringkey_params(conditions)
-    {}.merge(call_sbrs(params)).merge(call_wbrs(params))
-    # this should return {"sbrs": {"score": "<score>"}}
-    # where <score> is either between -10 and 10 (inclusive)
-    # or noscore
   end
 
   def self.get_rule_names_from_rulehits(rep_data)
@@ -153,4 +104,30 @@ class Sbrs::ManualSbrs < Sbrs::Base
     response
   end
 
+
+
+
+  protected   ##########################################################################################################
+
+  def self.new_from_attributes(attributes)
+    new(attributes)
+  end
+
+  def self.parse_sbrs(sbrs_response)
+    sbrs_return = JSON.parse(sbrs_response.body)
+    sbrs_return = sbrs_return[0]['response']
+
+    sbrs_return
+  end
+
+  def self.parse_wbrs(wbrs_response)
+    wbrs_return = JSON.parse(wbrs_response.body)
+    #sometimes we get responses back that are arrays
+    #sometimes we get responses that are hashes...
+    #i hate the wubya bee arr ess API
+    if wbrs_return.kind_of?(Array)
+      wbrs_return = wbrs_return[0]['response']
+    end
+    wbrs_return
+  end
 end
