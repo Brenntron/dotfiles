@@ -702,11 +702,10 @@ $ ->
         window.toggle_selectize_layer(this, 'false')
     }
     tag_input = $('#tags-input').selectize {
-      persist: false,
-      create: false,
-      searchField: 'name',
+      persist: false
       valueField: 'name',
       labelField: 'name',
+      searchField: 'name',
       options: createSelectOptions()
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
@@ -714,10 +713,6 @@ $ ->
         if this.lastQuery != ""
           this.addItem([this.lastQuery])
         window.toggle_selectize_layer(this, 'false')
-
-#      score: (search) ->
-#        return (item) ->
-#          item.name.toLowerCase().startsWith( search.toLowerCase() ) ? 1 : 0;
     }
 
     category_input = $('#category-input').selectize {
