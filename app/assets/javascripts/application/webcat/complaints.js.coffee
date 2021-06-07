@@ -1263,6 +1263,8 @@ format = (complaint_entry_row) ->
       complaint_source = 'TI Webform'
     else if complaint_entry.complaint_source == 'talos-intelligence-api'
       complaint_source = 'TI API'
+    else if complaint_entry.complaint_source == ''
+      complaint_source = '<span class="missing-data">No source available</span>'
     else
       complaint_source = complaint_entry.complaint_source
   else
