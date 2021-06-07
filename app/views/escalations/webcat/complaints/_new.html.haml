@@ -16,6 +16,10 @@
     %input.form-control#customers{list: 'customerList'}
       %datalist#customerList
   .form-group
+    %label.content-label-sm Platform
+    %input.form-control#platforms{list: 'platformList', required: true}
+      %datalist#platformList
+  .form-group
     %label.content-label-sm Tags
     %select.form-control.selectize#select-to-new{placeholder: "Select or create tags", multiple: "multiple", tabindex:"-1"}
     %input.hidden#complaint_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(',')}

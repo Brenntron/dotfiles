@@ -136,7 +136,7 @@ class Complaint < ApplicationRecord
     top_url = Wbrs::TopUrl.check_urls([ip_or_uri]).first.is_important
     if top_url
       #create a complaint/complaint entry and set to pending
-      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, category_names_string, user)
+      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, nil, PENDING, category_names_string, user)
     else
       # Look for existing prefix
       existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
@@ -776,7 +776,7 @@ class Complaint < ApplicationRecord
     wbnp_report.save
   end
 
-  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil, user_email = nil)
+  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, platform, status=NEW, categories = nil, user_email = nil)
 
     summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -798,9 +798,11 @@ class Complaint < ApplicationRecord
 
 
     cust = find_customer(customer) if customer
+    platform_record = Platform.find_by_public_name(platform) if platform
     new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
                                      customer_id: cust&.id,
+                                     platform_id: platform_record&.id,
                                      status: status,
                                      channel: INT_CHANNEL)
 
@@ -814,7 +816,7 @@ class Complaint < ApplicationRecord
     end
 
     ips_urls.split(' ').each do |ip_url|
-      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, user, status, categories)
+      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, platform_record, user, status, categories)
     end
 
     bug_proxy

@@ -39,6 +39,19 @@ namespace :escalations do
       puts "#{processed} of #{total_count} processed"
     end
   end
+
+  task :populate_ngfw_platform => :environment do
+    ngfw_platform = Platform.where('LOWER(internal_name) LIKE ?', '%ngfw%').first # there is no ILIKE in mysql...
+
+    ComplaintTag.where('LOWER(name) LIKE ?', '%ngfw%').each do |tag|
+      puts tag.name
+      tag.complaints.each do |complaint|
+        puts "processing #{complaint.complaint_entries.count} entries for complaint id #{complaint.id}"
+        complaint.update_attributes(platform_id: ngfw_platform.id)
+        complaint.complaint_entries.update_all(platform_id: ngfw_platform.id)
+      end
+    end
+  end
 end
 
 namespace :bugs do

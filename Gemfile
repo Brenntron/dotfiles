@@ -46,6 +46,10 @@ gem 'xmlrpc'
 
 gem 'rails_admin', '~> 1.4.3'
 
+gem 'paper_trail', '12.0.0'
+gem 'psych', '3.2.0'
+
+
 # System Management
 gem 'foreman', '0.85.0'
 gem 'daemons', '1.2.6'
@@ -156,5 +160,4 @@ gem 'less-rails', '~> 3.0.0'
 gem 'bootstrap-sass', '~> 3.4.1'
 gem 'therubyracer', '~> 0.12.3'
 gem 'turbolinks', '5.2.0'
-gem 'paper_trail', '10.0.1'
 gem "sprockets", '~> 3.7.1'
