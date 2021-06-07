@@ -312,7 +312,7 @@ class ComplaintEntry < ApplicationRecord
       end
 
       # add credit for user's contribution to complaint entry
-      ComplaintEntryCredits::CreditProcessor.new(current_user, self).process
+      WebcatCredits::ComplaintEntries::CreditProcessor.new(current_user, self).process
 
       if self.status == "COMPLETED" && self.complaint_entry_screenshot.present?
         self.complaint_entry_screenshot.destroy
@@ -556,7 +556,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.save
 
       if user != User.where(display_name:"Vrt Incoming").first
-        ComplaintEntryCredits::CreditProcessor.new(user, new_complaint_entry).process
+        WebcatCredits::ComplaintEntries::CreditProcessor.new(user, new_complaint_entry).process
       end
     rescue Exception => e
       raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")

@@ -1,4 +1,4 @@
-class ComplaintEntryCredits::CreditProcessor
+class WebcatCredits::ComplaintEntries::CreditProcessor
   attr_reader :user, :complaint_entry
 
   def initialize(user, complaint_entry)
@@ -7,7 +7,7 @@ class ComplaintEntryCredits::CreditProcessor
   end
 
   def process
-    credit_handler = ComplaintEntryCredits::CreditHandler.new(user, complaint_entry)
+    credit_handler = WebcatCredits::ComplaintEntries::CreditHandler.new(user, complaint_entry)
 
     case complaint_entry.status
     when 'PENDING'

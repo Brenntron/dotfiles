@@ -13,16 +13,19 @@ class Clusters::Processor
 
   def process
     clusters.each do |cluster|
+      credit_handler = WebcatCredits::Clusters::CreditHandler.new(user, cluster)
       cluster_processor = PLATFORM_PROVIDERS[cluster[:platform]].new(cluster, user)
       next unless cluster_processor.processable?
 
       if cluster[:is_important]
         # skip processing, move cluster to 2nd person review
         cluster_processor.process_2nd_person_review
-        # TODO: add credit to the user
+        # add pending credit to the user
+        credit_handler.handle_pending_credit
       else
         cluster_processor.process
-        # TODO: add credit to the user
+        # add fixed credit to the user
+        credit_handler.handle_fixed_credit
       end
     end
   end
@@ -36,7 +39,9 @@ class Clusters::Processor
         raise 'Cluster should pass manager review'
       else
         PLATFORM_PROVIDERS[cluster[:platform]].new(cluster, user).process
-        # TODO: add credit to the user
+        # add fixed credit to the user
+        credit_handler = WebcatCredits::Clusters::CreditHandler.new(user, cluster)
+        credit_handler.handle_fixed_credit
       end
     end
   end
@@ -44,7 +49,9 @@ class Clusters::Processor
   def decline
     clusters.each do |cluster|
       PLATFORM_PROVIDERS[cluster[:platform]].new(cluster, user).decline
-      # TODO: add credit to the user
+      # add unchanged credit to the user
+      credit_handler = WebcatCredits::Clusters::CreditHandler.new(user, cluster)
+      credit_handler.handle_unchanged_credit
     end
   end
 
