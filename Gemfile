@@ -34,6 +34,8 @@ gem 'peake-bridge-client', '>= 0.0.9.0', git: "https://gitlab.vrt.sourcefire.com
 gem 'stomp', '1.4.6'
 gem 'aws-sdk', '2.11.170'
 gem 'nokogiri' ,'1.10.4'
+gem 'grpc', '1.30.2'
+gem 'grpc-tools', '1.30.2'
 
 gem 'mysql2', '0.5.2'
 gem 'rmagick', '~> 2.16.0'
@@ -43,6 +45,10 @@ gem 'xmlrpc'
 
 
 gem 'rails_admin', '~> 1.4.3'
+
+gem 'paper_trail', '12.0.0'
+gem 'psych', '3.2.0'
+
 
 # System Management
 gem 'foreman', '0.85.0'
@@ -153,5 +159,4 @@ gem 'less-rails', '~> 3.0.0'
 gem 'bootstrap-sass', '~> 3.4.1'
 gem 'therubyracer', '~> 0.12.3'
 gem 'turbolinks', '5.2.0'
-gem 'paper_trail', '10.0.1'
 gem "sprockets", '~> 3.7.1'

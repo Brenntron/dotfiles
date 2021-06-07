@@ -1,6 +1,19 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
+  def self.log_exception(exception = $!)
+    Rails.logger.error(exception.message)
+    Rails.logger.error(exception.backtrace[0])
+    Rails.logger.error(exception.backtrace[1])
+    Rails.logger.error(exception.backtrace[2])
+    Rails.logger.error(exception.backtrace[3])
+    Rails.logger.error(exception.backtrace[4])
+  end
+
+  def log_exception(exception = $!)
+    self.class.log_exception(exception)
+  end
+
   def self.humanize_secs(sec_input)
     mm, ss = sec_input.to_i.divmod(60)
     hh, mm = mm.divmod(60)

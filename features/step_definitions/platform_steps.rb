@@ -1,3 +1,9 @@
+Given(/^the following platforms exist:$/) do |platforms|
+  platforms.hashes.each do |platform|
+    FactoryBot.create(:platform, platform)
+  end
+end
+
 Given(/^platforms with all traits exist$/) do
   FactoryBot.create(:platform)
   FactoryBot.create(:platform, :webrep)

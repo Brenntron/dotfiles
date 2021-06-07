@@ -507,7 +507,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
 
-  def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
+  def self.create_complaint_entry(complaint, ip_url, platform, user = nil, status = NEW, categories = nil)
     new_complaint_entry = ComplaintEntry.new
     begin
       wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
@@ -541,6 +541,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.is_important = importance if importance
       new_complaint_entry.user = user
       new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
+      new_complaint_entry.platform_id = platform.id if platform
 
       if status == PENDING # occurs when attempt to categorized a Top URl without a complaint
         new_complaint_entry.url_primary_category = categories
@@ -1237,5 +1238,19 @@ class ComplaintEntry < ApplicationRecord
     commit_category(existing_prefixes, ip_or_uri: prefix, categories_string: final_cat_string, description: comment, user: ticket_user.email, casenumber: self.complaint.id)
 
     return log_messages
+  end
+
+  def determine_platform
+    if self.platform_id.present?
+      return (self.product_platform.public_name rescue "No Data")
+    end
+    if self.complaint.platform_id.present?
+      return (self.complaint.platform.public_name rescue "No Data")
+    end
+    if self.platform.present?
+      return (self.platform rescue "No Data")
+    end
+
+    return nil
   end
 end

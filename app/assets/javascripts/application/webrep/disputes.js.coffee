@@ -663,60 +663,64 @@ window.return_dispute = (dispute_id) ->
 
 window.save_dispute_entries = () ->
   data = {}
+  changes_made = false
   $('#disputes-research-table').find('tr.research-table-row').each(() ->
-    result = {}
-    fielddata = $(this).find('.dual-edit-field').map(() ->
-      new_value = switch (this.dataset.field)
-        when 'status'
-          if $(this).find("input[name='entry-status']:checked").attr('id') == undefined
-            $(this).find(".table-entry-input")[0].innerHTML
+    $(this).find('.dual-edit-field').map(() ->
+      {id, field} = this.dataset
+      if field != 'host-ip'
+        # host-ip is changing is handled separately
+        if data[id] == undefined then data[id] = []
+        switch field
+          when 'status'
+            if $(this).find("input[name='entry-status']:checked").attr('id') == undefined
+              new_value = $(this).find(".table-entry-input")[0].innerHTML.trim()
+            else
+              new_value = $(this).find("input[name='entry-status']:checked").attr('id')
+          when 'host'
+            new_value = $(this).find('.table-entry-input').val()
+
+        old_value = $(this).find('.entry-data')[0].innerText.trim()
+
+        if new_value == undefined then new_value = old_value
+
+        if new_value != old_value
+          changes_made = true
+          if new_value == "RESOLVED_CLOSED"
+            resolution_data = {
+              id: id
+              field: "resolution"
+              new: $('input[name=entry-resolution]:checked').attr('id')
+            }
+            resolution_comment = {
+              id: id
+              field: "resolution_comment"
+              new: $(this).find("textarea[name='resolution-comment']")[0].value
+            }
+            data[id].push(resolution_data)
+            data[id].push(resolution_comment)
+
           else
-            $(this).find("input[name='entry-status']:checked").attr('id')
-
-        else $(this).find('.table-entry-input')[0].value.trim()
-
-      old_value = $(this).find('.entry-data')[0].innerText.trim()
-
-      if new_value == undefined
-        new_value = old_value
-
-      data[this.dataset.id] = [{
-        id: this.dataset.id
-        field: this.dataset.field
-        old: old_value
-        new: new_value
-      }]
-
-      if new_value == "RESOLVED_CLOSED" && (new_value != old_value)
-        data[this.dataset.id].push(
-          id: this.dataset.id
-          field: "resolution"
-          new: $('input[name=entry-resolution]:checked').attr('id')
-        )
-
-        data[this.dataset.id].push({
-          id: this.dataset.id
-          field: "resolution_comment"
-          new: $(this).find("textarea[name='resolution-comment']")[0].value
-        })
-    ).toArray().filter((field_data) ->
-      field_data.old != field_data.new
+            new_data = {
+              id: id,
+              field: field,
+              old: old_value
+              new: new_value}
+            data[id].push( new_data )
     )
-
-    if 0 < fielddata.length
-      data[this.dataset.entryId] = fielddata
-
   )
-  if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
-    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+  if !changes_made
+    std_msg_error('No changes made', [])
   else
-    std_msg_ajax(
-      method: 'PATCH'
-      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-      data: { field_data: data }
-      success_reload: true
-      error_prefix: 'Error updating data.'
-    )
+    if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+    else
+      std_msg_ajax(
+        method: 'PATCH'
+        url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+        data: { 'field_data': data }
+        success_reload: true
+        error_prefix: 'Error updating data.'
+      )
 
 
 
@@ -1069,16 +1073,10 @@ $ ->
       }
       { data: 'source' }
       {
-        data: null
+        data: 'platform'
         class: 'platform-col'
         render: (data,type,full,meta) ->
-          if full.dispute_entries?
-            if full.dispute_entries.length == 0
-              platform = "Unknown"
-            else
-              platform = full.dispute_entries[0].entry.platform
-          else
-            platform = "Unknown"
+          platform = full.platform
 
           if  platform == "N/A" ||  platform == "Unknown" ||  platform == "Missing" ||  platform == "" ||  platform == null
             platform = '<span class="missing-data platform"></span>'
@@ -1120,7 +1118,8 @@ $ ->
     entry_rows = []
 
     $(entry).each ->
-      { ip_address, uri, primary_category, platform} = this.entry
+      {ip_address, uri, primary_category} = this.entry
+      platform = this.rendered_platform
       entry_content = missing_data
       if ip_address != null
         entry_content = ip_address
@@ -2339,10 +2338,12 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
       $(dropdown).remove()
 
       console.log response
-
       # Prep for inserting into DOM
       if response.json.rulehits?
-        rules     = response.json.rulehits.join(', ')
+        rules = []
+        $(response.json.rulehits).each ->
+          rules.push(this.mnemonic)
+        rule_names = rules.join(', ')
         rule_hits = response.json.rulehits.length
       else
         rules = ''
@@ -2370,7 +2371,7 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
       # Populate with our new data!
       $(wbrs_score_cell).text(score)
       $(wbrs_hits_cell).text(rule_hits)
-      $(wbrs_rules_cell).text(rules)
+      $(wbrs_rules_cell).text(rule_names)
       $(wbrs_cat_cell).text(threat_cats)
       $(wbrs_proxy_cell).text(proxy)
 
