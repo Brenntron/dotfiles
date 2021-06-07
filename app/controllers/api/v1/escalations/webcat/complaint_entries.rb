@@ -604,7 +604,7 @@ module API
                 permitted_params[:complaint_entries].each do |entry|
                   begin
                     complaint_entry = ComplaintEntry.find(entry)
-                    processed = complaint_entry.process_resolution_changes(permitted_params[:resolution], permitted_params[:internal_comment], permitted_params[:customer_facing_comment])
+                    processed = complaint_entry.process_resolution_changes(permitted_params[:resolution], permitted_params[:internal_comment], permitted_params[:customer_facing_comment], current_user)
 
                     confirmations << processed
                   rescue

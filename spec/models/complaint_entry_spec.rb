@@ -76,5 +76,20 @@ describe ComplaintEntry do
         create_complaint_entry
       end
     end
+
+    describe 'process_resolution_changes' do
+      subject(:process_resolution_changes) do
+        described_class.process_resolution_changes(resolution, internal_comment, customer_facing_comment, user)
+
+        let(:resolution) { "UNCHANGED" }
+        let(:internal_comment) { "we do not want to categorize this" }
+        let(:customer_facing_comment) { "all good!" }
+
+        it 'requests ComplaintEntryCredits::CreditProcessor' do
+          expect(ComplaintEntryCredits::CreditProcessor).to receive_message_chain(:new, :process)
+          create_complaint_entry
+        end
+      end
+    end
   end
 end
