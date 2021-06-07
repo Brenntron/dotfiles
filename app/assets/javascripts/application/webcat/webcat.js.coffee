@@ -703,16 +703,16 @@ $ ->
     }
     tag_input = $('#tags-input').selectize {
       persist: false
-      create: false
       valueField: 'name',
       labelField: 'name',
-      create: true,
-      createOnBlur: true,
       options: createSelectOptions()
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
+        if this.lastQuery != ""
+          this.addItem([this.lastQuery])
         window.toggle_selectize_layer(this, 'false')
+
       score: (search) ->
         return (item) ->
           item.name.toLowerCase().startsWith( search.toLowerCase() ) ? 1 : 0;
