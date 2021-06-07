@@ -10,7 +10,7 @@ class FileReputationDispute < ApplicationRecord
   has_many :file_rep_comments
   has_many :dispute_emails
 
-  #after_save :update_amp_detection
+  after_save :update_amp_detection
 
   belongs_to :ti_product_platform, :class_name => "Platform", :foreign_key => "platform_id", optional: true
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
