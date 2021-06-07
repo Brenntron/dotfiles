@@ -113,14 +113,6 @@ Feature: Webcat clusters
   @javascript
   Scenario: user should see important label if there is important clusters
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
     And the following cluster assignments exists:
       |id| user_id |  domain  |
       |1 |    1    | food.com |
@@ -146,20 +138,8 @@ Feature: Webcat clusters
   @javascript
   Scenario: an important cluster should go to 2nd person review after categorization
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
-    And the following cluster assignments exists:
-      |id| user_id |  domain  |
-      |1 |    1    | food.com |
-      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    Then I check "cluster_row_0"
+    Then I check "cluster_row_2"
     And I fill in selectized of element "#food_com_categories" with "[6]"
     Then I click "Submit Changes"
     Then I should see button with class "cluster-submit-button"
@@ -168,20 +148,8 @@ Feature: Webcat clusters
   @javascript
   Scenario: a user should be able to see "waiting for review" clusters
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
-    And the following cluster assignments exists:
-      |id| user_id |  domain  |
-      |1 |    1    | food.com |
-      |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    Then I check "cluster_row_0"
+    Then I check "cluster_row_2"
     And I fill in selectized of element "#food_com_categories" with "[6]"
     Then I click "Submit Changes"
     Then I click "#filter-clusters"
@@ -192,48 +160,14 @@ Feature: Webcat clusters
     And I should not see "blah.com"
 
   @javascript
-  Scenario: user can submit cluster on 2nd person review
-    Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
-    And the following cluster assignments exists:
-      |id| user_id |  domain  |
-      |1 |    1    | food.com |
-      |2 |    1    | blah.com |
-    When I goto "/escalations/webcat/clusters"
-    And I wait for "3" seconds
-    Then I check "cluster_row_0"
-    And I fill in selectized of element "#food_com_categories" with "[6]"
-    Then I click "Submit Changes"
-    Then I click button with class "cluster-submit-button"
-    Then I should see "CLUSTER WAS SUBMITTED."
-    And I click "#msg-modal"
-    Then I should not see button with class "cluster-submit-button"
-    And I should not see button with class "cluster-cancel-button"
-
-  @javascript
   Scenario: user can decline cluster categorization on 2nd person review
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
     And the following cluster assignments exists:
       |id| user_id |  domain  |
       |1 |    1    | food.com |
       |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    Then I check "cluster_row_0"
+    Then I check "cluster_row_2"
     And I fill in selectized of element "#food_com_categories" with "[6]"
     Then I click "Submit Changes"
     Then I click button with class "cluster-cancel-button"
@@ -246,20 +180,12 @@ Feature: Webcat clusters
   @javascript
   Scenario: cluster should be assigned to the user who declined categorization
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
     And the following cluster assignments exists:
       |id| user_id |  domain  |
       |1 |    1    | food.com |
       |2 |    1    | blah.com |
     When I goto "/escalations/webcat/clusters"
-    Then I check "cluster_row_0"
+    Then I check "cluster_row_2"
     And I fill in selectized of element "#food_com_categories" with "[6]"
     Then I click "Submit Changes"
     Then I click button with class "cluster-cancel-button"
@@ -271,14 +197,6 @@ Feature: Webcat clusters
   @javascript
   Scenario: non important complaints should be submitted without 2nd person review
     Given a user with id "1" has a role "webcat user" and is logged in
-    And WBRS Cluster returns the following stubbed clusters:
-      |id|  domain      |
-      |1 | food.com     |
-      |2 | blah.com     |
-    And WBRS TopUrl API call is stubbed with:
-      |   url   | is_important |
-      | food.com|     true     |
-      | blah.com|     false    |
     And the following cluster assignments exists:
       |id| user_id |  domain  |
       |1 |    1    | food.com |
