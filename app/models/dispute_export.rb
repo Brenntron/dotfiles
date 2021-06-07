@@ -79,7 +79,7 @@ class DisputeExport
              'last-updated' => dispute_entry.dispute.updated_at.strftime("%FT%T"),
              'age' => ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at),
              'case-origin' => dispute_entry.dispute.ticket_source,
-             'platform' => dispute_entry.platform,
+             'platform' => dispute_entry.determine_platform,
              'submitter-type' => dispute_entry.dispute.submitter_type,
              'submitter-org' => dispute_entry.dispute.customer_org,
              'submitter-domain' => dispute_entry.dispute.org_domain,

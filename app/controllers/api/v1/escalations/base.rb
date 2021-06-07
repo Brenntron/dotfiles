@@ -28,6 +28,7 @@ module API
         mount API::V1::Escalations::Webcat::Customers
         mount API::V1::Escalations::Webcat::Clusters
         mount API::V1::Escalations::Webcat::Companies
+        mount API::V1::Escalations::Webcat::Platforms
         mount API::V1::Escalations::Admin::Tools
         mount API::V1::Escalations::WsaStatuses
       end

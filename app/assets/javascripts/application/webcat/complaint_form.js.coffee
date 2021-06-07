@@ -15,6 +15,16 @@ $ ->
           $('#customerList').append '<option value="' + data + '"></option>'
     )
 
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/platforms_names'
+      method: 'GET'
+      success: (response) ->
+        $('#platformList').empty()
+        for platform in response.data
+          $('#platformList').append '<option value="' + platform + '"></option>'
+    )
+
+
   $('#advanced-search-button').on 'click', ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
@@ -104,6 +114,7 @@ $ ->
     ips_urls = unparsed_ips_urls.join(' ')
     desc = this.description.value
     customer = this.customers.value
+    platform = this.platforms.value
     tags = $('.selectize').val() || []
     $('#new-complaint').dropdown('toggle');
 
@@ -115,6 +126,7 @@ $ ->
         ips_urls: ips_urls,
         description: desc,
         customer: customer,
+        platform: platform,
         tags: tags
       success: (response) ->
         std_msg_success('Complaint Created.', [], reload: true)
