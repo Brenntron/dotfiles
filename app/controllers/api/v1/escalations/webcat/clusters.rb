@@ -123,7 +123,7 @@ module API
             end
             post 'proccess' do
               cluster_ids = params[:cluster_ids]
-              ::Webcat::ClustersProcessor.process!(cluster_ids)
+              ::Webcat::ClustersProcessor.process!(cluster_ids, current_user)
               return {:status => "success"}.to_json
             rescue Exception => e
               {

@@ -1,8 +1,10 @@
 describe Webcat::ClustersProcessor do
   before do
     allow(Wbrs::Cluster).to receive(:process).and_return(true)
+    allow(Wbrs::Cluster).to receive(:retrieve).and_return([{ 'url' => 'http://example.com' }])
   end
 
+  let!(:main_webcat_manager) { FactoryBot.create(:user, cvs_username: Complaint::MAIN_WEBCAT_MANAGER_CONTACT) }
   let(:user) { FactoryBot.create(:user) }
 
   describe 'process' do
@@ -50,17 +52,51 @@ describe Webcat::ClustersProcessor do
   end
 
   describe 'process!' do
-    subject { described_class.process!(cluster_ids) }
+    subject { described_class.process!(cluster_ids, user) }
 
     let(:cluster_ids) { [1] }
 
     before do
       FactoryBot.create(:cluster_categorization, cluster_id: 1, user_id: user.id)
+      allow(Webcat::EntryVerdictChecker).to receive_message_chain(:new, :check).and_return(
+        {
+          verdict_pass: verdict_pass,
+          verdict_reasons: 'whatever reasons'
+        }
+      )
     end
 
-    it 'processes cluster with no conditions' do
-      expect(Wbrs::Cluster).to receive(:process)
-      expect { subject }.to change { ClusterCategorization.count }.to(0)
+    context 'when 3rd person review is not needed' do
+      context 'when verdict check passed' do
+        let(:verdict_pass) { true }
+
+        it 'processes cluster' do
+          expect(Wbrs::Cluster).to receive(:process)
+          expect { subject }.to change { ClusterCategorization.count }.to(0)
+        end
+      end
+
+      context 'when user is webcat manager' do
+        before { user.roles << FactoryBot.create(:web_cat_manager_role) }
+        let(:verdict_pass) { false }
+
+        it 'processes cluster' do
+          expect(Wbrs::Cluster).to receive(:process)
+          expect { subject }.to change { ClusterCategorization.count }.to(0)
+        end
+      end
+    end
+
+    context 'when 3rd person review needed' do
+      context 'when verdict check not passed' do
+        let(:verdict_pass) { false }
+
+        it 'processes cluster' do
+          expect(Wbrs::Cluster).not_to receive(:process)
+          expect { subject }.to raise_error(RuntimeError)
+          expect(ClusterAssignment.last.user_id).to eq(main_webcat_manager.id)
+        end
+      end
     end
   end
 

@@ -847,7 +847,7 @@ window.return_selected_clusters = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('Error Returning Entries', [json.error])
+          std_msg_error('Error Returning Clusters', [json.error])
         else
           for id, i in entry_ids
             $("#owner_#{id}").text('')
@@ -870,7 +870,7 @@ window.approve_cluster = (cluster_id) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
-        std_msg_error('Error Returning Entries', [json.error])
+        std_msg_error('Error Approving Clusters', [json.error])
       else
         std_msg_success("cluster was submitted.", '', reload: true)
     error: (response) ->
@@ -888,7 +888,7 @@ window.decline_cluster = (cluster_id) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
-        std_msg_error('Error Returning Entries', [json.error])
+        std_msg_error('Error Declining Clusters', [json.error])
       else
         std_msg_success("cluster categories were declined.", '',reload: true)
     error: (response) ->
