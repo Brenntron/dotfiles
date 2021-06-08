@@ -1,8 +1,0 @@
-service_name: <%= ENV['ESCALATIONS_ELASTIC_APM_SERVICE_NAME'] %>
-service_node_name: <%= ENV['ESCALATIONS_ELASTIC_APM_SERVICE_NODE_NAME'] %>
-server_url: <%= ENV['ELASTIC_APM_SERVER_URL'] %>
-secret_token: <%= ENV['ELASTIC_APM_SECRET_TOKEN'] %>
-server_ca_cert_file: <%= ENV['ELASTIC_APM_SERVER_CA_CERT_FILE'] %>
-api_buffer_size: <%= ENV['ELASTIC_APM_API_BUFFER_SIZE'] %>
-pool_size: <%= ENV['ELASTIC_APM_POOL_SIZE'] %>
-disable_metrics: ["*"]
