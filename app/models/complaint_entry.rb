@@ -1161,7 +1161,7 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def process_resolution_changes(resolution, internal_comment, customer_facing_comment)
+  def process_resolution_changes(resolution, internal_comment, customer_facing_comment, current_user)
     confirmation = {}
     if !["COMPLETED","PENDING"].include?(self.status) && resolution != "REOPENED"
       if self.is_important && resolution != "UNCHANGED"
@@ -1186,6 +1186,9 @@ class ComplaintEntry < ApplicationRecord
       confirmation.update(state: 'ERROR', host: self.hostlookup, status: self.status,resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
                           message: "Cannot process a resolution update to #{resolution} on Complaint Entry (#{self.hostlookup})  of status #{self.status}")
     end
+
+    # add credit for user's contribution to complaint entry
+    ComplaintEntryCredits::CreditProcessor.new(current_user, self).process
     confirmation
   end
 
