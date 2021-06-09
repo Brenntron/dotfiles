@@ -63,18 +63,16 @@ class DisputeEntry < ApplicationRecord
 
   def self.create_dispute_entry(dispute, ip_url, status = NEW)
     begin
-      params = {}
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.status = status
 
+      sbrs_api_rulehits = nil
       if is_ip?(ip_url)
-        params['ip'] = ip_url
 
-        wbrs_api_response = Sbrs::Base.remote_call_sds_v3(params['ip'], "wbrs")
-        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params)
-        sbrs_api_rulehit_response =  Sbrs::GetSbrs.get_sbrs_rules_for_ip(ip_url)
-        wbrs_prefix_response = ComplaintEntry.get_category(params['ip'])
+        wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
+        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs('ip' => ip_url)
+        sbrs_api_rulehits = CloudIntel::Reputation.mnemonics_ip(ip_url)
 
 
 
@@ -98,7 +96,6 @@ class DisputeEntry < ApplicationRecord
         end
 
       else
-        params['url'] = ip_url
 
         resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(ip_url)) rescue nil
         if resolved_ip.present?
@@ -108,8 +105,7 @@ class DisputeEntry < ApplicationRecord
 
 
         wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
-        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params, type: 'wbrs')
-        wbrs_prefix_response = ComplaintEntry.get_category(params['url'])
+        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs({'url' => ip_url}, type: 'wbrs')
 
         url_parts = Complaint.parse_url(ip_url)
         new_dispute_entry.uri = ip_url
@@ -183,14 +179,15 @@ class DisputeEntry < ApplicationRecord
         end
       end
 
-      if sbrs_api_rulehit_response.present?
-        sbrs_api_rulehit_response.each do |rule_hit|
+      if sbrs_api_rulehits.present?
+        sbrs_api_rulehits.each do |rule_hit|
           DisputeRuleHit.create(rule_type:'SBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
         end
       end
       return new_dispute_entry
-    rescue Exception => e
-      raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{e}}}")
+    rescue Exception => ex
+      log_exception(ex)
+      raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{ex}}}")
     end
 
 
@@ -846,7 +843,8 @@ class DisputeEntry < ApplicationRecord
 
     if self.entry_type == "IP"
       sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => self.hostlookup})
-      sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(self.hostlookup)
+      sbrs_stuff_rules = CloudIntel::Reputation.mnemonics_ip(self.hostlookup)
+
 
       self.sbrs_score = sbrs_stuff["sbrs"]["score"]
       sbrs_stuff_rules.each do |rule_hit|
@@ -1082,7 +1080,7 @@ class DisputeEntry < ApplicationRecord
       if is_ip_address === true
         sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
         entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
-        sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
+        sbrs_stuff_rules = CloudIntel::Reputation.mnemonics_ip(entry.uri)
 
         sbrs_stuff_rules.each do |rule_hit|
           new_rule_hit = DisputeRuleHit.new
@@ -1187,6 +1185,9 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.process_multi_ip_info(uri, ips, dispute_entry = nil)
+
+    all_rulehits = Wbrs::RuleHit.all
+    rule_hit_info = []
     result = {}
 
     results = Sbrs::Base.combo_call_sds_v3(uri, ips)
@@ -1219,6 +1220,13 @@ class DisputeEntry < ApplicationRecord
 
         wbrs_rule_hits.each do |rule_hit|
           DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id, is_multi_ip_rulehit: true)
+          
+          rule_hit_data = all_rulehits.find {|rulehit| rulehit.mnemonic == rule_hit}
+          if rule_hit_data.present?
+            rule_hit_info << {:mnemonic => rule_hit, :malware_probability => rule_hit_data.probability, :description => rule_hit_data.description}
+          else
+            rule_hit_info << {:mnemonic => rule_hit}
+          end
         end
       end
 
@@ -1230,9 +1238,11 @@ class DisputeEntry < ApplicationRecord
 
     end
 
+
+
     result[:threat_cats] = threat_cat_names
     result[:proxy_uri] = proxy_uri
-    result[:rulehits] = wbrs_rule_hits
+    result[:rulehits] = rule_hit_info
     result[:score] = wbrs_score
 
     return result
@@ -1269,21 +1279,21 @@ class DisputeEntry < ApplicationRecord
     verdict = ""
 
     begin
-      if is_float(score)         # failing this should include "noscore"
-        score = score.to_f
-        case
-        when score >= 1.0                 # Good is +1.0 to +10
-          verdict = 'Good'
-        when score > -2.0                 # Neutral is -1.9 to 0.9
-          verdict = 'Neutral'
-        when score <= -2.0                # Poor is -10 to -2.0
-          verdict = 'Poor'
-        else
-          verdict = ''
-        end
-      end
-    rescue
 
+      score = Float(score)
+      case
+      when score >= 1.0                 # Good is +1.0 to +10
+        verdict = 'Good'
+      when score > -2.0                 # Neutral is -1.9 to 0.9
+        verdict = 'Neutral'
+      when score <= -2.0                # Poor is -10 to -2.0
+        verdict = 'Poor'
+      else
+        verdict = ''
+      end
+
+    rescue
+      verdict = ''
     end
 
     verdict
@@ -1339,6 +1349,20 @@ class DisputeEntry < ApplicationRecord
     rescue
       return false
     end
+  end
+
+  def determine_platform
+    if self.platform_id.present?
+      return (self.product_platform.public_name rescue "No Data")
+    end
+    if self.dispute.platform_id.present?
+      return (self.dispute.platform.public_name rescue "No Data")
+    end
+    if self.platform.present?
+      return (self.platform rescue "No Data")
+    end
+
+    return nil
   end
 
 end

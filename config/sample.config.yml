@@ -10,6 +10,9 @@ development:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  beaker:
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    hostport: "annapolis-stage.vrt.sourcefire.com:4252"
   bls:
     host: "stage-bls-vip.sv4.ironport.com"
     port: 443
@@ -89,6 +92,7 @@ development:
     host: "panacea.threatgrid.com"
     port: 443
     verify_mode: "verify-none"
+    gssnegotiate: false
     api_key: "redacted"
   ticloud:
     host: "ticloud-cdn-api.reversinglabs.com"
@@ -113,6 +117,8 @@ development:
     gssnegotiate: false
     auth_token: "redacted"
 
+
+ 
 test:
   api_timeout:
     timeout: 15
@@ -125,6 +131,9 @@ test:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  beaker:
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    hostport: "annapolis-stage.vrt.sourcefire.com:4252"
   bls:
     host: "stage-bls-vip.sv4.ironport.com"
     port: 443
@@ -203,6 +212,7 @@ test:
     host: "panacea.threatgrid.com"
     port: 443
     verify_mode: "verify-none"
+    gssnegotiate: false
     api_key: "redacted"
   ticloud:
     host: "ticloud-cdn-api.reversinglabs.com"
@@ -244,6 +254,9 @@ staging:
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       # umbrella always uses https and verify peer
       api_key: "redacted"
+  beaker:
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    hostport: "annapolis-stage.vrt.sourcefire.com:4252"
   bls:
     host: "stage-bls-vip.sv4.ironport.com"
     port: 443
@@ -324,6 +337,7 @@ staging:
     port: 443
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-peer"
+    gssnegotiate: false
     api_key: "redacted"
   ticloud:
     host: "ticloud-cdn-api.reversinglabs.com"
@@ -368,6 +382,9 @@ production:
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       # umbrella always uses https and verify peer
       api_key: "redacted"
+  beaker:
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
+    hostport: "annapolis.vrt.sourcefire.com:4252"
   bls:
     host: "prod-bls-vip.sv4.ironport.com"
     port: 443
@@ -445,6 +462,7 @@ production:
     port: 443
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-peer"
+    gssnegotiate: false
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     api_key: "redacted"
   ticloud:

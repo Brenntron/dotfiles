@@ -146,7 +146,8 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" onclick="WebCat.RepLookup.queryWhoIs('+query_who_params+ '\')">Lookup</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
-    error: (response) ->      std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
+    error: (response) ->
+      std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
 
  )
 
@@ -1223,7 +1224,11 @@ format = (complaint_entry_row) ->
 
   if complaint_entry.status == "PENDING"
     if complaint_entry.uri_as_categorized  == ""
-      domain = complaint_entry.subdomain + "." + complaint_entry.domain
+      # if a subdomain string exists, prepend it to the domain
+      if complaint_entry.subdomain.length > 0
+        domain = complaint_entry.subdomain + "." + complaint_entry.domain
+      else
+        domain = complaint_entry.domain
     else
       domain = complaint_entry.uri_as_categorized
     # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
@@ -1250,7 +1255,6 @@ format = (complaint_entry_row) ->
   retake_in_progress = false
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
-
 
   edit_input = if domain != "" then domain else host #if the domain is empty, then display host for ips in edit input
 
@@ -1317,7 +1321,7 @@ format = (complaint_entry_row) ->
 
 ## Complaint history dialog box. Includes tabs for domain history, complaint entry history, and xbrs history of the url.
 window.history_dialog = (id, url) ->
-#  here here
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
@@ -1330,19 +1334,25 @@ window.history_dialog = (id, url) ->
         alert(json.error)
       else
         history_dialog_content =
-          "<ul class='nav nav-tabs dialog-tabs' role='tablist'>
+          "<div class='cat-history-dialog dialog-content-wrapper'>
+               <h4>#{url}</h4>
+              <ul class='nav nav-tabs dialog-tabs' role='tablist'>
                <li class='nav-item active' role='presentation'>
                 <a class='nav-link' role='tab' data-toggle='tab' href='#domain-history-tab' aria-controls='domain-history-tab'>
                    Domain History
                 </a>
                </li>
+              <li class='nav-item' role='presentation'>
+                <a class='nav-link' role='tab' data-toggle='tab' href='#complaint-history-tab' aria-controls='complaint-history-tab'>
+                   Complaint Entry History
+                </a>
+              </li>
                <li class='nav-item' role='presentation'>
                 <a class='nav-link' role='tab' data-toggle='tab' href='#xbrs-history-tab' aria-controls='xbrs-history-tab' onclick='get_xbrs_history(\"#{url}\", this)'>
                   XBRS History
                 </a>
                </li>
             </ul>
-            <div class='tab-content dialog-tab-content'>
             <div class='tab-pane active' role='tabpanel' id='domain-history-tab'>
             <h5>Domain History</h5>"
 
@@ -1350,34 +1360,34 @@ window.history_dialog = (id, url) ->
           history_dialog_content += '<span class="missing-data">No domain history available.</span>'
         else
           history_dialog_content +=
-          '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
-          '<tbody>'
+            '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
+              '<tbody>'
           # Build domain history table
           for entry in json.entry_history.domain_history
             history_dialog_content +=
               '<tr>' +
-              '<td>' + entry['action'] + '</td>' +
-              '<td>' + entry['confidence'] + '</td>' +
-              '<td>' + entry['description'] + '</td>' +
-              '<td>' + entry['time'] + '</td>' +
-              '<td>' + entry['user'] + '</td>' +
-              '<td>' + entry['category']['descr'] + '</td>' +
-              '</tr>'
+                '<td>' + entry['action'] + '</td>' +
+                '<td>' + entry['confidence'] + '</td>' +
+                '<td>' + entry['description'] + '</td>' +
+                '<td>' + entry['time'] + '</td>' +
+                '<td>' + entry['user'] + '</td>' +
+                '<td>' + entry['category']['descr'] + '</td>' +
+                '</tr>'
           # End domain history table
           history_dialog_content += '</tbody></table>'
 
         # End domain history tab start Complaint Entry Tab
         history_dialog_content +=
           '</div>' +
-          '<div class="tab-pane" role="tabpanel" id="complaint-history-tab">' +
-          '<h5>Complaint Entry History</h5>'
+            '<div class="tab-pane" role="tabpanel" id="complaint-history-tab">' +
+            '<h5>Complaint Entry History</h5>'
 
         if json.entry_history.complaint_history.length < 1
           history_dialog_content += '<span class="missing-data">No complaint entry history available.</span>'
         else
           history_dialog_content +=
             '<table class="history-table"><thead><th>Time</th><th>User</th><th>Details</th></thead>' +
-            '<tbody>'
+              '<tbody>'
 
           # Build the complaint history table
           entry_row = ""
@@ -1396,17 +1406,18 @@ window.history_dialog = (id, url) ->
             entry_row += '<td>' + details_col + '</td></tr>'
             history_dialog_content += entry_row
           # End complaint history table
-          history_dialog_content += '</tbody></table>'
+          history_dialog_content += '</tbody></table></div>'
 
+
+        # End complaint history table tab
+        # Start XBRS Tab
         history_dialog_content +=
-          # End complaint history table tab
-          '</div>' +
-          # Start XBRS Tab
-          '<div class="tab-pane" role="tabpanel" id="xbrs-history-tab">' +
-          '<h5>XBRS History</h5>' +
-          '<table class="history-table xbrs-history-table" id="webcat-xbrs-history"></table>' +
-          '</div>' +
-          '</div>'
+          "
+           <div class='tab-pane' role='tabpanel' id='xbrs-history-tab'>
+            <h5>XBRS History</h5>
+              <table class=''history-table xbrs-history-table' id='webcat-xbrs-history'></table>
+            </div>
+           "
 
         # Only one history dialog open at a time - content gets swapped out
         if $("#history_dialog").length
@@ -1417,7 +1428,6 @@ window.history_dialog = (id, url) ->
           history_dialog = '<div id="history_dialog" title="History Information"></div>'
           $('body').append(history_dialog)
           $("#history_dialog").html(history_dialog_content)
-          #$('#history_dialog').append(history_dialog_content)
           $('#history_dialog').dialog
             autoOpen: false
             minWidth: 800
@@ -2133,15 +2143,22 @@ $ ->
 
   $(document).ready ->
     if window.location.pathname != '/escalations/webcat/complaints'
-      $('#filter-complaints').hide()
+      $('#filter-complaints-nav').hide()
       $('#fetch').hide()
       $('#web-cat-search').hide()
       $('#new-complaint').hide()
+      $('#filter-clusters-nav').hide()
     else
       $('#filter-complaints').show()
       $('#fetch').show()
       $('#web-cat-search').show()
       $('#new-complaint').show()
+      $('#filter-clusters-nav').hide()
+
+    if window.location.pathname == '/escalations/webcat/clusters'
+      $('#filter-complaints-nav').hide()
+      $('#filter-clusters-nav').show()
+
 
   # If a stupidly long email address is returned it will wrap
   # rather than pushing the column into the column beside it

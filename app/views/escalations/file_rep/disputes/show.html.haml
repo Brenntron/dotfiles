@@ -125,9 +125,16 @@
               %label.content-label-sm
                 Suggested Disposition
               - if @file_rep_dispute.suggested_malicious?
-                .suggested-disposition.disp-negative= @file_rep_dispute.disposition_suggested
+                .suggested-disposition.disp-negative.top-info-data= @file_rep_dispute.disposition_suggested
               - else
-                .suggested-disposition= @file_rep_dispute.disposition_suggested
+                .suggested-disposition.top-info-data= @file_rep_dispute.disposition_suggested
+
+              %label.content-label-sm
+                Platform
+              - if @platform_name.blank?
+                .top-info-data.missing-data No platform
+              - else
+                .top-info-data=@platform_name
 
         .col-xs-12.col-sm-12.col-md-12.col-lg-7.col-with-divider.col-ticket-right
           .row
@@ -157,7 +164,7 @@
               %label.content-label-sm Auto Resolve Log
               %button#auto_resolve_log_button.dispute-inline-buttons.auto-resolve-button.esc-tooltipped{onclick:'show_auto_resolve()', title:'Auto Resolve Log'}
               #auto-resolve-dialog{title: 'Auto Resolve Log'}
-                = @file_rep_dispute.auto_resolve_log
+                = raw(@file_rep_dispute.auto_resolve_log)
       .row
         .col-lg-12.dispute-details
           %label.content-label-sm Dispute Details

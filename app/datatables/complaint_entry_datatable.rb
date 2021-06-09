@@ -38,6 +38,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
         complaint_id:       {source: "ComplaintEntry.complaint_id", data: :complaint_id, cond: :like},
         tags:               {source: "ComplaintEntry.tags", data: :tags, searchable: false, orderable: false},
         submitter_type:     {source: "ComplaintEntry.submitter_type", data: :submitter_type, cond: :string_eq},
+        customer_email:     {source: 'ComplaintEntry.customer_email', data: :customer_email, cond: :like, orderable: false },
         description:        {source: "ComplaintEntry.description", data: :description, cond: :like},
         platform:           {source: "ComplaintEntry.platform", data: :platform, cond: :like}
     }
@@ -65,6 +66,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           wbrs_score:       complaint_entry.wbrs_score ? complaint_entry.wbrs_score.to_d.truncate(2).to_s : '',
           customer_name:    complaint_entry.customer_name,
           company_name:     complaint_entry.customer_company_name,
+          customer_email:   complaint.customer&.email,
           assigned_to:      complaint_entry.user&.display_name,
 
           uri:              complaint_entry.uri,
@@ -80,7 +82,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           submitter_type:   complaint.submitter_type,
           description:      complaint.description,
           uri_as_categorized: complaint_entry.uri_as_categorized,
-          platform:         complaint_entry.platform,
+          platform:         complaint_entry.determine_platform,
 
           DT_RowId:         complaint_entry.id,
       }
@@ -116,6 +118,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
       records.left_joins(:complaint).order("complaints.submitter_type #{datatable.orders.first.direction}")
     when 'complaint_entries.company_name'
       records.left_joins(complaint: {customer: :company}).order("companies.name #{datatable.orders.first.direction}")
+    when 'complaint_entries.customer_email'
+      records.left_joins(complaint: :customer).order("customers.email #{datatable.orders.first.direction}")
     when 'complaint_entries.assigned_to'
       records.left_joins(:user).order("users.display_name #{datatable.orders.first.direction}")
     else

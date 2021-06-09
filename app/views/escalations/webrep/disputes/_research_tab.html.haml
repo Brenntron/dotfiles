@@ -272,18 +272,17 @@
             %td.research-table-row-wrapper
               %table
                 %tr.research-first-row
-                  %td.expandable-row-column.expandable-cell
+                  %td.expandable-row-column.expandable-cell{rowspan: '2'}
                     %button.expand-row-button-inline{'data-entry-id': "#{entry.id}"}
-                  %td.cb-cell
+                  %td.cb-cell{rowspan: '2'}
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}", class: "dispute-entry-cb-#{entry.id}"}
+                  -if entry[:is_important]
+                    %td
+                      %span.entry-important-flag
                   %td.dual-edit-field.url-cell{'data-id': entry.id, 'data-field': 'host'}
-                    - if entry[:is_important]
-                      %span.entry-data.entry-data-content.entry-important-flag
-                        = entry.hostlookup
-                    - else
-                      %span.entry-data.entry-data-content
-                        = entry.hostlookup
-                      %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
+                    %span.entry-data.entry-data-content
+                      = entry.hostlookup
+                    %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
 
                   -# if entry = uri and there are no resolved ips
                   - if entry.uri? && entry[:web_ips].blank?
@@ -302,17 +301,47 @@
                   - else
                     %td.no-padding
 
-
                   %td.category-cell
                     %label Category
                     - if entry[:primary_category] != '{}' && !entry[:primary_category].nil?
                       = entry[:primary_category]
                     - else
                       %span.missing-data No assigned categories
+
+                  %td.platform-cell
+                    %label Platform
+                    - if !entry[:platform].nil?
+                      = entry[:platform]
+                    - else
+                      %span.missing-data No platform
+
                   %td.hostname-cell
-                    %label Hostname
                     - unless entry[:hostname].nil?
+                      %label Hostname
                       = entry[:hostname]
+
+                  %td.sugg-tc-cell
+                    %label Suggested Threat Category
+                    - unless entry[:suggested_threat_category].nil?
+                      = entry[:suggested_threat_category].gsub(/,(?![ ])/, ', ')
+                      
+                  %td.sugg-cell
+                    %label Suggested Disposition
+                    - unless entry[:suggested_disposition].nil?
+                      = entry[:suggested_disposition]
+
+                  %td.platform-cell
+                    %label Platform
+                    - if @dispute.platform.present?
+                      =(@dispute.platform.public_name rescue "No Data")
+                    - else
+                      - if entry.platform_id.present?
+                        =(entry.product_platform.public_name rescue "No Data")
+                      - elsif entry.platform.present?
+                        =entry.platform
+                      - else
+                        %span.missing-data No platform
+
                   %td.dual-edit-field.status-cell{'data-id': entry.id, 'data-field': 'status'}
                     %label Status
                     %span.entry-data.entry-data-status
@@ -320,7 +349,6 @@
                         NEW
                       - else
                         = entry[:status]
-
                     %span.dropdown
                       %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         - if entry[:status].nil?
@@ -393,7 +421,7 @@
                     %label As of
                     = entry.dispute_entry_preload&.created_at&.strftime('%F %T')
 
-                  %td.dispute_rep_tools.rep-tools-cell
+                  %td.dispute_rep_tools.rep-tools-cell{rowpan: '2'}
                     .webrep_auto_resolve{id:"webrep_auto_resolve-#{entry.id}", title:"Auto Resolve Log"}
                       = (entry.auto_resolve_log.html_safe rescue "")
                     %span.dispute_rep_tools_wrapper
@@ -616,12 +644,31 @@
                                   %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_individual_reptool(this)', disabled: true}
                                     Submit Changes
 
+                %tr.research-second-row
+                  %td{colspan: '2'}
+                  //placeholder cell
+                  %td.category-cell
+                    %label Category
+                    - if entry[:primary_category] != '{}' && !entry[:primary_category].nil?
+                      = entry[:primary_category]
+                    - else
+                      %span.missing-data No assigned categories
+
+                  %td.sugg-tc-cell{colspan: '2'}
+                    %label Suggested Threat Category
+                    - unless entry[:suggested_threat_category].nil?
+                      = entry[:suggested_threat_category].gsub(/,(?![ ])/, ', ')
+                  %td.sugg-cell{colspan: '2'}
+                    %label Suggested Disposition
+                    - unless entry[:suggested_disposition].nil?
+                      = entry[:suggested_disposition]
+                  %td
+                  -#//placeholder cell
 
                 %tr.research-overview-row
                   %td
                     -#Expander area
-
-                  %td.research-table-details-wrapper{colspan: '9'}
+                  %td.research-table-details-wrapper{colspan: '12'}
                     %table
                       %tr
                         %td.input-col.wbrs-input-wrapper
@@ -698,13 +745,17 @@
                                 = "#{entry.referenced_tickets.count} ticket(s)"
                               .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
                                 %table
-                                  - entry.referenced_tickets.each do |reference|
-                                    %tr
-                                      %td
-                                        %a{href: escalations_webrep_dispute_path(reference.id)}
-                                          = reference.id
-                                      %td
-                                        = reference.case_opened_at
+                                  %thead
+                                    %th Case ID
+                                    %th Date/Time Submitted
+                                  %tbody
+                                    - entry.referenced_tickets.each do |reference|
+                                      %tr
+                                        %td
+                                          %a{name:"#{reference.id}_link", href: escalations_webrep_dispute_path(reference.id)}
+                                            = reference.id
+                                        %td
+                                          = reference.case_opened_at
                       %tr
                         %td.input-col.sbrs-input-wrapper
                           %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -778,7 +829,7 @@
                         = ips
 
                       %input.table-ip-input{type:'text', value: "#{ips}", placeholder: 'enter one or more IPs, separated by commas; ex: 1.2.3.4. or 1.1.1.1, 2.2.2.2'}
-                    %td.text-right.no-padding-right{colspan: '3'}
+                    %td.text-right.no-padding-right{colspan: '6'}
                       %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses'}
                         Edit IP Addresses
                       %button.save-button.inline-save-ip-button.esc-tooltipped{title: 'Save IP Addresses'}
@@ -786,7 +837,7 @@
                       %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses'}
 
                   %tr.research-uri-ip-data-row
-                    %td.research-table-details-wrapper{colspan: '8'}
+                    %td.research-table-details-wrapper{colspan: '11'}
                       %table
                         %tr.single-details-row
                           %td
@@ -826,10 +877,10 @@
 
 
                 %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
-                  %td.expanded-row{colspan: '10'}
+                  %td.expanded-row{colspan: '13'}
                     .expanded-row-data-wrapper
                       .row
-                        .col-sm-3
+                        .col-sm-4
                           .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header
                               WBRS Rule Hit Details
@@ -851,22 +902,41 @@
                                     -#  Placeholder col for if a rule hit is from querying uri + ip
                                     %th Rule
                                     %th Rule Description
-                                    -#%th Weight <- hiding this as it currently is not set up and just takes up space
+                                    %th.text-center Malware Prob
                                 %tbody
                                   - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit != true}.each do |wbrs_hit|
+                                    - rulehit = @all_rulehits.select {|hit| hit.mnemonic == wbrs_hit.name}
                                     %tr
                                       %td
                                       %td= wbrs_hit.name
-                                      %td= wbrs_hit.mnemonic
-                                      -#%td
-                                        -#Put weight of rule here
-                                  -# if any wbrs rulehits are returned from querying uri + ip each do
+                                      %td= rulehit.first.description
+                                      %td.text-center
+                                        - malware_prob = rulehit.first.probability / 100.0
+                                        - if malware_prob > 50
+                                          %span.mal-highlight
+                                            = rulehit.first.probability / 100.0
+                                            \%
+                                        - else
+                                          = rulehit.first.probability / 100.0
+                                          \%
+
+
                                   - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit == true}.each do |wbrs_hit|
+                                    - rulehit = @all_rulehits.select {|hit| hit.mnemonic == wbrs_hit.name}
                                     %tr.plus-ip-rule-row
                                       %td.uri-plus-ip-rule-indicator
                                       %td= wbrs_hit.name
-                                      %td= wbrs_hit.mnemonic
-                                      -#%td
+                                      %td= rulehit.first.description
+                                      %td.text-center
+                                        - malware_prob = rulehit.first.probability / 100.0
+                                        - if malware_prob > 50
+                                          %span.mal-highlight
+                                            = rulehit.first.probability / 100.0
+                                            \%
+                                        - else
+                                          = rulehit.first.probability / 100.0
+                                          \%
+
 
                           .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header
@@ -927,7 +997,7 @@
                                         %td.unrated-site-result Unrated
                                       - else
                                         %td.unclean-site-result= virustotal[:result]
-                        .col-sm-9
+                        .col-sm-8
                           = render 'shared/xbrs_table', :entry => entry
                           .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header

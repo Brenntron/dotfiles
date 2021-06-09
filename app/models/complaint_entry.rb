@@ -172,6 +172,8 @@ class ComplaintEntry < ApplicationRecord
 
             ###############################################################################################################################################################
             ###guard rails
+
+            # TODO: this code should be refactored to use Webcat::EntryVerdictChecker class
             verdict_pass = true
             verdict_reasons = []
             if categories_string.blank?
@@ -308,6 +310,10 @@ class ComplaintEntry < ApplicationRecord
           update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
         end
       end
+
+      # add credit for user's contribution to complaint entry
+      ComplaintEntryCredits::CreditProcessor.new(current_user, self).process
+
       if self.status == "COMPLETED" && self.complaint_entry_screenshot.present?
         self.complaint_entry_screenshot.destroy
       end
@@ -344,6 +350,7 @@ class ComplaintEntry < ApplicationRecord
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"
     end
+
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
       prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
@@ -398,17 +405,19 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def self.create_wbnp_complaint_entry(complaint, ip_url, url_parts, user = nil, status = NEW, categories = nil)
+  def self.create_wbnp_complaint_entry(complaint, ip_url, url_parts, user = nil, status = NEW, categories = nil, logger_token)
 
     new_complaint_entry = ComplaintEntry.new
     new_complaint_entry.complaint_id = complaint.id
     new_complaint_entry.status = status
 
     begin
+      Rails.logger.error "#{logger_token} getting sbrs data for uri: #{ip_url}\n"
       wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
     rescue
+      Rails.logger.error "#{logger_token} failed getting sbrs data for uri: #{ip_url}\n"
       # do nothing continue with saving the entry
     end
 
@@ -425,6 +434,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.entry_type = "URI/DOMAIN"
 
       # Parse the ip_url
+      Rails.logger.error "#{logger_token} parsing url for uri: #{ip_url}\n"
       parsed_url = Complaint.parse_url(ip_url)
 
       new_complaint_entry.subdomain = parsed_url[:subdomain]
@@ -434,6 +444,7 @@ class ComplaintEntry < ApplicationRecord
     # lets query the top url API endpoint to determine if this is an important site or not
     # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
     begin
+      Rails.logger.error "#{logger_token} getting importance for uri: #{ip_url}\n"
       importance = self_importance(ip_url)
       new_complaint_entry.is_important = importance if importance
     rescue
@@ -442,6 +453,7 @@ class ComplaintEntry < ApplicationRecord
     new_complaint_entry.user = user
     new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
 
+    Rails.logger.error "#{logger_token} setting categories for dispute entry for uri: #{ip_url}\n"
     if status == PENDING # occurs when attempt to categorized a Top URl without a complaint
       new_complaint_entry.url_primary_category = categories
       new_complaint_entry.category = categories
@@ -450,12 +462,12 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.url_primary_category = current_category
       new_complaint_entry.category = current_category
     end
-
+    ActiveRecord::Base.connection.reconnect!
     new_complaint_entry.save
-
+    Rails.logger.error "#{logger_token} generating preload for dispute entry #{new_complaint_entry.id.to_s} uri: #{ip_url}\n"
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-
-    delay.capture_screenshot(new_complaint_entry.hostlookup, new_complaint_entry.id)
+    #turning this off for the time being, until we know for sure screenshots are fully functional, plus this is the wrong screenshot capture anyways
+    #delay.capture_screenshot(new_complaint_entry.hostlookup, new_complaint_entry.id)
   end
 
   class << self
@@ -493,11 +505,11 @@ class ComplaintEntry < ApplicationRecord
       end
 
     end
-    handle_asynchronously :capture_screenshot
+    #handle_asynchronously :capture_screenshot
   end
 
 
-  def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
+  def self.create_complaint_entry(complaint, ip_url, platform, user = nil, status = NEW, categories = nil)
     new_complaint_entry = ComplaintEntry.new
     begin
       wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
@@ -531,6 +543,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.is_important = importance if importance
       new_complaint_entry.user = user
       new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
+      new_complaint_entry.platform_id = platform.id if platform
 
       if status == PENDING # occurs when attempt to categorized a Top URl without a complaint
         new_complaint_entry.url_primary_category = categories
@@ -542,6 +555,9 @@ class ComplaintEntry < ApplicationRecord
       end
       new_complaint_entry.save
 
+      if user != User.where(display_name:"Vrt Incoming").first
+        ComplaintEntryCredits::CreditProcessor.new(user, new_complaint_entry).process
+      end
     rescue Exception => e
       raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
@@ -690,7 +706,6 @@ class ComplaintEntry < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-
     present_params = params.select{|ignore_key, value| value.present?}
 
     if present_params['status'].present?
@@ -726,9 +741,14 @@ class ComplaintEntry < ApplicationRecord
     relation = where(simple_params)
 
     if params['user_id'].present?
-      
+
       relation =
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
+    end
+
+    if params['platform_ids'].present?
+      ids = params['platform_ids'].split(',').map {|m| m.to_i}
+      relation = relation.joins(:complaint).where("complaints.platform_id in (:ids) or complaint_entries.platform_id in (:ids)", ids: ids)
     end
 
     if params['submitted_newer'].present?
@@ -855,7 +875,7 @@ class ComplaintEntry < ApplicationRecord
       if prefix_results.first&.is_active == 1
 
         qualified_prefixes =
-            prefix_results.find_all {|result| result.path == self.path && cat.subdomain == self.subdomain}
+            prefix_results.find_all {|result| result.path == self.path && result.subdomain == self.subdomain}
         category_names = Wbrs::Prefix.category_names(qualified_prefixes)
 
         self.url_primary_category = category_names
@@ -1170,5 +1190,69 @@ class ComplaintEntry < ApplicationRecord
                           message: "Cannot process a resolution update to #{resolution} on Complaint Entry (#{self.hostlookup})  of status #{self.status}")
     end
     confirmation
+  end
+
+  def resubmit_to_rule_api
+    log_messages = []
+    #do some sanity checks ot make sure it's not already categorized
+
+    if !["completed","resolved"].include?(self.status.downcase)
+      log_messages << "complaint entry #{self.id} : #{self.hostlookup} is not resolved yet, not attempting resend"
+      return log_messages
+    end
+    all_cats = Wbrs::Category.all
+    if self.category.blank?
+      log_messages << "complaint entry #{self.id} : #{self.hostlookup} has no categories saved, cannot attempt resubmit"
+      return log_messages
+    end
+    cat_string = self.category.split(",").map {|cat| cat.strip }
+    cat_ids_array = []
+
+    cat_string.each do |cat_s|
+      possible_cat = all_cats.select {|cat| cat.descr == cat_s}
+      if possible_cat.present?
+        cat_ids_array << possible_cat.first.category_id
+      end
+    end
+    cat_ids_string = cat_ids_array.join(",")
+
+    current_cats = Wbrs::Prefix.where({:urls => [URI.escape(self.uri_as_categorized)]}).map {|result| result.category_id}
+
+    if current_cats.sort == cat_ids_array.sort
+      log_messages << "#{self.id} : #{self.hostlookup} current cat ids appear to match cat ids in ruleAPI, aborting resubmit"
+      return log_messages
+    end
+    final_prefix = ""
+    if self.uri_as_categorized.present?
+      log_messages << "#{self.id} : #{self.hostlookup} using uri_as_categorized: #{self.uri_as_categorized}"
+      final_prefix = self.uri_as_categorized
+    else
+      log_messages << "#{self.id} : #{self.hostlookup} could not find uri_as_categorized, using hostlookup"
+      final_prefix = self.hostlookup
+    end
+    #setup for call to ruleAPI
+    existing_prefixes = Wbrs::Prefix.where({:urls => [URI.escape(self.uri_as_categorized)]})
+    prefix = self.uri_as_categorized
+    final_cat_string = cat_ids_string
+    comment = self.internal_comment + " -- automated re-attempt at categorization"
+    ticket_user = User.find(self.user_id)
+    log_messages << "#{self.id} : #{self.hostlookup} committing category #{cat_string} : #{cat_ids_string} to ruleAPI"
+    commit_category(existing_prefixes, ip_or_uri: prefix, categories_string: final_cat_string, description: comment, user: ticket_user.email, casenumber: self.complaint.id)
+
+    return log_messages
+  end
+
+  def determine_platform
+    if self.platform_id.present?
+      return (self.product_platform.public_name rescue "No Data")
+    end
+    if self.complaint.platform_id.present?
+      return (self.complaint.platform.public_name rescue "No Data")
+    end
+    if self.platform.present?
+      return (self.platform rescue "No Data")
+    end
+
+    return nil
   end
 end

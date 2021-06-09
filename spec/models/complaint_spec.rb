@@ -148,7 +148,7 @@ describe Complaint do
       Complaint.process_bridge_payload(complaint_message_payload)
     end.to change { Complaint.count }.from(0).to(1)
   end
-  
+
   it 'check to ensure WBRS score is populated' do
     # Note: get rules is called three times.
     # Note: had get rules returned results, another call to get the history would have been made.

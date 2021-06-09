@@ -70,6 +70,10 @@
     %input.form-control#domain-input{name: 'domain'}
     %button.remove-input#remove-criteria-domain
   .form-group.search-item.hidden
+    %label.content-label-sm Platform
+    %input.form-control.selectize#platform-input{name: 'platform', multiple: 'multiple', tabindex: '-1', data: 'webrep'}
+    %button#remove-criteria-platform.remove-input{onclick: 'clearSelectize("platform-input")'}
+  .form-group.search-item.hidden
     %label.content-label-sm Date Submitted (Newer)
     %input.form-control#submitted-newer-input{type: 'date', name: 'date-submitted-newer'}
     %button.remove-input#remove-criteria-submitted-newer
@@ -151,6 +155,10 @@
           %label.search-criteria-label
             %input.search-checkbox#domain-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Domain', for: 'domain-input'}
             Submitter Domain
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#platform-cb{type: 'checkbox', name: 'search-criteria', value: 'Platform', for: 'platform-input'}
+            Platform
         %li
           %label.search-criteria-label
             %input.search-checkbox#submitted-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Newer)', for: 'submitted-newer-input'}

@@ -13,6 +13,7 @@
       %thead
         %tr
           %th
+          %th Pending Complaints
           %th Fixed Complaints
           %th Invalid Complaints
           %th Unchanged Complaints
@@ -25,6 +26,7 @@
         - @report.each_engineer do |counts|
           %tr
             %td= counts.username
+            %td= counts.pending
             %td.total-fixed= counts.fixed
             %td= counts.invalid
             %td= counts.unchanged
@@ -33,4 +35,3 @@
             %td= ApplicationRecord.humanize_secs(counts.eng_max)
             %td= ApplicationRecord.humanize_secs(counts.dept_avg)
             %td= ApplicationRecord.humanize_secs(counts.dept_max)
-

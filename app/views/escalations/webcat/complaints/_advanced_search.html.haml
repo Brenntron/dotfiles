@@ -70,6 +70,11 @@
     %button#remove-criteria-customer-email.remove-input
 
   .form-group.search-item.hidden
+    %label.content-label-sm Platform
+    %input.form-control.selectize#platform-input{name: 'platform', multiple: 'multiple', tabindex: '-1', data: 'webcat'}
+    %button#remove-criteria-platform.remove-input{onclick: 'clearSelectize("platform-input")'}
+
+  .form-group.search-item.hidden
     %label.content-label-sm Date Submitted (Older)
     %input.form-control#submitted-older-input{name: 'date-submitted-older', type: 'date'}
     %button#remove-criteria-submitted-older.remove-input
@@ -143,6 +148,10 @@
           %label.search-criteria-label
             %input.search-checkbox#email-cb{type: 'checkbox', name: 'search-criteria', value: 'Customer Email', for: 'email-input'}
             Customer Email
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#platform-cb{type: 'checkbox', name: 'search-criteria', value: 'Platform', for: 'platform-input'}
+            Platform
         %li
           %label.search-criteria-label
             %input.search-checkbox#submitted-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Older)', for: 'submitted-older-input'}

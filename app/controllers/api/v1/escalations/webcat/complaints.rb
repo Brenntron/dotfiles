@@ -36,6 +36,7 @@ module API
                   complaint_packet[:status] = complaint.status
                   complaint_packet[:created_at] = complaint.created_at.strftime('%Y-%m-%d %H:%M:%S')
                   complaint_packet[:customer_name] = complaint.customer.name # Customer name
+                  complaint_packet[:customer_email] = complaint.customer.email # Submitter email
                   complaint_packet[:complaint_entries] = complaint.complaint_entries
                   complaint_packet[:complaint_entries_count] = complaint.complaint_entries.count
 
@@ -66,6 +67,7 @@ module API
               requires :description, type: String, desc: 'Description of new complaint'
               optional :customer, type: String, desc: 'Customer related to new complaint'
               optional :tags, type: Array, desc: 'Array of tags to be associated with the new complaint'
+              optional :platform, type: String, desc: 'Platform public name'
             end
 
             post "" do
@@ -74,7 +76,8 @@ module API
                                         permitted_params[:ips_urls],
                                         permitted_params[:description],
                                         permitted_params[:customer],
-                                        permitted_params[:tags])
+                                        permitted_params[:tags],
+                                        permitted_params[:platform])
                 {:status => 'success'}.to_json
               end
             end

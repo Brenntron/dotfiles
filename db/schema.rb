@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 2021_02_14_014754) do
+ActiveRecord::Schema.define(version: 2021_03_26_174523) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -52,7 +51,6 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.integer "bug_id"
     t.integer "unused_rule_id"
     t.integer "task_id"
-    t.string "rule_test_id"
     t.index ["bug_id"], name: "index_attachments_on_bug_id"
     t.index ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id"
     t.index ["task_id"], name: "index_attachments_on_task_id"
@@ -217,7 +215,7 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
   create_table "complaints", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "channel"
     t.string "status"
-    t.text "description", collation: "utf8mb4_general_ci"
+    t.text "description"
     t.string "added_through"
     t.datetime "complaint_assigned_at"
     t.datetime "complaint_closed_at"
@@ -236,6 +234,8 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
+    t.text "bridge_packet", limit: 16777215
+    t.text "import_log", limit: 16777215
 
     t.index ["channel", "customer_id"], name: "index_complaints_on_channel_and_customer_id"
     t.index ["customer_id"], name: "index_complaints_on_customer_id"
@@ -276,8 +276,6 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.text "scope"
     t.text "user_interaction"
     t.text "privileges_required"
-    t.string "attack_complexity"
-    t.string "attack_vector"
     t.index ["cve_key"], name: "index_cves_on_cve_key", unique: true
     t.index ["reference_id"], name: "index_cves_on_reference_id", unique: true
   end
@@ -382,6 +380,7 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.text "auto_resolve_log"
     t.string "platform"
     t.integer "platform_id"
+    t.text "suggested_threat_category"
 
     t.index ["dispute_id"], name: "index_dispute_entries_on_dispute_id"
   end
@@ -444,7 +443,7 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "resolution"
     t.string "priority"
     t.text "subject"
-    t.text "description", collation: "utf8mb4_general_ci"
+    t.text "description"
     t.string "source_ip_address"
     t.text "problem_summary"
     t.text "research_notes"
@@ -469,6 +468,8 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
+    t.text "bridge_packet", limit: 16777215
+    t.text "import_log", limit: 16777215
     t.index ["customer_id"], name: "index_disputes_on_customer_id"
   end
 
@@ -524,7 +525,7 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.index ["reference_id"], name: "index_exploits_references_on_reference_id"
   end
 
-  create_table "false_positive_selections", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "false_positive_selections", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "display"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -582,8 +583,8 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "status", default: "NEW", null: false
     t.string "source"
     t.string "platform"
-    t.text "description", collation: "utf8mb4_general_ci"
-    t.string "file_name", collation: "utf8mb4_general_ci"
+    t.text "description", collation: "utf8mb4_0900_ai_ci"
+    t.string "file_name"
     t.integer "file_size"
     t.string "sha256_hash"
     t.string "sample_type"
@@ -620,18 +621,13 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
+    t.text "bridge_packet", limit: 16777215
+    t.text "import_log", limit: 16777215
     t.index ["created_at"], name: "index_file_reputation_disputes_on_created_at"
     t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
     t.index ["sha256_hash"], name: "index_file_reputation_disputes_on_sha256_hash"
     t.index ["updated_at"], name: "index_file_reputation_disputes_on_updated_at"
     t.index ["user_id"], name: "index_file_reputation_disputes_on_user_id"
-  end
-
-  create_table "form_prefills", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.string "field"
-    t.text "text"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "fp_file_refs", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -652,7 +648,7 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.index ["gib_type", "gib_id"], name: "index_giblets_on_gib_type_and_gib_id"
   end
 
-  create_table "mitre_data", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "mitre_data", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "external_id", null: false
     t.string "platform", default: "enterprise"
     t.string "category", null: false
@@ -768,13 +764,6 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.index ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id", unique: true
   end
 
-  create_table "rule_associations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "snort2_rule_id"
-    t.bigint "snort3_rule_id"
-  end
-
   create_table "rule_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "category"
     t.datetime "created_at"
@@ -804,7 +793,7 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.index ["rule_id"], name: "index_rule_docs_on_rule_id"
   end
 
-  create_table "rule_documents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "rule_documents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "rule_id", null: false
@@ -819,15 +808,10 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "snort_doc_status", default: "NOTYET", null: false
     t.string "mitre_category"
     t.string "mitre_sub_category"
-    t.string "known_usage"
-    t.integer "mitre_tactic_id"
-    t.integer "mitre_technique_id"
-    t.boolean "is_deleted"
-    t.integer "rule_id_coverage"
     t.index ["rule_id"], name: "index_rule_documents_on_rule_id", unique: true
   end
 
-  create_table "rule_vulnerabilities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "rule_vulnerabilities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "display_name"
     t.text "blurb"
     t.datetime "created_at", null: false
@@ -880,12 +864,12 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "snort_on_off", default: "on"
     t.string "fatal_errors"
     t.boolean "edited", default: false
+    t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true
     t.string "type", default: "Snort2Rule"
     t.text "pre_normalized_rule"
     t.integer "autoconvert", default: 0
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"
     t.index ["task_id"], name: "index_rules_on_task_id"
-    t.index ["type", "gid", "sid"], name: "index_rules_on_type_and_gid_and_sid", unique: true
   end
 
   create_table "saved_searches", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -939,9 +923,6 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.string "policy"
     t.datetime "scheduled_at"
     t.datetime "completed_at"
-    t.datetime "started_at"
-    t.boolean "timed_out", default: false
-    t.integer "engine_id"
     t.index ["bug_id"], name: "index_tasks_on_bug_id"
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end
@@ -979,7 +960,32 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
-  
+
+  create_table "ticket_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "ticket_email_id"
+    t.integer "bugzilla_attachment_id"
+    t.string "file_name"
+    t.text "direct_upload_url"
+    t.integer "size"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "ticket_emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "bugzilla_id"
+    t.text "email_headers"
+    t.text "from"
+    t.text "to"
+    t.text "subject"
+    t.text "body", limit: 16777215
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "parse_report", limit: 16777215
+    t.text "simulation_results", limit: 16777215
+    t.boolean "is_simulation"
+  end
+
   create_table "ticket_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "ticket_email_id"
     t.integer "bugzilla_attachment_id"
@@ -1076,7 +1082,7 @@ ActiveRecord::Schema.define(version: 2021_02_14_014754) do
     t.index ["rgt"], name: "index_users_on_rgt"
   end
 
-  create_table "versions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "versions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false

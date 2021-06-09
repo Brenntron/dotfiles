@@ -34,6 +34,8 @@ gem 'peake-bridge-client', '>= 0.0.9.0', git: "https://gitlab.vrt.sourcefire.com
 gem 'stomp', '1.4.6'
 gem 'aws-sdk', '2.11.170'
 gem 'nokogiri' ,'1.10.4'
+gem 'grpc', '1.30.2'
+gem 'grpc-tools', '1.30.2'
 
 gem 'mysql2', '0.5.2'
 gem 'rmagick', '~> 2.16.0'
@@ -43,6 +45,10 @@ gem 'xmlrpc'
 
 
 gem 'rails_admin', '~> 1.4.3'
+
+gem 'paper_trail', '12.0.0'
+gem 'psych', '3.2.0'
+
 
 # System Management
 gem 'foreman', '0.85.0'
@@ -97,6 +103,10 @@ gem 'dotiw'
 gem 'elasticsearch'
 gem 'hashie'
 
+group :production, :staging do
+  gem 'elastic-apm', '~> 3.15', '>= 3.15.1'
+end
+
 group :development do
   gem 'thin', '1.8.0'
   gem 'puma', '3.12.0'
@@ -122,6 +132,7 @@ group :test do
   gem 'json_spec', '1.1.5'
   gem 'simplecov', '0.16.1', :require => false
   gem 'cucumber-api-steps', '~>0.14', require: false
+  gem "timecop"
 end
 
 group :development, :profile do
@@ -148,7 +159,4 @@ gem 'less-rails', '~> 3.0.0'
 gem 'bootstrap-sass', '~> 3.4.1'
 gem 'therubyracer', '~> 0.12.3'
 gem 'turbolinks', '5.2.0'
-gem 'paper_trail', '10.0.1'
 gem "sprockets", '~> 3.7.1'
-
-

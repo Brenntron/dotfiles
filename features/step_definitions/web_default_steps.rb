@@ -291,6 +291,10 @@ Then(/^I should see element "(.*?)"$/) do |element|
   end
 end
 
+Then(/^I should not see element "(.*?)"$/) do |element|
+  expect(page).not_to have_selector(element)
+end
+
 Then(/^I should not see element with class "(.*?)"$/) do |classname|
   page.should have_no_selector(:xpath, "//*[contains(@id, '#{classname}')]")
 end
