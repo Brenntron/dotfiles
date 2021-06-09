@@ -1384,7 +1384,7 @@ $ ->
           create: false
           valueField: 'id',
           labelField: 'public_name',
-          options: response.json.platforms[$('#platform-input').attr('data')]
+          options: response.json.platforms
           onFocus: () ->
             window.toggle_selectize_layer(this, 'true')
           onBlur: () ->
