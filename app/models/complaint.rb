@@ -39,6 +39,11 @@ class Complaint < ApplicationRecord
 
   MAIN_WEBCAT_MANAGER_CONTACT = "admatter"
 
+  TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web and Email reputation. AUP categories are not applied to URLs that are primarily malicious in nature but may be applied in cases where a domain has been compromised or in cases of a web reputation false positive - these updates may take several hours to propagate. A new Web and Email Reputation ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all future updates regarding this request on the new ticket.
+
+For future web and email reputation requests, please open a web categorization ticket using the \"Web & Email\" form: https://talosintelligence.com/reputation_center/support#reputation
+"
+
   scope :active_count , -> {where(status:ACTIVE).count}
   scope :completed_count , -> {where(status:COMPLETED).count}
   scope :new_count , -> {where(status:NEW).count}
@@ -700,7 +705,6 @@ class Complaint < ApplicationRecord
     package[:name] = complaint&.customer&.name
     package[:company_name] = complaint&.customer&.company&.name
     package[:internal_message] = params[:summary] + " | " + "original analyst console webcat ticket: #{complaint.id.to_s}"
-
     suggested_disposition_entries.each do |sugg|
       if complaint.platform_id.present?
         platform_id = complaint.platform_id
@@ -726,7 +730,7 @@ class Complaint < ApplicationRecord
     #send update to bridge
 
     complaint.status = Complaint::COMPLETED
-    complaint.resolution_comment = ""
+    complaint.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
     complaint.save
 
     complaint.complaint_entries.each do |c_entry|
@@ -735,7 +739,7 @@ class Complaint < ApplicationRecord
       end
       c_entry.status = ComplaintEntry::STATUS_COMPLETED
       c_entry.resolution = ComplaintEntry::STATUS_RESOLVED_FIXED_INVALID
-      c_entry.resolution_comment = ""
+      c_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
       c_entry.internal_comment += " | User: #{current_user&.cvs_username} converted SDO ticket to webrep TE ticket on #{Time.now.to_s}"
       c_entry.save
     end

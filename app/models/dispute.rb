@@ -71,6 +71,10 @@ class Dispute < ApplicationRecord
   LABEL_RESOLVED_UNCHANGED = "Unchanged"
   LABEL_RESOLVED_OTHER = "Other"
 
+  TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web categorization requests. A new Web categorization ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all updates regarding this request on the new ticket.
+
+For future Web categorization requests, please open a Web categorization ticket using the \"Web Categorization Requests\" form: https://talosintelligence.com/reputation_center/support#reputation_center_support_ticket"
+
   scope :open_disputes, -> { where(status: NEW) }
   scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
@@ -2201,13 +2205,13 @@ class Dispute < ApplicationRecord
 
     dispute.status = STATUS_RESOLVED
     dispute.resolution = STATUS_RESOLVED_INVALID
-    dispute.resolution_comment = "NEED MESSAGE HERE"
+    dispute.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
     dispute.save
 
     dispute.dispute_entries.each do |d_entry|
       d_entry.status = DisputeEntry::STATUS_RESOLVED
       d_entry.resolution = DisputeEntry::STATUS_RESOLVED_INVALID
-      d_entry.resolution_comment = "NEED MESSAGE HERE"
+      d_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
       d_entry.save
     end
 
