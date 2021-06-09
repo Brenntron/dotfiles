@@ -2192,3 +2192,48 @@ $ ->
       $('#complaints').attr('href', link)
 
   set_complaints_link()
+
+
+
+
+# Convert webcat to webrep
+# Enable / disable button to attempt based on if anything is selected
+$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+  if $('tr.selected').length > 0
+    $('#convert-ticket-button').removeAttr('disabled')
+  else
+    $('#convert-ticket-button').attr('disabled', 'disabled')
+
+
+# Prepare ticket for converting
+window.prep_complaint_to_convert = () ->
+  if $('tr.selected').length > 1
+    std_api_error('Can only convert 1 complaint at a time.')
+  else
+    debugger
+    # get all data associated with the selected row
+    complaint_row = $('tr.selected')[0]
+    row_data = $('#complaints-index').DataTable().row(complaint_row).data()
+    complaint_id = row_data.complaint_id
+    summary = row_data.description
+    # need to make a call here to fetch all the entries associated with this complaint id
+    # does not look like there is an endpoint to do this atm
+    entry_table = $('#entries-to-convert')
+    # entries.each ->
+    #   entry_content = ''
+    #   if this.uri?
+    #     entry_content = this.uri
+    #   else
+    #     entry_content = this.ip_address
+    #   entry_row = '<tr><td>#{this.id}</td><td>#{entry_content}</td></tr>'
+    #   $(entry_table).append(entry_row)
+
+    # then populate the dropdown
+    $('#complaint-id-to-convert').text(complaint_id)
+    $('#convert-ticket-summary').append(summary)
+
+
+
+
+convert_complaint_to_webrep = () ->
+  # send it on over

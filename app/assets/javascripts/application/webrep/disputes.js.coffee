@@ -1028,7 +1028,6 @@ $ ->
       {
         data: 'case_age'
         'render':(data,type,full,meta) ->
-          console.log data,type,full,meta
           if data != "<1 hr"
             dispute_duration = moment(full.case_opened_at).fromNow()
             if dispute_duration.includes('minute')
@@ -1651,6 +1650,11 @@ window.populate_resolution_dropdown = (dispute_id) ->
 
 window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
+  row = $('.dispute_check_box').parents('tr')
+  if $('.dispute_check_box').prop('checked') == true
+    $(row).addClass('selected')
+  else
+    $(row).removeClass('selected')
 
 window.webrep_export_selected_rows = () ->
   checked_boxes = $('.dispute_check_box:checked').get()
@@ -2380,3 +2384,80 @@ $ ->
       $('#queue').attr('href', link)
 
   set_disputes_link()
+
+
+
+# Convert webrep to webcat
+# Enable / disable button to attempt based on if anything is selected
+$(document).on 'click', '#disputes-index tr, #disputes-index .dispute_check_box, #disputes_check_box', ->
+  if $('tr.selected').length > 0
+    $('#convert-ticket-button').removeAttr('disabled')
+  else
+    $('#convert-ticket-button').attr('disabled', 'disabled')
+
+
+
+# Prepare ticket for converting
+window.prep_dispute_to_convert = (event) ->
+  if $('tr.selected').length > 1
+    std_msg_error('Too many rows selected', ['Please select only one row.'])
+  else
+    # get all data associated with the selected row
+    dispute_row = $('tr.selected')[0]
+    row_data = $('#disputes-index').DataTable().row(dispute_row).data()
+    dispute_id = row_data.id
+    entries = row_data.dispute_entries
+    summary = row_data.dispute_summary
+
+    $('#dispute-id-to-convert').text(dispute_id)
+    $('#convert-ticket-summary').text(summary)
+    entry_table = $('#entries-to-convert')
+    # clear out previous data
+    $(entry_table).empty()
+    $(entries).each ->
+      entry_content = ''
+      if this.entry.uri?
+        entry_content = this.entry.uri
+      else
+        entry_content = this.entry.ip_address
+      entry_row = '<tr><td>' + this.entry.id + '</td><td class="entry-content-cell"><span class="input-truncate">' + entry_content + '</span></td></tr>'
+      $(entry_table).append(entry_row)
+
+    $selected_cats = $('#suggested-categories').selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      closeAfterSelect: true,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: AC.WebCat.createSelectOptions('#suggested-categories')
+    }
+
+    cats_controller = $selected_cats[0].selectize
+    cats_controller.on 'change', ->
+      cats = $('#suggested-categories').val()
+      if cats == '' || cats == null
+        $('#convert-ticket-dropdown .dropdown-submit-button').attr('disabled', 'disabled')
+      else
+        $('#convert-ticket-dropdown .dropdown-submit-button').removeAttr('disabled')
+
+
+window.convert_dispute_to_webcat = () ->
+  $('#convert-ticket-dropdown .dropdown-loader-wrapper').removeClass('hidden')
+  data = {}
+  data.dispute_id = $('#dispute-id-to-convert').text()
+  data.summary = $('#convert-ticket-summary').val()
+  data.suggested_categories = $('#suggested-categories').val()
+
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/convert_ticket'
+    method: 'POST'
+    data: data
+    success: (response) ->
+      console.log response
+      $('#convert-ticket-dropdown .dropdown-loader-wrapper').addClass('hidden')
+    error: (response) ->
+      console.log response
+      $('#convert-ticket-dropdown .dropdown-loader-wrapper').addClass('hidden')
+  )
