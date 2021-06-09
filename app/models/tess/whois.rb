@@ -1,10 +1,11 @@
 # move to TESS
 require 'sb-api_services_pb'
+require 'service-tess_services_pb'
 
-class Beaker::Whois < Beaker::BeakerBase
+class Tess::Whois
 
   def self.hostport
-    @hostport ||= 'ipedia-api.sl.talos.cisco.com:443'
+    @hostport ||= 'tess.sl.talos.cisco.com:443'
   end
 
   def self.ca_cert
@@ -25,6 +26,15 @@ class Beaker::Whois < Beaker::BeakerBase
     # @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert)
   end
 
+  def self.get_app_info
+    Talos::AppInfo.new(
+      device_id: Rails.configuration.app_info.device_id,
+      product_family: Rails.configuration.app_info.product_family,
+      product_id: Rails.configuration.app_info.product_id,
+      product_version: Rails.configuration.app_info.product_version
+    )
+  end
+
   # Tried Google auth procedure
   # def self.creds
   #   server_creds = GRPC::Core::ChannelCredentials.new(ca_cert)
@@ -35,7 +45,9 @@ class Beaker::Whois < Beaker::BeakerBase
   def self.remote_stub
     # @remote_stub ||= SBAPI::Stub.new('aeon-denaliipediainternalsb-api.marathon.l4lb.thisdcos.directory:10069', creds)
     # @remote_stub ||= SBAPI::Stub.new(hostport, creds)
-    @remote_stub ||= SBAPI::Stub.new(hostport, :this_channel_is_insecure)
+    # @remote_stub ||= SBAPI::Stub.new(hostport, :this_channel_is_insecure)
+    # @remote_stub ||= Talos::Service::TESS::Stub.new(hostport, creds)
+    @remote_stub ||= Talos::Service::TESS::Stub.new(hostport, :this_channel_is_insecure)
   end
 
   def remote_stub
@@ -43,7 +55,10 @@ class Beaker::Whois < Beaker::BeakerBase
   end
 
   def lookup(name)
-    remote_stub.who_is_query(WhoIsSearchRequest.new(search_string: name))
+    byebug
+    # remote_stub.who_is_query(WhoIsSearchRequest.new(search_string: name))
+    whois_search_request = Talos::TESS::WhoisSearchRequest.new(app_info: self.class.get_app_info, search_string: name)
+    remote_stub.whois_query(whois_search_request)
   end
 end
 

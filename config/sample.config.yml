@@ -1,6 +1,13 @@
 development:
   api_timeout:
     timeout: 15
+  app_info:
+    pubkey_file: "/usr/local/etc/talos/talos-web-certificate.pem"
+    pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
+    device_id: "analyst-console-escalations-dev"
+    product_family: "Talos_Web"
+    product_id: "analyst-console-escalations"
+    # product_version: 'development'
   auto_resolve:
     complaints:
       check: true
@@ -77,17 +84,22 @@ development:
   sds:
     #host: "v2.sds.cisco.com"
     host: "v3-cat2020.sds.cisco.com"
-    cert_file: "/usr/local/etc/sds-certificate.pem"
     ca_cert_file: "/usr/local/etc/sds-certificate.pem"
-    pkey_file: "/usr/local/etc/sds-pkey.pem"
+    cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
+    pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
     user: "tidev"
     pass: "redacted"
   sds_v3:
     host: "v3.sds.cisco.com"
-    cert_file: "/usr/local/etc/sds-certificate.pem"
-    pkey_file: "/usr/local/etc/sds-pkey.pem"
+    cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
+    pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
     user: "tidev"
     pass: "redacted"
+  tess:
+    host: "tess.sl.talos.cisco.com"
+    port: 443
+    verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
@@ -122,6 +134,13 @@ development:
 test:
   api_timeout:
     timeout: 15
+  app_info:
+    pubkey_file: "/usr/local/etc/talos/talos-web-certificate.pem"
+    pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
+    device_id: "analyst-console-escalations-dev" #use dev for test environment to the server it is dev
+    product_family: "Talos_Web"
+    product_id: "analyst-console-escalations"
+    # product_version: 'test'
   auto_resolve:
     complaints:
       check: true
@@ -197,17 +216,22 @@ test:
     password: "redacted"
   sds:
     host: "v2.sds.cisco.com"
-    cert_file: "/usr/local/etc/sds-certificate.pem"
     ca_cert_file: "/usr/local/etc/sds-certificate.pem"
-    pkey_file: "/usr/local/etc/sds-pkey.pem"
+    cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
+    pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
     user: "tidev"
     pass: "redacted"
   sds_v3:
     host: "v3.sds.cisco.com"
-    cert_file: "/usr/local/etc/sds-certificate.pem"
-    pkey_file: "/usr/local/etc/sds-pkey.pem"
+    cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
+    pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
     user: "tidev"
     pass: "redacted"
+  tess:
+    host: "tess.sl.talos.cisco.com"
+    port: 443
+    verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
@@ -244,6 +268,14 @@ staging:
     verify_mode: "verify-none"
   api_timeout:
     timeout: 15
+  app_info:
+    pubkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-certificate.pem"
+    pkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-pkey.pem"
+    product_family: "Talos_Web"
+    product_id: "analyst-console-escalations"
+    # device_id defaults to hostname
+    # device_id: "analyst-console.vrt.sourcefire.com"
+    # product_version: 'staging'
   auto_resolve:
     complaints:
       check: true
@@ -327,11 +359,16 @@ staging:
     # Old host name -> host: "v2.beta.sds.cisco.com"
     #host: "v3-cat2020.sds.cisco.com"
     host: "v2.beta.sds.cisco.com"
-    ca_cert_file: "/usr/local/etc/analyst-console-escalations/sds-certificate.pem"
-    pkey_file: "/usr/local/etc/analyst-console-escalations/sds-pkey.pem"
+    ca_cert_file: "/usr/local/etc/analyst-console-escalations/talos-web-certificate.pem"
+    pkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-pkey.pem"
     v3_host: "v3-web-intel-rest-integration.talos.cisco.com"
     username: "redacted"
     password: "redacted"
+  tess:
+    host: "tess.sl.talos.cisco.com"
+    port: 443
+    verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/analyst-console-escalations/tess-ca_cert.pem"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
@@ -372,6 +409,14 @@ production:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
   api_timeout:
     timeout: 15
+  app_info:
+    pubkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-certificate.pem"
+    pkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-pkey.pem"
+    product_family: "Talos_Web"
+    product_id: "analyst-console-escalations"
+    # device_id defaults to hostname
+    # device_id: "analyst-console.vrt.sourcefire.com"
+    # product_version: 'production'
   auto_resolve:
     complaints:
       check: true
@@ -454,9 +499,14 @@ production:
     v3_host: "v3-web-intel-rest.talos.cisco.com"
     ca_cert_file: "/usr/local/etc/analyst-console-escalations/sds-certificate.pem"
     category_version: "v10"
-    pkey_file: "/usr/local/etc/analyst-console-escalations/sds-pkey.pem"
+    pkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-pkey.pem"
     user: "talosintel" 
     pass: "redacted"
+  tess:
+    host: "tess.sl.talos.cisco.com"
+    port: 443
+    verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/analyst-console-escalations/tess-ca_cert.pem"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
