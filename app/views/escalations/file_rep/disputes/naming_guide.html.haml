@@ -22,7 +22,7 @@
             %th Pattern
             %th Example
             %th Engine Description
-            %th Public Engine Description
+            %th{style: 'color:red'} Private Engine Description
             %th Point of Contact
             %th Notes
             %th Public Facing Notes
@@ -40,18 +40,18 @@
                 %span.table-form-content
                   %input.example-input{type: 'text', value: "#{convention.example}"}
 
-              %td.amp-engine-description
+              %td.engine-description
                 %span.table-content
                   = convention.engine_description
                 %span.table-form-content
                   %textarea.description-textarea
                     = convention.engine_description
-              %td.amp-public-engine-description
+              %td.private-engine-description
                 %span.table-content
-                  = convention.public_engine_description
+                  = convention.private_engine_description
                 %span.table-form-content
                   %textarea.description-textarea
-                    = convention.public_engine_description
+                    = convention.private_engine_description
               %td.amp-contact
                 %span.table-content{data: "#{convention.contact}"}
                   %span.formatted-contact
