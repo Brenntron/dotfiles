@@ -214,7 +214,7 @@ window.named_webrep_index_table = (search_name) ->
 window.call_contains_search = (search_form) ->
   data = {
     search_type: 'contains'
-    value: search_form.querySelector('input.search-box').value
+    value: search_form.querySelector('input.search-box').value.trim()
   }
   window.current_search_data = data
   window.populate_webrep_index_table(data)
@@ -451,8 +451,10 @@ window.toolbar_show_change_assignee = () ->
     data: data
     dataType: 'json'
     success: (response) ->
+      show_message('success', 'Ticket assignment has been updated!', 5)
       window.location.reload()
     error: (response) ->
+      show_message('error', 'Ticket assignment could not be updated.', 5)
       std_msg_error('No Tickets Selected', ['Select at least one ticket to assign to yourself.'])
   )
 
@@ -637,6 +639,13 @@ window.take_single_dispute = (id) ->
     data: { dispute_ids: dispute_ids }
     error_prefix: 'Error updating ticket.'
     success_reload: true
+    success: (response) ->
+      if response.dispute_ids.length > 0
+        show_message('success', 'Ticket assignment has been updated!', 5)
+        location.reload()
+      else
+        show_message('error', 'Ticket assnigment could not be updated.', 5)
+        location.reload()
   )
 
 window.return_dispute = (dispute_id) ->
@@ -654,60 +663,64 @@ window.return_dispute = (dispute_id) ->
 
 window.save_dispute_entries = () ->
   data = {}
+  changes_made = false
   $('#disputes-research-table').find('tr.research-table-row').each(() ->
-    result = {}
-    fielddata = $(this).find('.dual-edit-field').map(() ->
-      new_value = switch (this.dataset.field)
-        when 'status'
-          if $(this).find("input[name='entry-status']:checked").attr('id') == undefined
-            $(this).find(".table-entry-input")[0].innerHTML
+    $(this).find('.dual-edit-field').map(() ->
+      {id, field} = this.dataset
+      if field != 'host-ip'
+        # host-ip is changing is handled separately
+        if data[id] == undefined then data[id] = []
+        switch field
+          when 'status'
+            if $(this).find("input[name='entry-status']:checked").attr('id') == undefined
+              new_value = $(this).find(".table-entry-input")[0].innerHTML.trim()
+            else
+              new_value = $(this).find("input[name='entry-status']:checked").attr('id')
+          when 'host'
+            new_value = $(this).find('.table-entry-input').val()
+
+        old_value = $(this).find('.entry-data')[0].innerText.trim()
+
+        if new_value == undefined then new_value = old_value
+
+        if new_value != old_value
+          changes_made = true
+          if new_value == "RESOLVED_CLOSED"
+            resolution_data = {
+              id: id
+              field: "resolution"
+              new: $('input[name=entry-resolution]:checked').attr('id')
+            }
+            resolution_comment = {
+              id: id
+              field: "resolution_comment"
+              new: $(this).find("textarea[name='resolution-comment']")[0].value
+            }
+            data[id].push(resolution_data)
+            data[id].push(resolution_comment)
+
           else
-            $(this).find("input[name='entry-status']:checked").attr('id')
-
-        else $(this).find('.table-entry-input')[0].value.trim()
-
-      old_value = $(this).find('.entry-data')[0].innerText.trim()
-
-      if new_value == undefined
-        new_value = old_value
-
-      data[this.dataset.id] = [{
-        id: this.dataset.id
-        field: this.dataset.field
-        old: old_value
-        new: new_value
-      }]
-
-      if new_value == "RESOLVED_CLOSED" && (new_value != old_value)
-        data[this.dataset.id].push(
-          id: this.dataset.id
-          field: "resolution"
-          new: $('input[name=entry-resolution]:checked').attr('id')
-        )
-
-        data[this.dataset.id].push({
-          id: this.dataset.id
-          field: "resolution_comment"
-          new: $(this).find("textarea[name='resolution-comment']")[0].value
-        })
-    ).toArray().filter((field_data) ->
-      field_data.old != field_data.new
+            new_data = {
+              id: id,
+              field: field,
+              old: old_value
+              new: new_value}
+            data[id].push( new_data )
     )
-
-    if 0 < fielddata.length
-      data[this.dataset.entryId] = fielddata
-
   )
-  if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
-    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+  if !changes_made
+    std_msg_error('No changes made', [])
   else
-    std_msg_ajax(
-      method: 'PATCH'
-      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-      data: { field_data: data }
-      success_reload: true
-      error_prefix: 'Error updating data.'
-    )
+    if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+    else
+      std_msg_ajax(
+        method: 'PATCH'
+        url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+        data: { 'field_data': data }
+        success_reload: true
+        error_prefix: 'Error updating data.'
+      )
 
 
 
@@ -1084,7 +1097,22 @@ $ ->
   $('#disputes-index_filter input').addClass('table-search-input');
 
   window.format = (dispute) ->
-    table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input class="dispute_entry_select_all" type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-res">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
+    table_head =
+      "<table class='table dispute-entry-table'><thead><tr>
+       <th><input class='dispute_entry_select_all' type='checkbox' onclick='select_or_deselect_all(#{dispute.id})' id='#{dispute.id}' /></th>
+       <th class='entry-col-content'>Dispute Entry</th>
+       <th class='entry-col-status'>Dispute Entry Status</th>
+       <th class='entry-col-res'>Dispute Entry Resolution</th>
+       <th class='entry-col-disp'>Suggested Disposition</th>
+       <th class='entry-col-cat'>Category</th>
+       <th class='entry-col-platform-entry'>Platform</th>
+       <th class='entry-col-wbrs-score'>WBRS Score</th>
+       <th class='entry-col-wbrs-hits'>WBRS Total Rule Hits</th>
+       <th class='entry-col-wbrs-rules'>WBRS Rules</th>
+       <th class='entry-col-sbrs-score'>SBRS Score</th>
+       <th class='entry-col-sbrs-hits'>SBRS Total Rule Hits</th>
+       <th class='entry-col-sbrs-rules'>SBRS Rules</th></tr></thead><tbody>"
+
     entry = dispute.dispute_entries
     missing_data = '<span class="missing-data">Missing data</span>'
     entry_rows = []
@@ -1100,6 +1128,9 @@ $ ->
       category = '<span class="missing-data">No assigned categories</span>'
       if this.entry.primary_category != null && this.entry.primary_category != '{}'
         category = this.entry.primary_category
+
+      if platform == null
+        platform = "<span class='missing-data'>No platform</span>"
 
       status = missing_data
       if this.entry.status != null
@@ -1152,6 +1183,7 @@ $ ->
         #{resolution_col}
         <td class='entry-col-disp'>#{suggested_disposition}</td>
         <td class='entry-col-cat'>#{category}</td>
+        <td class='entry-col-platform-entry'>#{platform}</td>
         <td class='entry-col-wbrs-score'>
           <div class='reputation-icon-container'>
             <span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>
@@ -1455,6 +1487,7 @@ $ ->
       data['entry-resolution'] = $("#entry-resolution-checkbox").is(':checked')
       data['suggested-disposition'] = $("#suggested-disposition-checkbox").is(':checked')
       data['category'] = $("#category-checkbox").is(':checked')
+      data['platform-entry'] = $("#platform-entry-checkbox").is(':checked')
       data['wbrs-score'] = $("#wbrs-score-checkbox").is(':checked')
       data['wbrs-total-rule-hits'] = $("#wbrs-total-rule-hits-checkbox").is(':checked')
       data['wbrs-rules'] = $("#wbrs-rules-checkbox").is(':checked')

@@ -236,6 +236,7 @@ ActiveRecord::Schema.define(version: 2021_03_26_174523) do
     t.integer "platform_id"
     t.text "bridge_packet", limit: 16777215
     t.text "import_log", limit: 16777215
+
     t.index ["channel", "customer_id"], name: "index_complaints_on_channel_and_customer_id"
     t.index ["customer_id"], name: "index_complaints_on_customer_id"
     t.index ["status", "customer_id"], name: "index_complaints_on_status_and_customer_id"
@@ -380,6 +381,7 @@ ActiveRecord::Schema.define(version: 2021_03_26_174523) do
     t.string "platform"
     t.integer "platform_id"
     t.text "suggested_threat_category"
+
     t.index ["dispute_id"], name: "index_dispute_entries_on_dispute_id"
   end
 
@@ -863,6 +865,9 @@ ActiveRecord::Schema.define(version: 2021_03_26_174523) do
     t.string "fatal_errors"
     t.boolean "edited", default: false
     t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true
+    t.string "type", default: "Snort2Rule"
+    t.text "pre_normalized_rule"
+    t.integer "autoconvert", default: 0
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"
     t.index ["task_id"], name: "index_rules_on_task_id"
   end
@@ -922,6 +927,20 @@ ActiveRecord::Schema.define(version: 2021_03_26_174523) do
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end
 
+  create_table "test_queue_events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "unstarted"
+    t.integer "running"
+    t.string "event"
+    t.datetime "event_time"
+    t.integer "engine_id"
+    t.bigint "prior_event_id"
+    t.bigint "task_id"
+    t.string "task_type"
+    t.index ["prior_event_id"], name: "index_test_queue_events_on_prior_event_id"
+  end
+
   create_table "test_reports", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -940,6 +959,31 @@ ActiveRecord::Schema.define(version: 2021_03_26_174523) do
     t.string "policy"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "ticket_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "ticket_email_id"
+    t.integer "bugzilla_attachment_id"
+    t.string "file_name"
+    t.text "direct_upload_url"
+    t.integer "size"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "ticket_emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "bugzilla_id"
+    t.text "email_headers"
+    t.text "from"
+    t.text "to"
+    t.text "subject"
+    t.text "body", limit: 16777215
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "parse_report", limit: 16777215
+    t.text "simulation_results", limit: 16777215
+    t.boolean "is_simulation"
   end
 
   create_table "ticket_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

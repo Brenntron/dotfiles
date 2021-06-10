@@ -4,6 +4,13 @@ class Escalations::Webcat::ReportsController < Escalations::WebcatController
   def index
   end
 
+  def old_resolution
+    # temporary used endpoint. will be removed after WEB-5420 deploy
+
+    @report = WebcatReport::ResolutionReport.new(date_from: params['report']['date_from'],
+                                                 date_to: params['report']['date_to'])
+  end
+
   def resolution
     @report = WebcatReport::ResolutionReport.new(date_from: params['report']['date_from'],
                                                  date_to: params['report']['date_to'])

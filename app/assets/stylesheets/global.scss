@@ -2107,7 +2107,7 @@ a.static-nav-item {
 .icon-search{background-image: url(image_path('icon_search_white.svg'));}
 .icon-paste {background-image: url(image_path('icon_paste.svg'));}
 .icon-clear {background-image: url(image_path('icon_clear.svg'));}
-.icon-submit{background-image: url("icon_submit_arrow.svg")}
+.icon-submit{background-image: url(image_path('icon_submit_arrow.svg'));}
 .icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 .icon-guest-user {background-image: url(image_path('icon_guest_grey.svg'));}
 .icon-talos-sandbox {background-image: url(image_path('icon_sandbox2.svg'));}
@@ -2399,7 +2399,7 @@ a.static-nav-item {
   font-style: italic;
 }
 .missing-data.platform:before{
-  content: 'No Platform'
+  content: 'No platform'
 }
 .file-attachment {
   font-size: 9pt;
@@ -4010,6 +4010,12 @@ input.communication-subject {
   }
 }
 
+//bump up button when next to duplicate status
+.duplicate-status-notice + .mng-resolution-message-templates-button {
+  position: relative;
+  bottom: 5px;
+}
+
 .select-a-template{
   margin-left: 26px;
   margin-top: 2px;
@@ -4533,7 +4539,7 @@ button.tertiary {
 #search-criteria-options {
   color: $type-base-color;
   border: 1px solid $faint-neutral-color;
-  padding: 6px 12px;
+  padding: 6px 20px;
   font-weight: 300;
   font-size: 9pt;
   position: absolute;
@@ -4548,9 +4554,13 @@ button.tertiary {
 #search-criteria-options li {
   border-bottom: 1px solid $faint-neutral-color;
   display: inline-block;
-  width: 100%;
+  width: 107%;
+  margin: 0px -10px;
+  padding-right: 17px;
 }
-
+.create.active{
+  display: none;
+}
 #search-criteria-options input[type='checkbox'] {
   box-shadow: none !important;
   outline: none !important;
@@ -4561,6 +4571,10 @@ button.tertiary {
 .search-criteria-label {
   padding: 6px 0 1px 0;
   width: 100%;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  height: 30px;
 }
 
 .multicol-2 {
@@ -5273,6 +5287,15 @@ table > tbody > tr > td.dispute_rep_tools {
 
 .dispute-entry-table tbody tr td, .dispute-entry-table thead tr th, .cluster-path-table thead tr th, .cluster-path-table tbody tr td {
   border-color: $table-dark-header;
+}
+
+.dispute-entry-table thead tr th {
+  vertical-align: middle;
+  padding-top: 8px;
+}
+
+.dispute-entry-table tbody tr td {
+  padding-bottom: 5px;
 }
 
 .cluster-path-table tbody tr td {
@@ -6716,23 +6739,14 @@ td.ticket-total::before {
   border: none;
   border-radius: 2px 0 2px 2px;
   width: 250px;
-  background-color: $bug-section-color;
   padding: 3px 6px;
-}
-
-.references-dropdown table td {
-  background-color: $bug-section-color;
-  color: $content-bg-color;
-  border-bottom-color: $faint-accent-color;
-}
-
-.references-dropdown table tr:last-of-type td {
-  border-bottom: none;
-}
-
-.references-dropdown table td a {
-  color: $content-bg-color;
-  text-decoration: underline;
+  table td {
+    background-color: transparent!important;
+    padding: 3px 10px!important;
+    a {
+      text-decoration: underline;
+    }
+  }
 }
 
 .referenced-tickets-col .dropdown.open {
@@ -8780,7 +8794,7 @@ td.text-center span {
   width: fit-content;
   font-size: 9pt !important;
   transition: background-color 0.2s!important;
-  
+
   &:hover{
     background-color: darken($primary-section-color, 10%)!important;
   }
@@ -8798,7 +8812,7 @@ td.text-center span {
     min-width: 110px;
     background-size: 17px;
   }
-  
+
 }
 
 .copycat-tool-footer .cluster-button{
@@ -9239,7 +9253,11 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 .manage-child-row .user-displayname-col {
   padding-left: 16px !important;
 }
-
+.sugg-tc-cell, .sugg-cell{
+  label{
+    white-space: nowrap;
+  }
+}
 .manage-grandchild-row .user-displayname-col {
   padding-left: 26px !important
 }
@@ -11232,7 +11250,13 @@ table.rl-content {
 #naming-guide-dialog {
   display: none;
 }
-
+.amp-url, .amp-email{
+  display:block!important;
+  white-space: pre!important;
+}
+.amp-url{
+  color: #333;
+}
 // ensure AMP disposition on File Rep > Show is capitalized in all 3 instances
 #create-detection-dialog .top-info-data,
 .amp-area label:first-of-type + div,
@@ -11803,8 +11827,8 @@ span.threat-cat-no-data {
   td{
     border-color: $table-dark-header;
   }
-  th.entry-col-wbrs-score{
-    display: block;
+  th {
+    vertical-align: middle;
   }
 }
 .reputation-icon-container{
@@ -12058,7 +12082,7 @@ table > tbody > tr > td.no-padding {
   margin-top: 0;
 }
 
-// FIRST ROW of each entry (contains the URL + category)
+// webrep research tab and bfrp results page
 .research-first-row {
   margin-top: 120px;
   td label {
@@ -12074,7 +12098,7 @@ table > tbody > tr > td.no-padding {
   .url-cell {
     width: 340px;
     padding-right: 10px;
-    vertical-align: top;
+    vertical-align: middle;
     span.entry-data-content {
       display: inline-block;
       word-break: break-all;
@@ -12102,17 +12126,17 @@ table > tbody > tr > td.no-padding {
   }
 }
 
-// FIRST ROW - BFRP SPECIFIC
+// first row - bfrp specific
 .research-action .research-first-row {
   .url-cell {
     width: 40%;
   }
 }
 
-// SECOND ROW of each entry
+// second row of each entry, do widths below in better way when time avail
 .research-overview-row {
   background: $faint-neutral-color;
-  // PRIMARY CELL WIDTHS, NEEDS PRECISE FIXED + FLUID WIDTHS
+  // primary cell widths, needs precise fixed + fluid widths
   .wbrs-score-label-cell {
     width: 3%;
     max-width: 50px;
@@ -12997,4 +13021,51 @@ input.wl-bl-list-inline {
 
 #current-xbrs-table-head th:last-child, #current-xbrs-table-body td:last-child {
   display: none;
+}
+
+// clusters page categories styles
+.cluster-btn-container {
+  width: max-content;
+  button {
+    width: 30px;
+    background-position-x: 5px;
+  }
+  .cluster-submit-button {
+    background-color: $primary-section-color;
+  }
+  .cluster-cancel-button {
+    background-image: url(image_path('icon_blacklist_grey.svg'));
+    background-size: 18px 18px;
+  }
+}
+
+// selectizes need overrides > clusters categories
+.category-column .form-control.selectize {
+  display: inline-block;
+  padding: 0;
+  border-width: 1px;
+}
+
+.cluster_categories .selectize-input {
+  padding-bottom: 2px !important;
+  margin: 0 !important;
+  min-height: 30px !important;
+  overflow: visible;
+  border-radius: 0;
+  outline: solid 1px $disabled-bg;
+  input {
+    height: 25px;
+    padding-left: 4px !important;
+  }
+}
+
+.cluster_categories .selectize-input.disabled {
+  background-color: lighten($primary-section-color, 30%);
+}
+.category-column .selectize-control.multi .selectize-input .item {
+  margin: 3px 0 0 4px !important;
+}
+
+.toggle-vis, .toggle-vis-nested {
+  cursor: default;
 }

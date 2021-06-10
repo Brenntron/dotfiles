@@ -37,6 +37,7 @@ module API
                                        permitted_params['resolution_comment'],
                                        uri_as_categorized,
                                        current_user, "")
+
                 Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
                   message = Bridge::ComplaintUpdateStatusEvent.new
@@ -113,9 +114,6 @@ module API
                     message = Bridge::ComplaintUpdateStatusEvent.new
                     message.post_complaint(@entry.complaint)
                   end
-
-
-
                 end
                 response = {entry_id: @entry.id, domain: @entry.domain, subdomain: @entry.subdomain, path: @entry.path,
                             categories: @entry.url_primary_category, uri: @entry.uri, status:@entry.status,
@@ -606,7 +604,7 @@ module API
                 permitted_params[:complaint_entries].each do |entry|
                   begin
                     complaint_entry = ComplaintEntry.find(entry)
-                    processed = complaint_entry.process_resolution_changes(permitted_params[:resolution], permitted_params[:internal_comment], permitted_params[:customer_facing_comment])
+                    processed = complaint_entry.process_resolution_changes(permitted_params[:resolution], permitted_params[:internal_comment], permitted_params[:customer_facing_comment], current_user)
 
                     confirmations << processed
                   rescue

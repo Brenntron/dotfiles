@@ -128,6 +128,7 @@ group :test do
   gem 'json_spec', '1.1.5'
   gem 'simplecov', '0.16.1', :require => false
   gem 'cucumber-api-steps', '~>0.14', require: false
+  gem "timecop"
 end
 
 group :development, :profile do
@@ -156,5 +157,3 @@ gem 'therubyracer', '~> 0.12.3'
 gem 'turbolinks', '5.2.0'
 gem 'paper_trail', '10.0.1'
 gem "sprockets", '~> 3.7.1'
-
-

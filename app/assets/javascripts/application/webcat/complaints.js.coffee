@@ -1224,7 +1224,11 @@ format = (complaint_entry_row) ->
 
   if complaint_entry.status == "PENDING"
     if complaint_entry.uri_as_categorized  == ""
-      domain = complaint_entry.subdomain + "." + complaint_entry.domain
+      # if a subdomain string exists, prepend it to the domain
+      if complaint_entry.subdomain.length > 0
+        domain = complaint_entry.subdomain + "." + complaint_entry.domain
+      else
+        domain = complaint_entry.domain
     else
       domain = complaint_entry.uri_as_categorized
     # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
@@ -1251,7 +1255,6 @@ format = (complaint_entry_row) ->
   retake_in_progress = false
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
-
 
   edit_input = if domain != "" then domain else host #if the domain is empty, then display host for ips in edit input
 
@@ -2140,15 +2143,22 @@ $ ->
 
   $(document).ready ->
     if window.location.pathname != '/escalations/webcat/complaints'
-      $('#filter-complaints').hide()
+      $('#filter-complaints-nav').hide()
       $('#fetch').hide()
       $('#web-cat-search').hide()
       $('#new-complaint').hide()
+      $('#filter-clusters-nav').hide()
     else
       $('#filter-complaints').show()
       $('#fetch').show()
       $('#web-cat-search').show()
       $('#new-complaint').show()
+      $('#filter-clusters-nav').hide()
+
+    if window.location.pathname == '/escalations/webcat/clusters'
+      $('#filter-complaints-nav').hide()
+      $('#filter-clusters-nav').show()
+
 
   # If a stupidly long email address is returned it will wrap
   # rather than pushing the column into the column beside it

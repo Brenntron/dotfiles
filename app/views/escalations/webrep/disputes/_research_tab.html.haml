@@ -276,18 +276,17 @@
                     %button.expand-row-button-inline{'data-entry-id': "#{entry.id}"}
                   %td.cb-cell{rowspan: '2'}
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}", class: "dispute-entry-cb-#{entry.id}"}
+                  -if entry[:is_important]
+                    %td
+                      %span.entry-important-flag
                   %td.dual-edit-field.url-cell{'data-id': entry.id, 'data-field': 'host'}
-                    - if entry[:is_important]
-                      %span.entry-data.entry-data-content.entry-important-flag
-                        = entry.hostlookup
-                    - else
-                      %span.entry-data.entry-data-content
-                        = entry.hostlookup
-                      %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
+                    %span.entry-data.entry-data-content
+                      = entry.hostlookup
+                    %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
 
                   -# if entry = uri and there are no resolved ips
                   - if entry.uri? && entry[:web_ips].blank?
-                    %td.single-button-col.no-padding
+                    %td.single-button-col.no-padding{colspan: '2'}
                       %span.dropdown
                         %button.add-ip-button.inline-button.esc-tooltipped{id: "add_ip_button_#{entry.id}", title: 'Add host IP addresses', 'aria-expanded': 'false', 'aria-haspopup': 'true', 'data-toggle': 'dropdown'}
                         %div.dropdown-menu.toolbar-dropdown.add-ip-dropdown{id: "add_ip_dropdown_#{entry.id}", 'aria-labelledby': "add_ip_button_#{entry.id}"}
@@ -300,12 +299,12 @@
                               .button-row-center
                                 %button.primary.dropdown-submit-button{type: 'button', onclick: 'add_host_ips(this)', 'data-entry-id': "#{entry.id}"} Submit Query
                   - else
-                    %td.no-padding
-
-                  %td.hostname-cell
-                    - unless entry[:hostname].nil?
-                      %label Hostname
-                      = entry[:hostname]
+                    - if !entry[:is_important]
+                      %td.no-padding
+                    - if !entry[:hostname].nil?
+                      %td.hostname-cell
+                        %label Hostname
+                        = entry[:hostname]
 
                   %td.platform-cell
                     %label Platform
@@ -319,15 +318,13 @@
                       - else
                         %span.missing-data No platform
 
-
-                  %td.dual-edit-field.status-cell{'data-id': entry.id, 'data-field': 'status'}
+                  %td.dual-edit-field.status-cell{'data-id': entry.id, 'data-field': 'status', colspan: '2'}
                     %label Status
                     %span.entry-data.entry-data-status
                       - if entry[:status].nil?
                         NEW
                       - else
                         = entry[:status]
-
                     %span.dropdown
                       %button.inline-select-dropdown.dropdown-toggle.table-entry-input{id: "entry_status_button_#{entry.id}", title: 'Change Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         - if entry[:status].nil?
@@ -633,7 +630,7 @@
                     - else
                       %span.missing-data No assigned categories
 
-                  %td.sugg-tc-cell{colspan: '2'}
+                  %td.sugg-tc-cell
                     %label Suggested Threat Category
                     - unless entry[:suggested_threat_category].nil?
                       = entry[:suggested_threat_category].gsub(/,(?![ ])/, ', ')
@@ -725,13 +722,17 @@
                                 = "#{entry.referenced_tickets.count} ticket(s)"
                               .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
                                 %table
-                                  - entry.referenced_tickets.each do |reference|
-                                    %tr
-                                      %td
-                                        %a{href: escalations_webrep_dispute_path(reference.id)}
-                                          = reference.id
-                                      %td
-                                        = reference.case_opened_at
+                                  %thead
+                                    %th Case ID
+                                    %th Date/Time Submitted
+                                  %tbody
+                                    - entry.referenced_tickets.each do |reference|
+                                      %tr
+                                        %td
+                                          %a{name:"#{reference.id}_link", href: escalations_webrep_dispute_path(reference.id)}
+                                            = reference.id
+                                        %td
+                                          = reference.case_opened_at
                       %tr
                         %td.input-col.sbrs-input-wrapper
                           %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -805,7 +806,7 @@
                         = ips
 
                       %input.table-ip-input{type:'text', value: "#{ips}", placeholder: 'enter one or more IPs, separated by commas; ex: 1.2.3.4. or 1.1.1.1, 2.2.2.2'}
-                    %td.text-right.no-padding-right{colspan: '3'}
+                    %td.text-right.no-padding-right{colspan: '12'}
                       %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses'}
                         Edit IP Addresses
                       %button.save-button.inline-save-ip-button.esc-tooltipped{title: 'Save IP Addresses'}
@@ -813,7 +814,7 @@
                       %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses'}
 
                   %tr.research-uri-ip-data-row
-                    %td.research-table-details-wrapper{colspan: '8'}
+                    %td.research-table-details-wrapper{colspan: '12'}
                       %table
                         %tr.single-details-row
                           %td

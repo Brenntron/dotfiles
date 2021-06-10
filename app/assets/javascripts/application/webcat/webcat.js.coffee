@@ -41,7 +41,7 @@ $ ->
     { keyCode } = e
     { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
     if keyCode == 13
-      webcat_search_string = $('#web-cat-search .search-box').val()
+      webcat_search_string = $('#web-cat-search .search-box').val().trim()
       if webcat_search_string == ''
        refresh_localStorage()
       else
@@ -52,6 +52,7 @@ $ ->
 
   $('#filter-cases-list a').on 'click', (e)->
     localStorage.setItem('webcat_reset_page', true)
+
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
@@ -127,7 +128,6 @@ $ ->
       modified_older: form.date_modified_newer
       modified_newer: form.date_modified_older
     )
-
     refresh_url()
 
   window.webcat_refresh = ()->
@@ -222,6 +222,7 @@ $ ->
 
     container = $('#webcat_searchref_container')
     search_condition_tooltip = []
+
     for condition_name, condition of subheader
       if condition != ''
         if condition_name == 'platform_ids'
@@ -230,6 +231,12 @@ $ ->
           condition_name = 'Entry Id'
         if condition_name == 'user_id'
           condition_name = 'Assignee'
+        if condition_name == 'customer_email'
+          condition_name = 'Submitter Email'
+        if condition_name == 'customer_name'
+          condition_name = 'Submitter Name'
+        if condition_name == 'company_name'
+          condition_name = 'Submitter Org'
         condition_name = condition_name.replace(/_/g, " ").toUpperCase()
         condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
         if typeof condition == 'object'
@@ -619,10 +626,13 @@ $ ->
                   if data == 'CUSTOMER'
                     '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
                   else
-                    data
+                    '<button class="complaint-submitter-type icon-guest-user esc-tooltipped" title="Guest"></button>'
               }
               {
                 data: 'company_name'
+              }
+              {
+                data: 'customer_email'
               }
               {
                 data: 'assigned_to'
@@ -693,15 +703,18 @@ $ ->
     }
     tag_input = $('#tags-input').selectize {
       persist: false
-      create: false
       valueField: 'name',
       labelField: 'name',
+      searchField: 'name',
       options: createSelectOptions()
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
+        if this.lastQuery != ""
+          this.addItem([this.lastQuery])
         window.toggle_selectize_layer(this, 'false')
     }
+
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,
@@ -877,8 +890,10 @@ $ ->
     data['primary'] = $("#primary-checkbox").is(':checked')
     data['suggested'] = $("#suggested-checkbox").is(':checked')
     data['wbrs'] = $("#wbrs-checkbox").is(':checked')
+    data['platform'] = $("#platform-checkbox").is(':checked')
     data['submittertype'] = $("#submittertype-checkbox").is(':checked')
     data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
+    data['submitteremail'] = $("#submitteremail-checkbox").is(':checked')
     data['assignee'] = $("#assignee-checkbox").is(':checked')
 
     std_msg_ajax(

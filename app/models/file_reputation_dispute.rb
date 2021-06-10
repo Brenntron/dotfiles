@@ -9,6 +9,9 @@ class FileReputationDispute < ApplicationRecord
   has_many :digital_signers
   has_many :file_rep_comments
   has_many :dispute_emails
+
+  after_save :update_amp_detection
+
   belongs_to :ti_product_platform, :class_name => "Platform", :foreign_key => "platform_id", optional: true
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
@@ -458,10 +461,12 @@ class FileReputationDispute < ApplicationRecord
   def update_threadgrid_score
     if self.sha256_hash.present?
       threatgrid_response = Threatgrid::Search.query(self.sha256_hash)
-
+      n_auto_resolve_log = "<br />---------------------<br />THREATGRID<br /> score: [#{threatgrid_response[:threatgrid_score]}] threshold: [#{threatgrid_response[:threatgrid_threshold]}] private: [#{threatgrid_response[:threatgrid_private]}]<br />Recorded at: #{Time.now.to_s}<br /> "
+      new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
       self.threatgrid_score = threatgrid_response[:threatgrid_score]
       self.threatgrid_private = threatgrid_response[:threatgrid_private]
       self.threatgrid_threshold = threatgrid_response[:threatgrid_threshold]
+      self.auto_resolve_log = new_auto_resolve_log
       save!
     end
 
@@ -498,15 +503,19 @@ class FileReputationDispute < ApplicationRecord
   def update_sandbox_score(api_key_type: self.sandbox_key)
     sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash, api_key_type: api_key_type)
     sandbox_threshold = self.pdf? ? 90.0 : 61.0
-    update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
+    n_auto_resolve_log = "<br />---------------------<br />SANDBOX<br /> score: [#{sandbox_score}] threshold: [#{sandbox_threshold}]<br />Recorded at: #{Time.now.to_s}<br /> "
+    new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
+    update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold, auto_resolve_log: new_auto_resolve_log)
   rescue => except
     Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
   end
 
   def update_amp_disposition
-    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
 
-    update!(disposition: detection.disposition, detection_name: detection.name)
+    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
+    n_auto_resolve_log = "<br />---------------------<br />AMP<br /> disp: [#{detection.disposition}] name: [#{detection.name}]<br />Recorded at: #{Time.now.to_s}<br /> "
+    new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
+    update!(disposition: detection.disposition, detection_name: detection.name, auto_resolve_log: new_auto_resolve_log)
 
   rescue => except
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
@@ -526,6 +535,9 @@ class FileReputationDispute < ApplicationRecord
     zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
     begin
       attributes = FileReputationApi::SampleZoo.query_from_data(zoo_response)
+      n_auto_resolve_log = "<br />--------------------<br />ZOO<br /> in zoo: #{attributes[:in_zoo]}<br />Recorded at: #{Time.now.to_s}<br />"
+      new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
+      attributes[:auto_resolve_log] = new_auto_resolve_log
       update!(attributes)
     rescue Exception => except
       Rails.logger.error("Error updating sample zoo flag for id #{self.id} -- #{except.message}")
@@ -637,7 +649,7 @@ class FileReputationDispute < ApplicationRecord
     new_dispute.description = message_payload[:payload][:summary_description]
     new_dispute.customer_id = customer&.id
     new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
-    new_dispute.auto_resolve_log = ""
+    new_dispute.auto_resolve_log = "Ticket generated at: #{Time.now.to_s}<br />----------<br />"
 
     check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
     if check_for_duplicate.any?
@@ -1183,6 +1195,41 @@ class FileReputationDispute < ApplicationRecord
   end
 
 
+  def update_amp_detection
+    # Check whether AMP API is disabled
+    if Rails.configuration.amp_poke.host.blank?
+      raise "AMP Poke API is disabled or not configured"
+      # If we're on staging, test to see whether AMP API is enabled
+    elsif Rails.env == 'staging'
+      begin
+        FileReputationApi::Detection.get_bulk('1eba23049d725aabd84b63f8cd4b079c78f26cde6f7bb8be1d2477df0c0d1234')
+      rescue Exception
+        raise "AMP Poke API is currently disabled on staging"
+      end
+    end
+
+    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
+    detection_last_set = FileReputationApi::ElasticSearch.query(self.sha256_hash)
+    last_fetched = Time.now.utc
+
+    begin
+      file_rep_disputes = FileReputationDispute.where(sha256_hash: detection.sha256_hash)
+      file_rep_dispute = file_rep_disputes.first
+      if detection_last_set == 'No history to display' && !file_rep_dispute.detection_last_set.nil?
+        detection_last_set = file_rep_dispute.detection_last_set
+      end
+      # TODO: I don't necessarily know that we need to .update_all on an after_save callback,
+      # but leaving it in here just to be safe. If this method causes performance problems,
+      # change this line first. Update only `self` instead of updating everything.
+      file_rep_disputes.update_all(disposition: detection.disposition,
+                                   detection_name: detection.name,
+                                   detection_last_set: detection_last_set,
+                                   last_fetched: last_fetched)
+    rescue
+      Rails.logger.error("Error saving updated detection information -- #{$!.message}")
+    end
+  end
+
   def self.build_ips_bug(bugzilla_rest_session, filename, sha256, problem, original_bug_id)
     summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -1217,5 +1264,4 @@ class FileReputationDispute < ApplicationRecord
 
     return nil
   end
-
 end
