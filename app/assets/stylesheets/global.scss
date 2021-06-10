@@ -2107,7 +2107,7 @@ a.static-nav-item {
 .icon-search{background-image: url(image_path('icon_search_white.svg'));}
 .icon-paste {background-image: url(image_path('icon_paste.svg'));}
 .icon-clear {background-image: url(image_path('icon_clear.svg'));}
-.icon-submit{background-image: url("icon_submit_arrow.svg")}
+.icon-submit{background-image: url(image_path('icon_submit_arrow.svg'));}
 .icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 .icon-guest-user {background-image: url(image_path('icon_guest_grey.svg'));}
 .icon-talos-sandbox {background-image: url(image_path('icon_sandbox2.svg'));}
@@ -4012,7 +4012,8 @@ input.communication-subject {
 
 //bump up button when next to duplicate status
 .duplicate-status-notice + .mng-resolution-message-templates-button {
-  top: 15px;
+  position: relative;
+  bottom: 5px;
 }
 
 .select-a-template{

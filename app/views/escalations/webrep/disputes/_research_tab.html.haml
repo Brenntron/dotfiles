@@ -286,7 +286,7 @@
 
                   -# if entry = uri and there are no resolved ips
                   - if entry.uri? && entry[:web_ips].blank?
-                    %td.single-button-col.no-padding
+                    %td.single-button-col.no-padding{colspan: '2'}
                       %span.dropdown
                         %button.add-ip-button.inline-button.esc-tooltipped{id: "add_ip_button_#{entry.id}", title: 'Add host IP addresses', 'aria-expanded': 'false', 'aria-haspopup': 'true', 'data-toggle': 'dropdown'}
                         %div.dropdown-menu.toolbar-dropdown.add-ip-dropdown{id: "add_ip_dropdown_#{entry.id}", 'aria-labelledby': "add_ip_button_#{entry.id}"}
@@ -299,36 +299,12 @@
                               .button-row-center
                                 %button.primary.dropdown-submit-button{type: 'button', onclick: 'add_host_ips(this)', 'data-entry-id': "#{entry.id}"} Submit Query
                   - else
-                    %td.no-padding
-
-                  %td.category-cell
-                    %label Category
-                    - if entry[:primary_category] != '{}' && !entry[:primary_category].nil?
-                      = entry[:primary_category]
-                    - else
-                      %span.missing-data No assigned categories
-
-                  %td.platform-cell
-                    %label Platform
-                    - if !entry[:platform].nil?
-                      = entry[:platform]
-                    - else
-                      %span.missing-data No platform
-
-                  %td.hostname-cell
-                    - unless entry[:hostname].nil?
-                      %label Hostname
-                      = entry[:hostname]
-
-                  %td.sugg-tc-cell
-                    %label Suggested Threat Category
-                    - unless entry[:suggested_threat_category].nil?
-                      = entry[:suggested_threat_category].gsub(/,(?![ ])/, ', ')
-                      
-                  %td.sugg-cell
-                    %label Suggested Disposition
-                    - unless entry[:suggested_disposition].nil?
-                      = entry[:suggested_disposition]
+                    - if !entry[:is_important]
+                      %td.no-padding
+                    - if !entry[:hostname].nil?
+                      %td.hostname-cell
+                        %label Hostname
+                        = entry[:hostname]
 
                   %td.platform-cell
                     %label Platform
@@ -342,7 +318,7 @@
                       - else
                         %span.missing-data No platform
 
-                  %td.dual-edit-field.status-cell{'data-id': entry.id, 'data-field': 'status'}
+                  %td.dual-edit-field.status-cell{'data-id': entry.id, 'data-field': 'status', colspan: '2'}
                     %label Status
                     %span.entry-data.entry-data-status
                       - if entry[:status].nil?
@@ -654,7 +630,7 @@
                     - else
                       %span.missing-data No assigned categories
 
-                  %td.sugg-tc-cell{colspan: '2'}
+                  %td.sugg-tc-cell
                     %label Suggested Threat Category
                     - unless entry[:suggested_threat_category].nil?
                       = entry[:suggested_threat_category].gsub(/,(?![ ])/, ', ')
@@ -829,7 +805,8 @@
                         = ips
 
                       %input.table-ip-input{type:'text', value: "#{ips}", placeholder: 'enter one or more IPs, separated by commas; ex: 1.2.3.4. or 1.1.1.1, 2.2.2.2'}
-                    %td.text-right.no-padding-right{colspan: '6'}
+
+                    %td.text-right.no-padding-right{colspan: '12'}
                       %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses'}
                         Edit IP Addresses
                       %button.save-button.inline-save-ip-button.esc-tooltipped{title: 'Save IP Addresses'}
@@ -837,7 +814,7 @@
                       %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses'}
 
                   %tr.research-uri-ip-data-row
-                    %td.research-table-details-wrapper{colspan: '11'}
+                    %td.research-table-details-wrapper{colspan: '12'}
                       %table
                         %tr.single-details-row
                           %td
