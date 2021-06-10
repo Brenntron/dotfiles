@@ -26,10 +26,8 @@ $ ->
       if name != 'token' && name != 'xml_token' && name != 'current_user'
         data[name] = value
 
-    # entries will be either separated by commas or newlines
-    if data.ips_urls.indexOf(',') > 0
-      urls_array = data.ips_urls.split(',')
-    else if data.ips_urls.indexOf('\n') > 0
+    # entries will be either separated by newlines
+    if data.ips_urls.indexOf('\n') > 0
       urls_array = data.ips_urls.split('\n')
     else
       urls_array.push(data.ips_urls)
