@@ -330,3 +330,56 @@ Feature: Webcat clusters
       Then I should see "food.com"
       And I should not see "blah.com"
       And I should not see "127.0.0.1"
+
+  @javascript
+  Scenario: a cluster should go to 3rd person review
+    Given a user with id "1" has a role "webcat user" and is logged in
+    And the following users exist
+      | id | cvs_username | display_name |
+      | 2  | admatter     | Adam Mattern |
+    And WBRS Cluster returns the following stubbed clusters:
+      |id|  domain      |
+      |1 | food.com     |
+      |2 | blah.com     |
+      |3 | 127.0.0.1    |
+    And GuardRails verdicts API is stubbed to return failure for domain "food.com"
+    And the following cluster categorizations exist:
+      |id|  cluster_id  | category_ids  | user_id |
+      |1 |      1       |    [6, 77]    |    1    |
+    And WBRS Cluster retrieves the following stubbed cluster:
+      |id|  domain      |
+      |1 | food.com     |
+    When I goto "/escalations/webcat/clusters?f=pending"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    Then I click button with class "cluster-submit-button"
+    And I wait for "10" seconds
+    Then I should see "Cluster should pass manager review"
+    Then I click "#msg-modal"
+    And I goto "/escalations/webcat/clusters?f=pending"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    Then I should see content "admatter" within "#owner_1"
+
+  @javascript
+  Scenario: webcat manager should be able to submit cluster without 3rd person review
+    Given a webcat manager with id "1" exists and is logged in
+    And WBRS Cluster returns the following stubbed clusters:
+      |id|  domain      |
+      |1 | food.com     |
+      |2 | blah.com     |
+      |3 | 127.0.0.1    |
+    And GuardRails verdicts API is stubbed to return failure for domain "food.com"
+    And the following cluster categorizations exist:
+      |id|  cluster_id  | category_ids  | user_id |
+      |1 |      1       |    [6, 77]    |    1    |
+    When I goto "/escalations/webcat/clusters?f=pending"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    Then I click button with class "cluster-submit-button"
+    And I wait for "10" seconds
+    Then I should see "CLUSTER WAS SUBMITTED."
+    Then I click "#msg-modal"
+    And I goto "/escalations/webcat/clusters?f=pending"
+    And I wait for "3" seconds
+    And I should not see "food.com"
