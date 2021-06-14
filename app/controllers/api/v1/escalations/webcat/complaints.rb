@@ -428,6 +428,20 @@ module API
               Complaint.convert_to_dispute(permitted_params, current_user)
             end
 
+            desc 'details for a given complaint'
+
+            params do
+              requires :complaint_entry_id, type: Integer
+            end
+
+            post 'view_complaint' do
+              complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
+              complaint = Complaint.find(complaint_entry.complaint_id)
+
+              {:data => {:complaint => complaint, :complaint_entries => complaint.complaint_entries}}.to_json
+
+            end
+
           end
         end
       end
