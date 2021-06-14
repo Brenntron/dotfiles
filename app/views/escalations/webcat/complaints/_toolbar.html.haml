@@ -62,14 +62,18 @@
         .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
         .inline-tool-content-wrapper
           .dropdown-loader-wrapper.hidden
-            Converting...
+            .gear-loader-wrapper
+              = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+            %span.loader-msg Converting to Webrep...
           %label.content-label-sm
             Ticket ID to Convert:
           %span.ticket-id-to-convert#complaint-id-to-convert
 
           %label.content-label-sm
             Ticket Entries:
-          %table#entries-to-convert
+            %span.convert-entry-count
+          .convert-entry-table-wrapper
+            %table#entries-to-convert
 
           .form-group
             %label.content-label-sm Reputation Ticket Type

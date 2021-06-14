@@ -868,9 +868,13 @@ button {
   }
   .inline-radio-wrapper {
     width: 100%;
+    .col-xs-6 {
+      margin-top: -6px;
+    }
     label, input {
       display: inline-block;
       margin: 0 2px;
+      width: auto;
     }
   }
   select.form-control {
@@ -906,6 +910,16 @@ button {
       margin: 4px !important;
       color: lighten($type-lighter-color, 5%);
     }
+  }
+  .convert-entry-table-wrapper {
+    max-height: 100px;
+    overflow-y: scroll;
+    margin-bottom: 10px;
+  }
+  .content-label-sm .convert-entry-count {
+    font-size: 7.5pt;
+    font-weight: 600;
+    float: none;
   }
 }
 

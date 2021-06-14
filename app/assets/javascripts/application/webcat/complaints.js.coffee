@@ -2216,7 +2216,7 @@ $ ->
 # Convert webcat to webrep
 # Enable / disable button to attempt based on if anything is selected
 $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
-  if $('tr.selected').length > 0
+  if $('tr.selected').length == 1
     $('#convert-ticket-button').removeAttr('disabled')
   else
     $('#convert-ticket-button').attr('disabled', 'disabled')
@@ -2225,14 +2225,41 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
 # Prepare ticket for converting
 window.prep_complaint_to_convert = () ->
   if $('tr.selected').length > 1
+    # This shouldn't happen, but just in case
     std_api_error('Can only convert 1 complaint at a time.')
   else
-    debugger
     # get all data associated with the selected row
     complaint_row = $('tr.selected')[0]
     row_data = $('#complaints-index').DataTable().row(complaint_row).data()
     complaint_id = row_data.complaint_id
     summary = row_data.description
+    entries_table = $('#entries-to-convert')
+    entry_id = row_data.entry_id
+
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
+      data:
+        complaint_entry_id: entry_id
+      success: (response) ->
+        response = $.parseJSON(response)
+        entries = response.data.complaint_entries
+        entry_count = entries.length
+
+        $(entries).each ->
+          if this.ip_address?
+            entry_content = this.ip_address
+          else
+            entry_content = this.uri
+          entry_row = '<tr><td>' + this.id + '</td><td>' + entry_content + '</td></tr>'
+          $(entries_table).append(entry_row)
+
+        $('.convert-entry-count').text('(' + entry_count + ')')
+
+      error: (response) ->
+        console.log response
+    )
+
     # need to make a call here to fetch all the entries associated with this complaint id
     # does not look like there is an endpoint to do this atm
     entry_table = $('#entries-to-convert')
