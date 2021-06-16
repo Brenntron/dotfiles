@@ -1,35 +1,5 @@
 namespace 'WebCat.RepLookup', (exports) ->
 
-  exports.getLookup = (query_url, query_entry, offset = 0, sort_column = 'ip', sort_type = 'asc') ->
-
-    if sort_column == 'domain'
-      sort_column = 'name'
-
-    data_lookup =
-      'query': query_url
-      'query_entry': query_entry
-      'offset': offset
-      'order': sort_column + ' ' + sort_type
-
-
-    $.ajax {
-      url: '/escalations/sb_api/query_lookup'
-      method: 'GET'
-      crossDomain: true
-      dataType: 'json'
-      data: data_lookup
-      success: (response) ->
-        response
-      error: (response) ->
-        if response != null
-          console.log response
-          return $.each(response.responseJSON, (key, value) ->
-            console.log value
-          )
-        return
-
-    }, this
-
   exports.getWhoisLookup = (query_entry) ->
 
     if sort_column == 'domain'

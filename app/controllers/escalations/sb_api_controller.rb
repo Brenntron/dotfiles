@@ -12,10 +12,6 @@ class Escalations::SbApiController < ApplicationController
     end
   end
 
-  def query_lookup()
-    response = safe_json(SbApi.query_lookup(sb_api_params))
-    render json: response, status: :created
-  end
 
   private
 
