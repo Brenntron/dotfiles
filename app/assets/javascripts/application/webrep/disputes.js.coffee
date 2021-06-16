@@ -2440,7 +2440,7 @@ $ ->
 # Convert webrep to webcat
 # Enable / disable button to attempt based on if anything is selected
 $(document).on 'click', '#disputes-index tr, #disputes-index .dispute_check_box, #disputes_check_box', ->
-  if $('tr.selected').length > 0
+  if $('tr.selected').length == 1
     $('#convert-ticket-button').removeAttr('disabled')
   else
     $('#convert-ticket-button').attr('disabled', 'disabled')
@@ -2450,8 +2450,10 @@ $(document).on 'click', '#disputes-index tr, #disputes-index .dispute_check_box,
 # Prepare ticket for converting
 window.prep_dispute_to_convert = (event) ->
   if $('tr.selected').length > 1
+    # this shouldn't happen, but just in case
     std_msg_error('Too many rows selected', ['Please select only one row.'])
   else
+#    debugger
     # get all data associated with the selected row
     dispute_row = $('tr.selected')[0]
     row_data = $('#disputes-index').DataTable().row(dispute_row).data()
@@ -2461,7 +2463,7 @@ window.prep_dispute_to_convert = (event) ->
 
     $('#dispute-id-to-convert').text(dispute_id)
     $('#convert-ticket-summary').text(summary)
-    entry_table = $('#entries-to-convert')
+    entry_table = $('#entries-to-convert tbody')
     # clear out previous data
     $(entry_table).empty()
     $(entries).each ->
@@ -2470,10 +2472,14 @@ window.prep_dispute_to_convert = (event) ->
         entry_content = this.entry.uri
       else
         entry_content = this.entry.ip_address
-      entry_row = '<tr><td>' + this.entry.id + '</td><td class="entry-content-cell"><span class="input-truncate">' + entry_content + '</span></td></tr>'
+      entry_row = '<tr><td>' + this.entry.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
+        '<td class="entry-cat-suggestions"><select class="selectize convert-entry-selectize" multiple="multiple" placeholder="Add categories"></select></td></tr>'
+
       $(entry_table).append(entry_row)
 
-    $selected_cats = $('#suggested-categories').selectize {
+
+
+    $selected_cats = $('.convert-entry-selectize').selectize {
       persist: false,
       create: false,
       maxItems: 5,
@@ -2481,16 +2487,16 @@ window.prep_dispute_to_convert = (event) ->
       valueField: 'category_id',
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions('#suggested-categories')
+      options: AC.WebCat.createSelectOptions('.convert-entry-selectize')
     }
 
-    cats_controller = $selected_cats[0].selectize
-    cats_controller.on 'change', ->
-      cats = $('#suggested-categories').val()
-      if cats == '' || cats == null
-        $('#convert-ticket-dropdown .dropdown-submit-button').attr('disabled', 'disabled')
-      else
-        $('#convert-ticket-dropdown .dropdown-submit-button').removeAttr('disabled')
+#    cats_controller = $selected_cats[0].selectize
+#    cats_controller.on 'change', ->
+#      cats = $('#suggested-categories').val()
+#      if cats == '' || cats == null
+#        $('#convert-ticket-dropdown .dropdown-submit-button').attr('disabled', 'disabled')
+#      else
+#        $('#convert-ticket-dropdown .dropdown-submit-button').removeAttr('disabled')
 
 
 window.convert_dispute_to_webcat = () ->

@@ -249,6 +249,7 @@ window.multiple_url_categorization = () ->
       error: (response) ->
         loader.addClass('hidden')
         std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
+
     )
   else
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
@@ -2216,7 +2217,7 @@ $ ->
 # Convert webcat to webrep
 # Enable / disable button to attempt based on if anything is selected
 $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
-  if $('tr.selected').length > 0
+  if $('tr.selected').length == 1
     $('#convert-ticket-button').removeAttr('disabled')
   else
     $('#convert-ticket-button').attr('disabled', 'disabled')
@@ -2225,32 +2226,95 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
 # Prepare ticket for converting
 window.prep_complaint_to_convert = () ->
   if $('tr.selected').length > 1
+    # This shouldn't happen, but just in case
     std_api_error('Can only convert 1 complaint at a time.')
   else
-    debugger
     # get all data associated with the selected row
     complaint_row = $('tr.selected')[0]
     row_data = $('#complaints-index').DataTable().row(complaint_row).data()
     complaint_id = row_data.complaint_id
     summary = row_data.description
-    # need to make a call here to fetch all the entries associated with this complaint id
-    # does not look like there is an endpoint to do this atm
-    entry_table = $('#entries-to-convert')
-    # entries.each ->
-    #   entry_content = ''
-    #   if this.uri?
-    #     entry_content = this.uri
-    #   else
-    #     entry_content = this.ip_address
-    #   entry_row = '<tr><td>#{this.id}</td><td>#{entry_content}</td></tr>'
-    #   $(entry_table).append(entry_row)
+    entries_table = $('#entries-to-convert tbody')
+    entry_id = row_data.entry_id
 
-    # then populate the dropdown
-    $('#complaint-id-to-convert').text(complaint_id)
-    $('#convert-ticket-summary').append(summary)
+    # clear residual info from prev selections
+    $('#complaint-id-to-convert').empty()
+    $('.convert-entry-count').empty()
+    $(entries_table).empty()
+    $('#convert-ticket-summary').empty()
 
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
+      data:
+        complaint_entry_id: entry_id
+      success: (response) ->
+        response = $.parseJSON(response)
+        entries = response.data.complaint_entries
+        entry_count = entries.length
+
+        # populate the dropdown
+        $('#complaint-id-to-convert').text(complaint_id)
+
+        $(entries).each ->
+          if this.ip_address?
+            entry_content = this.ip_address
+          else
+            entry_content = this.uri
+
+            entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
+              '<td class="text-center entry-disposition"><div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio">FP</label><input type="radio" name="disposition" value="fp" id="' + this.id + '-fp-radio"/></div>' +
+              '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio">FN</label><input type="radio" name="disposition" value="fn" id="' + this.id + '-fn-radio"/></div></td></tr>'
+
+          $(entries_table).append(entry_row)
+
+        $('.convert-entry-count').text('(' + entry_count + ')')
+        $('#convert-ticket-summary').append(summary)
+
+      error: (response) ->
+        console.log response
+    )
 
 
 
 convert_complaint_to_webrep = () ->
   # send it on over
+  complaint_id = parseInt($('#complaint-id-to-convert').text())
+  summary = $('#convert-ticket-summary').text()
+  submission_type = $('input[name=ticket-type]:checked').val()
+
+  # get the entries
+  suggested_dispositions = []
+  entry_rows = $('#entries-to-convert tbody tr')
+  $(entry_rows).each ->
+    entry_content = $(this).find('.entry-content-to-convert').text()
+    entry_disposition = $(this).find('input[name=disposition]:checked').val()
+    suggested_dispositions.push(entry: entry_content, suggested_disposition: entry_disposition)
+
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/convert_ticket'
+    data: {
+      complaint_id: complaint_id
+      summary: summary
+      submission_type: submission_type
+      suggested_dispositions: suggested_dispositions
+    }
+    success: (response) ->
+      std_msg_success('Success',["Complaint converted to Reputation Dispute."], reload: true)
+    error: (response) ->
+      std_api_error(response, 'Complaint unable to be converted to Reputation Dispute.', reload: false)
+  )
+
+
+$ ->
+  # Enable convert submit button if reputation type and disposition have been selected
+  $('#convert-ticket-dropdown').click ->
+    # check to see if ticket type is selected
+    if $('input[name=ticket-type]').is(':checked') && $('input[name=disposition]').is(':checked')
+      #enable the button
+      $('#convert-to-webrep').removeAttr('disabled')
+
+
+  $('#convert-to-webrep').click ->
+    convert_complaint_to_webrep()
