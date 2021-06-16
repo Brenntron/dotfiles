@@ -2280,7 +2280,7 @@ convert_complaint_to_webrep = () ->
 
   std_msg_ajax(
     method: 'POST'
-    url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
+    url: '/escalations/api/v1/escalations/webcat/complaints/convert_ticket'
     data: {
       complaint_id: complaint_id
       summary: summary
