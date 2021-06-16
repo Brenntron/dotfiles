@@ -80,27 +80,27 @@
             .inline-radio-wrapper.row
               .col-xs-6
                 %label{for: 'web-ticket-type'} Web
-                %input#web-ticket-type{type: 'radio', name: 'ticket-type', value: 'web'}
+                %input#web-ticket-type.convert-input{type: 'radio', name: 'ticket-type', value: 'w'}
               .col-xs-6
                 %label{for: 'email-ticket-type'} Email
-                %input#email-ticket-type{type: 'radio', name: 'ticket-type', value: 'email'}
+                %input#email-ticket-type.convert-input{type: 'radio', name: 'ticket-type', value: 'e'}
 
           .form-group
             %label.content-label-sm Suggested Disposition
             .inline-radio-wrapper.row
               .col-xs-6
                 %label{for: 'false-pos-radio'} False Positive
-                %input#false-pos-radio{type: 'radio', name: 'disposition', value: 'fp'}
+                %input#false-pos-radio.convert-input{type: 'radio', name: 'disposition', value: 'fp'}
               .col-xs-6
                 %label{for: 'false-neg-radio'} False Negative
-                %input#false-neg-radio{type: 'radio', name: 'disposition', value: 'fn'}
+                %input#false-neg-radio.convert-input{type: 'radio', name: 'disposition', value: 'fn'}
 
           %hr.thin
           .comment-wrapper
             %label.content-label-sm Ticket Summary
             %textarea#convert-ticket-summary.dropdown-comment.note-input
           .button-row-center
-            %button.primary.dropdown-submit-button{type: 'button'}
+            %button#convert-to-webrep.primary.dropdown-submit-button{type: 'button', disabled: 'disabled'}
               Convert Ticket
 
   %div

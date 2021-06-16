@@ -2236,6 +2236,12 @@ window.prep_complaint_to_convert = () ->
     entries_table = $('#entries-to-convert')
     entry_id = row_data.entry_id
 
+    # clear residual info from prev selections
+    $('#complaint-id-to-convert').empty()
+    $('.convert-entry-count').empty()
+    $(entries_table).empty()
+    $('#convert-ticket-summary').empty()
+
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
@@ -2246,6 +2252,8 @@ window.prep_complaint_to_convert = () ->
         entries = response.data.complaint_entries
         entry_count = entries.length
 
+        # populate the dropdown
+        $('#complaint-id-to-convert').text(complaint_id)
         $(entries).each ->
           if this.ip_address?
             entry_content = this.ip_address
@@ -2255,29 +2263,46 @@ window.prep_complaint_to_convert = () ->
           $(entries_table).append(entry_row)
 
         $('.convert-entry-count').text('(' + entry_count + ')')
+        $('#convert-ticket-summary').append(summary)
 
       error: (response) ->
         console.log response
     )
 
-    # need to make a call here to fetch all the entries associated with this complaint id
-    # does not look like there is an endpoint to do this atm
-    entry_table = $('#entries-to-convert')
-    # entries.each ->
-    #   entry_content = ''
-    #   if this.uri?
-    #     entry_content = this.uri
-    #   else
-    #     entry_content = this.ip_address
-    #   entry_row = '<tr><td>#{this.id}</td><td>#{entry_content}</td></tr>'
-    #   $(entry_table).append(entry_row)
-
-    # then populate the dropdown
-    $('#complaint-id-to-convert').text(complaint_id)
-    $('#convert-ticket-summary').append(summary)
-
-
 
 
 convert_complaint_to_webrep = () ->
   # send it on over
+  complaint_id = parseInt($('#complaint-id-to-convert').text())
+  summary = $('#convert-ticket-summary').text()
+  submission_type = $('input[name=ticket-type]:checked').val()
+  disposition = $('input[name=disposition]:checked').val()
+
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
+    data: {
+      complaint_id: complaint_id
+      summary: summary
+      submission_type: submission_type
+      suggested_disposition: disposition
+    }
+    success: (response) ->
+      debugger
+      console.log response
+    error: (response) ->
+      console.log response
+  )
+
+
+$ ->
+  # Enable convert submit button if reputation type and disposition have been selected
+  $('#convert-ticket-dropdown').click ->
+    # check to see if ticket type is selected
+    if $('input[name=ticket-type]').is(':checked') && $('input[name=disposition]').is(':checked')
+      #enable the button
+      $('#convert-to-webrep').removeAttr('disabled')
+
+
+  $('#convert-to-webrep').click ->
+    convert_complaint_to_webrep()
