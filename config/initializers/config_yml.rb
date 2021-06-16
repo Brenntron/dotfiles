@@ -17,9 +17,9 @@ Rails.configuration.amp_poke            = ApiRequester::ApiRequester.config_of(a
 app_info_config = env_config['app_info']
 raise 'config.yml missing app_info section' unless app_info_config
 Rails.configuration.app_info        = OpenStruct.new
+# device_id: "analyst-console-escalations-dev"
 # product_family: "Talos_Web"
 # product_id: "analyst-console-escalations"
-# device_id: "analyst-console-escalations-dev"
 Rails.configuration.app_info.device_id      = app_info_config['device_id'] || `hostname`.chomp
 Rails.configuration.app_info.product_family = app_info_config['product_family'] || 'Talos_Web'
 Rails.configuration.app_info.product_id     = app_info_config['product_id'] || 'analyst-console-escalations'
@@ -27,10 +27,14 @@ Rails.configuration.app_info.product_version =
   begin
     version = app_info_config['product_version']
     version ||= File.open("public/escalations/version.html", "rt") { |file| file.read }.chomp rescue nil
-    version ||= `git symbolic-ref --short HEAD`.chomp rescue nil
+    if Rails.env.development? || Rails.env.test?
+      version ||= `git symbolic-ref --short HEAD`.chomp rescue nil
+    end
     version ||= 'unknown'
     version
   end
+Rails.configuration.app_info.pubkey_file = app_info_config['pubkey_file']
+Rails.configuration.app_info.pkey_file  = app_info_config['pkey_file']
 
 
 # The auto resolve section refers to the auto resolve algorithm where different steps may be disabled.

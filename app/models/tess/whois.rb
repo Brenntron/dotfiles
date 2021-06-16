@@ -1,28 +1,29 @@
-# move to TESS
-require 'sb-api_services_pb'
 require 'service-tess_services_pb'
 
 class Tess::Whois
 
   def self.hostport
-    @hostport ||= 'tess.sl.talos.cisco.com:443'
+    @hostport ||= "#{Rails.configuration.tess.host}:#{Rails.configuration.tess.port || 443}"
   end
 
   def self.ca_cert
-    @ca_cert ||= File.open('/Users/marlpier/projects/analyst-console-escalations/whois/server.crt').read
+    # @ca_cert ||= File.open('/Users/marlpier/projects/analyst-console-escalations/whois/server.crt').read
+    @ca_cert ||= File.open(Rails.configuration.tess.ca_cert_file).read
   end
 
   def self.cert
-    @cert ||= File.open('/Users/marlpier/projects/analyst-console-escalations/whois/client.crt').read
+    # @cert ||= File.open('/Users/marlpier/projects/analyst-console-escalations/whois/client.crt').read
+    @cert ||= File.open(Rails.configuration.app_info.pubkey_file).read
   end
 
   def self.cert_key
-    @cert_key ||= File.open('/Users/marlpier/projects/analyst-console-escalations/whois/client.key').read
+    # @cert_key ||= File.open('/Users/marlpier/projects/analyst-console-escalations/whois/client.key').read
+    @cert_key ||= File.open(Rails.configuration.app_info.pkey_file).read
   end
 
   def self.creds
-    # @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert, cert, cert_key)
-    @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert)
+    @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert, cert, cert_key)
+    # @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert)
     # @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert)
   end
 
@@ -35,13 +36,6 @@ class Tess::Whois
     )
   end
 
-  # Tried Google auth procedure
-  # def self.creds
-  #   server_creds = GRPC::Core::ChannelCredentials.new(ca_cert)
-  #   client_creds = GRPC::Core::CallCredentials.new(proc {{}})
-  #   server_creds.compose(client_creds)
-  # end
-
   def self.remote_stub
     # @remote_stub ||= SBAPI::Stub.new('aeon-denaliipediainternalsb-api.marathon.l4lb.thisdcos.directory:10069', creds)
     # @remote_stub ||= SBAPI::Stub.new(hostport, creds)
@@ -50,31 +44,15 @@ class Tess::Whois
     @remote_stub ||= Talos::Service::TESS::Stub.new(hostport, :this_channel_is_insecure)
   end
 
-  def remote_stub
-    self.class.remote_stub
-  end
+  def self.whois_query(name)
+    whois_search_request = Talos::TESS::WhoisSearchRequest.new(app_info: get_app_info, search_string: name)
+    response = remote_stub.whois_query(whois_search_request)
 
-  def lookup(name)
-    byebug
-    # remote_stub.who_is_query(WhoIsSearchRequest.new(search_string: name))
-    whois_search_request = Talos::TESS::WhoisSearchRequest.new(app_info: self.class.get_app_info, search_string: name)
-    remote_stub.whois_query(whois_search_request)
+    unless :WHOIS_SUCCESS == response.status
+      raise "Failure getting whois information -- #{response.status_message}"
+    end
+
+    response.result
   end
 end
-
-
-# # require 'grpc'
-# # require 'sb-api_pb'
-# require 'sb-api_services_pb'
-#
-#
-# ca_cert = File.open('/Users/marlpier/projects/analyst-console-escalations/whois/server.crt').read
-# cert = File.open('/Users/marlpier/projects/analyst-console-escalations/whois/client.crt').read
-# cert_key = File.open('/Users/marlpier/projects/analyst-console-escalations/whois/client.key').read
-# creds = GRPC::Core::ChannelCredentials.new(ca_cert, cert, cert_key)
-#
-# #stub = SBAPI::Stub.new(hostport, :this_channel_is_insecure)
-# stub = SBAPI::Stub.new('ipedia-api.sl.talos.cisco.com:443', creds)
-#
-# stub.who_is_query(WhoIsSearchRequest.new(search_string: 'cisco.com'))
 

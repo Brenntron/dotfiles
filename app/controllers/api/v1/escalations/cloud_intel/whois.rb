@@ -12,9 +12,8 @@ module API
               requires :name, type: String
             end
             get "lookup", root: "whois" do
-              byebug
-              Beaker::Whois.new.lookup(permitted_params['name'])
-              raise 'unimplemented'
+              result_data = Tess::Whois.whois_query(permitted_params['name'])
+              { data: result_data }
             end
           end
         end

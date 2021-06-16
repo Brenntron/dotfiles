@@ -41,10 +41,8 @@ namespace 'WebCat.RepLookup', (exports) ->
       data:
         name: query_entry
       success: (response) ->
-        debugger
         response
       error: (response) ->
-        debugger
         if response != null
           console.log response
           return $.each(response.responseJSON, (key, value) ->
