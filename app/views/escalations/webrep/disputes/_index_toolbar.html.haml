@@ -206,14 +206,18 @@
 
           %label.content-label-sm
             Ticket Entries:
+            %span.convert-entry-count
           %table#entries-to-convert
-          %br
-          %label.content-label-sm{for: '#convert-ticket-summary'} Ticket Summary
-          %textarea#convert-ticket-summary.dropdown-comment.note-input
-          %hr.thin
-          .form-group
-            %label.content-label-sm Suggested Categories
-            %select#suggested-categories.selectize{:multiple=>"multiple", :placeholder=>"Add Categories"}
+            %thead
+              %tr
+                %th Entry ID
+                %th Entry Content
+                %th.text-right Suggested Categories
+            %tbody
+
+          .comment-wrapper
+            %label.content-label-sm{for: '#convert-ticket-summary'} Ticket Summary
+            %textarea#convert-ticket-summary.dropdown-comment.note-input
           .button-row-center
             %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
               Convert Ticket
