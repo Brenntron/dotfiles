@@ -852,7 +852,7 @@ For future web and email reputation requests, please open a web categorization t
 
   def self.convert_to_dispute(params, current_user)
     complaint = Complaint.find(params[:complaint_id])
-    suggested_disposition_entries = JSON.parse(params[:suggested_dispositions])
+    suggested_disposition_entries = params[:suggested_dispositions]
     package = {}
     package[:entries] = []
     package[:convert_to] = "Dispute"

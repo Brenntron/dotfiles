@@ -889,8 +889,11 @@ button {
       width: auto;
     }
   }
-  td .inline-radio-wrapper input {
-    margin-top: 0 !important;
+  td .inline-radio-wrapper {
+    input {
+      margin-top: 0 !important;
+      float: right;
+    }
   }
   select.form-control {
     margin-left: 0;

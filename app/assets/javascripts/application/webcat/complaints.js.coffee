@@ -249,6 +249,7 @@ window.multiple_url_categorization = () ->
       error: (response) ->
         loader.addClass('hidden')
         std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
+
     )
   else
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
@@ -2300,10 +2301,9 @@ convert_complaint_to_webrep = () ->
       suggested_dispositions: suggested_dispositions
     }
     success: (response) ->
-      debugger
-      console.log response
+      std_msg_success('Success',["Complaint converted to Reputation Dispute."], reload: true)
     error: (response) ->
-      console.log response
+      std_api_error(response, 'Complaint unable to be converted to Reputation Dispute.', reload: false)
   )
 
 
