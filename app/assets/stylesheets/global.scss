@@ -851,7 +851,7 @@ button {
 
 #convert-ticket-dropdown {
   border-top-right-radius: 4px;
-  min-width: 300px;
+  min-width: 400px;
   margin-top: 0;
   margin-left: 0;
 
@@ -866,16 +866,31 @@ button {
   .inline-tool-content-wrapper {
     padding: 8px 10px;
   }
-  .inline-radio-wrapper {
-    width: 100%;
-    .col-xs-6 {
-      margin-top: -6px;
+  .form-group .inline-radio-wrapper {
+    display: inline-block;
+    padding-top: 0;
+    padding-left: 0;
+    label {
+      float:left;
+      padding-top: 1px;
     }
+  }
+  .convert-disposition-cell {
+    width: 130px;
+  }
+  #convert-ticket-type {
+    margin-top: -5px;
+  }
+  .inline-radio-wrapper {
+    display: inline-block;
     label, input {
       display: inline-block;
       margin: 0 2px;
       width: auto;
     }
+  }
+  td .inline-radio-wrapper input {
+    margin-top: 0 !important;
   }
   select.form-control {
     margin-left: 0;
@@ -883,12 +898,10 @@ button {
   }
   .form-group {
     margin-bottom: 4px;
+    padding: 0;
   }
   #complaint-id-to-convert, #dispute-id-to-convert {
     color: $type-base-color;
-  }
-  hr.thin {
-    margin: 0 4px;
   }
   .selectize-control {
     border: none !important;
@@ -13103,9 +13116,13 @@ input.wl-bl-list-inline {
 }
 
 #entries-to-convert {
-  font-size: 10px;
   margin-top: -4px;
+  th {
+    font-size: 9px;
+    padding: 2px 4px;
+  }
   tr td {
+    font-size: 10px;
     padding: 2px 4px;
     &.entry-content-cell {
       padding: 0 4px;
@@ -13153,7 +13170,7 @@ input.wl-bl-list-inline {
     padding: 1px;
   }
   hr.thin {
-    margin: 20px 0 10px 0;
+    margin: 4px 0 10px 0;
   }
   .ticket-id-to-convert {
     display: block;

@@ -65,35 +65,35 @@
             .gear-loader-wrapper
               = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
             %span.loader-msg Converting to Webrep...
-          %label.content-label-sm
-            Ticket ID to Convert:
-          %span.ticket-id-to-convert#complaint-id-to-convert
+          .row
+            .col-xs-8
+              %label.content-label-sm
+                Ticket ID to Convert:
+              %span.ticket-id-to-convert#complaint-id-to-convert
 
-          %label.content-label-sm
-            Ticket Entries:
-            %span.convert-entry-count
-          .convert-entry-table-wrapper
-            %table#entries-to-convert
-
-          .form-group
-            %label.content-label-sm Reputation Ticket Type
-            .inline-radio-wrapper.row
-              .col-xs-6
-                %label{for: 'web-ticket-type'} Web
-                %input#web-ticket-type.convert-input{type: 'radio', name: 'ticket-type', value: 'w'}
-              .col-xs-6
-                %label{for: 'email-ticket-type'} Email
-                %input#email-ticket-type.convert-input{type: 'radio', name: 'ticket-type', value: 'e'}
-
-          .form-group
-            %label.content-label-sm Suggested Disposition
-            .inline-radio-wrapper.row
-              .col-xs-6
-                %label{for: 'false-pos-radio'} False Positive
-                %input#false-pos-radio.convert-input{type: 'radio', name: 'disposition', value: 'fp'}
-              .col-xs-6
-                %label{for: 'false-neg-radio'} False Negative
-                %input#false-neg-radio.convert-input{type: 'radio', name: 'disposition', value: 'fn'}
+            .col-xs-4
+              %label.content-label-sm Reputation Ticket Type
+              #convert-ticket-type.form-group
+                .inline-radio-wrapper
+                  %label{for: 'web-ticket-type'} Web
+                  %input#web-ticket-type.convert-input{type: 'radio', name: 'ticket-type', value: 'w'}
+                .inline-radio-wrapper
+                  %label{for: 'email-ticket-type'} Email
+                  %input#email-ticket-type.convert-input{type: 'radio', name: 'ticket-type', value: 'e'}
+          %hr.thin
+          .row
+            .col-xs-12
+              %label.content-label-sm
+                Ticket Entries:
+                %span.convert-entry-count
+              .convert-entry-table-wrapper
+                %table#entries-to-convert
+                  %thead
+                    %tr
+                      %th Entry ID
+                      %th Entry Content
+                      %th.convert-disposition-cell.text-right Suggested Disposition
+                  %tbody
 
           %hr.thin
           .comment-wrapper

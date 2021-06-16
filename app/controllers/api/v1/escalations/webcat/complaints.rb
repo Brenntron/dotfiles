@@ -420,7 +420,7 @@ module API
 
             params do
               requires :complaint_id, type: Integer
-              requires :suggested_dispositions, type: String
+              requires :suggested_dispositions, type: Array
               requires :summary, type: String
               requires :submission_type, type: String
             end

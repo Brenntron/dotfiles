@@ -2233,7 +2233,7 @@ window.prep_complaint_to_convert = () ->
     row_data = $('#complaints-index').DataTable().row(complaint_row).data()
     complaint_id = row_data.complaint_id
     summary = row_data.description
-    entries_table = $('#entries-to-convert')
+    entries_table = $('#entries-to-convert tbody')
     entry_id = row_data.entry_id
 
     # clear residual info from prev selections
@@ -2254,12 +2254,17 @@ window.prep_complaint_to_convert = () ->
 
         # populate the dropdown
         $('#complaint-id-to-convert').text(complaint_id)
+
         $(entries).each ->
           if this.ip_address?
             entry_content = this.ip_address
           else
             entry_content = this.uri
-          entry_row = '<tr><td>' + this.id + '</td><td>' + entry_content + '</td></tr>'
+
+            entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
+              '<td class="text-center entry-disposition"><div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio">FP</label><input type="radio" name="disposition" value="fp" id="' + this.id + '-fp-radio"/></div>' +
+              '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio">FN</label><input type="radio" name="disposition" value="fn" id="' + this.id + '-fn-radio"/></div></td></tr>'
+
           $(entries_table).append(entry_row)
 
         $('.convert-entry-count').text('(' + entry_count + ')')
@@ -2276,7 +2281,14 @@ convert_complaint_to_webrep = () ->
   complaint_id = parseInt($('#complaint-id-to-convert').text())
   summary = $('#convert-ticket-summary').text()
   submission_type = $('input[name=ticket-type]:checked').val()
-  disposition = $('input[name=disposition]:checked').val()
+
+  # get the entries
+  suggested_dispositions = []
+  entry_rows = $('#entries-to-convert tbody tr')
+  $(entry_rows).each ->
+    entry_content = $(this).find('.entry-content-to-convert').text()
+    entry_disposition = $(this).find('input[name=disposition]:checked').val()
+    suggested_dispositions.push(entry: entry_content, suggested_disposition: entry_disposition)
 
   std_msg_ajax(
     method: 'POST'
@@ -2285,7 +2297,7 @@ convert_complaint_to_webrep = () ->
       complaint_id: complaint_id
       summary: summary
       submission_type: submission_type
-      suggested_disposition: disposition
+      suggested_dispositions: suggested_dispositions
     }
     success: (response) ->
       debugger
