@@ -138,7 +138,7 @@ set softtabstop=2
 set smarttab
 set expandtab
 set noshiftround
-let g:node_host_prog = '/Users/Brenntron/.asdf/installs/nodejs/13.12.0/bin/npm'
+let g:node_host_prog = '/Users/Brenntron/.asdf/installs/nodejs/16.3.0/bin/npm'
 
 syn match javaScriptCommentSkip "^[ \t]*\*\($\|[ \t]\+\)"
 syn region javaScriptComment start="/\*" end="\*/" contains=@Spell,javaScriptCommentTodo
@@ -384,6 +384,32 @@ let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
   \ 'ctrl-x': 'split',
   \ 'ctrl-v': 'vsplit' }
+
+let g:gutentags_cache_dir = expand('~/.gutentags_cache')
+let g:gutentags_exclude_filetypes = ['gitcommit', 'gitconfig', 'gitrebase', 'gitsendemail', 'git']
+let g:gutentags_ctags_exclude = [
+\  '*.git', '*.svn', '*.hg',
+\  'cache', 'build', 'dist', 'bin', 'node_modules', 'bower_components',
+\  '*-lock.json',  '*.lock',
+\  '*.min.*',
+\  '*.bak',
+\  '*.zip',
+\  '*.pyc',
+\  '*.class',
+\  '*.sln',
+\  '*.csproj', '*.csproj.user',
+\  '*.tmp',
+\  '*.cache',
+\  '*.vscode',
+\  '*.pdb',
+\  '*.exe', '*.dll', '*.bin',
+\  '*.mp3', '*.ogg', '*.flac',
+\  '*.swp', '*.swo',
+\  '.DS_Store', '*.plist',
+\  '*.bmp', '*.gif', '*.ico', '*.jpg', '*.png', '*.svg',
+\  '*.rar', '*.zip', '*.tar', '*.tar.gz', '*.tar.xz', '*.tar.bz2',
+\  '*.pdf', '*.doc', '*.docx', '*.ppt', '*.pptx', '*.xls',
+\]
 
 " Customize fzf colors to match your color scheme
 let g:fzf_colors =
