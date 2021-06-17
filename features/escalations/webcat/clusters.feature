@@ -223,9 +223,6 @@ Feature: Webcat clusters
     And the following cluster categorizations exist:
       |id|  cluster_id  | category_ids  | user_id |
       |1 |      1       |    [6, 77]    |    1    |
-    And WBRS Cluster retrieves the following stubbed cluster:
-      |id|  domain      |
-      |1 | food.com     |
     When I goto "/escalations/webcat/clusters?f=pending"
     And I wait for "3" seconds
     And I should see "food.com"
@@ -234,9 +231,8 @@ Feature: Webcat clusters
     Then I should see "Cluster should pass manager review"
     Then I click "#msg-modal"
     And I goto "/escalations/webcat/clusters?f=pending"
-    And I wait for "3" seconds
     And I should see "food.com"
-    Then I should see content "admatter" within "#owner_1"
+    Then I should see content "admatter" within "#owner_food_com"
 
   @javascript
   Scenario: webcat manager should be able to submit cluster without 3rd person review

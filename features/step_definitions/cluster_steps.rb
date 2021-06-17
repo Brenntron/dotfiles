@@ -83,7 +83,7 @@ end
 
 Given(/^GuardRails verdicts API is stubbed to return failure for domain "(.*?)"$/) do |domain|
   response_body = {}
-  response_body[domain] = { color: 'red' }
+  response_body[domain] = { 'color' => 'red' }
   response = double('Net::HTTPResponse', code: 200, body: response_body.to_json)
   Webcat::GuardRails.stub(:verdict_for_entry).and_return(response)
 end

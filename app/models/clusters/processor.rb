@@ -50,12 +50,12 @@ class Clusters::Processor
 
   private
 
-  def third_person_review_cluster?
+  def third_person_review_cluster?(cluster)
     # third person review - should be done by webcat manager
     return false if user.is_webcat_manager? # webcat managers skip 3rd person review
 
     prefix = cluster[:domain]
-    categories = JSON.parse(cluster[:categories].map(&:to_i))
+    categories = cluster[:categories].map(&:to_i)
 
     verdict_check = Webcat::EntryVerdictChecker.new(prefix, categories).check
     !verdict_check[:verdict_pass]
