@@ -13133,9 +13133,10 @@ input.wl-bl-list-inline {
       margin: -1px 0 -4px -2px !important;
     }
     .item {
-      margin-top: 0px !important;
+      margin-top: 0 !important;
       font-size: 10px;
       margin-bottom: 2px !important;
+      padding: 1px 4px;
     }
 
     .select-multiple {
@@ -13159,6 +13160,9 @@ input.wl-bl-list-inline {
       &:focus{
         box-shadow: none !important;
         border: none !important;
+      }
+      &::placeholder {
+        font-size: 10px;
       }
     }
   }
@@ -13193,6 +13197,13 @@ input.wl-bl-list-inline {
       margin-right: -8px;
     }
   }
+  .align-top {
+    padding-top: 3px !important;
+  }
+}
+
+.align-top {
+  vertical-align: top;
 }
 
 // clusters page categories styles

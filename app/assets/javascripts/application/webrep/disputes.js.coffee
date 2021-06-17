@@ -2472,11 +2472,10 @@ window.prep_dispute_to_convert = (event) ->
         entry_content = this.entry.uri
       else
         entry_content = this.entry.ip_address
-      entry_row = '<tr><td>' + this.entry.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
+      entry_row = '<tr><td class="align-top">' + this.entry.id + '</td><td class="entry-content-to-convert align-top">' + entry_content + '</td>' +
         '<td class="entry-cat-suggestions"><select class="selectize convert-entry-selectize" multiple="multiple" placeholder="Add categories"></select></td></tr>'
 
       $(entry_table).append(entry_row)
-
 
 
     $selected_cats = $('.convert-entry-selectize').selectize {

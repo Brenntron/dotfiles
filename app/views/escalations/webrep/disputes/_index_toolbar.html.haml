@@ -207,14 +207,16 @@
           %label.content-label-sm
             Ticket Entries:
             %span.convert-entry-count
-          %table#entries-to-convert
-            %thead
-              %tr
-                %th Entry ID
-                %th Entry Content
-                %th.text-right Suggested Categories
-            %tbody
+          .convert-entry-table-wrapper
+            %table#entries-to-convert.complaint-entries-to-convert
+              %thead
+                %tr
+                  %th Entry ID
+                  %th Entry Content
+                  %th.text-right Suggested Categories
+              %tbody
 
+          %hr.thin
           .comment-wrapper
             %label.content-label-sm{for: '#convert-ticket-summary'} Ticket Summary
             %textarea#convert-ticket-summary.dropdown-comment.note-input
