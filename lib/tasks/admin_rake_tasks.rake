@@ -52,6 +52,10 @@ namespace :escalations do
       end
     end
   end
+
+  task :run_ngfw_import => :environment do
+    Ngfw::Importer.import
+  end
 end
 
 namespace :bugs do
