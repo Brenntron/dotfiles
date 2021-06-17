@@ -887,16 +887,19 @@
                                     %tr
                                       %td
                                       %td= wbrs_hit.name
-                                      %td= rulehit.first.description
+                                      %td
+                                        - if rulehit.length > 0
+                                          = rulehit.first.description
                                       %td.text-center
-                                        - malware_prob = rulehit.first.probability / 100.0
-                                        - if malware_prob > 50
-                                          %span.mal-highlight
+                                        - if rulehit.length > 0
+                                          - malware_prob = rulehit.first.probability / 100.0
+                                          - if malware_prob > 50
+                                            %span.mal-highlight
+                                              = rulehit.first.probability / 100.0
+                                              \%
+                                          - else
                                             = rulehit.first.probability / 100.0
                                             \%
-                                        - else
-                                          = rulehit.first.probability / 100.0
-                                          \%
 
 
                                   - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit == true}.each do |wbrs_hit|
@@ -904,16 +907,19 @@
                                     %tr.plus-ip-rule-row
                                       %td.uri-plus-ip-rule-indicator
                                       %td= wbrs_hit.name
-                                      %td= rulehit.first.description
+                                      %td
+                                        - if rulehit.length > 0
+                                          = rulehit.first.description
                                       %td.text-center
-                                        - malware_prob = rulehit.first.probability / 100.0
-                                        - if malware_prob > 50
-                                          %span.mal-highlight
+                                        - if rulehit.length > 0
+                                          - malware_prob = rulehit.first.probability / 100.0
+                                          - if malware_prob > 50
+                                            %span.mal-highlight
+                                              = rulehit.first.probability / 100.0
+                                              \%
+                                          - else
                                             = rulehit.first.probability / 100.0
                                             \%
-                                        - else
-                                          = rulehit.first.probability / 100.0
-                                          \%
 
 
                           .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
