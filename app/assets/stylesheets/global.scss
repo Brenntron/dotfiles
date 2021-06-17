@@ -904,19 +904,17 @@ button {
   }
 
   .convert-entry-table-wrapper {
-    max-height: 100px;
-    overflow-y: scroll;
     margin-bottom: 10px;
+    &.max-scroll {
+      max-height: 200px;
+      overflow-y: scroll;
+    }
   }
   .content-label-sm .convert-entry-count {
     font-size: 7.5pt;
     font-weight: 600;
     float: none;
   }
-}
-
-.convert-entry-selectize {
-
 }
 
 .delete-search img {
@@ -13163,6 +13161,8 @@ input.wl-bl-list-inline {
       }
       &::placeholder {
         font-size: 10px;
+        padding-left: 0 !important;
+        padding-top: 0 !important;
       }
     }
   }

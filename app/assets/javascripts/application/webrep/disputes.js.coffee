@@ -2460,9 +2460,18 @@ window.prep_dispute_to_convert = (event) ->
     dispute_id = row_data.id
     entries = row_data.dispute_entries
     summary = row_data.dispute_summary
+    entry_count = entries.length
 
     $('#dispute-id-to-convert').text(dispute_id)
+    $('.convert-entry-count').text('(' + entry_count + ')')
     $('#convert-ticket-summary').text(summary)
+
+    # extra handling to deal with too many entries and overlapping issues with selectize
+    if entry_count > 8
+      $('.convert-entry-table-wrapper').addClass('max-scroll')
+    else
+      $('.convert-entry-table-wrapper').removeClass('max-scroll')
+
     entry_table = $('#entries-to-convert tbody')
     # clear out previous data
     $(entry_table).empty()
@@ -2473,21 +2482,22 @@ window.prep_dispute_to_convert = (event) ->
       else
         entry_content = this.entry.ip_address
       entry_row = '<tr><td class="align-top">' + this.entry.id + '</td><td class="entry-content-to-convert align-top">' + entry_content + '</td>' +
-        '<td class="entry-cat-suggestions"><select class="selectize convert-entry-selectize" multiple="multiple" placeholder="Add categories"></select></td></tr>'
+        '<td class="entry-cat-suggestions"><select id="' + this.entry.id + '-selectize" class="selectize convert-entry-selectize" multiple="multiple" placeholder="Add categories"></select></td></tr>'
 
       $(entry_table).append(entry_row)
+      entry_select = '#' + this.entry.id + '-selectize'
+      $(entry_select).selectize {
+        persist: false,
+        create: false,
+        maxItems: 5,
+        closeAfterSelect: true,
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
+        options: AC.WebCat.createSelectOptions(entry_select)
+      }
 
 
-    $selected_cats = $('.convert-entry-selectize').selectize {
-      persist: false,
-      create: false,
-      maxItems: 5,
-      closeAfterSelect: true,
-      valueField: 'category_id',
-      labelField: 'category_name',
-      searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions('.convert-entry-selectize')
-    }
 
 #    cats_controller = $selected_cats[0].selectize
 #    cats_controller.on 'change', ->
