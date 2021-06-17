@@ -1761,6 +1761,7 @@ $ ->
 
   $('.esc-tooltipped:disabled').tooltipster
     disable: true
+    debug: false
 
   $(document).on 'click', (e)->
     if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
