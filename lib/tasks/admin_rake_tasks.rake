@@ -19,16 +19,16 @@ namespace :escalations do
       'DUPLICATE' => ComplaintEntryCredit::DUPLICATE
     }
 
-    total_complaints = ComplaintEntry.where(resolution: resolutions)
+    credited_complaint_ids = ComplaintEntryCredit.pluck(:complaint_entry_id).uniq
+    total_complaints = ComplaintEntry.where(resolution: resolutions).where.not(id: credited_complaint_ids)
     total_count = total_complaints.count
     processed = 0
-    total_complaints.each do |entry|
+    total_complaints.find_each do |entry|
       if entry.case_resolved_at.nil?
         processed += 1
         puts "#{processed} of #{total_count} processed"
         next
       end
-      # binding.pry if entry.resolution == 'DUPLICATE'
       ComplaintEntryCredit.find_or_create_by(
         user_id: entry.user_id,
         complaint_entry_id: entry.id,
