@@ -2232,6 +2232,7 @@ window.prep_complaint_to_convert = () ->
     # get all data associated with the selected row
     complaint_row = $('tr.selected')[0]
     row_data = $('#complaints-index').DataTable().row(complaint_row).data()
+
     complaint_id = row_data.complaint_id
     summary = row_data.description
     entries_table = $('#entries-to-convert tbody')
@@ -2253,23 +2254,37 @@ window.prep_complaint_to_convert = () ->
         entries = response.data.complaint_entries
         entry_count = entries.length
 
-        # populate the dropdown
-        $('#complaint-id-to-convert').text(complaint_id)
+        # now that we have parent data, check complaint status
+        complaint_status = response.data.complaint.status
 
-        $(entries).each ->
-          if this.ip_address?
-            entry_content = this.ip_address
+        if complaint_status == 'NEW' || 'ASSIGNED' || 'ACTIVE' || 'REOPENED'
+          # populate the dropdown
+          $('#complaint-id-to-convert').text(complaint_id)
+          $('.convert-entry-count').text('(' + entry_count + ')')
+
+          # extra handling to deal with too many entries and overlapping issues with selectize
+          if entry_count > 8
+            $('.convert-entry-table-wrapper').addClass('max-scroll')
           else
-            entry_content = this.uri
+            $('.convert-entry-table-wrapper').removeClass('max-scroll')
+
+          $(entries).each ->
+            if this.ip_address?
+              entry_content = this.ip_address
+            else
+              entry_content = this.uri
 
             entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
               '<td class="text-center entry-disposition"><div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio">FP</label><input type="radio" name="disposition" value="fp" id="' + this.id + '-fp-radio"/></div>' +
               '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio">FN</label><input type="radio" name="disposition" value="fn" id="' + this.id + '-fn-radio"/></div></td></tr>'
 
-          $(entries_table).append(entry_row)
+            $(entries_table).append(entry_row)
 
-        $('.convert-entry-count').text('(' + entry_count + ')')
-        $('#convert-ticket-summary').append(summary)
+          $('#convert-ticket-summary').append(summary)
+
+        else
+          std_msg_error('Ticket cannot be converted', ['Selected entry\'s parent ticket is not in a convertable (open) status.'])
+          return
 
       error: (response) ->
         console.log response

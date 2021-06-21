@@ -2468,10 +2468,7 @@ window.prep_dispute_to_convert = (event) ->
       return
     else
       ticket_status = $(row_data.status).text().trim();
-      if ticket_status != 'NEW' || 'ASSIGNED' || 'RESEARCHING' || 'RE-OPENED' || 'ESCALATED'
-        std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertable (open) status.'])
-        return
-      else
+      if ticket_status == 'NEW' || 'ASSIGNED' || 'RESEARCHING' || 'RE-OPENED' || 'ESCALATED'
         dispute_id = row_data.id
         entries = row_data.dispute_entries
         summary = row_data.dispute_summary
@@ -2491,12 +2488,13 @@ window.prep_dispute_to_convert = (event) ->
         # clear out previous data
         $(entry_table).empty()
         $(entries).each ->
+          console.log this
           entry_content = ''
           if this.entry.uri?
             entry_content = this.entry.uri
           else
             entry_content = this.entry.ip_address
-          entry_row = '<tr><td class="align-top">' + this.entry.id + '</td><td class="entry-content-to-convert align-top">' + entry_content + '</td>' +
+          entry_row = '<tr><td class="align-top">' + this.entry.id + '</td><td class="entry-content-to-convert align-top">' + entry_content + '</td>' + '<td class="align-top"></td>' +
             '<td class="entry-cat-suggestions"><select id="' + this.entry.id + '-selectize" class="selectize convert-entry-selectize" multiple="multiple" placeholder="Add categories"></select></td></tr>'
 
           $(entry_table).append(entry_row)
@@ -2511,10 +2509,14 @@ window.prep_dispute_to_convert = (event) ->
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions(entry_select)
           }
+      else
+        std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertable (open) status.'])
+        return
 
 
 
-    #    cats_controller = $selected_cats[0].selectize
+
+#    cats_controller = $selected_cats[0].selectize
     #    cats_controller.on 'change', ->
     #      cats = $('#suggested-categories').val()
     #      if cats == '' || cats == null
