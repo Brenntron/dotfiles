@@ -1,7 +1,7 @@
 
 development:
   adapter: mysql2
-  encoding: utf8
+  encoding: utf8mb4
   database: ac_dev
   username: root
   host: localhost
@@ -9,7 +9,7 @@ development:
 
 profile:
   adapter: mysql2
-  encoding: utf8
+  encoding: utf8mb4
   database: ac_dev
   username: root
   host: localhost
