@@ -6,7 +6,7 @@
     %button#remove-criteria-complaint.remove-input{onclick:'clearSelectize("complaint-input")'}
 
   .form-group.search-item
-    %label.content-label-sm{for: 'company-input'} Company
+    %label.content-label-sm{for: 'company-input'} Submitter Org
     %select.form-control.selectize#company-input{name: 'company-input', multiple: 'multiple', tabindex:'-1'}
     %button#remove-criteria-company.remove-input{onclick:'clearSelectize("company-input")'}
 
@@ -59,12 +59,12 @@
     %button#remove-criteria-resolution.remove-input{onclick:'clearSelectize("resolution-input")'}
 
   .form-group.search-item.hidden
-    %label.content-label-sm Customer Name
+    %label.content-label-sm Submitter Name
     %input.form-control.selectize#name-input{name: 'customer-name', multiple: 'multiple', tabindex:'-1'}
     %button#remove-criteria-customer-name.remove-input{onclick:'clearSelectize("name-input")'}
 
   .form-group.search-item.hidden
-    %label.content-label-sm Customer Email
+    %label.content-label-sm Submitter Email
     %input.form-control#email-input{name: 'customer-email', list: 'customerEmailList'}
     %datalist#customerEmailList
     %button#remove-criteria-customer-email.remove-input
@@ -101,8 +101,8 @@
             Complaint (URL/IP/Domain)
         %li.hidden
           %label.search-criteria-label
-            %input.search-checkbox#company-cb{type: 'checkbox', name: 'search-criteria', value: 'Company', for: 'company-input'}
-            Company
+            %input.search-checkbox#company-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Org', for: 'company-input'}
+            Submitter Org
         %li.hidden
           %label.search-criteria-label
             %input.search-checkbox#channel-cb{type: 'checkbox', name: 'search-criteria', value: 'Added Through Channel', for: 'channel-input'}
@@ -142,12 +142,12 @@
             Resolution
         %li
           %label.search-criteria-label
-            %input.search-checkbox#name-cb{type: 'checkbox', name: 'search-criteria', value: 'Customer Name', for: 'name-input'}
-            Customer Name
+            %input.search-checkbox#name-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Name', for: 'name-input'}
+            Submitter Name
         %li
           %label.search-criteria-label
-            %input.search-checkbox#email-cb{type: 'checkbox', name: 'search-criteria', value: 'Customer Email', for: 'email-input'}
-            Customer Email
+            %input.search-checkbox#email-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Email', for: 'email-input'}
+            Submitter Email
         %li
           %label.search-criteria-label
             %input.search-checkbox#platform-cb{type: 'checkbox', name: 'search-criteria', value: 'Platform', for: 'platform-input'}

@@ -155,4 +155,41 @@ describe ClusterAssignment do
       expect { subject }.to change { ClusterAssignment.count }.to(0)
     end
   end
+
+  describe '#assign_pemanent!' do
+    subject { described_class.assign_pemanent!(cluster_ids, user) }
+    let(:cluster_ids) { ['1'] }
+
+    context 'when cluster is not assigned' do
+      it 'creates permanent assignment for the user' do
+        expect { subject }.to change { ClusterAssignment.count }.to(1)
+        expect(ClusterAssignment.last.permanent).to be_truthy
+      end
+    end
+
+    context 'when cluster is already assigned' do
+      before { FactoryBot.create(:cluster_assignment, user_id: user.id, cluster_id: cluster_ids.first) }
+
+      it 'assigns cluster to the user anyway and drops previous assignment' do
+        expect { subject }.to_not change { ClusterAssignment.count }
+        expect(ClusterAssignment.where(user_id: user.id).count).to be 1
+        expect(ClusterAssignment.last.permanent).to be_truthy
+      end
+    end
+  end
+
+  describe 'destroy_expired_assignments!' do
+    subject { described_class.send(:destroy_expired_assignments!) }
+
+    context 'permanent assignments' do
+      before do
+        FactoryBot.create(:cluster_assignment, :expired, user_id: user.id)
+        FactoryBot.create(:cluster_assignment, :expired, :permanent, user_id: user.id)
+      end
+
+      it 'should not remove expired permanent attachments' do
+        expect { subject }.to change { ClusterAssignment.count }.to(1)
+      end
+    end
+  end
 end

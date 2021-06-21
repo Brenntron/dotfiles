@@ -1761,6 +1761,7 @@ $ ->
 
   $('.esc-tooltipped:disabled').tooltipster
     disable: true
+    debug: false
 
   $(document).on 'click', (e)->
     if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
@@ -2338,10 +2339,12 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
       $(dropdown).remove()
 
       console.log response
-
       # Prep for inserting into DOM
       if response.json.rulehits?
-        rules     = response.json.rulehits.join(', ')
+        rules = []
+        $(response.json.rulehits).each ->
+          rules.push(this.mnemonic)
+        rule_names = rules.join(', ')
         rule_hits = response.json.rulehits.length
       else
         rules = ''
@@ -2369,7 +2372,7 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
       # Populate with our new data!
       $(wbrs_score_cell).text(score)
       $(wbrs_hits_cell).text(rule_hits)
-      $(wbrs_rules_cell).text(rules)
+      $(wbrs_rules_cell).text(rule_names)
       $(wbrs_cat_cell).text(threat_cats)
       $(wbrs_proxy_cell).text(proxy)
 
@@ -2378,10 +2381,16 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
       plus_ip_rule_rows = $(wbrs_details_table).find('.plus-ip-rule-row')
       $(plus_ip_rule_rows).each ->
         $(this).remove()
+
       if rule_hits > 0
         $(response.json.rulehits).each ->
-          # Ignoring description and weight right now as I don't think we are getting that data currently
-          rule_row = '<tr class="plus-ip-rule-row"><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
+          probability = this.malware_probability / 100
+          if probability > 50
+            probability = '<span class="mal-highlight">' + probability + '%</span>'
+          else
+            probability = '<span>' + probability + '%</span>'
+
+          rule_row = '<tr class="plus-ip-rule-row"><td class="uri-plus-ip-rule-indicator"></td><td>' + this.mnemonic + '</td><td>' + this.description + '</td><td class="text-center">' + probability + '</td></tr>'
           $(wbrs_details_table).append(rule_row)
       return
   )

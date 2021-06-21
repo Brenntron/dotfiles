@@ -172,6 +172,8 @@ class ComplaintEntry < ApplicationRecord
 
             ###############################################################################################################################################################
             ###guard rails
+
+            # TODO: this code should be refactored to use Webcat::EntryVerdictChecker class
             verdict_pass = true
             verdict_reasons = []
             if categories_string.blank?
@@ -507,7 +509,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
 
-  def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
+  def self.create_complaint_entry(complaint, ip_url, platform, user = nil, status = NEW, categories = nil)
     new_complaint_entry = ComplaintEntry.new
     begin
       wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
@@ -541,6 +543,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.is_important = importance if importance
       new_complaint_entry.user = user
       new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
+      new_complaint_entry.platform_id = platform.id if platform
 
       if status == PENDING # occurs when attempt to categorized a Top URl without a complaint
         new_complaint_entry.url_primary_category = categories
@@ -1161,7 +1164,7 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def process_resolution_changes(resolution, internal_comment, customer_facing_comment)
+  def process_resolution_changes(resolution, internal_comment, customer_facing_comment, current_user)
     confirmation = {}
     if !["COMPLETED","PENDING"].include?(self.status) && resolution != "REOPENED"
       if self.is_important && resolution != "UNCHANGED"
@@ -1186,6 +1189,9 @@ class ComplaintEntry < ApplicationRecord
       confirmation.update(state: 'ERROR', host: self.hostlookup, status: self.status,resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
                           message: "Cannot process a resolution update to #{resolution} on Complaint Entry (#{self.hostlookup})  of status #{self.status}")
     end
+
+    # add credit for user's contribution to complaint entry
+    ComplaintEntryCredits::CreditProcessor.new(current_user, self).process
     confirmation
   end
 

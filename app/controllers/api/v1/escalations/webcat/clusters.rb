@@ -21,29 +21,8 @@ module API
             post "process_cluster" do
               cluster_process_array = []
 
-              JSON.parse(params[:clusters]).each do |cluster|
-                conditions = {}
-
-                total_cats = cluster["categories"].size
-
-                conditions[:comment] = params[:comment] unless params[:comment].blank?
-                conditions[:user] = User.find(params[:user_id]).cvs_username
-                conditions[:cluster_id] = cluster["cluster_id"]
-                conditions[:cat_ids] = Wbrs::Category.get_category_ids(cluster["categories"])
-                conditions[:domain] = cluster["domain"]
-                conditions[:is_important] = cluster["is_important"]
-
-                if conditions[:cat_ids].blank? || conditions[:cat_ids].size != total_cats || !conditions[:cat_ids].all? {|i| i.is_a?(Integer)}
-                  raise "could not resolve categories (#{cluster["categories"]}) for cluster id #{conditions[:cluster_id]}, stopping process."
-                end
-                cluster_process_array << conditions
-              end
-
-              if cluster_process_array.blank?
-                raise "no categories were selected for any cluster, nothing happened."
-              end
-
-              ::Webcat::ClustersProcessor.process(cluster_process_array, current_user)
+              clusters = JSON.parse(params[:clusters], symbolize_names: true)
+              ::Clusters::Processor.new(clusters, current_user).process
               return {:status => "success"}.to_json
             end
 
@@ -55,9 +34,10 @@ module API
             # Uses class Beaker::Verdicts in old Beaker namespace.
             get "" do
               authorize!(:index, Complaint)
-              clusters = ::Webcat::ClustersFetcher.new(params[:f], params[:regex], current_user).fetch
 
-              {:status => "success", :data => clusters[:data], :meta => clusters[:meta]}.to_json
+              clusters = ::Clusters::Fetcher.new(params[:f], params[:regex], current_user).fetch
+
+              {:status => "success", :data => clusters}.to_json
             end
 
             #returns an array of hashes about urls associated with a cluster_id
@@ -77,10 +57,9 @@ module API
             end
             get ":id" do
               cluster_id = params[:id]
-
               cluster_info = Wbrs::Cluster.retrieve(cluster_id)
-
               sorted_limited_cluster_info = cluster_info.sort { |x,y| y["glob_volume"] <=> x["glob_volume"] }.first(300)
+
 
               {:status => "success", :data => sorted_limited_cluster_info}.to_json
             end
@@ -89,12 +68,12 @@ module API
             params do
             end
             post 'take' do
-              cluster_ids = params[:cluster_ids]
-              ClusterAssignment.assign(cluster_ids, current_user)
+              clusters = JSON.parse(params[:clusters], symbolize_names: true)
+              ::Clusters::Assignor.new(clusters, current_user).assign
               {
                 status: "success",
                 username: current_user.cvs_username,
-                cluster_ids: cluster_ids
+                clusters: clusters
               }.to_json
 
             rescue Exception => e
@@ -108,8 +87,8 @@ module API
             params do
             end
             post 'return' do
-              cluster_ids = params[:cluster_ids]
-              ClusterAssignment.unassign(cluster_ids, current_user)
+              clusters = JSON.parse(params[:clusters], symbolize_names: true)
+              ::Clusters::Assignor.new(clusters, current_user).unassign
               return {:status => "success"}.to_json
             rescue Exception => e
               {
@@ -122,8 +101,8 @@ module API
             params do
             end
             post 'proccess' do
-              cluster_ids = params[:cluster_ids]
-              ::Webcat::ClustersProcessor.process!(cluster_ids)
+              cluster = params[:cluster]
+              ::Clusters::Processor.new([cluster], current_user).process!
               return {:status => "success"}.to_json
             rescue Exception => e
               {
@@ -136,8 +115,8 @@ module API
             params do
             end
             post 'decline' do
-              cluster_ids = params[:cluster_ids]
-              ::Webcat::ClustersProcessor.decline!(cluster_ids, current_user)
+              cluster = params[:cluster]
+              ::Clusters::Processor.new([cluster], current_user).decline
               return {:status => "success"}.to_json
             rescue Exception => e
               {
