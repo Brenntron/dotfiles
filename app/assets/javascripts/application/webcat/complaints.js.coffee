@@ -2254,36 +2254,43 @@ window.prep_complaint_to_convert = () ->
         entries = response.data.complaint_entries
         entry_count = entries.length
 
-        # now that we have parent data, check complaint status
+        # now that we have parent data, check complaint status & source
         complaint_status = response.data.complaint.status
+        complaint_source = response.data.complaint.ticket_source
 
-        if complaint_status == 'NEW' || 'ASSIGNED' || 'ACTIVE' || 'REOPENED'
-          # populate the dropdown
-          $('#complaint-id-to-convert').text(complaint_id)
-          $('.convert-entry-count').text('(' + entry_count + ')')
+        if complaint_source == 'talosintelligence'
 
-          # extra handling to deal with too many entries and overlapping issues with selectize
-          if entry_count > 8
-            $('.convert-entry-table-wrapper').addClass('max-scroll')
-          else
-            $('.convert-entry-table-wrapper').removeClass('max-scroll')
+          if complaint_status == 'NEW' || 'ASSIGNED' || 'ACTIVE' || 'REOPENED'
+            # populate the dropdown
+            $('#complaint-id-to-convert').text(complaint_id)
+            $('.convert-entry-count').text('(' + entry_count + ')')
 
-          $(entries).each ->
-            if this.ip_address?
-              entry_content = this.ip_address
+            # extra handling to deal with too many entries and overlapping issues with selectize
+            if entry_count > 8
+              $('.convert-entry-table-wrapper').addClass('max-scroll')
             else
-              entry_content = this.uri
+              $('.convert-entry-table-wrapper').removeClass('max-scroll')
 
-            entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
-              '<td class="text-center entry-disposition"><div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio">FP</label><input type="radio" name="disposition" value="fp" id="' + this.id + '-fp-radio"/></div>' +
-              '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio">FN</label><input type="radio" name="disposition" value="fn" id="' + this.id + '-fn-radio"/></div></td></tr>'
+            $(entries).each ->
+              if this.ip_address?
+                entry_content = this.ip_address
+              else
+                entry_content = this.uri
 
-            $(entries_table).append(entry_row)
+              entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
+                '<td class="text-center entry-disposition"><div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio">FP</label><input type="radio" name="disposition" value="fp" id="' + this.id + '-fp-radio"/></div>' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio">FN</label><input type="radio" name="disposition" value="fn" id="' + this.id + '-fn-radio"/></div></td></tr>'
 
-          $('#convert-ticket-summary').append(summary)
+              $(entries_table).append(entry_row)
+
+            $('#convert-ticket-summary').append(summary)
+
+          else
+            std_msg_error('Ticket cannot be converted', ['Selected entry\'s parent ticket is not in a convertable (open) status.'])
+            return
 
         else
-          std_msg_error('Ticket cannot be converted', ['Selected entry\'s parent ticket is not in a convertable (open) status.'])
+          std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
           return
 
       error: (response) ->
