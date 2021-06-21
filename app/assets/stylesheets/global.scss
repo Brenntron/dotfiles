@@ -11485,7 +11485,10 @@ input[type="radio"].resolution_radio_button {
   font-style: oblique!important;
 }
 // webrep and webcat toolbars - prevent breaking/wrapping of the buttons
-@media (min-width: 1600px) {
+#webrep-index-toolbar .toolbar-button .toolbar-button-text {
+  display: none;
+}
+@media (min-width: 1700px) {
   #webrep-index-toolbar{
     .toolbar-button {
       background-position: 4px 6px;
@@ -11494,6 +11497,9 @@ input[type="radio"].resolution_radio_button {
       min-height: 25px;
       background-size: 14px 14px; // icon size
       transition: background-color 0.2s;
+      .toolbar-button-text {
+        display: inline-block;
+      }
     }
   }
 }

@@ -2458,11 +2458,9 @@ window.prep_dispute_to_convert = (event) ->
     dispute_row = $('tr.selected')[0]
     row_data = $('#disputes-index').DataTable().row(dispute_row).data()
 
-    debugger
     # conversion checks
     # - ti.com ticket
     # - open ticket
-
     if row_data.source =! 'talos-intelligence'
       std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
       return
@@ -2508,34 +2506,64 @@ window.prep_dispute_to_convert = (event) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions(entry_select)
+            onChange: ->
+              check_convert_to_webcat_ready()
           }
+        check_convert_to_webcat_ready()
+
       else
         std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertable (open) status.'])
         return
 
 
+$ ->
+
+  # Check dropdown to decide when to enable the conversion submit button
+  # check on dd click
+  # check on selectize change
+  # check on finish of population of entries (user may not need to alter anything)
+  # - this will not work / be testable until the current cats come through
+  $('#webrep-index-toolbar #convert-ticket-dropdown').click ->
+    check_convert_to_webcat_ready()
 
 
-#    cats_controller = $selected_cats[0].selectize
-    #    cats_controller.on 'change', ->
-    #      cats = $('#suggested-categories').val()
-    #      if cats == '' || cats == null
-    #        $('#convert-ticket-dropdown .dropdown-submit-button').attr('disabled', 'disabled')
-    #      else
-    #        $('#convert-ticket-dropdown .dropdown-submit-button').removeAttr('disabled')
+check_convert_to_webcat_ready = () ->
+  entry_cats = $('#webrep-index-toolbar #convert-ticket-dropdown').find('.selectize')
+  enable = true
+  # if any are not filled out we don't enable the submit button
+  $(entry_cats).each ->
+    if $(this).val() == null
+      enable = false
+  if enable == true
+    $('#convert-ticket-dropdown .dropdown-submit-button').removeAttr('disabled')
+  else
+    $('#convert-ticket-dropdown .dropdown-submit-button').attr('disabled', 'disabled')
+  return false
 
 
 window.convert_dispute_to_webcat = () ->
+
   $('#convert-ticket-dropdown .dropdown-loader-wrapper').removeClass('hidden')
-  data = {}
-  data.dispute_id = $('#dispute-id-to-convert').text()
-  data.summary = $('#convert-ticket-summary').val()
-  data.suggested_categories = $('#suggested-categories').val()
+  debugger
+  dispute_id = $('#dispute-id-to-convert').text()
+  summary = $('#convert-ticket-summary').val()
+
+  # get the entries
+  suggested_categories = []
+  entry_rows = $('#entries-to-convert tbody tr')
+  $(entry_rows).each ->
+    entry_content = $(this).find('.entry-content-to-convert').text()
+    entry_cats = $(this).find('.convert-entry-selectize').val()
+    suggested_categories.push(entry: entry_content, suggested_categories: entry_cats)
 
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/convert_ticket'
     method: 'POST'
-    data: data
+    data: {
+      dispute_id: dispute_id
+      summary: summary
+      suggested_categories: suggested_categories
+    }
     success: (response) ->
       console.log response
       $('#convert-ticket-dropdown .dropdown-loader-wrapper').addClass('hidden')
