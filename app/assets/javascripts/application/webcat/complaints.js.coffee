@@ -91,6 +91,7 @@ window.touchedFormChange = (url) ->
 
   if !urls_touched.includes(url)
     url_items = urls_touched.split(",")
+    url_items = url_items.filter((item) -> return item)
     url_items.push(url)
     urls_touched = url_items.join(",")
   sessionStorage.setItem("touchedForm", urls_touched)
@@ -100,19 +101,17 @@ window.removeTouchedFormChange = (url) ->
 
   if urls_touched.includes(url)
     url_items = urls_touched.split(",")
+    url_items = url_items.filter((item) -> return item)
     url_index = url_items.indexOf(url)
     url_items.splice(url_index, 1)
     urls_touched = url_items.join(",")
   sessionStorage.setItem("touchedForm", urls_touched)
 
 getTouchedFormCount = ()->
-  form_item = sessionStorage.getItem("touchedForm")
-  items = 0
-  if form_item
-    if form_item.slice -1 == ","
-      form_item = form_item.slice(0, -1);
-    items = form_item.split(",").length - 1
-  return items
+  form_item = (sessionStorage.getItem("touchedForm") || "")
+  form_item = form_item.split(",")
+  form_item = form_item.filter((item) -> return item)
+  return form_item.length
 
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
@@ -184,6 +183,7 @@ processSubmitNewURL = () ->
 
 window.cat_new_url = ()->
   timesTouched = getTouchedFormCount()
+  debugger
   if timesTouched > 1
     std_msg_confirm(
       "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
@@ -422,6 +422,7 @@ window.review_bulk_submit = () ->
     , this)
 
 processSubmitPending=(entry_id,row_id)->
+  debugger
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   status = $('[name=resolution_review_'+entry_id+']:checked').val()
   if status == "ignore"
@@ -639,6 +640,7 @@ processSubmitEntry = (entry_id,row_id) ->
 ## Called when user submits categories / information to close a ticket
 window.updateEntryColumns = (entry_id,row_id) ->
   timesTouched = getTouchedFormCount()
+  debugger
   if timesTouched > 1
     std_msg_confirm(
       "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
