@@ -985,7 +985,7 @@ Feature: Webcat complaints
 # the convert button should trigger a dropdown when it is enabled and clicked on
 
   @javascript
-  Scenario: a user tries to convert a webcat ticket from WBNP
+  Scenario: a user tries to convert a webcat ticket that originated from WBNP
     Given a user with role "webcat user" exists and is logged in
     And the following complaints exist:
       | id | description         | ticket_source | channel |
@@ -1005,4 +1005,25 @@ Feature: Webcat complaints
     And I wait for "1" seconds
     And I should see "TICKET CANNOT BE CONVERTED"
     And I should see "Selected ticket is not a customer ticket from talos-intelligence"
+
+  @javascript
+  Scenario: a user tries to convert a webcat ticket that originated from the talos intelligence form
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source        | channel    |
+      | 1  | this is shenanigans | talos-intelligence   | talosintel |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status     | ip_address |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | NEW        |            |
+      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | NEW        |            |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "5" seconds
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And Element with id "1111" should have class "selected"
+    And button with id "convert-ticket-button" should be enabled
+    And I wait for "2" seconds
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And I should not see "TICKET CANNOT BE CONVERTED"
     And take a screenshot
+    Then pending
