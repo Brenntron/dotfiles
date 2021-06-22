@@ -2544,7 +2544,7 @@ check_convert_to_webcat_ready = () ->
 window.convert_dispute_to_webcat = () ->
 
   $('#convert-ticket-dropdown .dropdown-loader-wrapper').removeClass('hidden')
-  debugger
+#  debugger
   dispute_id = $('#dispute-id-to-convert').text()
   summary = $('#convert-ticket-summary').val()
 
@@ -2556,9 +2556,12 @@ window.convert_dispute_to_webcat = () ->
     entry_cats = $(this).find('.convert-entry-selectize').val()
     suggested_categories.push(entry: entry_content, suggested_categories: entry_cats)
 
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/convert_ticket'
     method: 'POST'
+    headers: headers
     data: {
       dispute_id: dispute_id
       summary: summary
