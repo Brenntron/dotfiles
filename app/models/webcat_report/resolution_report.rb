@@ -20,7 +20,7 @@ class WebcatReport::ResolutionReport
             'avg(time_to_sec(timediff( case_resolved_at, created_at ))) as dept_avg, ' +
             'max( time_to_sec( timediff( case_resolved_at, created_at ))) as dept_max'
 
-    counts = ComplaintEntryCredit.where(created_at: (@date_from..@date_to+1)).group(:credit).count
+    counts = WebcatCredit.where(created_at: (@date_from..@date_to+1)).group(:credit).count
 
     times =
         ComplaintEntry.where.not(resolution: nil)
@@ -28,21 +28,21 @@ class WebcatReport::ResolutionReport
             .select(times_select_phrase).first
 
     yield ResolutionCount.new(username: 'TOTAL',
-                              pending: counts[ComplaintEntryCredit::PENDING],
-                              fixed: counts[ComplaintEntryCredit::FIXED],
-                              invalid: counts[ComplaintEntryCredit::INVALID],
-                              unchanged: counts[ComplaintEntryCredit::UNCHANGED],
-                              duplicate: counts[ComplaintEntryCredit::DUPLICATE],
+                              pending: counts[WebcatCredit::PENDING],
+                              fixed: counts[WebcatCredit::FIXED],
+                              invalid: counts[WebcatCredit::INVALID],
+                              unchanged: counts[WebcatCredit::UNCHANGED],
+                              duplicate: counts[WebcatCredit::DUPLICATE],
                               eng_avg: times.eng_avg, eng_max: times.eng_max,
                               dept_avg: times.dept_avg, dept_max: times.dept_max)
 
 
-    User.joins(:complaint_entry_credits)
-        .where(complaint_entry_credits: {created_at: (@date_from..@date_to+1)})
+    User.joins(:webcat_credits)
+        .where(webcat_credits: {created_at: (@date_from..@date_to+1)})
         .group(:id).order(:cvs_username).each do |user|
 
       counts =
-          ComplaintEntryCredit.where(user_id: user.id, created_at: (@date_from..@date_to+1)).group(:credit).count
+          WebcatCredit.where(user_id: user.id, created_at: (@date_from..@date_to+1)).group(:credit).count
 
       times =
           ComplaintEntry.where.not(resolution: nil)
@@ -50,11 +50,11 @@ class WebcatReport::ResolutionReport
           .select(times_select_phrase).first
 
       yield ResolutionCount.new(username: user.cvs_username,
-                                pending: counts[ComplaintEntryCredit::PENDING],
-                                fixed: counts[ComplaintEntryCredit::FIXED],
-                                invalid: counts[ComplaintEntryCredit::INVALID],
-                                unchanged: counts[ComplaintEntryCredit::UNCHANGED],
-                                duplicate: counts[ComplaintEntryCredit::DUPLICATE],
+                                pending: counts[WebcatCredit::PENDING],
+                                fixed: counts[WebcatCredit::FIXED],
+                                invalid: counts[WebcatCredit::INVALID],
+                                unchanged: counts[WebcatCredit::UNCHANGED],
+                                duplicate: counts[WebcatCredit::DUPLICATE],
                                 eng_avg: times.eng_avg, eng_max: times.eng_max,
                                 dept_avg: times.dept_avg, dept_max: times.dept_max)
     end
