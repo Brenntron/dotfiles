@@ -34,6 +34,7 @@ When(/^I click "(.*?)"$/) do |target|
       page.find("#{target}").click
     end
 end
+
 When(/^I select row "(.*?)"$/) do |target|
   page.execute_script("$('##{target}').addClass('selected')")
 end
@@ -50,6 +51,15 @@ end
 When(/^I click first element of class "(.*?)"$/) do |target|
   page.find("#{target}", match: :first).click
 end
+
+When(/^I click row with id "(.*?)"$/) do | id |
+  page.find(:xpath, "//tr[contains(@id, '#{id}')]").click
+end
+
+When(/^I click on cell with class "(.*?)" within row with id "(.*?)"$/) do | class_name, id_name |
+  page.find(:xpath, "//tr[contains(@id, '#{id_name}')]//td[contains(@class, '#{class_name}')]").click
+end
+
 
 When(/^I click through "(.*?)" and accept confirmation$/) do |target|
   accept_confirm do
@@ -180,6 +190,11 @@ Then(/^Element with class "(.*?)" should not have content "(.*?)"$/) do |class_n
   element = find(:xpath, "//*[contains(@class, '#{class_name}')]")
   raise "content found when it should not have been found" if element.has_content?(content)
 end
+
+Then(/^Element with id "(.*?)" should have class "(.*?)"$/) do |id_name, class_name|
+  find(:xpath, "//*[contains(@id, '#{id_name}')][contains(@class, '#{class_name}')]")
+end
+
 
 Then(/^Element with class "(.*?)" should not be empty$/) do |class_name|
   element = find(:xpath, "//*[contains(@class, '#{class_name}')]")
@@ -539,6 +554,14 @@ end
 
 Then(/^button "(.*?)" should be disabled$/) do |button|
   expect(page).to have_button(button, disabled: true)
+end
+
+Then(/^button with id "(.*?)" should be disabled$/) do |id_name|
+  page.find(:xpath, "//button[@id='#{id_name}']").disabled? == true
+end
+
+Then(/^button with id "(.*?)" should be enabled$/) do |id_name|
+  page.find(:xpath, "//button[@id='#{id_name}']").disabled? == false
 end
 
 Given(/^I fill in selectized with "(.*?)"$/) do |value|

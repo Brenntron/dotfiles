@@ -2254,11 +2254,12 @@ window.prep_complaint_to_convert = () ->
         entries = response.data.complaint_entries
         entry_count = entries.length
 
+        debugger
         # now that we have parent data, check complaint status & source
         complaint_status = response.data.complaint.status
         complaint_source = response.data.complaint.ticket_source
 
-        if complaint_source == 'talosintelligence'
+        if complaint_source == 'talos-intelligence'
 
           if complaint_status == 'NEW' || 'ASSIGNED' || 'ACTIVE' || 'REOPENED'
             # populate the dropdown
