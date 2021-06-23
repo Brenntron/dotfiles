@@ -809,7 +809,7 @@ class DisputeEntry < ApplicationRecord
 
 
 
-    self.wbrs_score = wbrs_stuff["wbrs"]["score"]
+    self.wbrs_score = wbrs_stuff["wbrs"]["score"] if wbrs_stuff["wbrs"].present?
 
     if wbrs_stuff["threat_cats"].present?
       threat_cats = wbrs_stuff["threat_cats"]
