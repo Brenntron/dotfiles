@@ -993,9 +993,8 @@ Feature: Webcat complaints
     And the following complaint entries exist:
       | id    | uri                | domain             | entry_type | complaint_id | status     |
       | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | NEW        |
-      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | NEW        |
     And I goto "/escalations/webcat/complaints"
-    Then I wait for "5" seconds
+    Then I wait for "3" seconds
     And button with id "convert-ticket-button" should be disabled
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
@@ -1015,9 +1014,8 @@ Feature: Webcat complaints
     And the following complaint entries exist:
       | id    | uri                | domain             | entry_type | complaint_id | status     |
       | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | NEW        |
-      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | NEW        |
     And I goto "/escalations/webcat/complaints"
-    Then I wait for "5" seconds
+    Then I wait for "3" seconds
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
     And I wait for "2" seconds
@@ -1027,7 +1025,8 @@ Feature: Webcat complaints
     And I should see "Selected ticket is not a customer ticket from talos-intelligence"
 
   @javascript
-  Scenario: a user tries to convert a webcat ticket that originated from the talos intelligence form and does not see an error msg
+  Scenario: a user tries to convert a webcat ticket that originated from the talos intelligence form
+    and does not see an error msg
     Given a user with role "webcat user" exists and is logged in
     And the following complaints exist:
       | id | description         | ticket_source        | channel    | status |
@@ -1035,9 +1034,8 @@ Feature: Webcat complaints
     And the following complaint entries exist:
       | id    | uri                | domain             | entry_type | complaint_id | status     | ip_address |
       | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | NEW        |            |
-      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | NEW        |            |
     And I goto "/escalations/webcat/complaints"
-    Then I wait for "5" seconds
+    Then I wait for "3" seconds
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
     And button with id "convert-ticket-button" should be enabled
@@ -1055,9 +1053,8 @@ Feature: Webcat complaints
     And the following complaint entries exist:
       | id    | uri                | domain             | entry_type | complaint_id | status     | ip_address |
       | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | COMPLETED  |            |
-      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | COMPLETED  |            |
     And I goto "/escalations/webcat/complaints"
-    Then I wait for "5" seconds
+    Then I wait for "3" seconds
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
     And button with id "convert-ticket-button" should be enabled
@@ -1076,9 +1073,8 @@ Feature: Webcat complaints
     And the following complaint entries exist:
       | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
       | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | RESOLVED  |            |
-      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | RESOLVED  |            |
     And I goto "/escalations/webcat/complaints"
-    Then I wait for "5" seconds
+    Then I wait for "3" seconds
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
     And button with id "convert-ticket-button" should be enabled
@@ -1097,9 +1093,8 @@ Feature: Webcat complaints
     And the following complaint entries exist:
       | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
       | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | ASSIGNED  |            |
-      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | ASSIGNED  |            |
     And I goto "/escalations/webcat/complaints"
-    Then I wait for "5" seconds
+    Then I wait for "3" seconds
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
     And button with id "convert-ticket-button" should be enabled
@@ -1117,9 +1112,8 @@ Feature: Webcat complaints
     And the following complaint entries exist:
       | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
       | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | REOPENED  |            |
-      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | REOPENED  |            |
     And I goto "/escalations/webcat/complaints"
-    Then I wait for "5" seconds
+    Then I wait for "3" seconds
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
     And button with id "convert-ticket-button" should be enabled
@@ -1127,3 +1121,64 @@ Feature: Webcat complaints
     And I click "#convert-ticket-button"
     And I wait for "1" seconds
     And I should not see "TICKET CANNOT BE CONVERTED"
+
+  @javascript
+  Scenario: a user tries to convert multiple webcat tickets and cannot
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source        | channel    | status |
+      | 1  | this is shenanigans | talos-intelligence   | talosintel | ACTIVE |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | ASSIGNED  |            |
+      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | ASSIGNED  |            |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "3" seconds
+    And button with id "convert-ticket-button" should be disabled
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And Element with id "1111" should have class "selected"
+    And button with id "convert-ticket-button" should be enabled
+    And I click on cell with class "entry-id-col" within row with id "2222"
+    And Element with id "2222" should have class "selected"
+    And button with id "convert-ticket-button" should be disabled
+
+  @javascript
+  Scenario: a user tries to convert a webcat ticket with multiple entries
+    should see all entries listed in the conversion dropdown
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source        | channel    | status |
+      | 1  | this is shenanigans | talos-intelligence   | talosintel | ACTIVE |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | ASSIGNED  |            |
+      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | ASSIGNED  |            |
+      | 3333  | hideyokids.com     | hideyokids.com     | URI/DOMAIN |  1           | ASSIGNED  |            |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "3" seconds
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And Table with id "entries-to-convert" should have "3" number of rows
+
+  @javascript
+  Scenario: a user must select a ticket type in order to be able to convert a webcat ticket
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source        | channel    | status   |
+      | 1  | this is shenanigans | talos-intelligence   | talosintel | ACTIVE |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | ASSIGNED  |            |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "3" seconds
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And button with id "convert-to-webrep" should be disabled
+    And I click input with id "1111-fp-radio"
+    And button with id "convert-to-webrep" should be disabled
+    And I click input with id "web-ticket-type"
+    And button with id "convert-to-webrep" should be enabled
+    And button with id "convert-to-webrep" should be disabled
+    And take a screenshot

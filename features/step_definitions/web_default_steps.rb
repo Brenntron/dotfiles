@@ -557,11 +557,16 @@ Then(/^button "(.*?)" should be disabled$/) do |button|
 end
 
 Then(/^button with id "(.*?)" should be disabled$/) do |id_name|
-  page.find(:xpath, "//button[@id='#{id_name}']").disabled? == true
+  # page.find(:xpath, "//button[@id='#{id_name}']").disabled? == true
+  # find_button("button##{id_name}", disabled: true)
+  # find_button("button##{id_name}").enabled?
+  find_button("button##{id_name}").disabled?
+  # find_button("button##{id_name}[disabled]")
 end
 
 Then(/^button with id "(.*?)" should be enabled$/) do |id_name|
-  page.find(:xpath, "//button[@id='#{id_name}']").disabled? == false
+  # page.find(:xpath, "//button[@id='#{id_name}']")
+  find_button("button##{id_name}", disabled: false)
 end
 
 Given(/^I fill in selectized with "(.*?)"$/) do |value|
@@ -587,4 +592,12 @@ Given(/^I remove row "(.*?)"$/) do |element|
   field = find("#{element}", match: :first)
   field.native.clear
   field.send_keys [:backspace]
+end
+
+Then(/^Table with id "(.*?)" should have "(.*?)" number of rows$/) do |id_name, row_count|
+  page.all("table##{id_name} tbody > tr").count.should == row_count.to_i
+end
+
+Then(/^I click input with id "(.*?)"$/) do |id_name|
+  page.find(:xpath, "//input[@id='#{id_name}']").click
 end
