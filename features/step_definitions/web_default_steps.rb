@@ -559,9 +559,14 @@ end
 Then(/^button with id "(.*?)" should be disabled$/) do |id_name|
   # page.find(:xpath, "//button[@id='#{id_name}']").disabled? == true
   # find_button("button##{id_name}", disabled: true)
+  # find_button("##{id_name}", disabled: true)
   # find_button("button##{id_name}").enabled?
-  find_button("button##{id_name}").disabled?
+  # find_button("button##{id_name}").disabled?
   # find_button("button##{id_name}[disabled]")
+  # find_button("button##{id_name}", disabled: true).should be
+  # find_button("##{id_name}", disabled: true).should be
+  find_button("##{id_name}").disabled?
+  #
 end
 
 Then(/^button with id "(.*?)" should be enabled$/) do |id_name|
