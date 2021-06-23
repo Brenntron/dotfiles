@@ -2466,7 +2466,7 @@ window.prep_dispute_to_convert = (event) ->
       return
     else
       ticket_status = $(row_data.status).text().trim();
-      if ticket_status == 'NEW' || 'ASSIGNED' || 'RESEARCHING' || 'RE-OPENED' || 'ESCALATED'
+      if ticket_status == 'NEW' || ticket_status == 'ASSIGNED' || ticket_status == 'RESEARCHING' || ticket_status == 'RE-OPENED' || ticket_status == 'ESCALATED'
         dispute_id = row_data.id
         entries = row_data.dispute_entries
         summary = row_data.dispute_summary
@@ -2512,7 +2512,7 @@ window.prep_dispute_to_convert = (event) ->
         check_convert_to_webcat_ready()
 
       else
-        std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertable (open) status.'])
+        std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertible (open) status.'])
         return
 
 

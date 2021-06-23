@@ -2259,8 +2259,7 @@ window.prep_complaint_to_convert = () ->
         complaint_source = response.data.complaint.ticket_source
 
         if complaint_source == 'talos-intelligence'
-
-          if complaint_status == 'NEW' || 'ASSIGNED' || 'ACTIVE' || 'REOPENED'
+          if complaint_status == 'NEW' || complaint_status == 'ACTIVE' || complaint_status == 'REOPENED'
             # populate the dropdown
             $('#complaint-id-to-convert').text(complaint_id)
             $('.convert-entry-count').text('(' + entry_count + ')')
@@ -2272,7 +2271,7 @@ window.prep_complaint_to_convert = () ->
               $('.convert-entry-table-wrapper').removeClass('max-scroll')
 
             $(entries).each ->
-              if this.ip_address?
+              if this.entry_type == 'IP'
                 entry_content = this.ip_address
               else
                 entry_content = this.uri
@@ -2286,7 +2285,7 @@ window.prep_complaint_to_convert = () ->
             $('#convert-ticket-summary').append(summary)
 
           else
-            std_msg_error('Ticket cannot be converted', ['Selected entry\'s parent ticket is not in a convertable (open) status.'])
+            std_msg_error('Ticket cannot be converted', ['Selected entry\'s parent ticket is not in a convertible (open) status.'])
             return
 
         else
