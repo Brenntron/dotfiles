@@ -539,7 +539,7 @@ class Complaint < ApplicationRecord
 
     new_report = WbnpReport.new
 
-    all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(5)
+    all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
     logger_token = SecureRandom.uuid
     new_report.notes = ""
@@ -574,7 +574,7 @@ class Complaint < ApplicationRecord
 
         platform = Platform.where("internal_name like '%wsa%'").first
 
-        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(5)
+        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
         total_entries = all_complaints.size
         entry_num = 1
         bugzilla_rest_session = BugzillaRest::Session.default_session
