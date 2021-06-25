@@ -1,11 +1,11 @@
 describe ComplaintEntry do
   context 'complaint entry credit changes' do
     before do
-      allow(ComplaintEntryCredits::CreditProcessor).to receive(:new).and_return(double(process: true))
+      allow(WebcatCredits::ComplaintEntries::CreditProcessor).to receive(:new).and_return(double(process: true))
       allow(Wbrs::Prefix).to receive(:where).and_return([wbrs_prefix])
     end
 
-    let(:credit_processor) { ComplaintEntryCredits::CreditProcessor.new(user, complaint_entry) }
+    let(:credit_processor) { WebcatCredits::ComplaintEntries::CreditProcessor.new(user, complaint_entry) }
     let(:wbrs_prefix) do
       Wbrs::Prefix.new_from_attributes(
         category_id: 27,
@@ -50,7 +50,7 @@ describe ComplaintEntry do
       let(:commit_pending) { '' }
       let(:complaint_entry) { FactoryBot.create(:complaint_entry) }
 
-      it 'requests ComplaintEntryCredits::CreditProcessor' do
+      it 'requests WebcatCredits::ComplaintEntries::CreditProcessor' do
         expect(credit_processor).to receive(:process)
         change_category
       end
@@ -71,9 +71,24 @@ describe ComplaintEntry do
       let(:ip_url) { 'example.com' }
       let(:user) { FactoryBot.create(:user) }
 
-      it 'requests ComplaintEntryCredits::CreditProcessor' do
-        expect(ComplaintEntryCredits::CreditProcessor).to receive_message_chain(:new, :process)
+      it 'requests WebcatCredits::ComplaintEntries::CreditProcessor' do
+        expect(WebcatCredits::ComplaintEntries::CreditProcessor).to receive_message_chain(:new, :process)
         create_complaint_entry
+      end
+    end
+
+    describe 'process_resolution_changes' do
+      subject(:process_resolution_changes) do
+        described_class.process_resolution_changes(resolution, internal_comment, customer_facing_comment, user)
+
+        let(:resolution) { "UNCHANGED" }
+        let(:internal_comment) { "we do not want to categorize this" }
+        let(:customer_facing_comment) { "all good!" }
+
+        it 'requests ComplaintEntryCredits::CreditProcessor' do
+          expect(ComplaintEntryCredits::CreditProcessor).to receive_message_chain(:new, :process)
+          create_complaint_entry
+        end
       end
     end
   end

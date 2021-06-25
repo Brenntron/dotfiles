@@ -2107,7 +2107,7 @@ a.static-nav-item {
 .icon-search{background-image: url(image_path('icon_search_white.svg'));}
 .icon-paste {background-image: url(image_path('icon_paste.svg'));}
 .icon-clear {background-image: url(image_path('icon_clear.svg'));}
-.icon-submit{background-image: url("icon_submit_arrow.svg")}
+.icon-submit{background-image: url(image_path('icon_submit_arrow.svg'));}
 .icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 .icon-guest-user {background-image: url(image_path('icon_guest_grey.svg'));}
 .icon-talos-sandbox {background-image: url(image_path('icon_sandbox2.svg'));}
@@ -4012,7 +4012,8 @@ input.communication-subject {
 
 //bump up button when next to duplicate status
 .duplicate-status-notice + .mng-resolution-message-templates-button {
-  top: 15px;
+  position: relative;
+  bottom: 5px;
 }
 
 .select-a-template{
@@ -13067,6 +13068,42 @@ input.wl-bl-list-inline {
 
 .toggle-vis, .toggle-vis-nested {
   cursor: default;
+}
+
+// webrep create new dispute - textarea
+#new-dispute-wrapper textarea, #new-dispute-wrapper textarea:focus {
+  border: none;
+  padding: 6px;
+  &::placeholder {
+    font-size: 8.5pt;
+    color: $content-label-color;
+  }
+}
+
+#new-dispute-wrapper .dispute-error-inline {
+  font-size: 9pt;
+  font-weight: 500;
+  background-color: #fdf0e2;  // one-off needed
+  color: #a2590b;  // one-off needed
+  padding: 7px 40px 7px 32px;
+  border-radius: 3px;
+  background-image: url(image_path('icon_error.svg'));
+  background-repeat: no-repeat;
+  background-position: 6px 5px;
+  background-size: 18px 20px;
+  margin-bottom: 10px;
+  .close {
+    float: right;
+    position: relative;
+    width: 20px;
+    left: 35px;
+    bottom: 20px;
+    color: $type-base-color;
+    font-size: 18pt;
+    background-color: transparent !important;
+    filter: alpha(opacity=20);
+    opacity: 0.2;
+  }
 }
 
 .mal-highlight {
