@@ -101,7 +101,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
         $('#current-wbnp-report .wbnp-status').text(curr_report.status)
         $('#current-wbnp-report .wbnp-status-msg').text(curr_report.status_message)
         current_table = $('#current-wbnp-report .wbnp-full-report-table')
-        curr_table_content = '<tr><td>' + curr_report.id + '</td><td>' + curr_report.attempts + '</td><td>' + curr_report.total_new_cases + '</td><td>' + curr_report.cases_failed + '</td><td>' + curr_report.cases_imported + '</td><td>' + curr_report.created_at + '</td><td>' + curr_report.updated_at + '</td></tr>'
+        curr_table_content = '<tr><td>' + curr_report.id + '</td><td>' + curr_report.attempts + '</td><td>' + curr_report.total_new_cases + '</td><td>' + curr_report.cases_imported + '</td><td>' + curr_report.cases_failed + '</td><td>' + curr_report.created_at + '</td><td>' + curr_report.updated_at + '</td></tr>'
         $(current_table).append(curr_table_content)
         $('#current-wbnp-report .wbnp-notes').html(curr_report.notes)
 
@@ -114,7 +114,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
           $('#previous-wbnp-report .wbnp-status').text(last_report.status)
           $('#previous-wbnp-report .wbnp-status-msg').text(last_report.status_message)
           prev_table = $('#previous-wbnp-report .wbnp-full-report-table')
-          prev_table_content = '<tr><td>' + last_report.id + '</td><td>' + last_report.attempts + '</td><td>' + last_report.total_new_cases + '</td><td>' + last_report.cases_failed + '</td><td>' + last_report.cases_imported + '</td><td>' + last_report.created_at + '</td><td>' + last_report.updated_at + '</td></tr>'
+          prev_table_content = '<tr><td>' + last_report.id + '</td><td>' + last_report.attempts + '</td><td>' + last_report.total_new_cases + '</td><td>' + last_report.cases_imported + '</td><td>' + last_report.cases_failed + '</td><td>' + last_report.created_at + '</td><td>' + last_report.updated_at + '</td></tr>'
           $(prev_table).append(prev_table_content)
           $('#previous-wbnp-report .wbnp-notes').html(last_report.notes)
 
