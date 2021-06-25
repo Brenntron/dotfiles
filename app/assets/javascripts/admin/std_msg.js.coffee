@@ -72,7 +72,7 @@ window.std_msg_error =(banner, messages, options = {}) ->
 window.std_msg_confirm =(banner, messages, options = {}) ->
   std_msg_set_class('error-msg', '#api-msg')
   std_msg_set(banner, messages)
-
+#  debugger
   if options.reload == true
     $('.confirm').click ->
       location.reload(true)

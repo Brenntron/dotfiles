@@ -162,6 +162,7 @@ class ComplaintEntry < ApplicationRecord
                       uri_as_categorized,
                       current_user,
                       commit_pending)
+    # byebug
     ActiveRecord::Base.transaction do
 
       # If the prefix is a high telemetry value then the status needs to be set to PENDING

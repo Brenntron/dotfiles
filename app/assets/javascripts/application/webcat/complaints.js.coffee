@@ -490,6 +490,7 @@ processSubmitPending=(entry_id,row_id)->
         $("#domain_#{entry_id}").text(domain)
         $("#subdomain_#{entry_id}").text(subdomain)
         $("#path_#{entry_id}").text(path)
+        removeTouchedFormChange(uri)
 
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
@@ -500,11 +501,12 @@ processSubmitPending=(entry_id,row_id)->
   , this)
 
 window.updatePending = (id,row_id) ->
+  debugger
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
     std_msg_confirm(
       "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
-      [],
+      ["id: #{id}", "row_id: #{row_id}"],
       {
         reload: false,
         confirm_dismiss: true,

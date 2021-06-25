@@ -76,6 +76,7 @@ module API
               requires :data, type: Array, desc: ''
             end
             post 'update_pending' do
+              # byebug
               begin
                 params[:data].each do |submitted_complaint|
                   @entry = ComplaintEntry.find(submitted_complaint[:id])
