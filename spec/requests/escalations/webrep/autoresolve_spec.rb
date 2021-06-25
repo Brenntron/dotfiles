@@ -68,6 +68,54 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     }
   end
 
+  let(:email_autoresolve_json) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute: {
+                source_type: 'Dispute',
+                source_key: 1001,
+                payload: {
+                    investigate_urls: {
+
+                    },
+                    investigate_ips:{
+                                     "2.3.4.5" => {
+                                         "wbrs" => {
+                                             "WBRS_SCORE"=>"-3.55",
+                                             "WBRS_Rule_Hits"=>"dotq",
+                                             "Hostname_ips"=>"",
+                                             "rep_sugg"=>"Good",
+                                             "category"=>"Not in our list"
+                                         },
+                                         "sbrs" => {
+                                             "SBRS_SCORE"=>"No score",
+                                             "SBRS_Rule_Hits"=>"DhH, IaM, Pbl",
+                                             "Hostname"=>"www.dealer.com",
+                                             "rep_sugg"=>"Good",
+                                             "claim" => "false positive",
+                                             "category"=>"Not in our list"
+                                         }
+                                     }
+                    },
+                    problem: 'What do I need to do to improve the reputation',
+                    submission_type: 'e',
+                    name: "test@test.com",
+                    user_company: "Guest",
+                    email: 'webmaster@cmim.org',
+                    email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
+                    email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
+                    user_ip: '64.70.56.99',
+                    domain: '355toyota.com',
+                }
+            }
+        }
+    }
+  end
 
   let(:dispute_message_json_bad) do
     {
@@ -273,6 +321,35 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.status).to eql(DisputeEntry::NEW)
     expect(dispute_entry_1.resolution).to eql("")
     expect(dispute_entry_1.auto_resolve_log).to eql("--------Starting Data---------<br>suggested disposition: Poor<br>effective disposition info: \"Neutral\"<br>-----------------------------<br>auto resolution is turned off or is experiencing configuration error")
+
+  end
+
+
+  it 'received dispute payload and auto resolves email false positive' do
+
+
+    vrt_incoming
+    guest_company
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: email_autoresolve_json
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    expect(dispute.dispute_entries.where(ip_address: '2.3.4.5')).to exist
+
+
+    dispute_entry_1 = DisputeEntry.where(:ip_address => '2.3.4.5').first
+
+    expect(dispute_entry_1.status).to eql("RESOLVED_CLOSED")
+
+    expect(dispute_entry_1.resolution).to eql("UNCHANGED")
+    expect(dispute_entry_1.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence. Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://www.spamhaus.org/) Review the status and reason(s) by visiting https://www.spamhaus.org/lookup/and entering your IP. Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours.")
+
+
+
 
   end
 
