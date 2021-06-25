@@ -2,7 +2,7 @@ development:
   api_timeout:
     timeout: 15
   app_info:
-    pubkey_file: "/usr/local/etc/talos/talos-web-certificate.pem"
+    cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
     pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
     device_id: "analyst-console-escalations-dev"
     product_family: "Talos_Web"
@@ -135,7 +135,7 @@ test:
   api_timeout:
     timeout: 15
   app_info:
-    pubkey_file: "/usr/local/etc/talos/talos-web-certificate.pem"
+    cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
     pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
     device_id: "analyst-console-escalations-dev" #use dev for test environment to the server it is dev
     product_family: "Talos_Web"
@@ -269,7 +269,7 @@ staging:
   api_timeout:
     timeout: 15
   app_info:
-    pubkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-certificate.pem"
+    cert_file: "/usr/local/etc/analyst-console-escalations/talos-web-certificate.pem"
     pkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-pkey.pem"
     product_family: "Talos_Web"
     product_id: "analyst-console-escalations"
@@ -410,7 +410,7 @@ production:
   api_timeout:
     timeout: 15
   app_info:
-    pubkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-certificate.pem"
+    cert_file: "/usr/local/etc/analyst-console-escalations/talos-web-certificate.pem"
     pkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-pkey.pem"
     product_family: "Talos_Web"
     product_id: "analyst-console-escalations"

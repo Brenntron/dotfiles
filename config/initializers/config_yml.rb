@@ -33,7 +33,7 @@ Rails.configuration.app_info.product_version =
     version ||= 'unknown'
     version
   end
-Rails.configuration.app_info.pubkey_file = app_info_config['pubkey_file']
+Rails.configuration.app_info.client_cert_file = app_info_config['client_cert_file']
 Rails.configuration.app_info.pkey_file  = app_info_config['pkey_file']
 
 
@@ -143,7 +143,7 @@ sds_config = env_config.fetch('sds', nil)
 raise 'config.yml missing SDS section' unless sds_config
 Rails.configuration.sds                 = ApiRequester::ApiRequester.config_of(sds_config)
 Rails.configuration.sds.v3_host         = sds_config['v3_host']
-Rails.configuration.sds.cert_file       = sds_config['cert_file'] || sds_config['ca_cert_file']
+Rails.configuration.sds.cert_file       = sds_config['client_cert_file'] || sds_config['cert_file']
 Rails.configuration.sds.pkey_file       = sds_config['pkey_file']
 
 talos_intelligence = env_config.fetch('talos_intelligence', {})
@@ -153,6 +153,8 @@ Rails.configuration.talos_intelligence  = ApiRequester::ApiRequester.config_of(t
 tess_config = env_config['tess']
 raise 'config.yml missing tess section' unless tess_config
 Rails.configuration.tess                = ApiRequester::ApiRequester.config_of(tess_config)
+Rails.configuration.tess.client_cert_file      = tess_config['client_cert_file']
+Rails.configuration.tess.pkey_file      = tess_config['pkey_file']
 
 
 threatgrid = env_config.fetch('threatgrid', nil)
