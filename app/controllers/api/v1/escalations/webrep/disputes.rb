@@ -1084,6 +1084,21 @@ module API
               Dispute.convert_to_complaint(permitted_params, current_user)
             end
 
+            params do
+              requires :uri, type: Array[String]
+            end
+
+            post 'current_content_categories' do
+              urls = permitted_params[:uri]
+              data = {}
+              urls.each do |url|
+                data[url] = ComplaintEntry.current_category_data_for_uri(url)
+              end
+              
+              {:status => "success", :data => data}
+            end
+
+
           end
         end
       end

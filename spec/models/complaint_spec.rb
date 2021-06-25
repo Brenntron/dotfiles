@@ -113,6 +113,14 @@ describe Complaint do
   before(:example) do
     FactoryBot.create(:vrt_incoming_user)
     FactoryBot.create(:guest_company)
+
+  end
+
+  before(:each) do
+
+    Complaint.destroy_all
+    ComplaintEntry.destroy_all
+    DelayedJob.destroy_all
   end
 
   it 'processes bridge payload' do
@@ -234,7 +242,7 @@ describe Complaint do
 
     params[:suggested_dispositions] = [{:entry => 'www.google.com', :suggested_disposition => 'fp'},{:entry => 'www.malware.com', :suggested_disposition => 'fn'}]
 
-
+    Complaint.convert_to_dispute(params, current_user)
   end
 
 end

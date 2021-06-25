@@ -851,6 +851,7 @@ For future web and email reputation requests, please open a web categorization t
   end
 
   def self.convert_to_dispute(params, current_user)
+    platform_id = nil
     complaint = Complaint.find(params[:complaint_id])
     suggested_disposition_entries = params[:suggested_dispositions]
     package = {}
@@ -863,18 +864,18 @@ For future web and email reputation requests, please open a web categorization t
     package[:internal_message] = params[:summary] + " | " + "original analyst console webcat ticket: #{complaint.id.to_s}"
     suggested_disposition_entries.each do |sugg|
       if complaint.platform_id.present?
-        platform_id = complaint.platform_id
+        platform_id = complaint.platform_id unless complaint.platform_id.blank?
       else
-        comp_entry = complaint.complaint_entries.select {|c| c.hostlookup == sugg["entry"]}.first
+        comp_entry = complaint.complaint_entries.select {|c| c.hostlookup == sugg[:entry]}.first
         if comp_entry.present?
-          platform_id = comp_entry.platform_id
+          platform_id = comp_entry.platform_id unless comp_entry.platform_id.blank?
         end
       end
 
       entry = {}
-      entry[:entry] = sugg["entry"]
+      entry[:entry] = sugg[:entry]
       #needs to be either 'fp' or 'fn'
-      entry[:suggested_disposition] = sugg["suggested_disposition"]
+      entry[:suggested_disposition] = sugg[:suggested_disposition]
       entry[:platform_id] = platform_id
       package[:entries] << entry
     end
@@ -893,11 +894,13 @@ For future web and email reputation requests, please open a web categorization t
       if c_entry.internal_comment.blank?
         c_entry.internal_comment = ""
       end
-      c_entry.status = ComplaintEntry::STATUS_COMPLETED
-      c_entry.resolution = ComplaintEntry::STATUS_RESOLVED_FIXED_INVALID
-      c_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
-      c_entry.internal_comment += " | User: #{current_user&.cvs_username} converted SDO ticket to webrep TE ticket on #{Time.now.to_s}"
-      c_entry.save
+      if c_entry.status != ComplaintEntry::STATUS_COMPLETED
+        c_entry.status = ComplaintEntry::STATUS_COMPLETED
+        c_entry.resolution = ComplaintEntry::STATUS_RESOLVED_FIXED_INVALID
+        c_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+        c_entry.internal_comment += " | User: #{current_user&.cvs_username} converted SDO ticket to webrep TE ticket on #{Time.now.to_s}"
+        c_entry.save
+      end
     end
 
     bridge_message = Bridge::ComplaintUpdateStatusEvent.new
