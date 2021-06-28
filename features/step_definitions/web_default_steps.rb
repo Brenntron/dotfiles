@@ -565,7 +565,10 @@ Then(/^button with id "(.*?)" should be disabled$/) do |id_name|
   # find_button("button##{id_name}[disabled]")
   # find_button("button##{id_name}", disabled: true).should be
   # find_button("##{id_name}", disabled: true).should be
-  find_button("##{id_name}").disabled?
+  # find_button("##{id_name}").disabled?
+
+  button = find(:xpath, "//button[contains(@id, '#{id_name}')]")
+  button.disabled?.should be true
   #
 end
 

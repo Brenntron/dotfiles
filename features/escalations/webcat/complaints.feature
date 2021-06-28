@@ -1175,7 +1175,7 @@ Feature: Webcat complaints
     And I click on cell with class "entry-id-col" within row with id "1111"
     And I click "#convert-ticket-button"
     And I wait for "1" seconds
-    And button "CONVERT TICKET" should be disabled
+    And button with id "convert-to-webrep" should be disabled
     And I click input with id "1111-fp-radio"
     And button with id "convert-to-webrep" should be disabled
     And I click input with id "web-ticket-type"

@@ -2485,32 +2485,19 @@ window.prep_dispute_to_convert = (event) ->
         entry_table = $('#entries-to-convert tbody')
         # clear out previous data
         $(entry_table).empty()
+
+        # grab entry content for category lookup
+        entries_content = []
         $(entries).each ->
-          console.log this
           entry_content = ''
-          if this.entry.uri?
-            entry_content = this.entry.uri
-          else
+          if this.entry.entry_type == 'IP'
             entry_content = this.entry.ip_address
-          entry_row = '<tr><td class="align-top">' + this.entry.id + '</td><td class="entry-content-to-convert align-top">' + entry_content + '</td>' + '<td class="align-top"></td>' +
-            '<td class="entry-cat-suggestions"><select id="' + this.entry.id + '-selectize" class="selectize convert-entry-selectize" multiple="multiple" placeholder="Add categories"></select></td></tr>'
+          else
+            entry_content = this.entry.uri
+          entries_content.push(entry_content)
 
-          $(entry_table).append(entry_row)
-          entry_select = '#' + this.entry.id + '-selectize'
-          $(entry_select).selectize {
-            persist: false,
-            create: false,
-            maxItems: 5,
-            closeAfterSelect: true,
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions(entry_select)
-            onChange: ->
-              check_convert_to_webcat_ready()
-          }
-        check_convert_to_webcat_ready()
-
+        # get the current categories for the entries
+        get_webrep_current_cats(entries, entries_content)
       else
         std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertible (open) status.'])
         return
@@ -2539,6 +2526,68 @@ check_convert_to_webcat_ready = () ->
   else
     $('#convert-ticket-dropdown .dropdown-submit-button').attr('disabled', 'disabled')
   return false
+
+
+get_webrep_current_cats = (entries, uris) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/current_content_categories'
+    method: 'POST'
+    headers: headers
+    data: {
+      uri: uris
+    }
+    success: (response) ->
+      entry_table = $('#entries-to-convert tbody')
+      $(entries).each ->
+        entry = this
+        entry_content = ''
+        if this.entry.entry_type == 'IP'
+          entry_content = this.entry.ip_address
+        else
+          entry_content = this.entry.uri
+
+        cat_ids = ''
+        cat_names = ''
+        $(response.data).each ->
+          # find the response that corresponds to our entry
+          #check to find our entry content
+          if this[0].url == entry_content
+            categories = this[0].categories
+
+            cat_ids = []
+            cat_names = []
+            if Object.keys(categories).length > 0
+              jQuery.each categories, (id, category) ->
+                cat_ids.push(category.category_id)
+                cat_names.push(category.descr)
+
+            cat_ids = cat_ids.join()
+            cat_names = cat_names.join()
+
+
+
+        entry_row = '<tr><td class="align-top">' + this.entry.id + '</td><td class="entry-content-to-convert align-top">' + entry_content + '</td>' + '<td class="align-top">' + cat_names + '</td>' +
+          '<td class="entry-cat-suggestions"><select id="' + this.entry.id + '-selectize" class="selectize convert-entry-selectize" multiple="multiple" placeholder="Add categories"></select></td></tr>'
+
+        $(entry_table).append(entry_row)
+        entry_select = '#' + this.entry.id + '-selectize'
+        $(entry_select).selectize {
+          persist: false,
+          create: false,
+          maxItems: 5,
+          closeAfterSelect: true,
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
+          options: AC.WebCat.createSelectOptions(entry_select)
+          onChange: ->
+            check_convert_to_webcat_ready()
+        }
+      check_convert_to_webcat_ready()
+    error: (response) ->
+      console.log response
+  )
 
 
 window.convert_dispute_to_webcat = () ->

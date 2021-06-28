@@ -1091,8 +1091,8 @@ module API
             post 'current_content_categories' do
               urls = permitted_params[:uri]
               data = {}
-              urls.each do |url|
-                data[url] = ComplaintEntry.current_category_data_for_uri(url)
+              urls.each_with_index do |url, i|
+                data[i] = {'url': url, 'categories': ComplaintEntry.current_category_data_for_uri(url)}
               end
               
               {:status => "success", :data => data}
