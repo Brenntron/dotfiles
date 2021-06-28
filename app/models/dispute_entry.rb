@@ -278,7 +278,24 @@ class DisputeEntry < ApplicationRecord
     }
   end
 
+  def self.safe_domain_of(url)
+    begin
+      url = url.strip
+      if !url.start_with?( 'http', 'https')
+        url = "http://" + url
+      end
+
+      clean_url = Addressable::URI.parse(url)
+      clean_host = clean_url.host
+    rescue
+      clean_host = url
+    end
+    
+    clean_host
+  end
+
   def self.domain_of(url)
+    url = url.strip
     if !url.start_with?( 'http', 'https')
       url = "http://" + url
     end
