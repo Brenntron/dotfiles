@@ -40,4 +40,9 @@ class Platform < ApplicationRecord
     end
 
   end
+
+  def self.find_by_all_names(name)
+    platform = Platform.where("public_name like '%name%' or internal_name like '%name%'").first
+    platform
+  end
 end

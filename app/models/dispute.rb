@@ -450,7 +450,13 @@ class Dispute < ApplicationRecord
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
     begin
+      ##################################
+      # Platform exceptions
 
+      umbrella_platform = Platform.find_by_all_names("Umbrella")
+
+
+      # ################################
       entry_claims = {}
 
       guest = Company.where(:name => "Guest").first
@@ -696,9 +702,11 @@ class Dispute < ApplicationRecord
       begin
         new_dispute.dispute_entries.each do |dispute_entry|
           false_negative_claim = false
-
-          matching_disposition = dispute_entry.is_disposition_matching?
-
+          matching_disposition = false
+          entry_claim = entry_claims[dispute_entry.hostlookup]
+          if new_dispute.determine_platform != umbrella_platform.public_name
+            matching_disposition = dispute_entry.is_disposition_matching?(entry_claim)
+          end
           initial_log = "--------Starting Data---------<br>"
           initial_log += "suggested disposition: #{dispute_entry.suggested_disposition}<br>"
           initial_log += "effective disposition info: #{dispute_entry.running_verdict.inspect.to_s}<br>"
@@ -709,7 +717,6 @@ class Dispute < ApplicationRecord
 
           ########Auto Resolve for IP addressses (email)##############
           if dispute_entry.entry_type == "IP"
-            entry_claim = entry_claims[dispute_entry.hostlookup]
 
             logger.info "fetching preload"
 
@@ -745,7 +752,6 @@ class Dispute < ApplicationRecord
           ############################################################
           #########Auto Resolve for URLs (web)########################
           if dispute_entry.entry_type == "URI/DOMAIN"
-            entry_claim = entry_claims[dispute_entry.hostlookup]
 
             logger.info "fetching preload"
 

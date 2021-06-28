@@ -1323,7 +1323,7 @@ class DisputeEntry < ApplicationRecord
     response
   end
 
-  def is_disposition_matching?
+  def is_disposition_matching?(entry_claim)
 
     begin
 
@@ -1335,14 +1335,30 @@ class DisputeEntry < ApplicationRecord
         @running_verdict = self.class.email_verdict_from_score(self.sbrs_score)
       end
 
-      if self.suggested_disposition == @running_verdict
-        self.status = STATUS_RESOLVED
-        self.resolution = STATUS_RESOLVED_UNCHANGED
-        self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
-        self.save
+      if entry_claim == "false negative"
 
-        return true
+        if self.suggested_disposition == @running_verdict
+          self.status = STATUS_RESOLVED
+          self.resolution = STATUS_RESOLVED_UNCHANGED
+          self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
+          self.save
+
+          return true
+        end
+
       end
+
+      if entry_claim == "false positive"
+        if ['Trusted', 'Favorable', 'Neutral', 'Good', 'Unknown', 'Questionable'].include?(@running_verdict)
+          self.status = STATUS_RESOLVED
+          self.resolution = STATUS_RESOLVED_UNCHANGED
+          self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
+          self.save
+
+          return true
+        end
+      end
+
 
       return false
 
