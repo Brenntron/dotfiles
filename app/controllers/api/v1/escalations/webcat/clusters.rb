@@ -35,7 +35,11 @@ module API
             get "" do
               authorize!(:index, Complaint)
 
-              clusters = ::Clusters::Fetcher.new(params[:f], params[:regex], current_user).fetch
+              filter = {
+                f: params[:f],
+                platform: params[:platform]
+              }
+              clusters = ::Clusters::Fetcher.new(filter, params[:regex], current_user).fetch
 
               {:status => "success", :data => clusters}.to_json
             end
