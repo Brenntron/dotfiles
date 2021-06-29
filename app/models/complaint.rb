@@ -513,8 +513,8 @@ class Complaint < ApplicationRecord
     end
   end
 
-  def self.get_latest_wbnp_complaints
-
+  def self.get_latest_wbnp_complaints(skip_thread = false)
+    
     max_attempts = 3
 
     #status reason
@@ -551,9 +551,12 @@ class Complaint < ApplicationRecord
     new_report.status = WbnpReport::ACTIVE
     new_report.notes += "logger_token: #{logger_token} <br />"
     new_report.save
-
-    Thread.new do
-      kick_off_wbnp_pull(new_report.id, logger_token)
+    if skip_thread == true
+      start_wbnp_pull(new_report.id, logger_token)
+    else
+      Thread.new do
+        start_wbnp_pull(new_report.id, logger_token)
+      end
     end
     new_report
 
