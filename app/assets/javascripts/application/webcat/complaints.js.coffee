@@ -183,7 +183,6 @@ processSubmitNewURL = () ->
 
 window.cat_new_url = ()->
   timesTouched = getTouchedFormCount()
-  debugger
   if timesTouched > 1
     std_msg_confirm(
       "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
@@ -422,7 +421,6 @@ window.review_bulk_submit = () ->
     , this)
 
 processSubmitPending=(entry_id,row_id)->
-  debugger
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   status = $('[name=resolution_review_'+entry_id+']:checked').val()
   if status == "ignore"
@@ -501,7 +499,6 @@ processSubmitPending=(entry_id,row_id)->
   , this)
 
 window.updatePending = (id,row_id) ->
-  debugger
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
     std_msg_confirm(
@@ -642,7 +639,6 @@ processSubmitEntry = (entry_id,row_id) ->
 ## Called when user submits categories / information to close a ticket
 window.updateEntryColumns = (entry_id,row_id) ->
   timesTouched = getTouchedFormCount()
-  debugger
   if timesTouched > 1
     std_msg_confirm(
       "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",

@@ -14,7 +14,6 @@ namespace 'AC.WebCat', (exports) ->
 
 
   exports.createSelectOptions = (id) ->
-#    debugger
     if id != undefined
       AC.WebCat.getAUPCategories().then( (categories) =>
         webcat_options = []
