@@ -1167,7 +1167,7 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def process_resolution_changes(resolution, internal_comment, customer_facing_comment)
+  def process_resolution_changes(resolution, internal_comment, customer_facing_comment, current_user)
     confirmation = {}
     if !["COMPLETED","PENDING"].include?(self.status) && resolution != "REOPENED"
       if self.is_important && resolution != "UNCHANGED"
@@ -1192,6 +1192,9 @@ class ComplaintEntry < ApplicationRecord
       confirmation.update(state: 'ERROR', host: self.hostlookup, status: self.status,resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
                           message: "Cannot process a resolution update to #{resolution} on Complaint Entry (#{self.hostlookup})  of status #{self.status}")
     end
+
+    # add credit for user's contribution to complaint entry
+    ComplaintEntryCredits::CreditProcessor.new(current_user, self).process
     confirmation
   end
 
@@ -1243,5 +1246,19 @@ class ComplaintEntry < ApplicationRecord
     commit_category(existing_prefixes, ip_or_uri: prefix, categories_string: final_cat_string, description: comment, user: ticket_user.email, casenumber: self.complaint.id)
 
     return log_messages
+  end
+
+  def determine_platform
+    if self.platform_id.present?
+      return (self.product_platform.public_name rescue "No Data")
+    end
+    if self.complaint.platform_id.present?
+      return (self.complaint.platform.public_name rescue "No Data")
+    end
+    if self.platform.present?
+      return (self.platform rescue "No Data")
+    end
+
+    return nil
   end
 end

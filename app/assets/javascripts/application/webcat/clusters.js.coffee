@@ -249,6 +249,7 @@ $ ->
   )
   $('#clusters-index_filter input').addClass('table-search-input');
   window.populate_clusters_index_table()
+  window.build_clusters_header()
 
 
 $ ->
@@ -893,3 +894,24 @@ window.decline_cluster = (cluster_id) ->
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
+
+window.build_clusters_header = () ->
+  return if $('#clusters-index_wrapper').length == 0
+  urlParams = new URLSearchParams(location.search).get('f');
+  if urlParams
+    search_name = urlParams.toLowerCase()
+
+    if !search_name.endsWith('clusters')
+      search_name += ' clusters'
+
+    new_header =
+      '<div>' +
+        '<span class="text-capitalize">' + search_name.replace(/_|%20/g, " ") + ' </span>' +
+        '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="webcat_clusters_refresh()"></span>' +
+        '</div>'
+  else
+    new_header = 'Current Clusters'
+  $('#clusters-index-title')[0].innerHTML = new_header
+
+window.webcat_clusters_refresh = () ->
+  window.location.replace('/escalations/webcat/clusters');

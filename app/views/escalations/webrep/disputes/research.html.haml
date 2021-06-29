@@ -806,6 +806,10 @@
                                   = "#{referenced_entries_size} ticket(s)"
                                 .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
                                   %table
+                                    %thead
+                                      %th Case ID
+                                      %th Date/Time Submitted
+                                    %tbody
                                     - referenced_entries.each do |reference|
                                       %tr
                                         %td

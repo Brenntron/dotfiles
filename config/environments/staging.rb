@@ -86,7 +86,7 @@ Rails.application.configure do
   config.log_formatter = ::Logger::Formatter.new
 
   # Use a different logger for distributed setups.
-  config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'analyst-console')
+  config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'analyst-console-escalations')
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
