@@ -2547,14 +2547,13 @@ get_webrep_current_cats = (entries, uris) ->
         else
           entry_content = this.entry.uri
 
-        cat_ids = ''
+        cat_ids = []
         cat_names = ''
         $(response.data).each ->
           # find the response that corresponds to our entry
-          #check to find our entry content
           if this[0].url == entry_content
             categories = this[0].categories
-
+            # make this data usable
             cat_ids = []
             cat_names = []
             if Object.keys(categories).length > 0
@@ -2562,10 +2561,7 @@ get_webrep_current_cats = (entries, uris) ->
                 cat_ids.push(category.category_id)
                 cat_names.push(category.descr)
 
-            cat_ids = cat_ids.join()
             cat_names = cat_names.join()
-
-
 
         entry_row = '<tr><td class="align-top">' + this.entry.id + '</td><td class="entry-content-to-convert align-top">' + entry_content + '</td>' + '<td class="align-top">' + cat_names + '</td>' +
           '<td class="entry-cat-suggestions"><select id="' + this.entry.id + '-selectize" class="selectize convert-entry-selectize" multiple="multiple" placeholder="Add categories"></select></td></tr>'
@@ -2580,7 +2576,8 @@ get_webrep_current_cats = (entries, uris) ->
           valueField: 'category_id',
           labelField: 'category_name',
           searchField: ['category_name', 'category_code'],
-          options: AC.WebCat.createSelectOptions(entry_select)
+          options: AC.WebCat.createSelectOptions(entry_select),
+          items: cat_ids
           onChange: ->
             check_convert_to_webcat_ready()
         }
