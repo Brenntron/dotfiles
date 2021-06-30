@@ -49,7 +49,7 @@ class AutoResolve
     results[:action] = nil
     begin
 
-      umbrella_popularity_result = check_umbrella_popularity(DisputeEntry.safe_domain_of(dispute_entry.hostlookup))
+      umbrella_popularity_result = check_umbrella_popularity(dispute_entry.hostlookup)
       results[:log] << umbrella_popularity_result[:log]
       if umbrella_popularity_result[:pass]
         results[:action] = :do_not_resolve
@@ -188,7 +188,9 @@ class AutoResolve
     end
   end
 
-  def self.check_umbrella_popularity(entry)
+  def self.check_umbrella_popularity(raw_entry)
+
+    entry = DisputeEntry.safe_domain_of(raw_entry)
 
     result = {}
     result[:pass] = true
