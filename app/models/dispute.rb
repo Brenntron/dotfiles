@@ -704,7 +704,8 @@ class Dispute < ApplicationRecord
           false_negative_claim = false
           matching_disposition = false
           entry_claim = entry_claims[dispute_entry.hostlookup]
-          if new_dispute.determine_platform != umbrella_platform.public_name
+
+          if new_dispute.determine_platform.present? && !new_dispute.determine_platform.downcase.include?("umbrella")
             matching_disposition = dispute_entry.is_disposition_matching?(entry_claim)
           end
           initial_log = "--------Starting Data---------<br>"

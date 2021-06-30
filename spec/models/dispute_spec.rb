@@ -3,34 +3,34 @@ describe Dispute do
   let(:target_ip_address) {'184.168.221.74'}
   let(:dispute_email) do
     <<~HEREDOC
-        ____________________________________________________________
-        User-entered Information:
-        ____________________________________________________________
-        Time: September 03, 2018 12:04\nName: Marlin Pierce\nE-mail: marlpier@cisco.com
-        Domain: cisco.com
-        Inquiry Type: web
-        Key Rules: 
-        Problem Summary: New category
-        IP(s) to be investigated:
+      ____________________________________________________________
+      User-entered Information:
+      ____________________________________________________________
+      Time: September 03, 2018 12:04\nName: Marlin Pierce\nE-mail: marlpier@cisco.com
+      Domain: cisco.com
+      Inquiry Type: web
+      Key Rules: 
+      Problem Summary: New category
+      IP(s) to be investigated:
 
 
-        URI(s) to be investigated:
-        www.spanx.com
-        
-        Detailed
-        Descriptions:
-        
-        
-        ____________________________________________________________
-        Cisco Confidential Analysis:
-        ____________________________________________________________
-        
-        User's IP:      ::1
-        
-        www.spanx.com
-        WBRS Score:     1.58
-        WBRS Rule Hits: alx_cln, vsvd
-        Hostname's IPs:
+      URI(s) to be investigated:
+      www.spanx.com
+
+      Detailed
+      Descriptions:
+
+
+      ____________________________________________________________
+      Cisco Confidential Analysis:
+      ____________________________________________________________
+
+      User's IP:      ::1
+
+      www.spanx.com
+      WBRS Score:     1.58
+      WBRS Rule Hits: alx_cln, vsvd
+      Hostname's IPs:
     HEREDOC
   end
   let(:fn_ip_dispute_message_payload) do
@@ -713,6 +713,45 @@ describe Dispute do
     args = {'uri' => "stupid.com\r\ndumb.com idiot.com", 'scope' => 'strict'}
     result = DisputeEntry.research_results(args)
     expect(result.size).to eql(6)
+
+  end
+
+  it 'should close as matching disposition for a wide net when false positive (one)' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.google.com"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => -3.5}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.google.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false positive")).to eql(true)
+    expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+    expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+
+  end
+
+
+  it 'should close as matching disposition for a wide net when false positive (two)' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.google.com"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => 3.5}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.google.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false positive")).to eql(true)
+    expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+    expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
 
   end
 
