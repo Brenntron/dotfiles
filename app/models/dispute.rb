@@ -450,13 +450,7 @@ class Dispute < ApplicationRecord
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
     begin
-      ##################################
-      # Platform exceptions
 
-      umbrella_platform = Platform.find_by_all_names("Umbrella")
-
-
-      # ################################
       entry_claims = {}
 
       guest = Company.where(:name => "Guest").first
