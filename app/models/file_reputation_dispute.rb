@@ -815,29 +815,39 @@ class FileReputationDispute < ApplicationRecord
 
       self.auto_resolve_log = auto_resolve_log
       self.save
-      if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == false } && [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == true }
-        self.auto_resolve_log += "\n-------\nSetting Status To New as there are some True's and some False's with the 4 presence sources.\n------\n"
-        self.status = STATUS_NEW
-        self.save
-        return auto_resolved_boolean
-      end
 
-      if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].all? {|prez| prez == false }
-        #notify customer that there is no sample and to escalate via TAC with sample
-        # self.status = STATUS_RESOLVED
-        # self.resolution = RESOLUTION_AUTORESOLVED
-        # self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
-        ### Temporary bypass of no sample auto resolve per WEB-6062 until WEB-5623 is resolved
-        if self.suggested_clean? || self.suggested_unknown?
-          self.status = STATUS_NEW
-          self.auto_resolve_log += "\n-------\nSetting Status To New as there is no sample.\n------\n"
-        else
+      if self.suggested_malicious?
+
+        if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].all? {|prez| prez == false }
+          #notify customer that there is no sample and to escalate via TAC with sample
+          # self.status = STATUS_RESOLVED
+          # self.resolution = RESOLUTION_AUTORESOLVED
+          # self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
+          ### Temporary bypass of no sample auto resolve per WEB-6062 until WEB-5623 is resolved
           self.status = STATUS_RESOLVED
           self.resolution = RESOLUTION_AUTORESOLVED
           self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
+
+          self.save
+          return auto_resolved_boolean
         end
-        self.save
-        return auto_resolved_boolean
+
+        if [sandbox_present, malware_zoo_present].all? {|prez| prez == false}
+          self.auto_resolve_log += "\n-------\nSetting Status To New as there are no files in malware_zoo or sandbox which is needed for FN.\n------\n"
+          self.status = STATUS_NEW
+          self.save
+          return auto_resolved_boolean
+        end
+      end
+
+      if self.suggested_clean?
+
+        if [reversinglab_present].all? {|prez| prez == false}
+          self.auto_resolve_log += "\n-------\nSetting Status To New as there are no files in Reversing Lab which is needed for FP.\n------\n"
+          self.status = STATUS_NEW
+          self.save
+          return auto_resolved_boolean
+        end
       end
 
       if self.suggested_malicious?
@@ -1172,7 +1182,7 @@ class FileReputationDispute < ApplicationRecord
             end
           rescue Exception => e
             morsel_message = "Error trying to run a result in FileReputationDispute.check_for_rep_updates:\n"
-            morsel_message = "result: #{result.inspect}\n"
+            morsel_message += "result: #{result.inspect}\n"
             morsel_message += "error: #{e.message}"
 
             Morsel.create({:output => morsel_message})

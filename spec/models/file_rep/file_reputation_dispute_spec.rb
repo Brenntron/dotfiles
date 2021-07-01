@@ -84,5 +84,13 @@ describe Dispute do
 
       expect(results.count).to eq(1)
     end
+
+    it 'should run check for rep updates without error' do
+
+
+
+      FileReputationDispute.check_for_rep_updates
+
+    end
   end
 end

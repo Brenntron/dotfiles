@@ -198,5 +198,80 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
     expect(DelayedJob.all.size).to eql(1)
 
   end
+
+
+  it 'should set to no file comment when does not exist in all sources for FN' do
+    expect(Threatgrid::Search).to receive(:query).with("sha256").and_return({}).at_least(:once)
+    expect(FileReputationApi::ReversingLabs).to receive(:lookup).with("sha256").and_return({}).at_least(:once)
+
+    expect(FileReputationApi::SampleZoo).to receive(:sha256_lookup).with("sha256").and_return({}).at_least(:once)
+
+    expect(FileReputationApi::Sandbox).to receive(:sample_exists).with("sha256", :api_key_type => "").and_return({}).at_least(:once)
+
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json,
+         params: file_rep_create_message_json
+
+    expect(response).to be_successful
+    dispute = FileReputationDispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(FileReputationDispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+    expect(dispute.status).to eql("asdf")
+    expect(dispute.resolution).to eql("asdf")
+    expect(dispute.resolution_comment).to eql("asdf")
+
+  end
+
+  it 'should set to new if FN and no existence specifically in both sandbox and malware zoo (but present in others)' do
+
+    expect(Threatgrid::Search).to receive(:query).with("sha256").and_return({}).at_least(:once)
+    expect(FileReputationApi::ReversingLabs).to receive(:lookup).with("sha256").and_return({}).at_least(:once)
+
+    expect(FileReputationApi::SampleZoo).to receive(:sha256_lookup).with("sha256").and_return({}).at_least(:once)
+
+    expect(FileReputationApi::Sandbox).to receive(:sample_exists).with("sha256", :api_key_type => "").and_return({}).at_least(:once)
+
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json,
+         params: file_rep_create_message_json
+
+    expect(response).to be_successful
+    dispute = FileReputationDispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(FileReputationDispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+    expect(dispute.status).to eql("asdf")
+    expect(dispute.resolution).to eql("asdf")
+    expect(dispute.resolution_comment).to eql("asdf")
+  end
+
+  it 'should set to new if FP and no existence in reversing lab' do
+    expect(Threatgrid::Search).to receive(:query).with("sha256").and_return({}).at_least(:once)
+    expect(FileReputationApi::ReversingLabs).to receive(:lookup).with("sha256").and_return({}).at_least(:once)
+
+    expect(FileReputationApi::SampleZoo).to receive(:sha256_lookup).with("sha256").and_return({}).at_least(:once)
+
+    expect(FileReputationApi::Sandbox).to receive(:sample_exists).with("sha256", :api_key_type => "").and_return({}).at_least(:once)
+
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json,
+         params: file_rep_create_message_json
+
+    expect(response).to be_successful
+    dispute = FileReputationDispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(FileReputationDispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+    expect(dispute.status).to eql("asdf")
+    expect(dispute.resolution).to eql("asdf")
+    expect(dispute.resolution_comment).to eql("asdf")
+  end
 end
 
