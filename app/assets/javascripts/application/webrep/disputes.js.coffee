@@ -2564,28 +2564,45 @@ get_webrep_current_cats = (entries, uris) ->
             cat_names = cat_names.join()
 
         entry_row = '<tr><td class="align-top">' + this.entry.id + '</td><td class="entry-content-to-convert align-top">' + entry_content + '</td>' + '<td class="align-top">' + cat_names + '</td>' +
-          '<td class="entry-cat-suggestions"><select id="' + this.entry.id + '-selectize" class="selectize convert-entry-selectize" multiple="multiple" placeholder="Add categories"></select></td></tr>'
+          '<td class="entry-cat-suggestions hidden" id="' + this.entry.id + '-selectize-holder"><select id="' + this.entry.id + '-selectize" class="selectize convert-entry-selectize" multiple="multiple" placeholder="Add categories"></select></td></tr>'
 
         $(entry_table).append(entry_row)
+        entry_selectize_container = '#' + this.entry.id + '-selectize-holder'
         entry_select = '#' + this.entry.id + '-selectize'
-        $(entry_select).selectize {
+
+        $convert_category_selectize = $(entry_select).selectize {
           persist: false,
           create: false,
           maxItems: 5,
           closeAfterSelect: true,
           valueField: 'category_id',
           labelField: 'category_name',
-          searchField: ['category_name', 'category_code'],
-          options: AC.WebCat.createSelectOptions(entry_select),
-          items: cat_ids
+          searchField: ['category_name', 'category_code']
+          options: AC.WebCat.createSelectOptions(entry_select)
           onChange: ->
             check_convert_to_webcat_ready()
         }
+
+
+        setTimeout (->
+          $(entry_selectize_container).removeClass('hidden')
+          convert_selectize = $convert_category_selectize[0].selectize
+          convert_selectize.setValue cat_ids
+         
+        ), 500
+
+
       check_convert_to_webcat_ready()
     error: (response) ->
       console.log response
+  
   )
 
+selected_options = (category_names) ->
+  options = []
+  if category_names
+    options = category_names.split(',')
+  return options
 
 window.convert_dispute_to_webcat = () ->
 
