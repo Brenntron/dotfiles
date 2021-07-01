@@ -81,11 +81,10 @@ window.std_msg_confirm =(banner, messages, options = {}) ->
     $('.confirmation-buttons').prepend($('<button aria-label="Confirm" class="panel-button primary confirm wide">Confirm</button>'))
     $('.confirm').click ->
       $('.confirmation-buttons').addClass('hidden')
+      $('#msg-modal').modal('hide')
       options.confirm()
       if options.success_msg != undefined
         std_msg_success(options.success_msg, success_reload: options.success_reload)
-      else if false == options.confirm_dismisss || undefined == options.confirm_dismiss
-        $('#msg-modal').modal('hide')
       $('.confirm').click ->
 
   $('.confirmation-buttons').removeClass 'hidden'
