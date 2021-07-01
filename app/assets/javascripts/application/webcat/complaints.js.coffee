@@ -2322,9 +2322,11 @@ convert_complaint_to_webrep = () ->
       suggested_dispositions: suggested_dispositions
     }
     success: (response) ->
+      console.log response
       std_msg_success('Success',["Complaint converted to Reputation Dispute."], reload: true)
     error: (response) ->
-      std_api_error(response, 'Complaint unable to be converted to Reputation Dispute.', reload: false)
+      console.log response
+      std_msg_error(response, 'Complaint unable to be converted to Reputation Dispute.', reload: false)
   )
 
 
