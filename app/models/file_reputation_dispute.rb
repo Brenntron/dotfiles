@@ -1162,10 +1162,12 @@ class FileReputationDispute < ApplicationRecord
         results.each do |result|
           begin
             if result.key?("sha256") && result["updated_sections"].include?("malware_presence")
-              file_rep_case = FileReputationDispute.where(:sha256_hash => result['sha256'])
-              if file_rep_case.present? && file_rep_case.disposition == FileReputationDispute::DISPOSITION_CLEAN
+              file_rep_case = FileReputationDispute.where(:sha256_hash => result['sha256']).order("id desc").first
+
+              if file_rep_case.present? && file_rep_case.status == STATUS_RESOLVED && file_rep_case.disposition == FileReputationDispute::DISPOSITION_CLEAN
                 category = FileReputationApi::ReversingLabs.get_signature_category(file_rep_case.sha256_hash)
                 if category != FileReputationDispute::DISPOSITION_CLEAN
+
                   new_comment = FileRepComment.new
                   new_comment.comment = "Auto resolve monitoring picked up a change in disposition from Reversing Labs [ #{file_rep_case.disposition} -> #{category} ].  Reopening Ticket.  Investigation from an analyst is required. "
                   new_comment.user_id = user.id
@@ -1173,6 +1175,7 @@ class FileReputationDispute < ApplicationRecord
                   new_comment.save
 
                   file_rep_case.disposition = category
+                  file_rep_case.user_id = user.id
                   file_rep_case.status = FileReputationDispute::STATUS_REOPENED
                   file_rep_case.save
 
@@ -1181,6 +1184,8 @@ class FileReputationDispute < ApplicationRecord
               end
             end
           rescue Exception => e
+            Rails.logger.error e.message
+            Rails.logger.error e.backtrace.join("\n")
             morsel_message = "Error trying to run a result in FileReputationDispute.check_for_rep_updates:\n"
             morsel_message += "result: #{result.inspect}\n"
             morsel_message += "error: #{e.message}"
@@ -1190,6 +1195,8 @@ class FileReputationDispute < ApplicationRecord
         end
       end
     rescue Exception => e
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
       morsel_message = "Error trying to run FileReputationDispute.check_for_rep_updates:"
       morsel_message += "#{e.message}"
 
