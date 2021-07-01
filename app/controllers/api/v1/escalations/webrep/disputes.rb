@@ -1076,7 +1076,7 @@ module API
 
             params do
               requires :dispute_id, type: Integer
-              requires :suggested_categories, type: Array
+              requires :suggested_categories
               requires :summary, type: String
             end
 

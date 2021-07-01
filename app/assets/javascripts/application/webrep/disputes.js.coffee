@@ -2616,11 +2616,14 @@ window.convert_dispute_to_webcat = () ->
   entry_rows = $('#entries-to-convert tbody tr')
   $(entry_rows).each ->
     entry_content = $(this).find('.entry-content-to-convert').text()
-    entry_cats = $(this).find('.convert-entry-selectize').val()
-    suggested_categories.push(entry: entry_content, suggested_categories: entry_cats)
+    suggested_cats_string = $(this).find('.convert-entry-selectize option:selected').map(->
+      $(this).text()
+    ).get().join(',')
+    
+    suggested_categories.push(entry: entry_content, suggested_categories: suggested_cats_string)
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
+  
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/convert_ticket'
     method: 'POST'
