@@ -1264,11 +1264,11 @@ format = (complaint_entry_row) ->
     else if complaint_entry.complaint_source == 'talos-intelligence-api'
       complaint_source = 'TI API'
     else if complaint_entry.complaint_source == ''
-      complaint_source = '<span class="missing-data">No source available</span>'
+      complaint_source = '<span class="missing-data">Source unknown</span>'
     else
       complaint_source = complaint_entry.complaint_source
   else
-    complaint_source = '<span class="missing-data">No source available</span>'
+    complaint_source = '<span class="missing-data">Source unknown</span>'
 
   complaint_entry_html =
       complaint_table_row_html +
