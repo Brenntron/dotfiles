@@ -597,6 +597,15 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
     expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("355toyota.com", "wbrs").and_return(wbrs_response).at_least(:once)
 
+    ReptoolResponse = Struct.new(:status)
+    rep_response = ReptoolResponse.new
+    rep_response.status = "EXPIRED"
+
+    reptool_response = [rep_response]
+
+
+    expect(RepApi::Blacklist).to receive(:where).and_return(reptool_response).at_least(:once)
+
     vrt_incoming
     guest_company
     FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)

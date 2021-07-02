@@ -1349,7 +1349,12 @@ class DisputeEntry < ApplicationRecord
       end
 
       if entry_claim == "false positive"
-        if ['Trusted', 'Favorable', 'Neutral', 'Good', 'Unknown', 'Questionable'].include?(@running_verdict)
+
+        results = RepApi::Blacklist.where(entries: [ self.hostlookup ]) rescue nil
+        
+        is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
+
+        if ['Trusted', 'Favorable', 'Neutral', 'Good', 'Unknown', 'Questionable'].include?(@running_verdict) && !is_blacklisted
           self.status = STATUS_RESOLVED
           self.resolution = STATUS_RESOLVED_UNCHANGED
           self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
