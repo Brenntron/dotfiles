@@ -256,3 +256,19 @@ Feature: Webcat clusters
     And I goto "/escalations/webcat/clusters?f=pending"
     And I wait for "3" seconds
     And I should not see "food.com"
+
+  @javascript
+  Scenario: user should be able to filter clusters by platform
+    Given a user with id "1" has a role "webcat user" and is logged in
+    When I goto "/escalations/webcat/clusters"
+    And I should see "food.com"
+    And I should see "blah.com"
+    Then I select "WSA" from "webcat-platform-filter"
+    And I should see "food.com"
+    And I should not see "blah.com"
+    Then I select "NGFW" from "webcat-platform-filter"
+    And I should not see "food.com"
+    And I should see "blah.com"
+    Then I select "All" from "webcat-platform-filter"
+    And I should see "food.com"
+    And I should see "blah.com"

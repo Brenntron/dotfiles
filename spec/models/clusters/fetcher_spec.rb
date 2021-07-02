@@ -4,14 +4,13 @@ describe Clusters::Fetcher do
   before do
     allow(Clusters::Wbnp::DataFetcher).to receive_message_chain(:new, :fetch).and_return(wbnp_clusters)
     allow(Clusters::Ngfw::DataFetcher).to receive_message_chain(:new, :fetch).and_return(ngfw_clusters)
-    allow(Clusters::Filter).to receive_message_chain(:new, :filter).and_return(expected_response.reverse)
+    allow(Clusters::Filter).to receive_message_chain(:new, :filter).and_return(expected_response)
     allow(Wbrs::TopUrl).to receive(:check_urls).and_return(top_urls)
     allow(Beaker::Verdicts).to receive(:verdicts).and_return(verdicts)
   end
 
   let(:user) { FactoryBot.create(:user) }
   let(:regex) { nil }
-  let(:filter) { nil }
 
   let(:wbnp_clusters) do
     [
@@ -58,18 +57,6 @@ describe Clusters::Fetcher do
       {
         :assigned_to=>"",
         :categories=>[],
-        :cluster_id=>'',
-        :cluster_size=>nil,
-        :domain=>"example.com",
-        :global_volume=>2821,
-        :is_important=>true,
-        :is_pending=>false,
-        :platform=>"NGFW",
-        :wbrs_score=>-3.0
-      },
-      {
-        :assigned_to=>"",
-        :categories=>[],
         :cluster_id=>1,
         :cluster_size=>2,
         :domain=>"googletest.com",
@@ -78,11 +65,25 @@ describe Clusters::Fetcher do
         :is_pending=>false,
         :platform=>"WSA",
         :wbrs_score=>-3.0
+      },
+      {
+        :assigned_to=>"",
+        :categories=>[],
+        :cluster_id=>'',
+        :cluster_size=>nil,
+        :domain=>"example.com",
+        :global_volume=>2821,
+        :is_important=>true,
+        :is_pending=>false,
+        :platform=>"NGFW",
+        :wbrs_score=>-3.0
       }
     ]
   end
 
   describe '.fetch' do
+    let(:filter) { nil }
+
     it 'should return all clusters' do
       expect(Clusters::Wbnp::DataFetcher).to receive_message_chain(:new, :fetch)
       expect(Clusters::Ngfw::DataFetcher).to receive_message_chain(:new, :fetch)
@@ -100,6 +101,23 @@ describe Clusters::Fetcher do
 
     it 'populates wbrs_score attribute' do
       expect(subject.fetch.first).to include(:wbrs_score)
+    end
+
+    describe 'platforms filter' do
+      context 'WSA filter' do
+        let(:filter) { { platform: 'WSA' } }
+        let(:expected_response) { wbnp_clusters }
+        it 'returns WSA clusters only' do
+          expect(subject.fetch).to eq(expected_response)
+        end
+      end
+      context 'NGFW filter' do
+        let(:filter) { { platform: 'NGFW' } }
+        let(:expected_response) { ngfw_clusters }
+        it 'returns NGFW clusters only' do
+          expect(subject.fetch).to eq(expected_response)
+        end
+      end
     end
   end
 end

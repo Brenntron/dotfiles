@@ -1,9 +1,12 @@
 class Clusters::Fetcher
   attr_accessor :filter, :regex, :user
 
-  DATA_PROVIDERS = [
-    Clusters::Wbnp::DataFetcher,
-    Clusters::Ngfw::DataFetcher
+  WSA_DATA_PROVIDER = Clusters::Wbnp::DataFetcher
+  NGFW_DATA_PROVIDER = Clusters::Ngfw::DataFetcher
+
+  ALL_DATA_PROVIDERS = [
+    WSA_DATA_PROVIDER,
+    NGFW_DATA_PROVIDER
   ]
 
   CLUSTERS_PAGE_LIMIT = 1000
@@ -24,9 +27,25 @@ class Clusters::Fetcher
   private
 
   def fetch_clusters
-    DATA_PROVIDERS.map do |provider_class|
+    data_providers_list.map do |provider_class|
       provider_class.new(regex).fetch
     end.flatten
+  end
+
+  def data_providers_list
+    # this is the data filtering that should be a part Clusters::filter
+    # but, for page load speedup purposes that will be more efficient to filter by platform
+    # before data select
+    return ALL_DATA_PROVIDERS if filter.blank?
+
+    case filter[:platform]
+    when Clusters::Wbnp::DataFetcher::DATA_PATFORM
+      [WSA_DATA_PROVIDER]
+    when Clusters::Ngfw::DataFetcher::DATA_PATFORM
+      [NGFW_DATA_PROVIDER]
+    else
+      ALL_DATA_PROVIDERS
+    end
   end
 
   def populate_3rd_party_clusters_data(clusters)

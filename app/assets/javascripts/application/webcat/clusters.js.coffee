@@ -906,3 +906,17 @@ window.build_clusters_header = () ->
 
 window.webcat_clusters_refresh = () ->
   window.location.replace('/escalations/webcat/clusters');
+
+window.webcat_platform_filter = () ->
+  selected_platform = $('#webcat-platform-filter').val()
+  url = new URL(document.location.href)
+  url.searchParams.set('platform', selected_platform)
+  document.location = url;
+
+$ ->
+  $(document).ready ->
+    url = new URL(document.location.href)
+    platform = url.searchParams.get('platform')
+
+    if(platform)
+      $('#webcat-platform-filter').val(platform)
