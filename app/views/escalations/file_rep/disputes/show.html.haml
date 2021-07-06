@@ -162,9 +162,23 @@
 
             .col-xs-6.col-sm-6.col-md-6
               %label.content-label-sm Auto Resolve Log
-              %button#auto_resolve_log_button.dispute-inline-buttons.auto-resolve-button.esc-tooltipped{onclick:'show_auto_resolve()', title:'Auto Resolve Log'}
-              #auto-resolve-dialog{title: 'Auto Resolve Log'}
-                = raw(@file_rep_dispute.auto_resolve_log)
+              .top-info-data
+                %button#auto_resolve_log_button.dispute-inline-buttons.auto-resolve-button.esc-tooltipped{onclick:'show_auto_resolve()', title:'Auto Resolve Log'}
+                #auto-resolve-dialog{title: 'Auto Resolve Log'}
+                  = raw(@file_rep_dispute.auto_resolve_log)
+              %label.content-label-sm Source
+              .top-info-data
+                - if @file_rep_dispute.source?
+                  - if @file_rep_dispute.source == 'talos-intelligence'
+                    TI Webform
+                  - elsif @file_rep_dispute.source == 'talos-intelligence-api'
+                    TI API
+                  - else
+                    = @file_rep_dispute.source
+                - else
+                  %span.missing-data Source unknown
+
+
       .row
         .col-lg-12.dispute-details
           %label.content-label-sm Dispute Details

@@ -313,6 +313,7 @@ class Complaint < ApplicationRecord
 
       new_complaint.submission_type = message_payload["payload"]["submission_type"]
       new_complaint.id = bug_proxy.id
+      new_complaint.meta_data = message_payload["payload"]["meta_data"]
       new_complaint.description = message_payload["payload"]["problem"]
       new_complaint.ticket_source_key = message_payload["source_key"]
       new_complaint.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
@@ -327,7 +328,9 @@ class Complaint < ApplicationRecord
       new_complaint.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
 
       new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
-
+      if message_payload["payload"]["api_customer"].present? && message_payload["payload"]["api_customer"] == true
+        new_complaint.submitter_type = SUBMITTER_TYPE_CUSTOMER
+      end
       if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
         ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
 
