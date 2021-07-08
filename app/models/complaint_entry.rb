@@ -30,6 +30,7 @@ class ComplaintEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_INVALID = "INVALID"
   STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
+  validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
 
   def self.what_time_is_it(value)
     distance_of_time_in_words(value)
@@ -1237,5 +1238,19 @@ class ComplaintEntry < ApplicationRecord
     commit_category(existing_prefixes, ip_or_uri: prefix, categories_string: final_cat_string, description: comment, user: ticket_user.email, casenumber: self.complaint.id)
 
     return log_messages
+  end
+
+  def determine_platform
+    if self.platform_id.present?
+      return (self.product_platform.public_name rescue "No Data")
+    end
+    if self.complaint.platform_id.present?
+      return (self.complaint.platform.public_name rescue "No Data")
+    end
+    if self.platform.present?
+      return (self.platform rescue "No Data")
+    end
+
+    return nil
   end
 end

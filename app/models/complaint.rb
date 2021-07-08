@@ -52,6 +52,8 @@ class Complaint < ApplicationRecord
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
 
+  validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
+
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}
     case new_status
@@ -313,6 +315,7 @@ class Complaint < ApplicationRecord
 
       new_complaint.submission_type = message_payload["payload"]["submission_type"]
       new_complaint.id = bug_proxy.id
+      new_complaint.meta_data = message_payload["payload"]["meta_data"]
       new_complaint.description = message_payload["payload"]["problem"]
       new_complaint.ticket_source_key = message_payload["source_key"]
       new_complaint.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]

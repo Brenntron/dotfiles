@@ -36,6 +36,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                                 "SBRS_Rule_Hits"=>"",
                                 "Hostname"=>"www.dealer.com",
                                 "rep_sugg"=>"Good",
+                                "claim" => "false positive",
                                 "category"=>"Not in our list"
                             }
                         },
@@ -52,6 +53,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                                 "SBRS_Rule_Hits"=>"",
                                 "Hostname"=>"redirect-v225.secureserver.net",
                                 "rep_sugg"=>"Good",
+                                "claim" => "false positive",
                                 "category"=>"Search Engines and Portals"
                             }
                         }
@@ -62,6 +64,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
                             "rep_sugg"=>"Good",
+                            "claim" => "false positive",
                             "category"=>"Not in our list"
                         },
                         "thepretenders.com" => {
@@ -69,6 +72,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
                             "rep_sugg"=>"Good",
+                            "claim" => "false positive",
                             "category"=>"Entertainment"
                         }
                     },
@@ -116,6 +120,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                                 "SBRS_Rule_Hits"=>"",
                                 "Hostname"=>"www.dealer.com",
                                 "rep_sugg"=>"Good",
+                                "claim" => "false positive",
                                 "category"=>"Not in our list"
                             }
                         },
@@ -125,6 +130,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                                 "WBRS_Rule_Hits"=>"dotq",
                                 "Hostname_ips"=>"",
                                 "rep_sugg"=>"Good",
+                                "claim" => "false positive",
                                 "category"=>"Search Engines and Portals"
                             },
                             "sbrs" => {
@@ -132,6 +138,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                                 "SBRS_Rule_Hits"=>"",
                                 "Hostname"=>"redirect-v225.secureserver.net",
                                 "rep_sugg"=>"Good",
+                                "claim" => "false positive",
                                 "category"=>"Search Engines and Portals"
                             }
                         }
@@ -142,6 +149,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
                             "rep_sugg"=>"Good",
+                            "claim" => "false positive",
                             "category"=>"Not in our list"
                         },
                         "thepretenders.com" => {
@@ -149,6 +157,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
                             "rep_sugg"=>"Good",
+                            "claim" => "false positive",
                             "category"=>"Entertainment"
                         }
                     },
@@ -163,7 +172,8 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                     domain: '355toyota.com',
                     product_platform: 1001,
                     product_version: "test_platform_version",
-                    network: false
+                    network: false,
+                    meta_data: "{\"ticket\":{\"testing_ticket\":123},\"entry\":{\"testing_entry\":123}}"
                 }
             }
         }
@@ -197,6 +207,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                                 "SBRS_Rule_Hits"=>"",
                                 "Hostname"=>"www.dealer.com",
                                 "rep_sugg"=>"Good",
+                                "claim" => "false positive",
                                 "category"=>"Not in our list"
                             }
                         },
@@ -213,6 +224,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                                 "SBRS_Rule_Hits"=>"",
                                 "Hostname"=>"redirect-v225.secureserver.net",
                                 "rep_sugg"=>"Good",
+                                "claim" => "false positive",
                                 "category"=>"Search Engines and Portals"
                             }
                         }
@@ -223,6 +235,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
                             "rep_sugg"=>"Good",
+                            "claim" => "false positive",
                             "category"=>"Not in our list"
                         },
                         "thepretenders.com" => {
@@ -230,6 +243,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
                             "rep_sugg"=>"Good",
+                            "claim" => "false positive",
                             "category"=>"Entertainment"
                         }
                     },
@@ -286,7 +300,6 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
     expect(dispute.dispute_entries.where(uri: 'thepretenders.com')).to exist
     expect(dispute.ticket_source).to eql("talos-intelligence")
-
     expect(dispute.platform_id).to eql(1001)
     expect(dispute.product_platform).to eql(nil)
   end
@@ -310,7 +323,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.product_version).to eql("test_platform_version")
     expect(dispute.in_network).to eql(nil)
     expect(dispute.ticket_source).to eql("talos-intelligence-api")
-
+    expect(dispute.meta_data).to eql("{\"ticket\":{\"testing_ticket\":123},\"entry\":{\"testing_entry\":123}}")
     expect(dispute.platform_id).to eql(1001)
     expect(dispute.product_platform).to eql(nil)
   end

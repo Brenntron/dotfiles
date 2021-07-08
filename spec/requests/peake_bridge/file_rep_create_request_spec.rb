@@ -60,7 +60,8 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
                     sandbox_key: "TI-Form",
                     product_platform: 1001,
                     product_version: "test_platform_version",
-                    network: false
+                    network: false,
+                    meta_data: "{\"ticket\":{\"testing_ticket\":123},\"entry\":{\"testing_entry\":123}}"
                 }
             }
 
@@ -155,6 +156,7 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
     expect(file_rep_dispute.product_platform).to eql(nil)
     expect(file_rep_dispute.product_version).to eql("test_platform_version")
     expect(file_rep_dispute.in_network).to eql(nil)
+    expect(file_rep_dispute.meta_data).to eql("{\"ticket\":{\"testing_ticket\":123},\"entry\":{\"testing_entry\":123}}")
     expect(file_rep_dispute.platform_id).to eql(1001)
   end
 

@@ -15,6 +15,8 @@ class FileReputationDispute < ApplicationRecord
   belongs_to :ti_product_platform, :class_name => "Platform", :foreign_key => "platform_id", optional: true
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
+  validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
+
   STATUS_NEW                = 'NEW'
   STATUS_ASSIGNED           = 'ASSIGNED'
   STATUS_RESEARCHING        = 'RESEARCHING'
@@ -633,6 +635,7 @@ class FileReputationDispute < ApplicationRecord
     end
 
     new_dispute.id = bug_proxy.id
+    new_dispute.meta_data = message_payload[:payload][:meta_data]
     new_dispute.user_id = user.id
     new_dispute.sha256_hash = message_payload[:payload][:sha256]
     new_dispute.status = STATUS_NEW
@@ -1251,8 +1254,8 @@ class FileReputationDispute < ApplicationRecord
     research_bug_proxy
   end
 
-  def get_email_meta_data
 
+  def get_email_meta_data
     response = {}
     if self.meta_data.present?
       begin
@@ -1275,9 +1278,18 @@ class FileReputationDispute < ApplicationRecord
       end
 
     end
-
     response
-
   end
 
+  def determine_platform
+    if self.platform_id.present?
+      return (self.ti_product_platform.public_name rescue "No Data")
+    end
+
+    if self.platform.present?
+      return self.platform
+    end
+
+    return nil
+  end
 end

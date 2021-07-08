@@ -146,7 +146,8 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" onclick="WebCat.RepLookup.queryWhoIs('+query_who_params+ '\')">Lookup</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
-    error: (response) ->      std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
+    error: (response) ->
+      std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
 
  )
 
@@ -513,9 +514,6 @@ window.updatePending = (id,row_id) ->
     processSubmitPending(id,row_id)
 
 processSubmitEntry = (entry_id,row_id) ->
-  $("#submit_changes_#{entry_id}").addClass('hidden')
-  $("#reopen_#{entry_id}").removeClass('hidden')
-
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   if $('#input_cat_'+entry_id).val() != null
     categories = $('#input_cat_'+entry_id).val().toString()
@@ -546,7 +544,11 @@ processSubmitEntry = (entry_id,row_id) ->
       data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment, 'uri_as_categorized': uri_as_categorized }
       success: (response) ->
         {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
+
         if !error
+          $("#submit_changes_#{entry_id}").addClass('hidden')
+          $("#reopen_#{entry_id}").removeClass('hidden')
+
           table = $('#complaints-index').DataTable()
 
           selected_rows = $('#complaints-index').DataTable().rows('.selected')
@@ -622,6 +624,11 @@ processSubmitEntry = (entry_id,row_id) ->
           $("#path_#{entry_id}").text(path)
           $("#entry-uri-#{entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})' >#{uri}</a>")
           $("#site-search-#{entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})'>#{uri}</a>")
+
+        else
+          $("#submit_changes_#{entry_id}").removeClass('hidden')
+          $("#reopen_#{entry_id}").addClass('hidden')
+          std_msg_error("Unable to update complaint entry",[error], reload: false)
 
         tds = $('#complaints-index tbody').closest('td')
         for td in tds
