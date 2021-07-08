@@ -172,7 +172,18 @@ processSubmitNewURL = () ->
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
+        popular_entries = []
+        message = ""
+        for key, val of response
+          if val.popular == true
+            popular_entries.push(val.url)
+
+        if popular_entries.length > 0
+           message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+        else
+           message = "No pending complaint entries have been created"
+
+        std_msg_success('URLs categorized successfully',[message, "All other entries have been submitted directly to WBRS."], reload: true)
       error: (response) ->
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
           std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)

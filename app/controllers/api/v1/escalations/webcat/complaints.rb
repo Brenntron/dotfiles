@@ -143,7 +143,7 @@ module API
               std_api_v2 do
                 params["data"].each do |item, prefix|
                   if prefix["url"].present?
-                    Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
+                    prefix["popular"] = Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
                                                        category_ids_string: prefix["category_ids"].join(','),
                                                        category_names_string: prefix["category_names"].join(','),
                                                        description: '',

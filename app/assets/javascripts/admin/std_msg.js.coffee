@@ -80,6 +80,7 @@ window.std_msg_confirm =(banner, messages, options = {}) ->
   else if undefined != options.confirm
     $('.confirm').click ->
       $('.confirmation-buttons').addClass('hidden')
+      $('#msg-modal').modal('hide')
       options.confirm()
       if options.success_msg != undefined
         std_msg_success(options.success_msg, success_reload: options.success_reload)
