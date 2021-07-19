@@ -449,6 +449,7 @@ class Dispute < ApplicationRecord
     new_dispute = nil
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
+
     begin
 
       entry_claims = {}
@@ -699,6 +700,8 @@ class Dispute < ApplicationRecord
 
       ######AUTO RESOLVE LOGIC########
       begin
+        umbrella_no_reply = Platform.find_by_all_names("Umbrella - No Reply")
+
         new_dispute.dispute_entries.each do |dispute_entry|
           false_negative_claim = false
 
@@ -736,7 +739,11 @@ class Dispute < ApplicationRecord
 
               else
                 if new_dispute.submission_type == "w"
-                  dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                  if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                    dispute_entry = Umbrella::AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                  else
+                    dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                  end
                 end
                 dispute_entry.save
               end
@@ -784,7 +791,13 @@ class Dispute < ApplicationRecord
               if entry_claim != "false negative"
                 dispute_entry.update(status: DisputeEntry::NEW)
               else
-                dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+
+                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+
+                  dispute_entry = Umbrella::AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                else
+                  dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                end
               end
               dispute_entry.save
             end
@@ -2272,6 +2285,13 @@ class Dispute < ApplicationRecord
       if self.dispute_entries.first.platform_id.present?
         return self.dispute_entries.map{|d_e| d_e.product_platform.public_name rescue 'No Data'}.uniq.join(",")
       end
+    end
+    return nil
+  end
+
+  def determine_platform_record
+    if self.platform_id.present?
+      return Platform.find(self.platform_id) rescue nil
     end
     return nil
   end

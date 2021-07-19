@@ -155,6 +155,48 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     }
   end
 
+  let(:umbrella_dispute_message_json_bad) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute: {
+                source_type: 'Dispute',
+                source_key: 1001,
+                payload: {
+                    investigate_urls: {
+                        "355toyota.com" => {
+                            "WBRS_SCORE"=>"noscore",
+                            "WBRS_Rule_Hits"=>"",
+                            "Hostname_ips"=>"",
+                            "rep_sugg"=>"Untrusted",
+                            "suggested_threat_category" => "malware",
+                            "claim" => "false negative",
+                            "category"=>"Not in our list"
+                        }
+                    },
+                    investigate_ips:{},
+                    problem: 'What do I need to do to improve the reputation',
+                    submission_type: 'w',
+                    name: customer_name,
+                    user_company: company_name,
+                    email: 'webmaster@cmim.org',
+                    email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
+                    email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
+                    user_ip: '64.70.56.99',
+                    domain: '355toyota.com',
+                    product_platform: 2000,
+                    network: false,
+                    product_version: 'test'
+                }
+            }
+        }
+    }
+  end
+
 
   let(:mininum_auto_resolve_json_allow) do
     {
@@ -194,6 +236,25 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
         }
     }
   end
+
+  before(:each) do
+    Platform.destroy_all
+
+    @umbrella_platform = Platform.new
+    @umbrella_platform.id = 2000
+    @umbrella_platform.public_name = "Umbrella - No Reply"
+    @umbrella_platform.internal_name = "Umbrella - No Reply"
+    @umbrella_platform.active = true
+    @umbrella_platform.webrep = true
+    @umbrella_platform.webcat = true
+    @umbrella_platform.filerep = true
+    @umbrella_platform.emailrep = true
+    @umbrella_platform.save
+
+
+
+  end
+
 
   it 'receives dispute payload message and does not auto resolve if there are no conditions' do
     vrt_incoming
@@ -348,8 +409,127 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("UNCHANGED")
     expect(dispute_entry_1.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence. Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://www.spamhaus.org/) Review the status and reason(s) by visiting https://www.spamhaus.org/lookup/and entering your IP. Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours.")
 
+  end
+
+  it 'should use umbrella no reply auto resolution for umbrella no reply tickets' do
+
+    umbrella_popular_bad = UmbrellaSecurityInfoResponse.new
+    umbrella_popular_bad.code = 200
+    umbrella_popular_bad.body = "{\"dga_score\":0.0,\"perplexity\":0.1698321879522074,\"entropy\":3.4594316186372978,\"securerank2\":0.0,\"pagerank\":0.0,\"asn_score\":-0.014739406284196042,\"prefix_score\":-0.023982712069696013,\"rip_score\":-0.011198019721606252,\"popularity\":0.0,\"fastflux\":false,\"geodiversity\":[[\"US\",0.5],[\"BR\",0.5]],\"geodiversity_normalized\":[[\"BR\",0.863526213328589],[\"US\",0.13647378667141086]],\"tld_geodiversity\":[],\"geoscore\":0.0,\"ks_test\":0.0,\"attack\":\"\",\"threat_type\":\"\",\"found\":true}"
+
+    umbrella_volume_bad = UmbrellaVolumeResponse.new
+    umbrella_volume_bad.code = 200
+    umbrella_volume_bad.body = "{\"dates\":[1624107600000,1626699600000],\"queries\":[0,0,1,2,0,1,0,0,0,1,0,0,0,0,0,0,2,0,0,0,0,0,0,5,0,0,0,0,0,6,0,0,5,0,0,5,0,0,3,0,0,5,0,0,9,0,0,5,0,0,3,0,3,1,0,4,0,0,3,0,0,5,0,0,5,0,0,6,0,0,4,0,0,4,0,0,2,0,0,4,0,0,2,0,0,4,0,0,5,0,0,6,0,0,6,0,0,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,1,0,2,0,0,0,0,0,0,1,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1,0,0,0,2,1,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}"
+
+    xena_allow_list = false
+
+    expect(Umbrella::SecurityInfo).to receive(:query_info).with(address: "355toyota.com").and_return(umbrella_popular_bad).at_least(:once)
+    #expect(Virustotal::Scan).to receive(:scan_hashes).and_return(virus_total_conviction_hash).at_least(:once)
+    expect(RepApi::Whitelist).to receive(:get_whitelist_info).and_raise(RepApi::RepApiNotFoundError, "HTTP response 404").at_least(:once)
+    expect(Xena::GuardRails).to receive(:is_allow_listed?).and_return(xena_allow_list).at_least(:once)
+    expect(Umbrella::DomainVolume).to receive(:query_domain_volume).and_return(umbrella_volume_bad).at_least(:once)
 
 
+    vrt_incoming
+    guest_company
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: umbrella_dispute_message_json_bad
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
+
+    dispute_entry_1 = DisputeEntry.where(:uri => '355toyota.com').first
+
+    expect(dispute_entry_1.status).to eql(DisputeEntry::STATUS_RESOLVED)
+    expect(dispute_entry_1.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
+
+    expect(dispute_entry_1.auto_resolve_log).to eql("--------Starting Data---------<br>suggested disposition: Untrusted<br>effective disposition info: \"Neutral\"<br>-----------------------------<br>Umbrella popularity rating: 0.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>no allow list entry on xena, continuing<br><br>found no signs of high volume, proceed to auto resolve")
+
+  end
+
+  it 'should use umbrella no reply auto resolution for umbrella no reply tickets, no auto resolve from high volume' do
+
+    umbrella_popular_bad = UmbrellaSecurityInfoResponse.new
+    umbrella_popular_bad.code = 200
+    umbrella_popular_bad.body = "{\"dga_score\":0.0,\"perplexity\":0.1698321879522074,\"entropy\":3.4594316186372978,\"securerank2\":0.0,\"pagerank\":0.0,\"asn_score\":-0.014739406284196042,\"prefix_score\":-0.023982712069696013,\"rip_score\":-0.011198019721606252,\"popularity\":0.0,\"fastflux\":false,\"geodiversity\":[[\"US\",0.5],[\"BR\",0.5]],\"geodiversity_normalized\":[[\"BR\",0.863526213328589],[\"US\",0.13647378667141086]],\"tld_geodiversity\":[],\"geoscore\":0.0,\"ks_test\":0.0,\"attack\":\"\",\"threat_type\":\"\",\"found\":true}"
+
+    umbrella_volume_bad = UmbrellaVolumeResponse.new
+    umbrella_volume_bad.code = 200
+    umbrella_volume_bad.body = "{\"dates\":[1624107600000,1626699600000],\"queries\":[0,0,100,400,100,100,0,100,100,100,0,0,0,0,0,0,2,0,0,0,0,0,0,5,0,0,0,0,0,6,0,0,5,0,0,5,0,0,3,0,0,5,0,0,9,0,0,5,0,0,3,0,3,1,0,4,0,0,3,0,0,5,0,0,5,0,0,6,0,0,4,0,0,4,0,0,2,0,0,4,0,0,2,0,0,4,0,0,5,0,0,6,0,0,6,0,0,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,1,0,2,0,0,0,0,0,0,1,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1,0,0,0,2,1,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,5,0,0,0,0,0,0,0,0,0,0,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,8,0,0,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}"
+
+    xena_allow_list = false
+
+
+    expect(Umbrella::SecurityInfo).to receive(:query_info).with(address: "355toyota.com").and_return(umbrella_popular_bad).at_least(:once)
+    #expect(Virustotal::Scan).to receive(:scan_hashes).and_return(virus_total_conviction_hash).at_least(:once)
+    expect(RepApi::Whitelist).to receive(:get_whitelist_info).and_raise(RepApi::RepApiNotFoundError, "HTTP response 404").at_least(:once)
+    expect(Xena::GuardRails).to receive(:is_allow_listed?).and_return(xena_allow_list).at_least(:once)
+    expect(Umbrella::DomainVolume).to receive(:query_domain_volume).and_return(umbrella_volume_bad).at_least(:once)
+
+
+    vrt_incoming
+    guest_company
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: umbrella_dispute_message_json_bad
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
+
+    dispute_entry_1 = DisputeEntry.where(:uri => '355toyota.com').first
+
+    expect(dispute_entry_1.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry_1.resolution).to eql("")
+    
+    expect(dispute_entry_1.auto_resolve_log).to eql("--------Starting Data---------<br>suggested disposition: Untrusted<br>effective disposition info: \"Neutral\"<br>-----------------------------<br>Umbrella popularity rating: 0.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>no allow list entry on xena, continuing<br><br>found high volume in day and month, send to TE for manual review")
+
+  end
+
+  it 'should use umbrella no reply auto resolution for umbrella no reply tickets, no auto resolve from xena match' do
+
+    umbrella_popular_bad = UmbrellaSecurityInfoResponse.new
+    umbrella_popular_bad.code = 200
+    umbrella_popular_bad.body = "{\"dga_score\":0.0,\"perplexity\":0.1698321879522074,\"entropy\":3.4594316186372978,\"securerank2\":0.0,\"pagerank\":0.0,\"asn_score\":-0.014739406284196042,\"prefix_score\":-0.023982712069696013,\"rip_score\":-0.011198019721606252,\"popularity\":0.0,\"fastflux\":false,\"geodiversity\":[[\"US\",0.5],[\"BR\",0.5]],\"geodiversity_normalized\":[[\"BR\",0.863526213328589],[\"US\",0.13647378667141086]],\"tld_geodiversity\":[],\"geoscore\":0.0,\"ks_test\":0.0,\"attack\":\"\",\"threat_type\":\"\",\"found\":true}"
+
+    umbrella_volume_bad = UmbrellaVolumeResponse.new
+    umbrella_volume_bad.code = 200
+    umbrella_volume_bad.body = umbrella_volume_bad.body = "{\"dates\":[1624107600000,1626699600000],\"queries\":[0,0,1,2,0,1,0,0,0,1,0,0,0,0,0,0,2,0,0,0,0,0,0,5,0,0,0,0,0,6,0,0,5,0,0,5,0,0,3,0,0,5,0,0,9,0,0,5,0,0,3,0,3,1,0,4,0,0,3,0,0,5,0,0,5,0,0,6,0,0,4,0,0,4,0,0,2,0,0,4,0,0,2,0,0,4,0,0,5,0,0,6,0,0,6,0,0,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,1,0,2,0,0,0,0,0,0,1,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1,0,0,0,2,1,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}"
+
+    xena_allow_list = true
+
+
+    expect(Umbrella::SecurityInfo).to receive(:query_info).with(address: "355toyota.com").and_return(umbrella_popular_bad).at_least(:once)
+    #expect(Virustotal::Scan).to receive(:scan_hashes).and_return(virus_total_conviction_hash).at_least(:once)
+    expect(RepApi::Whitelist).to receive(:get_whitelist_info).and_raise(RepApi::RepApiNotFoundError, "HTTP response 404").at_least(:once)
+    expect(Xena::GuardRails).to receive(:is_allow_listed?).and_return(xena_allow_list).at_least(:once)
+    #expect(Umbrella::DomainVolume).to receive(:query_domain_volume).and_return(umbrella_volume_bad).at_least(:once)
+
+
+    vrt_incoming
+    guest_company
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: umbrella_dispute_message_json_bad
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
+
+    dispute_entry_1 = DisputeEntry.where(:uri => '355toyota.com').first
+
+    expect(dispute_entry_1.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry_1.resolution).to eql("")
+
+    expect(dispute_entry_1.auto_resolve_log).to eql("--------Starting Data---------<br>suggested disposition: Untrusted<br>effective disposition info: \"Neutral\"<br>-----------------------------<br>Umbrella popularity rating: 0.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>allow listed on xena, manual review")
 
   end
 
