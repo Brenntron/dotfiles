@@ -1,0 +1,127 @@
+.title{
+    margin-top: 25px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+.background{
+    background-color: skyblue;
+    border-radius:3px;
+    margin-bottom: 20px;
+}
+.metrics
+{
+    margin:10px;
+}
+.metrics td{
+    border-bottom: 0px !important;
+    font-size: .7em;
+}
+.user_name{
+    font-weight: bold;
+    font-size: .8em;
+}
+.user_name a:hover{
+    text-decoration: none!important;
+}
+.user_id{
+    font-size: .4em;
+}
+.vl{
+    margin-top: 25px;
+    border-left: 1px solid white;
+    height:50px;
+}
+
+.wbnp-report-wrapper {
+  padding: 20px 40px;
+  .wbnp-status-wrapper div {
+    display: inline-block;
+    padding-right: 12px;
+  }
+  h6 {
+    font-weight: 600;
+    margin-bottom: 25px;
+    &::after {
+      content: '|';
+      display: block;
+      width: 20px;
+      height: 12px;
+      float: right;
+      padding-left: 17px;
+      color: #d2d3d4;
+      margin-top: -2px;
+      font-weight: 100;
+    }
+  }
+  .wbnp-status {
+    text-transform: capitalize;
+    background-repeat: no-repeat;
+    background-position: left -2px;
+    background-size: 16px 16px;
+    padding-left: 20px;
+    &.status_complete {
+      background-image: url(image_path('icon_check_grey.svg'));
+    }
+  }
+  .wbnp-full-report-table {
+    margin-bottom: 20px;
+  }
+  label {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 8pt;
+    padding-bottom: 5px;
+  }
+  .wbnp-notes {
+    font-family: "Fira Mono", monospace;
+    color: grey;
+    max-height: 200px;
+    overflow: scroll;
+    border-top: 1px solid #f2f2f2;
+    border-bottom: 1px solid #f2f2f2;
+    padding: 10px 0;
+    font-size: 12px;
+    line-height: 1.25em;
+  }
+  .thin {
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+  }
+}
+
+#fetch_wbnp:disabled {
+  opacity: .5;
+}
+
+.wbnp-full-report-title-status {
+  display: block;
+  float: right;
+  font-size: 9pt;
+  font-style: italic;
+  &.active::before {
+    content: '';
+    position: absolute;
+    display: block;
+    float: left;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    margin-left: -24px;
+    margin-top: -4px;
+    background-image: url(image_path('icon_sync_white.svg'));
+    animation: sync_rotate 2s infinite linear;
+  }
+}
+
+@-webkit-keyframes sync_rotate /* Safari and Chrome */ {
+  from {
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
