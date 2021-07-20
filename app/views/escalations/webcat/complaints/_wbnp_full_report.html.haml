@@ -1,0 +1,43 @@
+#wbnp-full-report{title: 'WBNP Report Details'}
+  .row
+    .col-xs-12#current-wbnp-report.wbnp-report-wrapper
+      .wbnp-status-wrapper
+        .wbnp-title
+          %h6 Current WBNP Report
+        .wbnp-status
+        .wbnp-status-msg
+      %table.wbnp-full-report-table
+        %thead
+          %tr
+            %th ID
+            %th Attempts
+            %th Total New Cases
+            %th Cases Imported
+            %th Cases Failed
+            %th Created At
+            %th Updated At
+        %tbody
+      %label Notes
+      .wbnp-notes
+  %hr.thin
+  .row
+    .col-xs-12#previous-wbnp-report.wbnp-report-wrapper
+      .wbnp-status-wrapper
+        .wbnp-title
+          %h6 Previous WBNP Report
+        .wbnp-status.status_complete
+        .wbnp-status-msg
+      %table.wbnp-full-report-table
+        %thead
+          %tr
+            %th ID
+            %th Attempts
+            %th Total New Cases
+            %th Cases Imported
+            %th Cases Failed
+            %th Created At
+            %th Updated At
+        %tbody
+      %label Notes
+      .wbnp-notes
+

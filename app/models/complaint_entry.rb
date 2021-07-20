@@ -405,11 +405,15 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def self.create_wbnp_complaint_entry(complaint, ip_url, url_parts, user = nil, status = NEW, categories = nil, logger_token)
+  def self.create_wbnp_complaint_entry(complaint, ip_url, url_parts, user = nil, status = NEW, categories = nil, logger_token, platform)
 
     new_complaint_entry = ComplaintEntry.new
     new_complaint_entry.complaint_id = complaint.id
     new_complaint_entry.status = status
+
+    if platform.present?
+      new_complaint_entry.platform_id = platform.id rescue nil
+    end
 
     begin
       Rails.logger.error "#{logger_token} getting sbrs data for uri: #{ip_url}\n"
@@ -462,10 +466,12 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.url_primary_category = current_category
       new_complaint_entry.category = current_category
     end
-    ActiveRecord::Base.connection.reconnect!
+
     new_complaint_entry.save
-    Rails.logger.error "#{logger_token} generating preload for dispute entry #{new_complaint_entry.id.to_s} uri: #{ip_url}\n"
-    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+    ##turning this off for WBNP pulls as it is a suspect in causing sudden thread halts. Fortunately this shouldn't affect SDO for just dealing with WBNP
+
+    #Rails.logger.error "#{logger_token} generating preload for dispute entry #{new_complaint_entry.id.to_s} uri: #{ip_url}\n"
+    #ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
     #turning this off for the time being, until we know for sure screenshots are fully functional, plus this is the wrong screenshot capture anyways
     #delay.capture_screenshot(new_complaint_entry.hostlookup, new_complaint_entry.id)
   end

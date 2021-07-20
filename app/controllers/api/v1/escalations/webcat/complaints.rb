@@ -282,7 +282,7 @@ module API
             get 'wbnp_report_status' do
 
               if permitted_params[:wbnp_report_id].blank?
-                report = WbnpReport.active_reports.last
+                report = WbnpReport.get_last_reports #WbnpReport.active_reports.last
               else
                 report = WbnpReport.where(:id => permitted_params[:wbnp_report_id]).first
               end
