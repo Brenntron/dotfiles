@@ -13,7 +13,30 @@ RSpec.describe Escalations::Webcat::RootController, type: :request do
     @current_user.roles << FactoryBot.create(:web_cat_role)
     @username = @current_user.cvs_username
     @auth_token = @current_user.authentication_token
+
+    @platform = Platform.new
+    @platform.id = 1001
+    @platform.public_name = "test"
+    @platform.internal_name = "test internal"
+    @platform.active = true
+    @platform.webrep = true
+    @platform.webcat = true
+    @platform.filerep = true
+    @platform.emailrep = true
+    @platform.save
+
+    @platform2 = Platform.new
+    @platform2.id = 1002
+    @platform2.public_name = "test2"
+    @platform2.internal_name = "test2 internal2"
+    @platform2.active = true
+    @platform2.webrep = true
+    @platform2.webcat = true
+    @platform2.filerep = true
+    @platform2.emailrep = true
+    @platform2.save
   end
+
 
   #for reporting
 
@@ -36,6 +59,20 @@ RSpec.describe Escalations::Webcat::RootController, type: :request do
     complaint_entry_three.save
     complaint_entry_four.save
 
+    complaint = complaint_entry_one.complaint
+    complaint.platform_id = @platform.id
+    complaint.save
+
+    complaint = complaint_entry_two.complaint
+    complaint.platform_id = @platform.id
+    complaint.save
+
+    complaint_entry_three.platform_id = @platform2.id
+    complaint_entry_three.save
+
+    complaint_entry_four.platform_id = @platform2.id
+    complaint_entry_four.save
+
     range_from = 30.days.ago.to_s.gsub(" ", "+")
     range_to = 20.days.ago.to_s.gsub(" ", "+")
 
@@ -43,7 +80,7 @@ RSpec.describe Escalations::Webcat::RootController, type: :request do
 
 
     json_response = JSON.parse(JSON.parse(response.body))
-
+    
     expect(json_response["count"]).to equal 3
 
   end
