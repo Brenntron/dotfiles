@@ -2,6 +2,11 @@ require 'pry'
 require 'rake'
 
 namespace :escalations do
+
+  task :run_wbnp_pull => :environment  do
+    Complaint.get_latest_wbnp_complaints(true)
+  end
+
   task :check_file_reputations do
     FileReputationDispute.check_for_rep_updates
   end
