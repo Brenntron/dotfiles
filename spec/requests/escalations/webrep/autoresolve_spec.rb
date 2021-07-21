@@ -487,7 +487,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
     expect(dispute_entry_1.status).to eql(DisputeEntry::NEW)
     expect(dispute_entry_1.resolution).to eql("")
-    
+
     expect(dispute_entry_1.auto_resolve_log).to eql("--------Starting Data---------<br>suggested disposition: Untrusted<br>effective disposition info: \"Neutral\"<br>-----------------------------<br>Umbrella popularity rating: 0.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>no allow list entry on xena, continuing<br><br>found high volume in day and month, send to TE for manual review")
 
   end
