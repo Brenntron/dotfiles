@@ -2243,6 +2243,7 @@ window.prep_complaint_to_convert = () ->
     $('.convert-entry-count').empty()
     $(entries_table).empty()
     $('#convert-ticket-summary').empty()
+    $('#convert-to-webrep').attr('disabled', 'disabled')
 
     std_msg_ajax(
       method: 'POST'
@@ -2277,8 +2278,10 @@ window.prep_complaint_to_convert = () ->
                 entry_content = this.uri
 
               entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
-                '<td class="text-center entry-disposition"><div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio">FP</label><input type="radio" name="disposition" value="fp" id="' + this.id + '-fp-radio"/></div>' +
-                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio">FN</label><input type="radio" name="disposition" value="fn" id="' + this.id + '-fn-radio"/></div></td></tr>'
+                '<td class="text-center entry-disposition">' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
+                '</td></tr>'
 
               $(entries_table).append(entry_row)
 
@@ -2299,7 +2302,7 @@ window.prep_complaint_to_convert = () ->
 
 
 convert_complaint_to_webrep = () ->
-  # send it on over
+  # get the parent ticket info
   complaint_id = parseInt($('#complaint-id-to-convert').text())
   summary = $('#convert-ticket-summary').text()
   submission_type = $('input[name=ticket-type]:checked').val()
@@ -2309,7 +2312,8 @@ convert_complaint_to_webrep = () ->
   entry_rows = $('#entries-to-convert tbody tr')
   $(entry_rows).each ->
     entry_content = $(this).find('.entry-content-to-convert').text()
-    entry_disposition = $(this).find('input[name=disposition]:checked').val()
+    disp_radio_name = $(this).find('input[type=radio]').attr('name')
+    entry_disposition = $(this).find('input[name=' + disp_radio_name + ']:checked').val()
     suggested_dispositions.push(entry: entry_content, suggested_disposition: entry_disposition)
 
   std_msg_ajax(
@@ -2331,12 +2335,33 @@ convert_complaint_to_webrep = () ->
 
 
 $ ->
-  # Enable convert submit button if reputation type and disposition have been selected
+  # check prior to enabling submit convert to webrep button
   $('#convert-ticket-dropdown').click ->
-    # check to see if ticket type is selected
-    if $('input[name=ticket-type]').is(':checked') && $('input[name=disposition]').is(':checked')
-      #enable the button
+    # find all the radios
+    radios = $(this).find('input:radio')
+
+    # separate into groups by name & then grab only the unique names
+    radio_names = []
+    $(radios).each ->
+      group = $(this).attr('name')
+      radio_names.push(group)
+    radio_groups = Array.from(new Set(radio_names))
+
+    # make sure each radio group has something checked
+    allchecked = 'true'
+    $(radio_groups).each ->
+      val = $('input[name=' + this + ']:checked').val()
+      if (val == undefined) || (val == null)
+        allchecked = 'false'
+      else
+        allchecked = 'true'
+
+    if allchecked == 'true'
       $('#convert-to-webrep').removeAttr('disabled')
+    else
+      $('#convert-to-webrep').attr('disabled', 'disabled')
+
+
 
 
   $('#convert-to-webrep').click ->
