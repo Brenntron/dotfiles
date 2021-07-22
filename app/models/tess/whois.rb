@@ -13,16 +13,16 @@ class Tess::Whois
 
   def self.cert
     # @cert ||= File.open('/Users/marlpier/projects/analyst-console-escalations/whois/client.crt').read
-    @cert ||= File.open(Rails.configuration.tess.client_cert_file).read
+    @cert ||= File.open(Rails.configuration.app_info.client_cert_file).read
   end
 
   def self.cert_key
     # @cert_key ||= File.open('/Users/marlpier/projects/analyst-console-escalations/whois/client.key').read
-    @cert_key ||= File.open(Rails.configuration.tess.pkey_file).read
+    @cert_key ||= File.open(Rails.configuration.app_info.pkey_file).read
   end
 
   def self.creds
-    @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert, cert, cert_key)
+    @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert, cert_key, cert)
     # @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert)
   end
 
@@ -42,7 +42,6 @@ class Tess::Whois
   end
 
   def self.remote_stub
-    byebug
     @remote_stub ||= Talos::Service::TESS::Stub.new(hostport, creds)
     # @remote_stub ||= Talos::Service::TESS::Stub.new(hostport, :this_channel_is_insecure)
   end

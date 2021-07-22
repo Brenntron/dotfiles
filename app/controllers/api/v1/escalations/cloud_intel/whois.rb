@@ -12,8 +12,10 @@ module API
               requires :name, type: String
             end
             get "lookup", root: "whois" do
-              result_data = Tess::Whois.whois_query(permitted_params['name'])
-              { data: result_data }
+              std_api_v2 do
+                result_data = Tess::Whois.whois_query(permitted_params['name'])
+                { data: result_data }
+              end
             end
           end
         end

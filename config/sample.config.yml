@@ -274,7 +274,6 @@ staging:
     product_family: "Talos_Web"
     product_id: "analyst-console-escalations"
     # device_id defaults to hostname
-    # device_id: "analyst-console.vrt.sourcefire.com"
     # product_version: 'staging'
   auto_resolve:
     complaints:
