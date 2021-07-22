@@ -969,14 +969,18 @@ class DisputeEntry < ApplicationRecord
     end
 
     # Make sure there will always be a "www" and "non-www" form to an inputted URL
-
-    if !url.include?("www.")
-      unless entries.find{|entry| url == "www." + entry.uri} || (url =~ Resolv::IPv4::Regex)
-        entries.prepend DisputeEntry.new(uri: "www."+ url)
-      end
-    elsif url.include?("www.")
-      unless entries.find{|entry| url.gsub("www.","") == entry.uri}
-        entries.prepend DisputeEntry.new(uri: url.gsub("www.",""))
+    # But, only do this if an entry has a `uri` at all; if we already know it's an
+    # IP address, there's no need to prepend www.
+    # (this is a fix for https://jira.vrt.sourcefire.com/browse/WEB-7679)
+    if !entry.uri.nil?
+      if !url.include?("www.")
+        unless entries.find{|entry| url == "www." + entry.uri} || (url =~ Resolv::IPv4::Regex)
+          entries.prepend DisputeEntry.new(uri: "www."+ url)
+        end
+      elsif url.include?("www.")
+        unless entries.find{|entry| url.gsub("www.","") == entry.uri}
+          entries.prepend DisputeEntry.new(uri: url.gsub("www.",""))
+        end
       end
     end
 
