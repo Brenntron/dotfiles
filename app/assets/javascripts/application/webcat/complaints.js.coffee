@@ -171,6 +171,7 @@ processSubmitNewURL = () ->
       method: 'POST'
       data: {data: data}
       success: (response) ->
+        timesTouched = 0
         std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
       error: (response) ->
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
@@ -185,7 +186,7 @@ window.cat_new_url = ()->
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
     std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with categorizing this new item? It will reload the page and you will lose your changes.",
       [],
       {
         reload: false,
@@ -489,6 +490,7 @@ processSubmitPending=(entry_id,row_id)->
         $("#subdomain_#{entry_id}").text(subdomain)
         $("#path_#{entry_id}").text(path)
         removeTouchedFormChange(uri)
+        timesTouched = 0
 
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
@@ -502,7 +504,7 @@ window.updatePending = (id,row_id) ->
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
     std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this pending item? It will reload the page and you will lose your changes.",
       [],
       {
         reload: false,
@@ -617,6 +619,7 @@ processSubmitEntry = (entry_id,row_id) ->
             select_complete.disable()
 
           removeTouchedFormChange(uri)
+          timesTouched = 0
           $("#complaint_prefix_#{entry_id}").val(uri)
           $("#domain_#{entry_id}").text(domain)
           $("#subdomain_#{entry_id}").text(subdomain)
@@ -641,7 +644,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
     std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this entry? It will reload the page and you will lose your changes.",
       [],
       {
         reload: false,
