@@ -92,4 +92,6 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
   config.assets.paths << Rails.root.join("app/assets/javascripts/application")
 
+  #allow access from talosnet only
+  config.web_console.permissions = '10.7.0.0/16'
 end
