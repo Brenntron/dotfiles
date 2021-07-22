@@ -509,4 +509,15 @@ class AutoResolve
   #
   # ####################################################################################
 
+
+
+  def self.auto_resolve_umbrella_false_positive(dispute_entry)
+    dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+    dispute_entry.status = DisputeEntry::STATUS_RESOLVED
+    dispute_entry.case_closed_at = Time.now
+    dispute_entry.case_resolved_at = Time.now
+    dispute_entry.resolution_comment = "The following ticket queue is for false negative requests only. If you would like to dispute the reputation of an Untrusted verdict, please open a Web Reputation ticket."
+    dispute_entry.save
+
+  end
 end

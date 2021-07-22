@@ -735,10 +735,15 @@ class Dispute < ApplicationRecord
               if entry_claim != "false negative"
                 dispute_entry.status = DisputeEntry::NEW
 
-                if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
-                  AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
+                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                  AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+                  dispute_entry.reload
+                else
+                  if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
+                    AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
+                    dispute_entry.reload
+                  end
                 end
-
               else
                 if new_dispute.submission_type == "w"
                   if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
@@ -791,7 +796,13 @@ class Dispute < ApplicationRecord
             if !matching_disposition
 
               if entry_claim != "false negative"
-                dispute_entry.update(status: DisputeEntry::NEW)
+
+                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                  AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+                  dispute_entry.reload
+                else
+                  dispute_entry.update(status: DisputeEntry::NEW)
+                end
               else
 
                 if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id

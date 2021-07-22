@@ -68,6 +68,50 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     }
   end
 
+  let(:umbrella_fp_json) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute: {
+                source_type: 'Dispute',
+                source_key: 1001,
+                payload: {
+                    investigate_urls: {
+                        "355toyota.com" => {
+                            "WBRS_SCORE"=>"noscore",
+                            "WBRS_Rule_Hits"=>"",
+                            "Hostname_ips"=>"",
+                            "rep_sugg"=>"Trusted",
+                            "suggested_threat_category" => "malware",
+                            "claim" => "false positive",
+                            "category"=>"Not in our list"
+                        }
+                    },
+                    investigate_ips:{},
+                    problem: 'What do I need to do to improve the reputation',
+                    submission_type: 'w',
+                    name: customer_name,
+                    user_company: company_name,
+                    email: 'webmaster@cmim.org',
+                    email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
+                    email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
+                    user_ip: '64.70.56.99',
+                    domain: '355toyota.com',
+                    product_platform: 2000,
+                    network: false,
+                    product_version: 'test'
+                }
+            }
+        }
+    }
+  end
+
+
+
   let(:email_autoresolve_json) do
     {
         envelope: {
@@ -170,7 +214,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                     investigate_urls: {
                         "355toyota.com" => {
                             "WBRS_SCORE"=>"noscore",
-                            "WBRS_Rule_Hits"=>"",
+                            "WBRS_Rule_Hits"=>"wlw, wlm, wlh",
                             "Hostname_ips"=>"",
                             "rep_sugg"=>"Untrusted",
                             "suggested_threat_category" => "malware",
@@ -348,7 +392,40 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("")
     expect(dispute_entry_1.auto_resolve_log).to eql("--------Starting Data---------<br>suggested disposition: Poor<br>effective disposition info: \"Neutral\"<br>-----------------------------<br>Umbrella popularity rating: 0.0: result of pass: false<br><br>allow list hits from SDS detected: wlw,wlm,wlh")
 
+  end
 
+  it 'receives dispute payload message and auto resolves to UNCHANGED for umbrella no reply if rulehits are allow list types' do
+
+    @umbrella_popular_bad = UmbrellaSecurityInfoResponse.new
+    @umbrella_popular_bad.code = 200
+    @umbrella_popular_bad.body = "{\"dga_score\":0.0,\"perplexity\":0.1698321879522074,\"entropy\":3.4594316186372978,\"securerank2\":0.0,\"pagerank\":0.0,\"asn_score\":-0.014739406284196042,\"prefix_score\":-0.023982712069696013,\"rip_score\":-0.011198019721606252,\"popularity\":0.0,\"fastflux\":false,\"geodiversity\":[[\"US\",0.5],[\"BR\",0.5]],\"geodiversity_normalized\":[[\"BR\",0.863526213328589],[\"US\",0.13647378667141086]],\"tld_geodiversity\":[],\"geoscore\":0.0,\"ks_test\":0.0,\"attack\":\"\",\"threat_type\":\"\",\"found\":true}"
+
+
+    expect(Umbrella::SecurityInfo).to receive(:query_info).with(address: "355toyota.com").and_return(@umbrella_popular_bad).at_least(:once)
+    #expect(Virustotal::Scan).to receive(:scan_hashes).and_return(virus_total_conviction_hash).at_least(:once)
+    #expect(RepApi::Whitelist).to receive(:get_whitelist_info).and_raise(RepApi::RepApiNotFoundError, "HTTP response 404").at_least(:once)
+
+    vrt_incoming
+    guest_company
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: umbrella_dispute_message_json_bad
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
+
+
+    dispute_entry_1 = DisputeEntry.where(:uri => '355toyota.com').first
+
+    expect(dispute_entry_1.status).to eql(DisputeEntry::STATUS_RESOLVED)
+    expect(dispute_entry_1.resolution).to eql(DisputeEntry::STATUS_RESOLVED_UNCHANGED)
+
+    expect(dispute_entry_1.resolution_comment).to eql("Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance.")
+    expect(dispute_entry_1.suggested_threat_category).to eql('malware')
+    expect(dispute_entry_1.auto_resolve_log).to eql("--------Starting Data---------<br>suggested disposition: Untrusted<br>effective disposition info: \"Neutral\"<br>-----------------------------<br>Umbrella popularity rating: 0.0: result of pass: false<br><br>allow list hits from SDS detected: wlw,wlm,wlh")
 
   end
 
@@ -385,6 +462,33 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
   end
 
+  it 'received dispute payload and auto resolves unchanged for false positive umbrella no reply cases' do
+
+    vrt_incoming
+    guest_company
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: umbrella_fp_json
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
+
+
+    dispute_entry_1 = DisputeEntry.where(:uri => '355toyota.com').first
+
+    expect(dispute_entry_1.status).to eql("RESOLVED_CLOSED")
+
+    expect(dispute_entry_1.resolution).to eql("UNCHANGED")
+    expect(dispute_entry_1.resolution_comment).to eql("The following ticket queue is for false negative requests only. If you would like to dispute the reputation of an Untrusted verdict, please open a Web Reputation ticket.")
+
+
+
+
+
+  end
 
   it 'received dispute payload and auto resolves email false positive' do
 
@@ -411,7 +515,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
   end
 
-  it 'should use umbrella no reply auto resolution for umbrella no reply tickets' do
+  xit 'should use umbrella no reply auto resolution for umbrella no reply tickets' do
 
     umbrella_popular_bad = UmbrellaSecurityInfoResponse.new
     umbrella_popular_bad.code = 200
@@ -426,7 +530,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(Umbrella::SecurityInfo).to receive(:query_info).with(address: "355toyota.com").and_return(umbrella_popular_bad).at_least(:once)
     #expect(Virustotal::Scan).to receive(:scan_hashes).and_return(virus_total_conviction_hash).at_least(:once)
     expect(RepApi::Whitelist).to receive(:get_whitelist_info).and_raise(RepApi::RepApiNotFoundError, "HTTP response 404").at_least(:once)
-    expect(Xena::GuardRails).to receive(:is_allow_listed?).and_return(xena_allow_list).at_least(:once)
+    #expect(Xena::GuardRails).to receive(:is_allow_listed?).and_return(xena_allow_list).at_least(:once)
     expect(Umbrella::DomainVolume).to receive(:query_domain_volume).and_return(umbrella_volume_bad).at_least(:once)
 
 
@@ -451,7 +555,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
   end
 
-  it 'should use umbrella no reply auto resolution for umbrella no reply tickets, no auto resolve from high volume' do
+  xit 'should use umbrella no reply auto resolution for umbrella no reply tickets, no auto resolve from high volume' do
 
     umbrella_popular_bad = UmbrellaSecurityInfoResponse.new
     umbrella_popular_bad.code = 200
@@ -492,7 +596,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
   end
 
-  it 'should use umbrella no reply auto resolution for umbrella no reply tickets, no auto resolve from xena match' do
+  xit 'should use umbrella no reply auto resolution for umbrella no reply tickets, no auto resolve from xena match' do
 
     umbrella_popular_bad = UmbrellaSecurityInfoResponse.new
     umbrella_popular_bad.code = 200

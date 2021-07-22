@@ -11,6 +11,10 @@ class Umbrella::AutoResolve
   STATUS_MALICIOUS          = 'MALICIOUS'
   STATUS_NONMALICIOUS       = 'CLEAR'
 
+
+  # had to backpedal on using this at the very last minute, but keeping this in existence in case the target moves
+  # in this direction again soon.
+
   def self.attempt_ai_conviction(rulehits, dispute_entry)
 
     if auto_resolve_toggle
