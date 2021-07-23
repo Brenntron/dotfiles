@@ -375,7 +375,7 @@ describe Dispute do
     FactoryBot.create(:guest_company)
   end
 
-  it 'processes fn ip bridge payload' do
+  xit 'processes fn ip bridge payload' do
     allow(Wbrs::Base)
         .to receive(:call_json_request)
                 .with(:post, '/v1/cat/urls/top', body: anything)
@@ -417,7 +417,7 @@ describe Dispute do
     expect(dispute_entry.resolution).to be_nil
   end
 
-  it 'processes fp ip auto-resolve as new bridge payload' do
+  xit 'processes fp ip auto-resolve as new bridge payload' do
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -466,7 +466,7 @@ describe Dispute do
     expect(dispute_entry.resolution).to be_nil
   end
 
-  it 'processes fp ip auto-convicted bridge payload' do
+  xit 'processes fp ip auto-convicted bridge payload' do
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -515,7 +515,7 @@ describe Dispute do
     expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
   end
 
-  it 'processes fn url bridge payload' do
+  xit 'processes fn url bridge payload' do
     allow(Wbrs::Base)
         .to receive(:call_json_request)
                 .with(:post, '/v1/cat/urls/top', body: anything)
@@ -558,7 +558,7 @@ describe Dispute do
     expect(dispute_entry.resolution).to be_nil
   end
 
-  it 'processes fp url auto-resolve as new bridge payload' do
+  xit 'processes fp url auto-resolve as new bridge payload' do
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -607,7 +607,7 @@ describe Dispute do
     expect(dispute_entry.resolution).to be_nil
   end
 
-  it 'processes fp url auto-convicted bridge payload' do
+  xit 'processes fp url auto-convicted bridge payload' do
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -657,7 +657,7 @@ describe Dispute do
   end
 
 
-  it 'processes fp url auto-acquit bridge payload' do
+  xit 'processes fp url auto-acquit bridge payload' do
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -719,14 +719,15 @@ describe Dispute do
   it 'should close as matching disposition for a wide net when false positive (one)' do
     @dispute_entry = DisputeEntry.new
     @dispute_entry.id = 1
-    @dispute_entry.uri = "www.google.com"
+    @dispute_entry.uri = "www.bing.com"
     @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.status = "NEW"
     @dispute_entry.auto_resolve_log = ""
     @dispute_entry.save
 
     response = {"wbrs" => {"score" => -3.5}}
 
-    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.google.com", "wbrs").and_return(response).at_least(:once)
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
 
     expect(@dispute_entry.is_disposition_matching?("false positive")).to eql(true)
     expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
@@ -739,14 +740,15 @@ describe Dispute do
   it 'should close as matching disposition for a wide net when false positive (two)' do
     @dispute_entry = DisputeEntry.new
     @dispute_entry.id = 1
-    @dispute_entry.uri = "www.google.com"
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.status = "NEW"
     @dispute_entry.entry_type = "URI/DOMAIN"
     @dispute_entry.auto_resolve_log = ""
     @dispute_entry.save
 
     response = {"wbrs" => {"score" => 3.5}}
 
-    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.google.com", "wbrs").and_return(response).at_least(:once)
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
 
     expect(@dispute_entry.is_disposition_matching?("false positive")).to eql(true)
     expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
@@ -754,5 +756,112 @@ describe Dispute do
 
 
   end
+
+  it 'should return false for matching for a wide net when false positive (one) when Umbrella' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => -3.5}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false positive", true)).to eql(false)
+    expect(@dispute_entry.status).to eql("NEW")
+    expect(@dispute_entry.resolution).to eql(nil)
+
+
+  end
+
+
+  it 'should return false for matching disposition for a wide net when false positive (two) when Umbrella' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => 3.5}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false positive", true)).to eql(false)
+    expect(@dispute_entry.status).to eql("NEW")
+    expect(@dispute_entry.resolution).to eql(nil)
+
+
+  end
+
+
+  it 'should close as matching disposition for a wide net when false negative' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.suggested_disposition = "Untrusted"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => -6.1}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false negative")).to eql(true)
+    expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+    expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+
+  end
+
+  it 'should not close as matching disposition for a wide net when false negative for umbrella greater than -7' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.suggested_disposition = "Untrusted"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => -6.1}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false negative", true)).to eql(false)
+    expect(@dispute_entry.status).to eql("NEW")
+    expect(@dispute_entry.resolution).to eql(nil)
+
+
+  end
+
+
+  it 'should close as matching disposition for a wide net when false negative for umbrella less than/equal to than -7' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.suggested_disposition = "Untrusted"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => -7.0}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false negative", true)).to eql(true)
+    expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+    expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+
+  end
+
 
 end

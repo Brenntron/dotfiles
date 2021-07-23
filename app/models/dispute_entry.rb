@@ -1323,11 +1323,13 @@ class DisputeEntry < ApplicationRecord
     response
   end
 
-  def is_disposition_matching?(entry_claim)
+  def is_disposition_matching?(entry_claim, is_umbrella=false)
 
     begin
 
       wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
+
+      raw_score = wbrs_stuff["wbrs"]["score"]
 
       if self.entry_type == "URI/DOMAIN"
         @running_verdict = self.class.verdict_from_score(wbrs_stuff["wbrs"]["score"])
@@ -1337,30 +1339,49 @@ class DisputeEntry < ApplicationRecord
 
       if entry_claim == "false negative"
 
-        if self.suggested_disposition == @running_verdict
-          self.status = STATUS_RESOLVED
-          self.resolution = STATUS_RESOLVED_UNCHANGED
-          self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
-          self.save
+        if is_umbrella == true
+          if raw_score.to_f <= -7.0
+            self.status = STATUS_RESOLVED
+            self.resolution = STATUS_RESOLVED_UNCHANGED
+            self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
+            self.save
 
-          return true
+            return true
+          end
+        else
+
+          if self.suggested_disposition == @running_verdict
+            self.status = STATUS_RESOLVED
+            self.resolution = STATUS_RESOLVED_UNCHANGED
+            self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
+            self.save
+
+            return true
+          end
+
         end
 
       end
 
       if entry_claim == "false positive"
 
-        results = RepApi::Blacklist.where(entries: [ self.hostlookup ]) rescue nil
-        
-        is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
+        if is_umbrella == true
+          return false
+        else
 
-        if ['Trusted', 'Favorable', 'Neutral', 'Good', 'Unknown', 'Questionable'].include?(@running_verdict) && !is_blacklisted
-          self.status = STATUS_RESOLVED
-          self.resolution = STATUS_RESOLVED_UNCHANGED
-          self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
-          self.save
+          results = RepApi::Blacklist.where(entries: [ self.hostlookup ]) rescue nil
 
-          return true
+          is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
+
+          if ['Trusted', 'Favorable', 'Neutral', 'Good', 'Unknown', 'Questionable'].include?(@running_verdict) && !is_blacklisted
+            self.status = STATUS_RESOLVED
+            self.resolution = STATUS_RESOLVED_UNCHANGED
+            self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
+            self.save
+
+            return true
+          end
+
         end
       end
 
