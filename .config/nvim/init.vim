@@ -166,6 +166,7 @@ autocmd FileType json syntax match Comment +\/\/.\+$+
 let g:ale_linter_aliases = {'es6': ['javascript'], 'jsx': ['css', 'javascript']}
 
 let g:ale_linters = {
+\  'coffeescript': ['coffeelint'],
 \  'javascript': ['eslint', 'prettier'],
 \  'typescript': ['tslint'],
 \  'es6': ['eslint'],
