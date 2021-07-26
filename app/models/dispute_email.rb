@@ -222,7 +222,10 @@ class DisputeEmail < ApplicationRecord
 
       if email_meta_data.present?
         if email_meta_data[:cc].present?
-          params[:cc] = ([params[:cc].split(",").map {|mail| mail.strip}] + email_meta_data[:cc].split(",").map {|mail| mail.strip}).join(",")
+          if params[:cc].blank?
+            params[:cc] = ""
+          end
+          params[:cc] = (params[:cc].split(",").map {|mail| mail.strip} + email_meta_data[:cc].split(",").map {|mail| mail.strip}).join(",")
         end
       end
 
