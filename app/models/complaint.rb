@@ -164,7 +164,7 @@ For future web and email reputation requests, please open a web categorization t
     new_ips = new_entries_ips.keys.sort
 
     response = {}
-    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE, COMPLETED ])
+    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE, COMPLETED ]) rescue []
     candidates = []
 
     possibles.each do |poss|
