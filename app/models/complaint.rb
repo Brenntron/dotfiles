@@ -542,12 +542,13 @@ class Complaint < ApplicationRecord
 
     new_report = WbnpReport.new
 
-    all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
+    all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(10)
 
     logger_token = SecureRandom.uuid
     new_report.notes = ""
     new_report.cases_imported = 0
     new_report.cases_failed = 0
+    new_report.cases_skipped = 0
     new_report.attempts = 0
     new_report.status_message = "Starting new pull."
     new_report.total_new_cases = all_complaints.size
@@ -580,7 +581,7 @@ class Complaint < ApplicationRecord
 
         platform = Platform.where("internal_name like '%wsa%'").first
 
-        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
+        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(10)
         total_entries = all_complaints.size
         entry_num = 1
         bugzilla_rest_session = BugzillaRest::Session.default_session
@@ -600,6 +601,26 @@ class Complaint < ApplicationRecord
               if exists.present?
                 new_report.notes += "<br />record exists for uri: #{uri} with source id: #{new_ui_complaint["complaint_id"]}"
                 new_report.save
+                new_report.notes += "<br />assigning on ruleAPI as duplicate for source id: #{new_ui_complaint["complaint_id"]}"
+
+                params = {:complaint_id => new_ui_complaint["complaint_id"], :new_tag => "dupe_or_fail_save"}
+                response = Wbrs::RuleUiComplaint.tag_complaint(params)
+                if response == "Complaint's tag was updated successfully."
+                  new_report.notes += "<br />uri tagged as dupe or fail save on ruleAPI"
+                end
+
+                response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [new_ui_complaint["complaint_id"]], :user => "admatter"})
+                if response["assigned"] == [new_ui_complaint["complaint_id"]]
+                  new_report.notes += "<br />duplicate uri assigned on ruleAPI"
+                  new_report.cases_skipped += 1
+                else
+                  binding.pry
+                  new_report.notes += "<br />something went wrong with assignment: #{response.to_s}"
+                end
+
+                new_report.save
+
+
                 next
               else
                 new_report.notes += "<br />no duplicate record exists for uri: #{uri} with source id: #{new_ui_complaint["complaint_id"]}"
@@ -783,12 +804,12 @@ class Complaint < ApplicationRecord
       Rails.logger.error "#{logger_token} complaint entry build complete for uri: #{uri}\n"
 
       begin
-        response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
-        if response["assigned"] == [rule_ui_complaint["complaint_id"]]
-          wbnp_report.notes += "<br />valid uri assigned on ruleAPI"
-        else
-          wbnp_report.notes += "<br />something went wrong with assignment: #{response.to_s}"
-        end
+        #response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
+        #if response["assigned"] == [rule_ui_complaint["complaint_id"]]
+        #  wbnp_report.notes += "<br />valid uri assigned on ruleAPI"
+        #else
+        #  wbnp_report.notes += "<br />something went wrong with assignment: #{response.to_s}"
+        #end
 
         wbnp_report.save
       rescue => e
