@@ -2607,7 +2607,6 @@ selected_options = (category_names) ->
 window.convert_dispute_to_webcat = () ->
 
   $('#convert-ticket-dropdown .dropdown-loader-wrapper').removeClass('hidden')
-#  debugger
   dispute_id = $('#dispute-id-to-convert').text()
   summary = $('#convert-ticket-summary').val()
 
