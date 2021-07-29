@@ -614,7 +614,7 @@ class Complaint < ApplicationRecord
                   new_report.notes += "<br />duplicate uri assigned on ruleAPI"
                   new_report.cases_skipped += 1
                 else
-                  
+
                   new_report.notes += "<br />something went wrong with assignment: #{response.to_s}"
                 end
 
