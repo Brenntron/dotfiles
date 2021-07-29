@@ -11,8 +11,7 @@ class Xena::GuardRails
     request = HTTPI::Request.new(full_url)
     request.ssl = true
     request.auth.ssl.verify_mode = :peer
-    #request.headers['Authorization'] = "Bearer #{Rails.configuration.xena.api_key}"
-    request.headers['Authorization'] = "Bearer dbb2da7f75fc69f4ae539b4721f23aed19ba2bd8dda18f043928c5b14ca03373"
+    request.headers['Authorization'] = "Bearer #{Rails.configuration.xena.api_key}"  #no config code for this right now, as we aren't using xena, but if it's failing in the future, get config sorted out.
     request.headers['Content-Type'] = 'application/json'
     request.body = "{\"items\":[\"#{address}\"]}"
     request
