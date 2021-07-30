@@ -543,7 +543,7 @@ class Complaint < ApplicationRecord
     new_report = WbnpReport.new
 
     all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(10)
-
+    puts all_complaints.inspect
     logger_token = SecureRandom.uuid
     new_report.notes = ""
     new_report.cases_imported = 0
@@ -582,6 +582,7 @@ class Complaint < ApplicationRecord
         platform = Platform.where("internal_name like '%wsa%'").first
 
         all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(10)
+
         total_entries = all_complaints.size
         entry_num = 1
         bugzilla_rest_session = BugzillaRest::Session.default_session
@@ -609,7 +610,8 @@ class Complaint < ApplicationRecord
                   new_report.notes += "<br />uri tagged as dupe or fail save on ruleAPI"
                 end
 
-                response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [new_ui_complaint["complaint_id"]], :user => "admatter"})
+                #response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [new_ui_complaint["complaint_id"]], :user => "admatter"})
+                response = assign_wbnp_case(new_ui_complaint["complaint_id"])
                 if response["assigned"] == [new_ui_complaint["complaint_id"]]
                   new_report.notes += "<br />duplicate uri assigned on ruleAPI"
                   new_report.cases_skipped += 1
@@ -722,7 +724,9 @@ class Complaint < ApplicationRecord
       Rails.logger.error "#{logger_token} | response from tagging for uri: #{uri} | " + response
     end
     begin
-      response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [complaint_id], :user => "admatter"})
+      #response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [complaint_id], :user => "admatter"})
+
+      response = assign_wbnp_case(complaint_id)
       if response["assigned"] == [complaint_id]
         new_report.notes += "<br />invalid uri assigned(rejected) on ruleAPI"
       else
@@ -805,11 +809,14 @@ class Complaint < ApplicationRecord
 
       begin
         #response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
-        #if response["assigned"] == [rule_ui_complaint["complaint_id"]]
-        #  wbnp_report.notes += "<br />valid uri assigned on ruleAPI"
-        #else
-        #  wbnp_report.notes += "<br />something went wrong with assignment: #{response.to_s}"
-        #end
+
+        response = assign_wbnp_case(rule_ui_complaint["complaint_id"])
+
+        if response["assigned"] == [rule_ui_complaint["complaint_id"]]
+          wbnp_report.notes += "<br />valid uri assigned on ruleAPI"
+        else
+          wbnp_report.notes += "<br />something went wrong with assignment: #{response.to_s}"
+        end
 
         wbnp_report.save
       rescue => e
@@ -925,6 +932,24 @@ class Complaint < ApplicationRecord
     research_bug_proxy
   end
 
+  def self.assign_wbnp_case(complaint_id)
+    max_attempts = 10
+    attempts = 0
+    
+    response = nil
+    while attempts < max_attempts do
 
+      response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [complaint_id], :user => "admatter"})
+
+      if response["assigned"].present?
+        break
+      else
+        attempts += 1
+      end
+
+    end
+
+    response
+  end
 
 end

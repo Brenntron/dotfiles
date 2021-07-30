@@ -64,7 +64,7 @@ class Wbrs::RuleUiComplaint < Wbrs::Base
     response = post_request(path: '/v1/cat/complaints/assign', body: stringkey_params(params))
 
     response_body = JSON.parse(response.body)
-    binding.pry if response_body["data"] == []
+
     response_body
   end
 
