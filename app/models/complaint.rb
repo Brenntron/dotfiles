@@ -542,7 +542,7 @@ class Complaint < ApplicationRecord
 
     new_report = WbnpReport.new
 
-    all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(10)
+    all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
     puts all_complaints.inspect
     logger_token = SecureRandom.uuid
     new_report.notes = ""
@@ -581,7 +581,7 @@ class Complaint < ApplicationRecord
 
         platform = Platform.where("internal_name like '%wsa%'").first
 
-        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(10)
+        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
         total_entries = all_complaints.size
         entry_num = 1
@@ -935,7 +935,7 @@ class Complaint < ApplicationRecord
   def self.assign_wbnp_case(complaint_id)
     max_attempts = 10
     attempts = 0
-    
+
     response = nil
     while attempts < max_attempts do
 
