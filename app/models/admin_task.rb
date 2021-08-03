@@ -1,7 +1,7 @@
 class AdminTask
   def self.available_tasks
     self.instance_methods - Object.instance_methods
-  end  
+  end
 
   def self.execute_task(name, args)
     admin_task = AdminTask.new
@@ -9,7 +9,7 @@ class AdminTask
     admin_task.send(name.to_sym, morsel.id, **args)
 
     morsel
-  end  
+  end
 
   ######NOTES#######
   #LIKE A RAKE TASK, EACH TASK SHOULD FIT INTO **ONE** INSTANCE METHOD
@@ -147,5 +147,18 @@ class AdminTask
     end
 
     morsel
+  end
+
+  def ngfw_clusters_import(morsel_id, args)
+    morsel = Morsel.find(morsel_id)
+    morsel.output += "############################################\n"
+    morsel.output += "starting NGFW clusters import now.\n"
+    morsel.output += "running.....\n"
+    morsel.save
+    Ngfw::Importer.import_without_delay
+    morsel.output += "completed.\n"
+    morsel.output += "############################################\n"
+    morsel.save
+
   end
 end
