@@ -2378,7 +2378,7 @@ window.prep_complaint_to_convert = () ->
 convert_complaint_to_webrep = () ->
   # get the parent ticket info
   complaint_id = parseInt($('#complaint-id-to-convert').text())
-  summary = $('#convert-ticket-summary').text()
+  summary = $('#convert-ticket-summary').val()
   submission_type = $('input[name=ticket-type]:checked').val()
 
   # get the entries
