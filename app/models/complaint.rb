@@ -610,7 +610,6 @@ class Complaint < ApplicationRecord
                   new_report.notes += "<br />uri tagged as dupe or fail save on ruleAPI"
                 end
 
-                #response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [new_ui_complaint["complaint_id"]], :user => "admatter"})
                 response = assign_wbnp_case(new_ui_complaint["complaint_id"])
                 if response["assigned"] == [new_ui_complaint["complaint_id"]]
                   new_report.notes += "<br />duplicate uri assigned on ruleAPI"
