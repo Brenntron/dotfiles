@@ -4,7 +4,8 @@ class Virustotal::GetVirustotal < Virustotal::Base
 
   def self.load_from_prefetch(data)
     response_body = JSON.parse(data)
-    response_body
+    return response_body if response_body.kind_of?(Hash)
+    {"scans" => []}
   end
 
   def self.by_domain(url, raw = false)

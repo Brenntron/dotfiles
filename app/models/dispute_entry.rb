@@ -278,7 +278,24 @@ class DisputeEntry < ApplicationRecord
     }
   end
 
+  def self.safe_domain_of(url)
+    begin
+      url = url.strip
+      if !url.start_with?( 'http', 'https')
+        url = "http://" + url
+      end
+
+      clean_url = Addressable::URI.parse(url)
+      clean_host = clean_url.host
+    rescue
+      clean_host = url
+    end
+    
+    clean_host
+  end
+
   def self.domain_of(url)
+    url = url.strip
     if !url.start_with?( 'http', 'https')
       url = "http://" + url
     end
@@ -809,7 +826,7 @@ class DisputeEntry < ApplicationRecord
 
 
 
-    self.wbrs_score = wbrs_stuff["wbrs"]["score"]
+    self.wbrs_score = wbrs_stuff["wbrs"]["score"] if wbrs_stuff["wbrs"].present?
 
     if wbrs_stuff["threat_cats"].present?
       threat_cats = wbrs_stuff["threat_cats"]

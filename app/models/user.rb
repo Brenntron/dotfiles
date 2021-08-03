@@ -13,7 +13,7 @@ class User < ApplicationRecord
   has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }
   has_many :recent_dispute_views, class_name: 'Dispute', through: :dispute_peeks, source: :dispute
   has_many :user_preferences
-  has_many :complaint_entry_credits
+  has_many :webcat_credits
 
   validates :cvs_username, presence: true, uniqueness: true
 

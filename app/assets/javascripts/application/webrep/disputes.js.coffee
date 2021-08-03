@@ -211,13 +211,19 @@ window.named_webrep_index_table = (search_name) ->
   window.current_search_data = data
   window.populate_webrep_index_table(data)
 
+
 window.call_contains_search = (search_form) ->
+  search_value = search_form.querySelector('input.search-box').value.trim()
+  search_value = search_value.replace(/^0+/, '')   # remove extraneous leading zeroes if they exist, example: "000123"
+
   data = {
     search_type: 'contains'
-    value: search_form.querySelector('input.search-box').value.trim()
+    value: search_value
   }
+
   window.current_search_data = data
   window.populate_webrep_index_table(data)
+
 
 window.delete_disputes_named_search = (close_button, search_name) ->
   std_msg_ajax(
@@ -1383,7 +1389,7 @@ $ ->
           create: false
           valueField: 'id',
           labelField: 'public_name',
-          options: response.json.platforms[$('#platform-input').attr('data')]
+          options: response.json.platforms
           onFocus: () ->
             window.toggle_selectize_layer(this, 'true')
           onBlur: () ->
@@ -1765,6 +1771,7 @@ $ ->
 
   $('.esc-tooltipped:disabled').tooltipster
     disable: true
+    debug: false
 
   $(document).on 'click', (e)->
     if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null

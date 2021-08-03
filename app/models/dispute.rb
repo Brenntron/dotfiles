@@ -509,6 +509,7 @@ For future Web categorization requests, please open a Web categorization ticket 
 
 
       new_dispute.id = bug_proxy.id
+      new_dispute.meta_data = message_payload["payload"]["meta_data"]
       new_dispute.user_id = user.id
       new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
       new_dispute.org_domain = message_payload["payload"]["domain"]
@@ -528,6 +529,10 @@ For future Web categorization requests, please open a Web categorization ticket 
 
       new_dispute.customer_id = customer&.id
       new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+      if message_payload["payload"]["api_customer"].present? && message_payload["payload"]["api_customer"] == true
+        new_dispute.submitter_type = SUBMITTER_TYPE_CUSTOMER
+      end
+
 
       if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
         new_dispute.priority = "P3"

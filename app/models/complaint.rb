@@ -242,7 +242,7 @@ For future web and email reputation requests, please open a web categorization t
   end
 
   def self.create_complaint_entry_credit(entry)
-    ComplaintEntryCredits::CreditProcessor.new(nil, entry).process
+    WebcatCredits::ComplaintEntries::CreditProcessor.new(nil, entry).process
   end
 
   def build_ti_payload
@@ -318,6 +318,7 @@ For future web and email reputation requests, please open a web categorization t
 
       new_complaint.submission_type = message_payload["payload"]["submission_type"]
       new_complaint.id = bug_proxy.id
+      new_complaint.meta_data = message_payload["payload"]["meta_data"]
       new_complaint.description = message_payload["payload"]["problem"]
       new_complaint.ticket_source_key = message_payload["source_key"]
       new_complaint.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
@@ -334,7 +335,9 @@ For future web and email reputation requests, please open a web categorization t
       new_complaint.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
 
       new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
-
+      if message_payload["payload"]["api_customer"].present? && message_payload["payload"]["api_customer"] == true
+        new_complaint.submitter_type = SUBMITTER_TYPE_CUSTOMER
+      end
       if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
         ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
 
@@ -520,34 +523,52 @@ For future web and email reputation requests, please open a web categorization t
     end
   end
 
-  def self.get_latest_wbnp_complaints
+  def self.get_latest_wbnp_complaints(skip_thread = false)
+    
+    max_attempts = 3
 
-      new_report = WbnpReport.new
+    #status reason
+    #attempts
 
-      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
-
-      #all_complaints.each do |rule_ui_complaint|
-      #  uri_to_test = compile_parts_to_uri(rule_ui_complaint)
-      #  rule_ui_complaint_exists = ComplaintEntry.where("uri like ?", "%" + uri_to_test + "%")
-
-      #  if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
-      #    new_complaints << rule_ui_complaint
-      #  end
-      #end
-      #
-      logger_token = SecureRandom.uuid
-      new_report.notes = ""
-      new_report.cases_imported = 0
-      new_report.cases_failed = 0
-      new_report.total_new_cases = all_complaints.size
-      new_report.status = WbnpReport::ACTIVE
-      new_report.notes += "logger_token: #{logger_token} <br />"
-      new_report.save
-
-      Thread.new do
-        kick_off_wbnp_pull(new_report.id, logger_token)
+    last_report = WbnpReport.order("id DESC").first
+    if last_report.present? && last_report.status == WbnpReport::ACTIVE
+      if last_report.attempts < max_attempts
+        last_report.attempts += 1
+        last_report.status_message = "Attempting to finish a running report, #{last_report.attempts} tries out of #{max_attempts}"
+        last_report.save
+        return last_report
       end
-      new_report
+
+      if last_report.attempts >= max_attempts
+        last_report.status = WbnpReport::ERROR
+        last_report.status_message = "waited #{last_report.attempts} times for pull to complete, closing report and starting a new one"
+        last_report.save
+      end
+    end
+
+
+    new_report = WbnpReport.new
+
+    all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
+
+    logger_token = SecureRandom.uuid
+    new_report.notes = ""
+    new_report.cases_imported = 0
+    new_report.cases_failed = 0
+    new_report.attempts = 0
+    new_report.status_message = "Starting new pull."
+    new_report.total_new_cases = all_complaints.size
+    new_report.status = WbnpReport::ACTIVE
+    new_report.notes += "logger_token: #{logger_token} <br />"
+    new_report.save
+    if skip_thread == true
+      start_wbnp_pull(new_report.id, logger_token)
+    else
+      Thread.new do
+        start_wbnp_pull(new_report.id, logger_token)
+      end
+    end
+    new_report
 
   end
 
@@ -563,13 +584,16 @@ For future web and email reputation requests, please open a web categorization t
 
       new_report = WbnpReport.find(new_report_id)
       begin
+
+        platform = Platform.where("internal_name like '%wsa%'").first
+
         all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
         total_entries = all_complaints.size
         entry_num = 1
         bugzilla_rest_session = BugzillaRest::Session.default_session
 
         all_complaints.each do |new_ui_complaint|
-          ActiveRecord::Base.connection.reconnect!
+
           if new_ui_complaint['add_channel'] == WBNP_CHANNEL
             begin
               uri = compile_parts_to_uri(new_ui_complaint)
@@ -577,10 +601,23 @@ For future web and email reputation requests, please open a web categorization t
               new_report.save
               pass = validate_url(uri, new_ui_complaint)
               new_report.notes += "<br />validation pass: #{pass.to_s}."
-              ActiveRecord::Base.connection.reconnect!
+
+              new_report.notes += "<br />checking for duplicate entry: uri: #{uri}."
+              exists = Complaint.where(:ticket_source_key => new_ui_complaint["complaint_id"], :channel => WBNP_CHANNEL).first
+              if exists.present?
+                new_report.notes += "<br />record exists for uri: #{uri} with source id: #{new_ui_complaint["complaint_id"]}"
+                new_report.save
+                next
+              else
+                new_report.notes += "<br />no duplicate record exists for uri: #{uri} with source id: #{new_ui_complaint["complaint_id"]}"
+              end
+
               new_report.save
+
+
+
               if pass
-                rule_ui_wbnp_create_action(uri, new_ui_complaint, new_report, logger_token, bugzilla_rest_session: bugzilla_rest_session)
+                rule_ui_wbnp_create_action(uri, new_ui_complaint, new_report, logger_token, platform, bugzilla_rest_session: bugzilla_rest_session)
               else
                 reject_complaint(uri, new_ui_complaint, new_report, logger_token)
               end
@@ -588,7 +625,7 @@ For future web and email reputation requests, please open a web categorization t
 
               new_report.cases_failed += 1
               new_report.notes += "<br />SWP uri: #{new_ui_complaint.inspect} | log token: #{logger_token} | failure: #{e.message}<br />"
-              ActiveRecord::Base.connection.reconnect!
+
               new_report.save
 
               Rails.logger.error "#{logger_token} | " + e.message
@@ -601,7 +638,7 @@ For future web and email reputation requests, please open a web categorization t
         new_report.status = WbnpReport::COMPLETE
         new_report.save
       rescue => e
-        ActiveRecord::Base.connection.reconnect!
+
         new_report.status = WbnpReport::ERROR
         new_report.notes += "<br />--------<br />token: #{logger_token} Pull suddenly ended with error: #{e.message}<br />"
         new_report.save
@@ -677,11 +714,11 @@ For future web and email reputation requests, please open a web categorization t
       else
         new_report.notes += "<br />something went wrong with rejection assignment: #{response.to_s}"
       end
-      ActiveRecord::Base.connection.reconnect!
+
       new_report.save
     rescue => e
       new_report.notes += "<br />--------<br />Exception when assigning ticket #{complaint_id} to admatter - error: #{e.message}<br />"
-      ActiveRecord::Base.connection.reconnect!
+
       new_report.save
 
       Rails.logger.error "#{logger_token} | " + e.message
@@ -689,11 +726,11 @@ For future web and email reputation requests, please open a web categorization t
     end
 
     new_report.cases_failed += 1
-    ActiveRecord::Base.connection.reconnect!
+
     new_report.save
   end
 
-  def self.rule_ui_wbnp_create_action(uri, rule_ui_complaint, wbnp_report, logger_token, bugzilla_rest_session:)
+  def self.rule_ui_wbnp_create_action(uri, rule_ui_complaint, wbnp_report, logger_token, platform, bugzilla_rest_session:)
     #"#{{"add_channel"=>"wbnp", "comment"=>"", "complaint_id"=>105, "complaint_type"=>"unknown", "customer_name"=>"ORANGE BUSINES SERVICES", "description"=>"",
     # "domain"=>"fmp-usmba.ac.ma", "path"=>"/cdim/mediatheque/e_theses/257-16.pdf", "port"=>0, "protocol"=>"http", "region"=>"", "resolution"=>nil, "state"=>"new",
     # "subdomain"=>"scolarite", "tag"=>nil, "url_query_string"=>"", "when_added"=>"Thu, 30 Aug 2018 15:00:05 GMT", "when_last_updated"=>"Thu, 30 Aug 2018 15:00:05 GMT",
@@ -701,7 +738,7 @@ For future web and email reputation requests, please open a web categorization t
 
     description = "WBNP Sourced Complaint"
 
-    ActiveRecord::Base.connection.reconnect!
+
     #user = User.where(cvs_username:"vrtincom").first
     user = User.vrtincoming
 
@@ -725,7 +762,7 @@ For future web and email reputation requests, please open a web categorization t
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
     cust = Customer.customer_from_ruleui(rule_ui_complaint)
-    ActiveRecord::Base.connection.reconnect!
+
     new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
                                      customer_id: cust ? cust.id : nil,
@@ -749,7 +786,7 @@ For future web and email reputation requests, please open a web categorization t
     end
     begin
       Rails.logger.error "#{logger_token} building complaint entry for uri: #{uri}\n"
-      ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category, logger_token)
+      ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category, logger_token, platform)
       Rails.logger.error "#{logger_token} complaint entry build complete for uri: #{uri}\n"
 
       begin
@@ -759,11 +796,11 @@ For future web and email reputation requests, please open a web categorization t
         else
           wbnp_report.notes += "<br />something went wrong with assignment: #{response.to_s}"
         end
-        ActiveRecord::Base.connection.reconnect!
+
         wbnp_report.save
       rescue => e
         wbnp_report.notes += "<br />--------<br />Exception when assigning ticket #{complaint_id} to admatter - error: #{e.message}<br />"
-        ActiveRecord::Base.connection.reconnect!
+
         wbnp_report.save
 
         Rails.logger.error "#{logger_token} | " + e.message
@@ -779,7 +816,7 @@ For future web and email reputation requests, please open a web categorization t
       Rails.logger.error "#{logger_token} | " + e.message
       Rails.logger.error "#{logger_token} | " + e.backtrace.join("\n")
     end
-    ActiveRecord::Base.connection.reconnect!
+
     wbnp_report.save
   end
 
