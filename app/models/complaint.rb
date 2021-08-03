@@ -807,7 +807,6 @@ class Complaint < ApplicationRecord
       Rails.logger.error "#{logger_token} complaint entry build complete for uri: #{uri}\n"
 
       begin
-        #response = Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
 
         response = assign_wbnp_case(rule_ui_complaint["complaint_id"])
 
