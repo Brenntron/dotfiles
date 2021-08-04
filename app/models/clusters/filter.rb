@@ -31,6 +31,7 @@ class Clusters::Filter
     clusters.select! do |cluster|
       cluster_assigned_to_user?(cluster)
     end
+    clusters.uniq! { |cluster| cluster[:domain] }
   end
 
   def filter_unassigned
