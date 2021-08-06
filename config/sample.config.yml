@@ -4,10 +4,10 @@ development:
   app_info:
     cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
     pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
-    device_id: "analyst-console-escalations-dev"
-    product_family: "Talos_Web"
-    product_id: "analyst-console-escalations"
-    # product_version: 'development'
+    # device_id: "analyst-console-escalations-dev"
+    # product_family: "Talos_Web"
+    # product_id: "analyst-console-escalations"
+    # product_version: 'development'    # defaults to git branch name
   auto_resolve:
     complaints:
       check: true
@@ -137,10 +137,10 @@ test:
   app_info:
     cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
     pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
-    device_id: "analyst-console-escalations-dev" #use dev for test environment to the server it is dev
-    product_family: "Talos_Web"
-    product_id: "analyst-console-escalations"
-    # product_version: 'test'
+    # device_id: "analyst-console-escalations-dev" #use dev for test environment to the server it is dev
+    # product_family: "Talos_Web"
+    # product_id: "analyst-console-escalations"
+    # product_version: 'test'           # defaults to git branch name
   auto_resolve:
     complaints:
       check: true
@@ -271,10 +271,10 @@ staging:
   app_info:
     cert_file: "/usr/local/etc/analyst-console-escalations/talos-web-certificate.pem"
     pkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-pkey.pem"
-    product_family: "Talos_Web"
-    product_id: "analyst-console-escalations"
+    # product_family: "Talos_Web"
+    # product_id: "analyst-console-escalations"
     # device_id defaults to hostname
-    # product_version: 'staging'
+    # product_version: defaults to version file or 'staging'
   auto_resolve:
     complaints:
       check: true
@@ -411,11 +411,11 @@ production:
   app_info:
     cert_file: "/usr/local/etc/analyst-console-escalations/talos-web-certificate.pem"
     pkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-pkey.pem"
-    product_family: "Talos_Web"
-    product_id: "analyst-console-escalations"
+    # product_family: "Talos_Web"
+    # product_id: "analyst-console-escalations"
     # device_id defaults to hostname
     # device_id: "analyst-console.vrt.sourcefire.com"
-    # product_version: 'production'
+    # product_version: defaults to version file or 'production'
   auto_resolve:
     complaints:
       check: true

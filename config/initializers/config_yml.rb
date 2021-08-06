@@ -20,7 +20,7 @@ Rails.configuration.app_info        = OpenStruct.new
 # device_id: "analyst-console-escalations-dev"
 # product_family: "Talos_Web"
 # product_id: "analyst-console-escalations"
-Rails.configuration.app_info.device_id      = app_info_config['device_id'] || `hostname`.chomp
+Rails.configuration.app_info.device_id      = app_info_config['device_id'] || Socket.gethostname
 Rails.configuration.app_info.product_family = app_info_config['product_family'] || 'Talos_Web'
 Rails.configuration.app_info.product_id     = app_info_config['product_id'] || 'analyst-console-escalations'
 Rails.configuration.app_info.product_version =
@@ -30,7 +30,7 @@ Rails.configuration.app_info.product_version =
     if Rails.env.development? || Rails.env.test?
       version ||= `git symbolic-ref --short HEAD`.chomp rescue nil
     end
-    version ||= 'unknown'
+    version ||= Rails.env
     version
   end
 Rails.configuration.app_info.client_cert_file = app_info_config['client_cert_file']
@@ -153,8 +153,6 @@ Rails.configuration.talos_intelligence  = ApiRequester::ApiRequester.config_of(t
 tess_config = env_config['tess']
 raise 'config.yml missing tess section' unless tess_config
 Rails.configuration.tess                = ApiRequester::ApiRequester.config_of(tess_config)
-Rails.configuration.tess.client_cert_file      = tess_config['client_cert_file']
-Rails.configuration.tess.pkey_file      = tess_config['pkey_file']
 
 
 threatgrid = env_config.fetch('threatgrid', nil)
