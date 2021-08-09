@@ -971,18 +971,10 @@ Feature: Webcat complaints
 # Converting Webcat ticket to Webrep (WEB-4413)
 #  only tickets from talos-intelligence are allowed to be converted - test from ti and from other sources
 #  only tickets in an 'open' state are allowed to be converted - test each open and closed state
-#  tickets cannot be submitted for conversion if the analyst has not picked a resolution for each entry
-#  tickets cannot be submitted for conversion if the analyst has not picked a reputation ticket type
 #  only one ticket can be converted at a time
 #  ticket conversion should display all affected entries of the parent ticket
 #  ticket conversion should display the summary supplied by the customer
 
-# Additional UI tests (steps)
-# a row should highlight on click anywhere within the row and be selected
-# a highlighted row should be unselected if it is clicked anywhere within the row (maybe. testing for not class is a challenge)
-# the convert button should be disabled if no rows are selected
-# the convert button should be disabled if more than one row is selected
-# the convert button should trigger a dropdown when it is enabled and clicked on
 
   @javascript
   Scenario: a user tries to convert a webcat ticket that originated from WBNP and cannot
@@ -995,10 +987,8 @@ Feature: Webcat complaints
       | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | NEW        |
     And I goto "/escalations/webcat/complaints"
     Then I wait for "3" seconds
-    And button with id "convert-ticket-button" should be disabled
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
-    And button with id "convert-ticket-button" should be enabled
     And I wait for "2" seconds
     And I click "#convert-ticket-button"
     And I wait for "1" seconds
@@ -1038,7 +1028,6 @@ Feature: Webcat complaints
     Then I wait for "3" seconds
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
-    And button with id "convert-ticket-button" should be enabled
     And I wait for "2" seconds
     And I click "#convert-ticket-button"
     And I wait for "1" seconds
@@ -1057,7 +1046,6 @@ Feature: Webcat complaints
     Then I wait for "3" seconds
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
-    And button with id "convert-ticket-button" should be enabled
     And I wait for "2" seconds
     And I click "#convert-ticket-button"
     And I wait for "1" seconds
@@ -1077,7 +1065,6 @@ Feature: Webcat complaints
     Then I wait for "3" seconds
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
-    And button with id "convert-ticket-button" should be enabled
     And I wait for "2" seconds
     And I click "#convert-ticket-button"
     And I wait for "1" seconds
@@ -1097,7 +1084,6 @@ Feature: Webcat complaints
     Then I wait for "3" seconds
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
-    And button with id "convert-ticket-button" should be enabled
     And I wait for "2" seconds
     And I click "#convert-ticket-button"
     And I wait for "1" seconds
@@ -1116,31 +1102,10 @@ Feature: Webcat complaints
     Then I wait for "3" seconds
     And I click on cell with class "entry-id-col" within row with id "1111"
     And Element with id "1111" should have class "selected"
-    And button with id "convert-ticket-button" should be enabled
     And I wait for "2" seconds
     And I click "#convert-ticket-button"
     And I wait for "1" seconds
     And I should not see "TICKET CANNOT BE CONVERTED"
-
-  @javascript
-  Scenario: a user tries to convert multiple webcat tickets and cannot
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaints exist:
-      | id | description         | ticket_source        | channel    | status |
-      | 1  | this is shenanigans | talos-intelligence   | talosintel | ACTIVE |
-    And the following complaint entries exist:
-      | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
-      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | ASSIGNED  |            |
-      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | ASSIGNED  |            |
-    And I goto "/escalations/webcat/complaints"
-    Then I wait for "3" seconds
-    And button with id "convert-ticket-button" should be disabled
-    And I click on cell with class "entry-id-col" within row with id "1111"
-    And Element with id "1111" should have class "selected"
-    And button with id "convert-ticket-button" should be enabled
-    And I click on cell with class "entry-id-col" within row with id "2222"
-    And Element with id "2222" should have class "selected"
-    And button with id "convert-ticket-button" should be disabled
 
   @javascript
   Scenario: a user tries to convert a webcat ticket with multiple entries
@@ -1161,24 +1126,4 @@ Feature: Webcat complaints
     And I wait for "1" seconds
     And Table with id "entries-to-convert" should have "3" number of rows
 
-  @javascript
-  Scenario: a user must select a ticket type in order to be able to convert a webcat ticket
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaints exist:
-      | id | description         | ticket_source        | channel    | status   |
-      | 1  | this is shenanigans | talos-intelligence   | talosintel | ACTIVE |
-    And the following complaint entries exist:
-      | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
-      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | ASSIGNED  |            |
-    And I goto "/escalations/webcat/complaints"
-    Then I wait for "3" seconds
-    And I click on cell with class "entry-id-col" within row with id "1111"
-    And I click "#convert-ticket-button"
-    And I wait for "1" seconds
-    And button with id "convert-to-webrep" should be disabled
-    And I click input with id "1111-fp-radio"
-    And button with id "convert-to-webrep" should be disabled
-    And I click input with id "web-ticket-type"
-    And button with id "convert-to-webrep" should be enabled
-    And button with id "convert-to-webrep" should be disabled
-    And take a screenshot
+
