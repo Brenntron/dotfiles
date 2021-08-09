@@ -6,7 +6,7 @@ class Sbrs::ManualSbrs < Sbrs::Base
   attr_accessor *FIELD_SYMS
 
 
-  #TODO: all of this needs to be refactored and improved.  Finished up quickly because of deadline.
+  #TODO: all of this needs to be refactored and improved.  See Sbrs::Base class.
   #Instructions:
   #get_sbrs_data({:ip => '1.2.3.4'})  <-- will return sbrs score for an ip
   #to get rulehit data for sbrs/email:

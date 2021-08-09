@@ -13,7 +13,7 @@ module API
             end
             get "lookup", root: "whois" do
               std_api_v2 do
-                result_data = Tess::Whois.whois_query(permitted_params['name'])
+                result_data = ::CloudIntel::Whois.whois_query(permitted_params['name'])
                 { data: result_data }
               end
             end
