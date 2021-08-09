@@ -51,7 +51,7 @@ RSpec.describe "dispute conversion to complaints", type: :request do
 
     conversion_params = {}
     conversion_params[:dispute_id] = Dispute.all.first.id
-    conversion_params[:suggested_categories] = "[{\"entry\":\"test.com\",\"suggested_categories\":\"Alcohol,Adult\"},{\"entry\":\"test2.com\",\"suggested_categories\":\"Alcohol,Adult\"}]"
+    conversion_params[:suggested_categories] = {"0" => {"entry":"test.com","suggested_categories":"Alcohol,Adult"},"1" => {"entry":"test2.com","suggested_categories":"Alcohol,Adult"}}
     conversion_params[:summary] = "test summary"
 
     post '/escalations/api/v1/escalations/webrep/disputes/convert_ticket', params: conversion_params
