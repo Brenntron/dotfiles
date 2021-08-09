@@ -188,7 +188,9 @@ class AutoResolve
     end
   end
 
-  def self.check_umbrella_popularity(entry)
+  def self.check_umbrella_popularity(raw_entry)
+
+    entry = DisputeEntry.safe_domain_of(raw_entry)
 
     result = {}
     result[:pass] = true

@@ -67,6 +67,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           customer_name:    complaint_entry.customer_name,
           company_name:     complaint_entry.customer_company_name,
           customer_email:   complaint.customer&.email,
+          complaint_source: complaint.ticket_source,
           assigned_to:      complaint_entry.user&.display_name,
 
           uri:              complaint_entry.uri,

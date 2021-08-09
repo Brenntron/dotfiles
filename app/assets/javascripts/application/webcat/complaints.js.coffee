@@ -29,6 +29,10 @@ window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
   $('#fetch_wbnp').addClass('esc-tooltipped')
   $('.wbnp-loading-spinner').show()
+  # Set status on header to checking
+  top_status = $('.top-area-bar').find('.wbnp-report-status')[0]
+  $(top_status).text('Checking...')
+
   std_msg_ajax(
     method: 'POST'
     url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
@@ -45,44 +49,100 @@ window.fetch_wbnp_data = () ->
 
 # WBNP - Check report info
 check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
-  # Turn on loader indicator
-  $('.wbnp-loading-spinner').show()
+  if $('#wbnp-full-report').length > 0
+    # this is a webcat manager and they get the full WBNP report
+    data = {}
+    full_report = true
+    # Turn on the checking message if needed
+    unless $('#current-wbnp-report .wbnp-status').hasClass('status_complete')
+      wbnp_check = $('.wbnp-full-report-title-status')[0]
+      $(wbnp_check).addClass('active')
+      wbnp_status = 'Checking report status...'
+      $(wbnp_check).text(wbnp_status)
 
-  # Set status on header to checking
-  top_status = $('.top-area-bar').find('.wbnp-report-status')[0]
-  $(top_status).text('Checking...')
+  else
+    data = {wbnp_report_id: wbnp_report_id}
+    full_report = false
 
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/webcat/complaints/wbnp_report_status"
-    data: {wbnp_report_id: wbnp_report_id }
+    data: data
     success: (response) ->
-      total_new_cases = response.data.total_new_cases
-      cases_imported = response.data.cases_imported
-      cases_failed = response.data.cases_failed
-      status = response.data.status
+      console.log response
 
-      # Turn of loader indicator
+      # Turn off loader indicator
       $('.wbnp-loading-spinner').hide()
 
-      # Add fields to table & header
-      $('.wbnp-report-status').text(status)
-      $('#wbnp-report-attempted').text(total_new_cases)
-      $('#wbnp-report-succeeded').text(cases_imported)
-      $('#wbnp-report-rejected').text(cases_failed)
+      if full_report == true
+        # Clear old data
+        $('.wbnp-status').empty();
+        $('.wbnp-status-msg').empty();
+        $('.wbnp-full-report-table tbody').empty();
+        $('.wbnp-notes').empty();
 
-      # If status is active, fetch button should be disabled
-      if status == 'active'
-        $('#fetch_wbnp').attr('disabled', true)
-        $('#fetch_wbnp').removeClass('esc-tooltipped')
-        # Check in 5 minutes to see if report has finished
-        setTimeout(check_wbnp, 120000)
+        curr_report = response.data[0]
+        last_report = response.data[1]
+
+        # Add current report info to top bar report area
+        $('.wbnp-report-status').text(curr_report.status)
+        $('#wbnp-report-attempted').text(curr_report.total_new_cases)
+        $('#wbnp-report-succeeded').text(curr_report.cases_imported)
+        $('#wbnp-report-rejected').text(curr_report.cases_failed)
+
+        # Build the full report for webcat managers
+        wbnp_dialog = $('#wbnp-full-report')
+
+        # Current report:
+        if curr_report.status == 'complete'
+          $('#current-wbnp-report .wbnp-status').addClass('status_complete')
+        else
+          $('#current-wbnp-report .wbnp-status').removeClass('status_complete')
+        $('#current-wbnp-report .wbnp-status').text(curr_report.status)
+        $('#current-wbnp-report .wbnp-status-msg').text(curr_report.status_message)
+        current_table = $('#current-wbnp-report .wbnp-full-report-table')
+        curr_table_content = '<tr><td>' + curr_report.id + '</td><td>' + curr_report.attempts + '</td><td>' + curr_report.total_new_cases + '</td><td>' + curr_report.cases_imported + '</td><td>' + curr_report.cases_failed + '</td><td>' + curr_report.created_at + '</td><td>' + curr_report.updated_at + '</td></tr>'
+        $(current_table).append(curr_table_content)
+        $('#current-wbnp-report .wbnp-notes').html(curr_report.notes)
+
+        # Previous report:
+        if last_report?
+          if last_report.status == 'complete'
+            $('#previous-wbnp-report .wbnp-status').addClass('status_complete')
+          else
+            $('#previous-wbnp-report .wbnp-status').removeClass('status_complete')
+          $('#previous-wbnp-report .wbnp-status').text(last_report.status)
+          $('#previous-wbnp-report .wbnp-status-msg').text(last_report.status_message)
+          prev_table = $('#previous-wbnp-report .wbnp-full-report-table')
+          prev_table_content = '<tr><td>' + last_report.id + '</td><td>' + last_report.attempts + '</td><td>' + last_report.total_new_cases + '</td><td>' + last_report.cases_imported + '</td><td>' + last_report.cases_failed + '</td><td>' + last_report.created_at + '</td><td>' + last_report.updated_at + '</td></tr>'
+          $(prev_table).append(prev_table_content)
+          $('#previous-wbnp-report .wbnp-notes').html(last_report.notes)
+
+        # Keep checking / updating if Current report is unfinished
+        if curr_report.status != 'complete'
+          if $('.wbnp-full-report-title-status').length == 0
+            $('.ui-dialog .ui-dialog-title').append('<span class="wbnp-full-report-title-status"></span>')
+          wbnp_check = $('.wbnp-full-report-title-status')[0]
+          wbnp_status = 'Checking report status in 45 seconds...'
+          $(wbnp_check).removeClass('active')
+          $(wbnp_check).text(wbnp_status)
+          setTimeout(check_wbnp, 45000)
+        else
+          $('.wbnp-full-report-title-status').remove()
+
+
+
       else
-        $('#fetch_wbnp').attr('disabled', false)
-        $('#fetch_wbnp').addClass('esc-tooltipped')
+        curr_report = response.data
+        # Add current report info to top bar report area
+        $('.wbnp-report-status').text(curr_report.status)
+        $('#wbnp-report-attempted').text(curr_report.total_new_cases)
+        $('#wbnp-report-succeeded').text(curr_report.cases_imported)
+        $('#wbnp-report-rejected').text(curr_report.cases_failed)
 
     error: (response) ->
       $('.wbnp-loading-spinner').hide()
+
       std_msg_error("Unable to pull wbnp status", [], reload: false)
   )
 
@@ -91,6 +151,7 @@ window.touchedFormChange = (url) ->
 
   if !urls_touched.includes(url)
     url_items = urls_touched.split(",")
+    url_items = url_items.filter((item) -> return item)
     url_items.push(url)
     urls_touched = url_items.join(",")
   sessionStorage.setItem("touchedForm", urls_touched)
@@ -100,19 +161,17 @@ window.removeTouchedFormChange = (url) ->
 
   if urls_touched.includes(url)
     url_items = urls_touched.split(",")
+    url_items = url_items.filter((item) -> return item)
     url_index = url_items.indexOf(url)
     url_items.splice(url_index, 1)
     urls_touched = url_items.join(",")
   sessionStorage.setItem("touchedForm", urls_touched)
 
 getTouchedFormCount = ()->
-  form_item = sessionStorage.getItem("touchedForm")
-  items = 0
-  if form_item
-    if form_item.slice -1 == ","
-      form_item = form_item.slice(0, -1);
-    items = form_item.split(",").length - 1
-  return items
+  form_item = (sessionStorage.getItem("touchedForm") || "")
+  form_item = form_item.split(",")
+  form_item = form_item.filter((item) -> return item)
+  return form_item.length
 
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
@@ -172,6 +231,7 @@ processSubmitNewURL = () ->
       method: 'POST'
       data: {data: data}
       success: (response) ->
+        timesTouched = 0
         std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
       error: (response) ->
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
@@ -186,7 +246,7 @@ window.cat_new_url = ()->
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
     std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with categorizing this new item? It will reload the page and you will lose your changes.",
       [],
       {
         reload: false,
@@ -489,6 +549,8 @@ processSubmitPending=(entry_id,row_id)->
         $("#domain_#{entry_id}").text(domain)
         $("#subdomain_#{entry_id}").text(subdomain)
         $("#path_#{entry_id}").text(path)
+        removeTouchedFormChange(uri)
+        timesTouched = 0
 
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
@@ -502,7 +564,7 @@ window.updatePending = (id,row_id) ->
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
     std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this pending item? It will reload the page and you will lose your changes.",
       [],
       {
         reload: false,
@@ -617,6 +679,7 @@ processSubmitEntry = (entry_id,row_id) ->
             select_complete.disable()
 
           removeTouchedFormChange(uri)
+          timesTouched = 0
           $("#complaint_prefix_#{entry_id}").val(uri)
           $("#domain_#{entry_id}").text(domain)
           $("#subdomain_#{entry_id}").text(subdomain)
@@ -641,7 +704,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
     std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this entry? It will reload the page and you will lose your changes.",
       [],
       {
         reload: false,
@@ -1258,6 +1321,18 @@ format = (complaint_entry_row) ->
 
   edit_input = if domain != "" then domain else host #if the domain is empty, then display host for ips in edit input
 
+  if complaint_entry.complaint_source?
+    if complaint_entry.complaint_source == 'talos-intelligence'
+      complaint_source = 'TI Webform'
+    else if complaint_entry.complaint_source == 'talos-intelligence-api'
+      complaint_source = 'TI API'
+    else if complaint_entry.complaint_source == ''
+      complaint_source = '<span class="missing-data">Source unknown</span>'
+    else
+      complaint_source = complaint_entry.complaint_source
+  else
+    complaint_source = '<span class="missing-data">Source unknown</span>'
+
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
@@ -1277,6 +1352,8 @@ format = (complaint_entry_row) ->
       "<span class='nested-complaint-data'>#{customer_name}</span>" +
       "<label class='content-label-sm'>Customer Description</label>" +
       "<span class='nested-complaint-data'>#{customer_description}</span>" +
+      "<label class='content-label-sm'>Complaint Source</label>" +
+      "<span class='nested-complaint-data'>#{complaint_source}</span>" +
       "</div></div><div class='col-xs-7 col-with-divider'>" +
       '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-3">WBRS Categories</th><th class="col-sm-2">WBRS Certainty</th><th class="col-sm-3">SDS URI Category</th><th class="col-sm-3">SDS Domain Category</th></tr></thead>' +
       '</table>' +
@@ -2209,3 +2286,16 @@ $ ->
       $('#complaints').attr('href', link)
 
   set_complaints_link()
+
+  $('#wbnp-full-report').dialog
+    autoOpen: false
+    width: 700
+    minHeight: 300
+    position:
+      my: "right top"
+      at: "right top+150"
+      of: window
+
+
+  $('#wbnp-report-button').click ->
+    $('#wbnp-full-report').dialog('open')

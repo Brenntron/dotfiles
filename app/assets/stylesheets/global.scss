@@ -12506,7 +12506,7 @@ table > tbody > tr > td.no-padding {
     padding-left: 0;
     padding-right: 1vw;
     padding-top: 2px;
-    max-width: 250px;  // accommodate the loading spinner
+    max-width: 300px;  // accommodate the loading spinner
     display: inline-block;
     .wbnp-report-status {
       display: inline-block;
@@ -12535,6 +12535,21 @@ table > tbody > tr > td.no-padding {
     padding: 0;
     margin: 0;
   }
+}
+
+.wbnp-full-report {
+  border: none;
+  border-radius: 2px;
+  background-color: #65a7c1;
+  background-repeat: no-repeat;
+  background-position: 5px 4px;
+  background-size: 16px 16px;
+  height: 25px;
+  width: 26px;
+  float: right;
+  margin-top: -5px;
+  margin-bottom: -5px;
+  margin-left: 12px;
 }
 
 @media screen and (max-width: 1950px) {
@@ -13109,4 +13124,8 @@ input.wl-bl-list-inline {
 .mal-highlight {
   color: #ff232a;
   font-weight: 700;
+}
+
+.webcat-platform-filter {
+  height: 25px;
 }

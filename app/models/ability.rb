@@ -20,6 +20,10 @@ class Ability
       end
     end
 
+    if role_names.include?('super admin')
+      can :manage, :rails_c
+    end
+
     # admin role includes developers who maintain the site
     if role_names.include?('admin')
       can :read, :all

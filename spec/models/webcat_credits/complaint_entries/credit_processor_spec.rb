@@ -1,8 +1,8 @@
-describe ComplaintEntryCredits::CreditProcessor do
+describe WebcatCredits::ComplaintEntries::CreditProcessor do
   subject { described_class.new(user, complaint_entry).process }
 
   before do
-    allow(ComplaintEntryCredits::CreditHandler).to receive(:new).and_return(
+    allow(WebcatCredits::ComplaintEntries::CreditHandler).to receive(:new).and_return(
       double(
         handle_pending_credit: true,
         handle_unchanged_credit: true,
@@ -15,7 +15,7 @@ describe ComplaintEntryCredits::CreditProcessor do
 
   # let(:complaint_entry) { FactoryBot.create(:complaint_entry) }
   let(:user) { FactoryBot.create(:user) }
-  let(:credit_handler) { ComplaintEntryCredits::CreditHandler.new(user, complaint_entry) }
+  let(:credit_handler) { WebcatCredits::ComplaintEntries::CreditHandler.new(user, complaint_entry) }
 
   context 'when complaint entry is PENDING' do
     let(:complaint_entry) { FactoryBot.create(:complaint_entry, status: 'PENDING') }

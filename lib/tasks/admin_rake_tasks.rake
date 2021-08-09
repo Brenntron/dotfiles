@@ -2,6 +2,11 @@ require 'pry'
 require 'rake'
 
 namespace :escalations do
+
+  task :run_wbnp_pull => :environment  do
+    Complaint.get_latest_wbnp_complaints(true)
+  end
+
   task :check_file_reputations do
     FileReputationDispute.check_for_rep_updates
   end
@@ -19,16 +24,16 @@ namespace :escalations do
       'DUPLICATE' => ComplaintEntryCredit::DUPLICATE
     }
 
-    total_complaints = ComplaintEntry.where(resolution: resolutions)
+    credited_complaint_ids = ComplaintEntryCredit.pluck(:complaint_entry_id).uniq
+    total_complaints = ComplaintEntry.where(resolution: resolutions).where.not(id: credited_complaint_ids)
     total_count = total_complaints.count
     processed = 0
-    total_complaints.each do |entry|
+    total_complaints.find_each do |entry|
       if entry.case_resolved_at.nil?
         processed += 1
         puts "#{processed} of #{total_count} processed"
         next
       end
-      # binding.pry if entry.resolution == 'DUPLICATE'
       ComplaintEntryCredit.find_or_create_by(
         user_id: entry.user_id,
         complaint_entry_id: entry.id,
@@ -51,6 +56,10 @@ namespace :escalations do
         complaint.complaint_entries.update_all(platform_id: ngfw_platform.id)
       end
     end
+  end
+
+  task :run_ngfw_import => :environment do
+    Ngfw::Importer.import
   end
 end
 
