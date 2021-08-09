@@ -41,7 +41,7 @@ class Complaint < ApplicationRecord
 
   TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web and Email reputation. AUP categories are not applied to URLs that are primarily malicious in nature but may be applied in cases where a domain has been compromised or in cases of a web reputation false positive - these updates may take several hours to propagate. A new Web and Email Reputation ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all future updates regarding this request on the new ticket.
 
-For future web and email reputation requests, please open a web categorization ticket using the \"Web & Email\" form: https://talosintelligence.com/reputation_center/support#reputation
+For future web and email reputation requests, please open a web and email reputation ticket using the \"Web & Email\" form: https://talosintelligence.com/reputation_center/support#reputation
 "
 
   scope :active_count , -> {where(status:ACTIVE).count}

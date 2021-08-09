@@ -2468,12 +2468,14 @@ window.prep_dispute_to_convert = (event) ->
     # conversion checks
     # - ti.com ticket
     # - open ticket
+
     if row_data.source =! 'talos-intelligence'
       std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
       return
     else
       ticket_status = $(row_data.status).text().trim();
-      if ticket_status == 'NEW' || ticket_status == 'ASSIGNED' || ticket_status == 'RESEARCHING' || ticket_status == 'RE-OPENED' || ticket_status == 'ESCALATED'
+      open_status = ['NEW', 'ASSIGNED', 'RESEARCHING', 'RE-OPENED', 'ESCALATED']
+      if open_status.includes(ticket_status)
         dispute_id = row_data.id
         entries = row_data.dispute_entries
         summary = row_data.dispute_summary
@@ -2602,7 +2604,7 @@ get_webrep_current_cats = (entries, uris) ->
       check_convert_to_webcat_ready()
     error: (response) ->
       console.log response
-  
+      std_msg_error('Error preparing ticket for conversion', [response])
   )
 
 selected_options = (category_names) ->

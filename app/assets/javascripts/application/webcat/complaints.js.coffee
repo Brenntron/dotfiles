@@ -2371,6 +2371,7 @@ window.prep_complaint_to_convert = () ->
 
       error: (response) ->
         console.log response
+        std_msg_error('Error preparing ticket for conversion', [response])
     )
 
 
