@@ -47,7 +47,7 @@ RSpec.describe "complaint conversion to disputes", type: :request do
     conversion_params = {}
     conversion_params[:complaint_id] = Complaint.all.first.id
     conversion_params[:submission_type] = "e"
-    conversion_params[:suggested_dispositions] = "[{\"entry\":\"2.3.4.5\",\"suggested_disposition\":\"fn\"},{\"entry\":\"www.test.com\",\"suggested_disposition\":\"fp\"}]"
+    conversion_params[:suggested_dispositions] = [{"entry":"2.3.4.5","suggested_disposition":"fn"},{"entry":"www.test.com","suggested_disposition":"fp"}]
     conversion_params[:summary] = "test summary"
 
     post '/escalations/api/v1/escalations/webcat/complaints/convert_ticket', params: conversion_params

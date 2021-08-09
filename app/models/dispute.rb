@@ -2251,6 +2251,8 @@ For future Web categorization requests, please open a Web categorization ticket 
     dispute = Dispute.find(params[:dispute_id])
     suggested_category_entries = params[:suggested_categories]
 
+    platform_id = nil
+
     package = {}
     package[:entries] = []
     package[:convert_to] = "Complaint"
@@ -2264,7 +2266,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       else
         disp_entry = dispute.dispute_entries.select {|c| c.hostlookup == sugg[1]['entry']}.first
         if disp_entry.present?
-          platform_id = disp_entry.platform_id
+          platform_id = disp_entry.platform_id unless disp_entry.platform_id.blank?
         end
       end
       entry = {}
