@@ -27,6 +27,12 @@
       %a{href: escalations_other_admin_tools_status_api_path}
         %i.glyphicon.glyphicon-pencil
         .button-text API Status
+- if can? :manage, :rails_c
+  .control-button-div
+    .control-button
+      %a{href: escalations_other_admin_tools_console_path}
+        %i.glyphicon.glyphicon-pencil
+        .button-text Rails Console
 
 
 

@@ -72,20 +72,19 @@ window.std_msg_error =(banner, messages, options = {}) ->
 window.std_msg_confirm =(banner, messages, options = {}) ->
   std_msg_set_class('error-msg', '#api-msg')
   std_msg_set(banner, messages)
-
   if options.reload == true
     $('.confirm').click ->
       location.reload(true)
       $('.confirm').click ->
   else if undefined != options.confirm
+    $('#msg-modal .confirm').remove()
+    $('.confirmation-buttons').prepend($('<button aria-label="Confirm" class="panel-button primary confirm wide">Confirm</button>'))
     $('.confirm').click ->
       $('.confirmation-buttons').addClass('hidden')
       $('#msg-modal').modal('hide')
       options.confirm()
       if options.success_msg != undefined
         std_msg_success(options.success_msg, success_reload: options.success_reload)
-      else if false == options.confirm_dismisss || undefined == options.confirm_dismiss
-        $('#msg-modal').modal('hide')
       $('.confirm').click ->
 
   $('.confirmation-buttons').removeClass 'hidden'
