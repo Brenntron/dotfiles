@@ -2,12 +2,12 @@ development:
   api_timeout:
     timeout: 15
   app_info:
-    cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
-    pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
-    # device_id: "analyst-console-escalations-dev"
+    client_cert_file: "/usr/local/etc/talos/tess-client.pem"
+    pkey_file: "/usr/local/etc/talos/tess-pkey.pem"
+    # device_id: "analyst-console-escalations-dev"   # defaults to hostname
     # product_family: "Talos_Web"
     # product_id: "analyst-console-escalations"
-    # product_version: 'development'    # defaults to git branch name
+    # product_version: 'development'    # defaults to git branch name or Rails.env
   auto_resolve:
     complaints:
       check: true
@@ -98,8 +98,9 @@ development:
   tess:
     host: "tess.sl.talos.cisco.com"
     port: 443
-    verify_mode: "verify-peer"
-    ca_cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
+    ca_cert_file: "/usr/local/etc/talos/tess-ca-cert.pem"
+    client_cert_file: "/usr/local/etc/talos/tess-client.pem"
+    pkey_file: "/usr/local/etc/talos/tess-pkey.pem"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
@@ -135,12 +136,12 @@ test:
   api_timeout:
     timeout: 15
   app_info:
-    cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
-    pkey_file: "/usr/local/etc/talos/talos-web-pkey.pem"
-    # device_id: "analyst-console-escalations-dev" #use dev for test environment to the server it is dev
+    client_cert_file: "/usr/local/etc/talos/tess-client.pem"
+    pkey_file: "/usr/local/etc/talos/tess-pkey.pem"
+    # device_id: "analyst-console-escalations-dev" #use dev for test environment to the TESS server it is dev
     # product_family: "Talos_Web"
     # product_id: "analyst-console-escalations"
-    # product_version: 'test'           # defaults to git branch name
+    # product_version: 'test'    # defaults to git branch name or Rails.env
   auto_resolve:
     complaints:
       check: true
@@ -230,8 +231,9 @@ test:
   tess:
     host: "tess.sl.talos.cisco.com"
     port: 443
-    verify_mode: "verify-peer"
-    ca_cert_file: "/usr/local/etc/talos/talos-web-certificate.pem"
+    ca_cert_file: "/usr/local/etc/talos/tess-ca-cert.pem"
+    client_cert_file: "/usr/local/etc/talos/tess-client.pem"
+    pkey_file: "/usr/local/etc/talos/tess-pkey.pem"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
@@ -269,12 +271,12 @@ staging:
   api_timeout:
     timeout: 15
   app_info:
-    cert_file: "/usr/local/etc/analyst-console-escalations/talos-web-certificate.pem"
-    pkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-pkey.pem"
+    client_cert_file: "/usr/local/etc/talos/tess-client.pem"
+    pkey_file: "/usr/local/etc/talos/tess-pkey.pem"
+    # device_id defaults to hostname
     # product_family: "Talos_Web"
     # product_id: "analyst-console-escalations"
-    # device_id defaults to hostname
-    # product_version: defaults to version file or 'staging'
+    # product_version: defaults to version file or Rails.env
   auto_resolve:
     complaints:
       check: true
@@ -409,13 +411,12 @@ production:
   api_timeout:
     timeout: 15
   app_info:
-    cert_file: "/usr/local/etc/analyst-console-escalations/talos-web-certificate.pem"
-    pkey_file: "/usr/local/etc/analyst-console-escalations/talos-web-pkey.pem"
+    client_cert_file: "/usr/local/etc/talos/tess-client.pem"
+    pkey_file: "/usr/local/etc/talos/tess-pkey.pem"
+    # device_id defaults to hostname
     # product_family: "Talos_Web"
     # product_id: "analyst-console-escalations"
-    # device_id defaults to hostname
-    # device_id: "analyst-console.vrt.sourcefire.com"
-    # product_version: defaults to version file or 'production'
+    # product_version: defaults to version file or Rails.env
   auto_resolve:
     complaints:
       check: true

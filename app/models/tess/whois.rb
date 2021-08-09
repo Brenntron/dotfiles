@@ -36,7 +36,6 @@ class Tess::Whois
   def self.creds
     if ca_cert.present? && cert_key.present?
       @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert, cert_key, cert)
-      # @creds ||= GRPC::Core::ChannelCredentials.new(ca_cert)
     else
       :this_channel_is_insecure
     end
@@ -53,7 +52,6 @@ class Tess::Whois
 
   def self.remote_stub
     @remote_stub ||= Talos::Service::TESS::Stub.new(hostport, creds)
-    # @remote_stub ||= Talos::Service::TESS::Stub.new(hostport, :this_channel_is_insecure)
   end
 
   def self.whois_query(name)
