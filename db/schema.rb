@@ -31,7 +31,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.text "public_notes"
     t.string "contact"
     t.integer "table_sequence"
-    t.text "public_engine_description"
+    t.text "private_engine_description"
     t.index ["table_sequence"], name: "index_amp_naming_conventions_on_table_sequence", unique: true
   end
 
@@ -146,6 +146,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "permanent", default: false
     t.index ["user_id"], name: "index_cluster_assignments_on_user_id"
   end
 
@@ -494,8 +495,6 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.integer "related_id"
     t.datetime "case_responded_at"
     t.datetime "related_at"
-    t.text "parse_body", limit: 16777215
-    t.integer "ticket_email_id"
     t.text "resolution_comment", limit: 16777215
     t.text "status_comment", limit: 16777215
     t.string "product_platform"
@@ -650,8 +649,6 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.text "reversing_labs_raw", limit: 4294967295
     t.integer "ticket_source_key"
     t.string "submitter_type"
-    t.text "parse_body", limit: 16777215
-    t.integer "ticket_email_id"
     t.text "auto_resolve_log", limit: 16777215
     t.string "product_platform"
     t.string "product_version"
@@ -1017,56 +1014,6 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.string "policy"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "ticket_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "ticket_email_id"
-    t.integer "bugzilla_attachment_id"
-    t.string "file_name"
-    t.text "direct_upload_url"
-    t.integer "size"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "ticket_emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "bugzilla_id"
-    t.text "email_headers"
-    t.text "from"
-    t.text "to"
-    t.text "subject"
-    t.text "body", limit: 16777215
-    t.string "status"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text "parse_report", limit: 16777215
-    t.text "simulation_results", limit: 16777215
-    t.boolean "is_simulation"
-  end
-
-  create_table "ticket_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "ticket_email_id"
-    t.integer "bugzilla_attachment_id"
-    t.string "file_name"
-    t.text "direct_upload_url"
-    t.integer "size"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "ticket_emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "bugzilla_id"
-    t.text "email_headers"
-    t.text "from"
-    t.text "to"
-    t.text "subject"
-    t.text "body", limit: 16777215
-    t.string "status"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text "parse_report", limit: 16777215
-    t.text "simulation_results", limit: 16777215
-    t.boolean "is_simulation"
   end
 
   create_table "unused_complaint_marked_commits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
