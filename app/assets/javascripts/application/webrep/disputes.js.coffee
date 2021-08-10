@@ -2447,7 +2447,7 @@ $ ->
 # Convert webrep to webcat
 # Enable / disable button to attempt based on if anything is selected
 $(document).on 'click', '#disputes-index tr, #disputes-index .dispute_check_box, #disputes_check_box', ->
-  if $('tr.selected').length == 1
+  if $('input.dispute_check_box:checked').length == 1
     $('#convert-ticket-button').removeAttr('disabled')
   else
     $('#convert-ticket-button').attr('disabled', 'disabled')
