@@ -70,7 +70,7 @@ window.categorize_clusters = () ->
   for selected_row in selected_rows
     selected_row["comment"] = comment
     escaped_domain = selected_row.domain.replaceAll('.', '_')
-    $("##{escaped_domain}_categories").each ->
+    $("##{escaped_domain}_#{selected_row["platform"]}_categories").each ->
       # collect selected categories
       categories = $(this).find('option')
 
@@ -205,14 +205,14 @@ $ ->
         className: "alt-col assignee-col"
         render: (data, type, full, meta) ->
           escaped_domain = full.domain.replaceAll('.', '_') # jquery doesn't like dots in id
-          return "<span id='owner_#{escaped_domain}'> #{data} </span>"
+          return "<span id='owner_#{escaped_domain}_#{full.platform}'> #{data} </span>"
       }
       {
         data: 'cluster_id'
         className: 'category-column'
         render: (data, type, full, meta) ->
           escaped_domain = full.domain.replaceAll('.', '_') # jquery doesn't like dots in id
-          "<select id='#{escaped_domain}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='6' name='' #{if full.is_pending then 'disabled'}>"
+          "<select id='#{escaped_domain}_#{full.platform}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='6' name='' #{if full.is_pending then 'disabled'}>"
       }
       {
         data: 'cluster_id'
@@ -368,9 +368,6 @@ window.selectize_category_inputs = () ->
   category_inputs = $("select.cluster_categories")
   input_ids = []
   $(category_inputs).each ->
-    if $(this).next("div").hasClass("selectize-control")
-#          This is already selectized
-    else
       input_ids.push("##{this.id}")
       $(this).selectize {
         persist: true,
@@ -389,9 +386,9 @@ window.populate_cat_select = ->
     for cluster in data
       if cluster.is_pending
         escaped_domain = cluster.domain.replaceAll('.', '_')
-        cat_select = $("##{escaped_domain}_categories")[0]
+        cat_select = $("##{escaped_domain}_#{cluster.platform}_categories")[0]
         if cat_select
-          $("##{escaped_domain}_categories")[0].selectize.setValue(cluster.categories)
+          $("##{escaped_domain}_#{cluster.platform}_categories")[0].selectize.setValue(cluster.categories)
   ), 2000
 
 window.copy_domain = (domain, element) ->
@@ -811,7 +808,7 @@ window.take_selected_clusters = ()->
         else
           for cluster, i in json.clusters
             escaped_domain = cluster.domain.replaceAll('.', '_')
-            $("#owner_#{escaped_domain}").text(json.username)
+            $("#owner_#{escaped_domain}_#{cluster.platform}").text(json.username)
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -836,7 +833,7 @@ window.return_selected_clusters = ()->
         else
           for entry, i in selected_rows
             escaped_domain = entry.domain.replaceAll('.', '_')
-            $("#owner_#{escaped_domain}").text('')
+            $("#owner_#{escaped_domain}_#{entry.platform}").text('')
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
