@@ -687,7 +687,7 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.named_search(search_name, user:)
     named_search = user.named_searches.where(name: search_name).first
-    raise "No search named '#{search_name}' found." unless named_search
+    return false unless named_search
     search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
       if /\A(?<super_name>[^~]*)~(?<sub_name>[^~]*)\z/ =~ criterion.field_name
         if criterion.field_name == 'complaint_entries~complaint_id'
