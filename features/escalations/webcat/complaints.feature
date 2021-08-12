@@ -964,3 +964,30 @@ Feature: Webcat complaints
     When I click "#complaints"
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
+
+  @javascript
+  Scenario: bulk sumbit submits all selected complaint entries
+    Given a user with role "webcat user" exists and is logged in
+    And WBRS Prefix where is stubbed
+    And the following complaint entries exist:
+      |id|  domain      | status |
+      |1 | food.com     |  NEW   |
+      |2 | blah.com     |  NEW   |
+      |3 | imhungry.com |  NEW   |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I click ".expand-row-button-1"
+    And I wait for "2" seconds
+    And I click ".expand-row-button-2"
+    And I wait for "2" seconds
+    And I fill in "complaint_comment_1" with "This is my favorite website"
+    And I fill in "complaint_comment_2" with "This is not my favorite website"
+    And I fill in "input_cat_1-selectized" with "Arts" and press enter
+    And I fill in "input_cat_2-selectized" with "Education" and press enter
+    When I click "master-submit"
+    And I click "Confirm"
+    And I wait for "5" seconds
+    And I dismiss modal "#msg-modal" if needed
+    And I wait for "5" seconds
+    Then I should not see "food.com"
+    And I should not see "blah.com"
