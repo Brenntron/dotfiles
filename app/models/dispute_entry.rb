@@ -1343,7 +1343,7 @@ class DisputeEntry < ApplicationRecord
           if raw_score.to_f <= -7.0
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_RESOLVED_UNCHANGED
-            self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
+            self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. By default, a URL/IP address with a Web Reputation of Untrusted should be inaccessible by our customers. Talos does not reduce the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers is able to access the submission, that is due to relaxed settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case."
             self.save
 
             return true
@@ -1353,7 +1353,7 @@ class DisputeEntry < ApplicationRecord
           if self.suggested_disposition == @running_verdict
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_RESOLVED_UNCHANGED
-            self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
+            self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. By default, a URL/IP address with a Web Reputation of Untrusted should be inaccessible by our customers. Talos does not reduce the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers is able to access the submission, that is due to relaxed settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case."
             self.save
 
             return true
@@ -1376,7 +1376,7 @@ class DisputeEntry < ApplicationRecord
           if ['Trusted', 'Favorable', 'Neutral', 'Good', 'Unknown', 'Questionable'].include?(@running_verdict) && !is_blacklisted
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_RESOLVED_UNCHANGED
-            self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
+            self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. By default, a URL/IP address with a Web Reputation of Trusted, Favorable, Neutral, or Questionable should be accessible by our customers. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case."
             self.save
 
             return true
