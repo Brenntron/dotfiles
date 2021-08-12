@@ -150,6 +150,7 @@ class Complaint < ApplicationRecord
         Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
       end
     end
+    top_url
   end
 
 
