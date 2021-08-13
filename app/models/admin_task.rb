@@ -148,4 +148,24 @@ class AdminTask
 
     morsel
   end
+
+  def parse_complaint_entry_uris(morsel_id, args)
+    morsel = Morsel.find(morsel_id)
+    entries = ComplaintEntry.where(entry_type: 'URI/DOMAIN').where("domain is null or domain = ''")
+    morsel.output += "\n##################################\n"
+    morsel.output += "Updated Complaint Entries\n"
+    morsel.output += "complaint_entry_id : complaint_id : uri\n"
+    entries.each do |entry|
+      parsed_uri = Complaint.parse_url(entry.uri)
+      entry.domain = parsed_uri[:domain]
+      entry.subdomain = parsed_uri[:subdomain] unless entry.subdomain.present?
+      entry.path = parsed_uri[:path] unless entry.path.present?
+      entry.save
+      morsel.output += "#{entry.id} : #{entry.complaint_id} : #{entry.uri}\n"
+    end
+    morsel.output += "####################################\n"
+    morsel.save
+  end
+  handle_asynchronously :parse_complaint_entry_uris
+
 end
