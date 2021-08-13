@@ -25,8 +25,36 @@ class Threatgrid::Search
   end
 
   def self.query(sha256_hash)
-    api_response = data(sha256_hash)
-    query_from_data(api_response)
+
+    response = {}
+
+    attempts = 0
+
+    while attempts < 5 do
+      begin
+        api_response = data(sha256_hash)
+        response = query_from_data(api_response)
+        break
+      rescue JSON::ParserError
+        Rails.logger.error('SampleZoo returned invalid JSON.')
+        response = {error: 'Invalid Hash'}
+        attempts += 1
+      rescue ApiRequester::ApiRequester::ApiRequesterNotAuthorized
+        Rails.logger.error('SampleZoo returned an "Unauthorized" response.')
+        response = {error: 'Unauthorized'}
+        attempts += 1
+      rescue
+        Rails.logger.error('SampleZoo returned an error response.')
+        response = {error: 'Data Currently Unavailable'}
+        attempts += 1
+      end
+
+    end
+
+    response
+
+    #api_response = data(sha256_hash)
+    #query_from_data(api_response)
   end
 
   def self.health_check

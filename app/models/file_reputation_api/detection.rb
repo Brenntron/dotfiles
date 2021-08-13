@@ -52,8 +52,43 @@ class FileReputationApi::Detection
   end
 
   def self.get_bulk(sha256_hash)
-    response_struct = call_request_parsed(:get, "/v0/bulk/sha256/#{sha256_hash}")
-    new(response_struct)
+
+    response = {}
+    attempts = 0
+
+    while attempts < 5 do
+      begin
+        response = call_request_parsed(:get, "/v0/bulk/sha256/#{sha256_hash}")
+        break
+      rescue JSON::ParserError
+        Rails.logger.error('SampleZoo returned invalid JSON.')
+        response = {error: 'Invalid Hash'}
+        attempts += 1
+      rescue ApiRequester::ApiRequester::ApiRequesterNotAuthorized
+        Rails.logger.error('SampleZoo returned an "Unauthorized" response.')
+        response = {error: 'Unauthorized'}
+        attempts += 1
+      rescue
+        Rails.logger.error('SampleZoo returned an error response.')
+        response = {error: 'Data Currently Unavailable'}
+        attempts += 1
+      end
+
+    end
+    if response.present?
+      if response[:error].blank?
+        return new(response)
+      else
+        raise response[:error]
+      end
+
+    end
+
+
+
+
+    #response_struct = call_request_parsed(:get, "/v0/bulk/sha256/#{sha256_hash}")
+    #new(response_struct)
   end
 
   def put_bulk
