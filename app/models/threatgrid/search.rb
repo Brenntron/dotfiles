@@ -36,15 +36,15 @@ class Threatgrid::Search
         response = query_from_data(api_response)
         break
       rescue JSON::ParserError
-        Rails.logger.error('SampleZoo returned invalid JSON.')
+        Rails.logger.error('Threatgrid returned invalid JSON.')
         response = {error: 'Invalid Hash'}
         attempts += 1
       rescue ApiRequester::ApiRequester::ApiRequesterNotAuthorized
-        Rails.logger.error('SampleZoo returned an "Unauthorized" response.')
+        Rails.logger.error('Threatgrid returned an "Unauthorized" response.')
         response = {error: 'Unauthorized'}
         attempts += 1
       rescue
-        Rails.logger.error('SampleZoo returned an error response.')
+        Rails.logger.error('Threatgrid returned an error response.')
         response = {error: 'Data Currently Unavailable'}
         attempts += 1
       end
