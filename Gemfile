@@ -134,6 +134,7 @@ group :test do
   gem 'simplecov', '0.16.1', :require => false
   gem 'cucumber-api-steps', '~>0.14', require: false
   gem "timecop"
+  gem 'geckodriver-helper'
 end
 
 group :development, :profile do
