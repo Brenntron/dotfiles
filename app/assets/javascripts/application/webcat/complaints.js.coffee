@@ -2427,7 +2427,7 @@ convert_complaint_to_webrep = () ->
       std_msg_success('Success',["Complaint converted to Reputation Dispute."], reload: true)
     error: (response) ->
       console.log response
-      std_msg_error(response, 'Complaint unable to be converted to Reputation Dispute.', reload: false)
+      std_msg_error('Error converting ticket', ['Complaint unable to be converted to Reputation Dispute.'], reload: false)
   )
 
 

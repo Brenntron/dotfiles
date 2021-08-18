@@ -2648,5 +2648,5 @@ window.convert_dispute_to_webcat = () ->
     error: (response) ->
       console.log response
       $('#convert-ticket-dropdown .dropdown-loader-wrapper').addClass('hidden')
-      std_msg_error(response, 'Reputation Dispute unable to be converted to Categorization Complaint.', reload: false)
+      std_msg_error(response, ['Reputation Dispute unable to be converted to Categorization Complaint.'], reload: false)
   )
