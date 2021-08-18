@@ -2436,7 +2436,6 @@ $ ->
   $('#convert-ticket-dropdown').click ->
     # find all the radios
     radios = $(this).find('input:radio')
-
     # separate into groups by name & then grab only the unique names
     radio_names = []
     $(radios).each ->
@@ -2445,15 +2444,13 @@ $ ->
     radio_groups = Array.from(new Set(radio_names))
 
     # make sure each radio group has something checked
-    allchecked = 'true'
+    allchecked = 0
     $(radio_groups).each ->
       val = $('input[name=' + this + ']:checked').val()
-      if (val == undefined) || (val == null)
-        allchecked = 'false'
-      else
-        allchecked = 'true'
+      unless (val == undefined) || (val == null)
+        allchecked++
 
-    if allchecked == 'true'
+    if allchecked == radio_groups.length
       $('#convert-to-webrep').removeAttr('disabled')
     else
       $('#convert-to-webrep').attr('disabled', 'disabled')
