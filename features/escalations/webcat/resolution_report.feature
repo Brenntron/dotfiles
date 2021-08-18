@@ -17,7 +17,9 @@ Feature: Webcat reporting
       |201 |
       |202 |
     And I goto a "resolution" report surrounding the current year
+    Then I should see "PENDING COMPLAINTS"
     Then I should see "FIXED COMPLAINTS"
+    Then I should see "INTERNAL/JIRA CATEGORIZATIONS"
     Then I should see "INVALID COMPLAINTS"
     Then I should see "UNCHANGED COMPLAINTS"
     Then I should see "DUPLICATE COMPLAINTS"
@@ -48,4 +50,3 @@ Feature: Webcat reporting
     When I click "Export"
     # Note the header isn't `text/csv` *specifically because* we generate this on-the-fly
     Then response header "Content-Type" should be "application/octet-stream"
-
