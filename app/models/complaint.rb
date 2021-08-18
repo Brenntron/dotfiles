@@ -543,7 +543,6 @@ class Complaint < ApplicationRecord
     new_report = WbnpReport.new
 
     all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
-    puts all_complaints.inspect
     logger_token = SecureRandom.uuid
     new_report.notes = ""
     new_report.cases_imported = 0
