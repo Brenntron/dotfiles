@@ -1,7 +1,7 @@
 class WebcatReport::ResolutionReport
   class ResolutionCount
     include ActiveModel::Model
-    attr_accessor :username, :pending, :fixed, :invalid, :unchanged, :duplicate,
+    attr_accessor :username, :internal, :pending, :fixed, :invalid, :unchanged, :duplicate,
                   :eng_avg, :eng_max, :dept_avg, :dept_max
   end
 
@@ -28,6 +28,7 @@ class WebcatReport::ResolutionReport
             .select(times_select_phrase).first
 
     yield ResolutionCount.new(username: 'TOTAL',
+                              internal: counts[WebcatCredit::INTERNAL],
                               pending: counts[WebcatCredit::PENDING],
                               fixed: counts[WebcatCredit::FIXED],
                               invalid: counts[WebcatCredit::INVALID],
@@ -50,6 +51,7 @@ class WebcatReport::ResolutionReport
           .select(times_select_phrase).first
 
       yield ResolutionCount.new(username: user.cvs_username,
+                                internal: counts[WebcatCredit::INTERNAL],
                                 pending: counts[WebcatCredit::PENDING],
                                 fixed: counts[WebcatCredit::FIXED],
                                 invalid: counts[WebcatCredit::INVALID],

@@ -154,7 +154,11 @@ For future web and email reputation requests, please open a web and email reputa
       else
         Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
       end
+      # add credit to the user for internal categorization
+      user_object = User.find_by_email(user)
+      WebcatCredits::InternalCategorizations::CreditHandler.new(user_object, ip_or_uri).handle_internal_credit
     end
+    top_url
   end
 
 

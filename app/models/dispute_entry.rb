@@ -342,14 +342,18 @@ class DisputeEntry < ApplicationRecord
       url = "http://" + url
     end
 
-    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
+    # Addressable::URI.parse(url)
+    uri_parsed = Addressable::URI.parse(url)
+    unless uri_parsed.scheme.present? || url.starts_with?('//')
+      uri_parsed = Addressable::URI.parse("http://#{url}")
+    end
+    public_suffix = PublicSuffix.parse(uri_parsed.host, :ignore_private => true)
 
-    self.subdomain                      = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
-    self.domain                         = domain.domain
-    self.path                           = uri.path
-    self.hostname                       = uri.host
-    self.top_level_domain               = domain.tld
+    self.subdomain                      = uri_parsed.host.gsub(Regexp.new("\\.?#{public_suffix.domain}$"), '')
+    self.domain                         = public_suffix.domain
+    self.path                           = uri_parsed.path
+    self.hostname                       = uri_parsed.host
+    self.top_level_domain               = public_suffix.tld
 
     self
   end

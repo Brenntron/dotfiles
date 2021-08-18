@@ -455,6 +455,63 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
   end
 
 
+  context "non-ascii" do
+    let(:dispute_message_cyrillic_json) do
+      {
+        "envelope": {
+          "channel": "ticket-event",
+          "addressee": "analyst-console-escalations",
+          "sender": "talos-intelligence"
+        },
+        "message": {
+          "dispute": {
+            "payload": {
+              "name": "Marlin Pierce",
+              "email": "marlpier@cisco.com",
+              "domain": "cisco.com",
+              "problem": "I cannot even read those letters",
+              "details": "",
+              "user_ip": "::1",
+              "ticket_time": "June 15, 2021 16:10",
+              "investigate_ips": {},
+              "investigate_urls": {
+                "липецкаяобласть.рф": {
+                  "WBRS_SCORE": "noscore",
+                  "WBRS_Rule_Hits": "",
+                  "Hostname_ips": "",
+                  "rep_sugg": "Untrusted",
+                  "category": "Not in our list",
+                  "claim": "false negative",
+                  "platform": 1
+                }
+              },
+              "email_subject": "I cannot even read those letters",
+              "email_body": "____________________________________________________________\nUser-entered\nInformation:\n____________________________________________________________\nTime:\nJune 15, 2021 16:10\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain:\ncisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: I cannot even\nread those letters\nIP(s) to be investigated:\n\n\nURI(s) to be investigated:\nлипецкаяобласть.рф\n\nDetailed\nDescriptions:\n\n\n",
+              "user_company": "Cisco Systems, Inc.",
+              "submission_type": "w"
+            },
+            "source_key": 101373,
+            "source_type": "Dispute"
+          }
+        }
+      }
+    end
+
+    it 'receives cyrillic dispute payload messages' do
+      vrt_incoming
+      guest_company
+
+      post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_cyrillic_json
+
+      expect(response).to be_successful
+      dispute = Dispute.where(ticket_source_key: 101373).first
+
+      expect(dispute).to_not be_nil
+      expect(dispute.dispute_entries.count).to eq(1)
+      expect(dispute.dispute_entries.where(uri: 'липецкаяобласть.рф')).to exist
+      expect(dispute.ticket_source).to eql("talos-intelligence")
+    end
+  end
 end
 
 # expect(response.code).to be_successful

@@ -15,6 +15,7 @@
           %th
           %th Pending Complaints
           %th Fixed Complaints
+          %th Internal/Jira Categorizations
           %th Invalid Complaints
           %th Unchanged Complaints
           %th Duplicate Complaints
@@ -28,6 +29,7 @@
             %td= counts.username
             %td= counts.pending
             %td.total-fixed= counts.fixed
+            %td= counts.internal
             %td= counts.invalid
             %td= counts.unchanged
             %td= counts.duplicate

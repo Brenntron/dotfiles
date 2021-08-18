@@ -232,7 +232,18 @@ processSubmitNewURL = () ->
       data: {data: data}
       success: (response) ->
         timesTouched = 0
-        std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
+        popular_entries = []
+        message = ""
+        for key, val of response
+          if val.popular == true
+            popular_entries.push(val.url)
+
+        if popular_entries.length > 0
+           message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+        else
+           message = "No pending complaint entries have been created"
+
+        std_msg_success('URLs categorized successfully',[message, "All other entries have been submitted directly to WBRS."], reload: true)
       error: (response) ->
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
           std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
@@ -1903,26 +1914,37 @@ window.triggerTooltips = (item) ->
 processSubmitMaster = () ->
 
   data = []
-  $('.selected + tr td.nested-complaint-data-wrapper').each ->
-    entry_id = $(this).find('tr').attr('entry_id')
-    row_id = $(this).find('tr').attr('row_id')
-    type = $(this).find('tr').attr('type')
+  selectedEntryDomains = (sessionStorage.getItem("touchedForm")|| "" )
+  return if selectedEntryDomains.length == 0
+
+  # remove empty values
+  selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
+  selectedEntries = []
+  $('#complaints-index').DataTable().rows (idx, data, node) ->
+    if selectedEntryDomains.includes(data.domain)
+      selectedEntries.push data
+    false
+  for entry in selectedEntries
+    data_wrapper = $("##{entry.entry_id}").closest('tr').next().find('.nested-complaint-data-wrapper')
+    entry_id = data_wrapper.find('tr').attr('entry_id')
+    row_id = data_wrapper.find('tr').attr('row_id')
+    type = data_wrapper.find('tr').attr('type')
 
     if type == 'submit_changes' && entry_id && row_id
-      prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
+      prefix = data_wrapper.find("#complaint_prefix_#{entry_id}")[0].value
 
       category_names = []
       categories = ""
-      if $(this).find("#input_cat_#{entry_id}").val()
-        categories = $(this).find("#input_cat_#{entry_id}").val().toString()
-      category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
+      if data_wrapper.find("#input_cat_#{entry_id}").val()
+        categories = data_wrapper.find("#input_cat_#{entry_id}").val().toString()
+      category_name = data_wrapper.find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
       category_name.each ->
         category_names.push($(this).text())
       category_names = category_names.toString()
-      status = $(this).find("[name=resolution#{entry_id}]:checked").val()
-      comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
-      resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
-      uri_as_categorized = $(this).find("#complaint_prefix_#{entry_id}")[0].value
+      status = data_wrapper.find("[name=resolution#{entry_id}]:checked").val()
+      comment = data_wrapper.find("#complaint_comment_#{entry_id}")[0].value
+      resolution_comment = data_wrapper.find("#complaint_resolution_comment_#{entry_id}")[0].value
+      uri_as_categorized = data_wrapper.find("#complaint_prefix_#{entry_id}")[0].value
       if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if status == 'UNCHANGED' || status == 'INVALID'
