@@ -389,5 +389,4 @@ namespace :bugs do
       raise "Missing bugzilla_username or bugzilla_password."
     end
   end
-
 end
