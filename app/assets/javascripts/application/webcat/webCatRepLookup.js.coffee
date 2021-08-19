@@ -42,7 +42,6 @@ namespace 'WebCat.RepLookup', (exports) ->
         $('#whois_content').append message
 
     errorFunction = (message) ->
-      debugger
       #loader.css('display', 'none')
       if undefined == message.responseJSON
         std_msg_error("Error retrieving WHOIS query.","")
