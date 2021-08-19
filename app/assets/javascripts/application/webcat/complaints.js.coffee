@@ -202,7 +202,7 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
-        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" onclick="WebCat.RepLookup.queryWhoIs('+query_who_params+ '\')">Lookup</button>')
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + qual_subdomain + '\')">Lookup</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
     error: (response) ->
@@ -1359,7 +1359,7 @@ format = (complaint_entry_row) ->
       '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="lookup-' + entry_id+ '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + url + '\')">Lookup</button><br/>' +
+      '<button class="secondary" id="lookup-' + entry_id+ '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + qual_subdomain + '\')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + entry_id + '" onclick="history_dialog(' + entry_id  + ',\'' + url + '\')">History</button><br/>' +
       '<button class="secondary" id="domain-' + entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +

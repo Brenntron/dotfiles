@@ -1,3 +1,6 @@
+
+require_relative '../bugzilla_rest_errors'
+
 module API
   module V1
     module Defaults
