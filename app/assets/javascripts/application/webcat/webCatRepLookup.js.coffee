@@ -41,12 +41,12 @@ namespace 'WebCat.RepLookup', (exports) ->
         message = 'We can\'t find any results. Possibly IP address is unallocated or its whois server is not available.'
         $('#whois_content').append message
 
-    errorFunction = (message) ->
-      #loader.css('display', 'none')
-      if undefined == message.responseJSON
+    errorFunction = (response) ->
+      {responseJSON} = response
+      if !responseJSON
         std_msg_error("Error retrieving WHOIS query.","")
       else
-        std_msg_error("Error retrieving WHOIS query.",message.responseJSON.message)
+        std_msg_error("Error retrieving WHOIS query.", [responseJSON.message])
 
 
     WebCat.RepLookup.getWhoisLookup(query_entry).then successFunction, errorFunction
