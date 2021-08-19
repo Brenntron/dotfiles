@@ -806,6 +806,7 @@
                         = ips
 
                       %input.table-ip-input{type:'text', value: "#{ips}", placeholder: 'enter one or more IPs, separated by commas; ex: 1.2.3.4. or 1.1.1.1, 2.2.2.2'}
+
                     %td.text-right.no-padding-right{colspan: '12'}
                       %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses'}
                         Edit IP Addresses
@@ -854,10 +855,10 @@
 
 
                 %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
-                  %td.expanded-row{colspan: '10'}
+                  %td.expanded-row{colspan: '13'}
                     .expanded-row-data-wrapper
                       .row
-                        .col-sm-3
+                        .col-sm-4
                           .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header
                               WBRS Rule Hit Details
@@ -879,22 +880,47 @@
                                     -#  Placeholder col for if a rule hit is from querying uri + ip
                                     %th Rule
                                     %th Rule Description
-                                    -#%th Weight <- hiding this as it currently is not set up and just takes up space
+                                    %th.text-center Malware Prob
                                 %tbody
                                   - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit != true}.each do |wbrs_hit|
+                                    - rulehit = @all_rulehits.select {|hit| hit.mnemonic == wbrs_hit.name}
                                     %tr
                                       %td
                                       %td= wbrs_hit.name
-                                      %td= wbrs_hit.mnemonic
-                                      -#%td
-                                        -#Put weight of rule here
-                                  -# if any wbrs rulehits are returned from querying uri + ip each do
+                                      %td
+                                        - if rulehit.length > 0
+                                          = rulehit.first.description
+                                      %td.text-center
+                                        - if rulehit.length > 0
+                                          - malware_prob = rulehit.first.probability / 100.0
+                                          - if malware_prob > 50
+                                            %span.mal-highlight
+                                              = rulehit.first.probability / 100.0
+                                              \%
+                                          - else
+                                            = rulehit.first.probability / 100.0
+                                            \%
+
+
                                   - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit == true}.each do |wbrs_hit|
+                                    - rulehit = @all_rulehits.select {|hit| hit.mnemonic == wbrs_hit.name}
                                     %tr.plus-ip-rule-row
                                       %td.uri-plus-ip-rule-indicator
                                       %td= wbrs_hit.name
-                                      %td= wbrs_hit.mnemonic
-                                      -#%td
+                                      %td
+                                        - if rulehit.length > 0
+                                          = rulehit.first.description
+                                      %td.text-center
+                                        - if rulehit.length > 0
+                                          - malware_prob = rulehit.first.probability / 100.0
+                                          - if malware_prob > 50
+                                            %span.mal-highlight
+                                              = rulehit.first.probability / 100.0
+                                              \%
+                                          - else
+                                            = rulehit.first.probability / 100.0
+                                            \%
+
 
                           .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header
@@ -955,7 +981,7 @@
                                         %td.unrated-site-result Unrated
                                       - else
                                         %td.unclean-site-result= virustotal[:result]
-                        .col-sm-9
+                        .col-sm-8
                           = render 'shared/xbrs_table', :entry => entry
                           .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header

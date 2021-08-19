@@ -1,4 +1,4 @@
-describe ComplaintEntryCredits::CreditHandler do
+describe WebcatCredits::ComplaintEntries::CreditHandler do
   subject(:handler) { described_class.new(user, complaint_entry) }
   let(:complaint_entry) { FactoryBot.create(:complaint_entry) }
   let(:user) { FactoryBot.create(:user) }
@@ -9,8 +9,8 @@ describe ComplaintEntryCredits::CreditHandler do
     context 'when user does not have credits for the complaint entry' do
       it 'adds PENDING credit for the user' do
         expect { subject }.to change { ComplaintEntryCredit.count }.to(1)
-        expect(user.complaint_entry_credits.count).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::PENDING
+        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.last.credit).to eq WebcatCredit::PENDING
       end
     end
 
@@ -19,14 +19,14 @@ describe ComplaintEntryCredits::CreditHandler do
         ComplaintEntryCredit.create(
           user_id: user.id,
           complaint_entry_id: complaint_entry.id,
-          credit: ComplaintEntryCredit::UNCHANGED
+          credit: WebcatCredit::UNCHANGED
         )
       end
 
       it 'removes prevoius credit and adds the PENDING credit' do
         subject
-        expect(user.complaint_entry_credits.count).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::PENDING
+        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.last.credit).to eq WebcatCredit::PENDING
       end
     end
   end
@@ -37,8 +37,8 @@ describe ComplaintEntryCredits::CreditHandler do
     context 'when user does not have credits for the complaint entry' do
       it 'adds UNCHANGED credit for the user' do
         expect { subject }.to change { ComplaintEntryCredit.count }.to(1)
-        expect(user.complaint_entry_credits.count).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::UNCHANGED
+        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.last.credit).to eq WebcatCredit::UNCHANGED
       end
     end
 
@@ -47,14 +47,14 @@ describe ComplaintEntryCredits::CreditHandler do
         ComplaintEntryCredit.create(
           user_id: user.id,
           complaint_entry_id: complaint_entry.id,
-          credit: ComplaintEntryCredit::PENDING
+          credit: WebcatCredit::PENDING
         )
       end
 
       it 'removes prevoius credit and adds the PENDING credit' do
         subject
-        expect(user.complaint_entry_credits.count).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::UNCHANGED
+        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.last.credit).to eq WebcatCredit::UNCHANGED
       end
     end
   end
@@ -65,8 +65,8 @@ describe ComplaintEntryCredits::CreditHandler do
     context 'when user does not have credits for the complaint entry' do
       it 'adds FIXED credit for the user' do
         expect { subject }.to change { ComplaintEntryCredit.count }.to(1)
-        expect(user.complaint_entry_credits.count).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::FIXED
+        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.last.credit).to eq WebcatCredit::FIXED
       end
     end
 
@@ -75,14 +75,14 @@ describe ComplaintEntryCredits::CreditHandler do
         ComplaintEntryCredit.create(
           user_id: user.id,
           complaint_entry_id: complaint_entry.id,
-          credit: ComplaintEntryCredit::PENDING
+          credit: WebcatCredit::PENDING
         )
       end
 
       it 'removes prevoius credit and adds the PENDING credit' do
         subject
-        expect(user.complaint_entry_credits.count).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::FIXED
+        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.last.credit).to eq WebcatCredit::FIXED
       end
     end
   end
@@ -93,8 +93,8 @@ describe ComplaintEntryCredits::CreditHandler do
     context 'when user does not have credits for the complaint entry' do
       it 'adds INVALID credit for the user' do
         expect { subject }.to change { ComplaintEntryCredit.count }.to(1)
-        expect(user.complaint_entry_credits.count).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::INVALID
+        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.last.credit).to eq WebcatCredit::INVALID
       end
     end
 
@@ -103,14 +103,14 @@ describe ComplaintEntryCredits::CreditHandler do
         ComplaintEntryCredit.create(
           user_id: user.id,
           complaint_entry_id: complaint_entry.id,
-          credit: ComplaintEntryCredit::PENDING
+          credit: WebcatCredit::PENDING
         )
       end
 
       it 'removes prevoius credit and adds the PENDING credit' do
         subject
-        expect(user.complaint_entry_credits.count).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::INVALID
+        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.last.credit).to eq WebcatCredit::INVALID
       end
     end
   end
@@ -121,8 +121,8 @@ describe ComplaintEntryCredits::CreditHandler do
     context 'when user does not have credits for the complaint entry' do
       it 'adds DUPLICATE credit for the user' do
         expect { subject }.to change { ComplaintEntryCredit.count }.to(1)
-        expect(user.complaint_entry_credits.count).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::DUPLICATE
+        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.last.credit).to eq WebcatCredit::DUPLICATE
       end
     end
 
@@ -131,14 +131,14 @@ describe ComplaintEntryCredits::CreditHandler do
         ComplaintEntryCredit.create(
           user_id: user.id,
           complaint_entry_id: complaint_entry.id,
-          credit: ComplaintEntryCredit::PENDING
+          credit: WebcatCredit::PENDING
         )
       end
 
       it 'removes prevoius credit and adds the DUPLICATE credit' do
         subject
-        expect(user.complaint_entry_credits.count).to be 1
-        expect(user.complaint_entry_credits.last.credit).to eq ComplaintEntryCredit::DUPLICATE
+        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.last.credit).to eq WebcatCredit::DUPLICATE
       end
     end
   end

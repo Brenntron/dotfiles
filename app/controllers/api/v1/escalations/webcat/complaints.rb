@@ -67,6 +67,7 @@ module API
               requires :description, type: String, desc: 'Description of new complaint'
               optional :customer, type: String, desc: 'Customer related to new complaint'
               optional :tags, type: Array, desc: 'Array of tags to be associated with the new complaint'
+              optional :platform, type: String, desc: 'Platform public name'
             end
 
             post "" do
@@ -75,7 +76,8 @@ module API
                                         permitted_params[:ips_urls],
                                         permitted_params[:description],
                                         permitted_params[:customer],
-                                        permitted_params[:tags])
+                                        permitted_params[:tags],
+                                        permitted_params[:platform])
                 {:status => 'success'}.to_json
               end
             end

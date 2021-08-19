@@ -13,6 +13,8 @@ $ ->
 
   window.submit_new_dispute = (submit_btn) ->
     data = {}
+    urls_array = []   # used for url validation
+    invalid_uri_exists = false
 
     form = $(submit_btn).closest('form')
     form_values = form.serializeArray()
@@ -23,6 +25,26 @@ $ ->
       name = name.toLowerCase().replace(/-/g, '_')
       if name != 'token' && name != 'xml_token' && name != 'current_user'
         data[name] = value
+
+    # entries will be either separated by newlines
+    if data.ips_urls.indexOf('\n') > 0
+      urls_array = data.ips_urls.split('\n')
+    else
+      urls_array.push(data.ips_urls)
+
+    # ensure each url/ip has no spaces (edge case)
+    $(urls_array).each ->
+      curr_url = this
+      curr_url = curr_url.trim().replace(/\r/g, '')  # carriage returns
+
+      if curr_url.includes(' ')
+        $('.dispute-error-inline').removeClass('hidden')  # show error msg about spaces
+        invalid_uri_exists = true
+
+    # exit the function if a bad uri exists
+    if invalid_uri_exists then return
+
+    $('.dispute-error-inline').addClass('hidden')  # ensure inline message is not showing
 
     if data.ips_urls.trim().length > 0
       data.ips_urls = data.ips_urls.replace(/,/g, '').replace(/\n/g, ' ')
@@ -78,4 +100,7 @@ $ ->
   $('.cancel_dispute').on 'click', ->
     $(this).find('.ips_urls').val('')
     $(this).find('.assignee').val('')
-    $(dropdown).dropdown 'toggle'
+    $('#new-dispute').dropdown 'toggle'
+
+  $('.new-dispute-close').click ->
+    $('.dispute-error-inline').addClass('hidden')

@@ -13,7 +13,7 @@ module API
                 requires :pattern, type: String
                 requires :example, type: String
                 optional :engine_description, type: String
-                optional :public_engine_description, type: String
+                optional :private_engine_description, type: String
                 optional :notes, type: String
                 optional :public_notes, type: String
                 optional :contact, type: String
@@ -21,6 +21,7 @@ module API
               end
             end
             post "" do
+              
               std_api_v2 do
                 ::AmpNamingConvention.transaction do
                   timestamp = Time.now
@@ -52,7 +53,7 @@ module API
                   timestamp = Time.now
                   Rails.logger.debug("\n\n*** PATCH #{params['patterns']}\n\n")
                   ::AmpNamingConvention.save_from_params(params['patterns'])
-                  # ::AmpNamingConvention.send_all_to_ti(timestamp: timestamp)
+                  ::AmpNamingConvention.send_all_to_ti(timestamp: timestamp)
                 end
 
                 render json: {status: 'Success'}

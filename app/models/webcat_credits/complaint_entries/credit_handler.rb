@@ -1,4 +1,4 @@
-class ComplaintEntryCredits::CreditHandler
+class WebcatCredits::ComplaintEntries::CreditHandler
   attr_reader :user, :complaint_entry
 
   def initialize(user, complaint_entry)
@@ -8,27 +8,27 @@ class ComplaintEntryCredits::CreditHandler
 
   def handle_pending_credit
     clear_previous_user_credits
-    create_credit_for(ComplaintEntryCredit::PENDING)
+    create_credit_for(WebcatCredit::PENDING)
   end
 
   def handle_unchanged_credit
     clear_previous_user_credits
-    create_credit_for(ComplaintEntryCredit::UNCHANGED)
+    create_credit_for(WebcatCredit::UNCHANGED)
   end
 
   def handle_fixed_credit
     clear_previous_user_credits
-    create_credit_for(ComplaintEntryCredit::FIXED)
+    create_credit_for(WebcatCredit::FIXED)
   end
 
   def handle_invalid_credit
     clear_previous_user_credits
-    create_credit_for(ComplaintEntryCredit::INVALID)
+    create_credit_for(WebcatCredit::INVALID)
   end
 
   def handle_duplicate_credit
     clear_previous_user_credits
-    create_credit_for(ComplaintEntryCredit::DUPLICATE)
+    create_credit_for(WebcatCredit::DUPLICATE)
   end
 
   private

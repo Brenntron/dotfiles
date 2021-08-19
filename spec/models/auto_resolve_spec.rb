@@ -394,5 +394,26 @@ describe AutoResolve do
       @dispute_entry.save(:validate => true)
     end
 
+    it "should provide host/domain names only to umbrella popularity" do
+      test_1_url = "http://random.domain.of.google.com/some/query/based.php?domain=this&=that"
+      test_2_url = "domain.of.google.com/without_an_http_in_it"
+      test_3_url = "2.3.4.5/ip_as_a_url"
+      test_4_url = "2001:db8:3333:4444:5555:6666:7777/some_awful_ipv6_based_url"
+
+      test_5_url = "http://www.google.com/some_random_url"
+      expect(DisputeEntry.safe_domain_of(test_1_url)).to eql("random.domain.of.google.com")
+      expect(DisputeEntry.safe_domain_of(test_2_url)).to eql("domain.of.google.com")
+      expect(DisputeEntry.safe_domain_of(test_3_url)).to eql("2.3.4.5")
+      expect(DisputeEntry.safe_domain_of(test_4_url)).to eql("2001:db8:3333:4444:5555:6666")
+
+      health_check = Umbrella::Scan.health_check
+
+      if health_check[:is_healthy] == true
+        result = AutoResolve.check_umbrella_popularity(test_5_url)
+        expect(result[:pass]).to eql(true)
+        expect(result[:log]).to eql("Umbrella popularity rating: 100.0: result of pass: true")
+      end
+    end
+
   end
 end

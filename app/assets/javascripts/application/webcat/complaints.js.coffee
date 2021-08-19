@@ -1318,6 +1318,18 @@ format = (complaint_entry_row) ->
 
   edit_input = if domain != "" then domain else host #if the domain is empty, then display host for ips in edit input
 
+  if complaint_entry.complaint_source?
+    if complaint_entry.complaint_source == 'talos-intelligence'
+      complaint_source = 'TI Webform'
+    else if complaint_entry.complaint_source == 'talos-intelligence-api'
+      complaint_source = 'TI API'
+    else if complaint_entry.complaint_source == ''
+      complaint_source = '<span class="missing-data">Source unknown</span>'
+    else
+      complaint_source = complaint_entry.complaint_source
+  else
+    complaint_source = '<span class="missing-data">Source unknown</span>'
+
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
@@ -1337,6 +1349,8 @@ format = (complaint_entry_row) ->
       "<span class='nested-complaint-data'>#{customer_name}</span>" +
       "<label class='content-label-sm'>Customer Description</label>" +
       "<span class='nested-complaint-data'>#{customer_description}</span>" +
+      "<label class='content-label-sm'>Complaint Source</label>" +
+      "<span class='nested-complaint-data'>#{complaint_source}</span>" +
       "</div></div><div class='col-xs-7 col-with-divider'>" +
       '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-3">WBRS Categories</th><th class="col-sm-2">WBRS Certainty</th><th class="col-sm-3">SDS URI Category</th><th class="col-sm-3">SDS Domain Category</th></tr></thead>' +
       '</table>' +

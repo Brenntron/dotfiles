@@ -136,7 +136,7 @@ class Complaint < ApplicationRecord
     top_url = Wbrs::TopUrl.check_urls([ip_or_uri]).first.is_important
     if top_url
       #create a complaint/complaint entry and set to pending
-      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, category_names_string, user)
+      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, nil, PENDING, category_names_string, user)
     else
       # Look for existing prefix
       existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
@@ -237,7 +237,7 @@ class Complaint < ApplicationRecord
   end
 
   def self.create_complaint_entry_credit(entry)
-    ComplaintEntryCredits::CreditProcessor.new(nil, entry).process
+    WebcatCredits::ComplaintEntries::CreditProcessor.new(nil, entry).process
   end
 
   def build_ti_payload
@@ -313,6 +313,7 @@ class Complaint < ApplicationRecord
 
       new_complaint.submission_type = message_payload["payload"]["submission_type"]
       new_complaint.id = bug_proxy.id
+      new_complaint.meta_data = message_payload["payload"]["meta_data"]
       new_complaint.description = message_payload["payload"]["problem"]
       new_complaint.ticket_source_key = message_payload["source_key"]
       new_complaint.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
@@ -327,7 +328,9 @@ class Complaint < ApplicationRecord
       new_complaint.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
 
       new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
-
+      if message_payload["payload"]["api_customer"].present? && message_payload["payload"]["api_customer"] == true
+        new_complaint.submitter_type = SUBMITTER_TYPE_CUSTOMER
+      end
       if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
         ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
 
@@ -810,7 +813,7 @@ class Complaint < ApplicationRecord
     wbnp_report.save
   end
 
-  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil, user_email = nil)
+  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, platform, status=NEW, categories = nil, user_email = nil)
 
     summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -832,9 +835,11 @@ class Complaint < ApplicationRecord
 
 
     cust = find_customer(customer) if customer
+    platform_record = Platform.find_by_public_name(platform) if platform
     new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
                                      customer_id: cust&.id,
+                                     platform_id: platform_record&.id,
                                      status: status,
                                      channel: INT_CHANNEL)
 
@@ -848,7 +853,7 @@ class Complaint < ApplicationRecord
     end
 
     ips_urls.split(' ').each do |ip_url|
-      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, user, status, categories)
+      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, platform_record, user, status, categories)
     end
 
     bug_proxy

@@ -24,6 +24,15 @@ module AnalystConsoleEscalations
     # config.i18n.default_locale = :de
 
     config.autoload_paths += %W(#{config.root}/lib/grpc)
+    # This is a monkey patch for https://jira.vrt.sourcefire.com/browse/WEB-7362
+    # The problem was this: https://github.com/paper-trail-gem/paper_trail/issues/1267
+    # And the fix is (1) upgrade to latest paper_trail, (2) install the psych gem
+    # (which is a YAML parser), (3) add this
+    # More info on the solution: https://github.com/ruby/psych/pull/445
+    def parse_int(string)
+      string.tr(',','').to_i
+    end
+    # End monkey patch
 
     config.middleware.use Rack::Cors do
       allow do

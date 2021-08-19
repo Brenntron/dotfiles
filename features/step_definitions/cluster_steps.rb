@@ -31,13 +31,13 @@ Given(/^WBRS Cluster returns the following stubbed clusters:$/) do |clusters|
       {
         'cluster_id'=>cluster["id"],
         'domain'=>cluster["domain"],
+        'glob_volume'=>cluster['global_volume'].to_i || 0,
         'ctime'=>"Fri, 21 Sep 2018 12:53:40 GMT",
         'mtime'=>"Fri, 21 Sep 2018 12:53:40 GMT",
         'apac_volume'=>0,
         'emrg_volume'=>0,
         'eurp_volume'=>0,
         'japn_volume'=>0,
-        'glob_volume'=>7637758,
         'cluster_size'=>2
       }
     )
@@ -49,6 +49,12 @@ Given(/^WBRS Cluster returns the following stubbed clusters:$/) do |clusters|
 
   Wbrs::Cluster.stub(:all).and_return(response)
   Wbrs::Cluster.stub(:where).and_return(response)
+end
+
+Given(/^the following ngfw clusters exist:$/) do |ngfw_clusters|
+  ngfw_clusters.hashes.each do |ngfw_cluster|
+    FactoryBot.create(:ngfw_cluster, domain: ngfw_cluster['domain'], traffic_hits: ngfw_cluster['traffic_hits'].to_i)
+  end
 end
 
 Given(/^the following cluster assignments exists:$/) do |cluster_assignments|
@@ -66,4 +72,24 @@ Given(/^WBRS TopUrl API call is stubbed with:$/) do |top_urls|
     ))
   end
   Wbrs::TopUrl.stub(:check_urls).and_return(response)
+end
+
+Given(/^GuardRails verdicts API is stubbed to return success for domain "(.*?)"$/) do |domain|
+  response_body = {}
+  response_body[domain] = { color: Webcat::GuardRails::PASS }
+  response = double('Net::HTTPResponse', code: 200, body: response_body.to_json)
+  Webcat::GuardRails.stub(:verdict_for_entry).and_return(response)
+end
+
+Given(/^GuardRails verdicts API is stubbed to return failure for domain "(.*?)"$/) do |domain|
+  response_body = {}
+  response_body[domain] = { 'color' => 'red' }
+  response = double('Net::HTTPResponse', code: 200, body: response_body.to_json)
+  Webcat::GuardRails.stub(:verdict_for_entry).and_return(response)
+end
+
+Given(/^the following cluster categorizations exist:$/) do |cluster_categorizations|
+  cluster_categorizations.hashes.each do |cluster_categorization|
+    FactoryBot.create(:cluster_categorization, cluster_categorization)
+  end
 end

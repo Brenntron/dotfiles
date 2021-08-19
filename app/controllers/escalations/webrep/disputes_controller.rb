@@ -26,6 +26,20 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @dispute = Dispute.eager_load([:dispute_comments, :dispute_emails]).eager_load(:dispute_entries => [:dispute_rule_hits, :dispute_entry_preload]).where(:id => params[:id]).first
     @versioned_items = @dispute.compose_versioned_items
 
+    #to compare against entry.dispute_rule_hits:
+    # rulehit = @all_rulehits.find({|hit| hit.mnemonic == dispute_rule_hit.name})
+    #
+    # to get malware probability, divide by 100.0
+    # rulehit.probability / 100.0
+    #
+    # description
+    # rulehit.description
+    #
+    # long description
+    #
+    # rulehit.desc_long
+    @all_rulehits = Wbrs::RuleHit.all
+
     @entries = @dispute.dispute_entries
 
     @entries.each do |entry|
