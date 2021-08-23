@@ -10,6 +10,49 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
   let(:existing_customer) do
     FactoryBot.create(:customer, name: customer_name, email: customer_email, company: existing_company)
   end
+
+  let(:dispute_message_alt_json) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute: {
+                source_type: 'Dispute',
+                source_key: 1001,
+                payload: {
+                    investigate_ips: {
+                    },
+                    investigate_urls: {
+                        "http://45.155.205.151" => {
+                            "WBRS_SCORE"=>"noscore",
+                            "WBRS_Rule_Hits"=>"",
+                            "Hostname_ips"=>"",
+                            "rep_sugg"=>"Untrusted",
+                            "claim" => "false negative",
+                            "category"=>"Not in our list"
+                        }
+                    },
+                    problem: 'What do I need to do to improve the reputation',
+                    submission_type: 'w',
+                    name: customer_name,
+                    user_company: company_name,
+                    email: 'webmaster@cmim.org',
+                    email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
+                    email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
+                    user_ip: '64.70.56.99',
+                    domain: '355toyota.com',
+                    product_platform: 1001,
+                    product_version: "test_platform_version"
+                }
+            }
+        }
+    }
+  end
+
+
   let(:dispute_message_json) do
     {
         envelope: {
@@ -302,6 +345,33 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.ticket_source).to eql("talos-intelligence")
     expect(dispute.platform_id).to eql(1001)
     expect(dispute.product_platform).to eql(nil)
+  end
+
+  it 'receives dispute message with ip address url and populates additional scores and rulehits' do
+    vrt_incoming
+    guest_company
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_alt_json
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    
+    expect(dispute.dispute_entries.where(uri: 'http://45.155.205.151')).to exist
+
+    expect(dispute.ticket_source).to eql("talos-intelligence")
+    expect(dispute.platform_id).to eql(1001)
+
+    dispute_entry = dispute.dispute_entries.first
+
+    expect(dispute_entry.web_ips).to eql("[\"45.155.205.151\"]")
+
+    expect(dispute_entry.multi_wbrs_threat_category).to eql("[\"Malicious Sites\"]")
+    expect(dispute_entry.score).to eql(-8.8)
+    expect(dispute.dispute_entries.first.dispute_rule_hits.pluck(:is_multi_ip_rulehit).uniq).to eql([true])
+
   end
 
   it 'receives dispute payload message from TI API not in-network' do

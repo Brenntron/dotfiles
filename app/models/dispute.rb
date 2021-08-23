@@ -654,6 +654,12 @@ class Dispute < ApplicationRecord
           new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
 
+          resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
+          if resolved_ip.present?
+            new_dispute_entry.web_ips = [resolved_ip]
+          end
+
+
           #new_dispute_entry.is_important = is_important?(key)
           new_dispute_entry.auto_resolve_log = ""
           begin
@@ -776,6 +782,44 @@ class Dispute < ApplicationRecord
               Rails.logger.error e
               Rails.logger.error e.backtrace.join("\n")
             end
+
+            begin
+              if dispute_entry.web_ips.present?
+
+                web_ips_formatted = dispute_entry.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
+
+                extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(dispute_entry.uri, web_ips_formatted)
+                extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
+                if extra_wbrs_stuff.present?
+                  dispute_entry.score = extra_wbrs_stuff["wbrs"]["score"]
+
+                  threat_cats = extra_wbrs_stuff["threat_cats"]
+
+                  threat_cat_names = []
+                  if threat_cats.present?
+                    threat_cat_info = DisputeEntry.threat_cats_from_ids(threat_cats)
+                    threat_cat_info.each do |name|
+                      threat_cat_names << name[:name]
+                    end
+                    dispute_entry.multi_wbrs_threat_category = threat_cat_names
+                  end
+                end
+
+
+                extra_wbrs_stuff_rulehits.each do |rule_hit|
+                  new_rule_hit = DisputeRuleHit.new
+                  new_rule_hit.name = rule_hit.strip
+                  new_rule_hit.rule_type = "WBRS"
+                  new_rule_hit.is_multi_ip_rulehit = true
+                  dispute_entry.dispute_rule_hits << new_rule_hit
+                end
+              end
+            rescue => e
+              Rails.logger.error e
+              Rails.logger.error e.backtrace.join("\n")
+            end
+
 
             dispute_entry.save!
 
