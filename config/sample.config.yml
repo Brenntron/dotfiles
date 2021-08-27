@@ -99,8 +99,6 @@ development:
     host: "tess.sl.talos.cisco.com"
     port: 443
     ca_cert_file: "/usr/local/etc/talos/tess-ca-cert.pem"
-    client_cert_file: "/usr/local/etc/talos/tess-client.pem"
-    pkey_file: "/usr/local/etc/talos/tess-pkey.pem"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
@@ -232,8 +230,6 @@ test:
     host: "tess.sl.talos.cisco.com"
     port: 443
     ca_cert_file: "/usr/local/etc/talos/tess-ca-cert.pem"
-    client_cert_file: "/usr/local/etc/talos/tess-client.pem"
-    pkey_file: "/usr/local/etc/talos/tess-pkey.pem"
   threatgrid:
     host: "panacea.threatgrid.com"
     port: 443
