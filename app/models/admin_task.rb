@@ -149,7 +149,7 @@ class AdminTask
     morsel
   end
 
-  def parse_complaint_entry_uris(morsel_id, args: nil)
+  def parse_complaint_entry_uris(morsel_id)
     morsel = Morsel.find(morsel_id)
     entries = ComplaintEntry.where(entry_type: 'URI/DOMAIN').where("domain is null or domain = ''")
     morsel.output += "\n##################################\n"
