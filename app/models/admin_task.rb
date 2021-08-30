@@ -156,12 +156,17 @@ class AdminTask
     morsel.output += "Updated Complaint Entries\n"
     morsel.output += "complaint_entry_id : complaint_id : uri\n"
     entries.each do |entry|
-      parsed_uri = Complaint.parse_url(entry.uri)
-      entry.domain = parsed_uri[:domain]
-      entry.subdomain = parsed_uri[:subdomain] unless entry.subdomain.present?
-      entry.path = parsed_uri[:path] unless entry.path.present?
-      entry.save
-      morsel.output += "#{entry.id} : #{entry.complaint_id} : #{entry.uri}\n"
+      begin
+        parsed_uri = Complaint.parse_url(entry.uri)
+        entry.domain = parsed_uri[:domain]
+        entry.subdomain = parsed_uri[:subdomain] unless entry.subdomain.present?
+        entry.path = parsed_uri[:path] unless entry.path.present?
+        entry.save
+        morsel.output += "#{entry.id} : #{entry.complaint_id} : #{entry.uri}\n"
+      rescue => e
+        morsel.output += "#{entry.id} : #{entry.complaint_id} : #{entry.uri} : error\n"
+        morsel.output += "#{e.message}\n"
+      end
     end
     morsel.output += "####################################\n"
     morsel.save
