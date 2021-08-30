@@ -23,11 +23,19 @@ Rails.configuration.app_info.product_id     = app_info_config['product_id'] || '
 Rails.configuration.app_info.product_version =
   begin
     version = app_info_config['product_version']
-    version ||= File.open("public/escalations/version.html", "rt") { |file| file.read }.chomp rescue nil
-    if Rails.env.development? || Rails.env.test?
-      version ||= `git symbolic-ref --short HEAD`.chomp rescue nil
+    unless version.present?
+      version = File.open("public/escalations/version.html", "rt") { |file| file.read }.chomp rescue nil
     end
-    version ||= Rails.env
+    unless version.present?
+      if Rails.env.development? || Rails.env.test?
+        Open3.popen3("git symbolic-ref --short HEAD") do |stdin, stdout, stderr, wait_thr|
+          version = stdout.read.chomp rescue nil
+        end
+      end
+    end
+    unless version.present?
+      version = Rails.env
+    end
     version
   end
 Rails.configuration.app_info.client_cert_file = app_info_config['client_cert_file']
