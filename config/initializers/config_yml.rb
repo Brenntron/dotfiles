@@ -31,6 +31,11 @@ Rails.configuration.app_info.product_version =
         Open3.popen3("git symbolic-ref --short HEAD") do |stdin, stdout, stderr, wait_thr|
           version = stdout.read.chomp rescue nil
         end
+        # Alternatives are
+        # git branch --show-current
+        # => also the currenct branch, which might be a better command line.
+        # git rev-parse HEAD
+        # => the revision hash
       end
     end
     unless version.present?
