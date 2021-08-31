@@ -1187,6 +1187,9 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.process_multi_ip_info(uri, ips, dispute_entry = nil)
+
+    all_rulehits = Wbrs::RuleHit.all
+    rule_hit_info = []
     result = {}
 
     results = Sbrs::Base.combo_call_sds_v3(uri, ips)
@@ -1219,6 +1222,13 @@ class DisputeEntry < ApplicationRecord
 
         wbrs_rule_hits.each do |rule_hit|
           DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id, is_multi_ip_rulehit: true)
+          
+          rule_hit_data = all_rulehits.find {|rulehit| rulehit.mnemonic == rule_hit}
+          if rule_hit_data.present?
+            rule_hit_info << {:mnemonic => rule_hit, :malware_probability => rule_hit_data.probability, :description => rule_hit_data.description}
+          else
+            rule_hit_info << {:mnemonic => rule_hit}
+          end
         end
       end
 
@@ -1230,9 +1240,11 @@ class DisputeEntry < ApplicationRecord
 
     end
 
+
+
     result[:threat_cats] = threat_cat_names
     result[:proxy_uri] = proxy_uri
-    result[:rulehits] = wbrs_rule_hits
+    result[:rulehits] = rule_hit_info
     result[:score] = wbrs_score
 
     return result

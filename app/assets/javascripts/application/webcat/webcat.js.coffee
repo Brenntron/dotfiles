@@ -160,7 +160,6 @@ $ ->
           search_name : webcat_search_name
           search_conditions: JSON.parse(webcat_search_conditions)
         }
-
       when 'contains'
         data = {
           search_type: webcat_search_type
@@ -232,6 +231,12 @@ $ ->
           condition_name = 'Entry Id'
         if condition_name == 'user_id'
           condition_name = 'Assignee'
+        if condition_name == 'customer_email'
+          condition_name = 'Submitter Email'
+        if condition_name == 'customer_name'
+          condition_name = 'Submitter Name'
+        if condition_name == 'company_name'
+          condition_name = 'Submitter Org'
         condition_name = condition_name.replace(/_/g, " ").toUpperCase()
         condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
         if typeof condition == 'object'
@@ -697,19 +702,16 @@ $ ->
     }
     tag_input = $('#tags-input').selectize {
       persist: false
-      create: false
       valueField: 'name',
       labelField: 'name',
-      create: true,
-      createOnBlur: true,
+      searchField: 'name',
       options: createSelectOptions()
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
+        if this.lastQuery != ""
+          this.addItem([this.lastQuery])
         window.toggle_selectize_layer(this, 'false')
-      score: (search) ->
-        return (item) ->
-          item.name.toLowerCase().startsWith( search.toLowerCase() ) ? 1 : 0;
     }
 
     category_input = $('#category-input').selectize {

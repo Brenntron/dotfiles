@@ -19,5 +19,9 @@ FactoryBot.define do
     factory :web_cat_role do
       role          { 'webcat user' }
     end
+
+    factory :web_cat_manager_role do
+      role          { 'webcat manager' }
+    end
   end
 end

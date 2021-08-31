@@ -1,0 +1,1 @@
+ALTER TABLE amp_naming_conventions RENAME COLUMN public_engine_description TO private_engine_description;

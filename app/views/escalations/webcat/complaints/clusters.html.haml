@@ -25,12 +25,11 @@
   .row
     .col-xs-6
       .current-cluster-info-wrapper
-        .result-label
-          Current Cluster Entries:
-          %span#total_results
         .result-label.regex-area.hidden
           Regex:
           %span#regex-filter
+      %h1#clusters-index-title
+
 
     .col-xs-6
       .card
@@ -81,6 +80,7 @@
             %th Cluster Domain
             %th Global Volume
             %th WBRS Score
+            %th Platform
             %th Assignee
             %th Categories
             %th

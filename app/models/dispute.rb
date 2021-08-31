@@ -527,6 +527,10 @@ class Dispute < ApplicationRecord
 
       new_dispute.customer_id = customer&.id
       new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+      if message_payload["payload"]["api_customer"].present? && message_payload["payload"]["api_customer"] == true
+        new_dispute.submitter_type = SUBMITTER_TYPE_CUSTOMER
+      end
+
 
       if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
         new_dispute.priority = "P3"

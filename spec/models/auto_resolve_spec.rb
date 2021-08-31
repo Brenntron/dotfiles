@@ -68,6 +68,7 @@ describe AutoResolve do
       @dispute_entry.id = 1
       @dispute_entry.uri = target_address
       @dispute_entry.entry_type = "URI/DOMAIN"
+      @dispute_entry.auto_resolve_log = ""
       @dispute_entry.save
     end
     it 'should not auto resolve if there is an error' do
@@ -288,6 +289,109 @@ describe AutoResolve do
       expect(dispute_entry.resolution).to eql(nil)
 
       expect(dispute_entry.auto_resolve_log).to eql("Umbrella popularity rating: 0.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>vt results: \n<br><br>trusted vt hits: 0\n<br><br>umbrella rating returned 1<br><br>no suspicious data points found.")
+    end
+
+    ################################################################################################EMAIL BASED AUTO RESOLUTION################################################################################################
+
+    it "should auto resolve email based tickets with the required rulehits" do
+
+      rulehits_test_one = ['DhH', 'test_rulehit']
+
+      rulehits_test_two = ['IaM', 'test_rulehit']
+
+      rulehits_test_three = ['IaL', 'DhL', 'test_rulehit']
+
+      rulehits_test_four = ['Pbl', 'test_rulehit']
+
+      rulehits_test_five = ['Cbl', 'IaM', 'DhM', 'test_rulehit']
+
+      rulehits_test_six = ['test_rulehit_one', 'test_rulehit_two']
+
+      #only auto resolve for Dh* rulehits
+
+      AutoResolve.auto_resolve_email(@dispute_entry, rulehits_test_one)
+      expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+      expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+      expect(@dispute_entry.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence.")
+
+      @dispute_entry.status = ""
+      @dispute_entry.resolution = ""
+      @dispute_entry.resolution_comment = ""
+      @dispute_entry.save(:validate => true)
+
+
+      #only auto resolve for Ia* rulehits
+
+      AutoResolve.auto_resolve_email(@dispute_entry, rulehits_test_two)
+      expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+      expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+      expect(@dispute_entry.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence.")
+
+      @dispute_entry.status = ""
+      @dispute_entry.resolution = ""
+      @dispute_entry.resolution_comment = ""
+      @dispute_entry.save(:validate => true)
+
+
+
+      #only auto resolve for both Ia* and Dh* rulehits
+
+
+      AutoResolve.auto_resolve_email(@dispute_entry, rulehits_test_three)
+      expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+      expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+      expect(@dispute_entry.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence.")
+
+      @dispute_entry.status = ""
+      @dispute_entry.resolution = ""
+      @dispute_entry.resolution_comment = ""
+      @dispute_entry.save(:validate => true)
+
+
+      #only auto resolve for *bl rulehits
+
+      AutoResolve.auto_resolve_email(@dispute_entry, rulehits_test_four)
+      expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+      expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+      expect(@dispute_entry.resolution_comment).to eql(" Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://www.spamhaus.org/) Review the status and reason(s) by visiting https://www.spamhaus.org/lookup/and entering your IP. Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours.")
+
+      @dispute_entry.status = ""
+      @dispute_entry.resolution = ""
+      @dispute_entry.resolution_comment = ""
+      @dispute_entry.save(:validate => true)
+
+      #auto resolve for all *bl, Ia* and Dh* rulehits
+
+      AutoResolve.auto_resolve_email(@dispute_entry, rulehits_test_five)
+      expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+      expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+      expect(@dispute_entry.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence. Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://www.spamhaus.org/) Review the status and reason(s) by visiting https://www.spamhaus.org/lookup/and entering your IP. Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours.")
+
+      @dispute_entry.status = ""
+      @dispute_entry.resolution = ""
+      @dispute_entry.resolution_comment = ""
+      @dispute_entry.save(:validate => true)
+
+
+
+
+      #Do not auto resolve at all
+
+      AutoResolve.auto_resolve_email(@dispute_entry, rulehits_test_six)
+      expect(@dispute_entry.status).to eql("")
+      expect(@dispute_entry.resolution).to eql("")
+
+      expect(@dispute_entry.resolution_comment).to eql("")
+
+      @dispute_entry.status = ""
+      @dispute_entry.resolution = ""
+      @dispute_entry.resolution_comment = ""
+      @dispute_entry.save(:validate => true)
     end
 
   end

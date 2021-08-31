@@ -3,6 +3,8 @@ class ClusterAssignment < ApplicationRecord
 
   EXPIRED_TIMEOUT = 60 # minutes
 
+  scope :temporary, -> { where(permanent: false) }
+
   class << self
     # all assignments are valid during EXPIRED_TIMEOUT
     # so we need to clear exipred assignments before each action
@@ -14,41 +16,43 @@ class ClusterAssignment < ApplicationRecord
       all
     end
 
-    def fetch_assignments_for(user: nil, clusters: nil)
+    def fetch_assignments_for(user: nil, domains: nil)
       destroy_expired_assignments!
 
-      return includes(:user).where(cluster_id: clusters) if clusters
+      return includes(:user).where(domain: domains) if domains
 
       return includes(:user).where(user_id: user.id) if user
     end
 
-    def assign(cluster_ids, user)
+    def assign(domain, user)
       destroy_expired_assignments!
 
-      assignments = where(cluster_id: cluster_ids)
-      cluster_ids.each do |cluster_id|
-        raise 'Cluster already assigned to someone else' if assignments.find { |a| a.cluster_id == cluster_id.to_i }
+      assignments = where(domain: domain)
+      raise 'Cluster already assigned to someone else' if assignments.any?
 
-        create(cluster_id: cluster_id, user_id: user.id)
-      end
+      create(domain: domain, user_id: user.id)
     end
 
-    def assign!(cluster_ids, user)
+    def assign!(domain, user)
       destroy_expired_assignments!
-      where(cluster_id: cluster_ids).destroy_all
-      cluster_ids.each do |cluster_id|
-        create(cluster_id: cluster_id, user_id: user.id)
-      end
+      where(domain: domain).destroy_all
+      create(domain: domain, user_id: user.id)
     end
 
-    def unassign(cluster_ids, user)
-      where(cluster_id: cluster_ids, user_id: user).destroy_all
+    def assign_pemanent!(domain, user)
+      destroy_expired_assignments!
+      where(domain: domain).destroy_all
+      create(domain: domain, user_id: user.id, permanent: true)
+    end
+
+    def unassign(domain, user)
+      where(domain: domain, user_id: user).destroy_all
     end
 
     private
 
     def destroy_expired_assignments!
-      where('created_at < ?', EXPIRED_TIMEOUT.minutes.ago).destroy_all
+      temporary.where('created_at < ?', EXPIRED_TIMEOUT.minutes.ago).destroy_all
     end
   end
 end
