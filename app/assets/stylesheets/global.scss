@@ -9339,8 +9339,16 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 #whois_content {
-  margin: 30px auto;
+  margin: 17px auto;
+  display: flex;
   white-space: pre-wrap;
+  justify-content: center;
+  align-items: center;
+  .dialog-content-wrapper{
+    max-height: 500px!important;
+    width: 90%;
+    overflow-y: scroll;
+  }
 }
 
 .dropdown-tool-text-divider {

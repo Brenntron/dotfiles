@@ -26,19 +26,19 @@ namespace 'WebCat.RepLookup', (exports) ->
       if result != null
         whois = result.data
         if $("#whois_content").length
-          whois_content = this
-          $("#whois_content").html(whois)
+          $("#whois_content").html("<div class='dialog-content-wrapper'>#{whois}</div> ")
           $('#whois_content').dialog('open')
         else
-          whois_content = '<div id="whois_content" title="Lookup Information"></div>'
+          whois_content = '<div id="whois_content" class="ui-dialog-content ui-widget-content" title="Lookup Information"></div>'
           $('body').append(whois_content)
-          $('#whois_content').append(whois)
+          html = "<div class='dialog-content-wrapper'>#{whois}</div> "
+          $('#whois_content').append(html)
           $('#whois_content').dialog
             autoOpen: true
             minWidth: 600
             position: { my: "right bottom", at: "right bottom", of: window }
       else
-        message = 'We can\'t find any results. Possibly IP address is unallocated or its whois server is not available.'
+        message = "No available results. The IP address may be unallocated or its whois server is unavailable."
         $('#whois_content').append message
 
     errorFunction = (response) ->
