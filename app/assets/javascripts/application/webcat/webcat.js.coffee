@@ -462,7 +462,6 @@ $ ->
                 sortable: false
                 render: ( data ) ->
                   { entry_id } = data
-                  console.log data
                   return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
               }
               {

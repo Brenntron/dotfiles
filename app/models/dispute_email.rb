@@ -205,16 +205,36 @@ class DisputeEmail < ApplicationRecord
 
   def self.create_email_and_send(params, bugzilla_rest_session:, current_user:)
     new_email = DisputeEmail.new
+    dispute_object = nil
     case params[:dispute_type]
     when 'FileReputationDispute'
       new_email.file_reputation_dispute_id = params[:dispute_id]
+      dispute_object = FileReputationDispute.find(params[:dispute_id])
     else #'Dispute'
       new_email.dispute_id = params[:dispute_id]
+      dispute_object = Dispute.find(params[:dispute_id])
+    end
+
+    if dispute_object.present?
+      ## ticket meta data interception here ##
+
+      email_meta_data = dispute_object.get_email_meta_data
+
+      if email_meta_data.present?
+        if email_meta_data[:cc].present?
+          if params[:cc].blank?
+            params[:cc] = ""
+          end
+          params[:cc] = (params[:cc].split(",").map {|mail| mail.strip} + email_meta_data[:cc].split(",").map {|mail| mail.strip}).join(",")
+        end
+      end
+
+      ########################################
     end
 
     new_email.from = current_user.email
     if params[:cc].present?
-      new_email.to = "#{params[:to]}, #{params[:cc]}"
+      new_email.to = [params[:to].split(",").map {|mail| mail.strip}, params[:cc].split(",").map {|mail| mail.strip}].join(",")
     else
       new_email.to = params[:to]
     end
@@ -243,9 +263,9 @@ class DisputeEmail < ApplicationRecord
     end
 
     email_args = {}
-    email_args[:to] = params[:to]
+    email_args[:to] = params[:to].split(",").map {|mail| mail.strip}.join(",")
     if params[:cc].present?
-      email_args[:cc] = params[:cc]
+      email_args[:cc] = params[:cc].split(",").map {|mail| mail.strip}.join(",")
     end
     email_args[:from] = generate_case_email_address(params[:dispute_id])
     email_args[:subject] = new_email.subject
