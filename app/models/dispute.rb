@@ -71,6 +71,10 @@ class Dispute < ApplicationRecord
   LABEL_RESOLVED_UNCHANGED = "Unchanged"
   LABEL_RESOLVED_OTHER = "Other"
 
+  TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web categorization requests. A new Web categorization ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all updates regarding this request on the new ticket.
+
+For future Web categorization requests, please open a Web categorization ticket using the \"Web Categorization Requests\" form: https://talosintelligence.com/reputation_center/support#reputation_center_support_ticket"
+
   scope :open_disputes, -> { where(status: NEW) }
   scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
@@ -1248,6 +1252,7 @@ class Dispute < ApplicationRecord
       dispute_packet[:submitter_domain] = dispute.org_domain
       dispute_packet[:submitter_name] = dispute.customer_name
       dispute_packet[:submitter_email] = dispute.customer_email
+      dispute_packet[:dispute_summary] = dispute.problem_summary
       dispute_packet[:dispute_domain] = dispute.org_domain
       dispute_packet[:updated_at] = dispute.updated_at&.strftime("%F %T")
       unless dispute.dispute_entries.blank?
@@ -2242,6 +2247,66 @@ class Dispute < ApplicationRecord
   end
 
 
+  def self.convert_to_complaint(params, current_user)
+    dispute = Dispute.find(params[:dispute_id])
+    suggested_category_entries = params[:suggested_categories]
+
+    platform_id = nil
+
+    package = {}
+    package[:entries] = []
+    package[:convert_to] = "Complaint"
+    package[:internal_message] = params[:summary] + " | " + "original analyst console webrep ticket: #{dispute.id.to_s}"
+    package[:email] = dispute&.customer&.email
+    package[:name] = dispute&.customer&.name
+    package[:company_name] = dispute&.customer&.company&.name
+    suggested_category_entries.each do |sugg|
+      if dispute.platform_id.present?
+        platform_id = dispute.platform_id
+      else
+        disp_entry = dispute.dispute_entries.select {|c| c.hostlookup == sugg[1]['entry']}.first
+        if disp_entry.present?
+          platform_id = disp_entry.platform_id unless disp_entry.platform_id.blank?
+        end
+      end
+      entry = {}
+      entry[:entry] = sugg[1]['entry']
+      entry[:suggested_categories] = sugg[1]['suggested_categories'].split(",")
+      entry[:platform_id] = platform_id
+      package[:entries] << entry
+    end
+
+    conn = ::Bridge::TicketConversionEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.ticket_source_key, ac_id: dispute.id)
+    conn.post(package)
+
+    new_comment = DisputeComment.new
+    new_comment.dispute_id = dispute.id
+    new_comment.user_id = current_user.id
+    new_comment.comment = "Converted from TE ticket to SDO ticket"
+    new_comment.save
+
+    #set status and resolution here with a message
+    #send update to bridge
+
+    dispute.status = STATUS_RESOLVED
+    dispute.resolution = STATUS_RESOLVED_INVALID
+    dispute.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+    dispute.save
+
+    dispute.dispute_entries.each do |d_entry|
+      d_entry.status = DisputeEntry::STATUS_RESOLVED
+      d_entry.resolution = DisputeEntry::STATUS_RESOLVED_INVALID
+      d_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+      d_entry.save
+    end
+
+    message = Bridge::DisputeEntryUpdateStatusEvent.new
+    message.post_entries(dispute.dispute_entries)
+
+    return true
+  end
+
+
   def self.build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, problem, original_bug_id)
     summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -2262,6 +2327,7 @@ class Dispute < ApplicationRecord
     new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
 
     research_bug_proxy
+
   end
 
   def determine_platform

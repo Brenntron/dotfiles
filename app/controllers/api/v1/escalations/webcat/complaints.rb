@@ -416,6 +416,33 @@ module API
               SbApi.category_lookup
             end
 
+            desc 'convert ticket from complaint to dispute'
+
+            params do
+              requires :complaint_id, type: Integer
+              requires :suggested_dispositions, type: Array
+              requires :summary, type: String
+              requires :submission_type, type: String
+            end
+
+            post 'convert_ticket' do
+              Complaint.convert_to_dispute(permitted_params, current_user)
+            end
+
+            desc 'details for a given complaint'
+
+            params do
+              requires :complaint_entry_id, type: Integer
+            end
+
+            post 'view_complaint' do
+              complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
+              complaint = complaint_entry.complaint
+
+              {:data => {:complaint => complaint, :complaint_entries => complaint.complaint_entries}}.to_json
+
+            end
+
           end
         end
       end

@@ -3,34 +3,34 @@ describe Dispute do
   let(:target_ip_address) {'184.168.221.74'}
   let(:dispute_email) do
     <<~HEREDOC
-        ____________________________________________________________
-        User-entered Information:
-        ____________________________________________________________
-        Time: September 03, 2018 12:04\nName: Marlin Pierce\nE-mail: marlpier@cisco.com
-        Domain: cisco.com
-        Inquiry Type: web
-        Key Rules: 
-        Problem Summary: New category
-        IP(s) to be investigated:
+      ____________________________________________________________
+      User-entered Information:
+      ____________________________________________________________
+      Time: September 03, 2018 12:04\nName: Marlin Pierce\nE-mail: marlpier@cisco.com
+      Domain: cisco.com
+      Inquiry Type: web
+      Key Rules: 
+      Problem Summary: New category
+      IP(s) to be investigated:
 
 
-        URI(s) to be investigated:
-        www.spanx.com
-        
-        Detailed
-        Descriptions:
-        
-        
-        ____________________________________________________________
-        Cisco Confidential Analysis:
-        ____________________________________________________________
-        
-        User's IP:      ::1
-        
-        www.spanx.com
-        WBRS Score:     1.58
-        WBRS Rule Hits: alx_cln, vsvd
-        Hostname's IPs:
+      URI(s) to be investigated:
+      www.spanx.com
+
+      Detailed
+      Descriptions:
+
+
+      ____________________________________________________________
+      Cisco Confidential Analysis:
+      ____________________________________________________________
+
+      User's IP:      ::1
+
+      www.spanx.com
+      WBRS Score:     1.58
+      WBRS Rule Hits: alx_cln, vsvd
+      Hostname's IPs:
     HEREDOC
   end
   let(:fn_ip_dispute_message_payload) do
@@ -370,12 +370,18 @@ describe Dispute do
     double('Bugzilla::Bug', create: { "id" => 101 })
   end
 
+  before(:each) do
+    Dispute.destroy_all
+    DisputeEntry.destroy_all
+
+  end
+
   before(:example) do
     FactoryBot.create(:vrt_incoming_user)
     FactoryBot.create(:guest_company)
   end
 
-  it 'processes fn ip bridge payload' do
+  xit 'processes fn ip bridge payload' do
     allow(Wbrs::Base)
         .to receive(:call_json_request)
                 .with(:post, '/v1/cat/urls/top', body: anything)
@@ -417,7 +423,7 @@ describe Dispute do
     expect(dispute_entry.resolution).to be_nil
   end
 
-  it 'processes fp ip auto-resolve as new bridge payload' do
+  xit 'processes fp ip auto-resolve as new bridge payload' do
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -466,7 +472,7 @@ describe Dispute do
     expect(dispute_entry.resolution).to be_nil
   end
 
-  it 'processes fp ip auto-convicted bridge payload' do
+  xit 'processes fp ip auto-convicted bridge payload' do
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -515,7 +521,7 @@ describe Dispute do
     expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
   end
 
-  it 'processes fn url bridge payload' do
+  xit 'processes fn url bridge payload' do
     allow(Wbrs::Base)
         .to receive(:call_json_request)
                 .with(:post, '/v1/cat/urls/top', body: anything)
@@ -558,7 +564,7 @@ describe Dispute do
     expect(dispute_entry.resolution).to be_nil
   end
 
-  it 'processes fp url auto-resolve as new bridge payload' do
+  xit 'processes fp url auto-resolve as new bridge payload' do
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -607,7 +613,7 @@ describe Dispute do
     expect(dispute_entry.resolution).to be_nil
   end
 
-  it 'processes fp url auto-convicted bridge payload' do
+  xit 'processes fp url auto-convicted bridge payload' do
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -657,7 +663,7 @@ describe Dispute do
   end
 
 
-  it 'processes fp url auto-acquit bridge payload' do
+  xit 'processes fp url auto-acquit bridge payload' do
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -714,6 +720,40 @@ describe Dispute do
     result = DisputeEntry.research_results(args)
     expect(result.size).to eql(6)
 
+  end
+
+  it "should create convert messages to complaints" do
+    current_user = FactoryBot.create(:current_user)
+    customer = FactoryBot.create(:customer, name: 'Some Customer')
+    dispute = Dispute.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :status => "NEW")
+
+    new_dispute_entry = DisputeEntry.new
+    new_dispute_entry.dispute_id = dispute.id
+    new_dispute_entry.user_id = current_user.id
+    new_dispute_entry.uri = "www.google.com"
+    new_dispute_entry.entry_type = "URI/DOMAIN"
+    new_dispute_entry.status = ComplaintEntry::NEW
+
+    new_dispute_entry.save
+
+
+    new_dispute_entry2 = DisputeEntry.new
+    new_dispute_entry2.dispute_id = dispute.id
+    new_dispute_entry2.user_id = current_user.id
+    new_dispute_entry2.uri = "www.malware.com"
+    new_dispute_entry2.entry_type = "URI/DOMAIN"
+    new_dispute_entry2.status = ComplaintEntry::NEW
+
+    new_dispute_entry2.save
+
+    params = {}
+
+    params[:dispute_id] = dispute.id
+    params[:summary] = "test_summary"
+
+    params[:suggested_categories] = {"0" => {'entry' => 'www.google.com', 'suggested_categories' => 'test'}, "1" => {'entry' => 'www.malware.com', 'suggested_categories' => 'test'}}
+
+    Dispute.convert_to_complaint(params, current_user)
   end
 
 end
