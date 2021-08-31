@@ -26,7 +26,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                     investigate_ips: {
                     },
                     investigate_urls: {
-                        "http://45.155.205.151" => {
+                        "45.155.205.151" => {
                             "WBRS_SCORE"=>"noscore",
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
@@ -358,8 +358,8 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
     expect(dispute).to_not be_nil
     expect(dispute.dispute_entries.count).to eq(1)
-    
-    expect(dispute.dispute_entries.where(uri: 'http://45.155.205.151')).to exist
+
+    expect(dispute.dispute_entries.where(uri: '45.155.205.151')).to exist
 
     expect(dispute.ticket_source).to eql("talos-intelligence")
     expect(dispute.platform_id).to eql(1001)
