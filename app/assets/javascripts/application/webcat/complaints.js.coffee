@@ -1132,16 +1132,18 @@ format = (complaint_entry_row) ->
     url = host
     if complaint_entry.path
       url = host
+
     uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
+    qual_subdomain = complaint_entry.domain
   else if  complaint_entry.ip_address
     host = complaint_entry.ip_address
     url = host
+    qual_subdomain = complaint_entry.ip_address
     uri = '<a href="http://' + complaint_entry.ip_address + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
-  qual_subdomain = complaint_entry.domain
   if complaint_entry.subdomain
     qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
 
