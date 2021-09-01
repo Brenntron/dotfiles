@@ -39,7 +39,7 @@ Rails.configuration.app_info.product_version =
       end
     end
     unless version.present?
-      version = Rails.env
+      version = Rails.env.to_s
     end
     version
   end
