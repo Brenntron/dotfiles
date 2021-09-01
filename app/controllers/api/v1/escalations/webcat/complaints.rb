@@ -381,18 +381,18 @@ module API
               tix.each do |tic|
                 if tic.case_resolved_at.present?
                   if tic.case_resolved_at >= from && tic.case_resolved_at <= to
-                    resolved_array << tic
+                    resolved_array << tic.as_report_row
                   end
                 end
 
                 if tic.case_assigned_at.present?
                   if tic.case_assigned_at >= from && tic.case_assigned_at <= to
-                    assigned_array << tic
+                    assigned_array << tic.as_report_row
                   end
                 end
 
                 if tic.created_at >= from && tic.created_at <= to
-                  created_array << tic
+                  created_array << tic.as_report_row
                 end
               end
 

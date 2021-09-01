@@ -1201,6 +1201,18 @@ class ComplaintEntry < ApplicationRecord
     confirmation
   end
 
+  def as_report_row
+    report_entry = JSON.parse(self.to_json)
+
+    platform = self.determine_platform
+
+    report_entry.delete("platform")
+    report_entry.delete("platform_id")
+    report_entry["platform"] = platform
+
+    report_entry
+  end
+
   def resubmit_to_rule_api
     log_messages = []
     #do some sanity checks ot make sure it's not already categorized
@@ -1264,4 +1276,5 @@ class ComplaintEntry < ApplicationRecord
 
     return nil
   end
+
 end
