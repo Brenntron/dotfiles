@@ -5,7 +5,6 @@ Rails.application.routes.draw do
 
   namespace :escalations, except: [:destroy, :edit] do
     get 'admin/extras' => 'admin#index'
-    get 'sb_api/query_lookup' => 'sb_api#query_lookup'
 
     resources :roles, except: [:show], controller: '/admin/roles'
 

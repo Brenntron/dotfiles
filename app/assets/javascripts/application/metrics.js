@@ -118,7 +118,6 @@ function bug_draw(data) {
             tooltips: {
                 callbacks: {
                     title: function (tooltipItem, data) {
-                        // debugger
                         if (data['labels'][tooltipItem[0]['index']] == 'Work Time') {
                             return "Time between assignment and being set to pending."
                         }
