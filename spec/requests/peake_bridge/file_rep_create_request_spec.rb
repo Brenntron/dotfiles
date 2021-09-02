@@ -8,6 +8,36 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
   let(:customer_email) { 'webmaster@cmim.org' }
   let(:existing_company) { FactoryBot.create(:company, name: company_name) }
 
+
+  let(:file_rep_create_message_json_fp) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            file_reputation_dispute: {
+                source_key: 1005,
+                source_type: "FileReputationDispute",
+                payload: {
+                    # sha256_hash: 'c01b39c7a35ccc3b081a3e83d2c71fa9a767ebfeb45c69f08e17dfe3ef375a7b',
+                    sha256: 'efb947a43bfe6d0812d105f6afdeb9774f4d79254dd48f89f1e95ffdf8732928', #threatgrid
+                    customer_email: 'steve@arora.org',
+                    customer_name: 'George',
+                    company_name: "Microsoft",
+                    disposition_suggested: 'Clean',
+                    summary_description: "What do i do to improve the reputation",
+                    sandbox_key: "TI-Form",
+                    product_platform: 1001
+
+                }
+            }
+
+        }
+    }
+  end
+
   let(:file_rep_create_message_json) do
     {
         envelope: {
@@ -198,6 +228,113 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
     expect(dispute).to_not be_nil
     expect(FileReputationDispute.all.size).to eql(1)
     expect(DelayedJob.all.size).to eql(1)
+
+  end
+
+
+  it 'should set to no file comment when does not exist in all sources for FN' do
+
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+
+    ReversingLabResponse = Struct.new(:raw_json)
+    rlab_bad = ReversingLabResponse.new
+    rlab_bad.raw_json = "{\"error\":\"Not in RL\"}"
+
+
+
+    expect(Threatgrid::Search).to receive(:query).with(anything).and_return({}).at_least(:once)
+    expect(FileReputationApi::ReversingLabs).to receive(:lookup).with(anything).and_return(rlab_bad).at_least(:once)
+
+    expect(FileReputationApi::SampleZoo).to receive(:sha256_lookup).with(anything).and_return({"hits" => {"total" => 0}}).at_least(:once)
+
+    expect(FileReputationApi::Sandbox).to receive(:sample_exists).with(anything, :api_key_type => anything).and_return(false).at_least(:once)
+
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json,
+         params: file_rep_create_message_json
+
+    expect(response).to be_successful
+    dispute = FileReputationDispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(FileReputationDispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+    expect(dispute.status).to eql("RESOLVED_CLOSED")
+    expect(dispute.resolution).to eql("Auto Resolved")
+
+
+  end
+
+  it 'should set to new if FN and no existence specifically in both sandbox and malware zoo (but present in others)' do
+
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+
+    ReversingLabResponse = Struct.new(:raw_json)
+    rlab_bad = ReversingLabResponse.new
+    rlab_bad.raw_json = "{\"result\":\"some data\"}"
+
+
+    expect(Threatgrid::Search).to receive(:query).with(anything).and_return({:threatgrid_score => 20}).at_least(:once)
+    expect(FileReputationApi::ReversingLabs).to receive(:lookup).with(anything).and_return(rlab_bad).at_least(:once)
+
+    expect(FileReputationApi::SampleZoo).to receive(:sha256_lookup).with(anything).and_return({}).at_least(:once)
+
+    expect(FileReputationApi::Sandbox).to receive(:sample_exists).with(anything, :api_key_type => anything).and_return({}).at_least(:once)
+
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json,
+         params: file_rep_create_message_json
+
+    expect(response).to be_successful
+    dispute = FileReputationDispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(FileReputationDispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+    expect(dispute.status).to eql("NEW")
+  end
+
+  it 'should set to new if FP and no existence in reversing lab' do
+    FileReputationDispute.destroy_all
+    ReversingLabResponse = Struct.new(:raw_json)
+    rlab_bad = ReversingLabResponse.new
+    rlab_bad.raw_json = "{\"error\":\"Not in RL\"}"
+
+    AmpResponse = Struct.new(:disposition, :name)
+    amp_bad = AmpResponse.new
+    amp_bad.disposition = "Test"
+    amp_bad.name = "Test"
+
+
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+
+    expect(Threatgrid::Search).to receive(:query).with(anything).and_return({:threatgrid_score => 20}).at_least(:once)
+    expect(FileReputationApi::ReversingLabs).to receive(:lookup).with(anything).and_return(rlab_bad).at_least(:once)
+
+    expect(FileReputationApi::SampleZoo).to receive(:sha256_lookup).with(anything).and_return({}).at_least(:once)
+
+    expect(FileReputationApi::Sandbox).to receive(:sample_exists).with(anything, :api_key_type => anything).and_return({}).at_least(:once)
+
+    expect(FileReputationApi::Detection).to receive(:get_bulk).with(anything).and_return(amp_bad).at_least(:once)
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json,
+         params: file_rep_create_message_json_fp
+
+    expect(response).to be_successful
+    dispute = FileReputationDispute.where(ticket_source_key: 1005).first
+
+    expect(dispute).to_not be_nil
+    expect(FileReputationDispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+    expect(dispute.status).to eql("NEW")
+    has_text = dispute.auto_resolve_log.include?("no files in Reversing Lab")
+    expect(has_text).to eql(true)
 
   end
 end
