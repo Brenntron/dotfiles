@@ -1390,4 +1390,14 @@ class DisputeEntry < ApplicationRecord
     return nil
   end
 
+  def determine_platform_record
+    if self.platform_id.present?
+      return (self.product_platform rescue nil)
+    end
+    if self.dispute.platform_id.present?
+      return (self.dispute.platform rescue nil)
+    end
+
+    return nil
+  end
 end

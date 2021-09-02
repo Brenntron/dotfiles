@@ -17,10 +17,16 @@ class Umbrella::DomainVolume
     request
   end
 
-  def self.query_domain_volume(address:)
+  def self.query_domain_volume(address: nil, as_json: false)
     request = new_request(address)
 
-    HTTPI.get(request)
+    response = HTTPI.get(request)
+
+    if as_json == true
+      response = JSON.parse(response.body)
+    end
+
+    response
   end
 
   def self.health_check

@@ -63,7 +63,9 @@ class Dispute < ApplicationRecord
   STATUS_RESOLVED_OTHER = "OTHER"
   STATUS_RESOLVED_QUICK_BULK = "QUICK_BULK" #tickets created and closed using the quick bulk entry form.
 
-  AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
+  #AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
+  AUTORESOLVED_UNCHANGED_MESSAGE = "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+
 
   #labels for charts on webrep dashboard
   LABEL_RESOLVED_FIXED_FP = "Fixed FP"
@@ -453,6 +455,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     new_dispute = nil
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
+
     begin
 
       entry_claims = {}
@@ -703,6 +706,8 @@ For future Web categorization requests, please open a Web categorization ticket 
 
       ######AUTO RESOLVE LOGIC########
       begin
+        umbrella_no_reply = Platform.find_by_all_names("Umbrella - No Reply")
+
         new_dispute.dispute_entries.each do |dispute_entry|
           false_negative_claim = false
 
@@ -734,13 +739,22 @@ For future Web categorization requests, please open a Web categorization ticket 
               if entry_claim != "false negative"
                 dispute_entry.status = DisputeEntry::NEW
 
-                if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
-                  AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
+                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                  AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+                  dispute_entry.reload
+                else
+                  if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
+                    AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
+                    dispute_entry.reload
+                  end
                 end
-
               else
                 if new_dispute.submission_type == "w"
-                  dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                  if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                    dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+                  else
+                    dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                  end
                 end
                 dispute_entry.save
               end
@@ -786,9 +800,21 @@ For future Web categorization requests, please open a Web categorization ticket 
             if !matching_disposition
 
               if entry_claim != "false negative"
-                dispute_entry.update(status: DisputeEntry::NEW)
+
+                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                  AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+                  dispute_entry.reload
+                else
+                  dispute_entry.update(status: DisputeEntry::NEW)
+                end
               else
-                dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+
+                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+
+                  dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+                else
+                  dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                end
               end
               dispute_entry.save
             end
@@ -2338,6 +2364,13 @@ For future Web categorization requests, please open a Web categorization ticket 
       if self.dispute_entries.first.platform_id.present?
         return self.dispute_entries.map{|d_e| d_e.product_platform.public_name rescue 'No Data'}.uniq.join(",")
       end
+    end
+    return nil
+  end
+
+  def determine_platform_record
+    if self.platform_id.present?
+      return Platform.find(self.platform_id) rescue nil
     end
     return nil
   end

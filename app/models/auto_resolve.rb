@@ -15,7 +15,7 @@ class AutoResolve
 
 
   #entry point
-  def self.attempt_ai_conviction(rulehits, dispute_entry)
+  def self.attempt_ai_conviction(rulehits, dispute_entry, skip_human_review = false)
 
     if auto_resolve_toggle
       results = process_uri_interrogation(rulehits, dispute_entry)
@@ -24,7 +24,7 @@ class AutoResolve
       results[:action] = :do_not_resolve
       results[:log] = ["auto resolution is turned off or is experiencing configuration error"]
     end
-    dispute_entry = process_interrogation_results(results, dispute_entry)
+    dispute_entry = process_interrogation_results(results, dispute_entry, skip_human_review)
 
     dispute_entry
   end
@@ -138,12 +138,22 @@ class AutoResolve
     results
   end
 
-  def self.process_interrogation_results(result, dispute_entry)
+  def self.process_interrogation_results(result, dispute_entry, skip_human_review)
 
     action = result[:action]
 
     if action == :do_not_resolve || action.blank?
-      dispute_entry.status = DisputeEntry::NEW
+      if skip_human_review == true
+        resolved_at = Time.now
+        dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+        dispute_entry.status = DisputeEntry::STATUS_RESOLVED
+        dispute_entry.resolution_comment = Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
+        dispute_entry.case_closed_at = resolved_at
+        dispute_entry.case_resolved_at = resolved_at
+      else
+        dispute_entry.status = DisputeEntry::NEW
+      end
+
     else
       resolved_at = Time.now
       reptool_result = commit_to_reptool(action, dispute_entry)
@@ -499,4 +509,15 @@ class AutoResolve
   #
   # ####################################################################################
 
+
+
+  def self.auto_resolve_umbrella_false_positive(dispute_entry)
+    dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+    dispute_entry.status = DisputeEntry::STATUS_RESOLVED
+    dispute_entry.case_closed_at = Time.now
+    dispute_entry.case_resolved_at = Time.now
+    dispute_entry.resolution_comment = "The following ticket queue is for false negative requests only. If you would like to dispute the reputation of an Untrusted verdict, please open a Web Reputation ticket."
+    dispute_entry.save
+
+  end
 end
