@@ -1115,6 +1115,7 @@ format = (complaint_entry_row) ->
   uri = ''
   host = ''
   qual_subdomain = ''
+  lookup_val = ''
   url = ''
   search_uri = ''
   if complaint_entry.uri
@@ -1122,6 +1123,8 @@ format = (complaint_entry_row) ->
     url = host
     uri = '<a href="http://' + complaint_entry.uri + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
     uri_no_path = complaint_entry.uri
+    qual_subdomain = complaint_entry.domain
+    lookup_val = complaint_entry.domain
     if uri_no_path.indexOf('/') > 0
       uri_no_path = uri_no_path.split('/')[0] # strip out the path in a uri for Site Search, it's extraneous
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + uri_no_path + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + uri_no_path + '</a>'
@@ -1132,20 +1135,20 @@ format = (complaint_entry_row) ->
     url = host
     if complaint_entry.path
       url = host
-
     uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
-    qual_subdomain = complaint_entry.domain
+    lookup_val = complaint_entry.domain
   else if  complaint_entry.ip_address
     host = complaint_entry.ip_address
     url = host
-    qual_subdomain = complaint_entry.ip_address
+    lookup_val = complaint_entry.ip_address
     uri = '<a href="http://' + complaint_entry.ip_address + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
   if complaint_entry.subdomain
     qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
+    lookup_val = complaint_entry.subdomain + '.' + qual_subdomain
 
   entry_status = ""
   reopen_class = "hidden"
@@ -1361,7 +1364,7 @@ format = (complaint_entry_row) ->
       '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="lookup-' + entry_id+ '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + qual_subdomain + '\')">Lookup</button><br/>' +
+      '<button class="secondary" id="lookup-' + entry_id+ '" data-fqdn="' + lookup_val + '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + lookup_val+ '\')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + entry_id + '" onclick="history_dialog(' + entry_id  + ',\'' + url + '\')">History</button><br/>' +
       '<button class="secondary" id="domain-' + entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
