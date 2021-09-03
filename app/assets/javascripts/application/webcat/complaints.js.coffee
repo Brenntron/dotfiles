@@ -69,8 +69,6 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/wbnp_report_status"
     data: data
     success: (response) ->
-      console.log response
-
       # Turn off loader indicator
       $('.wbnp-loading-spinner').hide()
 
@@ -83,12 +81,15 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 
         curr_report = response.data[0]
         last_report = response.data[1]
+        currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
 
         # Add current report info to top bar report area
         $('.wbnp-report-status').text(curr_report.status)
         $('#wbnp-report-attempted').text(curr_report.total_new_cases)
         $('#wbnp-report-succeeded').text(curr_report.cases_imported)
         $('#wbnp-report-rejected').text(curr_report.cases_failed)
+        $('#wbnp-quick-report-skipped').text(currentSkippedText)
+        $('#wbnp-full-report-skipped').text(currentSkippedText)
 
         # Build the full report for webcat managers
         wbnp_dialog = $('#wbnp-full-report')
@@ -101,12 +102,13 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
         $('#current-wbnp-report .wbnp-status').text(curr_report.status)
         $('#current-wbnp-report .wbnp-status-msg').text(curr_report.status_message)
         current_table = $('#current-wbnp-report .wbnp-full-report-table')
-        curr_table_content = '<tr><td>' + curr_report.id + '</td><td>' + curr_report.attempts + '</td><td>' + curr_report.total_new_cases + '</td><td>' + curr_report.cases_imported + '</td><td>' + curr_report.cases_failed + '</td><td>' + curr_report.created_at + '</td><td>' + curr_report.updated_at + '</td></tr>'
+        curr_table_content = '<tr><td>' + curr_report.id + '</td><td>' + curr_report.attempts + '</td><td>' + curr_report.total_new_cases + '</td><td>' + curr_report.cases_imported + '</td><td>' + curr_report.cases_failed + '</td><td>' + currentSkippedText + '</td><td>' + curr_report.created_at + '</td><td>' + curr_report.updated_at + '</td></tr>'
         $(current_table).append(curr_table_content)
         $('#current-wbnp-report .wbnp-notes').html(curr_report.notes)
 
         # Previous report:
         if last_report?
+          lastSkippedText = if last_report.cases_skipped? then last_report.cases_skipped else '0'
           if last_report.status == 'complete'
             $('#previous-wbnp-report .wbnp-status').addClass('status_complete')
           else
@@ -114,7 +116,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
           $('#previous-wbnp-report .wbnp-status').text(last_report.status)
           $('#previous-wbnp-report .wbnp-status-msg').text(last_report.status_message)
           prev_table = $('#previous-wbnp-report .wbnp-full-report-table')
-          prev_table_content = '<tr><td>' + last_report.id + '</td><td>' + last_report.attempts + '</td><td>' + last_report.total_new_cases + '</td><td>' + last_report.cases_imported + '</td><td>' + last_report.cases_failed + '</td><td>' + last_report.created_at + '</td><td>' + last_report.updated_at + '</td></tr>'
+          prev_table_content = '<tr><td>' + last_report.id + '</td><td>' + last_report.attempts + '</td><td>' + last_report.total_new_cases + '</td><td>' + last_report.cases_imported + '</td><td>' + last_report.cases_failed + '</td><td>' + lastSkippedText + '</td><td>' + last_report.created_at + '</td><td>' + last_report.updated_at + '</td></tr>'
           $(prev_table).append(prev_table_content)
           $('#previous-wbnp-report .wbnp-notes').html(last_report.notes)
 
@@ -134,11 +136,14 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 
       else
         curr_report = response.data
+        currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
         # Add current report info to top bar report area
         $('.wbnp-report-status').text(curr_report.status)
         $('#wbnp-report-attempted').text(curr_report.total_new_cases)
         $('#wbnp-report-succeeded').text(curr_report.cases_imported)
         $('#wbnp-report-rejected').text(curr_report.cases_failed)
+        $('#wbnp-quick-report-skipped').text(currentSkippedText)
+        $('#wbnp-full-report-skipped').text(currentSkippedText)
 
     error: (response) ->
       $('.wbnp-loading-spinner').hide()
@@ -2478,4 +2483,3 @@ $ ->
 
   $('#wbnp-report-button').click ->
     $('#wbnp-full-report').dialog('open')
-
