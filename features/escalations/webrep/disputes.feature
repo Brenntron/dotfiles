@@ -1235,3 +1235,40 @@ Feature: Disputes
     When I click "#queue"
     Then I should see "000001"
     And I should not see "000002"
+
+
+#*********************************************#
+
+# Converting Webrep ticket to Webcat (WEB-4413)
+
+  @javascript
+  Scenario: a user tries to convert a webrep ticket to a webcat ticket
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |  id       |  status         | user_id |
+      | 000001    | ASSIGNED        |    1    |
+    When I goto "/escalations/webrep/disputes?f=open"
+    And I wait for "2" seconds
+    And I click "#cbox0000000001"
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And I should see "talosintelligence.com"
+#    And I click "#1-selectize-selectized"
+    And I fill in selectized of element "#1-selectize" with "['6', '77']"
+    And I wait for "1" seconds
+    And I click ".dropdown-submit-button"
+    And I wait for "1" seconds
+    And I should see "Reputation Dispute converted to Categorization Complaint."
+
+  @javascript
+  Scenario: a user tries to convert a webrep ticket to a webcat ticket that is not in an open status
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |  id       |  status        | user_id |
+      | 000001    | ON_HOLD        |    1    |
+    When I goto "/escalations/webrep/disputes?f=open"
+    And I wait for "2" seconds
+    And I click "#cbox0000000001"
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And I should see "TICKET CANNOT BE CONVERTED"

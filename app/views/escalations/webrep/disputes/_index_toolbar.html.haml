@@ -177,7 +177,7 @@
                 Submit
 
     %span#mark-as-related.dropdown
-      %button#index_mark_related.toolbar-button.mark-related-button.esc-tooltipped{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_mark_related.toolbar-button.mark-related-button.esc-tooltipped.toolbar-button-spacer{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Mark as Related
       .dropdown-menu.toolbar-dropdown#set-related-dispute-div{'aria-labelledby': 'index_mark_related'}
@@ -188,6 +188,42 @@
           .button-row-center
             %button.primary#set-related-dispute-submit-button{type:'button', id: 'button_related_dispute', onclick:'related_disputes();'}
               Submit
+
+    %span.dropdown
+      %button#convert-ticket-button.toolbar-button.convert-ticket-button.esc-tooltipped.dropdown-toggle{onclick: 'prep_dispute_to_convert();', type: 'button', title: 'Convert ticket to web categorization ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled'}
+        %span.toolbar-button-text Convert to Webcat
+      .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'move-to-webcat'}
+        .dropdown-tool-text-divider.primary-text-divider Convert to Categorization Dispute
+        .inline-tool-content-wrapper
+          .dropdown-loader-wrapper.hidden
+            .gear-loader-wrapper
+              = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+            %span.loader-msg Converting to Webcat...
+
+          %label.content-label-sm
+            Ticket ID to Convert:
+          %span.ticket-id-to-convert#dispute-id-to-convert
+
+          %label.content-label-sm
+            Ticket Entries:
+            %span.convert-entry-count
+          .convert-entry-table-wrapper
+            %table#entries-to-convert.complaint-entries-to-convert
+              %thead
+                %tr
+                  %th Entry ID
+                  %th Entry Content
+                  %th Current Categories
+                  %th.text-right Suggested Categories
+              %tbody
+
+          %hr.thin
+          .comment-wrapper
+            %label.content-label-sm{for: '#convert-ticket-summary'} Ticket Summary
+            %textarea#convert-ticket-summary.dropdown-comment.note-input
+          .button-row-center
+            %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
+              Convert Ticket
 
   %div
     %label.toolbar-section-label
@@ -345,7 +381,7 @@
                   Submit Changes
 
     %span.dropdown
-      %button.toolbar-button.adjust-reptool-button.dropdown-toggle#reptool_index_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("index");'}
+      %button.toolbar-button.adjust-reptool-button.dropdown-button-margin-right.dropdown-toggle#reptool_index_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("index");'}
         %span.toolbar-button-text
           Adjust RepTool BL
       .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
@@ -468,6 +504,7 @@
               .button-row-center
                 %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool()', disabled: true}
                   Submit Changes
+
   %div.line-up
     %label.toolbar-section-label
       File

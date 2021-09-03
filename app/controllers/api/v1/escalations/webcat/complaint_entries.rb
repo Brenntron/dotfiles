@@ -417,9 +417,7 @@ module API
                 end
 
                 begin
-                  Rails.logger.info("This is where the sbrs call is")
                   sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
-                  Rails.logger.info("got it!")
                 rescue Exception => e
                   raise("having trouble with SDS setting category to empty string : #{e.message}")
                 end
