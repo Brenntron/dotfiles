@@ -710,9 +710,14 @@ For future Web categorization requests, please open a Web categorization ticket 
 
         new_dispute.dispute_entries.each do |dispute_entry|
           false_negative_claim = false
+          matching_disposition = false
+          entry_claim = entry_claims[dispute_entry.hostlookup]
 
-          matching_disposition = dispute_entry.is_disposition_matching?
-
+          if new_dispute.determine_platform.present? && new_dispute.determine_platform.downcase.include?("umbrella")
+            matching_disposition = dispute_entry.is_disposition_matching?(entry_claim, true)
+          else
+            matching_disposition = dispute_entry.is_disposition_matching?(entry_claim)
+          end
           initial_log = "--------Starting Data---------<br>"
           initial_log += "suggested disposition: #{dispute_entry.suggested_disposition}<br>"
           initial_log += "effective disposition info: #{dispute_entry.running_verdict.inspect.to_s}<br>"
@@ -723,7 +728,6 @@ For future Web categorization requests, please open a Web categorization ticket 
 
           ########Auto Resolve for IP addressses (email)##############
           if dispute_entry.entry_type == "IP"
-            entry_claim = entry_claims[dispute_entry.hostlookup]
 
             logger.info "fetching preload"
 
@@ -768,7 +772,6 @@ For future Web categorization requests, please open a Web categorization ticket 
           ############################################################
           #########Auto Resolve for URLs (web)########################
           if dispute_entry.entry_type == "URI/DOMAIN"
-            entry_claim = entry_claims[dispute_entry.hostlookup]
 
             logger.info "fetching preload"
 

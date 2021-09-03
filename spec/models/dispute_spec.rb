@@ -722,6 +722,154 @@ describe Dispute do
 
   end
 
+  it 'should close as matching disposition for a wide net when false positive (one)' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => -3.5}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false positive")).to eql(true)
+    expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+    expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+
+  end
+
+
+  it 'should close as matching disposition for a wide net when false positive (two)' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => 3.5}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false positive")).to eql(true)
+    expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+    expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+
+  end
+
+  it 'should return false for matching for a wide net when false positive (one) when Umbrella' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => -3.5}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false positive", true)).to eql(false)
+    expect(@dispute_entry.status).to eql("NEW")
+    expect(@dispute_entry.resolution).to eql(nil)
+
+
+  end
+
+
+  it 'should return false for matching disposition for a wide net when false positive (two) when Umbrella' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => 3.5}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false positive", true)).to eql(false)
+    expect(@dispute_entry.status).to eql("NEW")
+    expect(@dispute_entry.resolution).to eql(nil)
+
+
+  end
+
+
+  it 'should close as matching disposition for a wide net when false negative' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.suggested_disposition = "Untrusted"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => -6.1}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false negative")).to eql(true)
+    expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+    expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+
+  end
+
+  it 'should not close as matching disposition for a wide net when false negative for umbrella greater than -7' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.suggested_disposition = "Untrusted"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => -6.1}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false negative", true)).to eql(false)
+    expect(@dispute_entry.status).to eql("NEW")
+    expect(@dispute_entry.resolution).to eql(nil)
+
+
+  end
+
+
+  it 'should close as matching disposition for a wide net when false negative for umbrella less than/equal to than -7' do
+    @dispute_entry = DisputeEntry.new
+    @dispute_entry.id = 1
+    @dispute_entry.uri = "www.bing.com"
+    @dispute_entry.status = "NEW"
+    @dispute_entry.entry_type = "URI/DOMAIN"
+    @dispute_entry.suggested_disposition = "Untrusted"
+    @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.save
+
+    response = {"wbrs" => {"score" => -7.0}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("www.bing.com", "wbrs").and_return(response).at_least(:once)
+
+    expect(@dispute_entry.is_disposition_matching?("false negative", true)).to eql(true)
+    expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
+    expect(@dispute_entry.resolution).to eql("UNCHANGED")
+
+
+  end
+
+
   it "should create convert messages to complaints" do
     current_user = FactoryBot.create(:current_user)
     customer = FactoryBot.create(:customer, name: 'Some Customer')
