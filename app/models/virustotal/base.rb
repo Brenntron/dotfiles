@@ -72,6 +72,8 @@ class Virustotal::Base
   def self.request_error_handling(response)
     case
       when 300 > response.code
+        body_parsed = JSON.parse(response.body)
+        raise Virustotal::VirustotalError, "Unexpected Virustotal response, check request parameters" unless body_parsed.kind_of?(Hash)
         response
       when 404 == response.code
         body = response.body

@@ -1,15 +1,15 @@
 class Clusters::Filter
-  attr_accessor :clusters, :filter_param, :user
+  attr_accessor :clusters, :filter_hash, :user
 
   def initialize(clusters, filter, user)
     @clusters = clusters.dup
-    @filter_param = filter
+    @filter_hash = filter
     @user = user
   end
 
   def filter
     # user specific filters - filters, selected by users
-    case filter_param
+    case filter_hash[:f]
     when 'all'
       clusters
     when 'my'
@@ -31,6 +31,7 @@ class Clusters::Filter
     clusters.select! do |cluster|
       cluster_assigned_to_user?(cluster)
     end
+    clusters.uniq! { |cluster| cluster[:domain] }
   end
 
   def filter_unassigned

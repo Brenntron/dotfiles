@@ -14,6 +14,39 @@ amp_poke = env_config.fetch('amp_poke', {})
 Rails.configuration.amp_poke            = ApiRequester::ApiRequester.config_of(amp_poke)
 
 
+app_info_config = env_config['app_info']
+raise 'config.yml missing app_info section' unless app_info_config
+Rails.configuration.app_info        = OpenStruct.new
+Rails.configuration.app_info.device_id      = app_info_config['device_id'] || Socket.gethostname
+Rails.configuration.app_info.product_family = app_info_config['product_family'] || 'Talos_Web'
+Rails.configuration.app_info.product_id     = app_info_config['product_id'] || 'analyst-console-escalations'
+Rails.configuration.app_info.product_version =
+  begin
+    version = app_info_config['product_version']
+    unless version.present?
+      version = File.open("public/escalations/version.html", "rt") { |file| file.read }.chomp rescue nil
+    end
+    unless version.present?
+      if Rails.env.development? || Rails.env.test?
+        Open3.popen3("git symbolic-ref --short HEAD") do |stdin, stdout, stderr, wait_thr|
+          version = stdout.read.chomp rescue nil
+        end
+        # Alternatives are
+        # git branch --show-current
+        # => also the currenct branch, which might be a better command line.
+        # git rev-parse HEAD
+        # => the revision hash
+      end
+    end
+    unless version.present?
+      version = Rails.env.to_s
+    end
+    version
+  end
+Rails.configuration.app_info.client_cert_file = app_info_config['client_cert_file']
+Rails.configuration.app_info.pkey_file  = app_info_config['pkey_file']
+
+
 # The auto resolve section refers to the auto resolve algorithm where different steps may be disabled.
 auto_resolve = env_config['auto_resolve']
 raise "config.yml missing auto_resolve section" unless auto_resolve
@@ -120,11 +153,16 @@ sds_config = env_config.fetch('sds', nil)
 raise 'config.yml missing SDS section' unless sds_config
 Rails.configuration.sds                 = ApiRequester::ApiRequester.config_of(sds_config)
 Rails.configuration.sds.v3_host         = sds_config['v3_host']
-Rails.configuration.sds.cert_file       = sds_config['cert_file'] || sds_config['ca_cert_file']
+Rails.configuration.sds.cert_file       = sds_config['client_cert_file'] || sds_config['cert_file']
 Rails.configuration.sds.pkey_file       = sds_config['pkey_file']
 
 talos_intelligence = env_config.fetch('talos_intelligence', {})
 Rails.configuration.talos_intelligence  = ApiRequester::ApiRequester.config_of(talos_intelligence)
+
+
+tess_config = env_config['tess']
+raise 'config.yml missing tess section' unless tess_config
+Rails.configuration.tess                = ApiRequester::ApiRequester.config_of(tess_config)
 
 
 threatgrid = env_config.fetch('threatgrid', nil)

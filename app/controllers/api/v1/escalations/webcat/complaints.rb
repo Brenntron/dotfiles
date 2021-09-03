@@ -143,7 +143,7 @@ module API
               std_api_v2 do
                 params["data"].each do |item, prefix|
                   if prefix["url"].present?
-                    Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
+                    prefix["popular"] = Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
                                                        category_ids_string: prefix["category_ids"].join(','),
                                                        category_names_string: prefix["category_names"].join(','),
                                                        description: '',
@@ -282,7 +282,7 @@ module API
             get 'wbnp_report_status' do
 
               if permitted_params[:wbnp_report_id].blank?
-                report = WbnpReport.active_reports.last
+                report = WbnpReport.get_last_reports #WbnpReport.active_reports.last
               else
                 report = WbnpReport.where(:id => permitted_params[:wbnp_report_id]).first
               end
@@ -381,18 +381,18 @@ module API
               tix.each do |tic|
                 if tic.case_resolved_at.present?
                   if tic.case_resolved_at >= from && tic.case_resolved_at <= to
-                    resolved_array << tic
+                    resolved_array << tic.as_report_row
                   end
                 end
 
                 if tic.case_assigned_at.present?
                   if tic.case_assigned_at >= from && tic.case_assigned_at <= to
-                    assigned_array << tic
+                    assigned_array << tic.as_report_row
                   end
                 end
 
                 if tic.created_at >= from && tic.created_at <= to
-                  created_array << tic
+                  created_array << tic.as_report_row
                 end
               end
 
@@ -414,6 +414,33 @@ module API
 
             get 'category_list' do
               SbApi.category_lookup
+            end
+
+            desc 'convert ticket from complaint to dispute'
+
+            params do
+              requires :complaint_id, type: Integer
+              requires :suggested_dispositions, type: Array
+              requires :summary, type: String
+              requires :submission_type, type: String
+            end
+
+            post 'convert_ticket' do
+              Complaint.convert_to_dispute(permitted_params, current_user)
+            end
+
+            desc 'details for a given complaint'
+
+            params do
+              requires :complaint_entry_id, type: Integer
+            end
+
+            post 'view_complaint' do
+              complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
+              complaint = complaint_entry.complaint
+
+              {:data => {:complaint => complaint, :complaint_entries => complaint.complaint_entries}}.to_json
+
             end
 
           end

@@ -1,5 +1,8 @@
 describe Dispute do
   describe 'robust_search' do
+
+    let(:existing_company) { FactoryBot.create(:company, name: "test company") }
+    let(:vrt_incoming) { FactoryBot.create(:vrt_incoming_user) }
     before(:all) do
       @long_desc1 = 'Long Cool Woman In A Black Dress'
       @long_desc2 = 'Short Skirt Long Jacket'
@@ -83,6 +86,29 @@ describe Dispute do
                                                     user: @current_user)
 
       expect(results.count).to eq(1)
+    end
+
+    it 'should run check for rep updates without error' do
+      vrt_incoming
+
+      FactoryBot.create(:customer, name: "testing", email: 'test@teset.com', company: existing_company)
+      file_rep_dispute = FileReputationDispute.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :user_id => User.all.first.id, :disposition => "Clean", :status => "RESOLVED_CLOSED", :disposition_suggested => "Clean", :sha256_hash => "efb947a43bfe6d0812d105f6afdeb9774f4d79254dd48f89f1e95ffdf8732928")
+
+      rl_entries_response = {}
+      rl_entries_response["entries"] = []
+      rl_entries_response["entries"] << {"sha256" => "efb947a43bfe6d0812d105f6afdeb9774f4d79254dd48f89f1e95ffdf8732928", "updated_sections" => ["malware_presence"]}
+
+      expect(FileReputationApi::ReversingLabs).to receive(:check_for_updates).and_return(rl_entries_response).at_least(:once)
+
+      expect(FileReputationApi::ReversingLabs).to receive(:unsubscribe).with(anything).at_least(:once)
+
+      expect(file_rep_dispute.status).to eql("RESOLVED_CLOSED")
+
+      FileReputationDispute.check_for_rep_updates
+      file_rep_dispute.reload
+      
+      expect(file_rep_dispute.status).to eql("RE-OPENED")
+
     end
   end
 end

@@ -63,13 +63,19 @@ class Dispute < ApplicationRecord
   STATUS_RESOLVED_OTHER = "OTHER"
   STATUS_RESOLVED_QUICK_BULK = "QUICK_BULK" #tickets created and closed using the quick bulk entry form.
 
-  AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
+  #AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
+  AUTORESOLVED_UNCHANGED_MESSAGE = "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+
 
   #labels for charts on webrep dashboard
   LABEL_RESOLVED_FIXED_FP = "Fixed FP"
   LABEL_RESOLVED_FIXED_FN = "Fixed FN"
   LABEL_RESOLVED_UNCHANGED = "Unchanged"
   LABEL_RESOLVED_OTHER = "Other"
+
+  TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web categorization requests. A new Web categorization ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all updates regarding this request on the new ticket.
+
+For future Web categorization requests, please open a Web categorization ticket using the \"Web Categorization Requests\" form: https://talosintelligence.com/reputation_center/support#reputation_center_support_ticket"
 
   scope :open_disputes, -> { where(status: NEW) }
   scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
@@ -449,6 +455,7 @@ class Dispute < ApplicationRecord
     new_dispute = nil
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
+
     begin
 
       entry_claims = {}
@@ -505,6 +512,7 @@ class Dispute < ApplicationRecord
 
 
       new_dispute.id = bug_proxy.id
+      new_dispute.meta_data = message_payload["payload"]["meta_data"]
       new_dispute.user_id = user.id
       new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
       new_dispute.org_domain = message_payload["payload"]["domain"]
@@ -524,6 +532,10 @@ class Dispute < ApplicationRecord
 
       new_dispute.customer_id = customer&.id
       new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+      if message_payload["payload"]["api_customer"].present? && message_payload["payload"]["api_customer"] == true
+        new_dispute.submitter_type = SUBMITTER_TYPE_CUSTOMER
+      end
+
 
       if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
         new_dispute.priority = "P3"
@@ -694,6 +706,8 @@ class Dispute < ApplicationRecord
 
       ######AUTO RESOLVE LOGIC########
       begin
+        umbrella_no_reply = Platform.find_by_all_names("Umbrella - No Reply")
+
         new_dispute.dispute_entries.each do |dispute_entry|
           false_negative_claim = false
           matching_disposition = false
@@ -729,13 +743,22 @@ class Dispute < ApplicationRecord
               if entry_claim != "false negative"
                 dispute_entry.status = DisputeEntry::NEW
 
-                if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
-                  AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
+                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                  AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+                  dispute_entry.reload
+                else
+                  if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
+                    AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
+                    dispute_entry.reload
+                  end
                 end
-
               else
                 if new_dispute.submission_type == "w"
-                  dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                  if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                    dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+                  else
+                    dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                  end
                 end
                 dispute_entry.save
               end
@@ -780,9 +803,21 @@ class Dispute < ApplicationRecord
             if !matching_disposition
 
               if entry_claim != "false negative"
-                dispute_entry.update(status: DisputeEntry::NEW)
+
+                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                  AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+                  dispute_entry.reload
+                else
+                  dispute_entry.update(status: DisputeEntry::NEW)
+                end
               else
-                dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+
+                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+
+                  dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+                else
+                  dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                end
               end
               dispute_entry.save
             end
@@ -1246,6 +1281,7 @@ class Dispute < ApplicationRecord
       dispute_packet[:submitter_domain] = dispute.org_domain
       dispute_packet[:submitter_name] = dispute.customer_name
       dispute_packet[:submitter_email] = dispute.customer_email
+      dispute_packet[:dispute_summary] = dispute.problem_summary
       dispute_packet[:dispute_domain] = dispute.org_domain
       dispute_packet[:updated_at] = dispute.updated_at&.strftime("%F %T")
       unless dispute.dispute_entries.blank?
@@ -2240,6 +2276,66 @@ class Dispute < ApplicationRecord
   end
 
 
+  def self.convert_to_complaint(params, current_user)
+    dispute = Dispute.find(params[:dispute_id])
+    suggested_category_entries = params[:suggested_categories]
+
+    platform_id = nil
+
+    package = {}
+    package[:entries] = []
+    package[:convert_to] = "Complaint"
+    package[:internal_message] = params[:summary] + " | " + "original analyst console webrep ticket: #{dispute.id.to_s}"
+    package[:email] = dispute&.customer&.email
+    package[:name] = dispute&.customer&.name
+    package[:company_name] = dispute&.customer&.company&.name
+    suggested_category_entries.each do |sugg|
+      if dispute.platform_id.present?
+        platform_id = dispute.platform_id
+      else
+        disp_entry = dispute.dispute_entries.select {|c| c.hostlookup == sugg[1]['entry']}.first
+        if disp_entry.present?
+          platform_id = disp_entry.platform_id unless disp_entry.platform_id.blank?
+        end
+      end
+      entry = {}
+      entry[:entry] = sugg[1]['entry']
+      entry[:suggested_categories] = sugg[1]['suggested_categories'].split(",")
+      entry[:platform_id] = platform_id
+      package[:entries] << entry
+    end
+
+    conn = ::Bridge::TicketConversionEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.ticket_source_key, ac_id: dispute.id)
+    conn.post(package)
+
+    new_comment = DisputeComment.new
+    new_comment.dispute_id = dispute.id
+    new_comment.user_id = current_user.id
+    new_comment.comment = "Converted from TE ticket to SDO ticket"
+    new_comment.save
+
+    #set status and resolution here with a message
+    #send update to bridge
+
+    dispute.status = STATUS_RESOLVED
+    dispute.resolution = STATUS_RESOLVED_INVALID
+    dispute.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+    dispute.save
+
+    dispute.dispute_entries.each do |d_entry|
+      d_entry.status = DisputeEntry::STATUS_RESOLVED
+      d_entry.resolution = DisputeEntry::STATUS_RESOLVED_INVALID
+      d_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+      d_entry.save
+    end
+
+    message = Bridge::DisputeEntryUpdateStatusEvent.new
+    message.post_entries(dispute.dispute_entries)
+
+    return true
+  end
+
+
   def self.build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, problem, original_bug_id)
     summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -2260,6 +2356,7 @@ class Dispute < ApplicationRecord
     new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
 
     research_bug_proxy
+
   end
 
   def determine_platform
@@ -2270,6 +2367,13 @@ class Dispute < ApplicationRecord
       if self.dispute_entries.first.platform_id.present?
         return self.dispute_entries.map{|d_e| d_e.product_platform.public_name rescue 'No Data'}.uniq.join(",")
       end
+    end
+    return nil
+  end
+
+  def determine_platform_record
+    if self.platform_id.present?
+      return Platform.find(self.platform_id) rescue nil
     end
     return nil
   end

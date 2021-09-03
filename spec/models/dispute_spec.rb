@@ -370,6 +370,12 @@ describe Dispute do
     double('Bugzilla::Bug', create: { "id" => 101 })
   end
 
+  before(:each) do
+    Dispute.destroy_all
+    DisputeEntry.destroy_all
+
+  end
+
   before(:example) do
     FactoryBot.create(:vrt_incoming_user)
     FactoryBot.create(:guest_company)
@@ -863,5 +869,39 @@ describe Dispute do
 
   end
 
+
+  it "should create convert messages to complaints" do
+    current_user = FactoryBot.create(:current_user)
+    customer = FactoryBot.create(:customer, name: 'Some Customer')
+    dispute = Dispute.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :status => "NEW")
+
+    new_dispute_entry = DisputeEntry.new
+    new_dispute_entry.dispute_id = dispute.id
+    new_dispute_entry.user_id = current_user.id
+    new_dispute_entry.uri = "www.google.com"
+    new_dispute_entry.entry_type = "URI/DOMAIN"
+    new_dispute_entry.status = ComplaintEntry::NEW
+
+    new_dispute_entry.save
+
+
+    new_dispute_entry2 = DisputeEntry.new
+    new_dispute_entry2.dispute_id = dispute.id
+    new_dispute_entry2.user_id = current_user.id
+    new_dispute_entry2.uri = "www.malware.com"
+    new_dispute_entry2.entry_type = "URI/DOMAIN"
+    new_dispute_entry2.status = ComplaintEntry::NEW
+
+    new_dispute_entry2.save
+
+    params = {}
+
+    params[:dispute_id] = dispute.id
+    params[:summary] = "test_summary"
+
+    params[:suggested_categories] = {"0" => {'entry' => 'www.google.com', 'suggested_categories' => 'test'}, "1" => {'entry' => 'www.malware.com', 'suggested_categories' => 'test'}}
+
+    Dispute.convert_to_complaint(params, current_user)
+  end
 
 end

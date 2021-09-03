@@ -1,7 +1,12 @@
 class Ngfw::Importer
   class << self
     def import
-      handle_import
+      handle_import if no_other_import_jobs? # this runs the background job
+    end
+
+    def import_without_delay
+      destroy_existing_clusters!
+      import_new_clusters
     end
 
     private
@@ -9,8 +14,8 @@ class Ngfw::Importer
     def handle_import
       destroy_existing_clusters!
       import_new_clusters
-      handle_import if no_other_import_jobs?
     end
+    handle_asynchronously :handle_import, run_at: Proc.new { Time.zone.today.beginning_of_day + 19.hours } # run at 7pm UTC today
 
     def destroy_existing_clusters!
       # destroys NGFW clusters that should be replaced by new import
@@ -40,7 +45,5 @@ class Ngfw::Importer
     def no_other_import_jobs?
       DelayedJob.where('handler LIKE ?', "%#{self.name}%").empty?
     end
-
-    handle_asynchronously :handle_import, run_at: Proc.new { Time.zone.tomorrow.beginning_of_day + 16.hours } # run at 4pm next day
   end
 end

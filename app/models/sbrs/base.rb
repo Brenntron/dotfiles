@@ -1,7 +1,39 @@
+# Class to make SBRS API calls.
+#
+# TODO: Code could use refactoring as it was implemented quickly because of deadline.
+#
+# The code started from the SBAPI from the Talos Intelligence code.
+# It overlaps with the SDS (and SDS V3) API calls in SbApi.
+# All calls to SenderBase have been removed from this project for the SenderBase decommissioning.
+#
+# Since the implementation of this class we developed the ApiRequester::ApiRequester mixin.
+# This code overlaps that mixin and refactoring should migrate to use it,
+# which would eliminate some of the code here.
+#
+# We have also since designed the CloudIntel abstraction layer.
+# While CloudIntel was developed for and with a focus of gRPC calls, it can be used for abstracting SDS calls.
+# The application code should make calls to a model to get specific information
+# without regard to where (which API) is needed to find it.
+#
+# When the SenderBase calls were migrated to SDS,
+# the SbApi class changed its implementation for some methods to call SDS.
+# Somewhere along the line it might have been refactored with the aggregation pattern.
+# Where a gloss class has methods to return the data,
+# but aggregates component objects for SBAPI, SDS and SDSv3.
+# Now we would abstract it using CloudIntel.
+#
+# Suggested refactoring:
+#
+# 1.  Break out SDS and SDS V3 into their own classes instead of co-opting the SbApi and Sbrs classes.
+# 2.  Implement the SDS and SDS V3 calls using the ApiRequester::ApiRequester mixin.
+# 3.  Move calls in Sbrs::ManualSbrs class to CloudIntel organized by the information being requested,
+#     without references naming the API being called.
+#     For instance, named as "sbrs score" or "wbrs rule hits".
+#
+#
 class Sbrs::Base
   include ActiveModel::Model
   TEST_URL = "www.google.com"
-  #TODO: all of this needs to be refactored and improved.  Finished up quickly because of deadline.
 
   def self.log_exception(exception = $!)
     Rails.logger.error(exception.message)
@@ -181,7 +213,6 @@ class Sbrs::Base
   end
 
   def self.request_sds(path:, body:, type: nil)
-    # adapted from TI/sb_api, then heavily modified
     query_string = path
     cert = File.open(ca_cert_file, 'r') do |file|
       file.read

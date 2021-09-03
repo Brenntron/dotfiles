@@ -938,12 +938,10 @@ module API
               companies = Company.all.order(name: :asc)
               resolutions = [Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN, Dispute::STATUS_RESOLVED_UNCHANGED,
                              Dispute::STATUS_RESOLVED_INVALID, Dispute::STATUS_RESOLVED_TEST, Dispute::STATUS_RESOLVED_OTHER]
-              webrep_platforms = Platform.where('webrep = true or emailrep = true').where(active: true).map {|m| {id: m.id, public_name: m.public_name}}
-              webcat_platforms = Platform.where(webcat: true, active: true).map {|m| {id: m.id, public_name: m.public_name}}
-              filerep_platforms = Platform.where(filerep: true, active: true).map {|m| {id: m.id, public_name: m.public_name}}
+              platforms = Platform.all.order(public_name: :asc).map {|m| {id: m.id, public_name: m.public_name}}
               render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
                             contacts: contacts, companies: companies, resolutions: resolutions,
-                            platforms: {webrep: webrep_platforms, webcat: webcat_platforms, filerep: filerep_platforms}}
+                            platforms: platforms}
             end
 
             desc 'Auto-populate fields on New Dispute'
@@ -1071,6 +1069,33 @@ module API
               end
               {:status => "success", :data => result, :checked_ips => ips}
             end
+
+            desc 'convert ticket from dispute to complaint'
+
+            params do
+              requires :dispute_id, type: Integer
+              requires :suggested_categories
+              requires :summary, type: String
+            end
+
+            post 'convert_ticket' do
+              Dispute.convert_to_complaint(permitted_params, current_user)
+            end
+
+            params do
+              requires :uri, type: Array[String]
+            end
+
+            post 'current_content_categories' do
+              urls = permitted_params[:uri]
+              data = {}
+              urls.each_with_index do |url, i|
+                data[i] = {'url': url, 'categories': ComplaintEntry.current_category_data_for_uri(url)}
+              end
+              
+              {:status => "success", :data => data}
+            end
+
 
           end
         end

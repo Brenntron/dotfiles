@@ -39,6 +39,11 @@ class Complaint < ApplicationRecord
 
   MAIN_WEBCAT_MANAGER_CONTACT = "admatter"
 
+  TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web and Email reputation. AUP categories are not applied to URLs that are primarily malicious in nature but may be applied in cases where a domain has been compromised or in cases of a web reputation false positive - these updates may take several hours to propagate. A new Web and Email Reputation ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all future updates regarding this request on the new ticket.
+
+For future web and email reputation requests, please open a web and email reputation ticket using the \"Web & Email\" form: https://talosintelligence.com/reputation_center/support#reputation
+"
+
   scope :active_count , -> {where(status:ACTIVE).count}
   scope :completed_count , -> {where(status:COMPLETED).count}
   scope :new_count , -> {where(status:NEW).count}
@@ -83,11 +88,9 @@ class Complaint < ApplicationRecord
   end
 
   def self.parse_url(url)
-    if !url.starts_with?("http")
-      url = "http://" + url
-    end
-    url = URI.escape(url)
-    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
+    parser = URI::Parser.new
+    url = parser.escape(url)
+    uri = parser.parse(parser.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
     subdomain = uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
@@ -149,7 +152,11 @@ class Complaint < ApplicationRecord
       else
         Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
       end
+      # add credit to the user for internal categorization
+      user_object = User.find_by_email(user)
+      WebcatCredits::InternalCategorizations::CreditHandler.new(user_object, ip_or_uri).handle_internal_credit
     end
+    top_url
   end
 
 
@@ -159,7 +166,7 @@ class Complaint < ApplicationRecord
     new_ips = new_entries_ips.keys.sort
 
     response = {}
-    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE, COMPLETED ])
+    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE, COMPLETED ]) rescue []
     candidates = []
 
     possibles.each do |poss|
@@ -313,6 +320,7 @@ class Complaint < ApplicationRecord
 
       new_complaint.submission_type = message_payload["payload"]["submission_type"]
       new_complaint.id = bug_proxy.id
+      new_complaint.meta_data = message_payload["payload"]["meta_data"]
       new_complaint.description = message_payload["payload"]["problem"]
       new_complaint.ticket_source_key = message_payload["source_key"]
       new_complaint.ticket_source = message_payload["source"].blank? ? "talos-intelligence" : message_payload["source"]
@@ -321,13 +329,17 @@ class Complaint < ApplicationRecord
       new_complaint.customer_id = customer&.id
       new_complaint.status = NEW
       new_complaint.channel = TI_CHANNEL
+
       new_complaint.platform_id = platform.id unless platform.blank?
       new_complaint.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
+
       new_complaint.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
       new_complaint.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
 
       new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
-
+      if message_payload["payload"]["api_customer"].present? && message_payload["payload"]["api_customer"] == true
+        new_complaint.submitter_type = SUBMITTER_TYPE_CUSTOMER
+      end
       if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
         ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
 
@@ -513,34 +525,52 @@ class Complaint < ApplicationRecord
     end
   end
 
-  def self.get_latest_wbnp_complaints
+  def self.get_latest_wbnp_complaints(skip_thread = false)
+    
+    max_attempts = 3
 
-      new_report = WbnpReport.new
+    #status reason
+    #attempts
 
-      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
-
-      #all_complaints.each do |rule_ui_complaint|
-      #  uri_to_test = compile_parts_to_uri(rule_ui_complaint)
-      #  rule_ui_complaint_exists = ComplaintEntry.where("uri like ?", "%" + uri_to_test + "%")
-
-      #  if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
-      #    new_complaints << rule_ui_complaint
-      #  end
-      #end
-      #
-      logger_token = SecureRandom.uuid
-      new_report.notes = ""
-      new_report.cases_imported = 0
-      new_report.cases_failed = 0
-      new_report.total_new_cases = all_complaints.size
-      new_report.status = WbnpReport::ACTIVE
-      new_report.notes += "logger_token: #{logger_token} <br />"
-      new_report.save
-
-      Thread.new do
-        kick_off_wbnp_pull(new_report.id, logger_token)
+    last_report = WbnpReport.order("id DESC").first
+    if last_report.present? && last_report.status == WbnpReport::ACTIVE
+      if last_report.attempts < max_attempts
+        last_report.attempts += 1
+        last_report.status_message = "Attempting to finish a running report, #{last_report.attempts} tries out of #{max_attempts}"
+        last_report.save
+        return last_report
       end
-      new_report
+
+      if last_report.attempts >= max_attempts
+        last_report.status = WbnpReport::ERROR
+        last_report.status_message = "waited #{last_report.attempts} times for pull to complete, closing report and starting a new one"
+        last_report.save
+      end
+    end
+
+
+    new_report = WbnpReport.new
+
+    all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
+
+    logger_token = SecureRandom.uuid
+    new_report.notes = ""
+    new_report.cases_imported = 0
+    new_report.cases_failed = 0
+    new_report.attempts = 0
+    new_report.status_message = "Starting new pull."
+    new_report.total_new_cases = all_complaints.size
+    new_report.status = WbnpReport::ACTIVE
+    new_report.notes += "logger_token: #{logger_token} <br />"
+    new_report.save
+    if skip_thread == true
+      start_wbnp_pull(new_report.id, logger_token)
+    else
+      Thread.new do
+        start_wbnp_pull(new_report.id, logger_token)
+      end
+    end
+    new_report
 
   end
 
@@ -556,13 +586,16 @@ class Complaint < ApplicationRecord
 
       new_report = WbnpReport.find(new_report_id)
       begin
+
+        platform = Platform.where("internal_name like '%wsa%'").first
+
         all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
         total_entries = all_complaints.size
         entry_num = 1
         bugzilla_rest_session = BugzillaRest::Session.default_session
 
         all_complaints.each do |new_ui_complaint|
-          ActiveRecord::Base.connection.reconnect!
+
           if new_ui_complaint['add_channel'] == WBNP_CHANNEL
             begin
               uri = compile_parts_to_uri(new_ui_complaint)
@@ -570,10 +603,23 @@ class Complaint < ApplicationRecord
               new_report.save
               pass = validate_url(uri, new_ui_complaint)
               new_report.notes += "<br />validation pass: #{pass.to_s}."
-              ActiveRecord::Base.connection.reconnect!
+
+              new_report.notes += "<br />checking for duplicate entry: uri: #{uri}."
+              exists = Complaint.where(:ticket_source_key => new_ui_complaint["complaint_id"], :channel => WBNP_CHANNEL).first
+              if exists.present?
+                new_report.notes += "<br />record exists for uri: #{uri} with source id: #{new_ui_complaint["complaint_id"]}"
+                new_report.save
+                next
+              else
+                new_report.notes += "<br />no duplicate record exists for uri: #{uri} with source id: #{new_ui_complaint["complaint_id"]}"
+              end
+
               new_report.save
+
+
+
               if pass
-                rule_ui_wbnp_create_action(uri, new_ui_complaint, new_report, logger_token, bugzilla_rest_session: bugzilla_rest_session)
+                rule_ui_wbnp_create_action(uri, new_ui_complaint, new_report, logger_token, platform, bugzilla_rest_session: bugzilla_rest_session)
               else
                 reject_complaint(uri, new_ui_complaint, new_report, logger_token)
               end
@@ -581,7 +627,7 @@ class Complaint < ApplicationRecord
 
               new_report.cases_failed += 1
               new_report.notes += "<br />SWP uri: #{new_ui_complaint.inspect} | log token: #{logger_token} | failure: #{e.message}<br />"
-              ActiveRecord::Base.connection.reconnect!
+
               new_report.save
 
               Rails.logger.error "#{logger_token} | " + e.message
@@ -594,7 +640,7 @@ class Complaint < ApplicationRecord
         new_report.status = WbnpReport::COMPLETE
         new_report.save
       rescue => e
-        ActiveRecord::Base.connection.reconnect!
+
         new_report.status = WbnpReport::ERROR
         new_report.notes += "<br />--------<br />token: #{logger_token} Pull suddenly ended with error: #{e.message}<br />"
         new_report.save
@@ -670,11 +716,11 @@ class Complaint < ApplicationRecord
       else
         new_report.notes += "<br />something went wrong with rejection assignment: #{response.to_s}"
       end
-      ActiveRecord::Base.connection.reconnect!
+
       new_report.save
     rescue => e
       new_report.notes += "<br />--------<br />Exception when assigning ticket #{complaint_id} to admatter - error: #{e.message}<br />"
-      ActiveRecord::Base.connection.reconnect!
+
       new_report.save
 
       Rails.logger.error "#{logger_token} | " + e.message
@@ -682,11 +728,11 @@ class Complaint < ApplicationRecord
     end
 
     new_report.cases_failed += 1
-    ActiveRecord::Base.connection.reconnect!
+
     new_report.save
   end
 
-  def self.rule_ui_wbnp_create_action(uri, rule_ui_complaint, wbnp_report, logger_token, bugzilla_rest_session:)
+  def self.rule_ui_wbnp_create_action(uri, rule_ui_complaint, wbnp_report, logger_token, platform, bugzilla_rest_session:)
     #"#{{"add_channel"=>"wbnp", "comment"=>"", "complaint_id"=>105, "complaint_type"=>"unknown", "customer_name"=>"ORANGE BUSINES SERVICES", "description"=>"",
     # "domain"=>"fmp-usmba.ac.ma", "path"=>"/cdim/mediatheque/e_theses/257-16.pdf", "port"=>0, "protocol"=>"http", "region"=>"", "resolution"=>nil, "state"=>"new",
     # "subdomain"=>"scolarite", "tag"=>nil, "url_query_string"=>"", "when_added"=>"Thu, 30 Aug 2018 15:00:05 GMT", "when_last_updated"=>"Thu, 30 Aug 2018 15:00:05 GMT",
@@ -694,7 +740,7 @@ class Complaint < ApplicationRecord
 
     description = "WBNP Sourced Complaint"
 
-    ActiveRecord::Base.connection.reconnect!
+
     #user = User.where(cvs_username:"vrtincom").first
     user = User.vrtincoming
 
@@ -718,7 +764,7 @@ class Complaint < ApplicationRecord
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
     cust = Customer.customer_from_ruleui(rule_ui_complaint)
-    ActiveRecord::Base.connection.reconnect!
+
     new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
                                      customer_id: cust ? cust.id : nil,
@@ -742,7 +788,7 @@ class Complaint < ApplicationRecord
     end
     begin
       Rails.logger.error "#{logger_token} building complaint entry for uri: #{uri}\n"
-      ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category, logger_token)
+      ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category, logger_token, platform)
       Rails.logger.error "#{logger_token} complaint entry build complete for uri: #{uri}\n"
 
       begin
@@ -752,11 +798,11 @@ class Complaint < ApplicationRecord
         else
           wbnp_report.notes += "<br />something went wrong with assignment: #{response.to_s}"
         end
-        ActiveRecord::Base.connection.reconnect!
+
         wbnp_report.save
       rescue => e
         wbnp_report.notes += "<br />--------<br />Exception when assigning ticket #{complaint_id} to admatter - error: #{e.message}<br />"
-        ActiveRecord::Base.connection.reconnect!
+
         wbnp_report.save
 
         Rails.logger.error "#{logger_token} | " + e.message
@@ -772,7 +818,7 @@ class Complaint < ApplicationRecord
       Rails.logger.error "#{logger_token} | " + e.message
       Rails.logger.error "#{logger_token} | " + e.backtrace.join("\n")
     end
-    ActiveRecord::Base.connection.reconnect!
+
     wbnp_report.save
   end
 
@@ -843,7 +889,65 @@ class Complaint < ApplicationRecord
     message.post_complaint(self)
   end
 
+  def self.convert_to_dispute(params, current_user)
+    platform_id = nil
+    complaint = Complaint.find(params[:complaint_id])
+    suggested_disposition_entries = params[:suggested_dispositions]
+    package = {}
+    package[:entries] = []
+    package[:convert_to] = "Dispute"
+    package[:submission_type] = params[:submission_type]
+    package[:email] = complaint&.customer&.email
+    package[:name] = complaint&.customer&.name
+    package[:company_name] = complaint&.customer&.company&.name
+    package[:internal_message] = params[:summary] + " | " + "original analyst console webcat ticket: #{complaint.id.to_s}"
+    suggested_disposition_entries.each do |sugg|
+      if complaint.platform_id.present?
+        platform_id = complaint.platform_id unless complaint.platform_id.blank?
+      else
+        comp_entry = complaint.complaint_entries.select {|c| c.hostlookup == sugg[:entry]}.first
+        if comp_entry.present?
+          platform_id = comp_entry.platform_id unless comp_entry.platform_id.blank?
+        end
+      end
 
+      entry = {}
+      entry[:entry] = sugg[:entry]
+      #needs to be either 'fp' or 'fn'
+      entry[:suggested_disposition] = sugg[:suggested_disposition]
+      entry[:platform_id] = platform_id
+      package[:entries] << entry
+    end
+
+    conn = ::Bridge::TicketConversionEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: complaint.ticket_source_key, ac_id: complaint.id)
+    conn.post(package)
+
+    #set status and resolution here with a message
+    #send update to bridge
+
+    complaint.status = Complaint::COMPLETED
+    complaint.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+    complaint.save
+
+    complaint.complaint_entries.each do |c_entry|
+      if c_entry.internal_comment.blank?
+        c_entry.internal_comment = ""
+      end
+      if c_entry.status != ComplaintEntry::STATUS_COMPLETED
+        c_entry.status = ComplaintEntry::STATUS_COMPLETED
+        c_entry.resolution = ComplaintEntry::STATUS_RESOLVED_FIXED_INVALID
+        c_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+        c_entry.internal_comment += " | User: #{current_user&.cvs_username} converted SDO ticket to webrep TE ticket on #{Time.now.to_s}"
+        c_entry.save
+      end
+    end
+
+    bridge_message = Bridge::ComplaintUpdateStatusEvent.new
+    bridge_message.post_complaint(complaint)
+
+    return true
+
+  end
 
   def self.build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, problem, original_bug_id)
     summary = "New Web Content Categorization Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
@@ -865,6 +969,7 @@ class Complaint < ApplicationRecord
     new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
 
     research_bug_proxy
+
   end
 
 

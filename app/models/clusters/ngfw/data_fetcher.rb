@@ -25,7 +25,7 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
   def fetch_data
     data = if regex.present?
              # apply regex
-             NgfwCluster.where('domain REGEXP ?', regex)
+             NgfwCluster.visible.where('domain REGEXP ?', regex)
            else
              NgfwCluster.visible
            end

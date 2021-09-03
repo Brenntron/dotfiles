@@ -31,11 +31,11 @@ describe Clusters::Filter do
     ]
   end
 
-  
+
 
   describe 'user specific filters' do
     describe 'all filter' do
-      let(:filter) { 'all' }
+      let(:filter) { { f: 'all' } }
 
       let(:expected_response) { clusters }
 
@@ -45,7 +45,7 @@ describe Clusters::Filter do
     end
 
     describe 'my filter' do
-      let(:filter) { 'my' }
+      let(:filter) { { f: 'my' } }
 
       let(:expected_response) do
         [
@@ -70,7 +70,7 @@ describe Clusters::Filter do
     end
 
     describe 'unassigned filter' do
-      let(:filter) { 'unassigned' }
+      let(:filter) { { f: 'unassigned' } }
 
       let(:expected_response) do
         [
@@ -95,7 +95,7 @@ describe Clusters::Filter do
     end
 
     describe 'pending filter' do
-      let(:filter) { 'pending' }
+      let(:filter) { { f: 'pending' } }
 
       let(:expected_response) do
         [

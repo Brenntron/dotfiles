@@ -24,7 +24,7 @@ class Clusters::Ngfw::Processor < Clusters::Templates::Processor
     # process in the same way as complaint entries
     Wbrs::Prefix.create_from_url(
       url: ngfw_cluster.domain,
-      categories: JSON.parse(ngfw_cluster.category_ids),
+      categories: JSON.parse(ngfw_cluster.category_ids).map(&:to_i),
       user: user.email,
       description: ngfw_cluster.comment
     )

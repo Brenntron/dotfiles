@@ -1,5 +1,12 @@
 class Platform < ApplicationRecord
 
+  def self.find_by_all_names(name)
+
+    platform = Platform.where("public_name like '%#{name}%' or internal_name like '%#{name}%'").first
+    platform
+  end
+
+
   def self.process_bridge_payload(message_payload)
 
     payload = message_payload[:attributes]

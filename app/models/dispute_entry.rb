@@ -278,7 +278,24 @@ class DisputeEntry < ApplicationRecord
     }
   end
 
+  def self.safe_domain_of(url)
+    begin
+      url = url.strip
+      if !url.start_with?( 'http', 'https')
+        url = "http://" + url
+      end
+
+      clean_url = Addressable::URI.parse(url)
+      clean_host = clean_url.host
+    rescue
+      clean_host = url
+    end
+    
+    clean_host
+  end
+
   def self.domain_of(url)
+    url = url.strip
     if !url.start_with?( 'http', 'https')
       url = "http://" + url
     end
@@ -325,14 +342,18 @@ class DisputeEntry < ApplicationRecord
       url = "http://" + url
     end
 
-    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
+    # Addressable::URI.parse(url)
+    uri_parsed = Addressable::URI.parse(url)
+    unless uri_parsed.scheme.present? || url.starts_with?('//')
+      uri_parsed = Addressable::URI.parse("http://#{url}")
+    end
+    public_suffix = PublicSuffix.parse(uri_parsed.host, :ignore_private => true)
 
-    self.subdomain                      = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
-    self.domain                         = domain.domain
-    self.path                           = uri.path
-    self.hostname                       = uri.host
-    self.top_level_domain               = domain.tld
+    self.subdomain                      = uri_parsed.host.gsub(Regexp.new("\\.?#{public_suffix.domain}$"), '')
+    self.domain                         = public_suffix.domain
+    self.path                           = uri_parsed.path
+    self.hostname                       = uri_parsed.host
+    self.top_level_domain               = public_suffix.tld
 
     self
   end
@@ -809,7 +830,7 @@ class DisputeEntry < ApplicationRecord
 
 
 
-    self.wbrs_score = wbrs_stuff["wbrs"]["score"]
+    self.wbrs_score = wbrs_stuff["wbrs"]["score"] if wbrs_stuff["wbrs"].present?
 
     if wbrs_stuff["threat_cats"].present?
       threat_cats = wbrs_stuff["threat_cats"]
@@ -952,14 +973,18 @@ class DisputeEntry < ApplicationRecord
     end
 
     # Make sure there will always be a "www" and "non-www" form to an inputted URL
-
-    if !url.include?("www.")
-      unless entries.find{|entry| url == "www." + entry.uri} || (url =~ Resolv::IPv4::Regex)
-        entries.prepend DisputeEntry.new(uri: "www."+ url)
-      end
-    elsif url.include?("www.")
-      unless entries.find{|entry| url.gsub("www.","") == entry.uri}
-        entries.prepend DisputeEntry.new(uri: url.gsub("www.",""))
+    # But, only do this if an entry has a `uri` at all; if we already know it's an
+    # IP address, there's no need to prepend www.
+    # (this is a fix for https://jira.vrt.sourcefire.com/browse/WEB-7679)
+    if !entry.uri.nil?
+      if !url.include?("www.")
+        unless entries.find{|entry| url == "www." + entry.uri} || (url =~ Resolv::IPv4::Regex)
+          entries.prepend DisputeEntry.new(uri: "www."+ url)
+        end
+      elsif url.include?("www.")
+        unless entries.find{|entry| url.gsub("www.","") == entry.uri}
+          entries.prepend DisputeEntry.new(uri: url.gsub("www.",""))
+        end
       end
     end
 
@@ -1407,4 +1432,14 @@ class DisputeEntry < ApplicationRecord
     return nil
   end
 
+  def determine_platform_record
+    if self.platform_id.present?
+      return (self.product_platform rescue nil)
+    end
+    if self.dispute.platform_id.present?
+      return (self.dispute.platform rescue nil)
+    end
+
+    return nil
+  end
 end

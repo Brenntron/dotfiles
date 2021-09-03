@@ -1,7 +1,7 @@
 class AdminTask
   def self.available_tasks
     self.instance_methods - Object.instance_methods
-  end  
+  end
 
   def self.execute_task(name, args)
     admin_task = AdminTask.new
@@ -9,7 +9,7 @@ class AdminTask
     admin_task.send(name.to_sym, morsel.id, **args)
 
     morsel
-  end  
+  end
 
   ######NOTES#######
   #LIKE A RAKE TASK, EACH TASK SHOULD FIT INTO **ONE** INSTANCE METHOD
@@ -147,5 +147,42 @@ class AdminTask
     end
 
     morsel
+  end
+
+  def parse_complaint_entry_uris(morsel_id)
+    morsel = Morsel.find(morsel_id)
+    entries = ComplaintEntry.where(entry_type: 'URI/DOMAIN').where("domain is null or domain = ''")
+    morsel.output += "\n##################################\n"
+    morsel.output += "Updated Complaint Entries\n"
+    morsel.output += "complaint_entry_id : complaint_id : uri\n"
+    entries.each do |entry|
+      begin
+        parsed_uri = Complaint.parse_url(entry.uri)
+        entry.domain = parsed_uri[:domain]
+        entry.subdomain = parsed_uri[:subdomain] unless entry.subdomain.present?
+        entry.path = parsed_uri[:path] unless entry.path.present?
+        entry.save
+        morsel.output += "#{entry.id} : #{entry.complaint_id} : #{entry.uri}\n"
+      rescue => e
+        morsel.output += "#{entry.id} : #{entry.complaint_id} : #{entry.uri} : error\n"
+        morsel.output += "#{e.message}\n"
+      end
+    end
+    morsel.output += "####################################\n"
+    morsel.save
+  end
+  handle_asynchronously :parse_complaint_entry_uris
+
+  def ngfw_clusters_import(morsel_id, args)
+    morsel = Morsel.find(morsel_id)
+    morsel.output += "############################################\n"
+    morsel.output += "starting NGFW clusters import now.\n"
+    morsel.output += "running.....\n"
+    morsel.save
+    Ngfw::Importer.import_without_delay
+    morsel.output += "completed.\n"
+    morsel.output += "############################################\n"
+    morsel.save
+
   end
 end

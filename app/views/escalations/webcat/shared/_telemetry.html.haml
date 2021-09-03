@@ -61,6 +61,8 @@
           WBNP Report Status:
         %a#wbnp-report-status-link.esc-tooltipped{'data-tooltip-content':'#tooltip-wbnp-content'}
           .wbnp-report-status Checking...
+        - if current_user.is_webcat_manager?
+          %button#wbnp-report-button.wbnp-full-report.icon-reports-white
 
 
 #tooltip-wbnp

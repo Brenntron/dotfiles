@@ -66,6 +66,12 @@
           %span.toolbar-button-text CopyCat Tool
         %button.toolbar-button.wsa-btn.icon-telemetry.esc-tooltipped{'onclick': 'open_wsa_status()', title: 'WSA Telemetry Status'}
           %span.toolbar-button-text WSA Telemetry Status
+        %div
+          %label.toolbar-section-label Platform filter
+          %select.webcat-platform-filter#webcat-platform-filter{'onchange': 'webcat_platform_filter()'}
+            %option#all="All"
+            %option#all="WSA"
+            %option#email="NGFW"
   .row
     .col-xs-12
       %table.table.responsive#clusters-index
