@@ -52,7 +52,7 @@ class DisputeEntry < ApplicationRecord
   after_initialize do |dispute_entry|
     is_ip_address = !!(dispute_entry.uri =~ Resolv::IPv4::Regex)
 
-    if is_ip_address
+    if is_ip_address && dispute_entry.entry_type != "URI/DOMAIN"
       dispute_entry.ip_address = dispute_entry.uri
       dispute_entry.uri = nil
       dispute_entry.entry_type = "IP"
