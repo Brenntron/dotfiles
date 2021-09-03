@@ -10,7 +10,7 @@ class FileReputationDispute < ApplicationRecord
   has_many :file_rep_comments
   has_many :dispute_emails
 
-  after_save :update_amp_detection
+  #after_save :update_amp_detection
 
   belongs_to :ti_product_platform, :class_name => "Platform", :foreign_key => "platform_id", optional: true
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
@@ -236,6 +236,7 @@ class FileReputationDispute < ApplicationRecord
     file_rep.auto_resolve_on_matching_disposition
 
     if file_rep.save!
+      file_rep.update_amp_detection
       file_rep
     else
       error_messages = file_rep.errors.full_messages.join('; ')
@@ -662,6 +663,7 @@ class FileReputationDispute < ApplicationRecord
       is_duplicate = true
     else
       new_dispute.save
+      new_dispute.update_amp_detection
     end
 
     if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
@@ -685,7 +687,9 @@ class FileReputationDispute < ApplicationRecord
             new_dispute.update_scores
             new_dispute.populate_fields_from_rl
             new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
-          rescue
+          rescue => e
+            Rails.logger.error e
+            Rails.logger.error e.backtrace.join("\n")
             #do nothing for now, come back and improve this....somehow.
             #in this case if something catastrophic happens with auto resolve, the fallback
             #is that the dispute is created with a status of new, going into the pile for humans
@@ -698,7 +702,9 @@ class FileReputationDispute < ApplicationRecord
           new_dispute.update_scores
           new_dispute.populate_fields_from_rl
           new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
-        rescue
+        rescue => e
+          Rails.logger.error e
+          Rails.logger.error e.backtrace.join("\n")
           #do nothing for now, come back and improve this....somehow.
           #in this case if something catastrophic happens with auto resolve, the fallback
           #is that the dispute is created with a status of new, going into the pile for humans
@@ -757,22 +763,27 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def auto_resolve_on_matching_disposition(from: 'ACE')
-      auto_resolve_log = ""
+
+      if self.auto_resolve_log.present?
+        ar_log = self.auto_resolve_log
+      else
+        ar_log = ""
+      end
 
       auto_resolved_boolean = false
 
-      auto_resolve_log += "-------------------------------\n"
-      auto_resolve_log += "suggested: #{self.disposition_suggested}\n"
+      ar_log += "-------------------------------\n"
+      ar_log += "suggested: #{self.disposition_suggested}\n"
       if self.clean?
-        auto_resolve_log += "actual: clean\n"
+        ar_log += "actual: clean\n"
       end
       if self.malicious?
-        auto_resolve_log += "actual: malicious\n"
+        ar_log += "actual: malicious\n"
       end
-      auto_resolve_log += "--------------------------------\n"
+      ar_log += "--------------------------------\n"
 
       if (self.clean? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
-        self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT, auto_resolve_log: auto_resolve_log)
+        self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT, auto_resolve_log: ar_log)
 
         auto_resolved_boolean = true
       end
@@ -784,8 +795,8 @@ class FileReputationDispute < ApplicationRecord
       reversinglab_present = true
       malware_zoo_present = false
 
-      auto_resolve_log += "\n\n"
-      auto_resolve_log += "-----Source Presence Checks------\n"
+      ar_log += "\n\n"
+      ar_log += "-----Source Presence Checks------\n"
 
       ##query sources for file sample existence
       threatgrid_response = Threatgrid::Search.query(self.sha256_hash)
@@ -807,42 +818,52 @@ class FileReputationDispute < ApplicationRecord
 
       sandbox_present = FileReputationApi::Sandbox.sample_exists(self.sha256_hash, :api_key_type => self.sandbox_key)
 
-      auto_resolve_log += "threatgrid present: #{threatgrid_present}\n"
-      auto_resolve_log += "reversing lab present: #{reversinglab_present}\n"
-      auto_resolve_log += "malware zoo present: #{malware_zoo_present}\n"
-      auto_resolve_log += "sandbox present: #{sandbox_present}\n"
+      ar_log += "threatgrid present: #{threatgrid_present}\n"
+      ar_log += "reversing lab present: #{reversinglab_present}\n"
+      ar_log += "malware zoo present: #{malware_zoo_present}\n"
+      ar_log += "sandbox present: #{sandbox_present}\n"
 
-      auto_resolve_log += "-----data-----\n"
-      auto_resolve_log += "threatgrid:\n #{threatgrid_response.inspect.to_s}\n\n--\n"
-      auto_resolve_log += "reversing lab: too large (we just look for the existence of 'error' -> 'Not in RL')\n\n--\n"
-      auto_resolve_log += "malware zoo: #{zoo_response.inspect.to_s}\n\n--\n"
-      auto_resolve_log += "-----------------------------------\n"
+      ar_log += "-----data-----\n"
+      ar_log += "threatgrid:\n #{threatgrid_response.inspect.to_s}\n\n--\n"
+      ar_log += "reversing lab: too large (we just look for the existence of 'error' -> 'Not in RL')\n\n--\n"
+      ar_log += "malware zoo: #{zoo_response.inspect.to_s}\n\n--\n"
+      ar_log += "-----------------------------------\n"
 
-      self.auto_resolve_log = auto_resolve_log
+      self.auto_resolve_log = ar_log
       self.save
-      if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == false } && [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == true }
-        self.auto_resolve_log += "\n-------\nSetting Status To New as there are some True's and some False's with the 4 presence sources.\n------\n"
-        self.status = STATUS_NEW
-        self.save
-        return auto_resolved_boolean
-      end
 
-      if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].all? {|prez| prez == false }
-        #notify customer that there is no sample and to escalate via TAC with sample
-        # self.status = STATUS_RESOLVED
-        # self.resolution = RESOLUTION_AUTORESOLVED
-        # self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
-        ### Temporary bypass of no sample auto resolve per WEB-6062 until WEB-5623 is resolved
-        if self.suggested_clean? || self.suggested_unknown?
-          self.status = STATUS_NEW
-          self.auto_resolve_log += "\n-------\nSetting Status To New as there is no sample.\n------\n"
-        else
+      if self.suggested_malicious?
+
+        if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].all? {|prez| prez == false }
+          #notify customer that there is no sample and to escalate via TAC with sample
+          # self.status = STATUS_RESOLVED
+          # self.resolution = RESOLUTION_AUTORESOLVED
+          # self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
+          ### Temporary bypass of no sample auto resolve per WEB-6062 until WEB-5623 is resolved
           self.status = STATUS_RESOLVED
           self.resolution = RESOLUTION_AUTORESOLVED
           self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
+
+          self.save
+          return auto_resolved_boolean
         end
-        self.save
-        return auto_resolved_boolean
+
+        if [sandbox_present, malware_zoo_present].all? {|prez| prez == false}
+          self.auto_resolve_log += "\n-------\nSetting Status To New as there are no files in malware_zoo or sandbox which is needed for FN.\n------\n"
+          self.status = STATUS_NEW
+          self.save
+          return auto_resolved_boolean
+        end
+      end
+
+      if self.suggested_clean?
+
+        if [reversinglab_present].all? {|prez| prez == false}
+          self.auto_resolve_log += "\n-------\nSetting Status To New as there are no files in Reversing Lab which is needed for FP.\n------\n"
+          self.status = STATUS_NEW
+          self.save
+          return auto_resolved_boolean
+        end
       end
 
       if self.suggested_malicious?
@@ -861,11 +882,11 @@ class FileReputationDispute < ApplicationRecord
       file_rep = FileReputationDispute.find(file_rep_id)
 
       detection = FileReputationApi::Detection.get_bulk(file_rep.sha256_hash)
-      auto_resolve_log = ""
-      auto_resolve_log += "\n---------final check---------\n"
-      auto_resolve_log += "amp poke verdict: #{detection.disposition}\n"
-      auto_resolve_log += "amp poke name: #{detection.name}\n"
-      auto_resolve_log += "amp poke score: #{detection.score}\n"
+      ar_log = ""
+      ar_log += "\n---------final check---------\n"
+      ar_log += "amp poke verdict: #{detection.disposition}\n"
+      ar_log += "amp poke name: #{detection.name}\n"
+      ar_log += "amp poke score: #{detection.score}\n"
 
       if detection.malicious?
         #notify customer that there is no sample and to escalate via TAC with sample
@@ -873,13 +894,13 @@ class FileReputationDispute < ApplicationRecord
         file_rep.status = STATUS_RESOLVED
         file_rep.resolution = RESOLUTION_AUTORESOLVED
         file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT
-        file_rep.auto_resolve_log += auto_resolve_log
+        file_rep.auto_resolve_log += ar_log
         file_rep.save
         conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
         conn.post(file_rep, source_authority: "talos-intelligence", source_key: file_rep.ticket_source_key)
 
       else
-        file_rep.auto_resolve_log += auto_resolve_log
+        file_rep.auto_resolve_log += ar_log
         file_rep.status = STATUS_NEW
         file_rep.save
       end
@@ -893,12 +914,12 @@ class FileReputationDispute < ApplicationRecord
 
       file_rep = FileReputationDispute.find(file_rep_id)
 
-      auto_resolve_log = "\n-------final check----------\n"
+      ar_log = "\n-------final check----------\n"
 
 
       if FileReputationApi::ReversingLabs.has_trusted_signature?(file_rep.sha256_hash)
 
-        auto_resolve_log += "Reversing Labs has returned a trusted signature for this sha256 (['rl']['malware_presence']['trust_factor'] == 0), poking clean via amp poke"
+        ar_log += "Reversing Labs has returned a trusted signature for this sha256 (['rl']['malware_presence']['trust_factor'] == 0), poking clean via amp poke"
 
         #POKE CLEAN HERE
         if Rails.env.production?
@@ -908,7 +929,7 @@ class FileReputationDispute < ApplicationRecord
         file_rep.status = STATUS_RESOLVED
         file_rep.resolution = RESOLUTION_AUTORESOLVED_STATUS_FP
         file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_FP_CLEAN
-        file_rep.auto_resolve_log += auto_resolve_log
+        file_rep.auto_resolve_log += ar_log
         file_rep.save
 
         FileReputationApi::ReversingLabs.subscribe(file_rep.sha256_hash)
@@ -925,8 +946,8 @@ class FileReputationDispute < ApplicationRecord
       if !results["error"].present?
         results = results["rl"]["sample"]["xref"]["entries"].first["scanners"]
       else
-        auto_resolve_log += "There was an error looking up reversing lab scanners, setting sha256 to human review"
-        file_rep.auto_resolve_log += auto_resolve_log
+        ar_log += "There was an error looking up reversing lab scanners, setting sha256 to human review"
+        file_rep.auto_resolve_log += ar_log
         file_rep.status = STATUS_NEW
         file_rep.save
         return
@@ -952,10 +973,10 @@ class FileReputationDispute < ApplicationRecord
       end
 
       if is_malicious == true
-        auto_resolve_log += "Found to be malicious either from >= 15 RL scanners or >=2 critical scanners\n"
-        auto_resolve_log += "scanners: #{mal_results.to_s}\n\n"
-        auto_resolve_log += "critical scanners: #{critical_mals.to_s}\n\n"
-        file_rep.auto_resolve_log += auto_resolve_log
+        ar_log += "Found to be malicious either from >= 15 RL scanners or >=2 critical scanners\n"
+        ar_log += "scanners: #{mal_results.to_s}\n\n"
+        ar_log += "critical scanners: #{critical_mals.to_s}\n\n"
+        file_rep.auto_resolve_log += ar_log
         file_rep.status = STATUS_RESOLVED
         file_rep.resolution = RESOLUTION_AUTORESOLVED
         file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_UNCHANGED
@@ -965,8 +986,8 @@ class FileReputationDispute < ApplicationRecord
         conn.post(file_rep, source_authority: "talos-intelligence", source_key: file_rep.ticket_source_key)
 
       else
-        auto_resolve_log += "Found to not be malicious, setting to NEW for human review\n"
-        file_rep.auto_resolve_log += auto_resolve_log
+        ar_log += "Found to not be malicious, setting to NEW for human review\n"
+        file_rep.auto_resolve_log += ar_log
         file_rep.status = STATUS_NEW
         file_rep.save
         return
@@ -1157,10 +1178,12 @@ class FileReputationDispute < ApplicationRecord
         results.each do |result|
           begin
             if result.key?("sha256") && result["updated_sections"].include?("malware_presence")
-              file_rep_case = FileReputationDispute.where(:sha256_hash => result['sha256'])
-              if file_rep_case.present? && file_rep_case.disposition == FileReputationDispute::DISPOSITION_CLEAN
+              file_rep_case = FileReputationDispute.where(:sha256_hash => result['sha256']).order("id desc").first
+
+              if file_rep_case.present? && file_rep_case.status == STATUS_RESOLVED && file_rep_case.disposition == FileReputationDispute::DISPOSITION_CLEAN
                 category = FileReputationApi::ReversingLabs.get_signature_category(file_rep_case.sha256_hash)
                 if category != FileReputationDispute::DISPOSITION_CLEAN
+
                   new_comment = FileRepComment.new
                   new_comment.comment = "Auto resolve monitoring picked up a change in disposition from Reversing Labs [ #{file_rep_case.disposition} -> #{category} ].  Reopening Ticket.  Investigation from an analyst is required. "
                   new_comment.user_id = user.id
@@ -1168,6 +1191,7 @@ class FileReputationDispute < ApplicationRecord
                   new_comment.save
 
                   file_rep_case.disposition = category
+                  file_rep_case.user_id = user.id
                   file_rep_case.status = FileReputationDispute::STATUS_REOPENED
                   file_rep_case.save
 
@@ -1176,8 +1200,10 @@ class FileReputationDispute < ApplicationRecord
               end
             end
           rescue Exception => e
+            Rails.logger.error e.message
+            Rails.logger.error e.backtrace.join("\n")
             morsel_message = "Error trying to run a result in FileReputationDispute.check_for_rep_updates:\n"
-            morsel_message = "result: #{result.inspect}\n"
+            morsel_message += "result: #{result.inspect}\n"
             morsel_message += "error: #{e.message}"
 
             Morsel.create({:output => morsel_message})
@@ -1185,6 +1211,8 @@ class FileReputationDispute < ApplicationRecord
         end
       end
     rescue Exception => e
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
       morsel_message = "Error trying to run FileReputationDispute.check_for_rep_updates:"
       morsel_message += "#{e.message}"
 

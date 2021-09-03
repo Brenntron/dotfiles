@@ -10,6 +10,132 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
   let(:existing_customer) do
     FactoryBot.create(:customer, name: customer_name, email: customer_email, company: existing_company)
   end
+
+
+  let(:dispute_message_alt_json) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute: {
+                source_type: 'Dispute',
+                source_key: 1001,
+                payload: {
+                    investigate_ips: {
+                    },
+                    investigate_urls: {
+                        "45.155.205.151" => {
+                            "WBRS_SCORE"=>"noscore",
+                            "WBRS_Rule_Hits"=>"",
+                            "Hostname_ips"=>"",
+                            "rep_sugg"=>"Untrusted",
+                            "claim" => "false negative",
+                            "category"=>"Not in our list"
+                        }
+                    },
+                    problem: 'What do I need to do to improve the reputation',
+                    submission_type: 'w',
+                    name: customer_name,
+                    user_company: company_name,
+                    email: 'webmaster@cmim.org',
+                    email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
+                    email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
+                    user_ip: '64.70.56.99',
+                    domain: '355toyota.com',
+                    product_platform: 1001,
+                    product_version: "test_platform_version"
+                }
+            }
+        }
+    }
+  end
+
+
+  let(:umbrella_dispute_message_json) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute: {
+                source_type: 'Dispute',
+                source_key: 2001,
+                payload: {
+                    investigate_ips: {
+                    },
+                    investigate_urls: {
+                        "355toyota.com" => {
+                            "WBRS_SCORE"=>"noscore",
+                            "WBRS_Rule_Hits"=>"",
+                            "Hostname_ips"=>"",
+                            "rep_sugg"=>"Untrusted",
+                            "claim" => "false negative",
+                            "category"=>"Not in our list"
+                        }
+                    },
+                    problem: 'What do I need to do to improve the reputation',
+                    submission_type: 'w',
+                    name: customer_name,
+                    user_company: company_name,
+                    email: 'webmaster@cmim.org',
+                    email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
+                    email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
+                    user_ip: '64.70.56.99',
+                    domain: '355toyota.com',
+                    product_platform: 1000,
+                    product_version: "test_platform_version"
+                }
+            }
+        }
+    }
+  end
+
+  let(:non_umbrella_dispute_message_json) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute: {
+                source_type: 'Dispute',
+                source_key: 3001,
+                payload: {
+                    investigate_ips: {
+                    },
+                    investigate_urls: {
+                        "355toyota.com" => {
+                            "WBRS_SCORE"=>"noscore",
+                            "WBRS_Rule_Hits"=>"",
+                            "Hostname_ips"=>"",
+                            "rep_sugg"=>"Good",
+                            "claim" => "false positive",
+                            "category"=>"Not in our list"
+                        }
+                    },
+                    problem: 'What do I need to do to improve the reputation',
+                    submission_type: 'w',
+                    name: customer_name,
+                    user_company: company_name,
+                    email: 'webmaster@cmim.org',
+                    email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
+                    email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
+                    user_ip: '64.70.56.99',
+                    domain: '355toyota.com',
+                    product_platform: 1001,
+                    product_version: "test_platform_version"
+                }
+            }
+        }
+    }
+  end
+
   let(:dispute_message_json) do
     {
         envelope: {
@@ -304,6 +430,33 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.product_platform).to eql(nil)
   end
 
+  it 'receives dispute message with ip address url and populates additional scores and rulehits' do
+    vrt_incoming
+    guest_company
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_alt_json
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+
+    expect(dispute.dispute_entries.where(uri: '45.155.205.151')).to exist
+
+    expect(dispute.ticket_source).to eql("talos-intelligence")
+    expect(dispute.platform_id).to eql(1001)
+
+    dispute_entry = dispute.dispute_entries.first
+
+    expect(dispute_entry.web_ips).to eql("[\"45.155.205.151\"]")
+
+    expect(dispute_entry.multi_wbrs_threat_category).to eql("[\"Malicious Sites\"]")
+    expect(dispute_entry.score).to eql(-8.8)
+    expect(dispute.dispute_entries.first.dispute_rule_hits.pluck(:is_multi_ip_rulehit).uniq).to eql([true])
+
+  end
+
   it 'receives dispute payload message from TI API not in-network' do
     vrt_incoming
     guest_company
@@ -454,7 +607,186 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
   end
 
+  it 'should close as matching disposition when product is Umbrella with score -7.0 or lower' do
 
+    umbrella_platform = Platform.new
+    umbrella_platform.id = 1000
+    umbrella_platform.public_name = "Umbrella No Reply"
+    umbrella_platform.internal_name = "Umbrella No-Reply"
+    umbrella_platform.active = true
+    umbrella_platform.webrep = true
+    umbrella_platform.webcat = true
+    umbrella_platform.filerep = true
+    umbrella_platform.emailrep = true
+    umbrella_platform.save
+
+    wbrs_response = {"wbrs" => {"score" => -7.0}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("355toyota.com", "wbrs").and_return(wbrs_response).at_least(:once)
+
+    vrt_incoming
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+    #Dispute.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :user_id => User.all.first.id, :status => "NEW")
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: umbrella_dispute_message_json
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 2001).first
+
+    expect(dispute).to_not be_nil
+    expect(Dispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+    expect(dispute.dispute_entries.first.status).to eql("RESOLVED_CLOSED")
+    expect(dispute.dispute_entries.first.resolution).to eql("UNCHANGED")
+
+  end
+
+  it 'should not close as matching disposition when product is Umbrella with score greater than -7.0' do
+
+    umbrella_platform = Platform.new
+    umbrella_platform.id = 1000
+    umbrella_platform.public_name = "Umbrella No Reply"
+    umbrella_platform.internal_name = "Umbrella No-Reply"
+    umbrella_platform.active = true
+    umbrella_platform.webrep = true
+    umbrella_platform.webcat = true
+    umbrella_platform.filerep = true
+    umbrella_platform.emailrep = true
+    umbrella_platform.save
+
+    wbrs_response = {"wbrs" => {"score" => -6.9}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("355toyota.com", "wbrs").and_return(wbrs_response).at_least(:once)
+
+    vrt_incoming
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+    #Dispute.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :user_id => User.all.first.id, :status => "NEW")
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: umbrella_dispute_message_json
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 2001).first
+
+    expect(dispute).to_not be_nil
+    expect(Dispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+    expect(dispute.dispute_entries.first.status).to eql("NEW")
+
+
+  end
+
+
+
+
+
+  it 'should close as matching disposition when product is not Umbrella' do
+    Dispute.destroy_all
+    DisputeEntry.destroy_all
+
+    umbrella_platform = Platform.new
+    umbrella_platform.id = 1000
+    umbrella_platform.public_name = "Umbrella No Reply"
+    umbrella_platform.internal_name = "Umbrella No-Reply"
+    umbrella_platform.active = true
+    umbrella_platform.webrep = true
+    umbrella_platform.webcat = true
+    umbrella_platform.filerep = true
+    umbrella_platform.emailrep = true
+    umbrella_platform.save
+
+    wbrs_response = {"wbrs" => {"score" => 3.5}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("355toyota.com", "wbrs").and_return(wbrs_response).at_least(:once)
+
+    ReptoolResponse = Struct.new(:status)
+    rep_response = ReptoolResponse.new
+    rep_response.status = "EXPIRED"
+
+    reptool_response = [rep_response]
+
+
+    expect(RepApi::Blacklist).to receive(:where).and_return(reptool_response).at_least(:once)
+
+    vrt_incoming
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+    #Dispute.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :user_id => User.all.first.id, :status => "NEW")
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: non_umbrella_dispute_message_json
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 3001).first
+
+    expect(dispute).to_not be_nil
+    expect(Dispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+    expect(dispute.dispute_entries.first.status).to eql("RESOLVED_CLOSED")
+    expect(dispute.dispute_entries.first.resolution).to eql("UNCHANGED")
+
+  end
+
+  context "non-ascii" do
+    let(:dispute_message_cyrillic_json) do
+      {
+        "envelope": {
+          "channel": "ticket-event",
+          "addressee": "analyst-console-escalations",
+          "sender": "talos-intelligence"
+        },
+        "message": {
+          "dispute": {
+            "payload": {
+              "name": "Marlin Pierce",
+              "email": "marlpier@cisco.com",
+              "domain": "cisco.com",
+              "problem": "I cannot even read those letters",
+              "details": "",
+              "user_ip": "::1",
+              "ticket_time": "June 15, 2021 16:10",
+              "investigate_ips": {},
+              "investigate_urls": {
+                "липецкаяобласть.рф": {
+                  "WBRS_SCORE": "noscore",
+                  "WBRS_Rule_Hits": "",
+                  "Hostname_ips": "",
+                  "rep_sugg": "Untrusted",
+                  "category": "Not in our list",
+                  "claim": "false negative",
+                  "platform": 1
+                }
+              },
+              "email_subject": "I cannot even read those letters",
+              "email_body": "____________________________________________________________\nUser-entered\nInformation:\n____________________________________________________________\nTime:\nJune 15, 2021 16:10\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain:\ncisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: I cannot even\nread those letters\nIP(s) to be investigated:\n\n\nURI(s) to be investigated:\nлипецкаяобласть.рф\n\nDetailed\nDescriptions:\n\n\n",
+              "user_company": "Cisco Systems, Inc.",
+              "submission_type": "w"
+            },
+            "source_key": 101373,
+            "source_type": "Dispute"
+          }
+        }
+      }
+    end
+
+    it 'receives cyrillic dispute payload messages' do
+      vrt_incoming
+      guest_company
+
+      post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_cyrillic_json
+
+      expect(response).to be_successful
+      dispute = Dispute.where(ticket_source_key: 101373).first
+
+      expect(dispute).to_not be_nil
+      expect(dispute.dispute_entries.count).to eq(1)
+      expect(dispute.dispute_entries.where(uri: 'липецкаяобласть.рф')).to exist
+      expect(dispute.ticket_source).to eql("talos-intelligence")
+    end
+  end
 end
 
 # expect(response.code).to be_successful

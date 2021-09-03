@@ -39,6 +39,11 @@ class Complaint < ApplicationRecord
 
   MAIN_WEBCAT_MANAGER_CONTACT = "admatter"
 
+  TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web and Email reputation. AUP categories are not applied to URLs that are primarily malicious in nature but may be applied in cases where a domain has been compromised or in cases of a web reputation false positive - these updates may take several hours to propagate. A new Web and Email Reputation ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all future updates regarding this request on the new ticket.
+
+For future web and email reputation requests, please open a web and email reputation ticket using the \"Web & Email\" form: https://talosintelligence.com/reputation_center/support#reputation
+"
+
   scope :active_count , -> {where(status:ACTIVE).count}
   scope :completed_count , -> {where(status:COMPLETED).count}
   scope :new_count , -> {where(status:NEW).count}
@@ -83,11 +88,9 @@ class Complaint < ApplicationRecord
   end
 
   def self.parse_url(url)
-    if !url.starts_with?("http")
-      url = "http://" + url
-    end
-    url = URI.escape(url)
-    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
+    parser = URI::Parser.new
+    url = parser.escape(url)
+    uri = parser.parse(parser.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
     subdomain = uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
@@ -149,7 +152,11 @@ class Complaint < ApplicationRecord
       else
         Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
       end
+      # add credit to the user for internal categorization
+      user_object = User.find_by_email(user)
+      WebcatCredits::InternalCategorizations::CreditHandler.new(user_object, ip_or_uri).handle_internal_credit
     end
+    top_url
   end
 
 
@@ -159,7 +166,7 @@ class Complaint < ApplicationRecord
     new_ips = new_entries_ips.keys.sort
 
     response = {}
-    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE, COMPLETED ])
+    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE, COMPLETED ]) rescue []
     candidates = []
 
     possibles.each do |poss|
@@ -322,8 +329,10 @@ class Complaint < ApplicationRecord
       new_complaint.customer_id = customer&.id
       new_complaint.status = NEW
       new_complaint.channel = TI_CHANNEL
+
       new_complaint.platform_id = platform.id unless platform.blank?
       new_complaint.product_platform = message_payload["payload"]["product_platform"] unless (message_payload["payload"]["product_platform"].blank? || message_payload["payload"]["product_platform"].kind_of?(Integer))
+
       new_complaint.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
       new_complaint.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
 
@@ -905,7 +914,65 @@ class Complaint < ApplicationRecord
     message.post_complaint(self)
   end
 
+  def self.convert_to_dispute(params, current_user)
+    platform_id = nil
+    complaint = Complaint.find(params[:complaint_id])
+    suggested_disposition_entries = params[:suggested_dispositions]
+    package = {}
+    package[:entries] = []
+    package[:convert_to] = "Dispute"
+    package[:submission_type] = params[:submission_type]
+    package[:email] = complaint&.customer&.email
+    package[:name] = complaint&.customer&.name
+    package[:company_name] = complaint&.customer&.company&.name
+    package[:internal_message] = params[:summary] + " | " + "original analyst console webcat ticket: #{complaint.id.to_s}"
+    suggested_disposition_entries.each do |sugg|
+      if complaint.platform_id.present?
+        platform_id = complaint.platform_id unless complaint.platform_id.blank?
+      else
+        comp_entry = complaint.complaint_entries.select {|c| c.hostlookup == sugg[:entry]}.first
+        if comp_entry.present?
+          platform_id = comp_entry.platform_id unless comp_entry.platform_id.blank?
+        end
+      end
 
+      entry = {}
+      entry[:entry] = sugg[:entry]
+      #needs to be either 'fp' or 'fn'
+      entry[:suggested_disposition] = sugg[:suggested_disposition]
+      entry[:platform_id] = platform_id
+      package[:entries] << entry
+    end
+
+    conn = ::Bridge::TicketConversionEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: complaint.ticket_source_key, ac_id: complaint.id)
+    conn.post(package)
+
+    #set status and resolution here with a message
+    #send update to bridge
+
+    complaint.status = Complaint::COMPLETED
+    complaint.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+    complaint.save
+
+    complaint.complaint_entries.each do |c_entry|
+      if c_entry.internal_comment.blank?
+        c_entry.internal_comment = ""
+      end
+      if c_entry.status != ComplaintEntry::STATUS_COMPLETED
+        c_entry.status = ComplaintEntry::STATUS_COMPLETED
+        c_entry.resolution = ComplaintEntry::STATUS_RESOLVED_FIXED_INVALID
+        c_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+        c_entry.internal_comment += " | User: #{current_user&.cvs_username} converted SDO ticket to webrep TE ticket on #{Time.now.to_s}"
+        c_entry.save
+      end
+    end
+
+    bridge_message = Bridge::ComplaintUpdateStatusEvent.new
+    bridge_message.post_complaint(complaint)
+
+    return true
+
+  end
 
   def self.build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, problem, original_bug_id)
     summary = "New Web Content Categorization Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
@@ -927,6 +994,7 @@ class Complaint < ApplicationRecord
     new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
 
     research_bug_proxy
+
   end
 
   def self.assign_wbnp_case(complaint_id)

@@ -90,11 +90,19 @@ class FileReputationApi::Sandbox
         "apikey" => type_based_api_key(api_key_type)
     }
 
-    begin
-      response = call_request_parsed(:get, endpoint, :input => query_string)
-      data = {:success => true, :data => response}
-    rescue
-      data = {:success => false, :data => {}}
+    attempts = 0
+
+    while attempts < 5
+
+      begin
+        response = call_request_parsed(:get, endpoint, :input => query_string)
+        data = {:success => true, :data => response}
+        break
+      rescue
+        data = {:success => false, :data => {}}
+        attempts += 1
+      end
+
     end
 
     data
@@ -110,11 +118,19 @@ class FileReputationApi::Sandbox
         "apikey" => type_based_api_key(api_key_type)
     }
 
-    begin
-      response = call_request_parsed(:get, endpoint, :input => query_string)
-      data = {:success => true, :data => response}
-    rescue
-      data = {:success => false, :data => {}}
+    attempts = 0
+
+    while attempts < 5
+
+      begin
+        response = call_request_parsed(:get, endpoint, :input => query_string)
+        data = {:success => true, :data => response}
+        break
+      rescue
+        data = {:success => false, :data => {}}
+        attempts += 1
+      end
+
     end
 
     data

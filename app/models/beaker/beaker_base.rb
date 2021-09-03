@@ -14,10 +14,10 @@ class Beaker::BeakerBase
 
   def self.get_app_info
     Talos::AppInfo.new(
-        device_id: ENV['DEVICE_ID'],
-        product_family: ENV['PRODUCT_FAMILY'],
-        product_id: ENV['PRODUCT_ID'],
-        product_version: ENV['PRODUCT_VERSION']
+      device_id: Rails.configuration.app_info.device_id,
+      product_family: Rails.configuration.app_info.product_family,
+      product_id: Rails.configuration.app_info.product_id,
+      product_version: Rails.configuration.app_info.product_version
     )
   end
 

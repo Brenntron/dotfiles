@@ -228,6 +228,53 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :version, :uint32, 2
       optional :map_is_complete, :bool, 3
     end
+    add_message "Talos.TaxonomyMap" do
+      repeated :taxonomies, :message, 1, "Talos.Taxonomy"
+      optional :version, :uint32, 2
+    end
+    add_message "Talos.Taxonomy" do
+      optional :taxonomy_id, :uint32, 1
+      repeated :valid_fields, :string, 2
+      optional :name, :string, 3
+      optional :description, :string, 4
+      repeated :entries, :message, 5, "Talos.TaxonomyEntry"
+      optional :version, :uint32, 6
+      optional :version_meta, :message, 7, "Talos.VersionMeta"
+    end
+    add_message "Talos.IntelSpecificDescription" do
+      optional :intelligence_type_id, :uint32, 1
+      repeated :description, :message, 2, "Talos.LocalizedString"
+    end
+    add_message "Talos.TaxonomyEntry" do
+      optional :entry_id, :uint32, 1
+      repeated :name, :message, 2, "Talos.LocalizedString"
+      repeated :short_name, :message, 3, "Talos.LocalizedString"
+      repeated :description, :message, 4, "Talos.LocalizedString"
+      repeated :short_description, :message, 5, "Talos.LocalizedString"
+      repeated :intel_specific_descriptions, :message, 6, "Talos.IntelSpecificDescription"
+      optional :vers_avail, :message, 7, "Talos.VersionRange"
+      optional :is_avail, :bool, 8
+      repeated :parent_entries, :message, 9, "Talos.TaxonomyRelation"
+      repeated :intelligence_type_ids, :uint32, 10
+    end
+    add_message "Talos.TaxonomyRelation" do
+      optional :taxonomy_id, :uint32, 1
+      optional :taxonomy_entry_id, :uint32, 2
+    end
+    add_message "Talos.ContextTag" do
+      optional :tag_type_id, :uint32, 1
+      optional :taxonomy_id, :uint32, 2
+      optional :taxonomy_entry_id, :uint32, 3
+      optional :tag_val_uint32, :uint32, 4
+      optional :tag_val_uint64, :uint64, 5
+      optional :tag_val_string, :string, 6
+      optional :tag_val_bytes, :bytes, 7
+    end
+    add_message "Talos.ContextGroup" do
+      optional :taxonomy_id, :uint32, 1
+      optional :taxonomy_entry_id, :uint32, 2
+      repeated :context_tags, :message, 3, "Talos.ContextTag"
+    end
     add_message "Talos.ServiceData" do
       optional :service_name, :string, 1
       optional :message_type, :string, 2
@@ -282,6 +329,13 @@ module Talos
   Tag = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.Tag").msgclass
   ReputationRule = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.ReputationRule").msgclass
   ReputationRuleMap = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.ReputationRuleMap").msgclass
+  TaxonomyMap = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.TaxonomyMap").msgclass
+  Taxonomy = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.Taxonomy").msgclass
+  IntelSpecificDescription = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.IntelSpecificDescription").msgclass
+  TaxonomyEntry = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.TaxonomyEntry").msgclass
+  TaxonomyRelation = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.TaxonomyRelation").msgclass
+  ContextTag = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.ContextTag").msgclass
+  ContextGroup = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.ContextGroup").msgclass
   ServiceData = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.ServiceData").msgclass
   EmptyReply = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.EmptyReply").msgclass
   URLSource = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.URLSource").enummodule
