@@ -115,6 +115,22 @@ module API
               }.to_json
             end
 
+            desc "process multiple reviewed important clusters"
+            params do
+            end
+            post 'process_multiple_reviewed' do
+              clusters = params[:clusters]
+              ::Clusters::Processor.new(clusters, current_user).process!
+              return {:status => "success"}.to_json
+            rescue Exception => e
+              {
+                  status: 'failed',
+                  error: e.message
+              }.to_json
+            end
+
+
+
             desc "decline important clusters categorization"
             params do
             end
@@ -126,6 +142,21 @@ module API
               {
                 status: 'failed',
                 error: e.message
+              }.to_json
+            end
+
+
+            desc "decline important clusters categorization"
+            params do
+            end
+            post 'decline_multiple_reviewed' do
+              clusters = params[:clusters]
+              ::Clusters::Processor.new(clusters, current_user).decline
+              return {:status => "success"}.to_json
+            rescue Exception => e
+              {
+                  status: 'failed',
+                  error: e.message
               }.to_json
             end
           end
