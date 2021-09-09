@@ -37,6 +37,15 @@
         .card-body
           %input#cluster_comment_field.text_field{placeholder: 'Reason for category (not public facing)'}
           %button.toolbar-button.icon-submit.cluster-button{'onclick': 'categorize_clusters()'} Submit Changes
+
+          -# REMOVE WHEN SAFE
+          -# REMOVE WHEN SAFE
+          .category-buttons-area
+            .content-label-sm Category Changes
+            %button.cluster-button.accept-all-button.esc-tooltipped{'onclick': 'categories_approve_all()', title: 'Accept All Category Changes'} All Approved
+            %button.cluster-button.reject-all-button.icon-reject.esc-tooltipped{'onclick': 'categories_reject_all()', title: 'Reject All Category Changes'} All Denied
+
+
   .row
     .col-xs-12
       .toolbar.cluster-table-toolbar

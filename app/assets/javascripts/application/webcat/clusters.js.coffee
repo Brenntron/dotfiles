@@ -85,7 +85,7 @@ window.categorize_clusters = () ->
   data["clusters"] = JSON.stringify(clusters)
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
+  std_msg_ajax(
     url: "/escalations/api/v1/escalations/webcat/clusters/process_cluster"
     method: 'POST'
     headers: headers
@@ -106,7 +106,94 @@ window.categorize_clusters = () ->
     error: (response) ->
       loader.addClass('hidden')
       std_api_error(response, "There was an error loading search results.", reload: false)
-  , this)
+  )
+
+
+  
+
+
+
+# REMOVE WHEN SAFE
+# REMOVE WHEN SAFE
+window.categories_approve_all = () ->
+
+  $('.selectize-input:visible').each ->
+    if $(this).hasClass('has-items')
+      $(this).closest('tr').find('input[type="checkbox"]').click()
+
+
+  loader = $('.cluster-mgt-loader-wrapper')
+  loader.removeClass('hidden')
+  user_id = $("#user_id").val()
+
+  clusters = $ '[id$=\'_categories\']'
+  categories = []
+
+  if $('#clusters-index').find('input:checked').length == 0
+    std_msg_error('No rows selected', ['Please select at least one row.'])
+    loader.addClass('hidden')
+    return
+
+  data = {}
+  data["user_id"] = user_id
+
+  selected_rows = $("#clusters-index").DataTable().rows('.selected').data()
+  clusters = []
+
+  for selected_row in selected_rows
+    escaped_domain = selected_row.domain.replaceAll('.', '_')
+    $("##{escaped_domain}_#{selected_row["platform"]}_categories").each ->
+
+      categories = $(this).find('option')
+
+      if categories? and categories.length > 0
+        category_values = []
+        $(categories).each ->
+          value = $(this).attr('value')
+          category_values.push value
+        selected_row["categories"] = category_values
+    clusters.push(selected_row)
+
+
+  data["clusters"] = JSON.stringify(clusters)
+  console.log 'data sent to endpoint:'
+  console.log data
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/webcat/clusters/process_multiple_reviewed"
+    method: 'POST'
+    headers: headers
+    data: data
+    success: () ->
+      loader.addClass('hidden')
+      std_msg_success("All categories approved.", '', reload: true)
+
+#      json = $.parseJSON(response)
+#      if json.error
+#        std_msg_error('Error on approve all categories', [json.error])
+#      else
+#        location.reload()
+
+    error: (response) ->
+      std_msg_error('Error on approve all categories', [json.error])
+  )
+
+
+
+window.categories_reject_all = () ->
+#
+#  std_msg_ajax(
+#    url: "/escalations/api/v1/escalations/webcat/clusters/decline_multiple_reviewed"
+#    method: 'POST'
+#    headers: headers
+#    data: data
+#    success: (response) ->
+#    error: (response) ->
+#  )
+#
+
+
 
 $ ->
 #  Populate the cluster management table (temp data currently)
