@@ -84,6 +84,10 @@ window.categorize_clusters = () ->
 
   data["clusters"] = JSON.stringify(clusters)
 
+  console.log 'DATA SENT TO ENDPOINT FROM "SUBMIT CHANGES" BUTTON:'
+  console.log data
+  return
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/webcat/clusters/process_cluster"
@@ -109,7 +113,7 @@ window.categorize_clusters = () ->
   )
 
 
-  
+
 
 
 
@@ -117,14 +121,16 @@ window.categorize_clusters = () ->
 # REMOVE WHEN SAFE
 window.categories_approve_all = () ->
 
+  # select all the reviewed clusters with categories (will have a 'locked' class if so)
   $('.selectize-input:visible').each ->
     if $(this).hasClass('has-items')
-      $(this).closest('tr').find('input[type="checkbox"]').click()
-
+      if $(this).hasClass('locked')
+        $(this).closest('tr').find('input[type="checkbox"]').click()
 
   loader = $('.cluster-mgt-loader-wrapper')
   loader.removeClass('hidden')
   user_id = $("#user_id").val()
+  comment = $("#cluster_comment_field").val()
 
   clusters = $ '[id$=\'_categories\']'
   categories = []
@@ -136,6 +142,7 @@ window.categories_approve_all = () ->
 
   data = {}
   data["user_id"] = user_id
+  data["comment"] = comment
 
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data()
   clusters = []
@@ -156,8 +163,10 @@ window.categories_approve_all = () ->
 
 
   data["clusters"] = JSON.stringify(clusters)
-  console.log 'data sent to endpoint:'
+
+  console.log 'DATA SENT TO ENDPOINT FROM "ALL APPROVED" BUTTON:'
   console.log data
+#  return
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   std_msg_ajax(
@@ -176,7 +185,7 @@ window.categories_approve_all = () ->
 #        location.reload()
 
     error: (response) ->
-      std_msg_error('Error on approve all categories', [json.error])
+      std_msg_error('Error on approve all categories')
   )
 
 
