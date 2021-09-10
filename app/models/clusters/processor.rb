@@ -32,6 +32,7 @@ class Clusters::Processor
 
   def process!
     clusters.each do |cluster|
+      next if cluster[:is_pending].present? && cluster[:is_pending] == false
       if third_person_review_cluster?(cluster)
         manager_user = User.where(cvs_username: Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
         ClusterAssignment.assign_pemanent!(cluster[:domain], manager_user)
