@@ -994,7 +994,9 @@ button {
 .collapse-all:hover,
 .sync-button:hover,
 .pin-to-top-button:hover,
-.expand-all:hover {
+.expand-all:hover,
+.approve-all-button:hover,
+.reject-all-button:hover {
   background-color: lighten($nav-toolbar-color, 8%)!important;
 }
 
@@ -1018,7 +1020,9 @@ button {
 .collapse-all:focus,
 .sync-button:focus,
 .pin-to-top-button:focus,
-.expand-all:focus{
+.expand-all:focus,
+.approve-all-button:focus,
+.reject-all-button:focus {
   background-color: lighten($bug-section-color, 28%);
 }
 
@@ -8771,16 +8775,6 @@ td.text-center span {
       color: $type-lightest;
     }
   }
-  .category-buttons-area {
-    border-left: solid 1px #eee;
-    width: 430px;
-    margin-left: 15px;
-    padding-left: 15px;
-    .content-label-sm {
-      position: absolute;
-      top: 30px;
-    }
-  }
 }
 
 // copycat tool dialog
@@ -9059,6 +9053,9 @@ td.text-center span {
   margin-bottom: 0;
 }
 
+#clusters-index_wrapper .table-search-input {
+  max-width: 200px;
+}
 #clusters-index_wrapper .datatable-top-tools {
   margin-top: -35px;
 }
@@ -13334,30 +13331,14 @@ input.wl-bl-list-inline {
   height: 25px;
 }
 
-
 // approve/reject all categories on clusters page
-.accept-all-button, .reject-all-button {
-  background-repeat: no-repeat;
-  padding-left: 25px;
-  margin-bottom: 2px;
-}
-
-.accept-all-button {
-  background-image: url(image_path('icon_submit_arrow.svg'));
-  background-position: 5px center;
-  background-size: 20px 20px;
-  margin-right: 2px;
-  min-width: 120px;
+.approve-all-button {
+  background-image: url(image_path('icon_submit_arrow_grey.svg'));
+  background-size: 18px 18px;
 }
 
 .reject-all-button {
   background-image: url(image_path('icon_blacklist_grey.svg'));
-  background-color: $nav-toolbar-color;
+  background-size: 17px 17px;
   background-position: 6px center;
-  background-size: 18px 18px;
-  min-width: 100px;
-  color: $type-lighter-color;
-  &:hover {
-    background-color: darken($nav-toolbar-color, 5%) !important;  // flag needed
-  }
 }
