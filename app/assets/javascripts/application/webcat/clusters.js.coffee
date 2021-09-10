@@ -84,17 +84,20 @@ window.categorize_clusters = (review_action) ->
 
   data["clusters"] = JSON.stringify(clusters)
 
-  endpoint = "process_cluster"  # default 1st person endpoint
+  # endpoint for 1st person
+  endpoint = "process_cluster"
 
-  # 2nd person bulk accept/deny goes to diff endpoints
-  if review_action == "bulk_accept" then endpoint = "process_multiple_reviewed"
-  else if review_action == "bulk_deny" then endpoint = "decline_multiple_reviewed"
+  # endpoints for 2nd person bulk accept/deny
+  if review_action == "bulk_accept"
+    endpoint = "process_multiple_reviewed"
+  else if review_action == "bulk_deny"
+    endpoint = "decline_multiple_reviewed"
 
-  curr_url = "/escalations/api/v1/escalations/webcat/clusters/#{endpoint}"
-
+  url = "/escalations/api/v1/escalations/webcat/clusters/#{endpoint}"
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
   std_msg_ajax
-    url: curr_url
+    url: url
     method: 'POST'
     headers: headers
     data: data
