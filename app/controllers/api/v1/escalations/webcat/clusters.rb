@@ -119,10 +119,10 @@ module API
             params do
             end
             post 'process_multiple_reviewed' do
-              clusters = params[:clusters]
+              clusters = JSON.parse(params[:clusters], symbolize_names: true)
               ::Clusters::Processor.new(clusters, current_user).process!
               return {:status => "success"}.to_json
-            rescue Exception => e
+              rescue Exception => e
               {
                   status: 'failed',
                   error: e.message
@@ -150,7 +150,7 @@ module API
             params do
             end
             post 'decline_multiple_reviewed' do
-              clusters = params[:clusters]
+              clusters = JSON.parse(params[:clusters], symbolize_names: true)
               ::Clusters::Processor.new(clusters, current_user).decline
               return {:status => "success"}.to_json
             rescue Exception => e
