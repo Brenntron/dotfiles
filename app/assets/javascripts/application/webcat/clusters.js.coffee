@@ -47,7 +47,7 @@ window.populate_clusters_index_table = (filter) ->
 
 
 
-# review_action is "bulk_accept", "bulk_deny", or empty (default)
+# categorize clusters submission - review_action (optional) is "bulk_accept", "bulk_deny", or empty (default)
 window.categorize_clusters = (review_action) ->
   loader = $('.cluster-mgt-loader-wrapper')
   loader.removeClass('hidden')
@@ -84,7 +84,7 @@ window.categorize_clusters = (review_action) ->
 
   data["clusters"] = JSON.stringify(clusters)
 
-  # endpoint for 1st person
+  # endpoint for 1st person (default)
   endpoint = "process_cluster"
 
   # endpoints for 2nd person bulk accept/deny
@@ -94,6 +94,7 @@ window.categorize_clusters = (review_action) ->
     endpoint = "decline_multiple_reviewed"
 
   url = "/escalations/api/v1/escalations/webcat/clusters/#{endpoint}"
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   std_msg_ajax
