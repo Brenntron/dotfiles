@@ -47,7 +47,7 @@ window.populate_clusters_index_table = (filter) ->
 
 
 
-
+# review_action is "bulk_accept", "bulk_deny", or empty (default)
 window.categorize_clusters = (review_action) ->
   loader = $('.cluster-mgt-loader-wrapper')
   loader.removeClass('hidden')
@@ -62,10 +62,6 @@ window.categorize_clusters = (review_action) ->
     loader.addClass('hidden')
     return
 
-#  if comment == ''
-#    std_msg_error('no comment added', ['Please make a comment to submit.'])
-#    loader.addClass('hidden')
-#    return
   data = {}
   data["comment"] = comment
   data["user_id"] = user_id
@@ -88,54 +84,28 @@ window.categorize_clusters = (review_action) ->
 
   data["clusters"] = JSON.stringify(clusters)
 
-  console.log 'DATA SENT TO ENDPOINT FROM "SUBMIT CHANGES" BUTTON:'
-  console.log data
-#  return
+  endpoint = "process_cluster"  # default 1st person endpoint
+
+  # 2nd person bulk accept/deny goes to diff endpoints
+  if review_action == "bulk_accept" then endpoint = "process_multiple_reviewed"
+  else if review_action == "bulk_deny" then endpoint = "decline_multiple_reviewed"
+
+  curr_url = "/escalations/api/v1/escalations/webcat/clusters/#{endpoint}"
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
-
-  # DRY THIS CODE OUT HERE
-  # DRY THIS CODE OUT HERE
-  # second (or third) person bulk review of categories
-  if review_action == "bulk_accept"
-    console.log 'bulk deny action is triggered'
-    console.log data
-    std_msg_ajax
-      url: "/escalations/api/v1/escalations/webcat/clusters/process_multiple_reviewed"
-      method: 'POST'
-      headers: headers
-      data: data
-      success: () ->
-        loader.addClass('hidden')
-        std_msg_success("Approved all cluster categories", '', reload: true)
-      error: () ->
-        std_msg_error('Error on approve all categories')
-
-  else if review_action == "bulk_deny"
-    console.log 'bulk deny action is triggered'
-    console.log data
-    std_msg_ajax
-      url: "/escalations/api/v1/escalations/webcat/clusters/decline_multiple_reviewed"
-      method: 'POST'
-      headers: headers
-      data: data
-      success: () ->
-        loader.addClass('hidden')
+  std_msg_ajax
+    url: curr_url
+    method: 'POST'
+    headers: headers
+    data: data
+    success: (response) ->
+      loader.addClass('hidden')
+      if review_action == "bulk_accept"
+        std_msg_success("Approved all cluster categories.", '', reload: true)
+      else if review_action == "bulk_deny"
         std_msg_success("Denied all cluster categories.", '', reload: true)
-      error: () ->
-        std_msg_error('Error on deny all categories')
-
-  else
-    console.log 'normal (first review) action is triggered'
-    console.log data
-    std_msg_ajax(
-      url: "/escalations/api/v1/escalations/webcat/clusters/process_cluster"
-      method: 'POST'
-      headers: headers
-      data: data
-      success: (response) ->
-        loader.addClass('hidden')
+      else
+        # legacy success logic
         json = $.parseJSON(response)
         if json.error
           std_msg_error('Process Error', [json.error])
@@ -146,11 +116,15 @@ window.categorize_clusters = (review_action) ->
             populate_clusters_index_table(filter)
           else
             populate_clusters_index_table()
-      error: (response) ->
-        loader.addClass('hidden')
-        std_api_error(response, "There was an error loading search results.", reload: false)
-    )
 
+    error: (response) ->
+      loader.addClass('hidden')
+      if review_action == "bulk_accept"
+        std_msg_error('Error on approve all categories')
+      else if review_action == "bulk_deny"
+        std_msg_error('Error on deny all categories')
+      else
+        std_msg_error('Error on clusters')
 
 
 
