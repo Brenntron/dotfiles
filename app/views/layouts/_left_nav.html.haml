@@ -69,10 +69,10 @@
       %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
         = image_tag('layout/icon_documentation.svg', class: 'sidenav-icon', alt: 'Docs')
       %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav-icons'}
-        %li{class: 'confluence-link'}
+        %li{class: 'wiki-link'}
           %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'}
             =inline_svg 'confluence-brands.svg'
-        %li{class: 'confluence-link'}
+        %li{class: 'github-link'}
           - if !@version.nil?
             %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"}
               =inline_svg 'confluence-brands.svg'
@@ -80,7 +80,6 @@
             %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349"}
               =inline_svg 'confluence-brands.svg'
 
-%a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/tag/v#{@version}"}
   #sidenav-menu-div
     %ul{class: 'nav-container'}
       %li{class: 'nav-ac static-nav-item'}
@@ -147,11 +146,11 @@
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
           Docs
         %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav'}
-          %li{class: 'confluence-link'}
+          %li{class: 'wiki-link'}
             %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'} Doc
-          %li{class: 'confluence-link'}
+          %li{class: 'github-link'}
             - if !@version.nil?
-              %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"} Release Notes
+              %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"} V #{@version}
             - else
               %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349"} Release Notes
 
