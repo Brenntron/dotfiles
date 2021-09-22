@@ -1,3 +1,6 @@
+
+require_relative '../bugzilla_rest_errors'
+
 module API
   module V1
     module Defaults
@@ -73,8 +76,44 @@ module API
             std_exception(exception, status: 404)
           rescue Grape::Exceptions::ValidationErrors => exception
             std_exception(exception, status: 406)
+          rescue GRPC::BadStatus => badstatus
+            Rails.logger.error("gRPC exception code #{badstatus.code}: #{badstatus.details}")
+            Rails.logger.error("gRPC exception: #{badstatus.debug_error_string}")
+            badstatus.backtrace[0..4].each_with_index do |traceline, index|
+              Rails.logger.error("backtrace[#{index}] #{traceline}")
+            end
+            http_status =
+              case badstatus.code
+              when 14
+                503
+              when 4
+                504
+              when 3
+                400
+              when 16
+                401
+              when 7
+                403
+              when 5, 11, 12
+                404
+              when 6
+                409
+              # For an exception, even with a status code 0, execution stopped, so we should report a 500.
+              # when 0
+              #   200
+              else
+                500
+              end
+            error!({message: "gRPC call failed: #{badstatus.details}",
+                    status: http_status,
+                    success: 500,
+                    grpc_code: badstatus.code},
+                   http_status)
           rescue BugzillaRest::AuthenticationError => exception
             Rails.logger.error("exception: #{exception.message}")
+            exception.backtrace[0..4].each_with_index do |traceline, index|
+              Rails.logger.error("backtrace[#{index}] #{traceline}")
+            end
             error!({message: exception.message, status: 401, success: false,
                     url: exception.url, system: exception.system, prompt: exception.prompt,
                     fields: exception.fields},

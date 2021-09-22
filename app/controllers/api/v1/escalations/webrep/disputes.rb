@@ -1070,6 +1070,33 @@ module API
               {:status => "success", :data => result, :checked_ips => ips}
             end
 
+            desc 'convert ticket from dispute to complaint'
+
+            params do
+              requires :dispute_id, type: Integer
+              requires :suggested_categories
+              requires :summary, type: String
+            end
+
+            post 'convert_ticket' do
+              Dispute.convert_to_complaint(permitted_params, current_user)
+            end
+
+            params do
+              requires :uri, type: Array[String]
+            end
+
+            post 'current_content_categories' do
+              urls = permitted_params[:uri]
+              data = {}
+              urls.each_with_index do |url, i|
+                data[i] = {'url': url, 'categories': ComplaintEntry.current_category_data_for_uri(url)}
+              end
+              
+              {:status => "success", :data => data}
+            end
+
+
           end
         end
       end

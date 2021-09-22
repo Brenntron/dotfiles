@@ -15,7 +15,7 @@ class Ngfw::Importer
       destroy_existing_clusters!
       import_new_clusters
     end
-    handle_asynchronously :handle_import, run_at: Proc.new { Time.zone.tomorrow.beginning_of_day + 16.hours } # run at 4pm next day
+    handle_asynchronously :handle_import, run_at: Proc.new { Time.zone.today.beginning_of_day + 19.hours } # run at 7pm UTC today
 
     def destroy_existing_clusters!
       # destroys NGFW clusters that should be replaced by new import

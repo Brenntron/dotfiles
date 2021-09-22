@@ -7,7 +7,7 @@ class WbnpReport < ApplicationRecord
 
 
   def self.null_report
-    {:id => nil, :total_new_cases => 0, :cases_imported => 0, :cases_failed => 0, :status => COMPLETE, :notes => ""}
+    {:id => nil, :total_new_cases => 0, :cases_imported => 0, :cases_failed => 0, :cases_skipped => 0, :status => COMPLETE, :notes => ""}
   end
 
   def self.get_last_reports

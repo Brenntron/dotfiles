@@ -69,8 +69,6 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/wbnp_report_status"
     data: data
     success: (response) ->
-      console.log response
-
       # Turn off loader indicator
       $('.wbnp-loading-spinner').hide()
 
@@ -83,12 +81,15 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 
         curr_report = response.data[0]
         last_report = response.data[1]
+        currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
 
         # Add current report info to top bar report area
         $('.wbnp-report-status').text(curr_report.status)
         $('#wbnp-report-attempted').text(curr_report.total_new_cases)
         $('#wbnp-report-succeeded').text(curr_report.cases_imported)
         $('#wbnp-report-rejected').text(curr_report.cases_failed)
+        $('#wbnp-quick-report-skipped').text(currentSkippedText)
+        $('#wbnp-full-report-skipped').text(currentSkippedText)
 
         # Build the full report for webcat managers
         wbnp_dialog = $('#wbnp-full-report')
@@ -101,12 +102,13 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
         $('#current-wbnp-report .wbnp-status').text(curr_report.status)
         $('#current-wbnp-report .wbnp-status-msg').text(curr_report.status_message)
         current_table = $('#current-wbnp-report .wbnp-full-report-table')
-        curr_table_content = '<tr><td>' + curr_report.id + '</td><td>' + curr_report.attempts + '</td><td>' + curr_report.total_new_cases + '</td><td>' + curr_report.cases_imported + '</td><td>' + curr_report.cases_failed + '</td><td>' + curr_report.created_at + '</td><td>' + curr_report.updated_at + '</td></tr>'
+        curr_table_content = '<tr><td>' + curr_report.id + '</td><td>' + curr_report.attempts + '</td><td>' + curr_report.total_new_cases + '</td><td>' + curr_report.cases_imported + '</td><td>' + curr_report.cases_failed + '</td><td>' + currentSkippedText + '</td><td>' + curr_report.created_at + '</td><td>' + curr_report.updated_at + '</td></tr>'
         $(current_table).append(curr_table_content)
         $('#current-wbnp-report .wbnp-notes').html(curr_report.notes)
 
         # Previous report:
         if last_report?
+          lastSkippedText = if last_report.cases_skipped? then last_report.cases_skipped else '0'
           if last_report.status == 'complete'
             $('#previous-wbnp-report .wbnp-status').addClass('status_complete')
           else
@@ -114,7 +116,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
           $('#previous-wbnp-report .wbnp-status').text(last_report.status)
           $('#previous-wbnp-report .wbnp-status-msg').text(last_report.status_message)
           prev_table = $('#previous-wbnp-report .wbnp-full-report-table')
-          prev_table_content = '<tr><td>' + last_report.id + '</td><td>' + last_report.attempts + '</td><td>' + last_report.total_new_cases + '</td><td>' + last_report.cases_imported + '</td><td>' + last_report.cases_failed + '</td><td>' + last_report.created_at + '</td><td>' + last_report.updated_at + '</td></tr>'
+          prev_table_content = '<tr><td>' + last_report.id + '</td><td>' + last_report.attempts + '</td><td>' + last_report.total_new_cases + '</td><td>' + last_report.cases_imported + '</td><td>' + last_report.cases_failed + '</td><td>' + lastSkippedText + '</td><td>' + last_report.created_at + '</td><td>' + last_report.updated_at + '</td></tr>'
           $(prev_table).append(prev_table_content)
           $('#previous-wbnp-report .wbnp-notes').html(last_report.notes)
 
@@ -134,11 +136,14 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 
       else
         curr_report = response.data
+        currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
         # Add current report info to top bar report area
         $('.wbnp-report-status').text(curr_report.status)
         $('#wbnp-report-attempted').text(curr_report.total_new_cases)
         $('#wbnp-report-succeeded').text(curr_report.cases_imported)
         $('#wbnp-report-rejected').text(curr_report.cases_failed)
+        $('#wbnp-quick-report-skipped').text(currentSkippedText)
+        $('#wbnp-full-report-skipped').text(currentSkippedText)
 
     error: (response) ->
       $('.wbnp-loading-spinner').hide()
@@ -151,6 +156,7 @@ window.touchedFormChange = (url) ->
 
   if !urls_touched.includes(url)
     url_items = urls_touched.split(",")
+    url_items = url_items.filter((item) -> return item)
     url_items.push(url)
     urls_touched = url_items.join(",")
   sessionStorage.setItem("touchedForm", urls_touched)
@@ -160,19 +166,17 @@ window.removeTouchedFormChange = (url) ->
 
   if urls_touched.includes(url)
     url_items = urls_touched.split(",")
+    url_items = url_items.filter((item) -> return item)
     url_index = url_items.indexOf(url)
     url_items.splice(url_index, 1)
     urls_touched = url_items.join(",")
   sessionStorage.setItem("touchedForm", urls_touched)
 
 getTouchedFormCount = ()->
-  form_item = sessionStorage.getItem("touchedForm")
-  items = 0
-  if form_item
-    if form_item.slice -1 == ","
-      form_item = form_item.slice(0, -1);
-    items = form_item.split(",").length - 1
-  return items
+  form_item = (sessionStorage.getItem("touchedForm") || "")
+  form_item = form_item.split(",")
+  form_item = form_item.filter((item) -> return item)
+  return form_item.length
 
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
@@ -203,7 +207,7 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
-        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" onclick="WebCat.RepLookup.queryWhoIs('+query_who_params+ '\')">Lookup</button>')
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + qual_subdomain + '\')">Lookup</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
     error: (response) ->
@@ -232,7 +236,19 @@ processSubmitNewURL = () ->
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
+        timesTouched = 0
+        popular_entries = []
+        message = ""
+        for key, val of response
+          if val.popular == true
+            popular_entries.push(val.url)
+
+        if popular_entries.length > 0
+           message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+        else
+           message = "No pending complaint entries have been created"
+
+        std_msg_success('URLs categorized successfully',[message, "All other entries have been submitted directly to WBRS."], reload: true)
       error: (response) ->
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
           std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
@@ -246,7 +262,7 @@ window.cat_new_url = ()->
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
     std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with categorizing this new item? It will reload the page and you will lose your changes.",
       [],
       {
         reload: false,
@@ -309,6 +325,7 @@ window.multiple_url_categorization = () ->
       error: (response) ->
         loader.addClass('hidden')
         std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
+
     )
   else
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
@@ -549,6 +566,8 @@ processSubmitPending=(entry_id,row_id)->
         $("#domain_#{entry_id}").text(domain)
         $("#subdomain_#{entry_id}").text(subdomain)
         $("#path_#{entry_id}").text(path)
+        removeTouchedFormChange(uri)
+        timesTouched = 0
 
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
@@ -562,7 +581,7 @@ window.updatePending = (id,row_id) ->
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
     std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this pending item? It will reload the page and you will lose your changes.",
       [],
       {
         reload: false,
@@ -677,6 +696,7 @@ processSubmitEntry = (entry_id,row_id) ->
             select_complete.disable()
 
           removeTouchedFormChange(uri)
+          timesTouched = 0
           $("#complaint_prefix_#{entry_id}").val(uri)
           $("#domain_#{entry_id}").text(domain)
           $("#subdomain_#{entry_id}").text(subdomain)
@@ -701,7 +721,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
     std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this entry? It will reload the page and you will lose your changes.",
       [],
       {
         reload: false,
@@ -1112,6 +1132,7 @@ format = (complaint_entry_row) ->
   uri = ''
   host = ''
   qual_subdomain = ''
+  lookup_val = ''
   url = ''
   search_uri = ''
   if complaint_entry.uri
@@ -1119,6 +1140,8 @@ format = (complaint_entry_row) ->
     url = host
     uri = '<a href="http://' + complaint_entry.uri + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
     uri_no_path = complaint_entry.uri
+    qual_subdomain = complaint_entry.domain
+    lookup_val = complaint_entry.domain
     if uri_no_path.indexOf('/') > 0
       uri_no_path = uri_no_path.split('/')[0] # strip out the path in a uri for Site Search, it's extraneous
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + uri_no_path + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + uri_no_path + '</a>'
@@ -1131,16 +1154,18 @@ format = (complaint_entry_row) ->
       url = host
     uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
+    lookup_val = complaint_entry.domain
   else if  complaint_entry.ip_address
     host = complaint_entry.ip_address
     url = host
+    lookup_val = complaint_entry.ip_address
     uri = '<a href="http://' + complaint_entry.ip_address + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
-  qual_subdomain = complaint_entry.domain
   if complaint_entry.subdomain
     qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
+    lookup_val = complaint_entry.subdomain + '.' + qual_subdomain
 
   entry_status = ""
   reopen_class = "hidden"
@@ -1356,7 +1381,7 @@ format = (complaint_entry_row) ->
       '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="lookup-' + entry_id+ '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + url + '\')">Lookup</button><br/>' +
+      '<button class="secondary" id="lookup-' + entry_id+ '" data-fqdn="' + lookup_val + '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + lookup_val+ '\')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + entry_id + '" onclick="history_dialog(' + entry_id  + ',\'' + url + '\')">History</button><br/>' +
       '<button class="secondary" id="domain-' + entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
@@ -1899,26 +1924,37 @@ window.triggerTooltips = (item) ->
 processSubmitMaster = () ->
 
   data = []
-  $('.selected + tr td.nested-complaint-data-wrapper').each ->
-    entry_id = $(this).find('tr').attr('entry_id')
-    row_id = $(this).find('tr').attr('row_id')
-    type = $(this).find('tr').attr('type')
+  selectedEntryDomains = (sessionStorage.getItem("touchedForm")|| "" )
+  return if selectedEntryDomains.length == 0
+
+  # remove empty values
+  selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
+  selectedEntries = []
+  $('#complaints-index').DataTable().rows (idx, data, node) ->
+    if selectedEntryDomains.includes(data.domain)
+      selectedEntries.push data
+    false
+  for entry in selectedEntries
+    data_wrapper = $("##{entry.entry_id}").closest('tr').next().find('.nested-complaint-data-wrapper')
+    entry_id = data_wrapper.find('tr').attr('entry_id')
+    row_id = data_wrapper.find('tr').attr('row_id')
+    type = data_wrapper.find('tr').attr('type')
 
     if type == 'submit_changes' && entry_id && row_id
-      prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
+      prefix = data_wrapper.find("#complaint_prefix_#{entry_id}")[0].value
 
       category_names = []
       categories = ""
-      if $(this).find("#input_cat_#{entry_id}").val()
-        categories = $(this).find("#input_cat_#{entry_id}").val().toString()
-      category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
+      if data_wrapper.find("#input_cat_#{entry_id}").val()
+        categories = data_wrapper.find("#input_cat_#{entry_id}").val().toString()
+      category_name = data_wrapper.find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
       category_name.each ->
         category_names.push($(this).text())
       category_names = category_names.toString()
-      status = $(this).find("[name=resolution#{entry_id}]:checked").val()
-      comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
-      resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
-      uri_as_categorized = $(this).find("#complaint_prefix_#{entry_id}")[0].value
+      status = data_wrapper.find("[name=resolution#{entry_id}]:checked").val()
+      comment = data_wrapper.find("#complaint_comment_#{entry_id}")[0].value
+      resolution_comment = data_wrapper.find("#complaint_resolution_comment_#{entry_id}")[0].value
+      uri_as_categorized = data_wrapper.find("#complaint_prefix_#{entry_id}")[0].value
       if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if status == 'UNCHANGED' || status == 'INVALID'
@@ -2283,6 +2319,157 @@ $ ->
       $('#complaints').attr('href', link)
 
   set_complaints_link()
+
+# Convert webcat to webrep
+# Enable / disable button to attempt based on if anything is selected
+$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+  if $('tr.selected').length == 1
+    $('#convert-ticket-button').removeAttr('disabled')
+  else
+    $('#convert-ticket-button').attr('disabled', 'disabled')
+
+
+# Prepare ticket for converting
+window.prep_complaint_to_convert = () ->
+  if $('tr.selected').length > 1
+    # This shouldn't happen, but just in case
+    std_api_error('Can only convert 1 complaint at a time.')
+  else
+    # get all data associated with the selected row
+    complaint_row = $('tr.selected')[0]
+    row_data = $('#complaints-index').DataTable().row(complaint_row).data()
+
+    complaint_id = row_data.complaint_id
+    summary = row_data.description
+    entries_table = $('#entries-to-convert tbody')
+    entry_id = row_data.entry_id
+
+    # clear residual info from prev selections
+    $('#complaint-id-to-convert').empty()
+    $('.convert-entry-count').empty()
+    $(entries_table).empty()
+    $('#convert-ticket-summary').empty()
+    $('#convert-to-webrep').attr('disabled', 'disabled')
+
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
+      data:
+        complaint_entry_id: entry_id
+      success: (response) ->
+        response = $.parseJSON(response)
+        entries = response.data.complaint_entries
+        entry_count = entries.length
+
+        # now that we have parent data, check complaint status & source
+        complaint_status = response.data.complaint.status
+        complaint_source = response.data.complaint.ticket_source
+
+        if complaint_source == 'talos-intelligence'
+          if complaint_status == 'NEW' || complaint_status == 'ACTIVE' || complaint_status == 'REOPENED'
+            # populate the dropdown
+            $('#complaint-id-to-convert').text(complaint_id)
+            $('.convert-entry-count').text('(' + entry_count + ')')
+
+            # extra handling to deal with too many entries and overlapping issues with selectize
+            if entry_count > 8
+              $('.convert-entry-table-wrapper').addClass('max-scroll')
+            else
+              $('.convert-entry-table-wrapper').removeClass('max-scroll')
+
+            $(entries).each ->
+              if this.entry_type == 'IP'
+                entry_content = this.ip_address
+              else
+                entry_content = this.uri
+
+              entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
+                '<td class="text-center entry-disposition">' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
+                '</td></tr>'
+
+              $(entries_table).append(entry_row)
+
+            $('#convert-ticket-summary').append(summary)
+
+          else
+            std_msg_error('Ticket cannot be converted', ['Selected entry\'s parent ticket is not in a convertible (open) status.'])
+            return
+
+        else
+          std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
+          return
+
+      error: (response) ->
+        console.log response
+        std_msg_error('Error preparing ticket for conversion', [response])
+    )
+
+
+
+convert_complaint_to_webrep = () ->
+  # get the parent ticket info
+  complaint_id = parseInt($('#complaint-id-to-convert').text())
+  summary = $('#convert-ticket-summary').val()
+  submission_type = $('input[name=ticket-type]:checked').val()
+
+  # get the entries
+  suggested_dispositions = []
+  entry_rows = $('#entries-to-convert tbody tr')
+  $(entry_rows).each ->
+    entry_content = $(this).find('.entry-content-to-convert').text()
+    disp_radio_name = $(this).find('input[type=radio]').attr('name')
+    entry_disposition = $(this).find('input[name=' + disp_radio_name + ']:checked').val()
+    suggested_dispositions.push(entry: entry_content, suggested_disposition: entry_disposition)
+
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/convert_ticket'
+    data: {
+      complaint_id: complaint_id
+      summary: summary
+      submission_type: submission_type
+      suggested_dispositions: suggested_dispositions
+    }
+    success: (response) ->
+      console.log response
+      std_msg_success('Success',["Complaint converted to Reputation Dispute."], reload: true)
+    error: (response) ->
+      console.log response
+      std_msg_error('Error converting ticket', ['Complaint unable to be converted to Reputation Dispute.'], reload: false)
+  )
+
+
+$ ->
+  # check prior to enabling submit convert to webrep button
+  $('#convert-ticket-dropdown').click ->
+    # find all the radios
+    radios = $(this).find('input:radio')
+    # separate into groups by name & then grab only the unique names
+    radio_names = []
+    $(radios).each ->
+      group = $(this).attr('name')
+      radio_names.push(group)
+    radio_groups = Array.from(new Set(radio_names))
+
+    # make sure each radio group has something checked
+    allchecked = 0
+    $(radio_groups).each ->
+      val = $('input[name=' + this + ']:checked').val()
+      unless (val == undefined) || (val == null)
+        allchecked++
+
+    if allchecked == radio_groups.length
+      $('#convert-to-webrep').removeAttr('disabled')
+    else
+      $('#convert-to-webrep').attr('disabled', 'disabled')
+
+
+
+
+  $('#convert-to-webrep').click ->
+    convert_complaint_to_webrep()
 
   $('#wbnp-full-report').dialog
     autoOpen: false

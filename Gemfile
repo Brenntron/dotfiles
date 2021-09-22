@@ -13,9 +13,19 @@ gem 'hashie-forbidden_attributes', '~> 0.1.1'
 gem 'activerecord-session_store', '1.1.1'
 gem 'simple_form', '4.0.1'
 
+# Asset Pipeline
 gem 'haml', '~> 5.0.4'
+gem 'uglifier', '4.1.20'
+gem 'jquery-rails', '~> 4.3'
+gem 'jquery-ui-rails', '~> 6.0'
+gem 'coffee-rails', '~> 4.2.1'
+gem 'bootstrap-sass', '~> 3.4.1'
+gem 'therubyracer', '~> 0.12.3'
 gem 'libv8', '3.16.14.19'
 
+# Database
+gem 'mysql2', '0.5.2'
+gem 'paper_trail', '12.0.0'
 
 gem 'kaminari', '1.1.1'
 
@@ -34,10 +44,9 @@ gem 'peake-bridge-client', '>= 0.0.9.0', git: "https://gitlab.vrt.sourcefire.com
 gem 'stomp', '1.4.6'
 gem 'aws-sdk', '2.11.170'
 gem 'nokogiri' ,'1.10.4'
-gem 'grpc', '1.30.2'
-gem 'grpc-tools', '1.30.2'
+gem 'grpc', '1.38.0'
+gem 'grpc-tools', '1.38.0'
 
-gem 'mysql2', '0.5.2'
 gem 'rmagick', '~> 2.16.0'
 gem 'bugzilla', require: 'bugzilla'
 
@@ -46,7 +55,6 @@ gem 'xmlrpc'
 
 gem 'rails_admin', '~> 1.4.3'
 
-gem 'paper_trail', '12.0.0'
 gem 'psych', '3.2.0'
 
 
@@ -60,10 +68,11 @@ gem 'delayed_job', '4.1.5'
 gem 'delayed_job_active_record', '4.1.3'
 gem 'delayed_job_web', '1.4.3'
 
+
 # Micellaneous
 gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
-
+gem 'web-console'
 
 gem 'jbuilder', '2.8.0'
 gem 'diffy', '3.2.1'
@@ -96,7 +105,7 @@ gem 'gzip', '1.0'
 gem 'rubyXL', '3.3.30'
 
 gem 'public_suffix', '~> 3.0'
-gem 'addressable', '~> 2.5.2'
+gem 'addressable', '~> 2.7.0'
 
 gem 'dotiw'
 
@@ -112,7 +121,7 @@ group :development do
   gem 'puma', '3.12.0'
   gem 'awesome_print', '1.8.0'
   gem 'guard','2.14.2'
-  gem 'web-console', '~> 3.7.0'
+
 end
 
 group :development, :test do
@@ -135,28 +144,8 @@ group :test do
   gem "timecop"
 end
 
-group :development, :profile do
-  # gem 'rack-mini-profiler'
-  # gem 'memory_profiler'                 # ?pp=profile-memory
-  # gem 'flamegraph'                      # ?pp=flamegraph
-  # gem 'stackprof'
-
-  # https://scoutapp.com/devtrace
-  # SCOUT_DEV_TRACE=true bundle exec rails server
-  # gem 'scout_apm'
-end
-
-group :profile do
-  # gem 'ruby-prof'
-end
 
 gem 'httparty', '~> 0.15.3'
-gem 'uglifier', '4.1.20'
-gem 'jquery-rails', '~> 4.3'
-gem 'jquery-ui-rails', '~> 6.0'
-gem 'coffee-rails', '~> 4.2.1'
 gem 'less-rails', '~> 3.0.0'
-gem 'bootstrap-sass', '~> 3.4.1'
-gem 'therubyracer', '~> 0.12.3'
 gem 'turbolinks', '5.2.0'
 gem "sprockets", '~> 3.7.1'

@@ -1048,7 +1048,6 @@ $ ->
       {
         data: 'case_age'
         'render':(data,type,full,meta) ->
-          console.log data,type,full,meta
           if data != "<1 hr"
             dispute_duration = moment(full.case_opened_at).fromNow()
             if dispute_duration.includes('minute')
@@ -1699,6 +1698,11 @@ window.populate_resolution_dropdown = (dispute_id) ->
 
 window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
+  row = $('.dispute_check_box').parents('tr')
+  if $('.dispute_check_box').prop('checked') == true
+    $(row).addClass('selected')
+  else
+    $(row).removeClass('selected')
 
 window.webrep_export_selected_rows = () ->
   checked_boxes = $('.dispute_check_box:checked').get()
@@ -2437,3 +2441,212 @@ $ ->
       $('#queue').attr('href', link)
 
   set_disputes_link()
+
+
+
+# Convert webrep to webcat
+# Enable / disable button to attempt based on if anything is selected
+$(document).on 'click', '#disputes-index tr, #disputes-index .dispute_check_box, #disputes_check_box', ->
+  if $('input.dispute_check_box:checked').length == 1
+    $('#convert-ticket-button').removeAttr('disabled')
+  else
+    $('#convert-ticket-button').attr('disabled', 'disabled')
+
+
+
+# Prepare ticket for converting
+window.prep_dispute_to_convert = (event) ->
+  if $('tr.selected').length > 1
+    # this shouldn't happen, but just in case
+    std_msg_error('Too many rows selected', ['Please select only one row.'])
+  else
+
+    # get all data associated with the selected row
+    dispute_row = $('tr.selected')[0]
+    row_data = $('#disputes-index').DataTable().row(dispute_row).data()
+
+    # conversion checks
+    # - ti.com ticket
+    # - open ticket
+
+    if row_data.source =! 'talos-intelligence'
+      std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
+      return
+    else
+      ticket_status = $(row_data.status).text().trim();
+      open_status = ['NEW', 'ASSIGNED', 'RESEARCHING', 'RE-OPENED', 'ESCALATED']
+      if open_status.includes(ticket_status)
+        dispute_id = row_data.id
+        entries = row_data.dispute_entries
+        summary = row_data.dispute_summary
+        entry_count = entries.length
+
+        $('#dispute-id-to-convert').text(dispute_id)
+        $('.convert-entry-count').text('(' + entry_count + ')')
+        $('#convert-ticket-summary').text(summary)
+
+        # extra handling to deal with too many entries and overlapping issues with selectize
+        if entry_count > 8
+          $('.convert-entry-table-wrapper').addClass('max-scroll')
+        else
+          $('.convert-entry-table-wrapper').removeClass('max-scroll')
+
+        entry_table = $('#entries-to-convert tbody')
+        # clear out previous data
+        $(entry_table).empty()
+
+        # grab entry content for category lookup
+        entries_content = []
+        $(entries).each ->
+          entry_content = ''
+          if this.entry.entry_type == 'IP'
+            entry_content = this.entry.ip_address
+          else
+            entry_content = this.entry.uri
+          entries_content.push(entry_content)
+
+        # get the current categories for the entries
+        get_webrep_current_cats(entries, entries_content)
+      else
+        std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertible (open) status.'])
+        return
+
+
+$ ->
+
+  # Check dropdown to decide when to enable the conversion submit button
+  # check on dd click
+  # check on selectize change
+  # check on finish of population of entries (user may not need to alter anything)
+  # - this will not work / be testable until the current cats come through
+  $('#webrep-index-toolbar #convert-ticket-dropdown').click ->
+    check_convert_to_webcat_ready()
+
+
+check_convert_to_webcat_ready = () ->
+  entry_cats = $('#webrep-index-toolbar #convert-ticket-dropdown').find('.selectize')
+  enable = true
+  # if any are not filled out we don't enable the submit button
+  $(entry_cats).each ->
+    if $(this).val() == null
+      enable = false
+  if enable == true
+    $('#convert-ticket-dropdown .dropdown-submit-button').removeAttr('disabled')
+  else
+    $('#convert-ticket-dropdown .dropdown-submit-button').attr('disabled', 'disabled')
+  return false
+
+
+get_webrep_current_cats = (entries, uris) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/current_content_categories'
+    method: 'POST'
+    headers: headers
+    data: {
+      uri: uris
+    }
+    success: (response) ->
+      entry_table = $('#entries-to-convert tbody')
+      $(entries).each ->
+        entry = this
+        entry_content = ''
+        if this.entry.entry_type == 'IP'
+          entry_content = this.entry.ip_address
+        else
+          entry_content = this.entry.uri
+
+        cat_ids = []
+        cat_names = ''
+        $(response.data).each ->
+          # find the response that corresponds to our entry
+          if this[0].url == entry_content
+            categories = this[0].categories
+            # make this data usable
+            cat_ids = []
+            cat_names = []
+            if Object.keys(categories).length > 0
+              jQuery.each categories, (id, category) ->
+                cat_ids.push(category.category_id)
+                cat_names.push(category.descr)
+
+            cat_names = cat_names.join()
+
+        entry_row = '<tr><td class="align-top">' + this.entry.id + '</td><td class="entry-content-to-convert align-top">' + entry_content + '</td>' + '<td class="align-top">' + cat_names + '</td>' +
+          '<td class="entry-cat-suggestions hidden" id="' + this.entry.id + '-selectize-holder"><select id="' + this.entry.id + '-selectize" class="selectize convert-entry-selectize" multiple="multiple" placeholder="Add categories"></select></td></tr>'
+
+        $(entry_table).append(entry_row)
+        entry_selectize_container = '#' + this.entry.id + '-selectize-holder'
+        entry_select = '#' + this.entry.id + '-selectize'
+
+        $convert_category_selectize = $(entry_select).selectize {
+          persist: false,
+          create: false,
+          maxItems: 5,
+          closeAfterSelect: true,
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code']
+          options: AC.WebCat.createSelectOptions(entry_select)
+          onChange: ->
+            check_convert_to_webcat_ready()
+        }
+
+
+        setTimeout (->
+          $(entry_selectize_container).removeClass('hidden')
+          convert_selectize = $convert_category_selectize[0].selectize
+          convert_selectize.setValue cat_ids
+         
+        ), 500
+
+
+      check_convert_to_webcat_ready()
+    error: (response) ->
+      console.log response
+      std_msg_error('Error preparing ticket for conversion', [response])
+  )
+
+selected_options = (category_names) ->
+  options = []
+  if category_names
+    options = category_names.split(',')
+  return options
+
+window.convert_dispute_to_webcat = () ->
+
+  $('#convert-ticket-dropdown .dropdown-loader-wrapper').removeClass('hidden')
+  dispute_id = $('#dispute-id-to-convert').text()
+  summary = $('#convert-ticket-summary').val()
+
+  # get the entries
+  suggested_categories = []
+  entry_rows = $('#entries-to-convert tbody tr')
+  $(entry_rows).each ->
+    entry_content = $(this).find('.entry-content-to-convert').text()
+    suggested_cats_string = $(this).find('.convert-entry-selectize option:selected').map(->
+      $(this).text()
+    ).get().join(',')
+    
+    suggested_categories.push(entry: entry_content, suggested_categories: suggested_cats_string)
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/convert_ticket'
+    method: 'POST'
+    headers: headers
+    data: {
+      dispute_id: dispute_id
+      summary: summary
+      suggested_categories: suggested_categories
+    }
+    success: (response) ->
+      console.log response
+      $('#convert-ticket-dropdown .dropdown-loader-wrapper').addClass('hidden')
+      std_msg_success('Success', ["Reputation Dispute converted to Categorization Complaint."], reload: true )
+    error: (response) ->
+      console.log response
+      $('#convert-ticket-dropdown .dropdown-loader-wrapper').addClass('hidden')
+      std_msg_error(response, ['Reputation Dispute unable to be converted to Categorization Complaint.'], reload: false)
+  )

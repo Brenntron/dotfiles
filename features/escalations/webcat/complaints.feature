@@ -964,3 +964,208 @@ Feature: Webcat complaints
     When I click "#complaints"
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
+
+
+#*********************************************#
+
+# Converting Webcat ticket to Webrep (WEB-4413)
+#  only tickets from talos-intelligence are allowed to be converted - test from ti and from other sources
+#  only tickets in an 'open' state are allowed to be converted - test each open and closed state
+#  only one ticket can be converted at a time
+#  ticket conversion should display all affected entries of the parent ticket
+#  ticket conversion should display the summary supplied by the customer
+
+
+  @javascript
+  Scenario: a user tries to convert a webcat ticket that originated from WBNP and cannot
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source | channel | status |
+      | 1  | this is shenanigans | RuleUI        | wbnp    | NEW    |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status     |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | NEW        |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "3" seconds
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And Element with id "1111" should have class "selected"
+    And I wait for "2" seconds
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And I should see "TICKET CANNOT BE CONVERTED"
+    And I should see "Selected ticket is not a customer ticket from talos-intelligence"
+
+  @javascript
+  Scenario: a user tries to convert a webcat ticket that was created internally via ACE and cannot
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source | channel  | status |
+      | 1  | this is shenanigans |               | internal | NEW    |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status     |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | NEW        |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "3" seconds
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And Element with id "1111" should have class "selected"
+    And I wait for "2" seconds
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And I should see "TICKET CANNOT BE CONVERTED"
+    And I should see "Selected ticket is not a customer ticket from talos-intelligence"
+
+  @javascript
+  Scenario: a user tries to convert a webcat ticket that originated from the talos intelligence form
+    and does not see an error msg
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source        | channel    | status |
+      | 1  | this is shenanigans | talos-intelligence   | talosintel | NEW    |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status     | ip_address |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | NEW        |            |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "3" seconds
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And Element with id "1111" should have class "selected"
+    And I wait for "2" seconds
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And I should not see "TICKET CANNOT BE CONVERTED"
+
+  @javascript
+  Scenario: a user tries to convert a webcat ticket that has a 'COMPLETED' status and cannot
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source        | channel    | status    |
+      | 1  | this is shenanigans | talos-intelligence   | talosintel | COMPLETED |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status     | ip_address |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | COMPLETED  |            |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "3" seconds
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And Element with id "1111" should have class "selected"
+    And I wait for "2" seconds
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And I should see "TICKET CANNOT BE CONVERTED"
+    And I should see "Selected entry's parent ticket is not in a convertible (open) status."
+
+  @javascript
+  Scenario: a user tries to convert a webcat ticket that has a 'RESOLVED' status and cannot
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source        | channel    | status   |
+      | 1  | this is shenanigans | talos-intelligence   | talosintel | RESOLVED |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | RESOLVED  |            |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "3" seconds
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And Element with id "1111" should have class "selected"
+    And I wait for "2" seconds
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And I should see "TICKET CANNOT BE CONVERTED"
+    And I should see "Selected entry's parent ticket is not in a convertible (open) status."
+
+  @javascript
+  Scenario: a user tries to convert a webcat ticket that has an 'ACTIVE' status and does not get an error message
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source        | channel    | status |
+      | 1  | this is shenanigans | talos-intelligence   | talosintel | ACTIVE |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | ASSIGNED  |            |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "3" seconds
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And Element with id "1111" should have class "selected"
+    And I wait for "2" seconds
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And I should not see "TICKET CANNOT BE CONVERTED"
+
+  @javascript
+  Scenario: a user tries to convert a webcat ticket that has a 'REOPENED' status and does not get an error message
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source        | channel    | status   |
+      | 1  | this is shenanigans | talos-intelligence   | talosintel | REOPENED |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | REOPENED  |            |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "3" seconds
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And Element with id "1111" should have class "selected"
+    And I wait for "2" seconds
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And I should not see "TICKET CANNOT BE CONVERTED"
+
+  @javascript
+  Scenario: a user tries to convert a webcat ticket with multiple entries
+    should see all entries listed in the conversion dropdown
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | id | description         | ticket_source        | channel    | status |
+      | 1  | this is shenanigans | talos-intelligence   | talosintel | ACTIVE |
+    And the following complaint entries exist:
+      | id    | uri                | domain             | entry_type | complaint_id | status    | ip_address |
+      | 1111  | cashmeoutside.com  | cashmeoutside.com  | URI/DOMAIN |  1           | ASSIGNED  |            |
+      | 2222  | howbowda.com       | howbowda.com       | URI/DOMAIN |  1           | ASSIGNED  |            |
+      | 3333  | hideyokids.com     | hideyokids.com     | URI/DOMAIN |  1           | ASSIGNED  |            |
+    And I goto "/escalations/webcat/complaints"
+    Then I wait for "3" seconds
+    And I click on cell with class "entry-id-col" within row with id "1111"
+    And I click "#convert-ticket-button"
+    And I wait for "1" seconds
+    And Table with id "entries-to-convert" should have "3" number of rows
+
+
+####    End ticket conversion tests
+
+  @javascript
+  Scenario: bulk submit submits all selected complaint entries
+    Given a user with role "webcat user" exists and is logged in
+    And WBRS Prefix where is stubbed
+    And the following complaint entries exist:
+      |id|  domain      | status |
+      |1 | food.com     |  NEW   |
+      |2 | blah.com     |  NEW   |
+      |3 | imhungry.com |  NEW   |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I click ".expand-row-button-1"
+    And I wait for "2" seconds
+    And I click ".expand-row-button-2"
+    And I wait for "2" seconds
+    And I fill in "complaint_comment_1" with "This is my favorite website"
+    And I fill in "complaint_comment_2" with "This is not my favorite website"
+    And I fill in "input_cat_1-selectized" with "Arts" and press enter
+    And I fill in "input_cat_2-selectized" with "Education" and press enter
+    When I click "master-submit"
+    And I click "Confirm"
+    And I wait for "5" seconds
+    And I dismiss modal "#msg-modal" if needed
+    And I wait for "5" seconds
+    Then I should not see "food.com"
+    And I should not see "blah.com"
+
+  @javascript
+  Scenario: user should get credit for direct categorizations for non-important urls
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in "url_1" with "example123.com"
+    And I fill in selectized with "Advertisements"
+    And I click ".primary"
+    And I wait for "10" seconds
+    Then I should see "URLS CATEGORIZED SUCCESSFULLY"
+    And I should see "Categorization of a Top URL will create a pending complaint entry. All other entries have been submitted directly to WBRS."
+    Then I goto a "resolution" report surrounding the current year
+    And I should see my username

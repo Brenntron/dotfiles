@@ -149,6 +149,30 @@ class AdminTask
     morsel
   end
 
+  def parse_complaint_entry_uris(morsel_id)
+    morsel = Morsel.find(morsel_id)
+    entries = ComplaintEntry.where(entry_type: 'URI/DOMAIN').where("domain is null or domain = ''")
+    morsel.output += "\n##################################\n"
+    morsel.output += "Updated Complaint Entries\n"
+    morsel.output += "complaint_entry_id : complaint_id : uri\n"
+    entries.each do |entry|
+      begin
+        parsed_uri = Complaint.parse_url(entry.uri)
+        entry.domain = parsed_uri[:domain]
+        entry.subdomain = parsed_uri[:subdomain] unless entry.subdomain.present?
+        entry.path = parsed_uri[:path] unless entry.path.present?
+        entry.save
+        morsel.output += "#{entry.id} : #{entry.complaint_id} : #{entry.uri}\n"
+      rescue => e
+        morsel.output += "#{entry.id} : #{entry.complaint_id} : #{entry.uri} : error\n"
+        morsel.output += "#{e.message}\n"
+      end
+    end
+    morsel.output += "####################################\n"
+    morsel.save
+  end
+  handle_asynchronously :parse_complaint_entry_uris
+
   def ngfw_clusters_import(morsel_id, args)
     morsel = Morsel.find(morsel_id)
     morsel.output += "############################################\n"

@@ -8,22 +8,42 @@ class FileReputationApi::SampleZoo
   set_basic_auth
 
   def self.sha256_lookup(sha256)
-    cache_key = "sample_zoo:#{sha256}"
-    if Rails.env.development? or Rails.cache.read(cache_key).blank?
-      call_request_parsed(:get, "/samples/_search?q=SHA256:#{sha256}")
-    else
-      Rails.cache.read(cache_key)
+
+    #commenting cache based lookups for the time being, to rule out possible outdated caching causing
+    #auto resolution failures
+
+    #cache_key = "sample_zoo:#{sha256}"
+    #if Rails.env.development? or Rails.cache.read(cache_key).blank?
+    #  call_request_parsed(:get, "/samples/_search?q=SHA256:#{sha256}")
+    #else
+    #  Rails.cache.read(cache_key)
+    #end
+
+    response = {}
+
+    attempts = 0
+
+    while attempts < 5 do
+      begin
+        response = call_request_parsed(:get, "/samples/_search?q=SHA256:#{sha256}")
+        break
+      rescue JSON::ParserError
+        Rails.logger.error('SampleZoo returned invalid JSON.')
+        response = {error: 'Invalid Hash'}
+        attempts += 1
+      rescue ApiRequester::ApiRequester::ApiRequesterNotAuthorized
+        Rails.logger.error('SampleZoo returned an "Unauthorized" response.')
+        response = {error: 'Unauthorized'}
+        attempts += 1
+      rescue
+        Rails.logger.error('SampleZoo returned an error response.')
+        response = {error: 'Data Currently Unavailable'}
+        attempts += 1
+      end
+
     end
 
-  rescue JSON::ParserError
-    Rails.logger.error('SampleZoo returned invalid JSON.')
-    {error: 'Invalid Hash'}
-  rescue ApiRequester::ApiRequester::ApiRequesterNotAuthorized
-    Rails.logger.error('SampleZoo returned an "Unauthorized" response.')
-    {error: 'Unauthorized'}
-  rescue
-    Rails.logger.error('SampleZoo returned an error response.')
-    {error: 'Data Currently Unavailable'}
+    response
   end
 
   def self.query_from_data(api_response)

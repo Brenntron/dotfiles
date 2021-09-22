@@ -83,6 +83,9 @@ class Customer < ApplicationRecord
       customer_exists.save(:validate => false)
     end
 
+    if customer_exists.blank?
+      customer_exists = Customer.where(:name => "Guest").first
+    end
     customer_exists
   end
 

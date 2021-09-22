@@ -11,7 +11,9 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
     FactoryBot.create(:customer, name: customer_name, email: customer_email, company: existing_company)
   end
 
+
   let(:complaint_payload) do
+
 
     {
         investigate_ips: {
@@ -360,6 +362,7 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
     expect(Complaint.all.size).to eql(1)
     expect(DelayedJob.all.size).to eql(1)
   end
+
 
 end
 
