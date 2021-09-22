@@ -13148,6 +13148,10 @@ input.wl-bl-list-inline {
       &.input-truncate {
         width: 300px !important;
       }
+      &.highlight {
+        float: none;
+        font-size: 11px;
+      }
     }
   }
 }
