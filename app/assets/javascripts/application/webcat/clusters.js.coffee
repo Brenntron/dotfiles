@@ -84,8 +84,9 @@ window.categorize_clusters = (review_action) ->
 
   data["clusters"] = JSON.stringify(clusters)
 
-  # endpoint for 1st person (default)
-  endpoint = "process_cluster"
+  endpoint = "process_cluster"  # endpoint for 1st person (default)
+
+  selections_invalid = false  # ensure valid selections on bulk
 
   # endpoints for 2nd person bulk accept/deny
   if review_action == "bulk_accept"
@@ -97,46 +98,48 @@ window.categorize_clusters = (review_action) ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  # if click approve all or deny all, make sure all selected clusters are in 2nd review before proceeding
+  # if click approve all or deny all, ensure all selected are in 2nd review (blue row) before proceeding
   if review_action == "bulk_accept" || review_action == "bulk_deny"
     $('input.cluster-row-select:checked').each ->
       curr_selectize = $(this).closest('tr').find('.selectize-input')
       if !$(curr_selectize).hasClass('locked')   # locked rows are in review + have categories
         std_msg_error('Please make sure all clusters selected are in review', [''])
         loader.addClass('hidden')
+        selections_invalid = true  # user selected some rows not in 2nd review (locked)
 
-  std_msg_ajax
-    url: url
-    method: 'POST'
-    headers: headers
-    data: data
-    success: (response) ->
-      loader.addClass('hidden')
-      if review_action == "bulk_accept"
-        std_msg_success("Approved all cluster categories.", '', reload: true)
-      else if review_action == "bulk_deny"
-        std_msg_success("Denied all cluster categories.", '', reload: true)
-      else
-        # legacy success logic
-        json = $.parseJSON(response)
-        if json.error
-          std_msg_error('Process Error', [json.error])
+  unless selections_invalid
+    std_msg_ajax
+      url: url
+      method: 'POST'
+      headers: headers
+      data: data
+      success: (response) ->
+        loader.addClass('hidden')
+        if review_action == "bulk_accept"
+          std_msg_success("Approved all cluster categories.", '', reload: true)
+        else if review_action == "bulk_deny"
+          std_msg_success("Denied all cluster categories.", '', reload: true)
         else
-          $("#cluster_comment_field").val('')
-          filter = $("#cluster_filter_field").val()
-          if filter
-            populate_clusters_index_table(filter)
+          # legacy success logic
+          json = $.parseJSON(response)
+          if json.error
+            std_msg_error('Process Error', [json.error])
           else
-            populate_clusters_index_table()
+            $("#cluster_comment_field").val('')
+            filter = $("#cluster_filter_field").val()
+            if filter
+              populate_clusters_index_table(filter)
+            else
+              populate_clusters_index_table()
 
-    error: (response) ->
-      loader.addClass('hidden')
-      if review_action == "bulk_accept"
-        std_msg_error('Error on approve all categories')
-      else if review_action == "bulk_deny"
-        std_msg_error('Error on deny all categories')
-      else
-        std_msg_error('Error on clusters')
+      error: (response) ->
+        loader.addClass('hidden')
+        if review_action == "bulk_accept"
+          std_msg_error('Error on approve all categories')
+        else if review_action == "bulk_deny"
+          std_msg_error('Error on deny all categories')
+        else
+          std_msg_error('Error on clusters')
 
 
 
