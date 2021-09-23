@@ -49,6 +49,8 @@ class DisputeEntry < ApplicationRecord
     where(case_resolved_at: (date_from..date_to))
   }
 
+  validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
+
   after_initialize do |dispute_entry|
     is_ip_address = !!(dispute_entry.uri =~ Resolv::IPv4::Regex)
 
