@@ -80,6 +80,7 @@ end
 
 When(/^I choose "(.*?)"$/) do |target|
   choose(:option => "#{target}")
+  # choose(target)
 end
 
 When(/^I toggle checkbox "(.*?)"$/) do |target|
@@ -96,21 +97,15 @@ end
 #TODO for Katie: figure out which I Check checkbox step def to keep
 And (/^I check checkbox with class "(.*?)"$/) do |cb_class|
   page.execute_script(" document.querySelector('.#{cb_class}').click()")
+  # check(class: cb_class)
 end
 
 And (/^I check the first checkbox with class "(.*?)"$/) do |cb_class|
   check(class: cb_class)
 end
-And(/^I check checkbox with class "(.*?)"$/) do |cb_class|
-  check(class: cb_class)
-end
 
 And(/^I uncheck checkbox with class "(.*?)"$/) do |cb_class|
   uncheck(class: cb_class)
-end
-
-When(/^I choose "(.*?)"$/) do |target|
-  choose(target)
 end
 
 When(/^I click a table row$/) do
@@ -227,7 +222,7 @@ end
 
 
 Given(/^I click an image button in table "(.*?)" at row "(.*?)" and col "(.*?)" with class name "(.*?)"$/) do |table, row, column,class_name|
-page.find(:xpath, "//table[#{table}]//tr[#{row}]//td[#{column}]//*[contains(@class, '#{class_name}')]").click
+  page.find(:xpath, "//table[#{table}]//tr[#{row}]//td[#{column}]//*[contains(@class, '#{class_name}')]").click
 end
 
 Given(/^I toggle bootstrap-switch in table "(.*?)" at row "(.*?)" and col "(.*?)"$/) do |table, row, column|

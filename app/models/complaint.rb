@@ -57,6 +57,8 @@ For future web and email reputation requests, please open a web and email reputa
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
 
+  validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
+
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}
     case new_status
