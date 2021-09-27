@@ -79,6 +79,12 @@
             %option#all="All"
             %option#all="WSA"
             %option#email="NGFW"
+        %div
+          %label.toolbar-section-label Cluster type
+          %select.webcat-cluster-type-filter#webcat-cluster-type-filter{'onchange': 'webcat_cluster_type_filter()'}
+            %option#all="All"
+            %option#domain="Domains"
+            %option#ip="IP addresses"
   .row
     .col-xs-12
       %table.table.responsive#clusters-index

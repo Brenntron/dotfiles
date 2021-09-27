@@ -272,3 +272,27 @@ Feature: Webcat clusters
     Then I select "All" from "webcat-platform-filter"
     And I should see "food.com"
     And I should see "blah.com"
+
+  @javascript
+  # this Scenario uses NGFW clusters only to not bring the extra complexity
+  # by stubbing WBNP data depends on selected filter type
+  # because we don't filter data on our side - RuleAPI does that for us
+  Scenario: user should be able to filter clusters by cluster type
+    Given a user with id "1" has a role "webcat user" and is logged in
+    And the following ngfw clusters exist:
+      | id |  domain     |
+      | 1  | example.com |
+      | 1  | 127.0.0.1   |
+    When I goto "/escalations/webcat/clusters"
+    And I should see "example.com"
+    And I should see "127.0.0.1"
+    Then I select "Domains" from "webcat-cluster-type-filter"
+    And I should see "example.com"
+    And I should not see "127.0.0.1"
+    Then I select "IP addresses" from "webcat-cluster-type-filter"
+    And I wait for "20" seconds
+    And I should not see "example.com"
+    And I should see "127.0.0.1"
+    Then I select "All" from "webcat-cluster-type-filter"
+    And I should see "example.com"
+    And I should see "127.0.0.1"

@@ -954,10 +954,19 @@ window.webcat_platform_filter = () ->
   url.searchParams.set('platform', selected_platform)
   document.location = url;
 
+window.webcat_cluster_type_filter = () ->
+  selected_type = $('#webcat-cluster-type-filter').find('option:selected').attr('id');
+  url = new URL(document.location.href)
+  url.searchParams.set('cluster_type', selected_type)
+  document.location = url;
 $ ->
   $(document).ready ->
     url = new URL(document.location.href)
     platform = url.searchParams.get('platform')
+    cluster_type = url.searchParams.get('cluster_type')
 
     if(platform)
       $('#webcat-platform-filter').val(platform)
+
+    if(cluster_type)
+      $("##{cluster_type}").attr("selected", "selected");

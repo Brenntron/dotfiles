@@ -31,7 +31,7 @@ describe Clusters::Fetcher do
       {
         :cluster_id=>"",
         :cluster_size=>nil,
-        :domain=>"example.com",
+        :domain=>"127.0.0.1",
         :global_volume=>2821,
         :is_pending=>false,
         :categories=>[],
@@ -43,13 +43,13 @@ describe Clusters::Fetcher do
   let(:top_urls) do
     [
       Wbrs::TopUrl.new_from_datum(url: 'googletest.com', is_important: true),
-      Wbrs::TopUrl.new_from_datum(url: 'example.com', is_important: true),
+      Wbrs::TopUrl.new_from_datum(url: '127.0.0.1', is_important: true),
     ]
   end
 
   let(:verdicts) do
     [{"request"=>{"url"=>"googletest.com"}, "response"=>{"thrt"=>{"scor"=>-3.0, "rhts"=>[72], "thrt_vers"=>3}}},
-      {"request"=>{"url"=>"example.com"}, "response"=>{"thrt"=>{"scor"=>-3.0, "rhts"=>[72], "thrt_vers"=>3}}}]
+      {"request"=>{"url"=>"127.0.0.1"}, "response"=>{"thrt"=>{"scor"=>-3.0, "rhts"=>[72], "thrt_vers"=>3}}}]
   end
 
   let(:expected_response) do
@@ -71,7 +71,7 @@ describe Clusters::Fetcher do
         :categories=>[],
         :cluster_id=>'',
         :cluster_size=>nil,
-        :domain=>"example.com",
+        :domain=>"127.0.0.1",
         :global_volume=>2821,
         :is_important=>true,
         :is_pending=>false,
@@ -115,6 +115,58 @@ describe Clusters::Fetcher do
         let(:filter) { { platform: 'NGFW' } }
         let(:expected_response) { ngfw_clusters }
         it 'returns NGFW clusters only' do
+          expect(subject.fetch).to eq(expected_response)
+        end
+      end
+    end
+
+    describe 'cluster type filter' do
+      context 'domain filter' do
+        let(:filter) { { cluster_type: 'domain' } }
+
+        let(:expected_response) do
+          [
+            {
+              :assigned_to=>"",
+              :categories=>[],
+              :cluster_id=>1,
+              :cluster_size=>2,
+              :domain=>"googletest.com",
+              :global_volume=>7637758,
+              :is_important=>true,
+              :is_pending=>false,
+              :platform=>"WSA",
+              :wbrs_score=>-3.0
+            }
+          ]
+        end
+
+        it 'returns clusters with domains only' do
+          expect(subject.fetch).to eq(expected_response)
+        end
+      end
+
+      context 'domain filter' do
+        let(:filter) { { cluster_type: 'ip' } }
+
+        let(:expected_response) do
+          [
+            {
+              :assigned_to=>"",
+              :categories=>[],
+              :cluster_id=>'',
+              :cluster_size=>nil,
+              :domain=>"127.0.0.1",
+              :global_volume=>2821,
+              :is_important=>true,
+              :is_pending=>false,
+              :platform=>"NGFW",
+              :wbrs_score=>-3.0
+            }
+          ]
+        end
+
+        it 'returns clusters with ip addresses only' do
           expect(subject.fetch).to eq(expected_response)
         end
       end
