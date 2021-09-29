@@ -53,7 +53,7 @@ gem 'bugzilla', require: 'bugzilla'
 gem 'xmlrpc'
 
 
-gem 'rails_admin', '~> 1.4.3'
+gem 'rails_admin', '~> 2.2.1'
 
 gem 'psych', '3.2.0'
 
