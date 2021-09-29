@@ -98,11 +98,11 @@ window.categorize_clusters = (review_action) ->
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  # if click approve all or deny all, ensure all selected are in 2nd review (blue row) before proceeding
+  # approve all, deny all: ensure all selected rows are in 2nd review (blue row) before proceeding
   if review_action == "bulk_accept" || review_action == "bulk_deny"
     $('input.cluster-row-select:checked').each ->
       curr_selectize = $(this).closest('tr').find('.selectize-input')
-      if !$(curr_selectize).hasClass('locked')   # locked rows are in review + have categories
+      if !$(curr_selectize).hasClass('locked')   # locked rows are in review and have categories
         std_msg_error('Please make sure all clusters selected are in review', [''])
         loader.addClass('hidden')
         selections_invalid = true  # user selected some rows not in 2nd review (locked)
@@ -115,32 +115,38 @@ window.categorize_clusters = (review_action) ->
       data: data
       success: (response) ->
         loader.addClass('hidden')
-        if review_action == "bulk_accept"
-          std_msg_success("Approved all cluster categories.", '', reload: true)
-        else if review_action == "bulk_deny"
-          std_msg_success("Denied all cluster categories.", '', reload: true)
+        json = $.parseJSON(response)
+
+        # clusters submitted but need 3rd person review, this step is a success & error/notice at the same time
+        if json.error && json.error.includes("Manager needs to approve")
+          std_msg_success('Clusters submitted, manager approval still needed', [json.error], reload: true)
+        # success on ajax call but other error info exists in response
+        else if json.error && !json.error.includes("Manager needs to approve")
+          std_msg_error("Clusters processing error", [json.error], reload: true)
         else
-          # legacy success logic
-          json = $.parseJSON(response)
-          if json.error
-            std_msg_error('Process Error', [json.error])
+          # if no 'json.error' then this is a normal success, reload page for bulk data tidiness
+          switch review_action
+            when "bulk_accept"
+              std_msg_success("Approved all cluster categories", '', reload: true)
+            when "bulk_deny"
+              std_msg_success("Denied all cluster categories", '', reload: true)
+
+          # legacy logic here, indvidual submit success updates the datatable w/o page reload
+          $("#cluster_comment_field").val('')
+          filter = $("#cluster_filter_field").val()
+          if filter
+            populate_clusters_index_table(filter)
           else
-            $("#cluster_comment_field").val('')
-            filter = $("#cluster_filter_field").val()
-            if filter
-              populate_clusters_index_table(filter)
-            else
-              populate_clusters_index_table()
+            populate_clusters_index_table()
 
       error: (response) ->
         loader.addClass('hidden')
         if review_action == "bulk_accept"
-          std_msg_error('Error on approve all categories')
+          std_msg_error('Error on approve all categories', '', reload: false)
         else if review_action == "bulk_deny"
-          std_msg_error('Error on deny all categories')
+          std_msg_error('Error on deny all categories', '', reload: false)
         else
-          std_msg_error('Error on clusters')
-
+          std_msg_error('Error on clusters processing', '', reload: false)
 
 
 $ ->
@@ -889,9 +895,12 @@ window.approve_cluster = (cluster_row_id) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
-        std_msg_error('Error Approving Clusters', [json.error])
+        if json.error.includes("Manager needs to approve")
+          std_msg_success('Cluster submitted, manager approval still needed', [json.error], reload: true)
+        else
+          std_msg_error('Error approving clusters', [json.error], reload: false)
       else
-        std_msg_success("cluster was submitted.", '', reload: true)
+        std_msg_success("Cluster was submitted", '', reload: true)
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -908,9 +917,9 @@ window.decline_cluster = (cluster_row_id) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
-        std_msg_error('Error Declining Clusters', [json.error])
+        std_msg_error('Error declining clusters', [json.error])
       else
-        std_msg_success("cluster categories were declined.", '',reload: true)
+        std_msg_success("Cluster categories were declined", '', reload: true)
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
