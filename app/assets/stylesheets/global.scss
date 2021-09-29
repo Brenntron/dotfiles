@@ -4621,6 +4621,7 @@ button.tertiary {
   font-weight: 300;
   font-size: 9pt;
   position: absolute;
+  width: 91%;
   z-index: 5;
   background-color: $content-bg-color;
   margin-top: -23px;
@@ -4631,10 +4632,7 @@ button.tertiary {
 
 #search-criteria-options li {
   border-bottom: 1px solid $faint-neutral-color;
-  display: inline-block;
-  width: 107%;
-  margin: 0px -10px;
-  padding-right: 17px;
+  padding-right: 6px;
 }
 .create.active{
   display: none;
