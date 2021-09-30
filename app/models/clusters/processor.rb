@@ -39,7 +39,7 @@ class Clusters::Processor
         manager_user = User.where(cvs_username: Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
         ClusterAssignment.assign_pemanent!(cluster[:domain], manager_user)
         raise_manager_exception = true
-        manager_count << cluster[:cluster_id]
+        manager_count << cluster[:domain]
       else
         PLATFORM_PROVIDERS[cluster[:platform]].new(cluster, user).process
         # add fixed credit to the user
