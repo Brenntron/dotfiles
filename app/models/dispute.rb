@@ -85,6 +85,8 @@ For future Web categorization requests, please open a Web categorization ticket 
   scope :sbrs_disputes, -> { where(submission_type: ['e', 'ew'])}
   scope :wbrs_disputes, -> { where(submission_type: ['w', 'ew'])}
 
+  validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
+
   validates_with DisputeValidator
 
   def self.create_action(bugzilla_rest_session, ips_urls, assignee, priority, ticket_type, status=NEW, categories = nil)
@@ -2402,6 +2404,36 @@ For future Web categorization requests, please open a Web categorization ticket 
     research_bug_proxy
 
   end
+
+  def get_email_meta_data
+
+    response = {}
+    if self.meta_data.present?
+      begin
+        meta_data = JSON.parse(self.meta_data).deep_symbolize_keys
+
+        meta_cc = nil
+        if meta_data[:ticket].present? && meta_data[:ticket][:cc].present?
+          meta_cc = meta_data[:ticket][:cc]
+        end
+
+        if meta_data[:entry].present? && meta_data[:entry][:cc].present?
+          meta_cc = meta_data[:entry][:cc]
+        end
+
+        if meta_cc.present?
+          response[:cc] = meta_cc
+        end
+      rescue
+        response = {}
+      end
+
+    end
+
+    response
+
+  end
+
 
   def determine_platform
     if self.platform_id.present?
