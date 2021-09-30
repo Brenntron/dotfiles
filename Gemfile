@@ -20,7 +20,6 @@ gem 'jquery-rails', '~> 4.3'
 gem 'jquery-ui-rails', '~> 6.0'
 gem 'coffee-rails', '~> 4.2.1'
 gem 'bootstrap-sass', '~> 3.4.1'
-gem 'therubyracer', '~> 0.12.3'
 gem 'libv8', '3.16.14.19'
 
 # Database
@@ -146,6 +145,5 @@ end
 
 
 gem 'httparty', '~> 0.15.3'
-gem 'less-rails', '~> 3.0.0'
 gem 'turbolinks', '5.2.0'
 gem "sprockets", '~> 3.7.1'
