@@ -25,8 +25,7 @@ gem 'libv8', '3.16.14.19'
 # Database
 gem 'mysql2', '0.5.2'
 gem 'paper_trail', '12.0.0'
-
-gem 'kaminari', '1.1.1'
+gem 'rails_admin', '~> 2.2.1'
 
 # Security
 gem 'cancancan', '2.3.0'
@@ -46,13 +45,22 @@ gem 'nokogiri' ,'1.10.4'
 gem 'grpc', '1.38.0'
 gem 'grpc-tools', '1.38.0'
 
-gem 'rmagick', '~> 2.16.0'
+# Bugzilla
+gem 'xmlrpc'
 gem 'bugzilla', require: 'bugzilla'
 
-gem 'xmlrpc'
+# Formatting and Presentation
+gem 'diffy', '3.2.1'
+gem 'gzip', '1.0'
+gem 'chart-js-rails', '~> 0.1.2'
+gem 'chartkick', '~> 2.2.4'
+gem 'awesome_nested_set', '3.1.4'
+gem 'will_paginate', '3.1.6'
+gem 'kaminari', '1.1.1'
+gem 'jquery-datatables', '~> 1.10.19'
+gem 'ajax-datatables-rails', '~> 1.0.0'
+gem 'rmagick', '~> 2.16.0'
 
-
-gem 'rails_admin', '~> 2.2.1'
 
 gem 'psych', '3.2.0'
 
@@ -67,31 +75,23 @@ gem 'delayed_job', '4.1.5'
 gem 'delayed_job_active_record', '4.1.3'
 gem 'delayed_job_web', '1.4.3'
 
-
 # Micellaneous
 gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
 gem 'web-console'
 
 gem 'jbuilder', '2.8.0'
-gem 'diffy', '3.2.1'
 
 gem 'selectize-rails', '~> 0.12.4'
-gem 'chart-js-rails', '~> 0.1.2'
-gem 'chartkick', '~> 2.2.4'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
-gem 'awesome_nested_set', '3.1.4'
 
 
 gem 'whois', '4.0.7'
 gem 'whois-parser', '1.1.0'
 
-gem 'will_paginate', '3.1.6'
 
-gem 'jquery-datatables', '~> 1.10.19'
 gem "sassc", '2.4.0'
 gem "sassc-rails", '~> 2.0'
-gem 'ajax-datatables-rails', '~> 1.0.0'
 gem 'clipboard-rails', '1.7.1'
 
 gem 'capybara', '2.11.0'
@@ -100,7 +100,6 @@ gem 'selenium-webdriver'
 gem 'inline_svg', '1.3.1'
 
 
-gem 'gzip', '1.0'
 gem 'rubyXL', '3.3.30'
 
 gem 'public_suffix', '~> 3.0'
