@@ -119,17 +119,17 @@ window.categorize_clusters = (review_action) ->
 
         # clusters submitted but need 3rd person review, this step is a success & error/notice at the same time
         if json.error && json.error.includes("Manager needs to approve")
-          std_msg_success('Clusters submitted, manager approval still needed', [json.error], reload: true)
+          std_msg_success('Clusters submitted, manager approval still needed', [json.error])
         # success on ajax call but other error info exists in response
         else if json.error && !json.error.includes("Manager needs to approve")
-          std_msg_error("Clusters processing error", [json.error], reload: true)
+          std_msg_error("Clusters processing error", [json.error])
         else
-          # if no 'json.error' then this is a normal success, reload page for bulk data tidiness
+          # if no 'json.error' then this is a normal success, reload page for page cleanup
           switch review_action
             when "bulk_accept"
-              std_msg_success("Approved all cluster categories", '', reload: true)
+              std_msg_success("Approved all cluster categories", '')
             when "bulk_deny"
-              std_msg_success("Denied all cluster categories", '', reload: true)
+              std_msg_success("Denied all cluster categories", '')
 
           # legacy logic here, indvidual submit success updates the datatable w/o page reload
           $("#cluster_comment_field").val('')
@@ -142,11 +142,11 @@ window.categorize_clusters = (review_action) ->
       error: (response) ->
         loader.addClass('hidden')
         if review_action == "bulk_accept"
-          std_msg_error('Error on approve all categories', '', reload: false)
+          std_msg_error('Error on approve all categories', '')
         else if review_action == "bulk_deny"
-          std_msg_error('Error on deny all categories', '', reload: false)
+          std_msg_error('Error on deny all categories', '')
         else
-          std_msg_error('Error on clusters processing', '', reload: false)
+          std_msg_error('Error on clusters processing', '')
 
 
 $ ->
