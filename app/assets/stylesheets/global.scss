@@ -994,7 +994,9 @@ button {
 .collapse-all:hover,
 .sync-button:hover,
 .pin-to-top-button:hover,
-.expand-all:hover {
+.expand-all:hover,
+.approve-all-button:hover,
+.reject-all-button:hover {
   background-color: lighten($nav-toolbar-color, 8%)!important;
 }
 
@@ -1018,7 +1020,9 @@ button {
 .collapse-all:focus,
 .sync-button:focus,
 .pin-to-top-button:focus,
-.expand-all:focus{
+.expand-all:focus,
+.approve-all-button:focus,
+.reject-all-button:focus {
   background-color: lighten($bug-section-color, 28%);
 }
 
@@ -8750,25 +8754,19 @@ td.text-center span {
   width: 100%;
   padding: 10px;
   margin-top: 20px;
+  margin-bottom: 20px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
-  -webkit-transition: all 5s ease-in-out;
-  -moz-transition: all 5s ease-in-out;
-  -o-transition: all 5s ease-in-out;
-  -ms-transition: all 5s ease-in-out;
-  transition: all 5s ease-in-out;
-
   .card-body {
     display: inline-flex;
     width: 100%;
     margin: 0;
-
     input {
       width: 80%;
     }
-
     button.icon-submit {
       width: 20%;
       background-color: $primary-section-color;
+      background-position-x: 6px;
       margin: 0 0 0 10px;
       padding: 5px 5px 5px 25px;
       font-size: 9pt;
@@ -9053,6 +9051,9 @@ td.text-center span {
   margin-bottom: 0;
 }
 
+#clusters-index_wrapper .table-search-input {
+  max-width: 200px;
+}
 #clusters-index_wrapper .datatable-top-tools {
   margin-top: -35px;
 }
@@ -13332,3 +13333,15 @@ input.wl-bl-list-inline {
   height: 25px;
 }
 
+// approve/reject all categories on clusters page
+.approve-all-button {
+  background-image: url(image_path('icon_submit_arrow_grey.svg'));
+  background-size: 18px 18px;
+  background-position: 5px center;
+}
+
+.reject-all-button {
+  background-image: url(image_path('icon_blacklist_grey.svg'));
+  background-size: 17px 17px;
+  background-position: 6px center;
+}
