@@ -446,10 +446,10 @@ $ ->
             }
             {
               targets: [ 3 ]
-              orderData: 15
+              orderData: 16
             }
             {
-              targets: [ 13 ]
+              targets: [ 14 ]
               className: 'submitter-col'
             }
           ]
@@ -574,6 +574,10 @@ $ ->
                   if type == 'display'
                     path = td_truncate(data, 20)
                   return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + path + '">' + path + '</span>'
+              }
+              {
+                data: 'uri'
+                className: 'uri-col'
               }
               {
                 data: 'category'
@@ -886,6 +890,7 @@ $ ->
     data['subdomain'] = $("#subdomain-checkbox").is(':checked')
     data['domain'] = $("#domain-checkbox").is(':checked')
     data['path'] = $("#path-checkbox").is(':checked')
+    data['uri'] = $("#path-checkbox").is(':checked')
     data['primary'] = $("#primary-checkbox").is(':checked')
     data['suggested'] = $("#suggested-checkbox").is(':checked')
     data['wbrs'] = $("#wbrs-checkbox").is(':checked')
