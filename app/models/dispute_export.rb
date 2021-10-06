@@ -62,7 +62,8 @@ class DisputeExport
       worksheet = @workbook[0]
 
       # filter export headers according to user filter setup
-      visible_columns_setup = JSON.parse(@user_preferences.value).select{|_k, v| v}.keys
+      @user_preferences ||= UserPreference::DEFAULT_WEB_REP_COLUMNS
+      visible_columns_setup = JSON.parse(@user_preferences).select{|_k, v| v}.keys
       static_columns = ["wbrs-hits", "sbrs-hits"] # can't change these (no toggle on the frontend)
       visible_columns_setup += static_columns
       headers_to_export = EXPORT_HEADERS.filter{|k, _v| visible_columns_setup.include?(k)}.values
