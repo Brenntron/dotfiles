@@ -18,7 +18,12 @@ class Escalations::OtherAdminTools::ToolsController < ApplicationController
   end
 
   def wbnp_reports
-    @wbnp_reports = WbnpReport.order(id: :desc).first(5)
+    @wbnp_reports = WbnpReport.order(id: :desc).first(500)
+  end
+
+  def wbnp_report
+    wbnp_report = WbnpReport.find(params[:id])
+    @wbnp_reports = [wbnp_report]
   end
 
   def manage_escalations_sync
