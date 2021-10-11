@@ -24,29 +24,37 @@ class ClusterAssignment < ApplicationRecord
       return includes(:user).where(user_id: user.id) if user
     end
 
-    def assign(domain, user)
+    def assign(cluster, user)
       destroy_expired_assignments!
 
-      assignments = where(domain: domain)
+      assignments = where(domain: cluster[:domain])
       raise 'Cluster already assigned to someone else' if assignments.any?
 
-      create(domain: domain, user_id: user.id)
+      create(domain: cluster[:domain], cluster_id: cluster[:cluster_id].to_i, user_id: user.id)
     end
 
-    def assign!(domain, user)
+    def assign!(cluster, user)
       destroy_expired_assignments!
-      where(domain: domain).destroy_all
-      create(domain: domain, user_id: user.id)
+      where(domain: cluster[:domain]).destroy_all
+      create(domain: cluster[:domain], cluster_id: cluster[:cluster_id].to_i, user_id: user.id)
     end
 
-    def assign_pemanent!(domain, user)
+    def assign_pemanent!(cluster, user)
       destroy_expired_assignments!
-      where(domain: domain).destroy_all
-      create(domain: domain, user_id: user.id, permanent: true)
+      where(domain: cluster[:domain]).destroy_all
+      create(domain: cluster[:domain], cluster_id: cluster[:cluster_id].to_i, user_id: user.id, permanent: true)
     end
 
-    def unassign(domain, user)
-      where(domain: domain, user_id: user).destroy_all
+    def unassign(cluster, user)
+      where(domain: cluster[:domain], user_id: user).destroy_all
+    end
+
+    def get_assigned_cluster_ids_for(user)
+      where(user_id: user.id).pluck(:cluster_id)
+    end
+
+    def get_assigned_cluster_domains_for(user)
+      where(user_id: user.id).pluck(:domain)
     end
 
     private
