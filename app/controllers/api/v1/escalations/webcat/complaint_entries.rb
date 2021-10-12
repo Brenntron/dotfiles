@@ -607,9 +607,8 @@ module API
                     confirmations << processed
                   rescue
                     confirmations << {status: 'ERROR', id: entry, resolution: permitted_params[:resolution], internal_comment: permitted_params[:internal_comment],
-                                      customer_facing_comment: permitted_params[:customer_facing_comment,
-                                      message: "Database error occurred on the  while processing Complaint Entry (#{complaint_entry.present? ? complaint_entry.hostlookup : "Entry not found"})"]
-                                     }
+                                      customer_facing_comment: permitted_params[:customer_facing_comment],
+                                      message: "Database error occurred while processing Complaint Entry (#{complaint_entry.present? ? complaint_entry.hostlookup : "Entry not found"})"}
                   end
                 end
                 confirmations.to_json
