@@ -72,7 +72,7 @@ gem 'delayed_job_web', '1.4.3'
 # Micellaneous
 gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
-gem 'web-console'
+
 
 gem 'jbuilder', '2.8.0'
 gem 'diffy', '3.2.1'
