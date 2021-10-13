@@ -3,7 +3,7 @@ class Clusters::Wbnp::DataFetcher < Clusters::Templates::DataFetcher
 
   DATA_PATFORM = 'WSA'.freeze
 
-  def initialize(regex, filter, user)
+  def initialize(regex, filter = {}, user)
     @regex = regex
     @filter = filter
     @user = user

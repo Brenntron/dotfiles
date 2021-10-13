@@ -76,8 +76,6 @@ class Clusters::Fetcher
       next if top_url_response['response'].blank? || top_url_response['response']['error'].present?
 
       parsed_response[top_url_response['request']['url']] = top_url_response['response']['thrt']['scor']
-
-    rescue
     end
 
     parsed_response
