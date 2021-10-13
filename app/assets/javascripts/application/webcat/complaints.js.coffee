@@ -1986,7 +1986,6 @@ processSubmitMaster = () ->
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
-
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
@@ -2224,6 +2223,9 @@ $ ->
       pin_to_top()
 
   $(document).on 'change', '.resolution_radio_button', ->
+    id = this.name.split("resolution")[1]
+    domain = $("#complaint_prefix_"+id)[0].dataset.domain
+    touchedFormChange(domain)
     $('#master-submit').prop('disabled', false)
 
   $('.expand-all').click ->
