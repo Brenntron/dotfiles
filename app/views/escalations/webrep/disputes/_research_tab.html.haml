@@ -714,20 +714,22 @@
                         %td.left-bordered.referenced-tickets-label-cell
                           %label Referenced on
                         %td.referenced-tickets-col.referenced-tickets-cell
-                          - if entry.referenced_tickets.count < 1
+                          - referenced_tickets = entry.referenced_tickets
+                          - referenced_tickets_count = referenced_tickets.count
+                          - if referenced_tickets_count < 1
                             %span.missing-data
                               Not on any other tickets
                           - else
                             %span.dropdown
                               %button.show_references.dropdown-toggle.references-dropdown-button{title: 'Referenced on', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                                = "#{entry.referenced_tickets.count} ticket(s)"
+                                = "#{referenced_tickets_count} ticket(s)"
                               .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
                                 %table
                                   %thead
                                     %th Case ID
                                     %th Date/Time Submitted
                                   %tbody
-                                    - entry.referenced_tickets.each do |reference|
+                                    - referenced_tickets.each do |reference|
                                       %tr
                                         %td
                                           %a{name:"#{reference.id}_link", href: escalations_webrep_dispute_path(reference.id)}
