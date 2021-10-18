@@ -714,7 +714,7 @@
                         %td.left-bordered.referenced-tickets-label-cell
                           %label Referenced on
                         %td.referenced-tickets-col.referenced-tickets-cell
-                          - referenced_tickets = entry.referenced_tickets
+                          - referenced_tickets = entry.referenced_tickets.to_a
                           - referenced_tickets_count = referenced_tickets.count
                           - if referenced_tickets_count < 1
                             %span.missing-data
