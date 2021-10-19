@@ -37,7 +37,6 @@ class Wbrs::Cluster < Wbrs::Base
     params = stringkey_params(conditions)
 
     response = post_request(path: '/v1/clusters/get', body: params)
-
     response_body = JSON.parse(response.body)
 
     response_body

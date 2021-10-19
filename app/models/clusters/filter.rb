@@ -9,15 +9,12 @@ class Clusters::Filter
 
   def filter
     # user specific filters - filters, selected by users
+    # 'my' and 'pending' filters applied in DataFetcher's for better performance
     case filter_hash[:f]
     when 'all'
       clusters
-    when 'my'
-      filter_assigned_to_user
     when 'unassigned'
       filter_unassigned
-    when 'pending'
-      filter_pending
     else
       filter_by_default
     end
@@ -27,22 +24,9 @@ class Clusters::Filter
 
   private
 
-  def filter_assigned_to_user
-    clusters.select! do |cluster|
-      cluster_assigned_to_user?(cluster)
-    end
-    clusters.uniq! { |cluster| cluster[:domain] }
-  end
-
   def filter_unassigned
     clusters.filter! do |cluster|
       cluster_unassigned?(cluster)
-    end
-  end
-
-  def filter_pending
-    clusters.filter! do |cluster|
-      cluster[:is_pending]
     end
   end
 
@@ -59,9 +43,5 @@ class Clusters::Filter
 
   def cluster_unassigned?(cluster)
     cluster[:assigned_to].blank?
-  end
-
-  def cluster_pending?(cluster, pending_clusters)
-    pending_clusters.find { |pending_cluster| pending_cluster.cluster_id == cluster[:cluster_id].to_i }.present?
   end
 end

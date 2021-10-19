@@ -32,6 +32,6 @@ class Clusters::Wbnp::Processor < Clusters::Templates::Processor
   def decline
     ClusterCategorization.where(cluster_id: cluster[:cluster_id]).destroy_all
     # assign clusters to the person who declined current categorization
-    ClusterAssignment.assign!(cluster[:domain], user)
+    ClusterAssignment.assign!(cluster, user)
   end
 end
