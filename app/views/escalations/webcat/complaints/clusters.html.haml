@@ -18,24 +18,18 @@
       .col-xl-9.col-lg-8.col-md-7.col-sm-6.col-xs-12
         .row
           .col-xs-9
-            %input#cluster_filter_field.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
+            %input#cluster_comment_field.text_field{placeholder: 'Reason for category (optional, not public-facing)'}
           .col-xs-3.no_pad
-            %button.cluster-button{onclick: 'apply_filter_to_table()', class:'apply-filter-btn icon-filter-white'}Apply Filter
+            %button.toolbar-button.icon-submit.cluster-button#submit-clusters{'onclick': 'categorize_clusters()'} Submit Changes
 
   .row
-    .col-xs-6
+    .col-xs-12
       .current-cluster-info-wrapper
         .result-label.regex-area.hidden
           Regex:
           %span#regex-filter
       %h1#clusters-index-title
 
-    .col-xs-6
-      .card
-        .content-label-sm Comment
-        .card-body
-          %input#cluster_comment_field.text_field{placeholder: 'Reason for category (not public facing)'}
-          %button.toolbar-button.icon-submit.cluster-button{'onclick': 'categorize_clusters()'} Submit Changes
 
   .row
     .col-xs-12

@@ -1,0 +1,25 @@
+// Clusters page specific styles
+#apply-regex-btn {
+  background-color: #e5e5e5;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: -3px 0 0 0;
+  height: 28px;
+  border-radius: 0 4px 4px 0;
+  padding: 0 16px;
+  position: absolute;
+  right: 0;
+  border: none;
+  font-size: 9pt;
+}
+
+#cluster_filter_field {
+  background-image: none;
+  padding-left: 4px;
+}
+
+#submit-clusters {
+  padding-left: 34px;
+  margin-top: 7px;
+}
