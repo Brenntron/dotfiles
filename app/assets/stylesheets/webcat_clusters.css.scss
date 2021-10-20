@@ -23,3 +23,38 @@
   padding-left: 34px;
   margin-top: 7px;
 }
+
+.toolbar .btn-group.toolbar-btn-group {
+  padding: 0;
+  margin-right: 0;
+  border: none;
+  height: auto;
+  // diff bg color due to button-group
+  .expand-selected, .collapse-selected, .icon-opened-selected {
+    background-color: #c7c7c7;
+  }
+  .toolbar-button-text {
+    margin-top: 4px;
+  }
+}
+
+.collapse-selected {
+  background-image: url(image_path('icon_collapse_selected.svg'));
+}
+.expand-selected {
+  background-image: url(image_path('icon_expand_selected.svg'));
+}
+
+.cluster-table-toolbar .toolbar-select-wrapper{
+  .toolbar-checkbox {
+    margin-top: 3px;
+  }
+  .toolbar-button-text {
+    // overriding normal hide the text media queries
+    // overriding normal padding cuz no icons
+    display: inline-block !important;
+    padding-left: 6px;
+    padding-top: 4px;
+    line-height: 1em;
+  }
+}

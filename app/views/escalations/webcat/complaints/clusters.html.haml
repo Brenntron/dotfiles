@@ -35,50 +35,61 @@
     .col-xs-12
       .toolbar.cluster-table-toolbar
         %div
-          %label.toolbar-section-label View
-          %button.toolbar-button.icon-opened-selected.esc-tooltipped.toolbar-button-spacer{title: 'Open Viewable', onclick: 'open_selected_clusters()'}
-            %span.toolbar-button-text Open Selected
-          %button.toolbar-button.icon-open-all.esc-tooltipped.toolbar-button-spacer{title: 'Open All', onclick: 'open_all_clusters()'}
-            %span.toolbar-button-text Open All
+          %label.toolbar-section-label Show Platforms
+          %span.toolbar-select-wrapper
+            %label.toolbar-button-label.esc-tooltipped
+              %input.show-platforms-filter.toolbar-checkbox{name: 'show-platform-WSA', value: 'WSA', type: 'checkbox', checked: true, onclick: 'webcat_platform_filter();'}
+              %span.toolbar-button-text WSA
+            %label.toolbar-button-label.esc-tooltipped
+              %input.show-platforms-filter.toolbar-checkbox{name: 'show-platform-NGFW', value: 'NGFW', type: 'checkbox', checked: true, onclick: 'webcat_platform_filter();'}
+              %span.toolbar-button-text NGFW
         %div
-          %label.toolbar-section-label Edit
+          %label.toolbar-section-label Show Types
+          %span.toolbar-select-wrapper
+            %label.toolbar-button-label.esc-tooltipped
+              %input.show-cluster-types-filter.toolbar-checkbox{name: 'show-cluster-domain', value: 'domain', type: 'checkbox', checked: true, onclick: 'webcat_cluster_type_filter();'}
+              %span.toolbar-button-text Domains
+            %label.toolbar-button-label.esc-tooltipped
+              %input.show-cluster-types-filter.toolbar-checkbox{name: 'show-cluster-ip', value: 'ip', type: 'checkbox', checked: true, onclick: 'webcat_cluster_type_filter();'}
+              %span.toolbar-button-text IPs
+        %div
+          %label.toolbar-section-label View
+          .btn-group.toolbar-btn-group
+            %button.btn.toolbar-button.icon-opened-selected.esc-tooltipped{title: 'Open Selected in New Tab', onclick: 'open_selected_clusters()'}
+            %button.btn.toolbar-button.icon-open-all.esc-tooltipped{title: 'Open All', onclick: 'open_all_clusters()'}
+              %span.toolbar-button-text Open in New Tab
+        %div
+          %label.toolbar-section-label Assign
           %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped.toolbar-button-spacer{onclick: 'take_selected_clusters()', type: 'button', title: 'Take selected'}
             %span.toolbar-button-text Take
           %button.toolbar-button.return-ticket-toolbar-button.esc-tooltipped{onclick: 'return_selected_clusters()', type: 'button', title: 'Return selected'}
             %span.toolbar-button-text Return
         %div
-          %label.toolbar-section-label View Nested Data
-          %button.toolbar-button.collapse-button.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_selected_clusters("clusters-index")', type: 'button', title: 'Collapse Selected'}
-            %span.toolbar-button-text Collapse Selected
-          %button.toolbar-button.collapse-all.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_all_clusters("clusters-index")', type: 'button', title: 'Collapse All'}
-            %span.toolbar-button-text Collapse All
-          %button.toolbar-button.expand-row-button.esc-tooltipped.toolbar-button-spacer{onclick: 'expand_selected_clusters("clusters-index")', type: 'button', title: 'Expand Selected'}
-            %span.toolbar-button-text Expand Selected
-          %button.toolbar-button.expand-all.esc-tooltipped{onclick: 'expand_all_clusters("clusters-index")', type: 'button', title: 'Expand All'}
-            %span.toolbar-button-text Expand All
-        %div
-          %label.toolbar-section-label Category Changes
-          %button.toolbar-button.approve-all-button.esc-tooltipped.toolbar-button-spacer{onclick: 'categorize_clusters("bulk_accept")', type: 'button', title: 'Approve All Reviewed Categories'}
-            %span.toolbar-button-text Approve All
-          %button.toolbar-button.reject-all-button.esc-tooltipped{onclick: 'categorize_clusters("bulk_deny")', type: 'button', title: 'Deny All Reviewed Categories'}
-            %span.toolbar-button-text Deny All
-
+          %label.toolbar-section-label Show/Hide Nested Data
+          .btn-group.toolbar-btn-group
+            %button.btn.toolbar-button.collapse-selected.esc-tooltipped{onclick: 'collapse_selected_clusters("clusters-index")', type: 'button', title: 'Collapse Selected'}
+            %button.btn.toolbar-button.collapse-all.esc-tooltipped{onclick: 'collapse_all_clusters("clusters-index")', type: 'button', title: 'Collapse All'}
+              %span.toolbar-button-text Collapse
+          .btn-group.toolbar-btn-group
+            %button.btn.toolbar-button.expand-selected.esc-tooltipped{onclick: 'expand_selected_clusters("clusters-index")', type: 'button', title: 'Expand Selected'}
+            %button.btn.toolbar-button.expand-all.esc-tooltipped{onclick: 'expand_all_clusters("clusters-index")', type: 'button', title: 'Expand All'}
+              %span.toolbar-button-text Expand
         %button.toolbar-button.copycat-btn.icon-copycat.esc-tooltipped{'onclick': 'copycat_dialog()', title: 'CopyCat Tool'}
           %span.toolbar-button-text CopyCat Tool
         %button.toolbar-button.wsa-btn.icon-telemetry.esc-tooltipped{'onclick': 'open_wsa_status()', title: 'WSA Telemetry Status'}
           %span.toolbar-button-text WSA Telemetry Status
-        %div
-          %label.toolbar-section-label Platform filter
-          %select.webcat-platform-filter#webcat-platform-filter{'onchange': 'webcat_platform_filter()'}
-            %option#all="All"
-            %option#all="WSA"
-            %option#email="NGFW"
-        %div
-          %label.toolbar-section-label Cluster type
-          %select.webcat-cluster-type-filter#webcat-cluster-type-filter{'onchange': 'webcat_cluster_type_filter()'}
-            %option#all="All"
-            %option#domain="Domains"
-            %option#ip="IP addresses"
+        -#%div
+        -#  %label.toolbar-section-label Platform filter
+        -#  %select.webcat-platform-filter#webcat-platform-filter{'onchange': 'webcat_platform_filter()'}
+        -#    %option#all="All"
+        -#    %option#all="WSA"
+        -#    %option#email="NGFW"
+        -#%div
+        -#  %label.toolbar-section-label Cluster type
+        -#  %select.webcat-cluster-type-filter#webcat-cluster-type-filter{'onchange': 'webcat_cluster_type_filter()'}
+        -#    %option#all="All"
+        -#    %option#domain="Domains"
+        -#    %option#ip="IP addresses"
   .row
     .col-xs-12
       %table.table.responsive#clusters-index
