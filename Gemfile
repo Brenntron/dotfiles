@@ -1,7 +1,5 @@
 source 'https://rubygems.org'
 
-ruby '2.7.2'
-
 # Web-framework
 gem 'rack', '>= 2.0.8'
 gem 'rails', '5.2.1'
