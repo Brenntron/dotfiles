@@ -36,11 +36,11 @@ gem 'devise', '~> 4.5'
 
 # Networking and Messaging
 gem 'net-ldap', '0.16.1'
-gem 'httpi', '2.4.4'
+gem 'httpi'
 gem 'her', '1.0.3'
 gem 'curb', '0.9.8' #Libcurl bindings for Ruby
 gem 'net-ssh', '5.0.2'
-gem 'peake-bridge-client', '>= 0.0.9.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
+gem 'peake-bridge-client', '0.1.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 gem 'stomp', '1.4.6'
 gem 'aws-sdk', '2.11.170'
 gem 'nokogiri' ,'1.10.4'
