@@ -37,7 +37,7 @@ class AutoResolve
       return baseline_results
     end
 
-    conviction_results = process_conviction_requirements(dispute_entry.hostlookup, baseline_results[:log])
+    conviction_results = process_conviction_requirements(dispute_entry.hostlookup, baseline_results)
 
     return conviction_results
 
@@ -47,10 +47,12 @@ class AutoResolve
     results = {}
     results[:log ] = []
     results[:action] = nil
+    results[:popularity] = nil
     begin
 
       umbrella_popularity_result = check_umbrella_popularity(dispute_entry.hostlookup)
       results[:log] << umbrella_popularity_result[:log]
+      results[:popularity] = umbrella_popularity_result[:popularity]
       if umbrella_popularity_result[:pass]
         results[:action] = :do_not_resolve
         return results
@@ -76,17 +78,20 @@ class AutoResolve
       Rails.logger.error(e.message)
       results[:action] = :do_not_resolve
       results[:log] << "there was an error in baseline requirements, halting auto conviction process"
-      results
+      return results
     end
 
     results
 
   end
 
-  def self.process_conviction_requirements(entry, log)
+  def self.process_conviction_requirements(entry, baseline_results)
     results = {}
-    results[:log] = log
+
+    results[:log] = baseline_results[:log]
     results[:action] = nil
+
+    baseline_popularity = baseline_results[:popularity]
     begin
       virustotal_results = check_virustotal_hits(entry)
 
@@ -125,6 +130,16 @@ class AutoResolve
 
         return results
       end
+
+      umbrella_whois_popularity_results = check_whois_popularity_combo(entry, baseline_popularity)
+      results[:log] << umbrella_whois_popularity_results[:log]
+      if umbrella_whois_popularity_results[:pass] == false
+        results[:action] = :commit_malware
+
+        return results
+      end
+
+
 
       results[:action] = :do_not_resolve
 
@@ -205,7 +220,7 @@ class AutoResolve
     result = {}
     result[:pass] = true
     result[:log] = ""
-
+    result[:popularity] = nil
     begin
       response = Umbrella::SecurityInfo.query_info(address: entry)
 
@@ -213,12 +228,13 @@ class AutoResolve
         data = JSON.parse(response.body)
         popularity = data["popularity"]
         if popularity.present?
-          if !(popularity > 0)
+          if !(popularity > 40)
             result[:pass] = false
           else
             result[:pass] = true
           end
           result[:log] = "Umbrella popularity rating: #{popularity}: result of pass: #{result[:pass]}"
+          result[:popularity] = popularity
         else
           result[:pass] = true
           result[:log] = "Umbrella popularity value could not be found, sending for manual review."
@@ -358,7 +374,59 @@ class AutoResolve
     result
   end
 
+  def self.check_domain_life(entry)
 
+    result = {}
+    result[:age] = nil
+    result[:created] = nil
+    result[:log] = ""
+    result[:pass] = true
+    response = Umbrella::DomainInfo.domain_whois(domain: DisputeEntry.safe_domain_of(entry))
+
+    if response.code == 200
+      data = JSON.parse(response.body)
+      result[:created] = data["created"]
+      result[:age] = (Date.today - Date.parse(data["created"])) rescue nil
+
+      result[:log] = "umbrella whois returned #{data["created"]}"
+      if result[:age].blank?
+        result[:pass] = true
+        result[:log] += " Created field came back blank, halting for manual review"
+      else
+        result[:pass] = false
+      end
+    else
+      result[:pass] = true
+      result[:log] = "umbrella domain whois failed for unknown reason. halting for manual review."
+    end
+
+    result
+
+  end
+
+  def self.check_whois_popularity_combo(entry, popularity)
+
+    result = {}
+    result[:pass] = true
+    result[:log] = ""
+
+    domain_life_results = check_domain_life(entry)
+    result[:log] += domain_life_results[:log]
+    if domain_life_results[:pass] == true
+      return result
+    end
+
+    if domain_life_results[:age] < 90.0 && popularity == 0
+      result[:pass] = false
+      result[:log] += " age is less than 90 days and popularity is 0, should blocklist."
+    else
+      result[:pass] = true
+      result[:log] += " age is greater or equal to 90 days and popularity is greater than 0, manual review"
+    end
+    result[:log] += " age: #{domain_life_results[:age]} | popularity: #{popularity}"
+
+    result
+  end
 
   ###############################################################################################################
 
