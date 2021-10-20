@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+ruby '2.7.2'
+
 # Web-framework
 gem 'rack', '>= 2.0.8'
 gem 'rails', '5.2.1'
@@ -150,3 +152,4 @@ gem 'httparty', '~> 0.15.3'
 gem 'less-rails', '~> 3.0.0'
 gem 'turbolinks', '5.2.0'
 gem "sprockets", '~> 3.7.1'
+
