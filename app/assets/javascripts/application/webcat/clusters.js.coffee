@@ -950,7 +950,7 @@ window.webcat_clusters_refresh = () ->
 
 window.webcat_platform_filter = () ->
   platforms = $("input.show-platforms-filter:checked")
-  if $(platforms).length > 1
+  if $(platforms).length > 1 || $(platforms).length == 0
     selected_platform = 'All'
   else
     selected_platform = $("input.show-platforms-filter:checked").val()
@@ -960,7 +960,7 @@ window.webcat_platform_filter = () ->
 
 window.webcat_cluster_type_filter = () ->
   types = $("input.show-cluster-types-filter:checked")
-  if $(types).length > 1
+  if $(types).length > 1 || $(types).length == 0
     selected_type = 'all'
   else
     selected_type = $("input.show-cluster-types-filter:checked").val()
