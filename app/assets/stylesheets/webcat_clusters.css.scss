@@ -52,7 +52,7 @@
   width: auto;
   .toolbar-button-text {
     display:none;
-    @media (min-width: 1830px) {
+    @media (min-width: 1950px) {
       display: block;
     }
   }
@@ -103,5 +103,8 @@
   }
   .no-margin-datatable-top-tool {
     margin-bottom: 5px !important;
+  }
+  .table-search-input {
+    width: 315px;
   }
 }
