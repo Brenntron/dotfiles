@@ -40,6 +40,15 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
       data = data.pending
     end
 
+    case filter[:cluster_type]
+    when 'domain'
+      data = data.where('domain REGEXP ?', NON_IP_REGEX)
+    when 'ip'
+      data = data.where('domain NOT REGEXP ?', NON_IP_REGEX)
+    else
+      data
+    end
+
     data.order(traffic_hits: :desc).first(DATA_LIMIT)
   end
 
