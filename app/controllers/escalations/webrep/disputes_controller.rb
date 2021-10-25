@@ -14,7 +14,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                           search_name: search_name,
                                           params: index_params,
                                           user: current_user)
-        user_preferences = current_user.user_preferences.where(name: UserPreference::WEB_REP_COLUMNS).last.value
+        user_preferences = current_user.user_preferences.where(name: UserPreference::WEB_REP_COLUMNS).last
         export = DisputeExport.new(@disputes, user_preferences)
 
         send_data export.to_s, filename: "disputes_search_#{Time.now.utc.iso8601}.xlsx", disposition: 'attachment'
