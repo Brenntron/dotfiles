@@ -678,7 +678,6 @@ $ ->
       {
         data:'id'
         render: (data, type, full, meta) ->
-          console.log full
           return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" data-sha="' + full['sha256_hash'] + '"/>'
       }
       {
@@ -1148,9 +1147,6 @@ $ ->
       $('.dispute_check_box:checked').each ->
         sha_val =  $(this).attr('data-sha')
         sha256_hashes.push(sha_val)
-
-      console.log sha256_hashes
-      console.log detection_array
     else
       alert('Where are you? How did you trigger this? Stahp it.')
       return false
