@@ -53,7 +53,4 @@ Rails.application.configure do
   # config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
 
-  #allow access from talosnet only
-  config.web_console.permissions = '10.7.0.0/16'
-
 end

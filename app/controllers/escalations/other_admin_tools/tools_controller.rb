@@ -29,9 +29,5 @@ class Escalations::OtherAdminTools::ToolsController < ApplicationController
 
   end
 
-  def rails_c
-    authorize! :manage, :rails_c
-  end
-
 end
 
