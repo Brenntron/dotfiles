@@ -528,20 +528,15 @@
                                     %tr
                                       %th.content-label-sm.no-word-break Current WL/BL List
                                       %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                                      %th.text-center.content-label-sm.no-word-break Projected Score
                                       %th.content-label-sm.no-word-break.th-threat-cat Threat Category
 
                                   %tbody
                                     %tr
                                       %td.wlbl-entry-wlbl
                                       %td.wlbl-current-entry-wbrs
+                                        %td.wlbl-projected-entry-wbrs.text-center
                                       %td.wlbl-threat-cat-inline
-
-                                    -#  DO NOT REMOVE THIS
-                                    -#%td.text-center
-                                    -#  %label.content-label-sm New Score
-                                    -#  %br
-                                    -#  %span.new_wbrs_score
-                                    -#  DO NOT REMOVE THIS
 
                                 .inline-tool-content-wrapper
                                   .row
@@ -584,6 +579,11 @@
                                             %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
                                             %span.toggle-slider#bl-heavy-slider
                                           BL - Heavy
+
+                                  .button-row-center
+                                    %button.preview-wbrs-button{type: 'button', disabled: true, onclick: 'preview_wbrs_score(this);', 'data-add': '', 'data-remove': ''}
+                                      Preview Projected Score
+                                    %button.reset-form-button.esc-tooltipped{type: 'button', title: 'Reset list toggles.', onclick: 'reset_score_preview(this)'}
 
                                   -# threat cats row (2 of 2 for this file)
                                   .row.dropdown-tool-grey-row.threat-cat-row.hidden
