@@ -946,27 +946,51 @@
                                 %table
                                   %thead
                                     %tr
+                                      %th
+                                        -#  Placeholder col for if a rule hit is from querying uri + ip
                                       %th Rule
                                       %th Rule Description
-                                      %th Weight
+                                      %th.text-center Malware Prob
                                   %tbody
-                                    - entry.dispute_rule_hits.select{|rulehit| rulehit.rule_type == "WBRS"}.each do |wbrs_hit|
+                                    - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit != true}.each do |wbrs_hit|
+                                      -# - binding.pry
+                                      - rulehit = @all_rulehits.select {|hit| hit.mnemonic == wbrs_hit.name}
                                       %tr
                                         %td
-                                          - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
-                                            %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': wbrs_hit.name}
-                                              = wbrs_hit.name
-                                          - else
-                                            = wbrs_hit.name
-                                        %td= wbrs_hit.mnemonic
+                                        %td= wbrs_hit.name
                                         %td
-                                          -#Put weight of rule here
-                                      -# if any wbrs rulehits are returned from querying uri + ip each do
-                                      -#  %tr
-                                      -#    %td.uri-plus-ip-rule-indicator
-                                      -#    %td= wbrs_hit.name
-                                      -#    %td= wbrs_hit.mnemonic
-                                      -#    %td
+                                          - if rulehit.length > 0
+                                            = rulehit.first.description
+                                        %td.text-center
+                                          - if rulehit.length > 0
+                                            - malware_prob = rulehit.first.probability / 100.0
+                                            - if malware_prob > 50
+                                              %span.mal-highlight
+                                                = rulehit.first.probability / 100.0
+                                                \%
+                                            - else
+                                              = rulehit.first.probability / 100.0
+                                              \%
+
+                                    - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit == true}.each do |wbrs_hit|
+                                      - rulehit = @all_rulehits.select {|hit| hit.mnemonic == wbrs_hit.name}
+                                      %tr.plus-ip-rule-row
+                                        %td.uri-plus-ip-rule-indicator
+                                        %td= wbrs_hit.name
+                                        %td
+                                          - if rulehit.length > 0
+                                            = rulehit.first.description
+                                        %td.text-center
+                                          - if rulehit.length > 0
+                                            - malware_prob = rulehit.first.probability / 100.0
+                                            - if malware_prob > 50
+                                              %span.mal-highlight
+                                                = rulehit.first.probability / 100.0
+                                                \%
+                                            - else
+                                              = rulehit.first.probability / 100.0
+                                              \%
+
                             .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header
                                 SBRS Rule Hit Details
