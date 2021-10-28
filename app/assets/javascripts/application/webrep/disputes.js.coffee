@@ -1207,7 +1207,9 @@ $ ->
     table_head + entry_rows.join('') + '</tbody></table>'
 
   if !location.search && $('#disputes-index').length
-    standard_webrep_index_table('open')
+    # default filter set to Unassigned now as per requested in WEB-5387
+    standard_webrep_index_table('unassigned')
+
   $('#disputes-index tbody').on 'click', 'td.expandable-row-column, .dispute-count', ->
     tr = $(this).closest('tr')
     row = window.dispute_table.row(tr)
@@ -1428,11 +1430,6 @@ $ ->
       ajaxStop: () ->
         loader.addClass('hidden')
     )
-
-    if window.location.pathname == '/escalations/webrep/disputes'
-      $('#new-complaint').show()
-    else
-      $('#new-complaint').hide()
 
     if window.location.pathname == '/escalations/webrep/disputes'
       std_msg_ajax(
