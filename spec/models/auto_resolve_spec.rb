@@ -282,6 +282,7 @@ describe AutoResolve do
       expect(Umbrella::DomainVolume).to receive(:query_domain_volume).with(address: target_address).and_return(umbrella_domain_volume_good).at_least(:once)
 
 
+      age = (Date.today - Date.parse("1995-01-18"))
 
       response = AutoResolve.process_baseline_requirements(['plcbo'], @dispute_entry)
 
@@ -297,13 +298,14 @@ describe AutoResolve do
                                                                  "vt results: \n",
                                                                  "trusted vt hits: 0\n",
                                                                  "umbrella rating returned 1",
-                                                                 "no suspicious data points found.","umbrella whois returned 1995-01-18 age is greater or equal to 90 days and popularity is greater than 0, manual review age: 9772/1 | popularity: 38.0"]})
+                                                                 "no suspicious data points found.","umbrella whois returned 1995-01-18 age is greater or equal to 90 days and popularity is greater than 0, manual review age: #{age} | popularity: 38.0"]})
       #integration test
       dispute_entry = AutoResolve.attempt_ai_conviction(['plcbo'], @dispute_entry)
       expect(dispute_entry.status).to eql(DisputeEntry::NEW)
       expect(dispute_entry.resolution).to eql(nil)
 
-      expect(dispute_entry.auto_resolve_log).to eql("Umbrella popularity rating: 38.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>vt results: \n<br><br>trusted vt hits: 0\n<br><br>umbrella rating returned 1<br><br>no suspicious data points found.<br><br>umbrella whois returned 1995-01-18 age is greater or equal to 90 days and popularity is greater than 0, manual review age: 9772/1 | popularity: 38.0")
+
+      expect(dispute_entry.auto_resolve_log).to eql("Umbrella popularity rating: 38.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>vt results: \n<br><br>trusted vt hits: 0\n<br><br>umbrella rating returned 1<br><br>no suspicious data points found.<br><br>umbrella whois returned 1995-01-18 age is greater or equal to 90 days and popularity is greater than 0, manual review age: #{age} | popularity: 38.0")
     end
 
     # 9.
