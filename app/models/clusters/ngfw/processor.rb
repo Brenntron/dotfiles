@@ -34,7 +34,7 @@ class Clusters::Ngfw::Processor < Clusters::Templates::Processor
   def decline
     ngfw_cluster.update_attributes(category_ids: '')
     # assign clusters to the person who declined current categorization
-    ClusterAssignment.assign!(cluster[:domain], user)
+    ClusterAssignment.assign!(cluster, user)
     ngfw_cluster.created!
   end
 

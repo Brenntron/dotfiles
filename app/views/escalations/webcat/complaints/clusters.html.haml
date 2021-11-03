@@ -30,13 +30,13 @@
           %span#regex-filter
       %h1#clusters-index-title
 
-
     .col-xs-6
       .card
         .content-label-sm Comment
         .card-body
           %input#cluster_comment_field.text_field{placeholder: 'Reason for category (not public facing)'}
           %button.toolbar-button.icon-submit.cluster-button{'onclick': 'categorize_clusters()'} Submit Changes
+
   .row
     .col-xs-12
       .toolbar.cluster-table-toolbar
@@ -62,6 +62,13 @@
             %span.toolbar-button-text Expand Selected
           %button.toolbar-button.expand-all.esc-tooltipped{onclick: 'expand_all_clusters("clusters-index")', type: 'button', title: 'Expand All'}
             %span.toolbar-button-text Expand All
+        %div
+          %label.toolbar-section-label Category Changes
+          %button.toolbar-button.approve-all-button.esc-tooltipped.toolbar-button-spacer{onclick: 'categorize_clusters("bulk_accept")', type: 'button', title: 'Approve All Reviewed Categories'}
+            %span.toolbar-button-text Approve All
+          %button.toolbar-button.reject-all-button.esc-tooltipped{onclick: 'categorize_clusters("bulk_deny")', type: 'button', title: 'Deny All Reviewed Categories'}
+            %span.toolbar-button-text Deny All
+
         %button.toolbar-button.copycat-btn.icon-copycat.esc-tooltipped{'onclick': 'copycat_dialog()', title: 'CopyCat Tool'}
           %span.toolbar-button-text CopyCat Tool
         %button.toolbar-button.wsa-btn.icon-telemetry.esc-tooltipped{'onclick': 'open_wsa_status()', title: 'WSA Telemetry Status'}

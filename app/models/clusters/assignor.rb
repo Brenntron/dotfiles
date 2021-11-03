@@ -8,13 +8,13 @@ class Clusters::Assignor
 
   def assign
     clusters.each do |cluster|
-      ClusterAssignment.assign(cluster[:domain], user)
+      ClusterAssignment.assign(cluster, user)
     end
   end
 
   def unassign
     clusters.each do |cluster|
-      ClusterAssignment.unassign(cluster[:domain], user)
+      ClusterAssignment.unassign(cluster, user)
     end
   end
 end

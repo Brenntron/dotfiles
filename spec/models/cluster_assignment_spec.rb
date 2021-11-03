@@ -31,37 +31,37 @@ describe ClusterAssignment do
     end
 
     context 'fetching cluster assignments' do
-      subject { described_class.fetch_assignments_for(clusters: cluster_ids) }
+      subject { described_class.fetch_assignments_for(domains: cluster_domains) }
 
-      let(:cluster_ids) { ['1', '2', '3'] }
+      let(:cluster_domains) { ['example.com', '127.0.0.1', 'google.com'] }
 
       context 'when all assignments created less than 1 hour ago' do
         before do
-          cluster_ids.each do |cluster_id|
-            FactoryBot.create(:cluster_assignment, user_id: user.id, cluster_id: cluster_id)
+          cluster_domains.each do |domain|
+            FactoryBot.create(:cluster_assignment, user_id: user.id, domain: domain)
           end
           # create extra assignment
-          FactoryBot.create(:cluster_assignment, user_id: user.id, cluster_id: 4)
+          FactoryBot.create(:cluster_assignment, user_id: user.id, domain: 'some.thing')
         end
 
-        it 'returns cluster_assignments for given ids' do
+        it 'returns cluster_assignments for given domains' do
           expect(subject.count).to be 3
         end
       end
 
       context 'when there is an assignment older than 1 hour' do
         before do
-          FactoryBot.create(:cluster_assignment, user_id: user.id, cluster_id: 1)
-          FactoryBot.create(:cluster_assignment, user_id: user.id, cluster_id: 2)
-          FactoryBot.create(:cluster_assignment, :expired, user_id: user.id, cluster_id: 3)
+          FactoryBot.create(:cluster_assignment, user_id: user.id, domain: 'example.com')
+          FactoryBot.create(:cluster_assignment, user_id: user.id, domain: '127.0.0.1')
+          FactoryBot.create(:cluster_assignment, :expired, user_id: user.id, domain: 'google.com')
         end
 
         it 'removes outdated assignments' do
           subject
-          expect(described_class.where(cluster_id: cluster_ids).count).to be 2
+          expect(described_class.where(domain: cluster_domains).count).to be 2
         end
 
-        it 'returns cluster_assignments for given ids' do
+        it 'returns cluster_assignments for given domains' do
           expect(subject.count).to be 2
         end
       end
@@ -92,8 +92,8 @@ describe ClusterAssignment do
   end
 
   describe '#assign' do
-    subject { described_class.assign(cluster_ids, user) }
-    let(:cluster_ids) { ['1'] }
+    subject { described_class.assign(cluster, user) }
+    let(:cluster) { { domain: 'example.com' } }
 
     context 'when cluster is not assigned' do
       it 'assigns cluster to the user' do
@@ -103,7 +103,7 @@ describe ClusterAssignment do
 
     context 'when cluster is already assigned' do
       context 'when assignment is actual' do
-        before { FactoryBot.create(:cluster_assignment, user_id: user.id, cluster_id: cluster_ids.first) }
+        before { FactoryBot.create(:cluster_assignment, user_id: user.id, domain: cluster[:domain]) }
 
         it 'rasises an exception' do
           expect { subject }.to raise_error(RuntimeError)
@@ -112,7 +112,7 @@ describe ClusterAssignment do
 
       context 'when assignment is expired' do
         before do
-          FactoryBot.create(:cluster_assignment, :expired, user_id: user.id, cluster_id: cluster_ids.first)
+          FactoryBot.create(:cluster_assignment, :expired, user_id: user.id, domain: cluster[:domain])
         end
 
         it 'assigns cluster to the user' do
@@ -124,8 +124,8 @@ describe ClusterAssignment do
   end
 
   describe '#assign!' do
-    subject { described_class.assign!(cluster_ids, user) }
-    let(:cluster_ids) { [1] }
+    subject { described_class.assign!(cluster, user) }
+    let(:cluster) { { domain: 'example.com' } }
 
     context 'when cluster is not assigned' do
       it 'assigns cluster to the user' do
@@ -134,7 +134,7 @@ describe ClusterAssignment do
     end
 
     context 'when cluster is already assigned' do
-      before { FactoryBot.create(:cluster_assignment, user_id: another_user.id, cluster_id: cluster_ids.first) }
+      before { FactoryBot.create(:cluster_assignment, user_id: another_user.id, domain: cluster[:domain]) }
 
       let(:another_user) { FactoryBot.create(:user) }
 
@@ -146,10 +146,10 @@ describe ClusterAssignment do
   end
 
   describe '#unassign' do
-    subject { described_class.unassign(cluster_ids, user) }
-    let(:cluster_ids) { ['1'] }
+    subject { described_class.unassign(cluster, user) }
+    let(:cluster) { { domain: 'example.com' } }
 
-    before { FactoryBot.create(:cluster_assignment, user_id: user.id, cluster_id: cluster_ids.first) }
+    before { FactoryBot.create(:cluster_assignment, user_id: user.id, domain: cluster[:domain]) }
 
     it 'removes assignment' do
       expect { subject }.to change { ClusterAssignment.count }.to(0)
@@ -157,8 +157,8 @@ describe ClusterAssignment do
   end
 
   describe '#assign_pemanent!' do
-    subject { described_class.assign_pemanent!(cluster_ids, user) }
-    let(:cluster_ids) { ['1'] }
+    subject { described_class.assign_pemanent!(cluster, user) }
+    let(:cluster) { { domain: 'example.com' } }
 
     context 'when cluster is not assigned' do
       it 'creates permanent assignment for the user' do
@@ -168,7 +168,7 @@ describe ClusterAssignment do
     end
 
     context 'when cluster is already assigned' do
-      before { FactoryBot.create(:cluster_assignment, user_id: user.id, cluster_id: cluster_ids.first) }
+      before { FactoryBot.create(:cluster_assignment, user_id: user.id, domain: cluster[:domain]) }
 
       it 'assigns cluster to the user anyway and drops previous assignment' do
         expect { subject }.to_not change { ClusterAssignment.count }
@@ -190,6 +190,32 @@ describe ClusterAssignment do
       it 'should not remove expired permanent attachments' do
         expect { subject }.to change { ClusterAssignment.count }.to(1)
       end
+    end
+  end
+
+  describe 'get_assigned_cluster_ids_for' do
+    subject { described_class.get_assigned_cluster_ids_for(user) }
+
+    let(:another_user) { FactoryBot.create(:user) }
+    let!(:user_assignment) { FactoryBot.create(:cluster_assignment, user_id: user.id, cluster_id: 1) }
+    let!(:another_user_assignment) { FactoryBot.create(:cluster_assignment, user_id: another_user.id, cluster_id: 2) }
+
+    it 'returns cluster ids for the user' do
+      expect(subject.count).to be 1
+      expect(subject.first).to eq(user_assignment.cluster_id)
+    end
+  end
+
+  describe 'get_assigned_cluster_domains_for' do
+    subject { described_class.get_assigned_cluster_domains_for(user) }
+
+    let(:another_user) { FactoryBot.create(:user) }
+    let!(:user_assignment) { FactoryBot.create(:cluster_assignment, user_id: user.id, domain: 'example.com') }
+    let!(:another_user_assignment) { FactoryBot.create(:cluster_assignment, user_id: another_user.id, domain: '127.0.0.1') }
+
+    it 'returns cluster domains for the user' do
+      expect(subject.count).to be 1
+      expect(subject.first).to eq(user_assignment.domain)
     end
   end
 end

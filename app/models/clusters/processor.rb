@@ -31,18 +31,25 @@ class Clusters::Processor
   end
 
   def process!
+    raise_manager_exception = false
+    manager_count = []
     clusters.each do |cluster|
+      next if cluster[:is_pending].present? && cluster[:is_pending] == false
       if third_person_review_cluster?(cluster)
         manager_user = User.where(cvs_username: Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
-        ClusterAssignment.assign_pemanent!(cluster[:domain], manager_user)
-
-        raise 'Cluster should pass manager review'
+        ClusterAssignment.assign_pemanent!(cluster, manager_user)
+        raise_manager_exception = true
+        manager_count << cluster[:domain]
       else
         PLATFORM_PROVIDERS[cluster[:platform]].new(cluster, user).process
         # add fixed credit to the user
         credit_handler = WebcatCredits::Clusters::CreditHandler.new(user, cluster)
         credit_handler.handle_fixed_credit
       end
+    end
+
+    if raise_manager_exception == true
+      raise "Manager needs to approve cluster ids: [#{manager_count.join(",")}]"
     end
   end
 

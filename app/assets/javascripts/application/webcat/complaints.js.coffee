@@ -248,7 +248,26 @@ processSubmitNewURL = () ->
         else
            message = "No pending complaint entries have been created"
 
-        std_msg_success('URLs categorized successfully',[message, "All other entries have been submitted directly to WBRS."], reload: true)
+        reload_message = "</br><a href='.'>Refresh the page</a> to see the result"
+        std_msg_success(
+          'URLs categorized successfully',
+          [message, "All other entries have been submitted directly to WBRS.", reload_message],
+          reload: false,
+          complete: (->
+            # clear url inputs
+            $('#url_1').val('')
+            $('#url_2').val('')
+            $('#url_3').val('')
+            $('#url_4').val('')
+            $('#url_5').val('')
+            # clear categories inputs
+            $('#cat_new_url_1')[0].selectize.clear()
+            $('#cat_new_url_2')[0].selectize.clear()
+            $('#cat_new_url_3')[0].selectize.clear()
+            $('#cat_new_url_4')[0].selectize.clear()
+            $('#cat_new_url_5')[0].selectize.clear()
+            )
+        )
       error: (response) ->
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
           std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
@@ -1967,7 +1986,6 @@ processSubmitMaster = () ->
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
-
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
@@ -2205,6 +2223,9 @@ $ ->
       pin_to_top()
 
   $(document).on 'change', '.resolution_radio_button', ->
+    id = this.name.split("resolution")[1]
+    domain = $("#complaint_prefix_"+id)[0].dataset.domain
+    touchedFormChange(domain)
     $('#master-submit').prop('disabled', false)
 
   $('.expand-all').click ->

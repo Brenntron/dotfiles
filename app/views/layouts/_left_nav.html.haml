@@ -70,15 +70,15 @@
         = image_tag('layout/icon_documentation.svg', class: 'sidenav-icon', alt: 'Docs')
       %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav-icons'}
         %li{class: 'wiki-link'}
-          %a{href: 'https://confluence.vrt.sourcefire.com/display/OSDWE/Analyst+Console+Documentation', target: '_blank'}
-            =inline_svg 'icon_wiki_grey.svg'
+          %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'}
+            =inline_svg 'confluence-brands.svg'
         %li{class: 'github-link'}
           - if !@version.nil?
-            %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/tag/v#{@version}"}
-              = image_tag('icon_github.png', class: 'github-icon', alt: 'GitHub', size: '16x16')
+            %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"}
+              =inline_svg 'confluence-brands.svg'
           - else
-            %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/"}
-              = image_tag('icon_github.png', class: 'github-icon', alt: 'GitHub', size: '16x16')
+            %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349"}
+              =inline_svg 'confluence-brands.svg'
 
   #sidenav-menu-div
     %ul{class: 'nav-container'}
@@ -147,12 +147,12 @@
           Docs
         %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav'}
           %li{class: 'wiki-link'}
-            %a{href: 'https://confluence.vrt.sourcefire.com/display/OSDWE/Analyst+Console+Documentation', target: '_blank'} Doc
+            %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'} Doc
           %li{class: 'github-link'}
             - if !@version.nil?
-              %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/tag/v#{@version}"} V #{@version}
+              %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"} V #{@version}
             - else
-              %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/"} Release Notes
+              %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349"} Release Notes
 
 
   .copyright-area

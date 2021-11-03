@@ -47,8 +47,10 @@ class DisputeExport
       'entry-resolution' => 'Entry Resolution',
       'suggested-disposition' => 'Suggested Disposition',
       'category' => 'Category',
+      'wbrs-hits' => 'WBRS Rule Hits',
       'wbrs-score' => 'WBRS Score',
       'wbrs-total-rule-hits' => 'WBRS Total Rule Hits',
+      'sbrs-hits' => 'SBRS Rule Hits',
       'sbrs-score' => 'SBRS Score',
       'sbrs-total-rule-hits' => 'SBRS Total Rule Hits'
   }
@@ -60,7 +62,10 @@ class DisputeExport
       worksheet = @workbook[0]
 
       # filter export headers according to user filter setup
-      visible_columns_setup = JSON.parse(@user_preferences.value).select{|_k, v| v}.keys
+      @user_preferences ||= UserPreference::DEFAULT_WEB_REP_COLUMNS
+      visible_columns_setup = JSON.parse(@user_preferences).select{|_k, v| v}.keys
+      static_columns = ["wbrs-hits", "sbrs-hits"] # can't change these (no toggle on the frontend)
+      visible_columns_setup += static_columns
       headers_to_export = EXPORT_HEADERS.filter{|k, _v| visible_columns_setup.include?(k)}.values
 
       sheet_insert_row(worksheet, headers_to_export, "h1")
@@ -91,8 +96,10 @@ class DisputeExport
              'entry-resolution' => dispute_entry.resolution,
              'suggested-disposition' => dispute_entry.suggested_disposition,
              'category' => dispute_entry.primary_category,
+             'wbrs-hits' => assemble_rule_hits(dispute_entry, "WBRS"),
              'wbrs-score' => dispute_entry.wbrs_score,
              'wbrs-total-rule-hits' => dispute_entry.dispute_rule_hits.wbrs_rule_hits.count,
+             'sbrs-hits' => assemble_rule_hits(dispute_entry, "SBRS"),
              'sbrs-score' => dispute_entry.sbrs_score,
              'sbrs-total-rule-hits' => dispute_entry.dispute_rule_hits.sbrs_rule_hits.count
           }
@@ -119,5 +126,16 @@ class DisputeExport
     else
       dispute.user&.cvs_username
     end
+  end
+
+  ##
+  # Originated at https://jira.talos.cisco.com/browse/WEB-8045
+  def assemble_rule_hits(dispute_entry, rule_hit_type)
+    rule_hit_list = []
+    dispute_entry.dispute_rule_hits.select{|rulehit| rulehit.rule_type == rule_hit_type}.each do |rule_hit|
+      # You could golf this down to one line but let's do a little Defensive Coding instead
+      rule_hit_list << rule_hit.name
+    end
+    rule_hit_list.join(", ")
   end
 end

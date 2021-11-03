@@ -28,7 +28,7 @@ class Clusters::Fetcher
 
   def fetch_clusters
     data_providers_list.map do |provider_class|
-      provider_class.new(regex).fetch
+      provider_class.new(regex, filter, user).fetch
     end.flatten
   end
 
