@@ -161,7 +161,7 @@ $ ->
       5
       'desc'
     ] ]
-    lengthMenu: [50, 100, 500, 1000]
+    lengthMenu: [50, 100, 200]
     columnDefs: [
       {
         targets: [
