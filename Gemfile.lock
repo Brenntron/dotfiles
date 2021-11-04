@@ -86,7 +86,6 @@ GEM
     aws-sigv4 (1.4.0)
       aws-eventstream (~> 1, >= 1.0.2)
     bcrypt (3.1.16)
-    bindex (0.8.1)
     bootstrap-multiselect-rails (0.9.9)
       rails (>= 4.0.0)
     bootstrap-sass (3.4.1)
@@ -572,11 +571,6 @@ GEM
     unf_ext (0.0.8)
     warden (1.2.9)
       rack (>= 2.0.9)
-    web-console (3.7.0)
-      actionview (>= 5.0)
-      activemodel (>= 5.0)
-      bindex (>= 0.4.0)
-      railties (>= 5.0)
     webrick (1.7.0)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
@@ -694,7 +688,6 @@ DEPENDENCIES
   timecop
   turbolinks (= 5.2.0)
   uglifier (= 4.1.20)
-  web-console
   whois (= 4.0.7)
   whois-parser (= 1.1.0)
   will_paginate (= 3.1.6)
