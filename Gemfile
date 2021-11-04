@@ -98,7 +98,6 @@ gem 'capybara', '2.11.0'
 gem 'poltergeist', '1.18.1'
 gem 'selenium-webdriver'
 gem 'inline_svg', '1.3.1'
-gem 'web-console'
 
 gem 'gzip', '1.0'
 gem 'rubyXL', '3.3.30'
