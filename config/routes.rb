@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       get 'rule_api', to: 'tools#rule_api'
       get 'reptool', to: 'tools#reptool'
       get 'wbnp_reports', to: 'tools#wbnp_reports'
+      get 'wbnp_report/:id', to: 'tools#wbnp_report'
       get 'manage_escalations_sync', to: 'tools#manage_escalations_sync'
       get 'status_api', to: 'tools#status_api'
       get 'console', to: 'tools#rails_c'
