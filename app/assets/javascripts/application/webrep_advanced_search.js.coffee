@@ -10,7 +10,7 @@ $(document).ready ->
 
   $('.search-item').click ->
     $('#search-criteria-options').hide()
-    false
+    return
 
   $('.remove-input').click ->
     field = $(this).parent()

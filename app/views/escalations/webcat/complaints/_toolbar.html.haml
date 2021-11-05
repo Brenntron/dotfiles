@@ -9,7 +9,7 @@
       .dropdown-menu.toolbar-dropdown#webcat-index-table-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
         %ul
           %li.toggle-vis-webcat.hidden{'data-column':'1'}
-            %input.age-checkbox{type: 'checkbox', checked: true, id: 'important-checkbox'} Important
+            %input.important-checkbox{type: 'checkbox', checked: true, id: 'important-checkbox'} Important
           %li.toggle-vis-webcat{'data-column':'3'}
             %input.age-checkbox{type: 'checkbox', checked: true, id: 'age-checkbox'} Age
           %li.toggle-vis-webcat{'data-column':'4'}
@@ -23,22 +23,24 @@
           %li.toggle-vis-webcat{'data-column':'8'}
             %input.path-checkbox{type: 'checkbox', checked: true, id: 'path-checkbox'} Path
           %li.toggle-vis-webcat{'data-column':'9'}
-            %input.primary-checkbox{type: 'checkbox', checked: true, id: 'primary-checkbox'} Primary Cat
+            %input.uri-checkbox{type: 'checkbox', checked: true, id: 'uri-checkbox'} URI
 
         %ul
           %li.toggle-vis-webcat{'data-column':'10'}
-            %input.suggested-checkbox{type: 'checkbox', checked: true, id: 'suggested-checkbox' } Suggested Cat
+            %input.primary-checkbox{type: 'checkbox', checked: true, id: 'primary-checkbox'} Primary Cat
           %li.toggle-vis-webcat{'data-column':'11'}
-            %input.wbrs-checkbox{type: 'checkbox', checked: true, id: 'wbrs-checkbox'} WBRS
+            %input.suggested-checkbox{type: 'checkbox', checked: true, id: 'suggested-checkbox' } Suggested Cat
           %li.toggle-vis-webcat{'data-column':'12'}
-            %input.platform-checkbox{type: 'checkbox', checked: true, id: 'platform-checkbox'} Platform
+            %input.wbrs-checkbox{type: 'checkbox', checked: true, id: 'wbrs-checkbox'} WBRS
           %li.toggle-vis-webcat{'data-column':'13'}
-            %input.submittertype-checkbox{type: 'checkbox', checked: true, id: 'submittertype-checkbox'} Submitter Type
+            %input.platform-checkbox{type: 'checkbox', checked: true, id: 'platform-checkbox'} Platform
           %li.toggle-vis-webcat{'data-column':'14'}
-            %input.submitterorg-checkbox{type: 'checkbox', checked: true, id: 'submitterorg-checkbox'} Submitter Org
+            %input.submittertype-checkbox{type: 'checkbox', checked: true, id: 'submittertype-checkbox'} Submitter Type
           %li.toggle-vis-webcat{'data-column':'15'}
-            %input.submitterorg-checkbox{type: 'checkbox', checked: true, id: 'submitteremail-checkbox'} Submitter Email
+            %input.submitterorg-checkbox{type: 'checkbox', checked: true, id: 'submitterorg-checkbox'} Submitter Org
           %li.toggle-vis-webcat{'data-column':'16'}
+            %input.submitterorg-checkbox{type: 'checkbox', checked: true, id: 'submitteremail-checkbox'} Submitter Email
+          %li.toggle-vis-webcat{'data-column':'17'}
             %input.assignee-checkbox{type: 'checkbox', checked: true, id: 'assignee-checkbox'} Assignee
 
   %div
