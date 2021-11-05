@@ -1096,6 +1096,17 @@ module API
               {:status => "success", :data => data}
             end
 
+            post 'recover_dispute' do
+              dispute_to_recover = Dispute.find(params[:id])
+
+              results = dispute_to_cover.rebuild_from_packet
+              if results[:errors].present?
+                return {:status => "error", :errors => results[:errors], :messages => results[:messages]}
+              else
+                return {:status => "success", :messages => results[:messages]}
+              end
+            end
+
 
           end
         end
