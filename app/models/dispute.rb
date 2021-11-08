@@ -500,7 +500,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       end
     end
 
-
+    return results
 
   end
 
