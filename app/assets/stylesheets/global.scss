@@ -836,6 +836,11 @@ button {
 .url-cat-button {background-image: url(image_path('icon_categorize.svg'));}
 .add-user-button {background-image: url(image_path('icon_add_user_grey.svg'));}
 .export-button-white {background-image: url(image_path('icon_export_white.svg'));}
+.ping-button {
+  background-image: url(image_path('icon_ping_grey.svg'));
+  float: right;
+  margin-left: 3px;
+}
 .delete-search {
   display: inline-block;
   float: right;
