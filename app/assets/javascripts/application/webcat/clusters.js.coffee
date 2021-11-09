@@ -25,6 +25,7 @@ window.populate_clusters_index_table = (filter) ->
       method: 'GET'
       headers: headers
       success: (response) ->
+        console.log response
         loader.addClass('hidden')
         json = $.parseJSON(response)
         if json.data.length == 0
@@ -446,11 +447,11 @@ window.copy_domain = (domain, element) ->
 
 window.toggle_all_checkboxes = () ->
   if $('#clusters_check_box').prop('checked')
-    $('#clusters-index').DataTable().rows().select()
-    rows = $('table#clusters-index input[type="checkbox"]');
+    rows = $('.cluster-row-select');
     i = 1
-    while i < rows.length
-      $(rows[i])[0].checked = true
+    while i < 51
+      $(rows[i - 1])[0].checked = true
+      $('#clusters-index').DataTable().rows(i - 1).select()
       i++
   else
     $('#clusters-index').DataTable().rows().deselect()
