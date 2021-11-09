@@ -6,6 +6,7 @@ development:
   database:   ac_dev
   username:   root
   host:       localhost
+  password: password
   reconnect:  true
 
 # Warning: The database defined as "test" will be erased and
@@ -17,6 +18,7 @@ test: &test
   collation:  utf8mb4_general_ci
   database:   ac_test
   username:   root
+  password: password
   host:       localhost
 
 staging:
