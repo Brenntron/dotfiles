@@ -13,11 +13,8 @@ window.populate_clusters_index_table = (filter) ->
     loader = $('.cluster-mgt-loader-wrapper')
     loader.removeClass('hidden')
     filter_param = window.location.search
-    if filter
-      if filter_param
-        filter_param += "&regex=" + filter
-      else
-        filter_param = "?regex=" + filter
+    if filter && filter_param
+      filter_param += "&regex=" + filter
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
@@ -461,17 +458,10 @@ window.toggle_all_checkboxes = () ->
 
 # Select rows in Clusters Table
 $ ->
-  $('#clusters_check_box').click ->
-    toggle_all_checkboxes()
+  $('#clusters_check_box').click -> toggle_all_checkboxes()
 
   # Moves cluster selectize to table draw so that selectize boxes properly initialize when changing number of items being displayed
-  $("#clusters-index").on 'draw.dt', ->
-    selectize_category_inputs()
-    toggle_all_checkboxes()
-    populate_cat_select()
-
-
-  $("#clusters-index").on 'order.dt', ->
+  $("#clusters-index").on 'draw.dt order.dt', ->
     selectize_category_inputs()
     populate_cat_select()
 
