@@ -85,6 +85,9 @@ Plug 'leafgarland/typescript-vim'
 " JavaScript Support
 Plug 'flowtype/vim-flow'
 
+" Coffeescript
+Plug 'kchmck/vim-coffee-script'
+
 " Vue.js
 Plug 'posva/vim-vue'
 
@@ -147,8 +150,6 @@ autocmd BufNewFile,BufRead *.js.es6 set filetype=javascript
 autocmd BufNewFile,BufRead *.js.es6 set syntax=javascript
 autocmd BufNewFile,BufRead *.js.erb set filetype=javascript
 autocmd BufNewFile,BufRead *.js.erb set syntax=javascript
-autocmd BufNewFile,BufRead *.js.coffee set filetype=javascript
-autocmd BufNewFile,BufRead *.js.coffee set syntax=javascript
 autocmd BufNewFile,BufRead *.ts set filetype=javascript
 autocmd BufNewFile,BufRead *.ts set syntax=javascript
 autocmd BufWritePre * :%s/\s\+$//e
@@ -192,7 +193,7 @@ let g:ale_set_quickfix = 1
 let g:ale_sign_column_always = 1
 let g:ale_open_list = 1
 let g:ale_keep_list_window_open = 1
-let g:ale_fix_on_save = 1
+let g:ale_fix_on_save = 0
 let g:ale_linter_explicit = 1
 let g:ale_sign_error = 'X'
 let g:ale_sign_warning = '?'
