@@ -147,3 +147,6 @@ if [ -x "$(command -v exa)" ]; then
     alias la="exa --long --all --group"
 fi
 export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
+export PATH="/usr/local/opt/mysql/bin:$PATH"
+export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
