@@ -91,7 +91,7 @@ plugins=(
 )
 
 zstyle :omz:plugins:ssh-agent agent-forwarding on
-zstyle :omz:plugins:ssh-agent identities cisco_id_rsa gitlab_id_rsa
+zstyle :omz:plugins:ssh-agent identities cisco_id_rsa gitlab_id_rsa github_id_rsa
 
 export ZPLUG_HOME=/usr/local/opt/zplug
 source $ZPLUG_HOME/init.zsh
@@ -149,3 +149,4 @@ export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
 export PATH="/usr/local/opt/mysql/bin:$PATH"
 export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
