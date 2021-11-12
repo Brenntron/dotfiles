@@ -115,6 +115,294 @@
                       %br
                       = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
+
+
+- if current_user == @user || current_user == @user.parent || current_user.has_role?('admin')
+  -# Only current user, manager of current user, or admin can see user's bugs
+  %ul.nav.nav-tabs#user-tabs{role: 'tablist'}
+    %li.nav-item.active
+      %a.nav-link#user-open-bugs-tab{href: '#open-bugs', 'aria-controls': 'open-bugs', role: 'tab', 'data-toggle': 'tab'}
+        %span.tab-label Open Disputes
+        %span#open-bugs-count.tab-item-count= @total_open
+    %li.nav-item
+      %a.nav-link#user-closed-bugs-tab{href: '#closed-bugs', 'aria-controls': 'closed-bugs', role: 'tab', 'data-toggle': 'tab'}
+        %span.tab-label Closed Disputes
+        %span.tab-item-count= @total_closed
+
+  .tab-content.content-wrapper#user-tab-content
+    .tab-pane.active#open-bugs{role: 'tabpanel', 'aria-labeled-by': 'user-open-bugs-tab'}
+      .row
+        .col-xs-12
+          - if @open_disputes.any?
+            %table.table.responsive.index-table
+              %thead
+                %tr
+                  %th
+                    -# Priority
+                  %th Bug ID
+                  %th Component
+                  %th.indent{'data-defaultsign': 'nospan'} Summary
+                  %th State
+                  %th.embargo-col-header.tooltipped{title: 'Embargo'}
+                  %th.user-col
+                    %span.researcher-col-header.tooltipped{title: 'Researcher'}
+                      Researcher
+                  %th.user-col
+                    %span.committer-col-header.tooltipped{title: 'Committer'}
+                      Committer
+                  %th.date-col Updated
+              -#%tbody
+              -#  - @open_bugs.sort_by{ |b| b.priority_sort }.each do |bug|
+              -#    %tr{id: "bug_#{bug.id}"}
+              -#      %td
+              -#        %span.bug-priority{class: "p-#{bug.priority}", title: "Priority-#{bug.priority}"}
+              -#      %td.id-col= link_to bug.id, bug
+              -#      %td= bug.component
+              -#      %td
+              -#        = link_to bug.summary, bug_path(bug.id)
+              -#        %br
+              -#        %span.tags-wrapper
+              -#          - uniq_gibs = bug.giblets.map {|g| g.name}.uniq
+              -#          - uniq_gibs.each do |gib|
+              -#            %a{href: "#{bugs_path({:tag_names => [gib], :page => 1})}"}
+              -#              %button.tag.primary-tag
+              -#                = gib
+
+    -#                %td.state-col
+    -#                  = bug.state
+    -#                %td
+    -#                  %span.tooltipped{ class: "liberty_#{bug.id} #{bug.liberty_clear? ? 'embargo_off' : 'embargo_on'} ", title: "#{bug.liberty_clear? ? 'Embargo Off' : 'Embargo On'}"}
+    -#                %td.bug-user.alt-col.user-col-divider
+    -#                  - if bug.user
+    -#                    %span.float-left= bug.user.cvs_username
+    -#                  - else
+    -#                    %span.float-left.missing-data Unassigned
+    -#
+    -#                  - if bug.committer != current_user
+    -#                    - if bug.user && (bug.user != current_user)
+    -#                      .gear-loader-wrapper.take-bug-loader.hidden{id: "take-loader-#{bug.id}"}
+    -#                        = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                      %button.assignment-button.take-bug.tooltipped{id: "take-bug-#{bug.id}", type: 'button', title: 'Take this Bug'}
+    -#                    - else
+    -#                      .gear-loader-wrapper.take-bug-loader.hidden{id: "return-loader-#{bug.id}"}
+    -#                        = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                      %button.assignment-button.return-bug.tooltipped{id: "return-bug-#{bug.id}", type: 'button', 'data-id': "#{bug.id}", title: 'Return this Bug'}
+    -#
+    -#                %td.bug-user.alt-col
+    -#                  - if bug.committer
+    -#                    %span.float-left= bug.committer.cvs_username
+    -#                  - else
+    -#                    %span.float-left.missing-data Unassigned
+    -#
+    -#                  - if bug.user != current_user
+    -#                    - if current_user.has_role?('committer')
+    -#                      - if bug.committer != current_user
+    -#                        .gear-loader-wrapper.take-bug-loader.hidden{id: "take-committer-loader-#{bug.id}"}
+    -#                          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                        %button.assignment-button.take-bug-committer.tooltipped{id: "take-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'Take this Bug'}
+    -#                      - else
+    -#                        .gear-loader-wrapper.take-bug-loader.hidden{id: "return-committer-loader-#{bug.id}"}
+    -#                          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                        %button.assignment-button.return-bug-committer.tooltipped{id: "return-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'Return this Bug'}
+    -#                    - else
+    -#                      %button.assignment-button.take-bug-committer.tooltipped{id: "take-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'You are not authorized to take this Bug', disabled: true}
+    -#                  - else
+    -#                    %button.assignment-button.take-bug-committer.tooltipped{id: "take-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'You cannot be the researcher and committer on the same bug.', disabled: true}
+    -#
+    -#                %td
+    -#                  = display_last_updated_date(bug)
+    -#                  %br
+    -#                  = display_last_updated_time(bug)
+    -#
+    -#        .apple_pagination= will_paginate @open_bugs, param_name: 'open_page', params: {active_tab: 'open'}
+    -#      - else
+    -#        .missing-data
+    -#          No open bugs at this time.
+    -#
+    -#.tab-pane#pending-bugs{role: 'tabpanel', 'aria-labeled-by': 'user-pending-bugs-tab'}
+    -#  .row
+    -#    .col-xs-12
+    -#      - if @pending_bugs.any?
+    -#        %table.table.responsive.index-table
+    -#          %thead
+    -#            %tr
+    -#              %th
+    -#                -# Priority
+    -#              %th Bug ID
+    -#              %th Component
+    -#              %th.indent{'data-defaultsign': 'nospan'} Summary
+    -#              %th State
+    -#              %th.embargo-col-header.tooltipped{title: 'Embargo'}
+    -#              %th.user-col
+    -#                %span.researcher-col-header.tooltipped{title: 'Researcher'}
+    -#                  Researcher
+    -#              %th.user-col
+    -#                %span.committer-col-header.tooltipped{title: 'Committer'}
+    -#                  Committer
+    -#              %th.date-col Updated
+    -#          %tbody
+    -#            - @pending_bugs.each do |bug|
+    -#              %tr{id: "bug_#{bug.id}"}
+    -#                %td
+    -#                  %span.bug-priority{class: "p-#{bug.priority}", title: "Priority-#{bug.priority}"}
+    -#                %td.id-col= link_to bug.id, bug
+    -#                %td= bug.component
+    -#                %td
+    -#                  = link_to bug.summary, bug_path(bug.id)
+    -#                  %br
+    -#                  %span.tags-wrapper
+    -#                    - uniq_gibs = bug.giblets.map {|g| g.name}.uniq
+    -#                    - uniq_gibs.each do |gib|
+    -#                      %a{href: "#{bugs_path({:tag_names => [gib], :page => 1})}"}
+    -#                        %button.tag.primary-tag
+    -#                          = gib
+    -#
+    -#                %td.state-col= bug.state
+    -#                %td
+    -#                  %span.tooltipped{ class: "liberty_#{bug.id} #{bug.liberty_clear? ? 'embargo_off' : 'embargo_on'} ", title: "#{bug.liberty_clear? ? 'Embargo Off' : 'Embargo On'}"}
+    -#                %td.bug-user.alt-col.user-col-divider
+    -#                  - if bug.user
+    -#                    %span.float-left= bug.user.cvs_username
+    -#                  - else
+    -#                    %span.float-left.missing-data Unassigned
+    -#
+    -#                  - if bug.committer != current_user
+    -#                    - if bug.user && (bug.user != current_user)
+    -#                      .gear-loader-wrapper.take-bug-loader.hidden{id: "take-loader-#{bug.id}"}
+    -#                        = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                      %button.assignment-button.take-bug.tooltipped{id: "take-bug-#{bug.id}", type: 'button', title: 'Take this Bug'}
+    -#                    - else
+    -#                      .gear-loader-wrapper.take-bug-loader.hidden{id: "return-loader-#{bug.id}"}
+    -#                        = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                      %button.assignment-button.return-bug.tooltipped{id: "return-bug-#{bug.id}", type: 'button', 'data-id': "#{bug.id}", title: 'Return this Bug'}
+    -#
+    -#                %td.bug-user.alt-col
+    -#                  - if bug.committer
+    -#                    %span.float-left= bug.committer.cvs_username
+    -#                  - else
+    -#                    %span.float-left.missing-data Unassigned
+    -#
+    -#                  - if bug.user != current_user
+    -#                    - if current_user.has_role?('committer')
+    -#                      - if bug.committer != current_user
+    -#                        .gear-loader-wrapper.take-bug-loader.hidden{id: "take-committer-loader-#{bug.id}"}
+    -#                          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                        %button.assignment-button.take-bug-committer.tooltipped{id: "take-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'Take this Bug'}
+    -#                      - else
+    -#                        .gear-loader-wrapper.take-bug-loader.hidden{id: "return-committer-loader-#{bug.id}"}
+    -#                          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                        %button.assignment-button.return-bug-committer.tooltipped{id: "return-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'Return this Bug'}
+    -#                    - else
+    -#                      %button.assignment-button.take-bug-committer.tooltipped{id: "take-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'You are not authorized to take this Bug', disabled: true}
+    -#                  - else
+    -#                    %button.assignment-button.take-bug-committer.tooltipped{id: "take-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'You cannot be the researcher and committer on the same bug.', disabled: true}
+    -#
+    -#                %td
+    -#                  = display_last_updated_date(bug)
+    -#                  %br
+    -#                  = display_last_updated_time(bug)
+    -#
+    -#        .apple_pagination= will_paginate @pending_bugs, param_name: 'pending_page', params: {active_tab: 'pending'}
+    -#      - else
+    -#        .missing-data
+    -#          No pending bugs at this time.
+    -#
+    -#.tab-pane#closed-bugs{role: 'tabpanel', 'aria-labeled-by': 'user-closed-bugs-tab'}
+    -#  .row
+    -#    .col-xs-12
+    -#      - if @closed_bugs.any?
+    -#        %table.table.responsive.index-table
+    -#          %thead
+    -#            %tr
+    -#              %th
+    -#              -# Priority
+    -#              %th Bug ID
+    -#              %th Component
+    -#              %th.indent{'data-defaultsign': 'nospan'} Summary
+    -#              %th State
+    -#              %th.embargo-col-header.tooltipped{title: 'Embargo'}
+    -#              %th.user-col
+    -#                %span.researcher-col-header.tooltipped{title: 'Researcher'}
+    -#                  Researcher
+    -#              %th.user-col
+    -#                %span.committer-col-header.tooltipped{title: 'Committer'}
+    -#                  Committer
+    -#              %th.date-col Updated
+    -#          %tbody
+    -#            - @closed_bugs.each do |bug|
+    -#              %tr{id: "bug_#{bug.id}"}
+    -#                %td
+    -#                  %span.bug-priority{class: "p-#{bug.priority}", title: "Priority-#{bug.priority}"}
+    -#                %td.id-col= link_to bug.id, bug
+    -#                %td= bug.component
+    -#                %td
+    -#                  = link_to bug.summary, bug_path(bug.id)
+    -#                  %br
+    -#                  %span.tags-wrapper
+    -#                    - uniq_gibs = bug.giblets.map {|g| g.name}.uniq
+    -#                    - uniq_gibs.each do |gib|
+    -#                      %a{href: "#{bugs_path({:tag_names => [gib], :page => 1})}"}
+    -#                        %button.tag.primary-tag
+    -#                          = gib
+    -#
+    -#                %td.state-col= bug.state
+    -#                %td
+    -#                  %span.tooltipped{ class: "liberty_#{bug.id} #{bug.liberty_clear? ? 'embargo_off' : 'embargo_on'} ", title: "#{bug.liberty_clear? ? 'Embargo Off' : 'Embargo On'}"}
+    -#                %td.bug-user.alt-col.user-col-divider
+    -#                  - if bug.user
+    -#                    %span.float-left= bug.user.cvs_username
+    -#                  - else
+    -#                    %span.float-left.missing-data Unassigned
+    -#
+    -#                  - if bug.committer != current_user
+    -#                    - if bug.user && (bug.user != current_user)
+    -#                      .gear-loader-wrapper.take-bug-loader.hidden{id: "take-loader-#{bug.id}"}
+    -#                        = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                      %button.assignment-button.take-bug.tooltipped{id: "take-bug-#{bug.id}", type: 'button', title: 'Take this Bug'}
+    -#                    - else
+    -#                      .gear-loader-wrapper.take-bug-loader.hidden{id: "return-loader-#{bug.id}"}
+    -#                        = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                      %button.assignment-button.return-bug.tooltipped{id: "return-bug-#{bug.id}", type: 'button', 'data-id': "#{bug.id}", title: 'Return this Bug'}
+    -#
+    -#                %td.bug-user.alt-col
+    -#                  - if bug.committer
+    -#                    %span.float-left= bug.committer.cvs_username
+    -#                  - else
+    -#                    %span.float-left.missing-data Unassigned
+    -#
+    -#                  - if bug.user != current_user
+    -#                    - if current_user.has_role?('committer')
+    -#                      - if bug.committer != current_user
+    -#                        .gear-loader-wrapper.take-bug-loader.hidden{id: "take-committer-loader-#{bug.id}"}
+    -#                          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                        %button.assignment-button.take-bug-committer.tooltipped{id: "take-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'Take this Bug'}
+    -#                      - else
+    -#                        .gear-loader-wrapper.take-bug-loader.hidden{id: "return-committer-loader-#{bug.id}"}
+    -#                          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#                        %button.assignment-button.return-bug-committer.tooltipped{id: "return-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'Return this Bug'}
+    -#                    - else
+    -#                      %button.assignment-button.take-bug-committer.tooltipped{id: "take-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'You are not authorized to take this Bug', disabled: true}
+    -#                  - else
+    -#                    %button.assignment-button.take-bug-committer.tooltipped{id: "take-bug-committer-#{bug.id}", 'data-id': "#{bug.id}", type: 'button', title: 'You cannot be the researcher and committer on the same bug.', disabled: true}
+    -#
+    -#                %td
+    -#                  = display_last_updated_date(bug)
+    -#                  %br
+    -#                  = display_last_updated_time(bug)
+    -#
+    -#        .apple_pagination= will_paginate @closed_bugs, param_name: 'closed_page', params: {active_tab: 'closed'}
+    -#      - else
+    -#        .missing-data
+    -#          No closed bugs at this time.
+    -#
+    -#
+    -#
+    -#
+    -#
+
+
+
+
 %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
 .modal.fade.user-form-modal{id: "roleModal_#{@user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
   .modal-dialog{role: 'document'}

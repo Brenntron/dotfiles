@@ -11,6 +11,20 @@ class UsersController < ApplicationController
   def show
     @user = User.where(id: params[:id]).first
 
+    if @user
+      @closed_disputes = @user.disputes.where(status: "RESOLVED_CLOSED")
+      @open_disputes = @user.disputes.where.not(status: "RESOLVED_CLOSED")
+      @total_closed = @closed_disputes.length
+      @total_open = @open_disputes.length
+
+    # .paginate(:page => params[:closed_page], :per_page => CLOSED_BUGS_PAGINATION_SIZE)
+    #   # @pending_bugs = @user.disputes.pending.paginate(:page => params[:pending_page], :per_page => PENDING_BUGS_PAGINATION_SIZE)
+    #   @open_bugs = @user.disputes.where(status: nil).paginate(:page => params[:open_page], :per_page => OPEN_BUGS_PAGINATION_SIZE)
+    #
+
+    #   @total_open = @user.bugs.open_bugs.length
+    end
+
     case
       when @user.nil?
         flash[:error] = "Could not find user '#{params[:id]}'"
