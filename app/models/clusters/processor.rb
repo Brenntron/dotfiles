@@ -12,6 +12,9 @@ class Clusters::Processor
   end
 
   def process
+    bulk_wbnp_clusters = []
+    # First, handle non-WSA clusters. WSA is handled in bulk later, so they don't get http requests
+    # in this loop.
     clusters.each do |cluster|
       credit_handler = WebcatCredits::Clusters::CreditHandler.new(user, cluster)
       cluster_processor = PLATFORM_PROVIDERS[cluster[:platform]].new(cluster, user)
@@ -23,11 +26,24 @@ class Clusters::Processor
         # add pending credit to the user
         credit_handler.handle_pending_credit
       else
-        cluster_processor.process
-        # add fixed credit to the user
+        if cluster[:platform] == 'WSA'
+          wbnp_cluster = {
+            cluster_id: cluster[:cluster_id],
+            cat_ids: cluster[:categories].map(&:to_i),
+            user: user.cvs_username,
+            comment: cluster[:comment]
+          }
+          bulk_wbnp_clusters << wbnp_cluster
+        else
+          cluster_processor.process
+        end
+        # add fixed credit to the user, regardless of platform
         credit_handler.handle_fixed_credit
       end
     end
+
+    Wbrs::Cluster.process(bulk_wbnp_clusters)
+
   end
 
   def process!
