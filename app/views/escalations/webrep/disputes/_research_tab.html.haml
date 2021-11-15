@@ -936,7 +936,6 @@
                                             = rulehit.first.probability / 100.0
                                             \%
 
-
                                   - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit == true}.each do |wbrs_hit|
                                     - rulehit = @all_rulehits.select {|hit| hit.mnemonic == wbrs_hit.name}
                                     %tr.plus-ip-rule-row
