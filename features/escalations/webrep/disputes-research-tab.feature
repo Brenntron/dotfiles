@@ -234,7 +234,7 @@ Feature: Disputes index, Research tab
     And I click "#research-tab-link"
     And I click "#research-convert-to-webcat"
     And I wait for "1" seconds
-    And I should see "talosintelligence.com"
+    And I should see "1234computer.com"
     And I fill in selectized of element "#1-selectize" with "['6', '77']"
     And I wait for "1" seconds
     And I click ".dropdown-submit-button"
@@ -245,11 +245,11 @@ Feature: Disputes index, Research tab
   Scenario: a user tries to convert a webrep ticket to a webcat ticket that is not in an open status
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-      |  id       |  status        | user_id |
-      | 000001    | ON_HOLD        |    1    |
+      | id       |  status        | user_id |
+      | 1        | ON_HOLD        |    1    |
     And I go to "escalations/webrep/disputes/1"
     And I wait for "2" seconds
+    And I click "#research-tab-link"
     And I click "#research-convert-to-webcat"
-    And I click "#convert-ticket-button"
     And I wait for "1" seconds
     And I should see "TICKET CANNOT BE CONVERTED"
