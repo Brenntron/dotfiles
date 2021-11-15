@@ -165,7 +165,7 @@
       .dispute-source-wrapper
         %label.content-label-sm
           Source
-        %div
+        %div#dispute-source-text
           - if @dispute.ticket_source?
             - if @dispute.ticket_source == 'talos-intelligence'
               TI Webform

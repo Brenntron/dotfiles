@@ -2508,6 +2508,32 @@ window.prep_dispute_to_convert = (event) ->
         std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertible (open) status.'])
         return
 
+window.prep_dispute_to_convert_from_research = (event) ->
+  open_status = ['NEW', 'ASSIGNED', 'RESEARCHING', 'RE-OPENED', 'ESCALATED']
+  ticket_status = $("#show-edit-ticket-status-button")[0].innerText
+
+  if !open_status.includes(ticket_status)
+    std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertible (open) status.'])
+    return
+
+  if !(/TI Webform/.test $("#dispute-source-text").text())
+    std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
+    return
+
+  dispute_id = $("#dispute_id").text()
+  entry_ids = []
+  entries_content = []
+  summary = $('.email-msg-content').text()
+
+  for entry in $('.dual-edit-field.url-cell')
+    entry_ids.push $(entry).attr('data-id')
+    entries_content.push $(entry).find('.entry-data-content').text().replace(/^\s+|\s+$/g, '')
+
+  $('#convert-ticket-summary').text(summary)
+  $('#dispute-id-to-convert').text(dispute_id)
+  $('.convert-entry-count').text("(#{entry_ids.length})")
+
+  get_webrep_current_cats_from_research(entry_ids, entries_content)
 
 $ ->
 
@@ -2533,6 +2559,18 @@ check_convert_to_webcat_ready = () ->
     $('#convert-ticket-dropdown .dropdown-submit-button').attr('disabled', 'disabled')
   return false
 
+check_convert_to_webcat_ready_from_research = () ->
+  entry_cats = $('#research-tab-toolbar #convert-ticket-dropdown').find('.selectize')
+  enable = true
+  # if any are not filled out we don't enable the submit button
+  $(entry_cats).each ->
+    if $(this).val() == null
+      enable = false
+  if enable == true
+    $('#convert-ticket-dropdown .dropdown-submit-button').removeAttr('disabled')
+  else
+    $('#convert-ticket-dropdown .dropdown-submit-button').attr('disabled', 'disabled')
+  return false
 
 get_webrep_current_cats = (entries, uris) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -2594,7 +2632,7 @@ get_webrep_current_cats = (entries, uris) ->
           $(entry_selectize_container).removeClass('hidden')
           convert_selectize = $convert_category_selectize[0].selectize
           convert_selectize.setValue cat_ids
-         
+
         ), 500
 
 
@@ -2604,6 +2642,68 @@ get_webrep_current_cats = (entries, uris) ->
       std_msg_error('Error preparing ticket for conversion', [response])
   )
 
+get_webrep_current_cats_from_research = (entry_ids, uris) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/current_content_categories'
+    method: 'POST'
+    headers: headers
+    data: {
+      uri: uris
+    }
+    success: (response) ->
+      entry_table = $('#entries-to-convert tbody')
+      for entry_id, index in entry_ids
+        entry_content = uris[index]
+        cat_ids = []
+        cat_names = ''
+
+        for index, data of response.data
+          if data.url == entry_content
+            categories = data.categories
+            cat_ids = []
+            cat_names = []
+
+            if Object.keys(categories).length > 0
+              jQuery.each categories, (id, category) ->
+                cat_ids.push category.category_id
+                cat_names.push category.descr
+
+            cat_names = cat_names.join()
+
+        entry_row = "<tr><td class='align-top'>#{entry_id}</td><td class='entry-content-to-convert align-top'>#{entry_content}</td><td class='align-top'>#{cat_names}</td><td class='entry-cat-suggestions hidden' id='#{entry_id}-selectize-holder'><select id='#{entry_id}-selectize' class='selectize convert-entry-selectize' multiple='multiple' placeholder='Add categories'></select></td></tr>"
+
+        $(entry_table).append(entry_row)
+        entry_selectize_container = "##{entry_id}-selectize-holder"
+        entry_select = "##{entry_id}-selectize"
+
+        convert_category_selectize = $(entry_select).selectize {
+          persist: false,
+          create: false,
+          maxItems: 5,
+          closeAfterSelect: true,
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code']
+          options: AC.WebCat.createSelectOptions(entry_select)
+          onChange: ->
+            check_convert_to_webcat_ready_from_research()
+        }
+
+
+        setTimeout (->
+          $(entry_selectize_container).removeClass('hidden')
+          convert_selectize = convert_category_selectize[0].selectize
+          convert_selectize.setValue cat_ids
+
+        ), 500
+
+      check_convert_to_webcat_ready_from_research()
+    error: (response) ->
+      console.error response
+      std_msg_error("Error preparing ticket for conversion", [response])
+  )
+
 selected_options = (category_names) ->
   options = []
   if category_names
@@ -2611,7 +2711,6 @@ selected_options = (category_names) ->
   return options
 
 window.convert_dispute_to_webcat = () ->
-
   $('#convert-ticket-dropdown .dropdown-loader-wrapper').removeClass('hidden')
   dispute_id = $('#dispute-id-to-convert').text()
   summary = $('#convert-ticket-summary').val()
@@ -2624,11 +2723,11 @@ window.convert_dispute_to_webcat = () ->
     suggested_cats_string = $(this).find('.convert-entry-selectize option:selected').map(->
       $(this).text()
     ).get().join(',')
-    
+
     suggested_categories.push(entry: entry_content, suggested_categories: suggested_cats_string)
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  
+
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/convert_ticket'
     method: 'POST'
