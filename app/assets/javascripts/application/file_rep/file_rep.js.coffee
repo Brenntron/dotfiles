@@ -499,6 +499,7 @@ $ ->
             continue
           if condition != ''
             condition_name = condition_name.replace(/_/g, " ").toUpperCase()
+            condition_name = 'DATE SUBMITTED' if condition_name == 'CREATED AT'
             condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
 
             if typeof condition == 'object'
