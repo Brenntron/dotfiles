@@ -139,11 +139,10 @@
                 %tr
                   %th
                     -# Priority
-                  %th Bug ID
-                  %th Component
-                  %th.indent{'data-defaultsign': 'nospan'} Summary
+                  %th ID
+                  %th Status
                   %th State
-                  %th.embargo-col-header.tooltipped{title: 'Embargo'}
+                  %th Dispute Type
                   %th.user-col
                     %span.researcher-col-header.tooltipped{title: 'Researcher'}
                       Researcher
@@ -151,23 +150,17 @@
                     %span.committer-col-header.tooltipped{title: 'Committer'}
                       Committer
                   %th.date-col Updated
-              -#%tbody
-              -#  - @open_bugs.sort_by{ |b| b.priority_sort }.each do |bug|
-              -#    %tr{id: "bug_#{bug.id}"}
-              -#      %td
-              -#        %span.bug-priority{class: "p-#{bug.priority}", title: "Priority-#{bug.priority}"}
-              -#      %td.id-col= link_to bug.id, bug
-              -#      %td= bug.component
-              -#      %td
-              -#        = link_to bug.summary, bug_path(bug.id)
-              -#        %br
-              -#        %span.tags-wrapper
-              -#          - uniq_gibs = bug.giblets.map {|g| g.name}.uniq
-              -#          - uniq_gibs.each do |gib|
-              -#            %a{href: "#{bugs_path({:tag_names => [gib], :page => 1})}"}
-              -#              %button.tag.primary-tag
-              -#                = gib
-
+              %tbody
+                - @open_disputes.each do |dispute|
+                  %tr{id: "dispute_#{dispute.id}"}
+                    %td
+                      %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
+                    %td.id-col
+                      %a{href:"escalations/webrep/disputes/#{dispute.id}"}= dispute.id
+                    %td= dispute.status
+                    %td= dispute.submission_type
+                    %td= dispute.user_id
+                    %td= dispute.customer_id
     -#                %td.state-col
     -#                  = bug.state
     -#                %td
