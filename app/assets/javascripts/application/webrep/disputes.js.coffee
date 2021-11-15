@@ -2691,12 +2691,9 @@ get_webrep_current_cats_from_research = (entry_ids, uris) ->
         }
 
 
-        setTimeout (->
-          $(entry_selectize_container).removeClass('hidden')
-          convert_selectize = convert_category_selectize[0].selectize
-          convert_selectize.setValue cat_ids
-
-        ), 500
+        $(entry_selectize_container).removeClass('hidden')
+        convert_selectize = convert_category_selectize[0].selectize
+        convert_selectize.setValue cat_ids
 
       check_convert_to_webcat_ready_from_research()
     error: (response) ->
