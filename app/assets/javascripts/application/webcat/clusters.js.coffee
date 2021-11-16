@@ -949,15 +949,41 @@ window.webcat_clusters_refresh = () ->
   window.location.replace('/escalations/webcat/clusters');
 
 window.webcat_platform_filter = () ->
-  selected_platform = $('#webcat-platform-filter').val()
+  platforms = $("input.show-platforms-filter:checked")
+  if $(platforms).length > 1 || $(platforms).length == 0
+    selected_platform = 'All'
+  else
+    selected_platform = $("input.show-platforms-filter:checked").val()
   url = new URL(document.location.href)
   url.searchParams.set('platform', selected_platform)
+  document.location = url;
+
+window.webcat_cluster_type_filter = () ->
+  types = $("input.show-cluster-types-filter:checked")
+  if $(types).length > 1 || $(types).length == 0
+    selected_type = 'all'
+  else
+    selected_type = $("input.show-cluster-types-filter:checked").val()
+  url = new URL(document.location.href)
+  url.searchParams.set('cluster_type', selected_type)
   document.location = url;
 
 $ ->
   $(document).ready ->
     url = new URL(document.location.href)
     platform = url.searchParams.get('platform')
+    cluster_type = url.searchParams.get('cluster_type')
 
     if(platform)
-      $('#webcat-platform-filter').val(platform)
+      if platform == 'All'
+        $("input.show-platforms-filter").prop('checked', true)
+      else
+        $("input.show-platforms-filter").prop('checked', false)
+        $("input.show-platforms-filter[name='show-platform-#{platform}'").prop('checked', true)
+
+    if(cluster_type)
+      if cluster_type == 'all'
+        $("input.show-cluster-types-filter").prop('checked', true)
+      else
+        $("input.show-cluster-types-filter").prop('checked', false)
+        $("input.show-cluster-types-filter[name='show-cluster-#{cluster_type}'").prop('checked', true)

@@ -7616,12 +7616,14 @@ table.dispute-entry-table tbody tr.selected {
   display: flex;
 }
 #cluster_comment_field{
-  padding: 0 3px 0 3px;
+  padding: 0 6px 0 6px;
   font-weight: 400;
   height: 30px;
-  border: 1px solid #ccc;
+  border: none;
   border-radius: 2px;
-  color: #666
+  color: #666;
+  width: 100%;
+  margin-top: 7px;
 }
 
 .wsa-table{
@@ -8675,23 +8677,14 @@ td.text-center span {
   padding: 4px 8px;
 }
 
+
+
+
+
 // Cluster top bar header
 .cluster-mgt-top-area {
   background-color: $content-tab-color;
   padding-bottom: 20px;
-  .search-box {
-    background-image: none;
-    padding: 0 0 0 10px;
-    margin-top: 10px;
-    height: 30px;
-  }
-  .apply-filter-btn {
-    background-repeat: no-repeat;
-    background-size: 26px;
-    background-position: 6px center;
-    margin-top: 10px;
-    min-width: 100px;
-  }
 }
 #wsa_statuses, #clusters-index_filter, #cluster_comment_field{
   &:empty{
@@ -8734,12 +8727,19 @@ td.text-center span {
 
 
 .copycat-btn, .wsa-btn {
-  margin: 4px 0 0 5px;
   background-color: $content-tab-color;
   color: $type-lightest;
   display: block;
   height: 27px;
   background-size: 19px!important;
+}
+
+.copycat-btn {
+  margin: 4px 0 0 5px;
+}
+
+.wsa-btn {
+  margin: 4px 5px 0 5px;
 }
 
 .copycat-btn.active, .wsa-btn.active {
@@ -9005,10 +9005,6 @@ td.text-center span {
   font-weight: 200;
 }
 
-.cluster-mgt-loader-wrapper{
-  margin: 90px 25%;
-}
-
 .webcat-loader-wrapper, .webrep-loader-wrapper {
   margin: 0 37%;
 }
@@ -9046,35 +9042,6 @@ td.text-center span {
       width: 90px;
       margin-top: 6px;
     }
-}
-.cluster-table-toolbar {
-  margin-bottom: 0;
-}
-
-#clusters-index_wrapper .table-search-input {
-  max-width: 200px;
-}
-#clusters-index_wrapper .datatable-top-tools {
-  margin-top: -35px;
-}
-
-.expand-cluster-entries {
-  margin: 0 8px;
-}
-
-.expand-cluster-entries::after {
-  content: '';
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-  background-image: url(image_path('icon_expand_table_white.svg'));
-  background-repeat: no-repeat;
-  background-position: center center;
-  margin-bottom: -4px;
-}
-
-.expand-cluster-entries.collapse-cluster-entries::after {
-  transform: rotate(180deg);
 }
 
 .ticket-age-over3hr {
@@ -13333,7 +13300,7 @@ input.wl-bl-list-inline {
   font-weight: 700;
 }
 
-.webcat-platform-filter {
+.webcat-platform-filter, .webcat-cluster-type-filter {
   height: 25px;
 }
 
