@@ -141,7 +141,6 @@
                     -# Priority
                   %th ID
                   %th Status
-                  %th State
                   %th Dispute Type
                   %th.user-col
                     %span.researcher-col-header.tooltipped{title: 'Researcher'}
@@ -152,15 +151,18 @@
                   %th.date-col Updated
               %tbody
                 - @open_disputes.each do |dispute|
-                  %tr{id: "dispute_#{dispute.id}"}
-                    %td
-                      %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
-                    %td.id-col
-                      %a{href:"escalations/webrep/disputes/#{dispute.id}"}= dispute.id
-                    %td= dispute.status
-                    %td= dispute.submission_type
-                    %td= dispute.user_id
-                    %td= dispute.customer_id
+                  -#%tr{id: "dispute_#{dispute.id}"}
+                  -#  %td
+                  -#    %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
+                  -#  %td.id-col
+                  -#    = link_to dispute.id, "/escalations/webrep/disputes/#{dispute.id}"
+                  -#  %td= dispute.status
+                  -#  %td= dispute.submission_type
+                  -#  %td= User.where(id: dispute.user_id).first.cvs_username
+                  -#  %td
+                  -#    - if User.where(id: dispute.customer_id).first
+                  -#      =User.where(id: dispute.customer_id).first.cvs_username
+                  -#  %td= dispute.updated_at
     -#                %td.state-col
     -#                  = bug.state
     -#                %td
