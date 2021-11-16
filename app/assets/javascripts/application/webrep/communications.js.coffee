@@ -84,11 +84,11 @@ $ ->
     $(".reply-button").show()
     dispute_id = $('input[name="dispute_id"]').val()
     $('input[type=text].reply-subject').val("Talosintelligence.com support request " + dispute_id)
-    $('.communication-subject')[0].innerHTML = email.subject
-    $('.author-username')[0].innerHTML = email.from
-    $('.receiver-email')[0].innerHTML = (email.to || case_email)
-    $('.receiver-email')[1].innerHTML = email.from
-    $('.email-msg-content')[0].innerHTML = email.body
+    $('.communication-subject')[0].innerText = email.subject
+    $('.author-username')[0].innerText = email.from
+    $('.receiver-email')[0].innerText = (email.to || case_email)
+    $('.receiver-email')[1].innerText = email.from
+    $('.email-msg-content')[0].innerText = email.body
 
     $('.receiver-email').each(() ->
       if (this.innerHTML.indexOf("bounces+") != -1)
@@ -139,7 +139,7 @@ $ ->
   $('.forward-button').on 'click', ->
     $('#newEmailDialog').dialog 'open'
     $('.new-subject').val("Fwd:" + $(".communication-subject")[0].textContent)
-    $('.new-body').val("\n" + "###################################" + "\n" + "Begin Forwarded Message:" + "\n" + $('.email-msg-content')[0].innerHTML)
+    $('.new-body').val("\n" + "###################################" + "\n" + "Begin Forwarded Message:" + "\n" + $('.email-msg-content')[0].innerText)
 
   $('.delete-email').on 'click', ->
     $('.reply-body').val('')
