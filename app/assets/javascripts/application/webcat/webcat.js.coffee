@@ -221,7 +221,6 @@ $ ->
       subheader = JSON.parse(subheader)
 
     container = $('#webcat_searchref_container')
-    search_condition_tooltip = []
 
     for condition_name, condition of subheader
       if condition != ''
@@ -245,24 +244,7 @@ $ ->
         else
           condition_HTML = '<span>' + condition + '</span>'
 
-        search_condition_tooltip.push(condition_name + ': ' + $(condition_HTML).text())
         container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
-
-    if search_condition_tooltip.length > 0
-      container.css('display', 'inline-block')
-      list = $(container).find('#search-tooltip_content')[0]
-      for  li in search_condition_tooltip
-        item = document.createElement('li')
-        item.appendChild(document.createTextNode(li))
-        list.appendChild(item)
-      container.attr('data-tooltip-content', '#search-tooltip_content')
-      container.tooltipster(
-        theme: [
-          'tooltipster-borderless'
-          'tooltipster-borderless-customized'
-        ]
-        contentCloning: true
-      )
 
   build_header = (data) ->
     ###

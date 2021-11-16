@@ -488,7 +488,6 @@ $ ->
           '</div>'
 
       else if search_type == 'advanced'
-        search_condition_tooltip = []
         search_conditions = JSON.parse(localStorage.search_conditions)
         new_header =
           '<div>Results for Advanced Search ' +
@@ -507,28 +506,7 @@ $ ->
             else
               condition_HTML = '<span>' + condition + '</span>'
 
-            search_condition_tooltip.push(condition_name + ': ' + $(condition_HTML).text())
-
             container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
-
-
-        if search_condition_tooltip.length > 0
-          container.css('display', 'inline-block')
-          container.addClass('esc-tooltipped')
-
-          list = document.createElement('ul')
-          $(list).addClass('tooltip_content')
-          for  li in search_condition_tooltip
-            item = document.createElement('li')
-            item.appendChild(document.createTextNode(li))
-
-            list.appendChild(item)
-
-          container.prepend(list)
-          $(list).hide()
-
-          container.attr('data-tooltip-content', '.tooltip_content')
-
 
       else if search_type == 'named'
 
