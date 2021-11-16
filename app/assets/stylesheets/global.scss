@@ -407,44 +407,6 @@ table.dataTable.no-footer {
   background-position: 1px 1px;
 }
 
-/***** Pretty Tables *****/
-.pretty th .current {
-}
-
-.pretty th a {
-  display: block;
-}
-
-.pretty th a:hover {
-  color: $type-base-color;
-  text-decoration: none;
-}
-
-.pretty th a::after {
-  content: '';
-  display: block;
-  width: 14px;
-  height: 14px;
-  right: 0;
-  background-image: url("assets/layout/icon_sort.svg");
-  background-repeat: no-repeat;
-  background-position: right center;
-  float: right;
-}
-
-.pretty th a.asc::after {
-  background-image: url("/assets/layout/icon_sort_asc.svg");
-}
-
-.pretty th a.desc::after {
-  background-image: url("/assets/layout/icon_sort_dec.svg");
-}
-
-.pretty th.center-col a::after {
-  background-position: center center !important;
-  margin-right: 4px;
-}
-
 /**** Additional table styles ***/
 table {
   font-size: 9pt;
@@ -4117,7 +4079,6 @@ input.communication-subject {
   border: none;
   font-weight: 300;
   font-size: 9pt;
-  //margin-bottom: 3px;
 }
 
 .note-info-item {
@@ -12010,7 +11971,6 @@ span.threat-cat-no-data {
 table > tbody > tr > td.no-padding {
   padding: 0 !important;
 }
-
 .inline-row-loader {
   display: inline-block;
   font-style: italic;
@@ -12022,7 +11982,7 @@ table > tbody > tr > td.no-padding {
     height: 14px;
     width: 14px;
     background-repeat: no-repeat;
-    background-image: url('icon_sync_lt_grey.svg');
+    background-image: url(image_path('icon_sync_lt_grey.svg'));
     margin-bottom: -2px;
   }
 }
