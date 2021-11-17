@@ -14,7 +14,7 @@ class UsersController < ApplicationController
     if @user
       @closed_filerep_disputes = @user.file_reputation_disputes.where(status: "RESOLVED_CLOSED").to_a
       @open_filerep_disputes = @user.file_reputation_disputes.where.not(status: "RESOLVED_CLOSED").to_a
-      
+
       @closed_webrep_disputes = @user.disputes.where(status: "RESOLVED_CLOSED").to_a
       @open_webrep_disputes = @user.disputes.where.not(status: "RESOLVED_CLOSED").to_a
 
