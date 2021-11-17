@@ -250,7 +250,7 @@
         %button.toolbar-button.export-button.esc-tooltipped.toolbar-button-spacer{title: 'Export Selected to CSV', onclick: 'webrep_research_export_selected_rows();'}
           %span.toolbar-button-text Export Selected to CSV
 
-        - if @entries.blank? && @dispute.bridge_packet?
+        - if @entries.blank? && @dispute.bridge_packet.present?
           %button.toolbar-button.ping-button.esc-tooltipped{title: 'Entry Recovery - Ping bridge to grab missing Entry content', onclick: "dispute_entry_recovery(#{@dispute.id});"}
             %span.toolbar-button-text Dispute Entry Recovery
 

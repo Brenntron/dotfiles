@@ -541,13 +541,14 @@ $ ->
     # Something got lost, ping the bridge and pull in entry content
     std_msg_ajax(
       method: 'POST'
-      url: "/api/v1/escalations/webrep/disputes/recover_dispute"
-      data: dispute_id
+      url: "/escalations/api/v1/escalations/webrep/disputes/recover_dispute"
+      data: {
+        id: dispute_id
+      }
       success: (response) ->
-        response = JSON.parse(response)
-        std_msg_success("Entry content recovered", response, reload: true)
+        std_msg_success("Entry content recovered", response.messages, reload: true)
       error: (response) ->
-        std_api_error("Error recovering dispute entry content", response, reload: false)
+        std_api_error(response, "Error recovering dispute entry content", reload: false)
     )
 
 
