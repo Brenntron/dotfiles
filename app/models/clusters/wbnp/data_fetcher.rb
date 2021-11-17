@@ -18,6 +18,7 @@ class Clusters::Wbnp::DataFetcher < Clusters::Templates::DataFetcher
   def fetch_data
     conditions = {}
     conditions[:regex] = regex if regex.present?
+    conditions[:filter_type] = filter[:cluster_type] if filter[:cluster_type] && filter[:cluster_type] != 'all'
     # TODO: add template method for 'fetch' method
     # return Wbrs::Cluster.where(regex: regex) if regex.present?
     cluster_ids = cluster_ids_for_filter

@@ -29,6 +29,8 @@ module API
             desc 'get all clusters'
             params do
               optional :f, type: String, desc: 'filter'
+              optional :platform, type: String, desc: 'platform filter(WSA/NGFW)'
+              optional :cluster_type, type: String, desc: 'cluster type filter(ip/domain)'
             end
 
             # Uses class Beaker::Verdicts in old Beaker namespace.
@@ -37,7 +39,8 @@ module API
 
               filter = {
                 f: params[:f],
-                platform: params[:platform]
+                platform: params[:platform],
+                cluster_type: params[:cluster_type]
               }
               clusters = ::Clusters::Fetcher.new(filter, params[:regex], current_user).fetch
 

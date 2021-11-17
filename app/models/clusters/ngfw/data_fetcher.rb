@@ -11,6 +11,7 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
   # Since clusters processing are using platform name as an identifier
   # we use hardcoded value to be isolated from potential category name change on TI side
   DATA_PATFORM = 'NGFW'.freeze
+  NON_IP_REGEX = '^((?!\b((?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:(?<!\.)\b|\.)){4}).)*$'.freeze
 
   def initialize(regex, filter = {}, user)
     @regex = regex
@@ -37,6 +38,15 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
       data = data.where(domain: assigned_domains)
     when 'pending'
       data = data.pending
+    end
+
+    case filter[:cluster_type]
+    when 'domain'
+      data = data.where('domain REGEXP ?', NON_IP_REGEX)
+    when 'ip'
+      data = data.where('domain NOT REGEXP ?', NON_IP_REGEX)
+    else
+      data
     end
 
     data.order(traffic_hits: :desc).first(DATA_LIMIT)

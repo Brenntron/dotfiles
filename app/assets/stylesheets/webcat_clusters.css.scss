@@ -1,0 +1,110 @@
+// Clusters page specific styles
+#apply-regex-btn {
+  background-color: #e5e5e5;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: -3px 0 0 0;
+  height: 28px;
+  border-radius: 0 4px 4px 0;
+  padding: 0 16px;
+  position: absolute;
+  right: 0;
+  border: none;
+  font-size: 9pt;
+}
+
+#cluster_filter_field {
+  background-image: none;
+  padding-left: 4px;
+}
+
+#submit-clusters {
+  padding-left: 34px;
+  margin-top: 7px;
+}
+
+.toolbar .btn-group.toolbar-btn-group {
+  padding: 0;
+  margin-right: 0;
+  border: none;
+  height: auto;
+  // diff bg color due to button-group
+  .expand-selected, .collapse-selected, .icon-opened-selected {
+    background-color: #c7c7c7;
+  }
+  .toolbar-button-text {
+    margin-top: 4px;
+  }
+}
+
+.collapse-selected {
+  background-image: url(image_path('icon_collapse_selected.svg'));
+}
+.expand-selected {
+  background-image: url(image_path('icon_expand_selected.svg'));
+}
+
+.toolbar.cluster-table-toolbar {
+  margin-bottom: 0;
+  position: absolute;
+  z-index: 1;
+  width: auto;
+  .toolbar-button-text {
+    display:none;
+    @media (min-width: 1950px) {
+      display: block;
+    }
+  }
+  .toolbar-select-wrapper{
+    .toolbar-checkbox {
+      margin-top: 3px;
+    }
+    .toolbar-button-text {
+      // overriding normal hide the text media queries
+      // overriding normal padding cuz no icons
+      display: inline-block !important;
+      padding-left: 6px;
+      padding-top: 4px;
+      line-height: 1em;
+    }
+  }
+}
+
+
+
+.expand-cluster-entries {
+  margin: 0 8px;
+}
+
+.expand-cluster-entries::after {
+  content: '';
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-image: url(image_path('icon_expand_table_white.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  margin-bottom: -4px;
+}
+
+.expand-cluster-entries.collapse-cluster-entries::after {
+  transform: rotate(180deg);
+}
+
+.cluster-mgt-loader-wrapper{
+  margin: 60px 0 0 37%;;
+}
+
+#clusters-index_wrapper {
+  margin-top: 58px;
+  @media (min-width: 1350px) {
+    margin-top: 19px;
+  }
+  .no-margin-datatable-top-tool {
+    margin-bottom: 5px !important;
+  }
+  .table-search-input {
+    width: 315px;
+  }
+}

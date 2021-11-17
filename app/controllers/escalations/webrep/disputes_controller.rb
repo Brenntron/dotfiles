@@ -463,6 +463,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
   def research
     @entries = DisputeEntry.research_results(research_params)
+    @all_rulehits = Wbrs::RuleHit.all
   end
 
   def tickets
