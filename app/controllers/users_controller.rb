@@ -10,24 +10,16 @@ class UsersController < ApplicationController
 
   def show
     @user = User.where(id: params[:id]).first
+
     if @user
-      closed_filerep_disputes = @user.file_reputation_disputes.where(status: "RESOLVED_CLOSED")
-      open_filerep_disputes = @user.file_reputation_disputes.where.not(status: "RESOLVED_CLOSED")
-      closed_webrep_disputes = @user.disputes.where(status: "RESOLVED_CLOSED")
-      open_webrep_disputes = @user.disputes.where.not(status: "RESOLVED_CLOSED")
-      #
-      @closed_disputes = closed_filerep_disputes.merge closed_webrep_disputes
-      @open_disputes = open_filerep_disputes.merge(open_webrep_disputes)
+      @closed_filerep_disputes = @user.file_reputation_disputes.where(status: "RESOLVED_CLOSED").to_a
+      @open_filerep_disputes = @user.file_reputation_disputes.where.not(status: "RESOLVED_CLOSED").to_a
+      
+      @closed_webrep_disputes = @user.disputes.where(status: "RESOLVED_CLOSED").to_a
+      @open_webrep_disputes = @user.disputes.where.not(status: "RESOLVED_CLOSED").to_a
 
-      @total_closed = closed_filerep_disputes.length + closed_webrep_disputes.length
-      @total_open = open_filerep_disputes.length + open_webrep_disputes.length
-
-    # .paginate(:page => params[:closed_page], :per_page => CLOSED_BUGS_PAGINATION_SIZE)
-    #   # @pending_bugs = @user.disputes.pending.paginate(:page => params[:pending_page], :per_page => PENDING_BUGS_PAGINATION_SIZE)
-    #   @open_bugs = @user.disputes.where(status: nil).paginate(:page => params[:open_page], :per_page => OPEN_BUGS_PAGINATION_SIZE)
-    #
-
-    #   @total_open = @user.bugs.open_bugs.length
+      @total_closed = @closed_filerep_disputes.length + @closed_webrep_disputes.length
+      @total_open = @open_filerep_disputes.length + @open_webrep_disputes.length
     end
 
     case

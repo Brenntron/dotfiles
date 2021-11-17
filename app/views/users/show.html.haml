@@ -133,7 +133,9 @@
     .tab-pane.active#open-bugs{role: 'tabpanel', 'aria-labeled-by': 'user-open-bugs-tab'}
       .row
         .col-xs-12
-          - if @open_disputes.any?
+
+          - if @open_webrep_disputes.any?
+            Web Reputation
             %table.table.responsive.index-table
               %thead
                 %tr
@@ -141,7 +143,6 @@
                     -# Priority
                   %th ID
                   %th Status
-                  %th Dispute Type
                   %th.user-col
                     %span.researcher-col-header.tooltipped{title: 'Researcher'}
                       Researcher
@@ -150,19 +151,50 @@
                       Committer
                   %th.date-col Updated
               %tbody
-                - @open_disputes.each do |dispute|
-                  -#%tr{id: "dispute_#{dispute.id}"}
-                  -#  %td
-                  -#    %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
-                  -#  %td.id-col
-                  -#    = link_to dispute.id, "/escalations/webrep/disputes/#{dispute.id}"
-                  -#  %td= dispute.status
-                  -#  %td= dispute.submission_type
-                  -#  %td= User.where(id: dispute.user_id).first.cvs_username
-                  -#  %td
-                  -#    - if User.where(id: dispute.customer_id).first
-                  -#      =User.where(id: dispute.customer_id).first.cvs_username
-                  -#  %td= dispute.updated_at
+                - @open_webrep_disputes.each do |dispute|
+                  %tr{id: "dispute_#{dispute.id}"}
+                    %td
+                      %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
+                    %td.id-col
+                      = link_to dispute.id, "/escalations/webrep/disputes/#{dispute.id}"
+                    %td= dispute.status
+                    %td= User.where(id: dispute.user_id).first.cvs_username
+                    %td
+                      - if User.where(id: dispute.customer_id).first
+                        =User.where(id: dispute.customer_id).first.cvs_username
+                    %td= dispute.updated_at
+          - if @open_filerep_disputes.any?
+            File Reputation
+            %table.table.responsive.index-table
+              %thead
+                %tr
+                  %th ID
+                  %th Status
+                  %th Filename
+                  %th SHA256
+                  %th.user-col
+                    %span.researcher-col-header.tooltipped{title: 'Researcher'}
+                      Researcher
+                  %th.user-col
+                    %span.committer-col-header.tooltipped{title: 'Committer'}
+                      Committer
+                  %th.date-col Updated
+              %tbody
+                - @open_filerep_disputes.each do |dispute|
+                  %tr{id: "dispute_#{dispute.id}"}
+                    %td.id-col
+                      = link_to dispute.id, "/escalations/file_rep/disputes/#{dispute.id}"
+                    %td= dispute.status
+                    %td= dispute.file_name
+                    %td
+                      %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha tooltipstered"}
+                        = dispute.sha256_hash
+                    %td= User.where(id: dispute.user_id).first.cvs_username
+                    %td
+                      - if User.where(id: dispute.customer_id).first
+                        =User.where(id: dispute.customer_id).first.cvs_username
+                    %td= dispute.updated_at
+
     -#                %td.state-col
     -#                  = bug.state
     -#                %td
