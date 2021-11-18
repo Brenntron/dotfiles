@@ -7016,7 +7016,36 @@ table.dispute-entry-table tbody tr.selected {
   border-right: solid 1px $faint-neutral-color;
   margin-right: 12px;
 }
-
+#user-open-disputes-tab{
+  background-image: url(image_path('icon_open.svg'))
+}
+#user-closed-disputes-tab{
+  background-image: url(image_path('icon_closed.svg'))
+}
+#closed-disputes, #open-disputes{
+  .id-col, .resolution-col, .status-col{
+    width: 100px;
+  }
+  .resolution-col, .status-col{
+    width: 125px;
+    white-space: nowrap;
+  }
+  .priority-col{
+    width: 38px;
+  }
+  .date-col {
+    width: 160px;
+  }
+  table{
+    th{
+      font-weight: 700;
+      background-color: #f7f7f7;
+      white-space: nowrap;}
+    tr{
+      td:last-of-type ,td:first-of-type { background-color: #fff; }
+    }
+  }
+}
 .priority-col-wrapper {
   padding-right: 6px;
 }

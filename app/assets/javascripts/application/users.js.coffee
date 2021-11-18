@@ -27,6 +27,29 @@ $ ->
         return
     return
 
+  if $('#user-tab-content').length > 0
+    age_col = $('#user-tab-content tbody tr .age-col')
+    for col in age_col
+      age = moment( $(col).data('age') ).fromNow()
+      age_class = ""
+      console.log age
+      if age == "a few seconds ago" || age == "a few minutes ago" || age.includes("minutes ago")
+        age = "<1 hour"
+
+      if age != "<1 hour"
+        if age.includes('hour')
+          console.log age
+          hours = parseInt(age.replace(/[^0-9]/g, ''))
+          console.log hours
+          if hours > 3 && hours <= 12
+            age_class = "ticket-age-over3hr"
+          if hours > 12
+            age_class = "ticket-age-over12hr"
+        else
+          age_class = "ticket-age-over12hr"
+
+      $(col).append("<span class='#{age_class}'> #{age}</span>")
+
   $('#user-bugs').click ->
     user_id = $(this).attr('value')
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -69,4 +92,3 @@ $ ->
       ).done (response) ->
         window.location.reload()
         return
-
