@@ -38,7 +38,6 @@ namespace 'AC.WebCat', (exports) ->
     )
 
   exports.getCategoryIds = (category_names, id) ->
-
     AC.WebCat.getAUPCategories().then( (categories) =>
       category_ids = []
       for name in category_names
@@ -48,5 +47,7 @@ namespace 'AC.WebCat', (exports) ->
           if name == value_name
             category_ids.push(y)
 
-      $(id)[0].selectize.addItem(category_ids)
+      $(category_ids).each ->
+        cat_id = this
+        $(id)[0].selectize.addItem(cat_id)
     )
