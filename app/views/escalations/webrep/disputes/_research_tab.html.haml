@@ -37,39 +37,40 @@
                 .load-bar-segment.hidden
                 .load-bar-segment.hidden
                 .load-bar-segment.hidden
-          %button#research-convert-to-webcat.convert-ticket-button.toolbar-button.dropdown-button-margin-left{onclick: 'prep_dispute_to_convert_from_research();', type: 'button', title: 'Convert ticket to web categorization ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-            %span.toolbar-button-text Convert to Webcat
-          .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'move-to-webcat'}
-            .dropdown-tool-text-divider.primary-text-divider Convert to Categorization Dispute
-            .inline-tool-content-wrapper
-              .dropdown-loader-wrapper.hidden
-                .gear-loader-wrapper
-                  = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+          %span.dropdown
+            %button#research-convert-to-webcat.convert-ticket-button.toolbar-button.dropdown-button-margin-left{onclick: 'prep_dispute_to_convert_from_research();', type: 'button', title: 'Convert ticket to web categorization ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+              %span.toolbar-button-text Convert to Webcat
+            .dropdown-menu.toolbar-dropdown#webrep-convert-ticket-dropdown{'aria-labelledby': 'move-to-webcat'}
+              .dropdown-tool-text-divider.primary-text-divider Convert to Categorization Dispute
+              .inline-tool-content-wrapper
+                .dropdown-loader-wrapper.hidden
+                  .gear-loader-wrapper
+                    = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
 
-            %label.content-label-sm
-              Ticket ID to Convert:
-            %span.ticket-id-to-convert#dispute-id-to-convert
+                %label.content-label-sm
+                  Ticket ID to Convert:
+                %span.ticket-id-to-convert#dispute-id-to-convert
 
-            %label.content-label-sm
-              Ticket Entries:
-              %span.convert-entry-count
-            .convert-entry-table-wrapper
-              %table#entries-to-convert.complaint-entries-to-convert
-                %thead
-                  %tr
-                    %th Entry ID
-                    %th Entry Content
-                    %th Current Categories
-                    %th.text-right Suggested Categories
-                %tbody
+                %label.content-label-sm
+                  Ticket Entries:
+                  %span.convert-entry-count
+                .convert-entry-table-wrapper
+                  %table#entries-to-convert.complaint-entries-to-convert
+                    %thead
+                      %tr
+                        %th Entry ID
+                        %th Entry Content
+                        %th Current Categories
+                        %th.text-right Suggested Categories
+                    %tbody
 
-            %hr.thin
-            .comment-wrapper
-              %label.content-label-sm{for: '#convert-ticket-summary'} Ticket Summary
-              %textarea#convert-ticket-summary.dropdown-comment.note-input
-            .button-row-center
-              %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
-                Convert Ticket
+                %hr.thin
+                .comment-wrapper
+                  %label.content-label-sm{for: '#convert-ticket-summary'} Ticket Summary
+                  %textarea#convert-ticket-summary.dropdown-comment.note-input
+                .button-row-center
+                  %button#convert-webrep-ticket-dropdown.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
+                    Convert Ticket
 
       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         %div

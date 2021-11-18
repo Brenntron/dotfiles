@@ -2560,16 +2560,16 @@ check_convert_to_webcat_ready = () ->
   return false
 
 check_convert_to_webcat_ready_from_research = () ->
-  entry_cats = $('#research-tab-toolbar #convert-ticket-dropdown').find('.selectize')
+  entry_cats = $('#research-tab-toolbar #webrep-convert-ticket-dropdown').find('select.selectize')
   enable = true
   # if any are not filled out we don't enable the submit button
   $(entry_cats).each ->
     if $(this).val() == null
       enable = false
   if enable == true
-    $('#convert-ticket-dropdown .dropdown-submit-button').removeAttr('disabled')
+    $('#convert-webrep-ticket-dropdown').removeAttr('disabled')
   else
-    $('#convert-ticket-dropdown .dropdown-submit-button').attr('disabled', 'disabled')
+    $('#convert-webrep-ticket-dropdown').attr('disabled', 'disabled')
   return false
 
 get_webrep_current_cats = (entries, uris) ->
