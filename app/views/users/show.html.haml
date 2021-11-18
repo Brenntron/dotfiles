@@ -139,12 +139,13 @@
               %thead
                 %tr
                   %th.priority-col
-                  %th.id-col ID
+                  %th.id-col Case ID
+                  %th.status-col Status
+                  %th
+                    -#Submission Type
                   %th Dispute
                   %th Age
-                  %th.status-col Status
                   %th Submitter Type
-                  %th Submission Type
                   %th.date-col Updated
               %tbody
                 - @open_webrep_disputes.each do |dispute|
@@ -153,14 +154,16 @@
                       %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
                     %td.id-col
                       = link_to dispute.id, "/escalations/webrep/disputes/#{dispute.id}"
-                    %td= dispute.dispute_entries.first.hostlookup rescue ""
-                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                     %td.font-weight-bold
                       - if !dispute.status.nil?
                         = dispute.status.gsub '_',' '
+                    %td
+                      %span{class:"dispute-submission-type esc-tooltipped dispute-#{dispute.submission_type}", title: "#{dispute.submission_type == 'w' ? 'Web' : 'Email'}" }
+                    %td= dispute.dispute_entries.first.hostlookup rescue ""
+                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                     %td= dispute.submitter_type
-                    %td= dispute.submission_type
                     %td= dispute.updated_at
+
         - if @open_filerep_disputes.any?
           .col-xs-12
             %div.content-label-md File Reputation
@@ -169,10 +172,10 @@
                 %tr
                   - if @open_webrep_disputes.any?
                     %th.priority-col
-                  %th.id-col ID
+                  %th.id-col Case ID
+                  %th.status-col Status
                   %th SHA256
                   %th Age
-                  %th.status-col Status
                   %th Sample Type
                   %th Submitter Type
                   %th.date-col Updated
@@ -183,13 +186,13 @@
                       %td.priority-col
                     %td.id-col
                       = link_to dispute.id, "/escalations/file_rep/disputes/#{dispute.id}"
-                    %td
-                      %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha tooltipstered"}
-                        = dispute.sha256_hash
-                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                     %td.font-weight-bold.status-col
                       - if !dispute.status.nil?
                         = dispute.status.gsub '_',' '
+                    %td
+                      %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha", title:"#{dispute.sha256_hash}"}
+                        = dispute.sha256_hash
+                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                     %td
                       = dispute.sample_type
                     %td= dispute.submitter_type
@@ -204,13 +207,14 @@
               %thead
                 %tr
                   %th.priority-col
-                  %th.id-col ID
-                  %th Dispute
-                  %th Age
+                  %th.id-col Case ID
                   %th.status-col Status
                   %th.resolution-col Resolution
+                  %th
+                    -#Submission Type
+                  %th Dispute
+                  %th Age
                   %th Submitter Type
-                  %th Submission Type
                   %th.date-col Updated
               %tbody
                 - @closed_webrep_disputes.each do |dispute|
@@ -219,14 +223,14 @@
                       %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
                     %td.id-col
                       = link_to dispute.id, "/escalations/webrep/disputes/#{dispute.id}"
-                    %td= dispute.dispute_entries.first.hostlookup rescue ""
-                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                     %td.font-weight-bold.status-col
                       = dispute.status.gsub '_',' '
-                    %td.status-col
-                      = dispute.resolution.gsub '_',' '
+                    %td= dispute.resolution.gsub '_',' '
+                    %td
+                      %span{class:"dispute-submission-type esc-tooltipped dispute-#{dispute.submission_type}", title: "#{dispute.submission_type == 'w' ? 'Web' : 'Email'}" }
+                    %td= dispute.dispute_entries.first.hostlookup rescue ""
+                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                     %td= dispute.submitter_type
-                    %td= dispute.submission_type
                     %td= dispute.updated_at
 
           - if @closed_filerep_disputes.any?
@@ -236,15 +240,17 @@
                 %thead
                   %tr
                     - if @closed_webrep_disputes.any?
-                      %th.priority-col
-                    %th.id-col ID
-                    %th SHA256
-                    %th Age
+                      %th
+                    %th.id-col Case ID
                     %th.status-col Status
                     %th.resolution-col Resolution
+                    %th SHA256
+                    %th Age
                     %th Sample Type
                     %th Submitter Type
                     %th.date-col Updated
+
+
                 %tbody
                   - @closed_filerep_disputes.each do |dispute|
                     %tr{id: "dispute_#{dispute.id}"}
@@ -252,10 +258,6 @@
                         %td.priority-col
                       %td.id-col
                         = link_to dispute.id, "/escalations/file_rep/disputes/#{dispute.id}"
-                      %td
-                        %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha tooltipstered"}
-                          = dispute.sha256_hash
-                      %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                       %td.font-weight-bold.status-col
                         - if !dispute.status.nil?
                           = dispute.status.gsub '_',' '
@@ -263,7 +265,10 @@
                         - if !dispute.resolution.nil?
                           = dispute.resolution.gsub '_',' '
                       %td
-                        = dispute.sample_type
+                        %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha tooltipstered",title:"#{dispute.sha256_hash}"}
+                          = dispute.sha256_hash
+                      %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
+                      %td= dispute.sample_type
                       %td= dispute.submitter_type
                       %td= dispute.updated_at
 
