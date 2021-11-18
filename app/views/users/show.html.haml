@@ -140,6 +140,7 @@
                 %tr
                   %th.priority-col
                   %th.id-col ID
+                  %th Dispute
                   %th Age
                   %th.status-col Status
                   %th Submitter Type
@@ -152,6 +153,7 @@
                       %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
                     %td.id-col
                       = link_to dispute.id, "/escalations/webrep/disputes/#{dispute.id}"
+                    %td= dispute.dispute_entries.first.hostlookup rescue ""
                     %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                     %td.font-weight-bold
                       - if !dispute.status.nil?
@@ -168,10 +170,10 @@
                   - if @open_webrep_disputes.any?
                     %th.priority-col
                   %th.id-col ID
+                  %th SHA256
                   %th Age
                   %th.status-col Status
                   %th Sample Type
-                  %th SHA256
                   %th Submitter Type
                   %th.date-col Updated
               %tbody
@@ -181,15 +183,15 @@
                       %td.priority-col
                     %td.id-col
                       = link_to dispute.id, "/escalations/file_rep/disputes/#{dispute.id}"
+                    %td
+                      %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha tooltipstered"}
+                        = dispute.sha256_hash
                     %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                     %td.font-weight-bold.status-col
                       - if !dispute.status.nil?
                         = dispute.status.gsub '_',' '
                     %td
                       = dispute.sample_type
-                    %td
-                      %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha tooltipstered"}
-                        = dispute.sha256_hash
                     %td= dispute.submitter_type
                     %td= dispute.updated_at
 
@@ -203,6 +205,7 @@
                 %tr
                   %th.priority-col
                   %th.id-col ID
+                  %th Dispute
                   %th Age
                   %th.status-col Status
                   %th.resolution-col Resolution
@@ -216,6 +219,7 @@
                       %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
                     %td.id-col
                       = link_to dispute.id, "/escalations/webrep/disputes/#{dispute.id}"
+                    %td= dispute.dispute_entries.first.hostlookup rescue ""
                     %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                     %td.font-weight-bold.status-col
                       = dispute.status.gsub '_',' '
@@ -234,11 +238,11 @@
                     - if @closed_webrep_disputes.any?
                       %th.priority-col
                     %th.id-col ID
+                    %th SHA256
                     %th Age
                     %th.status-col Status
                     %th.resolution-col Resolution
                     %th Sample Type
-                    %th SHA256
                     %th Submitter Type
                     %th.date-col Updated
                 %tbody
@@ -248,6 +252,9 @@
                         %td.priority-col
                       %td.id-col
                         = link_to dispute.id, "/escalations/file_rep/disputes/#{dispute.id}"
+                      %td
+                        %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha tooltipstered"}
+                          = dispute.sha256_hash
                       %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                       %td.font-weight-bold.status-col
                         - if !dispute.status.nil?
@@ -257,9 +264,6 @@
                           = dispute.resolution.gsub '_',' '
                       %td
                         = dispute.sample_type
-                      %td
-                        %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha tooltipstered"}
-                          = dispute.sha256_hash
                       %td= dispute.submitter_type
                       %td= dispute.updated_at
 
