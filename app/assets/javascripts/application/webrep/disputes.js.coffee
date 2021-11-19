@@ -2533,6 +2533,10 @@ window.prep_dispute_to_convert_from_research = (event) ->
   $('#dispute-id-to-convert').text(dispute_id)
   $('.convert-entry-count').text("(#{entry_ids.length})")
 
+  if $("#entries-to-convert tbody").find('tr').length > 0
+    for row in $("#entries-to-convert tbody").find('tr')
+      $(row).remove()
+
   get_webrep_current_cats_from_research(entry_ids, entries_content)
 
 $ ->
