@@ -445,11 +445,12 @@ window.copy_domain = (domain, element) ->
 window.toggle_all_checkboxes = () ->
   if $('#clusters_check_box').prop('checked')
     rows = $('.cluster-row-select');
-    i = 1
-    while i < 51
+    row_count = $('.cluster-row-select:visible').length
+
+    for i in [1..row_count]
       $(rows[i - 1])[0].checked = true
       $('#clusters-index').DataTable().rows(i - 1).select()
-      i++
+
   else
     $('#clusters-index').DataTable().rows().deselect()
     rows = $('table#clusters-index input[type="checkbox"]')
