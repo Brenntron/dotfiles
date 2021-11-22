@@ -132,7 +132,7 @@
   .tab-content.content-wrapper#user-tab-content
     .tab-pane.active#open-disputes{role: 'tabpanel', 'aria-labeled-by': 'user-open-disputes-tab'}
       .row
-        - if @open_webrep_disputes.any?
+        - if @open_webrep_page.any?
           .col-xs-12
             %div.content-label-md Web Reputation
             %table.table.responsive.index-table
@@ -148,7 +148,7 @@
                   %th Submitter Type
                   %th.date-col Updated
               %tbody
-                - @open_webrep_disputes.each do |dispute|
+                - @open_webrep_page.each do |dispute|
                   %tr{id: "dispute_#{dispute.id}"}
                     %td
                       %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
@@ -163,14 +163,20 @@
                     %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                     %td= dispute.submitter_type
                     %td= dispute.updated_at
+            .apple_pagination
+              = will_paginate @open_webrep_page, param_name: 'open_webrep_page', params: {active_tab: 'open'}
 
-        - if @open_filerep_disputes.any?
+        - if @open_filerep_page.any? && @open_webrep_page.any?
+          .col-xs-12
+            %hr.thin
+
+        - if @open_filerep_page.any?
           .col-xs-12
             %div.content-label-md File Reputation
             %table.table.responsive.index-table
               %thead
                 %tr
-                  - if @open_webrep_disputes.any?
+                  - if @open_webrep_page.any?
                     %th.priority-col
                   %th.id-col Case ID
                   %th.status-col Status
@@ -180,9 +186,9 @@
                   %th Submitter Type
                   %th.date-col Updated
               %tbody
-                - @open_filerep_disputes.each do |dispute|
+                - @open_filerep_page.each do |dispute|
                   %tr{id: "dispute_#{dispute.id}"}
-                    - if @open_webrep_disputes.any?
+                    - if @open_webrep_page.any?
                       %td.priority-col
                     %td.id-col
                       = link_to dispute.id, "/escalations/file_rep/disputes/#{dispute.id}"
@@ -197,10 +203,11 @@
                       = dispute.sample_type
                     %td= dispute.submitter_type
                     %td= dispute.updated_at
-
+            .apple_pagination
+              = will_paginate @open_filerep_page, param_name: 'ope_filerep_page', params: {active_tab: 'open'}
     .tab-pane#closed-disputes{role: 'tabpanel', 'aria-labeled-by': 'user-closed-disputes-tab'}
       .row
-        - if @closed_webrep_disputes.any?
+        - if @closed_webrep_page.any?
           .col-xs-12
             %div.content-label-md Web Reputation
             %table.table.responsive.index-table
@@ -217,7 +224,7 @@
                   %th Submitter Type
                   %th.date-col Updated
               %tbody
-                - @closed_webrep_disputes.each do |dispute|
+                - @closed_webrep_page.each do |dispute|
                   %tr{id: "dispute_#{dispute.id}"}
                     %td
                       %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
@@ -232,14 +239,20 @@
                     %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
                     %td= dispute.submitter_type
                     %td= dispute.updated_at
+            .apple_pagination
+              = will_paginate @closed_webrep_page, param_name: 'closed_webrep_page', params: {active_tab: 'closed'}
 
-          - if @closed_filerep_disputes.any?
+          - if @closed_filerep_page.any? && @closed_webrep_page.any?
+            .col-xs-12
+              %hr.thin
+
+          - if @closed_filerep_page.any?
             .col-xs-12
               %div.content-label-md File Reputation
               %table.table.responsive.index-table
                 %thead
                   %tr
-                    - if @closed_webrep_disputes.any?
+                    - if @closed_webrep_page.any?
                       %th
                     %th.id-col Case ID
                     %th.status-col Status
@@ -252,9 +265,9 @@
 
 
                 %tbody
-                  - @closed_filerep_disputes.each do |dispute|
+                  - @closed_filerep_page.each do |dispute|
                     %tr{id: "dispute_#{dispute.id}"}
-                      - if @closed_webrep_disputes.any?
+                      - if @closed_webrep_page.any?
                         %td.priority-col
                       %td.id-col
                         = link_to dispute.id, "/escalations/file_rep/disputes/#{dispute.id}"
@@ -271,7 +284,8 @@
                       %td= dispute.sample_type
                       %td= dispute.submitter_type
                       %td= dispute.updated_at
-
+              .apple_pagination
+                = will_paginate @closed_filerep_page, param_name: 'closed_filerep_page', params: {active_tab: 'closed'}
 
 
 %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
