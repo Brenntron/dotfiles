@@ -446,7 +446,7 @@ $ ->
             }
             {
               targets: [ 3 ]
-              orderData: 19 #This is ordered by the age int column. Anytime the columns are changed this needs to be updated.
+              orderData: 18 #This is ordered by the age int column. Anytime the columns are changed this needs to be updated.
             }
             {
               targets: [ 14 ]
