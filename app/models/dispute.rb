@@ -474,8 +474,6 @@ For future Web categorization requests, please open a Web categorization ticket 
       return results
     end
 
-    new_entries_ips = message_payload["payload"]["investigate_ips"]
-    new_entries_urls = message_payload["payload"]["investigate_urls"]
     begin
       response = Dispute.build_new_entries(self, new_entries_ips, new_entries_urls)
     rescue => e
