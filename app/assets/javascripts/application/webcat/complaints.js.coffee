@@ -2246,7 +2246,8 @@ $ ->
         unless $(td).hasClass 'nested-complaint-data-wrapper'
           tr.find('td:first').addClass 'nested-complaint-data-wrapper'
 
-        $('#input_cat_'+ row.data().entry_id).selectize {
+        cat_select = $('#input_cat_'+ row.data().entry_id)
+        $(cat_select).selectize {
           persist: false,
           create: false,
           maxItems: 5,
@@ -2255,7 +2256,7 @@ $ ->
           labelField: 'category_name',
           searchField: ['category_name', 'category_code'],
           options: AC.WebCat.createSelectOptions('#input_cat_'+ row.data().entry_id)
-          items: selected_options(row.data().category)
+          items: AC.WebCat.getCategoryIds(selected_options(row.data().category), cat_select)
         }
 
         $('.toggle-vis-nested').each ->
