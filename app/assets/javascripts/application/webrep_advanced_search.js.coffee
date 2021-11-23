@@ -70,6 +70,7 @@ window.toggle_search_criteria = (element) ->
     criteria_wrapper = $(criteria_toggle).parents('li')[0]
 
     $(input_wrapper).addClass('hidden')
+    $(criteria_toggle).prop('checked', false)
     $(criteria_wrapper).removeClass('hidden')
 
   # grab visible criteria
