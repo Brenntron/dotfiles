@@ -13,11 +13,8 @@ window.populate_clusters_index_table = (filter) ->
     loader = $('.cluster-mgt-loader-wrapper')
     loader.removeClass('hidden')
     filter_param = window.location.search
-    if filter
-      if filter_param
-        filter_param += "&regex=" + filter
-      else
-        filter_param = "?regex=" + filter
+    if filter && filter_param
+      filter_param += "&regex=" + filter
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
@@ -25,6 +22,7 @@ window.populate_clusters_index_table = (filter) ->
       method: 'GET'
       headers: headers
       success: (response) ->
+        console.log response
         loader.addClass('hidden')
         json = $.parseJSON(response)
         if json.data.length == 0
@@ -161,7 +159,7 @@ $ ->
       5
       'desc'
     ] ]
-    lengthMenu: [50, 100, 500, 1000]
+    lengthMenu: [50, 100, 200]
     columnDefs: [
       {
         targets: [
@@ -446,12 +444,13 @@ window.copy_domain = (domain, element) ->
 
 window.toggle_all_checkboxes = () ->
   if $('#clusters_check_box').prop('checked')
-    $('#clusters-index').DataTable().rows().select()
-    rows = $('table#clusters-index input[type="checkbox"]');
-    i = 1
-    while i < rows.length
-      $(rows[i])[0].checked = true
-      i++
+    rows = $('.cluster-row-select');
+    row_count = $('.cluster-row-select:visible').length
+
+    for i in [1..row_count]
+      $(rows[i - 1])[0].checked = true
+      $('#clusters-index').DataTable().rows(i - 1).select()
+
   else
     $('#clusters-index').DataTable().rows().deselect()
     rows = $('table#clusters-index input[type="checkbox"]')
@@ -460,17 +459,10 @@ window.toggle_all_checkboxes = () ->
 
 # Select rows in Clusters Table
 $ ->
-  $('#clusters_check_box').click ->
-    toggle_all_checkboxes()
+  $('#clusters_check_box').click -> toggle_all_checkboxes()
 
   # Moves cluster selectize to table draw so that selectize boxes properly initialize when changing number of items being displayed
-  $("#clusters-index").on 'draw.dt', ->
-    selectize_category_inputs()
-    toggle_all_checkboxes()
-    populate_cat_select()
-
-
-  $("#clusters-index").on 'order.dt', ->
+  $("#clusters-index").on 'draw.dt order.dt', ->
     selectize_category_inputs()
     populate_cat_select()
 
@@ -949,15 +941,41 @@ window.webcat_clusters_refresh = () ->
   window.location.replace('/escalations/webcat/clusters');
 
 window.webcat_platform_filter = () ->
-  selected_platform = $('#webcat-platform-filter').val()
+  platforms = $("input.show-platforms-filter:checked")
+  if $(platforms).length > 1 || $(platforms).length == 0
+    selected_platform = 'All'
+  else
+    selected_platform = $("input.show-platforms-filter:checked").val()
   url = new URL(document.location.href)
   url.searchParams.set('platform', selected_platform)
+  document.location = url;
+
+window.webcat_cluster_type_filter = () ->
+  types = $("input.show-cluster-types-filter:checked")
+  if $(types).length > 1 || $(types).length == 0
+    selected_type = 'all'
+  else
+    selected_type = $("input.show-cluster-types-filter:checked").val()
+  url = new URL(document.location.href)
+  url.searchParams.set('cluster_type', selected_type)
   document.location = url;
 
 $ ->
   $(document).ready ->
     url = new URL(document.location.href)
     platform = url.searchParams.get('platform')
+    cluster_type = url.searchParams.get('cluster_type')
 
     if(platform)
-      $('#webcat-platform-filter').val(platform)
+      if platform == 'All'
+        $("input.show-platforms-filter").prop('checked', true)
+      else
+        $("input.show-platforms-filter").prop('checked', false)
+        $("input.show-platforms-filter[name='show-platform-#{platform}'").prop('checked', true)
+
+    if(cluster_type)
+      if cluster_type == 'all'
+        $("input.show-cluster-types-filter").prop('checked', true)
+      else
+        $("input.show-cluster-types-filter").prop('checked', false)
+        $("input.show-cluster-types-filter[name='show-cluster-#{cluster_type}'").prop('checked', true)
