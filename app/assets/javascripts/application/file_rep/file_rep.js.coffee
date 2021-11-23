@@ -296,6 +296,7 @@ $ ->
     last_updated = ''
     sandbox_score = ''
     threatgrid_score = ''
+    $('#add-search-items-button').removeClass('hidden')
 
     for i in inputs
       i.value = ""
