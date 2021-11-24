@@ -301,7 +301,7 @@ $ ->
     for i in inputs
       i.value = ""
 
-      if $(i).is('#status-input, #sha256-input, #amp-disposition-input, #sandbox-score-input, #tg-score-input, #suggested-disposition-input')
+      if $(i).is('#status-input, #sha256-input, #amp-disposition-input, #sandbox-score-input, #tg-score-input, #suggested-disposition-input, #search_name')
         $(i).closest('.form-group').removeClass('hidden')
       else
         $(i).closest('.form-group').addClass('hidden')
@@ -317,6 +317,14 @@ $ ->
         $(slider_1).text(values[0])
         $(slider_2).text(values[1])
 
+    #reset Add Search Criteria options when form is reset
+    $('#search-criteria-options ul li').each ->
+      if $(this).hasClass('default-hidden-option')
+        $(this).addClass('hidden')
+      else
+        $(this).removeClass('hidden')
+        checkbox = $(this).find('.search-checkbox')
+        $(checkbox).prop('checked', false)
 
   window.refresh_localStorage = () ->
     localStorage.removeItem('search_type')
