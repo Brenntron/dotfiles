@@ -96,4 +96,5 @@
 
 .uri-col {
     word-break: break-all;
+    min-width: 100px;
 }
