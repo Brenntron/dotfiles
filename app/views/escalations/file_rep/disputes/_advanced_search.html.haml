@@ -181,7 +181,7 @@
           %label.search-criteria-label
             %input.search-checkbox#caseid-cb{type: 'checkbox', name: 'search-criteria', value: 'Case IDs', for: 'caseid-input'}
             Case IDs
-        %li.hidden
+        %li.hidden.default-hidden-option
           %label.search-criteria-label
             %input.search-checkbox#status-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'Status', for: 'status-input'}
             Status
@@ -193,7 +193,7 @@
           %label.search-criteria-label
             %input.search-checkbox#file-name-cb{type: 'checkbox', name: 'search-criteria', value: 'File Name', for: 'file-name-input' }
             File Name
-        %li.hidden
+        %li.hidden.default-hidden-option
           %label.search-criteria-label
             %input.search-checkbox#sha-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'SHA256', for: 'sha256-input'}
             SHA256
@@ -201,7 +201,7 @@
           %label.search-criteria-label
             %input.search-checkbox#sample-type-cb{type: 'checkbox', name: 'search-criteria', value: 'Sample Type', for: 'sample-type-input'}
             Sample Type
-        %li.hidden
+        %li.hidden.default-hidden-option
           %label.search-criteria-label
             %input.search-checkbox#amp-disposition-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'AMP Disposition', for: 'amp-disposition-input'}
             AMP Disposition
@@ -217,11 +217,11 @@
           %label.search-criteria-label
             %input.search-checkbox#assignee-cb{type: 'checkbox', name: 'search-criteria', value: 'Assignee', for: 'assignee-input'}
             Assignee
-        %li.hidden
+        %li.hidden.default-hidden-option
           %label.search-criteria-label
             %input.search-checkbox#sandbox-score-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'Sandbox Score', for: 'sandbox-score-input'}
             Sandbox Score
-        %li.hidden
+        %li.hidden.default-hidden-option
           %label.search-criteria-label
             %input.search-checkbox#tg-score-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'TG Score', for: 'tg-score-input'}
             TG Score
@@ -229,7 +229,7 @@
           %label.search-criteria-label
             %input.search-checkbox#in-sample-zoo-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Older)', for: 'in-sample-zoo-input'}
             In Sample Zoo
-        %li.hidden
+        %li.hidden.default-hidden-option
           %label.search-criteria-label
             %input.search-checkbox#suggested-disposition-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'Suggested Disposition', for: 'suggested-disposition-input'}
             Suggested Disposition
