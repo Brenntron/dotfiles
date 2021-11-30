@@ -37,6 +37,41 @@
                 .load-bar-segment.hidden
                 .load-bar-segment.hidden
                 .load-bar-segment.hidden
+          %span.dropdown
+            %button#research-convert-to-webcat.convert-ticket-button.toolbar-button.dropdown-button-margin-left{onclick: 'prep_dispute_to_convert_from_research();', type: 'button', title: 'Convert ticket to web categorization ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+              %span.toolbar-button-text Convert to Webcat
+            .dropdown-menu.toolbar-dropdown#webrep-convert-ticket-dropdown{'aria-labelledby': 'move-to-webcat'}
+              .dropdown-tool-text-divider.primary-text-divider Convert to Categorization Dispute
+              .inline-tool-content-wrapper
+                .dropdown-loader-wrapper.hidden
+                  .gear-loader-wrapper
+                    = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+
+                %label.content-label-sm
+                  Ticket ID to Convert:
+                %span.ticket-id-to-convert#dispute-id-to-convert
+
+                %label.content-label-sm
+                  Ticket Entries:
+                  %span.convert-entry-count
+                .convert-entry-table-wrapper
+                  %table#entries-to-convert.complaint-entries-to-convert
+                    %thead
+                      %tr
+                        %th Entry ID
+                        %th Entry Content
+                        %th Current Categories
+                        %th.text-right Suggested Categories
+                    %tbody
+
+                %hr.thin
+                .comment-wrapper
+                  %label.content-label-sm{for: '#convert-ticket-summary'} Ticket Summary
+                  %textarea#convert-ticket-summary.dropdown-comment.note-input
+                .button-row-center
+                  %button#convert-webrep-ticket-dropdown.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
+                    Convert Ticket
+
       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         %div
           %label.toolbar-section-label Reputation
@@ -265,7 +300,7 @@
   .col-xs-12
     %table#disputes-research-table.table.table-sm
       %tbody
-        - @entries.each do |entry|
+        - @entries.each_with_index do |entry, index|
           %tr.research-table-row{'data-entry-id': "#{entry.id}", id: "entry-data-wrapper_#{entry.id}"}
             %td.research-table-row-wrapper
               %table
@@ -801,7 +836,7 @@
                     %td.input-col.ip-label-col{rowspan: '2'}
                       -# IP label
                     %td.dual-edit-field{colspan: '5', 'data-id': entry.id, 'data-field': 'host-ip'}
-                      %span.entry-resolved-ip-content
+                      %span.entry-resolved-ip-content{id: "entry-#{index}-ips"}
                         - ip_record = JSON.parse entry[:web_ips]
                         - ips = ip_record.to_sentence(two_words_connector: ', ', last_word_connector: ', ')
                         = ips
