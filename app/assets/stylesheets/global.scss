@@ -811,7 +811,17 @@ button {
   cursor: not-allowed;
 }
 
-#convert-ticket-dropdown {
+#research-tab-toolbar {
+  .dropdown {
+    max-height: 27px;
+  }
+
+  .toolbar-dropdown {
+    margin-left: 3px;
+  }
+}
+
+#convert-ticket-dropdown, #webrep-convert-ticket-dropdown {
   border-top-right-radius: 4px;
   min-width: 500px;
   margin-top: 0;
@@ -13103,7 +13113,7 @@ input.wl-bl-list-inline {
   }
 }
 
-#convert-ticket-dropdown {
+#convert-ticket-dropdown, #webrep-convert-ticket-dropdown {
   .selectize-control {
     border: none !important;
     outline: 1px solid darken($faint-neutral-color, 5%);
