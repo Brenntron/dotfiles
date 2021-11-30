@@ -32,7 +32,6 @@ $ ->
     for col in age_col
       age = moment( $(col).data('age') ).fromNow()
       age_class = ""
-
       if age != "Invalid date"
         if age == "a few seconds ago" || age == "a few minutes ago" || age.includes("minutes ago")
           age = "<1 hour"
@@ -48,7 +47,6 @@ $ ->
               age_class = "ticket-age-over12hr"
           else
             age_class = "ticket-age-over12hr"
-
         $(col).append("<span class='#{age_class}'> #{age}</span>")
 
   $('#user-bugs').click ->

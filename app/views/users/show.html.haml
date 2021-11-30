@@ -160,7 +160,7 @@
                     %td
                       %span{class:"dispute-submission-type esc-tooltipped dispute-#{dispute.submission_type}", title: "#{dispute.submission_type == 'w' ? 'Web' : 'Email'}" }
                     %td= dispute.dispute_entries.first.hostlookup rescue ""
-                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
+                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at.to_time.iso8601}"}
                     %td= dispute.submitter_type
                     %td= dispute.updated_at
             .apple_pagination
@@ -198,7 +198,7 @@
                     %td
                       %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha", title:"#{dispute.sha256_hash}"}
                         = dispute.sha256_hash
-                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
+                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at.to_time.iso8601}"}
                     %td
                       = dispute.sample_type
                     %td= dispute.submitter_type
@@ -231,12 +231,15 @@
                     %td.id-col
                       = link_to dispute.id, "/escalations/webrep/disputes/#{dispute.id}"
                     %td.font-weight-bold.status-col
-                      = dispute.status.gsub '_',' '
-                    %td= dispute.resolution.gsub '_',' '
+                      - if !dispute.status.nil?
+                        = dispute.status.gsub '_',' '
+                    %td
+                      - if !dispute.resolution.nil?
+                        = dispute.resolution.gsub '_',' '
                     %td
                       %span{class:"dispute-submission-type esc-tooltipped dispute-#{dispute.submission_type}", title: "#{dispute.submission_type == 'w' ? 'Web' : 'Email'}" }
                     %td= dispute.dispute_entries.first.hostlookup rescue ""
-                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
+                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at.to_time.iso8601}"}
                     %td= dispute.submitter_type
                     %td= dispute.updated_at
             .apple_pagination
@@ -280,7 +283,7 @@
                       %td
                         %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha tooltipstered",title:"#{dispute.sha256_hash}"}
                           = dispute.sha256_hash
-                      %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at}"}
+                      %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at.to_time.iso8601}"}
                       %td= dispute.sample_type
                       %td= dispute.submitter_type
                       %td= dispute.updated_at
