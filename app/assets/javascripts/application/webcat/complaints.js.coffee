@@ -573,7 +573,7 @@ processSubmitPending=(entry_id,row_id)->
         temp_row.invalidate().page(table_page).draw(false)
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
-
+        nested_tooltip()
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
           persist: false,
           create: false,
@@ -665,6 +665,7 @@ processSubmitEntry = (entry_id,row_id) ->
           temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
+          nested_tooltip()
 
           $('#input_cat_'+ temp_row.data().entry_id).selectize {
             persist: false,
@@ -1699,6 +1700,8 @@ window.click_table_buttons = (complaint_table, button)->
   else
     # Open this row
     row.child(format(row)).show()
+    nested_tooltip()
+
     tr.removeClass 'not-shown'
     tr.addClass 'shown'
     td = $(tr).next('tr').find('td:first')
@@ -2024,7 +2027,7 @@ processSubmitMaster = () ->
           temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
-
+          nested_tooltip()
           $('#input_cat_'+ entry.entry_id).selectize {
             persist: false,
             create: false,
@@ -2242,6 +2245,8 @@ $ ->
       unless row.child.isShown()
 
         row.child(format(row)).show()
+        nested_tooltip()
+
         tr.addClass 'shown'
 
         td = $(tr).next('tr').find('td:first')
@@ -2439,8 +2444,12 @@ window.prep_complaint_to_convert = () ->
         std_msg_error('Error preparing ticket for conversion', [response])
     )
 
-
-
+window.nested_tooltip = () ->
+  $('.esc-tooltipped:not(.tooltipstered)').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
 convert_complaint_to_webrep = () ->
   # get the parent ticket info
   complaint_id = parseInt($('#complaint-id-to-convert').text())
