@@ -196,8 +196,9 @@ window.updateURI = (event, complaint_entry_id) ->
         std_msg_error("Cannot edit IP entries.","")
       else
         $("#domain_#{complaint_entry_id}").tooltipster('content', uri);
-        $("#site-search-#{complaint_entry_id}").attr('title', uri);
-        $("#entry-uri-#{complaint_entry_id}").attr('title', uri);
+        $("#site-search-#{complaint_entry_id}").tooltipster('content', uri);
+        $("#entry-uri-#{complaint_entry_id}").tooltipster('content', uri);
+
         $.each current_categories, (key, entry) ->
           $(".simple-nested-table#entry-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
 
