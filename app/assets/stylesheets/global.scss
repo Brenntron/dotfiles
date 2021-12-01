@@ -1339,7 +1339,7 @@ thead th.sorting.center {
   background-color: lighten($content-tab-color, 15%);
   color: $content-bg-color;
   text-align: center;
-  border-radius: 50%;
+  border-radius: 10px;
   position: absolute;
   right: 8px;
   top: 8px;
@@ -6992,10 +6992,63 @@ table.dispute-entry-table tbody tr.selected {
   border-right: solid 1px $faint-neutral-color;
   margin-right: 12px;
 }
-
+#user-open-disputes-tab{
+  background-image: url(image_path('icon_open.svg'))
+}
+#user-closed-disputes-tab{
+  background-image: url(image_path('icon_closed.svg'))
+}
+#closed-disputes, #open-disputes{
+  .id-col, .resolution-col, .status-col{
+    width: 100px;
+  }
+  .resolution-col, .status-col{
+    width: 125px;
+    white-space: nowrap;
+  }
+  .priority-col{
+    width: 38px;
+  }
+  .date-col {
+    width: 160px;
+  }
+  table{
+    th{
+      font-weight: 700;
+      background-color: #f7f7f7;
+      whitespace: nowrap}
+    tr{
+      td:last-of-type ,td:first-of-type { background-color: #fff; }
+    }
+  }
+}
 .priority-col-wrapper {
   padding-right: 6px;
 }
+.apple_pagination {
+  text-align: center;
+  cursor: default; }
+.apple_pagination a, .apple_pagination span {
+  padding: 0.2em 0.3em; }
+.apple_pagination .disabled {
+  color: #aaaaaa; }
+.apple_pagination .current {
+  font-style: normal;
+  font-weight: bold;
+  background-color: #bebebe;
+  display: inline-block;
+  padding: 2px;
+  line-height: 1.5;
+  -moz-border-radius: 1em;
+  -webkit-border-radius: 1em;
+  border-radius: 1em;
+  text-shadow: rgba(255, 255, 255, 0.8) 1px 1px 1px; }
+.apple_pagination a {
+  text-decoration: none;
+  color: black; }
+.apple_pagination a:hover, .apple_pagination a:focus {
+  text-decoration: underline; }
+
 
 .case-id-wrapper {
   padding-right: 12px;
