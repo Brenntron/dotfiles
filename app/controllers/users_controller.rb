@@ -5,7 +5,8 @@ class UsersController < ApplicationController
 
   def index
     @users = current_user.children.order(:display_name)
-
+    @sibling_team_managers = current_user.sibling_team_managers
+    @sibling_team_members = current_user.sibling_team_members
   end
 
   def show

@@ -258,6 +258,30 @@
             %td.data_small_emphasis= user.roles.map(&:role).join(', ')
             %td
 
+      - if @sibling_team_members.length > 0
+        - @sibling_team_members.each_pair do |manager, team_members|
+          - manager_record = @sibling_team_managers.select { |man| man.display_name == manager }
+          - manager_record = manager_record[0]
+          - next if manager_record.nil?
+          %tr.manager
+            %td.user-group Sibling Team Manager
+            %td.alt-col.user-col-divider.user-displayname-col= manager
+            %td.alt-col.user-col-divider.user-name-col.current-user= link_to manager_record.cvs_username, escalations_user_path(manager_record)
+            %td.alt-col.user-col-divider=manager_record.children.length
+            %td.alt-col=manager_record.descendants.length
+            %td.data_small_emphasis= manager_record.roles.map(&:role).join(', ')
+            %td
+          - team_members.each_with_index do |team_member, index|
+            %tr.sibling-team
+              - if index == 0
+                %td.user-group{rowspan: "#{team_members.length}"}
+                  Sibling Team Members
+              %td.alt-col.team_member-col-divider.team_member-displayname-col= team_member.display_name
+              %td.alt-col.team_member-col-divider.team_member-name-col= link_to team_member.cvs_username, escalations_user_path(team_member)
+              %td.alt-col.team_member-col-divider=team_member.children.length
+              %td.alt-col=team_member.descendants.length
+              %td.data_small_emphasis= team_member.roles.map(&:role).join(', ')
+              %td
 
   .modal.fade.user-form-modal{id: "roleModal_#{current_user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
     .modal-dialog{role: 'document'}
