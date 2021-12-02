@@ -108,23 +108,6 @@ class User < ApplicationRecord
     end
   end
 
-  def sibling_team_managers
-    if self.parent.nil?
-      self.my_team
-    else
-      parent.siblings
-    end
-  end
-
-  def sibling_team_members
-    team_members = {}
-    self.sibling_team_managers.each do |manager|
-      children = manager.children
-      team_members["#{manager.display_name}"] = manager.children
-    end
-    team_members
-  end
-
   def available_users
     User.all.reject{|u| self_and_ancestors.include?(u) ||
                         children.include?(u) ||

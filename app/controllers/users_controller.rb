@@ -4,9 +4,13 @@ class UsersController < ApplicationController
   before_action :require_login
 
   def index
-    @users = current_user.children.order(:display_name)
-    @sibling_team_managers = current_user.sibling_team_managers
-    @sibling_team_members = current_user.sibling_team_members
+    @user = if params[:user].nil?
+               current_user
+             else
+               User.find(params[:user])
+             end
+
+    @users = @user.children.order(:display_name)
   end
 
   def show

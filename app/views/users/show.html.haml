@@ -50,10 +50,10 @@
         - if @user != current_user
           %a{href: "mailto:#{@user.email}"}
             %button.toolbar-button.email-button.tooltipped.toolbar-button-spacer{title: "Send Message to #{@user.cvs_username}"}
-        - if can?(:manage, @user)
+        - if can?(:manage, @user) || current_user.has_role?('admin') || current_user.has_role?('super admin')
           %button.toolbar-button.edit-button.tooltipped.toolbar-button-spacer{title: "Edit #{@user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{@user.id}"}
-        - if @user == current_user && @user.has_role?('manager')
-          = link_to escalations_users_path do
+        - if (@user == current_user && @user.has_role?('manager')) || current_user.has_role?('admin') || current_user.has_role?('super admin')
+          = link_to escalations_users_path(user: @user) do
             %button.toolbar-button.manage-button.tooltipped{title: "Manage Team"}
 
     .col-xs-8.col-with-divider
