@@ -4567,6 +4567,21 @@ button.tertiary {
   right: 0;
 }
 
+//allow webcat advanced search to scroll since it needs to be pinned at top of page
+#web-cat-search {
+  #advanced-search-wrapper {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+.form-group-wrapper-relative {
+  position: relative;
+  #search-criteria-options {
+    width: 100%;
+  }
+}
+
 #advanced-search-dropdown::before {
   right: 40px;
   left: auto;
@@ -9948,6 +9963,8 @@ hr.thin.form-divider {
     top: 10px;
   }
   #in-sample-zoo-input{
+    height: 20px;
+    min-height: 20px;
     border: none;
     outline: none;
   }
@@ -11540,7 +11557,7 @@ input[type="radio"].resolution_radio_button {
 }
 .toolbar#webcat-index-toolbar{
   margin: 25px 0 -35px 0;
-  z-index: 10;
+  z-index: 1;
   float: left;
   width: auto;
 }
