@@ -21,7 +21,8 @@ namespace 'AC.WebCat', (exports) ->
           cat_code = key.split(' - ')[1]
           value_name = key.split(' - ')[0]
           webcat_options.push {category_id: value, category_name: value_name, category_code: cat_code}
-        $(id)[0].selectize.addOption(webcat_options)
+        if $(id)[0]?
+          $(id)[0].selectize.addOption(webcat_options)
       )
 
     else return
@@ -38,15 +39,17 @@ namespace 'AC.WebCat', (exports) ->
     )
 
   exports.getCategoryIds = (category_names, id) ->
-
     AC.WebCat.getAUPCategories().then( (categories) =>
       category_ids = []
       for name in category_names
         for x, y of categories
           value_name = x.split(' - ')[0]
 
-          if name == value_name
+          if name.trim() == value_name
             category_ids.push(y)
 
-      $(id)[0].selectize.addItem(category_ids)
+      $(category_ids).each ->
+        cat_id = this
+        if $(id)[0]?
+          $(id)[0].selectize.addItem(cat_id)
     )

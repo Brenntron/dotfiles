@@ -2,7 +2,7 @@ class Wbrs::Cluster < Wbrs::Base
 
   # Get all the categories.
   # @return [Array<Wbrs::Category>] Array of the results.
-  def self.all(test = nil)
+  def self.all(test = nil, conditions: {})
     if test.present?
       return [
           {
@@ -20,7 +20,7 @@ class Wbrs::Cluster < Wbrs::Base
       ]
 
     else
-      params = stringkey_params({})
+      params = stringkey_params(conditions)
       response = call_json_request(:post, '/v1/clusters/get', body: params)
       response_body = JSON.parse(response.body)
       response_body
@@ -86,9 +86,8 @@ class Wbrs::Cluster < Wbrs::Base
     if test.present?
       return {}
     end
-    params = stringkey_params(conditions)
 
-    response = post_request(path: '/v1/clusters/process', body: params)
+    response = post_request(path: '/v1/clusters/process', body: conditions)
 
     response_body = JSON.parse(response.body)
     response_body

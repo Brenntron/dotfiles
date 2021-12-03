@@ -441,8 +441,378 @@ For future Web categorization requests, please open a Web categorization ticket 
   #
   #end dispute building instance methods
   #
-  def self.process_bridge_payload(message_payload)
 
+  ################REBUILD A DISPUTE FROM A PACKET#########################
+
+  def rebuild_from_packet()
+
+    results = {}
+    results[:errors] = []
+    results[:status] = nil
+    results[:messages] = []
+
+    if self.bridge_packet.blank?
+      results[:errors] << "bridge packet is empty."
+      results[:status] = "error"
+      return results
+    end
+
+    message_payload = JSON.parse(self.bridge_packet)
+
+    new_entries_ips = message_payload["payload"]["investigate_ips"]
+    new_entries_urls = message_payload["payload"]["investigate_urls"]
+
+    attempted_entries = []
+    attempted_entries += new_entries_ips.keys
+    attempted_entries += new_entries_urls.keys
+
+    results[:messages] << "entries attempted: #{attempted_entries.join(",")}"
+
+    if self.dispute_entries.present?
+      results[:errors] << "dispute is not empty, cannot attempt rebuild."
+      results[:status] = "error"
+      return results
+    end
+
+    begin
+      response = Dispute.build_new_entries(self, new_entries_ips, new_entries_urls)
+    rescue => e
+      Rails.logger.error e
+      Rails.logger.error e.backtrace.join("\n")
+      results[:status] = "error"
+      results[:errors] << "An error occurred attempting to build new entries."
+      return results
+    end
+
+    self.reload
+
+    if response[:status] == "success"
+      begin
+        Dispute.auto_resolve_entries(self, response[:entry_claims])
+      rescue => e
+        Rails.logger.error e
+        Rails.logger.error e.backtrace.join("\n")
+        results[:messages] << "attempting to auto resolve failed."
+      end
+    end
+
+    return results
+
+  end
+
+  #########
+  # TODO: eventually these following methods should be used in project refactor to make process bridge payload even more efficient
+
+  def self.auto_resolve_entries(dispute, entry_claims)
+
+    ######AUTO RESOLVE LOGIC########
+    begin
+      umbrella_no_reply = Platform.find_by_all_names("Umbrella - No Reply")
+
+      dispute.dispute_entries.each do |dispute_entry|
+        false_negative_claim = false
+        matching_disposition = false
+        entry_claim = entry_claims[dispute_entry.hostlookup]
+
+        if dispute.determine_platform.present? && dispute.determine_platform.downcase.include?("umbrella")
+          matching_disposition = dispute_entry.is_disposition_matching?(entry_claim, true)
+        else
+          matching_disposition = dispute_entry.is_disposition_matching?(entry_claim)
+        end
+        initial_log = "--------Starting Data---------<br>"
+        initial_log += "suggested disposition: #{dispute_entry.suggested_disposition}<br>"
+        initial_log += "effective disposition info: #{dispute_entry.running_verdict.inspect.to_s}<br>"
+        initial_log += "-----------------------------<br>"
+
+        dispute_entry.auto_resolve_log += initial_log
+        dispute_entry.save!
+
+        ########Auto Resolve for IP addressses (email)##############
+        if dispute_entry.entry_type == "IP"
+
+          logger.info "fetching preload"
+
+          begin
+            ::Preloader::Base.fetch_all_api_data(dispute_entry.hostlookup, dispute_entry.id)
+          rescue => e
+            Rails.logger.error e
+            Rails.logger.error e.backtrace.join("\n")
+          end
+
+          if !matching_disposition
+
+            if entry_claim != "false negative"
+              dispute_entry.status = DisputeEntry::NEW
+
+              if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+                dispute_entry.reload
+              else
+                if dispute.submitter_type == "NON-CUSTOMER" && dispute.submission_type == "e"
+                  AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
+                  dispute_entry.reload
+                end
+              end
+            else
+              if dispute.submission_type == "w"
+                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                  dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+                else
+                  dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+                end
+              end
+              dispute_entry.save
+            end
+
+          end
+          return_payload[dispute_entry.hostlookup] = dispute_entry.new_payload_item
+          return_payload[dispute_entry.hostlookup]['sugg_type'] = dispute_entry.suggested_disposition
+
+        end
+
+        ############################################################
+        #########Auto Resolve for URLs (web)########################
+        if dispute_entry.entry_type == "URI/DOMAIN"
+
+          logger.info "fetching preload"
+
+          begin
+            ::Preloader::Base.fetch_all_api_data(dispute_entry.hostlookup, dispute_entry.id)
+          rescue => e
+            Rails.logger.error e
+            Rails.logger.error e.backtrace.join("\n")
+          end
+
+          #threat cats for urls
+          begin
+            complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => dispute_entry.uri})
+            dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
+          rescue => e
+            Rails.logger.error e
+            Rails.logger.error e.backtrace.join("\n")
+          end
+
+          begin
+            dispute_entry.is_important = is_important?(dispute_entry.hostlookup)
+          rescue => e
+            Rails.logger.error e
+            Rails.logger.error e.backtrace.join("\n")
+          end
+
+          begin
+            if dispute_entry.web_ips.present?
+
+              web_ips_formatted = dispute_entry.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
+
+              extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(dispute_entry.uri, web_ips_formatted)
+              extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
+              if extra_wbrs_stuff.present?
+                dispute_entry.score = extra_wbrs_stuff["wbrs"]["score"]
+
+                threat_cats = extra_wbrs_stuff["threat_cats"]
+
+                threat_cat_names = []
+                if threat_cats.present?
+                  threat_cat_info = DisputeEntry.threat_cats_from_ids(threat_cats)
+                  threat_cat_info.each do |name|
+                    threat_cat_names << name[:name]
+                  end
+                  dispute_entry.multi_wbrs_threat_category = threat_cat_names
+                end
+              end
+
+
+              extra_wbrs_stuff_rulehits.each do |rule_hit|
+                new_rule_hit = DisputeRuleHit.new
+                new_rule_hit.name = rule_hit.strip
+                new_rule_hit.rule_type = "WBRS"
+                new_rule_hit.is_multi_ip_rulehit = true
+                dispute_entry.dispute_rule_hits << new_rule_hit
+              end
+            end
+          rescue => e
+            Rails.logger.error e
+            Rails.logger.error e.backtrace.join("\n")
+          end
+
+
+          dispute_entry.save!
+
+          if !matching_disposition
+
+            if entry_claim != "false negative"
+
+              if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+                dispute_entry.reload
+              else
+                dispute_entry.update(status: DisputeEntry::NEW)
+              end
+            else
+
+              if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+
+                dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+              else
+                dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+              end
+            end
+            dispute_entry.save
+          end
+
+          return_payload[dispute_entry.hostlookup] = dispute_entry.new_payload_item
+          return_payload[dispute_entry.hostlookup]['sugg_type'] = dispute_entry.suggested_disposition
+        end
+
+      end
+    rescue Exception => e
+
+      Rails.logger.error e
+      Rails.logger.error e.backtrace.join("\n")
+    end
+
+  end
+
+
+  def self.build_new_entries(dispute, new_entries_ips, new_entries_urls)
+    response = {}
+    response[:errors] = []
+    response[:status] = nil
+    response[:entry_claims] = nil
+    entry_claims = {}
+
+    opened_at = dispute.case_opened_at
+
+    new_entries_ips.each do |ip, entry|
+
+
+      #if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
+      #  false_negative_claim = true
+      #end
+      #
+      claim = entry["sbrs"]["claim"]
+      entry_claims[ip] = claim
+
+      if entry["sbrs"]["platform"].present?
+        entry_platform = Platform.find(entry[:sbrs]["platform"].to_i) rescue nil
+      end
+
+      new_dispute_entry = DisputeEntry.new
+      new_dispute_entry.auto_resolve_log = ""
+      new_dispute_entry.case_opened_at = opened_at
+      new_dispute_entry.dispute_id = dispute.id
+      new_dispute_entry.ip_address = ip
+      new_dispute_entry.entry_type = "IP"
+      new_dispute_entry.status = DisputeEntry::NEW
+      new_dispute_entry.resolution = ""
+      new_dispute_entry.suggested_disposition = entry["sbrs"]["rep_sugg"]
+      new_dispute_entry.suggested_threat_category = entry["sbrs"]["suggested_threat_category"] unless entry["sbrs"]["suggested_threat_category"].blank?
+
+      new_dispute_entry.sbrs_score = entry["sbrs"]["SBRS_SCORE"] == "No score" ? nil : entry["sbrs"]["SBRS_SCORE"]
+      new_dispute_entry.wbrs_score = entry["wbrs"]["WBRS_SCORE"] == "No score" ? nil : entry["wbrs"]["WBRS_SCORE"]
+      new_dispute_entry.suggested_disposition = entry["sbrs"]["rep_sugg"]
+      new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
+      new_dispute_entry.platform = entry["sbrs"]["platform"] if (entry["sbrs"]["platform"].present? && !entry["sbrs"]["platform"].kind_of?(Integer))
+      new_dispute_entry.save!
+
+      if entry && entry["wbrs"] && entry["wbrs"]["WBRS_Rule_Hits"]
+        wbrs_hits = entry["wbrs"]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+      else
+        Rails.logger.error('No data for WBRS Rule Hits')
+        wbrs_hits = []
+      end
+
+      if entry && entry["sbrs"] && entry["sbrs"]["SBRS_Rule_Hits"]
+        sbrs_hits = entry["sbrs"]["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+      else
+        Rails.logger.error('No data for SBRS Rule Hits')
+        sbrs_hits = []
+      end
+
+      #total_hits = (wbrs_hits + sbrs_hits).uniq
+
+
+      sbrs_hits.each do |rule_hit|
+        new_rule_hit = DisputeRuleHit.new
+        new_rule_hit.dispute_entry_id = new_dispute_entry.id
+        new_rule_hit.name = rule_hit.strip
+        new_rule_hit.rule_type = "SBRS"
+        new_rule_hit.save!
+      end
+
+      wbrs_hits.each do |rule_hit|
+        new_rule_hit = DisputeRuleHit.new
+        new_rule_hit.dispute_entry_id = new_dispute_entry.id
+        new_rule_hit.name = rule_hit.strip
+        new_rule_hit.rule_type = "WBRS"
+        new_rule_hit.save!
+      end
+
+    end
+
+    new_entries_urls.each do |url, entry|
+
+      claim = entry["claim"]
+      entry_claims[url] = claim
+
+      if entry["platform"].present?
+        entry_platform = Platform.find(entry["platform"].to_i) rescue nil
+      end
+
+      new_dispute_entry = DisputeEntry.new
+      new_dispute_entry.dispute_id = dispute.id
+      new_dispute_entry.uri = url
+      new_dispute_entry.entry_type = "URI/DOMAIN"
+      new_dispute_entry.suggested_disposition = entry["rep_sugg"]
+      new_dispute_entry.status = DisputeEntry::NEW
+      new_dispute_entry.resolution = ""
+      new_dispute_entry.suggested_threat_category = entry["suggested_threat_category"] unless entry["suggested_threat_category"].blank?
+      new_dispute_entry.case_opened_at = opened_at
+      new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
+
+      resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
+      if resolved_ip.present?
+        new_dispute_entry.web_ips = [resolved_ip]
+      end
+
+
+      #new_dispute_entry.is_important = is_important?(key)
+      new_dispute_entry.auto_resolve_log = ""
+      begin
+        new_dispute_entry.assign_url_parts(url)
+      rescue => e
+        Rails.logger.error e
+        Rails.logger.error e.backtrace.join("\n")
+      end
+      new_dispute_entry.platform = entry["platform"] if (entry["platform"].present? && !entry["platform"].kind_of?(Integer))
+      new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
+
+
+      new_dispute_entry.save
+
+      if entry["WBRS_Rule_Hits"].present?
+        all_hits = entry["WBRS_Rule_Hits"].split(",")
+        all_hits.each do |rule_hit|
+          new_rule_hit = DisputeRuleHit.new
+          new_rule_hit.dispute_entry_id = new_dispute_entry.id
+          new_rule_hit.name = rule_hit.strip
+          new_rule_hit.rule_type = "WBRS"
+          new_rule_hit.save!
+        end
+      end
+
+    end
+
+    response[:entry_claims] = entry_claims
+    response
+
+  end
+
+  ##############END DISPUTE REBUILD#################################
+
+  def self.process_bridge_payload(message_payload)
+    
     #check to see if ticket already exists in database to prevent accidental dupes
     record_exists = Dispute.where(:ticket_source_key => message_payload["source_key"]).first
 
@@ -596,8 +966,6 @@ For future Web categorization requests, please open a Web categorization ticket 
           new_dispute_entry.resolution = ""
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
           new_dispute_entry.suggested_threat_category = entry[:sbrs]["suggested_threat_category"] unless entry[:sbrs]["suggested_threat_category"].blank?
-          new_dispute_entry.case_closed_at = resolved_at
-          new_dispute_entry.case_resolved_at = resolved_at
 
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
@@ -657,8 +1025,6 @@ For future Web categorization requests, please open a Web categorization ticket 
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
           new_dispute_entry.status = DisputeEntry::NEW
           new_dispute_entry.resolution = ""
-          new_dispute_entry.case_closed_at = resolved_at
-          new_dispute_entry.case_resolved_at = resolved_at
           new_dispute_entry.suggested_threat_category = entry["suggested_threat_category"] unless entry["suggested_threat_category"].blank?
           new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]

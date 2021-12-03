@@ -43,8 +43,6 @@ describe Clusters::Wbnp::DataFetcher do
     }
   end
 
-  let(:regex) { nil }
-
   describe '.fetch' do
     let(:expected_response) do
       [
