@@ -1,5 +1,5 @@
 GIT
-  remote: git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git
+  remote: https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git
   revision: 62995672efe8cdc75fdd82cd3465396976b66911
   specs:
     peake-bridge-client (0.1.0.0)
