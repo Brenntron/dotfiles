@@ -2,6 +2,9 @@ class UsersController < ApplicationController
   authorize_resource
 
   before_action :require_login
+#per_page for User show page disputes tab
+  CLOSED_DISPUTES_PAGINATION_SIZE = 25
+  OPEN_DISPUTES_PAGINATION_SIZE = 10
 
   def index
     @users = current_user.children.order(:display_name)
@@ -10,6 +13,23 @@ class UsersController < ApplicationController
 
   def show
     @user = User.where(id: params[:id]).first
+
+    if @user
+      closed_filerep_disputes = @user.file_reputation_disputes.where(status: "RESOLVED_CLOSED")
+      open_filerep_disputes = @user.file_reputation_disputes.where.not(status: "RESOLVED_CLOSED")
+
+      closed_webrep_disputes = @user.disputes.where(status:  "RESOLVED_CLOSED")
+      open_webrep_disputes = @user.disputes.where.not(status: "RESOLVED_CLOSED")
+
+      @closed_filerep_page = closed_filerep_disputes.order("created_at DESC").paginate(:page => params[:closed_filerep_page], :per_page => CLOSED_DISPUTES_PAGINATION_SIZE)
+      @open_filerep_page = open_filerep_disputes.order("created_at DESC").paginate(:page => params[:closed_filerep_page], :per_page => OPEN_DISPUTES_PAGINATION_SIZE)
+
+      @closed_webrep_page = closed_webrep_disputes.paginate(:page => params[:closed_webrep_page], :per_page => CLOSED_DISPUTES_PAGINATION_SIZE)
+      @open_webrep_page = open_webrep_disputes.paginate(:page => params[:open_webrep_page], :per_page => OPEN_DISPUTES_PAGINATION_SIZE)
+
+      @total_closed = closed_filerep_disputes.length + closed_webrep_disputes.length
+      @total_open = open_filerep_disputes.length + open_webrep_disputes.length
+    end
 
     case
       when @user.nil?
