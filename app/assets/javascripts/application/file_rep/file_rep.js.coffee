@@ -382,7 +382,7 @@ $ ->
     if $('last-updated-input').closest('.form-group').hasClass('.hidden')
       time_submitted = {}
 
-    platforms = $('#platform-input')[0].selectize.items
+    platforms = $('#platform-input')[0].selectize? && $('#platform-input')[0].selectize.items
     platform_display = []
     if platforms.length
       for platform in platforms
@@ -507,7 +507,31 @@ $ ->
             continue
           if condition != ''
             condition_name = condition_name.replace(/_/g, " ").toUpperCase()
-            condition_name = 'DATE SUBMITTED' if condition_name == 'CREATED AT'
+
+            if condition_name == 'created_at'
+              condition_name = 'DATE SUBMITTED'
+            if condition_name == 'sha256_hash'
+              condition_name = 'SHA256'
+            if condition_name == 'disposition'
+              condition_name = 'AMP DISPOSITION'
+            if condition_name == 'detection_name'
+              condition_name = 'AMP DETECTION NAME'
+            if condition_name == 'assigned'
+               condition_name = 'ASSIGNEE'
+            if condition_name == 'threatgrid_score'
+              condition_name = 'TG SCORE'
+            if condition_name == 'in_zoo'
+              condition_name = 'IN SAMPLE ZOO'
+            if condition_name == 'disposition_suggested'
+              condition_name = 'SUGGESTED DISPOSITION'
+            if condition_name == 'customer_company_name'
+              condition_name = 'CUSTOMER COMPANY'
+            if condition_name == 'platforms'
+              condition_name = 'PLATFORM'
+
+            if condition == 'checked'
+              condition = 'True'
+
             condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
 
             if typeof condition == 'object'
