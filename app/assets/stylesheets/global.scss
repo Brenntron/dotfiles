@@ -471,7 +471,7 @@ th {
 }
 
 .alt-col.lighter-alt-col {
-  background-color: lighten( $faint-neutral-color, 5% );
+  background-color: #fcfcfc;
 }
 
 th.alt-col {
@@ -554,6 +554,21 @@ button {
   background-color: $content-bg-color;
   border-radius: 0 !important;
   margin: 1px 2px;
+}
+
+.team-index {
+  .select-wrapper {
+    margin-right: 0;
+    padding: 0;
+
+    .selectize-control {
+      padding: 0;
+    }
+  }
+
+  .inline-tool-content-wrapper .toolbar div {
+    border: 0 !important;
+  }
 }
 
 .dataTables_length label, .toolbar-select-wrapper {
@@ -2744,6 +2759,7 @@ a .tag {
 .researcher-label {background-image: url(image_path("icon_researcher.svg"));}
 .committer-label  {background-image: url(image_path("icon_committer.svg"));}
 .team-label       {background-image: url(image_path('icon_team.svg'));}
+.view-team-details {cursor: pointer;}
 
 .assignment-button {
   background-color: $faint-neutral-color;
@@ -9264,9 +9280,6 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   background-color: transparent;
 }
 
-.manage-child-row .user-displayname-col {
-  padding-left: 16px !important;
-}
 .sugg-tc-cell, .sugg-cell{
   label{
     white-space: nowrap;
