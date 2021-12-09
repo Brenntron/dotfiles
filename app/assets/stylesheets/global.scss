@@ -10991,8 +10991,16 @@ div[aria-describedby='create-detection-dialog'] {
 }
 
 // need a separate th class so the bg sort icon isn't affected by generic .text-center
-#file-rep-datatable_wrapper .th-center {
-  text-align: center;
+#file-rep-datatable_wrapper {
+  top: -55px;
+  .th-center {
+    text-align: center;
+  }
+}
+@media screen and (max-width: 700px){
+  #file-rep-datatable_wrapper {
+    top: unset;
+  }
 }
 
 // dbinebri: on Show, assignee column width fix on laptop screens
