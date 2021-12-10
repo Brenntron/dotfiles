@@ -560,14 +560,53 @@ button {
   .select-wrapper {
     margin-right: 0;
     padding: 0;
+    height: 30px !important;
 
     .selectize-control {
       padding: 0;
+      background: transparent;
+      border: none !important;
+      height: 100%;
+      .selectize-input {
+        background: transparent;
+        height: 28px !important;
+        margin-top: 0 !important;
+        margin-left: 0 !important;
+        padding: 2px !important;
+        border: none !important;
+        input {
+          border: none !important;
+          width: 100% !important;
+          height: 100% !important;
+          margin: 0 !important;
+          padding: 2px !important;
+        }
+        .item {
+          border: none !important;
+          background: transparent !important;
+        }
+      }
+      &::after {
+        right: 10px !important;
+        margin-top: -2px;
+      }
+      .selectize-dropdown {
+        margin-top: 4px !important;
+        padding: 0 !important;
+        .selectize-dropdown-content {
+          border: 0 !important;
+          padding: 0 !important;
+          div {
+            border: 0 !important;
+            span {
+              float: none;
+              padding-left: 0 !important;
+            }
+          }
+        }
+      }
     }
-  }
 
-  .inline-tool-content-wrapper .toolbar div {
-    border: 0 !important;
   }
 }
 
