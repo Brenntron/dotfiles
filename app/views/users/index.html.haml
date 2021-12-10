@@ -40,8 +40,8 @@
                         .toolbar
                           %div.select-wrapper
                             %label.toolbar-section-label{for: 'users-selection'} Users
-                            = select_tag "users_for_#{@user.id}", options_for_select(nested_set_options(@user.parent.available_users.sort_by(&:display_name)) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select select-team-members", name: 'child_id'}
-                          = hidden_field_tag "manager_id_#{@user.parent.id}", @user.id
+                            = select_tag "users_for_#{@user.parent.id}", options_for_select(nested_set_options(@user.parent.available_users.sort_by(&:display_name)) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select select-team-members", name: 'child_id'}
+                          = hidden_field_tag "manager_id_#{@user.parent.id}", @user.parent.id
                         .button-row-center
                           %button.primary.dropdown-submit-button{type: 'submit'} Add User
 
