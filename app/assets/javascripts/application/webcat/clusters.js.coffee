@@ -155,6 +155,7 @@ $ ->
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
+    pagingType: 'full_numbers'
     order: [ [
       5
       'desc'
