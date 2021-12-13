@@ -1390,6 +1390,8 @@ format = (complaint_entry_row) ->
   else
     complaint_source = '<span class="missing-data">Source unknown</span>'
 
+  form_change_item = complaint_entry.domain || complaint_entry.ip_address
+
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
@@ -1433,7 +1435,7 @@ format = (complaint_entry_row) ->
       '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
-      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + complaint_entry.domain + '\')"></select>' +
+      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + form_change_item + '\')"></select>' +
       '</div>' +
       '<div class="domain-categories" >' +
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
@@ -1959,7 +1961,6 @@ window.triggerTooltips = (item) ->
   return
 
 processSubmitMaster = () ->
-
   data = []
   selectedEntryDomains = (sessionStorage.getItem("touchedForm")|| "" )
   return if selectedEntryDomains.length == 0
@@ -1968,7 +1969,8 @@ processSubmitMaster = () ->
   selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
   selectedEntries = []
   $('#complaints-index').DataTable().rows (idx, data, node) ->
-    if selectedEntryDomains.includes(data.domain)
+    entry_item = data.domain || data.ip_address
+    if selectedEntryDomains.includes(entry_item)
       selectedEntries.push data
     false
   for entry in selectedEntries
