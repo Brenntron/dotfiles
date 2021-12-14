@@ -5405,6 +5405,7 @@ table > tbody > tr > td.dispute_rep_tools {
 .nested-complaint-data-wrapper {
   padding: 0 0 0 20px !important;
   background-color: $bug-section-color;
+  word-break: break-word;
 }
 
 .dispute-entry-table-wrapper::before, .nested-complaint-data-wrapper::before {
