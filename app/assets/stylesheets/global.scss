@@ -345,7 +345,7 @@ table.dataTable.no-footer {
 }
 
 .table-search-input {
-  width: 400px;
+  width: 100%;
   height: 100%;
   padding: 0 3px 0 26px;
   font-weight: 400;
@@ -10991,8 +10991,16 @@ div[aria-describedby='create-detection-dialog'] {
 }
 
 // need a separate th class so the bg sort icon isn't affected by generic .text-center
-#file-rep-datatable_wrapper .th-center {
-  text-align: center;
+#file-rep-datatable_wrapper {
+  top: -55px;
+  .th-center {
+    text-align: center;
+  }
+}
+@media screen and (max-width: 700px){
+  #file-rep-datatable_wrapper {
+    top: unset;
+  }
 }
 
 // dbinebri: on Show, assignee column width fix on laptop screens
@@ -11512,10 +11520,19 @@ input[type="radio"].resolution_radio_button {
   font-style: oblique!important;
 }
 // webrep and webcat toolbars - prevent breaking/wrapping of the buttons
-#webrep-index-toolbar .toolbar-button .toolbar-button-text {
-  display: none;
+#webrep-index-toolbar {
+  .toolbar-button .toolbar-button-text {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1699px)  and (min-width: 908px ) {
+  #disputes-index_wrapper {
+    top: -55px;
+  }
 }
 @media (min-width: 1700px) {
+
   #webrep-index-toolbar{
     .toolbar-button {
       background-position: 4px 6px;
@@ -11530,8 +11547,15 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
+
+@media (min-width: 2030px) {
+  #disputes-index_wrapper {
+    top: -55px;
+  }
+}
 // webcat - 1950px below is our current "widest" breakpoint
 @media (min-width: 1950px) {
+
   #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
