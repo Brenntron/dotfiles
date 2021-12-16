@@ -68,28 +68,31 @@
           %td.alt-col.user-col-divider=@user.children.length
           %td.alt-col=@user.descendants.length
           %td.data_small_emphasis=@user.roles.map(&:role).join(', ')
-          %td.text-right.table-button-row
-            %button.edit-button.table-row-button.tooltipped{title: "Edit #{@user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{@user.id}"}
-            %span.dropdown
-              %button.add-user-button.table-row-button.tooltipped{title: "Add user to #{@user.display_name}'s team'", id: "add_user_button_#{@user.id}", 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-              .dropdown-menu{id: "add_user_dropdown_#{@user.id}", 'aria-labelledby': "add_user_button_#{@user.id}"}
-                .user-select-wrapper
-                  %h3
-                    Add members to
-                    = @user.display_name
-                    \'s team
-                  .inline-tool-content-wrapper
-                    =form_tag escalations_user_add_to_team_path(@user), method: :patch do
-                      .toolbar
-                        %div.select-wrapper
-                          %label.toolbar-section-label{for: 'users-selection'} Users
-                          = select_tag "users_for_#{@user.id}", options_for_select(nested_set_options(@user.available_users.sort_by(&:display_name)) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select select-team-members", name: 'child_id'}
-                        = hidden_field_tag "manager_id_#{@user.id}", @user.id
-                      .button-row-center
-                        %button.primary.dropdown-submit-button{type: 'submit'} Add User
+          - if current_user.has_role?('admin')
+            %td.text-right.table-button-row
+              %button.edit-button.table-row-button.tooltipped{title: "Edit #{@user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{@user.id}"}
+              %span.dropdown
+                %button.add-user-button.table-row-button.tooltipped{title: "Add user to #{@user.display_name}'s team'", id: "add_user_button_#{@user.id}", 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                .dropdown-menu{id: "add_user_dropdown_#{@user.id}", 'aria-labelledby': "add_user_button_#{@user.id}"}
+                  .user-select-wrapper
+                    %h3
+                      Add members to
+                      = @user.display_name
+                      \'s team
+                    .inline-tool-content-wrapper
+                      =form_tag escalations_user_add_to_team_path(@user), method: :patch do
+                        .toolbar
+                          %div.select-wrapper
+                            %label.toolbar-section-label{for: 'users-selection'} Users
+                            = select_tag "users_for_#{@user.id}", options_for_select(nested_set_options(@user.available_users.sort_by(&:display_name)) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select select-team-members", name: 'child_id'}
+                          = hidden_field_tag "manager_id_#{@user.id}", @user.id
+                        .button-row-center
+                          %button.primary.dropdown-submit-button{type: 'submit'} Add User
+          - else
+            %td
 
         - @user.children.each do |user|
-          - if @user.has_role?('manager')
+          - if @user.has_role?('manager') || current_user.has_role?('admin')
             %tr.first-child
               - if user.children.length > 0
                 %td.alt-col.user-col-divider.user-displayname-col.manager-row-indicator
@@ -281,7 +284,13 @@
           %td.alt-col.user-col-divider=@user.children.length
           %td.alt-col=@user.descendants.length
           %td.data_small_emphasis=@user.roles.map(&:role).join(', ')
-          %td
+          - if current_user.has_role?('admin')
+            %td.text-right.table-button-row
+              %button.edit-button.table-row-button.tooltipped{title: "Edit #{user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{user.id}"}
+              = link_to escalations_user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
+                %button.remove-button.table-row-button.tooltipped{title: "Remove #{user.cvs_username} from this team"}
+          - else
+            %td
 
       - if @user.child?
         - @user.siblings.each_with_index do |user, index|
@@ -291,7 +300,7 @@
             %td.alt-col.user-col-divider=user.children.length
             %td.alt-col=user.descendants.length
             %td.data_small_emphasis= user.roles.map(&:role).join(', ')
-            - if @user.has_role?('admin')
+            - if current_user.has_role?('admin')
               %td.text-right.table-button-row
                 %button.edit-button.table-row-button.tooltipped{title: "Edit #{user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{user.id}"}
                 = link_to escalations_user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
@@ -326,7 +335,13 @@
                     .modal-body
                       =render 'edit_user_form', user: user
             - else
-              %td
+              - if current_user.has_role?('admin')
+                %td.text-right.table-button-row
+                  %button.edit-button.table-row-button.tooltipped{title: "Edit #{user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{user.id}"}
+                  = link_to escalations_user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
+                    %button.remove-button.table-row-button.tooltipped{title: "Remove #{user.cvs_username} from this team"}
+              - else
+                %td
 
   .modal.fade.user-form-modal{id: "roleModal_#{@user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
     .modal-dialog{role: 'document'}

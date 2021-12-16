@@ -55,15 +55,10 @@
 
     .col-xs-8.col-with-divider
       .row
-        - if current_user.has_role?('admin')
-          .col-xs-12
-            %label.content-label-md.team-label
-              Team
-            = link_to 'View Team Details', escalations_users_path(user: @user), class: 'view-team-details'
-        - else
-          .col-xs-12
-            %label.content-label-md.team-label
-              Team
+        .col-xs-12
+          %label.content-label-md.team-label
+            Team
+          = link_to 'View Team Details', escalations_users_path(user: @user), class: 'view-team-details'
       .row
         - if @user.has_role?('manager') && @user.children.length > 0
           .col-xs-6
