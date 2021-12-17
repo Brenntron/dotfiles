@@ -939,6 +939,16 @@ selected_options = (category_names) ->
   options = []
   if category_names
     options = category_names.split(',')
+
+    #splice together 'Conventions, Conferences and Trade Shows' due to extra comma
+    if category_names.includes('Conferences and Trade Shows')
+      $(options).each (i, category) ->
+        if category == 'Conventions'
+          options.splice(i, 1)
+        else if category == ' Conferences and Trade Shows'
+          i2 = i - 1
+          options.splice(i2, 1, 'Conventions, Conferences and Trade Shows')
+
   return options
 
 $('html').on 'click', (e) ->
