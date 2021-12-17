@@ -345,7 +345,7 @@ table.dataTable.no-footer {
 }
 
 .table-search-input {
-  width: 400px;
+  width: 100%;
   height: 100%;
   padding: 0 3px 0 26px;
   font-weight: 400;
@@ -852,6 +852,11 @@ button {
 .url-cat-button {background-image: url(image_path('icon_categorize.svg'));}
 .add-user-button {background-image: url(image_path('icon_add_user_grey.svg'));}
 .export-button-white {background-image: url(image_path('icon_export_white.svg'));}
+.ping-button {
+  background-image: url(image_path('icon_ping_grey.svg'));
+  float: right;
+  margin-left: 3px;
+}
 .delete-search {
   display: inline-block;
   float: right;
@@ -1388,7 +1393,7 @@ thead th.sorting.center {
   background-color: lighten($content-tab-color, 15%);
   color: $content-bg-color;
   text-align: center;
-  border-radius: 50%;
+  border-radius: 10px;
   position: absolute;
   right: 8px;
   top: 8px;
@@ -4617,6 +4622,21 @@ button.tertiary {
   right: 0;
 }
 
+//allow webcat advanced search to scroll since it needs to be pinned at top of page
+#web-cat-search {
+  #advanced-search-wrapper {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+.form-group-wrapper-relative {
+  position: relative;
+  #search-criteria-options {
+    width: 100%;
+  }
+}
+
 #advanced-search-dropdown::before {
   right: 40px;
   left: auto;
@@ -7042,10 +7062,63 @@ table.dispute-entry-table tbody tr.selected {
   border-right: solid 1px $faint-neutral-color;
   margin-right: 12px;
 }
-
+#user-open-disputes-tab{
+  background-image: url(image_path('icon_open.svg'))
+}
+#user-closed-disputes-tab{
+  background-image: url(image_path('icon_closed.svg'))
+}
+#closed-disputes, #open-disputes{
+  .id-col, .resolution-col, .status-col{
+    width: 100px;
+  }
+  .resolution-col, .status-col{
+    width: 125px;
+    white-space: nowrap;
+  }
+  .priority-col{
+    width: 38px;
+  }
+  .date-col {
+    width: 160px;
+  }
+  table{
+    th{
+      font-weight: 700;
+      background-color: #f7f7f7;
+      whitespace: nowrap}
+    tr{
+      td:last-of-type ,td:first-of-type { background-color: #fff; }
+    }
+  }
+}
 .priority-col-wrapper {
   padding-right: 6px;
 }
+.apple_pagination {
+  text-align: center;
+  cursor: default; }
+.apple_pagination a, .apple_pagination span {
+  padding: 0.2em 0.3em; }
+.apple_pagination .disabled {
+  color: #aaaaaa; }
+.apple_pagination .current {
+  font-style: normal;
+  font-weight: bold;
+  background-color: #bebebe;
+  display: inline-block;
+  padding: 2px;
+  line-height: 1.5;
+  -moz-border-radius: 1em;
+  -webkit-border-radius: 1em;
+  border-radius: 1em;
+  text-shadow: rgba(255, 255, 255, 0.8) 1px 1px 1px; }
+.apple_pagination a {
+  text-decoration: none;
+  color: black; }
+.apple_pagination a:hover, .apple_pagination a:focus {
+  text-decoration: underline; }
+
 
 .case-id-wrapper {
   padding-right: 12px;
@@ -9942,6 +10015,8 @@ hr.thin.form-divider {
     top: 10px;
   }
   #in-sample-zoo-input{
+    height: 20px;
+    min-height: 20px;
     border: none;
     outline: none;
   }
@@ -10968,8 +11043,16 @@ div[aria-describedby='create-detection-dialog'] {
 }
 
 // need a separate th class so the bg sort icon isn't affected by generic .text-center
-#file-rep-datatable_wrapper .th-center {
-  text-align: center;
+#file-rep-datatable_wrapper {
+  top: -55px;
+  .th-center {
+    text-align: center;
+  }
+}
+@media screen and (max-width: 700px){
+  #file-rep-datatable_wrapper {
+    top: unset;
+  }
 }
 
 // dbinebri: on Show, assignee column width fix on laptop screens
@@ -11489,10 +11572,19 @@ input[type="radio"].resolution_radio_button {
   font-style: oblique!important;
 }
 // webrep and webcat toolbars - prevent breaking/wrapping of the buttons
-#webrep-index-toolbar .toolbar-button .toolbar-button-text {
-  display: none;
+#webrep-index-toolbar {
+  .toolbar-button .toolbar-button-text {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1699px)  and (min-width: 908px ) {
+  #disputes-index_wrapper {
+    top: -55px;
+  }
 }
 @media (min-width: 1700px) {
+
   #webrep-index-toolbar{
     .toolbar-button {
       background-position: 4px 6px;
@@ -11507,8 +11599,15 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
+
+@media (min-width: 2030px) {
+  #disputes-index_wrapper {
+    top: -55px;
+  }
+}
 // webcat - 1950px below is our current "widest" breakpoint
 @media (min-width: 1950px) {
+
   #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
@@ -11534,7 +11633,7 @@ input[type="radio"].resolution_radio_button {
 }
 .toolbar#webcat-index-toolbar{
   margin: 25px 0 -35px 0;
-  z-index: 10;
+  z-index: 1;
   float: left;
   width: auto;
 }

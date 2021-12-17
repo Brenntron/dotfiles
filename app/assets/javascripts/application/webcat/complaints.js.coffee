@@ -190,11 +190,20 @@ window.updateURI = (event, complaint_entry_id) ->
     success: (response) ->
       {current_categories, category, wbrs_score, domain, subdomain, path, status} = response.json
 
+      if subdomain
+        qual_subdomain = subdomain + '.' + domain
+      else
+        qual_subdomain = domain
+
       $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
 
       if 'ip' == status
         std_msg_error("Cannot edit IP entries.","")
       else
+        $("#domain_#{complaint_entry_id}").tooltipster('content', uri);
+        $("#site-search-#{complaint_entry_id}").tooltipster('content', uri);
+        $("#entry-uri-#{complaint_entry_id}").tooltipster('content', uri);
+
         $.each current_categories, (key, entry) ->
           $(".simple-nested-table#entry-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
 
@@ -207,7 +216,7 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
-        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + qual_subdomain + '\')">Lookup</button>')
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.queryWhoIs(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Lookup</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
     error: (response) ->
@@ -570,7 +579,7 @@ processSubmitPending=(entry_id,row_id)->
         temp_row.invalidate().page(table_page).draw(false)
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
-
+        nested_tooltip()
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
           persist: false,
           create: false,
@@ -662,6 +671,7 @@ processSubmitEntry = (entry_id,row_id) ->
           temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
+          nested_tooltip()
 
           $('#input_cat_'+ temp_row.data().entry_id).selectize {
             persist: false,
@@ -1380,6 +1390,8 @@ format = (complaint_entry_row) ->
   else
     complaint_source = '<span class="missing-data">Source unknown</span>'
 
+  form_change_item = complaint_entry.domain || complaint_entry.ip_address
+
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
@@ -1423,7 +1435,7 @@ format = (complaint_entry_row) ->
       '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
-      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + complaint_entry.domain + '\')"></select>' +
+      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + form_change_item + '\')"></select>' +
       '</div>' +
       '<div class="domain-categories" >' +
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
@@ -1696,6 +1708,8 @@ window.click_table_buttons = (complaint_table, button)->
   else
     # Open this row
     row.child(format(row)).show()
+    nested_tooltip()
+
     tr.removeClass 'not-shown'
     tr.addClass 'shown'
     td = $(tr).next('tr').find('td:first')
@@ -1947,7 +1961,6 @@ window.triggerTooltips = (item) ->
   return
 
 processSubmitMaster = () ->
-
   data = []
   selectedEntryDomains = (sessionStorage.getItem("touchedForm")|| "" )
   return if selectedEntryDomains.length == 0
@@ -1956,7 +1969,8 @@ processSubmitMaster = () ->
   selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
   selectedEntries = []
   $('#complaints-index').DataTable().rows (idx, data, node) ->
-    if selectedEntryDomains.includes(data.domain)
+    entry_item = data.domain || data.ip_address
+    if selectedEntryDomains.includes(entry_item)
       selectedEntries.push data
     false
   for entry in selectedEntries
@@ -2021,7 +2035,7 @@ processSubmitMaster = () ->
           temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
-
+          nested_tooltip()
           $('#input_cat_'+ entry.entry_id).selectize {
             persist: false,
             create: false,
@@ -2239,6 +2253,8 @@ $ ->
       unless row.child.isShown()
 
         row.child(format(row)).show()
+        nested_tooltip()
+
         tr.addClass 'shown'
 
         td = $(tr).next('tr').find('td:first')
@@ -2437,8 +2453,12 @@ window.prep_complaint_to_convert = () ->
         std_msg_error('Error preparing ticket for conversion', [response])
     )
 
-
-
+window.nested_tooltip = () ->
+  $('.esc-tooltipped:not(.tooltipstered)').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
 convert_complaint_to_webrep = () ->
   # get the parent ticket info
   complaint_id = parseInt($('#complaint-id-to-convert').text())

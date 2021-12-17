@@ -14,12 +14,6 @@
           %span.toolbar-button-text Expand All Rows
         %button.toolbar-button.collapse-button#collapse-all-rows
           %span.toolbar-button-text Collapse All Rows
-        -#%span.dropdown
-        -#  %button.toolbar-button.sort-by-button#sort-table-by{title: 'Sort Table By', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-        -#    %span.toolbar-button-text Sort By
-        -#  .dropdown-menu.toolbar-dropdown#sort_by_dropdown{'aria-labelledby': 'sort-table-by'}
-        -#    Options to sort by go here.
-        -#      Add this later: list of useful fields to sort by, category, entry content, reptool class, WL/BL, WBRS Score, SBRS Score
       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         %div
           %label.toolbar-section-label Edit
@@ -290,6 +284,10 @@
             %span.toolbar-button-text Export
         %button.toolbar-button.export-button.esc-tooltipped.toolbar-button-spacer{title: 'Export Selected to CSV', onclick: 'webrep_research_export_selected_rows();'}
           %span.toolbar-button-text Export Selected to CSV
+
+        - if @entries.blank? && @dispute.bridge_packet.present?
+          %button.toolbar-button.ping-button.esc-tooltipped{title: 'Entry Recovery - Ping bridge to grab missing Entry content', onclick: "dispute_entry_recovery(#{@dispute.id});"}
+            %span.toolbar-button-text Dispute Entry Recovery
 
       .edit-button-wrapper.edit-entries-buttons.hidden
         %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',
