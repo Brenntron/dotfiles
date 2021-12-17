@@ -286,9 +286,9 @@
           %td.data_small_emphasis=@user.roles.map(&:role).join(', ')
           - if current_user.has_role?('admin')
             %td.text-right.table-button-row
-              %button.edit-button.table-row-button.tooltipped{title: "Edit #{user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{user.id}"}
-              = link_to escalations_user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
-                %button.remove-button.table-row-button.tooltipped{title: "Remove #{user.cvs_username} from this team"}
+              %button.edit-button.table-row-button.tooltipped{title: "Edit #{@user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{@user.id}"}
+              = link_to escalations_user_remove_from_team_path(user_id: @user.id), method: :patch, data: {confirm: "Remove #{@user.display_name} from team?"} do
+                %button.remove-button.table-row-button.tooltipped{title: "Remove #{@user.cvs_username} from this team"}
           - else
             %td
 
