@@ -471,7 +471,7 @@ th {
 }
 
 .alt-col.lighter-alt-col {
-  background-color: lighten( $faint-neutral-color, 5% );
+  background-color: #fcfcfc;
 }
 
 th.alt-col {
@@ -554,6 +554,60 @@ button {
   background-color: $content-bg-color;
   border-radius: 0 !important;
   margin: 1px 2px;
+}
+
+.team-index {
+  .select-wrapper {
+    margin-right: 0;
+    padding: 0;
+    height: 30px !important;
+
+    .selectize-control {
+      padding: 0;
+      background: transparent;
+      border: none !important;
+      height: 100%;
+      .selectize-input {
+        background: transparent;
+        height: 28px !important;
+        margin-top: 0 !important;
+        margin-left: 0 !important;
+        padding: 2px !important;
+        border: none !important;
+        input {
+          border: none !important;
+          width: 100% !important;
+          height: 100% !important;
+          margin: 0 !important;
+          padding: 2px !important;
+        }
+        .item {
+          border: none !important;
+          background: transparent !important;
+        }
+      }
+      &::after {
+        right: 10px !important;
+        margin-top: -2px;
+      }
+      .selectize-dropdown {
+        margin-top: 4px !important;
+        padding: 0 !important;
+        .selectize-dropdown-content {
+          border: 0 !important;
+          padding: 0 !important;
+          div {
+            border: 0 !important;
+            span {
+              float: none;
+              padding-left: 0 !important;
+            }
+          }
+        }
+      }
+    }
+
+  }
 }
 
 .dataTables_length label, .toolbar-select-wrapper {
@@ -2749,6 +2803,7 @@ a .tag {
 .researcher-label {background-image: url(image_path("icon_researcher.svg"));}
 .committer-label  {background-image: url(image_path("icon_committer.svg"));}
 .team-label       {background-image: url(image_path('icon_team.svg'));}
+.view-team-details {cursor: pointer;}
 
 .assignment-button {
   background-color: $faint-neutral-color;
@@ -9337,9 +9392,6 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   background-color: transparent;
 }
 
-.manage-child-row .user-displayname-col {
-  padding-left: 16px !important;
-}
 .sugg-tc-cell, .sugg-cell{
   label{
     white-space: nowrap;

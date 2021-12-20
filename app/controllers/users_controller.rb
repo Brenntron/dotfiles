@@ -7,8 +7,13 @@ class UsersController < ApplicationController
   OPEN_DISPUTES_PAGINATION_SIZE = 10
 
   def index
-    @users = current_user.children.order(:display_name)
+    @user = if params[:user].nil?
+               current_user
+             else
+               User.find(params[:user])
+             end
 
+    @users = @user.children.order(:display_name)
   end
 
   def show
