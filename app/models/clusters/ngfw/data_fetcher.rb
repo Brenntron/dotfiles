@@ -11,7 +11,7 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
   # Since clusters processing are using platform name as an identifier
   # we use hardcoded value to be isolated from potential category name change on TI side
   DATA_PATFORM = 'NGFW'.freeze
-  NON_IP_REGEX = '/(.+?)(?:(?:[0-9]{1,3}\.){3}[0-9]{1,3})(.+)/'.freeze
+  NON_IP_REGEX = '^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9])(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9])){3}$'.freeze
 
   def initialize(regex, filter = {}, user)
     @regex = regex
