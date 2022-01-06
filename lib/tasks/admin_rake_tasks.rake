@@ -59,7 +59,7 @@ namespace :escalations do
   end
 
   task :run_ngfw_import => :environment do
-    Ngfw::Importer.import
+    Ngfw::Importer.import_without_delay
   end
 end
 

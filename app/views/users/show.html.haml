@@ -50,19 +50,17 @@
         - if @user != current_user
           %a{href: "mailto:#{@user.email}"}
             %button.toolbar-button.email-button.tooltipped.toolbar-button-spacer{title: "Send Message to #{@user.cvs_username}"}
-        - if can?(:manage, @user)
+        - if can?(:manage, @user) || current_user.has_role?('admin')
           %button.toolbar-button.edit-button.tooltipped.toolbar-button-spacer{title: "Edit #{@user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{@user.id}"}
-        - if @user == current_user && @user.has_role?('manager')
-          = link_to escalations_users_path do
-            %button.toolbar-button.manage-button.tooltipped{title: "Manage Team"}
 
     .col-xs-8.col-with-divider
       .row
         .col-xs-12
           %label.content-label-md.team-label
             Team
+          = link_to 'View Team Details', escalations_users_path(user: @user), class: 'view-team-details'
       .row
-        - if @user.has_role?('manager')
+        - if @user.has_role?('manager') && @user.children.length > 0
           .col-xs-6
             %h5.content-label-sm Reports
             .multi-col
