@@ -1,4 +1,6 @@
 - flash.each do |type, message|
+  .flash-msg.alert.alert-dismissible.fade.in{class: "flash-msg-#{bootstrap_class_for(type)}"}
+    %button.small-flash-button{type: 'button', 'data-dismiss': 'alert', 'aria-label': 'Close'}
   :javascript
     var message = "#{message}"
-    window.show_message('error', message)
+    window.show_message('error', message, false, '.flash-msg.alert.alert-dismissible')

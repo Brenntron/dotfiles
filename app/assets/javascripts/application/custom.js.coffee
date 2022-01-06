@@ -85,8 +85,8 @@ window.show_message = (status, content, timer, selector) ->
     $(selector).before(div_full)
   else
     $('#flash-modal-title').after(div_full)   # place the alert
+    $('#flash_modal').modal('show')
 
-  $('#flash_modal').modal('show')
   # if timer is defined, auto-dismiss the alert. if timer not defined (or false), leave alerts alone
   if timer != undefined && timer != false
     timer = parseInt(timer) * 1000  # 5 sec == 5000 ms
