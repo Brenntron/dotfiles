@@ -508,7 +508,7 @@ $ ->
           if condition != ''
             condition_name = condition_name.replace(/_/g, " ").toUpperCase()
 
-            if condition_name == 'created_at'
+            if condition_name == 'CREATED AT'
               condition_name = 'DATE SUBMITTED'
             if condition_name == 'sha256_hash'
               condition_name = 'SHA256'
