@@ -10,13 +10,17 @@ $(document).on 'change','.nested-table-input','.selectize-input', ->
   touchedFormChange(this.dataset.domain)
 
 #### WBNP Reporting ####
+webcat_loader_timeout = ''
 $(document).ready ->
   sessionStorage.removeItem("touchedForm");
   loader = $('#inline-webcat')
   $(this).bind(
     ajaxStart: () ->
-      loader.removeClass('hidden')
+      webcat_loader_timeout = setTimeout ->
+        loader.removeClass('hidden')
+      , 500
     ajaxStop: () ->
+      clearTimeout(webcat_loader_timeout)
       loader.addClass('hidden')
     )
   if ($('body').hasClass('escalations--webcat--complaints-controller') || $('body').hasClass('escalations--webcat--reports-controller')) &&
