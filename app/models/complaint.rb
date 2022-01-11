@@ -602,7 +602,12 @@ For future web and email reputation requests, please open a web and email reputa
           if new_ui_complaint['add_channel'] == WBNP_CHANNEL
             begin
               uri = compile_parts_to_uri(new_ui_complaint)
+              new_report.notes += "<br />----------------------------"
               new_report.notes += "<br />working (#{entry_num}/#{total_entries}) uri: #{uri}."
+              new_report.notes += "<br />URI details:"
+              new_report.notes += "<br /> subdomain: #{new_ui_complaint["subdomain"]}"
+              new_report.notes += "<br /> domain: #{new_ui_complaint["domain"]}"
+              new_report.notes += "<br /> path: #{new_ui_complaint["path"]}"
               new_report.save
               pass = validate_url(uri, new_ui_complaint)
               new_report.notes += "<br />validation pass: #{pass.to_s}."

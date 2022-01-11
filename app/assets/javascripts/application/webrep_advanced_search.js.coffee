@@ -10,7 +10,7 @@ $(document).ready ->
 
   $('.search-item').click ->
     $('#search-criteria-options').hide()
-    false
+    return
 
   $('.remove-input').click ->
     field = $(this).parent()
@@ -61,6 +61,11 @@ window.toggle_search_criteria = (element) ->
     $(criteria_wrapper).addClass('hidden')
     $(input_wrapper).removeClass('hidden')
 
+    #check if all search criteria has been selected, close form if so
+    if $('#search-criteria-options .multicol-2 ul').children(':visible').length == 0
+      $('#search-criteria-options').hide()
+      $('#add-search-items-button').addClass('hidden')
+
   else if $(element).hasClass('remove-input')
     # hide criteria
     input_wrapper = $(element).parents('.search-item')[0]
@@ -68,8 +73,10 @@ window.toggle_search_criteria = (element) ->
     criteria = $(search_input).attr('id')
     criteria_toggle = $(search_wrapper).find('input[for="' + criteria + '"]')
     criteria_wrapper = $(criteria_toggle).parents('li')[0]
+    $('#add-search-items-button').removeClass('hidden')
 
     $(input_wrapper).addClass('hidden')
+    $(criteria_toggle).prop('checked', false)
     $(criteria_wrapper).removeClass('hidden')
 
   # grab visible criteria

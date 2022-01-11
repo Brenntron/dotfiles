@@ -115,6 +115,182 @@
                       %br
                       = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
+
+
+- if current_user == @user || current_user == @user.parent || current_user.has_role?('admin')
+  -# Only current user, manager of current user, or admin can see user's bugs
+  %ul.nav.nav-tabs#user-tabs{role: 'tablist'}
+    %li.nav-item.active
+      %a.nav-link#user-open-disputes-tab{href: '#open-disputes', 'aria-controls': 'open-disputes', role: 'tab', 'data-toggle': 'tab'}
+        %span.tab-label Open Disputes
+        %span#open-disputes-count.tab-item-count= @total_open
+    %li.nav-item
+      %a.nav-link#user-closed-disputes-tab{href: '#closed-disputes', 'aria-controls': 'closed-disputes', role: 'tab', 'data-toggle': 'tab'}
+        %span.tab-label Closed Disputes
+        %span.tab-item-count= @total_closed
+
+  .tab-content.content-wrapper#user-tab-content
+    .tab-pane.active#open-disputes{role: 'tabpanel', 'aria-labeled-by': 'user-open-disputes-tab'}
+      .row
+        - if @open_webrep_page.any?
+          .col-xs-12
+            %div.content-label-md Web Reputation
+            %table.table.responsive.index-table
+              %thead
+                %tr
+                  %th.priority-col
+                  %th.id-col Case ID
+                  %th.status-col Status
+                  %th
+                    -#Submission Type
+                  %th Dispute
+                  %th Age
+                  %th Submitter Type
+                  %th.date-col Updated
+              %tbody
+                - @open_webrep_page.each do |dispute|
+                  %tr{id: "dispute_#{dispute.id}"}
+                    %td
+                      %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
+                    %td.id-col
+                      = link_to dispute.id, "/escalations/webrep/disputes/#{dispute.id}"
+                    %td.font-weight-bold
+                      - if !dispute.status.nil?
+                        = dispute.status.gsub '_',' '
+                    %td
+                      %span{class:"dispute-submission-type esc-tooltipped dispute-#{dispute.submission_type}", title: "#{dispute.submission_type == 'w' ? 'Web' : 'Email'}" }
+                    %td= dispute.dispute_entries.first.hostlookup rescue ""
+                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at.to_time.iso8601}"}
+                    %td= dispute.submitter_type
+                    %td= dispute.updated_at
+            .apple_pagination
+              = will_paginate @open_webrep_page, param_name: 'open_webrep_page', params: {active_tab: 'open'}
+
+        - if @open_filerep_page.any? && @open_webrep_page.any?
+          .col-xs-12
+            %hr.thin
+
+        - if @open_filerep_page.any?
+          .col-xs-12
+            %div.content-label-md File Reputation
+            %table.table.responsive.index-table
+              %thead
+                %tr
+                  - if @open_webrep_page.any?
+                    %th.priority-col
+                  %th.id-col Case ID
+                  %th.status-col Status
+                  %th SHA256
+                  %th Age
+                  %th Sample Type
+                  %th Submitter Type
+                  %th.date-col Updated
+              %tbody
+                - @open_filerep_page.each do |dispute|
+                  %tr{id: "dispute_#{dispute.id}"}
+                    - if @open_webrep_page.any?
+                      %td.priority-col
+                    %td.id-col
+                      = link_to dispute.id, "/escalations/file_rep/disputes/#{dispute.id}"
+                    %td.font-weight-bold.status-col
+                      - if !dispute.status.nil?
+                        = dispute.status.gsub '_',' '
+                    %td
+                      %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha", title:"#{dispute.sha256_hash}"}
+                        = dispute.sha256_hash
+                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at.to_time.iso8601}"}
+                    %td
+                      = dispute.sample_type
+                    %td= dispute.submitter_type
+                    %td= dispute.updated_at
+            .apple_pagination
+              = will_paginate @open_filerep_page, param_name: 'ope_filerep_page', params: {active_tab: 'open'}
+    .tab-pane#closed-disputes{role: 'tabpanel', 'aria-labeled-by': 'user-closed-disputes-tab'}
+      .row
+        - if @closed_webrep_page.any?
+          .col-xs-12
+            %div.content-label-md Web Reputation
+            %table.table.responsive.index-table
+              %thead
+                %tr
+                  %th.priority-col
+                  %th.id-col Case ID
+                  %th.status-col Status
+                  %th.resolution-col Resolution
+                  %th
+                    -#Submission Type
+                  %th Dispute
+                  %th Age
+                  %th Submitter Type
+                  %th.date-col Updated
+              %tbody
+                - @closed_webrep_page.each do |dispute|
+                  %tr{id: "dispute_#{dispute.id}"}
+                    %td
+                      %span.bug-priority{class: "p-#{dispute.priority}", title: "Priority-#{dispute.priority}"}
+                    %td.id-col
+                      = link_to dispute.id, "/escalations/webrep/disputes/#{dispute.id}"
+                    %td.font-weight-bold.status-col
+                      - if !dispute.status.nil?
+                        = dispute.status.gsub '_',' '
+                    %td
+                      - if !dispute.resolution.nil?
+                        = dispute.resolution.gsub '_',' '
+                    %td
+                      %span{class:"dispute-submission-type esc-tooltipped dispute-#{dispute.submission_type}", title: "#{dispute.submission_type == 'w' ? 'Web' : 'Email'}" }
+                    %td= dispute.dispute_entries.first.hostlookup rescue ""
+                    %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at.to_time.iso8601}"}
+                    %td= dispute.submitter_type
+                    %td= dispute.updated_at
+            .apple_pagination
+              = will_paginate @closed_webrep_page, param_name: 'closed_webrep_page', params: {active_tab: 'closed'}
+
+          - if @closed_filerep_page.any? && @closed_webrep_page.any?
+            .col-xs-12
+              %hr.thin
+
+          - if @closed_filerep_page.any?
+            .col-xs-12
+              %div.content-label-md File Reputation
+              %table.table.responsive.index-table
+                %thead
+                  %tr
+                    - if @closed_webrep_page.any?
+                      %th
+                    %th.id-col Case ID
+                    %th.status-col Status
+                    %th.resolution-col Resolution
+                    %th SHA256
+                    %th Age
+                    %th Sample Type
+                    %th Submitter Type
+                    %th.date-col Updated
+
+
+                %tbody
+                  - @closed_filerep_page.each do |dispute|
+                    %tr{id: "dispute_#{dispute.id}"}
+                      - if @closed_webrep_page.any?
+                        %td.priority-col
+                      %td.id-col
+                        = link_to dispute.id, "/escalations/file_rep/disputes/#{dispute.id}"
+                      %td.font-weight-bold.status-col
+                        - if !dispute.status.nil?
+                          = dispute.status.gsub '_',' '
+                      %td.resolution-col
+                        - if !dispute.resolution.nil?
+                          = dispute.resolution.gsub '_',' '
+                      %td
+                        %span{id:"#{dispute.sha256_hash}_sha", class:"esc-tooltipped file_rep_sha tooltipstered",title:"#{dispute.sha256_hash}"}
+                          = dispute.sha256_hash
+                      %td{class:'age-col',id:"age_#{dispute.id}", 'data-age':"#{dispute.created_at.to_time.iso8601}"}
+                      %td= dispute.sample_type
+                      %td= dispute.submitter_type
+                      %td= dispute.updated_at
+              .apple_pagination
+                = will_paginate @closed_filerep_page, param_name: 'closed_filerep_page', params: {active_tab: 'closed'}
+
+
 %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
 .modal.fade.user-form-modal{id: "roleModal_#{@user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
   .modal-dialog{role: 'document'}

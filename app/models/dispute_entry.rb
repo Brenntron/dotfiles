@@ -735,9 +735,9 @@ class DisputeEntry < ApplicationRecord
   def referenced_tickets
     is_ip_address = !!(hostlookup =~ Resolv::IPv4::Regex)
     if is_ip_address
-      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:ip_address => self.ip_address}).where.not(:dispute_entries => {:dispute_id => self.dispute_id})
+      Dispute.select("disputes.id, disputes.case_opened_at, disputes.created_at").joins(:dispute_entries).where(:dispute_entries => {:ip_address => self.ip_address}).where.not(:dispute_entries => {:dispute_id => self.dispute_id}).distinct
     else
-      references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:uri => self.uri}).where.not(:dispute_entries => {:dispute_id => self.dispute_id})
+      Dispute.select("disputes.id, disputes.case_opened_at, disputes.created_at").joins(:dispute_entries).where(:dispute_entries => {:uri => self.uri}).where.not(:dispute_entries => {:dispute_id => self.dispute_id}).distinct
     end
   end
 

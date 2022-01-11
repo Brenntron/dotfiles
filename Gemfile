@@ -100,7 +100,6 @@ gem 'poltergeist', '1.18.1'
 gem 'selenium-webdriver'
 gem 'inline_svg', '1.3.1'
 
-
 gem 'rubyXL', '3.3.30'
 
 gem 'public_suffix', '~> 3.0'

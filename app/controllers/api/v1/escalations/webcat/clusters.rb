@@ -29,6 +29,8 @@ module API
             desc 'get all clusters'
             params do
               optional :f, type: String, desc: 'filter'
+              optional :platform, type: String, desc: 'platform filter(WSA/NGFW)'
+              optional :cluster_type, type: String, desc: 'cluster type filter(ip/domain)'
             end
 
             # Uses class Beaker::Verdicts in old Beaker namespace.
@@ -37,7 +39,8 @@ module API
 
               filter = {
                 f: params[:f],
-                platform: params[:platform]
+                platform: params[:platform],
+                cluster_type: params[:cluster_type]
               }
               clusters = ::Clusters::Fetcher.new(filter, params[:regex], current_user).fetch
 
@@ -115,6 +118,22 @@ module API
               }.to_json
             end
 
+            desc "process multiple reviewed important clusters"
+            params do
+            end
+            post 'process_multiple_reviewed' do
+              clusters = JSON.parse(params[:clusters], symbolize_names: true)
+              ::Clusters::Processor.new(clusters, current_user).process!
+              return {:status => "success"}.to_json
+              rescue Exception => e
+              {
+                  status: 'failed',
+                  error: e.message
+              }.to_json
+            end
+
+
+
             desc "decline important clusters categorization"
             params do
             end
@@ -126,6 +145,21 @@ module API
               {
                 status: 'failed',
                 error: e.message
+              }.to_json
+            end
+
+
+            desc "decline important clusters categorization"
+            params do
+            end
+            post 'decline_multiple_reviewed' do
+              clusters = JSON.parse(params[:clusters], symbolize_names: true)
+              ::Clusters::Processor.new(clusters, current_user).decline
+              return {:status => "success"}.to_json
+            rescue Exception => e
+              {
+                  status: 'failed',
+                  error: e.message
               }.to_json
             end
           end

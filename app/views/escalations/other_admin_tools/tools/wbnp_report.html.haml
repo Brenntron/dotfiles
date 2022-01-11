@@ -40,5 +40,4 @@
               %td= report.status
               %td= report.created_at
               %td= report.updated_at
-              %td
-                %td= link_to("View WBNP Report", escalations_other_admin_tools_path(report.id), target: "_blank")
+              %td= raw(report.notes)

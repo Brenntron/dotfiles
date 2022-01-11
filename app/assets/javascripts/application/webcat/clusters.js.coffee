@@ -13,11 +13,10 @@ window.populate_clusters_index_table = (filter) ->
     loader = $('.cluster-mgt-loader-wrapper')
     loader.removeClass('hidden')
     filter_param = window.location.search
-    if filter
-      if filter_param
-        filter_param += "&regex=" + filter
-      else
-        filter_param = "?regex=" + filter
+    if filter_param.length == 0
+      filter_param += "?f=all"
+    if filter && filter_param
+      filter_param += "&regex=" + filter
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
@@ -25,6 +24,7 @@ window.populate_clusters_index_table = (filter) ->
       method: 'GET'
       headers: headers
       success: (response) ->
+        console.log response
         loader.addClass('hidden')
         json = $.parseJSON(response)
         if json.data.length == 0
@@ -45,11 +45,15 @@ window.populate_clusters_index_table = (filter) ->
         std_msg_error('Table Error', [response.responseText])
     , this)
 
-window.categorize_clusters = () ->
+
+
+# categorize clusters submission - review_action (optional) is "bulk_accept", "bulk_deny", or empty (default)
+window.categorize_clusters = (review_action) ->
   loader = $('.cluster-mgt-loader-wrapper')
   loader.removeClass('hidden')
   user_id = $("#user_id").val()
   comment = $("#cluster_comment_field").val()
+
   #cluster_id comment category_ids
   clusters = $ '[id$=\'_categories\']'
   categories = []
@@ -58,10 +62,6 @@ window.categorize_clusters = () ->
     loader.addClass('hidden')
     return
 
-#  if comment == ''
-#    std_msg_error('no comment added', ['Please make a comment to submit.'])
-#    loader.addClass('hidden')
-#    return
   data = {}
   data["comment"] = comment
   data["user_id"] = user_id
@@ -84,29 +84,70 @@ window.categorize_clusters = () ->
 
   data["clusters"] = JSON.stringify(clusters)
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: "/escalations/api/v1/escalations/webcat/clusters/process_cluster"
-    method: 'POST'
-    headers: headers
-    data: data
-    success: (response) ->
-      loader.addClass('hidden')
-      json = $.parseJSON(response)
-      if json.error
-        std_msg_error('Process Error', [json.error])
-      else
-        $("#cluster_comment_field").val('')
-        filter = $("#cluster_filter_field").val()
-        if filter
-          populate_clusters_index_table(filter)
-        else
-          populate_clusters_index_table()
+  endpoint = "process_cluster"  # endpoint for 1st person (default)
 
-    error: (response) ->
-      loader.addClass('hidden')
-      std_api_error(response, "There was an error loading search results.", reload: false)
-  , this)
+  selections_invalid = false  # ensure valid selections on bulk
+
+  # endpoints for 2nd person bulk accept/deny
+  if review_action == "bulk_accept"
+    endpoint = "process_multiple_reviewed"
+  else if review_action == "bulk_deny"
+    endpoint = "decline_multiple_reviewed"
+
+  url = "/escalations/api/v1/escalations/webcat/clusters/#{endpoint}"
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  # approve all, deny all: ensure all selected rows are in 2nd review (blue row) before proceeding
+  if review_action == "bulk_accept" || review_action == "bulk_deny"
+    $('input.cluster-row-select:checked').each ->
+      curr_selectize = $(this).closest('tr').find('.selectize-input')
+      if !$(curr_selectize).hasClass('locked')   # locked rows are in review and have categories
+        std_msg_error('Please make sure all clusters selected are in review', [''])
+        loader.addClass('hidden')
+        selections_invalid = true  # user selected some rows not in 2nd review (locked)
+
+  unless selections_invalid
+    std_msg_ajax
+      url: url
+      method: 'POST'
+      headers: headers
+      data: data
+      success: (response) ->
+        loader.addClass('hidden')
+        json = $.parseJSON(response)
+
+        # clusters submitted but need 3rd person review, this step is a success & error/notice at the same time
+        if json.error && json.error.includes("Manager needs to approve")
+          std_msg_success('Clusters submitted, manager approval still needed', [json.error])
+        # success on ajax call but other error info exists in response
+        else if json.error && !json.error.includes("Manager needs to approve")
+          std_msg_error("Clusters processing error", [json.error])
+        else
+          # if no 'json.error' then this is a normal success, reload page for page cleanup
+          switch review_action
+            when "bulk_accept"
+              std_msg_success("Approved all cluster categories", '')
+            when "bulk_deny"
+              std_msg_success("Denied all cluster categories", '')
+
+          # legacy logic here, indvidual submit success updates the datatable w/o page reload
+          $("#cluster_comment_field").val('')
+          filter = $("#cluster_filter_field").val()
+          if filter
+            populate_clusters_index_table(filter)
+          else
+            populate_clusters_index_table()
+
+      error: (response) ->
+        loader.addClass('hidden')
+        if review_action == "bulk_accept"
+          std_msg_error('Error on approve all categories', '')
+        else if review_action == "bulk_deny"
+          std_msg_error('Error on deny all categories', '')
+        else
+          std_msg_error('Error on clusters processing', '')
+
 
 $ ->
 #  Populate the cluster management table (temp data currently)
@@ -120,7 +161,7 @@ $ ->
       5
       'desc'
     ] ]
-    lengthMenu: [50, 100, 500, 1000]
+    lengthMenu: [50, 100, 200]
     columnDefs: [
       {
         targets: [
@@ -156,7 +197,7 @@ $ ->
         data: null
         render: (data, type, full, meta) ->
           element_id = "cluster_row_#{meta.row}"
-          return "<input type='checkbox' class='cluser-row-select' name='#{element_id}' id='#{element_id}' onclick='window.selectRow(#{element_id})'>"
+          return "<input type='checkbox' class='cluster-row-select' name='#{element_id}' id='#{element_id}' onclick='window.selectRow(#{element_id})'>"
       }
       {
         data: null
@@ -405,12 +446,13 @@ window.copy_domain = (domain, element) ->
 
 window.toggle_all_checkboxes = () ->
   if $('#clusters_check_box').prop('checked')
-    $('#clusters-index').DataTable().rows().select()
-    rows = $('table#clusters-index input[type="checkbox"]');
-    i = 1
-    while i < rows.length
-      $(rows[i])[0].checked = true
-      i++
+    rows = $('.cluster-row-select');
+    row_count = $('.cluster-row-select:visible').length
+
+    for i in [1..row_count]
+      $(rows[i - 1])[0].checked = true
+      $('#clusters-index').DataTable().rows(i - 1).select()
+
   else
     $('#clusters-index').DataTable().rows().deselect()
     rows = $('table#clusters-index input[type="checkbox"]')
@@ -419,17 +461,10 @@ window.toggle_all_checkboxes = () ->
 
 # Select rows in Clusters Table
 $ ->
-  $('#clusters_check_box').click ->
-    toggle_all_checkboxes()
+  $('#clusters_check_box').click -> toggle_all_checkboxes()
 
   # Moves cluster selectize to table draw so that selectize boxes properly initialize when changing number of items being displayed
-  $("#clusters-index").on 'draw.dt', ->
-    selectize_category_inputs()
-    toggle_all_checkboxes()
-    populate_cat_select()
-
-
-  $("#clusters-index").on 'order.dt', ->
+  $("#clusters-index").on 'draw.dt order.dt', ->
     selectize_category_inputs()
     populate_cat_select()
 
@@ -854,9 +889,12 @@ window.approve_cluster = (cluster_row_id) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
-        std_msg_error('Error Approving Clusters', [json.error])
+        if json.error.includes("Manager needs to approve")
+          std_msg_success('Cluster submitted, manager approval still needed', [json.error], reload: true)
+        else
+          std_msg_error('Error approving clusters', [json.error], reload: false)
       else
-        std_msg_success("cluster was submitted.", '', reload: true)
+        std_msg_success("Cluster was submitted", '', reload: true)
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -873,9 +911,9 @@ window.decline_cluster = (cluster_row_id) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
-        std_msg_error('Error Declining Clusters', [json.error])
+        std_msg_error('Error declining clusters', [json.error])
       else
-        std_msg_success("cluster categories were declined.", '',reload: true)
+        std_msg_success("Cluster categories were declined", '', reload: true)
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -905,15 +943,41 @@ window.webcat_clusters_refresh = () ->
   window.location.replace('/escalations/webcat/clusters');
 
 window.webcat_platform_filter = () ->
-  selected_platform = $('#webcat-platform-filter').val()
+  platforms = $("input.show-platforms-filter:checked")
+  if $(platforms).length > 1 || $(platforms).length == 0
+    selected_platform = 'All'
+  else
+    selected_platform = $("input.show-platforms-filter:checked").val()
   url = new URL(document.location.href)
   url.searchParams.set('platform', selected_platform)
+  document.location = url;
+
+window.webcat_cluster_type_filter = () ->
+  types = $("input.show-cluster-types-filter:checked")
+  if $(types).length > 1 || $(types).length == 0
+    selected_type = 'all'
+  else
+    selected_type = $("input.show-cluster-types-filter:checked").val()
+  url = new URL(document.location.href)
+  url.searchParams.set('cluster_type', selected_type)
   document.location = url;
 
 $ ->
   $(document).ready ->
     url = new URL(document.location.href)
     platform = url.searchParams.get('platform')
+    cluster_type = url.searchParams.get('cluster_type')
 
     if(platform)
-      $('#webcat-platform-filter').val(platform)
+      if platform == 'All'
+        $("input.show-platforms-filter").prop('checked', true)
+      else
+        $("input.show-platforms-filter").prop('checked', false)
+        $("input.show-platforms-filter[name='show-platform-#{platform}'").prop('checked', true)
+
+    if(cluster_type)
+      if cluster_type == 'all'
+        $("input.show-cluster-types-filter").prop('checked', true)
+      else
+        $("input.show-cluster-types-filter").prop('checked', false)
+        $("input.show-cluster-types-filter[name='show-cluster-#{cluster_type}'").prop('checked', true)

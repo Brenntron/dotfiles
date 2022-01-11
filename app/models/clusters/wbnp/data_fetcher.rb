@@ -1,10 +1,12 @@
 class Clusters::Wbnp::DataFetcher < Clusters::Templates::DataFetcher
-  attr_accessor :regex
+  attr_accessor :regex, :filter, :user
 
   DATA_PATFORM = 'WSA'.freeze
 
-  def initialize(regex)
+  def initialize(regex, filter = {}, user)
     @regex = regex
+    @filter = filter
+    @user = user
   end
 
   def fetch
@@ -14,10 +16,30 @@ class Clusters::Wbnp::DataFetcher < Clusters::Templates::DataFetcher
   private
 
   def fetch_data
+    conditions = {}
+    conditions[:regex] = regex if regex.present?
+    conditions[:filter_type] = filter[:cluster_type] if filter[:cluster_type] && filter[:cluster_type] != 'all'
     # TODO: add template method for 'fetch' method
-    return Wbrs::Cluster.where(regex: regex) if regex.present?
+    # return Wbrs::Cluster.where(regex: regex) if regex.present?
+    cluster_ids = cluster_ids_for_filter
+    conditions[:cluster_ids] = cluster_ids if cluster_ids.any?
 
-    Wbrs::Cluster.all
+    Wbrs::Cluster.where(conditions)
+  end
+
+  def cluster_ids_for_filter
+    # we can save lots of time and provide better UX
+    # if we will request only for specific clusters
+    # instead of all. that's why we need filter and user params
+    # in the data fetcher class
+    case filter[:f]
+    when 'my'
+      ClusterAssignment.get_assigned_cluster_ids_for(user)
+    when 'pending'
+      ClusterCategorization.get_categorized_cluster_ids_for(user)
+    else
+      []
+    end
   end
 
   def parse_response(clusters_response)

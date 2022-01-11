@@ -14,7 +14,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                           search_name: search_name,
                                           params: index_params,
                                           user: current_user)
-        user_preferences = current_user.user_preferences.where(name: UserPreference::WEB_REP_COLUMNS).last
+        user_preferences = current_user.user_preferences.where(name: UserPreference::WEB_REP_COLUMNS).last&.value
         export = DisputeExport.new(@disputes, user_preferences)
 
         send_data export.to_s, filename: "disputes_search_#{Time.now.utc.iso8601}.xlsx", disposition: 'attachment'
@@ -463,6 +463,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
   def research
     @entries = DisputeEntry.research_results(research_params)
+    @all_rulehits = Wbrs::RuleHit.all
   end
 
   def tickets
@@ -666,7 +667,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def export_selected_dispute_rows
     @disputes = Dispute.where(id: params[:ids])
 
-    user_preferences = current_user.user_preferences.where(name: UserPreference::WEB_REP_COLUMNS).last
+    user_preferences = current_user.user_preferences.where(name: UserPreference::WEB_REP_COLUMNS).last&.value
     export = DisputeExport.new(@disputes, user_preferences)
 
     send_data export.to_s, filename: "disputes_search_#{Time.now.utc.iso8601}.xlsx", disposition: 'attachment'

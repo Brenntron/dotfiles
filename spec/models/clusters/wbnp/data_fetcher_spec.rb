@@ -1,10 +1,11 @@
 describe Clusters::Wbnp::DataFetcher do
-  subject { described_class.new(regex) }
+  subject { described_class.new(regex, filter, user) }
+
+  let(:user) { FactoryBot.create(:user) }
+  let(:filter) { {} }
 
   before do
-    allow(Wbrs::Cluster).to receive(:all).and_return(clusters)
     allow(Wbrs::Cluster).to receive(:where).and_return(clusters)
-
 
     Timecop.freeze(Time.zone.local(2019).in_time_zone('EST')) # freeze time to test time-related fields
   end
@@ -42,8 +43,6 @@ describe Clusters::Wbnp::DataFetcher do
     }
   end
 
-  let(:regex) { nil }
-
   describe '.fetch' do
     let(:expected_response) do
       [
@@ -69,7 +68,7 @@ describe Clusters::Wbnp::DataFetcher do
     end
     context 'when no regex passed' do
       it 'shoud return clusters assigned to user and unassigned' do
-        expect(Wbrs::Cluster).to receive(:all)
+        expect(Wbrs::Cluster).to receive(:where)
         expect(subject.fetch).to eq(expected_response)
       end
     end

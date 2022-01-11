@@ -93,3 +93,8 @@
     height: 98px;
     width: 98px;
 }
+
+.uri-col {
+    word-break: break-all;
+    min-width: 100px;
+}

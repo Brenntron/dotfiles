@@ -14,12 +14,6 @@
           %span.toolbar-button-text Expand All Rows
         %button.toolbar-button.collapse-button#collapse-all-rows
           %span.toolbar-button-text Collapse All Rows
-        -#%span.dropdown
-        -#  %button.toolbar-button.sort-by-button#sort-table-by{title: 'Sort Table By', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-        -#    %span.toolbar-button-text Sort By
-        -#  .dropdown-menu.toolbar-dropdown#sort_by_dropdown{'aria-labelledby': 'sort-table-by'}
-        -#    Options to sort by go here.
-        -#      Add this later: list of useful fields to sort by, category, entry content, reptool class, WL/BL, WBRS Score, SBRS Score
       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         %div
           %label.toolbar-section-label Edit
@@ -37,6 +31,41 @@
                 .load-bar-segment.hidden
                 .load-bar-segment.hidden
                 .load-bar-segment.hidden
+          %span.dropdown
+            %button#research-convert-to-webcat.convert-ticket-button.toolbar-button.dropdown-button-margin-left{onclick: 'prep_dispute_to_convert_from_research();', type: 'button', title: 'Convert ticket to web categorization ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+              %span.toolbar-button-text Convert to Webcat
+            .dropdown-menu.toolbar-dropdown#webrep-convert-ticket-dropdown{'aria-labelledby': 'move-to-webcat'}
+              .dropdown-tool-text-divider.primary-text-divider Convert to Categorization Dispute
+              .inline-tool-content-wrapper
+                .dropdown-loader-wrapper.hidden
+                  .gear-loader-wrapper
+                    = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+
+                %label.content-label-sm
+                  Ticket ID to Convert:
+                %span.ticket-id-to-convert#dispute-id-to-convert
+
+                %label.content-label-sm
+                  Ticket Entries:
+                  %span.convert-entry-count
+                .convert-entry-table-wrapper
+                  %table#entries-to-convert.complaint-entries-to-convert
+                    %thead
+                      %tr
+                        %th Entry ID
+                        %th Entry Content
+                        %th Current Categories
+                        %th.text-right Suggested Categories
+                    %tbody
+
+                %hr.thin
+                .comment-wrapper
+                  %label.content-label-sm{for: '#convert-ticket-summary'} Ticket Summary
+                  %textarea#convert-ticket-summary.dropdown-comment.note-input
+                .button-row-center
+                  %button#convert-webrep-ticket-dropdown.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
+                    Convert Ticket
+
       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         %div
           %label.toolbar-section-label Reputation
@@ -57,8 +86,6 @@
                         %th.text-center.content-label-sm.no-word-break Current WBRS Score
                         %th.content-label-sm.no-word-break.th-threat-cat Threat Category
                     %tbody
-
-                      -# TODO Hook up ability to preview scores based on changes in WL/BL
 
                   .dropdown-tool-text-divider.secondary-text-divider
                     Adjust WBRS Reputation
@@ -258,6 +285,10 @@
         %button.toolbar-button.export-button.esc-tooltipped.toolbar-button-spacer{title: 'Export Selected to CSV', onclick: 'webrep_research_export_selected_rows();'}
           %span.toolbar-button-text Export Selected to CSV
 
+        - if @entries.blank? && @dispute.bridge_packet.present?
+          %button.toolbar-button.ping-button.esc-tooltipped{title: 'Entry Recovery - Ping bridge to grab missing Entry content', onclick: "dispute_entry_recovery(#{@dispute.id});"}
+            %span.toolbar-button-text Dispute Entry Recovery
+
       .edit-button-wrapper.edit-entries-buttons.hidden
         %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',
                                                                      onclick: 'save_dispute_entries();'}
@@ -267,7 +298,7 @@
   .col-xs-12
     %table#disputes-research-table.table.table-sm
       %tbody
-        - @entries.each do |entry|
+        - @entries.each_with_index do |entry, index|
           %tr.research-table-row{'data-entry-id': "#{entry.id}", id: "entry-data-wrapper_#{entry.id}"}
             %td.research-table-row-wrapper
               %table
@@ -714,20 +745,22 @@
                         %td.left-bordered.referenced-tickets-label-cell
                           %label Referenced on
                         %td.referenced-tickets-col.referenced-tickets-cell
-                          - if entry.referenced_tickets.count < 1
+                          - referenced_tickets = entry.referenced_tickets.to_a
+                          - referenced_tickets_count = referenced_tickets.count
+                          - if referenced_tickets_count < 1
                             %span.missing-data
                               Not on any other tickets
                           - else
                             %span.dropdown
                               %button.show_references.dropdown-toggle.references-dropdown-button{title: 'Referenced on', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                                = "#{entry.referenced_tickets.count} ticket(s)"
+                                = "#{referenced_tickets_count} ticket(s)"
                               .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
                                 %table
                                   %thead
                                     %th Case ID
                                     %th Date/Time Submitted
                                   %tbody
-                                    - entry.referenced_tickets.each do |reference|
+                                    - referenced_tickets.each do |reference|
                                       %tr
                                         %td
                                           %a{name:"#{reference.id}_link", href: escalations_webrep_dispute_path(reference.id)}
@@ -801,7 +834,7 @@
                     %td.input-col.ip-label-col{rowspan: '2'}
                       -# IP label
                     %td.dual-edit-field{colspan: '5', 'data-id': entry.id, 'data-field': 'host-ip'}
-                      %span.entry-resolved-ip-content
+                      %span.entry-resolved-ip-content{id: "entry-#{index}-ips"}
                         - ip_record = JSON.parse entry[:web_ips]
                         - ips = ip_record.to_sentence(two_words_connector: ', ', last_word_connector: ', ')
                         = ips
@@ -901,7 +934,6 @@
                                           - else
                                             = rulehit.first.probability / 100.0
                                             \%
-
 
                                   - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit == true}.each do |wbrs_hit|
                                     - rulehit = @all_rulehits.select {|hit| hit.mnemonic == wbrs_hit.name}

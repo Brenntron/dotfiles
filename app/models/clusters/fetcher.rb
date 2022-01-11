@@ -27,8 +27,11 @@ class Clusters::Fetcher
   private
 
   def fetch_clusters
+
+    cluster_type = filter ? filter[:cluster_type] : nil
+
     data_providers_list.map do |provider_class|
-      provider_class.new(regex).fetch
+      provider_class.new(regex, filter, user).fetch
     end.flatten
   end
 
@@ -76,6 +79,7 @@ class Clusters::Fetcher
       next if top_url_response['response'].blank? || top_url_response['response']['error'].present?
 
       parsed_response[top_url_response['request']['url']] = top_url_response['response']['thrt']['scor']
+    rescue
     end
 
     parsed_response

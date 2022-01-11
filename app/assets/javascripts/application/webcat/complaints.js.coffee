@@ -190,11 +190,20 @@ window.updateURI = (event, complaint_entry_id) ->
     success: (response) ->
       {current_categories, category, wbrs_score, domain, subdomain, path, status} = response.json
 
+      if subdomain
+        qual_subdomain = subdomain + '.' + domain
+      else
+        qual_subdomain = domain
+
       $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
 
       if 'ip' == status
         std_msg_error("Cannot edit IP entries.","")
       else
+        $("#domain_#{complaint_entry_id}").tooltipster('content', uri);
+        $("#site-search-#{complaint_entry_id}").tooltipster('content', uri);
+        $("#entry-uri-#{complaint_entry_id}").tooltipster('content', uri);
+
         $.each current_categories, (key, entry) ->
           $(".simple-nested-table#entry-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
 
@@ -207,7 +216,7 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
-        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + qual_subdomain + '\')">Lookup</button>')
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.queryWhoIs(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Lookup</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
     error: (response) ->
@@ -248,7 +257,26 @@ processSubmitNewURL = () ->
         else
            message = "No pending complaint entries have been created"
 
-        std_msg_success('URLs categorized successfully',[message, "All other entries have been submitted directly to WBRS."], reload: true)
+        reload_message = "</br><a href='.'>Refresh the page</a> to see the result"
+        std_msg_success(
+          'URLs categorized successfully',
+          [message, "All other entries have been submitted directly to WBRS.", reload_message],
+          reload: false,
+          complete: (->
+            # clear url inputs
+            $('#url_1').val('')
+            $('#url_2').val('')
+            $('#url_3').val('')
+            $('#url_4').val('')
+            $('#url_5').val('')
+            # clear categories inputs
+            $('#cat_new_url_1')[0].selectize.clear()
+            $('#cat_new_url_2')[0].selectize.clear()
+            $('#cat_new_url_3')[0].selectize.clear()
+            $('#cat_new_url_4')[0].selectize.clear()
+            $('#cat_new_url_5')[0].selectize.clear()
+            )
+        )
       error: (response) ->
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
           std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
@@ -551,7 +579,7 @@ processSubmitPending=(entry_id,row_id)->
         temp_row.invalidate().page(table_page).draw(false)
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
-
+        nested_tooltip()
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
           persist: false,
           create: false,
@@ -643,6 +671,7 @@ processSubmitEntry = (entry_id,row_id) ->
           temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
+          nested_tooltip()
 
           $('#input_cat_'+ temp_row.data().entry_id).selectize {
             persist: false,
@@ -910,6 +939,16 @@ selected_options = (category_names) ->
   options = []
   if category_names
     options = category_names.split(',')
+
+    #splice together 'Conventions, Conferences and Trade Shows' due to extra comma
+    if category_names.includes('Conferences and Trade Shows')
+      $(options).each (i, category) ->
+        if category == 'Conventions'
+          options.splice(i, 1)
+        else if category == ' Conferences and Trade Shows'
+          i2 = i - 1
+          options.splice(i2, 1, 'Conventions, Conferences and Trade Shows')
+
   return options
 
 $('html').on 'click', (e) ->
@@ -1677,6 +1716,8 @@ window.click_table_buttons = (complaint_table, button)->
   else
     # Open this row
     row.child(format(row)).show()
+    nested_tooltip()
+
     tr.removeClass 'not-shown'
     tr.addClass 'shown'
     td = $(tr).next('tr').find('td:first')
@@ -1967,7 +2008,6 @@ processSubmitMaster = () ->
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
-
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
@@ -2003,7 +2043,7 @@ processSubmitMaster = () ->
           temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
-
+          nested_tooltip()
           $('#input_cat_'+ entry.entry_id).selectize {
             persist: false,
             create: false,
@@ -2205,6 +2245,9 @@ $ ->
       pin_to_top()
 
   $(document).on 'change', '.resolution_radio_button', ->
+    id = this.name.split("resolution")[1]
+    domain = $("#complaint_prefix_"+id)[0].dataset.domain
+    touchedFormChange(domain)
     $('#master-submit').prop('disabled', false)
 
   $('.expand-all').click ->
@@ -2218,6 +2261,8 @@ $ ->
       unless row.child.isShown()
 
         row.child(format(row)).show()
+        nested_tooltip()
+
         tr.addClass 'shown'
 
         td = $(tr).next('tr').find('td:first')
@@ -2225,7 +2270,8 @@ $ ->
         unless $(td).hasClass 'nested-complaint-data-wrapper'
           tr.find('td:first').addClass 'nested-complaint-data-wrapper'
 
-        $('#input_cat_'+ row.data().entry_id).selectize {
+        cat_select = $('#input_cat_'+ row.data().entry_id)
+        $(cat_select).selectize {
           persist: false,
           create: false,
           maxItems: 5,
@@ -2234,7 +2280,7 @@ $ ->
           labelField: 'category_name',
           searchField: ['category_name', 'category_code'],
           options: AC.WebCat.createSelectOptions('#input_cat_'+ row.data().entry_id)
-          items: selected_options(row.data().category)
+          items: AC.WebCat.getCategoryIds(selected_options(row.data().category), cat_select)
         }
 
         $('.toggle-vis-nested').each ->
@@ -2261,19 +2307,22 @@ $ ->
     if window.location.pathname != '/escalations/webcat/complaints'
       $('#filter-complaints-nav').hide()
       $('#fetch').hide()
-      $('#web-cat-search').hide()
-      $('#new-complaint').hide()
+      $('#complaints-nav-search-wrapper').hide()
+      $('#new-complaint-nav-wrapper').hide()
       $('#filter-clusters-nav').hide()
+      $('#clusters-nav-regex-wrapper').hide()
     else
       $('#filter-complaints').show()
       $('#fetch').show()
-      $('#web-cat-search').show()
-      $('#new-complaint').show()
+      $('#complaints-nav-search-wrapper').show()
+      $('#new-complaint-nav-wrapper').show()
       $('#filter-clusters-nav').hide()
+      $('#clusters-nav-regex-wrapper').hide()
 
     if window.location.pathname == '/escalations/webcat/clusters'
       $('#filter-complaints-nav').hide()
       $('#filter-clusters-nav').show()
+      $('#clusters-nav-regex-wrapper').show()
 
 
   # If a stupidly long email address is returned it will wrap
@@ -2412,8 +2461,12 @@ window.prep_complaint_to_convert = () ->
         std_msg_error('Error preparing ticket for conversion', [response])
     )
 
-
-
+window.nested_tooltip = () ->
+  $('.esc-tooltipped:not(.tooltipstered)').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
 convert_complaint_to_webrep = () ->
   # get the parent ticket info
   complaint_id = parseInt($('#complaint-id-to-convert').text())
