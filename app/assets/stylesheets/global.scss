@@ -13439,12 +13439,12 @@ input.wl-bl-list-inline {
   background-position: 6px center;
 }
 
-// rulehit resolution templates page
-#new_rulehit_resolution_mailer_template {
-  width: 265px;
+// Rulehit Resolution Mailer Templates
+#new_rulehit_resolution_mailer_template, .edit_rulehit_resolution_mailer_template {
+  max-width: 292px;
 }
 
-#new_rulehit_resolution_mailer_template .form-inputs {
+#new_rulehit_resolution_mailer_template .form-inputs, .edit_rulehit_resolution_mailer_template .form-inputs {
   margin: 10px 0 0 0;
   label {
     width: 100%;
@@ -13464,12 +13464,12 @@ input.wl-bl-list-inline {
   }
 }
 
-#new_rulehit_resolution_mailer_template .form-actions{
+#new_rulehit_resolution_mailer_template .form-actions, .edit_rulehit_resolution_mailer_template .form-actions{
   .btn.submit-rulehit-resolution {
-    padding: 0;
     margin: 12px 0;
+    background-color: #d7dadb;
   }
   .btn.submit-rulehit-resolution:hover {
-    text-decoration: underline;
+    background-color: #ccc;
   }
 }
