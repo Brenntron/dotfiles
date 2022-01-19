@@ -733,11 +733,21 @@ class DisputeEntry < ApplicationRecord
   end
 
   def referenced_tickets
+
     is_ip_address = !!(hostlookup =~ Resolv::IPv4::Regex)
-    if is_ip_address
-      Dispute.select("disputes.id, disputes.case_opened_at, disputes.created_at").joins(:dispute_entries).where(:dispute_entries => {:ip_address => self.ip_address}).where.not(:dispute_entries => {:dispute_id => self.dispute_id}).distinct
+    sub_type = "w"
+    if self.dispute.submission_type.present?
+      sub_type = self.dispute.submission_type.downcase
     else
-      Dispute.select("disputes.id, disputes.case_opened_at, disputes.created_at").joins(:dispute_entries).where(:dispute_entries => {:uri => self.uri}).where.not(:dispute_entries => {:dispute_id => self.dispute_id}).distinct
+      if is_ip_address
+        sub_type = "e"
+      end
+    end
+
+    if sub_type == "e"
+      Dispute.select("disputes.id, disputes.case_opened_at, disputes.created_at").joins(:dispute_entries).where(:dispute_entries => {:ip_address => self.hostlookup}).where.not(:dispute_entries => {:dispute_id => self.dispute_id}).distinct
+    else
+      Dispute.select("disputes.id, disputes.case_opened_at, disputes.created_at").joins(:dispute_entries).where(:dispute_entries => {:uri => self.hostlookup}).where.not(:dispute_entries => {:dispute_id => self.dispute_id}).distinct
     end
   end
 
