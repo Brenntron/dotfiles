@@ -11835,7 +11835,7 @@ hr.thin.extra-bottom-marg {
   background-image: url(image_path('icon_success.svg'));
 }
 
-.flash-msg-alert-danger::before, .flash-type-alert-error::before {
+.flash-msg-alert-danger::before, .flash-msg-alert-warning::before, .flash-type-alert-error::before {
   background-image: url(image_path('icon_error.svg'));
 }
 
