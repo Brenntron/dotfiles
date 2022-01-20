@@ -1453,7 +1453,7 @@ thead th.sorting.center {
   align-items: center;
 }
 
-#msg-modal, #loader-modal, #login-modal {
+#msg-modal, #loader-modal, #login-modal, #close-ticket-modal {
   .modal-dialog, .modal-dialog {
     margin-top: 180px;
   }
@@ -1513,11 +1513,11 @@ thead th.sorting.center {
     display: block;
   }
 }
-#modal-login-form {
+#modal-login-form{
   margin-top: 20px;
 }
 
-#modal-login-form .panel-button {
+#modal-login-form .panel-button, #close-ticket-modal .panel-button {
   padding: 0 !important;
   text-align: center;
   line-height: 2em;
@@ -11574,6 +11574,7 @@ input[type="radio"].resolution_radio_button {
 }
 // webrep and webcat toolbars - prevent breaking/wrapping of the buttons
 #webrep-index-toolbar {
+  z-index: 1;
   .toolbar-button .toolbar-button-text {
     display: none;
   }

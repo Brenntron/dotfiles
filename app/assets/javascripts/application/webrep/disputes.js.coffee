@@ -773,20 +773,46 @@ window.change_ticket_status = (event) ->
     comment: comment
   }
 
-  for dispute in checked_disputes
+  for dispute, dispute_index in checked_disputes
 #    event.preventDefault()
     data.dispute_ids = [dispute]
+    top_index = checked_disputes.length - 1
+
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
       method: 'POST'
       headers: headers
       data: data
       mimeType: 'application/json'
+      async: false
       success: (response) ->
-        window.location.reload()
+
+        if status != 'RESOLVED_CLOSED'
+         window.location.reload()
+        else
+          #show Close Tickets modal when the last query is returned
+          if dispute_index == top_index
+            show_close_tickets_modal(checked_disputes)
+
       error: (response) ->
         if response.status > 400
           popup_response_error(response, 'Error Updating Status')
+  )
+
+window.show_close_tickets_modal = (checked_disputes) ->
+
+  $('#close-ticket-modal').modal('show')
+  url = '/escalations/webrep/disputes/'
+  list_wrapper = $('#close-ticket-modal').find('#closed-tickets-id-list')[0]
+
+  $(checked_disputes).each (i, dispute) ->
+    dispute_trimmed = dispute.replace(/^0+/, '')
+    full_link = url + dispute_trimmed
+    dispute_link = "<li><a target='_blank' href=#{full_link}>#{dispute}</a></li>"
+    $(list_wrapper).append dispute_link
+
+  $('#close-ticket-modal').on('hidden.bs.modal', ->
+    window.location.reload()
   )
 
 window.set_relating_disputes = (form_tag) ->
