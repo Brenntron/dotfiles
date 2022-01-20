@@ -73,6 +73,7 @@ $ ->
       form['tags'] = tags.join(', ')
     if items.length
       form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
+      form['category_ids'] = items.map( (cat) -> options[cat].category_id ).join(', ')
     if company.length
       form['company'] = company.join(', ')
     if status.length
@@ -108,25 +109,26 @@ $ ->
     localStorage.webcat_search_type = 'advanced'
     localStorage.webcat_search_name = form.search_name
     localStorage.webcat_search_conditions = JSON.stringify(
-      status: form.status
+      category: form.category
+      category_ids: form.category_ids
+      channel: form.channel
+      company_name: form.company
       complaint_id: form.complaint_id
+      customer_email: form.customer_email
+      customer_name: form.customer_name
+      domain: form.domain
       id: form.entry_id
       ip_or_uri: form.ip_or_uri
-      resolution: form.resolution
-      channel: form.channel
-      category: form.category
-      customer_name: form.customer_name
-      customer_email: form.customer_email
-      company_name: form.company
-      domain: form.domain
-      tags: form.tags
-      user_id: form.user_id
+      modified_newer: form.date_modified_older
+      modified_older: form.date_modified_newer
       platform_ids: form.platform_ids
       platforms: form.platform_display.join(', ')
-      submitted_older: form.date_submitted_older
+      resolution: form.resolution
+      status: form.status
       submitted_newer: form.date_submitted_newer
-      modified_older: form.date_modified_newer
-      modified_newer: form.date_modified_older
+      submitted_older: form.date_submitted_older
+      tags: form.tags
+      user_id: form.user_id
     )
     refresh_url()
 
@@ -831,7 +833,6 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-
 
     window.clearSelectize = (input) ->
       $("##{input}")[0].selectize.clear()
