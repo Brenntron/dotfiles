@@ -62,7 +62,6 @@ namespace 'AC.WebCat', (exports) ->
 
   exports.populateSearchCriteria = ->
     searchConditions = JSON.parse localStorage.webcat_search_conditions
-    console.log searchConditions
     for searchLabel, searchCriteria of searchConditions
       break if searchCriteria == ''
 
