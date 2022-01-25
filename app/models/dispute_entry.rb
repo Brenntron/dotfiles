@@ -1306,6 +1306,9 @@ class DisputeEntry < ApplicationRecord
     begin
 
       score = Float(score)
+      if score > 10.0 || score < -10.0
+        score = score.to_f / 10.0
+      end
       case
       when score >= 1.0                 # Good is +1.0 to +10
         verdict = 'Good'
@@ -1327,6 +1330,18 @@ class DisputeEntry < ApplicationRecord
 
 
   def running_verdict
+    if @running_verdict.blank?
+
+      wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
+
+      raw_score = wbrs_stuff["wbrs"]["score"]
+
+      if self.entry_type == "URI/DOMAIN"
+        @running_verdict = self.class.verdict_from_score(raw_score)
+      else
+        @running_verdict = self.class.email_verdict_from_score(self.sbrs_score.to_f/10.0)
+      end
+    end
     @running_verdict
   end
 
@@ -1349,6 +1364,7 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.matching_disposition_toggle
+
     begin
       begin
         return AppConfig.matching_disposition_toggle
@@ -1365,7 +1381,7 @@ class DisputeEntry < ApplicationRecord
 
     begin
 
-      if !self.matching_disposition_toggle
+      if !self.class.matching_disposition_toggle
         return false
       end
 
@@ -1373,11 +1389,7 @@ class DisputeEntry < ApplicationRecord
 
       raw_score = wbrs_stuff["wbrs"]["score"]
 
-      if self.entry_type == "URI/DOMAIN"
-        @running_verdict = self.class.verdict_from_score(wbrs_stuff["wbrs"]["score"])
-      else
-        @running_verdict = self.class.email_verdict_from_score(self.sbrs_score.to_f/10.0)
-      end
+
 
       if entry_claim == "false negative"
 
@@ -1392,10 +1404,15 @@ class DisputeEntry < ApplicationRecord
           end
         else
 
-          if ["Untrusted", "Poor"].include?(@running_verdict)
+          if ["Untrusted", "Poor"].include?(running_verdict)
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_RESOLVED_UNCHANGED
-            self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. By default, a URL/IP address with a Web Reputation of Untrusted should be inaccessible by our customers. Talos does not reduce the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers is able to access the submission, that is due to relaxed settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case."
+            if self.dispute.submitter_type == "NON-CUSTOMER"
+              self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. By default, an IP address with an Email Reputation of Poor should be inaccessible by our customers. Talos does not decrease the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers can access the submission, that is due to lax settings on their side and can only be fixed locally by that customer."
+            else
+              self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. By default, an IP address with an Email Reputation of Poor should be inaccessible by our customers. Talos does not decrease the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers can access the submission, that is due to lax settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a Cisco TAC case."
+            end
+
             self.save
 
             return true
@@ -1415,10 +1432,15 @@ class DisputeEntry < ApplicationRecord
 
           is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
 
-          if ['Trusted', 'Favorable', 'Neutral', 'Good', 'Unknown', 'Questionable'].include?(@running_verdict) && !is_blacklisted
+          if ['Trusted', 'Favorable', 'Neutral', 'Good', 'Unknown', 'Questionable'].include?(running_verdict) && !is_blacklisted
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_RESOLVED_UNCHANGED
-            self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. By default, a URL/IP address with a Web Reputation of Trusted, Favorable, Neutral, or Questionable should be accessible by our customers. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case."
+            if self.dispute.submitter_type == "NON-CUSTOMER"
+              self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. By default, an IP address with an Email Reputation of Good or Neutral should be accessible by our customers. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer."
+            else
+              self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. By default, an IP address with an Email Reputation of Good or Neutral should be accessible by our customers. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a Cisco TAC case."
+            end
+
             self.save
 
             return true

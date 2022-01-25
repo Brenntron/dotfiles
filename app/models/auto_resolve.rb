@@ -67,7 +67,7 @@ class AutoResolve
               AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
               dispute_entry.reload
             else
-              if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
+              if dispute_entry.dispute.submitter_type == "NON-CUSTOMER"
                 AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
                 dispute_entry.reload
               end

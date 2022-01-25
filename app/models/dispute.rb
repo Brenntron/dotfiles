@@ -1148,7 +1148,7 @@ For future Web categorization requests, please open a Web categorization ticket 
 
       ######AUTO RESOLVE LOGIC########
       begin
-        umbrella_no_reply = Platform.find_by_all_names("Umbrella - No Reply")
+        #umbrella_no_reply = Platform.find_by_all_names("Umbrella - No Reply")
 
         new_dispute.dispute_entries.each do |dispute_entry|
           false_negative_claim = false
