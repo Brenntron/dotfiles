@@ -103,7 +103,7 @@
     %input.form-control.selectize#platform-input{name: 'platform', multiple: 'multiple', tabindex: '-1', data: 'filerep'}
     %button#remove-criteria-platform.remove-input{onclick: 'clearSelectize("platform-input")'}
   .form-group.search-item.hidden
-    %label.content-label-sm Time Submitted
+    %label.content-label-sm Date Submitted
     %input.form-control#time-submitted-input{name: 'time_submitted'}
     %button.remove-input
   .form-group.search-item.hidden
@@ -251,8 +251,8 @@
             Platform
         %li
           %label.search-criteria-label
-            %input.search-checkbox#time-submitted-cb{type: 'checkbox', name: 'search-criteria', value: 'Time Submitted', for: 'time-submitted-input'}
-            Time Submitted
+            %input.search-checkbox#time-submitted-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted', for: 'time-submitted-input'}
+            Date Submitted
         %li
           %label.search-criteria-label
             %input.search-checkbox#last-updated-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Updated', for: 'last-updated-input'}
