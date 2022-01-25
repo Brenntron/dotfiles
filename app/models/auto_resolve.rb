@@ -15,6 +15,98 @@ class AutoResolve
 
 
   #entry point
+  def self.process_auto_resolution(auto_args)
+    umbrella_no_reply = Platform.find_by_all_names("Umbrella - No Reply")
+    dispute_entry = auto_args[:dispute_entry]
+    sugg_disposition = auto_args[:entry_claim]
+
+    submission_type = dispute_entry.dispute.submission_type
+
+    #######################################################################################################################################
+
+    if submission_type == "w"
+      if dispute_entry.dispute.determine_platform.present? && dispute_entry.dispute.determine_platform.downcase.include?("umbrella")
+        matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition, true)
+        if !matching_disposition
+          if sugg_disposition == "false positive"
+            AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+            dispute_entry.reload
+          end
+          if sugg_disposition == "false negative"
+            dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+          end
+        end
+      else
+        matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition)
+        if !matching_disposition
+          if sugg_disposition == "false positive"
+            dispute_entry.update(status: DisputeEntry::NEW)
+          end
+          if sugg_disposition == "false negative"
+            dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+          end
+        end
+      end
+
+    end
+
+
+    #######################################################################################################################################
+
+    if submission_type == "e"
+      if sugg_disposition == "false positive"
+        if dispute_entry.dispute.submitter_type == "NON-CUSTOMER"
+          if dispute_entry.dispute.determine_platform.present? && dispute_entry.dispute.determine_platform.downcase.include?("umbrella")
+            matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition, true)
+          else
+            matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition)
+          end
+
+          if !matching_disposition
+            if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+              AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+              dispute_entry.reload
+            else
+              if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
+                AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
+                dispute_entry.reload
+              end
+            end
+          end
+
+        else
+          ## for customer specific stuff
+          dispute_entry.status == DisputeEntry::NEW
+        end
+      end
+
+      if sugg_disposition == "false negative"
+        if dispute_entry.dispute.submitter_type == "NON-CUSTOMER"
+          if dispute_entry.dispute.determine_platform.present? && dispute_entry.dispute.determine_platform.downcase.include?("umbrella")
+            matching_disposition = dispute_entry.is_disposition_matching?(entry_claim, true)
+          else
+            matching_disposition = dispute_entry.is_disposition_matching?(entry_claim)
+          end
+          if !matching_disposition
+            dispute_entry.status == DisputeEntry::NEW
+          end
+
+        else
+          ## for customer specific stuff
+          dispute_entry.status == DisputeEntry::NEW
+        end
+
+      end
+
+    end
+
+    #############################################################################################################################################
+
+    dispute_entry.save
+  end
+
+
+  #start auto resolution algorithm here
   def self.attempt_ai_conviction(rulehits, dispute_entry, skip_human_review = false)
 
     if auto_resolve_toggle
@@ -191,10 +283,14 @@ class AutoResolve
 
   def self.auto_resolve_toggle
     begin
-      Rails.configuration.auto_resolve.check_complaints
+      begin
+        return AppConfig.auto_resolve_toggle
+      rescue
+        return Rails.configuration.auto_resolve.check_complaints
+      end
     rescue Exception => e
       Rails.logger.error(e.message)
-      false
+      return false
     end
   end
 

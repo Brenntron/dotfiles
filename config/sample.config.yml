@@ -9,6 +9,7 @@ development:
     # product_id: "analyst-console-escalations"
     # product_version: 'development'    # defaults to git branch name or Rails.env
   auto_resolve:
+    check_matching_disposition: true
     complaints:
       check: true
     virus_total:
@@ -141,6 +142,7 @@ test:
     # product_id: "analyst-console-escalations"
     # product_version: 'test'    # defaults to git branch name or Rails.env
   auto_resolve:
+    check_matching_disposition: true
     complaints:
       check: true
     virus_total:

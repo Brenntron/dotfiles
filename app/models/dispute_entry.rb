@@ -1348,9 +1348,26 @@ class DisputeEntry < ApplicationRecord
     response
   end
 
+  def self.matching_disposition_toggle
+    begin
+      begin
+        return AppConfig.matching_disposition_toggle
+      rescue
+        return Rails.configuration.auto_resolve.check_matching_disposition
+      end
+    rescue Exception => e
+      Rails.logger.error(e.message)
+      return false
+    end
+  end
+
   def is_disposition_matching?(entry_claim, is_umbrella=false)
 
     begin
+
+      if !self.matching_disposition_toggle
+        return false
+      end
 
       wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
 
@@ -1359,7 +1376,7 @@ class DisputeEntry < ApplicationRecord
       if self.entry_type == "URI/DOMAIN"
         @running_verdict = self.class.verdict_from_score(wbrs_stuff["wbrs"]["score"])
       else
-        @running_verdict = self.class.email_verdict_from_score(self.sbrs_score)
+        @running_verdict = self.class.email_verdict_from_score(self.sbrs_score.to_f/10.0)
       end
 
       if entry_claim == "false negative"
@@ -1375,7 +1392,7 @@ class DisputeEntry < ApplicationRecord
           end
         else
 
-          if self.suggested_disposition == @running_verdict
+          if ["Untrusted", "Poor"].include?(@running_verdict)
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_RESOLVED_UNCHANGED
             self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. By default, a URL/IP address with a Web Reputation of Untrusted should be inaccessible by our customers. Talos does not reduce the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers is able to access the submission, that is due to relaxed settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case."

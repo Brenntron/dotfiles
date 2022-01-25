@@ -319,7 +319,8 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
     expect(dispute_entry_1.status).to eql(DisputeEntry::NEW)
     expect(dispute_entry_1.suggested_threat_category).to eql("malware")
-    expect(dispute_entry_2.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry_2.status).to eql(DisputeEntry::STATUS_RESOLVED)
+    expect(dispute_entry_2.resolution).to eql(DisputeEntry::STATUS_RESOLVED_UNCHANGED)
     expect(dispute_entry_2.suggested_threat_category).to eql(nil)
 
   end
