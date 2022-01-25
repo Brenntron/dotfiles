@@ -1517,12 +1517,26 @@ thead th.sorting.center {
   margin-top: 20px;
 }
 
-#modal-login-form .panel-button, #close-ticket-modal .panel-button {
+#modal-login-form .panel-button{
   padding: 0 !important;
   text-align: center;
   line-height: 2em;
   min-width: 100px;
   margin-top: 25px;
+}
+
+#close-ticket-modal .panel-button {
+  padding: 0 !important;
+  text-align: center;
+  line-height: 2em;
+  min-width: 100px;
+  width: 100px;
+  margin: 4px 0 4px 0;
+}
+
+#closed-tickets-id-list {
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 #modal-login-form input {
