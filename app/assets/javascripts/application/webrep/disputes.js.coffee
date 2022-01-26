@@ -750,6 +750,7 @@ window.change_ticket_status = (event) ->
   comment = ""
   checkboxes = $('#disputes-index').find('.dispute_check_box')
   checked_disputes = []
+  successfully_closed_disputes = []
 
   $(checkboxes).each ->
     if $(this).is(':checked')
@@ -791,8 +792,9 @@ window.change_ticket_status = (event) ->
          window.location.reload()
         else
           #show Close Tickets modal when the last query is returned
+          successfully_closed_disputes.push dispute
           if dispute_index == top_index
-            show_close_tickets_modal(checked_disputes)
+            show_close_tickets_modal(successfully_closed_disputes)
 
       error: (response) ->
         if response.status > 400
