@@ -344,7 +344,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       new_dispute_entry.ip_address = ip
       new_dispute_entry.entry_type = "IP"
       new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
-      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
+      new_dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_DUPLICATE
       new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
       new_dispute_entry.case_closed_at = resolved_at
       new_dispute_entry.case_resolved_at = resolved_at
@@ -363,7 +363,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       new_dispute_entry.entry_type = "URI/DOMAIN"
       new_dispute_entry.suggested_disposition = entry["rep_sugg"]
       new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
-      new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
+      new_dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_DUPLICATE
       new_dispute_entry.case_closed_at = resolved_at
       new_dispute_entry.case_resolved_at = resolved_at
       new_dispute_entry.save

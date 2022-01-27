@@ -237,7 +237,7 @@ class AutoResolve
     if action == :do_not_resolve || action.blank?
       if skip_human_review == true
         resolved_at = Time.now
-        dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+        dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_UNCHANGED
         dispute_entry.status = DisputeEntry::STATUS_RESOLVED
         dispute_entry.resolution_comment = Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
         dispute_entry.case_closed_at = resolved_at
@@ -251,7 +251,7 @@ class AutoResolve
       reptool_result = commit_to_reptool(action, dispute_entry)
       if reptool_result[:success]
         dispute_entry.status = DisputeEntry::STATUS_RESOLVED
-        dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
+        dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_FN
         dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
         dispute_entry.case_closed_at = resolved_at
         dispute_entry.case_resolved_at = resolved_at
@@ -569,7 +569,7 @@ class AutoResolve
     if bad_mnems.any?
       auto_resolve_log += "bad email hits were found:\n"
       auto_resolve_log += "#{bad_mnems.inspect.to_s}\n"
-      dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+      dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_UNCHANGED
       dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       dispute_entry.case_closed_at = Time.now
       dispute_entry.case_resolved_at = Time.now
@@ -608,7 +608,7 @@ class AutoResolve
 
 
   def self.auto_resolve_umbrella_false_positive(dispute_entry)
-    dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+    dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_UNCHANGED
     dispute_entry.status = DisputeEntry::STATUS_RESOLVED
     dispute_entry.case_closed_at = Time.now
     dispute_entry.case_resolved_at = Time.now
