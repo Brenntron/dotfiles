@@ -31,7 +31,7 @@ class DisputeExport
       'submission-type' => 'Ticket Type',
       'dispute' => 'Dispute',
       'owner' => 'Assignee',
-      'time-submitted' => 'Time Submitted',
+      'time-submitted' => 'Date Submitted',
       'last-updated' => 'Last Updated',
       'age' => 'Age',
       'case-origin' => 'Case origin',
