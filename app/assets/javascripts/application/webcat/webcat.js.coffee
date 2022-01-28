@@ -152,6 +152,12 @@ $ ->
     ###
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
     { search } = location
+
+    try
+      webcat_search_conditions = JSON.parse webcat_search_conditions
+    catch e
+      webcat_search_conditions = {}
+
     if search != ''
       webcat_search_type = 'standard'
       urlParams = new URLSearchParams(location.search);
@@ -160,12 +166,12 @@ $ ->
         data = {
           search_type: webcat_search_type
           search_name : webcat_search_name
-          search_conditions: JSON.parse(webcat_search_conditions)
+          search_conditions: webcat_search_conditions
         }
       when 'contains'
         data = {
           search_type: webcat_search_type
-          search_conditions: JSON.parse(webcat_search_conditions)
+          search_conditions: webcat_search_conditions
         }
       when 'standard'
         urlParams = new URLSearchParams(location.search);
@@ -258,6 +264,11 @@ $ ->
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="webcat_refresh()"></span>'
       {search_type, search_name} = data
 
+      try
+        webcat_search_conditions = JSON.parse webcat_search_conditions
+      catch e
+        webcat_search_conditions = {}
+
       if search_type == 'standard'
 
         search_name = search_name.toLowerCase().replace('complaints', 'tickets')
@@ -272,14 +283,11 @@ $ ->
             '</div>'
 
       else if search_type == 'advanced'
-
-        webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
         new_header =
           '<div>Results for Advanced Search ' +
             reset_icon +
             '</div>'
         build_subheader(webcat_search_conditions)
-
       else if search_type == 'named'
         new_header =
           '<div>Results for "' + search_name + '" Saved Search' +
@@ -291,9 +299,7 @@ $ ->
         else
           subheader = $('#saved-search-tbody').last('tr').find('.saved-search').attr('data-search_conditions')
         build_subheader(subheader)
-
       else if search_type == 'contains'
-        webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
         new_header =
           '<div>Results for "' + webcat_search_conditions.value + '" '+
             reset_icon +
