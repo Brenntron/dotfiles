@@ -14,7 +14,7 @@
                 Case ID
               .top-info-data.case-id-tag#dispute_id
                 = @file_rep_dispute.id.to_s.rjust(10, '0')
-              %label.content-label-sm Date/Time Submitted
+              %label.content-label-sm Date Submitted
               .top-info-data= @file_rep_dispute.created_at.strftime("%b %e, %Y %l:%M %p")
 
               %label.content-label-sm
