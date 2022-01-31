@@ -61,7 +61,13 @@ Feature: RuleHit Resolution Mailer Templates
   @javascript
   Scenario: A user creates an ad hoc email using a RuleHit Resolution Mailer Template
     Given a user with role "webrep user" exists and is logged in
-    And a RuleHit Resolution Mailer template exists with mnemonic, body: "wlm", "Temple Gates"
+    And a RuleHit Resolution Mailer template exists with mnemonic, body: "tuse", "Temple Gates"
+    And the following disputes exist:
+    |id|
+    |1 |
+    And the following dispute_entries exist:
+    |ip_address  | dispute_id|uri|
+    |2.133.94.166| 1         |   |
     When I go to "/escalations/webrep/research"
     And I fill in "search_uri" with "cisco.com"
     And I click "#research-search-strict"
