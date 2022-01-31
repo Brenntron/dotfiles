@@ -146,3 +146,4 @@ end
 gem 'httparty', '~> 0.15.3'
 gem 'turbolinks', '5.2.0'
 gem "sprockets", '~> 3.7.1'
+

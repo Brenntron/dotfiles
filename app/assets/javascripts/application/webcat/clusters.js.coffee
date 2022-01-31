@@ -13,6 +13,8 @@ window.populate_clusters_index_table = (filter) ->
     loader = $('.cluster-mgt-loader-wrapper')
     loader.removeClass('hidden')
     filter_param = window.location.search
+    if filter_param.length == 0
+      filter_param += "?f=all"
     if filter && filter_param
       filter_param += "&regex=" + filter
 
@@ -155,6 +157,7 @@ $ ->
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
+    pagingType: 'full_numbers'
     order: [ [
       5
       'desc'

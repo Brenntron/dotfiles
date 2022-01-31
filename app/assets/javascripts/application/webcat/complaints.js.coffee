@@ -10,13 +10,17 @@ $(document).on 'change','.nested-table-input','.selectize-input', ->
   touchedFormChange(this.dataset.domain)
 
 #### WBNP Reporting ####
+webcat_loader_timeout = ''
 $(document).ready ->
   sessionStorage.removeItem("touchedForm");
   loader = $('#inline-webcat')
   $(this).bind(
     ajaxStart: () ->
-      loader.removeClass('hidden')
+      webcat_loader_timeout = setTimeout ->
+        loader.removeClass('hidden')
+      , 500
     ajaxStop: () ->
+      clearTimeout(webcat_loader_timeout)
       loader.addClass('hidden')
     )
   if ($('body').hasClass('escalations--webcat--complaints-controller') || $('body').hasClass('escalations--webcat--reports-controller')) &&
@@ -939,6 +943,16 @@ selected_options = (category_names) ->
   options = []
   if category_names
     options = category_names.split(',')
+
+    #splice together 'Conventions, Conferences and Trade Shows' due to extra comma
+    if category_names.includes('Conferences and Trade Shows')
+      $(options).each (i, category) ->
+        if category == 'Conventions'
+          options.splice(i, 1)
+        else if category == ' Conferences and Trade Shows'
+          i2 = i - 1
+          options.splice(i2, 1, 'Conventions, Conferences and Trade Shows')
+
   return options
 
 $('html').on 'click', (e) ->
