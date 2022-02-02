@@ -56,18 +56,18 @@ $ ->
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
-    user_id = assignee_input[0].selectize.items
-    tags = tag_input[0].selectize.items
-    company = $('#company-input')[0].selectize.items
-    status = $('#status-input')[0].selectize.items
-    resolution = $('#resolution-input')[0].selectize.items
-    customer_name = $('#name-input')[0].selectize.items
+    user_id = if assignee_input[0].selectize? then assignee_input[0].selectize.items else []
+    tags = if tag_input[0].selectize? then tag_input[0].selectize.items else []
+    company = if $('#company-input')[0].selectize? then $('#company-input')[0].selectize.items else []
+    status = if $('#status-input')[0].selectize? then $('#status-input')[0].selectize.items else []
+    resolution = if $('#resolution-input')[0].selectize? then $('#resolution-input')[0].selectize.items else []
+    customer_name = if $('#name-input')[0].selectize? then $('#name-input')[0].selectize.items else []
     { items, options } = category_input[0].selectize
-    complaints = $('#complaint-input')[0].selectize.items
-    channels = $('#channel-input')[0].selectize.items
-    entry_ids = $('#entryid-input')[0].selectize.items
-    complaint_ids = $('#complaintid-input')[0].selectize.items
-    platform_ids = $('#platform-input')[0].selectize.items
+    complaints = if $('#complaint-input')[0].selectize? then $('#complaint-input')[0].selectize.items else []
+    channels = if $('#channel-input')[0].selectize? then $('#channel-input')[0].selectize.items else []
+    entry_ids = if $('#entryid-input')[0].selectize? then $('#entryid-input')[0].selectize.items else []
+    complaint_ids = if $('#complaintid-input')[0].selectize? then $('#complaintid-input')[0].selectize.items else []
+    platform_ids = if $('#platform-input')[0].selectize? then $('#platform-input')[0].selectize.items else []
 
     if tags.length
       form['tags'] = tags.join(', ')
@@ -265,7 +265,7 @@ $ ->
       {search_type, search_name} = data
 
       try
-        webcat_search_conditions = JSON.parse webcat_search_conditions
+        webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
       catch e
         webcat_search_conditions = {}
 
