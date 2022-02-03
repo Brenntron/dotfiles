@@ -73,7 +73,7 @@ namespace 'AC.WebCat', (exports) ->
     return unless localStorage.webcat_search_conditions
     searchConditions = JSON.parse localStorage.webcat_search_conditions
     for searchLabel, searchCriteria of searchConditions
-      break if searchCriteria == ''
+      continue if searchCriteria == ''
 
       if searchLabel == 'platform_ids'
         $searchLabel = $('#platform-input')
