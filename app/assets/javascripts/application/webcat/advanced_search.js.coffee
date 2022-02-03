@@ -77,6 +77,14 @@ namespace 'AC.WebCat', (exports) ->
 
       if searchLabel == 'platform_ids'
         $searchLabel = $('#platform-input')
+      else if searchLabel == 'ip_or_uri'
+        $searchLabel = $('#complaint-input')
+        $searchLabel[0].selectize.addOption({ value: searchCriteria, text: searchCriteria })
+      else if searchLabel == 'id'
+        $searchLabel = $('#entryid-input')
+        $searchLabel[0].selectize.addOption({ value: searchCriteria, text: searchCriteria })
+      else if searchLabel == 'customer_email'
+        $searchLabel = $('#email-input')
       else
         searchLabelTransformed = searchLabel.replace /_ids/, ''
         searchLabelTransformed = searchLabelTransformed.replace /_/, '-'

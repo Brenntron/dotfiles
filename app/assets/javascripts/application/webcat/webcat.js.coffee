@@ -244,6 +244,8 @@ $ ->
           condition_name = 'Submitter Name'
         if condition_name == 'company_name'
           condition_name = 'Submitter Org'
+        if condition_name == 'ip_or_uri'
+          condition_name = 'Complaint'
         condition_name = condition_name.replace(/_/g, " ").toUpperCase()
         condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
         if typeof condition == 'object'
