@@ -1453,7 +1453,7 @@ thead th.sorting.center {
   align-items: center;
 }
 
-#msg-modal, #loader-modal, #login-modal {
+#msg-modal, #loader-modal, #login-modal, #close-ticket-modal {
   .modal-dialog, .modal-dialog {
     margin-top: 180px;
   }
@@ -1513,16 +1513,30 @@ thead th.sorting.center {
     display: block;
   }
 }
-#modal-login-form {
+#modal-login-form{
   margin-top: 20px;
 }
 
-#modal-login-form .panel-button {
+#modal-login-form .panel-button{
   padding: 0 !important;
   text-align: center;
   line-height: 2em;
   min-width: 100px;
   margin-top: 25px;
+}
+
+#close-ticket-modal .panel-button {
+  padding: 0 !important;
+  text-align: center;
+  line-height: 2em;
+  min-width: 100px;
+  width: 100px;
+  margin: 4px 0 4px 0;
+}
+
+#closed-tickets-id-list {
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 #modal-login-form input {
@@ -11573,6 +11587,7 @@ input[type="radio"].resolution_radio_button {
 .loader-msg{
   font-style: oblique!important;
 }
+
 // webrep and webcat toolbars - prevent breaking/wrapping of the buttons
 #webrep-index-toolbar {
   z-index: 1;
