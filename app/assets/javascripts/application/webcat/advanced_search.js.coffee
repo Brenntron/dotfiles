@@ -90,12 +90,17 @@ namespace 'AC.WebCat', (exports) ->
           $searchLabel[0].selectize.addOption({ value: entryid, text: entryid })
       else if searchLabel == 'customer_email'
         $searchLabel = $('#email-input')
+      else if searchLabel = 'complaint_id'
+        $searchLabel = $('#complaintid-input')
+        complaintIds = searchCriteria.split(', ')
+        for complaintId in complaintIds
+          $searchLabel[0].selectize.addOption({ value: complaintId, text: complaintId })
       else
         searchLabelTransformed = searchLabel.replace /_ids/, ''
         searchLabelTransformed = searchLabelTransformed.replace /_/, '-'
         $searchLabel = $("##{searchLabelTransformed}-input")
 
-      if searchLabel == 'id' || searchLabel == 'ip_or_uri'
+      if searchLabel == 'id' || searchLabel == 'ip_or_uri' || searchLabel == 'complaint_id'
         splitSearchCriteria = searchCriteria.split(', ')
         $searchLabel[0].selectize.setValue(splitSearchCriteria)
       else if $searchLabel[0] && $searchLabel[0].selectize
