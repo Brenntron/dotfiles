@@ -80,6 +80,9 @@ namespace 'AC.WebCat', (exports) ->
       else if searchLabel == 'ip_or_uri'
         $searchLabel = $('#complaint-input')
         $searchLabel[0].selectize.addOption({ value: searchCriteria, text: searchCriteria })
+        complaints = searchCriteria.split(', ')
+        for complaint in complaints
+          $searchLabel[0].selectize.addOption({ value: complaint, text: complaint })
       else if searchLabel == 'id'
         $searchLabel = $('#entryid-input')
         entryids = searchCriteria.split(', ')
@@ -92,9 +95,9 @@ namespace 'AC.WebCat', (exports) ->
         searchLabelTransformed = searchLabelTransformed.replace /_/, '-'
         $searchLabel = $("##{searchLabelTransformed}-input")
 
-      if searchLabel == 'id'
-        entryids = searchCriteria.split(', ')
-        $searchLabel[0].selectize.setValue(entryids)
+      if searchLabel == 'id' || searchLabel == 'ip_or_uri'
+        splitSearchCriteria = searchCriteria.split(', ')
+        $searchLabel[0].selectize.setValue(splitSearchCriteria)
       else if $searchLabel[0] && $searchLabel[0].selectize
         $searchLabel[0].selectize.setValue(searchCriteria)
       else
