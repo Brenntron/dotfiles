@@ -4995,7 +4995,7 @@ input.file_attachment {
   border: 1px solid $faint-neutral-color;
 }
 
-#edit-resolution-message-template-form-wrapper {
+#edit-resolution-message-template-form-wrapper,  #edit-resolved-resolution-message-template-form-wrapper{
   display: none;
   height: 0;
   margin: 12px;

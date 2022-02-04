@@ -6,15 +6,22 @@ class ResolutionMessageTemplate < ApplicationRecord
     Dispute::STATUS_RESOLVED_INVALID => 'Invalid / Junk Mail',
     Dispute::STATUS_RESOLVED_TEST => 'Test / Training',
     Dispute::STATUS_RESOLVED_OTHER => 'Other'
-  }
+}.freeze
 
-  enum status: { default: 0, resolved: 1 }
+  enum status: { in_progress: 0, resolved: 1 }
 
   validates_presence_of :name
-  validates :body, presence: true, if: :status_default?
-  
+  validates :body, presence: true, if: :status_in_progress?
+  validate :resolved_message?
   private
-  def status_default?
-    [:status] == 'default'
+ 
+  def status_in_progress?
+    [:status] == 'in_progres'
+  end
+
+  def resolved_message?
+    if self.status_in_progress? && (name_chanded? || description_chanded?)
+      errors.add(:base, "You can't change name or description for 'Resolved / Closed' messages")
+    end
   end
  end

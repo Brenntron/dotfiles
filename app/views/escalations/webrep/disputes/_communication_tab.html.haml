@@ -100,54 +100,20 @@
         %pre.email-msg-content
 
     = render 'escalations/webrep/disputes/new_email_dialog'
-
-    #manageResolutionMessageTemplatesDialog{title: 'Manage Resolution Message Templates'}
-      %table.table
-        %thead
-          %tr.table-header-highlight
-            %th Template Name
-            %th Description
-            %th.min70
-          -ResolutionMessageTemplate.all.each do |template|
-            %tr
-              %td=template.name
-              %td=template.description
-              %td
-                %button.table-button.edit-button.edit-resolution-message-template{resolution_message_template_id: template.id, name: 'edit-resolution-message-template'}
-                %button.table-button.rmt-delete-button.delete-resolution-message-template{resolution_message_template_id: template.id, name: 'delete-resolution-message-template'}
-
-      #new-resolution-message-template-form-wrapper
-        %h4.dialog-inset-header New Resolution Message Template
-        %form
-          .dialog-form-information
-            %span.content-label-sm Name
-            %input#new-resolution-message-template-name{autofocus: true, required: true, type: 'text', name: 'template-name', maxlength: 100}
-            %span.content-label-sm Description
-            %input#new-resolution-message-template-desc{required: true, type: 'text', name: 'template-description', maxlength: 200}
-          .template-content-wrapper
-            %textarea.template-content#new-resolution-message-template-body{maxlength: 300}
-
-      #edit-resolution-message-template-form-wrapper
-        %h4.dialog-inset-header Edit Resolution Message Template
-        %form
-          .dialog-form-information
-            %span.content-label-sm Name
-            %input#edit-resolution-message-template-name{autofocus: true, required: true, type: 'text', name: 'template-name', maxlength: 100}
-            %span.content-label-sm Description
-            %input#edit-resolution-message-template-desc{required: true, type: 'text', name: 'template-description', maxlength: 200}
-            %input.hidden#resolution-message-template-id
-          .template-content-wrapper
-            %textarea.template-content#edit-resolution-message-template-body{maxlength: 300}
-
-      .dialog-section-divider
-        %button.primary#save-resolution-message-template.hidden{onclick: 'save_resolution_message_template()'}
-          Save Template
-        %button.secondary#create-resolution-message-template{onclick: 'create_new_resolution_message_template()'}
-          Create New Template
-        %button.primary#edit-resolution-message-template.hidden{onclick: 'update_resolution_message_template()'}
-          Update Template
-        %button.secondary.hidden#cancel-edit-resolution-message-template{onclick: 'cancel_edit_resolution_message_template()'}
-          Cancel
+   
+    #manageResolutionMessageTemplatesDialog{ title: 'Manage Resolution Message Templates' }
+      %ul.nav.nav-tabs{role: 'tablist'}
+        %li.nav-item
+          %a.nav-link#in-progress-tab-link{href: '#in_progress_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+            In Progress
+        %li.nav-item
+          %a.nav-link#resolved-tab-link{href: '#resolved_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+            Resolved / Closed
+      .tab-content.content-wrapper
+        .tab-pane#in_progress_tab.active{role: 'tabpanel'}
+          = render 'escalations/webrep/disputes/resolution_messages/list', { items: ResolutionMessageTemplate.in_progress, status: :in_progress}
+        .tab-pane#resolved_tab{role: 'tabpanel'}
+          = render 'escalations/webrep/disputes/resolution_messages/list', { items: ResolutionMessageTemplate.resolved, status: :resolved}
 
     #manageTemplatesDialog{title: 'Manage Email Templates'}
       %table.table

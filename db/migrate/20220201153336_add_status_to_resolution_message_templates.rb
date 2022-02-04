@@ -11,7 +11,12 @@ class AddStatusToResolutionMessageTemplates < ActiveRecord::Migration[5.2]
   def up
     add_column :resolution_message_templates, :status, :integer, default: 0
     RESOLVED_STATUSES.each do |name, description|
-      ResolutionMessageTemplate.create(name: ResolutionMessageTemplate::DISPLAY_STATUS_NAMES[name], body: description, status: :resolved)
+      ResolutionMessageTemplate.create(
+        name: ResolutionMessageTemplate::DISPLAY_STATUS_NAMES[name],
+        description: ResolutionMessageTemplate::DISPLAY_STATUS_NAMES[name],
+        body: description,
+        status: :resolved
+      )
     end
   end
 
