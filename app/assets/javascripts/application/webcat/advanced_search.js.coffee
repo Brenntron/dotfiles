@@ -90,7 +90,7 @@ namespace 'AC.WebCat', (exports) ->
           $searchLabel[0].selectize.addOption({ value: entryid, text: entryid })
       else if searchLabel == 'customer_email'
         $searchLabel = $('#email-input')
-      else if searchLabel = 'complaint_id'
+      else if searchLabel == 'complaint_id'
         $searchLabel = $('#complaintid-input')
         complaintIds = searchCriteria.split(', ')
         for complaintId in complaintIds
