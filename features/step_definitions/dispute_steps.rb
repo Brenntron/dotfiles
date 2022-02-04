@@ -15,8 +15,6 @@ Given(/^the following unassigned disputes exist:$/) do |disputes|
   end
 end
 
-
-
 Given(/^the following dispute_entries exist:$/) do |dispute_entries|
   FactoryBot.create(:customer) unless Customer.all.exists?
   FactoryBot.create(:user) unless User.all.exists?
@@ -78,6 +76,10 @@ Given(/^a RuleHit Resolution Mailer template exists with mnemonic, "(.*?)"/) do 
   FactoryBot.create(:rulehit_resolution_mailer_template, mnemonic: mnemonic)
 end
 
+Given(/^a RuleHit Resolution Mailer template exists with mnemonic, body: "(.*?)", "(.*?)"/) do |mnemonic, body|
+  FactoryBot.create(:rulehit_resolution_mailer_template, mnemonic: mnemonic, body: body)
+end
+
 Given(/^a named search with the name, "(.*?)" exists/) do |name|
   FactoryBot.create(:named_search, name: name)
 end
@@ -90,7 +92,7 @@ Given(/^I add a test user to current user's team/) do
   FactoryBot.create(:user, cvs_username: 'teammate', id: 2)
   User.find(2).move_to_child_of(User.find(1))
 end
-  
+
 Given (/^Dispute entry should have a status of, "(.*?)"/) do |status|
   expect(Dispute.first.priority).to eq(status)
 end
@@ -107,6 +109,7 @@ Then(/^clean up reptool and remove all reptool entries on "(.*?)"$/) do |url|
   reptool_params["entries"] = [url]
   RepApi::Blacklist.adjust_from_params(reptool_params, username: @user.cvs_username)
 end
+
 Given(/^an empty dispute exists$/) do
   FactoryBot.create(:customer) unless Customer.all.exists?
   dispute = FactoryBot.create(:dispute, {user_id: nil, subject: nil, problem_summary: nil, case_opened_at: nil, submission_type: nil})
