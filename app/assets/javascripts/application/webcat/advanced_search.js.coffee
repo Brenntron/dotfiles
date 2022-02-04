@@ -82,7 +82,9 @@ namespace 'AC.WebCat', (exports) ->
         $searchLabel[0].selectize.addOption({ value: searchCriteria, text: searchCriteria })
       else if searchLabel == 'id'
         $searchLabel = $('#entryid-input')
-        $searchLabel[0].selectize.addOption({ value: searchCriteria, text: searchCriteria })
+        entryids = searchCriteria.split(', ')
+        for entryid in entryids
+          $searchLabel[0].selectize.addOption({ value: entryid, text: entryid })
       else if searchLabel == 'customer_email'
         $searchLabel = $('#email-input')
       else
@@ -90,7 +92,10 @@ namespace 'AC.WebCat', (exports) ->
         searchLabelTransformed = searchLabelTransformed.replace /_/, '-'
         $searchLabel = $("##{searchLabelTransformed}-input")
 
-      if $searchLabel[0] && $searchLabel[0].selectize
+      if searchLabel == 'id'
+        entryids = searchCriteria.split(', ')
+        $searchLabel[0].selectize.setValue(entryids)
+      else if $searchLabel[0] && $searchLabel[0].selectize
         $searchLabel[0].selectize.setValue(searchCriteria)
       else
         $searchLabel.val(searchCriteria)
