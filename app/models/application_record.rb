@@ -20,11 +20,11 @@ class ApplicationRecord < ActiveRecord::Base
     dd, hh = hh.divmod(24)
     case
       when 366 < dd
-        "#{dd / 365} years"
+        "#{dd / 365} years, #{dd % 365} months"
       when 56 <= dd
-        "#{dd / 30} months"
+        "#{dd / 30} months, #{dd % 30} days"
       when 21 <= dd
-        "#{dd / 7} weeks"
+        "#{dd / 7} weeks #{dd % 7} days"
       when dd > 0
         "%id %ih" % [dd, hh]
       when hh > 0
