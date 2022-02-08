@@ -1448,7 +1448,6 @@ $ ->
           $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
     )
 
-
   $(document).ready ->
     # Hide loader cogs when page is done loading
     loader = $('#inline-webrep')
