@@ -1224,7 +1224,7 @@ For future Web categorization requests, please open a Web categorization ticket 
                 end
               else
 
-                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+                if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record&.id == umbrella_no_reply.id
 
                   dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
                 else
