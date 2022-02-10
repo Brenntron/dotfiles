@@ -11,17 +11,15 @@ class ResolutionMessageTemplate < ApplicationRecord
   enum status: { in_progress: 0, resolved: 1 }
 
   validates_presence_of :name
-  validates :body, presence: true, if: :status_in_progress?
+  validates :body, presence: true, if: :in_progress?
   validate :resolved_message?
+  
   private
- 
-  def status_in_progress?
-    [:status] == 'in_progres'
-  end
 
   def resolved_message?
-    if self.status_in_progress? && (name_chanded? || description_chanded?)
+    if resolved? && (name_changed? || description_changed?)
       errors.add(:base, "You can't change name or description for 'Resolved / Closed' messages")
     end
   end
  end
+
