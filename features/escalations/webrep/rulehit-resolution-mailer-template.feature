@@ -1,6 +1,6 @@
 Feature: RuleHit Resolution Mailer Templates
   In order to interact with RuleHit Resolution Mailer Templates as a user, I will provide ways to interact with them
-  
+
   @javascript
   Scenario: A user should see links as WBRS/SBRS rule hits which creates an email with a RuleHit Resolution Mailer Template
     Given a user with role "webrep user" exists and is logged in
@@ -12,9 +12,9 @@ Feature: RuleHit Resolution Mailer Templates
     |2.133.94.166| 1         |   |
     And a Dispute RuleHit exists with name, "sqdk", and RuleType of "WBRS"
     And a Dispute RuleHit exists with name, "Cbl", and RuleType of "SBRS"
-    And a RuleHit Resolution Mailer template exists with mnemonic, "sqdk", and body of "Temple Gates"
-    And a RuleHit Resolution Mailer template exists with mnemonic, "Cbl", and body of "Wisdom"
-    When I goto "escalations/webrep/disputes/1/"
+    And a RuleHit Resolution Mailer template exists with mnemonic, body: "sqdk", "Temple Gates"
+    And a RuleHit Resolution Mailer template exists with mnemonic, body: "Cbl", "Wisdom"
+    When I goto "escalations/webrep/disputes/1"
     Then I click "#research-tab-link"
     Then I click "#expand-all-rows"
     Then I click link "inline-wbrs-hit-1"
@@ -40,7 +40,7 @@ Feature: RuleHit Resolution Mailer Templates
   @javascript
   Scenario: A user updates RuleHit Resolution Mailer Template
     Given a user with role "webrep user" exists and is logged in
-    And a RuleHit Resolution Mailer template exists with mnemonic, "sqdk", and body of "Temple Gates"
+    And a RuleHit Resolution Mailer template exists with mnemonic, body: "sqdk", "Temple Gates"
     When I goto "/escalations/rulehit_resolution_mailer_templates/1/edit"
     And I fill in "rulehit_resolution_mailer_template[mnemonic]" with "sqdk"
     And I fill in "rulehit_resolution_mailer_template[to]" with "jobs@cisco.com"
@@ -53,7 +53,7 @@ Feature: RuleHit Resolution Mailer Templates
   @javascript
   Scenario: A user deletes RuleHit Resolution Mailer Template
     Given a user with role "webrep user" exists and is logged in
-    And a RuleHit Resolution Mailer template exists with mnemonic, "sqdk", and body of "Temple Gates"
+    And a RuleHit Resolution Mailer template exists with mnemonic, body: "sqdk", "Temple Gates"
     When I goto "/escalations/rulehit_resolution_mailer_templates/"
     And I click through "#delete-1" and accept confirmation
     Then I should see "Rulehit resolution mailer template was successfully destroyed."
@@ -61,11 +61,17 @@ Feature: RuleHit Resolution Mailer Templates
   @javascript
   Scenario: A user creates an ad hoc email using a RuleHit Resolution Mailer Template
     Given a user with role "webrep user" exists and is logged in
-    And a RuleHit Resolution Mailer template exists with mnemonic, "wlm", and body of "Temple Gates"
+    And a RuleHit Resolution Mailer template exists with mnemonic, body: "tuse", "Temple Gates"
+    And the following disputes exist:
+    |id|
+    |1 |
+    And the following dispute_entries exist:
+    |ip_address  | dispute_id|uri|
+    |2.133.94.166| 1         |   |
     When I go to "/escalations/webrep/research"
     And I fill in "search_uri" with "cisco.com"
     And I click "#research-search-strict"
-    And I click "submit-button"
+    And I click ".submit-button"
     And I wait for "10" seconds
     And I click first element of class ".adhoc-email-trigger"
     Then I should see "Compose New Email"
