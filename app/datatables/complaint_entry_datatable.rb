@@ -53,7 +53,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           entry_id:         complaint_entry.id,
           created_at:       complaint_entry.created_at,
           age_int:          (Time.now - complaint_entry.created_at).to_i,
-          age:              ComplaintEntry.humanize_secs(Time.now - complaint_entry.created_at),
+          age:              time_ago_in_words(complaint_entry.created_at),
           status:           complaint_entry.status,
           subdomain:        complaint_entry.subdomain,
           domain:           complaint_entry.domain,

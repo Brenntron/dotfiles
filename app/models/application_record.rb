@@ -20,11 +20,11 @@ class ApplicationRecord < ActiveRecord::Base
     dd, hh = hh.divmod(24)
     case
       when 366 < dd
-        (dd % 12) == 0 ? "#{ApplicationRecord.pluralize(dd / 365, 'year')}" : "#{ApplicationRecord.pluralize(dd / 365, 'year')}, #{ApplicationRecord.pluralize(dd % 12, 'month')}"
+        "#{dd / 365} years"
       when 56 <= dd
-        (dd % 30) == 0 ? "#{ApplicationRecord.pluralize(dd / 30 , 'month')}" : "#{ApplicationRecord.pluralize(dd / 30, 'month')}, #{ApplicationRecord.pluralize(dd % 30, 'day')}"
+        "#{dd / 30} months"
       when 21 <= dd
-        (dd % 7) == 0 ? "#{ApplicationRecord.pluralize(dd / 7, 'week')}" : "#{ApplicationRecord.pluralize(dd / 7, 'week')}, #{ApplicationRecord.pluralize(dd % 7, 'day')}"
+        "#{dd / 7} weeks"
       when dd > 0
         "%id %ih" % [dd, hh]
       when hh > 0
@@ -36,15 +36,5 @@ class ApplicationRecord < ActiveRecord::Base
 
   def humanize_secs(sec_input)
     ApplicationRecord.humanize_secs(sec_input)
-  end
-
-  private
-
-  def self.pluralize(count, string)
-    if count > 1
-      "#{count} #{string.pluralize}"
-    else
-      "#{count} #{string}"
-    end
   end
 end
