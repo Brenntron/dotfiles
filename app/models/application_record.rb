@@ -39,7 +39,10 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def self.first_two_time_layers(time)
-    first_two_layers = time.split(',').slice(0, 2)
+    formatted_time = time.split(/(and|,)/)
+    formatted_time.delete('and')
+    formatted_time.delete(',')
+    first_two_layers = formatted_time.slice(0, 2)
     first_two_layers.join(',')
   end
 end
