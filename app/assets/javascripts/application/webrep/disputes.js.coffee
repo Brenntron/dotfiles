@@ -2493,7 +2493,7 @@ window.prep_dispute_to_convert = (event) ->
     # - ti.com ticket
     # - open ticket
 
-    if row_data.source =! 'talos-intelligence'
+    if row_data.source != 'talos-intelligence' || row_data.source != 'talos-intelligence-api'
       std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
       return
     else
