@@ -37,4 +37,9 @@ class ApplicationRecord < ActiveRecord::Base
   def humanize_secs(sec_input)
     ApplicationRecord.humanize_secs(sec_input)
   end
+
+  def self.first_two_time_layers(time)
+    first_two_layers = time.split(',').slice(0, 2)
+    first_two_layers.join(',')
+  end
 end
