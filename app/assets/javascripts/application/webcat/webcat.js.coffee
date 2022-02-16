@@ -481,7 +481,7 @@ $ ->
               }
               {
 #               age column
-                width: '40px'
+                width: '100px'
                 render: ( data, type, full, meta) ->
                   { age, status } = full
                   time = timeMatch(age)
