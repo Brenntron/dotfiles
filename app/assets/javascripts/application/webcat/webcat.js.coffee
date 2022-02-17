@@ -469,7 +469,7 @@ $ ->
               }
               {
 #               age column
-                width: '80px'
+                width: '40px'
                 render: (data, type, full, meta) ->
                   { age, status } = full
                   unless status == 'COMPLETED' || status == 'RESOLVED'
