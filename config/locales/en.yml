@@ -72,6 +72,9 @@ en:
       years:
         one: '1Y'
         other: "%{count}Y"
+      weeks:
+        one: '1w'
+        other: "%{count}w"
   unauthorized:
     default: "You are not authorized to do that."
     manage:
