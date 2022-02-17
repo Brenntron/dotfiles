@@ -99,7 +99,8 @@ For future web and email reputation requests, please open a web and email reputa
     {
         subdomain: subdomain,
         domain: domain.domain,
-        path: uri.path
+        path: uri.path,
+        query: uri.query
     }
   end
 
