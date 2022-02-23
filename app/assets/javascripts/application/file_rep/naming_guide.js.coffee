@@ -270,7 +270,6 @@ $ ->
     rows_to_add = []
     $(rows_changed).each ->
       id = $(this).attr('data-id')
-      sequence = $(this).attr('data-sort-sequence')
       pattern = $($(this).find('.amp-pattern')[0]).find('.table-code').text()
       example = $($(this).find('.amp-example')[0]).find('.table-content').text()
       private_engine_desc = $($(this).find('.private-engine-description')[0]).find('.table-content').text()
@@ -293,8 +292,7 @@ $ ->
             'engine_description': engine_desc,
             'notes': notes,
             'public_notes': public_notes,
-            'contact': contact,
-            'table_sequence': sequence
+            'contact': contact
           )
         # New rows won't have an id yet
         else
@@ -305,8 +303,7 @@ $ ->
             'engine_description': engine_desc,
             'notes': notes,
             'public_notes': public_notes,
-            'contact': contact,
-            'table_sequence': sequence
+            'contact': contact
           )
 
     if rows_to_add.length > 0
@@ -370,7 +367,6 @@ $ ->
       $('.delete-patterns-queue').append(delete_pattern_html)
 
 
-
   window.create_amp_naming_conventions = ([data]) ->
     # Pulling out just patterns for response message
     response_data = ""
@@ -388,6 +384,7 @@ $ ->
       error: (response) ->
         $('tr[data-unsaved-id]').hide()
         std_msg_error('Error Creating AMP Naming Conventions', [response.responseText], reload: false)
+      async: false
     )
 
 
@@ -412,6 +409,7 @@ $ ->
         window.get_original_sort_array()
         window.restore_input_values()
         std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: true)
+      async: false
     )
 
 

@@ -17,11 +17,10 @@ module API
                 optional :notes, type: String
                 optional :public_notes, type: String
                 optional :contact, type: String
-                optional :table_sequence, type: Integer
               end
             end
             post "" do
-              
+
               std_api_v2 do
                 ::AmpNamingConvention.transaction do
                   timestamp = Time.now

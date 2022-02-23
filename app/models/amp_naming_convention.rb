@@ -2,6 +2,7 @@ class AmpNamingConvention < ApplicationRecord
   validates :pattern, :example, :private_engine_description, :engine_description, presence: true
   validates :table_sequence, presence: true, numericality: { only_integer: true }
   after_destroy :ensure_valid_table_sequence
+  after_create :ensure_valid_table_sequence
   # DB unique index enforces: validates :table_sequence, uniqueness: true
 
   def self.from_params(pattern_params_ary)
@@ -25,6 +26,17 @@ class AmpNamingConvention < ApplicationRecord
   end
 
   def self.create_from_params(pattern_params_ary)
+    if AmpNamingConvention.all.length > 1
+      table_sequence = AmpNamingConvention.all.order(table_sequence: :asc).last.table_sequence
+    else
+      table_sequence = 0
+    end
+
+    pattern_params_ary.each do |pattern_params|
+      table_sequence += 1
+      pattern_params[:table_sequence] = table_sequence
+    end
+
     records = from_params(pattern_params_ary)
     records.each {|rec| rec.save!}
   end
