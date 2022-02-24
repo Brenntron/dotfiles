@@ -26,8 +26,8 @@ class AmpNamingConvention < ApplicationRecord
   end
 
   def self.create_from_params(pattern_params_ary)
-    if AmpNamingConvention.all.length > 1
-      table_sequence = AmpNamingConvention.all.order(table_sequence: :asc).last.table_sequence
+    if AmpNamingConvention.exists?
+      table_sequence = AmpNamingConvention.maximum(:table_sequence)
     else
       table_sequence = 0
     end
