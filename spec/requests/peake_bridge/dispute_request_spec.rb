@@ -169,7 +169,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                             "claim" => "false positive",
                             "category"=>"Entertainment"
                         },
-                        "https://electric.cars.gov:23234/some/path.php?this=that&that=this" => {
+                        "https://ELECTRIC.cars.gov:23234/some/path.php?this=that&that=this" => {
                             "WBRS_SCORE"=>"noscore",
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
@@ -749,7 +749,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(response).to be_successful
     dispute = Dispute.where(ticket_source_key: 1001).first
     expect(dispute).to_not be_nil
-    expect(dispute.dispute_entries.count).to eq(2)
+    expect(dispute.dispute_entries.count).to eq(3)
 
     expect(dispute.dispute_entries.where(uri: '355toyota.com/some/path')).to exist
     expect(dispute.dispute_entries.where(uri: 'gmail.com')).to exist
@@ -859,6 +859,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
       expect(dispute).to_not be_nil
       expect(dispute.dispute_entries.count).to eq(1)
+      
       expect(dispute.dispute_entries.where(uri: 'липецкаяобласть.рф')).to exist
       expect(dispute.ticket_source).to eql("talos-intelligence")
     end

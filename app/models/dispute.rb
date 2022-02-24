@@ -812,27 +812,38 @@ For future Web categorization requests, please open a Web categorization ticket 
   ##############END DISPUTE REBUILD#################################
 
   def self.sanitize_url(url)
-    if url.first(3) == "ftp"
-      url = url.gsub("ftp://", '')
+    original_url = url
+
+    begin
+      url = url.downcase
+      if url.first(3) == "ftp"
+        url = url.gsub("ftp://", '')
+      end
+
+      sanitized_url = ""
+
+      if url.first(4) != "http"
+        url = "http://" + url
+      end
+
+      url_parts = Complaint.parse_url(url)
+
+      if url_parts[:subdomain].present?
+        sanitized_url += url_parts[:subdomain] + "."
+      end
+      sanitized_url += url_parts[:domain] + url_parts[:path]
+      if url_parts[:query].present?
+        sanitized_url += "?" + url_parts[:query]
+      end
+
+      if sanitized_url.blank?
+        sanitized_url = original_url
+      end
+
+      URI.decode(sanitized_url)
+    rescue
+      return original_url
     end
-
-    sanitized_url = ""
-
-    if url.first(4) != "http"
-      url = "http://" + url
-    end
-
-    url_parts = Complaint.parse_url(url)
-
-    if url_parts[:subdomain].present?
-      sanitized_url += url_parts[:subdomain] + "."
-    end
-    sanitized_url += url_parts[:domain] + url_parts[:path]
-    if url_parts[:query].present?
-      sanitized_url += "?" + url_parts[:query]
-    end
-
-    sanitized_url
 
   end
 
