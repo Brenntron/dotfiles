@@ -2493,10 +2493,7 @@ window.prep_dispute_to_convert = (event) ->
     # - ti.com ticket
     # - open ticket
 
-    if row_data.source != 'talos-intelligence' || row_data.source != 'talos-intelligence-api'
-      std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
-      return
-    else
+    if row_data.source == 'talos-intelligence' || row_data.source == 'talos-intelligence-api'
       ticket_status = $(row_data.status).text().trim();
       open_status = ['NEW', 'ASSIGNED', 'RESEARCHING', 'RE-OPENED', 'ESCALATED']
       if open_status.includes(ticket_status)
@@ -2534,38 +2531,44 @@ window.prep_dispute_to_convert = (event) ->
       else
         std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertible (open) status.'])
         return
+    else
+      std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
+    return
 
 window.prep_dispute_to_convert_from_research = (event) ->
   open_status = ['NEW', 'ASSIGNED', 'RESEARCHING', 'RE-OPENED', 'ESCALATED']
   ticket_status = $("#show-edit-ticket-status-button")[0].innerText
+  ticket_source = $('#dispute-source-text')[0].innerText
 
   if !open_status.includes(ticket_status)
     std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertible (open) status.'])
     return
 
-  if !(/TI Webform/.test $("#dispute-source-text").text())
+  if ticket_source == 'TI Webform' || ticket_source == 'TI API'
+    dispute_id = $("#dispute_id").text()
+    entry_ids = []
+    entries_content = []
+    summary = $('.email-msg-content').text()
+
+    for entry in $('.dual-edit-field.url-cell')
+      entry_ids.push $(entry).attr('data-id')
+      entries_content.push $(entry).find('.entry-data-content').text().replace(/^\s+|\s+$/g, '')
+
+    $('#convert-ticket-summary').text(summary)
+    $('#dispute-id-to-convert').text(dispute_id)
+    $('.convert-entry-count').text("(#{entry_ids.length})")
+
+    if $("#entries-to-convert tbody").find('tr').length > 0
+      for row in $("#entries-to-convert tbody").find('tr')
+        $(row).remove()
+
+    get_webrep_current_cats_from_research(entry_ids, entries_content)
+
+  else
     std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
     return
 
-  dispute_id = $("#dispute_id").text()
-  entry_ids = []
-  entries_content = []
-  summary = $('.email-msg-content').text()
-
-  for entry in $('.dual-edit-field.url-cell')
-    entry_ids.push $(entry).attr('data-id')
-    entries_content.push $(entry).find('.entry-data-content').text().replace(/^\s+|\s+$/g, '')
-
-  $('#convert-ticket-summary').text(summary)
-  $('#dispute-id-to-convert').text(dispute_id)
-  $('.convert-entry-count').text("(#{entry_ids.length})")
-
-  if $("#entries-to-convert tbody").find('tr').length > 0
-    for row in $("#entries-to-convert tbody").find('tr')
-      $(row).remove()
-
-  get_webrep_current_cats_from_research(entry_ids, entries_content)
-
+    
 $ ->
 
   # Check dropdown to decide when to enable the conversion submit button
