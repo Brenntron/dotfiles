@@ -284,7 +284,7 @@ Feature: Disputes
     Given a user with role "filerep user" exists and is logged in
     When I go to "/escalations/file_rep/disputes/"
     And I click "#naming-guide"
-    Then I should see "AMP Naming Conventions Guide"
+    Then I should see "Secure Endpoint Naming Conventions Guide"
 
   @javascript
   Scenario: a user visits the FileRep Dispute Communications tab and tries to adds a note
@@ -576,13 +576,13 @@ Feature: Disputes
     Then I should not see "1 hour"
 
   @javascript
-  Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and sees the edit button
+  Scenario: a user with the role 'amp pattern namer' visits the Secure Endpoint Naming Convention page and sees the edit button
     Given a user with role "amp pattern namer" exists and is logged in
     When I go to "/escalations/file_rep/naming_guide"
-    Then I should see "EDIT AMP NAMING CONVENTIONS"
+    Then I should see "EDIT SECURE ENDPOINT NAMING CONVENTIONS"
 
   @javascript
-  Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and clicks the edit button and a blank row is created
+  Scenario: a user with the role 'amp pattern namer' visits the Secure Endpoint Naming Convention page and clicks the edit button and a blank row is created
     Given a user with role "amp pattern namer" exists and is logged in
     When I go to "/escalations/file_rep/naming_guide"
     And I click "#amp-edit-button"
@@ -596,7 +596,7 @@ Feature: Disputes
     Then I should see content "" within ".amp-contact"
 
   @javascript
-  Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and saves an entry
+  Scenario: a user with the role 'amp pattern namer' visits the Secure Endpoint Naming Convention page and saves an entry
     Given a user with role "amp pattern namer" exists and is logged in
     When I go to "/escalations/file_rep/naming_guide"
     And I click "#amp-edit-button"
@@ -609,7 +609,7 @@ Feature: Disputes
     And I fill in element, ".notes-public-textarea" with "Public Notes"
     And I fill in element, ".contact-textarea" with "Contact"
     And I click "#amp-save-button"
-    Then I should see "THE FOLLOWING AMP NAMING CONVENTIONS HAVE BEEN CREATED:"
+    Then I should see "THE FOLLOWING Secure Endpoint NAMING CONVENTIONS HAVE BEEN CREATED:"
     And I should see content "Code" within ".amp-pattern"
     And I should see content "Example" within ".amp-example"
     And I should see content "Engine" within ".amp-engine"
@@ -619,9 +619,9 @@ Feature: Disputes
     And I should see content "Contact" within ".amp-contact"
 
   @javascript
-  Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and deletes an entry
+  Scenario: a user with the role 'amp pattern namer' visits the Secure Endpoint Naming Convention page and deletes an entry
     Given a user with role "amp pattern namer" exists and is logged in
-    And the following AMP Naming Conventions exist:
+    And the following Secure Endpoint Naming Conventions exist:
     |id|
     |1 |
     When I go to "/escalations/file_rep/naming_guide"
@@ -630,12 +630,12 @@ Feature: Disputes
     Then I should see "STAGED FOR DELETION: Pattern"
     When I click "#amp-save-button"
     Then I wait for "2" seconds
-    And I should see "AMP NAMING CONVENTION(S) BELOW HAS BEEN DELETED"
+    And I should see "SECURE ENDPOINT NAMING CONVENTION(S) BELOW HAS BEEN DELETED"
 
   @javascript
-  Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and edits an entry
+  Scenario: a user with the role 'amp pattern namer' visits the Secure Endpoint Naming Convention page and edits an entry
     Given a user with role "amp pattern namer" exists and is logged in
-    And the following AMP Naming Conventions exist:
+    And the following Secure Endpoint Naming Conventions exist:
     |id|
     |1 |
     When I go to "/escalations/file_rep/naming_guide"
@@ -648,7 +648,7 @@ Feature: Disputes
     And I fill in element, ".notes-public-textarea" with "Everyone"
     And I fill in element, ".contact-textarea" with "Now"
     And I click "#amp-save-button"
-    Then I should see "THE FOLLOWING AMP NAMING CONVENTIONS HAVE BEEN UPDATED:"
+    Then I should see "THE FOLLOWING SECURE ENDPOINT NAMING CONVENTIONS HAVE BEEN UPDATED:"
     When I go to "/escalations/file_rep/naming_guide"
     And I should see content "It's" within ".amp-pattern"
     And I should see content "Another" within ".amp-example"

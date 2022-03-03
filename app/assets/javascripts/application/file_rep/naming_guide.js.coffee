@@ -334,7 +334,7 @@ $ ->
         url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
         data: { 'ids': delete_id_array }
         success: (response) ->
-          std_msg_success('AMP Naming Convention(s) Below Has Been Deleted.', [delete_pattern_list], reload: false)
+          std_msg_success('Secure Endpoint Naming Convention(s) Below Has Been Deleted.', [delete_pattern_list], reload: false)
         error: (response) ->
           # On ajax error, restore the ready-to-delete rows
           $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
@@ -380,10 +380,10 @@ $ ->
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
       data: { patterns: data }
       success: (response) ->
-        std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
+        std_msg_success('The Following Secure Endpoint Naming Conventions Have Been Created:', [response_data], reload: false)
       error: (response) ->
         $('tr[data-unsaved-id]').hide()
-        std_msg_error('Error Creating AMP Naming Conventions', [response.responseText], reload: false)
+        std_msg_error('Error Creating Secure Endpoint Naming Conventions', [response.responseText], reload: false)
       async: false
     )
 
@@ -402,13 +402,13 @@ $ ->
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
       data: { patterns: data }
       success: (response) ->
-        std_msg_success('AMP Naming Conventions Have Been Updated', ["Relevant changes have also been sent to TI."], reload: true)
+        std_msg_success('Secure Endpoint Naming Conventions Have Been Updated', ["Relevant changes have also been sent to TI."], reload: true)
         contacts = $('.amp-contact .table-content')
         format_amp_contacts(contacts)
       error: (response) ->
         window.get_original_sort_array()
         window.restore_input_values()
-        std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: true)
+        std_msg_error('Error Updating Secure Endpoint Naming Conventions', [response.responseText], reload: true)
       async: false
     )
 
