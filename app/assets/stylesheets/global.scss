@@ -1453,7 +1453,7 @@ thead th.sorting.center {
   align-items: center;
 }
 
-#msg-modal, #loader-modal, #login-modal {
+#msg-modal, #loader-modal, #login-modal, #close-ticket-modal {
   .modal-dialog, .modal-dialog {
     margin-top: 180px;
   }
@@ -1513,16 +1513,30 @@ thead th.sorting.center {
     display: block;
   }
 }
-#modal-login-form {
+#modal-login-form{
   margin-top: 20px;
 }
 
-#modal-login-form .panel-button {
+#modal-login-form .panel-button{
   padding: 0 !important;
   text-align: center;
   line-height: 2em;
   min-width: 100px;
   margin-top: 25px;
+}
+
+#close-ticket-modal .panel-button {
+  padding: 0 !important;
+  text-align: center;
+  line-height: 2em;
+  min-width: 100px;
+  width: 100px;
+  margin: 4px 0 4px 0;
+}
+
+#closed-tickets-id-list {
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 #modal-login-form input {
@@ -9989,7 +10003,6 @@ hr.thin.form-divider {
     display: inline-block;
     overflow: hidden;
     padding: 2px 0;
-    white-space: nowrap;
     text-overflow: ellipsis;
     margin-bottom: 30px;
   }
@@ -10238,6 +10251,8 @@ hr.thin.form-divider {
 }
 
 .file-rep-index-toolbar {
+  z-index: 1;
+  width: fit-content; //stop toolbar from blocking show/search on the right
   .ticket-owner-button {
     margin: 0;
   }
@@ -11572,8 +11587,11 @@ input[type="radio"].resolution_radio_button {
 .loader-msg{
   font-style: oblique!important;
 }
+
 // webrep and webcat toolbars - prevent breaking/wrapping of the buttons
 #webrep-index-toolbar {
+  z-index: 1;
+  width: fit-content; //stop toolbar from blocking show/search on the right
   .toolbar-button .toolbar-button-text {
     display: none;
   }
@@ -11836,7 +11854,7 @@ hr.thin.extra-bottom-marg {
   background-image: url(image_path('icon_success.svg'));
 }
 
-.flash-msg-alert-danger::before, .flash-type-alert-error::before {
+.flash-msg-alert-danger::before, .flash-msg-alert-warning::before, .flash-type-alert-error::before {
   background-image: url(image_path('icon_error.svg'));
 }
 

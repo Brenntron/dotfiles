@@ -54,12 +54,15 @@ $ ->
         for resolution in complaint_resolution_list
           $('#resolution-input-list').append '<option value="' + resolution + '"></option>'
 
-      if window.location.pathname.includes('webcat') || window.location.pathname.includes('filerep')
-        AC.WebCat.createCompanyOptions()
-        AC.WebCat.createCustomerNameOptions()
-        AC.WebCat.createAssigneeOptions()
+        if window.location.pathname.includes('webcat') || window.location.pathname.includes('filerep')
+          AC.WebCat.createCompanyOptions()
+          AC.WebCat.createCustomerNameOptions()
+          AC.WebCat.createAssigneeOptions()
 
+        if window.location.pathname.includes('webcat')
+          AC.WebCat.populateSearchCriteria()
     )
+
 
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/customers_company_name'

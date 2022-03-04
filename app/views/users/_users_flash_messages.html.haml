@@ -1,6 +1,5 @@
 - flash.each do |type, message|
   .flash-msg.alert.alert-dismissible.fade.in{class: "flash-msg-#{bootstrap_class_for(type)}"}
+    = message.sub("You are not authorized to results user.", "You are not authorized to view that user.")
     %button.small-flash-button{type: 'button', 'data-dismiss': 'alert', 'aria-label': 'Close'}
-  :javascript
-    var message = "#{message}"
-    window.show_message('error', message, false, '.flash-msg.alert.alert-dismissible')
+

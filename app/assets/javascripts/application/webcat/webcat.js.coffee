@@ -56,23 +56,24 @@ $ ->
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
-    user_id = assignee_input[0].selectize.items
-    tags = tag_input[0].selectize.items
-    company = $('#company-input')[0].selectize.items
-    status = $('#status-input')[0].selectize.items
-    resolution = $('#resolution-input')[0].selectize.items
-    customer_name = $('#name-input')[0].selectize.items
+    user_id = if assignee_input[0].selectize? then assignee_input[0].selectize.items else []
+    tags = if tag_input[0].selectize? then tag_input[0].selectize.items else []
+    company = if $('#company-input')[0].selectize? then $('#company-input')[0].selectize.items else []
+    status = if $('#status-input')[0].selectize? then $('#status-input')[0].selectize.items else []
+    resolution = if $('#resolution-input')[0].selectize? then $('#resolution-input')[0].selectize.items else []
+    customer_name = if $('#name-input')[0].selectize? then $('#name-input')[0].selectize.items else []
     { items, options } = category_input[0].selectize
-    complaints = $('#complaint-input')[0].selectize.items
-    channels = $('#channel-input')[0].selectize.items
-    entry_ids = $('#entryid-input')[0].selectize.items
-    complaint_ids = $('#complaintid-input')[0].selectize.items
-    platform_ids = $('#platform-input')[0].selectize.items
+    complaints = if $('#complaint-input')[0].selectize? then $('#complaint-input')[0].selectize.items else []
+    channels = if $('#channel-input')[0].selectize? then $('#channel-input')[0].selectize.items else []
+    entry_ids = if $('#entryid-input')[0].selectize? then $('#entryid-input')[0].selectize.items else []
+    complaint_ids = if $('#complaintid-input')[0].selectize? then $('#complaintid-input')[0].selectize.items else []
+    platform_ids = if $('#platform-input')[0].selectize? then $('#platform-input')[0].selectize.items else []
 
     if tags.length
       form['tags'] = tags.join(', ')
     if items.length
       form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
+      form['category_ids'] = items.map( (cat) -> options[cat].category_id ).join(', ')
     if company.length
       form['company'] = company.join(', ')
     if status.length
@@ -108,25 +109,26 @@ $ ->
     localStorage.webcat_search_type = 'advanced'
     localStorage.webcat_search_name = form.search_name
     localStorage.webcat_search_conditions = JSON.stringify(
-      status: form.status
+      category: form.category
+      category_ids: form.category_ids
+      channel: form.channel
+      company_name: form.company
       complaint_id: form.complaint_id
+      customer_email: form.customer_email
+      customer_name: form.customer_name
+      domain: form.domain
       id: form.entry_id
       ip_or_uri: form.ip_or_uri
-      resolution: form.resolution
-      channel: form.channel
-      category: form.category
-      customer_name: form.customer_name
-      customer_email: form.customer_email
-      company_name: form.company
-      domain: form.domain
-      tags: form.tags
-      user_id: form.user_id
+      modified_newer: form.date_modified_older
+      modified_older: form.date_modified_newer
       platform_ids: form.platform_ids
       platforms: form.platform_display.join(', ')
-      submitted_older: form.date_submitted_older
+      resolution: form.resolution
+      status: form.status
       submitted_newer: form.date_submitted_newer
-      modified_older: form.date_modified_newer
-      modified_newer: form.date_modified_older
+      submitted_older: form.date_submitted_older
+      tags: form.tags
+      user_id: form.user_id
     )
     refresh_url()
 
@@ -150,6 +152,12 @@ $ ->
     ###
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
     { search } = location
+
+    try
+      webcat_search_conditions = JSON.parse webcat_search_conditions
+    catch e
+      webcat_search_conditions = {}
+
     if search != ''
       webcat_search_type = 'standard'
       urlParams = new URLSearchParams(location.search);
@@ -158,12 +166,12 @@ $ ->
         data = {
           search_type: webcat_search_type
           search_name : webcat_search_name
-          search_conditions: JSON.parse(webcat_search_conditions)
+          search_conditions: webcat_search_conditions
         }
       when 'contains'
         data = {
           search_type: webcat_search_type
-          search_conditions: JSON.parse(webcat_search_conditions)
+          search_conditions: webcat_search_conditions
         }
       when 'standard'
         urlParams = new URLSearchParams(location.search);
@@ -221,7 +229,6 @@ $ ->
       subheader = JSON.parse(subheader)
 
     container = $('#webcat_searchref_container')
-    search_condition_tooltip = []
 
     for condition_name, condition of subheader
       if condition != ''
@@ -237,6 +244,8 @@ $ ->
           condition_name = 'Submitter Name'
         if condition_name == 'company_name'
           condition_name = 'Submitter Org'
+        if condition_name == 'ip_or_uri'
+          condition_name = 'Complaint'
         condition_name = condition_name.replace(/_/g, " ").toUpperCase()
         condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
         if typeof condition == 'object'
@@ -244,24 +253,7 @@ $ ->
         else
           condition_HTML = '<span>' + condition + '</span>'
 
-        search_condition_tooltip.push(condition_name + ': ' + $(condition_HTML).text())
         container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
-
-    if search_condition_tooltip.length > 0
-      container.css('display', 'inline-block')
-      list = $(container).find('#search-tooltip_content')[0]
-      for  li in search_condition_tooltip
-        item = document.createElement('li')
-        item.appendChild(document.createTextNode(li))
-        list.appendChild(item)
-      container.attr('data-tooltip-content', '#search-tooltip_content')
-      container.tooltipster(
-        theme: [
-          'tooltipster-borderless'
-          'tooltipster-borderless-customized'
-        ]
-        contentCloning: true
-      )
 
   build_header = (data) ->
     ###
@@ -273,6 +265,11 @@ $ ->
     if data != undefined && container.length > 0
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="webcat_refresh()"></span>'
       {search_type, search_name} = data
+
+      try
+        webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
+      catch e
+        webcat_search_conditions = {}
 
       if search_type == 'standard'
 
@@ -288,14 +285,11 @@ $ ->
             '</div>'
 
       else if search_type == 'advanced'
-
-        webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
         new_header =
           '<div>Results for Advanced Search ' +
             reset_icon +
             '</div>'
         build_subheader(webcat_search_conditions)
-
       else if search_type == 'named'
         new_header =
           '<div>Results for "' + search_name + '" Saved Search' +
@@ -307,9 +301,7 @@ $ ->
         else
           subheader = $('#saved-search-tbody').last('tr').find('.saved-search').attr('data-search_conditions')
         build_subheader(subheader)
-
       else if search_type == 'contains'
-        webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
         new_header =
           '<div>Results for "' + webcat_search_conditions.value + '" '+
             reset_icon +
@@ -446,7 +438,7 @@ $ ->
             }
             {
               targets: [ 3 ]
-              orderData: 16
+              orderData: 18 #This is ordered by the age int column. Anytime the columns are changed this needs to be updated.
             }
             {
               targets: [ 14 ]
@@ -831,7 +823,6 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-
 
     window.clearSelectize = (input) ->
       $("##{input}")[0].selectize.clear()

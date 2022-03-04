@@ -71,6 +71,7 @@ class DisputeEntry < ApplicationRecord
 
   def self.create_dispute_entry(dispute, ip_url, status = NEW)
     begin
+      ip_url = ip_url.gsub("\u200B", "")
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.status = status
