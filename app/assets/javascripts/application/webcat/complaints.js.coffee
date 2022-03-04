@@ -1756,7 +1756,7 @@ window.click_table_buttons = (complaint_table, button)->
         score: (input) ->
           score = this.getScoreFunction(input)
           (item) ->
-            (item.category_name.toLowerCase().startsWith(input) || item.category_code.toLowerCase().startsWith(input.toLowerCase())) ? 1 : 0
+            (item.category_name.toLowerCase().startsWith(input.toLowerCase()) || item.category_code.toLowerCase().startsWith(input.toLowerCase())) ? 1 : 0
       }
     else
       # need to initialize the selectize function but disable it here if entry is completed
