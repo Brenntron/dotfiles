@@ -17,7 +17,7 @@ class ResolutionMessageTemplate < ApplicationRecord
   private
 
   def resolved_message?
-    if resolved? && (name_changed? || description_changed?)
+    if resolved? && (name_changed? || description_changed?) && !new_record?
       errors.add(:base, "You can't change name or description for 'Resolved / Closed' messages")
     end
   end

@@ -6261,8 +6261,13 @@ input[type="radio"].ticket-status-radio {
 }
 
 .resolution-comment-wrapper {
+  display: inline-block;
   background-color: $content-bg-color;
   padding: 4px 12px !important;;
+}
+
+textarea.ticket-resolution-comment {
+  display: inline-block;
 }
 
 .resolution-comment-wrapper input[type='text'] {
@@ -6815,7 +6820,7 @@ td.ticket-total::before {
   background-color: $faint-neutral-color;
   border-radius: 0 4px 4px 0;
   position: absolute;
-  width: 200px;
+  min-width: 200px;
   top: 0;
   left: 100%;
   height: 100%;
