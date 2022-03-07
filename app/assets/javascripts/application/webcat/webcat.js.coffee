@@ -5,18 +5,6 @@ window.td_truncate = (str, max, long) ->
   long = long or '...'
   if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
 
-window.def_includes = (check, str) ->
-  return check.indexOf(str) != -1
-
-window.timeMatch = (age)->
-  time = 'exceeds time'
-  if !def_includes(age, 'months')
-    if def_includes(age, 'm') && def_includes(age, 's')
-      time = 'minutes'
-    else if def_includes(age, 'h') && def_includes(age, 'm')
-      time =  'hours'
-  return time
-
 window.wbrs_display = (score) ->
   score = parseFloat(score)
   if score == NaN
@@ -482,21 +470,19 @@ $ ->
               {
 #               age column
                 width: '40px'
-                render: ( data, type, full, meta) ->
+                render: (data, type, full, meta) ->
                   { age, status } = full
-                  time = timeMatch(age)
                   unless status == 'COMPLETED' || status == 'RESOLVED'
-                    switch ( time )
-                      when 'minutes'
-                        age_class = ''
-                      when 'hours'
-                        hour = parseInt( age.split("h")[0] )
-                        if hour >= 3 && hour < 12
-                          age_class = 'ticket-age-over3hr'
-                        else if hour > 12
-                          age_class = 'ticket-age-over12hr'
-                      when 'exceeds time'
+                    if age.indexOf('hour') != -1
+                      hour = parseInt( age.split("h")[0] )
+                      if hour >= 3 && hour < 12
+                        age_class = 'ticket-age-over3hr'
+                      else if hour > 12
                         age_class = 'ticket-age-over12hr'
+                    else if age.indexOf('minute') != -1
+                      age_class = ''
+                    else
+                      age_class = 'ticket-age-over12hr'
                     return "<span class='#{age_class}'>#{age}</span>"
                   # if status is "completed" or "resolved", no css class (orange/red) needed
                   else
