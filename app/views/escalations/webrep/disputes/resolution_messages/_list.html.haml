@@ -1,0 +1,18 @@
+%table.table
+  %thead
+    %tr.table-header-highlight
+      %th Template Name
+      %th Description
+      %th.min70
+    -items.each do |template|
+      %tr
+        %td=template.name
+        %td=template.description
+        %td
+          %button.table-button.edit-button.edit-resolution-message-template{class: ('resolved' if status == :resolved), resolution_message_template_id: template.id, name: 'edit-resolution-message-template'}
+          -if status == :in_progress
+            %button.table-button.rmt-delete-button.delete-resolution-message-template{resolution_message_template_id: template.id, name: 'delete-resolution-message-template'}
+-if status == :in_progress
+  = render 'escalations/webrep/disputes/resolution_messages/in_progress_form', { status: status }
+-else
+  = render 'escalations/webrep/disputes/resolution_messages/resolved_form', { status: status }
