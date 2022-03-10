@@ -2426,7 +2426,7 @@ window.prep_complaint_to_convert = () ->
         complaint_status = response.data.complaint.status
         complaint_source = response.data.complaint.ticket_source
 
-        if complaint_source == 'talos-intelligence'
+        if complaint_source == 'talos-intelligence' || complaint_source == 'talos-intelligence-api'
           if complaint_status == 'NEW' || complaint_status == 'ACTIVE' || complaint_status == 'REOPENED'
             # populate the dropdown
             $('#complaint-id-to-convert').text(complaint_id)
