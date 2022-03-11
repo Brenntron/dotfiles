@@ -13461,3 +13461,38 @@ input.wl-bl-list-inline {
   background-size: 17px 17px;
   background-position: 6px center;
 }
+
+// Rulehit Resolution Mailer Templates
+#new_rulehit_resolution_mailer_template, .edit_rulehit_resolution_mailer_template {
+  max-width: 292px;
+}
+
+#new_rulehit_resolution_mailer_template .form-inputs, .edit_rulehit_resolution_mailer_template .form-inputs {
+  margin: 10px 0 0 0;
+  label {
+    width: 100%;
+    float: left;
+    padding: 0 0 1px 0;
+  }
+  input {
+    clear: both;
+    float: left;
+    margin: 0 0 10px 0;
+    width: 100%;
+  }
+  #rulehit_resolution_mailer_template_body {
+    height: 60px;
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
+#new_rulehit_resolution_mailer_template .form-actions, .edit_rulehit_resolution_mailer_template .form-actions{
+  .btn.submit-rulehit-resolution {
+    margin: 12px 0;
+    background-color: #d7dadb;
+  }
+  .btn.submit-rulehit-resolution:hover {
+    background-color: #ccc;
+  }
+}
