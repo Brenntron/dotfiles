@@ -41,6 +41,7 @@ gem 'her', '1.0.3'
 gem 'curb', '0.9.8' #Libcurl bindings for Ruby
 gem 'net-ssh', '5.0.2'
 gem 'peake-bridge-client', '0.1.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
+# gem 'peake-bridge-client', '0.1.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
 gem 'stomp', '1.4.6'
 gem 'aws-sdk', '2.11.170'
 gem 'nokogiri' ,'1.10.4'
@@ -146,4 +147,3 @@ end
 gem 'httparty', '~> 0.15.3'
 gem 'turbolinks', '5.2.0'
 gem "sprockets", '~> 3.7.1'
-
