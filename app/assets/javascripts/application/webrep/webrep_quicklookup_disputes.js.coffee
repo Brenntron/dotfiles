@@ -621,12 +621,12 @@ $ ->
     confirmation_rows = document.querySelector('#confirmation-modal tbody').rows
     $('#confirmation-modal').modal('toggle');
     $('#quick-lookup-loader').addClass('visible-ajax-message')
-    disputes = { comment: $('.confirm-rep-input').text() }
+    disputes = {}
 
     $( confirmation_rows ).each ->
         action_list = []
         cells = $(this).find('td')
-        dispute = $( cells[0] ).text()
+        dispute = $( cells[0] ).text().trim()
         actions = $( cells[1] ).children()
 
         for action, i in actions
