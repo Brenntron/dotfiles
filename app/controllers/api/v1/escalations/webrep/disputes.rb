@@ -988,8 +988,10 @@ module API
                 memo
               end
               
-              raise "Unable to create the following duplicate dispute entries: #{errors.join(', ')}" if errors.any?
-
+              if errors.any?
+                return { status: 'error', message: "Unable to create the following duplicate dispute entries: #{errors.join(', ')}" }.to_json
+              end
+  
               begin
                 response = Dispute.process_quick_bulk_entries(data, current_user)
                 { status: 'success', data: response }.to_json
