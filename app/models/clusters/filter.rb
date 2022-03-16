@@ -13,6 +13,8 @@ class Clusters::Filter
     case filter_hash[:f]
     when 'all'
       clusters
+    when 'pending'
+      clusters
     when 'unassigned'
       filter_unassigned
     else

@@ -36,7 +36,7 @@ class Clusters::Wbnp::DataFetcher < Clusters::Templates::DataFetcher
     when 'my'
       ClusterAssignment.get_assigned_cluster_ids_for(user)
     when 'pending'
-      ClusterCategorization.get_categorized_cluster_ids_for(user)
+      ClusterCategorization.all.pluck(:cluster_id)
     else
       []
     end
