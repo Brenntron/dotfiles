@@ -43,7 +43,6 @@ module API
                 optional :notes, type: String
                 optional :public_notes, type: String
                 optional :contact, type: String
-                optional :table_sequence, type: Integer
               end
             end
             patch "" do
