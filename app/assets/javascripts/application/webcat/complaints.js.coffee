@@ -1711,6 +1711,11 @@ window.click_table_buttons = (complaint_table, button)->
   row = complaint_table.row(tr)
   data = row.data()
   cat_select = '#input_cat_'+ data.entry_id
+
+  if (!String.prototype.startsWith)
+    String.prototype.startsWith = (input, pos) ->
+      this.substr(!pos || pos < 0 ? 0 : +pos, input.length) == input
+
   if row.child.isShown()       # This row is already open - close it
     row.child.hide()
     tr.removeClass 'shown'
@@ -1748,6 +1753,10 @@ window.click_table_buttons = (complaint_table, button)->
             $('#master-submit').prop('disabled', false)
           else
             $('#master-submit').prop('disabled', true)
+        score: (input) ->
+          score = this.getScoreFunction(input)
+          (item) ->
+            (item.category_name.toLowerCase().startsWith(input.toLowerCase()) || item.category_code.toLowerCase().startsWith(input.toLowerCase())) ? 1 : 0
       }
     else
       # need to initialize the selectize function but disable it here if entry is completed
