@@ -26,6 +26,13 @@ class AmpNamingConvention < ApplicationRecord
     records.each {|rec| rec.save!}
   end
 
+  def self.save_from_params(pattern_params_ary)
+    records = from_params(pattern_params_ary)
+    records.each do |rec|
+      rec.save!
+    end
+  end
+
   # Note: pass timestamp argument to insure that timestamp is determined within transaction.
   def self.send_all_to_ti(timestamp:)
     amp_patterns = all.map do |record|
