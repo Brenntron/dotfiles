@@ -23,7 +23,7 @@ describe WebcatCredits::Clusters::CreditHandler do
         )
       end
 
-      it 'removes prevoius credit and adds the PENDING credit' do
+      it 'removes previous credit and adds the PENDING credit' do
         subject
         expect(user.webcat_credits.count).to be 1
         expect(user.webcat_credits.last.credit).to eq WebcatCredit::PENDING
@@ -51,7 +51,7 @@ describe WebcatCredits::Clusters::CreditHandler do
         )
       end
 
-      it 'removes prevoius credit and adds the PENDING credit' do
+      it 'removes previous credit and adds the PENDING credit' do
         subject
         expect(user.webcat_credits.count).to be 1
         expect(user.webcat_credits.last.credit).to eq WebcatCredit::UNCHANGED
@@ -79,7 +79,7 @@ describe WebcatCredits::Clusters::CreditHandler do
         )
       end
 
-      it 'removes prevoius credit and adds the PENDING credit' do
+      it 'removes previous credit and adds the PENDING credit' do
         subject
         expect(user.webcat_credits.count).to be 1
         expect(user.webcat_credits.last.credit).to eq WebcatCredit::FIXED

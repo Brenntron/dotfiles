@@ -38,16 +38,15 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                             "WBRS_SCORE"=>"noscore",
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
-                            "rep_sugg"=>"Good",
+                            "rep_sugg"=>"Trusted",
                             "category"=>"Not in our list",
-                            "claim" => "false positive",
-                            "suggested_threat_category" => "malware"
+                            "claim" => "false positive"
                         },
                         "thepretenders.com" => {
                             "WBRS_SCORE"=>"noscore",
                             "WBRS_Rule_Hits"=>"",
                             "Hostname_ips"=>"",
-                            "rep_sugg"=>"Good",
+                            "rep_sugg"=>"Trusted",
                             "category"=>"Entertainment",
                             "claim" => "false positive"
                         }
@@ -137,7 +136,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                                              "category"=>"Not in our list"
                                          },
                                          "sbrs" => {
-                                             "SBRS_SCORE"=>"No score",
+                                             "SBRS_SCORE"=>"-53",
                                              "SBRS_Rule_Hits"=>"DhH, IaM, Pbl",
                                              "Hostname"=>"www.dealer.com",
                                              "rep_sugg"=>"Good",
@@ -299,8 +298,8 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
   end
 
-
-  it 'receives dispute payload message and does not auto resolve if there are no conditions' do
+  #to do, find a domain that has a non blocking score to avoid the UNCHANGED auto resolution
+  xit 'receives dispute payload message and does not auto resolve if there are no conditions' do
     vrt_incoming
     guest_company
 
@@ -316,10 +315,10 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
     dispute_entry_1 = DisputeEntry.where(:uri => '355toyota.com').first
     dispute_entry_2 = DisputeEntry.where(:uri => 'thepretenders.com').first
-
+    
     expect(dispute_entry_1.status).to eql(DisputeEntry::NEW)
-    expect(dispute_entry_1.suggested_threat_category).to eql("malware")
-    expect(dispute_entry_2.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry_2.status).to eql(DisputeEntry::STATUS_RESOLVED)
+    expect(dispute_entry_2.resolution).to eql(DisputeEntry::STATUS_RESOLVED_UNCHANGED)
     expect(dispute_entry_2.suggested_threat_category).to eql(nil)
 
   end

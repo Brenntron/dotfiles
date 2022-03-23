@@ -91,3 +91,14 @@ $ ->
       ).done (response) ->
         window.location.reload()
         return
+
+window.setupSelectBoxes = () ->
+  addUserButtons = $('.add-user-button')
+  for user in addUserButtons
+    id = $(user).attr('id')
+    strippedId = id.replace('add_user_button_', '')
+
+    $("#users_for_#{strippedId}").selectize({
+      create: true,
+      sortField: 'text'
+    })

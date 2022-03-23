@@ -23,7 +23,7 @@ describe WebcatCredits::InternalCategorizations::CreditHandler do
         )
       end
 
-      it 'removes prevoius credit and adds the INTERNAL credit' do
+      it 'removes previous credit and adds the INTERNAL credit' do
         subject
         expect(user.webcat_credits.count).to be 1
         expect(user.webcat_credits.last.credit).to eq WebcatCredit::INTERNAL

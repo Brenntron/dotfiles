@@ -538,7 +538,7 @@ class FileReputationDispute < ApplicationRecord
     zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
     begin
       attributes = FileReputationApi::SampleZoo.query_from_data(zoo_response)
-      n_auto_resolve_log = "<br />--------------------<br />ZOO<br /> in zoo: #{attributes[:in_zoo]}<br />Recorded at: #{Time.now.to_s}<br />"
+      n_auto_resolve_log = "<br />--------------------<br />ZOO<br /> in sample zoo: #{attributes[:in_zoo]}<br />Recorded at: #{Time.now.to_s}<br />"
       new_auto_resolve_log = self.auto_resolve_log.present? ? (self.auto_resolve_log += n_auto_resolve_log) : n_auto_resolve_log
       attributes[:auto_resolve_log] = new_auto_resolve_log
       update!(attributes)
@@ -607,7 +607,7 @@ class FileReputationDispute < ApplicationRecord
     full_description = <<~HEREDOC
       File name: #{message_payload[:payload][:file_name]}
       File Rep Sha: #{message_payload[:payload][:sha256]}
-      
+
 
     HEREDOC
 

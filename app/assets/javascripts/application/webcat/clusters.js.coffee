@@ -157,6 +157,7 @@ $ ->
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
+    pagingType: 'full_numbers'
     order: [ [
       5
       'desc'
@@ -967,6 +968,7 @@ $ ->
     url = new URL(document.location.href)
     platform = url.searchParams.get('platform')
     cluster_type = url.searchParams.get('cluster_type')
+    dropdownShouldToggle = true
 
     if(platform)
       if platform == 'All'
@@ -981,3 +983,14 @@ $ ->
       else
         $("input.show-cluster-types-filter").prop('checked', false)
         $("input.show-cluster-types-filter[name='show-cluster-#{cluster_type}'").prop('checked', true)
+
+    $('#categorize-urls').on 'click', (e) ->
+      dropdownShouldToggle = !dropdownShouldToggle
+
+      if dropdownShouldToggle == true
+        $('#categorize-urls').dropdown('toggle')
+
+    $('.nav-tool-blocks.col-xs-3.col-sm-2.col-lg-2.dropdown').on 'hide.bs.dropdown', (e) ->
+      if dropdownShouldToggle == false
+        e.preventDefault()
+

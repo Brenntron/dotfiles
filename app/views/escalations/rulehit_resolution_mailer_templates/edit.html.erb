@@ -1,9 +1,14 @@
 <h1>Editing Rulehit Resolution Mailer Template</h1>
+<% if current_user&.has_role?('big_email_honcho') %>
+  <%= render 'form_edit', rulehit_resolution_mailer_template: @rulehit_resolution_mailer_template %>
 
-<%= render 'form_edit', rulehit_resolution_mailer_template: @rulehit_resolution_mailer_template %>
+  <%= link_to 'Show', escalations_rulehit_resolution_mailer_templates_path %> |
+  <%= link_to 'Back', escalations_rulehit_resolution_mailer_templates_path %>
 
-<%= link_to 'Show', escalations_rulehit_resolution_mailer_templates_path %> |
-<%= link_to 'Back', escalations_rulehit_resolution_mailer_templates_path %>
+<% else %>
+  Authorization not found.
+<% end %>
+
 <script>
     $( document ).ready(function() {
         $('body').addClass('escalations--webrep--disputes-controller')

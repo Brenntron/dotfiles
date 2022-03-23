@@ -38,4 +38,10 @@ class ApplicationRecord < ActiveRecord::Base
     ApplicationRecord.humanize_secs(sec_input)
   end
 
+  def self.first_two_time_layers(time)
+    stripped_time = time.gsub(/\sand/, ', ')
+    formatted_time = stripped_time.split(',')
+    first_two_layers = formatted_time.slice(0, 2)
+    first_two_layers.join(',')
+  end
 end

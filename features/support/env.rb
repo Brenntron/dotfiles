@@ -5,6 +5,8 @@
 # files.
 
 require 'cucumber/api_steps'
+require 'selenium-webdriver'
+require 'capybara/cucumber'
 
 
 if ENV['COVERAGE'] && ("0" != ENV['COVERAGE'])
@@ -34,7 +36,7 @@ require 'capybara/poltergeist'
 require 'paper_trail/frameworks/cucumber'
 require 'will_paginate/array'
 
-Capybara.javascript_driver = :selenium
+Capybara.default_driver = :selenium
 Selenium::WebDriver.logger.level = :error
 
 # This setting is required for DataTables to be compatible with Selenium

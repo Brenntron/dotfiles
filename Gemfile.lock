@@ -449,6 +449,7 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    redis (4.6.0)
     remotipart (1.4.4)
     request_store (1.5.0)
       rack (>= 1.4)
@@ -634,6 +635,7 @@ DEPENDENCIES
   rails (= 5.2.1)
   rails_admin (~> 2.2.1)
   rb-fsevent (= 0.10.3)
+  redis
   rmagick (~> 2.16.0)
   rspec-rails (= 3.8.1)
   rubyXL (= 3.3.30)

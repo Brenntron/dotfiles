@@ -1,0 +1,11 @@
+.modal.fade#close-ticket-modal
+  .modal-dialog{role: 'document'}
+    .modal-content
+      #api-msg.message-div.success-msg
+        %button.close{'data-dismiss': 'modal', 'aria-label': 'Close'}
+        .message-div
+          #message-text
+            %p The following tickets were successfully closed:
+            %ul#closed-tickets-id-list
+        .text-center
+          %button#close-tickets-modal-btn.panel-button.primary{'data-dismiss': 'modal', 'aria-label': 'Close'} Close

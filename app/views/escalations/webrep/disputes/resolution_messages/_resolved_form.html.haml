@@ -1,0 +1,16 @@
+#edit-resolved-resolution-message-template-form-wrapper
+  %h4.dialog-inset-header Edit Resolution Message Template
+  %form
+    .dialog-form-information
+      %span.content-label-sm Name
+      %input#edit-resolved-resolution-message-template-name{type: 'text', disabled: true}
+      %span.content-label-sm Description
+      %input#edit-resolved-resolution-message-template-desc{type: 'text', disabled: true}
+      %input.hidden#resolved-resolution-message-template-id
+    .template-content-wrapper
+      %textarea.template-content#edit-resolved-resolution-message-template-body{maxlength: 400}
+.dialog-section-divider
+  %button.primary#edit-resolved-resolution-message-template.hidden{onclick: 'update_resolved_resolution_message_template()'}
+    Update Template
+  %button.secondary.hidden#cancel-edit-resolved-resolution-message-template{onclick: 'cancel_edit_resolved_resolution_message_template()'}
+    Cancel

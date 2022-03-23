@@ -1,0 +1,6 @@
+%ul
+  - ResolutionMessageTemplate.resolved.each do |message|
+    %li
+      %input.ticket-resolution-radio{type: 'radio', name: dispute_resolution_name, data: {id: message.id}, id: message.description, value: message.description}
+      %label.ticket-res-radio-label.radio-label{for: message.description, data: {id: message.id}}
+        = message.name

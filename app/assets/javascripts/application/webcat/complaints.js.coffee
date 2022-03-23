@@ -10,13 +10,17 @@ $(document).on 'change','.nested-table-input','.selectize-input', ->
   touchedFormChange(this.dataset.domain)
 
 #### WBNP Reporting ####
+webcat_loader_timeout = ''
 $(document).ready ->
   sessionStorage.removeItem("touchedForm");
   loader = $('#inline-webcat')
   $(this).bind(
     ajaxStart: () ->
-      loader.removeClass('hidden')
+      webcat_loader_timeout = setTimeout ->
+        loader.removeClass('hidden')
+      , 500
     ajaxStop: () ->
+      clearTimeout(webcat_loader_timeout)
       loader.addClass('hidden')
     )
   if ($('body').hasClass('escalations--webcat--complaints-controller') || $('body').hasClass('escalations--webcat--reports-controller')) &&
@@ -1400,6 +1404,8 @@ format = (complaint_entry_row) ->
   else
     complaint_source = '<span class="missing-data">Source unknown</span>'
 
+  form_change_item = complaint_entry.domain || complaint_entry.ip_address
+
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
@@ -1443,7 +1449,7 @@ format = (complaint_entry_row) ->
       '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
-      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + complaint_entry.domain + '\')"></select>' +
+      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + form_change_item + '\')"></select>' +
       '</div>' +
       '<div class="domain-categories" >' +
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
@@ -1705,6 +1711,11 @@ window.click_table_buttons = (complaint_table, button)->
   row = complaint_table.row(tr)
   data = row.data()
   cat_select = '#input_cat_'+ data.entry_id
+
+  if (!String.prototype.startsWith)
+    String.prototype.startsWith = (input, pos) ->
+      this.substr(!pos || pos < 0 ? 0 : +pos, input.length) == input
+
   if row.child.isShown()       # This row is already open - close it
     row.child.hide()
     tr.removeClass 'shown'
@@ -1742,6 +1753,10 @@ window.click_table_buttons = (complaint_table, button)->
             $('#master-submit').prop('disabled', false)
           else
             $('#master-submit').prop('disabled', true)
+        score: (input) ->
+          score = this.getScoreFunction(input)
+          (item) ->
+            (item.category_name.toLowerCase().startsWith(input.toLowerCase()) || item.category_code.toLowerCase().startsWith(input.toLowerCase())) ? 1 : 0
       }
     else
       # need to initialize the selectize function but disable it here if entry is completed
@@ -1969,7 +1984,6 @@ window.triggerTooltips = (item) ->
   return
 
 processSubmitMaster = () ->
-
   data = []
   selectedEntryDomains = (sessionStorage.getItem("touchedForm")|| "" )
   return if selectedEntryDomains.length == 0
@@ -1978,7 +1992,8 @@ processSubmitMaster = () ->
   selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
   selectedEntries = []
   $('#complaints-index').DataTable().rows (idx, data, node) ->
-    if selectedEntryDomains.includes(data.domain)
+    entry_item = data.domain || data.ip_address
+    if selectedEntryDomains.includes(entry_item)
       selectedEntries.push data
     false
   for entry in selectedEntries
@@ -2420,7 +2435,7 @@ window.prep_complaint_to_convert = () ->
         complaint_status = response.data.complaint.status
         complaint_source = response.data.complaint.ticket_source
 
-        if complaint_source == 'talos-intelligence'
+        if complaint_source == 'talos-intelligence' || complaint_source == 'talos-intelligence-api'
           if complaint_status == 'NEW' || complaint_status == 'ACTIVE' || complaint_status == 'REOPENED'
             # populate the dropdown
             $('#complaint-id-to-convert').text(complaint_id)
