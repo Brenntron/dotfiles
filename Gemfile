@@ -96,7 +96,7 @@ gem "sassc", '2.4.0'
 gem "sassc-rails", '~> 2.0'
 gem 'clipboard-rails', '1.7.1'
 
-gem 'capybara', '3.36.0'
+gem 'capybara', '2.11.0'
 gem 'poltergeist', '1.18.1'
 gem 'selenium-webdriver'
 gem 'inline_svg', '1.3.1'
@@ -140,7 +140,7 @@ group :test do
   gem 'simplecov', '0.16.1', :require => false
   gem 'cucumber-api-steps', '~>0.14', require: false
   gem "timecop"
-  gem 'webdrivers', '~> 5.0'
+  gem 'geckodriver-helper'
 end
 
 
