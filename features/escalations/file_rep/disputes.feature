@@ -588,12 +588,12 @@ Feature: Disputes
     And I click "#amp-edit-button"
     And I click "#amp-new-button"
     Then I should see content "" within ".amp-pattern"
-    Then I should see content "" within ".amp-example"
-    Then I should see content "" within ".amp-engine"
-    Then I should see content "" within ".amp-engine-description"
-    Then I should see content "" within ".amp-notes"
-    Then I should see content "" within ".amp-public-notes"
-    Then I should see content "" within ".amp-contact"
+    And I should see content "" within ".amp-example"
+    And I should see content "" within ".engine-description"
+    And I should see content "" within ".private-engine-description"
+    And I should see content "" within ".amp-contact"
+    And I should see content "" within ".amp-notes"
+    And I should see content "" within ".amp-public-notes"
 
   @javascript
   Scenario: a user with the role 'amp pattern namer' visits the Secure Endpoint Naming Convention page and saves an entry
@@ -603,27 +603,26 @@ Feature: Disputes
     And I click "#amp-new-button"
     And I fill in element, ".code-input" with "Code"
     And I fill in element, ".example-input" with "Example"
-    And I fill in element, ".engine-input" with "Engine"
-    And I fill in element, ".description-textarea" with "Description"
-    And I fill in element, ".notes-input" with "Notes"
-    And I fill in element, ".notes-public-textarea" with "Public Notes"
-    And I fill in element, ".contact-textarea" with "Contact"
+    And I fill in element, ".engine-description .table-form-content textarea" with "Description"
+    And I fill in element, ".private-engine-description .table-form-content textarea" with "Private Description"
+    And I fill in element, ".amp-contact .table-form-content textarea" with "Contact"
+    And I fill in element, ".amp-notes .table-form-content textarea" with "Notes"
+    And I fill in element, ".amp-public-notes .table-form-content textarea" with "Public Notes"
     And I click "#amp-save-button"
-    Then I should see "THE FOLLOWING Secure Endpoint NAMING CONVENTIONS HAVE BEEN CREATED:"
-    And I should see content "Code" within ".amp-pattern"
+    Then I should see "THE FOLLOWING SECURE ENDPOINT NAMING CONVENTIONS HAVE BEEN CREATED:"
+    And I should see content "Code" within ".amp-pattern .table-code"
     And I should see content "Example" within ".amp-example"
-    And I should see content "Engine" within ".amp-engine"
-    And I should see content "Description" within ".amp-engine-description"
+    And I should see content "Description" within ".engine-description"
+    And I should see content "Contact" within ".amp-contact"
     And I should see content "Notes" within ".amp-notes"
     And I should see content "Public Notes" within ".amp-public-notes"
-    And I should see content "Contact" within ".amp-contact"
 
   @javascript
   Scenario: a user with the role 'amp pattern namer' visits the Secure Endpoint Naming Convention page and deletes an entry
     Given a user with role "amp pattern namer" exists and is logged in
     And the following Secure Endpoint Naming Conventions exist:
-    |id|
-    |1 |
+      |private_engine_description|
+      |Private                   |
     When I go to "/escalations/file_rep/naming_guide"
     And I click "#amp-edit-button"
     And I click ".delete-button"
@@ -636,24 +635,25 @@ Feature: Disputes
   Scenario: a user with the role 'amp pattern namer' visits the Secure Endpoint Naming Convention page and edits an entry
     Given a user with role "amp pattern namer" exists and is logged in
     And the following Secure Endpoint Naming Conventions exist:
-    |id|
-    |1 |
+      |private_engine_description|
+      |Private                   |
     When I go to "/escalations/file_rep/naming_guide"
     And I click "#amp-edit-button"
     And I fill in element, ".code-input" with "It's"
     And I fill in element, ".example-input" with "Another"
-    And I fill in element, ".engine-input" with "Cucumber"
-    And I fill in element, ".description-textarea" with "Test"
-    And I fill in element, ".notes-input" with "Tell"
-    And I fill in element, ".notes-public-textarea" with "Everyone"
-    And I fill in element, ".contact-textarea" with "Now"
+    And I fill in element, ".engine-description .table-form-content textarea" with "Cucumber"
+    And I fill in element, ".private-engine-description .table-form-content textarea" with "Test"
+    And I fill in element, ".amp-contact .table-form-content textarea" with "Now"
+    And I fill in element, ".amp-notes .table-form-content textarea" with "Tell"
+    And I fill in element, ".amp-public-notes .table-form-content textarea" with "Everyone"
     And I click "#amp-save-button"
-    Then I should see "THE FOLLOWING SECURE ENDPOINT NAMING CONVENTIONS HAVE BEEN UPDATED:"
+    #Then take a screenshot
+    Then I should see "SECURE ENDPOINT NAMING CONVENTIONS HAVE BEEN UPDATED"
     When I go to "/escalations/file_rep/naming_guide"
     And I should see content "It's" within ".amp-pattern"
     And I should see content "Another" within ".amp-example"
-    And I should see content "Cucumber" within ".amp-engine"
-    And I should see content "Test" within ".amp-engine-description"
+    And I should see content "Cucumber" within ".engine-description"
+    And I should see content "Test" within ".private-engine-description"
     And I should see content "Tell" within ".amp-notes"
     And I should see content "Everyone" within ".amp-public-notes"
     And I should see content "Now" within ".amp-contact"
