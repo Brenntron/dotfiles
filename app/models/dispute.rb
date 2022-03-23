@@ -811,8 +811,44 @@ For future Web categorization requests, please open a Web categorization ticket 
 
   ##############END DISPUTE REBUILD#################################
 
+  def self.sanitize_url(url)
+    original_url = url
+
+    begin
+      url = url.downcase
+      if url.first(3) == "ftp"
+        url = url.gsub("ftp://", '')
+      end
+
+      sanitized_url = ""
+
+      if url.first(4) != "http"
+        url = "http://" + url
+      end
+
+      url_parts = Complaint.parse_url(url)
+
+      if url_parts[:subdomain].present?
+        sanitized_url += url_parts[:subdomain] + "."
+      end
+      sanitized_url += url_parts[:domain] + url_parts[:path]
+      if url_parts[:query].present?
+        sanitized_url += "?" + url_parts[:query]
+      end
+
+      if sanitized_url.blank?
+        sanitized_url = original_url
+      end
+
+      URI.decode(sanitized_url)
+    rescue
+      return original_url
+    end
+
+  end
+
   def self.process_bridge_payload(message_payload)
-    
+
     #check to see if ticket already exists in database to prevent accidental dupes
     record_exists = Dispute.where(:ticket_source_key => message_payload["source_key"]).first
 
@@ -1018,9 +1054,11 @@ For future Web categorization requests, please open a Web categorization ticket 
             entry_platform = Platform.find(entry["platform"].to_i) rescue nil
           end
 
+          sanitized_url = sanitize_url(url)
+
           new_dispute_entry = DisputeEntry.new
           new_dispute_entry.dispute_id = new_dispute.id
-          new_dispute_entry.uri = url
+          new_dispute_entry.uri = sanitized_url
           new_dispute_entry.entry_type = "URI/DOMAIN"
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
           new_dispute_entry.status = DisputeEntry::NEW
@@ -1038,7 +1076,7 @@ For future Web categorization requests, please open a Web categorization ticket 
           #new_dispute_entry.is_important = is_important?(key)
           new_dispute_entry.auto_resolve_log = ""
           begin
-            new_dispute_entry.assign_url_parts(url)
+            new_dispute_entry.assign_url_parts(sanitized_url)
           rescue => e
             Rails.logger.error e
             Rails.logger.error e.backtrace.join("\n")
