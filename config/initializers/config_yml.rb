@@ -68,7 +68,7 @@ Rails.configuration.auto_resolve        = OpenStruct.new
 Rails.configuration.auto_resolve.check_complaints = auto_resolve['complaints'] && auto_resolve['complaints']['check']
 Rails.configuration.auto_resolve.check_virus_total = auto_resolve['virus_total'] && auto_resolve['virus_total']['check']
 Rails.configuration.auto_resolve.check_umbrella = auto_resolve['umbrella'] && auto_resolve['umbrella']['check']
-
+Rails.configuration.auto_resolve.check_matching_disposition = auto_resolve['check_matching_disposition']
 
 beaker_config = env_config['beaker']
 raise "config.yml missing beaker section" unless beaker_config

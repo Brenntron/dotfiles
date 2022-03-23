@@ -28,6 +28,7 @@ gem 'libv8', '3.16.14.19'
 gem 'mysql2', '0.5.2'
 gem 'paper_trail', '12.0.0'
 gem 'rails_admin', '~> 2.2.1'
+gem 'redis'
 
 # Security
 gem 'cancancan', '2.3.0'
