@@ -39,11 +39,11 @@ When(/^I select row "(.*?)"$/) do |target|
   page.execute_script("$('##{target}').addClass('selected')")
 end
 
-Then (/^a new window should be opened$/) do
+Then(/^a new window should be opened$/) do
   raise("Page did not open") if page.driver.browser.window_handles.count <= 1
 end
 
-When (/^I switch to the new window$/) do
+When(/^I switch to the new window$/) do
   popup = page.driver.browser.window_handles.last
   page.driver.browser.switch_to.window(popup)
 end
