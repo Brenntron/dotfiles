@@ -76,6 +76,7 @@ $ ->
   window.cancel_amp_naming_conventions = () ->
     # On cancel, restore the ready-to-delete rows
     $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
+    $('#amp-naming-details-table tbody').removeClass 'ui-sortable'
     $('.delete-patterns-area').addClass('hidden')
     $('.delete-patterns-queue').empty()
     $('.formatted-contact').show()
