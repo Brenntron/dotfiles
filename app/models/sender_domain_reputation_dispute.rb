@@ -144,7 +144,7 @@ class SenderDomainReputationDispute < ApplicationRecord
         sugg_type: self.suggested_disposition
     }
 
-    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
+    conn = ::Bridge::SdrDisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
     conn.post(return_payload)
   end
 
