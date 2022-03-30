@@ -41,4 +41,40 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
   end
 
+  def parse_email_content(bug_attachment)
+
+    file_data = bug_attachment.file_contents
+
+    if file_data.present?
+
+      header_json = SenderDomainReputationDisputeAttachment.parse_headers_to_hash(file_data)
+
+      self.email_header_data = header_json
+      self.save!
+
+    end
+
+  end
+
+  def self.parse_headers_to_array(file_data, convert_to_json = true)
+
+    json_data = {}
+    begin
+      email_headers = Mail.new(file_data).header_fields
+      email_headers.each do |header|
+        json_data[header.name] = header.value
+      end
+
+    rescue
+      json_data = {}
+    end
+
+    if convert_to_json == true
+      json_data.to_json
+    else
+      json_data
+    end
+
+  end
+
 end
