@@ -101,15 +101,13 @@ $ ->
       cells = $(this).find('td')
       $(cells).each ->
         if $($(this).find('input')).length > 0
-          input = $($(this).find('input')).val()
           content = $($(this).find('.table-content')).text()
           if $(this).hasClass('amp-pattern')
             content = $($(this).find('.table-code')).text()
-          input == content
+          $($(this).find('input')).val(content.trim())
         else
-          textarea = $($(this).find('textarea')).val()
           content = $($(this).find('.table-content')).text()
-          textarea == content
+          $($(this).find('textarea')).val(content.trim())
 
   # Create new row in table
   window.add_amp_naming_conventions = () ->
@@ -136,7 +134,7 @@ $ ->
       <td class='amp-contact'>
       <span class='table-content'></span>
       <span class='table-form-content'><textarea class='contact-textarea'></textarea></span>
-      <span class='delete-button' onclick='delete_amp_naming_convention('#{new_sequence_number}', '')'></span>
+      <span class='delete-button' onclick="delete_amp_naming_convention('#{new_sequence_number}', '')"></span>
       </td>
       <td class='amp-notes'>
       <span class='table-content'></span>
@@ -158,6 +156,7 @@ $ ->
     # and prep for saving
     rows = $('#amp-naming-details-table tbody').find('tr')
     rows_changed = []
+    newRowsWithErrors = []
 
     $(rows).each ->
       row = this
@@ -187,6 +186,12 @@ $ ->
           text = $(this).find('.table-content')
           content = $(text).text()
           content = $.trim(content)
+          if $(this).hasClass('amp-contact')
+            textarea = textarea.replace(/(\r\n|\n|\r|<|>|\(|\))/gm, "")
+            content = content.replace(/(\r\n|\n|\r|<|>|\(|\))/gm, "")
+          else
+            textarea = textarea.replace(/(\r\n|\n|\r)/gm, "")
+            content = content.replace(/(\r\n|\n|\r)/gm, "")
           if content != textarea
             nochange = false
           content = textarea
@@ -198,11 +203,6 @@ $ ->
       # Put changed and new rows in an array
       if nochange == false
         rows_changed.push(this)
-
-    # Hide active editing buttons
-    $('#amp-edit-button').show()
-    $('.active-editing-buttons').hide()
-    $('#amp-naming-details-table tbody').removeClass 'ui-sortable'
 
     # Prep new arrays for sending to db
     # This may need to change, not sure how we'll want this formatted
@@ -222,6 +222,8 @@ $ ->
       if pattern == '' && example == '' && private_engine_desc == '' && engine_desc == '' && notes == '' && public_notes == '' && contact == ''
         $(this).remove()
 
+      else if pattern == '' || example == '' || private_engine_desc == '' || engine_desc == ''
+        newRowsWithErrors.push($(this))
       else
         unless id == ''
           rows_to_update.push(
@@ -245,6 +247,15 @@ $ ->
             'public_notes': public_notes,
             'contact': contact
           )
+
+    if newRowsWithErrors.length > 0
+      showNewRowErrorMessage()
+      return
+
+    # Hide active editing buttons
+    $('#amp-edit-button').show()
+    $('.active-editing-buttons').hide()
+    $('#amp-naming-details-table tbody').removeClass 'ui-sortable'
 
     if rows_to_add.length > 0
       window.create_amp_naming_conventions([rows_to_add])
@@ -274,7 +285,7 @@ $ ->
         url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
         data: { 'ids': delete_id_array }
         success: (response) ->
-          std_msg_success('Secure Endpoint Naming Convention(s) Below Has Been Deleted.', [delete_pattern_list], reload: false)
+          std_msg_success('Secure Endpoint Naming Convention(s) Have Been Deleted.', [delete_pattern_list], reload: false)
         error: (response) ->
           # On ajax error, restore the ready-to-delete rows
           $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
@@ -389,3 +400,6 @@ $ ->
 
   $('#nav-banner #naming-guide').click ->
     $('#naming-guide-dialog').dialog('open')
+
+  showNewRowErrorMessage = () ->
+    std_msg_error('Error Adding Secure Endpoint Naming Convention', ['Pattern, Example, Engine Description, and Private Engine Description are required fields.'], reload: false)
