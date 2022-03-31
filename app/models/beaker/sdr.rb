@@ -1,7 +1,4 @@
-# Domain Reputation
-
 require 'service-sdr_services_pb'
-
 
 class Beaker::Sdr < Beaker::BeakerBase
 
