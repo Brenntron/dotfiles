@@ -4,11 +4,12 @@ require 'service-sdr_services_pb'
 
 
 class Beaker::Sdr < Beaker::BeakerBase
+
   # Request a reputation verdict based on sender information in the SMTP
   # envelope.
   # rpc :EnvelopeQuery, ::Talos::SDR::EnvelopeRequest, ::Talos::SDR::EnvelopeReply
   # params:
-  # ip - (string)
+  # ip_address - (string)
   # smtp_envelope_params
   #   * mail_from - (string)
   #   * rcpt_to - (array[string])
@@ -18,7 +19,11 @@ class Beaker::Sdr < Beaker::BeakerBase
   #     * mail_from - 'none', 'neutral', 'pass', 'fail', 'softfail', 'temperror', 'permerror', or 'notimplemented'
   #     * dmarc_align - (bool)
   #   * helo or ehlo - (string)
-  def self.envelope_query(ip, smtp_envelope_params)
+  # -------------------------------------------------------------------------------------
+  # This is an exhaustive list of params, but ip_address is the only one that is required
+  # For better results include mail_from and rcpt_to in smtp_envelope_params
+  # -------------------------------------------------------------------------------------
+  def self.envelope_query(ip_address, smtp_envelope_params: {spf_results: {}})
     spf_results = Talos::SPFResults.new(helo: spf_result_enum(smtp_envelope_params[:spf_results][:helo]),
                                         mail_from: spf_result_enum(smtp_envelope_params[:spf_results][:mail_from]),
                                         dmarc_align: smtp_envelope_params[:spf_results][:dmarc_align])
@@ -35,7 +40,7 @@ class Beaker::Sdr < Beaker::BeakerBase
     end
 
     envelope_request = Talos::SDR::EnvelopeRequest.new(app_info: get_app_info,
-                                                       endpoint: get_ip_endpoint(ip),
+                                                       endpoint: get_ip_endpoint(ip_address),
                                                        smtp_envelope: smtp_envelope,
                                                        connection: get_connection([SecureRandom.uuid.gsub("-", "")].pack("H*")),
                                                        msg_guid: [SecureRandom.uuid.gsub("-", "")].pack("H*"))
@@ -45,7 +50,7 @@ class Beaker::Sdr < Beaker::BeakerBase
 
   # Request a reputation verdict based on sending domains.
   # rpc :DataQuery, ::Talos::SDR::DataRequest, ::Talos::SDR::DataReply
-  # ip - (string)
+  # ip_address - (string)
   # esa_mid - (int)
   # smtp_envelope_params
   #   * mail_from - (string)
@@ -75,7 +80,7 @@ class Beaker::Sdr < Beaker::BeakerBase
   #     * archive - (string)
   #     * unsub_post - 'valid', 'invalid', or 'none'
   #   * dkim_disabled - (bool)
-  #   * dkim_disp - (hash)
+  #   * dkim_disp - (array[hash])
   #     * domain - (string)
   #     * selector - (string)
   #     * head_canon - 'relaxed' or 'strict'
@@ -91,7 +96,11 @@ class Beaker::Sdr < Beaker::BeakerBase
   #   * misc_hdrs - (array[hash])
   #     * name - (string)
   #     * value - (string)
-  def self.data_query(ip, esa_mid, smtp_envelope_params, mail_data_params)
+  # -------------------------------------------------------------------------------------
+  # This is an exhaustive list of params, but ip_address is the only one that is required
+  # For better results include mail_from and rcpt_to in smtp_envelope_params
+  # -------------------------------------------------------------------------------------
+  def self.data_query(ip_address, esa_mid: nil, smtp_envelope_params: {spf_results: {}}, mail_data_params: {dkim_disp: [{}], dmarc_disp: {}, email_list: {}})
     spf_results = Talos::SPFResults.new(helo: spf_result_enum(smtp_envelope_params[:spf_results][:helo]),
                                         mail_from: spf_result_enum(smtp_envelope_params[:spf_results][:mail_from]),
                                         dmarc_align: smtp_envelope_params[:spf_results][:dmarc_align])
@@ -115,30 +124,33 @@ class Beaker::Sdr < Beaker::BeakerBase
                                       archive: mail_data_params[:email_list][:archive],
                                       unsub_post: unsub_post_enum(mail_data_params[:email_list][:unsub_post]))
 
-    dkim_disposition = Talos::DKIMDisposition.new(domain: mail_data_params[:dkim_disp][:domain],
-                                                  selector: mail_data_params[:dkim_disp][:selector],
-                                                  head_canon: dkim_canon_enum(mail_data_params[:dkim_disp][:head_canon]),
-                                                  body_canon: dkim_canon_enum(mail_data_params[:dkim_disp][:body_canon]),
-                                                  dmarc_align: mail_data_params[:dkim_disp][:dmarc_align],
-                                                  uses_from_hdr: mail_data_params[:dkim_disp][:uses_from_hdr],
-                                                  dkim_sig_is_valid: mail_data_params[:dkim_disp][:dkim_sig_is_valid])
+    dkim_disposition = mail_data_params[:dkim_disp]&.map do |m|
+      Talos::DKIMDisposition.new(domain: m[:domain],
+                                 selector: m[:selector],
+                                 head_canon: dkim_canon_enum(m[:head_canon]),
+                                 body_canon: dkim_canon_enum(m[:body_canon]),
+                                 dmarc_align: m[:dmarc_align],
+                                 uses_from_hdr: m[:uses_from_hdr],
+                                 dkim_sig_is_valid: m[:dkim_sig_is_valid])
+    end
+
 
     dmarc_disposition = Talos::DMARCDisposition.new(record: mail_data_params[:dmarc_disp][:record],
                                                     strict: mail_data_params[:dmarc_disp][:strict],
                                                     aligned: mail_data_params[:dmarc_disp][:aligned])
 
-    mail_data = Talos::MailData.new(from_hdr: mail_data_params[:from_hdr].map {|m| Talos::EmailMailbox.new(addr: m[:addr], display: m[:display])},
-                                    to_hdr: mail_data_params[:to_hdr].map {|m| Talos::EmailMailbox.new(addr: m[:addr], display: m[:display])},
-                                    reply_to_hdr: mail_data_params[:reply_to_hdr].map {|m| Talos::EmailMailbox.new(addr: m[:addr], display: m[:display])},
+    mail_data = Talos::MailData.new(from_hdr: mail_data_params[:from_hdr]&.map {|m| Talos::EmailMailbox.new(addr: m[:addr], display: m[:display])},
+                                    to_hdr: mail_data_params[:to_hdr]&.map {|m| Talos::EmailMailbox.new(addr: m[:addr], display: m[:display])},
+                                    reply_to_hdr: mail_data_params[:reply_to_hdr]&.map {|m| Talos::EmailMailbox.new(addr: m[:addr], display: m[:display])},
                                     list: email_list,
                                     dkim_disabled: mail_data_params[:dkim_disabled],
                                     dkim_disp: dkim_disposition,
                                     dmarc_disabled: mail_data_params[:dmarc_disabled],
                                     dmarc_disp: dmarc_disposition,
-                                    misc_hdrs: mail_data_params[:misc_hdrs].map {|m| Talos::EmailHeader.new(name: m[:name], value: m[:value])})
+                                    misc_hdrs: mail_data_params[:misc_hdrs]&.map {|m| Talos::EmailHeader.new(name: m[:name], value: m[:value])})
 
     data_request = Talos::SDR::DataRequest.new(app_info: get_app_info,
-                                               endpoint: get_ip_endpoint(ip),
+                                               endpoint: get_ip_endpoint(ip_address),
                                                smtp_envelope: smtp_envelope,
                                                mail_data: mail_data,
                                                esa_mid: esa_mid,
@@ -177,8 +189,10 @@ class Beaker::Sdr < Beaker::BeakerBase
       Talos::SPFResults::ResultType::SPF_RESULT_TEMPERROR
     when "permerror"
       Talos::SPFResults::ResultType::SPF_RESULT_PERMERROR
-    else
+    when "notimplemented"
       Talos::SPFResults::ResultType::SPF_RESULT_NOT_IMPLEMENTED
+    else
+      nil
     end
   end
 
@@ -188,8 +202,10 @@ class Beaker::Sdr < Beaker::BeakerBase
       Talos::EmailList::EmailListUnsubPost::EMAIL_LISTUNSUBPOST_VALID
     when "invalid"
       Talos::EmailList::EmailListUnsubPost::EMAIL_LISTUNSUBPOST_INVALID
-    else
+    when "none"
       Talos::EmailList::EmailListUnsubPost::EMAIL_LISTUNSUBPOST_NONE
+    else
+      nil
     end
   end
 
