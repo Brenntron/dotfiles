@@ -1,5 +1,6 @@
 require 'service-sdr_services_pb'
 
+# see lib/grpc/service-sdr_services_pb.rb for usage information
 class Beaker::Sdr < Beaker::BeakerBase
 
   # Request a reputation verdict based on sender information in the SMTP
