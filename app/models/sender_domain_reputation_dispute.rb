@@ -3,6 +3,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional: true
   belongs_to :user, optional:true
+  belongs_to :platform, optional:true
 
   has_many :sender_domain_reputation_dispute_attachments
 
