@@ -8061,6 +8061,10 @@ table#duplicates a {
   opacity: .5 !important;
 }
 
+li.disabled-link {
+  display: none;
+}
+
 .disabled-link:hover {
   text-decoration: none !important;
 }
