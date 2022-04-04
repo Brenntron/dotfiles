@@ -525,6 +525,8 @@ $ ->
       success_reload:false
       success: () ->
         $('#confirmation-modal').modal('hide')
+      error: (response) ->
+        std_api_error(response, "Reptool API error", reload: false)
     )
 
   window.drop_reptool_bl = (data) ->
