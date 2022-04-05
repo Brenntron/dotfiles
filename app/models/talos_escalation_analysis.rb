@@ -16,7 +16,10 @@ class TalosEscalationAnalysis
     tea_data[:security_intelligence] = {}     #reptool
     tea_data[:virustotal] = {}                #virustotal
     tea_data[:umbrella] = {}                  #umbrella
-    tea_data[:threatgrid] = {}                #threatgrid
+
+
+    tea_data[:entry][:url] = entry
+    tea_data[:entry][:ip_address] = Resolv.getaddress('1234computer.com') rescue nil
 
     ###WEB REP
     begin
@@ -122,7 +125,7 @@ class TalosEscalationAnalysis
     results[:bl_comment] = nil
     results[:wl_status] = nil
 
-    block_list_info = RepApi::BlackList.where(:entry => entry) rescue nil
+    block_list_info = RepApi::Blacklist.where(:entries => [entry]).first rescue nil
 
     if block_list_info.present?
       results[:bl_classification] = block_list_info.classifications
@@ -130,7 +133,7 @@ class TalosEscalationAnalysis
       results[:bl_comment] = block_list_info.metadata["VRT"]["comment"] rescue nil
     end
 
-    allow_list_info = RepApi::Whitelist.get_whitelist_info({:entries => [entry]})
+    allow_list_info = RepApi::Whitelist.get_whitelist_info({:entries => [entry]}) rescue {}
     results[:wl_status] = allow_list_info[allow_list_info.keys.last]["status"] rescue nil
 
     results
@@ -148,7 +151,7 @@ class TalosEscalationAnalysis
 
     vt_scans = AutoResolve.check_virustotal_hits(entry) rescue nil
     if vt_scans.present?
-      results[:url_detection] = vt_scans[:positives].to_s + "/" + vt_scans[:total_scans] rescue nil
+      results[:url_detection] = vt_scans[:positives].to_s + "/" + vt_scans[:total_scans].to_s rescue nil
       results[:trusted_detection] = AutoResolve.number_of_virustotal_trusted_hits(vt_scans[:positive_scans]).to_s + "/5"
       results[:permalink] = vt_scans[:permalink] rescue nil
     end
@@ -179,7 +182,7 @@ class TalosEscalationAnalysis
     rep_info = Umbrella::Scan.scan_result(address: safe_entry) rescue {}
     security_info = Umbrella::SecurityInfo.query_info(address: safe_entry) rescue {}
 
-    results[:popularity] = security_info["popularity"] rescue nil
+    results[:popularity] = JSON.parse(security_info.body)["popularity"] rescue nil
 
     ##################
     if domain_volume.code == 200
@@ -213,7 +216,7 @@ class TalosEscalationAnalysis
         results[:domain_volume] = "NORMAL"
       end
 
-      return result
+
     else
       results[:domain_volume] = nil
     end

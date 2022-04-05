@@ -28,7 +28,7 @@ RSpec.describe API::V1::Escalations::CloudIntel::Tea, type: :request do
 
     get_data_params = {
 
-        entry: 'www.google.com'
+        entry: '1234computer.com'
     }
 
     post '/escalations/api/v1/escalations/cloud_intel/tea/get_data', as: :json, headers: { 'Token' => @auth_token },
@@ -40,9 +40,13 @@ RSpec.describe API::V1::Escalations::CloudIntel::Tea, type: :request do
     body = response.body
 
     response_hash = JSON.parse(body)
-
+    
     expect(code).to eql("201")
-    expect(response_hash).to eql({})
+    expect(response_hash["data"]["url"]).to_not eql({})
+    expect(response_hash["data"]["web_reputation"]).to_not eql({})
+    expect(response_hash["data"]["security_intelligence"]).to_not eql({})
+    expect(response_hash["data"]["virustotal"]).to_not eql({})
+    expect(response_hash["data"]["umbrella"]).to_not eql({})
   end
 
 
