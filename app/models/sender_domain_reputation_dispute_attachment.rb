@@ -47,7 +47,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
     if file_data.present?
 
-      header_json = SenderDomainReputationDisputeAttachment.parse_headers_to_hash(file_data)
+      header_json = SenderDomainReputationDisputeAttachment.parse_headers_to_array(file_data)
 
       self.email_header_data = header_json
       self.save!
@@ -66,7 +66,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
       end
 
     rescue
-      json_data = {}
+      json_data = {:status => "error"}
     end
 
     if convert_to_json == true
