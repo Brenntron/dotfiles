@@ -111,6 +111,8 @@ class TalosEscalationAnalysis
     end
 
     xena_entry = DisputeEntry.safe_domain_of(entry)
+    #this isn't fully implemented yet, requires api keys to complete, per https://jira.talos.cisco.com/browse/TPHU-1831
+    # will create an additional follow up ticket to square this away.
     results[:xena] = Xena::GuardRails.is_allow_listed?(xena_entry) rescue nil
 
     results[:threat_level] = SbApi.wbrs_to_new_threat_level(results[:score]) rescue nil
@@ -186,36 +188,26 @@ class TalosEscalationAnalysis
 
     ##################
     if domain_volume.code == 200
+      results[:domain_volume] = "NORMAL"
       data = JSON.parse(domain_volume.body)["queries"]
 
-      ###### check each day ##########
-      #
-      high_day_flag = false
-      data.each_slice(24).each do |data_day|
-        if data_day.size == 24
-          sum = data_day.inject(0){|sum, x| sum + x}
-          if sum > 100
-            high_day_flag = true
+      total_queries = data.inject(0){|sum, x| sum + x }
+
+      if total_queries == 0
+        results[:domain_volume] = "ZERO DOMAIN VOLUME"
+      else
+
+        data.each do |data_point|
+          if data_point.to_i == 0
+            next
           end
+          data_point_factor = (data_point.to_f / total_queries.to_f)
+          if data_point_factor > 0.1
+            results[:domain_volume] = "SUSPICIOUS"
+          end
+
         end
       end
-
-      ###### check all days ######
-      high_month_flag = false
-
-      sum = data.inject(0){|sum, x| sum + x}
-
-      if sum > 1000
-        high_month_flag = true
-      end
-
-      ######  determine high volume pass/fail ##############
-      if high_month_flag == true && high_day_flag == true
-        results[:domain_volume] = "ABNORMAL/HIGH VOLUME"
-      else
-        results[:domain_volume] = "NORMAL"
-      end
-
 
     else
       results[:domain_volume] = nil
