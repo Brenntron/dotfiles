@@ -99,8 +99,9 @@ Rails.application.routes.draw do
       get 'sandbox-html-report', to: 'disputes#sandbox_html_report'
     end
 
-    namespace :sender_domain_reputation do
-      resources :root, only: [:index, :show]
+    namespace :sdr do
+      root 'root#index'
+      resources :disputes, only: [:index, :show]
     end
 
 
