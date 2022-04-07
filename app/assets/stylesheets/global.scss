@@ -4491,7 +4491,8 @@ td.wbrs-highlight, td.sbrs-highlight {
 .escalations--webcat--complaints-controller,
 .escalations--webcat--reports-controller,
 .users-controller,
-.escalations--file_rep--disputes-controller {
+.escalations--file_rep--disputes-controller,
+.escalations--sdr--disputes-controller {
   #nav-banner {
     background-color: $table-dark-body;
     color: $content-bg-color;
