@@ -41,8 +41,7 @@ class Ngfw::Importer
           )
         end
       rescue ActiveRecord::ValueTooLong => error
-        # someday, we might want to do something with these (like figure out how many we
-        # get and why) but for now, do nothing.
+        puts error
       end      
     end
 
