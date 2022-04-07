@@ -25,21 +25,25 @@ class Ngfw::Importer
     end
 
     def import_new_clusters
-      platform = Platform.where('LOWER(internal_name) LIKE ?', '%ngfw%').first # there is no ILIKE in mysql...
-      raise 'NGFW platform not found' if platform.blank?
-
-      pending_clusters = NgfwCluster.pluck(:domain) # all the rest clusters were deleted by destroy_existing_clusters!
-
-      Ngfw::DataFetcher.fetch.each do |ngfw_record|
-        # skip pending clusters domains - they are already in progress
-        next if pending_clusters.include?(ngfw_record[:domain])
-
-        NgfwCluster.create(
-          domain: ngfw_record[:domain],
-          traffic_hits: ngfw_record[:traffic_hits],
-          platform_id: platform.id
-        )
-      end
+      begin
+        platform = Platform.where('LOWER(internal_name) LIKE ?', '%ngfw%').first # there is no ILIKE in mysql...
+        raise 'NGFW platform not found' if platform.blank?
+  
+        pending_clusters = NgfwCluster.pluck(:domain) # all the rest clusters were deleted by destroy_existing_clusters!
+  
+        Ngfw::DataFetcher.fetch.each do |ngfw_record|
+          # skip pending clusters domains - they are already in progress
+          next if pending_clusters.include?(ngfw_record[:domain])
+          NgfwCluster.create(
+            domain: ngfw_record[:domain],
+            traffic_hits: ngfw_record[:traffic_hits],
+            platform_id: platform.id
+          )
+        end
+      rescue ActiveRecord::ValueTooLong => error
+        # someday, we might want to do something with these (like figure out how many we
+        # get and why) but for now, do nothing.
+      end      
     end
 
     def no_other_import_jobs?
