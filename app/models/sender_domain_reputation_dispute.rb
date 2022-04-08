@@ -122,6 +122,11 @@ class SenderDomainReputationDispute < ApplicationRecord
         message_payload["attachments"].each do |dispute_attachment|
           SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, dispute_attachment, user, new_dispute)
         end
+        new_dispute.reload
+      end
+
+      if new_dispute.sender_domain_reputation_dispute_attachments.present?
+        new_dispute.parse_all_email_file_headers(bugzilla_rest_session)
       end
 
       new_dispute.send_created_ack
@@ -154,4 +159,21 @@ class SenderDomainReputationDispute < ApplicationRecord
     conn = ::Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
     conn.post
   end
+
+  def parse_all_email_file_headers(bugzilla_rest_session)
+
+    bug_proxy = bugzilla_rest_session.build_bug(id: self.id)
+
+    bug_attachments = bug_proxy.attachments
+
+    bug_attachments.each do |bug_attachment|
+      sdr_attachment = sender_domain_reputation_dispute_attachments.where(:id => bug_attachment.id).first
+      if sdr_attachment.present?
+        sdr_attachment.parse_email_content(bug_attachment)
+      end
+    end
+
+
+  end
+
 end
