@@ -5392,6 +5392,15 @@ table > tbody > tr > td.dispute_rep_tools {
   min-width: 750px;
 }
 
+#sdr-index-table-show-columns-dropdown {
+  min-width: 400px;
+}
+
+#sdr-index-table-show-columns-dropdown ul {
+  display: block;
+  padding: 10px;
+}
+
 .dropdown-menu-content-block ul {
   padding: 10px;
   display: inline-block;

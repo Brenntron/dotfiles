@@ -7,20 +7,12 @@ class Escalations::Sdr::DisputesController < ApplicationController
     respond_to do |format|
       format.html
       format.json do
-        render json: SdrDisputeDatatable.new(params,
-                                               initialize_params,
-                                               user: current_user)
+        render json: SdrDisputeDatatable.new(params, initialize_params, user: current_user)
       end
     end
   end
 
   private
-
-    def index_params
-      params.fetch(:dispute, {}).permit(:customer_name, :customer_email, :customer_company_name,
-                                        :status, :resolution, :subject,
-                                        :value)
-    end
 
     def datatables_search_params
       params.fetch(:search, {value: ''}).permit(:value)

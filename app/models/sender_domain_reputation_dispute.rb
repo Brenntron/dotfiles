@@ -155,4 +155,74 @@ class SenderDomainReputationDispute < ApplicationRecord
     conn = ::Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
     conn.post
   end
+
+  def return_dispute
+    update!(user_id: User.vrtincoming.id, status: STATUS_NEW)
+  end
+
+  def self.take_tickets(dispute_ids, user:)
+    SenderDomainReputationDispute.transaction do
+      if SenderDomainReputationDispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).present?
+        raise 'This ticket is already assigned'
+      end
+      SenderDomainReputationDispute.assign(dispute_ids, user: user)
+    end
+  end
+
+  def self.assign(dispute_ids, user:)
+    disputes_ary = []
+    user_id = user.kind_of?(User) ? user.id : user
+
+    SenderDomainReputationDispute.transaction do
+      disputes = SenderDomainReputationDispute.where(id: dispute_ids)
+      disputes_ary = disputes.to_a
+
+      disputes.update_all(user_id: user_id, status: STATUS_ASSIGNED)
+    end
+    disputes_ary
+  end
+
+  # Searches in a variety of ways.
+  # advanced -- search by supplied field.
+  # named -- call a saved search.
+  # standard -- use a pre-defined search.
+  # contains -- search many fields where supplied value is contained in the field.
+  # nil -- all records.
+  # @param [String] search_type variety of search
+  # @param [ActionController::Parameters] params supplied fields and values for search.
+  # @param [String] search_name name of saved search.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.robust_search(search_type, search_name: nil, params: nil, user:)
+    case search_type
+    # when 'advanced'
+    #   advanced_search(params, search_name: search_name, user: user)
+    # when 'named'
+    #   named_search(search_name, user: user)
+    # when 'standard'
+    #   standard_search(search_name, user: user)
+    when 'contains'
+      contains_search(params['value'])
+    else
+      where({})
+    end
+  end
+
+  # Searches many fields in the record for values containing a given value.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.contains_search(value)
+    sdr_dispute_fields = %w[id status resolution source sender_domain_entry submitter_type]
+    sdr_dispute_where = sdr_dispute_fields.map do |field|
+      "sender_domain_reputation_disputes.#{field} like :pattern"
+    end.join(' or ')
+
+    user_where = "users.display_name like :pattern"
+    platform_where = "platforms.public_name like :pattern"
+    company_where = "companies.name like :pattern"
+    customer_where = %w[email name].map { |field| "customers.#{field} like :pattern" }.join(' or ')
+
+    where_str = [sdr_dispute_where, user_where, platform_where, company_where, company_where, customer_where].join(' or ')
+    left_joins({ customer: :company }, :platform, :user).where(where_str, pattern: "%#{value}%")
+  end
 end
