@@ -810,6 +810,7 @@ button {
 .ticket-status-button {background-image: url(image_path('icon_status.svg'));}
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .mark-related-button {background-image: url(image_path('icon_related.svg'));}
+.sdr-ticket-owner-button {background-image: url(image_path('icon_user_white.svg'));}
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
@@ -1010,6 +1011,7 @@ button {
 .show-col-button:hover,
 .mark-related-button:hover,
 .ticket-status-button:hover,
+.sdr-ticket-owner-button:hover,
 .ticket-owner-button:hover,
 .ticket-owner-unassigned-button:hover,
 .adjust-reptool-button:hover,
@@ -1036,6 +1038,7 @@ button {
 .show-col-button:focus,
 .mark-related-button:focus,
 .ticket-status-button:focus,
+.sdr-ticket-owner-button:focus,
 .ticket-owner-button:focus,
 .adjust-reptool-button:focus,
 .adjust-wlbl-button:focus,
@@ -5101,6 +5104,11 @@ table > tbody > tr > td.dispute_rep_tools {
   display: inline-block;
 }
 
+.dropdown.open .sdr-ticket-owner-button {
+  background-color: $bug-section-color;
+  border-radius: 2px 2px 0 0 ;
+}
+
 .dropdown.open .ticket-owner-button {
   background-color: $bug-section-color;
   border-radius: 2px 2px 0 0 ;
@@ -7028,8 +7036,19 @@ table.dispute-entry-table tbody tr.selected {
   margin-left: 10px;
 }
 
+.sdr-dispute-owner-buttons-wrapper .dropdown.open {
+  background-color: transparent !important;
+}
+
 .dispute-owner-buttons-wrapper .dropdown.open {
   background-color: transparent !important;
+}
+
+.sdr-dispute-owner-buttons-wrapper .sdr-ticket-owner-button {
+  background-image: url(image_path('icon_user_white.svg'));
+  &:hover {
+    background-color: $primary-section-color !important;
+  }
 }
 
 .dispute-owner-buttons-wrapper .ticket-owner-button {

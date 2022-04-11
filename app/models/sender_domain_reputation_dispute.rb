@@ -3,6 +3,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional: true
   belongs_to :user, optional:true
+  belongs_to :platform, optional: true
 
   has_many :sender_domain_reputation_dispute_attachments
 
@@ -63,7 +64,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       full_description = <<~HEREDOC
         SDR Dispute entry: #{message_payload[:payload][:sender_domain_entry]}
         SDR Dispute Problem Summary: #{message_payload[:payload][:problem_summary]}
-  
+
 
       HEREDOC
 
@@ -153,5 +154,9 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     conn = ::Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
     conn.post
+  end
+
+  def case_id_str
+    '%010i' % id
   end
 end
