@@ -159,4 +159,36 @@ class SenderDomainReputationDispute < ApplicationRecord
   def case_id_str
     '%010i' % id
   end
+
+  def self.process_status_changes(disputes, status, resolution = nil, comment = nil, current_user = nil)
+    resolved_at = Time.now
+    disputes.each do |dispute|
+      dispute.status = status
+      if resolution.present?
+        dispute.resolution = resolution
+        dispute.resolution_comment = comment
+        dispute.case_closed_at = resolved_at
+      else
+        dispute.resolution = nil
+        dispute.resolution_comment = nil
+      end
+
+      unless [STATUS_NEW, STATUS_ASSIGNED].include?(dispute.status)
+        dispute.user_id = current_user.id unless dispute.is_assigned?
+      end
+
+      dispute.save!
+
+      #if comment.present?
+      #  DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute.id)
+      #end
+
+      dispute.reload
+
+      message = Bridge::SdrDisputeUpdateStatusEvent.new
+      message.post_entries(dispute)
+
+    end
+  end
+
 end
