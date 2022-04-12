@@ -123,6 +123,11 @@ class SenderDomainReputationDispute < ApplicationRecord
         message_payload["attachments"].each do |dispute_attachment|
           SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, dispute_attachment, user, new_dispute)
         end
+        new_dispute.reload
+      end
+
+      if new_dispute.sender_domain_reputation_dispute_attachments.present?
+        new_dispute.parse_all_email_file_headers(bugzilla_rest_session)
       end
 
       new_dispute.send_created_ack
@@ -156,6 +161,7 @@ class SenderDomainReputationDispute < ApplicationRecord
     conn.post
   end
 
+<<<<<<< HEAD
   def case_id_str
     '%010i' % id
   end
@@ -209,6 +215,20 @@ class SenderDomainReputationDispute < ApplicationRecord
       disputes = SenderDomainReputationDispute.where(id: dispute_ids).where.not(status: [SenderDomainReputationDispute::STATUS_RESOLVED])
       disputes_ary = disputes.all.to_a
       disputes.update_all(user_id: user_id, status: SenderDomainReputationDispute::STATUS_ASSIGNED, case_assigned_at: assigned_at)
+    end
+  end
+
+  def parse_all_email_file_headers(bugzilla_rest_session)
+
+    bug_proxy = bugzilla_rest_session.build_bug(id: self.id)
+
+    bug_attachments = bug_proxy.attachments
+
+    bug_attachments.each do |bug_attachment|
+      sdr_attachment = sender_domain_reputation_dispute_attachments.where(:id => bug_attachment.id).first
+      if sdr_attachment.present?
+        sdr_attachment.parse_email_content(bug_attachment)
+      end
     end
   end
 end
