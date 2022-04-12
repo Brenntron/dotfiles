@@ -6293,7 +6293,7 @@ input[type="radio"].ticket-status-radio {
   min-height: 40px;
 }
 
-.non-resolution-submit-wrapper .content-label-sm {
+.non-resolution-submit-wrapper .content-label-sm, .sdr-non-resolution-submit-wrapper .content-label-sm {
   margin-top: 12px;
 }
 
@@ -6833,6 +6833,16 @@ td.ticket-total::before {
   margin-bottom: 0;
 }
 
+.sdr-non-resolution-submit-wrapper {
+  padding: 12px !important;
+  background-color: $faint-neutral-color;
+  border-radius: 0 4px 4px 0;
+  width: 200px;
+  top: 0;
+  left: 100%;
+  height: 100%;
+}
+
 .non-resolution-submit-wrapper {
   padding: 12px !important;
   background-color: $faint-neutral-color;
@@ -6844,7 +6854,7 @@ td.ticket-total::before {
   height: 100%;
 }
 
-.non-resolution-submit-wrapper textarea, .resolution-comment-wrapper textarea {
+.sdr-non-resolution-submit-wrapper textarea, non-resolution-submit-wrapper textarea, .resolution-comment-wrapper textarea {
   width: 100%;
   margin: auto;
   border: 1px solid darken($faint-neutral-color, 5%);
@@ -6853,11 +6863,11 @@ td.ticket-total::before {
   min-height: 50px;
 }
 
-.non-resolution-submit-wrapper button {
+.non-resolution-submit-wrapper button, .sdr-non-resolution-submit-wrapper button {
   margin: 20px auto 8px auto;
 }
 
-.non-resolution-submit-wrapper:hover {
+.non-resolution-submit-wrapper:hover, .sdr-non-resolution-submit-wrapper:hover {
   background-color: $faint-neutral-color !important;
 }
 
@@ -6868,7 +6878,7 @@ td.ticket-total::before {
   margin-top: -56px;
 }
 
-.non-resolution-submit-wrapper {
+.non-resolution-submit-wrapper, .sdr-non-resolution-submit-wrapper {
   display: none;
 }
 

@@ -44,3 +44,22 @@ window.sdr_show_page_edit_status = (dispute_id) ->
     error_prefix: 'Unable to update dispute.'
     success_reload: true
   )
+
+$ ->
+
+  $('.sdr-ticket-status-radio').click ->
+    if $(this).is(':checked')
+      wrapper = $(this).parent()
+      $(wrapper).addClass('selected')
+
+    if $(this).attr('id') == 'RESOLVED_CLOSED'
+      $('#show-ticket-resolution-submenu').show()
+      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+      $('#ticket-non-res-submit').hide()
+      $(stat_comment).val('')
+    else
+      $('#ticket-non-res-submit').show()
+      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+      $('.ticket-resolution-radio').prop('checked', false)
+      $('#show-ticket-resolution-submenu').hide()
+      $(res_comment[0]).val('')
