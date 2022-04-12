@@ -56,7 +56,8 @@ module API
             end
             post "change_assignee" do
               authorize!(:update, SenderDomainReputationDispute)
-
+              disputes = SenderDomainReputationDispute.assign(params[:new_assignee], params[:dispute_ids])
+              {:status => "success", :data => disputes}.to_json
             end
 
             desc "Remove assignee from a group of dispute IDs (revert to vrtincoming)"
@@ -64,7 +65,20 @@ module API
               requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
             end
             post "unassign_all" do
+              json_packet = []
+              vrt = User.where(email: 'vrt-incoming@sourcefire.com').first
+              params[:dispute_ids].each do |dispute|
+                SenderDomainReputationDispute.where(id: dispute).update_all(user_id: vrt.id)
+                d = SenderDomainReputationDispute.find_by(id: dispute)
+                if d.status == SenderDomainReputationDispute::STATUS_ASSIGNED
+                  d.update(status: SenderDomainReputationDispute::STATUS_NEW, case_assigned_at: nil)
+                  message = Bridge::DisputeEntryUpdateStatusEvent.new
+                end
 
+                raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
+                json_packet << d
+              end
+              {:status => "success", :data => json_packet}.to_json
             end
 
 
@@ -83,6 +97,12 @@ module API
             end
             patch 'take_disputes' do
               std_api_v2 do
+                authorize!(:update, SenderDomainReputationDispute)
+
+                dispute_ids = permitted_params['dispute_ids']
+                SenderDomainReputationDispute.take_tickets(dispute_ids, user: current_user)
+
+                { username: current_user.cvs_username, dispute_ids: dispute_ids }
 
               end
             end

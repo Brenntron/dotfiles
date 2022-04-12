@@ -191,4 +191,24 @@ class SenderDomainReputationDispute < ApplicationRecord
     end
   end
 
+  def self.take_tickets(dispute_ids, user:)
+    SenderDomainReputationDispute.transaction do
+      unless 0 == SenderDomainReputationDispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).count
+        raise 'Some of these tickets are already assigned.'
+      end
+      SenderDomainReputationDispute.assign(user, ids)
+    end
+  end
+
+  def self.assign(user, dispute_ids)
+    user_id = user.kind_of?(User) ? user.id : user
+    assigned_at = Time.now
+
+    disputes_ary = []
+    SenderDomainReputationDispute.transaction do
+      disputes = SenderDomainReputationDispute.where(id: dispute_ids).where.not(status: [SenderDomainReputationDispute::STATUS_RESOLVED])
+      disputes_ary = disputes.all.to_a
+      disputes.update_all(user_id: user_id, status: SenderDomainReputationDispute::STATUS_ASSIGNED, case_assigned_at: assigned_at)
+    end
+  end
 end

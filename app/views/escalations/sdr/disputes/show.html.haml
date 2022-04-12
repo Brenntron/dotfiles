@@ -104,7 +104,7 @@
         %label.content-label-sm
           Assignee
         %div
-          - if @dispute.user_id == nil
+          - if @dispute.user_id == nil || @dispute.user.cvs_username == 'vrtincom'
             %span.missing-data#dispute-assignee "None"
           - else
             %span#dispute-assignee= @dispute.user.cvs_username || "None"
@@ -112,10 +112,10 @@
         .sdr-dispute-owner-buttons-wrapper.col-xs-12
           - if @dispute.user_id == current_user.id
             - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-              %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
+              %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'sdr_toolbar_unassign_dispute();'}
           - else
-            - if @dispute.user_id == nil && (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-              %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
+            - if (@dispute.user_id == nil || @dispute.user.cvs_username == 'vrtincom') && (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+              %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_sdr_dispute(#{@dispute.id});"}
 
             %span.dropdown
               - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
@@ -128,12 +128,12 @@
                       %div
                         %label.toolbar-section-label Assignee
                         =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
-                      %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
+                      %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'sdr_toolbar_show_change_assignee();'}
                         Assign
 
-          - if (!@dispute.user_id.nil?)
+          - if (!@dispute.user_id.nil? && @dispute.user.cvs_username != 'vrtincom')
             .sdr-container_unassign
-              %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
+              %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'sdr_toolbar_unassign_dispute();'}
                 Unassign
 
     .col-xs-2.col-with-divider

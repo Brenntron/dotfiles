@@ -5153,7 +5153,7 @@ table > tbody > tr > td.dispute_rep_tools {
   border-radius: 2px 2px 0 0 ;
 }
 
-.dispute_rep_tools .dropdown-menu h3, .dispute-owner-buttons-wrapper .dropdown-menu h3 {
+.dispute_rep_tools .dropdown-menu h3, .dispute-owner-buttons-wrapper .dropdown-menu h3, .sdr-dispute-owner-buttons-wrapper .dropdown-menu h3 {
   color: $content-bg-color;
   padding: 0 10px;
   font-weight: 400;
@@ -6824,7 +6824,7 @@ td.ticket-total::before {
     background-color: $bug-section-color !important;
   }
 }
-.container_unassign{
+.container_unassign, .sdr-container_unassign {
   display: inline-block;
   float: right;
 }
@@ -7040,13 +7040,13 @@ table.dispute-entry-table tbody tr.selected {
   float: left;
 }
 
-.dispute-owner-buttons-wrapper {
+.dispute-owner-buttons-wrapper, .sdr-dispute-owner-buttons-wrapper {
   display: inline-block;
   margin-top: -4px;
   margin-left: 10px;
 }
 
-.sdr-dispute-owner-buttons-wrapper .dropdown.open {
+.sdr-dispute-owner-buttons-wrapper .dropdown.open, .sdr-dispute-owner-buttons-wrapper .dropdown.open {
   background-color: transparent !important;
 }
 
@@ -7068,7 +7068,7 @@ table.dispute-entry-table tbody tr.selected {
   }
 }
 
-.dispute-owner-buttons-wrapper .dropdown-menu {
+.dispute-owner-buttons-wrapper .dropdown-menu, .sdr-dispute-owner-buttons-wrapper .dropdown-menu {
   border-radius: 0 4px 4px 4px;
   border: none;
   background-color: $primary-section-color;
@@ -7077,7 +7077,7 @@ table.dispute-entry-table tbody tr.selected {
   left: 3px;
 }
 
-.dispute-owner-buttons-wrapper h3 {
+.dispute-owner-buttons-wrapper h3, .sdr-dispute-owner-buttons-wrapper h3 {
   padding: 2px 10px !important;
 }
 
@@ -7094,7 +7094,8 @@ table.dispute-entry-table tbody tr.selected {
   margin: 0 6px 0 6px;
 }
 
-.dispute-owner-buttons-wrapper .inline-tool-content-wrapper {
+.dispute-owner-buttons-wrapper .inline-tool-content-wrapper, .sdr-dispute-owner-buttons-wrapper
+.inline-tool-content-wrapper {
   padding-bottom: 20px;
 }
 
@@ -11081,7 +11082,7 @@ div[aria-describedby='create-detection-dialog'] {
 
 // FF - tiny vertical alignment fix for 2nd button in this panel
 @-moz-document url-prefix() {
-  .dispute-owner-buttons-wrapper button#index_change_assign {
+  .dispute-owner-buttons-wrapper button#index_change_assign, .sdr-dispute-owner-buttons-wrapper button#index_change_assign {
     position: relative;
     top: -2px;
   }
@@ -11120,7 +11121,7 @@ div[aria-describedby='create-detection-dialog'] {
     .missing-data {
       font-size: 12px;
     }
-    .dispute-owner-buttons-wrapper {
+    .dispute-owner-buttons-wrapper, .sdr-dispute-owner-buttons-wrapper {
       margin-left: 1px;
     }
   }
