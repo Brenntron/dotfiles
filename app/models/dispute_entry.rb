@@ -1199,22 +1199,13 @@ class DisputeEntry < ApplicationRecord
 
 
   def self.check_for_duplicates(entry)
-    if is_ip?(entry) && DisputeEntry.where(ip_address: entry).present?
-      return true
-    elsif is_ip?(entry) && !DisputeEntry.where(ip_address: entry).present?
-      return false
-    elsif !is_ip?(entry) && DisputeEntry.where(uri: entry).present?
-      return true
-    elsif !is_ip?(entry) && !DisputeEntry.where(uri: entry).present?
-      return false
-    end
+    DisputeEntry.where("ip_address = ? or uri = ?", entry, entry).present?
   end
 
   def self.valid_url?(test_url)
-
     test_url =~ URI::regexp ? true : false
   end
-
+  
   def self.process_multi_ip_info(uri, ips, dispute_entry = nil)
 
     all_rulehits = Wbrs::RuleHit.all
