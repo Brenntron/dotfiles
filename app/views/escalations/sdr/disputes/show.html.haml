@@ -105,9 +105,9 @@
           Assignee
         %div
           - if @dispute.user_id == nil || @dispute.user.cvs_username == 'vrtincom'
-            %span.missing-data#dispute-assignee "None"
+            %span.missing-data#dispute-assignee Unassigned
           - else
-            %span#dispute-assignee= @dispute.user.cvs_username || "None"
+            %span#dispute-assignee= @dispute.user.cvs_username || Unassigned
       - if can? :update, Dispute
         .sdr-dispute-owner-buttons-wrapper.col-xs-12
           - if @dispute.user_id == current_user.id
