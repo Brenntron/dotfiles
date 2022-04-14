@@ -1,8 +1,17 @@
-.age-wrapper, .submitter-org-wrapper, .contact-email-wrapper {
+.sdr-age-wrapper, .submitter-org-wrapper, .contact-email-wrapper {
   margin-top: 10px;
 }
 
 .sdr-dispute-owner-buttons-wrapper {
   display: inline-block;
   margin-top: 15px;
+}
+
+.sdr-dispute-owner-buttons-wrapper {
+  margin-left: 0px;
+  padding-left: 15px;
+}
+
+.sdr-submitted-at-wrapper, .sdr-age-wrapper {
+  padding-left: 15px;
 }
