@@ -161,7 +161,6 @@ class SenderDomainReputationDispute < ApplicationRecord
     conn.post
   end
 
-<<<<<<< HEAD
   def case_id_str
     '%010i' % id
   end
