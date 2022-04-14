@@ -5,7 +5,7 @@ $(document).ready ->
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: 'SDRColumns'}
+    data: {name: 'SdrColumns'}
     success: (response) ->
       response = JSON.parse(response)
       if response?
@@ -75,7 +75,7 @@ $ ->
     std_msg_ajax(
       url: "/escalations/api/v1/escalations/user_preferences/update"
       method: 'POST'
-      data: {data, name: 'SDRColumns'}
+      data: {data, name: 'SdrColumns'}
       dataType: 'json'
       success: (response) ->
       error: () ->
