@@ -9058,6 +9058,22 @@ td.text-center span {
   background-color: $nav-toolbar-color;
 }
 
+.sdr-whois-btn {
+  background-color: $nav-toolbar-color;
+  background-image: url(image_path('icon_whois.svg'));
+  background-position: 4px center;
+  background-repeat: no-repeat;
+  border-radius: 2px;
+  border: none;
+  float: right;
+  height: 20px;
+  padding: 0 10px 0 20px;
+}
+
+.sdr-whois-btn-text {
+  float: right;
+}
+
 .google-btn {
   background-image: url(image_path('icon_google_grey.svg'));
   background-color: $nav-toolbar-color;
