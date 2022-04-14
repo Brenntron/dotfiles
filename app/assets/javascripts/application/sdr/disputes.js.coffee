@@ -17,11 +17,35 @@ $(document).ready ->
             $("##{column}-checkbox").prop('checked', false)
             $('#sdr-disputes-index').DataTable().column("##{column}").visible false
   )
+
+  # pull entries per page setting
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/user_preferences/"
+    data: {name: 'SdrEntriesPerPage'}
+    success: (response) ->
+      response = JSON.parse(response)
+      if response?
+        $('select[name="sdr-disputes-index_length"]').val(response.entries_per_page)
+        $('#sdr-disputes-index').DataTable().page.len(response.entries_per_page).draw('page')
+  )
 $ ->
   initialize_sdr_disputes_datatable()
 
   $('#sdr-disputes-index_filter input').addClass('table-search-input');
   $('#sdr-disputes-index_filter label').addClass('table-search-label');
+
+  # save entries per page setting
+  $('#sdr-disputes-index').DataTable().on 'length.dt', (e, settings, len) ->
+    data = {}
+    data['entries_per_page'] = $('select[name="sdr-disputes-index_length"]').val()
+    std_msg_ajax(
+      url: "/escalations/api/v1/escalations/user_preferences/update"
+      method: 'POST'
+      data: {data, name: 'SdrEntriesPerPage'}
+      dataType: 'json'
+      success: (response) ->
+  )
 
   $('.toggle-vis-sdr').each ->
     column = $('#sdr-disputes-index').DataTable().column($(this).attr('data-column'))
