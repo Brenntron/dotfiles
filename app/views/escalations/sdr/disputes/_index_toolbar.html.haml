@@ -50,31 +50,25 @@
     %label.toolbar-section-label
       Assign
 
-    %button.take-ticket-toolbar-button#index_ticket_assign.toolbar-button.esc-tooltipped.toolbar-button-spacer{onclick: 'take_sdr_disputes();'}
+    %button.take-ticket-toolbar-button#index_ticket_assign.toolbar-button.esc-tooltipped.toolbar-button-spacer{ onclick: 'take_sdr_disputes();' }
       %span.toolbar-button-text
         Take Ticket
 
-    %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped{onclick: 'return_sdr_disputes()', type: 'button'}
+    %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped{ onclick: 'return_sdr_disputes()', type: 'button' }
       %span.toolbar-button-text Return
 
   %div
     %label.toolbar-section-label
       Info
 
-    %button.toolbar-button.dropdown-button-margin-right#index_ticket_assign.esc-tooltipped.sdr-whois-btn
+    %button.toolbar-button.dropdown-button-margin-right#sdr-whois-index-btn.esc-tooltipped.sdr-whois-btn{ disabled: true }
       %span.toolbar-button-text
         WHOIS
 
-
-  %div.line-up
+  %div
     %label.toolbar-section-label
-      File
-    %form#webrep-disputes-index-export-form{action: escalations_webrep_disputes_path(format: :xlsx), method: :get}
-      = hidden_field_tag('data_json', '{}', id: 'disputes-index-export-data-input')
-      %button.toolbar-button.dropdown-button-margin-right.export-button.export-all-btn.esc-tooltipped{title: 'Export (alt + ctrl + shift + p)'}
-        %span.toolbar-button-text
-          Export
-    %button.toolbar-button.export-button.export-selected-btn.esc-tooltipped{title: 'Export Selected (alt + ctrl + p)', onclick: 'webrep_export_selected_rows();'}
-      %span.toolbar-button-text
-        Export Selected
+      Edit
 
+    %button.toolbar-button.dropdown-button-margin-right#sdr-adjust-rep-index-btn.esc-tooltipped.sdr-adjust-rep-btn{ disabled: true }
+      %span.toolbar-button-text
+        Adjust Reputation
