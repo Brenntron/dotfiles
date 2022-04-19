@@ -1830,29 +1830,28 @@ $ ->
 # Create Dashboard Initial Table (My Open Tickets)
 $ ->
 
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: 'WebRepEntriesPerPage'}
-    success: (response) ->
-      unless $('body').hasClass('escalations--file_rep--disputes-controller')
+  if $('body').hasClass('escalations--webrep--disputes_controller')
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/user_preferences/"
+      data: {name: 'WebRepEntriesPerPage'}
+      success: (response) ->
         response = JSON.parse(response)
         if response?
           $('select[name="disputes-index_length"]').val(response.entriesperpage)
           $('#disputes-index').DataTable().page.len(response.entriesperpage).draw('page')
           pageLength = response.entriesperpage
-  )
+    )
 
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: 'WebRepCurrentPage'}
-    success: (response) ->
-      unless $('body').hasClass('escalations--file_rep--disputes-controller')
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/user_preferences/"
+      data: {name: 'WebRepCurrentPage'}
+      success: (response) ->
         response = JSON.parse(response)
         if response?
           $('#disputes-index').DataTable().page(response.currentpage).draw('page')
-  )
+    )
 
   window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
     dom: '<t>'

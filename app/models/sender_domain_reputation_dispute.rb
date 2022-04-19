@@ -2,8 +2,8 @@ class SenderDomainReputationDispute < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at, :user_id]
 
   belongs_to :customer, optional: true
-  belongs_to :user, optional:true
-  belongs_to :platform, optional:true
+  belongs_to :user, optional: true
+  belongs_to :platform, optional: true
 
   has_many :sender_domain_reputation_dispute_attachments
 
@@ -64,7 +64,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       full_description = <<~HEREDOC
         SDR Dispute entry: #{message_payload[:payload][:sender_domain_entry]}
         SDR Dispute Problem Summary: #{message_payload[:payload][:problem_summary]}
-  
+
 
       HEREDOC
 
@@ -123,6 +123,11 @@ class SenderDomainReputationDispute < ApplicationRecord
         message_payload["attachments"].each do |dispute_attachment|
           SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, dispute_attachment, user, new_dispute)
         end
+        new_dispute.reload
+      end
+
+      if new_dispute.sender_domain_reputation_dispute_attachments.present?
+        new_dispute.parse_all_email_file_headers(bugzilla_rest_session)
       end
 
       new_dispute.send_created_ack
@@ -160,6 +165,41 @@ class SenderDomainReputationDispute < ApplicationRecord
     update!(user_id: User.vrtincoming.id, status: STATUS_NEW)
   end
 
+  def case_id_str
+    '%010i' % id
+  end
+
+  def self.process_status_changes(disputes, status, resolution = nil, comment = nil, current_user = nil)
+    resolved_at = Time.now
+    disputes.each do |dispute|
+      dispute.status = status
+      if resolution.present?
+        dispute.resolution = resolution
+        dispute.resolution_comment = comment
+        dispute.case_closed_at = resolved_at
+      else
+        dispute.resolution = nil
+        dispute.resolution_comment = nil
+      end
+
+      unless [STATUS_NEW, STATUS_ASSIGNED].include?(dispute.status)
+        dispute.user_id = current_user.id unless dispute.is_assigned?
+      end
+
+      dispute.save!
+
+      #if comment.present?
+      #  DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute.id)
+      #end
+
+      dispute.reload
+
+      message = Bridge::SdrDisputeUpdateStatusEvent.new
+      message.post_entries(dispute)
+
+    end
+  end
+
   def self.take_tickets(dispute_ids, user:)
     SenderDomainReputationDispute.transaction do
       if SenderDomainReputationDispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).present?
@@ -172,12 +212,12 @@ class SenderDomainReputationDispute < ApplicationRecord
   def self.assign(dispute_ids, user:)
     disputes_ary = []
     user_id = user.kind_of?(User) ? user.id : user
-
+    assigned_at = Time.now
     SenderDomainReputationDispute.transaction do
-      disputes = SenderDomainReputationDispute.where(id: dispute_ids)
+      disputes = SenderDomainReputationDispute.where(id: dispute_ids).where.not(status: STATUS_RESOLVED)
       disputes_ary = disputes.to_a
 
-      disputes.update_all(user_id: user_id, status: STATUS_ASSIGNED)
+      disputes.update_all(user_id: user_id, status: STATUS_ASSIGNED, case_assigned_at: assigned_at)
     end
     disputes_ary
   end
@@ -224,5 +264,19 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     where_str = [sdr_dispute_where, user_where, platform_where, company_where, company_where, customer_where].join(' or ')
     left_joins({ customer: :company }, :platform, :user).where(where_str, pattern: "%#{value}%")
+  end
+
+  def parse_all_email_file_headers(bugzilla_rest_session)
+
+    bug_proxy = bugzilla_rest_session.build_bug(id: self.id)
+
+    bug_attachments = bug_proxy.attachments
+
+    bug_attachments.each do |bug_attachment|
+      sdr_attachment = sender_domain_reputation_dispute_attachments.where(:id => bug_attachment.id).first
+      if sdr_attachment.present?
+        sdr_attachment.parse_email_content(bug_attachment)
+      end
+    end
   end
 end
