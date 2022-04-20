@@ -23,7 +23,6 @@ class Ability
     # admin role includes developers who maintain the site
     if role_names.include?('admin')
       can :read, :all
-      #TODO sdr role
       can :manage, [Admin, User, Role]
     end
 
