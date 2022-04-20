@@ -6,6 +6,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   has_many :sender_domain_reputation_dispute_attachments
   has_many :dispute_emails
+  has_many :sender_domain_reputation_dispute_comments
 
   AC_SUCCESS = 'CREATE_ACK'
   AC_FAILED = 'CREATE_FAILED'
