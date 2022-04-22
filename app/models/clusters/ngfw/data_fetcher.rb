@@ -35,7 +35,8 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
     end
 
     if regex.present?
-      data = data.select { |cluster| !(cluster.domain =~ regex).nil? }
+      regexp = Regexp.new(regex)
+      data = data.select { |cluster| !(cluster.domain =~ regexp).nil? }
     end
 
     case filter[:cluster_type]
