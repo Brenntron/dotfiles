@@ -157,6 +157,7 @@ $ ->
     rows = $('#amp-naming-details-table tbody').find('tr')
     rows_changed = []
     newRowsWithErrors = []
+    sendToTI = true
 
     $(rows).each ->
       row = this
@@ -257,10 +258,15 @@ $ ->
     $('.active-editing-buttons').hide()
     $('#amp-naming-details-table tbody').removeClass 'ui-sortable'
 
+    sendToTI = if rows_to_update.length > 0 then false else true
+
     if rows_to_add.length > 0
-      window.create_amp_naming_conventions([rows_to_add])
+      window.create_amp_naming_conventions([rows_to_add], sendToTI)
+
+    sendToTI = if $('.delete-pattern').length > 0 then false else true
+
     if rows_to_update.length > 0
-      window.update_amp_naming_conventions([rows_to_update])
+      window.update_amp_naming_conventions([rows_to_update], sendToTI)
 
     # Bulk delete on save, are records ready for deletion? Then pass id's array to back-end
     if $('.delete-pattern').length > 0
@@ -283,7 +289,8 @@ $ ->
       std_msg_ajax(
         method: 'DELETE'
         url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
-        data: { 'ids': delete_id_array }
+        # delete should always update ti
+        data: { 'ids': delete_id_array, 'send_to_ti': true }
         success: (response) ->
           std_msg_success('Secure Endpoint Naming Convention(s) Have Been Deleted.', [delete_pattern_list], reload: false)
         error: (response) ->
@@ -292,6 +299,7 @@ $ ->
           $('.delete-patterns-area').addClass('hidden')
           $('.delete-patterns-queue').empty()
           std_msg_error('Error Deleting ' + delete_pattern_list, [response.responseText], reload: true)
+        async: false
       )
 
 
@@ -318,7 +326,7 @@ $ ->
       $('.delete-patterns-queue').append(delete_pattern_html)
 
 
-  window.create_amp_naming_conventions = ([data]) ->
+  window.create_amp_naming_conventions = ([data], sendToTI) ->
     # Pulling out just patterns for response message
     response_data = ""
     if data.length > 1
@@ -329,7 +337,7 @@ $ ->
     std_msg_ajax(
       method: 'POST'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
-      data: { patterns: data }
+      data: { patterns: data, send_to_ti: sendToTI }
       success: (response) ->
         std_msg_success('The Following Secure Endpoint Naming Conventions Have Been Created:', [response_data], reload: false)
       error: (response) ->
@@ -339,7 +347,7 @@ $ ->
     )
 
 
-  window.update_amp_naming_conventions = ([data]) ->
+  window.update_amp_naming_conventions = ([data], sendToTI) ->
     # Pulling out just patterns for response message
     response_data = ""
     if data.length > 1
@@ -351,7 +359,7 @@ $ ->
     std_msg_ajax(
       method: 'PATCH'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
-      data: { patterns: data }
+      data: { patterns: data, send_to_ti: sendToTI }
       success: (response) ->
         std_msg_success('Secure Endpoint Naming Conventions Have Been Updated', ["Relevant changes have also been sent to TI."], reload: true)
         contacts = $('.amp-contact .table-content')
