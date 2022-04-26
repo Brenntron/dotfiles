@@ -31,7 +31,8 @@ module API
                   end
                 end
 
-                render json: {status: 'Success'}
+                created_patterns = ::AmpNamingConvention.last(params['patterns'].length)
+                render json: {status: 'Success', new_records: created_patterns}
               end
             end
 

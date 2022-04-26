@@ -340,6 +340,15 @@ $ ->
       data: { patterns: data, send_to_ti: sendToTI }
       success: (response) ->
         std_msg_success('The Following Secure Endpoint Naming Conventions Have Been Created:', [response_data], reload: false)
+        if $('[data-unsaved-id]').length > 0
+          $('[data-unsaved-id]').each ->
+            newRecords = response['json']['new_records']
+            patternValue = $(@).find('.amp-pattern').attr('defaultValue')
+            matchingRecord = (record for record in newRecords when record.pattern is patternValue)[0]
+            if matchingRecord
+              $(@).attr('data-id', matchingRecord.id)
+              $(@).removeAttr('data-unsaved-id')
+              $(@).find('.delete-button').attr('onclick',"delete_amp_naming_convention('#{matchingRecord.id}', '#{matchingRecord.pattern}')")
       error: (response) ->
         $('tr[data-unsaved-id]').hide()
         std_msg_error('Error Creating Secure Endpoint Naming Conventions', [response.responseText], reload: false)
