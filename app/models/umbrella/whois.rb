@@ -1,23 +1,32 @@
-class Virustotal::GetVirustotal < Virustotal::Base
+class Umbrella::Whois
 
   TEST_URL = "www.google.com"
 
-  def self.load_from_prefetch(data)
-    response_body = JSON.parse(data)
-    return response_body if response_body.kind_of?(Hash)
-    {"scans" => []}
+  UMBRELLA_VOLUME_BASE_URL = "https://investigate.api.umbrella.com/whois/"
+
+  def self.new_request(address)
+
+    full_url = UMBRELLA_VOLUME_BASE_URL + address
+
+    request = HTTPI::Request.new(full_url)
+    request.ssl = true
+    request.auth.ssl.verify_mode = :peer
+    request.headers['Authorization'] = "Bearer #{Rails.configuration.umbrella.api_key}"
+    request.headers['Content-Type'] = 'application/json'
+
+    request
   end
 
-  def self.by_domain(url, raw = false)
-    call_virustotal_request(:get, "/vtapi/v2/url/report?resource=#{url}", {}, raw)
-  end
+  def self.query_whois(address: nil, as_json: false)
+    request = new_request(address)
 
-  def self.by_host_domain(url, raw = false)
-    call_virustotal_request(:get, "/vtapi/v2/domain/report?domain=#{url}", {}, raw)
-  end
+    response = HTTPI.get(request)
 
-  def self.by_ip(url, raw = false)
-    call_virustotal_request(:get, "/vtapi/v2/ip-address/report?ip=#{url}", {}, raw)
+    if as_json == true
+      response = JSON.parse(response.body)
+    end
+
+    response
   end
 
   def self.health_check
@@ -31,8 +40,8 @@ class Virustotal::GetVirustotal < Virustotal::Base
 
     (1..times_to_try).each do |i|
       begin
-        result = by_domain(TEST_URL, false)
-        if result["scan_id"].present?
+        result = query_wohis(address: TEST_URL)
+        if result.code == 200
           times_successful += 1
         else
           times_failed += 1

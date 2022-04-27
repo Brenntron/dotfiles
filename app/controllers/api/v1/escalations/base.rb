@@ -30,6 +30,7 @@ module API
         mount API::V1::Escalations::Webcat::Companies
         mount API::V1::Escalations::Webcat::Platforms
         mount API::V1::Escalations::CloudIntel::Whois
+        mount API::V1::Escalations::CloudIntel::Tea
         mount API::V1::Escalations::Admin::Tools
         mount API::V1::Escalations::WsaStatuses
         mount API::V1::Escalations::Sdr::Disputes
