@@ -30,6 +30,7 @@ class SenderDomainReputationDispute < ApplicationRecord
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
   SUBMITTER_TYPE_INTERNAL = "INTERNAL"
 
+  RESOLUTION_DUPLICATE = "DUPLICATE"
 
   def self.process_bridge_payload(message_payload)
 
@@ -110,14 +111,20 @@ class SenderDomainReputationDispute < ApplicationRecord
         new_dispute.submitter_type = SUBMITTER_TYPE_CUSTOMER
       end
 
+      if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
+        new_dispute.priority = "P3"
+      else
+        new_dispute.priority = "P4"
+      end
+
       #TODO: DO DUPLICATE CHECKING HERE
-      #check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
+      #check_for_duplicate = SenderDomainReputationDispute.where(sender_domain_entry: message_payload[:payload][:sender_domain_entry]).where.not(status: SenderDomainReputationDispute::STATUS_RESOLVED)
       #if check_for_duplicate.any?
-        #auto_resolve_on_duplicate(new_dispute)
-        #is_duplicate = true
+      #  auto_resolve_on_duplicate(new_dispute)
       #else
       new_dispute.save
       #end
+
 
       if message_payload["attachments"].present?
         message_payload["attachments"].each do |dispute_attachment|
@@ -126,19 +133,59 @@ class SenderDomainReputationDispute < ApplicationRecord
         new_dispute.reload
       end
 
+      if message_payload["attachments"].present? && message_payload["attachments"].size != new_dispute.sender_domain_reputation_dispute_attachments.size
+        raise "attachments failed to save"
+      end
+
       if new_dispute.sender_domain_reputation_dispute_attachments.present?
         new_dispute.parse_all_email_file_headers(bugzilla_rest_session)
+        new_dispute.retrieve_attachments_beaker_data
       end
 
       new_dispute.send_created_ack
+
+      new_dispute
+
     rescue => e
+
+      new_dispute = SenderDomainReputationDispute.where(:ticket_source_key => message_payload[:source_key]).first
       Rails.logger.error e
       Rails.logger.error e.backtrace.join("\n")
-      new_dispute.send_failed_ack(message_payload[:source_key])
+
+      if new_dispute.present?
+        new_dispute.reload
+        new_dispute.sender_domain_reputation_dispute_attachments.destroy
+        new_dispute.destroy
+      end
+      if message_payload["source_key"].present?
+        begin
+          conn = ::Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+          conn.post
+        rescue
+          conn = Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+          conn.post
+        end
+      end
     end
 
 
+  end
 
+  def self.auto_resolve_on_duplicate(dispute)
+    dispute.status = STATUS_RESOLVED
+    dispute.resolution = RESOLUTION_DUPLICATE
+    dispute.resolution_comment = RESOLUTION_DUPLICATE_COMMENT
+
+    dispute.save
+
+    dispute.send_created_ack
+
+  end
+
+  def retrieve_attachments_beaker_data
+    self.sender_domain_reputation_dispute_attachments.each do |attachment|
+      attachment.retrieve_beaker_data_and_save
+    end
   end
 
   def send_created_ack
@@ -149,9 +196,17 @@ class SenderDomainReputationDispute < ApplicationRecord
         status: self.status,
         sugg_type: self.suggested_disposition
     }
+    ##Note: I don't know why this works, but in dev when a flood of tickets are incoming sometimes would get this error:
+    # Unable to autoload constant Bridge::BaseMessage, expected /analyst-console-escalations/app/models/bridge/base_message.rb to define it (LoadError)
+    # having Bridge as a retry of ::Bridge *seems* to work.  i suspect there's a deeper problem here but not prepared for that rabbit hole
+    begin
+      conn = ::Bridge::SdrDisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
+      conn.post(return_payload)
+    rescue
+      conn = Bridge::SdrDisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
+      conn.post(return_payload)
+    end
 
-    conn = ::Bridge::SdrDisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
-    conn.post(return_payload)
   end
 
 
@@ -427,5 +482,22 @@ class SenderDomainReputationDispute < ApplicationRecord
         sdr_attachment.parse_email_content(bug_attachment)
       end
     end
+  end
+
+  def domain_name
+
+    parser = URI::Parser.new
+    url = parser.escape(self.sender_domain_entry)
+    uri = parser.parse(parser.parse(self.sender_domain_entry).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
+
+    full_domain = ""
+    if domain.trd.present?
+      full_domain += domain.trd + "."
+    end
+    full_domain += domain.domain
+
+    return full_domain
+
   end
 end
