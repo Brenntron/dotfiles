@@ -122,7 +122,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
             end
           end
           beaker_data[:response][:envelope] << {:ip => mx_record.last, :response => envelope_response}
-          beaker_data[:response][:data] = {:ip => mx_record.last, :response => data_response}
+          beaker_data[:response][:data] << {:ip => mx_record.last, :response => data_response}
 
         end
 
