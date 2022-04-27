@@ -5,10 +5,10 @@
         = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
       %span.loader-msg Loading data...
 
-  %h1#dispute-index-title Open Tickets
+  %h1#sdr-index-title Open Tickets
   %span.refresh-message#refresh-working-msg
   %span.refresh-message#refresh-error-msg
-
+  #sdr_searchref_container{ onmouseover: "triggerTooltips(this)" }
   = render('index_toolbar')
 
   %input{type: 'hidden', name: 'token', value: "#{current_user.authentication_token}"}

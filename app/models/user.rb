@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :complaint_entries
   has_many :disputes
   has_many :file_reputation_disputes
+  has_many :sender_domain_reputation_disputes
   has_many :saved_searches
   has_and_belongs_to_many :roles, dependent: :destroy
   has_many :named_searches

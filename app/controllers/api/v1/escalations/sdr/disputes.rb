@@ -322,18 +322,19 @@ module API
 
             desc 'Autopopulate fields on Advanced Search'
             get 'autopopulate_advanced_search' do
-              case_owners = User.joins(:disputes).where.not(cvs_username: nil).order(cvs_username: :asc).uniq
-              statuses = [Dispute::STATUS_RESEARCHING,Dispute::STATUS_ESCALATED,Dispute::STATUS_CUSTOMER_PENDING,
-                          Dispute::STATUS_ON_HOLD,Dispute::STATUS_RESOLVED,Dispute::STATUS_REOPENED]
-              submitter_types = ['Customer', 'Non-Customer']
+              case_owners = User.joins(:sender_domain_reputation_disputes).where.not(cvs_username: nil).order(cvs_username: :asc).uniq
+              all_constants = SenderDomainReputationDispute.constants
+              statuses = all_constants.select { |x| x.match?('STATUS') }.map { |name| SenderDomainReputationDispute.const_get(name) }
+              submitter_types = all_constants.select { |x| x.match?('SUBMITTER_TYPE') }.map { |name| SenderDomainReputationDispute.const_get(name) }
               contacts = Customer.all.order(name: :asc)
               companies = Company.all.order(name: :asc)
+              # TODO: add resolutions to SenderDomainReputationDispute model and use it there
               resolutions = [Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN, Dispute::STATUS_RESOLVED_UNCHANGED,
                              Dispute::STATUS_RESOLVED_INVALID, Dispute::STATUS_RESOLVED_TEST, Dispute::STATUS_RESOLVED_OTHER]
-              platforms = Platform.all.order(public_name: :asc).map {|m| {id: m.id, public_name: m.public_name}}
-              render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
+              platforms = Platform.all.order(public_name: :asc).map { |m| { id: m.id, public_name: m.public_name } }
+              render json: { case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
                             contacts: contacts, companies: companies, resolutions: resolutions,
-                            platforms: platforms}
+                            platforms: platforms }
             end
 
             desc 'Auto-populate fields on New Dispute'

@@ -235,8 +235,8 @@ class SenderDomainReputationDispute < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.robust_search(search_type, search_name: nil, params: nil, user:)
     case search_type
-    # when 'advanced'
-    #   advanced_search(params, search_name: search_name, user: user)
+    when 'advanced'
+      advanced_search(params, search_name: search_name, user: user)
     # when 'named'
     #   named_search(search_name, user: user)
     # when 'standard'
@@ -264,6 +264,155 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     where_str = [sdr_dispute_where, user_where, platform_where, company_where, company_where, customer_where].join(' or ')
     left_joins({ customer: :company }, :platform, :user).where(where_str, pattern: "%#{value}%")
+  end
+
+  # Searches based on supplied fields and values.
+  # Optionally takes a name to save this search as a saved search.
+  # @param [ActionController::Parameters] params supplied fields and values for search.
+  # @param [String] search_name name to save this search as a saved search.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.advanced_search(params, search_name:, user:, reload: false)
+    dispute_params = non_blank_fields(params)
+    dispute_fields = matching_fields(dispute_params) # to store attributes related to SenderDomainReputationDispute only
+
+    # if dispute_fields['priority'] && /(?<priority_digits>\d+)/ =~ dispute_fields.delete('priority')
+    #   dispute_fields['priority'] = priority_digits
+    # end
+    #
+    dispute_fields['id'] = dispute_fields['id'].split(/[\s,]+/) if dispute_fields['id'].present?
+
+    if dispute_params['case_owner'].present?
+      user = User.find_by(display_name: dispute_params.delete('case_owner'))
+      dispute_fields['user_id'] = user.id
+    end
+
+    relation = where(dispute_fields)
+
+    if dispute_params['submitted_newer'].present?
+      relation =
+        relation.where('created_at >= :submitted_newer', submitted_newer: dispute_params['submitted_newer'])
+    end
+
+    # if dispute_params['submission_type'].present?
+    #   submission_types = YAML.load(dispute_params['submission_type'].to_s)
+    #
+    #   relation =
+    #     relation.where(submission_type: submission_types)
+    # end
+
+    if dispute_params['submitted_older'].present?
+      if dispute_params['submitted_older'].kind_of?(Date)
+        relation =
+          relation.where('created_at < :submitted_older', submitted_older: (dispute_params['submitted_older']) + 1)
+      elsif dispute_params['submitted_older'].kind_of?(String)
+        relation =
+          relation.where('created_at < :submitted_older', submitted_older: Date.parse(dispute_params['submitted_older']) + 1)
+      end
+    end
+
+    if dispute_params['age_newer'].present?
+      seconds_ago = age_to_seconds(dispute_params['age_newer'])
+      if seconds_ago != 0
+        age_newer_cutoff = Time.now - seconds_ago
+        relation =
+          relation.where('created_at >= :submitted_newer', submitted_newer: age_newer_cutoff)
+      end
+    end
+
+    if dispute_params['age_older'].present?
+      seconds_ago = age_to_seconds(dispute_params['age_older'])
+      if seconds_ago != 0
+        age_older_cutoff = Time.now - seconds_ago
+        relation =
+          relation.where('created_at < :submitted_older', submitted_older: age_older_cutoff)
+      end
+    end
+
+    if dispute_params['platform_ids'].present?
+      ids = dispute_params['platform_ids'].split(',').map(&:to_i)
+      relation = relation.joins(:platform).where('sender_domain_reputation_disputes.platform_id in (:ids)', ids: ids)
+    end
+
+    company_name = nil
+    customer_params = dispute_params.slice(*%w[customer_name customer_email company_name]).select { |_, value| value.present? }
+
+    if customer_params.any?
+      if customer_params['company_name'].present?
+        company_name = customer_params.delete('company_name')
+        relation = relation.joins(customer: :company)
+      else
+        relation = relation.joins(:customer)
+      end
+
+      customer_params['name'] = customer_params.delete('customer_name') if customer_params['customer_name'].present?
+      customer_params['email'] = customer_params.delete('customer_email') if customer_params['customer_email'].present?
+      customer_where = customer_params
+      if company_name.present?
+        customer_where = customer_where.merge(companies: { name: company_name } )
+      end
+      relation = relation.where(customers: customer_where)
+    end
+
+    # Save this search as a named search
+    if params.present? && search_name.present? && reload == false
+      save_named_search(search_name, params, user: user, project_type: 'SDR')
+    end
+    relation
+  end
+
+  # selects fields which match database field names from given parameters
+  # @param [Hash|ActionController::Parameters] fields input which may contain blank values
+  # @return [Hash] A hash with just this model's fields
+  def self.matching_fields(fields)
+    fields.slice(*column_names)
+  end
+
+  def self.age_to_seconds(age_str)
+    days =
+      if /(?<days_str>\d+)[Dd]/ =~ age_str
+        days_str.to_i
+      else
+        0
+      end
+    hours =
+      if /(?<hours_str>\d+)[Hh]/ =~ age_str
+        hours_str.to_i
+      else
+        0
+      end
+    (days * 24 + hours) * 3600
+  end
+
+  # omits fields with empty strings and nil as values
+  # @param [Hash|ActionController::Parameters] fields input which may contain blank values
+  # @return [Hash] A hash without blanks
+  def self.non_blank_fields(fields)
+    fields.to_h.reject { |_, value| value.blank? }
+  end
+
+  def self.save_named_search(search_name, params, user:, project_type:)
+    NamedSearchCriterion.where(named_search_id: NamedSearch.where(user_id: user.id, name: search_name).ids).delete_all
+
+    found_search = user.named_searches.where(name: search_name).first
+    named_search = found_search || NamedSearch.create!(user: user, name: search_name, project_type: project_type)
+
+    params.each do |field_name, value|
+      case
+      when value.blank?
+        #do nothing
+      when value.kind_of?(Hash) || value.kind_of?(ActionController::Parameters)
+        value.each do |sub_field_name, sub_value|
+          named_search.named_search_criteria.create(field_name: "#{field_name}~#{sub_field_name}", value: sub_value)
+        end
+      when 'search_type' == field_name
+        #do nothing
+      when 'search_name' == field_name
+        #do nothing
+      else
+        named_search.named_search_criteria.create(field_name: field_name, value: value)
+      end
+    end
   end
 
   def parse_all_email_file_headers(bugzilla_rest_session)

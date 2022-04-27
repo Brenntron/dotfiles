@@ -12,20 +12,20 @@ class SdrDisputeDatatable < AjaxDatatablesRails::ActiveRecord
   # TODO: add  current rep and rules (blocked by schema right now)
   def view_columns
     @view_columns ||= {
-      case_id:            {source: "SenderDomainReputationDispute.id", cond: :like},
-      created_at:         {source: "SenderDomainReputationDispute.created_at", data: :created_at, cond: :date_range},
-      age_int:            {source: "SenderDomainReputationDispute.age_int", data: :age_int, searchable: false, orderable: false},
-      age:                {source: "SenderDomainReputationDispute.age", data: :age, searchable: false, orderable: false},
-      status:             {source: "SenderDomainReputationDispute.status", data: :status, cond: :string_eq},
-      resolution:         {source: "SenderDomainReputationDispute.resolution", data: :resolution, cond: :string_eq},
-      source:             {source: "SenderDomainReputationDispute.source", data: :source, cond: :string_eq},
-      assignee:           {source: "User.display_name", data: :assignee, cond: :like},
-      platform:           {source: "Platform.public_name", data: :platform, cond: :string_eq},
-      dispute:            {source: "SenderDomainReputationDispute.sender_domain_entry", data: :dispute, cond: :like},
-      submitter_type:     {source: "SenderDomainReputationDispute.submitter_type", data: :submitter_type, cond: :string_eq},
-      contact_name:       {source: "Customer.name", data: :contact_name, cond: :like},
-      contact_email:      {source: "Customer.email", data: :contact_email, cond: :like},
-      submitter_org:      {source: "Company.name", data: :contact_email, cond: :like}
+      case_id:            { source: "SenderDomainReputationDispute.id", cond: :like },
+      created_at:         { source: "SenderDomainReputationDispute.created_at", data: :created_at, cond: :date_range },
+      age_int:            { source: "SenderDomainReputationDispute.age_int", data: :age_int, searchable: false, orderable: false },
+      age:                { source: "SenderDomainReputationDispute.age", data: :age, searchable: false, orderable: false },
+      status:             { source: "SenderDomainReputationDispute.status", data: :status, cond: :string_eq },
+      resolution:         { source: "SenderDomainReputationDispute.resolution", data: :resolution, cond: :string_eq },
+      source:             { source: "SenderDomainReputationDispute.source", data: :source, cond: :string_eq },
+      assignee:           { source: "User.display_name", data: :assignee, cond: :like },
+      platform:           { source: "Platform.public_name", data: :platform, cond: :string_eq },
+      dispute:            { source: "SenderDomainReputationDispute.sender_domain_entry", data: :dispute, cond: :like },
+      submitter_type:     { source: "SenderDomainReputationDispute.submitter_type", data: :submitter_type, cond: :string_eq },
+      contact_name:       { source: "Customer.name", data: :contact_name, cond: :like },
+      contact_email:      { source: "Customer.email", data: :contact_email, cond: :like },
+      submitter_org:      { source: "Company.name", data: :contact_email, cond: :like },
     }
   end
 

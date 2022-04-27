@@ -98,6 +98,52 @@ $ ->
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
 
+  $('#sdr-advanced-search-button').click ->
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/sdr/disputes/autopopulate_advanced_search'
+      success: (response) ->
+
+        $('#user-list').empty()
+        $('#status-list').empty()
+        $('#submittertype-list').empty()
+        $('#contactname-list').empty()
+        $('#contactemail-list').empty()
+        $('#company-list').empty()
+        $('#resolution-list').empty()
+
+        $('#platform-input').selectize {
+          persist: false
+          create: false
+          valueField: 'id',
+          labelField: 'public_name',
+          options: response.json.platforms
+          onFocus: () ->
+            window.sdr_toggle_selectize_layer(this, 'true')
+          onBlur: () ->
+            window.sdr_toggle_selectize_layer(this, 'false')
+        }
+
+        for user in response.json.case_owners
+          $('#user-list').append '<option value=\'' + user.display_name + '\'></option>'
+
+        for status in response.json.statuses
+          $('#status-list').append '<option value=\'' + status + '\'></option>'
+
+        for contact in response.json.contacts
+          $('#contactname-list').append '<option value=\'' + contact.name + '\'></option>'
+
+        for contact in response.json.contacts
+          $('#contactemail-list').append '<option value=\'' + contact.email + '\'></option>'
+
+        for company in response.json.companies
+          $('#submitter-org-list').append '<option value=\'' + company.name + '\'></option>'
+
+        for resolution in response.json.resolutions
+          $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
+
+        $('#advanced-search-dropdown').show()
+    )
 
 window.initialize_sdr_disputes_datatable = () ->
   $('#sdr-disputes-index').DataTable(
@@ -110,6 +156,7 @@ window.initialize_sdr_disputes_datatable = () ->
     }
     ajax:
       url: $('#sdr-disputes-index').data('source')
+      data: build_sdr_data()
     pagingType: 'full_numbers'
     order: [[ 5, 'desc' ]]  # that's tmp default sorting column
     columnDefs: [
@@ -164,24 +211,24 @@ window.initialize_sdr_disputes_datatable = () ->
       }
       {
         #age column
-        width: '30px'
+        width: '40px'
         render: (data, type, full, meta) ->
-          { age, status } = full
-          unless status == 'COMPLETED' || status == 'RESOLVED'
-            if age.indexOf('hour') != -1
-              hour = parseInt( age.split("h")[0] )
-              if hour >= 3 && hour < 12
-                age_class = 'ticket-age-over3hr'
-              else if hour > 12
-                age_class = 'ticket-age-over12hr'
-            else if age.indexOf('minute') != -1
-              age_class = ''
-            else
-              age_class = 'ticket-age-over12hr'
-            return "<span class='#{age_class}'>#{age}</span>"
-          # if status is "completed" or "resolved", no css class (orange/red) needed
-          else
-            return "<span>#{age}</span>"
+#          { age, status } = full
+#          unless status == 'COMPLETED' || status == 'RESOLVED'
+#            if age.indexOf('hour') != -1
+#              hour = parseInt( age.split("h")[0] )
+#              if hour >= 3 && hour < 12
+#                age_class = 'ticket-age-over3hr'
+#              else if hour > 12
+#                age_class = 'ticket-age-over12hr'
+#            else if age.indexOf('minute') != -1
+#              age_class = ''
+#            else
+#              age_class = 'ticket-age-over12hr'
+#            return "<span class='#{age_class}'>#{age}</span>"
+#          # if status is "completed" or "resolved", no css class (orange/red) needed
+#          else
+          return "<span>#{age}</span>"
       }
       {
         data: 'assignee'
@@ -418,3 +465,216 @@ window.sdr_toolbar_show_change_assignee = () ->
       show_message('error', 'Ticket assignment could not be updated.', 5)
       std_msg_error('No Tickets Selected', ['Select at least one ticket to assign to yourself.'])
   )
+
+window.advanced_search_sdr_index_table = () ->
+  # if form groups are hidden, wipe their values
+  $('#sdr-disputes-advanced-search-form .form-group.hidden').find('input').val('')
+
+  form = $('#sdr-disputes-advanced-search-form')
+
+  platforms = $('#platform-input')[0].selectize? && $('#platform-input')[0].selectize.items
+  platform_display = []
+  if platforms.length
+    for platform in platforms
+      platform_display.push($('#platform-input')[0].selectize.options[platform].public_name)
+
+  data = {
+    id: form.find('input[id="caseid-input"]').val()
+    customer_name: form.find('input[id="name-input"]').val()
+    customer_email: form.find('input[id="email-input"]').val()
+    company_name: form.find('input[id="submitter-org-input"]').val()
+    sender_domain_entry: form.find('input[id="dispute-input"]').val()
+    suggested_rep: form.find('input[id="suggested-rep-input"]').val()
+    case_owner: form.find('input[id="owner-input"]').val()
+    status: form.find('input[id="status-input"]').val()
+    priority: form.find('input[id="priority-input"]').val()
+    resolution: form.find('input[id="resolution-input"]').val()
+    platform_ids: form.find('input[id="platform-input"]').val()
+    submitted_older: form.find('input[id="submitted-older-input"]').val()
+    submitted_newer: form.find('input[id="submitted-newer-input"]').val()
+    age_older: form.find('input[id="age-older-input"]').val()
+    age_newer: form.find('input[id="age-newer-input"]').val()
+    platforms: platform_display.join(', ')
+  }
+
+
+  localStorage.sdr_search_type = 'advanced'
+  localStorage.sdr_search_name = form.find('input[name="search_name"]').val()
+  localStorage.sdr_search_conditions = JSON.stringify(data)
+  sdr_refresh_url()
+
+# Prevent the many selectizes from running into each other
+window.sdr_toggle_selectize_layer = (input, focus) ->
+  input = input.$control_input[0]
+  select_parent = $(input).parents('.form-control')[0]
+  if focus == 'true'
+    $(select_parent).css('z-index', '4')
+  else
+    $(select_parent).css('z-index', '2')
+
+window.build_sdr_data = () ->
+  data = {
+    search_type: ''
+    search_name: ''
+    selected_cases: []
+  }
+
+  if location.search != ''
+    urlParams = new URLSearchParams(location.search);
+    # if the location.search has value, it is a standard search
+    data = {
+      search_type : 'standard'
+      search_name : urlParams.get('f')
+      selected_cases: []
+    }
+
+    refresh_localStorage()
+
+  else if localStorage.sdr_search_type
+    { sdr_search_type, sdr_search_name, sdr_search_conditions } = localStorage
+    search_type = sdr_search_type
+    search_name = sdr_search_name
+    search_conditions = sdr_search_conditions
+
+    if search_type == 'advanced'
+      search_conditions = JSON.parse(search_conditions)
+
+      data = {
+        search_type: search_type
+        search_name: search_name
+        search_conditions: search_conditions
+      }
+    else if search_type == 'named'
+      data = {
+        search_type: search_type
+        search_name: search_name
+      }
+    else if search_type == 'contains'
+      search_conditions = JSON.parse(search_conditions)
+      data = {
+        search_type: search_type
+        search_conditions: search_conditions
+      }
+
+  format_sdr_header(data)
+  return data
+
+
+window.sdr_refresh_url = (href) ->
+  { sdr_search_type, sdr_search_name } = localStorage
+  search_type = sdr_search_type
+  search_name = sdr_search_name
+
+  url_check = window.location.href.split('/escalations/sdr/disputes/')[0]
+  new_url = '/escalations/sdr/disputes'
+
+  if href != undefined
+    localStorage.setItem('sdr_search_name', href)
+    window.location.replace(new_url + href)
+
+  if !href && typeof parseInt(url_check) == 'number'
+    window.location.replace('/escalations/sdr/disputes')
+
+window.sdr_refresh_localStorage = () ->
+  localStorage.removeItem('sdr_search_type')
+  localStorage.removeItem('sdr_search_name')
+  localStorage.removeItem('sdr_search_conditions')
+
+#window.file_rep_reset_search = () ->
+#  inputs = document.getElementsByClassName('form-control')
+#  time_submitted = ''
+#  last_updated = ''
+#  sandbox_score = ''
+#  threatgrid_score = ''
+#  $('#add-search-items-button').removeClass('hidden')
+#
+#
+#
+#  #reset Add Search Criteria options when form is reset
+#  $('#search-criteria-options ul li').each ->
+#    if $(this).hasClass('default-hidden-option')
+#      $(this).addClass('hidden')
+#    else
+#      $(this).removeClass('hidden')
+#      checkbox = $(this).find('.search-checkbox')
+#      $(checkbox).prop('checked', false)
+
+window.format_sdr_header = (data) ->
+  container = $('#sdr_searchref_container')
+  container.html("")
+  if data != undefined && container.length > 0
+    reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="sdr_search_refresh()"></span>'
+    { search_type, search_name } = data
+    if search_type == 'standard'
+      if search_name == 'all'
+        reset_icon = ''
+      new_header =
+        '<div>' +
+          '<span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span>' +
+          reset_icon +
+          '</div>'
+
+    else if search_type == 'advanced'
+      search_conditions = JSON.parse(localStorage.sdr_search_conditions)
+      new_header = '<div>Results for Advanced Search ' + reset_icon + '</div>'
+      for condition_name, condition of search_conditions
+        if condition_name == 'platform_ids'
+          continue
+        if condition != ''
+          condition_name = condition_name.replace(/_/g, " ").toUpperCase()
+          if condition_name == 'CASE OWNER'
+            condition_name = 'Assignee'
+          if condition_name == 'COMPANY NAME'
+            condition_name = 'SUBMITTER ORG'
+          if condition_name == 'ID'
+            condition_name = 'CASE ID'
+          if condition_name == 'SENDER DOMAIN ENTRY'
+            condition_name = 'DISPUTE'
+          if condition_name == 'SUBMITED NEWER'
+            condition_name = 'TIME SUBMITTED (NEWER)'
+          if condition_name == 'SUBMITTED OLDER'
+            condition_name = 'TIME SUBMITTED (OLDER)'
+
+          condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
+
+#          if typeof condition == 'object'
+#            condition_HTML = '<span>' + condition.from  + ' - ' + condition.to+ '</span>'
+#          else
+          condition_HTML = '<span>' + condition + '</span>'
+
+          container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
+    else if search_type == 'named'
+      new_header =
+        '<div>Results for "' + search_name + '" Saved Search' +
+          reset_icon +
+          '</div>'
+    else if search_type == 'contains'
+      search_conditions = JSON.parse(localStorage.sdr_search_conditions)
+      new_header =
+        '<div>Results for "' + search_conditions.value + '" '+
+          reset_icon +
+          '</div>'
+    else
+      new_header = 'All Tickets'
+    $('#sdr-index-title')[0].innerHTML = new_header
+
+# on tooltip click
+window.sdr_search_refresh = ()->
+  sdr_refresh_localStorage()
+  window.location.replace('/escalations/sdr/disputes')
+
+# clean fields for advanced search
+window.sdr_reset_search = ()->
+  $('#sdr-disputes-advanced-search-form .form-group.hidden').find('input').val('')
+  window.location.replace('/escalations/sdr/disputes')
+
+window.sdr_build_contains_search = () ->
+  search_string = $('#sdr-search .search-box').val().trim()
+  if search_string == ''
+    sdr_refresh_localStorage()
+    sdr_refresh_url()
+  else
+    localStorage.sdr_search_type = 'contains'
+    localStorage.sdr_search_name = ''
+    localStorage.sdr_search_conditions = JSON.stringify({value:search_string})
+  sdr_refresh_url()

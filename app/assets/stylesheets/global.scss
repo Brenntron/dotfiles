@@ -2463,6 +2463,22 @@ a.static-nav-item {
   z-index: 51;
 }
 
+#sdr-advanced-search-button {
+  margin-top: -4px;
+  background-color: transparent;
+  color: $type-lighter-color;
+}
+
+#sdr-advanced-search-button::before {
+  content: '|';
+  color: $bug-accent-color;
+}
+
+#sdr-advanced-search-dropdown {
+  min-width: 400px;
+  z-index: 51;
+}
+
 .search-group form {
   display: inline-block;
 }
@@ -4534,6 +4550,22 @@ td.wbrs-highlight, td.sbrs-highlight {
     right: 0;
   }
   #advanced-search-button::before {
+    display: none;
+  }
+
+  #sdr-advanced-search-button {
+    background-color: darken($faint-neutral-color, 5%);
+    color: $type-lighter-color;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin: -3px 0 0 0;
+    height: 28px;
+    border-radius: 0 4px 4px 0;
+    padding: 0 16px;
+    position: absolute;
+    right: 0;
+  }
+  #sdr-advanced-search-button::before {
     display: none;
   }
   .search-box {
@@ -10063,7 +10095,7 @@ hr.thin.form-divider {
   margin-left: 35px;
 }
 
-#filerep_searchref_container, #webcat_searchref_container{
+#filerep_searchref_container, #webcat_searchref_container, #sdr_searchref_container{
   & {
     color: $primary-section-color;
     max-width: 100%;
@@ -10489,6 +10521,11 @@ button.secondary.view-report-external-button {
     height: 28px;
   }
 
+  .input-group.search-group #sdr-advanced-search-button {
+    padding: 0 12px 0 18px;
+    height: 28px;
+  }
+
   // adding the down caret icon using the sort_by svg for advanced search button
   .input-group.search-group #advanced-search-button::after {
     content: '';
@@ -10503,6 +10540,18 @@ button.secondary.view-report-external-button {
     float: right;
   }
 
+  .input-group.search-group #sdr-advanced-search-button::after {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 14px;
+    right: 0;
+    background-image: url(image_path('icon_sort_by.svg'));
+    background-repeat: no-repeat;
+    background-position: 30% 92%;
+    background-size: 26px 26px;
+    float: right;
+  }
 
   // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
   @media screen and (min-width: 1200px) {
@@ -13028,6 +13077,11 @@ table > tbody > tr > td.no-padding {
     margin-bottom: 0;
     display: inline;  // ensure no used vertical space when empty
   }
+
+  #sdr_searchref_container {
+    margin-bottom: 0;
+    display: inline;  // ensure no used vertical space when empty
+  }
   // show 25 entries
   #file-rep-datatable_length label {
     margin-left: 3px;
@@ -13204,6 +13258,19 @@ table > tbody > tr > td.no-padding {
 
 // adding the down caret icon using the sort_by svg for advanced search button
 #advanced-search-button::after {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 14px;
+  right: 0;
+  background-image: url(image_path('icon_sort_by.svg'));
+  background-repeat: no-repeat;
+  background-position: 30% 92%;
+  background-size: 26px 26px;
+  float: right;
+}
+
+#sdr-advanced-search-button::after {
   content: '';
   display: block;
   width: 16px;

@@ -15,7 +15,7 @@ class Escalations::Sdr::DisputesController < ApplicationController
   private
 
     def datatables_search_params
-      params.fetch(:search, {value: ''}).permit(:value)
+      params.require(:search).permit(:value)
     end
 
     def robust_search_params
