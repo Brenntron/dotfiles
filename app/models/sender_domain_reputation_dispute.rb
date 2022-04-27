@@ -292,10 +292,10 @@ class SenderDomainReputationDispute < ApplicationRecord
     case search_type
     when 'advanced'
       advanced_search(params, search_name: search_name, user: user)
-    # when 'named'
-    #   named_search(search_name, user: user)
-    # when 'standard'
-    #   standard_search(search_name, user: user)
+    when 'named'
+      named_search(search_name, user: user)
+    when 'standard'
+      standard_search(search_name, user: user)
     when 'contains'
       contains_search(params['value'])
     else
@@ -331,10 +331,6 @@ class SenderDomainReputationDispute < ApplicationRecord
     dispute_params = non_blank_fields(params)
     dispute_fields = matching_fields(dispute_params) # to store attributes related to SenderDomainReputationDispute only
 
-    # if dispute_fields['priority'] && /(?<priority_digits>\d+)/ =~ dispute_fields.delete('priority')
-    #   dispute_fields['priority'] = priority_digits
-    # end
-    #
     dispute_fields['id'] = dispute_fields['id'].split(/[\s,]+/) if dispute_fields['id'].present?
 
     if dispute_params['case_owner'].present?
@@ -348,13 +344,6 @@ class SenderDomainReputationDispute < ApplicationRecord
       relation =
         relation.where('created_at >= :submitted_newer', submitted_newer: dispute_params['submitted_newer'])
     end
-
-    # if dispute_params['submission_type'].present?
-    #   submission_types = YAML.load(dispute_params['submission_type'].to_s)
-    #
-    #   relation =
-    #     relation.where(submission_type: submission_types)
-    # end
 
     if dispute_params['submitted_older'].present?
       if dispute_params['submitted_older'].kind_of?(Date)
@@ -414,6 +403,46 @@ class SenderDomainReputationDispute < ApplicationRecord
       save_named_search(search_name, params, user: user, project_type: 'SDR')
     end
     relation
+  end
+
+  # Searches specific to quick generic button filters.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.standard_search(search_name, user:)
+    case search_name
+    when 'my_open'
+      where.not(status: STATUS_RESOLVED).where(user_id: user.id)
+    when 'my_disputes'
+      where(user_id: user.id)
+    when 'unassigned'
+      vrtincoming = User.vrtincoming
+      where(user_id: [nil, vrtincoming]).where.not(status: STATUS_RESOLVED)
+    when 'open'
+      where.not(status: STATUS_RESOLVED)
+    when 'team_disputes'
+      where(user_id: user.my_team)
+    when 'closed'
+      where(status: STATUS_RESOLVED)
+    when 'all'
+      all
+    else
+      raise "No search named '#{search_name}' known."
+    end
+  end
+
+  def self.named_search(search_name, user:)
+    named_search = user.named_searches.where(name: search_name).first
+    raise "No search named '#{search_name}' found." unless named_search
+    search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
+      if /\A(?<super_name>[^~]*)~(?<sub_name>[^~]*)\z/ =~ criterion.field_name
+        search_params[super_name] ||= {}
+        search_params[super_name][sub_name] = criterion.value
+      else
+        search_params[criterion.field_name] = criterion.value
+      end
+      search_params
+    end
+    advanced_search(search_params, search_name: nil, user: user)
   end
 
   # selects fields which match database field names from given parameters

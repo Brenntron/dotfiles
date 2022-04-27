@@ -18,7 +18,7 @@ module API
 
             patch 'take_disputes' do
               std_api_v2 do
-                # authorize!(:update, SenderDomainReputationDispute)
+                authorize!(:update, SenderDomainReputationDispute)
                 dispute_ids = permitted_params[:dispute_ids]
                 SenderDomainReputationDispute.take_tickets(dispute_ids, user: current_user)
 
@@ -33,11 +33,9 @@ module API
 
             patch 'take_dispute/:dispute_id' do
               std_api_v2 do
-                dispute = SenderDomainReputationDispute.find(permitted_params[:dispute_id])
-                # authorize!(:update, dispute)
+                authorize!(:update, SenderDomainReputationDispute)
 
                 SenderDomainReputationDispute.take_tickets(permitted_params[:dispute_id], user: current_user)
-
                 { user_display_name: current_user.display_name, dispute_id: dispute.id }
               end
             end
@@ -49,10 +47,9 @@ module API
 
             patch 'return_dispute/:dispute_id' do
               std_api_v2 do
-                # authorize!(:update, SenderDomainReputationDispute)
+                authorize!(:update, SenderDomainReputationDispute)
 
                 SenderDomainReputationDispute.find(permitted_params[:dispute_id]).return_dispute
-
                 { user_display_name: current_user.display_name, dispute_id: permitted_params[:dispute_id] }
               end
             end
@@ -64,7 +61,7 @@ module API
 
             patch 'return_disputes' do
               std_api_v2 do
-                # authorize!(:update, SenderDomainReputationDispute)
+                authorize!(:update, SenderDomainReputationDispute)
 
                 SenderDomainReputationDispute.where(id: permitted_params[:dispute_ids]).each(&:return_dispute)
 
@@ -328,13 +325,14 @@ module API
               submitter_types = all_constants.select { |x| x.match?('SUBMITTER_TYPE') }.map { |name| SenderDomainReputationDispute.const_get(name) }
               contacts = Customer.all.order(name: :asc)
               companies = Company.all.order(name: :asc)
+              priorities = SenderDomainReputationDispute.pluck(:priority).uniq.compact
               # TODO: add resolutions to SenderDomainReputationDispute model and use it there
               resolutions = [Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN, Dispute::STATUS_RESOLVED_UNCHANGED,
                              Dispute::STATUS_RESOLVED_INVALID, Dispute::STATUS_RESOLVED_TEST, Dispute::STATUS_RESOLVED_OTHER]
               platforms = Platform.all.order(public_name: :asc).map { |m| { id: m.id, public_name: m.public_name } }
               render json: { case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
                             contacts: contacts, companies: companies, resolutions: resolutions,
-                            platforms: platforms }
+                            platforms: platforms, priorities: priorities }
             end
 
             desc 'Auto-populate fields on New Dispute'

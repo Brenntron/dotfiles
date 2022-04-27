@@ -108,6 +108,7 @@ $ ->
         $('#status-list').empty()
         $('#submittertype-list').empty()
         $('#contactname-list').empty()
+        $('#priority-list').empty()
         $('#contactemail-list').empty()
         $('#company-list').empty()
         $('#resolution-list').empty()
@@ -141,6 +142,10 @@ $ ->
 
         for resolution in response.json.resolutions
           $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
+          $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
+
+        for priority in response.json.priorities
+          $('#priority-list').append '<option value=\'' + priority + '\'></option>'
 
         $('#advanced-search-dropdown').show()
     )
@@ -171,29 +176,16 @@ window.initialize_sdr_disputes_datatable = () ->
       }
       # placeholder for priority column
       {
-        data: null
-        orderable: false
+        data: 'priority'
         searchable: false
-        sortable: false
         defaultContent: '<span></span>'
         width: '10px'
-        render: ( data )-> ''
-#          { is_important, was_dismissed } = data
-#          if is_important == "true" && was_dismissed == "true"
-#            return '<div class="container-important-tags ">' +
-#              '<div class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></div>' +
-#              '<div class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></div>' +
-#              '</div>'
-#          else if is_important == "true" && was_dismissed == "false"
-#            return '<span class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
-#          else if is_important == "false" && was_dismissed == "true"
-#            return '<span class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></span>'
+        render: ( data ) -> '<span class="bug-priority p-' + data + '">' + data + '</span>'
       }
       {
         width: '50px'
         data: 'case_id'
-        render: (data, type, full, meta) ->
-          return parseInt(data).pad(10)
+        render: (data, type, full, meta) -> parseInt(data).pad(10)
       }
       {
         data: 'status'
@@ -210,25 +202,8 @@ window.initialize_sdr_disputes_datatable = () ->
             return ''
       }
       {
-        #age column
-        width: '40px'
-        render: (data, type, full, meta) ->
-#          { age, status } = full
-#          unless status == 'COMPLETED' || status == 'RESOLVED'
-#            if age.indexOf('hour') != -1
-#              hour = parseInt( age.split("h")[0] )
-#              if hour >= 3 && hour < 12
-#                age_class = 'ticket-age-over3hr'
-#              else if hour > 12
-#                age_class = 'ticket-age-over12hr'
-#            else if age.indexOf('minute') != -1
-#              age_class = ''
-#            else
-#              age_class = 'ticket-age-over12hr'
-#            return "<span class='#{age_class}'>#{age}</span>"
-#          # if status is "completed" or "resolved", no css class (orange/red) needed
-#          else
-          return "<span>#{age}</span>"
+        data: 'age'
+        width: '50px'
       }
       {
         data: 'assignee'
@@ -249,7 +224,7 @@ window.initialize_sdr_disputes_datatable = () ->
       #rules
       { data: null, render: ( data )-> '' }
       #suggested_rep
-      { data: null, render: ( data )-> '' }
+      { data: 'suggested_disposition' }
       { data: 'submitter_type' }
       { data: 'contact_name' }
       { data: 'contact_email' }
@@ -484,7 +459,7 @@ window.advanced_search_sdr_index_table = () ->
     customer_email: form.find('input[id="email-input"]').val()
     company_name: form.find('input[id="submitter-org-input"]').val()
     sender_domain_entry: form.find('input[id="dispute-input"]').val()
-    suggested_rep: form.find('input[id="suggested-rep-input"]').val()
+    suggested_disposition: form.find('input[id="suggested-rep-input"]').val()
     case_owner: form.find('input[id="owner-input"]').val()
     status: form.find('input[id="status-input"]').val()
     priority: form.find('input[id="priority-input"]').val()
@@ -496,7 +471,6 @@ window.advanced_search_sdr_index_table = () ->
     age_newer: form.find('input[id="age-newer-input"]').val()
     platforms: platform_display.join(', ')
   }
-
 
   localStorage.sdr_search_type = 'advanced'
   localStorage.sdr_search_name = form.find('input[name="search_name"]').val()
@@ -516,7 +490,6 @@ window.build_sdr_data = () ->
   data = {
     search_type: ''
     search_name: ''
-    selected_cases: []
   }
 
   if location.search != ''
@@ -525,11 +498,8 @@ window.build_sdr_data = () ->
     data = {
       search_type : 'standard'
       search_name : urlParams.get('f')
-      selected_cases: []
     }
-
-    refresh_localStorage()
-
+    sdr_refresh_localStorage()
   else if localStorage.sdr_search_type
     { sdr_search_type, sdr_search_name, sdr_search_conditions } = localStorage
     search_type = sdr_search_type
@@ -579,25 +549,6 @@ window.sdr_refresh_localStorage = () ->
   localStorage.removeItem('sdr_search_type')
   localStorage.removeItem('sdr_search_name')
   localStorage.removeItem('sdr_search_conditions')
-
-#window.file_rep_reset_search = () ->
-#  inputs = document.getElementsByClassName('form-control')
-#  time_submitted = ''
-#  last_updated = ''
-#  sandbox_score = ''
-#  threatgrid_score = ''
-#  $('#add-search-items-button').removeClass('hidden')
-#
-#
-#
-#  #reset Add Search Criteria options when form is reset
-#  $('#search-criteria-options ul li').each ->
-#    if $(this).hasClass('default-hidden-option')
-#      $(this).addClass('hidden')
-#    else
-#      $(this).removeClass('hidden')
-#      checkbox = $(this).find('.search-checkbox')
-#      $(checkbox).prop('checked', false)
 
 window.format_sdr_header = (data) ->
   container = $('#sdr_searchref_container')
@@ -677,4 +628,10 @@ window.sdr_build_contains_search = () ->
     localStorage.sdr_search_type = 'contains'
     localStorage.sdr_search_name = ''
     localStorage.sdr_search_conditions = JSON.stringify({value:search_string})
+  sdr_refresh_url()
+
+window.sdr_build_named_search = (search_name) ->
+  localStorage.sdr_search_type = 'named'
+  localStorage.sdr_search_name = search_name
+  localStorage.removeItem('sdr_search_conditions')
   sdr_refresh_url()
