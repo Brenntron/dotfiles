@@ -1,0 +1,47 @@
+%input{type:'hidden', name: 'token', value: "#{current_user.authentication_token}"}
+%input{type:'hidden', name: 'xml_token', value: "#{xml_token}"}
+%input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
+
+.row
+  .col-xs-6.sdr-dispute-info-wrapper
+    %h1.sdr-dispute-info-title Dispute Information
+    .row.sdr-research-subwrapper
+      .col-xs-6
+        %h5 SUBMITTED DISPUTE
+        %p= @dispute.sender_domain_entry
+      .col-xs-6
+        .sdr-suggested-reputation-wrapper
+          %h5 SUGGESTED REPUTATION
+          %p= @dispute.suggested_disposition
+    .row
+      .col-xs-12.sdr-research-subwrapper
+        %h5 ITEMS EXTRACTED FROM DETAILS
+        - extracted_details = extract_details @dispute.description
+        - extracted_details.each do |detail|
+          %p= detail
+    .row
+      .col-xs-12.sdr-research-subwrapper
+        %h5 DESCRIPTION / DETAILS
+        %p= @dispute.description
+    .row
+      .col-xs-12.sdr-research-subwrapper
+        %h5 ATTACHMENTS
+        - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
+          %a= attachment.file_name
+
+  .col-xs-6.sdr-research-data-wrapper
+    %h1.sdr-research-data-title Research Data
+    .row
+      .col-xs-12.sdr-research-subwrapper
+        %h5 SENDER DOMAIN REPUTATION
+        .col-xs-4
+          %h5 DOMAIN
+          %p= @dispute.sender_domain_entry
+        .col-xs-4
+          %h5 CURRENT REPUTATION
+          %p= @dispute.suggested_disposition
+        .col-xs-4
+          %h5 RULES
+    .row
+      .col-xs-12.sdr-research-subwrapper
+        %h5 WHOIS

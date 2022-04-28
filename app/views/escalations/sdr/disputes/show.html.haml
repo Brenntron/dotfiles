@@ -191,3 +191,12 @@
           Contact Email
         %p.dispute-edit-field#dispute-customer-email= @dispute.customer.email
         %input.dispute-edit-input#dispute-customer-email-input{type: 'text', value: "#{@dispute.customer.email}"}
+
+%ul.nav.nav-tabs#research-tab{role: 'tablist'}
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
+      Research
+
+.tab-content.content-wrapper#bug-tab-content
+  .tab-pane#research_tab{role: 'tabpanel'}
+    = render 'escalations/sdr/disputes/research_tab'
