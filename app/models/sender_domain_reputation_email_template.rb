@@ -1,0 +1,2 @@
+class SenderDomainReputationEmailTemplate < ApplicationRecord
+end

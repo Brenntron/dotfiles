@@ -1,0 +1,2 @@
+CREATE TABLE `sender_domain_reputation_dispute_comments` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `sender_domain_reputation_dispute_id` int, `user_id` int, `comment` text, `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL);
+INSERT INTO `schema_migrations` (`version`) VALUES ('20220415180948');
