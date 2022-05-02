@@ -32,6 +32,19 @@
                 = format_date(email.created_at)
                 %br
                 =email.created_at.strftime("%H:%M:%S")
+          -@dispute.sender_domain_reputation_dispute_comments.recent_first.each do |comment|
+            %tr.note-history-row
+              %td.alt-col.icon-col
+                %span.case-history-icon.note-icon{:data => {:history_kind => "note"}}
+              %td
+                %span.case-history-author
+                  =comment.user.cvs_username
+                %span.case-history-preview
+                  =comment.comment.truncate(75, omission: '...')
+              %td.alt-col.case-history-datetime{:data => {:db_date => comment.created_at}}
+                = format_date(comment.created_at)
+                %br
+                =comment.created_at.strftime("%H:%M:%S")
 
   .col-sm-6.border-section
     .row
@@ -183,7 +196,7 @@
                       .template-label
                         Select a Template
 
-                    %select.dropdown.email-template-select#select-reply-template
+                    %select.dropdown.email-template-select#sdr-select-reply-template
                       -if EmailTemplate.all.empty?
                         %option.hidden{value:'', disabled: true, selected: true} No Templates Created
                       -else
@@ -224,13 +237,40 @@
             .note-info-item.author-notation
               Creating new note
             .note-info-item.note-tool-buttons
-              %button.note-save-button.new-case-note-save-button
+              %button#sdr-new-case-note-save-button.note-save-button.new-case-note-save-button
               %button.note-cancel-button.new-case-note-cancel-button
               %button.note-copy-button
         .row
           .col-xs-12
             .note-block.content-editable.new-case-note-textarea{contenteditable: true}
               %pre
+
+    -@dispute.sender_domain_reputation_dispute_comments.recent_first.each do |comment|
+      .note-wrapper
+        .row
+          .col-xs-12
+            .note-info-item.author-notation
+              Written by
+              %span.author-username
+                =comment.user.cvs_username
+              = distance_of_time_in_words(Time.now, comment.created_at) + " ago."
+            %br.hidden-break
+            .note-info-item.time-stamp
+              = format_timestamp(comment.created_at)
+            .note-info-item.note-tool-buttons
+              %button.hidden.note-save-button.update-note{class: "note-save-button#{comment.id}", comment_id: "#{comment.id}"}
+              %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
+              %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
+              %button#sdr-note-delete-button.note-delete-button{comment_id: "#{comment.id}"}
+
+        .row
+          .col-xs-12
+            - if comment.user.cvs_username == current_user.cvs_username
+              .note-block.content-editable{class: "note-block#{comment.id}", comment_id: "#{comment.id}", contenteditable: true}
+                %pre=comment.comment
+            - else
+              .note-block{comment_id: "#{comment.id}"}
+                %pre=comment.comment
 
     %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
     %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
