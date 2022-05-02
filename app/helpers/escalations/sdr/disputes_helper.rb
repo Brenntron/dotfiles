@@ -16,7 +16,7 @@ module Escalations::Sdr::DisputesHelper
   end
 
   def extract_details(description)
-    return '' if description.nil?
+    return [] if description.nil?
     extracted_details = description.split(".\r")[0]
     extracted_details = extracted_details.split(',')
   end
