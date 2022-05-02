@@ -191,3 +191,13 @@
           Contact Email
         %p.dispute-edit-field#dispute-customer-email= @dispute.customer.email
         %input.dispute-edit-input#dispute-customer-email-input{type: 'text', value: "#{@dispute.customer.email}"}
+
+%ul.nav.nav-tabs#communication-tab{role: 'tablist'}
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+      communication
+
+.tab-content.content-wrapper#bug-tab-content
+  .tab-pane#communication_tab{role: 'tabpanel'}
+    = render 'escalations/sdr/disputes/communication_tab'
+
