@@ -9,6 +9,8 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   CORPUS_PHISH = "phish@access.ironport.com"
   CORPUS_VIRUS = "virus@access.ironport.com"
 
+  CORPUS_EMAIL_LIST= [CORPUS_SPAM, CORPUS_HAM, CORPUS_ADS, CORPUS_NOT_ADS, CORPUS_PHISH, CORPUS_VIRUS]
+  ALL_POSSIBLE_TAGS = ["[SUSPECTED SPAM]", "[MARKETING]", "[SOCIAL NETWORK]", "[BULK]", "[WARNING: VIRUS DETECTED]"]
   def self.build_and_push_to_bugzilla(bugzilla_rest_session, payload, user, sender_domain_reputation_dispute, remote = true)
 
     new_local_attachment = nil
@@ -86,8 +88,19 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
     end
 
   end
+  #tags can be: [SUSPECTED SPAM], [MARKETING], [SOCIAL NETWORK], [BULK], [WARNING: VIRUS DETECTED]
+  # BugzillaRest::Session.default_session
+  def send_to_corpus(corpus_submission_category, base_subject, tag, bugzilla_session)
 
-  def send_to_corpus(corpus_submission_category, base_subject, file, tag, bugzilla_session)
+    bug_proxy = bugzilla_session.build_bug(id: self.sender_domain_reputation_dispute.id)
+    bug_attachments = bug_proxy.attachments
+    file = nil
+    bug_attachments.each do |bug_attachment|
+      if bug_attachment.id == self.id
+        file = bug_attachment
+      end
+    end
+
 
     email_args = {}
     email_args[:to] = corpus_submission_category
@@ -110,8 +123,8 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
     new_attachment[:file_name] = attachment["filename"]
     new_attachment[:file_url] = self.s3_url(s3_file_path)
 
-
-
+    puts "\n---------------------------------------------------\n"
+    puts new_attachment.inspect.to_s
 
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
     conn.post(email_args, [new_attachment])
@@ -220,4 +233,23 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
     self.save
   end
 
+  def suggested_subject
+    subject = ""
+
+    if self.email_header_data.present?
+      begin
+        raw_data = JSON.parse(self.email_header_data)
+        raw_data.keys.each do |key|
+          if key.downcase.include?("subject")
+            subject = raw_data[key].strip
+          end
+        end
+      rescue
+        subject = ""
+      end
+    end
+
+    return subject
+
+  end
 end

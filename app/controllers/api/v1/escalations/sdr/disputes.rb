@@ -294,7 +294,12 @@ module API
             end
 
             get 'suggested_subject' do
-
+              attachment = SenderDomainReputationDisputeAttachment.find(params[:id])
+              if attachment.suggested_subject.present?
+                return {:status => "success", :messages => attachment.suggested_subject}
+              else
+                return {:status => "success", :messages => ""}
+              end
             end
 
             params do
@@ -305,16 +310,8 @@ module API
             end
 
             post 'submit_to_corpus' do
-              bug_proxy = bugzilla_rest_session.build_bug(id: self.id)
-              bug_attachments = bug_proxy.attachments
-              attachment_file = nil
-              bug_attachments.each do |bug_attachment|
-                if bug_attachment.id == params[:id]
-                  attachment_file = bug_attachment
-                end
-              end
               attachment = SenderDomainReputationDisputeAttachment.find(params[:id])
-              attachment.send_to_corpus(params[:email], params[:subject], attachment_file, params[:tag], bugzilla_session)
+              attachment.send_to_corpus(params[:email], params[:subject], params[:tag], bugzilla_session)
 
             end
 
