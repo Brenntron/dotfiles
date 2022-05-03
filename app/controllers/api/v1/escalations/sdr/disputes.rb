@@ -309,6 +309,31 @@ module API
             end
 
 
+            params do
+              requires :id, type: Integer
+            end
+
+            get 'suggested_subject' do
+              attachment = SenderDomainReputationDisputeAttachment.find(params[:id])
+              if attachment.suggested_subject.present?
+                return {:status => "success", :messages => attachment.suggested_subject}
+              else
+                return {:status => "success", :messages => ""}
+              end
+            end
+
+            params do
+              requires :id, type: Integer
+              requires :subject, type: String
+              requires :tag, type: String
+              requires :email, type: String
+            end
+
+            post 'submit_to_corpus' do
+              attachment = SenderDomainReputationDisputeAttachment.find(params[:id])
+              attachment.send_to_corpus(params[:email], params[:subject], params[:tag], bugzilla_session)
+
+            end
           end
         end
       end
