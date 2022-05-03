@@ -28,6 +28,7 @@
 //= require application/webrep/disputes
 //= require application/webrep/communications
 //= require application/sdr/disputes
+//= require application/sdr/communications
 //= require application/helpers
 //= require clipboard
 //= require moment

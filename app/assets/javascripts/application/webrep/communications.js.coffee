@@ -591,6 +591,7 @@ $ ->
     $('#edit-template-form-wrapper').contents().hide()
     $('#create-email-template').hide()
     $('#save-email-template').addClass('hidden')
+    $('#save-sdr-email-template').addClass('hidden')
     $('#save-filerep-email-template').addClass('hidden')
     $('#create-email-template').show()
     $('#cancel-edit-email-template').addClass('hidden')
@@ -657,6 +658,7 @@ $ ->
       $('#new-template-form-wrapper').contents().show()
       $('#create-email-template').text('Cancel')
       $('#save-email-template').removeClass('hidden')
+      $('#save-sdr-email-template').removeClass('hidden')
       $('#save-filerep-email-template').removeClass('hidden')
       $('#new-template-form-wrapper').animate {
         height: 200
@@ -666,6 +668,7 @@ $ ->
       $('#new-template-form-wrapper').contents().hide()
       $('#create-email-template').text('Create New Template')
       $('#save-email-template').addClass('hidden')
+      $('#save-sdr-email-template').addClass('hidden')
       $('#save-filerep-email-template').addClass('hidden')
       $('#new-template-form-wrapper').animate {
         height: 0
