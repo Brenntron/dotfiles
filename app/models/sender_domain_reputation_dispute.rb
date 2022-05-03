@@ -167,8 +167,6 @@ class SenderDomainReputationDispute < ApplicationRecord
         end
       end
     end
-
-
   end
 
   def self.auto_resolve_on_duplicate(dispute)
@@ -285,11 +283,30 @@ class SenderDomainReputationDispute < ApplicationRecord
       end
     end
   end
+
   def domain_name
 
     parser = URI::Parser.new
     url = parser.escape(self.sender_domain_entry)
     uri = parser.parse(parser.parse(self.sender_domain_entry).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
+
+    full_domain = ""
+    if domain.trd.present?
+      full_domain += domain.trd + "."
+    end
+    full_domain += domain.domain
+
+    return full_domain
+
+  end
+
+
+  def self.domain_name_of(entry)
+
+    parser = URI::Parser.new
+    url = parser.escape(entry)
+    uri = parser.parse(parser.parse(entry).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
 
     full_domain = ""

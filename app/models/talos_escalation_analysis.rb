@@ -10,6 +10,8 @@ class TalosEscalationAnalysis
 
   def self.get_data_as_hash(entry, json=false, admin=false)
 
+    entry = SenderDomainReputationDispute.domain_name_of(entry)
+
     tea_data = {}
     tea_data[:entry] = {}
     tea_data[:web_reputation] = {}            #sds and/or beaker
@@ -19,7 +21,7 @@ class TalosEscalationAnalysis
 
 
     tea_data[:entry][:url] = entry
-    tea_data[:entry][:ip_address] = Resolv.getaddress('1234computer.com') rescue nil
+    tea_data[:entry][:ip_address] = Resolv.getaddress(entry) rescue nil
 
     ###WEB REP
     begin
