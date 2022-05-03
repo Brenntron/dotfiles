@@ -200,3 +200,8 @@
 .tab-content.content-wrapper#bug-tab-content
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/sdr/disputes/research_tab'
+
+:javascript
+  $(document).ready(function(){
+  get_whois_data("#{@dispute.sender_domain_entry}")
+  })
