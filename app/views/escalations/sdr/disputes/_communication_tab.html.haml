@@ -96,7 +96,7 @@
               %td=template.description
               %td
                 %button#edit-sdr-template.table-button.edit-button.edit-template{template_id: template.id, name: 'edit-template'}
-                %button#delete-sdr-template.table-button.delete-button.delete-template{template_id: template.id, name: 'delete-template'}
+                %button#delete-sdr-template.table-button.delete-button{template_id: template.id, name: 'delete-template'}
 
       #new-template-form-wrapper
         %h4.dialog-inset-header New Email Template
@@ -153,7 +153,7 @@
                         %option.hidden{value:'', disabled: true, selected: true} No Templates Created
                       -else
                         %option.hidden{value:'', disabled: true, selected: true} No Template Selected
-                        =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+                        =options_for_select(SenderDomainReputationEmailTemplate.all.pluck(:template_name, :id))
 
                     .email-reply-button-wrapper
                       .email-reply-buttons
@@ -189,7 +189,7 @@
             .note-info-item.author-notation
               Creating new note
             .note-info-item.note-tool-buttons
-              %button#sdr-new-case-note-save-button.note-save-button.new-case-note-save-button
+              %button#new-sdr-case-note-save-button.note-save-button
               %button.note-cancel-button.new-case-note-cancel-button
               %button.note-copy-button
         .row
@@ -213,7 +213,7 @@
               %button.hidden.note-save-button.update-note{class: "note-save-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
-              %button#sdr-note-delete-button.note-delete-button{comment_id: "#{comment.id}"}
+              %button#sdr-note-delete-button.sdr-note-delete-button{comment_id: "#{comment.id}"}
 
         .row
           .col-xs-12
