@@ -1,11 +1,11 @@
 module API
   module V1
     module Escalations
-      module SenderDomainReputation
+      module Sdr
         class DisputeComments < Grape::API
           include API::V1::Defaults
 
-          resource "escalations/sender_domain_reputation/dispute_comments" do
+          resource "escalations/sdr/dispute_comments" do
 
             before do
               PaperTrail.request.whodunnit = current_user.id if current_user.present?

@@ -1,11 +1,11 @@
 module API
   module V1
     module Escalations
-      module SenderDomainReputation
+      module Sdr
         class EmailTemplates < Grape::API
           include API::V1::Defaults
 
-          resource "escalations/sender_domain_reputation/email_templates" do
+          resource "escalations/sdr/email_templates" do
 
             desc "get an email template"
             params do
