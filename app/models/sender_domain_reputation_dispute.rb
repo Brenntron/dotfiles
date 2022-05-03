@@ -154,4 +154,41 @@ class SenderDomainReputationDispute < ApplicationRecord
     conn = ::Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
     conn.post
   end
+
+  def domain_name
+
+    parser = URI::Parser.new
+    url = parser.escape(self.sender_domain_entry)
+    uri = parser.parse(parser.parse(self.sender_domain_entry).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
+
+    full_domain = ""
+    if domain.trd.present?
+      full_domain += domain.trd + "."
+    end
+    full_domain += domain.domain
+
+    return full_domain
+
+  end
+
+
+  def self.domain_name_of(entry)
+
+    parser = URI::Parser.new
+    url = parser.escape(entry)
+    uri = parser.parse(parser.parse(entry).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
+
+    full_domain = ""
+    if domain.trd.present?
+      full_domain += domain.trd + "."
+    end
+    full_domain += domain.domain
+
+    return full_domain
+
+  end
+
+
 end
