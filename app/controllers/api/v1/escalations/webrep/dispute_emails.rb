@@ -87,6 +87,8 @@ module API
                       case params[:dispute_type]
                       when 'FileReputationDispute'
                         dispute = FileReputationDispute.find(params[:dispute_id])
+                      when 'SenderDomainReputationDispute'
+                        dispute = SenderDomainReputationDispute.find(params[:dispute_id])
                       else #'Dispute'
                         dispute = Dispute.find(params[:dispute_id])
                       end
