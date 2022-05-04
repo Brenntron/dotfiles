@@ -92,28 +92,31 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
     beaker_data = {}
     beaker_data[:request] = {}
-    beaker_data[:request][:mx_data] = []
     beaker_data[:response] = {}
-    beaker_data[:response][:envelope] = []
-    beaker_data[:response][:data] = []
+    beaker_data[:response][:data] = {}
     domain_of_parent = self.sender_domain_reputation_dispute.domain_name
 
     begin
-      mx_records = SenderDomainReputationDisputeAttachment.get_mx_records(domain_of_parent)
 
-      if mx_records.present?
-        mx_records.each do |mx_record|
-          beaker_data[:request][:mx_data] << {:exchange => mx_record.first, :ip_address => mx_record.last}
+      headers = JSON.parse(self.email_header_data)
+      possible_from = []
+      headers.keys.each do |key|
+        if key.downcase.include?("from")
+          possible_from += SenderDomainReputationDisputeAttachment.extract_emails_to_array(headers[key])
+        end
+      end
 
-          envelope_response = Beaker::Sdr.envelope_query(mx_record.last).to_h
-          envelope_response.keys.each do |key|
-            begin
-              envelope_response[key].to_json
-            rescue
-              envelope_response[key] = "could not translate encoded characters"
-            end
-          end
-          data_response = Beaker::Sdr.data_query(mx_record.last).to_h
+      possible_from = possible_from.uniq
+
+      mail_data_params = {}
+      mail_data_params[:dkim_disp] = [{}]
+      mail_data_params[:dmarc_disp] = {}
+      mail_data_params[:email_list] = {}
+
+      possible_from.each do |from_email|
+        mail_data_params[:from_hdr] = [{"addr" => from_email}]
+        data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        if data_response.present?
           data_response.keys.each do |key|
             begin
               data_response[key].to_json
@@ -121,12 +124,48 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
               data_response[key] = "could not translate encoded characters"
             end
           end
-          beaker_data[:response][:envelope] << {:ip => mx_record.last, :response => envelope_response}
-          beaker_data[:response][:data] << {:ip => mx_record.last, :response => data_response}
+          begin
+            data_response[:service_data].first[:data] = JSON.parse(data_response[:service_data].first[:data])
+          rescue
 
+          end
+          beaker_data[:response][:data][from_email] = data_response
         end
 
       end
+
+
+
+
+
+      #mx_records = SenderDomainReputationDisputeAttachment.get_mx_records(domain_of_parent)
+
+      #if mx_records.present?
+      #  mx_records.each do |mx_record|
+      #    beaker_data[:request][:mx_data] << {:exchange => mx_record.first, :ip_address => mx_record.last}
+
+      #    envelope_response = Beaker::Sdr.envelope_query(mx_record.last).to_h
+      #    envelope_response.keys.each do |key|
+      #      begin
+      #        envelope_response[key].to_json
+      #      rescue
+      #        envelope_response[key] = "could not translate encoded characters"
+      #      end
+      #    end
+      #    data_response = Beaker::Sdr.data_query(mx_record.last).to_h
+      #    data_response.keys.each do |key|
+      #      begin
+      #        data_response[key].to_json
+      #      rescue
+      #        data_response[key] = "could not translate encoded characters"
+      #      end
+      #    end
+      #    beaker_data[:response][:envelope] << {:ip => mx_record.last, :response => envelope_response}
+      #    beaker_data[:response][:data] << {:ip => mx_record.last, :response => data_response}
+
+      #  end
+      #end
+
       beaker_data = beaker_data.to_json
 
     rescue => e
@@ -140,5 +179,8 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
     self.save
   end
 
-
+  def self.extract_emails_to_array(txt)
+    reg = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i
+    txt.scan(reg).uniq
+  end
 end

@@ -124,6 +124,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       new_dispute.save
       #end
 
+      new_dispute.get_and_save_beaker_data
 
       if message_payload["attachments"].present?
         message_payload["attachments"].each do |dispute_attachment|
@@ -246,6 +247,48 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     return full_domain
 
+  end
+
+  def get_and_save_beaker_data
+    beaker_data = {}
+    beaker_data[:request] = {}
+    beaker_data[:response] = {}
+    beaker_data[:response][:data] = {}
+
+    mail_data_params = {}
+    mail_data_params[:dkim_disp] = [{}]
+    mail_data_params[:dmarc_disp] = {}
+    mail_data_params[:email_list] = {}
+
+    begin
+
+      mail_data_params[:from_hdr] = [{"addr" => self.sender_domain_entry}]
+      data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+      if data_response.present?
+        data_response.keys.each do |key|
+          begin
+            data_response[key].to_json
+          rescue
+            data_response[key] = "could not translate encoded characters"
+          end
+        end
+        begin
+          data_response[:service_data].first[:data] = JSON.parse(data_response[:service_data].first[:data])
+        rescue
+
+        end
+        beaker_data[:response][:data][self.sender_domain_entry] = data_response
+      end
+
+      beaker_data = beaker_data.to_json
+    rescue => e
+      Rails.logger.error e
+      Rails.logger.error e.backtrace.join("\n")
+      beaker_data = {:status => "failed", :message => "something went wrong trying to communicate with beaker and parsing data"}.to_json
+    end
+
+    self.beaker_info = beaker_data
+    self.save
   end
 
 end
