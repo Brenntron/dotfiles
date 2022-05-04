@@ -36,7 +36,7 @@ module API
                 authorize!(:update, SenderDomainReputationDispute)
 
                 SenderDomainReputationDispute.take_tickets(permitted_params[:dispute_id], user: current_user)
-                { user_display_name: current_user.display_name, dispute_id: dispute.id }
+                { user_display_name: current_user.display_name, dispute_id: permitted_params[:dispute_id] }
               end
             end
 

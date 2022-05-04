@@ -93,31 +93,7 @@ Rails.application.routes.draw do
 
     namespace :sdr do
       root 'root#index'
-      resources :disputes, only: [:index, :show] do
-        collection do
-          # get :advanced_search
-          # get :named_search
-          # get :standard_search
-          # get :contains_search
-          # get :resolution_report
-          # get :export_per_resolution_report
-          # get :export_per_engineer_report
-          # get :export_per_customer_report
-          # get :resolution_age_report
-          # get :export_resolution_age_report
-        end
-        # member do
-        #   get :export
-        # end
-      end
-      # resources :dispute_emails         # TODO This route has no controller so determine if it should be removed.
-      # resources :dispute_comments       # TODO This route has no controller so determine if it should be removed.
-      # resources :email_templates        # TODO This route has no controller so determine if it should be removed.
-
-      # get 'dashboard', to: 'disputes#dashboard'
-      # get 'research', to: 'disputes#research'
-      # get :export_selected_dispute_rows, to: 'disputes#export_selected_dispute_rows'
-      # get :export_selected_dispute_entry_rows, to: 'disputes#export_selected_dispute_entry_rows'
+      resources :disputes, only: [:index, :show]
     end
 
     namespace :file_rep do
