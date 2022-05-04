@@ -66,9 +66,10 @@ $ ->
   # TODO: we could create universal method for this one too
   $('.toggle-vis-sdr').on "click", ->
     data = {}
+    # TODO: add 'rules' and 'current-rep'
     columns = ['priority', 'case-id', 'status', 'resolution', 'time-submitted',
-               'age', 'assignee', 'case-origin', 'platform', 'dispute', 'current-rep',
-               'rules', 'suggested-rep', 'submitter-type', 'contact-name', 'contact-email', 'submitter-org']
+               'age', 'assignee', 'case-origin', 'platform', 'dispute',
+               'suggested-rep', 'submitter-type', 'contact-name', 'contact-email', 'submitter-org']
 
     data[column] = $("##{column}-checkbox").is(':checked') for column in columns
 
@@ -174,7 +175,6 @@ window.initialize_sdr_disputes_datatable = () ->
         render: (data, type, full, meta) ->
           return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="sdr_dispute_check_box" id="cbox' + data + '" value="' + data + '"/>'
       }
-      # placeholder for priority column
       {
         data: 'priority'
         searchable: false
@@ -185,7 +185,7 @@ window.initialize_sdr_disputes_datatable = () ->
       {
         width: '50px'
         data: 'case_id'
-        render: (data, type, full, meta) -> parseInt(data).pad(10)
+        render: (data, type, full, meta) -> "<a href='/escalations/sdr/disputes/#{data}'>#{parseInt(data).pad(10)}</a>"
       }
       {
         data: 'status'
@@ -220,9 +220,9 @@ window.initialize_sdr_disputes_datatable = () ->
       { data: 'platform' }
       { data: 'dispute' }
       #current_rep
-      { data: null, render: ( data )-> '' }
+      { data: null, visible: false, render: ( data )-> '' }
       #rules
-      { data: null, render: ( data )-> '' }
+      { data: null, visible: false, render: ( data )-> '' }
       #suggested_rep
       { data: 'suggested_disposition' }
       { data: 'submitter_type' }

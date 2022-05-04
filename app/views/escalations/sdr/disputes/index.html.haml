@@ -8,7 +8,7 @@
   %h1#sdr-index-title Open Tickets
   %span.refresh-message#refresh-working-msg
   %span.refresh-message#refresh-error-msg
-  #sdr_searchref_container{ onmouseover: "triggerTooltips(this)" }
+  #sdr_searchref_container{ onmouseover: 'triggerTooltips(this)' }
   = render('index_toolbar')
 
   %input{type: 'hidden', name: 'token', value: "#{current_user.authentication_token}"}
@@ -30,8 +30,8 @@
             %th#case-origin Case Origin
             %th#platform Platform
             %th#dispute Dispute
-            %th#current-rep Current Rep
-            %th#rules Rules
+            %th#current-rep{hidden: true} Current Rep
+            %th#rules{hidden: true} Rules
             %th#suggested-rep Suggested Rep
             %th#submitter-type.esc-tooltipped{title: 'Submitter Type'} Submitter Type
             %th#contact-name Contact Name
