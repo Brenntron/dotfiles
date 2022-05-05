@@ -210,7 +210,7 @@
             .note-info-item.time-stamp
               = format_timestamp(comment.created_at)
             .note-info-item.note-tool-buttons
-              %button.hidden.note-save-button.update-note{class: "note-save-button#{comment.id}", comment_id: "#{comment.id}"}
+              %button.hidden.note-save-button{class: "note-save-button#{comment.id}", onclick: "updateSdrNote(#{comment.id})"}
               %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
               %button.sdr-note-delete-button{onclick: "deleteSdrNote(#{comment.id})"}
