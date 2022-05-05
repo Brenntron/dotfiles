@@ -42,6 +42,7 @@
 //= require application/webrep_advanced_search
 //= require application/webcat/complaints
 //= require application/webcat/clusters
+//= require application/sdr/disputes
 //= require application/webcat/complaint_form
 //= require application/webrep/dispute_form
 //= require application/webrep_research_tab

@@ -1,0 +1,34 @@
+%form.new-dispute-form{ method: 'get', 'accept-charset': 'UTF-8' }
+
+  .form-group
+    %input{ type:'hidden', name: 'token', value: "#{current_user.authentication_token}" }
+    %input{ type:'hidden', name: 'xml_token', value: "#{xml_token}" }
+    %input{ type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}" }
+
+  .form-group
+    .dispute-error-inline.hidden
+      Invalid URL detected, please remove spaces from all entries and try again.
+      %a.new-dispute-close.close ×
+
+    %label.content-label-sm Sender Domain
+    %input.sender_domain{required: true, name:'sender_domain', spellcheck: false}
+    .sender_domain_div.hidden
+  .form-group
+    %label.content-label-sm Priority
+    %select.form-control.priority{name:'priority'}
+      %option P1
+      %option P2
+      %option{ selected: 'selected' } P3
+      %option P4
+      %option P5
+  .form-group
+    %label.content-label-sm Sender Domain
+    %input.customer{ required: true, name:'Customer', spellcheck: false }
+    .customer_div.hidden
+
+  %hr.thin
+  .form-group.text-center
+    %button.primary{ value: 'submit', type: 'button', class:'submit_new_dispute', onclick: 'window.submit_new_dispute(this); return false;' }
+      Create
+    %button.secondary.cancel_dispute{ value: 'cancel',type: 'button' }
+      Cancel

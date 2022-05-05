@@ -1,4 +1,5 @@
 - content_for(:title) do
+
   Escalations - Analyst Console
 
 - content_for(:nav_banner) do
@@ -14,17 +15,14 @@
       %h3.nav-tool-dropdown-header.inverse
         New Dispute
       .nav-tool-content-wrapper#new-dispute-wrapper
+        = render 'escalations/sdr/disputes/new'
 
   .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
-    %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    %a{href: '#', class: 'dropdown-toggle', id: 'sdr-filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
-        %li{class: ("selected" if params[:f] == "recently_viewed")}
-          %a{href: "#{escalations_sdr_disputes_path}?f=recently_viewed"}
-            %span.nav-dropdown-icon.icon-recently-viewed
-            Recently Viewed
         %li{class: ("selected" if params[:f] == "my_disputes")}
           %a{href: "#{escalations_sdr_disputes_path}?f=my_disputes"}
             %span.nav-dropdown-icon.icon-my-bugs
@@ -45,14 +43,6 @@
           %a{href: "#{escalations_sdr_disputes_path}?f=open"}
             %span.nav-dropdown-icon.icon-open-bugs
             Open Tickets
-        %li{class: ("selected" if params[:f] == "open_email")}
-          %a{href: "#{escalations_sdr_disputes_path}?f=open_email"}
-            %span.nav-dropdown-icon.icon-email-tix
-            Open Email Tickets
-        %li{class: ("selected" if params[:f] == "open_web")}
-          %a{href: "#{escalations_sdr_disputes_path}?f=open_web"}
-            %span.nav-dropdown-icon.icon-web-tix
-            Open Web Tickets
         %li{class: ("selected" if params[:f] == "closed")}
           %a{href: "#{escalations_sdr_disputes_path}?f=closed"}
             %span.nav-dropdown-icon.icon-fixed-bugs
@@ -69,20 +59,20 @@
         %table#saved-search.table
           %tbody#saved-search-tbody
             - if current_user.named_searches.any?
-              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'Dispute', nil).order(:id).each do |named_search|
+              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'SDR', nil).order(:id).each do |named_search|
                 %tr{id: "saved_search_#{named_search.id}"}
                   %td
-                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "named_sdr_index_table('#{named_search.name}');", title: named_search.name}
+                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "sdr_build_named_search('#{named_search.name}');", title: named_search.name}
                       = named_search.name
                     %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                       = image_tag('icon_cancel_grey.svg')
 
   .nav-tool-blocks.col-xs-4.col-sm-4.col-lg-5.search-wrapper
-    .input-group.search-group#web-rep-search
-      = form_tag('/tickets', method: :get, onsubmit: 'call_contains_search(this);return false;') do
+    .input-group.search-group#sdr-search
+      = form_tag('/tickets', method: :get, onsubmit: 'sdr_build_contains_search(this);return false;') do
         = text_field_tag 'case[id]', "#{}", class: 'search-box', placeholder: 'Search by Substring'
 
-      %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#sdr-advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         Advanced
       .dropdown-menu.nav-tools-dropdown#advanced-search-dropdown{'aria-labelledby': 'advanced-search-button'}
         %h3.nav-tool-dropdown-header.inverse
