@@ -8,7 +8,16 @@ window.get_whois_data = (entry) ->
     headers: headers
     data: {entry: entry}
     success: (response) ->
-      debugger
+      data = response.data
+      applyWhoisData(data)
     error: (error) ->
       std_msg_error(error.responseText, ['Cannot find Whois data.'])
   )
+
+  applyWhoisData = (data) ->
+    Object.keys(data).forEach (key) ->
+      if data[key]? && typeof data[key] == 'object'
+        applyWhoisData(data[key])
+      else
+        $("##{key}").text(data[key])
+        $("##{key}").removeClass('missing-data')
