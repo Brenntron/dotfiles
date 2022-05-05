@@ -5,6 +5,8 @@ class SenderDomainReputationDispute < ApplicationRecord
   belongs_to :user, optional:true
 
   has_many :sender_domain_reputation_dispute_attachments
+  has_many :dispute_emails
+  has_many :sender_domain_reputation_dispute_comments
 
   AC_SUCCESS = 'CREATE_ACK'
   AC_FAILED = 'CREATE_FAILED'
@@ -32,7 +34,6 @@ class SenderDomainReputationDispute < ApplicationRecord
   RESOLUTION_DUPLICATE = "DUPLICATE"
 
   def self.process_bridge_payload(message_payload)
-
     customer_payload = {
         customer_name: message_payload[:payload][:customer_name],
         customer_email: message_payload[:payload][:customer_email],
@@ -289,6 +290,33 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     self.beaker_info = beaker_data
     self.save
+  end
+
+  def get_email_meta_data
+    response = {}
+    if self.meta_data.present?
+      begin
+        meta_data = JSON.parse(self.meta_data).deep_symbolize_keys
+
+        meta_cc = nil
+        if meta_data[:ticket].present? && meta_data[:ticket][:cc].present?
+          meta_cc = meta_data[:ticket][:cc]
+        end
+
+        if meta_data[:entry].present? && meta_data[:entry][:cc].present?
+          meta_cc = meta_data[:entry][:cc]
+        end
+
+        if meta_cc.present?
+          response[:cc] = meta_cc
+        end
+      rescue
+        response = {}
+      end
+
+    end
+    response
+
   end
 
 end

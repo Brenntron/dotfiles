@@ -1,6 +1,7 @@
 class DisputeEmail < ApplicationRecord
   belongs_to :dispute, optional: true, touch: true
   belongs_to :file_reputation_dispute, optional: true
+  belongs_to :sender_domain_reputation_dispute, optional: true
   has_many :dispute_email_attachments
 
   EMAIL_DOMAIN = "dispute.talosintelligence.com"
@@ -213,6 +214,9 @@ class DisputeEmail < ApplicationRecord
     when 'FileReputationDispute'
       new_email.file_reputation_dispute_id = params[:dispute_id]
       dispute_object = FileReputationDispute.find(params[:dispute_id])
+    when 'SenderDomainReputationDispute'
+      new_email.sender_domain_reputation_dispute_id = params[:dispute_id]
+      dispute_object = SenderDomainReputationDispute.find(params[:dispute_id])
     else #'Dispute'
       new_email.dispute_id = params[:dispute_id]
       dispute_object = Dispute.find(params[:dispute_id])
@@ -278,15 +282,8 @@ class DisputeEmail < ApplicationRecord
     new_email.reload
 
     #update dispute status
-    dispute =
-        case params[:dispute_type]
-        when 'FileReputationDispute'
-          FileReputationDispute.find(params[:dispute_id])
-        else #'Dispute'
-          Dispute.find(params[:dispute_id])
-        end
-    dispute.status = Dispute::STATUS_CUSTOMER_PENDING
-    dispute.save
+    dispute_object.status = Dispute::STATUS_CUSTOMER_PENDING
+    dispute_object.save
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
 

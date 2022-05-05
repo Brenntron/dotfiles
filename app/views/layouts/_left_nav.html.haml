@@ -36,16 +36,20 @@
               %a{href: '/escalation_bugs'}
                 =inline_svg 'icon_snort.svg'
           - if can?(:read, Admin)
-            %li{class: 'clam-link'}
+            %li{class: 'clam-link disabled-link'}
               %a.disabled-link= inline_svg 'icon_clam.svg'
           - if can?(:index, FileReputationDispute)
             %li{class: 'amp-link'}
               %a{href: escalations_file_rep_disputes_path + "?f=open", id: 'amp-icon-link'}
-                = inline_svg 'icon_amp.svg'
+                = inline_svg 'icon_filerep_tix_grey.svg'
           - if can?(:index, Dispute)
             %li{class: 'rep-link'}
               %a{href: escalations_webrep_disputes_path, id: 'rep-icon-link'}
-                =inline_svg 'icon_rep.svg'
+                =inline_svg 'icon_webrep_tix_grey.svg'
+          - if can?(:read, Admin)
+            %li{class: 'sdr-link'}
+              %a{href: escalations_sdr_disputes_path, id: 'sdr-icon-link'}
+                =inline_svg 'icon_sender_rep.svg'
           - if can?(:index, Complaint)
             %li{class: 'cat-link'}
               %a{href: escalations_webcat_complaints_path, id: 'cat-icon-link'}
@@ -95,16 +99,16 @@
               %li{class: 'ips-link'}
                 %a{href: '/bugs'} IPS
             - if can?(:read, Admin)
-              %li{class: 'clam-link'}
+              %li{class: 'clam-link disabled-link'}
                 %a.disabled-link Clam
             - if can?(:read, Admin)
-              %li{class: 'amp-link'}
+              %li{class: 'amp-link disabled-link'}
                 %a.disabled-link AMP
             - if can?(:read, Admin)
-              %li{class: 'rep-link'}
+              %li{class: 'rep-link disabled-link'}
                 %a.disabled-link Reputation
             - if can?(:read, Admin)
-              %li{class: 'cat-link'}
+              %li{class: 'cat-link disabled-link'}
                 %a.disabled-link Categorization
 
       - if is_rule_user? || can?(:index, any: [ FileReputationDispute, Dispute, Complaint ])
@@ -116,7 +120,7 @@
               %li{class: 'ips-link'}
                 %a{href: '/escalation_bugs'} IPS
             - if can?(:read, Admin)
-              %li{class: 'clam-link'}
+              %li{class: 'clam-link disabled-link'}
                 %a.disabled-link Clam
             - if can?(:index, FileReputationDispute)
               %li{class: 'amp-link'}
@@ -124,6 +128,8 @@
             - if can?(:index, Dispute)
               %li{class: 'rep-link'}
                 %a{href: escalations_webrep_disputes_path, id: 'rep-link'} Web Reputation
+            %li{class: 'sdr-link'}
+              %a{href: escalations_sdr_disputes_path, id: 'sdr-icon-link'} Sender Domain Rep
             - if can?(:index, Complaint)
               %li{class: 'cat-link'}
                 %a{href: escalations_webcat_complaints_path, id: 'cat-link'} Web Categorization
