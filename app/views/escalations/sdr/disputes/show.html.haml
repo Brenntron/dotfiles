@@ -81,7 +81,7 @@
                             %label.content-label-sm
                               Comment
                             %textarea.ticket-resolution-comment
-                            %button.primary{onClick: 'show_page_edit_status()'}
+                            %button.primary{onClick: 'sdr_show_page_edit_status()'}
                               Submit
                     %li.status-radio-wrapper
                       %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
@@ -89,7 +89,7 @@
 
                   %li.sdr-non-resolution-submit-wrapper#ticket-non-res-submit
                     .button-row-center
-                      %button.primary{onClick: 'show_page_edit_status()'}
+                      %button.primary{onClick: 'sdr_show_page_edit_status()'}
                         Submit
 
             - if @dispute&.resolution_comment.present?

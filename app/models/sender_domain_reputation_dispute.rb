@@ -248,7 +248,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       dispute.reload
 
       message = Bridge::SdrDisputeUpdateStatusEvent.new
-      message.post_entries(dispute)
+      message.post(dispute)
 
     end
   end

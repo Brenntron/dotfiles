@@ -176,7 +176,7 @@ module API
                 end
               end
 
-              disputes = SenderDomainReputationDispute.where(id: dispute_ids)
+              disputes = SenderDomainReputationDispute.where(id: params['dispute_ids'])
 
               SenderDomainReputationDispute.process_status_changes(disputes, status, resolution, comment, current_user)
               {:status => "success"}.to_json
