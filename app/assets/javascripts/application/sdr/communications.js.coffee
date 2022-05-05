@@ -111,7 +111,7 @@ $ ->
       )
 
   # Editing a Note
-  $('.update-note').on "click", ->
+  $('#sdr-update-note').on "click", ->
     comment_id = $(this).attr('comment_id')
     current_user_id = $('input[name="current_user_id"]').val()
     editable_note_block = $(".note-block" + comment_id)

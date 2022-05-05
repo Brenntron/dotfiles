@@ -87,7 +87,7 @@
                       %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
                       %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
 
-                  %li.sdr-non-resolution-submit-wrapper#ticket-non-res-submit
+                  %li.non-resolution-submit-wrapper#ticket-non-res-submit
                     .button-row-center
                       %button.primary{onClick: 'show_page_edit_status()'}
                         Submit
@@ -109,7 +109,7 @@
           - else
             %span#dispute-assignee= @dispute.user.cvs_username || Unassigned
       - if can? :update, Dispute
-        .sdr-dispute-owner-buttons-wrapper.col-xs-12
+        .dispute-owner-buttons-wrapper.col-xs-12
           - if @dispute.user_id == current_user.id
             - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
               %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'sdr_toolbar_unassign_dispute();'}
@@ -119,7 +119,7 @@
 
             %span.dropdown
               - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                %button#index_change_assign.dispute-inline-buttons.sdr-ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
                 .change-assignee-dropdown-wrapper
                   %h3 Change Assignee
@@ -132,7 +132,7 @@
                         Assign
 
           - if (!@dispute.user_id.nil? && @dispute.user.cvs_username != 'vrtincom')
-            .sdr-container_unassign
+            .container_unassign
               %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'sdr_toolbar_unassign_dispute();'}
                 Unassign
 
