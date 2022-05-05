@@ -109,7 +109,7 @@
           - else
             %span#dispute-assignee= @dispute.user.cvs_username || Unassigned
       - if can? :update, Dispute
-        .dispute-owner-buttons-wrapper.col-xs-12
+        .dispute-owner-buttons-wrapper.sdr-dispute-owner-buttons-wrapper.col-xs-12
           - if @dispute.user_id == current_user.id
             - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
               %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'sdr_toolbar_unassign_dispute();'}
