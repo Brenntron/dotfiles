@@ -57,7 +57,7 @@ class Ability
       can [:read, :advanced_search, :named_search, :standard_search, :contains_search, :export_resolution_age_report,
            :resolution_report, :export_per_resolution_report, :export_per_engineer_report, :resolution_age_report,
            :dashboard, :research],
-          Dispute
+          [Dispute, SenderDomainReputationDispute, SenderDomainReputationDisputeAttachment]
       can :read, [DisputeComment, DisputeEmail, DisputeEmailAttachment, DisputeEntry, Wbrs::ManualWlbl]
       can :manage, [EmailTemplate]
     end
