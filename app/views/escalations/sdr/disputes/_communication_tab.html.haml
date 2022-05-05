@@ -95,8 +95,8 @@
               %td=template.template_name
               %td=template.description
               %td
-                %button#edit-sdr-template.table-button.edit-button.edit-template{template_id: template.id, name: 'edit-template'}
-                %button#delete-sdr-template.table-button.delete-button{template_id: template.id, name: 'delete-template'}
+                %button.table-button.edit-button{name: 'edit-template', onclick: "editSdrEmailTemplate(#{template.id})"}
+                %button.table-button.delete-button{name: 'delete-template', onclick: "deleteSdrEmailTemplate(#{template.id})"}
 
       #new-template-form-wrapper
         %h4.dialog-inset-header New Email Template
@@ -213,7 +213,7 @@
               %button.hidden.note-save-button.update-note{class: "note-save-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
-              %button#sdr-note-delete-button.sdr-note-delete-button{comment_id: "#{comment.id}"}
+              %button.sdr-note-delete-button{onclick: "deleteSdrNote(#{comment.id})"}
 
         .row
           .col-xs-12

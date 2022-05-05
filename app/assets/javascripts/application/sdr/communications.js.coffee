@@ -27,10 +27,9 @@ $ ->
         std_api_error(response, "There was a problem retrieving email template.", reload: false)
     )
 
-  $('#edit-sdr-template').on 'click', ->
+  window.editSdrEmailTemplate = (template_id) ->
     populate_template_details()
 
-    template_id = $(this).attr('template_id')
     std_msg_ajax(
       method: 'GET'
       url: "/escalations/api/v1/escalations/sdr/email_templates/#{template_id}"
@@ -61,8 +60,7 @@ $ ->
         std_api_error(response, "There was an error updating the email template.", reload: false)
     )
 
-  $('#delete-sdr-template').on 'click', ->
-    template_id = $(this).attr('template_id')
+  window.deleteSdrEmailTemplate = (template_id) ->
     confirmation = confirm('Are you sure you want to delete this template?')
 
     if confirmation
@@ -94,8 +92,7 @@ $ ->
 
   # Notes (Comments) related communications stuff
   # Delete Note
-  $('#sdr-note-delete-button').on "click", ->
-    comment_id = $(this).attr('comment_id')
+  window.deleteSdrNote = (comment_id) ->
     current_user_id = $('input[name="current_user_id"]').val()
 
     std_msg_confirm('Are you sure you want to delete this note?', [])
