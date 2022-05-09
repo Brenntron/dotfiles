@@ -373,4 +373,8 @@ class SenderDomainReputationDispute < ApplicationRecord
     response
 
   end
+
+  def is_assigned?
+    (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
+  end
 end

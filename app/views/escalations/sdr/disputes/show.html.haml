@@ -114,9 +114,6 @@
             - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
               %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'sdr_toolbar_unassign_dispute();'}
           - else
-            - if (@dispute.user_id == nil || @dispute.user.cvs_username == 'vrtincom') && (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-              %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_sdr_dispute(#{@dispute.id});"}
-
             %span.dropdown
               - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                 %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_sdr_dispute(#{@dispute.id});"}
