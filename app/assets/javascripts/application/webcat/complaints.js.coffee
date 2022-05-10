@@ -1712,10 +1712,6 @@ window.click_table_buttons = (complaint_table, button)->
   data = row.data()
   cat_select = '#input_cat_'+ data.entry_id
 
-  if (!String.prototype.startsWith)
-    String.prototype.startsWith = (input, pos) ->
-      this.substr(!pos || pos < 0 ? 0 : +pos, input.length) == input
-
   if row.child.isShown()       # This row is already open - close it
     row.child.hide()
     tr.removeClass 'shown'
@@ -1755,8 +1751,13 @@ window.click_table_buttons = (complaint_table, button)->
             $('#master-submit').prop('disabled', true)
         score: (input) ->
           score = this.getScoreFunction(input)
+          #  Adding some customization for autofill
+          #  restricting on certain cats to avoid accidental categorization
           (item) ->
-            (item.category_name.toLowerCase().startsWith(input.toLowerCase()) || item.category_code.toLowerCase().startsWith(input.toLowerCase())) ? 1 : 0
+            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+              item.category_code == input ? 1 : 0
+            else
+              item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase()) ? 1 : 0
       }
     else
       # need to initialize the selectize function but disable it here if entry is completed
