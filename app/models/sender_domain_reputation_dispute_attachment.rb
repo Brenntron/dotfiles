@@ -3,8 +3,10 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   belongs_to :sender_domain_reputation_dispute
 
   def self.build_and_push_to_bugzilla(bugzilla_rest_session, payload, user, sender_domain_reputation_dispute, remote = true)
+
+    new_local_attachment = nil
     if remote == true
-      file_content = open(payload[:url]).read
+      file_content = open(payload["url"]).read
     else
       file_content = payload[:file_content].read
     end
@@ -16,7 +18,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
         file_name: payload[:file_name],
         content_type: payload[:content_type],
         summary: payload[:file_name],
-        comment: "a file: #{payload[:file_name]} for SDR case: #{sender_domain_reputation_dispute.dispute_id}"
+        comment: "a file: #{payload[:file_name]} for SDR case: #{sender_domain_reputation_dispute.id}"
     }
 
     attachment_proxy = bug_proxy.create_attachment!(options)
@@ -35,10 +37,11 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
       new_local_attachment.save!
 
-      new_local_attachment
+
 
     end
 
+    new_local_attachment
   end
 
   def parse_email_content(bug_attachment)
@@ -77,4 +80,107 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
   end
 
+  def self.get_mx_records(domain)
+    mxs = Resolv::DNS.open do |dns|
+      ress = dns.getresources(domain, Resolv::DNS::Resource::IN::MX)
+      ress.map { |r| [r.exchange.to_s, IPSocket::getaddress(r.exchange.to_s)] }
+    end
+    return mxs
+  end
+
+  def retrieve_beaker_data_and_save
+
+    beaker_data = {}
+    beaker_data[:request] = {}
+    beaker_data[:response] = {}
+    beaker_data[:response][:data] = {}
+    domain_of_parent = self.sender_domain_reputation_dispute.domain_name
+
+    begin
+
+      headers = JSON.parse(self.email_header_data)
+      possible_from = []
+      headers.keys.each do |key|
+        if key.downcase.include?("from")
+          possible_from += SenderDomainReputationDisputeAttachment.extract_emails_to_array(headers[key])
+        end
+      end
+
+      possible_from = possible_from.uniq
+
+      mail_data_params = {}
+      mail_data_params[:dkim_disp] = [{}]
+      mail_data_params[:dmarc_disp] = {}
+      mail_data_params[:email_list] = {}
+
+      possible_from.each do |from_email|
+        mail_data_params[:from_hdr] = [{"addr" => from_email}]
+        data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        if data_response.present?
+          data_response.keys.each do |key|
+            begin
+              data_response[key].to_json
+            rescue
+              data_response[key] = "could not translate encoded characters"
+            end
+          end
+          begin
+            data_response[:service_data].first[:data] = JSON.parse(data_response[:service_data].first[:data])
+          rescue
+
+          end
+          beaker_data[:response][:data][from_email] = data_response
+        end
+
+      end
+
+
+
+
+
+      #mx_records = SenderDomainReputationDisputeAttachment.get_mx_records(domain_of_parent)
+
+      #if mx_records.present?
+      #  mx_records.each do |mx_record|
+      #    beaker_data[:request][:mx_data] << {:exchange => mx_record.first, :ip_address => mx_record.last}
+
+      #    envelope_response = Beaker::Sdr.envelope_query(mx_record.last).to_h
+      #    envelope_response.keys.each do |key|
+      #      begin
+      #        envelope_response[key].to_json
+      #      rescue
+      #        envelope_response[key] = "could not translate encoded characters"
+      #      end
+      #    end
+      #    data_response = Beaker::Sdr.data_query(mx_record.last).to_h
+      #    data_response.keys.each do |key|
+      #      begin
+      #        data_response[key].to_json
+      #      rescue
+      #        data_response[key] = "could not translate encoded characters"
+      #      end
+      #    end
+      #    beaker_data[:response][:envelope] << {:ip => mx_record.last, :response => envelope_response}
+      #    beaker_data[:response][:data] << {:ip => mx_record.last, :response => data_response}
+
+      #  end
+      #end
+
+      beaker_data = beaker_data.to_json
+
+    rescue => e
+      Rails.logger.error e
+      Rails.logger.error e.backtrace.join("\n")
+      beaker_data = {:status => "failed", :message => "something went wrong trying to communicate with beaker and parsing data"}.to_json
+    end
+    self.beaker_info = beaker_data
+    puts "---------------------------------------------\nhere\n--------------------------------\n"
+    puts beaker_data
+    self.save
+  end
+
+  def self.extract_emails_to_array(txt)
+    reg = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i
+    txt.scan(reg).uniq
+  end
 end

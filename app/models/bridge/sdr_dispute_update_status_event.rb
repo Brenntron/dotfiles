@@ -1,6 +1,6 @@
 class Bridge::SdrDisputeUpdateStatusEvent < Bridge::BaseMessage
   #sender domain reputation disputes
-  def initialize(sender_data)
+  def initialize()
     super(channel: 'update-ticket',
           addressee: 'talos-intelligence')
     Delayed::Worker.logger.info("SDR Dispute update init")
