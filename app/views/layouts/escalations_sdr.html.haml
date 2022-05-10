@@ -121,6 +121,10 @@
 
     -##username= current_user.cvs_username
 
+%input{type: "hidden", name: "token", value: "#{current_user.authentication_token}"}
+%input{type: "hidden", name: "current_user_id", value: "#{current_user.id}"}
+%input{type: "hidden", name: "xml_token", value: "#{xml_token}"}
+
 = render template: "layouts/rocket"
 
 - if params[:f]

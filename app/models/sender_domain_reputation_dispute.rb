@@ -3,6 +3,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional: true
   belongs_to :user, optional:true
+  belongs_to :platform, optional: true
 
   has_many :sender_domain_reputation_dispute_attachments
   has_many :dispute_emails
@@ -31,6 +32,7 @@ class SenderDomainReputationDispute < ApplicationRecord
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
   SUBMITTER_TYPE_INTERNAL = "INTERNAL"
 
+  RESOLUTION_DUPLICATE = "DUPLICATE"
 
   def self.process_bridge_payload(message_payload)
     customer_payload = {
@@ -64,7 +66,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       full_description = <<~HEREDOC
         SDR Dispute entry: #{message_payload[:payload][:sender_domain_entry]}
         SDR Dispute Problem Summary: #{message_payload[:payload][:problem_summary]}
-  
+
 
       HEREDOC
 
@@ -110,14 +112,21 @@ class SenderDomainReputationDispute < ApplicationRecord
         new_dispute.submitter_type = SUBMITTER_TYPE_CUSTOMER
       end
 
+      if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
+        new_dispute.priority = "P3"
+      else
+        new_dispute.priority = "P4"
+      end
+
       #TODO: DO DUPLICATE CHECKING HERE
-      #check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
+      #check_for_duplicate = SenderDomainReputationDispute.where(sender_domain_entry: message_payload[:payload][:sender_domain_entry]).where.not(status: SenderDomainReputationDispute::STATUS_RESOLVED)
       #if check_for_duplicate.any?
-        #auto_resolve_on_duplicate(new_dispute)
-        #is_duplicate = true
+      #  auto_resolve_on_duplicate(new_dispute)
       #else
       new_dispute.save
       #end
+
+      new_dispute.get_and_save_beaker_data
 
       if message_payload["attachments"].present?
         message_payload["attachments"].each do |dispute_attachment|
@@ -126,19 +135,59 @@ class SenderDomainReputationDispute < ApplicationRecord
         new_dispute.reload
       end
 
+      if message_payload["attachments"].present? && message_payload["attachments"].size != new_dispute.sender_domain_reputation_dispute_attachments.size
+        raise "attachments failed to save"
+      end
+
       if new_dispute.sender_domain_reputation_dispute_attachments.present?
         new_dispute.parse_all_email_file_headers(bugzilla_rest_session)
+        new_dispute.retrieve_attachments_beaker_data
       end
 
       new_dispute.send_created_ack
+
+      new_dispute
+
     rescue => e
+
+      new_dispute = SenderDomainReputationDispute.where(:ticket_source_key => message_payload[:source_key]).first
       Rails.logger.error e
       Rails.logger.error e.backtrace.join("\n")
-      new_dispute.send_failed_ack(message_payload[:source_key])
+
+      if new_dispute.present?
+        new_dispute.reload
+        new_dispute.sender_domain_reputation_dispute_attachments.destroy
+        new_dispute.destroy
+      end
+      if message_payload["source_key"].present?
+        begin
+          conn = ::Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+          conn.post
+        rescue
+          conn = Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+          conn.post
+        end
+      end
     end
 
 
+  end
 
+  def self.auto_resolve_on_duplicate(dispute)
+    dispute.status = STATUS_RESOLVED
+    dispute.resolution = RESOLUTION_DUPLICATE
+    dispute.resolution_comment = RESOLUTION_DUPLICATE_COMMENT
+
+    dispute.save
+
+    dispute.send_created_ack
+
+  end
+
+  def retrieve_attachments_beaker_data
+    self.sender_domain_reputation_dispute_attachments.each do |attachment|
+      attachment.retrieve_beaker_data_and_save
+    end
   end
 
   def send_created_ack
@@ -149,9 +198,17 @@ class SenderDomainReputationDispute < ApplicationRecord
         status: self.status,
         sugg_type: self.suggested_disposition
     }
+    ##Note: I don't know why this works, but in dev when a flood of tickets are incoming sometimes would get this error:
+    # Unable to autoload constant Bridge::BaseMessage, expected /analyst-console-escalations/app/models/bridge/base_message.rb to define it (LoadError)
+    # having Bridge as a retry of ::Bridge *seems* to work.  i suspect there's a deeper problem here but not prepared for that rabbit hole
+    begin
+      conn = ::Bridge::SdrDisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
+      conn.post(return_payload)
+    rescue
+      conn = Bridge::SdrDisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
+      conn.post(return_payload)
+    end
 
-    conn = ::Bridge::SdrDisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
-    conn.post(return_payload)
   end
 
 
@@ -159,6 +216,62 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     conn = ::Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
     conn.post
+  end
+
+  def case_id_str
+    '%010i' % id
+  end
+
+  def self.process_status_changes(disputes, status, resolution = nil, comment = nil, current_user = nil)
+    resolved_at = Time.now
+    disputes.each do |dispute|
+      dispute.status = status
+      if resolution.present?
+        dispute.resolution = resolution
+        dispute.resolution_comment = comment
+        dispute.case_closed_at = resolved_at
+      else
+        dispute.resolution = nil
+        dispute.resolution_comment = nil
+      end
+
+      unless [STATUS_NEW, STATUS_ASSIGNED].include?(dispute.status)
+        dispute.user_id = current_user.id unless dispute.is_assigned?
+      end
+
+      dispute.save!
+
+      #if comment.present?
+      #  DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute.id)
+      #end
+
+      dispute.reload
+
+      message = Bridge::SdrDisputeUpdateStatusEvent.new
+      message.post(dispute)
+
+    end
+  end
+
+  def self.take_tickets(dispute_ids, user:)
+    SenderDomainReputationDispute.transaction do
+      unless 0 == SenderDomainReputationDispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).count
+        raise 'Some of these tickets are already assigned.'
+      end
+      SenderDomainReputationDispute.assign(user, ids)
+    end
+  end
+
+  def self.assign(user, dispute_ids)
+    user_id = user.kind_of?(User) ? user.id : user
+    assigned_at = Time.now
+
+    disputes_ary = []
+    SenderDomainReputationDispute.transaction do
+      disputes = SenderDomainReputationDispute.where(id: dispute_ids).where.not(status: [SenderDomainReputationDispute::STATUS_RESOLVED])
+      disputes_ary = disputes.all.to_a
+      disputes.update_all(user_id: user_id, status: SenderDomainReputationDispute::STATUS_ASSIGNED, case_assigned_at: assigned_at)
+    end
   end
 
   def parse_all_email_file_headers(bugzilla_rest_session)
@@ -173,8 +286,65 @@ class SenderDomainReputationDispute < ApplicationRecord
         sdr_attachment.parse_email_content(bug_attachment)
       end
     end
+  end
 
+  def domain_name
 
+    parser = URI::Parser.new
+    url = parser.escape(self.sender_domain_entry)
+    uri = parser.parse(parser.parse(self.sender_domain_entry).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
+
+    full_domain = ""
+    if domain.trd.present?
+      full_domain += domain.trd + "."
+    end
+    full_domain += domain.domain
+
+    return full_domain
+
+  end
+
+  def get_and_save_beaker_data
+    beaker_data = {}
+    beaker_data[:request] = {}
+    beaker_data[:response] = {}
+    beaker_data[:response][:data] = {}
+
+    mail_data_params = {}
+    mail_data_params[:dkim_disp] = [{}]
+    mail_data_params[:dmarc_disp] = {}
+    mail_data_params[:email_list] = {}
+
+    begin
+
+      mail_data_params[:from_hdr] = [{"addr" => self.sender_domain_entry}]
+      data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+      if data_response.present?
+        data_response.keys.each do |key|
+          begin
+            data_response[key].to_json
+          rescue
+            data_response[key] = "could not translate encoded characters"
+          end
+        end
+        begin
+          data_response[:service_data].first[:data] = JSON.parse(data_response[:service_data].first[:data])
+        rescue
+
+        end
+        beaker_data[:response][:data][self.sender_domain_entry] = data_response
+      end
+
+      beaker_data = beaker_data.to_json
+    rescue => e
+      Rails.logger.error e
+      Rails.logger.error e.backtrace.join("\n")
+      beaker_data = {:status => "failed", :message => "something went wrong trying to communicate with beaker and parsing data"}.to_json
+    end
+
+    self.beaker_info = beaker_data
+    self.save
   end
 
   def get_email_meta_data
@@ -201,6 +371,10 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     end
     response
+
   end
 
+  def is_assigned?
+    (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
+  end
 end
