@@ -287,8 +287,6 @@ class SenderDomainReputationDispute < ApplicationRecord
       end
     end
   end
-<<<<<<< HEAD
-=======
 
   def domain_name
 
@@ -348,7 +346,6 @@ class SenderDomainReputationDispute < ApplicationRecord
     self.beaker_info = beaker_data
     self.save
   end
->>>>>>> 5e679558928c5de8189690e1c91a52df91ebc357
 
   def get_email_meta_data
     response = {}
