@@ -81,7 +81,7 @@
                             %label.content-label-sm
                               Comment
                             %textarea.ticket-resolution-comment
-                            %button.primary{onClick: 'show_page_edit_status()'}
+                            %button.primary{onClick: 'sdr_show_page_edit_status()'}
                               Submit
                     %li.status-radio-wrapper
                       %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
@@ -89,7 +89,7 @@
 
                   %li.sdr-non-resolution-submit-wrapper#ticket-non-res-submit
                     .button-row-center
-                      %button.primary{onClick: 'show_page_edit_status()'}
+                      %button.primary{onClick: 'sdr_show_page_edit_status()'}
                         Submit
 
             - if @dispute&.resolution_comment.present?
@@ -114,11 +114,9 @@
             - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
               %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'sdr_toolbar_unassign_dispute();'}
           - else
-            - if (@dispute.user_id == nil || @dispute.user.cvs_username == 'vrtincom') && (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-              %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_sdr_dispute(#{@dispute.id});"}
-
             %span.dropdown
               - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+                %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_sdr_dispute(#{@dispute.id});"}
                 %button#index_change_assign.dispute-inline-buttons.sdr-ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
                 .change-assignee-dropdown-wrapper

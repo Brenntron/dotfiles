@@ -250,7 +250,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       dispute.reload
 
       message = Bridge::SdrDisputeUpdateStatusEvent.new
-      message.post_entries(dispute)
+      message.post(dispute)
 
     end
   end
@@ -613,5 +613,9 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     end
     response
+  end
+
+  def is_assigned?
+    (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
 end

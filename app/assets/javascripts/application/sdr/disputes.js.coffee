@@ -358,8 +358,9 @@ window.sdr_show_page_edit_status = (dispute_id) ->
 
   if statusName == 'RESOLVED_CLOSED'
     resolution = $("#show-edit-ticket-status-dropdown").find('input[name=dispute-resolution]:checked').val()
-  else
-    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+  if statusName == 'ASSIGNED' && $('#dispute-assignee').hasClass('missing-data')
+    std_msg_error('This ticket is unassigned', ['Please select an assignee.'])
+    return
 
   data = {
     dispute_ids: [ dispute_id ]
@@ -401,21 +402,26 @@ window.sdr_toolbar_unassign_dispute = () ->
 
 window.take_single_sdr_dispute = (id) ->
   dispute_ids = [ id ]
-
-  std_msg_ajax(
-    method: 'PATCH'
-    url: "/escalations/api/v1/escalations/sdr/disputes/take_disputes"
-    data: { dispute_ids: dispute_ids }
-    error_prefix: 'Error updating ticket.'
-    success_reload: true
-    success: (response) ->
-      if response.dispute_ids.length > 0
-        show_message('success', 'Ticket assignment has been updated!', 5)
-        location.reload()
-      else
-        show_message('error', 'Ticket assnigment could not be updated.', 5)
-        location.reload()
-  )
+  disputeAssignee = $('#dispute-assignee')
+  if disputeAssignee.hasClass('missing-data')
+    std_msg_ajax(
+      method: 'PATCH'
+      url: "/escalations/api/v1/escalations/sdr/disputes/take_disputes"
+      data: { dispute_ids: dispute_ids }
+      error_prefix: 'Error updating ticket.'
+      success_reload: true
+      success: (response) ->
+        if response.dispute_ids.length > 0
+          show_message('success', 'Ticket assignment has been updated!', 5)
+          location.reload()
+        else
+          show_message('error', 'Ticket assnigment could not be updated.', 5)
+          location.reload()
+    )
+  else
+    currentUser = $('input[name="current_user_id"]').val()
+    $('#index_target_assignee').val(currentUser)
+    window.sdr_toolbar_show_change_assignee()
 
 window.sdr_toolbar_show_change_assignee = () ->
   singleId = $('#dispute_id').text()
