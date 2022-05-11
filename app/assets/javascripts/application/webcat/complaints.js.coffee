@@ -1404,7 +1404,7 @@ format = (complaint_entry_row) ->
   else
     complaint_source = '<span class="missing-data">Source unknown</span>'
 
-  form_change_item = complaint_entry.domain || complaint_entry.ip_address
+  form_change_item = domain || complaint_entry.ip_address
 
   complaint_entry_html =
       complaint_table_row_html +
@@ -1443,7 +1443,7 @@ format = (complaint_entry_row) ->
       '<div>' + host  + '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" data-domain="' + domain + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
+      '" type="text" data-domain="' + form_change_item + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
       '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
