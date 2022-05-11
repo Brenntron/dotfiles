@@ -10,8 +10,12 @@ window.get_whois_data = (entry) ->
     success: (response) ->
       data = response.data
       applyWhoisData(data)
+      $('#sdr-research-loader').hide()
+      $('.sdr-research-data-present').show()
     error: (error) ->
       std_msg_error(error.responseText, ['Cannot find Whois data.'])
+      $('#sdr-research-loader').hide()
+      $('.sdr-research-data-missing').show()
   )
 
   applyWhoisData = (data) ->

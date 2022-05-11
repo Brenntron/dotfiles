@@ -10711,7 +10711,8 @@ button.secondary.view-report-external-button {
 .rl-report-run,
 .sb-data-present,
 .sb-data-missing,
-.sb-report-run {
+.sb-report-run,
+.sdr-research-data-present {
   display: none;
 }
 
@@ -10777,7 +10778,7 @@ button.secondary.view-report-external-button {
   }
 }
 
-#rl-loader, #tg-loader, #sb-loader {
+#rl-loader, #tg-loader, #sb-loader, #sdr-research-loader {
   width: 100%;
 }
 

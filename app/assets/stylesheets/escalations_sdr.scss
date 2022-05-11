@@ -1,8 +1,3 @@
-.sdr-research-tab {
-  h6 {
-    font-weight: 600;
-  }
-}
 .sdr-age-wrapper, .submitter-org-wrapper, .contact-email-wrapper {
   margin-top: 10px;
 }
@@ -22,8 +17,9 @@
 }
 
 .sdr-research-data-title, .sdr-dispute-info-title {
-  border-bottom: 3px solid;
-  margin-bottom: 20px;
+  font-weight: 300;
+  margin-bottom: 30px;
+  padding-left: 0;
 }
 
 .sdr-dispute-info-title {
@@ -44,9 +40,16 @@
 
 .sdr-research-subwrapper {
   border-bottom: 2px solid #EFEFEF;
-  padding: 20px 15px 30px;
+  padding: 20px 0 30px;
 
   .col-xs-6 {
     padding: 0;
+  }
+}
+
+.sdr-research-data-wrapper {
+  .col-xs-2, .col-xs-3, .col-xs-1 {
+    padding-left: 0;
+    padding-right: 0;
   }
 }

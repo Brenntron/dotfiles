@@ -12,6 +12,10 @@ class Escalations::Sdr::DisputesController < ApplicationController
     end
   end
 
+  def show
+    @dispute = SenderDomainReputationDispute.where(id: params[:id]).first
+  end
+
   private
 
     def datatables_search_params
@@ -28,9 +32,5 @@ class Escalations::Sdr::DisputesController < ApplicationController
 
     def initialize_params
       robust_search_params.merge(datatables_search_params).merge('search_conditions' => search_conditions)
-    end
-
-    def show
-      @dispute = SenderDomainReputationDispute.where(id: params[:id]).first
     end
 end
