@@ -12,6 +12,12 @@ class Clusters::Assignor
     end
   end
 
+  def assign!
+    clusters.each do |cluster|
+      ClusterAssignment.assign!(cluster, user)
+    end
+  end
+
   def unassign
     clusters.each do |cluster|
       ClusterAssignment.unassign(cluster, user)
