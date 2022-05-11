@@ -34,6 +34,7 @@ $ ->
     platform = this.platforms.value
     priority = this.priority.value
     customer = this.customers.value
+    details = this.details.value
 
     domain = domain.trim()
     domain = domain.replace('http://', '')
