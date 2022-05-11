@@ -127,7 +127,7 @@ $ ->
         }
 
         for user in response.json.case_owners
-          $('#user-list').append '<option value=\'' + user.display_name + '\'></option>'
+          $('#user-list').append '<option value=\'' + user.cvs_username + '\'></option>'
 
         for status in response.json.statuses
           $('#status-list').append '<option value=\'' + status + '\'></option>'
@@ -220,7 +220,7 @@ window.initialize_sdr_disputes_datatable = () ->
         render: (data, type, full, meta) ->
           if full.current_user == data
             return "<span id='owner_#{full.case_id}'> #{data} </span><button class='esc-tooltipped return-ticket-button inline-return-ticket-#{full.case_id}' title='Return ticket' onclick='return_sdr_dispute(#{full.case_id});'></button>"
-          else if data == 'Vrt Incoming' || data == ""
+          else if data == 'vrtincom' || data == ""
             return "<span class='missing-data missing-data-index' id='owner_#{full.case_id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.case_id}' onClick='take_sdr_dispute(#{full.case_id})'/></button></span>"
           else
             return data
@@ -267,8 +267,8 @@ window.take_sdr_disputes = () ->
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       for dispute_id in response.dispute_ids
-        assign_sdr_dispute_on_me_on_view(dispute_id, response.user_display_name)
-      std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.user_display_name])
+        assign_sdr_dispute_on_me_on_view(dispute_id, response.username)
+      std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.username])
     error: (error) ->
       std_msg_error('Assign Issue(s) Error', [
         'Failed to assign ' + dispute_ids.length + ' issue(s).',
@@ -284,7 +284,7 @@ window.take_sdr_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      assign_sdr_dispute_on_me_on_view(response.dispute_id, response.user_display_name)
+      assign_sdr_dispute_on_me_on_view(response.dispute_id, response.username)
   )
 
 window.return_sdr_dispute = (dispute_id) ->
@@ -312,7 +312,7 @@ window.return_sdr_disputes = () ->
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       for dispute_id in response.dispute_ids
-        return_sdr_dispute_on_view(dispute_id, response.user_display_name)
+        return_sdr_dispute_on_view(dispute_id, response.username)
       std_msg_success('Tickets successfully returned', [response.dispute_ids.length + ' have been returned '])
     error: (error) ->
       std_msg_error('Return Issue(s) Error', [
