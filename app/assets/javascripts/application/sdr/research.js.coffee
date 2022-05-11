@@ -25,3 +25,8 @@ window.get_whois_data = (entry) ->
       else
         $("##{key}").text(data[key])
         $("##{key}").removeClass('missing-data')
+
+  $('#sdr-research-tab .expand-row-button-inline').click ->
+    expandButton = $(this)
+    nestedRow = expandButton.siblings('.nested-data-row')[0]
+    $(nestedRow).toggle()

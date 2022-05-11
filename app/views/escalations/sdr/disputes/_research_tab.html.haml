@@ -28,12 +28,19 @@
     %hr.thin
     .row
       .col-xs-12.sdr-attachments
-        %h5 ATTACHMENTS
+        .sdr-attachments-header
+          %h5 ATTACHMENTS
+          .sdr-attachments-buttons
+            %button.button.sdr-attachments-button
+              %span DOWNLOAD ALL
         %hr.thin
         - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
-          %a= attachment.file_name
-          %button.expand-row-button-inline
-          %hr.thin
+          .sdr-attachment-wrappr
+            %a{href: "#{attachment.direct_upload_url}", class: 'sdr-attachment-link', download: "#{attachment.file_name}"}= attachment.file_name
+            %button.expand-row-button-inline
+            .nested-data-row.code-snippet.code-block
+              = attachment.email_header_data
+            %hr.thin
 
   .col-xs-12.col-sm-6.sdr-research-data-wrapper
     %h1.research-data-header.sdr-research-data-title Research Data
@@ -195,6 +202,8 @@
           - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
             %a= attachment.file_name
             %button.expand-row-button-inline
+            .nested-data-row.code-snippet.code-block
+              = attachment.beaker_info
             %hr.thin
     .sdr-research-data-missing.text-center
       %span.missing-data
