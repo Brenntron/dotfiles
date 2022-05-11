@@ -24,4 +24,18 @@ $ ->
 
   $('#cancel_sdr_dispute').on 'click', ->
     $(':input','#new-sdr-dispute-form').val('')
+    $('#new-sdr-dispute-form #priority').val('P3') #set Priority back to default
     $('#new-sdr-dispute').dropdown('toggle')
+
+  $('#new-sdr-dispute-form').submit (e) ->
+    e.preventDefault()
+    domain = this.sender.value
+    reputation = this.reputation.value
+    platform = this.platforms.value
+    priority = this.priority.value
+    customer = this.customers.value
+
+    domain = domain.trim()
+    domain = domain.replace('http://', '')
+    domain = domain.replace('https://', '')
+    domain - domain.replace(/&/g, '&amp;')

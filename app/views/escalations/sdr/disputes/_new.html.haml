@@ -12,11 +12,11 @@
 
   .form-group
     %label.content-label-sm Sender Domain
-    %input.form-control
+    %input#sender.form-control{required: true}
 
   .form-group
     %label.content-label-sm Priority
-    %select.form-control.priority{name:'priority'}
+    %select.form-control#priority{name:'priority'}
       %option P1
       %option P2
       %option{:selected => 'selected'} P3
@@ -25,13 +25,14 @@
 
   .form-group
     %label.content-label-sm Reputation
-    %select.form-control{name:'reputation'}
-      %option{:selected => 'selected', :value => 'false positive'} False Positive
+    %select#reputation.form-control{name:'reputation'}
+      %option{:selected => 'selected', :value => ''}
+      %option{ :value => 'false positive'} False Positive
       %option{:value => 'false negative'} False Negative
 
   .form-group
     %label.content-label-sm Platform
-    %input.form-control#platforms{list: 'sdr-platform-list', required: true}
+    %input.form-control#platforms{list: 'sdr-platform-list'}
       %datalist#sdr-platform-list
 
   .form-group
@@ -41,7 +42,7 @@
 
   %hr.thin
   .form-group.text-center
-    %button.primary{value: 'submit', type: 'button', class:'submit_new_dispute', onclick: 'window.submit_new_dispute(this); return false;'}
+    %button.primary{value: 'submit', type: 'submit', class:'submit_new_dispute'}
       Create
     %button.secondary#cancel_sdr_dispute{value: 'cancel',type: 'button'}
       Cancel
