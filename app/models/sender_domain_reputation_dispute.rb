@@ -377,4 +377,10 @@ class SenderDomainReputationDispute < ApplicationRecord
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
+
+  def compose_versioned_items
+    versioned_items = [self]
+    sender_domain_reputation_dispute_comments.includes(:versions).map{ |sdrdc| versioned_items << sdrdc }
+    versioned_items
+  end
 end
