@@ -15,3 +15,13 @@
 .sdr-submitted-at-wrapper, .sdr-age-wrapper {
   padding-left: 15px;
 }
+
+#sdr-index-toolbar {
+  margin-top: -10px;
+  z-index: 1;
+  width: fit-content;
+}
+
+#sdr-disputes-index_wrapper {
+  top: -55px;
+}

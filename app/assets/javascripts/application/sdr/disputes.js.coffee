@@ -166,12 +166,24 @@ window.initialize_sdr_disputes_datatable = () ->
     pagingType: 'full_numbers'
     order: [[ 5, 'desc' ]]  # that's tmp default sorting column
     columnDefs: [
-      { targets: [0,6], orderable: false } # remove sorting from age column
+      {
+        # remove sorting from age column
+        targets: [0,6],
+        orderable: false
+      }
+      {
+        targets: [ 2 ]
+        className: 'id-col'
+      }
+      {
+        # Bolds the status
+        targets: [ 3 ]
+        className: 'font-weight-bold'
+      }
     ]
     columns: [
       {
         data:'case_id'
-        width: '10px'
         render: (data, type, full, meta) ->
           return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="sdr_dispute_check_box" id="cbox' + data + '" value="' + data + '"/>'
       }
@@ -179,11 +191,9 @@ window.initialize_sdr_disputes_datatable = () ->
         data: 'priority'
         searchable: false
         defaultContent: '<span></span>'
-        width: '10px'
         render: ( data ) -> '<span class="bug-priority p-' + data + '">' + data + '</span>'
       }
       {
-        width: '50px'
         data: 'case_id'
         render: (data, type, full, meta) -> "<a href='/escalations/sdr/disputes/#{data}'>#{parseInt(data).pad(10)}</a>"
       }
@@ -203,7 +213,6 @@ window.initialize_sdr_disputes_datatable = () ->
       }
       {
         data: 'age'
-        width: '50px'
       }
       {
         data: 'assignee'
@@ -224,7 +233,11 @@ window.initialize_sdr_disputes_datatable = () ->
       #rules
       { data: null, visible: false, render: ( data )-> '' }
       #suggested_rep
-      { data: 'suggested_disposition' }
+      {
+        data: 'suggested_disposition'
+        render: (data) ->
+          return "<span class='text-capitalize'>#{data}</span>"
+      }
       { data: 'submitter_type' }
       { data: 'contact_name' }
       { data: 'contact_email' }
