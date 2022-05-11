@@ -2020,10 +2020,14 @@ button.close {
 
 .nav-container .sub-nav li, .sidenav-icons .sub-nav li {
   height: 30px;
-  line-height: 30px;
   padding-left: 0;
   border: none;
 }
+
+.nav-container .sub-nav li {
+  line-height: 30px;
+}
+
 
 #bugs-subnav, #bugs-subnav-icons {
   background-color: lighten($bug-section-color, 28%)
