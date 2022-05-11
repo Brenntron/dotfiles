@@ -642,7 +642,7 @@ class ComplaintEntry < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
-    complaint_entry_fields = %w{complaint_id subdomain domain path url_primary_category
+    complaint_entry_fields = %w{complaint_entries.complaint_id subdomain domain path url_primary_category
                         complaint_entries.resolution complaint_entries.internal_comment complaint_entries.status uri ip_address category}
     complaint_entry_where = complaint_entry_fields.map{|field| "#{field} like :pattern"}.join(' or ')
 
