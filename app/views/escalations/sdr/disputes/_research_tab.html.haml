@@ -3,7 +3,7 @@
 %input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
 
 .row#sdr-research-tab
-  .col-xs-12.col-sm-6#sdr-dispute-info-wrapper
+  .col-xs-12.col-sm-6.sdr-dispute-info-wrapper
     %h1.research-data-header.sdr-dispute-info-title Dispute Information
     .row
       .col-xs-6
@@ -27,12 +27,15 @@
         %p= @dispute.description
     %hr.thin
     .row
-      .col-xs-12
+      .col-xs-12.sdr-attachments
         %h5 ATTACHMENTS
+        %hr.thin
         - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
           %a= attachment.file_name
+          %button.expand-row-button-inline
+          %hr.thin
 
-  .col-xs-6
+  .col-xs-12.col-sm-6.sdr-research-data-wrapper
     %h1.research-data-header.sdr-research-data-title Research Data
     #sdr-research-loader
       .inline-loader-wrapper
@@ -44,102 +47,155 @@
         .col-xs-12
           %h5 SENDER DOMAIN REPUTATION
           .col-xs-2
-            %h6 DOMAIN
+            %h5 DOMAIN
+            %hr.thin
             %p#url.missing-data No data
+            %hr.thin
           .col-xs-2
-            %h6 IP ADDRESS
+            %h5 IP ADDRESS
+            %hr.thin
             %p#ip_address.missing-data No data
+            %hr.thin
           .col-xs-2
-            %h6 CURRENT REPUTATION
+            %h5 CURRENT REP
+            %hr.thin
             %p#threat_level.missing-data No data
+            %hr.thin
           .col-xs-2
-            %h6 SCORE
+            %h5 SCORE
+            %hr.thin
             %p#score.missing-data No data
+            %hr.thin
           .col-xs-2
-            %h6 RULES
+            %h5 RULES
+            %hr.thin
             %p#rules.missing-data No data
+            %hr.thin
           .col-xs-2
-            %h6 Category
+            %h5 Category
+            %hr.thin
             %p#category.missing-data nocat
+            %hr.thin
+      %hr.thin
       .row
         .col-xs-12
-          %h5 SECURITY INTELLIGENCE
+          %h4 SECURITY INTELLIGENCE
           .col-xs-3
-            %h6 BL CLASSIFICATION
-            #bl_classification.missing-data
+            %h5 BL CLASSIFICATION
+            %hr.thin
+            %p#bl_classification.missing-data
               No data
+            %hr.thin
           .col-xs-3
-            %h6 BL STATUS
-            #bl_status.missing-data
+            %h5 BL STATUS
+            %hr.thin
+            %p#bl_status.missing-data
               No data
+            %hr.thin
           .col-xs-4
-            %h6 BL COMMENT
-            #bl_comment.missing-data
+            %h5 BL COMMENT
+            %hr.thin
+            %p#bl_comment.missing-data
               No data
+            %hr.thin
           .col-xs-2
-            %h6 WL STATUS
-            #bl_status.missing-data
+            %h5 WL STATUS
+            %hr.thin
+            %p#bl_status.missing-data
               No data
+            %hr.thin
+      %hr.thin
       .row
         .col-xs-12
-          %h5 VIRUS TOTAL
+          %h4 VIRUS TOTAL
           .col-xs-2
-            %h6 URL DETECTION
-            #url_detection.missing-data
+            %h5 URL DETECTION
+            %hr.thin
+            %p#url_detection.missing-data
               No data
+            %hr.thin
           .col-xs-2
-            %h6 TRUSTED DETECTION
-            #trusted_detection.missing-data
+            %h5 TRUSTED DETECTION
+            %hr.thin
+            %p#trusted_detection.missing-data
               No data
+            %hr.thin
           .col-xs-3
-            %h6 URL DATE
-            #url_date.missing-data
+            %h5 URL DATE
+            %hr.thin
+            %p#url_date.missing-data
               No data
+            %hr.thin
           .col-xs-2
-            %h6 DETECTED URLS
-            #detected_urls.missing-data
+            %h5 DETECTED URLS
+            %hr.thin
+            %p#detected_urls.missing-data
               No data
-          .col-xs-2
-            %h6 DETECTED HASHES
-            #detected_hashes.missing-data
+            %hr.thin
+          .col-xs-3
+            %h5 DETECTED HASHES
+            %hr.thin
+            %p#detected_hashes.missing-data
               No data
+            %hr.thin
+      %hr.thin
       .row
         .col-xs-12
-          %h5 UMBRELLA
+          %h4 UMBRELLA
           .col-xs-1
-            %h6 RATING
-            #umbrellaRating.missing-data
+            %h5 RATING
+            %hr.thin
+            %p#umbrellaRating.missing-data
               No data
+            %hr.thin
           .col-xs-2
-            %h6 CATEGORY
-            #umbrellaCategory.missing-data
+            %h5 CATEGORY
+            %hr.thin
+            %p#umbrellaCategory.missing-data
               No data
+            %hr.thin
           .col-xs-1
-            %h6 POPULARITY
-            #umbrellaPopularity.missing-data
+            %h5 POPULARITY
+            %hr.thin
+            %p#umbrellaPopularity.missing-data
               No data
+            %hr.thin
           .col-xs-2
-            %h6 DOMAIN VOL
-            #umbrellaDomainVol.missing-data
+            %h5 DOMAIN VOL
+            %hr.thin
+            %p#umbrellaDomainVol.missing-data
               No data
+            %hr.thin
           .col-xs-2
-            %h6 ORGANIZATION
-            #umbrellaOrganization.missing-data
+            %h5 ORGANIZATION
+            %hr.thin
+            %p#umbrellaOrganization.missing-data
               No data
+            %hr.thin
           .col-xs-2
-            %h6 REGISTRAR
-            #umbrellaRegistrar.missing-data
+            %h5 REGISTRAR
+            %hr.thin
+            %p#umbrellaRegistrar.missing-data
               No data
+            %hr.thin
           .col-xs-2
-            %h6 CREATED
-            #umbrellaCreated.missing-data
+            %h5 CREATED
+            %hr.thin
+            %p#umbrellaCreated.missing-data
               No data
+            %hr.thin
+      %hr.thin
       .row
         .col-xs-12
-          %h5 BEAKER
+          %h4 BEAKER
         .col-xs-12
-          #beakerCodeBlock.code-block
-            = @dispute.beaker_info
+          %pre#beakerCodeBlock.code-snippet.code-block
+            = @beaker_info
+        .col-xs-12.sdr-entries
+          - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
+            %a= attachment.file_name
+            %button.expand-row-button-inline
+            %hr.thin
     .sdr-research-data-missing.text-center
       %span.missing-data
         No data

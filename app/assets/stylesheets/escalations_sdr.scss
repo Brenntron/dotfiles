@@ -48,8 +48,42 @@
 }
 
 .sdr-research-data-wrapper {
-  .col-xs-2, .col-xs-3, .col-xs-1 {
+  border-left: 1px solid #eeeeee;
+
+  .col-xs-2, .col-xs-3, .col-xs-1, .col-xs-4 {
     padding-left: 0;
     padding-right: 0;
+
+    .thin {
+      margin-bottom: 10px;
+      margin-top: 0;
+    }
+
+    p {
+      margin-bottom: 5px;
+    }
+  }
+}
+
+.sdr-dispute-info-wrapper {
+  border-right: 1px solid #eeeeee;
+}
+
+.sdr-attachments {
+  margin-top: 10px;
+
+  hr {
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
+}
+
+.sdr-entries {
+  margin-top: 10px;
+}
+
+.sdr-entries, .sdr-attachments {
+  .expand-row-button-inline {
+    float: right;
   }
 }
