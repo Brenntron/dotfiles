@@ -6,34 +6,33 @@
   .col-xs-12.col-sm-6.sdr-dispute-info-wrapper
     %h1.research-data-header.sdr-dispute-info-title Dispute Information
     .row
-      .col-xs-6
-        %h5 SUBMITTED DISPUTE
-        %p= @dispute.sender_domain_entry
-      .col-xs-6
-        .sdr-suggested-reputation-wrapper
-          %h5 SUGGESTED REPUTATION
-          %p= @dispute.suggested_disposition
+      .col-xs-9
+        %label.data-report-label Submitted Dispute
+        %span.data-report-content= @dispute.sender_domain_entry
+      .col-xs-3
+        %label.data-report-label Suggested Reputation
+        %span.data-report-content.text-capitalize= @dispute.suggested_disposition
     %hr.thin
+    -#.row
+    -#  .col-xs-12
+    -#    %label.data-report-label Items Extracted from Details
+    -#    - extracted_details = extract_details @dispute.description
+    -#    - extracted_details.each do |detail|
+    -#      %span.data-report-content= detail
+    -#%hr.thin
     .row
       .col-xs-12
-        %h5 ITEMS EXTRACTED FROM DETAILS
-        - extracted_details = extract_details @dispute.description
-        - extracted_details.each do |detail|
-          %p= detail
+        %label.data-report-label Details
+        %span.data-report-content= @dispute.description
     %hr.thin
+    .row
+      .col-xs-6
+        %label.data-report-label Attachments
+      .col-xs-6.sdr-attachments-buttons
+        %button.button
+          %span Download All
     .row
       .col-xs-12
-        %h5 DESCRIPTION / DETAILS
-        %p= @dispute.description
-    %hr.thin
-    .row
-      .col-xs-12.sdr-attachments
-        .sdr-attachments-header
-          %h5 ATTACHMENTS
-          .sdr-attachments-buttons
-            %button.button.sdr-attachments-button
-              %span DOWNLOAD ALL
-        %hr.thin
         - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
           .sdr-attachment-wrappr
             %a{href: "#{attachment.direct_upload_url}", class: 'sdr-attachment-link', download: "#{attachment.file_name}"}= attachment.file_name
@@ -52,159 +51,71 @@
     .sdr-research-data-present
       .row
         .col-xs-12
-          %h5 SENDER DOMAIN REPUTATION
-          .col-xs-2
-            %h5 DOMAIN
-            %hr.thin
-            %p#url.missing-data No data
-            %hr.thin
-          .col-xs-2
-            %h5 IP ADDRESS
-            %hr.thin
-            %p#ip_address.missing-data No data
-            %hr.thin
-          .col-xs-2
-            %h5 CURRENT REP
-            %hr.thin
-            %p#threat_level.missing-data No data
-            %hr.thin
-          .col-xs-2
-            %h5 SCORE
-            %hr.thin
-            %p#score.missing-data No data
-            %hr.thin
-          .col-xs-2
-            %h5 RULES
-            %hr.thin
-            %p#rules.missing-data No data
-            %hr.thin
-          .col-xs-2
-            %h5 Category
-            %hr.thin
-            %p#category.missing-data nocat
-            %hr.thin
+          %label.data-report-label Sender Domain Reputation
+          %table.data-report-table#sdr-reputation-data-table
+            %thead
+              %tr
+                %th Domain
+                %th IP Address
+                %th Score
+                %th Rules
+                %th Threat Level
+                %th Category
+            %tbody
+
       %hr.thin
       .row
         .col-xs-12
-          %h4 SECURITY INTELLIGENCE
-          .col-xs-3
-            %h5 BL CLASSIFICATION
-            %hr.thin
-            %p#bl_classification.missing-data
-              No data
-            %hr.thin
-          .col-xs-3
-            %h5 BL STATUS
-            %hr.thin
-            %p#bl_status.missing-data
-              No data
-            %hr.thin
-          .col-xs-4
-            %h5 BL COMMENT
-            %hr.thin
-            %p#bl_comment.missing-data
-              No data
-            %hr.thin
-          .col-xs-2
-            %h5 WL STATUS
-            %hr.thin
-            %p#bl_status.missing-data
-              No data
-            %hr.thin
+          %label.data-report-label Security Intelligence
+          %table.data-report-table#sdr-security-data-table
+            %thead
+              %tr
+                %th BL Classification
+                %th BL Status
+                %th BL Comment
+                %th WL Status
+            %tbody
+
       %hr.thin
       .row
         .col-xs-12
-          %h4 VIRUS TOTAL
-          .col-xs-2
-            %h5 URL DETECTION
-            %hr.thin
-            %p#url_detection.missing-data
-              No data
-            %hr.thin
-          .col-xs-2
-            %h5 TRUSTED DETECTION
-            %hr.thin
-            %p#trusted_detection.missing-data
-              No data
-            %hr.thin
-          .col-xs-3
-            %h5 URL DATE
-            %hr.thin
-            %p#url_date.missing-data
-              No data
-            %hr.thin
-          .col-xs-2
-            %h5 DETECTED URLS
-            %hr.thin
-            %p#detected_urls.missing-data
-              No data
-            %hr.thin
-          .col-xs-3
-            %h5 DETECTED HASHES
-            %hr.thin
-            %p#detected_hashes.missing-data
-              No data
-            %hr.thin
+          %label.data-report-label Virus Total
+          %table.data-report-table#sdr-vt-data-table
+            %thead
+              %tr
+                %th URL Detection
+                %th Trusted Detection
+                %th Detected URLs
+            %tbody
+
       %hr.thin
       .row
         .col-xs-12
-          %h4 UMBRELLA
-          .col-xs-1
-            %h5 RATING
-            %hr.thin
-            %p#umbrellaRating.missing-data
-              No data
-            %hr.thin
-          .col-xs-2
-            %h5 CATEGORY
-            %hr.thin
-            %p#umbrellaCategory.missing-data
-              No data
-            %hr.thin
-          .col-xs-1
-            %h5 POPULARITY
-            %hr.thin
-            %p#umbrellaPopularity.missing-data
-              No data
-            %hr.thin
-          .col-xs-2
-            %h5 DOMAIN VOL
-            %hr.thin
-            %p#umbrellaDomainVol.missing-data
-              No data
-            %hr.thin
-          .col-xs-2
-            %h5 ORGANIZATION
-            %hr.thin
-            %p#umbrellaOrganization.missing-data
-              No data
-            %hr.thin
-          .col-xs-2
-            %h5 REGISTRAR
-            %hr.thin
-            %p#umbrellaRegistrar.missing-data
-              No data
-            %hr.thin
-          .col-xs-2
-            %h5 CREATED
-            %hr.thin
-            %p#umbrellaCreated.missing-data
-              No data
-            %hr.thin
+          %label.data-report-label Umbrella
+          %table.data-report-table#sdr-umbrella-data-table
+            %thead
+              %th Rating
+              %th Category
+              %th Popularity
+              %th Domain Vol
+              %th Organization
+              %th Registrar
+              %th Created
+            %tbody
+
+
       %hr.thin
       .row
         .col-xs-12
-          %h4 BEAKER
+          %label.data-report-label Beaker
+      .row
         .col-xs-12
-          %pre#beakerCodeBlock.code-snippet.code-block
+          %pre.data-report-code-content
             = @beaker_info
-        .col-xs-12.sdr-entries
-          - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
-            %a= attachment.file_name
-            %button.expand-row-button-inline
-            .nested-data-row.code-snippet.code-block
-              = attachment.beaker_info
-            %hr.thin
-    .sdr-research-data-missing.text-center
-      %span.missing-data
-        No data
+        -#.col-xs-12.sdr-entries
+        -#  - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
+        -#    %a= attachment.file_name
+        -#    %button.expand-row-button-inline
+        -#    .nested-data-row.code-snippet.code-block
+        -#      = attachment.beaker_info
+        -#    %hr.thin
