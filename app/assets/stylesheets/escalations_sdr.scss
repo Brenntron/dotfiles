@@ -51,18 +51,12 @@
   border-left: 1px solid #eeeeee;
   padding-left: 30px;
 
-  .col-xs-2, .col-xs-3, .col-xs-1, .col-xs-4 {
-    padding-left: 0;
-    padding-right: 0;
-
-    .thin {
-      margin-bottom: 10px;
-      margin-top: 0;
-    }
-
-    p {
-      margin-bottom: 5px;
-    }
+  .data-report-table {
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+  hr.thin {
+    margin-bottom: 25px;
   }
 }
 

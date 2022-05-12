@@ -34,7 +34,7 @@
     .row
       .col-xs-12
         - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
-          .sdr-attachment-wrappr
+          .sdr-attachment-wrapper
             %a{href: "#{attachment.direct_upload_url}", class: 'sdr-attachment-link', download: "#{attachment.file_name}"}= attachment.file_name
             %button.expand-row-button-inline
             .nested-data-row.code-snippet.code-block
@@ -110,7 +110,7 @@
           %label.data-report-label Beaker
       .row
         .col-xs-12
-          %pre.data-report-code-content
+          %pre.data-report-code-content.beaker-json-dump
             = @beaker_info
         -#.col-xs-12.sdr-entries
         -#  - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|

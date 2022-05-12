@@ -9,10 +9,13 @@ window.get_sdr_research_data = (entry) ->
     data: {entry: entry}
     success: (response) ->
       data = response.data
-      $('#sdr-research-loader').hide()
-      $('.sdr-research-data-present').show()
+
       fill_out_sdr_research_data(data)
 
+      $('#sdr-research-loader').hide()
+      $('.sdr-research-data-present').show()
+
+      beautify_beaker()
 
     error: (error) ->
       std_msg_error(error.responseText, ['Unable to fetch SDR data.'])
@@ -80,7 +83,7 @@ window.get_sdr_research_data = (entry) ->
     # address missing or null vals
     $('.sdr-research-data-wrapper .data-report-table tbody tr td').each ->
       if ($(this).text() == '') || ($(this).text() == 'null')
-        $(this).html('<span class="missing-data">Not available</span>')
+        $(this).html('<span class="missing-data">N/A</span>')
 
 
 
@@ -88,3 +91,14 @@ window.get_sdr_research_data = (entry) ->
     expandButton = $(this)
     nestedRow = expandButton.siblings('.nested-data-row')[0]
     $(nestedRow).toggle()
+
+
+
+window.beautify_beaker = () ->
+  # Beautify poorly formatted json dump
+  $('.beaker-json-dump').each ->
+    beaker_txt = $(this).text()
+    bkr_Obj = JSON.parse(beaker_txt)
+    beaker_pretty = JSON.stringify(bkr_Obj, null, '\t');
+
+    $(this).text(beaker_pretty)
