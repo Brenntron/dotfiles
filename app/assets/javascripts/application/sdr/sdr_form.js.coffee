@@ -40,3 +40,27 @@ $ ->
     domain = domain.replace('http://', '')
     domain = domain.replace('https://', '')
     domain - domain.replace(/&/g, '&amp;')
+
+    console.log domain
+    console.log reputation
+    console.log platform
+    console.log priority
+    console.log customer
+    console.log details
+
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/sdr/disputes'
+      method: 'POST'
+      data:
+        sender_domain_entry: domain,
+        reputation: reputation,
+        customer: customer,
+        platform: platform,
+        priority: priority,
+        details: details
+      success: (response) ->
+        std_msg_success('Dispute Created.', [], reload: true)
+      error: (response) ->
+        console.log response
+        std_api_error(response, "Dispute was not created.", reload: false)
+    )
