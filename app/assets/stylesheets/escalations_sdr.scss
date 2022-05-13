@@ -109,19 +109,21 @@
   margin-top: -1px;
 }
 
-.attachment-collapse-header {
+.attachment-collapse-header, .beaker-collapse-header {
   display: block;
   height: 35px;
   width: 100%;
   padding: 5px;
   border-top: 1px solid #eeeeee;
   border-bottom: 1px solid #eeeeee;
-  a {
-    color: #3F6F8D;
-    text-decoration: underline;
+  .sdr-attachment-link, .sdr-beaker-item {
     padding: 5px 5px 4px 0;
     display: inline-block;
     font-size: 12px;
+  }
+  .sdr-attachment-link {
+    color: #3F6F8D;
+    text-decoration: underline;
   }
 }
 

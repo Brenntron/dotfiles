@@ -38,11 +38,9 @@
     .row
       .col-xs-12
         - if @dispute.sender_domain_reputation_dispute_attachments.any?
-
-
           - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
             .card-header.attachment-collapse-header{id: "attachment-#{attachment.id}-header"}
-              %a{href: "#{attachment.direct_upload_url}", class: 'sdr-attachment-link', download: "#{attachment.file_name}"}= attachment.file_name
+              %a.sdr-attachment-link{href: "#{attachment.direct_upload_url}", download: "#{attachment.file_name}"}= attachment.file_name
               %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "attachment-#{attachment.id}-content"}
             .collapse{id: "attachment-#{attachment.id}-content", 'aria-labelledby': "attachment-#{attachment.id}-header"}
               .card-body.email-json-dump
@@ -120,12 +118,20 @@
           %label.data-report-label Beaker
       .row
         .col-xs-12
-          %pre.data-report-code-content.beaker-json-dump
-            = @beaker_info
-        -#.col-xs-12.sdr-entries
-        -#  - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
-        -#    %a= attachment.file_name
-        -#    %button.expand-row-button-inline
-        -#    .nested-data-row.code-snippet.code-block
-        -#      = attachment.beaker_info
-        -#    %hr.thin
+          .card-header.beaker-collapse-header#domain-beaker-header
+            %span.sdr-beaker-item= @dispute.sender_domain_entry
+            %button.expand-row-button-inline.shown{'data-toggle': 'collapse', type: 'button', 'data-target': "#sdr-beaker-domain-content", 'aria-expanded': 'true', 'aria-controls': "sdr-beaker-domain-content"}
+          .collapse.in#sdr-beaker-domain-content{'aria-labelledby': "domain-beaker-header"}
+            .card-body
+              %pre.data-report-code-content.beaker-json-dump
+                = @beaker_info
+
+          - if @dispute.sender_domain_reputation_dispute_attachments.any?
+            - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
+              .card-header.attachment-collapse-header{id: "beaker-attachment-#{attachment.id}-header"}
+                %span.sdr-beaker-item= attachment.file_name
+                %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#beaker-attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "beaker-attachment-#{attachment.id}-content"}
+              .collapse{id: "beaker-attachment-#{attachment.id}-content", 'aria-labelledby': "beaker-attachment-#{attachment.id}-header"}
+                .card-body
+                  %pre.data-report-code-content.beaker-json-dump
+                    = attachment.beaker_info
