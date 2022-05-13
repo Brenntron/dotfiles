@@ -118,6 +118,11 @@ window.beautify_email_headers = () ->
     tbl = tbl + "</table>"
     $(txt_wrapper).html(tbl)
 
+window.beautify_details_field = () ->
+  raw_txt = $('.sdr-details').text()
+  formatted_details = raw_txt.replace(/\\r\\n|\n|\r|\r\n|\\r|\\n/g, '<br/>')
+  $('.sdr-details').html(formatted_details)
 
 $ ->
   beautify_email_headers()
+  beautify_details_field()
