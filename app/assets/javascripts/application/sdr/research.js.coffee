@@ -9,12 +9,9 @@ window.get_sdr_research_data = (entry) ->
     data: {entry: entry}
     success: (response) ->
       data = response.data
-
       fill_out_sdr_research_data(data)
-
       $('#sdr-research-loader').hide()
       $('.sdr-research-data-present').show()
-
       beautify_beaker()
 
     error: (error) ->
@@ -28,6 +25,8 @@ window.get_sdr_research_data = (entry) ->
     console.log data
 
     for key of data
+      # breaking these apart so we can easily see and customize
+      # which pieces of data we are showing / how they are shown
       if data.hasOwnProperty(key)
         value = data[key]
         if key == 'entry'
@@ -99,6 +98,26 @@ window.beautify_beaker = () ->
   $('.beaker-json-dump').each ->
     beaker_txt = $(this).text()
     bkr_Obj = JSON.parse(beaker_txt)
-    beaker_pretty = JSON.stringify(bkr_Obj, null, '\t');
+    beaker_pretty = JSON.stringify(bkr_Obj, null, 2);
 
     $(this).text(beaker_pretty)
+
+window.beautify_email_headers = () ->
+  # Format the email attachment headers for legibility
+  $('.email-json-dump').each ->
+    txt_wrapper = this
+    headerstxt = $(txt_wrapper).text()
+    headerObj = JSON.parse(headerstxt)
+    tbl = '<table class="email-headers-table">'
+
+    for key of headerObj
+      value = headerObj[key]
+      row = "<tr><th>" + key + "</th><td>" + value + "</td></tr>"
+      tbl = tbl + row
+
+    tbl = tbl + "</table>"
+    $(txt_wrapper).html(tbl)
+
+
+$ ->
+  beautify_email_headers()

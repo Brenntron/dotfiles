@@ -23,23 +23,33 @@
     .row
       .col-xs-12
         %label.data-report-label Details
-        %span.data-report-content= @dispute.description
+        %div.data-report-content.sdr-details
+          = @dispute.description
     %hr.thin
-    .row
+
+    .row.attachments-row
       .col-xs-6
         %label.data-report-label Attachments
       .col-xs-6.sdr-attachments-buttons
-        %button.button
-          %span Download All
+        - if @dispute.sender_domain_reputation_dispute_attachments.any?
+          %button.button.sdr-attachments-button
+            %span Download All
+
     .row
       .col-xs-12
-        - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
-          .sdr-attachment-wrapper
-            %a{href: "#{attachment.direct_upload_url}", class: 'sdr-attachment-link', download: "#{attachment.file_name}"}= attachment.file_name
-            %button.expand-row-button-inline
-            .nested-data-row.code-snippet.code-block
-              = attachment.email_header_data
-            %hr.thin
+        - if @dispute.sender_domain_reputation_dispute_attachments.any?
+
+
+          - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
+            .card-header.attachment-collapse-header{id: "attachment-#{attachment.id}-header"}
+              %a{href: "#{attachment.direct_upload_url}", class: 'sdr-attachment-link', download: "#{attachment.file_name}"}= attachment.file_name
+              %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "attachment-#{attachment.id}-content"}
+            .collapse{id: "attachment-#{attachment.id}-content", 'aria-labelledby': "attachment-#{attachment.id}-header"}
+              .card-body.email-json-dump
+                = attachment.email_header_data
+
+        - else
+          %span.missing-data No Attachments
 
   .col-xs-12.col-sm-6.sdr-research-data-wrapper
     %h1.research-data-header.sdr-research-data-title Research Data
