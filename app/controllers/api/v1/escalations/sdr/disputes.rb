@@ -23,11 +23,33 @@ module API
 
             desc 'create a dispute'
             params do
+              requires :sender_domain_entry, type: String, desc: 'URL or email to create entry'
+              requires :priority, type: String, desc: 'Priority of new dispute'
+              optional :suggested_disposition, type: String, desc: 'What should the disposition be'
+              optional :platform, type: String, desc: 'Platform public name'
+              optional :customer, type: String, desc: 'Customer related to new complaint'
+              optional :description, type: String, desc: 'Description of new complaint'
 
             end
 
             post "" do
               std_api_v2 do
+
+                # user_validation = User.where(cvs_username: permitted_params['assignee'])
+                #
+                # if user_validation.exists?
+                SenderDomainReputationDispute.create_action(bugzilla_rest_session,
+                                        permitted_params[:sender_domain_entry],
+                                        permitted_params[:priority],
+                                        permitted_params[:suggested_disposition],
+                                        permitted_params[:platform],
+                                        permitted_params[:customer],
+                                        permitted_params[:description])
+                {:status => 'success'}.to_json
+                # else
+                #   raise "Invalid assignee or assignee does not exist. Please try again."
+
+                # end
 
               end
             end
