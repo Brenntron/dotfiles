@@ -35,21 +35,15 @@ module API
             post "" do
               std_api_v2 do
 
-                # user_validation = User.where(cvs_username: permitted_params['assignee'])
-                #
-                # if user_validation.exists?
                 SenderDomainReputationDispute.create_action(bugzilla_rest_session,
                                         permitted_params[:sender_domain_entry],
                                         permitted_params[:priority],
                                         permitted_params[:suggested_disposition],
                                         permitted_params[:platform],
                                         permitted_params[:customer],
-                                        permitted_params[:description])
+                                        permitted_params[:description],
+                                        current_user.id)
                 {:status => 'success'}.to_json
-                # else
-                #   raise "Invalid assignee or assignee does not exist. Please try again."
-
-                # end
 
               end
             end

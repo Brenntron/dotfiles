@@ -179,8 +179,8 @@ class SenderDomainReputationDispute < ApplicationRecord
     Customer.find_by_email(email)
   end
 
-  def self.create_action(bugzilla_rest_session, sender_domain_entry, priority, suggested_disposition, platform, customer, description, status=NEW)
-    user = User.where(cvs_username: assignee).first
+  def self.create_action(bugzilla_rest_session, sender_domain_entry, priority, suggested_disposition, platform, customer, description, user_id, status=NEW)
+
     summary = "New Senders Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     # Does a description need to go in here and be in the form?
@@ -203,16 +203,15 @@ class SenderDomainReputationDispute < ApplicationRecord
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
     new_dispute = SenderDomainReputationDispute.create!(id: bug_proxy.id,
-                                  user_id: user.id,
+                                  user_id: user_id,
                                   sender_domain_entry: sender_domain_entry,
                                   priority: priority,
-                                  suggested_disposition: suggested_disposition.downcase,
+                                  suggested_disposition: suggested_disposition,
                                   platform_id: platform_record&.id,
                                   submitter_type: 'Internal',
                                   status: status,
                                   customer_id: cust&.id,
-                                  description: description,
-                                  case_opened_at: Time.now)
+                                  description: description)
 
     new_dispute
   end
