@@ -81,7 +81,7 @@ window.get_sdr_research_data = (entry) ->
 
     # address missing or null vals
     $('.sdr-research-data-wrapper .data-report-table tbody tr td').each ->
-      if ($(this).text() == '') || ($(this).text() == 'null')
+      if ($(this).text() == '') || ($(this).text() == 'null' || $(this).text() == 'undefined' || $(this).text() == 'NaN')
         $(this).html('<span class="missing-data">N/A</span>')
 
 
