@@ -85,7 +85,6 @@ window.get_sdr_research_data = (entry) ->
         $(this).html('<span class="missing-data">N/A</span>')
 
 
-
   $('#sdr-research-tab .expand-row-button-inline').click ->
     expandButton = $(this)
     nestedRow = expandButton.siblings('.nested-data-row')[0]
@@ -97,6 +96,7 @@ window.beautify_beaker = () ->
   # Beautify poorly formatted json dump
   $('.beaker-json-dump').each ->
     beaker_txt = $(this).text()
+    return unless beaker_txt is ''
     bkr_Obj = JSON.parse(beaker_txt)
     beaker_pretty = JSON.stringify(bkr_Obj, null, 2);
 
@@ -107,6 +107,7 @@ window.beautify_email_headers = () ->
   $('.email-json-dump').each ->
     txt_wrapper = this
     headerstxt = $(txt_wrapper).text()
+    return unless headerstxt is ''
     headerObj = JSON.parse(headerstxt)
     tbl = '<table class="email-headers-table">'
 
