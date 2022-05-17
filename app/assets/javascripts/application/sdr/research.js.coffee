@@ -96,7 +96,6 @@ window.beautify_beaker = () ->
   # Beautify poorly formatted json dump
   $('.beaker-json-dump').each ->
     beaker_txt = $(this).text()
-    return if beaker_txt is ''
     bkr_Obj = JSON.parse(beaker_txt)
     beaker_pretty = JSON.stringify(bkr_Obj, null, 2);
 
@@ -107,7 +106,6 @@ window.beautify_email_headers = () ->
   $('.email-json-dump').each ->
     txt_wrapper = this
     headerstxt = $(txt_wrapper).text()
-    return if headerstxt is ''
     headerObj = JSON.parse(headerstxt)
     tbl = '<table class="email-headers-table">'
 
@@ -141,7 +139,7 @@ $ ->
 
   $('#submitCorpus').click () ->
     $('.corpus-row').each (index) ->
-      checked = $(".download-attachment[name='send to corpus #{index}']").is(':checked')
+      checked = $(".corpus-attachment[name='send to corpus #{index}']").is(':checked')
       if checked
         row = $(this)
         attachmentId = parseInt(row.find('input[name="attachmentId"]').val(), 10)
@@ -165,8 +163,8 @@ $ ->
           )
     $('.sdr-corpus-button').dropdown('toggle')
 
-  $('.download-all-attachments').click () ->
-    check = $('.download-all-attachments').is(":checked")
-    $('.download-attachment').each ->
+  $('.corpus-all-attachments').click () ->
+    check = $('.corpus-all-attachments').is(":checked")
+    $('.corpus-attachment').each ->
       $(this).prop('checked', check)
 
