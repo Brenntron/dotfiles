@@ -124,6 +124,16 @@ window.beautify_details_field = () ->
   formatted_details = raw_txt.replace(/\\r\\n|\n|\r|\r\n|\\r|\\n/g, '<br/>')
   $('.sdr-details').html(formatted_details)
 
+window.open_corpus_dialog = () ->
+  dialog = $('#send-to-corpus-wrapper')
+
+  #check which attachments are checked
+  #build table
+  #open dialog
+
+  dialog.dialog('open')
+
+
 $ ->
   beautify_email_headers()
   beautify_details_field()
@@ -152,3 +162,10 @@ $ ->
       unless failedCalls > 0
         std_msg_success('Attachments sent to Corpus', [], { reload: false })
         $('.sdr-corpus-button').dropdown('toggle')
+
+  # Initialize send to corpus dialog
+  $('#send-to-corpus-wrapper').dialog({autoOpen : false, width: 1000});
+
+  # Check / enable button (make sure each attachment has a category selected)
+#  $('#submitCorpus')
+  
