@@ -29,6 +29,7 @@
 
     .row.attachments-row
       .col-xs-6
+        %input{type: "checkbox", name: "all attachments", class: 'download-all-attachments'}
         %label.data-report-label Attachments
       .col-xs-6.sdr-attachments-buttons
         - if @dispute.sender_domain_reputation_dispute_attachments.any?
@@ -37,7 +38,7 @@
               %button{data: {toggle: 'dropdown'}, class: 'button sdr-attachments-button sdr-corpus-button'}
                 %span
                   send to corpus
-              %ul.dropdown-menu.text-center
+              .dropdown-menu.text-center
                 %table
                   %thead
                     %tr
@@ -86,17 +87,17 @@
                       %td
                         %input{type: "radio", value: 'not ads', name: "category#{index}"}
                       %td.odd-column
-                        %input{type: 'text', name: 'subject line', placeholder: attachment.email_header_data}
+                        %input{type: 'text', name: "subject line#{index}"}
                       %td
-                        %input{type: 'checkbox', name: 'spam'}
+                        %input{type: "checkbox", name: "spam#{index}"}
                       %td.odd-column
-                        %input{type: 'checkbox', name: 'marketing'}
+                        %input{type: "checkbox", name: "marketing#{index}"}
                       %td
-                        %input{type: 'checkbox', name: 'social network'}
+                        %input{type: "checkbox", name: "social network#{index}"}
                       %td.odd-column
-                        %input{type: 'checkbox', name: 'bulk'}
+                        %input{type: "checkbox", name: "bulk#{index}"}
                       %td
-                        %input{type: 'checkbox', name: 'virus'}
+                        %input{type: "checkbox", name: "virus#{index}"}
                 %button#submitCorpus.submit-corpus
                   Submit to Corpus
             -#%button.button.sdr-attachments-button.sdr-download-all-button
@@ -105,8 +106,9 @@
     .row
       .col-xs-12
         - if @dispute.sender_domain_reputation_dispute_attachments.any?
-          - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
+          - @dispute.sender_domain_reputation_dispute_attachments.each_with_index do |attachment, index|
             .card-header.attachment-collapse-header{id: "attachment-#{attachment.id}-header"}
+              %input{type: "checkbox", name: "send to corpus #{index}", class: 'download-attachment'}
               %a.sdr-attachment-link{href: "#{attachment.direct_upload_url}", download: "#{attachment.file_name}"}= attachment.file_name
               %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "attachment-#{attachment.id}-content"}
             .collapse{id: "attachment-#{attachment.id}-content", 'aria-labelledby': "attachment-#{attachment.id}-header"}

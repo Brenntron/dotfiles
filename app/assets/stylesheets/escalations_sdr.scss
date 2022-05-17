@@ -16,7 +16,6 @@
   padding-left: 15px;
 }
 
-<<<<<<< HEAD
 .sdr-research-data-title, .sdr-dispute-info-title {
   font-weight: 300;
   margin-bottom: 30px;
@@ -60,6 +59,19 @@
 
 .attachments-row {
   margin-top: 30px;
+
+  .data-report-label {
+    width: initial;
+  }
+
+  .download-all-attachments {
+    margin: 0 5px;
+  }
+}
+
+input[type="checkbox"].download-attachment, .download-all-attachments {
+  margin-right: 5px;
+  vertical-align: sub;
 }
 
 .sdr-attachments-buttons {

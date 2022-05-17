@@ -124,31 +124,49 @@ window.beautify_details_field = () ->
   formatted_details = raw_txt.replace(/\\r\\n|\n|\r|\r\n|\\r|\\n/g, '<br/>')
   $('.sdr-details').html(formatted_details)
 
+window.addCorpusSubjects = () ->
+  $('.email-json-dump').each (index) ->
+    txt_wrapper = this
+    headerstxt = $(txt_wrapper).text()
+    headerObj = JSON.parse(headerstxt)
+    subject = headerObj['Subject']
+    $("input[name='subject line#{index}'").val(subject)
+
 $ ->
+  #addCorpusSubjects must be called first as beautify_email_headers formats the header data and doesn't give an id or
+  #class for any key
+  addCorpusSubjects()
   beautify_email_headers()
   beautify_details_field()
 
   $('#submitCorpus').click () ->
-    failedCalls = 0
-    $('.corpus-row').each (index)->
-      row = $(this)
-      attachmentId = parseInt(row.find('input[name="attachmentId"]').val(), 10)
-      category = $("input[name='category#{index}']:checked").val()
-      subject = row.find('input[name="subject line"]').val()
-      tags = (tag.name for tag in row.find('input[type="checkbox"]:checked'))
-      tags = tags.join(', ')
+    $('.corpus-row').each (index) ->
+      checked = $(".download-attachment[name='send to corpus #{index}']").is(':checked')
+      if checked
+        row = $(this)
+        attachmentId = parseInt(row.find('input[name="attachmentId"]').val(), 10)
+        category = $("input[name='category#{index}']:checked").val()
+        subject = $("input[name='subject line#{index}']").val()
+        tags = (tag.name for tag in row.find('input[type="checkbox"]:checked'))
+        tags = tags.join(', ')
 
-      $.ajax(
-        url: '/escalations/api/v1/escalations/sdr/disputes/submit_to_corpus'
-        method: 'POST'
-        headers: headers
-        data: {id: attachmentId, subject: subject, tag: tags, email: category }
-        success: (response) ->
-          console.log 'response', response
-        error: (error) ->
-          failedCalls++
-          std_msg_error(error.responseText, ['Unable to attachment data to corpus.'])
-      )
-      unless failedCalls > 0
-        std_msg_success('Attachments sent to Corpus', [], { reload: false })
-        $('.sdr-corpus-button').dropdown('toggle')
+        if category == '' || subject == ''
+          std_msg_error('A Category and a Subject are required for Corpus submissions', ['Data Missing'])
+        else
+          $.ajax(
+            url: '/escalations/api/v1/escalations/sdr/disputes/submit_to_corpus'
+            method: 'POST'
+            headers: headers
+            data: {id: attachmentId, subject: subject, tag: tags, email: category }
+            success: (response) ->
+              std_msg_success('Data sent to Corpus', [], { reload: false })
+            error: (error) ->
+              std_msg_error(error.responseText, ['Unable to send attachment data to corpus.'])
+          )
+    $('.sdr-corpus-button').dropdown('toggle')
+
+  $('.download-all-attachments').click () ->
+    check = $('.download-all-attachments').is(":checked")
+    $('.download-attachment').each ->
+      $(this).prop('checked', check)
+
