@@ -29,7 +29,7 @@
 
     .row.attachments-row
       .col-xs-6
-        %input{type: "checkbox", name: "all attachments", class: 'download-all-attachments'}
+        %input{type: "checkbox", name: "all attachments", class: 'corpus-all-attachments'}
         %label.data-report-label Attachments
       .col-xs-6.sdr-attachments-buttons
         - if @dispute.sender_domain_reputation_dispute_attachments.any?
@@ -108,7 +108,7 @@
         - if @dispute.sender_domain_reputation_dispute_attachments.any?
           - @dispute.sender_domain_reputation_dispute_attachments.each_with_index do |attachment, index|
             .card-header.attachment-collapse-header{id: "attachment-#{attachment.id}-header"}
-              %input{type: "checkbox", name: "send to corpus #{index}", class: 'download-attachment'}
+              %input{type: "checkbox", name: "send to corpus #{index}", class: 'corpus-attachment'}
               %a.sdr-attachment-link{href: "#{attachment.direct_upload_url}", download: "#{attachment.file_name}"}= attachment.file_name
               %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "attachment-#{attachment.id}-content"}
             .collapse{id: "attachment-#{attachment.id}-content", 'aria-labelledby': "attachment-#{attachment.id}-header"}
