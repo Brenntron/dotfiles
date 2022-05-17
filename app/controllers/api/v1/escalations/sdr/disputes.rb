@@ -131,7 +131,6 @@ module API
                 d = SenderDomainReputationDispute.find_by(id: dispute)
                 if d.status == SenderDomainReputationDispute::STATUS_ASSIGNED
                   d.update(status: SenderDomainReputationDispute::STATUS_NEW, case_assigned_at: nil)
-                  message = Bridge::DisputeEntryUpdateStatusEvent.new
                 end
 
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id

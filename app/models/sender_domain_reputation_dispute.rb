@@ -250,7 +250,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       dispute.reload
 
       message = Bridge::SdrDisputeUpdateStatusEvent.new
-      message.post(dispute)
+      message.post(dispute, :source_key => dispute.ticket_source_key)
 
     end
   end
