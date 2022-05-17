@@ -1,9 +1,9 @@
-.toolbar#sdr-index-toolbar{style: 'margin-bottom: -30px; z-index: 1; width: fit-content;'}
+.toolbar#sdr-index-toolbar
   %div
     %label.toolbar-section-label
       View
     %span.dropdown
-      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Show/Hide Columns
       .dropdown-menu.toolbar-dropdown#sdr-index-table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button', style: ''}
@@ -54,21 +54,23 @@
       %span.toolbar-button-text
         Take Ticket
 
-    %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped{ onclick: 'return_sdr_disputes()', type: 'button' }
-      %span.toolbar-button-text Return
-
-  %div
-    %label.toolbar-section-label
-      Info
-
-    %button.toolbar-button.dropdown-button-margin-right#sdr-whois-index-btn.esc-tooltipped.sdr-whois-btn{ disabled: true }
+    %button.toolbar-button.return-ticket-toolbar-button.esc-tooltipped{ onclick: 'return_sdr_disputes()', type: 'button' }
       %span.toolbar-button-text
-        WHOIS
+        Return
 
-  %div
-    %label.toolbar-section-label
-      Edit
-
-    %button.toolbar-button.dropdown-button-margin-right#sdr-adjust-rep-index-btn.esc-tooltipped.sdr-adjust-rep-btn{ disabled: true }
-      %span.toolbar-button-text
-        Adjust Reputation
+  -#  Add later with functionality or remove
+  -#%div
+  -#  %label.toolbar-section-label
+  -#    Info
+  -#
+  -#  %button.toolbar-button#sdr-whois-index-btn.esc-tooltipped.sdr-whois-btn{ disabled: true }
+  -#    %span.toolbar-button-text
+  -#      WHOIS
+  -#
+  -#%div
+  -#  %label.toolbar-section-label
+  -#    Edit
+  -#
+  -#  %button.toolbar-button#sdr-adjust-rep-index-btn.esc-tooltipped.sdr-adjust-rep-btn{ disabled: true }
+  -#    %span.toolbar-button-text
+  -#      Adjust Reputation

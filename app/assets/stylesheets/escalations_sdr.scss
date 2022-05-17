@@ -16,6 +16,7 @@
   padding-left: 15px;
 }
 
+<<<<<<< HEAD
 .sdr-research-data-title, .sdr-dispute-info-title {
   font-weight: 300;
   margin-bottom: 30px;
@@ -169,4 +170,14 @@
 
 .odd-column {
   background-color: #f2f2f2;
+}
+
+#sdr-index-toolbar {
+  margin-top: -10px;
+  z-index: 1;
+  width: fit-content;
+}
+
+#sdr-disputes-index_wrapper {
+  top: -55px;
 }

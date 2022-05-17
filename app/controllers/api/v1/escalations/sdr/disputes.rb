@@ -22,7 +22,7 @@ module API
                 dispute_ids = permitted_params[:dispute_ids]
                 SenderDomainReputationDispute.take_tickets(dispute_ids, user: current_user)
 
-                { user_display_name: current_user.display_name, dispute_ids: dispute_ids }
+                { username: current_user.cvs_username, dispute_ids: dispute_ids }
               end
             end
 
@@ -36,7 +36,7 @@ module API
                 authorize!(:update, SenderDomainReputationDispute)
 
                 SenderDomainReputationDispute.take_tickets(permitted_params[:dispute_id], user: current_user)
-                { user_display_name: current_user.display_name, dispute_id: permitted_params[:dispute_id] }
+                { username: current_user.cvs_username, dispute_id: permitted_params[:dispute_id] }
               end
             end
 
@@ -50,7 +50,7 @@ module API
                 authorize!(:update, SenderDomainReputationDispute)
 
                 SenderDomainReputationDispute.find(permitted_params[:dispute_id]).return_dispute
-                { user_display_name: current_user.display_name, dispute_id: permitted_params[:dispute_id] }
+                { username: current_user.cvs_username, dispute_id: permitted_params[:dispute_id] }
               end
             end
 
@@ -65,7 +65,7 @@ module API
 
                 SenderDomainReputationDispute.where(id: permitted_params[:dispute_ids]).each(&:return_dispute)
 
-                { user_display_name: current_user.display_name, dispute_ids: permitted_params[:dispute_ids] }
+                { username: current_user.cvs_username, dispute_ids: permitted_params[:dispute_ids] }
               end
             end
 
