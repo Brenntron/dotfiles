@@ -68,17 +68,17 @@
                               =attachment.file_name
                               %input{type: 'hidden', name: 'attachmentId', value: "#{attachment.id}"}
                             %td.alt-col.input-col.text-center
-                              %input{type: 'radio', value: 'spam', name: "category#{index}"}
+                              %input.email-category{type: 'radio', value: 'spam', name: "category#{index}"}
                             %td.input-col.text-center
-                              %input{type: "radio", value: 'phish', name: "category#{index}"}
+                              %input.email-category{type: "radio", value: 'phish', name: "category#{index}"}
                             %td.alt-col.input-col.text-center
-                              %input{type: "radio", value: 'virus', name: "category#{index}"}
+                              %input.email-category{type: "radio", value: 'virus', name: "category#{index}"}
                             %td.input-col.text-center
-                              %input{type: "radio", value: 'ham', name: "category#{index}"}
+                              %input.email-category{type: "radio", value: 'ham', name: "category#{index}"}
                             %td.alt-col.input-col.text-center
-                              %input{type: "radio", value: 'ads', name: "category#{index}"}
+                              %input.email-category{type: "radio", value: 'ads', name: "category#{index}"}
                             %td.input-col.text-center
-                              %input{type: "radio", value: 'not ads', name: "category#{index}"}
+                              %input.email-category{type: "radio", value: 'not ads', name: "category#{index}"}
                             %td.alt-col.input-col
                               %input{type: 'text', name: 'subject line', placeholder: attachment.email_header_data}
                             %td.input-col.text-center

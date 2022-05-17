@@ -129,9 +129,19 @@ window.open_corpus_dialog = () ->
 
   #check which attachments are checked
   #build table
-  #open dialog
-
   dialog.dialog('open')
+
+window.enable_send_to_corpus = () ->
+  submit = $('#submitCorpus')
+  enable = true
+  $('.corpus-row').each (index)->
+    unless $("input[name='category#{index}']:checked").val()
+      enable = false
+
+  if enable == true
+    $(submit).removeAttr('disabled')
+  else
+    $(submit).attr('disabled', 'disabled')
 
 
 $ ->
@@ -167,5 +177,5 @@ $ ->
   $('#send-to-corpus-wrapper').dialog({autoOpen : false, width: 1000});
 
   # Check / enable button (make sure each attachment has a category selected)
-#  $('#submitCorpus')
-  
+  $('.email-category').on 'change', ->
+    enable_send_to_corpus()
