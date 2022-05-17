@@ -65,17 +65,20 @@
   text-align: right;
 }
 
+.sdr-attachments-button-wrapper {
+  display: flex;
+  justify-content: end;
+  margin-bottom: 5px;
+}
+
 .sdr-attachments-button {
   background-color: #efefef;
-  color: #4E4E4E;
-  background-image: url(image_path('icon_download_dk_grey.svg'));
   background-position: 4px center;
   background-repeat: no-repeat;
   background-size: 18px 18px;
   border: none;
   border-radius: 2px;
   margin-left: 4px;
-  margin-top: -10px;
   padding: 5px 20px;
 
   span {
@@ -84,6 +87,24 @@
     font-weight: 700;
     margin-left: 8px;
   }
+}
+
+.sdr-corpus-button {
+  background-image: url(image_path('icon_submit_arrow_grey.svg'));
+}
+
+.open .sdr-corpus-button {
+  background-color: #60BFDD;
+  background-image: url(image_path('icon_submit_arrow.svg'));
+  color: white;
+}
+
+.submit-corpus {
+  background-color: #b9bdbd;
+  border: none;
+  color: white;
+  margin: 20px 0;
+  padding: 15px 20px;
 }
 
 .sdr-entries {
@@ -144,4 +165,8 @@
     }
     color: #4E4E4E;
   }
+}
+
+.odd-column {
+  background-color: #f2f2f2;
 }

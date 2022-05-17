@@ -127,3 +127,28 @@ window.beautify_details_field = () ->
 $ ->
   beautify_email_headers()
   beautify_details_field()
+
+  $('#submitCorpus').click () ->
+    failedCalls = 0
+    $('.corpus-row').each (index)->
+      row = $(this)
+      attachmentId = parseInt(row.find('input[name="attachmentId"]').val(), 10)
+      category = $("input[name='category#{index}']:checked").val()
+      subject = row.find('input[name="subject line"]').val()
+      tags = (tag.name for tag in row.find('input[type="checkbox"]:checked'))
+      tags = tags.join(', ')
+
+      $.ajax(
+        url: '/escalations/api/v1/escalations/sdr/disputes/submit_to_corpus'
+        method: 'POST'
+        headers: headers
+        data: {id: attachmentId, subject: subject, tag: tags, email: category }
+        success: (response) ->
+          console.log 'response', response
+        error: (error) ->
+          failedCalls++
+          std_msg_error(error.responseText, ['Unable to attachment data to corpus.'])
+      )
+      unless failedCalls > 0
+        std_msg_success('Attachments sent to Corpus', [], { reload: false })
+        $('.sdr-corpus-button').dropdown('toggle')

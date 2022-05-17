@@ -32,8 +32,75 @@
         %label.data-report-label Attachments
       .col-xs-6.sdr-attachments-buttons
         - if @dispute.sender_domain_reputation_dispute_attachments.any?
-          -#%button.button.sdr-attachments-button
-            %span Download All
+          .sdr-attachments-button-wrapper
+            .sdr-corpus-button-wrapper
+              %button{data: {toggle: 'dropdown'}, class: 'button sdr-attachments-button sdr-corpus-button'}
+                %span
+                  send to corpus
+              %ul.dropdown-menu.text-center
+                %table
+                  %thead
+                    %tr
+                      %th
+                        File
+                      %th
+                        Spam
+                      %th
+                        Phish
+                      %th
+                        Virus
+                      %th
+                        Ham
+                      %th
+                        Ads
+                      %th
+                        Not Ads
+                      %th
+                        Subject Line
+                      %th
+                        Spam
+                      %th
+                        Marketing
+                      %th
+                        Social Network
+                      %th
+                        Bulk
+                      %th
+                        Virus
+                  %tbody
+                  - @dispute.sender_domain_reputation_dispute_attachments.each_with_index do |attachment, index|
+                    %tr{id: "corpusRow#{index}", class: 'corpus-row'}
+                      %td
+                        =attachment.file_name
+                        %input{type: 'hidden', name: 'attachmentId', value: "#{attachment.id}"}
+                      %td.odd-column
+                        %input{type: 'radio', value: 'spam', name: "category#{index}"}
+                      %td
+                        %input{type: "radio", value: 'phish', name: "category#{index}"}
+                      %td.odd-column
+                        %input{type: "radio", value: 'virus', name: "category#{index}"}
+                      %td
+                        %input{type: "radio", value: 'ham', name: "category#{index}"}
+                      %td.odd-column
+                        %input{type: "radio", value: 'ads', name: "category#{index}"}
+                      %td
+                        %input{type: "radio", value: 'not ads', name: "category#{index}"}
+                      %td.odd-column
+                        %input{type: 'text', name: 'subject line', placeholder: attachment.email_header_data}
+                      %td
+                        %input{type: 'checkbox', name: 'spam'}
+                      %td.odd-column
+                        %input{type: 'checkbox', name: 'marketing'}
+                      %td
+                        %input{type: 'checkbox', name: 'social network'}
+                      %td.odd-column
+                        %input{type: 'checkbox', name: 'bulk'}
+                      %td
+                        %input{type: 'checkbox', name: 'virus'}
+                %button#submitCorpus.submit-corpus
+                  Submit to Corpus
+            -#%button.button.sdr-attachments-button.sdr-download-all-button
+              %span download all
 
     .row
       .col-xs-12
