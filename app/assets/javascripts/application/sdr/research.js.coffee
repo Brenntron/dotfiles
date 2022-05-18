@@ -188,3 +188,8 @@ $ ->
   # Check / enable button (make sure each attachment has a category selected)
   $('.email-category').on 'change', ->
     enable_send_to_corpus()
+
+  $('.corpus-all-attachments').click () ->
+    checked = $('.corpus-all-attachments').is(':checked')
+    $('.corpus-attachment').each () ->
+      $(this).prop('checked', checked)
