@@ -14,7 +14,7 @@ class Bridge::SdrDisputeUpdateStatusEvent < Bridge::BaseMessage
         resolution: dispute.resolution,
         resolution_message: dispute.resolution_comment,
         status: dispute.status,
-        sugg_type: dispute.disposition_suggested
+        sugg_type: dispute.suggested_disposition
     }
     super(message: {source_authority: source_authority,
                     source_key: source_key,
