@@ -41,13 +41,6 @@ $ ->
     domain = domain.replace('https://', '')
     domain - domain.replace(/&/g, '&amp;')
 
-    console.log domain
-    console.log reputation
-    console.log platform
-    console.log priority
-    console.log customer
-    console.log details
-
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/sdr/disputes'
       method: 'POST'
