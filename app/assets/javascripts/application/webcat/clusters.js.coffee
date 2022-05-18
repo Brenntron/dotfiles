@@ -1006,7 +1006,7 @@ window.webcat_clusters_refresh = () ->
 
 window.webcat_platform_filter = () ->
   platforms = $("input.show-platforms-filter:checked")
-  if $(platforms).length > 1 || $(platforms).length == 0
+  if $(platforms).length == 3 || $(platforms).length == 0
     selected_platform = 'All'
   else
     selected_platform = $("input.show-platforms-filter:checked").val()

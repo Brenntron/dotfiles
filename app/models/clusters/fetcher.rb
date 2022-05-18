@@ -3,10 +3,12 @@ class Clusters::Fetcher
 
   WSA_DATA_PROVIDER = Clusters::Wbnp::DataFetcher
   NGFW_DATA_PROVIDER = Clusters::Ngfw::DataFetcher
+  UMBRELLA_DATA_PROVIDER = Clusters::Umbrella::DataFetcher
 
   ALL_DATA_PROVIDERS = [
     WSA_DATA_PROVIDER,
-    NGFW_DATA_PROVIDER
+    NGFW_DATA_PROVIDER,
+    UMBRELLA_DATA_PROVIDER
   ]
 
   CLUSTERS_PAGE_LIMIT = 1000
@@ -46,6 +48,8 @@ class Clusters::Fetcher
       [WSA_DATA_PROVIDER]
     when Clusters::Ngfw::DataFetcher::DATA_PATFORM
       [NGFW_DATA_PROVIDER]
+    when Clusters::Umbrella::DataFetcher::DATA_PLATFORM
+      [UMBRELLA_DATA_PROVIDER]
     else
       ALL_DATA_PROVIDERS
     end

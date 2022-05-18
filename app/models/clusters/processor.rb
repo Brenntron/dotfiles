@@ -3,7 +3,8 @@ class Clusters::Processor
 
   PLATFORM_PROVIDERS = {
     'WSA' => Clusters::Wbnp::Processor,
-    'NGFW' => Clusters::Ngfw::Processor
+    'NGFW' => Clusters::Ngfw::Processor,
+    'Umbrella' => Clusters::Umbrella::Processor,
   }
 
   def initialize(clusters, user)
