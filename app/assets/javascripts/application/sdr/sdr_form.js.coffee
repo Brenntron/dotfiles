@@ -46,11 +46,11 @@ $ ->
       method: 'POST'
       data:
         sender_domain_entry: domain,
-        reputation: reputation,
+        suggested_disposition: reputation,
         customer: customer,
         platform: platform,
         priority: priority,
-        details: details
+        description: details
       success: (response) ->
         std_msg_success('Dispute Created.', [], reload: true)
       error: (response) ->
