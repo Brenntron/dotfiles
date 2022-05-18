@@ -810,7 +810,6 @@ button {
 .ticket-status-button {background-image: url(image_path('icon_status.svg'));}
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .mark-related-button {background-image: url(image_path('icon_related.svg'));}
-.sdr-ticket-owner-button {background-image: url(image_path('icon_user_white.svg'));}
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
@@ -1011,7 +1010,6 @@ button {
 .show-col-button:hover,
 .mark-related-button:hover,
 .ticket-status-button:hover,
-.sdr-ticket-owner-button:hover,
 .ticket-owner-button:hover,
 .ticket-owner-unassigned-button:hover,
 .adjust-reptool-button:hover,
@@ -1038,7 +1036,6 @@ button {
 .show-col-button:focus,
 .mark-related-button:focus,
 .ticket-status-button:focus,
-.sdr-ticket-owner-button:focus,
 .ticket-owner-button:focus,
 .adjust-reptool-button:focus,
 .adjust-wlbl-button:focus,
@@ -4206,7 +4203,7 @@ input.communication-subject {
 
 .note-edit-button {background-image: url(image_path('icon_edit.svg'));}
 .note-copy-button {background-image: url(image_path('icon_copy.svg'));}
-.note-delete-button, .filerep-note-delete-button {background-image: url(image_path('icon_delete.svg'));}
+.note-delete-button, .filerep-note-delete-button, .sdr-note-delete-button {background-image: url(image_path('icon_delete.svg'));}
 .note-save-button {background-image: url(image_path('icon_save_grey.svg'));}
 .note-cancel-button {background-image: url(image_path('icon_cancel.svg'));}
 
@@ -5136,11 +5133,6 @@ table > tbody > tr > td.dispute_rep_tools {
   display: inline-block;
 }
 
-.dropdown.open .sdr-ticket-owner-button {
-  background-color: $bug-section-color;
-  border-radius: 2px 2px 0 0 ;
-}
-
 .dropdown.open .ticket-owner-button {
   background-color: $bug-section-color;
   border-radius: 2px 2px 0 0 ;
@@ -5185,7 +5177,7 @@ table > tbody > tr > td.dispute_rep_tools {
   border-radius: 2px 2px 0 0 ;
 }
 
-.dispute_rep_tools .dropdown-menu h3, .dispute-owner-buttons-wrapper .dropdown-menu h3, .sdr-dispute-owner-buttons-wrapper .dropdown-menu h3 {
+.dispute_rep_tools .dropdown-menu h3, .dispute-owner-buttons-wrapper .dropdown-menu h3 {
   color: $content-bg-color;
   padding: 0 10px;
   font-weight: 400;
@@ -6334,7 +6326,7 @@ input[type="radio"].ticket-status-radio {
   min-height: 40px;
 }
 
-.non-resolution-submit-wrapper .content-label-sm, .sdr-non-resolution-submit-wrapper .content-label-sm {
+.non-resolution-submit-wrapper .content-label-sm {
   margin-top: 12px;
 }
 
@@ -6865,23 +6857,13 @@ td.ticket-total::before {
     background-color: $bug-section-color !important;
   }
 }
-.container_unassign, .sdr-container_unassign {
+.container_unassign {
   display: inline-block;
   float: right;
 }
 #index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
   margin-top: 6px;
   margin-bottom: 0;
-}
-
-.sdr-non-resolution-submit-wrapper {
-  padding: 12px !important;
-  background-color: $faint-neutral-color;
-  border-radius: 0 4px 4px 0;
-  width: 200px;
-  top: 0;
-  left: 100%;
-  height: 100%;
 }
 
 .non-resolution-submit-wrapper {
@@ -6895,7 +6877,7 @@ td.ticket-total::before {
   height: 100%;
 }
 
-.sdr-non-resolution-submit-wrapper textarea, non-resolution-submit-wrapper textarea, .resolution-comment-wrapper textarea {
+.non-resolution-submit-wrapper textarea, .resolution-comment-wrapper textarea {
   width: 100%;
   margin: auto;
   border: 1px solid darken($faint-neutral-color, 5%);
@@ -6904,11 +6886,11 @@ td.ticket-total::before {
   min-height: 50px;
 }
 
-.non-resolution-submit-wrapper button, .sdr-non-resolution-submit-wrapper button {
+.non-resolution-submit-wrapper button {
   margin: 20px auto 8px auto;
 }
 
-.non-resolution-submit-wrapper:hover, .sdr-non-resolution-submit-wrapper:hover {
+.non-resolution-submit-wrapper:hover {
   background-color: $faint-neutral-color !important;
 }
 
@@ -6919,7 +6901,7 @@ td.ticket-total::before {
   margin-top: -56px;
 }
 
-.non-resolution-submit-wrapper, .sdr-non-resolution-submit-wrapper {
+.non-resolution-submit-wrapper {
   display: none;
 }
 
@@ -7081,25 +7063,14 @@ table.dispute-entry-table tbody tr.selected {
   float: left;
 }
 
-.dispute-owner-buttons-wrapper, .sdr-dispute-owner-buttons-wrapper {
+.dispute-owner-buttons-wrapper {
   display: inline-block;
   margin-top: -4px;
   margin-left: 10px;
 }
 
-.sdr-dispute-owner-buttons-wrapper .dropdown.open, .sdr-dispute-owner-buttons-wrapper .dropdown.open {
-  background-color: transparent !important;
-}
-
 .dispute-owner-buttons-wrapper .dropdown.open {
   background-color: transparent !important;
-}
-
-.sdr-dispute-owner-buttons-wrapper .sdr-ticket-owner-button {
-  background-image: url(image_path('icon_user_white.svg'));
-  &:hover {
-    background-color: $primary-section-color !important;
-  }
 }
 
 .dispute-owner-buttons-wrapper .ticket-owner-button {
@@ -7109,7 +7080,7 @@ table.dispute-entry-table tbody tr.selected {
   }
 }
 
-.dispute-owner-buttons-wrapper .dropdown-menu, .sdr-dispute-owner-buttons-wrapper .dropdown-menu {
+.dispute-owner-buttons-wrapper .dropdown-menu {
   border-radius: 0 4px 4px 4px;
   border: none;
   background-color: $primary-section-color;
@@ -7118,7 +7089,7 @@ table.dispute-entry-table tbody tr.selected {
   left: 3px;
 }
 
-.dispute-owner-buttons-wrapper h3, .sdr-dispute-owner-buttons-wrapper h3 {
+.dispute-owner-buttons-wrapper h3 {
   padding: 2px 10px !important;
 }
 
@@ -7135,8 +7106,7 @@ table.dispute-entry-table tbody tr.selected {
   margin: 0 6px 0 6px;
 }
 
-.dispute-owner-buttons-wrapper .inline-tool-content-wrapper, .sdr-dispute-owner-buttons-wrapper
-.inline-tool-content-wrapper {
+.dispute-owner-buttons-wrapper .inline-tool-content-wrapper {
   padding-bottom: 20px;
 }
 
@@ -11168,7 +11138,7 @@ div[aria-describedby='create-detection-dialog'] {
 
 // FF - tiny vertical alignment fix for 2nd button in this panel
 @-moz-document url-prefix() {
-  .dispute-owner-buttons-wrapper button#index_change_assign, .sdr-dispute-owner-buttons-wrapper button#index_change_assign {
+  .dispute-owner-buttons-wrapper button#index_change_assign {
     position: relative;
     top: -2px;
   }
@@ -11207,7 +11177,7 @@ div[aria-describedby='create-detection-dialog'] {
     .missing-data {
       font-size: 12px;
     }
-    .dispute-owner-buttons-wrapper, .sdr-dispute-owner-buttons-wrapper {
+    .dispute-owner-buttons-wrapper {
       margin-left: 1px;
     }
   }

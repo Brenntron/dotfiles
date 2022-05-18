@@ -15,6 +15,7 @@ class Escalations::Sdr::DisputesController < ApplicationController
   def show
     @dispute = SenderDomainReputationDispute.where(id: params[:id]).first
     @beaker_info = @dispute.beaker_info
+    @versioned_items = @dispute.compose_versioned_items
   end
 
   private
