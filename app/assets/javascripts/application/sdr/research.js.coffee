@@ -130,6 +130,25 @@ window.addCorpusSubjects = () ->
     subject = headerObj['Subject']
     $("input[name='subject line#{index}'").val(subject)
 
+window.open_corpus_dialog = () ->
+  dialog = $('#send-to-corpus-wrapper')
+
+  #check which attachments are checked
+  #build table
+  dialog.dialog('open')
+
+window.enable_send_to_corpus = () ->
+  submit = $('#submitCorpus')
+  enable = false
+  $('.corpus-row').each (index)->
+    if $("input[name='category#{index}']:checked").is(':checked') && $(".corpus-attachment[name='send to corpus #{index}']").is(':checked')
+      enable = true
+
+  if enable == true
+    $(submit).removeAttr('disabled')
+  else
+    $(submit).attr('disabled', 'disabled')
+
 $ ->
   #addCorpusSubjects must be called first as beautify_email_headers formats the header data and doesn't give an id or
   #class for any key
@@ -163,8 +182,9 @@ $ ->
           )
     $('.sdr-corpus-button').dropdown('toggle')
 
-  $('.corpus-all-attachments').click () ->
-    check = $('.corpus-all-attachments').is(":checked")
-    $('.corpus-attachment').each ->
-      $(this).prop('checked', check)
+  # Initialize send to corpus dialog
+  $('#send-to-corpus-wrapper').dialog({autoOpen : false, width: 1000});
 
+  # Check / enable button (make sure each attachment has a category selected)
+  $('.email-category').on 'change', ->
+    enable_send_to_corpus()
