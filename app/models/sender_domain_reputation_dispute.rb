@@ -618,4 +618,12 @@ class SenderDomainReputationDispute < ApplicationRecord
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
+
+  def customer_org
+    if customer.nil?
+      ""
+    else
+      customer.company.nil? ? "" : customer.company.name
+    end
+  end
 end
