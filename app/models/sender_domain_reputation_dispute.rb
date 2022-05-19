@@ -619,6 +619,14 @@ class SenderDomainReputationDispute < ApplicationRecord
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
 
+  def customer_name
+    customer.nil? ? "" : customer.name
+  end
+
+  def customer_email
+    customer.nil? ? "" : customer.email
+  end
+
   def customer_org
     if customer.nil?
       ""

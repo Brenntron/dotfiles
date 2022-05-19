@@ -175,20 +175,20 @@
       .submitter-org-wrapper
         %label.content-label-sm
           Submitter Organization
-        %p= @dispute.customer.company.name
+        %p= @dispute.customer_org
 
     .col-xs-2
       .contact-name-wrapper
         %label.content-label-sm
           Contact Name
-        %p.dispute-edit-field#dispute-customer-name= @dispute.customer.name
-        %input.dispute-edit-input#dispute-customer-name-input{type: 'text', value: "#{@dispute.customer.name}"}
+        %p.dispute-edit-field#dispute-customer-name= @dispute.customer_name
+        %input.dispute-edit-input#dispute-customer-name-input{type: 'text', value: "#{@dispute.customer_name}"}
 
       .contact-email-wrapper
         %label.content-label-sm
           Contact Email
         %p.dispute-edit-field#dispute-customer-email= @dispute.customer.email
-        %input.dispute-edit-input#dispute-customer-email-input{type: 'text', value: "#{@dispute.customer.email}"}
+        %input.dispute-edit-input#dispute-customer-email-input{type: 'text', value: "#{@dispute.customer_email}"}
 
 %ul.nav.nav-tabs#research-tab{role: 'tablist'}
   %li.nav-item{role:'presentation'}
