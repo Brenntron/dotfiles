@@ -225,24 +225,24 @@ window.prep_submit_to_corpus = () ->
     }
 
     # show a loader while the file is being submitted
+    loader = '<span class="inline-row-loader"><span class="sync-button sync_rotate"></span>Submitting to Corpus...</span>'
     $(this).find('td').each (index) ->
       if index == 0
         return
       else if index == 1
         $(this).attr('colspan', '12')
+        $(this).removeClass('alt-col')
         $(this).addClass('feedback-col')
       else
         $(this).remove()
 
-    $('.feedback-col').text('Sending to Corpus...')
-
+    $('.feedback-col').html(loader)
     submit_to_corpus(data)
 
 
 
 window.submit_to_corpus = (attachment_data) ->
   # actual submission
-  debugger
   $.ajax(
     url: '/escalations/api/v1/escalations/sdr/disputes/submit_to_corpus'
     method: 'POST'
