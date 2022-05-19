@@ -132,8 +132,12 @@ window.beautify_details_field = () ->
 window.open_corpus_dialog = () ->
   dialog = $('#send-to-corpus-wrapper')
   att_table = $(dialog).find('.attachment-to-send-table tbody')
-  $('#submitCorpus').attr('disabled', 'disabled')
-  # clear table
+  submit_btn = $('#submitCorpus')
+
+  # dialog reset
+  $(dialog).find('.dialog-close').addClass('hidden')
+  $(submit_btn).show()
+  $(submit_btn).attr('disabled', 'disabled')
   $(att_table).empty()
 
   if $('.corpus-attachment:checked').length > 0
@@ -207,6 +211,13 @@ window.enable_send_to_corpus = () ->
 
 window.prep_submit_to_corpus = () ->
   dialog = $('#send-to-corpus-wrapper')
+  close_btn = $(dialog).find('.dialog-close')
+
+  # remove ability to hit submit again after initial submit
+  $('#submitCorpus').hide()
+  $(close_btn).removeClass('hidden')
+  $(close_btn).on 'click', ->
+    $(dialog).dialog('close')
 
   $(dialog).find('.submit-attachment-row').each ->
     attachment_id = $(this).attr('data-id')
@@ -232,6 +243,7 @@ window.prep_submit_to_corpus = () ->
       else if index == 1
         $(this).attr('colspan', '12')
         $(this).removeClass('alt-col')
+        $(this).removeClass('text-center')
         $(this).addClass('feedback-col')
       else
         $(this).remove()
@@ -249,11 +261,14 @@ window.submit_to_corpus = (attachment_data) ->
     headers: headers
     data: attachment_data
     success: (response) ->
-      debugger
-  #        std_msg_success('Data sent to Corpus', [], { reload: false })
+      att_feedback_col = $('.submit-attachment-row[data-id=' + response.data + '] .feedback-col')
+      success_msg = "<div class='inline-msg success-msg'>Attachment successfully submitted to Corpus.</div>"
+      $(att_feedback_col).html(success_msg)
+
     error: (error) ->
-      debugger
-  #        std_msg_error(error.responseText, ['Unable to send attachment data to corpus.'])
+      att_feedback_col = $('.submit-attachment-row[data-id=' + response.data + '] .feedback-col')
+      err_msg = "<div class='inline-msg error-msg'>Unable to submit attachment to Corpus, please try again later.</div>"
+      $(att_feedback_col).html(err_msg)
   )
 
 

@@ -13573,15 +13573,3 @@ input.wl-bl-list-inline {
 .no-border {
   border: none !important;
 }
-
-#send-to-corpus-wrapper {
-  padding: 15px 15px 40px 15px;
-  .attachment-to-send-table {
-    margin-bottom: 20px;
-    th {
-      color: $content-label-color;
-      text-transform: none;
-      font-weight: 400;
-    }
-  }
-}
