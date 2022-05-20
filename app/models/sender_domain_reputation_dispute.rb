@@ -15,6 +15,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
 
+  NEW = 'NEW'
   STATUS_NEW                = 'NEW'
   STATUS_ASSIGNED           = 'ASSIGNED'
   STATUS_RESEARCHING        = 'RESEARCHING'
@@ -169,6 +170,48 @@ class SenderDomainReputationDispute < ApplicationRecord
         end
       end
     end
+  end
+
+  def self.find_customer(customer)
+    email = customer.split(':').last
+    Customer.find_by_email(email)
+  end
+
+  def self.create_action(bugzilla_rest_session, sender_domain_entry, priority, suggested_disposition, platform, customer, description, user_id, status=NEW)
+
+    summary = "New Senders Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    # Does a description need to go in here and be in the form?
+    full_description = %Q{
+          IPs/URIs: #{sender_domain_entry}
+    }
+
+    bug_attrs = {
+      'product' => 'Escalations Console',
+      'component' => 'IP/Domain',
+      'summary' => summary,
+      'version' => 'unspecified',
+      'description' => full_description,
+      'priority' => priority,
+      'classification' => 'unclassified',
+    }
+
+    platform_record = Platform.find_by_public_name(platform) if platform
+    cust = find_customer(customer) if customer
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    new_dispute = SenderDomainReputationDispute.create!(id: bug_proxy.id,
+                                  user_id: user_id,
+                                  sender_domain_entry: sender_domain_entry,
+                                  priority: priority,
+                                  suggested_disposition: suggested_disposition,
+                                  platform_id: platform_record&.id,
+                                  submitter_type: 'Internal',
+                                  status: status,
+                                  customer_id: cust&.id,
+                                  description: description)
+
+    new_dispute
   end
 
   def self.auto_resolve_on_duplicate(dispute)

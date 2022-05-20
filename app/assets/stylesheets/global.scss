@@ -4581,7 +4581,8 @@ td.wbrs-highlight, td.sbrs-highlight {
 #advanced-search-wrapper input,
 #new-complaint-form input,
 #categorize-urls-form-wrapper input,
-.new-dispute-form input {
+.new-dispute-form input,
+#new-sdr-dispute-form input {
   margin-bottom: 8px;
   background-color: transparent;
   border: 1px solid darken($faint-neutral-color, 5%);
