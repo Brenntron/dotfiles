@@ -233,11 +233,7 @@ module API
               end
 
               if params[:comment].present?
-                if status == SenderDomainReputationDispute::STATUS_RESOLVED
-                  comment = status + ' : ' + resolution + ' - ' + params[:comment]
-                else
-                  comment = status + ' - ' + params[:comment]
-                end
+                comment = params[:comment]
               end
 
               disputes = SenderDomainReputationDispute.where(id: params['dispute_ids'])
