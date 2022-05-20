@@ -8,12 +8,12 @@
       %span.nav-toolbar-icon-large.icon-queue
 
   .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
-    %a{href: '#', class: 'dropdown-toggle', id: 'new-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    %a{href: '#', class: 'dropdown-toggle', id: 'new-sdr-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-new-white'}
       New
-    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-dispute'}
+    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-sdr-dispute'}
       %h3.nav-tool-dropdown-header.inverse
-        New Dispute
+        New Sender Domain Dispute
       .nav-tool-content-wrapper#new-dispute-wrapper
         = render 'escalations/sdr/disputes/new'
 

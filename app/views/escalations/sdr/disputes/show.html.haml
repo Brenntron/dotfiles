@@ -151,7 +151,8 @@
         %label.content-label-sm
           Platform
         .disposition
-          = @dispute.platform.public_name
+          - unless @dispute.platform.blank?
+            = @dispute.platform.public_name
         %br
       .dispute-source-wrapper
         %label.content-label-sm
@@ -175,37 +176,37 @@
       .submitter-org-wrapper
         %label.content-label-sm
           Submitter Organization
-        %p= @dispute.customer.company.name
+        %p= @dispute.customer_org
 
     .col-xs-2
       .contact-name-wrapper
         %label.content-label-sm
           Contact Name
-        %p.dispute-edit-field#dispute-customer-name= @dispute.customer.name
-        %input.dispute-edit-input#dispute-customer-name-input{type: 'text', value: "#{@dispute.customer.name}"}
+        %p.dispute-edit-field#dispute-customer-name= @dispute.customer_name
+        %input.dispute-edit-input#dispute-customer-name-input{type: 'text', value: "#{@dispute.customer_name}"}
 
       .contact-email-wrapper
         %label.content-label-sm
           Contact Email
-        %p.dispute-edit-field#dispute-customer-email= @dispute.customer.email
-        %input.dispute-edit-input#dispute-customer-email-input{type: 'text', value: "#{@dispute.customer.email}"}
+        %p.dispute-edit-field#dispute-customer-email= @dispute.customer_email
+        %input.dispute-edit-input#dispute-customer-email-input{type: 'text', value: "#{@dispute.customer_email}"}
 
 %ul.nav.nav-tabs#research-tab{role: 'tablist'}
   %li.nav-item{role:'presentation'}
-    %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
-      communication
-  %li.nav-item{role:'presentation'}
     %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
       Research
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+      Communication
 
-.tab-content.content-wrapper#bug-tab-content
-  .tab-pane#communication_tab{role: 'tabpanel'}
-    = render 'escalations/sdr/disputes/communication_tab'
 .tab-content.content-wrapper#bug-tab-content
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/sdr/disputes/research_tab'
+  .tab-pane#communication_tab{role: 'tabpanel'}
+    = render 'escalations/sdr/disputes/communication_tab'
 
 :javascript
   $(document).ready(function(){
   get_sdr_research_data("#{@dispute.sender_domain_entry}")
   })
+

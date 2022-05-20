@@ -30,6 +30,7 @@
 //= require application/sdr/disputes
 //= require application/sdr/research
 //= require application/sdr/communications
+//= require application/sdr/sdr_form
 //= require application/helpers
 //= require clipboard
 //= require moment
