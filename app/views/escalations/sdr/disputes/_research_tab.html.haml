@@ -29,7 +29,8 @@
 
     .row.attachments-row
       .col-xs-6
-        %input{type: "checkbox", name: "all attachments", class: 'corpus-all-attachments'}
+        - if @dispute.sender_domain_reputation_dispute_attachments.any?
+          %input{type: "checkbox", name: "all attachments", class: 'corpus-all-attachments'}
         %label.data-report-label Attachments
       .col-xs-6.sdr-attachments-buttons
         - if @dispute.sender_domain_reputation_dispute_attachments.any?
@@ -158,13 +159,16 @@
           %label.data-report-label Beaker
       .row
         .col-xs-12
-          .card-header.beaker-collapse-header#domain-beaker-header
-            %span.sdr-beaker-item= @dispute.sender_domain_entry
-            %button.expand-row-button-inline.shown{'data-toggle': 'collapse', type: 'button', 'data-target': "#sdr-beaker-domain-content", 'aria-expanded': 'true', 'aria-controls': "sdr-beaker-domain-content"}
-          .collapse.in#sdr-beaker-domain-content{'aria-labelledby': "domain-beaker-header"}
-            .card-body
-              %pre.data-report-code-content.beaker-json-dump
-                = @beaker_info
+          - if @beaker_info.blank?
+            %span.missing-data Unable to grab data from beaker
+          - else
+            .card-header.beaker-collapse-header#domain-beaker-header
+              %span.sdr-beaker-item= @dispute.sender_domain_entry
+              %button.expand-row-button-inline.shown{'data-toggle': 'collapse', type: 'button', 'data-target': "#sdr-beaker-domain-content", 'aria-expanded': 'true', 'aria-controls': "sdr-beaker-domain-content"}
+            .collapse.in#sdr-beaker-domain-content{'aria-labelledby': "domain-beaker-header"}
+              .card-body
+                %pre.data-report-code-content.beaker-json-dump
+                  = @beaker_info
 
           - if @dispute.sender_domain_reputation_dispute_attachments.any?
             - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|

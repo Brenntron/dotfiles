@@ -151,7 +151,8 @@
         %label.content-label-sm
           Platform
         .disposition
-          = @dispute.platform.public_name
+          - unless @dispute.platform.blank?
+            = @dispute.platform.public_name
         %br
       .dispute-source-wrapper
         %label.content-label-sm
@@ -198,9 +199,6 @@
     %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
       Communication
 
-.tab-content.content-wrapper#bug-tab-content
-  .tab-pane#communication_tab{role: 'tabpanel'}
-    = render 'escalations/sdr/disputes/communication_tab'
 .tab-content.content-wrapper#bug-tab-content
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/sdr/disputes/research_tab'

@@ -32,7 +32,6 @@
                 = format_date(email.created_at)
                 %br
                 =email.created_at.strftime("%H:%M:%S")
-
           -@dispute.sender_domain_reputation_dispute_comments.recent_first.each do |comment|
             %tr.note-history-row
               %td.alt-col.icon-col
@@ -109,7 +108,6 @@
             %th Template Name
             %th Description
             %th.min70
-
           -SenderDomainReputationEmailTemplate.all.each do |template|
             %tr
               %td=template.template_name
