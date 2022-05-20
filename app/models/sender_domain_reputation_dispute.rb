@@ -334,7 +334,7 @@ class SenderDomainReputationDispute < ApplicationRecord
     dispute_fields['id'] = dispute_fields['id'].split(/[\s,]+/) if dispute_fields['id'].present?
 
     if dispute_params['case_owner'].present?
-      user = User.find_by(display_name: dispute_params.delete('case_owner'))
+      user = User.find_by(cvs_username: dispute_params.delete('case_owner'))
       dispute_fields['user_id'] = user.id
     end
 

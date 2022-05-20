@@ -1,17 +1,15 @@
 .content-wrapper
-  .row.top-margin
-    #sdr-loading-gear.webrep-loader-wrapper
-      .gear-loader-wrapper
-        = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
-      %span.loader-msg Loading data...
+  .row
+    .col-xs-12
+      %h1#sdr-index-title Open Tickets
 
-  %h1#sdr-index-title Open Tickets
-  %span.refresh-message#refresh-working-msg
-  %span.refresh-message#refresh-error-msg
-  #sdr_searchref_container{ onmouseover: 'triggerTooltips(this)' }
-  = render('index_toolbar')
+      #sdr-loading-gear.webrep-loader-wrapper
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+        %span.loader-msg Loading data...
 
-  %input{type: 'hidden', name: 'token', value: "#{current_user.authentication_token}"}
+      #sdr_searchref_container{ onmouseover: 'triggerTooltips(this)' }
+      = render('index_toolbar')
 
   .row
     .col-xs-12
@@ -37,3 +35,4 @@
             %th#contact-name Contact Name
             %th#contact-email Contact Email
             %th#submitter-org Submitter Org
+        %tbody
