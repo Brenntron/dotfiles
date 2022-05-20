@@ -93,6 +93,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       end
 
       new_dispute.id = bug_proxy.id
+      new_dispute.bridge_packet = message_payload.to_json
       new_dispute.meta_data = message_payload[:payload][:meta_data] if message_payload[:payload][:meta_data].present?
       new_dispute.user_id = user.id
       new_dispute.sender_domain_entry = message_payload[:payload][:sender_domain_entry]
@@ -128,11 +129,25 @@ class SenderDomainReputationDispute < ApplicationRecord
       #end
 
       new_dispute.get_and_save_beaker_data
+      #retry
+      if new_dispute.beaker_info.blank?
+        new_dispute.get_and_save_beaker_data
+      end
 
       if message_payload["attachments"].present?
         message_payload["attachments"].each do |dispute_attachment|
           SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, dispute_attachment, user, new_dispute)
         end
+        #retry for sometimes it gets weird
+        if new_dispute.sender_domain_reputation_dispute_attachments.size != message_payload["attachments"].size
+          new_dispute.sender_domain_reputation_dispute_attachments.destroy_all
+          new_dispute.reload
+          message_payload["attachments"].each do |dispute_attachment|
+            SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, dispute_attachment, user, new_dispute)
+          end
+        end
+
+
         new_dispute.reload
       end
 
@@ -170,6 +185,14 @@ class SenderDomainReputationDispute < ApplicationRecord
         end
       end
     end
+
+    if new_dispute.sender_domain_reputation_dispute_attachments.size != message_payload["attachments"].size
+      new_dispute.sender_domain_reputation_dispute_attachments.destroy_all
+      new_dispute.destroy
+      conn = ::Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+      conn.post
+    end
+
   end
 
   def self.find_customer(customer)
@@ -228,6 +251,9 @@ class SenderDomainReputationDispute < ApplicationRecord
   def retrieve_attachments_beaker_data
     self.sender_domain_reputation_dispute_attachments.each do |attachment|
       attachment.retrieve_beaker_data_and_save
+      if attachment.beaker_info.blank?
+        attachment.retrieve_beaker_data_and_save
+      end
     end
   end
 
