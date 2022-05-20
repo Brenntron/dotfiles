@@ -155,8 +155,12 @@ class SenderDomainReputationDispute < ApplicationRecord
         raise "attachments failed to save"
       end
 
+      ###seperating this to try to prevent cases where email_header_data is "nil" in retrieve_attachments_beaker_data even though there is data.
       if new_dispute.sender_domain_reputation_dispute_attachments.present?
         new_dispute.parse_all_email_file_headers(bugzilla_rest_session)
+      end
+      new_dispute.reload
+      if new_dispute.sender_domain_reputation_dispute_attachments.present?
         new_dispute.retrieve_attachments_beaker_data
       end
 
@@ -630,7 +634,12 @@ class SenderDomainReputationDispute < ApplicationRecord
     begin
 
       mail_data_params[:from_hdr] = [{"addr" => self.sender_domain_entry}]
-      data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+      begin
+        data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+      rescue
+        data_response = ::Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+      end
+
       if data_response.present?
         data_response.keys.each do |key|
           begin

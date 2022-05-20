@@ -190,7 +190,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
     domain_of_parent = self.sender_domain_reputation_dispute.domain_name
 
     begin
-
+      self.reload
       headers = JSON.parse(self.email_header_data)
       possible_from = []
       headers.keys.each do |key|
@@ -208,7 +208,12 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
       possible_from.each do |from_email|
         mail_data_params[:from_hdr] = [{"addr" => from_email}]
-        data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        begin
+          data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        rescue
+          data_response = ::Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        end
+
         if data_response.present?
           data_response.keys.each do |key|
             begin
@@ -226,39 +231,6 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
         end
 
       end
-
-
-
-
-
-      #mx_records = SenderDomainReputationDisputeAttachment.get_mx_records(domain_of_parent)
-
-      #if mx_records.present?
-      #  mx_records.each do |mx_record|
-      #    beaker_data[:request][:mx_data] << {:exchange => mx_record.first, :ip_address => mx_record.last}
-
-      #    envelope_response = Beaker::Sdr.envelope_query(mx_record.last).to_h
-      #    envelope_response.keys.each do |key|
-      #      begin
-      #        envelope_response[key].to_json
-      #      rescue
-      #        envelope_response[key] = "could not translate encoded characters"
-      #      end
-      #    end
-      #    data_response = Beaker::Sdr.data_query(mx_record.last).to_h
-      #    data_response.keys.each do |key|
-      #      begin
-      #        data_response[key].to_json
-      #      rescue
-      #        data_response[key] = "could not translate encoded characters"
-      #      end
-      #    end
-      #    beaker_data[:response][:envelope] << {:ip => mx_record.last, :response => envelope_response}
-      #    beaker_data[:response][:data] << {:ip => mx_record.last, :response => data_response}
-
-      #  end
-      #end
-
       beaker_data = beaker_data.to_json
 
     rescue => e
@@ -267,8 +239,8 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
       beaker_data = {:status => "failed", :message => "something went wrong trying to communicate with beaker and parsing data"}.to_json
     end
     self.beaker_info = beaker_data
-    puts "---------------------------------------------\nhere\n--------------------------------\n"
-    puts beaker_data
+    #puts "---------------------------------------------\nhere\n--------------------------------\n"
+    #puts beaker_data
     self.save
   end
 
