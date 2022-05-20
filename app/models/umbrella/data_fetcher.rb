@@ -15,6 +15,7 @@ class Umbrella::DataFetcher
     rescue Aws::S3::Errors::NoSuchKey
       msg = "File named #{filename} for #{BUCKET_NAME} bucket on #{REGION} region was not found"
       Rails.logger.error(msg)
+      []
     end
 
     private

@@ -61,6 +61,10 @@ namespace :escalations do
   task :run_ngfw_import => :environment do
     Ngfw::Importer.import_without_delay
   end
+  
+  task :run_umbrella_import => :environment do
+    Umbrella::Importer.import_without_delay
+  end
 end
 
 namespace :bugs do
