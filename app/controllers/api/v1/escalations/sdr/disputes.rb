@@ -397,7 +397,8 @@ module API
 
             post 'submit_to_corpus' do
               attachment = SenderDomainReputationDisputeAttachment.find(params[:id])
-              attachment.send_to_corpus(params[:email], params[:subject], params[:tag], bugzilla_session)
+              attachment.send_to_corpus(params[:email], params[:subject], params[:tag], bugzilla_rest_session)
+              return {:status => "success", :data => attachment.id}
 
             end
           end

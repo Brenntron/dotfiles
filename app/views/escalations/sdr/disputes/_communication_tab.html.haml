@@ -33,7 +33,6 @@
                 %br
                 =email.created_at.strftime("%H:%M:%S")
 
-
           -@dispute.sender_domain_reputation_dispute_comments.recent_first.each do |comment|
             %tr.note-history-row
               %td.alt-col.icon-col
@@ -217,7 +216,6 @@
           .col-xs-12
             .note-block.content-editable.new-case-note-textarea{contenteditable: true}
               %pre
-
 
     -@dispute.sender_domain_reputation_dispute_comments.recent_first.each do |comment|
       .note-wrapper

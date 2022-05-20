@@ -54,23 +54,39 @@
 
 .attachments-row {
   margin-top: 30px;
+
+  .data-report-label {
+    width: initial;
+  }
+
+  .corpus-all-attachments {
+    margin: 0 5px;
+  }
+}
+
+input[type="checkbox"].corpus-attachment, .corpus-all-attachments {
+  margin-right: 5px;
+  vertical-align: sub;
 }
 
 .sdr-attachments-buttons {
   text-align: right;
 }
 
+.sdr-attachments-button-wrapper {
+  display: flex;
+  justify-content: end;
+  margin-bottom: 5px;
+}
+
 .sdr-attachments-button {
   background-color: #efefef;
-  color: #4E4E4E;
-  background-image: url(image_path('icon_download_dk_grey.svg'));
   background-position: 4px center;
   background-repeat: no-repeat;
   background-size: 18px 18px;
   border: none;
   border-radius: 2px;
   margin-left: 4px;
-  margin-top: -10px;
   padding: 5px 20px;
 
   span {
@@ -79,6 +95,16 @@
     font-weight: 700;
     margin-left: 8px;
   }
+}
+
+.sdr-corpus-button {
+  background-image: url(image_path('icon_submit_arrow_grey.svg'));
+}
+
+.open .sdr-corpus-button {
+  background-color: #60BFDD;
+  background-image: url(image_path('icon_submit_arrow.svg'));
+  color: white;
 }
 
 .sdr-entries {
@@ -153,4 +179,34 @@
 
 #sdr-disputes-index_wrapper {
   top: -55px;
+}
+
+#send-to-corpus-wrapper {
+  padding: 15px 15px 40px 15px;
+  .attachment-to-send-table {
+    margin-bottom: 20px;
+    th {
+      color: #999;
+      text-transform: none;
+      font-weight: 400;
+    }
+  }
+}
+
+.inline-msg {
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  text-align: left;
+  padding: 3px 0 3px 25px;
+  height: 18px;
+  background-position: left center;
+
+  &.success-msg {
+    color: #3c763d;
+    background-image: url(image_path('icon_success.svg'));
+  }
+  &.error-msg {
+    color: #fc4349;
+    background-image: url(image_path('icon_warning.svg'));
+  }
 }

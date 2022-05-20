@@ -199,6 +199,9 @@
       Communication
 
 .tab-content.content-wrapper#bug-tab-content
+  .tab-pane#communication_tab{role: 'tabpanel'}
+    = render 'escalations/sdr/disputes/communication_tab'
+.tab-content.content-wrapper#bug-tab-content
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/sdr/disputes/research_tab'
   .tab-pane#communication_tab{role: 'tabpanel'}

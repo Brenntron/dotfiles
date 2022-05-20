@@ -67,3 +67,19 @@ Feature: Disputes index, Research tab
     Then I should see content "9.3" within "#sdr-reputation-data-table"
     Then I should see content "false negative" within ".sdr-dispute-info-wrapper"
     Then I should see content "cisco.com" within ".sdr-dispute-info-wrapper"
+
+  #Send to Corpus
+
+  @javascript
+  Scenario: A user can submit all the SDR Dispute Attachments to Corpus
+    Given a user with role "webrep user" exists and is logged in
+    And the following SDR disputes exist:
+      | id | sender_domain_entry |
+      | 1  | cisco.com           |
+    When I goto "escalations/sdr/disputes/1"
+    Then I click "#research-tab-link"
+    Then I click ".sdr-corpus-button"
+    Then I click "input[name='category0'][value='phish']"
+    Then I fill in element, "input[name='subject line0']" with "Test Subject"
+    Then I click "input[name='bulk0']"
+    Then I click "input[name='virus0']"

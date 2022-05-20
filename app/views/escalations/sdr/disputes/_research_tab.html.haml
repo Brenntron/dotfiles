@@ -29,22 +29,62 @@
 
     .row.attachments-row
       .col-xs-6
+        %input{type: "checkbox", name: "all attachments", class: 'corpus-all-attachments'}
         %label.data-report-label Attachments
       .col-xs-6.sdr-attachments-buttons
         - if @dispute.sender_domain_reputation_dispute_attachments.any?
-          -#%button.button.sdr-attachments-button
-            %span Download All
+          .sdr-attachments-button-wrapper
+            .sdr-corpus-button-wrapper
+              %button.button.sdr-attachments-button.sdr-corpus-button{onclick: 'open_corpus_dialog();'}
+                %span Send to Corpus
+
+              %div#send-to-corpus-wrapper{title: 'Send Email Attachments to Corpus'}
+                %div.row
+                  %div.col-xs-12
+                    %table.attachment-to-send-table
+                      %thead
+                        %tr
+                          %th.no-border
+                          %th.text-center{colspan: '6'} Email Category
+                          %th.no-border
+                          %th.text-center{colspan: '5'} Prepend Tags (Optional)
+                        %tr
+                          %th File
+                          %th.text-center Spam
+                          %th.text-center Phish
+                          %th.text-center Virus
+                          %th.text-center Ham
+                          %th.text-center Ads
+                          %th.text-center Not Ads
+                          %th Subject Line
+                          %th.text-center Spam
+                          %th.text-center Marketing
+                          %th.text-center Social Network
+                          %th.text-center Bulk
+                          %th.text-center Virus
+                      %tbody
+
+                %div.row
+                  %div.col-xs-12.text-center
+                    %button#submitCorpus.submit-corpus.primary{disabled: "disabled"}
+                      Submit to Corpus
+                    %button.secondary.hidden.dialog-close
+                      Close
+            -#%button.button.sdr-attachments-button.sdr-download-all-button
+              %span download all
 
     .row
       .col-xs-12
         - if @dispute.sender_domain_reputation_dispute_attachments.any?
           - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
-            .card-header.attachment-collapse-header{id: "attachment-#{attachment.id}-header"}
-              %a.sdr-attachment-link{href: "#{attachment.direct_upload_url}", download: "#{attachment.file_name}"}= attachment.file_name
-              %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "attachment-#{attachment.id}-content"}
-            .collapse{id: "attachment-#{attachment.id}-content", 'aria-labelledby': "attachment-#{attachment.id}-header"}
-              .card-body.email-json-dump
-                = attachment.email_header_data
+            .attachment-data-wrapper
+              .card-header.attachment-collapse-header{id: "attachment-#{attachment.id}-header"}
+                %input{type: "checkbox", class: 'corpus-attachment', 'data-id': "#{attachment.id}", 'data-filename': "#{attachment.file_name}"}
+                %a.sdr-attachment-link{href: "#{attachment.direct_upload_url}", download: "#{attachment.file_name}"}= attachment.file_name
+                %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "attachment-#{attachment.id}-content"}
+              .collapse{id: "attachment-#{attachment.id}-content", 'aria-labelledby': "attachment-#{attachment.id}-header"}
+                .card-body.email-json-dump
+                  = attachment.email_header_data
 
         - else
           %span.missing-data No Attachments
