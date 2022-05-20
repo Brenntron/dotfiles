@@ -477,8 +477,10 @@ $ ->
                       hour = parseInt( age.split("h")[0] )
                       if hour>= 3 && hour < 12
                         age_class = 'ticket-age-over3hr'
-                      else if hour > 12
+                      else if hour >= 12
                         age_class = 'ticket-age-over12hr'
+                    else if age.indexOf('mo') != -1
+                      age_class = 'ticket-age-over12hr'
                     else if age.indexOf('m') != -1
                       age_class = ''
                     else
