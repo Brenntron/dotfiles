@@ -106,7 +106,9 @@ Rails.application.routes.draw do
 
     namespace :sdr do
       root 'root#index'
-      resources :disputes, only: [:index, :show]
+      resources :disputes, only: [:index, :show] do
+        get :all_attachments
+      end
     end
 
 

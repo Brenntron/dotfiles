@@ -72,14 +72,52 @@ Feature: Disputes index, Research tab
 
   @javascript
   Scenario: A user can submit all the SDR Dispute Attachments to Corpus
+    Then pending
+    Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
+    And the following SDR disputes exist:
+      | id | sender_domain_entry |
+      | 1  | cisco.com           |
+    And the following SDR dispute attachments exist:
+      | file_name |
+      | Test      |
+    When I goto "escalations/sdr/disputes/1"
+    Then I click "#research-tab-link"
+    Then I click "input[name='send to corpus 0']"
+    Then I click ".sdr-corpus-button"
+    Then I click "input[name='category0'][value='not ads']"
+    Then I fill in element, "input[name='subject line0']" with "Test Subject"
+    Then I click checkbox with name "bulk0"
+    Then button with id "submitCorpus" should be enabled
+    Then I click "#submitCorpus"
+    Then I wait for "150" seconds
+    Then I should see "Data sent to Corpus"
+
+  @javascript
+  Scenario: A user cannot submit SDR Dispute Attachments to Corpus if none are selected and lack a category
     Given a user with role "webrep user" exists and is logged in
     And the following SDR disputes exist:
       | id | sender_domain_entry |
       | 1  | cisco.com           |
+    And the following SDR dispute attachments exist:
+      | file_name |
+      | Test      |
     When I goto "escalations/sdr/disputes/1"
     Then I click "#research-tab-link"
     Then I click ".sdr-corpus-button"
-    Then I click "input[name='category0'][value='phish']"
-    Then I fill in element, "input[name='subject line0']" with "Test Subject"
-    Then I click "input[name='bulk0']"
-    Then I click "input[name='virus0']"
+    Then button with id "submitCorpus" should be disabled
+
+  @javascript
+  Scenario: A user can add multiple tags to corpus submissions
+    Given a user with role "webrep user" exists and is logged in
+    And the following SDR disputes exist:
+      | id | sender_domain_entry |
+      | 1  | cisco.com           |
+    And the following SDR dispute attachments exist:
+      | file_name |
+      | Test      |
+    When I goto "escalations/sdr/disputes/1"
+    Then I click "#research-tab-link"
+    Then I click "input[name='send to corpus 0']"
+    Then I click ".sdr-corpus-button"
+    Then I click checkbox with name "bulk0"
+    Then I click checkbox with name "virus0"
