@@ -97,8 +97,8 @@
                   %div.col-xs-12.text-center
                     %button#submitCorpus.submit-corpus.primary{disabled: "disabled"}
                       Submit to Corpus
-            -#%button.button.sdr-attachments-button.sdr-download-all-button
-              %span download all
+            %button.button.sdr-attachments-button.sdr-download-all-button
+              %a{href: escalations_sdr_dispute_all_attachments_path(@dispute)} download all
 
     .row
       .col-xs-12
