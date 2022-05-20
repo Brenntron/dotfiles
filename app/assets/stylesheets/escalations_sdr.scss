@@ -189,3 +189,33 @@ input[type="checkbox"].corpus-attachment, .corpus-all-attachments {
 .sdr-download-all-button {
   background-image: url(image_path('icon_download_dk_grey.svg'));
 }
+
+#send-to-corpus-wrapper {
+  padding: 15px 15px 40px 15px;
+  .attachment-to-send-table {
+    margin-bottom: 20px;
+    th {
+      color: #999;
+      text-transform: none;
+      font-weight: 400;
+    }
+  }
+}
+
+.inline-msg {
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  text-align: left;
+  padding: 3px 0 3px 25px;
+  height: 18px;
+  background-position: left center;
+
+  &.success-msg {
+    color: #3c763d;
+    background-image: url(image_path('icon_success.svg'));
+  }
+  &.error-msg {
+    color: #fc4349;
+    background-image: url(image_path('icon_warning.svg'));
+  }
+}

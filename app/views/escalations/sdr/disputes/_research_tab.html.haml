@@ -63,54 +63,28 @@
                           %th.text-center Bulk
                           %th.text-center Virus
                       %tbody
-                        - @dispute.sender_domain_reputation_dispute_attachments.each_with_index do |attachment, index|
-                          %tr{id: "corpusRow#{index}", class: 'corpus-row'}
-                            %td
-                              =attachment.file_name
-                              %input{type: 'hidden', name: 'attachmentId', value: "#{attachment.id}"}
-                            %td.alt-col.input-col.text-center
-                              %input.email-category{type: 'radio', value: 'spam', name: "category#{index}"}
-                            %td.input-col.text-center
-                              %input.email-category{type: "radio", value: 'phish', name: "category#{index}"}
-                            %td.alt-col.input-col.text-center
-                              %input.email-category{type: "radio", value: 'virus', name: "category#{index}"}
-                            %td.input-col.text-center
-                              %input.email-category{type: "radio", value: 'ham', name: "category#{index}"}
-                            %td.alt-col.input-col.text-center
-                              %input.email-category{type: "radio", value: 'ads', name: "category#{index}"}
-                            %td.input-col.text-center
-                              %input.email-category{type: "radio", value: 'not ads', name: "category#{index}"}
-                            %td.alt-col.input-col
-                              %input{type: 'text', name: "subject line#{index}"}
-                            %td.input-col.text-center
-                              %input{type: "checkbox", name: "spam#{index}"}
-                            %td.alt-col.input-col.text-center
-                              %input{type: "checkbox", name: "marketing#{index}"}
-                            %td.input-col.text-center
-                              %input{type: "checkbox", name: "social network#{index}"}
-                            %td.alt-col.input-col.text-center
-                              %input{type: "checkbox", name: "bulk#{index}"}
-                            %td.input-col.text-center
-                              %input{type: "checkbox", name: "virus#{index}"}
 
                 %div.row
                   %div.col-xs-12.text-center
                     %button#submitCorpus.submit-corpus.primary{disabled: "disabled"}
                       Submit to Corpus
+                    %button.secondary.hidden.dialog-close
+                      Close
             %button.button.sdr-attachments-button.sdr-download-all-button
               %a{href: escalations_sdr_dispute_all_attachments_path(@dispute)} download all
 
     .row
       .col-xs-12
         - if @dispute.sender_domain_reputation_dispute_attachments.any?
-          - @dispute.sender_domain_reputation_dispute_attachments.each_with_index do |attachment, index|
-            .card-header.attachment-collapse-header{id: "attachment-#{attachment.id}-header"}
-              %input{type: "checkbox", name: "send to corpus #{index}", class: 'corpus-attachment'}
-              %a.sdr-attachment-link{href: "#{attachment.direct_upload_url}", download: "#{attachment.file_name}"}= attachment.file_name
-              %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "attachment-#{attachment.id}-content"}
-            .collapse{id: "attachment-#{attachment.id}-content", 'aria-labelledby': "attachment-#{attachment.id}-header"}
-              .card-body.email-json-dump
-                = attachment.email_header_data
+          - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
+            .attachment-data-wrapper
+              .card-header.attachment-collapse-header{id: "attachment-#{attachment.id}-header"}
+                %input{type: "checkbox", class: 'corpus-attachment', 'data-id': "#{attachment.id}", 'data-filename': "#{attachment.file_name}"}
+                %a.sdr-attachment-link{href: "#{attachment.direct_upload_url}", download: "#{attachment.file_name}"}= attachment.file_name
+                %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "attachment-#{attachment.id}-content"}
+              .collapse{id: "attachment-#{attachment.id}-content", 'aria-labelledby': "attachment-#{attachment.id}-header"}
+                .card-body.email-json-dump
+                  = attachment.email_header_data
 
         - else
           %span.missing-data No Attachments
