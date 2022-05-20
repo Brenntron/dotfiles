@@ -202,6 +202,15 @@ $ ->
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
       options: AC.WebCat.createSelectOptions("##{select.id}")
+      score: (input) ->
+        score = this.getScoreFunction(input)
+        #  Adding some customization for autofill
+        #  restricting on certain cats to avoid accidental categorization
+        (item) ->
+          if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+            item.category_code == input ? 1 : 0
+          else
+            item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase()) ? 1 : 0
     }
 
   url = $('#complaints-index').data('source')
