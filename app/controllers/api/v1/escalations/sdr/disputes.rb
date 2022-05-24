@@ -6,10 +6,69 @@ module API
           include API::V1::Defaults
           include API::BugzillaRestSession
 
-          resource "escalations/sdr/disputes" do
+          resource 'escalations/sdr/disputes' do
             before do
               PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
+
+            desc 'Take list of SDR disputes'
+            params do
+              requires :dispute_ids, type: Array[Integer]
+            end
+
+            patch 'take_disputes' do
+              std_api_v2 do
+                authorize!(:update, SenderDomainReputationDispute)
+                dispute_ids = permitted_params[:dispute_ids]
+                SenderDomainReputationDispute.take_tickets(dispute_ids, user: current_user)
+
+                { username: current_user.cvs_username, dispute_ids: dispute_ids }
+              end
+            end
+
+            desc 'Take single SDR dispute'
+            params do
+              requires :dispute_id, type: Integer
+            end
+
+            patch 'take_dispute/:dispute_id' do
+              std_api_v2 do
+                authorize!(:update, SenderDomainReputationDispute)
+
+                SenderDomainReputationDispute.take_tickets(permitted_params[:dispute_id], user: current_user)
+                { username: current_user.cvs_username, dispute_id: permitted_params[:dispute_id] }
+              end
+            end
+
+            desc 'Return single SDR dispute'
+            params do
+              requires :dispute_id, type: Integer
+            end
+
+            patch 'return_dispute/:dispute_id' do
+              std_api_v2 do
+                authorize!(:update, SenderDomainReputationDispute)
+
+                SenderDomainReputationDispute.find(permitted_params[:dispute_id]).return_dispute
+                { username: current_user.cvs_username, dispute_id: permitted_params[:dispute_id] }
+              end
+            end
+
+            desc 'Return list of SDR disputes'
+            params do
+              requires :dispute_ids, type: Array[Integer]
+            end
+
+            patch 'return_disputes' do
+              std_api_v2 do
+                authorize!(:update, SenderDomainReputationDispute)
+
+                SenderDomainReputationDispute.where(id: permitted_params[:dispute_ids]).each(&:return_dispute)
+
+                { username: current_user.cvs_username, dispute_ids: permitted_params[:dispute_ids] }
+              end
+            end
+
             desc 'get all disputes'
             params do
 
@@ -23,11 +82,28 @@ module API
 
             desc 'create a dispute'
             params do
+              requires :sender_domain_entry, type: String, desc: 'URL or email to create entry'
+              requires :priority, type: String, desc: 'Priority of new dispute'
+              optional :suggested_disposition, type: String, desc: 'What should the disposition be'
+              optional :platform, type: String, desc: 'Platform public name'
+              optional :customer, type: String, desc: 'Customer related to new complaint'
+              optional :description, type: String, desc: 'Description of new complaint'
 
             end
 
             post "" do
               std_api_v2 do
+
+                new_dispute = SenderDomainReputationDispute.create_action(bugzilla_rest_session,
+                                        permitted_params[:sender_domain_entry],
+                                        permitted_params[:priority],
+                                        permitted_params[:suggested_disposition],
+                                        permitted_params[:platform],
+                                        permitted_params[:customer],
+                                        permitted_params[:description],
+                                        current_user.id)
+                new_dispute.get_and_save_beaker_data
+                {:status => 'success'}.to_json
 
               end
             end
@@ -56,7 +132,7 @@ module API
             end
             post "change_assignee" do
               authorize!(:update, SenderDomainReputationDispute)
-              disputes = SenderDomainReputationDispute.assign(params[:new_assignee], params[:dispute_ids])
+              disputes = SenderDomainReputationDispute.assign(params[:dispute_ids], user: params[:new_assignee])
               {:status => "success", :data => disputes}.to_json
             end
 
@@ -72,24 +148,12 @@ module API
                 d = SenderDomainReputationDispute.find_by(id: dispute)
                 if d.status == SenderDomainReputationDispute::STATUS_ASSIGNED
                   d.update(status: SenderDomainReputationDispute::STATUS_NEW, case_assigned_at: nil)
-                  message = Bridge::DisputeEntryUpdateStatusEvent.new
                 end
 
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
                 json_packet << d
               end
               {:status => "success", :data => json_packet}.to_json
-            end
-
-
-
-            params do
-              requires :dispute_id, type: Integer
-            end
-            patch 'take_dispute/:dispute_id' do
-              std_api_v2 do
-
-              end
             end
 
             params do
@@ -169,11 +233,7 @@ module API
               end
 
               if params[:comment].present?
-                if status == SenderDomainReputationDispute::STATUS_RESOLVED
-                  comment = status + ' : ' + resolution + ' - ' + params[:comment]
-                else
-                  comment = status + ' - ' + params[:comment]
-                end
+                comment = params[:comment]
               end
 
               disputes = SenderDomainReputationDispute.where(id: params['dispute_ids'])
@@ -271,18 +331,20 @@ module API
 
             desc 'Autopopulate fields on Advanced Search'
             get 'autopopulate_advanced_search' do
-              case_owners = User.joins(:disputes).where.not(cvs_username: nil).order(cvs_username: :asc).uniq
-              statuses = [Dispute::STATUS_RESEARCHING,Dispute::STATUS_ESCALATED,Dispute::STATUS_CUSTOMER_PENDING,
-                          Dispute::STATUS_ON_HOLD,Dispute::STATUS_RESOLVED,Dispute::STATUS_REOPENED]
-              submitter_types = ['Customer', 'Non-Customer']
+              case_owners = User.joins(:sender_domain_reputation_disputes).where.not(cvs_username: nil).order(cvs_username: :asc).uniq
+              all_constants = SenderDomainReputationDispute.constants
+              statuses = all_constants.select { |x| x.match?('STATUS') }.map { |name| SenderDomainReputationDispute.const_get(name) }
+              submitter_types = all_constants.select { |x| x.match?('SUBMITTER_TYPE') }.map { |name| SenderDomainReputationDispute.const_get(name) }
               contacts = Customer.all.order(name: :asc)
               companies = Company.all.order(name: :asc)
+              priorities = SenderDomainReputationDispute.pluck(:priority).uniq.compact
+              # TODO: add resolutions to SenderDomainReputationDispute model and use it there
               resolutions = [Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN, Dispute::STATUS_RESOLVED_UNCHANGED,
                              Dispute::STATUS_RESOLVED_INVALID, Dispute::STATUS_RESOLVED_TEST, Dispute::STATUS_RESOLVED_OTHER]
-              platforms = Platform.all.order(public_name: :asc).map {|m| {id: m.id, public_name: m.public_name}}
-              render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
+              platforms = Platform.all.order(public_name: :asc).map { |m| { id: m.id, public_name: m.public_name } }
+              render json: { case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
                             contacts: contacts, companies: companies, resolutions: resolutions,
-                            platforms: platforms}
+                            platforms: platforms, priorities: priorities }
             end
 
             desc 'Auto-populate fields on New Dispute'
@@ -309,6 +371,32 @@ module API
             end
 
 
+            params do
+              requires :id, type: Integer
+            end
+
+            get 'suggested_subject' do
+              attachment = SenderDomainReputationDisputeAttachment.find(params[:id])
+              if attachment.suggested_subject.present?
+                return {:status => "success", :messages => attachment.suggested_subject}
+              else
+                return {:status => "success", :messages => ""}
+              end
+            end
+
+            params do
+              requires :id, type: Integer
+              requires :subject, type: String
+              requires :tag, type: String
+              requires :email, type: String
+            end
+
+            post 'submit_to_corpus' do
+              attachment = SenderDomainReputationDisputeAttachment.find(params[:id])
+              attachment.send_to_corpus(params[:email], params[:subject], params[:tag], bugzilla_rest_session)
+              return {:status => "success", :data => attachment.id}
+
+            end
           end
         end
       end

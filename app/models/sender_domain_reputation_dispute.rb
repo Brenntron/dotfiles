@@ -2,7 +2,7 @@ class SenderDomainReputationDispute < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at, :user_id]
 
   belongs_to :customer, optional: true
-  belongs_to :user, optional:true
+  belongs_to :user, optional: true
   belongs_to :platform, optional: true
 
   has_many :sender_domain_reputation_dispute_attachments
@@ -15,6 +15,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
 
+  NEW = 'NEW'
   STATUS_NEW                = 'NEW'
   STATUS_ASSIGNED           = 'ASSIGNED'
   STATUS_RESEARCHING        = 'RESEARCHING'
@@ -92,6 +93,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       end
 
       new_dispute.id = bug_proxy.id
+      new_dispute.bridge_packet = message_payload.to_json
       new_dispute.meta_data = message_payload[:payload][:meta_data] if message_payload[:payload][:meta_data].present?
       new_dispute.user_id = user.id
       new_dispute.sender_domain_entry = message_payload[:payload][:sender_domain_entry]
@@ -127,11 +129,25 @@ class SenderDomainReputationDispute < ApplicationRecord
       #end
 
       new_dispute.get_and_save_beaker_data
+      #retry
+      if new_dispute.beaker_info.blank?
+        new_dispute.get_and_save_beaker_data
+      end
 
       if message_payload["attachments"].present?
         message_payload["attachments"].each do |dispute_attachment|
           SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, dispute_attachment, user, new_dispute)
         end
+        #retry for sometimes it gets weird
+        if new_dispute.sender_domain_reputation_dispute_attachments.size != message_payload["attachments"].size
+          new_dispute.sender_domain_reputation_dispute_attachments.destroy_all
+          new_dispute.reload
+          message_payload["attachments"].each do |dispute_attachment|
+            SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, dispute_attachment, user, new_dispute)
+          end
+        end
+
+
         new_dispute.reload
       end
 
@@ -139,8 +155,12 @@ class SenderDomainReputationDispute < ApplicationRecord
         raise "attachments failed to save"
       end
 
+      ###seperating this to try to prevent cases where email_header_data is "nil" in retrieve_attachments_beaker_data even though there is data.
       if new_dispute.sender_domain_reputation_dispute_attachments.present?
         new_dispute.parse_all_email_file_headers(bugzilla_rest_session)
+      end
+      new_dispute.reload
+      if new_dispute.sender_domain_reputation_dispute_attachments.present?
         new_dispute.retrieve_attachments_beaker_data
       end
 
@@ -170,7 +190,55 @@ class SenderDomainReputationDispute < ApplicationRecord
       end
     end
 
+    if new_dispute.sender_domain_reputation_dispute_attachments.size != message_payload["attachments"].size
+      new_dispute.sender_domain_reputation_dispute_attachments.destroy_all
+      new_dispute.destroy
+      conn = ::Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+      conn.post
+    end
 
+  end
+
+  def self.find_customer(customer)
+    email = customer.split(':').last
+    Customer.find_by_email(email)
+  end
+
+  def self.create_action(bugzilla_rest_session, sender_domain_entry, priority, suggested_disposition, platform, customer, description, user_id, status=NEW)
+
+    summary = "New Senders Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    # Does a description need to go in here and be in the form?
+    full_description = %Q{
+          IPs/URIs: #{sender_domain_entry}
+    }
+
+    bug_attrs = {
+      'product' => 'Escalations Console',
+      'component' => 'IP/Domain',
+      'summary' => summary,
+      'version' => 'unspecified',
+      'description' => full_description,
+      'priority' => priority,
+      'classification' => 'unclassified',
+    }
+
+    platform_record = Platform.find_by_public_name(platform) if platform
+    cust = find_customer(customer) if customer
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    new_dispute = SenderDomainReputationDispute.create!(id: bug_proxy.id,
+                                  user_id: user_id,
+                                  sender_domain_entry: sender_domain_entry,
+                                  priority: priority,
+                                  suggested_disposition: suggested_disposition,
+                                  platform_id: platform_record&.id,
+                                  submitter_type: 'Internal',
+                                  status: status,
+                                  customer_id: cust&.id,
+                                  description: description)
+
+    new_dispute
   end
 
   def self.auto_resolve_on_duplicate(dispute)
@@ -187,6 +255,9 @@ class SenderDomainReputationDispute < ApplicationRecord
   def retrieve_attachments_beaker_data
     self.sender_domain_reputation_dispute_attachments.each do |attachment|
       attachment.retrieve_beaker_data_and_save
+      if attachment.beaker_info.blank?
+        attachment.retrieve_beaker_data_and_save
+      end
     end
   end
 
@@ -216,6 +287,10 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     conn = ::Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
     conn.post
+  end
+
+  def return_dispute
+    update!(user_id: User.vrtincoming.id, status: STATUS_NEW)
   end
 
   def case_id_str
@@ -248,29 +323,252 @@ class SenderDomainReputationDispute < ApplicationRecord
       dispute.reload
 
       message = Bridge::SdrDisputeUpdateStatusEvent.new
-      message.post(dispute)
+      message.post(dispute, :source_key => dispute.ticket_source_key)
 
     end
   end
 
   def self.take_tickets(dispute_ids, user:)
     SenderDomainReputationDispute.transaction do
-      unless 0 == SenderDomainReputationDispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).count
-        raise 'Some of these tickets are already assigned.'
+      if SenderDomainReputationDispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).present?
+        raise 'This ticket is already assigned'
       end
-      SenderDomainReputationDispute.assign(user, ids)
+      SenderDomainReputationDispute.assign(dispute_ids, user: user)
     end
   end
 
-  def self.assign(user, dispute_ids)
+  def self.assign(dispute_ids, user:)
+    disputes_ary = []
     user_id = user.kind_of?(User) ? user.id : user
     assigned_at = Time.now
-
-    disputes_ary = []
     SenderDomainReputationDispute.transaction do
-      disputes = SenderDomainReputationDispute.where(id: dispute_ids).where.not(status: [SenderDomainReputationDispute::STATUS_RESOLVED])
-      disputes_ary = disputes.all.to_a
-      disputes.update_all(user_id: user_id, status: SenderDomainReputationDispute::STATUS_ASSIGNED, case_assigned_at: assigned_at)
+      disputes = SenderDomainReputationDispute.where(id: dispute_ids).where.not(status: STATUS_RESOLVED)
+      disputes_ary = disputes.to_a
+
+      disputes.update_all(user_id: user_id, status: STATUS_ASSIGNED, case_assigned_at: assigned_at)
+    end
+    disputes_ary
+  end
+
+  # Searches in a variety of ways.
+  # advanced -- search by supplied field.
+  # named -- call a saved search.
+  # standard -- use a pre-defined search.
+  # contains -- search many fields where supplied value is contained in the field.
+  # nil -- all records.
+  # @param [String] search_type variety of search
+  # @param [ActionController::Parameters] params supplied fields and values for search.
+  # @param [String] search_name name of saved search.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.robust_search(search_type, search_name: nil, params: nil, user:)
+    case search_type
+    when 'advanced'
+      advanced_search(params, search_name: search_name, user: user)
+    when 'named'
+      named_search(search_name, user: user)
+    when 'standard'
+      standard_search(search_name, user: user)
+    when 'contains'
+      contains_search(params['value'])
+    else
+      where({})
+    end
+  end
+
+  # Searches many fields in the record for values containing a given value.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.contains_search(value)
+    sdr_dispute_fields = %w[id status resolution source sender_domain_entry submitter_type]
+    sdr_dispute_where = sdr_dispute_fields.map do |field|
+      "sender_domain_reputation_disputes.#{field} like :pattern"
+    end.join(' or ')
+
+    user_where = "users.display_name like :pattern"
+    platform_where = "platforms.public_name like :pattern"
+    company_where = "companies.name like :pattern"
+    customer_where = %w[email name].map { |field| "customers.#{field} like :pattern" }.join(' or ')
+
+    where_str = [sdr_dispute_where, user_where, platform_where, company_where, company_where, customer_where].join(' or ')
+    left_joins({ customer: :company }, :platform, :user).where(where_str, pattern: "%#{value}%")
+  end
+
+  # Searches based on supplied fields and values.
+  # Optionally takes a name to save this search as a saved search.
+  # @param [ActionController::Parameters] params supplied fields and values for search.
+  # @param [String] search_name name to save this search as a saved search.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.advanced_search(params, search_name:, user:, reload: false)
+    dispute_params = non_blank_fields(params)
+    dispute_fields = matching_fields(dispute_params) # to store attributes related to SenderDomainReputationDispute only
+
+    dispute_fields['id'] = dispute_fields['id'].split(/[\s,]+/) if dispute_fields['id'].present?
+
+    if dispute_params['case_owner'].present?
+      user = User.find_by(cvs_username: dispute_params.delete('case_owner'))
+      dispute_fields['user_id'] = user.id
+    end
+
+    relation = where(dispute_fields)
+
+    if dispute_params['submitted_newer'].present?
+      relation =
+        relation.where('created_at >= :submitted_newer', submitted_newer: dispute_params['submitted_newer'])
+    end
+
+    if dispute_params['submitted_older'].present?
+      if dispute_params['submitted_older'].kind_of?(Date)
+        relation =
+          relation.where('created_at < :submitted_older', submitted_older: (dispute_params['submitted_older']) + 1)
+      elsif dispute_params['submitted_older'].kind_of?(String)
+        relation =
+          relation.where('created_at < :submitted_older', submitted_older: Date.parse(dispute_params['submitted_older']) + 1)
+      end
+    end
+
+    if dispute_params['age_newer'].present?
+      seconds_ago = age_to_seconds(dispute_params['age_newer'])
+      if seconds_ago != 0
+        age_newer_cutoff = Time.now - seconds_ago
+        relation =
+          relation.where('created_at >= :submitted_newer', submitted_newer: age_newer_cutoff)
+      end
+    end
+
+    if dispute_params['age_older'].present?
+      seconds_ago = age_to_seconds(dispute_params['age_older'])
+      if seconds_ago != 0
+        age_older_cutoff = Time.now - seconds_ago
+        relation =
+          relation.where('created_at < :submitted_older', submitted_older: age_older_cutoff)
+      end
+    end
+
+    if dispute_params['platform_ids'].present?
+      ids = dispute_params['platform_ids'].split(',').map(&:to_i)
+      relation = relation.joins(:platform).where('sender_domain_reputation_disputes.platform_id in (:ids)', ids: ids)
+    end
+
+    company_name = nil
+    customer_params = dispute_params.slice(*%w[customer_name customer_email company_name]).select { |_, value| value.present? }
+
+    if customer_params.any?
+      if customer_params['company_name'].present?
+        company_name = customer_params.delete('company_name')
+        relation = relation.joins(customer: :company)
+      else
+        relation = relation.joins(:customer)
+      end
+
+      customer_params['name'] = customer_params.delete('customer_name') if customer_params['customer_name'].present?
+      customer_params['email'] = customer_params.delete('customer_email') if customer_params['customer_email'].present?
+      customer_where = customer_params
+      if company_name.present?
+        customer_where = customer_where.merge(companies: { name: company_name } )
+      end
+      relation = relation.where(customers: customer_where)
+    end
+
+    # Save this search as a named search
+    if params.present? && search_name.present? && reload == false
+      save_named_search(search_name, params, user: user, project_type: 'SDR')
+    end
+    relation
+  end
+
+  # Searches specific to quick generic button filters.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.standard_search(search_name, user:)
+    case search_name
+    when 'my_open'
+      where.not(status: STATUS_RESOLVED).where(user_id: user.id)
+    when 'my_disputes'
+      where(user_id: user.id)
+    when 'unassigned'
+      vrtincoming = User.vrtincoming
+      where(user_id: [nil, vrtincoming]).where.not(status: STATUS_RESOLVED)
+    when 'open'
+      where.not(status: STATUS_RESOLVED)
+    when 'team_disputes'
+      where(user_id: user.my_team)
+    when 'closed'
+      where(status: STATUS_RESOLVED)
+    when 'all'
+      all
+    else
+      raise "No search named '#{search_name}' known."
+    end
+  end
+
+  def self.named_search(search_name, user:)
+    named_search = user.named_searches.where(name: search_name).first
+    raise "No search named '#{search_name}' found." unless named_search
+    search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
+      if /\A(?<super_name>[^~]*)~(?<sub_name>[^~]*)\z/ =~ criterion.field_name
+        search_params[super_name] ||= {}
+        search_params[super_name][sub_name] = criterion.value
+      else
+        search_params[criterion.field_name] = criterion.value
+      end
+      search_params
+    end
+    advanced_search(search_params, search_name: nil, user: user)
+  end
+
+  # selects fields which match database field names from given parameters
+  # @param [Hash|ActionController::Parameters] fields input which may contain blank values
+  # @return [Hash] A hash with just this model's fields
+  def self.matching_fields(fields)
+    fields.slice(*column_names)
+  end
+
+  def self.age_to_seconds(age_str)
+    days =
+      if /(?<days_str>\d+)[Dd]/ =~ age_str
+        days_str.to_i
+      else
+        0
+      end
+    hours =
+      if /(?<hours_str>\d+)[Hh]/ =~ age_str
+        hours_str.to_i
+      else
+        0
+      end
+    (days * 24 + hours) * 3600
+  end
+
+  # omits fields with empty strings and nil as values
+  # @param [Hash|ActionController::Parameters] fields input which may contain blank values
+  # @return [Hash] A hash without blanks
+  def self.non_blank_fields(fields)
+    fields.to_h.reject { |_, value| value.blank? }
+  end
+
+  def self.save_named_search(search_name, params, user:, project_type:)
+    NamedSearchCriterion.where(named_search_id: NamedSearch.where(user_id: user.id, name: search_name).ids).delete_all
+
+    found_search = user.named_searches.where(name: search_name).first
+    named_search = found_search || NamedSearch.create!(user: user, name: search_name, project_type: project_type)
+
+    params.each do |field_name, value|
+      case
+      when value.blank?
+        #do nothing
+      when value.kind_of?(Hash) || value.kind_of?(ActionController::Parameters)
+        value.each do |sub_field_name, sub_value|
+          named_search.named_search_criteria.create(field_name: "#{field_name}~#{sub_field_name}", value: sub_value)
+        end
+      when 'search_type' == field_name
+        #do nothing
+      when 'search_name' == field_name
+        #do nothing
+      else
+        named_search.named_search_criteria.create(field_name: field_name, value: value)
+      end
     end
   end
 
@@ -305,6 +603,23 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   end
 
+  def self.domain_name_of(entry)
+
+    parser = URI::Parser.new
+    url = parser.escape(entry)
+    uri = parser.parse(parser.parse(entry).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
+
+    full_domain = ""
+    if domain.trd.present?
+      full_domain += domain.trd + "."
+    end
+    full_domain += domain.domain
+
+    return full_domain
+
+  end
+
   def get_and_save_beaker_data
     beaker_data = {}
     beaker_data[:request] = {}
@@ -319,7 +634,12 @@ class SenderDomainReputationDispute < ApplicationRecord
     begin
 
       mail_data_params[:from_hdr] = [{"addr" => self.sender_domain_entry}]
-      data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+      begin
+        data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+      rescue
+        data_response = ::Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+      end
+
       if data_response.present?
         data_response.keys.each do |key|
           begin
@@ -371,10 +691,31 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     end
     response
-
   end
 
   def is_assigned?
     (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
+  end
+
+  def customer_name
+    customer.nil? ? "" : customer.name
+  end
+
+  def customer_email
+    customer.nil? ? "" : customer.email
+  end
+
+  def customer_org
+    if customer.nil?
+      ""
+    else
+      customer.company.nil? ? "" : customer.company.name
+    end
+  end
+
+  def compose_versioned_items
+    versioned_items = [self]
+    sender_domain_reputation_dispute_comments.includes(:versions).map{ |sdrdc| versioned_items << sdrdc }
+    versioned_items
   end
 end

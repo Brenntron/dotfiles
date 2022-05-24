@@ -1,0 +1,181 @@
+%input{type:'hidden', name: 'token', value: "#{current_user.authentication_token}"}
+%input{type:'hidden', name: 'xml_token', value: "#{xml_token}"}
+%input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
+
+.row#sdr-research-tab
+  .col-xs-12.col-sm-6.sdr-dispute-info-wrapper
+    %h1.research-data-header.sdr-dispute-info-title Dispute Information
+    .row
+      .col-xs-9
+        %label.data-report-label Submitted Dispute
+        %span.data-report-content= @dispute.sender_domain_entry
+      .col-xs-3
+        %label.data-report-label Suggested Reputation
+        %span.data-report-content.text-capitalize= @dispute.suggested_disposition
+    %hr.thin
+    -#.row
+    -#  .col-xs-12
+    -#    %label.data-report-label Items Extracted from Details
+    -#    - extracted_details = extract_details @dispute.description
+    -#    - extracted_details.each do |detail|
+    -#      %span.data-report-content= detail
+    -#%hr.thin
+    .row
+      .col-xs-12
+        %label.data-report-label Details
+        %div.data-report-content.sdr-details
+          = @dispute.description
+    %hr.thin
+
+    .row.attachments-row
+      .col-xs-6
+        - if @dispute.sender_domain_reputation_dispute_attachments.any?
+          %input{type: "checkbox", name: "all attachments", class: 'corpus-all-attachments'}
+        %label.data-report-label Attachments
+      .col-xs-6.sdr-attachments-buttons
+        - if @dispute.sender_domain_reputation_dispute_attachments.any?
+          .sdr-attachments-button-wrapper
+            .sdr-corpus-button-wrapper
+              %button.button.sdr-attachments-button.sdr-corpus-button{onclick: 'open_corpus_dialog();'}
+                %span Send to Corpus
+
+              %div#send-to-corpus-wrapper{title: 'Send Email Attachments to Corpus'}
+                %div.row
+                  %div.col-xs-12
+                    %table.attachment-to-send-table
+                      %thead
+                        %tr
+                          %th.no-border
+                          %th.text-center{colspan: '6'} Email Category
+                          %th.no-border
+                          %th.text-center{colspan: '5'} Prepend Tags (Optional)
+                        %tr
+                          %th File
+                          %th.text-center Spam
+                          %th.text-center Phish
+                          %th.text-center Virus
+                          %th.text-center Ham
+                          %th.text-center Ads
+                          %th.text-center Not Ads
+                          %th Subject Line
+                          %th.text-center Spam
+                          %th.text-center Marketing
+                          %th.text-center Social Network
+                          %th.text-center Bulk
+                          %th.text-center Virus
+                      %tbody
+
+                %div.row
+                  %div.col-xs-12.text-center
+                    %button#submitCorpus.submit-corpus.primary{disabled: "disabled"}
+                      Submit to Corpus
+                    %button.secondary.hidden.dialog-close
+                      Close
+            %button.button.sdr-attachments-button.sdr-download-all-button
+              %a{href: escalations_sdr_dispute_all_attachments_path(@dispute)} download all
+
+    .row
+      .col-xs-12
+        - if @dispute.sender_domain_reputation_dispute_attachments.any?
+          - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
+            .attachment-data-wrapper
+              .card-header.attachment-collapse-header{id: "attachment-#{attachment.id}-header"}
+                %input{type: "checkbox", class: 'corpus-attachment', 'data-id': "#{attachment.id}", 'data-filename': "#{attachment.file_name}"}
+                %a.sdr-attachment-link{href: "#{attachment.direct_upload_url}", download: "#{attachment.file_name}"}= attachment.file_name
+                %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "attachment-#{attachment.id}-content"}
+              .collapse{id: "attachment-#{attachment.id}-content", 'aria-labelledby': "attachment-#{attachment.id}-header"}
+                .card-body.email-json-dump
+                  = attachment.email_header_data
+
+        - else
+          %span.missing-data No Attachments
+
+  .col-xs-12.col-sm-6.sdr-research-data-wrapper
+    %h1.research-data-header.sdr-research-data-title Research Data
+    #sdr-research-loader
+      .inline-loader-wrapper
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+        %span.loader-msg Loading data...
+    .sdr-research-data-present
+      .row
+        .col-xs-12
+          %label.data-report-label Sender Domain Reputation
+          %table.data-report-table#sdr-reputation-data-table
+            %thead
+              %tr
+                %th Domain
+                %th IP Address
+                %th Score
+                %th Rules
+                %th Threat Level
+                %th Category
+            %tbody
+
+      %hr.thin
+      .row
+        .col-xs-12
+          %label.data-report-label Security Intelligence
+          %table.data-report-table#sdr-security-data-table
+            %thead
+              %tr
+                %th BL Classification
+                %th BL Status
+                %th BL Comment
+                %th WL Status
+            %tbody
+
+      %hr.thin
+      .row
+        .col-xs-12
+          %label.data-report-label Virus Total
+          %table.data-report-table#sdr-vt-data-table
+            %thead
+              %tr
+                %th URL Detection
+                %th Trusted Detection
+                %th Detected URLs
+            %tbody
+
+      %hr.thin
+      .row
+        .col-xs-12
+          %label.data-report-label Umbrella
+          %table.data-report-table#sdr-umbrella-data-table
+            %thead
+              %th Rating
+              %th Category
+              %th Popularity
+              %th Domain Vol
+              %th Organization
+              %th Registrar
+              %th Created
+            %tbody
+
+
+      %hr.thin
+      .row
+        .col-xs-12
+          %label.data-report-label Beaker
+      .row
+        .col-xs-12
+          - if @beaker_info.blank?
+            %span.missing-data Unable to grab data from beaker
+          - else
+            .card-header.beaker-collapse-header#domain-beaker-header
+              %span.sdr-beaker-item= @dispute.sender_domain_entry
+              %button.expand-row-button-inline.shown{'data-toggle': 'collapse', type: 'button', 'data-target': "#sdr-beaker-domain-content", 'aria-expanded': 'true', 'aria-controls': "sdr-beaker-domain-content"}
+            .collapse.in#sdr-beaker-domain-content{'aria-labelledby': "domain-beaker-header"}
+              .card-body
+                %pre.data-report-code-content.beaker-json-dump
+                  = @beaker_info
+
+          - if @dispute.sender_domain_reputation_dispute_attachments.any?
+            - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
+              .card-header.attachment-collapse-header{id: "beaker-attachment-#{attachment.id}-header"}
+                %span.sdr-beaker-item= attachment.file_name
+                %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#beaker-attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "beaker-attachment-#{attachment.id}-content"}
+              .collapse{id: "beaker-attachment-#{attachment.id}-content", 'aria-labelledby': "beaker-attachment-#{attachment.id}-header"}
+                .card-body
+                  %pre.data-report-code-content.beaker-json-dump
+                    = attachment.beaker_info

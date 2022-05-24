@@ -2,6 +2,15 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
   belongs_to :sender_domain_reputation_dispute
 
+  CORPUS_SPAM = "spam@access.ironport.com"
+  CORPUS_HAM = "ham@access.ironport.com"
+  CORPUS_ADS = "ads@access.ironport.com"
+  CORPUS_NOT_ADS = "not_ads@access.ironport.com"
+  CORPUS_PHISH = "phish@access.ironport.com"
+  CORPUS_VIRUS = "virus@access.ironport.com"
+
+  CORPUS_EMAIL_LIST= [CORPUS_SPAM, CORPUS_HAM, CORPUS_ADS, CORPUS_NOT_ADS, CORPUS_PHISH, CORPUS_VIRUS]
+  ALL_POSSIBLE_TAGS = ["[SUSPECTED SPAM]", "[MARKETING]", "[SOCIAL NETWORK]", "[BULK]", "[WARNING: VIRUS DETECTED]"]
   def self.build_and_push_to_bugzilla(bugzilla_rest_session, payload, user, sender_domain_reputation_dispute, remote = true)
 
     new_local_attachment = nil
@@ -79,6 +88,90 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
     end
 
   end
+  #tags can be: [SUSPECTED SPAM], [MARKETING], [SOCIAL NETWORK], [BULK], [WARNING: VIRUS DETECTED]
+  # BugzillaRest::Session.default_session
+  def send_to_corpus(corpus_submission_category, base_subject, tag, bugzilla_session)
+
+    bug_proxy = bugzilla_session.build_bug(id: self.sender_domain_reputation_dispute.id)
+    bug_attachments = bug_proxy.attachments
+    file = nil
+    bug_attachments.each do |bug_attachment|
+      if bug_attachment.id == self.id
+        file = bug_attachment
+      end
+    end
+
+
+    email_args = {}
+    email_args[:to] = corpus_submission_category
+    email_args[:from] = "noreply@talosintelligence.com"
+    email_args[:subject] = tag + " " + base_subject
+    email_args[:body] = ""
+
+    #payload = {}
+    #payload[:file_name] = attachment["filename"]
+    #payload[:file_content] = attachment["tempfile"]
+    #payload[:content_type] = attachment["type"]
+    #new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, payload, current_user, new_email, false)
+
+    attachment = {}
+    attachment["filename"] = self.file_name
+    attachment["data"] = file.file_contents
+
+    s3_file_path = self.push_to_aws(attachment)
+    new_attachment = {}
+    new_attachment[:file_name] = attachment["filename"]
+    new_attachment[:file_url] = self.s3_url(s3_file_path)
+
+    puts "\n---------------------------------------------------\n"
+    puts new_attachment.inspect.to_s
+
+    conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+    conn.post(email_args, [new_attachment])
+
+  end
+
+
+  def push_to_aws(file)
+
+    config_values = Rails.configuration.peakebridge.sources["snort-org"]
+    Aws.config.update(
+        {
+            credentials: Aws::Credentials.new(config_values['aws_access_key_id'], config_values['aws_secret_access_key']),
+            region: config_values['aws_region']
+        }
+    )
+
+    s3           = Aws::S3::Resource.new(region: config_values['aws_region'])
+    bucket       = s3.bucket("analyst-console")
+    prefix       = "#{Rails.env}/ac_sdr_attachments/#{self.id}/"
+    s3_url       = []
+
+    key    = prefix + "#{file['filename']}"
+    object = bucket.object(key)
+    #object.upload_file(File.open(file['tempfile']))
+    object.upload_stream do |write_stream|
+      write_stream << file['data']
+    end
+    s3_url = {file['filename'] => [object.key, file] }
+
+    s3_url.values.flatten[0]
+
+
+  end
+
+  def s3_url(s3_path)
+    config_values = Rails.configuration.peakebridge.sources["snort-org"]
+    Aws.config.update(
+        {
+            credentials: Aws::Credentials.new(config_values['aws_access_key_id'], config_values['aws_secret_access_key']),
+            region: config_values['aws_region']
+        }
+    )
+    url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'analyst-console', key: s3_path, expires_in: 86400).to_s
+
+    url
+  end
 
   def self.get_mx_records(domain)
     mxs = Resolv::DNS.open do |dns|
@@ -97,7 +190,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
     domain_of_parent = self.sender_domain_reputation_dispute.domain_name
 
     begin
-
+      self.reload
       headers = JSON.parse(self.email_header_data)
       possible_from = []
       headers.keys.each do |key|
@@ -115,7 +208,12 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
       possible_from.each do |from_email|
         mail_data_params[:from_hdr] = [{"addr" => from_email}]
-        data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        begin
+          data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        rescue
+          data_response = ::Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        end
+
         if data_response.present?
           data_response.keys.each do |key|
             begin
@@ -133,39 +231,6 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
         end
 
       end
-
-
-
-
-
-      #mx_records = SenderDomainReputationDisputeAttachment.get_mx_records(domain_of_parent)
-
-      #if mx_records.present?
-      #  mx_records.each do |mx_record|
-      #    beaker_data[:request][:mx_data] << {:exchange => mx_record.first, :ip_address => mx_record.last}
-
-      #    envelope_response = Beaker::Sdr.envelope_query(mx_record.last).to_h
-      #    envelope_response.keys.each do |key|
-      #      begin
-      #        envelope_response[key].to_json
-      #      rescue
-      #        envelope_response[key] = "could not translate encoded characters"
-      #      end
-      #    end
-      #    data_response = Beaker::Sdr.data_query(mx_record.last).to_h
-      #    data_response.keys.each do |key|
-      #      begin
-      #        data_response[key].to_json
-      #      rescue
-      #        data_response[key] = "could not translate encoded characters"
-      #      end
-      #    end
-      #    beaker_data[:response][:envelope] << {:ip => mx_record.last, :response => envelope_response}
-      #    beaker_data[:response][:data] << {:ip => mx_record.last, :response => data_response}
-
-      #  end
-      #end
-
       beaker_data = beaker_data.to_json
 
     rescue => e
@@ -174,9 +239,28 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
       beaker_data = {:status => "failed", :message => "something went wrong trying to communicate with beaker and parsing data"}.to_json
     end
     self.beaker_info = beaker_data
-    puts "---------------------------------------------\nhere\n--------------------------------\n"
-    puts beaker_data
+    #puts "---------------------------------------------\nhere\n--------------------------------\n"
+    #puts beaker_data
     self.save
+  end
+
+  def suggested_subject
+    subject = ""
+
+    if self.email_header_data.present?
+      begin
+        raw_data = JSON.parse(self.email_header_data)
+        raw_data.keys.each do |key|
+          if key.downcase.include?("subject")
+            subject = raw_data[key].strip
+          end
+        end
+      rescue
+        subject = ""
+      end
+    end
+
+    return subject
   end
 
   def self.extract_emails_to_array(txt)

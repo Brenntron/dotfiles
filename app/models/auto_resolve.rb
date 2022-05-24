@@ -328,6 +328,8 @@ class AutoResolve
     result = {}
     result[:positives] = 0
     result[:positive_scans] = []
+    result[:total_scans] = vt_results["scans"].keys.size rescue nil
+    result[:permalink] = vt_results["permalink"] rescue nil 
 
     if vt_results && vt_results['scans']
       result[:positives] = vt_results["positives"]

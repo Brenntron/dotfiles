@@ -58,6 +58,7 @@ class DisputeEmailAttachment < ApplicationRecord
     key    = prefix + "#{file['filename']}"
     object = bucket.object(key)
     object.upload_file(File.open(file['tempfile']))
+
     s3_url = {file['filename'] => [object.key, file] }
 
     s3_url.values.flatten[0]

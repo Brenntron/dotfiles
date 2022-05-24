@@ -1,6 +1,6 @@
 -#%form#search-webrep-cases-form{method: 'get', 'accept-charset': 'UTF-8'}
 -#=simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
-= form_for :advanced_search, html: {id: 'disputes-advanced-search-form'}, url: escalations_webrep_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |advanced_search_form|
+= form_for :advanced_search, html: {id: 'sdr-disputes-advanced-search-form'}, url: escalations_sdr_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |advanced_search_form|
   .form-group.search-item
     %label.content-label-sm Case IDs
     %input.form-control#caseid-input{name: 'case_id'}
@@ -21,30 +21,18 @@
     %button.remove-input#remove-criteria-status
   .form-group.search-item.hidden
     %label.content-label-sm Priority
-    %input.form-control#priority-input{name: 'priority'}
+    %input.form-control#priority-input{name: 'priority', list: 'priority-list'}
+    %datalist#priority-list
     %button.remove-input#remove-criteria-owner
   .form-group.search-item.hidden
-    %label.content-label-sm Suggested Disposition
-    %input.form-control#disposition-input{name: 'disposition'}
+    %label.content-label-sm Suggested Rep
+    %input.form-control#suggested-rep-input{name: 'suggested-rep'}
     %button.remove-input#remove-criteria-disposition
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
     %input.form-control#resolution-input{name: 'resolution', list: 'resolution-list'}
     %datalist#resolution-list
     %button.remove-input#remove-criteria-resolution
-  .form-group.search-item.hidden#submission-type
-    %label.content-label-sm Submission Type
-    .radio-wrapper
-      .ticket-radio-button-wrapper
-        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-w-cb', class: 'form-control', checked: 'checked'}, 'w')
-        %label.content-label-sm{for: 'submission-type-w-cb'} Web Tickets (W)
-      .ticket-radio-button-wrapper
-        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-e-cb', class: 'form-control', checked: 'checked'}, 'e')
-        %label.content-label-sm{for: 'submission-type-e-cb'} Email Tickets (E)
-      .ticket-radio-button-wrapper
-        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-ew-cb', class: 'form-control', checked: 'checked'}, 'ew')
-        %label.content-label-sm{for: 'submission-type-ew-cb'} Email/Web Tickets (EW)
-    %button.remove-input.remove-radio-input
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
     %input.form-control#submitter-input{name: 'submitter', list: 'submittertype-list'}
@@ -61,24 +49,20 @@
     %datalist#contactemail-list
     %button.remove-input#remove-criteria-contact-email
   .form-group.search-item.hidden
-    %label.content-label-sm Company
-    %input.form-control#company-input{name: 'company', list: 'company-list'}
-    %datalist#company-list
+    %label.content-label-sm Submitter Org
+    %input.form-control#submitter-org-input{name: 'submitter-org', list: 'submitter-org-list'}
+    %datalist#submitter-org-list
     %button.remove-input#remove-criteria-company
-  .form-group.search-item.hidden
-    %label.content-label-sm Submitter Domain
-    %input.form-control#domain-input{name: 'domain'}
-    %button.remove-input#remove-criteria-domain
   .form-group.search-item.hidden
     %label.content-label-sm Platform
     %input.form-control.selectize#platform-input{name: 'platform', multiple: 'multiple', tabindex: '-1', data: 'webrep'}
     %button#remove-criteria-platform.remove-input{onclick: 'clearSelectize("platform-input")'}
   .form-group.search-item.hidden
-    %label.content-label-sm Date Submitted (Newer)
+    %label.content-label-sm Time Submitted (Newer)
     %input.form-control#submitted-newer-input{type: 'date', name: 'date-submitted-newer'}
     %button.remove-input#remove-criteria-submitted-newer
   .form-group.search-item.hidden
-    %label.content-label-sm Date Submitted (Older)
+    %label.content-label-sm Time Submitted (Older)
     %input.form-control#submitted-older-input{type: 'date', name: 'date-submitted-older'}
     %button.remove-input#remove-criteria-submitted-older
   .form-group.search-item.hidden
@@ -89,14 +73,14 @@
     %label.content-label-sm Case Age (Older) ex: 7d 12h
     %input.form-control#age-older-input{name: 'age'}
     %button.remove-input#remove-criteria-age-older
-  .form-group.search-item.hidden
-    %label.content-label-sm Last Modified (Newer)
-    %input.form-control#modified-newer-input{type: 'date', name: 'date-modified-newer'}
-    %button.remove-input#remove-criteria-modified-newer
-  .form-group.search-item.hidden
-    %label.content-label-sm Last Modified (Older)
-    %input.form-control#modified-older-input{type: 'date', name: 'date-modified-older'}
-    %button.remove-input#remove-criteria-modified-older
+  -#.form-group.search-item.hidden
+  -#  %label.content-label-sm Last Modified (Newer)
+  -#  %input.form-control#modified-newer-input{type: 'date', name: 'date-modified-newer'}
+  -#  %button.remove-input#remove-criteria-modified-newer
+  -#.form-group.search-item.hidden
+  -#  %label.content-label-sm Last Modified (Older)
+  -#  %input.form-control#modified-older-input{type: 'date', name: 'date-modified-older'}
+  -#  %button.remove-input#remove-criteria-modified-older
 
   %button#add-search-items-button
     Add Search Criteria
@@ -125,16 +109,16 @@
             Priority
         %li
           %label.search-criteria-label
-            %input.search-checkbox#disposition-cb{type: 'checkbox', name: 'search-criteria', value: 'Suggested Disposition', for: 'disposition-input'}
-            Suggested Disposition
+            %input.search-checkbox#suggested-rep-cb{type: 'checkbox', name: 'search-criteria', value: 'Suggested Rep', for: 'suggested-rep-input'}
+            Suggested Rep
         %li
           %label.search-criteria-label
             %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria', value: 'Resolution', for: 'resolution-input' }
             Resolution
         %li
-          %label.search-criteria-label
-            %input.search-checkbox#submission-type-cb{type: 'checkbox', name: 'search-criteria', value: 'SubmissionType', for: 'submission-type'}
-            Submission Type
+          -#%label.search-criteria-label
+          -#  %input.search-checkbox#submission-type-cb{type: 'checkbox', name: 'search-criteria', value: 'SubmissionType', for: 'submission-type'}
+          -#  Submission Type
         %li
           %label.search-criteria-label
             %input.search-checkbox#submitter-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Type', for: 'submitter-input'}
@@ -149,12 +133,12 @@
             Contact Email
         %li
           %label.search-criteria-label
-            %input.search-checkbox#company-cb{type: 'checkbox', name: 'search-criteria', value: 'Company', for: 'company-input'}
-            Company
-        %li
-          %label.search-criteria-label
-            %input.search-checkbox#domain-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Domain', for: 'domain-input'}
-            Submitter Domain
+            %input.search-checkbox#submitter-org-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Org', for: 'submitter-org-input'}
+            Submitter Org
+        -#%li
+        -#  %label.search-criteria-label
+        -#    %input.search-checkbox#domain-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Domain', for: 'domain-input'}
+        -#    Submitter Domain
         %li
           %label.search-criteria-label
             %input.search-checkbox#platform-cb{type: 'checkbox', name: 'search-criteria', value: 'Platform', for: 'platform-input'}
@@ -162,11 +146,11 @@
         %li
           %label.search-criteria-label
             %input.search-checkbox#submitted-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Newer)', for: 'submitted-newer-input'}
-            Date Submitted (Newer)
+            Time Submitted (Newer)
         %li
           %label.search-criteria-label
             %input.search-checkbox#submitted-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Older)', for: 'submitted-older-input'}
-            Date Submitted (Older)
+            Time Submitted (Older)
         %li
           %label.search-criteria-label
             %input.search-checkbox#age-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Age', for: 'age-newer-input'}
@@ -175,14 +159,14 @@
           %label.search-criteria-label
             %input.search-checkbox#age-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Age', for: 'age-older-input'}
             Case Age (Older)
-        %li
-          %label.search-criteria-label
-            %input.search-checkbox#modified-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified (Newer)', for: 'modified-newer-input'}
-            Last Modified (Newer)
-        %li
-          %label.search-criteria-label
-            %input.search-checkbox#modified-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified (Older)', for: 'modified-older-input'}
-            Last Modified (Older)
+        -#%li
+        -#  %label.search-criteria-label
+        -#    %input.search-checkbox#modified-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified (Newer)', for: 'modified-newer-input'}
+        -#    Last Modified (Newer)
+        -#%li
+        -#  %label.search-criteria-label
+        -#    %input.search-checkbox#modified-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified (Older)', for: 'modified-older-input'}
+        -#    Last Modified (Older)
     .form-group.text-center
       %button.tertiary#cancel-add-criteria
         Close
@@ -193,9 +177,9 @@
       Add Name to save this search criteria to My Saved Searches
     %input.form-control#search_name{name: 'search_name', :type => 'text', :maxlength => '50'}
   .form-group.text-center
-    %button.primary#submit-advanced-search{type: 'button', value: 'submit', onclick: 'advanced_webrep_index_table();'}
+    %button.primary#submit-advanced-search{type: 'button', value: 'submit', onclick: 'advanced_search_sdr_index_table();'}
       Submit Search
-    %button.secondary#reset-advanced-search.reset{type: 'button', onclick: 'webrep_reset_search()'}
+    %button.secondary#reset-advanced-search.reset{type: 'button', onclick: 'sdr_reset_search()'}
       Reset Search
 
 
