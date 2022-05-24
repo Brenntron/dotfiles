@@ -481,7 +481,7 @@ $ ->
                         age_class = 'ticket-age-over12hr'
                     else if age.indexOf('mo') != -1
                       age_class = 'ticket-age-over12hr'
-                    else if age.indexOf('m') != -1
+                    else if age.indexOf('m') != -1 && age.indexOf('m') < 4
                       age_class = ''
                     else
                       age_class = 'ticket-age-over12hr'
