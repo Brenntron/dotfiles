@@ -18,6 +18,12 @@ class Clusters::Assignor
     end
   end
 
+  def assign_permanent!
+    clusters.each do |cluster|
+      ClusterAssignment.assign_permanent!(cluster, user)
+    end
+  end
+
   def unassign
     clusters.each do |cluster|
       ClusterAssignment.unassign(cluster, user)

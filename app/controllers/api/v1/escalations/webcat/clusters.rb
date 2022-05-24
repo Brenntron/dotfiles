@@ -22,7 +22,7 @@ module API
               cluster_process_array = []
 
               clusters = JSON.parse(params[:clusters], symbolize_names: true)
-              ::Clusters::Assignor.new(clusters, current_user).assign!
+              ::Clusters::Assignor.new(clusters, current_user).assign_permanent!
               ::Clusters::Processor.new(clusters, current_user).process
               return {:status => "success"}.to_json
             end

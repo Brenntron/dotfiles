@@ -23,7 +23,7 @@ class Webcat::ClustersProcessor
       ClusterCategorization.where(cluster_id: cluster_ids).each do |cluster_categorization|
         if third_person_review_cluster?(cluster_categorization, current_user)
           manager_user = User.where(cvs_username: Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
-          ClusterAssignment.assign_pemanent!(cluster_ids, manager_user)
+          ClusterAssignment.assign_permanent!(cluster_ids, manager_user)
 
           raise 'Cluster should pass manager review'
         else
