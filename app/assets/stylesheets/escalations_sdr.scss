@@ -1,3 +1,16 @@
+.sdr-dispute-case-priority-wrapper {
+  display: flex;
+}
+
+.sdr-dispute-priority-wrapper {
+  flex: 1;
+  margin-top: 15px;
+}
+
+.sdr-dispute-case-id-wrapper {
+  flex: 4;
+}
+
 .sdr-age-wrapper, .submitter-org-wrapper, .contact-email-wrapper {
   margin-top: 10px;
 }

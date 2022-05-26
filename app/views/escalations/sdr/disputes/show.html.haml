@@ -5,10 +5,9 @@
 
 .content-wrapper.top-case-info
   .row
-    .col-xs-2.col-with-divider
+    .col-xs-2.col-with-divider.sdr-dispute-case-priority-wrapper
       .sdr-dispute-priority-wrapper
-        /%span.bug-state-info.bug-priority#dispute-priority-icon{class: "p-#{@dispute}"}
-        /=select_tag(:'dispute-priority-select', options_for_select([["#{Dispute::PRIORITY_1}"], ["#{Dispute::PRIORITY_2}"], ["#{Dispute::PRIORITY_3}"], ["#{Dispute::PRIORITY_4}"], ["#{Dispute::PRIORITY_5}"]], @dispute.priority))
+        %span.bug-state-info.bug-priority#dispute-priority-icon{class: "p-#{@dispute.priority}"}
       .sdr-dispute-case-id-wrapper
         %label.content-label-sm
           Case ID

@@ -326,28 +326,3 @@ Feature: sdr communications
     Then I go to "/escalations/sdr/disputes/722"
     Then I click on row with email_id "1"
     Then I should see div element with class "customer-facing-notice"
-
-  @javascript
-  Scenario: a user attaches a file to an email and sends it
-    Then pending
-    # we need to figure out how selenium can interact with the file selector
-    Given a user with role "webrep user" exists and is logged in
-    And the following platforms exist:
-      | public_name |
-      | FirePower   |
-    And the following SDR disputes exist:
-    |id     |
-    |5370    |
-    And bugzilla rest creates a bug with id "5370"
-    And I goto "/escalations/sdr/disputes/5370"
-    Then I click "Compose New Email"
-    And I wait for "2" seconds
-    And I fill in "receiver" with "customer@gmail.com"
-    And I click ".new-attachment"
-    Then I wait for "2" seconds
-    Given I upload "test_doc.txt" from_button "attachment"
-    Then I wait for "5" seconds
-    Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
-    Then I click "Send"
-    And I wait for "3" seconds
-    And I should see "test_doc.txt"

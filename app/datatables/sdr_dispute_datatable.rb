@@ -51,7 +51,7 @@ class SdrDisputeDatatable < AjaxDatatablesRails::ActiveRecord
         contact_name:           dispute.customer&.name,
         contact_email:          dispute.customer&.email,
         submitter_org:          dispute.customer&.company&.name,
-        current_user:           @user.display_name,
+        current_user:           @user.cvs_username,
       }
     end
   end
