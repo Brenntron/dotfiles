@@ -52,8 +52,8 @@ $ ->
         priority: priority,
         description: details
       success: (response) ->
-        std_msg_success('Dispute Created.', [], reload: true)
+        std_msg_success('Dispute Created', [], reload: true)
       error: (response) ->
         console.log response
-        std_api_error(response, "Dispute was not created.", reload: false)
+        std_msg_error("Dispute was not created", [response.responseText], reload: false)
     )
