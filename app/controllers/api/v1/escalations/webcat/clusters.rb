@@ -36,7 +36,6 @@ module API
             # Uses class Beaker::Verdicts in old Beaker namespace.
             get "" do
               authorize!(:index, Complaint)
-
               filter = {
                 f: params[:f],
                 platform: params[:platform],
@@ -65,10 +64,20 @@ module API
             get ":id" do
               cluster_id = params[:id]
               cluster_info = Wbrs::Cluster.retrieve(cluster_id)
-              sorted_limited_cluster_info = cluster_info.sort { |x,y| y["glob_volume"] <=> x["glob_volume"] }.first(300)
+              sorted_limited_cluster_info = cluster_info.sort { |x,y| y['glob_volume'] <=> x['glob_volume'] }.first(300)
 
 
-              {:status => "success", :data => sorted_limited_cluster_info}.to_json
+              { status: 'success', data: sorted_limited_cluster_info }.to_json
+            end
+
+            post 'multiple' do
+              clusters_info = Wbrs::Cluster.retrieve_many(params[:ids])['data']
+              sorted_limited_cluster_info =  clusters_info.reduce({}) do |result, (id, clusters)|
+                result[id] = clusters.sort { |x, y| y['glob_volume'] <=> x['glob_volume'] }.first(300)
+                result
+              end
+              puts sorted_limited_cluster_info
+              { status: 'success', data: sorted_limited_cluster_info }.to_json
             end
 
             desc "assign cluster to the user"

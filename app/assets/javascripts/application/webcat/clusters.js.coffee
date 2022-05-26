@@ -1,3 +1,36 @@
+cluster_detail_head = """
+    <table class='table cluster-path-table'>
+      <thead>
+        <tr>
+          <th class='clusterpath-col-path'>Cluster Paths</th>
+          <th class='clusterpath-col-path'>Customer Name</th>
+          <th class='clusterpath-col-volume text-center'>APAC Region Volume</th>
+          <th class='clusterpath-col-volume text-center'>EMRG Region Volume</th>
+          <th class='clusterpath-col-volume text-center'>EURP Region Volume</th>
+          <th class='clusterpath-col-volume text-center'>GLOB Volume</th>
+          <th class='clusterpath-col-volume text-center'>JAPN Volume</th>
+          <th class='clusterpath-col-volum text-centere'>NA Region Volume</th>
+          <th class='clusterpath-col-wbrs text-center'>WBRS Score</th>
+        </tr>
+        </thead>
+      <tbody>
+  """
+
+window.cluster_detail_row = (wbrs_rep, wbrs_score, url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume) ->
+  wbrs_col = "<div class='reputation-icon-container'><span class='reputation-icon icon-#{wbrs_rep} esc-tooltipped' title='#{wbrs_rep.toUpperCase()}'></span> #{wbrs_score}</div>"
+
+  "<tr class='index-entry-row'>
+    <td class='clusterpath-col-path'>#{url}</td>
+    <td class='clusterpath-col-path'>#{customer_name}</td>
+    <td class='clusterpath-col-volume text-center'>#{apac_volume}</td>
+    <td class='clusterpath-col-volume text-center'>#{emrg_volume}</td>
+    <td class='clusterpath-col-volume text-center'>#{eurp_volume}</td>
+    <td class='clusterpath-col-volume text-center'>#{glob_volume}</td>
+    <td class='clusterpath-col-volume text-center'>#{japn_volume}</td>
+    <td class='clusterpath-col-volume text-center'>#{noam_volume}</td>
+    <td class='clusterpath-col-wbrs text-center'>#{wbrs_col}</td>
+  </tr>"
+
 window.apply_filter_to_table = () ->
   filter = $("#cluster_filter_field").val()
 
@@ -18,13 +51,11 @@ window.populate_clusters_index_table = (filter) ->
     if filter && filter_param
       filter_param += "&regex=" + filter
 
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
       method: 'GET'
-      headers: headers
+      headers: window.headers()
       success: (response) ->
-        console.log response
         loader.addClass('hidden')
         json = $.parseJSON(response)
         if json.data.length == 0
@@ -96,8 +127,6 @@ window.categorize_clusters = (review_action) ->
 
   url = "/escalations/api/v1/escalations/webcat/clusters/#{endpoint}"
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
   # approve all, deny all: ensure all selected rows are in 2nd review (blue row) before proceeding
   if review_action == "bulk_accept" || review_action == "bulk_deny"
     $('input.cluster-row-select:checked').each ->
@@ -111,7 +140,7 @@ window.categorize_clusters = (review_action) ->
     std_msg_ajax
       url: url
       method: 'POST'
-      headers: headers
+      headers: window.headers()
       data: data
       success: (response) ->
         loader.addClass('hidden')
@@ -212,6 +241,7 @@ $ ->
       {
         data: 'cluster_id'
         width: '100px'
+        className: 'cluster_identifier'
       }
       {
         data: null
@@ -292,9 +322,8 @@ $ ->
 # expand all functionality
 window.expand_all_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"]')
-  for row in selectedRows
-    if !$(row).hasClass('shown')
-      $(row).find('.expand-row-button-inline').click()
+  clusterIds = window.clusters_table.rows({page:'current'} ).data().pluck('cluster_id').toArray()
+  window.get_data_for_clusters(selectedRows, clusterIds)
 
 # collapse all functionality
 window.collapse_all_clusters = (tableId) ->
@@ -306,9 +335,28 @@ window.collapse_all_clusters = (tableId) ->
 #  expand selected funtionality
 window.expand_selected_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
-  for row in selectedRows
-    if !$(row).hasClass('shown')
-      $(row).find('.expand-row-button-inline').click()
+  clusterIds = selectedRows.map (i, row) -> 
+    parseInt($(row).find('.cluster_identifier').text())
+  window.get_data_for_clusters(selectedRows, clusterIds.toArray())
+
+# get data and expandand clusters details
+window.get_data_for_clusters  = (selectedRows, clusterIds) ->
+  $.ajax
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/webcat/clusters/multiple"
+    headers: window.headers()
+    data: { ids: clusterIds }
+    success: (response) ->
+      clustersData =  $.parseJSON(response).data
+      for row in selectedRows
+        cluster_id = $(row).find('td.cluster_identifier').text()
+        if !$(row).hasClass('shown') && clustersData[parseInt(cluster_id)]
+          window.expandSingleRow(row, clustersData[parseInt(cluster_id)])
+      $('.cluster-mgt-loader-wrapper').addClass('hidden')
+
+    error: (response) ->
+      $('.cluster-mgt-loader-wrapper').addClass('hidden')
+      std_api_error(response, "There was an error loading cluster data.", reload: false)
 
 #  collapse selected funtionality
 window.collapse_selected_clusters = (tableId) ->
@@ -459,7 +507,8 @@ window.toggle_all_checkboxes = () ->
     rows = $('table#clusters-index input[type="checkbox"]')
     for row in rows
       $(row)[0].checked = false
-
+window.headers = () ->
+  {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 # Select rows in Clusters Table
 $ ->
   $('#clusters_check_box').click -> toggle_all_checkboxes()
@@ -471,33 +520,72 @@ $ ->
 
   #  Expand cluster rows
   $('#clusters-index tbody').on 'click', '.expand-row-button-inline, .entry-count', ->
-    tr = $(this).closest('tr')
-    row = window.clusters_table.row(tr)
-    if row.child.isShown()
-# This row is already open - close it
-      row.child.hide()
-      tr.removeClass 'shown'
+    expandSingleRow(this)
+
+window.expandSingleRow = (currentRow, preloadedData=[])->
+  tr = $(currentRow).closest('tr')
+  row = window.clusters_table.row(tr)
+  if row.child.isShown()
+    # This row is already open - close it
+    row.child.hide()
+    tr.removeClass 'shown'
+  else
+    # Open this row
+    $('.cluster-mgt-loader-wrapper').removeClass('hidden')
+    cluster = row.data()
+
+    missing_data = '<span class="missing-data">Missing data</span>'
+    entry_rows = []
+    if preloadedData.length != 0 
+      entry = preloadedData
+      total_shown_entries = 0
+      total_entries = $($(tr[0]).find('.entry-count')[0]).text()
+
+      if total_entries < 300
+        max_viewable_entries = total_entries
+      else
+        max_viewable_entries = 300
+
+      if total_entries > 25
+        link_to_more_results = '<a class="expand-cluster-entries">Click to preview the top  26 - ' + max_viewable_entries + ' cluster entries.</a>'
+      else
+        link_to_more_results = ''
+
+      $(entry).each (i) ->
+        if i <= 24
+          {url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume, wbrs_score}= this
+          wbrs_rep = window.wbrs_display(wbrs_score)
+          if wbrs_rep == undefined then wbrs_rep = 'unknown'
+          if wbrs_rep == 'unknown'then wbrs_score = '--'
+
+          entry_rows.push window.cluster_detail_row(wbrs_rep, wbrs_score, url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume)
+          total_shown_entries = i + 1
+          return
+
+      bottom_row = '<tr class="cluster-entry-bottom-row">' +
+        '<td colspan="10">Previewing cluster entries 1 - <span class="total-shown-entries">' + total_shown_entries + '</span>. ' + link_to_more_results + '<span class="total-cluster-entry-count">Total Entries: ' + total_entries + '.</span></td>' +
+        '</tr>'
+
+      complete_table = cluster_detail_head + entry_rows.join('') + '</tbody><tfoot>' + bottom_row + '</tfoot></table>'
+
+      row.child(complete_table).show()
+      tr.addClass 'shown'
+      td = $(tr).next('tr').find('td:first')
+      $(td).addClass 'nested-complaint-data-wrapper'
+
+      #         Expanding to maximum preview rows
+      $('.expand-cluster-entries').click ->
+        expand_table_row = this
+        expandClusterEntryPreview(cluster, expand_table_row, max_viewable_entries)
+
+      # subrow icons on clusters DT need the TT init on row expand, these icons don't exist on dt draw.dt, init them here
+      $('#clusters-index .reputation-icon').tooltipster
+        theme: [
+          'tooltipster-borderless'
+          'tooltipster-borderless-customized'
+        ]
+
     else
-# Open this row
-      $('.cluster-mgt-loader-wrapper').removeClass('hidden')
-      cluster = row.data()
-
-      table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' +
-        '<th class="clusterpath-col-path">Cluster Paths</th>' +
-        '<th class="clusterpath-col-path">Customer Name</th>' +
-        '<th class="clusterpath-col-volume text-center">APAC Region Volume</th>' +
-        '<th class="clusterpath-col-volume text-center">EMRG Region Volume</th>' +
-        '<th class="clusterpath-col-volume text-center">EURP Region Volume</th>' +
-        '<th class="clusterpath-col-volume text-center">GLOB Volume</th>' +
-        '<th class="clusterpath-col-volume text-center">JAPN Volume</th>' +
-        '<th class="clusterpath-col-volum text-centere">NA Region Volume</th>' +
-        '<th class="clusterpath-col-wbrs text-center">WBRS Score</th>' +
-        '</tr>' +
-        '</thead>' + '<tbody>'
-      missing_data = '<span class="missing-data">Missing data</span>'
-      entry_rows = []
-
-
       std_msg_ajax(
         method: 'GET'
         url: "/escalations/api/v1/escalations/webcat/clusters/" + cluster.cluster_id
@@ -519,27 +607,14 @@ $ ->
           else
             link_to_more_results = ''
 
-
-
           $(entry).each (i) ->
             if i <= 24
               {url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume, wbrs_score}= this
               wbrs_rep = window.wbrs_display(wbrs_score)
               if wbrs_rep == undefined then wbrs_rep = 'unknown'
               if wbrs_rep == 'unknown'then wbrs_score = '--'
-              wbrs_col = "<div class='reputation-icon-container'><span class='reputation-icon icon-#{wbrs_rep} esc-tooltipped' title='#{wbrs_rep.toUpperCase()}'></span> #{wbrs_score}</div>"
-              entry_row = "<tr class='index-entry-row'>
-                      <td class='clusterpath-col-path'>#{url}</td>
-                      <td class='clusterpath-col-path'>#{customer_name}</td>
-                      <td class='clusterpath-col-volume text-center'>#{apac_volume}</td>
-                      <td class='clusterpath-col-volume text-center'>#{emrg_volume}</td>
-                      <td class='clusterpath-col-volume text-center'>#{eurp_volume}</td>
-                      <td class='clusterpath-col-volume text-center'>#{glob_volume}</td>
-                      <td class='clusterpath-col-volume text-center'>#{japn_volume}</td>
-                      <td class='clusterpath-col-volume text-center'>#{noam_volume}</td>
-                      <td class='clusterpath-col-wbrs text-center'>#{wbrs_col}</td>
-                      </tr>"
-              entry_rows.push entry_row
+  
+              entry_rows.push window.cluster_detail_row(wbrs_rep, wbrs_score, url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume)
               total_shown_entries = i + 1
               return
 
@@ -547,7 +622,7 @@ $ ->
             '<td colspan="10">Previewing cluster entries 1 - <span class="total-shown-entries">' + total_shown_entries + '</span>. ' + link_to_more_results + '<span class="total-cluster-entry-count">Total Entries: ' + total_entries + '.</span></td>' +
             '</tr>'
 
-          complete_table = table_head + entry_rows.join('') + '</tbody><tfoot>' + bottom_row + '</tfoot></table>'
+          complete_table = cluster_detail_head + entry_rows.join('') + '</tbody><tfoot>' + bottom_row + '</tfoot></table>'
 
           row.child(complete_table).show()
           tr.addClass 'shown'
@@ -567,10 +642,10 @@ $ ->
             ]
 
           error: (response) ->
-          $('.cluster-mgt-loader-wrapper').addClass('hidden')
-          std_api_error(response, "There was an error loading cluster data.", reload: false)
-      )
-    return
+            $('.cluster-mgt-loader-wrapper').addClass('hidden')
+            std_api_error(response, "There was an error loading cluster data.", reload: false)
+        )
+  return
 
 window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entries) ->
   $('.cluster-mgt-loader-wrapper').removeClass('hidden')
@@ -602,19 +677,8 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
               wbrs_score = '--'
             else
               wbrs_score = parseFloat(wbrs_score).toFixed(1)
-            wbrs_col = "<div class='.reputation-icon-container'><span class='reputation-icon icon-#{wbrs_rep} esc-tooltipped' title='#{wbrs_rep.toUpperCase()}'></span> #{wbrs_score}</div>"
-            entry_row = "<tr class='index-entry-row'>
-                    <td class='clusterpath-col-path'>#{url}</td>
-                    <td class='clusterpath-col-path'>#{customer_name}</td>
-                    <td class='clusterpath-col-volume text-center'>#{apac_volume}</td>
-                    <td class='clusterpath-col-volume text-center'>#{emrg_volume}</td>
-                    <td class='clusterpath-col-volume text-center'>#{eurp_volume}</td>
-                    <td class='clusterpath-col-volume text-center'>#{glob_volume}</td>
-                    <td class='clusterpath-col-volume text-center'>#{japn_volume}</td>
-                    <td class='clusterpath-col-volume text-center'>#{noam_volume}</td>
-                    <td class='clusterpath-col-wbrs text-center'>#{wbrs_col}</td>
-                    </tr>"
-            entry_rows.push entry_row
+          
+              entry_rows.push window.cluster_detail_row(wbrs_rep, wbrs_score, url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume)
             return
 
         $(table_body).append(entry_rows)
@@ -791,7 +855,7 @@ window.build_wsa_table = ()->
 
 window.telemetry_call = (data, type) ->
     $.ajax(
-      headers : {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+      headers: window.headers()
       url: "/escalations/api/v1/escalations/wsa_statuses"
       method: 'POST'
       data: data
@@ -830,7 +894,7 @@ $ ->
 window.take_selected_clusters = ()->
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data().toArray()
   if selected_rows.length > 0
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    headers = window.headers()
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/clusters/take'
       method: 'POST'
@@ -855,11 +919,10 @@ window.take_selected_clusters = ()->
 window.return_selected_clusters = ()->
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data().toArray()
   if selected_rows.length > 0
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/clusters/return'
       method: 'POST'
-      headers: headers
+      headers: window.headers()
       data: 'clusters': JSON.stringify(selected_rows)
       success: (response) ->
         json = $.parseJSON(response)
@@ -879,12 +942,11 @@ window.return_selected_clusters = ()->
 
 
 window.approve_cluster = (cluster_row_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   cluster = window.get_cluster_by_row_id(cluster_row_id)
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/clusters/proccess'
     method: 'POST'
-    headers: headers
+    headers: window.headers()
     data: 'cluster': cluster
     success: (response) ->
       json = $.parseJSON(response)
@@ -901,12 +963,11 @@ window.approve_cluster = (cluster_row_id) ->
   , this)
 
 window.decline_cluster = (cluster_row_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   cluster = window.get_cluster_by_row_id(cluster_row_id)
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/clusters/decline'
     method: 'POST'
-    headers: headers
+    headers: window.headers()
     data: 'cluster': cluster
     success: (response) ->
       json = $.parseJSON(response)
@@ -968,6 +1029,7 @@ $ ->
     url = new URL(document.location.href)
     platform = url.searchParams.get('platform')
     cluster_type = url.searchParams.get('cluster_type')
+    dropdownShouldToggle = true
 
     if(platform)
       if platform == 'All'
@@ -982,3 +1044,14 @@ $ ->
       else
         $("input.show-cluster-types-filter").prop('checked', false)
         $("input.show-cluster-types-filter[name='show-cluster-#{cluster_type}'").prop('checked', true)
+
+    $('#categorize-urls').on 'click', (e) ->
+      dropdownShouldToggle = !dropdownShouldToggle
+
+      if dropdownShouldToggle == true
+        $('#categorize-urls').dropdown('toggle')
+
+    $('.nav-tool-blocks.col-xs-3.col-sm-2.col-lg-2.dropdown').on 'hide.bs.dropdown', (e) ->
+      if dropdownShouldToggle == false
+        e.preventDefault()
+

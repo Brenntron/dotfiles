@@ -20,11 +20,11 @@ class ApplicationRecord < ActiveRecord::Base
     dd, hh = hh.divmod(24)
     case
       when 366 < dd
-        "#{dd / 365} years, #{dd % 365} months"
+        "#{dd / 365} years"
       when 56 <= dd
-        "#{dd / 30} months, #{dd % 30} days"
+        "#{dd / 30} months"
       when 21 <= dd
-        "#{dd / 7} weeks #{dd % 7} days"
+        "#{dd / 7} weeks"
       when dd > 0
         "%id %ih" % [dd, hh]
       when hh > 0
@@ -38,4 +38,10 @@ class ApplicationRecord < ActiveRecord::Base
     ApplicationRecord.humanize_secs(sec_input)
   end
 
+  def self.first_two_time_layers(time)
+    stripped_time = time.gsub(/\sand/, ', ')
+    formatted_time = stripped_time.split(',')
+    first_two_layers = formatted_time.slice(0, 2)
+    first_two_layers.join(',')
+  end
 end

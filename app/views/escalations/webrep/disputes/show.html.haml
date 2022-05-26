@@ -99,25 +99,7 @@
                         .col-xs-6.submenu-left-wrapper{id: "webrep-resolution-selector"}
                           .submenu-header
                             Ticket Resolution
-                          %ul
-                            %li
-                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"}
-                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
-                            %li
-                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"}
-                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
-                            %li
-                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", value: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"}
-                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"} Unchanged
-                            %li
-                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_INVALID}", value: "#{Dispute::STATUS_RESOLVED_INVALID}"}
-                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
-                            %li
-                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_TEST}", value: "#{Dispute::STATUS_RESOLVED_TEST}"}
-                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_TEST}"} Test / Training
-                            %li
-                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
-                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
+                          = render 'escalations/shared/resolved_resolution_options',  { dispute_resolution_name: 'dispute-resolution' }
                         .col-xs-6.submenu-right-wrapper
                           .resolution-comment-wrapper
                             %label.content-label-sm
@@ -133,11 +115,11 @@
                     %center{class: 'select-resolution-message-templates-button'}
                       %p{class:'select-a-template'} Select A Template
                     %select.dropdown.resolution-message-template-select#select-new-resolution-message-template-status
-                      -if ResolutionMessageTemplate.all.empty?
+                      -if ResolutionMessageTemplate.in_progress.empty?
                         %option.hidden{value:'', disabled: true, selected: true} No Templates Created
                       -else
                         %option{value:'', disabled: true, selected: true} No Template Selected
-                        =options_for_select(ResolutionMessageTemplate.all.pluck(:name, :id))
+                        =options_for_select(ResolutionMessageTemplate.in_progress.pluck(:name, :id))
                     %label.content-label-sm
                       Comment
                     %textarea.ticket-status-comment

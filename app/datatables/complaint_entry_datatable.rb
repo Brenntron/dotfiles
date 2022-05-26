@@ -36,7 +36,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
         was_dismissed:      {source: "ComplaintEntry.was_dismissed", data: :was_dismissed, searchable: false, orderable: false},
         viewable:           {source: "ComplaintEntry.viewable", data: :viewable, searchable: false, orderable: false},
         complaint_id:       {source: "ComplaintEntry.complaint_id", data: :complaint_id, cond: :like},
-        tags:               {source: "ComplaintEntry.tags", data: :tags, searchable: false, orderable: false},
+        tags:               {source: "ComplaintTag.name", data: :tags},
         submitter_type:     {source: "ComplaintEntry.submitter_type", data: :submitter_type, cond: :string_eq},
         customer_email:     {source: 'ComplaintEntry.customer_email', data: :customer_email, cond: :like, orderable: false },
         description:        {source: "ComplaintEntry.description", data: :description, cond: :like},
@@ -53,7 +53,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           entry_id:         complaint_entry.id,
           created_at:       complaint_entry.created_at,
           age_int:          (Time.now - complaint_entry.created_at).to_i,
-          age:              ComplaintEntry.humanize_secs(Time.now - complaint_entry.created_at),
+          age:              ComplaintEntry.first_two_time_layers(time_ago_in_words(complaint_entry.created_at, {scope: 'datetime.distance_in_words',include_seconds: false})),
           status:           complaint_entry.status,
           subdomain:        complaint_entry.subdomain,
           domain:           complaint_entry.domain,
@@ -93,7 +93,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   # private
 
   def get_raw_records
-    ComplaintEntry.includes(complaint: {customer: :company}, user: {})
+    ComplaintEntry.includes(complaint: [{customer: :company}, :complaint_tags], user: {}).references(:complaint)
   end
 
   def filter_records(records)
@@ -123,6 +123,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
       records.left_joins(complaint: :customer).order("customers.email #{datatable.orders.first.direction}")
     when 'complaint_entries.assigned_to'
       records.left_joins(:user).order("users.display_name #{datatable.orders.first.direction}")
+    when 'complaint_tags.name'
+      records.left_joins(complaint: :complaint_tags).order("complaint_tags.name #{datatable.orders.first.direction}")
     else
       super
     end

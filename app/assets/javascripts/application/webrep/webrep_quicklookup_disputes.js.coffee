@@ -525,6 +525,8 @@ $ ->
       success_reload:false
       success: () ->
         $('#confirmation-modal').modal('hide')
+      error: (response) ->
+        std_api_error(response, "Reptool API error", reload: false)
     )
 
   window.drop_reptool_bl = (data) ->
@@ -592,7 +594,7 @@ $ ->
       url: '/escalations/api/v1/escalations/webrep/disputes/quick_bulk_update'
       data: update_data: data
       success_reload:false
-      error_prefix: 'Error logging in.'
+      error_prefix: 'Error'
       success: (response) ->
         submitted_entries = []
         $('#quick-lookup-loader').removeClass('visible-ajax-message')
@@ -602,14 +604,15 @@ $ ->
               submitted_entries.push(key.trim())
               el = document.querySelectorAll("td[data='#{key.trim()}']")
               $(el).closest('tr').remove()
+          parsedResponse = JSON.parse(response)
+          if parsedResponse['status'] == 'error'
+            errors.push(parsedResponse['message'])
           if  errors.length == 0
             std_msg_success('All Disputes were successfully created', ["Disputes were successfully created for the following entries:<div>#{submitted_entries.join(', ')}</div>"], reload: false)
           else
-            submitted_msg = ''
             if submitted_entries.length > 0
-              submitted_msg = "<div>Successfully created entries: #{submitted_entries.join(', ')}</div>"
-              errors = "<div>Error creating the following entries: #{submitted_entries.join(', ')}</div>"
-            std_msg_error('Error Creating disputes',[errors + submitted_msg], reload: false)
+              errors = "<div>#{errors.join('. ')}</div>"
+            std_msg_error('Error Creating disputes',[errors], reload: false)
         return response
     )
 
@@ -621,12 +624,12 @@ $ ->
     confirmation_rows = document.querySelector('#confirmation-modal tbody').rows
     $('#confirmation-modal').modal('toggle');
     $('#quick-lookup-loader').addClass('visible-ajax-message')
-    disputes = { comment: $('.confirm-rep-input').text() }
+    disputes = {}
 
     $( confirmation_rows ).each ->
         action_list = []
         cells = $(this).find('td')
-        dispute = $( cells[0] ).text()
+        dispute = $( cells[0] ).text().trim()
         actions = $( cells[1] ).children()
 
         for action, i in actions

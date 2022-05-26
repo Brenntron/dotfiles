@@ -2020,10 +2020,14 @@ button.close {
 
 .nav-container .sub-nav li, .sidenav-icons .sub-nav li {
   height: 30px;
-  line-height: 30px;
   padding-left: 0;
   border: none;
 }
+
+.nav-container .sub-nav li {
+  line-height: 30px;
+}
+
 
 #bugs-subnav, #bugs-subnav-icons {
   background-color: lighten($bug-section-color, 28%)
@@ -5009,7 +5013,7 @@ input.file_attachment {
   border: 1px solid $faint-neutral-color;
 }
 
-#edit-resolution-message-template-form-wrapper {
+#edit-resolution-message-template-form-wrapper,  #edit-resolved-resolution-message-template-form-wrapper{
   display: none;
   height: 0;
   margin: 12px;
@@ -6275,8 +6279,13 @@ input[type="radio"].ticket-status-radio {
 }
 
 .resolution-comment-wrapper {
+  display: inline-block;
   background-color: $content-bg-color;
   padding: 4px 12px !important;;
+}
+
+textarea.ticket-resolution-comment {
+  display: inline-block;
 }
 
 .resolution-comment-wrapper input[type='text'] {
@@ -6829,7 +6838,7 @@ td.ticket-total::before {
   background-color: $faint-neutral-color;
   border-radius: 0 4px 4px 0;
   position: absolute;
-  width: 200px;
+  min-width: 200px;
   top: 0;
   left: 100%;
   height: 100%;
@@ -13454,4 +13463,39 @@ input.wl-bl-list-inline {
   background-image: url(image_path('icon_blacklist_grey.svg'));
   background-size: 17px 17px;
   background-position: 6px center;
+}
+
+// Rulehit Resolution Mailer Templates
+#new_rulehit_resolution_mailer_template, .edit_rulehit_resolution_mailer_template {
+  max-width: 292px;
+}
+
+#new_rulehit_resolution_mailer_template .form-inputs, .edit_rulehit_resolution_mailer_template .form-inputs {
+  margin: 10px 0 0 0;
+  label {
+    width: 100%;
+    float: left;
+    padding: 0 0 1px 0;
+  }
+  input {
+    clear: both;
+    float: left;
+    margin: 0 0 10px 0;
+    width: 100%;
+  }
+  #rulehit_resolution_mailer_template_body {
+    height: 60px;
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
+#new_rulehit_resolution_mailer_template .form-actions, .edit_rulehit_resolution_mailer_template .form-actions{
+  .btn.submit-rulehit-resolution {
+    margin: 12px 0;
+    background-color: #d7dadb;
+  }
+  .btn.submit-rulehit-resolution:hover {
+    background-color: #ccc;
+  }
 }

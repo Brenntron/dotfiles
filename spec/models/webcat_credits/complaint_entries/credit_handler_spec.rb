@@ -23,9 +23,9 @@ describe WebcatCredits::ComplaintEntries::CreditHandler do
         )
       end
 
-      it 'removes prevoius credit and adds the PENDING credit' do
+      it 'does not remove previous credit and adds the PENDING credit' do
         subject
-        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.count).to be 2
         expect(user.webcat_credits.last.credit).to eq WebcatCredit::PENDING
       end
     end
@@ -51,9 +51,9 @@ describe WebcatCredits::ComplaintEntries::CreditHandler do
         )
       end
 
-      it 'removes prevoius credit and adds the PENDING credit' do
+      it 'does not remove previous credit and adds the PENDING credit' do
         subject
-        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.count).to be 2
         expect(user.webcat_credits.last.credit).to eq WebcatCredit::UNCHANGED
       end
     end
@@ -79,9 +79,10 @@ describe WebcatCredits::ComplaintEntries::CreditHandler do
         )
       end
 
-      it 'removes prevoius credit and adds the PENDING credit' do
+      it 'does not remove previous credit and adds the PENDING credit' do
         subject
-        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.count).to be 2
+        expect(user.webcat_credits.first.credit).to eq WebcatCredit::PENDING
         expect(user.webcat_credits.last.credit).to eq WebcatCredit::FIXED
       end
     end
@@ -107,9 +108,10 @@ describe WebcatCredits::ComplaintEntries::CreditHandler do
         )
       end
 
-      it 'removes prevoius credit and adds the PENDING credit' do
+      it 'does not remove previous credit and adds the PENDING credit' do
         subject
-        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.count).to be 2
+        expect(user.webcat_credits.first.credit).to eq WebcatCredit::PENDING
         expect(user.webcat_credits.last.credit).to eq WebcatCredit::INVALID
       end
     end
@@ -135,9 +137,10 @@ describe WebcatCredits::ComplaintEntries::CreditHandler do
         )
       end
 
-      it 'removes prevoius credit and adds the DUPLICATE credit' do
+      it 'does not remove previous credit and adds the DUPLICATE credit' do
         subject
-        expect(user.webcat_credits.count).to be 1
+        expect(user.webcat_credits.count).to be 2
+        expect(user.webcat_credits.first.credit).to eq WebcatCredit::PENDING
         expect(user.webcat_credits.last.credit).to eq WebcatCredit::DUPLICATE
       end
     end

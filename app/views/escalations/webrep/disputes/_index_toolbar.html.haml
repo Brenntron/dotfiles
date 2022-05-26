@@ -137,25 +137,7 @@
               .col-xs-6.submenu-left-wrapper
                 .submenu-header
                   Ticket Resolution
-                %ul
-                  %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'FIXED_FP', value: 'FIXED_FP'}
-                    %label.ticket-res-radio-label.radio-label{for: 'FIXED_FP'} Fixed - FP
-                  %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'FIXED_FN', value: 'FIXED_FN'}
-                    %label.ticket-res-radio-label.radio-label{for: 'FIXED_FN'} Fixed - FN
-                  %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'UNCHANGED', value: 'UNCHANGED'}
-                    %label.ticket-res-radio-label.radio-label{for: 'UNCHANGED'} Unchanged
-                  %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'INVALID', value: 'INVALID'}
-                    %label.ticket-res-radio-label.radio-label{for: 'INVALID'} Invalid / Junk Mail
-                  %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'TEST_TRAINING', value: 'TEST_TRAINING'}
-                    %label.ticket-res-radio-label.radio-label{for: 'TEST_TRAINING'} Test / Training
-                  %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'OTHER', value: 'OTHER'}
-                    %label.ticket-res-radio-label.radio-label{for: 'OTHER'} Other
+                = render 'escalations/shared/resolved_resolution_options', { dispute_resolution_name: 'ticket-resolution' }
               .col-xs-6.submenu-right-wrapper
                 .resolution-comment-wrapper
                   %label.content-label-sm.customer-facing-comment
@@ -253,25 +235,7 @@
               .col-xs-6.submenu-left-wrapper
                 .submenu-header
                   Entry Resolution
-                %ul
-                  %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_FIXED_FP}", value: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FP}"}
-                    %label.entry-res-radio-label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
-                  %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_FIXED_FN}", value: "#{DisputeEntry::STATUS_RESOLVED_FIXED_FN}"}
-                    %label.entry-res-radio-label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
-                  %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_UNCHANGED}", value: "#{DisputeEntry::STATUS_RESOLVED_UNCHANGED}"}
-                    %label.entry-res-radio-label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_UNCHANGED}"} Unchanged
-                  %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_INVALID}", value: "#{DisputeEntry::STATUS_RESOLVED_INVALID}"}
-                    %label.entry-res-radio-label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
-                  %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_TEST}", value: "#{DisputeEntry::STATUS_RESOLVED_TEST}"}
-                    %label.entry-res-radio-label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_TEST}"} Test / Training
-                  %li
-                    %input.entry-resolution-radio{type: 'radio', name: 'entry-resolution', id: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_OTHER}", value: "#{DisputeEntry::STATUS_RESOLVED_OTHER}"}
-                    %label.entry-res-radio-label.radio-label{for: "ENTRY_#{DisputeEntry::STATUS_RESOLVED_OTHER}"} Other
+                = render 'escalations/shared/resolved_resolution_options',  { dispute_resolution_name: 'entry-resolution' }
               .col-xs-6.submenu-right-wrapper
                 .resolution-comment-wrapper
                   %label.content-label-sm.customer-facing-comment
