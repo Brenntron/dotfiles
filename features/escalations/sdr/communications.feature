@@ -1,7 +1,6 @@
-Feature: sdr communications
+Feature: SDR communications
   In order to communicate with customers
   I will provide a communications interface
-
 
   @javascript
   Scenario: there should be a difference between read and unread emails
@@ -139,10 +138,7 @@ Feature: sdr communications
     And I wait for "2" seconds
     And I select "PSB" from "select-new-sdr-template"
     And I wait for "2" seconds
-    # this works confirmed via screen shot, but can't get test to pass
-    # Then I should see "Our worldwide sensor network indicates that spam originated from IP (x.x.x.x) as recently as xx-xx-xx ."
-
-
+    Then I should see content "Our worldwide sensor network indicates that spam originated from IP (x.x.x.x) as recently as xx-xx-xx ." within ".email-reply-body"
 
   ##Notes
 

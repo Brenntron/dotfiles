@@ -1,5 +1,5 @@
 Feature: Disputes index, Research tab
-  In order to interact with disputes' entries as a user, I will provide ways to interact with entries in the Research tab
+  In order to interact with disputes' attachments and research data as a user, I will provide ways to interact with the attachments and research data in the Research tab
 
   @javascript
   Scenario: Disputes with no attachments shouldn't attempt to display any attachments
