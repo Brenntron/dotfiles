@@ -259,7 +259,7 @@ $ ->
 
           html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
                    <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
-          if platform != 'NGFW'
+          if platform == 'WSA'
             html += "<span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
           return html
       }
@@ -1009,7 +1009,8 @@ window.webcat_platform_filter = () ->
   if $(platforms).length == 3 || $(platforms).length == 0
     selected_platform = 'All'
   else
-    selected_platform = $("input.show-platforms-filter:checked").val()
+    selected_platform = []
+    platforms.each -> selected_platform.push($(this).val());
   url = new URL(document.location.href)
   url.searchParams.set('platform', selected_platform)
   document.location = url;
@@ -1035,8 +1036,10 @@ $ ->
       if platform == 'All'
         $("input.show-platforms-filter").prop('checked', true)
       else
+        platforms = platform.split(',')
         $("input.show-platforms-filter").prop('checked', false)
-        $("input.show-platforms-filter[name='show-platform-#{platform}'").prop('checked', true)
+        for platform in platforms
+          $("input.show-platforms-filter[name='show-platform-#{platform}'").prop('checked', true)
 
     if(cluster_type)
       if cluster_type == 'all'

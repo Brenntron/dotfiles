@@ -29,7 +29,7 @@ module API
             desc 'get all clusters'
             params do
               optional :f, type: String, desc: 'filter'
-              optional :platform, type: String, desc: 'platform filter(WSA/NGFW)'
+              optional :platform, type: String, desc: 'platform filter(WSA/NGFW/Umbrella)'
               optional :cluster_type, type: String, desc: 'cluster type filter(ip/domain)'
             end
 

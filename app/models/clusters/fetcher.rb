@@ -1,17 +1,17 @@
 class Clusters::Fetcher
   attr_accessor :filter, :regex, :user
 
-  WSA_DATA_PROVIDER = Clusters::Wbnp::DataFetcher
-  NGFW_DATA_PROVIDER = Clusters::Ngfw::DataFetcher
-  UMBRELLA_DATA_PROVIDER = Clusters::Umbrella::DataFetcher
+  PLATFORM_TO_DATA_PROVIDER = {
+    Clusters::Wbnp::DataFetcher::DATA_PATFORM => Clusters::Wbnp::DataFetcher,
+    Clusters::Ngfw::DataFetcher::DATA_PATFORM => Clusters::Ngfw::DataFetcher,
+    Clusters::Umbrella::DataFetcher::DATA_PLATFORM => Clusters::Umbrella::DataFetcher,
+  }.freeze
 
-  ALL_DATA_PROVIDERS = [
-    WSA_DATA_PROVIDER,
-    NGFW_DATA_PROVIDER,
-    UMBRELLA_DATA_PROVIDER
-  ]
+  ALL_DATA_PROVIDERS = PLATFORM_TO_DATA_PROVIDER.values.freeze
 
-  CLUSTERS_PAGE_LIMIT = 1000
+  # changed this value because Umbrella clusters do not have any global_volume value
+  # and they are not shown in the table because of sorting by global_volume field
+  CLUSTERS_PAGE_LIMIT = 10000
 
   def initialize(filter, regex, user)
     @filter = filter
@@ -29,9 +29,6 @@ class Clusters::Fetcher
   private
 
   def fetch_clusters
-
-    cluster_type = filter ? filter[:cluster_type] : nil
-
     data_providers_list.map do |provider_class|
       provider_class.new(regex, filter, user).fetch
     end.flatten
@@ -43,16 +40,9 @@ class Clusters::Fetcher
     # before data select
     return ALL_DATA_PROVIDERS if filter.blank?
 
-    case filter[:platform]
-    when Clusters::Wbnp::DataFetcher::DATA_PATFORM
-      [WSA_DATA_PROVIDER]
-    when Clusters::Ngfw::DataFetcher::DATA_PATFORM
-      [NGFW_DATA_PROVIDER]
-    when Clusters::Umbrella::DataFetcher::DATA_PLATFORM
-      [UMBRELLA_DATA_PROVIDER]
-    else
-      ALL_DATA_PROVIDERS
-    end
+    data_providers = filter[:platform].split(',').filter_map { |platform| PLATFORM_TO_DATA_PROVIDER[platform] }
+
+    data_providers.present? ? data_providers : ALL_DATA_PROVIDERS
   end
 
   def populate_3rd_party_clusters_data(clusters)
