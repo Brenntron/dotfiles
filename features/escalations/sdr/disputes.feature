@@ -240,20 +240,6 @@ Feature: Disputes
     And  I should see "0000000002"
 
   @javascript
-  Scenario: A user creates a new named search for disputes
-    Given a user with role "webrep user" exists and is logged in
-    And the following SDR disputes exist:
-      |  id  |  status  | user_id |
-      | 5370 | ASSIGNED |    1    |
-    When I goto "/escalations/sdr/disputes?f=open"
-    And  I wait for "3" seconds
-    And I click "#sdr-advanced-search-button"
-    And I fill in "search_name" with "Cucumber"
-    And I click "#submit-advanced-search"
-    And I click "#sdr-filter-cases"
-    Then I should see content "Cucumber" within "#saved-searches-wrapper"
-
-  @javascript
   Scenario: A user creates a duplicate named search for disputes
     Given a user with role "webrep user" exists and is logged in
     And a named search with the name, "Cucumber" exists
@@ -299,17 +285,3 @@ Feature: Disputes
     And I click "#RESEARCHING"
     And I click ".primary"
     Then I should see content "RESEARCHING" within "#show-edit-ticket-status-button"
-
-  @javascript
-  Scenario: A user can show and hide columns
-    Given a user with role "webrep user" exists and is logged in
-    And the following SDR disputes exist:
-      | id |
-      | 1  |
-    When I goto "/escalations/sdr/disputes"
-    Then I should see content "CASE ID" within "#case-id"
-    When I click "#table-show-columns-button"
-    And I toggle checkbox "#case-id-checkbox"
-    And I toggle checkbox "#submitter-type-checkbox"
-    Then I should see content "SUBMITTER TYPE" within "#submitter-type"
-    Then I should not see element "#case-id"
