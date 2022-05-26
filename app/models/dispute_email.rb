@@ -102,6 +102,9 @@ class DisputeEmail < ApplicationRecord
           dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
           dispute.save!
 
+          message = Bridge::DisputeEntryUpdateStatusEvent.new
+          message.post_entries(dispute.dispute_entries)
+
           conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
           conn.post()
         end
