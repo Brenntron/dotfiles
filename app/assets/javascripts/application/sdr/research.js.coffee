@@ -40,7 +40,7 @@ window.get_sdr_research_data = (entry) ->
         else if key == 'web_reputation'
           table_content =
             '<td>' + value.score + '</td>' +
-            '<td>' + value.rules + '</td>' +
+            '<td>' + value.rules.join(', ') + '</td>' +
             '<td>' + value.threat_level + '</td>' +
             '<td>' + value.category + '</td>'
           $('#sdr-reputation-data-table tbody tr').append(table_content)
