@@ -38,7 +38,7 @@ class Clusters::Fetcher
     # this is the data filtering that should be a part Clusters::filter
     # but, for page load speedup purposes that will be more efficient to filter by platform
     # before data select
-    return ALL_DATA_PROVIDERS if filter.blank?
+    return ALL_DATA_PROVIDERS if filter[:platform].blank?
 
     data_providers = filter[:platform].split(',').filter_map { |platform| PLATFORM_TO_DATA_PROVIDER[platform] }
 
