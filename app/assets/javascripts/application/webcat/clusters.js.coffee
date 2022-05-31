@@ -116,7 +116,7 @@ window.categorize_clusters = (review_action) ->
           duplicate['categories'] = category_values
 
     clusters.push(selected_row)
-    clusters = clusters.concat(selected_row.duplicates)
+    clusters = clusters.concat(selected_row.duplicates) if selected_row.duplicates
 
   data["clusters"] = JSON.stringify(clusters)
 
@@ -257,7 +257,7 @@ $ ->
 
           html = "<span ondblclick='copy_domain(\"#{domain}\", this)'> #{domain} </span>"
 
-          if duplicates.length > 0
+          if duplicates && duplicates.length > 0
             html += "<button type='button' class='right-margin esc-tooltipped' title='Show duplicates' onclick='show_duplicates(#{meta.row})'>DUPLICATES</button>"
           # only show WHOIS lookup button for normal domains, not ip addresses
           if !is_ip.test(domain)
