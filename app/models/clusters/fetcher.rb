@@ -22,11 +22,22 @@ class Clusters::Fetcher
   def fetch
     clusters_data = fetch_clusters
     clusters_data = populate_3rd_party_clusters_data(clusters_data)
+    clusters_data = nest_duplicates(clusters_data)
     filtered_clusters = Clusters::Filter.new(clusters_data, filter, user).filter
     filtered_clusters.sort_by { |cluster| cluster[:global_volume] }.reverse.first(CLUSTERS_PAGE_LIMIT)
   end
 
   private
+
+  def nest_duplicates(clusters)
+    clusters = clusters.deep_dup
+    clusters.each do |cluster|
+      duplicates = clusters.select { |c| c[:domain] == cluster[:domain] && c != cluster }
+      cluster[:duplicates] = duplicates
+      clusters.reject! { |c| duplicates.include?(c) }
+    end
+    clusters
+  end
 
   def fetch_clusters
     data_providers_list.map do |provider_class|

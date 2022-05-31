@@ -744,6 +744,45 @@ button {
     text-transform: capitalize;
   }
 }
+
+#duplicated-clusters-modal {
+  .message-div {
+    border: none;
+    padding-top: 2px;
+  }
+  .modal-content {
+    border: 2px solid $faint-neutral-color;
+    border-radius: 2px;
+  }
+  .modal-dialog{
+    width: 900px;
+    margin-top: 180px;
+  }
+  .message-div::before {
+    margin-top: -30px;
+  }
+  .table {
+    margin-top: 20px;
+  }
+  .modal-body>div{
+    line-height: 1.2em;
+  }
+  .modal-header {
+    text-transform: capitalize;
+  }
+  .panel-button {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+#duplicated-clusters-modal {
+  td {
+    text-align: left;
+    font-weight: normal;
+    text-transform: none !important;
+  }
+}
 #confirmation-modal {
   .modal-header{
     background: $primary-section-color;
