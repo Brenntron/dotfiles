@@ -1,21 +1,14 @@
-.modal.fade#duplicated-clusters-modal
-  .modal-dialog{role: 'document'}
-    .modal-content
-      .message-div
-        #message-text
-          %p The cluster has following duplicates:
-          .row
-            .col-xs-12
-              %table.table.responsive#clusters-index-duplicates
-                %thead
-                  %tr
-                    %th Cluster ID
-                    %th Cluster Domain
-                    %th Global Volume
-                    %th WBRS Score
-                    %th Platform
-                    %th Assignee
-                    %th Categories
-                %tbody
-        .text-center
-          %button.panel-button.primary{'data-dismiss': 'modal', 'aria-label': 'Close'} Close
+#duplicate-clusters-dialog{title: 'Duplicate Clusters'}
+  .dialog-content-wrapper
+    %h6.top-table-note This cluster has the following duplicates:
+    %table#clusters-index-duplicates
+      %thead
+        %tr
+          %th Cluster ID
+          %th Cluster Domain
+          %th Global Volume
+          %th WBRS Score
+          %th Platform
+          %th Assignee
+          %th Categories
+      %tbody

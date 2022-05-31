@@ -257,8 +257,6 @@ $ ->
 
           html = "<span ondblclick='copy_domain(\"#{domain}\", this)'> #{domain} </span>"
 
-          if duplicates && duplicates.length > 0
-            html += "<button type='button' class='right-margin esc-tooltipped' title='Show duplicates' onclick='show_duplicates(#{meta.row})'>DUPLICATES</button>"
           # only show WHOIS lookup button for normal domains, not ip addresses
           if !is_ip.test(domain)
             html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='domain_whois(\"#{domain}\")'></button>"
@@ -267,6 +265,10 @@ $ ->
 
           html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
                    <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
+
+          if duplicates && duplicates.length > 0
+            html += "<button type='button' class='cluster-dup-btn right-margin esc-tooltipped' title='Show duplicates' onclick='show_duplicates(#{meta.row})'></button>"
+
           if platform == 'WSA'
             html += "<span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
           return html
@@ -899,6 +901,11 @@ $ ->
         'tooltipster-borderless-customized'
       ]
 
+  $('#duplicate-clusters-dialog').dialog({
+    autoOpen : false
+    width: 750
+  });
+
 window.take_selected_clusters = ()->
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data().toArray()
   if selected_rows.length > 0
@@ -1054,7 +1061,7 @@ window.show_duplicates = (row) ->
         else
           row = row + "<td></td>"
       $('#clusters-index-duplicates').find('tbody').append(row + "</tr>");
-    $('#duplicated-clusters-modal').modal('show')
+    $('#duplicate-clusters-dialog').dialog('open')
   )
 
 # convert categories_ids to categories names
