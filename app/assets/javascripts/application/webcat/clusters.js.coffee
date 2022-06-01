@@ -98,7 +98,7 @@ window.categorize_clusters = (review_action) ->
   data["user_id"] = user_id
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data()
   clusters = []
-  # TODO: ADD DUPLICATES TOO
+
   for selected_row in selected_rows
     selected_row["comment"] = comment
     escaped_domain = selected_row.domain.replaceAll('.', '_')
@@ -964,7 +964,6 @@ window.return_selected_clusters = ()->
     std_msg_error('no rows selected', ['Please select at least one row.'])
 
 
-    # TODO: ADD DUPLICATES HERE
 window.approve_cluster = (cluster_row_id) ->
   cluster = window.get_cluster_by_row_id(cluster_row_id)
   $.ajax(
@@ -1029,9 +1028,8 @@ window.webcat_clusters_refresh = () ->
   window.location.replace('/escalations/webcat/clusters');
 
 window.show_duplicates = (row) ->
-  $('#clusters-index-duplicates').find('tbody').html('')
-
   AC.WebCat.getAUPCategories().then((categories) ->
+    $('#clusters-index-duplicates').find('tbody').html('')
     reverted_categories = {}
     for key, value of categories
       reverted_categories[value] = key.split(' - ')[0]
