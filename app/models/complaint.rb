@@ -7,6 +7,18 @@ class Complaint < ApplicationRecord
 
   delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
 
+  FILTER_VIEW_OPTIONS = [
+    { label: 'Manager Queue', param: 'MANAGER QUEUE', icon: 'icon-my-bugs' },
+    { label: 'My Tickets', param: 'MY COMPLAINTS', icon: 'icon-my-bugs' },
+    { label: 'My Open Tickets', param: 'MY OPEN COMPLAINTS', icon: 'icon-my-open-bugs' },
+    { label: 'My Closed Tickets', param: 'MY CLOSED COMPLAINTS', icon: 'icon-fixed-bugs' },
+    { label: 'Active Tickets', param: 'ACTIVE', icon: 'icon-team-bugs' },
+    { label: 'New Tickets', param: 'NEW', icon: 'icon-open-bugs' },
+    { label: 'Waiting for Review', param: 'REVIEW', icon: 'icon-pending-bugs' },
+    { label: 'Completed Tickets', param: 'COMPLETED', icon: 'icon-fixed-bugs' },
+    { label: 'All Tickets', param: 'ALL', icon: 'icon-recently-viewed' },
+  ].freeze
+
   RESOLUTION_FIXED                      = 'FIXED'
   RESOLUTION_INVALID                    = 'INVALID'
   RESOLUTION_UNCHANGED                  = 'UNCHANGED'

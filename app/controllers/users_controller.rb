@@ -34,6 +34,12 @@ class UsersController < ApplicationController
 
       @total_closed = closed_filerep_disputes.length + closed_webrep_disputes.length
       @total_open = open_filerep_disputes.length + open_webrep_disputes.length
+      @webcat_complaints_filters = [[nil, nil]] + Complaint::FILTER_VIEW_OPTIONS.map { |f| [f[:label], f[:param]] }
+      @webcat_complaints_filters += @user.named_searches.where_project_type('Complaint').order(:name).map do |search|
+        [search.name, search.name]
+      end
+      @webcat_complaints_default_filter_value = @user.user_preferences.find_by(name: 'webcat_complaints_filter')&.value
+      @webcat_complaints_default_filter_name = @webcat_complaints_filters.to_h.key(@webcat_complaints_default_filter_value)
     end
 
     case
@@ -60,6 +66,7 @@ class UsersController < ApplicationController
   def update
     @user = User.find(params[:id])
     @user.update(user_params)
+    update_settings(@user)
     redirect_back(fallback_location: :back)
     if @user.save
       flash[:notice] = "#{@user.cvs_username} updated successfully."
@@ -97,8 +104,19 @@ class UsersController < ApplicationController
 
   private
 
+  def update_settings(user)
+    # just in case if there are few of settings in the future
+    settings_params.each do |name, value|
+      UserPreference.find_or_create_by(user_id: user.id, name: name).update(value: value)
+    end
+  end
+
   def user_params
     params.require(:user).permit(:parent_id, :display_name,:cvs_username, :cec_username, :kerberos_login, :committer, :confirmed, :email, :class_level, :metrics_timeframe, :threatgrid_api_key, :bugzilla_api_key, :sandbox_api_key, role_ids: [])
+  end
+
+  def settings_params
+    params.require(:settings).permit(:webcat_complaints_filter)
   end
 
   def user_api_key_params

@@ -56,6 +56,12 @@
         .form-group
           %label.content-label-sm{for: "user_#{user.id}_sb_api"} Sandbox API Key
           %input.form-control.code{type: 'text', name: 'user[sandbox_api_key]', id: "user_#{user.id}_sb_api", value: "#{user.sandbox_api_key}"}
+    .row
+      .col-sm-12
+        .form-group
+          %label.content-label-sm{for: "user_#{user.id}_user_webcat_complaints_filter"} WebCat Complaints Default Filter
+          %select.dropdown.form-control{ name: 'settings[webcat_complaints_filter]', id: "user_#{user.id}_user_webcat_complaints_filter", style: 'line-height: 17px !important;'}
+            = options_for_select(@webcat_complaints_filters, { selected: @webcat_complaints_default_filter })
     %hr.thin
 
 

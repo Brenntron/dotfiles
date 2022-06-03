@@ -163,6 +163,7 @@ $ ->
         }
       when 'standard'
         urlParams = new URLSearchParams(location.search);
+        refresh_localStorage()
         data = {
           search_type: webcat_search_type
           search_name: urlParams.get('f')
@@ -177,8 +178,8 @@ $ ->
 
   refresh_url = (href) ->
     { webcat_search_type, webcat_search_name } = localStorage
-    url_check = current_url.split('/escalations/file_rep/disputes/')[0]
-    new_url = '/escalations/file_rep/disputes'
+    url_check = current_url.split('/escalations/webcat/complaints/')[0]
+    new_url = '/escalations/webcat/complaints'
     if href != undefined
       window.location.replace( new_url + href )
     if !href && typeof parseInt(url_check) == 'number'
@@ -190,6 +191,34 @@ $ ->
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
 
+  load_user_preference_filter = () ->
+    return if window.location.pathname != '/escalations/webcat/complaints'
+
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/user_preferences/'
+      data: { name: 'webcat_complaints_filter' }
+      success: (response) ->
+        default_filters = []
+        $('#filter-cases-list a').each((_, el) -> default_filters.push($(el).attr('href').split('?f=')[1]))
+
+        # clear search result btn should be shown if current search is not one chosen in user settings
+        if !response || localStorage.webcat_search_name == response || response == window.location.search.split('?f=')[1]
+          localStorage.removeItem('webcatUserPreferenceUsed')
+
+        # do not redirect if there is already some chosen search/filter (not from the settings)
+        return if localStorage.webcat_search_type || window.location.search
+
+        refresh_localStorage()
+        if response && response in default_filters
+          localStorage.webcatUserPreferenceUsed = true
+          refresh_url('?f=' + response)
+        else if response
+          localStorage.webcatUserPreferenceUsed = true
+          window.build_webcat_named_search(response)
+    )
+
+  load_user_preference_filter()
 
   for select in $('select.cat_new_url')
 
@@ -251,7 +280,7 @@ $ ->
     ###
     container = $('#webcat_searchref_container')
     if data != undefined && container.length > 0
-      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="webcat_refresh()"></span>'
+      reset_icon = "<span #{if localStorage.webcatUserPreferenceUsed then 'hidden style="display: none"' else ''} id='refresh-filter-button' class='reset-filter esc-tooltipped' title='Clear Search Results' onclick='webcat_refresh()'></span>"
       {search_type, search_name} = data
 
       try
