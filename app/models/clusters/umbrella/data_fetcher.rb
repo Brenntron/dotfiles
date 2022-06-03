@@ -11,7 +11,6 @@ class Clusters::Umbrella::DataFetcher < Clusters::Templates::DataFetcher
   # Since clusters processing are using platform name as an identifier
   # we use hardcoded value to be isolated from potential category name change on TI side
   DATA_PLATFORM = 'Umbrella'.freeze
-  IP_REGEX = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'.freeze
 
   def initialize(regex, filter = {}, user)
     @regex = regex
@@ -26,12 +25,7 @@ class Clusters::Umbrella::DataFetcher < Clusters::Templates::DataFetcher
   private
 
     def fetch_data
-      data = if regex.present?
-               # apply regex
-               UmbrellaCluster.visible.where('domain REGEXP ?', regex)
-             else
-               UmbrellaCluster.visible
-             end
+      data = UmbrellaCluster.visible.order(traffic_hits: :desc)
 
       case filter[:f]
       when 'my'
@@ -40,11 +34,16 @@ class Clusters::Umbrella::DataFetcher < Clusters::Templates::DataFetcher
         data = data.pending
       end
 
+      if regex.present?
+        regexp = Regexp.new(regex)
+        data = data.select { |cluster| !(cluster.domain =~ regexp).nil? }
+      end
+
       case filter[:cluster_type]
       when 'domain'
-        data = data.where('domain NOT REGEXP ?', IP_REGEX)
+        data = data.select { |cluster| (cluster.domain =~ Resolv::IPv4::Regex).nil? }
       when 'ip'
-        data = data.where('domain REGEXP ?', IP_REGEX)
+        data = data.select { |cluster| !(cluster.domain =~ Resolv::IPv4::Regex).nil? }
       else
         data
       end
