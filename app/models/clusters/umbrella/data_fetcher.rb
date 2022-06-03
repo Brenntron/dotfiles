@@ -11,6 +11,7 @@ class Clusters::Umbrella::DataFetcher < Clusters::Templates::DataFetcher
   # Since clusters processing are using platform name as an identifier
   # we use hardcoded value to be isolated from potential category name change on TI side
   DATA_PLATFORM = 'Umbrella'.freeze
+  IP_REGEX = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'.freeze
 
   def initialize(regex, filter = {}, user)
     @regex = regex
