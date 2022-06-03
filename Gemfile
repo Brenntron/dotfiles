@@ -104,7 +104,7 @@ gem 'inline_svg', '1.3.1'
 
 gem 'rubyXL', '3.3.30'
 
-gem 'public_suffix', '~> 3.0'
+gem 'public_suffix', '4.0.7'
 gem 'addressable', '~> 2.7.0'
 
 gem 'dotiw'
