@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_05_18_164842) do
+ActiveRecord::Schema.define(version: 2022_06_07_145233) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -1171,6 +1171,7 @@ ActiveRecord::Schema.define(version: 2022_05_18_164842) do
     t.string "comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "traffic_hits", default: 0
     t.index ["platform_id"], name: "index_umbrella_clusters_on_platform_id"
   end
 
