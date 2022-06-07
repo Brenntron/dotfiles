@@ -60,13 +60,14 @@ namespace 'AC.WebCat', (exports) ->
         for assignee in json
           selectize.addOption(assignee)
 
-        webcat_search_conditions = localStorage.webcat_search_conditions
+        { webcat_search_conditions, webcat_search_type } = localStorage
 
-        if webcat_search_conditions && JSON.parse(webcat_search_conditions).user_id
-          { user_id } = JSON.parse localStorage.webcat_search_conditions
+        if webcat_search_type?
+          if webcat_search_type == 'advanced'
+            { user_id } = JSON.parse localStorage.webcat_search_conditions
 
-          if user_id
-            element[0].selectize.setValue(user_id)
+            if user_id
+              element[0].selectize.setValue(user_id)
     )
 
   exports.populateSearchCriteria = ->
