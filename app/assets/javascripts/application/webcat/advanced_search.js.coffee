@@ -14,13 +14,14 @@ namespace 'AC.WebCat', (exports) ->
         for company in json
           selectize.addOption(company)
 
-        webcat_search_conditions = localStorage.webcat_search_conditions
+        { webcat_search_conditions, webcat_search_type } = localStorage
 
-        if webcat_search_conditions && JSON.parse(localStorage.webcat_search_conditions).company_name
-          { company_name } = JSON.parse localStorage.webcat_search_conditions
+        if webcat_search_type?
+          if webcat_search_type == 'advanced'
+            { company_name } = JSON.parse localStorage.webcat_search_conditions
 
-          if company_name
-            element[0].selectize.setValue(company_name)
+            if company_name
+              element[0].selectize.setValue(company_name)
     )
 
   exports.createCustomerNameOptions = ->
@@ -37,13 +38,14 @@ namespace 'AC.WebCat', (exports) ->
         for customer_name in json
           selectize.addOption(customer_name)
 
-        webcat_search_conditions = localStorage.webcat_search_conditions
+        { webcat_search_conditions, webcat_search_type } = localStorage
 
-        if webcat_search_conditions && JSON.parse(localStorage.webcat_search_conditions).customer_name
-          { customer_name } = JSON.parse localStorage.webcat_search_conditions
+        if webcat_search_type?
+          if webcat_search_type == 'advanced'
+            { customer_name } = JSON.parse localStorage.webcat_search_conditions
 
-          if customer_name
-            element[0].selectize.setValue(customer_name)
+            if customer_name
+              element[0].selectize.setValue(customer_name)
     )
 
   exports.createAssigneeOptions = ->
@@ -60,13 +62,14 @@ namespace 'AC.WebCat', (exports) ->
         for assignee in json
           selectize.addOption(assignee)
 
-        webcat_search_conditions = localStorage.webcat_search_conditions
+        { webcat_search_conditions, webcat_search_type } = localStorage
 
-        if webcat_search_conditions && JSON.parse(webcat_search_conditions).user_id
-          { user_id } = JSON.parse localStorage.webcat_search_conditions
+        if webcat_search_type?
+          if webcat_search_type == 'advanced'
+            { user_id } = JSON.parse localStorage.webcat_search_conditions
 
-          if user_id
-            element[0].selectize.setValue(user_id)
+            if user_id
+              element[0].selectize.setValue(user_id)
     )
 
   exports.populateSearchCriteria = ->
