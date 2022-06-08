@@ -744,6 +744,7 @@ button {
     text-transform: capitalize;
   }
 }
+
 #confirmation-modal {
   .modal-header{
     background: $primary-section-color;
@@ -7717,12 +7718,16 @@ table.dispute-entry-table tbody tr.selected {
   border-top-color: $table-dark-body;
 }
 
-#complaint_button_dialog .dialog-content-wrapper, #history_dialog .dialog-content-wrapper {
+.dialog-content-wrapper {
   padding: 15px;
 }
 
-#cluster_button_dialog .dialog-content-wrapper, #copycat_dialog .dialog-content-wrapper, #wsa_status_dialog .dialog-content-wrapper  {
-  padding: 15px;
+#clusters-index-duplicates {
+  margin-bottom: 30px;
+}
+
+.top-table-note {
+  margin: 15px 0;
 }
 .tab-pane:not(.active){
   display: none
@@ -7822,10 +7827,6 @@ table.dispute-entry-table tbody tr.selected {
 }
 .searched-for-url {
   color: $bug-section-color;
-}
-
-#complaint_button_dialog .dialog-content-wrapper {
-  padding: 15px;
 }
 
 hr.condensed {
@@ -9037,7 +9038,7 @@ td.text-center span {
   color:$type-lighter-color!important;
 }
 
-.open-in-tab-btn, .whois-btn, .google-btn {
+.open-in-tab-btn, .whois-btn, .google-btn, .cluster-dup-btn {
   background-repeat: no-repeat;
   background-position: center center;
   width: 20px;
@@ -9062,6 +9063,13 @@ td.text-center span {
   background-image: url(image_path('icon_google_grey.svg'));
   background-color: $nav-toolbar-color;
 }
+
+.cluster-dup-btn {
+  background-image: url(image_path('icon_mark_duplicate.svg'));
+  background-color: $nav-toolbar-color;
+  background-size: 16px 16px;
+}
+
 
 .right-margin {
   margin-right: 4px;

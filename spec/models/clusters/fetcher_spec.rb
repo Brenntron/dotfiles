@@ -4,6 +4,7 @@ describe Clusters::Fetcher do
   before do
     allow(Clusters::Wbnp::DataFetcher).to receive_message_chain(:new, :fetch).and_return(wbnp_clusters)
     allow(Clusters::Ngfw::DataFetcher).to receive_message_chain(:new, :fetch).and_return(ngfw_clusters)
+    allow(Clusters::Umbrella::DataFetcher).to receive_message_chain(:new, :fetch).and_return(umbrella_clusters)
     allow(Clusters::Filter).to receive_message_chain(:new, :filter).and_return(expected_response)
     allow(Wbrs::TopUrl).to receive(:check_urls).and_return(top_urls)
     allow(Beaker::Verdicts).to receive(:verdicts).and_return(verdicts)
@@ -15,13 +16,13 @@ describe Clusters::Fetcher do
   let(:wbnp_clusters) do
     [
       {
-        :cluster_id=>1,
-        :domain=>"googletest.com",
-        :global_volume=>7637758,
-        :cluster_size=>2,
-        :is_pending=>false,
-        :categories=>[],
-        :platform=>"WSA"
+        cluster_id: 1,
+        domain: 'googletest.com',
+        global_volume: 7637758,
+        cluster_size: 2,
+        is_pending: false,
+        categories: [],
+        platform: 'WSA'
       }
     ]
   end
@@ -29,13 +30,27 @@ describe Clusters::Fetcher do
   let(:ngfw_clusters) do
     [
       {
-        :cluster_id=>"",
-        :cluster_size=>nil,
-        :domain=>"127.0.0.1",
-        :global_volume=>2821,
-        :is_pending=>false,
-        :categories=>[],
-        :platform=>"NGFW"
+        cluster_id: '',
+        cluster_size: nil,
+        domain: '127.0.0.1',
+        global_volume: 2821,
+        is_pending: false,
+        categories: [],
+        platform: 'NGFW'
+      }
+    ]
+  end
+
+  let(:umbrella_clusters) do
+    [
+      {
+        cluster_id: '',
+        cluster_size: nil,
+        domain: 'google.com',
+        global_volume: 0,
+        is_pending: false,
+        categories: [],
+        platform: 'Umbrella'
       }
     ]
   end
@@ -55,28 +70,28 @@ describe Clusters::Fetcher do
   let(:expected_response) do
     [
       {
-        :assigned_to=>"",
-        :categories=>[],
-        :cluster_id=>1,
-        :cluster_size=>2,
-        :domain=>"googletest.com",
-        :global_volume=>7637758,
-        :is_important=>true,
-        :is_pending=>false,
-        :platform=>"WSA",
-        :wbrs_score=>-3.0
+        assigned_to: '',
+        categories: [],
+        cluster_id: 1,
+        cluster_size: 2,
+        domain: 'googletest.com',
+        global_volume: 7637758,
+        is_important: true,
+        is_pending: false,
+        platform: 'WSA',
+        wbrs_score: -3.0
       },
       {
-        :assigned_to=>"",
-        :categories=>[],
-        :cluster_id=>'',
-        :cluster_size=>nil,
-        :domain=>"127.0.0.1",
-        :global_volume=>2821,
-        :is_important=>true,
-        :is_pending=>false,
-        :platform=>"NGFW",
-        :wbrs_score=>-3.0
+        assigned_to: '',
+        categories: [],
+        cluster_id: '',
+        cluster_size: nil,
+        domain: '127.0.0.1',
+        global_volume: 2821,
+        is_important: true,
+        is_pending: false,
+        platform: 'NGFW',
+        wbrs_score: -3.0
       }
     ]
   end
@@ -87,6 +102,7 @@ describe Clusters::Fetcher do
     it 'should return all clusters' do
       expect(Clusters::Wbnp::DataFetcher).to receive_message_chain(:new, :fetch)
       expect(Clusters::Ngfw::DataFetcher).to receive_message_chain(:new, :fetch)
+      expect(Clusters::Umbrella::DataFetcher).to receive_message_chain(:new, :fetch)
       expect(Clusters::Filter).to receive_message_chain(:new, :filter)
       expect(subject.fetch).to eq(expected_response)
     end
@@ -127,16 +143,16 @@ describe Clusters::Fetcher do
         let(:expected_response) do
           [
             {
-              :assigned_to=>"",
-              :categories=>[],
-              :cluster_id=>1,
-              :cluster_size=>2,
-              :domain=>"googletest.com",
-              :global_volume=>7637758,
-              :is_important=>true,
-              :is_pending=>false,
-              :platform=>"WSA",
-              :wbrs_score=>-3.0
+              assigned_to: '',
+              categories: [],
+              cluster_id: 1,
+              cluster_size: 2,
+              domain: 'googletest.com',
+              global_volume: 7637758,
+              is_important: true,
+              is_pending: false,
+              platform: 'WSA',
+              wbrs_score: -3.0
             }
           ]
         end
@@ -152,16 +168,16 @@ describe Clusters::Fetcher do
         let(:expected_response) do
           [
             {
-              :assigned_to=>"",
-              :categories=>[],
-              :cluster_id=>'',
-              :cluster_size=>nil,
-              :domain=>"127.0.0.1",
-              :global_volume=>2821,
-              :is_important=>true,
-              :is_pending=>false,
-              :platform=>"NGFW",
-              :wbrs_score=>-3.0
+              assigned_to: '',
+              categories: [],
+              cluster_id: '',
+              cluster_size: nil,
+              domain:'127.0.0.1',
+              global_volume: 2821,
+              is_important: true,
+              is_pending: false,
+              platform: 'NGFW',
+              wbrs_score: -3.0
             }
           ]
         end

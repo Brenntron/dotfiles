@@ -98,6 +98,7 @@ window.categorize_clusters = (review_action) ->
   data["user_id"] = user_id
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data()
   clusters = []
+
   for selected_row in selected_rows
     selected_row["comment"] = comment
     escaped_domain = selected_row.domain.replaceAll('.', '_')
@@ -110,8 +111,12 @@ window.categorize_clusters = (review_action) ->
         $(categories).each ->
           value = $(this).attr('value')
           category_values.push value
-        selected_row["categories"] = category_values
+        selected_row['categories'] = category_values
+        for duplicate in selected_row.duplicates
+          duplicate['categories'] = category_values
+
     clusters.push(selected_row)
+    clusters = clusters.concat(selected_row.duplicates) if selected_row.duplicates
 
   data["clusters"] = JSON.stringify(clusters)
 
@@ -246,11 +251,12 @@ $ ->
       {
         data: null
         className: 'domain-column',
-        render: (data) ->
-          {domain, cluster_size, platform} = data  # get domain string and cluster_size out of the data
+        render:  (data, _type, _full, meta) ->
+          {domain, cluster_size, platform, duplicates} = data  # get domain string and cluster_size out of the data
           is_ip = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
 
           html = "<span ondblclick='copy_domain(\"#{domain}\", this)'> #{domain} </span>"
+
           # only show WHOIS lookup button for normal domains, not ip addresses
           if !is_ip.test(domain)
             html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='domain_whois(\"#{domain}\")'></button>"
@@ -259,7 +265,11 @@ $ ->
 
           html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
                    <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
-          if platform != 'NGFW'
+
+          if duplicates && duplicates.length > 0
+            html += "<button type='button' class='cluster-dup-btn right-margin esc-tooltipped' title='Show duplicates' onclick='show_duplicates(#{meta.row})'></button>"
+
+          if platform == 'WSA'
             html += "<span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
           return html
       }
@@ -891,6 +901,11 @@ $ ->
         'tooltipster-borderless-customized'
       ]
 
+  $('#duplicate-clusters-dialog').dialog({
+    autoOpen : false
+    width: 750
+  });
+
 window.take_selected_clusters = ()->
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data().toArray()
   if selected_rows.length > 0
@@ -907,6 +922,7 @@ window.take_selected_clusters = ()->
           std_msg_error('Error Taking Clusters', [json.error])
         else
           for cluster, i in json.clusters
+            change_assignee_for_duplicates(cluster.domain, json.username)
             escaped_domain = cluster.domain.replaceAll('.', '_')
             $("#owner_#{escaped_domain}_#{cluster.platform}").text(json.username)
 
@@ -915,6 +931,12 @@ window.take_selected_clusters = ()->
     , this)
   else
     std_msg_error('No rows selected', ['Please select at least one row.'])
+
+window.change_assignee_for_duplicates = (domain, username) ->
+  selected_rows = $("#clusters-index").DataTable().rows('.selected').data().toArray()
+  row = (row for row in selected_rows when row.domain is domain)[0]
+  for duplicate in row.duplicates
+    duplicate.assigned_to = username
 
 window.return_selected_clusters = ()->
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data().toArray()
@@ -931,6 +953,7 @@ window.return_selected_clusters = ()->
           std_msg_error('Error Returning Clusters', [json.error])
         else
           for entry, i in selected_rows
+            change_assignee_for_duplicates(entry.domain, '')
             escaped_domain = entry.domain.replaceAll('.', '_')
             $("#owner_#{escaped_domain}_#{entry.platform}").text('')
 
@@ -1004,12 +1027,55 @@ window.build_clusters_header = () ->
 window.webcat_clusters_refresh = () ->
   window.location.replace('/escalations/webcat/clusters');
 
+window.show_duplicates = (row) ->
+  AC.WebCat.getAUPCategories().then((categories) ->
+    $('#clusters-index-duplicates').find('tbody').html('')
+    reverted_categories = {}
+    for key, value of categories
+      reverted_categories[value] = key.split(' - ')[0]
+
+    data = window.clusters_table.row(row).data()
+    duplicates = data.duplicates
+
+    for duplicate in duplicates
+      row = "<tr>"
+      # check if already converted ids to names
+      if duplicate.categories.every((element) -> return !isNaN(element))
+        duplicate.categories = category_ids_to_names(reverted_categories, duplicate.categories)
+
+      attribites = [
+        duplicate.cluster_id,
+        duplicate.domain,
+        duplicate.global_volume,
+        duplicate.wbrs_score,
+        duplicate.platform,
+        duplicate.assigned_to,
+        duplicate.categories.join(', ')
+      ]
+
+      for attribute in attribites
+        if attribute || attribute == 0
+          row = row + "<td>#{attribute}</td>"
+        else
+          row = row + "<td></td>"
+      $('#clusters-index-duplicates').find('tbody').append(row + "</tr>");
+    $('#duplicate-clusters-dialog').dialog('open')
+  )
+
+# convert categories_ids to categories names
+window.category_ids_to_names = (categories_hash, category_ids) ->
+  categories = []
+  for category_id in category_ids
+    categories.push(categories_hash[category_id])
+  return categories
+
 window.webcat_platform_filter = () ->
   platforms = $("input.show-platforms-filter:checked")
-  if $(platforms).length > 1 || $(platforms).length == 0
+  if $(platforms).length == 3 || $(platforms).length == 0
     selected_platform = 'All'
   else
-    selected_platform = $("input.show-platforms-filter:checked").val()
+    selected_platform = []
+    platforms.each -> selected_platform.push($(this).val());
   url = new URL(document.location.href)
   url.searchParams.set('platform', selected_platform)
   document.location = url;
@@ -1035,8 +1101,10 @@ $ ->
       if platform == 'All'
         $("input.show-platforms-filter").prop('checked', true)
       else
+        platforms = platform.split(',')
         $("input.show-platforms-filter").prop('checked', false)
-        $("input.show-platforms-filter[name='show-platform-#{platform}'").prop('checked', true)
+        for platform in platforms
+          $("input.show-platforms-filter[name='show-platform-#{platform}'").prop('checked', true)
 
     if(cluster_type)
       if cluster_type == 'all'

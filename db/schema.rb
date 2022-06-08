@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_07_095055) do
+ActiveRecord::Schema.define(version: 2022_05_18_164842) do
 
-  create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "test_group", null: false
@@ -20,6 +20,16 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.integer "attachment_id", null: false
     t.string "policy"
     t.index ["test_group", "attachment_id", "rule_id"], name: "index_alerts_on_test_group_and_attachment_id_and_rule_id"
+  end
+
+  create_table "amp_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.integer "sr_id"
+    t.text "payload"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "file_reputation_ticket_id"
+    t.index ["file_reputation_ticket_id"], name: "index_amp_false_positives_on_file_reputation_ticket_id"
+    t.index ["payload"], name: "index_amp_false_positives_on_payload", length: 15
   end
 
   create_table "amp_naming_conventions", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -35,7 +45,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["table_sequence"], name: "index_amp_naming_conventions_on_table_sequence", unique: true
   end
 
-  create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "bugzilla_attachment_id"
     t.string "file_name"
     t.string "summary"
@@ -58,7 +68,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["unused_rule_id"], name: "index_attachments_on_unused_rule_id"
   end
 
-  create_table "bug_blockers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "bug_blockers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "snort_blocker_bug_id"
     t.integer "snort_blocked_bug_id"
     t.datetime "created_at", null: false
@@ -77,7 +87,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["reference_id", "link_type"], name: "index_reference_links_on_reference_and_link_type"
   end
 
-  create_table "bugs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "bugs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "bugzilla_id"
     t.string "state"
     t.string "status"
@@ -118,7 +128,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["user_id"], name: "index_bugs_on_user_id"
   end
 
-  create_table "bugs_rules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "bugs_rules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "bug_id", default: 0, null: false
     t.integer "rule_id", default: 0, null: false
     t.boolean "tested"
@@ -127,7 +137,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["bug_id", "rule_id"], name: "index_bugs_rules_on_bug_id_and_rule_id", unique: true
   end
 
-  create_table "bugs_tags", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "bugs_tags", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "bug_id", null: false
     t.integer "tag_id", null: false
     t.index ["bug_id", "tag_id"], name: "index_bugs_tags_on_bug_id_and_tag_id", unique: true
@@ -141,48 +151,49 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["whiteboard_id"], name: "index_bugs_whiteboards_on_whiteboard_id"
   end
 
-  create_table "cluster_assignments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.integer "cluster_id"
-    t.integer "user_id"
+  create_table "cluster_assignments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "permanent", default: false
+    t.string "domain"
+    t.integer "cluster_id"
     t.index ["user_id"], name: "index_cluster_assignments_on_user_id"
   end
 
-  create_table "cluster_categorizations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "cluster_categorizations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.bigint "user_id"
     t.integer "cluster_id"
     t.string "comment"
     t.string "category_ids"
-    t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_cluster_categorizations_on_user_id"
   end
 
-  create_table "companies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "companies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_companies_on_name", unique: true
   end
 
-  create_table "complaint_entries", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "complaint_entries", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "complaint_id"
     t.string "subdomain"
     t.string "domain"
-    t.text "path", limit: 16777215
+    t.text "path"
     t.float "wbrs_score"
     t.string "url_primary_category", limit: 2000
     t.string "resolution"
-    t.text "resolution_comment", limit: 16777215
+    t.text "resolution_comment"
     t.datetime "complaint_entry_resolved_at"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "viewable", default: true, null: false
     t.float "sbrs_score"
-    t.text "uri", limit: 16777215
+    t.text "uri"
     t.string "suggested_disposition"
     t.string "ip_address"
     t.string "entry_type"
@@ -191,9 +202,9 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.boolean "is_important"
     t.datetime "case_resolved_at"
     t.datetime "case_assigned_at"
-    t.text "internal_comment", limit: 16777215
+    t.text "internal_comment"
     t.boolean "was_dismissed", default: false
-    t.text "uri_as_categorized", limit: 16777215
+    t.text "uri_as_categorized"
     t.string "platform"
     t.integer "platform_id"
     t.index ["complaint_id"], name: "index_complaint_entries_on_complaint_id"
@@ -202,28 +213,15 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["user_id", "status"], name: "index_complaint_entries_on_user_id_and_status"
   end
 
-  create_table "complaint_entry_credits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.string "credit"
-    t.integer "user_id"
-    t.integer "complaint_entry_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "type"
-    t.string "domain", limit: 191
-    t.index ["complaint_entry_id"], name: "index_complaint_entry_credits_on_user_id"
-    t.index ["user_id"], name: "index_complaint_entry_credits_on_complient_entry_id"
-  end
-
-  create_table "complaint_entry_preloads", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "complaint_entry_preloads", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "complaint_entry_id"
     t.text "current_category_information", limit: 4294967295
     t.text "historic_category_information", limit: 4294967295
-    t.index ["complaint_entry_id", "id"], name: "index_complaint_entry_preloads_on_complaint_entry_id_and_id"
   end
 
-  create_table "complaint_entry_screenshots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "complaint_entry_screenshots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "complaint_entry_id"
@@ -232,29 +230,39 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["complaint_entry_id"], name: "index_complaint_entry_screenshots_on_complaint_entry_id"
   end
 
-  create_table "complaint_tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "complaint_marked_commits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.integer "complaint_entry_id"
+    t.string "comment"
+    t.string "category_list"
+    t.index ["user_id"], name: "index_complaint_marked_commits_on_user_id"
+  end
+
+  create_table "complaint_tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_complaint_tags_on_name", unique: true
   end
 
-  create_table "complaint_tags_complaints", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "complaint_tags_complaints", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.bigint "complaint_id", null: false
     t.bigint "complaint_tag_id", null: false
     t.index ["complaint_id", "complaint_tag_id"], name: "idx_comp_comp_tag"
     t.index ["complaint_tag_id", "complaint_id"], name: "idx_comp_tag_comp"
   end
 
-  create_table "complaints", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "complaints", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "channel"
     t.string "status"
-    t.text "description"
+    t.text "description", collation: "utf8mb4_0900_ai_ci"
     t.string "added_through"
     t.datetime "complaint_assigned_at"
     t.datetime "complaint_closed_at"
     t.string "resolution"
-    t.text "resolution_comment", limit: 16777215
+    t.text "resolution_comment"
     t.string "region"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -268,14 +276,15 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
-    t.text "bridge_packet", limit: 4294967295
-    t.text "import_log", limit: 4294967295
+    t.text "bridge_packet", limit: 16777215
+    t.text "import_log", limit: 16777215
+    t.text "meta_data", limit: 16777215
     t.index ["channel", "customer_id"], name: "index_complaints_on_channel_and_customer_id"
     t.index ["customer_id"], name: "index_complaints_on_customer_id"
     t.index ["status", "customer_id"], name: "index_complaints_on_status_and_customer_id"
   end
 
-  create_table "customers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "customers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "company_id"
     t.string "name"
     t.string "email"
@@ -284,7 +293,6 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.datetime "updated_at", null: false
     t.index ["company_id", "name"], name: "index_customers_on_company_id_and_name"
     t.index ["email"], name: "index_customers_on_email", unique: true
-    t.index ["name"], name: "index_customers_on_name"
   end
 
   create_table "cves", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -316,7 +324,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["reference_id"], name: "index_cves_on_reference_id", unique: true
   end
 
-  create_table "delayed_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "delayed_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
     t.text "handler", limit: 16777215
@@ -331,7 +339,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
-  create_table "digital_signers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "digital_signers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "file_reputation_dispute_id", null: false
@@ -342,7 +350,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["file_reputation_dispute_id"], name: "index_digital_signers_on_file_reputation_dispute_id"
   end
 
-  create_table "dispute_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "dispute_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "dispute_id"
     t.text "comment"
     t.integer "user_id"
@@ -351,7 +359,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["dispute_id"], name: "index_dispute_comments_on_dispute_id"
   end
 
-  create_table "dispute_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "dispute_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "dispute_email_id"
     t.integer "bugzilla_attachment_id"
     t.string "file_name"
@@ -362,13 +370,13 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["dispute_email_id", "bugzilla_attachment_id"], name: "index_dispute_email_attachments_on_email_and_attachment"
   end
 
-  create_table "dispute_emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "dispute_emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "dispute_id"
-    t.text "email_headers", limit: 16777215
+    t.text "email_headers"
     t.string "from"
-    t.text "to", limit: 16777215
-    t.text "subject", limit: 16777215
-    t.text "body", limit: 16777215
+    t.text "to"
+    t.text "subject"
+    t.text "body"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -378,10 +386,10 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["file_reputation_dispute_id"], name: "index_dispute_emails_on_file_reputation_dispute_id"
   end
 
-  create_table "dispute_entries", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "dispute_entries", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "dispute_id"
     t.string "ip_address"
-    t.text "uri", limit: 16777215
+    t.text "uri"
     t.string "hostname"
     t.string "entry_type"
     t.float "score"
@@ -392,11 +400,11 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.string "top_level_domain"
     t.string "subdomain"
     t.string "domain"
-    t.text "path", limit: 16777215
+    t.text "path"
     t.string "channel"
     t.string "status"
     t.string "resolution"
-    t.text "resolution_comment", limit: 16777215
+    t.text "resolution_comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.float "sbrs_score"
@@ -409,18 +417,18 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.datetime "case_closed_at"
     t.datetime "case_accepted_at"
     t.datetime "case_resolved_at"
-    t.text "proxy_url", limit: 16777215
-    t.text "multi_wbrs_threat_category", limit: 16777215
-    t.text "wbrs_threat_category", limit: 16777215
-    t.text "web_ips", limit: 16777215
-    t.text "auto_resolve_log", limit: 16777215
+    t.text "proxy_url"
+    t.text "multi_wbrs_threat_category"
+    t.text "wbrs_threat_category"
+    t.text "web_ips"
+    t.text "auto_resolve_log"
     t.string "platform"
     t.integer "platform_id"
-    t.text "suggested_threat_category", limit: 16777215
+    t.text "suggested_threat_category"
     t.index ["dispute_id"], name: "index_dispute_entries_on_dispute_id"
   end
 
-  create_table "dispute_entry_preloads", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "dispute_entry_preloads", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.bigint "dispute_entry_id"
     t.text "xbrs_history", limit: 4294967295
     t.text "crosslisted_urls", limit: 4294967295
@@ -435,7 +443,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["dispute_entry_id"], name: "index_dispute_entry_preloads_on_dispute_entry_id"
   end
 
-  create_table "dispute_peeks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "dispute_peeks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
@@ -443,7 +451,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["user_id", "dispute_id"], name: "index_dispute_peeks_on_user_id_and_dispute_id", unique: true
   end
 
-  create_table "dispute_rule_hits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "dispute_rule_hits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "rule_number"
     t.string "mnemonic"
     t.string "name"
@@ -455,7 +463,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["dispute_entry_id", "rule_number"], name: "index_dispute_rule_hits_on_dispute_entry_id_and_rule_number"
   end
 
-  create_table "dispute_rules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "dispute_rules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "name"
     t.string "mnemonic"
     t.text "description"
@@ -466,7 +474,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["name"], name: "index_dispute_rules_on_name"
   end
 
-  create_table "disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "case_number"
     t.string "case_guid"
     t.string "org_domain"
@@ -477,11 +485,11 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.string "status"
     t.string "resolution"
     t.string "priority"
-    t.text "subject", limit: 16777215
-    t.text "description"
+    t.text "subject"
+    t.text "description", collation: "utf8mb4_0900_ai_ci"
     t.string "source_ip_address"
-    t.text "problem_summary", limit: 16777215
-    t.text "research_notes", limit: 16777215
+    t.text "problem_summary"
+    t.text "research_notes"
     t.string "channel"
     t.integer "ticket_source_key"
     t.string "ticket_source"
@@ -495,20 +503,19 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.integer "related_id"
     t.datetime "case_responded_at"
     t.datetime "related_at"
-    t.text "resolution_comment", limit: 16777215
-    t.text "status_comment", limit: 16777215
+    t.text "resolution_comment"
+    t.text "status_comment"
     t.string "product_platform"
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
-    t.text "bridge_packet", limit: 4294967295
-    t.text "import_log", limit: 4294967295
+    t.text "bridge_packet", limit: 16777215
+    t.text "import_log", limit: 16777215
+    t.text "meta_data", limit: 16777215
     t.index ["customer_id"], name: "index_disputes_on_customer_id"
-    t.index ["related_id"], name: "index_disputes_on_related_id"
-    t.index ["user_id"], name: "index_disputes_on_user_id"
   end
 
-  create_table "email_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "email_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "template_name"
     t.text "description"
     t.text "body"
@@ -517,7 +524,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["template_name"], name: "index_email_templates_on_template_name"
   end
 
-  create_table "escalation_links", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "escalation_links", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "snort_escalation_bug_id"
@@ -526,7 +533,14 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["snort_research_bug_id", "snort_escalation_bug_id"], name: "index_escalation_links"
   end
 
-  create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "escalations", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "snort_research_escalation_bug_id"
+    t.integer "snort_escalation_research_bug_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "user"
     t.string "action"
     t.string "description"
@@ -536,14 +550,14 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["user"], name: "index_events_on_user"
   end
 
-  create_table "exploit_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "exploit_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "name"
     t.string "description"
     t.string "pcap_validation"
     t.index ["name"], name: "index_exploit_types_on_name"
   end
 
-  create_table "exploits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "exploits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "data"
     t.integer "exploit_type_id"
     t.datetime "created_at"
@@ -553,14 +567,14 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["exploit_type_id"], name: "index_exploits_on_exploit_type_id"
   end
 
-  create_table "exploits_references", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "exploits_references", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "exploit_id"
     t.integer "reference_id"
     t.index ["exploit_id", "reference_id"], name: "index_exploits_references_on_exploit_id_and_reference_id"
     t.index ["reference_id"], name: "index_exploits_references_on_reference_id"
   end
 
-  create_table "false_positive_selections", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "false_positive_selections", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "display"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -593,7 +607,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.string "source"
   end
 
-  create_table "file_rep_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "file_rep_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "file_reputation_dispute_id", null: false
@@ -611,15 +625,23 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.string "description"
   end
 
-  create_table "file_reputation_disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "file_reps", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "file_rep_name"
+    t.text "sha256_checksum"
+    t.string "email"
+  end
+
+  create_table "file_reputation_disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "customer_id"
     t.string "status", default: "NEW", null: false
     t.string "source"
     t.string "platform"
-    t.text "description"
-    t.string "file_name"
+    t.text "description", collation: "utf8mb4_0900_ai_ci"
+    t.string "file_name", collation: "utf8mb4_0900_ai_ci"
     t.integer "file_size"
     t.string "sha256_hash"
     t.string "sample_type"
@@ -644,18 +666,19 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.datetime "case_responded_at"
     t.integer "reversing_labs_count"
     t.string "sandbox_key"
-    t.text "resolution_comment", limit: 16777215
+    t.text "resolution_comment"
     t.datetime "last_fetched"
-    t.text "reversing_labs_raw", limit: 4294967295
+    t.text "reversing_labs_raw", limit: 16777215
     t.integer "ticket_source_key"
     t.string "submitter_type"
-    t.text "auto_resolve_log", limit: 16777215
+    t.text "auto_resolve_log"
     t.string "product_platform"
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
-    t.text "bridge_packet", limit: 4294967295
-    t.text "import_log", limit: 4294967295
+    t.text "bridge_packet", limit: 16777215
+    t.text "import_log", limit: 16777215
+    t.text "meta_data", limit: 16777215
     t.index ["created_at"], name: "index_file_reputation_disputes_on_created_at"
     t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
     t.index ["sha256_hash"], name: "index_file_reputation_disputes_on_sha256_hash"
@@ -663,7 +686,18 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["user_id"], name: "index_file_reputation_disputes_on_user_id"
   end
 
-  create_table "form_prefills", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "file_reputation_tickets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.bigint "customer_id"
+    t.string "status"
+    t.string "source"
+    t.string "platform"
+    t.string "description"
+    t.bigint "reputation_file_id"
+    t.index ["customer_id"], name: "index_file_reputation_tickets_on_customer_id"
+    t.index ["reputation_file_id"], name: "index_file_reputation_tickets_on_reputation_file_id"
+  end
+
+  create_table "form_prefills", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "field"
     t.text "text"
     t.datetime "created_at", null: false
@@ -688,7 +722,11 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["gib_type", "gib_id"], name: "index_giblets_on_gib_type_and_gib_id"
   end
 
-  create_table "mitre_data", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "immunet_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.string "version"
+  end
+
+  create_table "mitre_data", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "external_id", null: false
     t.string "platform", default: "enterprise"
     t.string "category", null: false
@@ -714,7 +752,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "named_search_criteria", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "named_search_criteria", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "named_search_id"
@@ -723,7 +761,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["named_search_id"], name: "index_named_search_criteria_on_named_search_id"
   end
 
-  create_table "named_searches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "named_searches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
@@ -732,7 +770,19 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["user_id", "name"], name: "index_named_searches_on_user_id_and_name", unique: true
   end
 
-  create_table "notes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "ngfw_clusters", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "domain"
+    t.integer "traffic_hits"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "platform_id"
+    t.string "category_ids"
+    t.integer "status", default: 0
+    t.string "comment"
+    t.index ["platform_id"], name: "index_ngfw_clusters_on_platform_id"
+  end
+
+  create_table "notes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.text "comment"
     t.string "note_type"
     t.string "author"
@@ -743,14 +793,14 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["bug_id"], name: "index_notes_on_bug_id"
   end
 
-  create_table "org_subsets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "org_subsets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_org_subsets_on_name"
   end
 
-  create_table "platforms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "platforms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "public_name"
     t.string "internal_name"
     t.boolean "webrep", null: false
@@ -762,7 +812,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "reference_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "reference_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "name"
     t.string "description"
     t.string "validation"
@@ -773,7 +823,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["name"], name: "index_reference_types_on_name"
   end
 
-  create_table "references", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "references", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.text "reference_data"
     t.integer "reference_type_id"
     t.datetime "created_at"
@@ -782,36 +832,46 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
   end
 
+  create_table "reputation_files", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.integer "bugzilla_attachment_id"
+    t.string "sha256"
+    t.string "file_path"
+    t.string "file_name"
+  end
+
   create_table "resolution_message_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.text "description"
     t.text "body"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "status", default: 0
   end
 
-  create_table "roles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "roles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "role"
     t.integer "org_subset_id"
     t.index ["org_subset_id"], name: "index_roles_on_org_subset_id"
     t.index ["role"], name: "index_roles_on_role"
   end
 
-  create_table "roles_users", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "roles_users", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "role_id", null: false
     t.index ["role_id"], name: "index_roles_users_on_role_id"
     t.index ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id", unique: true
   end
 
-  create_table "rule_associations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "rule_associations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "snort2_rule_id"
     t.bigint "snort3_rule_id"
+    t.boolean "local", default: true
+    t.boolean "remote", default: false
   end
 
-  create_table "rule_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "rule_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "category"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -819,7 +879,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["category"], name: "index_rule_categories_on_category"
   end
 
-  create_table "rule_docs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "rule_docs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "rule_id"
     t.text "summary"
     t.text "impact"
@@ -840,7 +900,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["rule_id"], name: "index_rule_docs_on_rule_id"
   end
 
-  create_table "rule_documents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "rule_documents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "rule_id", null: false
@@ -863,14 +923,24 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["rule_id"], name: "index_rule_documents_on_rule_id", unique: true
   end
 
-  create_table "rule_vulnerabilities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "rule_replacements", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "deleted_rule_id", null: false
+    t.bigint "replacement_rule_id", null: false
+    t.boolean "local", default: true
+    t.boolean "remote", default: false
+    t.index ["deleted_rule_id", "replacement_rule_id"], name: "index_rule_replacements_on_rule_ids", unique: true
+  end
+
+  create_table "rule_vulnerabilities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "display_name"
     t.text "blurb"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "rulehit_resolution_mailer_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "rulehit_resolution_mailer_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "mnemonic"
     t.string "to"
     t.string "cc"
@@ -880,7 +950,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "rules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "rules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.text "rule_content"
     t.text "rule_parsed"
     t.text "rule_warnings"
@@ -919,6 +989,9 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.string "type", default: "Snort2Rule"
     t.text "pre_normalized_rule"
     t.integer "autoconvert", default: 0
+    t.boolean "been_deleted", default: false
+    t.boolean "remote_been_deleted", default: false
+    t.string "delete_message"
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"
     t.index ["task_id"], name: "index_rules_on_task_id"
     t.index ["type", "gid", "sid"], name: "index_rules_on_type_and_gid_and_sid", unique: true
@@ -935,7 +1008,42 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["user_id", "name"], name: "index_saved_searches_on_user_id_and_name"
   end
 
-  create_table "sessions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "sender_domain_reputation_dispute_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "sender_domain_reputation_dispute_id"
+    t.integer "bugzilla_attachment_id"
+    t.string "file_name"
+    t.text "direct_upload_url"
+    t.integer "size"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "email_header_data"
+    t.text "beaker_info", limit: 16777215
+  end
+
+  create_table "sender_domain_reputation_disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "platform_id"
+    t.string "platform_version"
+    t.text "sender_domain_entry"
+    t.integer "user_id"
+    t.string "source"
+    t.string "suggested_disposition"
+    t.string "status"
+    t.string "resolution"
+    t.string "resolution_comment"
+    t.integer "customer_id"
+    t.integer "ticket_source_key"
+    t.string "submitter_type"
+    t.text "bridge_packet", limit: 16777215
+    t.text "meta_data", limit: 16777215
+    t.text "description"
+    t.datetime "case_assigned_at"
+    t.datetime "case_closed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "priority"
+  end
+
+  create_table "sessions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "session_id", null: false
     t.text "data"
     t.datetime "created_at", null: false
@@ -944,7 +1052,24 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
-  create_table "snort_researches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "snort_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.integer "bug_id"
+    t.string "user_email"
+    t.string "sid"
+    t.text "description"
+    t.string "source_authority"
+    t.string "source_key"
+    t.string "os"
+    t.string "version"
+    t.string "built_from"
+    t.string "pcap_lib"
+    t.string "cmd_line_options"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_authority", "source_key"], name: "index_snort_false_positives_on_source_authority_and_source_key"
+  end
+
+  create_table "snort_researches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "bug_id"
     t.integer "snort_research_to_research_bug_id"
     t.datetime "created_at", null: false
@@ -953,14 +1078,14 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["snort_research_to_research_bug_id"], name: "index_snort_researches_researches"
   end
 
-  create_table "tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["name"], name: "index_tags_on_name"
   end
 
-  create_table "tasks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "tasks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.boolean "completed", default: false
     t.boolean "failed", default: false
     t.text "result", limit: 16777215
@@ -982,7 +1107,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end
 
-  create_table "test_queue_events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "test_queue_events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "unstarted"
@@ -996,7 +1121,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["prior_event_id"], name: "index_test_queue_events_on_prior_event_id"
   end
 
-  create_table "test_reports", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "test_reports", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "task_id", null: false
@@ -1008,7 +1133,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["rule_id", "task_id"], name: "index_test_reports_on_rule_id_and_task_id", unique: true
   end
 
-  create_table "tested_policies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "tested_policies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "rule_id"
     t.integer "bug_id"
     t.string "policy"
@@ -1016,7 +1141,50 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "unused_complaint_marked_commits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "ticket_email_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.integer "ticket_email_id"
+    t.integer "bugzilla_attachment_id"
+    t.string "file_name"
+    t.text "direct_upload_url"
+    t.integer "size"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "ticket_emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.integer "bugzilla_id"
+    t.text "email_headers"
+    t.text "from"
+    t.text "to"
+    t.text "subject"
+    t.text "body"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "umbrella_clusters", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "domain"
+    t.bigint "platform_id"
+    t.string "category_ids"
+    t.integer "status", default: 0
+    t.string "comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["platform_id"], name: "index_umbrella_clusters_on_platform_id"
+  end
+
+  create_table "unused_attachments_exploits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.integer "attachment_id"
+    t.integer "exploit_id"
+  end
+
+  create_table "unused_attachments_rules", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.integer "attachment_id"
+    t.integer "rule_id"
+  end
+
+  create_table "unused_complaint_marked_commits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
@@ -1033,6 +1201,13 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "unused_references_rules", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.integer "reference_id"
+    t.integer "rule_id"
+    t.index ["reference_id"], name: "index_unused_references_rules_on_reference_id"
+    t.index ["rule_id"], name: "index_unused_references_rules_on_rule_id"
+  end
+
   create_table "user_api_keys", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1041,7 +1216,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["api_key"], name: "index_user_api_keys_on_api_key", unique: true
   end
 
-  create_table "user_preferences", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "user_preferences", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.bigint "user_id"
     t.string "name"
     t.text "value"
@@ -1050,7 +1225,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["user_id", "name"], name: "index_user_preferences_on_user_id"
   end
 
-  create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "cvs_username", null: false
     t.string "cec_username"
     t.string "kerberos_login"
@@ -1079,7 +1254,6 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.string "bugzilla_api_key"
     t.string "threatgrid_api_key"
     t.string "sandbox_api_key"
-    t.index ["authentication_token"], name: "index_users_on_authentication_token"
     t.index ["cvs_username"], name: "index_users_on_cvs_username", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["lft"], name: "index_users_on_lft"
@@ -1088,7 +1262,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.index ["rgt"], name: "index_users_on_rgt"
   end
 
-  create_table "versions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "versions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false
@@ -1107,6 +1281,21 @@ ActiveRecord::Schema.define(version: 2021_06_07_095055) do
     t.text "notes", limit: 16777215
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "status_message"
+    t.integer "attempts"
+    t.integer "cases_skipped"
+  end
+
+  create_table "webcat_credits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.string "credit"
+    t.bigint "user_id"
+    t.bigint "complaint_entry_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type"
+    t.string "domain", collation: "utf8mb4_0900_ai_ci"
+    t.index ["complaint_entry_id"], name: "index_webcat_credits_on_complaint_entry_id"
+    t.index ["user_id"], name: "index_webcat_credits_on_user_id"
   end
 
   create_table "whiteboards", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
