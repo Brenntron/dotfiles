@@ -1750,14 +1750,18 @@ window.click_table_buttons = (complaint_table, button)->
           else
             $('#master-submit').prop('disabled', true)
         score: (input) ->
-          score = this.getScoreFunction(input)
           #  Adding some customization for autofill
           #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
           (item) ->
             if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
               item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
             else
-              item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase()) ? 1 : 0
+              0
       }
     else
       # need to initialize the selectize function but disable it here if entry is completed
