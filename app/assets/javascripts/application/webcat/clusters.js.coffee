@@ -365,14 +365,18 @@ window.copycat_dialog = () ->
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions('#copycat_dialog #copycat-categories')
         score: (input) ->
-          score = this.getScoreFunction(input)
           #  Adding some customization for autofill
           #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
           (item) ->
             if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
               item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
             else
-              item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase()) ? 1 : 0
+              0
       }
   });
 
@@ -429,14 +433,18 @@ window.selectize_category_inputs = () ->
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
         score: (input) ->
-          score = this.getScoreFunction(input)
           #  Adding some customization for autofill
           #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
           (item) ->
             if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
               item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
             else
-              item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase()) ? 1 : 0
+              0
       }
   AC.WebCat.createSelectOptionsForIds(input_ids)
 
