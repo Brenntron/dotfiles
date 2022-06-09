@@ -863,6 +863,9 @@ button {
   cursor: pointer;
   width: 20px !important;
   margin-top: -15px;
+  right: 40px;
+  height: 20px !important;
+  position: absolute;
 }
 
 .convert-ticket-button:disabled {
@@ -2358,14 +2361,6 @@ a.static-nav-item {
 
 #filter-dropdown {
   min-width: 450px;
-
-  .favorite-search-icon {
-    float: right;
-  }
-}
-
-.favorite-search-icon {
-  float: right;
 }
 
 #filter-dropdown li a {
