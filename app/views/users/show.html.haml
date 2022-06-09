@@ -21,10 +21,6 @@
         - if (@user == current_user && @user.has_role?(['api user', 'webcat user', 'webcat manager'])) || current_user.has_role?('admin')
           %hr.thin
           .user-access-wrapper
-            %label.content-label-sm WebCat Complaints Default Filter
-            %pre.code-snippet.break-word
-              = @webcat_complaints_default_filter_name.presence || 'Not chosen'
-          .user-access-wrapper
             %label.content-label-sm Access
             %label.content-label-md Application Token
             %pre.code-snippet.break-word

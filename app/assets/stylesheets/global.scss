@@ -2358,6 +2358,14 @@ a.static-nav-item {
 
 #filter-dropdown {
   min-width: 450px;
+
+  .favorite-search-icon {
+    float: right;
+  }
+}
+
+.favorite-search-icon {
+  float: right;
 }
 
 #filter-dropdown li a {

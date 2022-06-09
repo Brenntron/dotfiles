@@ -58,6 +58,16 @@ module API
             user_preference.save
 
             end
+
+            desc 'Remove a preference for current user'
+            params do
+              requires :name, type: String, desc: 'A string containing the type of preference to be destroyed'
+            end
+
+            delete 'destroy', root: :user_preferences do
+              user_preference = UserPreference.find_by(user_id: current_user.id, name: params['name'])
+              user_preference.destroy if user_preference.present?
+            end
           end
         end
       end

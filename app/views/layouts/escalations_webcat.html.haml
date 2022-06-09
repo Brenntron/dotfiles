@@ -146,16 +146,18 @@
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
         - Complaint::FILTER_VIEW_OPTIONS.each do |filter|
-          - if filter[:label] == 'Manager Queue' && current_user.is_webcat_manager?
+          - if filter[:label] == 'Manager Queue' && current_user.is_webcat_manager? || filter[:label] != 'Manager Queue'
             %li{class: ('selected' if params[:f] == filter[:param])}
               %a{href: "?f=#{filter[:param]}"}
                 %span.nav-dropdown-icon{class: filter[:icon]}
                 = filter[:label]
-          - elsif filter[:label] != 'Manager Queue'
-            %li{class: ('selected' if params[:f] == filter[:param])}
-              %a{href: "?f=#{filter[:param]}"}
-                %span.nav-dropdown-icon{class: filter[:icon]}
-                = filter[:label]
+              %span.nav-dropdown-icon.favorite-search-icon
+                text
+        %br
+        %li{class: 'favorite-instruction'}
+          %a
+            %span.nav-dropdown-icon.favorite-search-icon-sample
+            Star filter to set as default
 
       #saved-searches-wrapper.webcat-named-search-list.nav-tool-content-wrapper
         %h3.nav-tool-dropdown-header
@@ -168,6 +170,8 @@
                 %td
                   %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_webcat_named_search('#{named_search.name}');", title: named_search.name, :'data-search_conditions' => search_condition_json(named_search)}
                     = named_search.name
+                  %span.nav-dropdown-icon.favorite-search-icon{style: 'color: black;'}
+                    text
                   %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                     = image_tag('icon_cancel_grey.svg')
 

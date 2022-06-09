@@ -191,6 +191,39 @@ $ ->
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
 
+  $('#filter-dropdown').on 'click', '.favorite-search-icon', () ->
+    name = $(this).parent().find('a').attr('href') || $(this).parent().find('a').text().trim()
+    data = { name: name }
+    $icon = $(this)
+
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/user_preferences/update'
+      method: 'POST'
+      data: { data, name: 'webcat_complaints_filter' }
+      dataType: 'json'
+      success: (response) ->
+        $('.favorite-search-icon-active').removeClass('favorite-search-icon-active').addClass('favorite-search-icon')
+        $icon.removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+    )
+
+  $('#filter-dropdown').on 'click', '.favorite-search-icon-active', () ->
+    localStorage.removeItem('webcatFilterUserPreferenceUsed')
+    $icon = $(this)
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/user_preferences/destroy'
+      method: 'DELETE'
+      data: { name: 'webcat_complaints_filter' }
+      dataType: 'json'
+      success: (response) ->
+        $icon.removeClass('favorite-search-icon-active').addClass('favorite-search-icon')
+    )
+
+  set_icon_for_favorite_filter = (name, isDefaultFilter = false) ->
+    if isDefaultFilter
+      $("#filter-dropdown > #filter-cases-list a[href='#{name}']").parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+    else
+      $("#saved-search-tbody a:contains('#{name}')").parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+
   load_user_preference_filter = () ->
     return if window.location.pathname != '/escalations/webcat/complaints'
 
@@ -199,23 +232,32 @@ $ ->
       url: '/escalations/api/v1/escalations/user_preferences/'
       data: { name: 'webcat_complaints_filter' }
       success: (response) ->
+        unless response?
+          localStorage.removeItem('webcatFilterUserPreferenceUsed')
+          return
+
+        name = JSON.parse(response).name
         default_filters = []
-        $('#filter-cases-list a').each((_, el) -> default_filters.push($(el).attr('href').split('?f=')[1]))
+        $('#filter-dropdown > #filter-cases-list a').each((_, el) -> default_filters.push($(el).attr('href')))
+        is_default_filter = name in default_filters
+
+        if is_default_filter then set_icon_for_favorite_filter(name, true) else set_icon_for_favorite_filter(name, false)
 
         # clear search result btn should be shown if current search is not one chosen in user settings
-        if !response || localStorage.webcat_search_name == response || response == window.location.search.split('?f=')[1]
-          localStorage.removeItem('webcatUserPreferenceUsed')
+        if localStorage.webcat_search_name == name || name == decodeURIComponent(window.location.search)
+          localStorage.removeItem('webcatFilterUserPreferenceUsed')
 
         # do not redirect if there is already some chosen search/filter (not from the settings)
         return if localStorage.webcat_search_type || window.location.search
 
         refresh_localStorage()
-        if response && response in default_filters
-          localStorage.webcatUserPreferenceUsed = true
-          refresh_url('?f=' + response)
-        else if response
-          localStorage.webcatUserPreferenceUsed = true
-          window.build_webcat_named_search(response)
+        localStorage.webcatFilterUserPreferenceUsed = true
+        if is_default_filter
+          set_icon_for_favorite_filter(name, true)
+          refresh_url(name)
+        else
+          set_icon_for_favorite_filter(name, false)
+          window.build_webcat_named_search(name)
     )
 
   load_user_preference_filter()
@@ -280,7 +322,7 @@ $ ->
     ###
     container = $('#webcat_searchref_container')
     if data != undefined && container.length > 0
-      reset_icon = "<span #{if localStorage.webcatUserPreferenceUsed then 'hidden style="display: none"' else ''} id='refresh-filter-button' class='reset-filter esc-tooltipped' title='Clear Search Results' onclick='webcat_refresh()'></span>"
+      reset_icon = "<span #{if localStorage.webcatFilterUserPreferenceUsed then 'hidden style="display: none"' else ''} id='refresh-filter-button' class='reset-filter esc-tooltipped' title='Clear Search Results' onclick='webcat_refresh()'></span>"
       {search_type, search_name} = data
 
       try
