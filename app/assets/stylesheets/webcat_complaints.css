@@ -104,14 +104,22 @@
     margin-top: -26px;
     opacity: 0.7;
 }
+#filter-cases-list .favorite-search-icon-active {
+    margin-top: -26px;
+    background-image: url('icon-star-active.svg');
+}
+
 .webcat-named-search-list .favorite-search-icon {
     background-image: url('icon-star-outline-grey.svg');
     opacity: 0.7;
     margin-top: -19px;
     margin-right: -6px;
 }
-.favorite-search-icon-active {
-    background-image: url('icon-star-active.svg');
+
+.webcat-named-search-list .favorite-search-icon-active {
+    margin-top: -19px;
+    margin-right: -6px;
+    background-image: url('icon-star-active-grey.svg');
 }
 
 .favorite-search-icon, .favorite-search-icon-active {
