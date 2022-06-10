@@ -11,7 +11,7 @@ class Umbrella::DataFetcher
       date = date.strftime('%Y-%m-%d')
       filename = date + FILENAME_SUFFIX
       file_content = s3_client.get_object(bucket: BUCKET_NAME, key: filename).body.read
-      file_content.split("\n").map { |domain| { domain: domain } } # that's placeholder for the file attribute that can be added in the future
+      file_content.split("\n").filter_map { |domain| { domain: domain } unless first_line_of_empty_file?(domain) }
     rescue Aws::S3::Errors::NoSuchKey
       msg = "File named #{filename} for #{BUCKET_NAME} bucket on #{REGION} region was not found"
       Rails.logger.error(msg)
@@ -19,6 +19,11 @@ class Umbrella::DataFetcher
     end
 
     private
+
+      # we should ignore default string of empty file: <?xml version=1.0 encoding=UTF-8?>
+      def first_line_of_empty_file?(domain)
+        %w[< xml version encoding > ?].all? { |x| domain.include? x }
+      end
 
       def s3_client
         @client ||= Aws::S3::Client.new(region: REGION)
