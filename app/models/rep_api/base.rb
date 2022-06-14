@@ -104,6 +104,7 @@ class RepApi::Base
   end
 
   def self.call_request(method, request)
+
     case method
       when :post
         if gssnegotiate?
