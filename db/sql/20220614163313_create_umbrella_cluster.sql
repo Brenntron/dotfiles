@@ -8,5 +8,5 @@ CREATE TABLE `umbrella_clusters` (
   `comment` varchar(255)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-CREATE  INDEX `index_umbrella_clusters_on_platform_id`  ON `ubmrella_clusters` (`platform_id`);
+CREATE  INDEX `index_umbrella_clusters_on_platform_id`  ON `umbrella_clusters` (`platform_id`);
 INSERT INTO `schema_migrations` (`version`) VALUES ('20220614163313');
