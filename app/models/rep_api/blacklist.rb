@@ -161,13 +161,14 @@ class RepApi::Blacklist < RepApi::Base
     conditions = {}
     conditions[:source] = input['author'] rescue nil
     conditions[:comment] = input['comment'] rescue nil
-    conditions[:classifications] = self.classifications rescue nil
+    conditions[:classification] = self.classifications rescue nil
     conditions[:entry] = self.entry rescue nil
 
     #response = call_json_request(:post, '/escalations/add', body: build_request_body(input))
+
     response = call_json_request(:post, '/api/v3/blocklist/add', body: conditions)
     #@new_record = false
-    #binding.pry
+
 
     #blacklist_hash = JSON.parse(response.body).inject({}) do |hash, message|
     #  contained_entry = entries.find{ |entry| message['MSG'].include?(entry) }
@@ -254,6 +255,7 @@ class RepApi::Blacklist < RepApi::Base
 
     #response = call_json_request(:post, '/blacklist/expire', body: build_request_body(input))
     response = call_json_request(:post, '/api/v3/blocklist/expire', body: build_request_body(input))
+
     true
   end
 
