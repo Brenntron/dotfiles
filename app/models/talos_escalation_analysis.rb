@@ -94,7 +94,10 @@ class TalosEscalationAnalysis
 
     wbrs_api_response = Sbrs::Base.remote_call_sds_v3(entry, "wbrs")
 
-    score = wbrs_api_response['wbrs']['score']
+    if wbrs_api_response['wbrs']
+      results[:score] = wbrs_api_response['wbrs']['score']
+    end
+
     wbrs_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_api_response) rescue nil
 
     rulehits = []
@@ -102,7 +105,6 @@ class TalosEscalationAnalysis
       rulehits << rule_hit.strip
     end
 
-    results[:score] = score
     if rulehits.present?
       results[:rules] = rulehits
     end
