@@ -2,7 +2,7 @@ class RepApi::Blacklist < RepApi::Base
   FIELD_NAMES = %w{entry disposition public excluded classifications manual_classifications class_id
                    expiration expired hostname author primary_source metadata seen_by
                    _id _rev first_seen last_seen stale status ip ipi
-                   message seen_since_exclude comment}
+                   message seen_since_exclude comment guardrails}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   attr_accessor *FIELD_SYMS
@@ -146,17 +146,20 @@ class RepApi::Blacklist < RepApi::Base
   # @param [String] author: moniker of who is adding or updating this entry.
   # @param [String] comment:
   # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
+  # For v3:
+  # ["entries"]["entry"]["result"] is the right place.
+  #
+  # failed means it failed, most likely the allow list blocked it, and you can't force it.
+  #
+  # manual means it failed guardrails, and it could be forced with the force flag.
+  #
+  # block means it was successfully blocked.
   def save!(params = {})
     raise "Validation failed: #{errors.full_messages.join(', ')}" unless valid?
 
     input = stringkey_params(params)
     raise "Missing parameter: author" unless input.has_key?('author')
     raise "Missing parameter: comment" unless input.has_key?('comment')
-
-    #input = input.to_a
-    #input += self.classifications.join(",").split(",").map{ |classification| "classification=#{classification}" }
-    #entries = entry.kind_of?(Array) ? entry : [entry]
-    #input += entries.map{ |entry_curr| "entry=#{entry_curr}" }
 
     conditions = {}
     conditions[:source] = input['author'] rescue nil
@@ -167,42 +170,40 @@ class RepApi::Blacklist < RepApi::Base
     #response = call_json_request(:post, '/escalations/add', body: build_request_body(input))
 
     response = call_json_request(:post, '/api/v3/blocklist/add', body: conditions)
-    #@new_record = false
-
-
-    #blacklist_hash = JSON.parse(response.body).inject({}) do |hash, message|
-    #  contained_entry = entries.find{ |entry| message['MSG'].include?(entry) }
-    #  case
-    #    when message['expiration'].present?
-    #      hash[message['entry']] = RepApi::Blacklist.new(entry: message['entry'],
-    #                                                     expiration: message['expiration'],
-    #                                                     message: message['MSG'],
-    #                                                     new_record: false)
-    #    when contained_entry
-    #      hash[contained_entry] = RepApi::Blacklist.new(entry: contained_entry,
-    #                                                    message: message['MSG'],
-    #                                                    new_record: true)
-    #  end
-
-    #  hash
-    #end
-
-    #entries.map do |entry_curr|
-    #  key = blacklist_hash.keys.find{ |key_curr| entry_curr.include?(key_curr) }
-    #  if key
-    #    blacklist_hash[key]
-    #  else
-    #    RepApi::Blacklist.new(entry: entry_curr,
-    #                          new_record: true)
-    #  end
-    #end
 
     blocklist_objects = []
 
     response_hash = JSON.parse(response.body)
+
     if response_hash["success"]
       response_hash["entries"].keys.each do |key|
-        new_record = RepApi::Blacklist.new(entry: key, expiration: response_hash["entries"][key]["data"]["expiration"], message: response_hash["entries"][key]["data"]["message"])
+        guardrails_message = ""
+        if response_hash["entries"][key]["guardrails"].present?
+          guardrails_data = response_hash["entries"][key]["guardrails"]
+          guardrails_data["reason"].each do |reason|
+            answer = reason["answer"] rescue ""
+            reason_text = reason["reason"] rescue ""
+            data_text = reason["data"].to_s rescue ""
+            guardrails_message += "| #{answer} = #{reason_text} #{data_text}}"
+          end
+        end
+
+        result = response_hash["entries"][key]["result"]
+        if result == "manual" || result == "failed"
+          error_message = response_hash["entries"][key]["message"] rescue ""
+          if guardrails_message.present?
+            error_message += " " + guardrails_message
+          end
+          raise RepApi::RepApiError, "HTTP response 400: #{error_message}"
+        end
+        message = response_hash["entries"][key]["message"] rescue ""
+        expiration = response_hash["entries"][key]["data"]["expiration"] rescue ""
+
+        if message.blank?
+          message = guardrails_message
+        end
+
+        new_record = RepApi::Blacklist.new(entry: key, expiration: expiration, message: message, guardrails: guardrails_message)
         blocklist_objects << new_record
       end
     end
