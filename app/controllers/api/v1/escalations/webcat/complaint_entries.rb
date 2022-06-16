@@ -262,7 +262,7 @@ module API
                   prefixes = Wbrs::Prefix.where(:urls => [url[:domain]])
 
                   prefixes.each do |prefix|
-                    if prefix.subdomain == url[:subdomain] && prefix.path == url[:path]
+                    if prefix.subdomain == (url[:subdomain] || '') && prefix.path == url[:path]
                       prefix_id = prefix.prefix_id
 
                       prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
