@@ -364,6 +364,19 @@ window.copycat_dialog = () ->
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions('#copycat_dialog #copycat-categories')
+        score: (input) ->
+          #  Adding some customization for autofill
+          #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
+          (item) ->
+            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+              item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
+            else
+              0
       }
   });
 
@@ -419,6 +432,19 @@ window.selectize_category_inputs = () ->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
+        score: (input) ->
+          #  Adding some customization for autofill
+          #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
+          (item) ->
+            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+              item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
+            else
+              0
       }
   AC.WebCat.createSelectOptionsForIds(input_ids)
 
@@ -983,14 +1009,4 @@ $ ->
       else
         $("input.show-cluster-types-filter").prop('checked', false)
         $("input.show-cluster-types-filter[name='show-cluster-#{cluster_type}'").prop('checked', true)
-
-    $('#categorize-urls').on 'click', (e) ->
-      dropdownShouldToggle = !dropdownShouldToggle
-
-      if dropdownShouldToggle == true
-        $('#categorize-urls').dropdown('toggle')
-
-    $('.nav-tool-blocks.col-xs-3.col-sm-2.col-lg-2.dropdown').on 'hide.bs.dropdown', (e) ->
-      if dropdownShouldToggle == false
-        e.preventDefault()
-
+        

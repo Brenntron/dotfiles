@@ -156,8 +156,8 @@ describe ClusterAssignment do
     end
   end
 
-  describe '#assign_pemanent!' do
-    subject { described_class.assign_pemanent!(cluster, user) }
+  describe '#assign_permanent!' do
+    subject { described_class.assign_permanent!(cluster, user) }
     let(:cluster) { { domain: 'example.com' } }
 
     context 'when cluster is not assigned' do
