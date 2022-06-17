@@ -33,7 +33,7 @@ class Clusters::Ngfw::Processor < Clusters::Templates::Processor
       if third_person_review_cluster?(cluster)
         # prevent bulk processing for 3rd person review clusters
         manager_user = User.where(cvs_username: Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
-        ClusterAssignment.assign_pemanent!(cluster, manager_user)
+        ClusterAssignment.assign_permanent!(cluster, manager_user)
         raise_manager_exception = true
         manager_count << cluster[:domain]
       else
