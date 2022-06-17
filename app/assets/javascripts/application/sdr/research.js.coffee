@@ -1,5 +1,10 @@
 headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+unloading = false
 
+#this prevents get_sdr_research_data from displaying the error modal during a page unload.
+window.addEventListener('beforeunload', () ->
+  unloading = true
+)
 
 window.get_sdr_research_data = (entry) ->
   $.ajax(
@@ -13,9 +18,9 @@ window.get_sdr_research_data = (entry) ->
       $('#sdr-research-loader').hide()
       $('.sdr-research-data-present').show()
       beautify_beaker()
-
     error: (error) ->
-      std_msg_error(error.responseText, ['Unable to fetch SDR data.'])
+      unless unloading
+        std_msg_error(error.responseText, ['Unable to fetch SDR data.'])
       $('#sdr-research-loader').hide()
       $('.sdr-research-data-missing').show()
   )
@@ -40,7 +45,7 @@ window.get_sdr_research_data = (entry) ->
         else if key == 'web_reputation'
           table_content =
             '<td>' + value.score + '</td>' +
-            '<td>' + value.rules.join(', ') + '</td>' +
+            '<td>' + (if value.rules then value.rules.join(', ') else '') + '</td>' +
             '<td>' + value.threat_level + '</td>' +
             '<td>' + value.category + '</td>'
           $('#sdr-reputation-data-table tbody tr').append(table_content)
