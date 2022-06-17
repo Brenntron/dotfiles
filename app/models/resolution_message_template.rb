@@ -6,14 +6,14 @@ class ResolutionMessageTemplate < ApplicationRecord
     Dispute::STATUS_RESOLVED_INVALID => 'Invalid / Junk Mail',
     Dispute::STATUS_RESOLVED_TEST => 'Test / Training',
     Dispute::STATUS_RESOLVED_OTHER => 'Other'
-}.freeze
+  }.freeze
 
   enum status: { in_progress: 0, resolved: 1 }
 
   validates_presence_of :name
   validates :body, presence: true, if: :in_progress?
   validate :resolved_message?
-  
+
   private
 
   def resolved_message?
@@ -22,4 +22,4 @@ class ResolutionMessageTemplate < ApplicationRecord
     end
   end
  end
-
+ 

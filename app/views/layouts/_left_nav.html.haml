@@ -14,18 +14,7 @@
           - if is_rule_user?
             %li{class: 'ips-link'}
               %a{href: '/bugs'}= inline_svg 'icon_snort.svg'
-          - if can?(:read, Admin)
-            %li{class: 'clam-link'}
-              %a.disabled-link= inline_svg 'icon_clam.svg'
-          - if can?(:read, Admin)
-            %li{class: 'amp-link'}
-              %a.disabled-link= inline_svg 'icon_amp.svg'
-          - if can?(:read, Admin)
-            %li{class: 'rep-link'}
-              %a.disabled-link= inline_svg 'icon_rep.svg'
-          - if can?(:read, Admin)
-            %li{class: 'cat-link'}
-              %a.disabled-link= inline_svg 'icon_cat.svg'
+
     - if is_rule_user? || can?(:index, any: [FileReputationDispute, Dispute, Complaint])
       %li{class: 'nav-escalations'}
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
@@ -94,18 +83,6 @@
             - if is_rule_user?
               %li{class: 'ips-link'}
                 %a{href: '/bugs'} IPS
-            - if can?(:read, Admin)
-              %li{class: 'clam-link'}
-                %a.disabled-link Clam
-            - if can?(:read, Admin)
-              %li{class: 'amp-link'}
-                %a.disabled-link AMP
-            - if can?(:read, Admin)
-              %li{class: 'rep-link'}
-                %a.disabled-link Reputation
-            - if can?(:read, Admin)
-              %li{class: 'cat-link'}
-                %a.disabled-link Categorization
 
       - if is_rule_user? || can?(:index, any: [ FileReputationDispute, Dispute, Complaint ])
         %li{class: 'nav-escalations'}

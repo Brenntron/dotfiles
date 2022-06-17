@@ -35,7 +35,8 @@ namespace 'AC.WebCat', (exports) ->
         value_name = key.split(' - ')[0]
         webcat_options.push {category_id: value, category_name: value_name, category_code: cat_code}
       for id in ids
-        $(id)[0].selectize.addOption(webcat_options)
+        if $(id)[0]?
+          $(id)[0].selectize.addOption(webcat_options)
     )
 
   exports.getCategoryIds = (category_names, id) ->
