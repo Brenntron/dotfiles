@@ -99,7 +99,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       new_dispute.sender_domain_entry = message_payload[:payload][:sender_domain_entry]
       new_dispute.status = STATUS_NEW
 
-      new_dispute.platform_id = platform.id
+      new_dispute.platform_id = platform.id unless platform.blank?
       new_dispute.product_version = message_payload[:payload][:product_version] unless message_payload[:payload][:product_version].blank?
 
       new_dispute.suggested_disposition = message_payload[:payload][:suggested_disposition]
@@ -188,15 +188,23 @@ class SenderDomainReputationDispute < ApplicationRecord
           conn.post
         end
       end
+      return nil
     end
-
-    if new_dispute.sender_domain_reputation_dispute_attachments.size != message_payload["attachments"].size
+    if new_dispute.present?
+      new_dispute.reload
+    end
+    if new_dispute.present? && new_dispute.sender_domain_reputation_dispute_attachments.present? && new_dispute.sender_domain_reputation_dispute_attachments.size != message_payload["attachments"].size
       new_dispute.sender_domain_reputation_dispute_attachments.destroy_all
       new_dispute.destroy
       conn = ::Bridge::SdrDisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post
+      return nil
     end
 
+    ### redundant for verification
+    if new_dispute.present?
+      new_dispute.send_created_ack
+    end
   end
 
   def self.find_customer(customer)
@@ -635,9 +643,9 @@ class SenderDomainReputationDispute < ApplicationRecord
 
       mail_data_params[:from_hdr] = [{"addr" => self.sender_domain_entry}]
       begin
-        data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
-      rescue
         data_response = ::Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+      rescue
+        data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
       end
 
       if data_response.present?
