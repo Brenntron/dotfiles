@@ -45,7 +45,15 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   def data
-    records.map do |complaint_entry|
+
+    # Call pluck because using records in the where clause produces a "not supported" error.
+    complaint_entry_ids = records.pluck(:id)
+
+    # Get one page of records separate from the eager loading and do the eagar loading from those ids.
+    # complaint_entries = ComplaintEntry.includes(complaint: [{customer: :company}, :complaint_tags], user: {}).references(:complaint).where(id: complaint_entry_ids)
+    complaint_entries = ComplaintEntry.includes(complaint: [{customer: :company}], user: {}).where(id: complaint_entry_ids)
+
+    complaint_entries.map do |complaint_entry|
       complaint = complaint_entry.complaint
       suggested_dispositions = complaint_entry.suggested_disposition&.split(',')
 
@@ -90,10 +98,11 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
     end
   end
 
-  # private
+  private
 
   def get_raw_records
-    ComplaintEntry.includes(complaint: [{customer: :company}, :complaint_tags], user: {}).references(:complaint)
+    # ComplaintEntry.includes(complaint: [{customer: :company}, :complaint_tags], user: {}).references(:complaint)
+    ComplaintEntry
   end
 
   def filter_records(records)
