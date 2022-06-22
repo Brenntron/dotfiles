@@ -168,7 +168,7 @@ describe AutoResolve do
       dispute_entry = AutoResolve.attempt_ai_conviction(['plcbo'], @dispute_entry)
 
       expect(dispute_entry.status).to eql(DisputeEntry::STATUS_RESOLVED)
-      expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
+      expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_AUTO_RESOLVED_FN)
       expect(dispute_entry.auto_resolve_log).to eql("Umbrella popularity rating: 38.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>vt results: Kaspersky,Avira,Forcepoint ThreatSeeker,Fortinet\n<br><br>trusted vt hits: 2\n")
     end
 
@@ -195,7 +195,7 @@ describe AutoResolve do
       dispute_entry = AutoResolve.attempt_ai_conviction(['plcbo'], @dispute_entry)
 
       expect(dispute_entry.status).to eql(DisputeEntry::STATUS_RESOLVED)
-      expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
+      expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_AUTO_RESOLVED_FN)
       expect(dispute_entry.auto_resolve_log).to eql("Umbrella popularity rating: 38.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>vt results: \n<br><br>trusted vt hits: 0\n<br><br>umbrella rating returned -1")
 
     end
@@ -224,7 +224,7 @@ describe AutoResolve do
       #integration test
       dispute_entry = AutoResolve.attempt_ai_conviction(['plcbo'], @dispute_entry)
       expect(dispute_entry.status).to eql(DisputeEntry::STATUS_RESOLVED)
-      expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
+      expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_AUTO_RESOLVED_FN)
       expect(dispute_entry.auto_resolve_log).to eql("Umbrella popularity rating: 38.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>vt results: Botvrij.eu,Feodo Tracker,CLEAN MX,DNS8,NotMining,VX Vault\n<br><br>trusted vt hits: 0\n<br><br>umbrella rating returned 1<br><br>total vt hits > 5, committing to reptool.")
 
 
@@ -264,7 +264,7 @@ describe AutoResolve do
       #integration test
       dispute_entry = AutoResolve.attempt_ai_conviction(['plcbo'], @dispute_entry)
       expect(dispute_entry.status).to eql(DisputeEntry::STATUS_RESOLVED)
-      expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
+      expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_AUTO_RESOLVED_FN)
 
       expect(dispute_entry.auto_resolve_log).to eql("Umbrella popularity rating: 38.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>vt results: \n<br><br>trusted vt hits: 0\n<br><br>umbrella rating returned 1<br><br>suspicious data point found: 25.0 / 161.0 = 0.15527950310559005")
 
@@ -340,7 +340,7 @@ describe AutoResolve do
       #integration test
       dispute_entry = AutoResolve.attempt_ai_conviction(['plcbo'], @dispute_entry)
       expect(dispute_entry.status).to eql(DisputeEntry::STATUS_RESOLVED)
-      expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
+      expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_AUTO_RESOLVED_FN)
 
       expect(dispute_entry.auto_resolve_log).to eql("Umbrella popularity rating: 0.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>vt results: \n<br><br>trusted vt hits: 0\n<br><br>umbrella rating returned 1<br><br>no suspicious data points found.<br><br>umbrella whois returned #{two_days_ago} age is less than 90 days and popularity is 0, should blocklist. age: 89/1 | popularity: 0.0")
 
@@ -366,7 +366,7 @@ describe AutoResolve do
 
       AutoResolve.auto_resolve_email(@dispute_entry, rulehits_test_one)
       expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
-      expect(@dispute_entry.resolution).to eql("UNCHANGED")
+      expect(@dispute_entry.resolution).to eql("AP - Unchanged")
 
       expect(@dispute_entry.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence.")
 
@@ -380,7 +380,7 @@ describe AutoResolve do
 
       AutoResolve.auto_resolve_email(@dispute_entry, rulehits_test_two)
       expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
-      expect(@dispute_entry.resolution).to eql("UNCHANGED")
+      expect(@dispute_entry.resolution).to eql("AP - Unchanged")
 
       expect(@dispute_entry.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence.")
 
@@ -396,7 +396,7 @@ describe AutoResolve do
 
       AutoResolve.auto_resolve_email(@dispute_entry, rulehits_test_three)
       expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
-      expect(@dispute_entry.resolution).to eql("UNCHANGED")
+      expect(@dispute_entry.resolution).to eql("AP - Unchanged")
 
       expect(@dispute_entry.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence.")
 
@@ -410,7 +410,7 @@ describe AutoResolve do
 
       AutoResolve.auto_resolve_email(@dispute_entry, rulehits_test_four)
       expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
-      expect(@dispute_entry.resolution).to eql("UNCHANGED")
+      expect(@dispute_entry.resolution).to eql("AP - Unchanged")
 
       expect(@dispute_entry.resolution_comment).to eql(" Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://www.spamhaus.org/) Review the status and reason(s) by visiting https://www.spamhaus.org/lookup/and entering your IP. Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours.")
 
@@ -423,7 +423,7 @@ describe AutoResolve do
 
       AutoResolve.auto_resolve_email(@dispute_entry, rulehits_test_five)
       expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
-      expect(@dispute_entry.resolution).to eql("UNCHANGED")
+      expect(@dispute_entry.resolution).to eql("AP - Unchanged")
 
       expect(@dispute_entry.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence. Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://www.spamhaus.org/) Review the status and reason(s) by visiting https://www.spamhaus.org/lookup/and entering your IP. Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours.")
 
