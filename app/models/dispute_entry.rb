@@ -1394,7 +1394,7 @@ class DisputeEntry < ApplicationRecord
           if raw_score.to_f <= -7.0
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_AUTO_RESOLVED_MATCH
-            self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. By default, a URL/IP address with a Web Reputation of Untrusted should be inaccessible by our customers. Talos does not reduce the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers is able to access the submission, that is due to relaxed settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case."
+            self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. Talos does not reduce the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers is able to access the submission, that is due to relaxed settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case."
             self.save
 
             return true
@@ -1405,9 +1405,9 @@ class DisputeEntry < ApplicationRecord
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_AUTO_RESOLVED_MATCH
             if self.dispute.submitter_type == "NON-CUSTOMER"
-              self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. By default, an IP address with an Email Reputation of Poor should be inaccessible by our customers. Talos does not decrease the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers can access the submission, that is due to lax settings on their side and can only be fixed locally by that customer."
+              self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. Talos does not decrease the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers can access the submission, that is due to lax settings on their side and can only be fixed locally by that customer."
             else
-              self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. By default, an IP address with an Email Reputation of Poor should be inaccessible by our customers. Talos does not decrease the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers can access the submission, that is due to lax settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a Cisco TAC case."
+              self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. Talos does not decrease the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers can access the submission, that is due to lax settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a Cisco TAC case."
             end
 
             self.save
@@ -1433,9 +1433,9 @@ class DisputeEntry < ApplicationRecord
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_AUTO_RESOLVED_MATCH
             if self.dispute.submitter_type == "NON-CUSTOMER"
-              self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. By default, an IP address with an Email Reputation of Good or Neutral should be accessible by our customers. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer."
+              self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer."
             else
-              self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. By default, an IP address with an Email Reputation of Good or Neutral should be accessible by our customers. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a Cisco TAC case."
+              self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a Cisco TAC case."
             end
 
             self.save
