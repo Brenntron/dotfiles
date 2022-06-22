@@ -29,10 +29,9 @@ class Escalations::Sdr::DisputesController < ApplicationController
       temp_file = Tempfile.new(zip_filename)
 
       file_attachments = []
-
       bug_attachments.each do |bug_attachment|
         sdr_attach = SenderDomainReputationDisputeAttachment.find(bug_attachment.id)
-        File.open("#{zip_directory}/#{sdr_attach.file_name}", "w") { |f| f.write bug_attachment.file_contents}
+        File.open("#{zip_directory}/#{sdr_attach.file_name}", "w") { |f| f.write bug_attachment.file_contents.encode("UTF-8", invalid: :replace, undef: :replace, replace: '')}
         file_attachments << sdr_attach.file_name
       end
 
