@@ -67,14 +67,38 @@ class RepApi::Blacklist < RepApi::Base
   end
 
   def self.load_from_prefetch(data)
-    data = JSON.parse(data)
-    data.inject({}) do |collection_hash, (entry, value)|
-      unless 'NOT_FOUND' == value
-        collection_hash[entry] = value.merge('entry' => entry)
-      end
+    response_body = JSON.parse(data)
 
-      collection_hash
-    end.values.map{ |attributes| load_from_attributes(attributes) }
+    begin
+      entry_response = response_body["entries"][response_body["entries"].keys.first]
+      if entry_response["message"].downcase == "entry found."
+        entry_data = entry_response["data"]
+        attributes = {}
+        attributes["classifications"] = entry_data["classifications"] rescue ""
+        attributes["metadata"] = entry_data["sources"] rescue ""
+        attributes["first_seen"] = entry_data["first_seen"] rescue ""
+        attributes["last_seen"] = entry_data["last_seen"] rescue ""
+        attributes["primary_source"] = entry_data["primary_source"] rescue ""
+        attributes["expiration"] = entry_data["expiration"] rescue ""
+        attributes["status"] = entry_data["status"] rescue ""
+        attributes["_rev"] = entry_data["rev"] rescue ""
+        attributes["excluded"] = entry_data["excluded"] rescue ""
+        attributes["public"] = entry_data["public"] rescue ""
+        attributes["entry"] = entry_data["entry"] rescue ""
+        attributes["manual_classifications"] = entry_data["classifications"] rescue ""
+        return [load_from_attributes(attributes)]
+      else
+        return []
+      end
+    rescue
+      attributes = {}
+      attributes["manual_classifications"] = " "
+      attributes["status"] = "REFRESH DATA"
+      attributes["classifications"] = " "
+      return [load_from_attributes(attributes)]
+
+    end
+
   end
 
   # Get the blacklist entries from the reputation API
@@ -86,7 +110,6 @@ class RepApi::Blacklist < RepApi::Base
     entries = params.delete('entries')
     raise 'Missing required entries condition' unless entries
     return [] unless entries.present?
-    string_array = entries.map {|entry| "entry=#{entry}"}
 
     #response = call_json_request(:post, '/blacklist/get', body: build_request_body(string_array))
     if conditions[:entries].present?
@@ -104,14 +127,6 @@ class RepApi::Blacklist < RepApi::Base
 
     return response.body if raw == true
     response_body = JSON.parse(response.body)
-
-    #response_body.inject({}) do |collection_hash, (entry, value)|
-    #  unless 'NOT_FOUND' == value
-    #    collection_hash[entry] = value.merge('entry' => entry)
-    #  end
-
-    #  collection_hash
-    #end.values.map{ |attributes| load_from_attributes(attributes) }
 
     entry_response = response_body["entries"][response_body["entries"].keys.first]
     if entry_response["message"].downcase == "entry found."
@@ -189,6 +204,7 @@ class RepApi::Blacklist < RepApi::Base
         end
 
         result = response_hash["entries"][key]["result"]
+
         if result == "manual" || result == "failed"
           error_message = response_hash["entries"][key]["message"] rescue ""
           if guardrails_message.present?
