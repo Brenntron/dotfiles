@@ -97,3 +97,14 @@ window.show_message = (status, content, timer, selector) ->
   # after activated, toolbar buttons should hide residual alerts
   $('.toolbar-button').mouseup ->
     $('.alert-dismissable').remove()  # use mouseup() above instead of click()
+
+$ ->
+  # dropdowns should be able to be closed on clicking outside of the dropdown
+  # but should NOT be closed if a user is dismissing a success or error modal
+  # should work across ACE
+  $('.dropdown').on 'hide.bs.dropdown', (e) ->
+    dropdown = this
+    if $('body').hasClass('modal-open')
+      e.preventDefault()
+      # clear loader if exists
+      $(this).find('.lookup-drop-loader').addClass('hidden')

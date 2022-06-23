@@ -983,11 +983,20 @@ module API
             post 'quick_bulk_update' do
               data = params[:update_data]
 
+              errors = data.keys.reduce([])  do |memo, url|
+                memo << url if DisputeEntry.check_for_duplicates(url)
+                memo
+              end
+              
+              if errors.any?
+                return { status: 'error', message: "Unable to create the following duplicate dispute entries: #{errors.join(', ')}" }.to_json
+              end
+  
               begin
                 response = Dispute.process_quick_bulk_entries(data, current_user)
-                {:status => "success", :data => response}.to_json
+                { status: 'success', data: response }.to_json
               rescue
-                {:status => "error"}.to_json
+                { status: 'error' }.to_json
               end
             end
 

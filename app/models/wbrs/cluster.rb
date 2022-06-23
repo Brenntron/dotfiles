@@ -44,7 +44,6 @@ class Wbrs::Cluster < Wbrs::Base
   end
 
   def self.retrieve(cluster_id, test = nil)
-
     if test.present?
       return [
           {
@@ -70,11 +69,16 @@ class Wbrs::Cluster < Wbrs::Base
       ]
 
     end
-
     response = call_json_request(:get, "/v1/clusters/get/#{cluster_id}", body: '')
     response_body = JSON.parse(response.body)
 
     response_body
+  end
+
+  def self.retrieve_many(cluster_ids)
+    ids = URI.encode_www_form({ id: cluster_ids })
+    response = call_json_request(:get, "/v1/clusters/get?#{ids}", body: '')
+    JSON.parse(response.body)
   end
 
   #This is still a work in progress, need to get finalized version from UKR team
@@ -92,5 +96,4 @@ class Wbrs::Cluster < Wbrs::Base
     response_body = JSON.parse(response.body)
     response_body
   end
-
 end

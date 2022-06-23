@@ -75,6 +75,7 @@ RailsAdmin.config do |config|
       "User",
       "UserApiKey",
       "UserPreference",
+      "WebcatCredit"
   ]
 
   config.actions do

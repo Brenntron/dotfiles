@@ -744,6 +744,7 @@ button {
     text-transform: capitalize;
   }
 }
+
 #confirmation-modal {
   .modal-header{
     background: $primary-section-color;
@@ -2020,10 +2021,14 @@ button.close {
 
 .nav-container .sub-nav li, .sidenav-icons .sub-nav li {
   height: 30px;
-  line-height: 30px;
   padding-left: 0;
   border: none;
 }
+
+.nav-container .sub-nav li {
+  line-height: 30px;
+}
+
 
 #bugs-subnav, #bugs-subnav-icons {
   background-color: lighten($bug-section-color, 28%)
@@ -5043,7 +5048,7 @@ input.file_attachment {
   border: 1px solid $faint-neutral-color;
 }
 
-#edit-resolution-message-template-form-wrapper {
+#edit-resolution-message-template-form-wrapper,  #edit-resolved-resolution-message-template-form-wrapper{
   display: none;
   height: 0;
   margin: 12px;
@@ -6318,8 +6323,13 @@ input[type="radio"].ticket-status-radio {
 }
 
 .resolution-comment-wrapper {
+  display: inline-block;
   background-color: $content-bg-color;
   padding: 4px 12px !important;;
+}
+
+textarea.ticket-resolution-comment {
+  display: inline-block;
 }
 
 .resolution-comment-wrapper input[type='text'] {
@@ -6872,7 +6882,7 @@ td.ticket-total::before {
   background-color: $faint-neutral-color;
   border-radius: 0 4px 4px 0;
   position: absolute;
-  width: 200px;
+  min-width: 200px;
   top: 0;
   left: 100%;
   height: 100%;
@@ -7751,12 +7761,16 @@ table.dispute-entry-table tbody tr.selected {
   border-top-color: $table-dark-body;
 }
 
-#complaint_button_dialog .dialog-content-wrapper, #history_dialog .dialog-content-wrapper {
+.dialog-content-wrapper {
   padding: 15px;
 }
 
-#cluster_button_dialog .dialog-content-wrapper, #copycat_dialog .dialog-content-wrapper, #wsa_status_dialog .dialog-content-wrapper  {
-  padding: 15px;
+#clusters-index-duplicates {
+  margin-bottom: 30px;
+}
+
+.top-table-note {
+  margin: 15px 0;
 }
 .tab-pane:not(.active){
   display: none
@@ -7856,10 +7870,6 @@ table.dispute-entry-table tbody tr.selected {
 }
 .searched-for-url {
   color: $bug-section-color;
-}
-
-#complaint_button_dialog .dialog-content-wrapper {
-  padding: 15px;
 }
 
 hr.condensed {
@@ -9075,7 +9085,7 @@ td.text-center span {
   color:$type-lighter-color!important;
 }
 
-.open-in-tab-btn, .whois-btn, .google-btn {
+.open-in-tab-btn, .whois-btn, .google-btn, .cluster-dup-btn {
   background-repeat: no-repeat;
   background-position: center center;
   width: 20px;
@@ -9124,6 +9134,13 @@ td.text-center span {
   background-image: url(image_path('icon_google_grey.svg'));
   background-color: $nav-toolbar-color;
 }
+
+.cluster-dup-btn {
+  background-image: url(image_path('icon_mark_duplicate.svg'));
+  background-color: $nav-toolbar-color;
+  background-size: 16px 16px;
+}
+
 
 .right-margin {
   margin-right: 4px;
@@ -13573,4 +13590,38 @@ input.wl-bl-list-inline {
 
 .no-border {
   border: none !important;
+}
+// Rulehit Resolution Mailer Templates
+#new_rulehit_resolution_mailer_template, .edit_rulehit_resolution_mailer_template {
+  max-width: 292px;
+}
+
+#new_rulehit_resolution_mailer_template .form-inputs, .edit_rulehit_resolution_mailer_template .form-inputs {
+  margin: 10px 0 0 0;
+  label {
+    width: 100%;
+    float: left;
+    padding: 0 0 1px 0;
+  }
+  input {
+    clear: both;
+    float: left;
+    margin: 0 0 10px 0;
+    width: 100%;
+  }
+  #rulehit_resolution_mailer_template_body {
+    height: 60px;
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
+#new_rulehit_resolution_mailer_template .form-actions, .edit_rulehit_resolution_mailer_template .form-actions{
+  .btn.submit-rulehit-resolution {
+    margin: 12px 0;
+    background-color: #d7dadb;
+  }
+  .btn.submit-rulehit-resolution:hover {
+    background-color: #ccc;
+  }
 }

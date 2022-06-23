@@ -11,7 +11,6 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
   # Since clusters processing are using platform name as an identifier
   # we use hardcoded value to be isolated from potential category name change on TI side
   DATA_PATFORM = 'NGFW'.freeze
-  NON_IP_REGEX = '^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9])(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9])){3}$'.freeze
 
   def initialize(regex, filter = {}, user)
     @regex = regex
@@ -26,12 +25,7 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
   private
 
   def fetch_data
-    data = if regex.present?
-             # apply regex
-             NgfwCluster.visible.where('domain REGEXP ?', regex)
-           else
-             NgfwCluster.visible
-           end
+    data = NgfwCluster.visible.order(traffic_hits: :desc)
 
     case filter[:f]
     when 'my'
@@ -40,16 +34,21 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
       data = data.pending
     end
 
+    if regex.present?
+      regexp = Regexp.new(regex)
+      data = data.select { |cluster| !(cluster.domain =~ regexp).nil? }
+    end
+
     case filter[:cluster_type]
     when 'domain'
-      data = data.where('domain REGEXP ?', NON_IP_REGEX)
+      data = data.select { |cluster| (cluster.domain =~ Resolv::IPv4::Regex).nil? }
     when 'ip'
-      data = data.where('domain NOT REGEXP ?', NON_IP_REGEX)
+      data = data.select { |cluster| !(cluster.domain =~ Resolv::IPv4::Regex).nil? }
     else
       data
     end
 
-    data.order(traffic_hits: :desc).first(DATA_LIMIT)
+    data.first(DATA_LIMIT)
   end
 
   def assigned_domains

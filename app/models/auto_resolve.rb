@@ -15,6 +15,104 @@ class AutoResolve
 
 
   #entry point
+  def self.process_auto_resolution(auto_args)
+    umbrella_no_reply = Platform.find_by_all_names("Umbrella - No Reply")
+    dispute_entry = auto_args[:dispute_entry]
+    sugg_disposition = auto_args[:entry_claim]
+
+    submission_type = dispute_entry.dispute.submission_type
+
+    #######################################################################################################################################
+
+    if submission_type == "w"
+      if dispute_entry.dispute.determine_platform.present? && dispute_entry.dispute.determine_platform.downcase.include?("umbrella")
+        matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition, true)
+        if !matching_disposition
+          if sugg_disposition == "false positive"
+            if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+              AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+              dispute_entry.reload
+            end
+          end
+          if sugg_disposition == "false negative"
+            if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+              dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+            else
+              dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+            end
+          end
+        end
+      else
+        matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition)
+        if !matching_disposition
+          if sugg_disposition == "false positive"
+            dispute_entry.update(status: DisputeEntry::NEW)
+          end
+          if sugg_disposition == "false negative"
+            dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+          end
+        end
+      end
+
+    end
+
+
+    #######################################################################################################################################
+
+    if submission_type == "e"
+      if sugg_disposition == "false positive"
+        if dispute_entry.dispute.submitter_type == "NON-CUSTOMER"
+          if dispute_entry.dispute.determine_platform.present? && dispute_entry.dispute.determine_platform.downcase.include?("umbrella")
+            matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition, true)
+          else
+            matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition)
+          end
+
+          if !matching_disposition
+            if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+              AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+              dispute_entry.reload
+            else
+              if dispute_entry.dispute.submitter_type == "NON-CUSTOMER"
+                AutoResolve.auto_resolve_email(dispute_entry, dispute_entry.dispute_rule_hits.pluck(:name))
+                dispute_entry.reload
+              end
+            end
+          end
+
+        else
+          ## for customer specific stuff
+          dispute_entry.status == DisputeEntry::NEW
+        end
+      end
+
+      if sugg_disposition == "false negative"
+        if dispute_entry.dispute.submitter_type == "NON-CUSTOMER"
+          if dispute_entry.dispute.determine_platform.present? && dispute_entry.dispute.determine_platform.downcase.include?("umbrella")
+            matching_disposition = dispute_entry.is_disposition_matching?(entry_claim, true)
+          else
+            matching_disposition = dispute_entry.is_disposition_matching?(entry_claim)
+          end
+          if !matching_disposition
+            dispute_entry.status == DisputeEntry::NEW
+          end
+
+        else
+          ## for customer specific stuff
+          dispute_entry.status == DisputeEntry::NEW
+        end
+
+      end
+
+    end
+
+    #############################################################################################################################################
+
+    dispute_entry.save
+  end
+
+
+  #start auto resolution algorithm here
   def self.attempt_ai_conviction(rulehits, dispute_entry, skip_human_review = false)
 
     if auto_resolve_toggle
@@ -37,7 +135,7 @@ class AutoResolve
       return baseline_results
     end
 
-    conviction_results = process_conviction_requirements(dispute_entry.hostlookup, baseline_results[:log])
+    conviction_results = process_conviction_requirements(dispute_entry.hostlookup, baseline_results)
 
     return conviction_results
 
@@ -47,10 +145,12 @@ class AutoResolve
     results = {}
     results[:log ] = []
     results[:action] = nil
+    results[:popularity] = nil
     begin
 
       umbrella_popularity_result = check_umbrella_popularity(dispute_entry.hostlookup)
       results[:log] << umbrella_popularity_result[:log]
+      results[:popularity] = umbrella_popularity_result[:popularity]
       if umbrella_popularity_result[:pass]
         results[:action] = :do_not_resolve
         return results
@@ -76,17 +176,20 @@ class AutoResolve
       Rails.logger.error(e.message)
       results[:action] = :do_not_resolve
       results[:log] << "there was an error in baseline requirements, halting auto conviction process"
-      results
+      return results
     end
 
     results
 
   end
 
-  def self.process_conviction_requirements(entry, log)
+  def self.process_conviction_requirements(entry, baseline_results)
     results = {}
-    results[:log] = log
+
+    results[:log] = baseline_results[:log]
     results[:action] = nil
+
+    baseline_popularity = baseline_results[:popularity]
     begin
       virustotal_results = check_virustotal_hits(entry)
 
@@ -126,6 +229,16 @@ class AutoResolve
         return results
       end
 
+      umbrella_whois_popularity_results = check_whois_popularity_combo(entry, baseline_popularity)
+      results[:log] << umbrella_whois_popularity_results[:log]
+      if umbrella_whois_popularity_results[:pass] == false
+        results[:action] = :commit_malware
+
+        return results
+      end
+
+
+
       results[:action] = :do_not_resolve
 
     rescue Exception => e
@@ -145,7 +258,7 @@ class AutoResolve
     if action == :do_not_resolve || action.blank?
       if skip_human_review == true
         resolved_at = Time.now
-        dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+        dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_UNCHANGED
         dispute_entry.status = DisputeEntry::STATUS_RESOLVED
         dispute_entry.resolution_comment = Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
         dispute_entry.case_closed_at = resolved_at
@@ -159,7 +272,7 @@ class AutoResolve
       reptool_result = commit_to_reptool(action, dispute_entry)
       if reptool_result[:success]
         dispute_entry.status = DisputeEntry::STATUS_RESOLVED
-        dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
+        dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_FN
         dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
         dispute_entry.case_closed_at = resolved_at
         dispute_entry.case_resolved_at = resolved_at
@@ -191,10 +304,14 @@ class AutoResolve
 
   def self.auto_resolve_toggle
     begin
-      Rails.configuration.auto_resolve.check_complaints
+      begin
+        return AppConfig.auto_resolve_toggle
+      rescue
+        return Rails.configuration.auto_resolve.check_complaints
+      end
     rescue Exception => e
       Rails.logger.error(e.message)
-      false
+      return false
     end
   end
 
@@ -205,7 +322,7 @@ class AutoResolve
     result = {}
     result[:pass] = true
     result[:log] = ""
-
+    result[:popularity] = nil
     begin
       response = Umbrella::SecurityInfo.query_info(address: entry)
 
@@ -213,12 +330,13 @@ class AutoResolve
         data = JSON.parse(response.body)
         popularity = data["popularity"]
         if popularity.present?
-          if !(popularity > 0)
+          if !(popularity > 40)
             result[:pass] = false
           else
             result[:pass] = true
           end
           result[:log] = "Umbrella popularity rating: #{popularity}: result of pass: #{result[:pass]}"
+          result[:popularity] = popularity
         else
           result[:pass] = true
           result[:log] = "Umbrella popularity value could not be found, sending for manual review."
@@ -360,7 +478,59 @@ class AutoResolve
     result
   end
 
+  def self.check_domain_life(entry)
 
+    result = {}
+    result[:age] = nil
+    result[:created] = nil
+    result[:log] = ""
+    result[:pass] = true
+    response = Umbrella::DomainInfo.domain_whois(domain: DisputeEntry.safe_domain_of(entry))
+
+    if response.code == 200
+      data = JSON.parse(response.body)
+      result[:created] = data["created"]
+      result[:age] = (Date.today - Date.parse(data["created"])) rescue nil
+
+      result[:log] = "umbrella whois returned #{data["created"]}"
+      if result[:age].blank?
+        result[:pass] = true
+        result[:log] += " Created field came back blank, halting for manual review"
+      else
+        result[:pass] = false
+      end
+    else
+      result[:pass] = true
+      result[:log] = "umbrella domain whois failed for unknown reason. halting for manual review."
+    end
+
+    result
+
+  end
+
+  def self.check_whois_popularity_combo(entry, popularity)
+
+    result = {}
+    result[:pass] = true
+    result[:log] = ""
+
+    domain_life_results = check_domain_life(entry)
+    result[:log] += domain_life_results[:log]
+    if domain_life_results[:pass] == true
+      return result
+    end
+
+    if domain_life_results[:age] < 90.0 && popularity == 0
+      result[:pass] = false
+      result[:log] += " age is less than 90 days and popularity is 0, should blocklist."
+    else
+      result[:pass] = true
+      result[:log] += " age is greater or equal to 90 days and popularity is greater than 0, manual review"
+    end
+    result[:log] += " age: #{domain_life_results[:age]} | popularity: #{popularity}"
+
+    result
+  end
 
   ###############################################################################################################
 
@@ -475,7 +645,7 @@ class AutoResolve
     if bad_mnems.any?
       auto_resolve_log += "bad email hits were found:\n"
       auto_resolve_log += "#{bad_mnems.inspect.to_s}\n"
-      dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+      dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_UNCHANGED
       dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       dispute_entry.case_closed_at = Time.now
       dispute_entry.case_resolved_at = Time.now
@@ -514,7 +684,7 @@ class AutoResolve
 
 
   def self.auto_resolve_umbrella_false_positive(dispute_entry)
-    dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+    dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_UNCHANGED
     dispute_entry.status = DisputeEntry::STATUS_RESOLVED
     dispute_entry.case_closed_at = Time.now
     dispute_entry.case_resolved_at = Time.now

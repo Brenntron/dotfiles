@@ -1592,7 +1592,7 @@ $ ->
       alert('No disputes selected')
 
 
-  $('#webrep-resolution-selector input[type=radio][name=dispute-resolution]').change ->
+  $('#webrep-resolution-selector input[type=radio][name=dispute-resolution]').change (event)->
     submission_type = $('input[name=webrep-dispute-submission-type').val()
     submitter_type = $('input[name=webrep-dispute-submitter-type]').val()
     #Only fill comment if web type submission
@@ -1601,11 +1601,12 @@ $ ->
         is_customer = true
 
       $(".ticket-resolution-comment").html('')
-      resolution_comment = get_resolution_comment(@value, is_customer)
+      messageId = $(event.target).data('id')
+      resolution_comment = get_resolution_comment(@value, is_customer, messageId)
       $(".ticket-resolution-comment").html(resolution_comment)
 
 
-  $('#webrep-entry-resolution-selector input[type=radio][name=entry-resolution]').change ->
+  $('#webrep-entry-resolution-selector input[type=radio][name=entry-resolution]').change (event)->
     submission_type = $('input[name=webrep-dispute-submission-type').val()
     submitter_type = $('input[name=webrep-dispute-submitter-type]').val()
     #Only fill comment if web type submission
@@ -1613,11 +1614,12 @@ $ ->
       if submitter_type == 'CUSTOMER'
         is_customer = true
       $('#webrep-entry-resolution-comment').html('')
-      resolution_comment = get_resolution_comment(@value, is_customer)
+      messageId = $(event.target).data('id')
+      resolution_comment = get_resolution_comment(@value, is_customer, messageId)
       $("#webrep-entry-resolution-comment").html(resolution_comment)
 
 
-  $('#index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change ->
+  $('#index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change (event)->
     $(".ticket-status-comment").html('')
     submission_types = []
     submitter_types = []
@@ -1642,11 +1644,11 @@ $ ->
       if submission_type == 'w' && submitter_type != 'INTERNAl'
         if submitter_type == 'CUSTOMER'
           is_customer = true
-
-        resolution_comment = get_resolution_comment(@value, is_customer)
+        messageId = $(event.target).data('id')
+        resolution_comment = get_resolution_comment(@value, is_customer, messageId)
         $(".ticket-status-comment").html(resolution_comment)
 
-  $('#index-entry-resolution-submenu input[type=radio][name=entry-resolution]').change ->
+  $('#index-entry-resolution-submenu input[type=radio][name=entry-resolution]').change (event)->
     $("#entry-status-comment").html('')
     checkboxes = $('#disputes-index').find('.dispute-entry-checkbox')
     submission_types = []
@@ -1673,27 +1675,27 @@ $ ->
       if submission_type == 'w' && submitter_type != 'INTERNAl'
         if submitter_type == 'CUSTOMER'
           is_customer = true
-
-        resolution_comment = get_resolution_comment(@value, is_customer)
+        messageId = $(event.target).data('id')
+        resolution_comment = get_resolution_comment(@value, is_customer, messageId)
         $("#entry-status-comment").html(resolution_comment)
 
-window.get_resolution_comment = (value, is_customer) ->
-  resolution_comment = ''
-  switch value
-    when 'FIXED_FP'
-      resolution_comment += "Talos has concluded that the submission is safe to access at this time; the submission’s reputation has been improved. This update will be publicly visible in the next 24 hours."
-      if is_customer
-        resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
-    when 'FIXED_FN'
-      resolution_comment += "Talos has concluded that the submission is unsafe to access at this time due to malicious activity; the submission’s reputation has been decreased. This update will be publicly visible in the next 24 hours."
-      if is_customer
-        resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
-    when 'UNCHANGED'
-      resolution_comment += "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so."
-      if is_customer
-        resolution_comment += " Please open a TAC case and provide additional details if you need further assistance."
-  return resolution_comment
+window.get_resolution_comment = (value, is_customer, messageId) ->
+  resolutionMessage = getResolutionMessageTemplate(messageId)
+  if resolutionMessage.description == 'UNCHANGED'
+    return resolutionMessage.body + " Please open a TAC case and provide additional details if you need further assistance."
+  return resolutionMessage.body
 
+window.getResolutionMessageTemplate = (messageId)->
+  message = null
+  std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{messageId}"
+      success_reload: false
+      async: false
+      success: (response) ->
+        message = response
+  )
+  message
 window.populate_entry_status_dropdown = (dispute_id) ->
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_id}"
@@ -1829,13 +1831,12 @@ $ ->
 
 # Create Dashboard Initial Table (My Open Tickets)
 $ ->
-
-  if $('body').hasClass('escalations--webrep--disputes_controller')
-    std_msg_ajax(
-      method: 'POST'
-      url: "/escalations/api/v1/escalations/user_preferences/"
-      data: {name: 'WebRepEntriesPerPage'}
-      success: (response) ->
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/user_preferences/"
+    data: {name: 'WebRepEntriesPerPage'}
+    success: (response) ->
+      unless $('body').hasClass('escalations--file_rep--disputes-controller')
         response = JSON.parse(response)
         if response?
           $('select[name="disputes-index_length"]').val(response.entriesperpage)
@@ -2492,10 +2493,7 @@ window.prep_dispute_to_convert = (event) ->
     # - ti.com ticket
     # - open ticket
 
-    if row_data.source =! 'talos-intelligence'
-      std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
-      return
-    else
+    if row_data.source == 'talos-intelligence' || row_data.source == 'talos-intelligence-api'
       ticket_status = $(row_data.status).text().trim();
       open_status = ['NEW', 'ASSIGNED', 'RESEARCHING', 'RE-OPENED', 'ESCALATED']
       if open_status.includes(ticket_status)
@@ -2533,38 +2531,44 @@ window.prep_dispute_to_convert = (event) ->
       else
         std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertible (open) status.'])
         return
+    else
+      std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
+    return
 
 window.prep_dispute_to_convert_from_research = (event) ->
   open_status = ['NEW', 'ASSIGNED', 'RESEARCHING', 'RE-OPENED', 'ESCALATED']
   ticket_status = $("#show-edit-ticket-status-button")[0].innerText
+  ticket_source = $('#dispute-source-text')[0].innerText
 
   if !open_status.includes(ticket_status)
     std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertible (open) status.'])
     return
 
-  if !(/TI Webform/.test $("#dispute-source-text").text())
+  if ticket_source == 'TI Webform' || ticket_source == 'TI API'
+    dispute_id = $("#dispute_id").text()
+    entry_ids = []
+    entries_content = []
+    summary = $('.email-msg-content').text()
+
+    for entry in $('.dual-edit-field.url-cell')
+      entry_ids.push $(entry).attr('data-id')
+      entries_content.push $(entry).find('.entry-data-content').text().replace(/^\s+|\s+$/g, '')
+
+    $('#convert-ticket-summary').text(summary)
+    $('#dispute-id-to-convert').text(dispute_id)
+    $('.convert-entry-count').text("(#{entry_ids.length})")
+
+    if $("#entries-to-convert tbody").find('tr').length > 0
+      for row in $("#entries-to-convert tbody").find('tr')
+        $(row).remove()
+
+    get_webrep_current_cats_from_research(entry_ids, entries_content)
+
+  else
     std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
     return
 
-  dispute_id = $("#dispute_id").text()
-  entry_ids = []
-  entries_content = []
-  summary = $('.email-msg-content').text()
-
-  for entry in $('.dual-edit-field.url-cell')
-    entry_ids.push $(entry).attr('data-id')
-    entries_content.push $(entry).find('.entry-data-content').text().replace(/^\s+|\s+$/g, '')
-
-  $('#convert-ticket-summary').text(summary)
-  $('#dispute-id-to-convert').text(dispute_id)
-  $('.convert-entry-count').text("(#{entry_ids.length})")
-
-  if $("#entries-to-convert tbody").find('tr').length > 0
-    for row in $("#entries-to-convert tbody").find('tr')
-      $(row).remove()
-
-  get_webrep_current_cats_from_research(entry_ids, entries_content)
-
+    
 $ ->
 
   # Check dropdown to decide when to enable the conversion submit button
