@@ -1844,15 +1844,15 @@ $ ->
           pageLength = response.entriesperpage
     )
 
-    std_msg_ajax(
-      method: 'POST'
-      url: "/escalations/api/v1/escalations/user_preferences/"
-      data: {name: 'WebRepCurrentPage'}
-      success: (response) ->
-        response = JSON.parse(response)
-        if response?
-          $('#disputes-index').DataTable().page(response.currentpage).draw('page')
-    )
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/user_preferences/"
+    data: {name: 'WebRepCurrentPage'}
+    success: (response) ->
+      response = JSON.parse(response)
+      if response?
+        $('#disputes-index').DataTable().page(response.currentpage).draw('page')
+  )
 
   window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
     dom: '<t>'
@@ -2568,7 +2568,7 @@ window.prep_dispute_to_convert_from_research = (event) ->
     std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
     return
 
-    
+
 $ ->
 
   # Check dropdown to decide when to enable the conversion submit button
