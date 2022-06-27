@@ -1,9 +1,5 @@
 class AddSdrPlatformSetting < ActiveRecord::Migration[5.2]
-  def up
+  def change
     add_column :platforms, :senderdomain, :boolean
-  end
-
-  def down
-
   end
 end
