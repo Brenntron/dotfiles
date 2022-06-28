@@ -2403,7 +2403,8 @@ a.static-nav-item {
 .hidden-auto-resolve{
   z-index: 0;
 }
-.reputation-research-search-wrapper #confirmation-modal .modal-body{
+.reputation-research-search-wrapper #confirmation-modal .modal-body, .webcat-research-search-wrapper
+#confirmation-modal .modal-body {
   color:$type-darkest!important
 }
 .webrep_auto_resolve, #auto-resolve-dialog{
@@ -5670,6 +5671,27 @@ input.table-entry-input:focus {
   border-right: 1px solid $faint-neutral-color;
 }
 
+.webcat-research-toolbar {
+  color: $type-darkest;
+  height: 32px;
+  margin-left: 45px;
+  margin-top: 50px;
+  position: unset;
+  width: fit-content;
+
+  div {
+    margin-top: -18px;
+  }
+
+  .toolbar-button {
+    background-image: url(image_path('icon_categorize.svg'));
+  }
+
+  .toolbar-dropdown {
+    min-width: 500px;
+  }
+}
+
 .note-repsubmit.small{
   display: flex;
   align-items: flex-end;
@@ -5699,23 +5721,23 @@ input.table-entry-input:focus {
   margin-left: -5px!important;
 }
 
-.reputation-research-search-wrapper {
+.reputation-research-search-wrapper, .webcat-research-search-wrapper {
   margin: -15px -15px 40px -15px;
   background-color: $content-tab-color;
   border-radius: 4px 4px 0 0 ;
 }
-.reputation-research-search-wrapper .nav-tabs::before{
+.reputation-research-search-wrapper .nav-tabs::before, .webcat-research-search-wrapper .nav-tabs::before {
   content:unset;
 }
-.reputation-research-search-wrapper .nav-tabs{
+.reputation-research-search-wrapper .nav-tabs, .webcat-research-search-wrapper .nav-tabs{
    margin:0;
  }
-.reputation-research-search-wrapper h1 {
+.reputation-research-search-wrapper h1, .webcat-research-search-wrapper h1 {
   color: $content-bg-color;
   margin-bottom: 20px;
 }
 
-.reputation-research-search-wrapper .top-info-icon {
+.reputation-research-search-wrapper .top-info-icon, .webcat-research-search-wrapper .top-info-icon {
   width: 27px;
   height: 27px;
   margin: 0 0 -3px 15px;
@@ -5729,7 +5751,14 @@ input.table-entry-input:focus {
   line-height: 1.25em;
   min-height: 174px;
 }
-.reputation-research-search-wrapper{
+
+.webcat-research-search-wrapper .search-group {
+  margin-left: auto;
+  margin-right: 35px;
+  width: 25%;
+}
+
+.reputation-research-search-wrapper, .webcat-research-search-wrapper {
   padding: 0 15px;
 }
 .research-search-form {
@@ -5759,6 +5788,38 @@ input.table-entry-input:focus {
 
 .research-search-form hr.thin {
   opacity: 0.3;
+}
+
+.domain-table-wrapper {
+  margin: auto;
+  width: 95%;
+
+  table {
+    max-width: 550px;
+  }
+
+  thead {
+    color: #999;
+
+    th {
+      font-weight: 400;
+      text-transform: none;
+    }
+  }
+
+  thead th, tbody td {
+    border: none;
+    padding-top: 0;
+  }
+
+  &-listing {
+    font-size: 18px;
+  }
+}
+
+.webcat-research-wrapper {
+  margin: auto;
+  width: 95%;
 }
 
 #disputes-research-table label, #edit-ticket-status-dropdown label {
@@ -5855,7 +5916,7 @@ table > tbody > tr > td.research-table-row-wrapper {
 .research-lookup-container {
   margin-left: 20px
 }
-.reputation-research-search-wrapper h1{
+.reputation-research-search-wrapper h1, .webcat-research-search-wrapper h1 {
   margin: 0 100px 0 0;
 }
 .research-header-wrapper{
@@ -5876,6 +5937,7 @@ table > tbody > tr > td.research-table-row-wrapper {
   margin-top: 12px;
   box-shadow: none;
   color: $type-lightest;
+  height: 70px;
 }
 .research-header-wrapper .nav-tabs > li > a:hover{
   color: $type-lightest;
@@ -6052,7 +6114,7 @@ h5.entry-details-table-header {
   margin-top: 0;
 }
 @media (min-width: 1100px) {
-  #research-tab-toolbar .toolbar-button-text {
+  #research-tab-toolbar .toolbar-button-text, .webcat-research-toolbar .toolbar-button-text {
     display: block;
     margin-left: 8px;
   }
@@ -6615,7 +6677,8 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-EW, .dispute-ew {background-image: url(image_path('icon_type_email_web.svg'));}
 
 
-.team-dashboard-header-area, .dashboard-header-area, .complaint-mgt-top-area, .reputation-research-search-wrapper {
+.team-dashboard-header-area, .dashboard-header-area, .complaint-mgt-top-area, .reputation-research-search-wrapper,
+.webcat-research-search-wrapper {
   background-color: $content-tab-color;
   margin-top: -15px;
   margin-right: -15px;
@@ -10689,7 +10752,8 @@ button.secondary.view-report-external-button {
 
 // dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
 @media screen and (min-width: 1600px) {
-  #research-tab-toolbar .toolbar-button-label .toolbar-button-text {
+  #research-tab-toolbar .toolbar-button-label .toolbar-button-text, .webcat-research-toolbar .toolbar-button-label
+  .toolbar-button-text {
     padding-top: 1px;
   }
 }
@@ -11609,7 +11673,7 @@ input[type="radio"].resolution_radio_button {
 }
 @media (min-width: 1700px) {
 
-  #webrep-index-toolbar{
+  #webrep-index-toolbar, .webcat-research-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
       padding-left: 13px;
@@ -11674,7 +11738,7 @@ input[type="radio"].resolution_radio_button {
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
 @media screen and (max-width: 1600px) and (min-width: 1401px) {
-  #research-tab-toolbar {
+  #research-tab-toolbar, .webcat-research-toolbar {
     .toolbar-button {
       background-position: 6px 6px;
       padding-left: 9px;
@@ -11687,7 +11751,7 @@ input[type="radio"].resolution_radio_button {
 }
 // fix the collapse breakpoint
 @media screen and (max-width: 1400px) {
-  #research-tab-toolbar .toolbar-button-text {
+  #research-tab-toolbar .toolbar-button-text, .webcat-research-toolbar .toolbar-button-text {
     display: none;
     margin-left: 8px;
   }

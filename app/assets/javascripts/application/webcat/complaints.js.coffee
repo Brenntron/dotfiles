@@ -2319,7 +2319,7 @@ $ ->
     return
 
   $(document).ready ->
-    if window.location.pathname != '/escalations/webcat/complaints'
+    if window.location.pathname != '/escalations/webcat/complaints' && window.location.pathname != '/escalations/webcat/research'
       $('#filter-complaints-nav').hide()
       $('#fetch').hide()
       $('#complaints-nav-search-wrapper').hide()
