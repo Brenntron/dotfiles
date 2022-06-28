@@ -51,7 +51,9 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
 
     # Get one page of records separate from the eager loading and do the eagar loading from those ids.
     # complaint_entries = ComplaintEntry.includes(complaint: [{customer: :company}, :complaint_tags], user: {}).references(:complaint).where(id: complaint_entry_ids)
-    complaint_entries = ComplaintEntry.includes(complaint: [{customer: :company}], user: {}).where(id: complaint_entry_ids)
+    complaint_entries = ComplaintEntry.includes(complaint: [{customer: :company}], user: {}).where(id: complaint_entry_ids).sort_by do |entry|
+      complaint_entry_ids.index(entry.id)
+    end
 
     complaint_entries.map do |complaint_entry|
       complaint = complaint_entry.complaint
