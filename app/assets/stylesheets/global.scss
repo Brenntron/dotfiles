@@ -5679,16 +5679,44 @@ input.table-entry-input:focus {
   position: unset;
   width: fit-content;
 
-  div {
-    margin-top: -18px;
-  }
-
-  .toolbar-button {
+  .webcat-research-categorize-url-button {
     background-image: url(image_path('icon_categorize.svg'));
   }
 
   .toolbar-dropdown {
-    min-width: 500px;
+    min-width: 350px;
+  }
+
+  .selected-urls-wrapper {
+    padding: 10px;
+
+    .selected-urls-label {
+      margin-bottom: 5px;
+    }
+  }
+
+  .selected-urls-categories-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+
+    .input-group {
+      border: 2px solid #ccc;
+      border-radius: 2px;
+      margin: 10px 0;
+    }
+
+    .toolbar-button {
+      padding: 0 30px;
+    }
+
+    .toolbar-button, .toolbar-button-text {
+      margin: auto;
+    }
+
+    .toolbar-button-text {
+      padding: 0;
+    }
   }
 }
 
