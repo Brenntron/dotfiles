@@ -30,15 +30,24 @@ class AutoResolve
         matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition, true)
         if !matching_disposition
           if sugg_disposition == "false positive"
-            AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
-            dispute_entry.reload
+            if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+              AutoResolve.auto_resolve_umbrella_false_positive(dispute_entry)
+              dispute_entry.reload
+            end
           end
           if sugg_disposition == "false negative"
-
-            if is_ip_address
-              dispute_entry = AutoResolve.attempt_ai_conviction_of_ip(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+            if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
+              if is_ip_address
+                dispute_entry = AutoResolve.attempt_ai_conviction_of_ip(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+              else
+                dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+              end
             else
-              dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+              if is_ip_address
+                dispute_entry = AutoResolve.attempt_ai_conviction_of_ip(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+              else
+                dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+              end
             end
           end
         end

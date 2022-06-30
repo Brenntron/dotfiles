@@ -5,6 +5,7 @@ class DisputeEmail < ApplicationRecord
 
   EMAIL_DOMAIN = "dispute.talosintelligence.com"
   NOREPLY      = "noreply"
+  NOREPLY_EMAIL_DOMAIN = "comm.talosintelligence.com"
 
   UNREAD   = "unread"
   READ     = "read"
@@ -12,6 +13,7 @@ class DisputeEmail < ApplicationRecord
   SENT     = "sent"
 
   REFERENCE_TEMPLATE = "ref-CASEID-anco"
+
 
   def self.process_bridge_payload(message_payload)
     begin
@@ -28,7 +30,7 @@ class DisputeEmail < ApplicationRecord
 
           bad_email_args = {}
           bad_email_args[:to] = message_payload["payload"]["from"]
-          bad_email_args[:from] = "#{NOREPLY}@#{EMAIL_DOMAIN}"
+          bad_email_args[:from] = "#{NOREPLY}@#{NOREPLY_EMAIL_DOMAIN}"
           bad_email_args[:subject] = bad_gateway_subject
           bad_email_args[:body] = bad_gateway_body
 
@@ -63,7 +65,7 @@ class DisputeEmail < ApplicationRecord
 
             old_case_email_args = {}
             old_case_email_args[:to] = message_payload["payload"]["from"]
-            old_case_email_args[:from] = "#{NOREPLY}@#{EMAIL_DOMAIN}"
+            old_case_email_args[:from] = "#{NOREPLY}@#{NOREPLY_EMAIL_DOMAIN}"
             old_case_email_args[:subject] = old_case_gateway_subject
             old_case_email_args[:body] = old_case_gateway_body
 
@@ -119,7 +121,7 @@ class DisputeEmail < ApplicationRecord
 
             old_case_email_args = {}
             old_case_email_args[:to] = message_payload["payload"]["from"]
-            old_case_email_args[:from] = "#{NOREPLY}@#{EMAIL_DOMAIN}"
+            old_case_email_args[:from] = "#{NOREPLY}@#{NOREPLY_EMAIL_DOMAIN}"
             old_case_email_args[:subject] = old_case_gateway_subject
             old_case_email_args[:body] = old_case_gateway_body
 
@@ -169,6 +171,7 @@ class DisputeEmail < ApplicationRecord
       conn.post()
     end
   end
+
 
   ## FORMAT FOR AN EXTERNAL FACING CASE NUMBER IS:  ref-[dispute#id]-anco   example: ref-325302-anco wher 325302 is the ID of a record in disputes table
   def self.find_case_number_in_email(message_payload)

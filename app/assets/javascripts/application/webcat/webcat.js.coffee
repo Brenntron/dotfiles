@@ -202,6 +202,19 @@ $ ->
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
       options: AC.WebCat.createSelectOptions("##{select.id}")
+      score: (input) ->
+        #  Adding some customization for autofill
+        #  restricting on certain cats to avoid accidental categorization
+        #  (replaces selectize's built-in `getScoreFunction()` with our own)
+        (item) ->
+          if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+            item.category_code == input ? 1 : 0
+          else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+            1
+          else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+            0.9
+          else
+            0
     }
 
   url = $('#complaints-index').data('source')
@@ -473,13 +486,15 @@ $ ->
                 render: (data, type, full, meta) ->
                   { age, status } = full
                   unless status == 'COMPLETED' || status == 'RESOLVED'
-                    if age.indexOf('hour') != -1
+                    if age.indexOf('h') != -1 && age.indexOf('h') < 4
                       hour = parseInt( age.split("h")[0] )
-                      if hour >= 3 && hour < 12
+                      if hour>= 3 && hour < 12
                         age_class = 'ticket-age-over3hr'
-                      else if hour > 12
+                      else if hour >= 12
                         age_class = 'ticket-age-over12hr'
-                    else if age.indexOf('minute') != -1
+                    else if age.indexOf('mo') != -1
+                      age_class = 'ticket-age-over12hr'
+                    else if age.indexOf('m') != -1 && age.indexOf('m') < 4
                       age_class = ''
                     else
                       age_class = 'ticket-age-over12hr'

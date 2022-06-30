@@ -116,7 +116,47 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
         }
     }
   end
-
+  let(:regular_umbrella_fp_json) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute: {
+                source_type: 'Dispute',
+                source_key: 1001,
+                payload: {
+                    investigate_urls: {
+                        "355toyota.com" => {
+                            "WBRS_SCORE"=>"noscore",
+                            "WBRS_Rule_Hits"=>"",
+                            "Hostname_ips"=>"",
+                            "rep_sugg"=>"Trusted",
+                            "suggested_threat_category" => "malware",
+                            "claim" => "false positive",
+                            "category"=>"Not in our list"
+                        }
+                    },
+                    investigate_ips:{},
+                    problem: 'What do I need to do to improve the reputation',
+                    submission_type: 'w',
+                    name: customer_name,
+                    user_company: company_name,
+                    email: 'webmaster@cmim.org',
+                    email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
+                    email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
+                    user_ip: '64.70.56.99',
+                    domain: '355toyota.com',
+                    product_platform: 2001,
+                    network: false,
+                    product_version: 'test'
+                }
+            }
+        }
+    }
+  end
 
 
   let(:email_autoresolve_json) do
@@ -383,7 +423,16 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     @umbrella_platform.emailrep = true
     @umbrella_platform.save
 
-
+    @umbrella_reg_platform = Platform.new
+    @umbrella_reg_platform.id = 2001
+    @umbrella_reg_platform.public_name = "Umbrella"
+    @umbrella_reg_platform.internal_name = "Umbrella"
+    @umbrella_reg_platform.active = true
+    @umbrella_reg_platform.webrep = true
+    @umbrella_reg_platform.webcat = true
+    @umbrella_reg_platform.filerep = true
+    @umbrella_reg_platform.emailrep = true
+    @umbrella_reg_platform.save
 
   end
 
@@ -572,10 +621,27 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql(DisputeEntry::STATUS_AUTO_RESOLVED_UNCHANGED)
     expect(dispute_entry_1.resolution_comment).to eql("The following ticket queue is for false negative requests only. If you would like to dispute the reputation of an Untrusted verdict, please open a Web Reputation ticket.")
 
+  end
+
+  it 'received dispute payload and sets to new for false positive standard (not no-reply) umbrella cases' do
+    vrt_incoming
+    guest_company
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: regular_umbrella_fp_json
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    expect(dispute.dispute_entries.where(uri: '355toyota.com')).to exist
 
 
+    dispute_entry_1 = DisputeEntry.where(:uri => '355toyota.com').first
 
-
+    expect(dispute_entry_1.status).to eql("NEW")
+    expect(dispute_entry_1.resolution).to eql("")
+    expect(dispute_entry_1.resolution_comment).to eql(nil)
   end
 
   it 'received dispute payload and auto resolves email false positive' do

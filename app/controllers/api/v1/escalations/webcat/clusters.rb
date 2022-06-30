@@ -22,6 +22,7 @@ module API
               cluster_process_array = []
 
               clusters = JSON.parse(params[:clusters], symbolize_names: true)
+              ::Clusters::Assignor.new(clusters, current_user).assign_permanent!
               ::Clusters::Processor.new(clusters, current_user).process
               return {:status => "success"}.to_json
             end
@@ -29,7 +30,7 @@ module API
             desc 'get all clusters'
             params do
               optional :f, type: String, desc: 'filter'
-              optional :platform, type: String, desc: 'platform filter(WSA/NGFW)'
+              optional :platform, type: String, desc: 'platform filter(WSA/NGFW/Umbrella)'
               optional :cluster_type, type: String, desc: 'cluster type filter(ip/domain)'
             end
 
@@ -99,13 +100,13 @@ module API
               }.to_json
             end
 
-            desc "unassign cluster from the user"
+            desc 'unassign cluster from the user'
             params do
             end
             post 'return' do
               clusters = JSON.parse(params[:clusters], symbolize_names: true)
               ::Clusters::Assignor.new(clusters, current_user).unassign
-              return {:status => "success"}.to_json
+              return { status: 'success' }.to_json
             rescue Exception => e
               {
                 status: 'failed',
@@ -113,13 +114,15 @@ module API
               }.to_json
             end
 
-            desc "process important clusters"
+            desc 'process important clusters'
             params do
             end
             post 'proccess' do
-              cluster = params[:cluster]
-              ::Clusters::Processor.new([cluster], current_user).process!
-              return {:status => "success"}.to_json
+              clusters = [params[:cluster]]
+              # js converts array to hash on sending for some reason => .values
+              clusters += params.dig(:cluster, :duplicates).values if params.dig(:cluster, :duplicates).present?
+              ::Clusters::Processor.new(clusters, current_user).process!
+              return { status: 'success' }.to_json
             rescue Exception => e
               {
                 status: 'failed',
@@ -133,7 +136,7 @@ module API
             post 'process_multiple_reviewed' do
               clusters = JSON.parse(params[:clusters], symbolize_names: true)
               ::Clusters::Processor.new(clusters, current_user).process!
-              return {:status => "success"}.to_json
+              return { status: 'success' }.to_json
               rescue Exception => e
               {
                   status: 'failed',
@@ -141,15 +144,15 @@ module API
               }.to_json
             end
 
-
-
-            desc "decline important clusters categorization"
+            desc 'decline important clusters categorization'
             params do
             end
             post 'decline' do
-              cluster = params[:cluster]
-              ::Clusters::Processor.new([cluster], current_user).decline
-              return {:status => "success"}.to_json
+              clusters = [params[:cluster]]
+              # js converts array to hash on sending for some reason => .values
+              clusters += params.dig(:cluster, :duplicates).values if params.dig(:cluster, :duplicates).present?
+              ::Clusters::Processor.new(clusters, current_user).decline
+              return { status: 'success' }.to_json
             rescue Exception => e
               {
                 status: 'failed',
