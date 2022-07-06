@@ -1,0 +1,27 @@
+# Heavily inspired by the official docs, https://docs.docker.com/get-started/08_using_compose/
+services:
+  app:
+    build: .
+    volumes:
+      - .:/analyst_console_escalations
+    ports:
+      # Format here is `external:internal`
+      # (where 'external' is what you'd go to in your browser, on your local machine, and 'internal'
+      # is the port that Docker runs Rails on)
+      - 9200:3002
+    # This overrides the "CMD" specified in the Dockerfile.
+    command: bundle exec rails s -p 3002 -b "0.0.0.0"
+    environment:
+      # Notice that we do NOT specify a port here. The "ports" declaration down in the "mysql" section
+      # is only for exposing internal (3306) ports to the outside world. From our app, we connect from
+      # the VM's internal network, so trying to connect over anything other than 3306 would cause an
+      # error.
+      DATABASE_URL: mysql2://root:root@mysql/analyst_console
+    networks:
+      - atlas_database_network
+      - atlas_bridge_network
+networks:
+  atlas_database_network:
+    external: true
+  atlas_bridge_network:
+    external: true
