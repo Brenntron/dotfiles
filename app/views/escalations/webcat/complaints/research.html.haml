@@ -24,24 +24,16 @@
       .input-group.search-group#webcat-research-search
         = text_field_tag 'general_search', "#{}", class: 'search-box', placeholder: 'Search'
 
-        %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-          Advanced
-        .dropdown-menu.nav-tools-dropdown#advanced-search-dropdown{'aria-labelledby': 'advanced-search-button'}
-          %h3.nav-tool-dropdown-header.inverse
-            Advanced Search
-          #advanced-search-wrapper.nav-tool-content-wrapper
-            = render 'escalations/webcat/complaints/advanced_search'
-
   .domain-table-wrapper
     %table.domain-table
       %thead
         %tr
           %th
-            domain
+            Domain
           %th
-            current category
+            Current Category
           %th
-            reputation
+            Reputation
       %tbody
         %tr
           %td.domain-table-listing
@@ -70,7 +62,7 @@
 
 
   .research-tab-wrapper.tab-content
-    .tab-pane.domain-history-pane#domainHistoryPane{role: 'tabpanel'}
+    .tab-pane.active#domain-history{role: 'tabpanel'}
       = render 'escalations/webcat/complaints/domain_history_tab'
-    .tab-pane#xbrsHistoryPane{role: 'tabpanel'}
+    .tab-pane#xbrs-history{role: 'tabpanel'}
       = render 'escalations/webcat/complaints/xbrs_history_tab'

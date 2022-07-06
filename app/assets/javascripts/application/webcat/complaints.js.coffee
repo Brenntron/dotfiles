@@ -2326,6 +2326,10 @@ $ ->
       $('#new-complaint-nav-wrapper').hide()
       $('#filter-clusters-nav').hide()
       $('#clusters-nav-regex-wrapper').hide()
+    else if window.location.pathname == '/escalations/webcat/research'
+      $('#advanced-search-button').hide()
+      $('#filter-clusters-nav').hide()
+      $('#clusters-nav-regex-wrapper').hide()
     else
       $('#filter-complaints').show()
       $('#fetch').show()
