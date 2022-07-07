@@ -2,7 +2,7 @@
   Escalations WebCat - Analyst Console
 
 - content_for(:nav_banner) do
-  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-3.col-lg-2
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-4.col-sm-4.col-md-3.col-lg-2
     %a#complaints.nav-page-button{href: '/escalations/webcat/complaints', class: ("active" if current_page?('/escalations/webcat/complaints'))}
       %span.nav-toolbar-icon-large.icon-queue
 
@@ -11,6 +11,8 @@
 
     %a#reports.nav-page-button{href: '/escalations/webcat/reports', class: ("active" if current_page?('/escalations/webcat/reports'))}
       %span.nav-toolbar-icon-large.icon-reports-white
+    %a#reports.nav-page-button{href: '/escalations/webcat/research', class: ("active" if current_page?('/escalations/webcat/research'))}
+      %span.nav-toolbar-icon-large.icon-research
 
 
   .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown#new-complaint-nav-wrapper

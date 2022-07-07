@@ -2408,7 +2408,7 @@ a.static-nav-item {
 .hidden-auto-resolve{
   z-index: 0;
 }
-.reputation-research-search-wrapper #confirmation-modal .modal-body{
+.reputation-research-search-wrapper #confirmation-modal .modal-body {
   color:$type-darkest!important
 }
 .webrep_auto_resolve, #auto-resolve-dialog{
@@ -4597,6 +4597,10 @@ td.wbrs-highlight, td.sbrs-highlight {
 .nav-page-button-wrapper {
   text-align: left !important;
   padding-left: 25px !important;
+
+  @media (max-width: 1300px) {
+    padding-left: 5px !important;
+  }
 }
 
 .nav-toolbar-icon-large {
@@ -5675,6 +5679,55 @@ input.table-entry-input:focus {
   border-right: 1px solid $faint-neutral-color;
 }
 
+.webcat-research-toolbar {
+  color: $type-darkest;
+  height: 32px;
+  margin: 0 0 20px;
+  margin-top: 50px;
+  position: unset;
+  width: fit-content;
+
+  .webcat-research-categorize-url-button {
+    background-image: url(image_path('icon_categorize.svg'));
+  }
+
+  .toolbar-dropdown {
+    min-width: 350px;
+  }
+
+  .selected-urls-wrapper {
+    padding: 10px;
+
+    .selected-urls-label {
+      margin-bottom: 5px;
+    }
+  }
+
+  .selected-urls-categories-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+
+    .input-group {
+      border: 2px solid #ccc;
+      border-radius: 2px;
+      margin: 10px 0;
+    }
+
+    .toolbar-button {
+      padding: 0 30px;
+    }
+
+    .toolbar-button, .toolbar-button-text {
+      margin: auto;
+    }
+
+    .toolbar-button-text {
+      padding: 0;
+    }
+  }
+}
+
 .note-repsubmit.small{
   display: flex;
   align-items: flex-end;
@@ -5704,23 +5757,23 @@ input.table-entry-input:focus {
   margin-left: -5px!important;
 }
 
-.reputation-research-search-wrapper {
+.reputation-research-search-wrapper, .webcat-research-search-wrapper {
   margin: -15px -15px 40px -15px;
   background-color: $content-tab-color;
   border-radius: 4px 4px 0 0 ;
 }
-.reputation-research-search-wrapper .nav-tabs::before{
+.reputation-research-search-wrapper .nav-tabs::before, .webcat-research-search-wrapper .nav-tabs::before {
   content:unset;
 }
-.reputation-research-search-wrapper .nav-tabs{
+.reputation-research-search-wrapper .nav-tabs, .webcat-research-search-wrapper .nav-tabs{
    margin:0;
  }
-.reputation-research-search-wrapper h1 {
+.reputation-research-search-wrapper h1, .webcat-research-search-wrapper h1 {
   color: $content-bg-color;
   margin-bottom: 20px;
 }
 
-.reputation-research-search-wrapper .top-info-icon {
+.reputation-research-search-wrapper .top-info-icon, .webcat-research-search-wrapper .top-info-icon {
   width: 27px;
   height: 27px;
   margin: 0 0 -3px 15px;
@@ -5734,7 +5787,14 @@ input.table-entry-input:focus {
   line-height: 1.25em;
   min-height: 174px;
 }
-.reputation-research-search-wrapper{
+
+.webcat-research-search-wrapper .search-group {
+  margin-left: auto;
+  margin-right: 35px;
+  width: 25%;
+}
+
+.reputation-research-search-wrapper, .webcat-research-search-wrapper {
   padding: 0 15px;
 }
 .research-search-form {
@@ -5764,6 +5824,32 @@ input.table-entry-input:focus {
 
 .research-search-form hr.thin {
   opacity: 0.3;
+}
+
+.domain-table-wrapper {
+  width: auto;
+
+  thead {
+    color: #999;
+
+    th {
+      font-weight: 400;
+      text-transform: none;
+    }
+  }
+
+  thead th, tbody td {
+    border: none;
+    padding-top: 0;
+  }
+
+  &-listing {
+    font-size: 18px;
+  }
+}
+
+.webcat-research-wrapper {
+  width: auto;
 }
 
 #disputes-research-table label, #edit-ticket-status-dropdown label {
@@ -5860,9 +5946,15 @@ table > tbody > tr > td.research-table-row-wrapper {
 .research-lookup-container {
   margin-left: 20px
 }
-.reputation-research-search-wrapper h1{
+.reputation-research-search-wrapper h1 {
   margin: 0 100px 0 0;
+
 }
+
+.webcat-research-search-wrapper h1 {
+  margin: 0 40px 0 0;
+}
+
 .research-header-wrapper{
   margin: -15px;
   height: 70px;
@@ -5881,6 +5973,7 @@ table > tbody > tr > td.research-table-row-wrapper {
   margin-top: 12px;
   box-shadow: none;
   color: $type-lightest;
+  height: 70px;
 }
 .research-header-wrapper .nav-tabs > li > a:hover{
   color: $type-lightest;
@@ -5901,6 +5994,65 @@ table > tbody > tr > td.research-table-row-wrapper {
     }
   }
 }
+
+.webcat-research-search-wrapper {
+  li > a {
+    max-width: 250px;
+  }
+
+  @media (max-width: 1300px) {
+    h1 {
+      font-size: 17pt;
+      margin: 0 35px 0 0;
+    }
+
+    .top-info-icon {
+      margin: 0 0 -3px 10px;
+    }
+
+    .nav-tabs > li > a{
+      max-width: 200px;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .nav-tabs > li > a{
+      max-width: 175px;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    h1 {
+      font-size: 15pt;
+      margin: 0 25px 0 0;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .nav-tabs > li > a{
+      max-width: 100px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .nav-tabs > li > a {
+      font-size: 8pt;
+    }
+  }
+
+  @media (max-width: 800px) {
+    h1 {
+      font-size: 12pt;
+      margin: 0 10px 0 0;
+    }
+
+    .top-info-icon {
+      margin: 0 0 -3px 5px;
+      padding-right: 20px;
+    }
+  }
+}
+
 //caret for active tab  in reputation toolbar
 .research-header-wrapper li::after {
   content: '';
@@ -6057,7 +6209,7 @@ h5.entry-details-table-header {
   margin-top: 0;
 }
 @media (min-width: 1100px) {
-  #research-tab-toolbar .toolbar-button-text {
+  #research-tab-toolbar .toolbar-button-text, .webcat-research-toolbar .toolbar-button-text {
     display: block;
     margin-left: 8px;
   }
@@ -6620,7 +6772,8 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-EW, .dispute-ew {background-image: url(image_path('icon_type_email_web.svg'));}
 
 
-.team-dashboard-header-area, .dashboard-header-area, .complaint-mgt-top-area, .reputation-research-search-wrapper {
+.team-dashboard-header-area, .dashboard-header-area, .complaint-mgt-top-area, .reputation-research-search-wrapper,
+.webcat-research-search-wrapper {
   background-color: $content-tab-color;
   margin-top: -15px;
   margin-right: -15px;
@@ -10701,7 +10854,8 @@ button.secondary.view-report-external-button {
 
 // dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
 @media screen and (min-width: 1600px) {
-  #research-tab-toolbar .toolbar-button-label .toolbar-button-text {
+  #research-tab-toolbar .toolbar-button-label .toolbar-button-text, .webcat-research-toolbar .toolbar-button-label
+  .toolbar-button-text {
     padding-top: 1px;
   }
 }
@@ -11621,7 +11775,7 @@ input[type="radio"].resolution_radio_button {
 }
 @media (min-width: 1700px) {
 
-  #webrep-index-toolbar{
+  #webrep-index-toolbar, .webcat-research-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
       padding-left: 13px;
@@ -11686,7 +11840,7 @@ input[type="radio"].resolution_radio_button {
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
 @media screen and (max-width: 1600px) and (min-width: 1401px) {
-  #research-tab-toolbar {
+  #research-tab-toolbar, .webcat-research-toolbar {
     .toolbar-button {
       background-position: 6px 6px;
       padding-left: 9px;
@@ -11699,7 +11853,7 @@ input[type="radio"].resolution_radio_button {
 }
 // fix the collapse breakpoint
 @media screen and (max-width: 1400px) {
-  #research-tab-toolbar .toolbar-button-text {
+  #research-tab-toolbar .toolbar-button-text, .webcat-research-toolbar .toolbar-button-text {
     display: none;
     margin-left: 8px;
   }
@@ -12846,6 +13000,12 @@ table > tbody > tr > td.no-padding {
     .wbnp-area {
       padding: 15px;
     }
+  }
+}
+
+@media screen and (max-width: 900px) {
+  #nav-banner a {
+    font-size: 9pt;
   }
 }
 
