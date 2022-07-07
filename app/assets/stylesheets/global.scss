@@ -5677,7 +5677,7 @@ input.table-entry-input:focus {
 .webcat-research-toolbar {
   color: $type-darkest;
   height: 32px;
-  margin-left: 45px;
+  margin: 0 0 20px;
   margin-top: 50px;
   position: unset;
   width: fit-content;
@@ -5822,7 +5822,6 @@ input.table-entry-input:focus {
 }
 
 .domain-table-wrapper {
-  margin-left: 45px;
   width: auto;
 
   thead {
@@ -5845,8 +5844,7 @@ input.table-entry-input:focus {
 }
 
 .webcat-research-wrapper {
-  margin: auto;
-  width: 95%;
+  width: auto;
 }
 
 #disputes-research-table label, #edit-ticket-status-dropdown label {

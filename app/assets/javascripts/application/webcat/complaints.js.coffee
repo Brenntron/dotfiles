@@ -2319,15 +2319,11 @@ $ ->
     return
 
   $(document).ready ->
-    if window.location.pathname != '/escalations/webcat/complaints' && window.location.pathname != '/escalations/webcat/research'
+    if (window.location.pathname != '/escalations/webcat/complaints' && window.location.pathname != '/escalations/webcat/research')
       $('#filter-complaints-nav').hide()
       $('#fetch').hide()
       $('#complaints-nav-search-wrapper').hide()
       $('#new-complaint-nav-wrapper').hide()
-      $('#filter-clusters-nav').hide()
-      $('#clusters-nav-regex-wrapper').hide()
-    else if window.location.pathname == '/escalations/webcat/research'
-      $('#advanced-search-button').hide()
       $('#filter-clusters-nav').hide()
       $('#clusters-nav-regex-wrapper').hide()
     else
