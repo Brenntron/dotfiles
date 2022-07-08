@@ -8,7 +8,7 @@
     .row
       .col-xs-9
         %label.data-report-label Submitted Dispute
-        %span.data-report-content= @dispute.sender_domain_entry
+        %span.data-report-content= sanitize @dispute.sender_domain_entry
       .col-xs-3
         %label.data-report-label Suggested Reputation
         %span.data-report-content.text-capitalize= @dispute.suggested_disposition
@@ -24,7 +24,7 @@
       .col-xs-12
         %label.data-report-label Details
         %div.data-report-content.sdr-details
-          = @dispute.description
+          = sanitize @dispute.description
     %hr.thin
 
     .row.attachments-row
@@ -163,7 +163,7 @@
             %span.missing-data Unable to grab data from beaker
           - else
             .card-header.beaker-collapse-header#domain-beaker-header
-              %span.sdr-beaker-item= @dispute.sender_domain_entry
+              %span.sdr-beaker-item= sanitize @dispute.sender_domain_entry
               %button.expand-row-button-inline.shown{'data-toggle': 'collapse', type: 'button', 'data-target': "#sdr-beaker-domain-content", 'aria-expanded': 'true', 'aria-controls': "sdr-beaker-domain-content"}
             .collapse.in#sdr-beaker-domain-content{'aria-labelledby': "domain-beaker-header"}
               .card-body
