@@ -486,7 +486,7 @@ $ ->
                 render: (data, type, full, meta) ->
                   { age, status } = full
                   unless status == 'COMPLETED' || status == 'RESOLVED'
-                    if age.indexOf('h') != -1 && age.indexOf('h') < 4
+                    if age.indexOf('h') != -1 && age.indexOf('h') >= 3
                       hour = parseInt( age.split("h")[0] )
                       if hour>= 3 && hour < 12
                         age_class = 'ticket-age-over3hr'
