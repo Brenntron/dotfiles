@@ -28,11 +28,15 @@ class Escalations::Sdr::DisputesController < ApplicationController
       zip_filename = "sdr_export-#{Time.now.utc.iso8601}.zip"
       temp_file = Tempfile.new(zip_filename)
 
+      offset = 0
       file_attachments = []
       bug_attachments.each do |bug_attachment|
         sdr_attach = SenderDomainReputationDisputeAttachment.find(bug_attachment.id)
-        File.open("#{zip_directory}/#{sdr_attach.file_name}", "w") { |f| f.write bug_attachment.file_contents.encode("UTF-8", invalid: :replace, undef: :replace, replace: '')}
-        file_attachments << sdr_attach.file_name
+        split_file_name = sdr_attach.file_name.split('.')
+        temp_file_name = "#{split_file_name.first}_#{(Time.now.to_i + offset).to_s}.#{split_file_name.last}"
+        File.open("#{zip_directory}/#{temp_file_name}", "w") { |f| f.write bug_attachment.file_contents.encode("UTF-8", invalid: :replace, undef: :replace, replace: '')}
+        file_attachments << temp_file_name
+        offset += 1
       end
 
 
