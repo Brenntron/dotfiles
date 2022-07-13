@@ -5,6 +5,8 @@ COPY . /analyst_console_escalations
 ADD http://wwwint.vrt.sourcefire.com/ca.pem /usr/local/share/ca-certificates/vrt.crt
 RUN update-ca-certificates
 RUN apt-get update
+
+RUN apt-get -y install iputils-ping
 RUN apt-get -y install nodejs
 RUN apt-get -y install cmake
 RUN apt-get -y install vim

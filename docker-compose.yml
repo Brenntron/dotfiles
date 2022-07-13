@@ -1,6 +1,7 @@
 # Heavily inspired by the official docs, https://docs.docker.com/get-started/08_using_compose/
 services:
   app:
+    container_name: analyst_console_escalations
     build: .
     volumes:
       - .:/analyst_console_escalations
@@ -17,6 +18,8 @@ services:
       # the VM's internal network, so trying to connect over anything other than 3306 would cause an
       # error.
       DATABASE_URL: mysql2://root:root@mysql/analyst_console
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - atlas_database_network
       - atlas_bridge_network
