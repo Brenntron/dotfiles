@@ -9,7 +9,7 @@ fi
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/jewillin/.oh-my-zsh"
+export ZSH="${HOME}/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -21,6 +21,7 @@ export ZSH="/Users/jewillin/.oh-my-zsh"
 # a theme from this variable instead of looking in $ZSH/themes/
 # If set to an empty array, this variable will have no effect.
 # ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -77,23 +78,21 @@ export ZSH="/Users/jewillin/.oh-my-zsh"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-  git
   asdf
-  ruby
-  yarn
-  thefuck
-  fzf
-  ssh-agent
-  zsh-syntax-highlighting
-  zsh-autosuggestions
   brew
   bundler
   docker-compose
   docker
+  fzf
+  git
+  ruby
+  ssh-agent
+  thefuck
+  yarn
 )
 
 zstyle :omz:plugins:ssh-agent agent-forwarding on
-zstyle :omz:plugins:ssh-agent identities cisco_id_rsa gitlab_id_rsa
+zstyle :omz:plugins:ssh-agent identities cisco_id_rsa gitlab_id_rsa github_id_rsa
 
 export ZPLUG_HOME=/usr/local/opt/zplug
 source $ZPLUG_HOME/init.zsh
@@ -152,3 +151,4 @@ export PATH="/usr/local/opt/mysql/bin:$PATH"
 export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
 export PATH="/usr/local/opt/openssl@3/bin:$PATH"
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
