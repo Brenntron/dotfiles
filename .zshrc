@@ -88,6 +88,7 @@ plugins=(
   zsh-autosuggestions
   brew
   bundler
+  docker-compose
   docker
 )
 
@@ -149,4 +150,5 @@ fi
 export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
 export PATH="/usr/local/opt/mysql/bin:$PATH"
 export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
+export PATH="/usr/local/opt/openssl@3/bin:$PATH"
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
