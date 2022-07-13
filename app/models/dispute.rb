@@ -815,14 +815,13 @@ For future Web categorization requests, please open a Web categorization ticket 
     original_url = url
 
     begin
-      url = url.downcase
-      if url.first(3) == "ftp"
+      if url.first(3).downcase == "ftp"
         url = url.gsub("ftp://", '')
       end
 
       sanitized_url = ""
 
-      if url.first(4) != "http"
+      if url.first(4).downcase != "http"
         url = "http://" + url
       end
 
