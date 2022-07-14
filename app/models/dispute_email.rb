@@ -48,6 +48,7 @@ class DisputeEmail < ApplicationRecord
 
         dispute = Dispute.where(:id => case_id).first
         file_rep_dispute = FileReputationDispute.where(:id => case_id).first
+        sdr_dispute = SenderDomainReputationDispute.where(:id => case_id).first
         if dispute.present?
 
           if dispute.status == Dispute::RESOLVED && dispute.case_resolved_at >= 2.weeks.ago
@@ -157,7 +158,66 @@ class DisputeEmail < ApplicationRecord
           end
 
           #Update ticket status
-          dispute = Dispute.find(case_id)
+          dispute = FileReputationDispute.find(case_id)
+          dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
+          dispute.save!
+
+          conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+          conn.post()
+
+
+        end
+
+        if sdr_dispute.present?
+
+          if sdr_dispute.status == SenderDomainReputationDispute::STATUS_RESOLVED && sdr_dispute.case_closed_at >= 2.weeks.ago
+
+            sdr_dispute.status = Dispute::STATUS_REOPENED
+            sdr_dispute.save!
+
+          end
+
+          if sdr_dispute.status == SenderDomainReputationDispute::STATUS_RESOLVED && sdr_dispute.case_closed_at <= 2.weeks.ago
+
+            old_case_email_args = {}
+            old_case_email_args[:to] = message_payload["payload"]["from"]
+            old_case_email_args[:from] = "#{NOREPLY}@#{NOREPLY_EMAIL_DOMAIN}"
+            old_case_email_args[:subject] = old_case_gateway_subject
+            old_case_email_args[:body] = old_case_gateway_body
+
+            attachments_to_mail = []
+            conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+            conn.post(old_case_email_args, attachments_to_mail)
+
+            conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+            conn.post()
+
+            return
+
+          end
+
+          ##########################################
+
+          new_email = DisputeEmail.new
+          new_email.sender_domain_reputation_dispute_id = case_id
+          new_email.email_headers = message_payload["payload"]["headers"]
+          #Need to clean from value, can show up in form of:
+          #\"Chris LaClair (claclair)\" <claclair@cisco.com>   which as an absolute value, is not a valid email address
+          new_email.from = envelope["from"]
+          new_email.to = envelope["to"].join(",")
+          new_email.subject = message_payload["payload"]["subject"]
+          new_email.body = message_payload["payload"]["text"]
+          new_email.status = UNREAD
+          new_email.save!
+
+          if message_payload["attachments"].present?
+            message_payload["attachments"].each do |email_attachment|
+              DisputeEmailAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, email_attachment, user, new_email)
+            end
+          end
+
+          #Update ticket status
+          dispute = SenderDomainReputationDispute.find(case_id)
           dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
           dispute.save!
 
