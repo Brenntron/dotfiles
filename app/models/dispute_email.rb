@@ -169,10 +169,11 @@ class DisputeEmail < ApplicationRecord
         end
 
         if sdr_dispute.present?
+
           if sdr_dispute.status == SenderDomainReputationDispute::STATUS_RESOLVED && sdr_dispute.case_closed_at >= 2.weeks.ago
 
-            file_rep_dispute.status = Dispute::STATUS_REOPENED
-            file_rep_dispute.save!
+            sdr_dispute.status = Dispute::STATUS_REOPENED
+            sdr_dispute.save!
 
           end
 
