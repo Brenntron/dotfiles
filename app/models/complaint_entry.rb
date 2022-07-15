@@ -351,7 +351,6 @@ class ComplaintEntry < ApplicationRecord
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"
     end
-
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
       prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
@@ -882,7 +881,7 @@ class ComplaintEntry < ApplicationRecord
       if prefix_results.first&.is_active == 1
 
         qualified_prefixes =
-            prefix_results.find_all {|result| result.path == self.path && result.subdomain == self.subdomain}
+            prefix_results.find_all {|result| result.path == self.path && result.subdomain == (self.subdomain || '')}
         category_names = Wbrs::Prefix.category_names(qualified_prefixes)
 
         self.url_primary_category = category_names
@@ -965,7 +964,7 @@ class ComplaintEntry < ApplicationRecord
     certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([domain_of])
 
     qualified_prefixes = prefix_results.find_all do |result|
-      result.path == self.path && ((result.subdomain == self.subdomain) || (self.subdomain == 'www'))
+      result.path == self.path && ((result.subdomain == (self.subdomain || '')) || (self.subdomain == 'www'))
     end
 
     final_current_categories = {}
@@ -1060,7 +1059,7 @@ class ComplaintEntry < ApplicationRecord
     prefix_history = []
     prefixes = remote_prefixes
     prefixes.each do |prefix|
-      if prefix.subdomain == self.subdomain && prefix.path == self.path
+      if prefix.subdomain == (self.subdomain || '') && prefix.path == self.path
         prefix_id = prefix.prefix_id
         response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
         response.each do |resp|
