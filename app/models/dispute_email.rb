@@ -54,11 +54,11 @@ class DisputeEmail < ApplicationRecord
           if dispute.status == Dispute::RESOLVED && dispute.case_resolved_at >= 2.weeks.ago
 
             dispute.status = Dispute::STATUS_REOPENED
-            dispute.save!
+            dispute.save(:validate => false)
 
             dispute.dispute_entries.each do |entry|
               entry.status = DisputeEntry::STATUS_REOPENED
-              entry.save!
+              entry.save(:validate => false)
             end
 
           end
@@ -104,7 +104,7 @@ class DisputeEmail < ApplicationRecord
           #Update ticket status
           dispute = Dispute.find(case_id)
           dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
-          dispute.save!
+          dispute.save(:validate => false)
 
           conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
           conn.post()
@@ -115,7 +115,7 @@ class DisputeEmail < ApplicationRecord
           if file_rep_dispute.status == FileReputationDispute::CLOSED && file_rep_dispute.case_resolved_at >= 2.weeks.ago
 
             file_rep_dispute.status = Dispute::STATUS_REOPENED
-            file_rep_dispute.save!
+            file_rep_dispute.save(:validate => false)
 
           end
 
@@ -160,7 +160,7 @@ class DisputeEmail < ApplicationRecord
           #Update ticket status
           dispute = FileReputationDispute.find(case_id)
           dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
-          dispute.save!
+          dispute.save(:validate => false)
 
           conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
           conn.post()
@@ -173,7 +173,7 @@ class DisputeEmail < ApplicationRecord
           if sdr_dispute.status == SenderDomainReputationDispute::STATUS_RESOLVED && sdr_dispute.case_closed_at >= 2.weeks.ago
 
             sdr_dispute.status = Dispute::STATUS_REOPENED
-            sdr_dispute.save!
+            sdr_dispute.save(:validate => false)
 
           end
 
@@ -219,7 +219,7 @@ class DisputeEmail < ApplicationRecord
           #Update ticket status
           dispute = SenderDomainReputationDispute.find(case_id)
           dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
-          dispute.save!
+          dispute.save(:validate => false)
 
           conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
           conn.post()

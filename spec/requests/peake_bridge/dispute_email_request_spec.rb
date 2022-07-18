@@ -81,7 +81,44 @@ RSpec.describe "Peake-Bridge dispute email messages channels", type: :request do
     }
   end
 
-
+  let(:reopen_dispute_email_params) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute_email: {
+                source_type: 'DisputeEmail',
+                source_key: 1001,
+                payload: {
+                    envelope: {
+                        from: 'paulo@capterra.com',
+                        to: [ 'marlpier@cisco.com' ],
+                    }.to_json,
+                    from: 'paulo@capterra.com',
+                    to: [ 'marlpier@cisco.com' ],
+                    text: "ref-123-anco",
+                    headers: '',
+                    name: 'reputation deal',
+                    email: '',
+                    domain: 'capterra.com',
+                    problem: 'What is its deal?',
+                    details: 'I just want to know what its deal is.',
+                    user_ip: '54.156.208.110',
+                    ticket_time: Time.now - 30,
+                    investigate_ips: {},
+                    investigate_urls: {},
+                    email_subject: 'This reputation stuff',
+                    email_body: 'What is the deal with the reputation stuff?',
+                    user_company: 'Capterra',
+                },
+                attachments: [],
+            }
+        }
+    }
+  end
 
   let(:bridge_message) { double('Bridge::BaseMessage', post: true) }
 
@@ -111,5 +148,23 @@ RSpec.describe "Peake-Bridge dispute email messages channels", type: :request do
     expect(sdr_dispute.status).to eql("RE-OPENED")
 
 
+  end
+
+  it 'receives an email and reopens an auto resolved case' do
+    user = User.new
+    user.email = "vrt-incoming@sourcefire.com"
+    user.cvs_username = "vrt-incoming@sourcefire.com"
+    user.cec_username = "vrt-incoming@sourcefire.com"
+    user.save(:validate => false)
+    DisputeEmail.destroy_all
+    dispute = Dispute.create(:id => 123, :status => "RESOLVED_CLOSED", :case_closed_at => 2.days.ago, :case_resolved_at => 2.days.ago)
+    dispute.user_id = user.id
+    dispute.save!(:validate => false)
+
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: reopen_dispute_email_params
+    expect(response).to be_successful
+    dispute.reload
+    expect(dispute.status).to eql("RE-OPENED")
   end
 end
