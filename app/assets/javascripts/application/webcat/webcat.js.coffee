@@ -218,13 +218,44 @@ $ ->
         icon.removeClass('favorite-search-icon-active').addClass('favorite-search-icon')
     )
 
-  set_icon_for_favorite_filter = (name, isDefaultFilter = false) ->
-    if isDefaultFilter
-      $("#filter-dropdown > #filter-cases-list a[href='#{name}']").parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
-    else
-      $("#saved-search-tbody a:contains('#{name}')").parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+  set_icon_for_favorite_filter = (filter_name) ->
+    filter_dropdown = $("#filter-dropdown > #filter-cases-list a[href='#{filter_name}']")
+    saved_search = $("#saved-search-tbody a:contains('#{filter_name}')")
+    if filter_dropdown.length > 0
+      filter_dropdown.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+    else if saved_search.length > 0
+      saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
 
-  load_user_preference_filter = () ->
+  use_user_preference_filter = () ->
+    return if window.location.pathname != '/escalations/webcat/complaints'
+
+    fav_icon = $('.favorite-search-icon-active')
+    link = fav_icon.parent().find('a')
+    if fav_icon.length == 0 && link.length == 0
+      localStorage.removeItem('webcatFilterUserPreferenceUsed')
+      return
+
+    is_default_filter = fav_icon.closest('#filter-dropdown > #filter-cases-list').length > 0
+
+    # clear search result btn should be shown if current search is not one chosen in user settings
+    if localStorage.webcat_search_name == name || name == decodeURIComponent(window.location.search)
+      localStorage.removeItem('webcatFilterUserPreferenceUsed')
+
+    # do not redirect if there is already some chosen search/filter (not from the settings)
+    return if localStorage.webcat_search_type || window.location.search
+
+    refresh_localStorage()
+    localStorage.webcatFilterUserPreferenceUsed = true
+    if is_default_filter
+      name = link.attr('href')
+      localStorage.removeItem('webcatFilterUserPreferenceUsed') if name == decodeURIComponent(window.location.search)
+      refresh_url(name)
+    else
+      name = link.text().trim()
+      localStorage.removeItem('webcatFilterUserPreferenceUsed') if name == localStorage.webcat_search_name
+      build_webcat_named_search(name);
+
+  pull_user_preference_filter = () ->
     return if window.location.pathname != '/escalations/webcat/complaints'
 
     std_msg_ajax(
@@ -232,33 +263,12 @@ $ ->
       url: '/escalations/api/v1/escalations/user_preferences/'
       data: { name: 'webcat_complaints_filter' }
       success: (response) ->
-        unless response?
-          localStorage.removeItem('webcatFilterUserPreferenceUsed')
-          return
-
+        return unless response?
         name = JSON.parse(response).name
-        default_filters = []
-        $('#filter-dropdown > #filter-cases-list a').each((_, el) -> default_filters.push($(el).attr('href')))
-        is_default_filter = name in default_filters
-
-        if is_default_filter then set_icon_for_favorite_filter(name, true) else set_icon_for_favorite_filter(name, false)
-
-        # clear search result btn should be shown if current search is not one chosen in user settings
-        if localStorage.webcat_search_name == name || name == decodeURIComponent(window.location.search)
-          localStorage.removeItem('webcatFilterUserPreferenceUsed')
-
-        # do not redirect if there is already some chosen search/filter (not from the settings)
-        return if localStorage.webcat_search_type || window.location.search
-
-        refresh_localStorage()
-        localStorage.webcatFilterUserPreferenceUsed = true
-        if is_default_filter
-          set_icon_for_favorite_filter(name, true)
-          refresh_url(name)
-        else
-          set_icon_for_favorite_filter(name, false)
-          window.build_webcat_named_search(name)
+        set_icon_for_favorite_filter(name)
     )
+
+  pull_user_preference_filter()
 
   for select in $('select.cat_new_url')
 
@@ -410,9 +420,9 @@ $ ->
               ###
               refresh_localStorage()
               refresh_url()
+            complete: ->
+              use_user_preference_filter()
           drawCallback: ( settings ) ->
-            load_user_preference_filter()
-
             if localStorage.webcat_reset_page
               localStorage.removeItem('webcat_reset_page')
 
