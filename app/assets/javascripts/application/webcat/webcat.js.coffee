@@ -260,8 +260,6 @@ $ ->
           window.build_webcat_named_search(name)
     )
 
-  load_user_preference_filter()
-
   for select in $('select.cat_new_url')
 
     $(select).selectize {
@@ -413,6 +411,8 @@ $ ->
               refresh_localStorage()
               refresh_url()
           drawCallback: ( settings ) ->
+            load_user_preference_filter()
+
             if localStorage.webcat_reset_page
               localStorage.removeItem('webcat_reset_page')
 
