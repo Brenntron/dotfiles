@@ -1,7 +1,7 @@
 class CreateUmbrellaCluster < ActiveRecord::Migration[5.2]
   def change
-    create_table :umbrella_clusters, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
-      t.string :domain, collation: "utf8mb4_0900_ai_ci"
+    create_table :umbrella_clusters, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+      t.string :domain, collation: "utf8_general_ci"
       t.references :platform, index: true
       t.string :category_ids
       t.integer :status, default: 0
