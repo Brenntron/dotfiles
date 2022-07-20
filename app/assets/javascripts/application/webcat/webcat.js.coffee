@@ -194,7 +194,7 @@ $ ->
   $('#filter-dropdown').on 'click', '.favorite-search-icon', () ->
     name = $(this).parent().find('a').attr('href') || $(this).parent().find('a').text().trim()
     data = { name: name }
-    $icon = $(this)
+    icon = $(this)
 
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/user_preferences/update'
@@ -203,19 +203,19 @@ $ ->
       dataType: 'json'
       success: (response) ->
         $('.favorite-search-icon-active').removeClass('favorite-search-icon-active').addClass('favorite-search-icon')
-        $icon.removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+        icon.removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
     )
 
   $('#filter-dropdown').on 'click', '.favorite-search-icon-active', () ->
     localStorage.removeItem('webcatFilterUserPreferenceUsed')
-    $icon = $(this)
+    icon = $(this)
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/user_preferences/destroy'
       method: 'DELETE'
       data: { name: 'webcat_complaints_filter' }
       dataType: 'json'
       success: (response) ->
-        $icon.removeClass('favorite-search-icon-active').addClass('favorite-search-icon')
+        icon.removeClass('favorite-search-icon-active').addClass('favorite-search-icon')
     )
 
   set_icon_for_favorite_filter = (name, isDefaultFilter = false) ->
