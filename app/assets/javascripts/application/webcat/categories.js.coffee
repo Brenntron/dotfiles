@@ -52,10 +52,18 @@ namespace 'AC.WebCat', (exports) ->
       id = id.slice(1)
       $edit_cats = $(document.getElementById(id))
 
+      # initialized selectize
       if $edit_cats[0]?
         edit_cats_selectize = $edit_cats[0].selectize
         $(category_ids).each ->
           cat_id = this
           edit_cats_selectize.addItem(cat_id)
 
+      # hasn't initialized yet
+      else
+        $edit_cats = $(document.getElementById(id)).selectize()
+        edit_cats_selectize = $edit_cats[0].selectize
+        $(category_ids).each ->
+          cat_id = this
+          edit_cats_selectize.addItem(cat_id)
     )

@@ -2290,7 +2290,7 @@ $ ->
         unless $(td).hasClass 'nested-complaint-data-wrapper'
           tr.find('td:first').addClass 'nested-complaint-data-wrapper'
 
-        cat_select = $('#input_cat_'+ row.data().entry_id)
+        cat_select = '#input_cat_'+ row.data().entry_id
         $(cat_select).selectize {
           persist: false,
           create: false,
