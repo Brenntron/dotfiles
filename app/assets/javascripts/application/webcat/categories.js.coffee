@@ -1,5 +1,6 @@
 namespace 'AC.WebCat', (exports) ->
 
+  ## I think we fetch this entirely too many times per page, there must be a simpler way ##
   exports.getAUPCategories = ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
@@ -45,12 +46,17 @@ namespace 'AC.WebCat', (exports) ->
       for name in category_names
         for x, y of categories
           value_name = x.split(' - ')[0]
-
           if name.trim() == value_name
             category_ids.push(y)
 
-      $(category_ids).each ->
-        cat_id = this
-        if $(id)[0]?
-          $(id)[0].selectize.addItem(cat_id)
+      if id?
+        #needs to find in the dom correctly
+        id = id.slice(1)
+        $edit_cats = $(document.getElementById(id))
+        edit_cats_selectize = $edit_cats[0].selectize
+
+        $(category_ids).each ->
+          cat_id = this
+          edit_cats_selectize.addItem(cat_id)
+
     )

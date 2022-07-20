@@ -1705,7 +1705,7 @@ window.lookup_dialog  = (id) ->
       std_msg_error("<p>Something went wrong: #{response.responseText}","")
   , this)
 
-
+## This is for expanding and collapsing the nested rows ##
 window.click_table_buttons = (complaint_table, button)->
   tr = $(button).closest('tr')
   row = complaint_table.row(tr)
