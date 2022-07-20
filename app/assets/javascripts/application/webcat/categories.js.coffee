@@ -49,12 +49,11 @@ namespace 'AC.WebCat', (exports) ->
           if name.trim() == value_name
             category_ids.push(y)
 
-      if id?
-        #needs to find in the dom correctly
-        id = id.slice(1)
-        $edit_cats = $(document.getElementById(id))
-        edit_cats_selectize = $edit_cats[0].selectize
+      id = id.slice(1)
+      $edit_cats = $(document.getElementById(id))
 
+      if $edit_cats[0]?
+        edit_cats_selectize = $edit_cats[0].selectize
         $(category_ids).each ->
           cat_id = this
           edit_cats_selectize.addItem(cat_id)
