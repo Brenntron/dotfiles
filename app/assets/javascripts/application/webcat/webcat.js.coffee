@@ -207,7 +207,6 @@ $ ->
     )
 
   $('#filter-dropdown').on 'click', '.favorite-search-icon-active', () ->
-    localStorage.removeItem('webcatFilterUserPreferenceUsed')
     icon = $(this)
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/user_preferences/destroy'
