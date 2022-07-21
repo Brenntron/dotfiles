@@ -1814,7 +1814,9 @@ window.click_table_buttons = (complaint_table, button)->
 
         if verifyMasterSubmit() == true
           $('#master-submit').prop('disabled', false)
-      , this)
+      error: (response) ->
+        std_msg_error("<p>Something went wrong</p>","")
+    , this)
 
 window.display_preview_window = (entry) ->
   {domain, category, id} = entry
