@@ -52,18 +52,24 @@ namespace 'AC.WebCat', (exports) ->
       id = id.slice(1)
       $edit_cats = $(document.getElementById(id))
 
-      # initialized selectize
       if $edit_cats[0]?
         edit_cats_selectize = $edit_cats[0].selectize
-        $(category_ids).each ->
-          cat_id = this
-          edit_cats_selectize.addItem(cat_id)
 
-      # hasn't initialized yet
-      else
-        $edit_cats = $(document.getElementById(id)).selectize()
-        edit_cats_selectize = $edit_cats[0].selectize
-        $(category_ids).each ->
-          cat_id = this
-          edit_cats_selectize.addItem(cat_id)
+        # in case options didn't load yet, lets check those first
+        options = edit_cats_selectize.options
+        options_count = Object.keys(options).length
+        if options_count < 1
+          webcat_options = []
+          for key, value of categories
+            cat_code = key.split(' - ')[1]
+            value_name = key.split(' - ')[0]
+            webcat_options.push {category_id: value, category_name: value_name, category_code: cat_code}
+          edit_cats_selectize.addOption(webcat_options)
+
+        # Add the cat items
+        if category_ids.length > 0
+          $(category_ids).each ->
+            cat_id = this
+            edit_cats_selectize.addItem(cat_id)
+
     )
