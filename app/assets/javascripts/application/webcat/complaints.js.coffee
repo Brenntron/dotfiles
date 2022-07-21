@@ -207,7 +207,6 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#domain_#{complaint_entry_id}").tooltipster('content', uri);
         $("#site-search-#{complaint_entry_id}").tooltipster('content', uri);
         $("#entry-uri-#{complaint_entry_id}").tooltipster('content', uri);
-
         $.each current_categories, (key, entry) ->
           $(".simple-nested-table#entry-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
 
@@ -1317,6 +1316,7 @@ format = (complaint_entry_row) ->
           new_cat = '<li>' + cat + '</li>'
           $(master_categories_list).append(new_cat)
 
+      $(".simple-nested-table#entry-table-#{complaint_entry.entry_id} tbody > tr").remove()
       $.each current_categories, (key, value) ->
         active =  $(this).attr("is_active")
         if active == true
