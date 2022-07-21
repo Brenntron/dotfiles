@@ -1709,8 +1709,6 @@ window.lookup_dialog  = (id) ->
 window.click_table_buttons = (complaint_table, button)->
   tr = $(button).closest('tr')
   row = complaint_table.row(tr)
-  data = row.data()
-  cat_select = '#input_cat_'+ data.entry_id
 
   if row.child.isShown()       # This row is already open - close it
     row.child.hide()
@@ -1722,78 +1720,101 @@ window.click_table_buttons = (complaint_table, button)->
 
   else
     # Open this row
-    row.child(format(row)).show()
-    nested_tooltip()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
+      method: 'GET'
+      headers: headers
+      success: (response) ->
+        data = row.data()
+        cat_select = '#input_cat_'+ data.entry_id
 
-    tr.removeClass 'not-shown'
-    tr.addClass 'shown'
-    td = $(tr).next('tr').find('td:first')
-    unless $(td).hasClass 'nested-complaint-data-wrapper'
-      $(td).addClass 'nested-complaint-data-wrapper'
-    if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
-      $( cat_select ).selectize {
-        persist: true,
-        create: false,
-        maxItems: 5,
-        closeAfterSelect: true,
-        valueField: 'category_id',
-        labelField: 'category_name',
-        searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(cat_select),
-        items: AC.WebCat.getCategoryIds(selected_options(data.category), cat_select),
-        onItemAdd: ->
-          if verifyMasterSubmit() == true
-            $('#master-submit').prop('disabled', false)
-        onItemRemove: ->
-          if verifyMasterSubmit() == true
-            $('#master-submit').prop('disabled', false)
-          else
-            $('#master-submit').prop('disabled', true)
-        score: (input) ->
-          #  Adding some customization for autofill
-          #  restricting on certain cats to avoid accidental categorization
-          #  (replaces selectize's built-in `getScoreFunction()` with our own)
-          (item) ->
-            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
-              item.category_code == input ? 1 : 0
-            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
-              1
-            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
-              0.9
-            else
-              0
-      }
-    else
-      # need to initialize the selectize function but disable it here if entry is completed
-      $completed_selectize = $( cat_select ).selectize {
-        persist: true,
-        create: false,
-        maxItems: 5,
-        closeAfterSelect: true,
-        valueField: 'category_id',
-        labelField: 'category_name',
-        searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(cat_select),
-        items: AC.WebCat.getCategoryIds(selected_options(data.category), cat_select),
-      }
-      select_complete = $completed_selectize[0].selectize
-      select_complete.disable()
+        webcat_options = []
+        for key, value of response
+          cat_code = key.split(' - ')[1]
+          value_name = key.split(' - ')[0]
+          webcat_options.push({category_id: value, category_name: value_name, category_code: cat_code})
 
-    # Check to see which columns should be displayed
-    $('.toggle-vis-nested').each ->
-      checkbox_trigger = $(button).attr('data-column')
-      checkbox = $(this).find('input')
-      if $(checkbox).prop('checked')
-        $('.complaint-entry-table td, .complaint-entry-table th').each ->
-          if $(button).hasClass(checkbox_trigger)
-            $(button).show()
-      else if $(checkbox).prop('checked') == false
-        $('.complaint-entry-table td, .complaint-entry-table th').each ->
-          if $(button).hasClass(checkbox_trigger)
-            $(button).hide()
+        category_ids = []
+        for name in selected_options(data.category)
+          for x, y of response
+            value_name = x.split(' - ')[0]
+            if name.trim() == value_name
+              category_ids.push(y)
 
-    if verifyMasterSubmit() == true
-      $('#master-submit').prop('disabled', false)
+        row.child(format(row)).show()
+        nested_tooltip()
+
+        tr.removeClass 'not-shown'
+        tr.addClass 'shown'
+        td = $(tr).next('tr').find('td:first')
+        unless $(td).hasClass 'nested-complaint-data-wrapper'
+          $(td).addClass 'nested-complaint-data-wrapper'
+        if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
+          $( cat_select ).selectize {
+            persist: true,
+            create: false,
+            maxItems: 5,
+            closeAfterSelect: true,
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: webcat_options,
+            items: category_ids,
+            onItemAdd: ->
+              if verifyMasterSubmit() == true
+                $('#master-submit').prop('disabled', false)
+            onItemRemove: ->
+              if verifyMasterSubmit() == true
+                $('#master-submit').prop('disabled', false)
+              else
+                $('#master-submit').prop('disabled', true)
+            score: (input) ->
+              #  Adding some customization for autofill
+              #  restricting on certain cats to avoid accidental categorization
+              #  (replaces selectize's built-in `getScoreFunction()` with our own)
+              (item) ->
+                if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+                  item.category_code == input ? 1 : 0
+                else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+                  1
+                else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+                  0.9
+                else
+                  0
+          }
+        else
+          # need to initialize the selectize function but disable it here if entry is completed
+          $completed_selectize = $( cat_select ).selectize {
+            persist: true,
+            create: false,
+            maxItems: 5,
+            closeAfterSelect: true,
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: webcat_options,
+            items: category_ids,
+          }
+          select_complete = $completed_selectize[0].selectize
+          select_complete.disable()
+
+        # Check to see which columns should be displayed
+        $('.toggle-vis-nested').each ->
+          checkbox_trigger = $(button).attr('data-column')
+          checkbox = $(this).find('input')
+          if $(checkbox).prop('checked')
+            $('.complaint-entry-table td, .complaint-entry-table th').each ->
+              if $(button).hasClass(checkbox_trigger)
+                $(button).show()
+          else if $(checkbox).prop('checked') == false
+            $('.complaint-entry-table td, .complaint-entry-table th').each ->
+              if $(button).hasClass(checkbox_trigger)
+                $(button).hide()
+
+        if verifyMasterSubmit() == true
+          $('#master-submit').prop('disabled', false)
+      , this)
 
 window.display_preview_window = (entry) ->
   {domain, category, id} = entry
