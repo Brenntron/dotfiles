@@ -347,7 +347,6 @@ class ComplaintEntry < ApplicationRecord
     end
 
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
-
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"
     end
@@ -1057,13 +1056,17 @@ class ComplaintEntry < ApplicationRecord
   def historic_category_data
 
     prefix_history = []
+    ids_checked = []
     prefixes = remote_prefixes
     prefixes.each do |prefix|
-      if prefix.subdomain == (self.subdomain || '') && prefix.path == self.path
-        prefix_id = prefix.prefix_id
-        response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
-        response.each do |resp|
-          prefix_history << resp
+      unless ids_checked.include?(prefix.id)
+        if prefix.subdomain == (self.subdomain || '') && prefix.path == self.path
+          prefix_id = prefix.prefix_id
+          response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
+          response.each do |resp|
+            prefix_history << resp
+          end
+          ids_checked << prefix_id
         end
       end
     end
