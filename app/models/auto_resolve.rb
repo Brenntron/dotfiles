@@ -95,7 +95,7 @@ class AutoResolve
 
         else
           ## for customer specific stuff
-          dispute_entry.status == DisputeEntry::NEW
+          dispute_entry.status = DisputeEntry::NEW
         end
       end
 
@@ -107,12 +107,12 @@ class AutoResolve
             matching_disposition = dispute_entry.is_disposition_matching?(entry_claim)
           end
           if !matching_disposition
-            dispute_entry.status == DisputeEntry::NEW
+            dispute_entry.status = DisputeEntry::NEW
           end
 
         else
           ## for customer specific stuff
-          dispute_entry.status == DisputeEntry::NEW
+          dispute_entry.status = DisputeEntry::NEW
         end
 
       end

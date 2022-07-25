@@ -1424,14 +1424,39 @@ class DisputeEntry < ApplicationRecord
         if is_umbrella == true
           return false
         else
+          if raw_score.to_f <= -6.0
+            return false
+          end
 
           results = RepApi::Blacklist.where(entries: [ self.hostlookup ]) rescue nil
 
           is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
 
           if ['Trusted', 'Favorable', 'Neutral', 'Good', 'Unknown', 'Questionable'].include?(running_verdict) && !is_blacklisted
+
+            ##Check for web category existence, as no-category can be a source of blocking on some network setups
+
+            current_cat = DisputeEntry.get_primary_category(self.hostlookup)
+            #for now, only take this path when single entry ticket
+
+            if current_cat.blank? && self.dispute.dispute_entries.size == 1
+              # ticket conversion action here
+              conversion_packet = {}
+              conversion_packet[:dispute_id] = self.dispute.id
+              conversion_packet[:summary] = self.dispute.problem_summary
+              conversion_packet[:suggested_categories] = []
+              conversion_packet[:suggested_categories] << [{}, {"entry" => self.hostlookup, "suggested_categories" => "Business and Industry"}]
+              user = User.where(cvs_username:"vrtincom").first
+
+              Dispute.convert_to_complaint(conversion_packet, user, true)
+
+              return true
+            end
+
+
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_AUTO_RESOLVED_MATCH
+
             if self.dispute.submitter_type == "NON-CUSTOMER"
               self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer."
             else

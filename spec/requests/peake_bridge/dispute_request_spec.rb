@@ -757,7 +757,56 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
   end
 
+  it 'should send a conversion ticket and close as invalid in matching disposition logic when category is blank' do
 
+    Dispute.destroy_all
+    DisputeEntry.destroy_all
+    DelayedJob.destroy_all
+    umbrella_platform = Platform.new
+    umbrella_platform.id = 1000
+    umbrella_platform.public_name = "Umbrella No Reply"
+    umbrella_platform.internal_name = "Umbrella No-Reply"
+    umbrella_platform.active = true
+    umbrella_platform.webrep = true
+    umbrella_platform.webcat = true
+    umbrella_platform.filerep = true
+    umbrella_platform.emailrep = true
+    umbrella_platform.save
+
+    wbrs_response = {"wbrs" => {"score" => 3.5}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("355toyota.com", "wbrs").and_return(wbrs_response).at_least(:once)
+
+    ReptoolResponse = Struct.new(:status)
+    rep_response = ReptoolResponse.new
+    rep_response.status = "EXPIRED"
+
+    reptool_response = [rep_response]
+
+
+    expect(RepApi::Blacklist).to receive(:where).and_return(reptool_response).at_least(:once)
+    expect(DisputeEntry).to receive(:get_primary_category).and_return(nil).at_least(:once)
+    vrt_incoming
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+    #Dispute.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :user_id => User.all.first.id, :status => "NEW")
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: non_umbrella_dispute_message_json
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 3001).first
+
+    expect(dispute).to_not be_nil
+    expect(Dispute.all.size).to eql(1)
+
+    expect(DelayedJob.all.size).to eql(3)
+
+    expect(dispute.dispute_entries.first.status).to eql("RESOLVED_CLOSED")
+    expect(dispute.dispute_entries.first.resolution).to eql("INVALID")
+
+    #expect(dispute.dispute_entries.first.resolution_comment).to eql('Thank you for your request; this has now been forwarded to the team responsible for Web categorization requests. A new Web categorization ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all updates regarding this request on the new ticket.\n\nPlease note that by default, a submission with a Trusted, Favorable, Neutral, or Questionable reputation should be accessible by our customers. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission after successful web categorization, that is due to aggressive settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case.\n\nFor future Web categorization requests, please open a Web categorization ticket using the \"Web Categorization Requests\" form: https://talosintelligence.com/reputation_center/support#reputation_center_support_ticket')
+
+  end
 
   it 'should close as matching disposition when product is not Umbrella' do
     Dispute.destroy_all
