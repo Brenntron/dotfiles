@@ -2,7 +2,16 @@ FROM ruby:2.7.4
 
 WORKDIR /analyst_console_escalations
 COPY . /analyst_console_escalations
+
+ADD extras/processes.conf /usr/local/etc/analyst-console-escalations/processes.conf
+ADD extras/tess-ca_cert.pem /usr/local/etc/analyst-console-escalations/tess-ca_cert.pem
+ADD extras/tess-client.pem /usr/local/etc/analyst-console-escalations/tess-client.pem
+ADD extras/tess-pkey.key /usr/local/etc/analyst-console-escalations/tess-pkey.key
+ADD extras/sds-certificate.pem /usr/local/etc/analyst-console-escalations/sds-certificate.pem
+ADD extras/sds-pkey.pem /usr/local/etc/analyst-console-escalations/sds-pkey.pem
+
 ADD http://wwwint.vrt.sourcefire.com/ca.pem /usr/local/share/ca-certificates/vrt.crt
+ADD http://wwwint.vrt.sourcefire.com/ca.pem /usr/local/etc/trusted-certificates.pem
 RUN update-ca-certificates
 RUN apt-get update
 

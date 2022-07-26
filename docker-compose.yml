@@ -9,7 +9,7 @@ services:
       # Format here is `external:internal`
       # (where 'external' is what you'd go to in your browser, on your local machine, and 'internal'
       # is the port that Docker runs Rails on)
-      - 9200:3002
+      - 9002:3002
     # This overrides the "CMD" specified in the Dockerfile.
     command: bundle exec rails s -p 3002 -b "0.0.0.0"
     environment:
@@ -17,6 +17,20 @@ services:
       # is only for exposing internal (3306) ports to the outside world. From our app, we connect from
       # the VM's internal network, so trying to connect over anything other than 3306 would cause an
       # error.
+      DATABASE_URL: mysql2://root:root@mysql/analyst_console
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - atlas_database_network
+      - atlas_bridge_network
+  delayed_job_worker:
+    container_name: analyst_console_escalations_dj
+    build: .
+    volumes:
+      - .:/analyst_console_escalations
+      # This overrides the "CMD" specified in the Dockerfile.
+    command: bundle exec bin/delayed_job run
+    environment:
       DATABASE_URL: mysql2://root:root@mysql/analyst_console
     extra_hosts:
       - "host.docker.internal:host-gateway"
