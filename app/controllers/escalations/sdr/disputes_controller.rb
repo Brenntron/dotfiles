@@ -9,6 +9,10 @@ class Escalations::Sdr::DisputesController < ApplicationController
       format.json do
         render json: SdrDisputeDatatable.new(params, initialize_params, user: current_user)
       end
+      format.xlsx do
+        workbook = SenderDomainReputationDispute.export_xlsx(params['data_json'], current_user: current_user)
+        send_data workbook.stream.string, filename: "sdr_search_#{Time.now}.xlsx", disposition: 'attachment'
+      end
     end
   end
 

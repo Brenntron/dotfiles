@@ -57,6 +57,18 @@
     %button.toolbar-button.return-ticket-toolbar-button.esc-tooltipped{ onclick: 'return_sdr_disputes()', type: 'button' }
       %span.toolbar-button-text
         Return
+  %div
+    %label.toolbar-section-label
+      File
+    %form#sdr-disputes-export-form{action: escalations_sdr_disputes_path(format: :xlsx), method: :get,  onsubmit: 'return false'}
+      = hidden_field_tag('data_json', '{}', id: 'index-export-data-input')
+      %button.toolbar-button.toolbar-button-spacer.export-button.esc-tooltipped{onclick: 'export_sdr_all();', title: 'Export All to CSV (alt + ctrl + shift + p)'}
+        %span.toolbar-button-text
+          Export All to CSV
+      %button.toolbar-button.export-button.esc-tooltipped{onclick: 'export_sdr_selected();', title: 'Export Selected to CSV (alt + ctrl + p)'}
+        %span.toolbar-button-text
+          Export Selected to CSV
+
 
   -#  Add later with functionality or remove
   -#%div

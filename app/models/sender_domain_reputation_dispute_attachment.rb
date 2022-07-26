@@ -12,7 +12,6 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   CORPUS_EMAIL_LIST= [CORPUS_SPAM, CORPUS_HAM, CORPUS_ADS, CORPUS_NOT_ADS, CORPUS_PHISH, CORPUS_VIRUS]
   ALL_POSSIBLE_TAGS = ["[SUSPECTED SPAM]", "[MARKETING]", "[SOCIAL NETWORK]", "[BULK]", "[WARNING: VIRUS DETECTED]"]
   def self.build_and_push_to_bugzilla(bugzilla_rest_session, payload, user, sender_domain_reputation_dispute, remote = true)
-
     new_local_attachment = nil
     if remote == true
       file_content = open(payload["url"]).read
@@ -34,38 +33,28 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
     new_attachment_id = attachment_proxy.id
 
     if new_attachment_id.present?
-
       new_local_attachment = new(
           id: new_attachment_id,
           sender_domain_reputation_dispute_id: sender_domain_reputation_dispute.id,
           size: file_content.length,
           bugzilla_attachment_id: new_attachment_id,
           file_name: payload[:file_name],
-          direct_upload_url: "https://" + Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s
-      )
-
+          direct_upload_url: "https://" + Rails.configuration.bugzilla_host + "/attachment.cgi?id=" + new_attachment_id.to_s)
       new_local_attachment.save!
-
-
-
     end
 
     new_local_attachment
   end
 
   def parse_email_content(bug_attachment)
-
     file_data = bug_attachment.file_contents
 
     if file_data.present?
-
       header_json = SenderDomainReputationDisputeAttachment.parse_headers_to_array(file_data)
 
       self.email_header_data = header_json
       self.save!
-
     end
-
   end
 
   def self.parse_headers_to_array(file_data, convert_to_json = true)
@@ -182,7 +171,6 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   end
 
   def retrieve_beaker_data_and_save
-
     beaker_data = {}
     beaker_data[:request] = {}
     beaker_data[:response] = {}
