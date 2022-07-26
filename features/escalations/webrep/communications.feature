@@ -125,8 +125,7 @@ Feature: Webrep communications
     And I wait for "2" seconds
     And I select "PSB" from "select-new-template"
     And I wait for "2" seconds
-    # this works confirmed via screen shot, but can't get test to pass
-#    Then I should see "Our worldwide sensor network indicates that spam originated from IP (x.x.x.x) as recently as xx-xx-xx ."
+    Then I should see content "Our worldwide sensor network indicates that spam originated from IP (x.x.x.x) as recently as xx-xx-xx ." within ".email-reply-body"
 
 
 

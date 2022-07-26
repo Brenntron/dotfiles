@@ -1,0 +1,93 @@
+Delivered-To: test@gmail.com
+Received: by 2002:a05:6504:5d4:0:0:0:0 with SMTP id s20csp10301357ltp;
+        Tue, 29 Mar 2022 05:10:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz1zjH3gOVQoH6aqq9xCV7lr6g/Ckw6gi1Tpps9xP7gI61ER9eCmm2eG4YUZHDeLeJsQv7r
+X-Received: by 2002:a05:6214:20e4:b0:441:8031:9152 with SMTP id 4-20020a05621420e400b0044180319152mr20107785qvk.115.1648555826816;
+        Tue, 29 Mar 2022 05:10:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1648555826; cv=none;
+        d=google.com; s=arc-20160816;
+        b=GWSb+fTG8PAQBELuBUujeBJ/lkH1WmHbjXTS6g1K6BBhB7NcTlfHMgB0iPsFtdmdbg
+         w3wY3ncVMmG1A9w2n3trKmi+rT8jaB7/NXmrlLxy1vbYSyJ3ntD+jZgCtMdOWtefH7NM
+         d2exYCeS0kDpqKvKJ5NfVQX0uV84mKrgJVbntUD64XLOTZdiuEoLAe/C1o4elS82ZSTh
+         uHfstl49Yz0Z+kE5jEz5l3flwGcgMzFiru2azv29YwR11l7om34hvhdmstbJuSQ0a+gF
+         jAE3x9do+9yITcqTS56P/tN31VCmf4fcy3wcx8wqxqMHYj1MqRDLrJ6uEFnpIuk4ONfB
+         PK3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;
+        h=feedback-id:message-id:list-id:mime-version:list-unsubscribe-post
+         :list-unsubscribe:date:subject:to:from:dkim-signature;
+        bh=l6DDLgPh5xJOPloRoF1kCn9H7BdqjJnZuuVzIipqWu8=;
+        b=jdTjr2QQB8mEsz0as/LXKJsZTd0JHKjQarjYeprlw+jD338paS7QYrmm9LDmBFE1gg
+         BHSgofX9K5l5unIj149sfwfPPYW7JANKUBg1NBJ6QmQqBH9z3E5yAS+wcWM419CdQe/Z
+         bCF0ed9jGtB9H6j/G52hQ/GkLYpHKyrRuagccyQYdjOsR8bhrxp3+rLIuDFvNSOYrqyw
+         NrjHDcZwjtGZERPleQoskqIdguSZLoPzk9e/J6gUMeP+KQ2+mXQzpsqYNy2936c5S7YG
+         wgtgzb0s2ePnUp0Y5jMwFEPKlM15eT2wUGRU3EwDCH+hUiG5tRP1PlgD/G+fEDyL0sJa
+         hVDg==
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@email-giantfood.com header.s=200608 header.b=mJvdR8lG;
+       spf=pass (google.com: domain of bounce-4666521_html-1959965006-27648920-10983657-88@bounce.email-giantfood.com designates 13.111.57.183 as permitted sender) smtp.mailfrom=bounce-4666521_HTML-1959965006-27648920-10983657-88@bounce.email-giantfood.com;
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=email-giantfood.com
+Return-Path: <bounce-4666521_HTML-1959965006-27648920-10983657-88@bounce.email-giantfood.com>
+Received: from mta.email-giantfood.com (mta.email-giantfood.com. [13.111.57.183])
+        by mx.google.com with ESMTPS id q8-20020ad45488000000b00440e46a7d6bsi9143793qvy.521.2022.03.29.05.10.25
+        for <test@gmail.com>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 29 Mar 2022 05:10:26 -0700 (PDT)
+Received-SPF: pass (google.com: domain of bounce-4666521_html-1959965006-27648920-10983657-88@bounce.email-giantfood.com designates 13.111.57.183 as permitted sender) client-ip=13.111.57.183;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@email-giantfood.com header.s=200608 header.b=mJvdR8lG;
+       spf=pass (google.com: domain of bounce-4666521_html-1959965006-27648920-10983657-88@bounce.email-giantfood.com designates 13.111.57.183 as permitted sender) smtp.mailfrom=bounce-4666521_HTML-1959965006-27648920-10983657-88@bounce.email-giantfood.com;
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=email-giantfood.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=200608; d=email-giantfood.com;
+ h=From:To:Subject:Date:List-Unsubscribe:List-Unsubscribe-Post:MIME-Version:
+ List-ID:X-CSA-Complaints:Message-ID:Content-Type; i=Giant@email-giantfood.com;
+ bh=l6DDLgPh5xJOPloRoF1kCn9H7BdqjJnZuuVzIipqWu8=;
+ b=mJvdR8lG9IBL62NNYye+/lD8W0je0/T8Ki8PAN3Qa71TxE3w6wh/b38S8HiQBT0eKsZNDjoqNuV6
+   cNH4FB0JadjWMHD1j3TvYZ90R2HWja3BkNug7odggXtsMSgHf1cjSVVWlha9Du6gFc74bZbs3K8E
+   6X9n+n88bQevaxP6p1M=
+Received: by mta.email-giantfood.com id h8brj42fmd4c for <test@GMAIL.COM>; Tue, 29 Mar 2022 12:02:36 +0000 (envelope-from <bounce-4666521_HTML-1959965006-27648920-10983657-88@bounce.email-giantfood.com>)
+From: "Giant" <Giant@email-giantfood.com>
+To: <test@GMAIL.COM>
+Subject: $20 off your next order inside!
+Date: Tue, 29 Mar 2022 06:02:36 -0600
+List-Unsubscribe: <https://click.email-giantfood.com/subscription_center.aspx?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaWQiOiIxMDk4MzY1NyIsInMiOiIxOTU5OTY1MDA2IiwibGlkIjoiNDY2NjUyMSIsImoiOiIyNzY0ODkyMCIsImpiIjoiODgiLCJkIjoiMTAxNTYifQ.hTLgefSWn3fFk6hGyoV745E6Y0rNJWWug9HEPzfUSMo>, <mailto:leave-fc7d10767362017f747b28313958-fded1579706d0d7b70147073-fe59167773600c747714-fe5815707c6c077b7013-ff8f1c78@leave.email-giantfood.com>
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+x-CSA-Compliance-Source: SFMC
+MIME-Version: 1.0
+List-ID: <10983340.xt.local>
+X-CSA-Complaints: csa-complaints@eco.de
+X-SFMC-Stack: 1
+x-job: 10983657_27648920
+Message-ID: <64f4ec74-c382-4231-b6a5-a31ad48e4e93@ind1s01mta988.xt.local>
+Feedback-ID: 10983657:27648920:13.111.57.183:sfmktgcld
+Content-Type: multipart/alternative;
+	boundary="ae5xYd9ZnyFQ=_?:"
+
+This is a multi-part message in MIME format.
+
+--ae5xYd9ZnyFQ=_?:
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Giant
+
+
+
+ (c) 2022 Giant of Maryland LLC. All rights reserved. 
+https://click.email-giantfood.com/?qs=676f2001e1f79ea2c0b30e2e7be8dd8f97338d637e598b5ae382e15cb1d6b71b4e94b861abccb91f1db19058c06440d4664ddadea0b4627b 
+Privacy Policy Statement .
+
+
+
+--ae5xYd9ZnyFQ=_?:
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"><head>
+
+</html>
+
+--ae5xYd9ZnyFQ=_?:--
+

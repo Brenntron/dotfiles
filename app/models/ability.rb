@@ -57,14 +57,15 @@ class Ability
       can [:read, :advanced_search, :named_search, :standard_search, :contains_search, :export_resolution_age_report,
            :resolution_report, :export_per_resolution_report, :export_per_engineer_report, :resolution_age_report,
            :dashboard, :research],
-          Dispute
-      can :read, [DisputeComment, DisputeEmail, DisputeEmailAttachment, DisputeEntry, Wbrs::ManualWlbl]
-      can :manage, [EmailTemplate]
+          [Dispute, SenderDomainReputationDispute, SenderDomainReputationDisputeAttachment]
+      can :read, [DisputeComment, DisputeEmail, DisputeEmailAttachment, DisputeEntry, Wbrs::ManualWlbl, SenderDomainReputationDisputeComment]
+      can :manage, [EmailTemplate, SenderDomainReputationEmailTemplate]
     end
 
     if role_names.include?('webrep user')
       can :manage, [Dispute, DisputeComment, DisputeEmail, DisputeEmailAttachment,
-                    DisputeEntry, EmailTemplate, Wbrs::ManualWlbl, ResolutionMessageTemplate]
+                    DisputeEntry, EmailTemplate, Wbrs::ManualWlbl, ResolutionMessageTemplate,
+                    SenderDomainReputationDisputeComment, SenderDomainReputationEmailTemplate, SenderDomainReputationDispute, SenderDomainReputationDisputeAttachment]
     end
 
     if role_names.include?('amp pattern namer')

@@ -1,6 +1,7 @@
 class DisputeEmail < ApplicationRecord
   belongs_to :dispute, optional: true, touch: true
   belongs_to :file_reputation_dispute, optional: true
+  belongs_to :sender_domain_reputation_dispute, optional: true
   has_many :dispute_email_attachments
 
   EMAIL_DOMAIN = "dispute.talosintelligence.com"
@@ -47,16 +48,17 @@ class DisputeEmail < ApplicationRecord
 
         dispute = Dispute.where(:id => case_id).first
         file_rep_dispute = FileReputationDispute.where(:id => case_id).first
+        sdr_dispute = SenderDomainReputationDispute.where(:id => case_id).first
         if dispute.present?
 
           if dispute.status == Dispute::RESOLVED && dispute.case_resolved_at >= 2.weeks.ago
 
             dispute.status = Dispute::STATUS_REOPENED
-            dispute.save!
+            dispute.save(:validate => false)
 
             dispute.dispute_entries.each do |entry|
               entry.status = DisputeEntry::STATUS_REOPENED
-              entry.save!
+              entry.save(:validate => false)
             end
 
           end
@@ -102,7 +104,7 @@ class DisputeEmail < ApplicationRecord
           #Update ticket status
           dispute = Dispute.find(case_id)
           dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
-          dispute.save!
+          dispute.save(:validate => false)
 
           message = Bridge::DisputeEntryUpdateStatusEvent.new
           message.post_entries(dispute.dispute_entries)
@@ -116,7 +118,7 @@ class DisputeEmail < ApplicationRecord
           if file_rep_dispute.status == FileReputationDispute::CLOSED && file_rep_dispute.case_resolved_at >= 2.weeks.ago
 
             file_rep_dispute.status = Dispute::STATUS_REOPENED
-            file_rep_dispute.save!
+            file_rep_dispute.save(:validate => false)
 
           end
 
@@ -159,9 +161,68 @@ class DisputeEmail < ApplicationRecord
           end
 
           #Update ticket status
-          dispute = Dispute.find(case_id)
+          dispute = FileReputationDispute.find(case_id)
           dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
-          dispute.save!
+          dispute.save(:validate => false)
+
+          conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+          conn.post()
+
+
+        end
+
+        if sdr_dispute.present?
+
+          if sdr_dispute.status == SenderDomainReputationDispute::STATUS_RESOLVED && sdr_dispute.case_closed_at >= 2.weeks.ago
+
+            sdr_dispute.status = Dispute::STATUS_REOPENED
+            sdr_dispute.save(:validate => false)
+
+          end
+
+          if sdr_dispute.status == SenderDomainReputationDispute::STATUS_RESOLVED && sdr_dispute.case_closed_at <= 2.weeks.ago
+
+            old_case_email_args = {}
+            old_case_email_args[:to] = message_payload["payload"]["from"]
+            old_case_email_args[:from] = "#{NOREPLY}@#{NOREPLY_EMAIL_DOMAIN}"
+            old_case_email_args[:subject] = old_case_gateway_subject
+            old_case_email_args[:body] = old_case_gateway_body
+
+            attachments_to_mail = []
+            conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+            conn.post(old_case_email_args, attachments_to_mail)
+
+            conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+            conn.post()
+
+            return
+
+          end
+
+          ##########################################
+
+          new_email = DisputeEmail.new
+          new_email.sender_domain_reputation_dispute_id = case_id
+          new_email.email_headers = message_payload["payload"]["headers"]
+          #Need to clean from value, can show up in form of:
+          #\"Chris LaClair (claclair)\" <claclair@cisco.com>   which as an absolute value, is not a valid email address
+          new_email.from = envelope["from"]
+          new_email.to = envelope["to"].join(",")
+          new_email.subject = message_payload["payload"]["subject"]
+          new_email.body = message_payload["payload"]["text"]
+          new_email.status = UNREAD
+          new_email.save!
+
+          if message_payload["attachments"].present?
+            message_payload["attachments"].each do |email_attachment|
+              DisputeEmailAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, email_attachment, user, new_email)
+            end
+          end
+
+          #Update ticket status
+          dispute = SenderDomainReputationDispute.find(case_id)
+          dispute.status = Dispute::STATUS_CUSTOMER_UPDATE unless dispute.status == Dispute::STATUS_REOPENED
+          dispute.save(:validate => false)
 
           conn = ::Bridge::EmailCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
           conn.post()
@@ -219,6 +280,9 @@ class DisputeEmail < ApplicationRecord
     when 'FileReputationDispute'
       new_email.file_reputation_dispute_id = params[:dispute_id]
       dispute_object = FileReputationDispute.find(params[:dispute_id])
+    when 'SenderDomainReputationDispute'
+      new_email.sender_domain_reputation_dispute_id = params[:dispute_id]
+      dispute_object = SenderDomainReputationDispute.find(params[:dispute_id])
     else #'Dispute'
       new_email.dispute_id = params[:dispute_id]
       dispute_object = Dispute.find(params[:dispute_id])
@@ -284,15 +348,8 @@ class DisputeEmail < ApplicationRecord
     new_email.reload
 
     #update dispute status
-    dispute =
-        case params[:dispute_type]
-        when 'FileReputationDispute'
-          FileReputationDispute.find(params[:dispute_id])
-        else #'Dispute'
-          Dispute.find(params[:dispute_id])
-        end
-    dispute.status = Dispute::STATUS_CUSTOMER_PENDING
-    dispute.save
+    dispute_object.status = Dispute::STATUS_CUSTOMER_PENDING
+    dispute_object.save
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
 

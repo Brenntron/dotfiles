@@ -12,6 +12,14 @@ class Virustotal::GetVirustotal < Virustotal::Base
     call_virustotal_request(:get, "/vtapi/v2/url/report?resource=#{url}", {}, raw)
   end
 
+  def self.by_host_domain(url, raw = false)
+    call_virustotal_request(:get, "/vtapi/v2/domain/report?domain=#{url}", {}, raw)
+  end
+
+  def self.by_ip(url, raw = false)
+    call_virustotal_request(:get, "/vtapi/v2/ip-address/report?ip=#{url}", {}, raw)
+  end
+
   def self.health_check
     health_report = {}
 
