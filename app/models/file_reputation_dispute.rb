@@ -1114,11 +1114,6 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def self.export_xlsx(search_params_json, current_user:)
-    fields = %w{id status resolution file_name sha256_hash file_size platform sample_type
-                disposition detection_name detection_last_set
-                in_zoo sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
-                disposition_suggested created_at submitter_type
-                customer_name company_name customer_email user_id description}
     search_params = JSON.parse(search_params_json)
 
     file_rep_disputes = robust_search(search_params['search_type'],
