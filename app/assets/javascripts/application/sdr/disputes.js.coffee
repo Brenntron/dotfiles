@@ -509,7 +509,6 @@ window.build_sdr_data = () ->
   data = {
     search_type: ''
     search_name: ''
-    selected_cases: []
   }
 
   if location.search != ''
@@ -545,9 +544,6 @@ window.build_sdr_data = () ->
         search_type: search_type
         search_conditions: search_conditions
       }
-  $('.sdr_dispute_check_box:checked').each ->
-      case_id =  $(this).attr('value')
-      data.selected_cases.push(case_id)
 
   format_sdr_header(data)
   return data
@@ -663,7 +659,6 @@ window.export_sdr_all = () ->
   form = document.getElementById("sdr-disputes-export-form")
 
   data = build_sdr_data()
-
   if 'advanced' == data.search_type
     data.search_name = null
   data_json = JSON.stringify(data)
@@ -675,6 +670,9 @@ window.export_sdr_all = () ->
 
 window.export_sdr_selected = () ->
   data = build_sdr_data()
+  data.selected_cases = $('.sdr_dispute_check_box:checked').map((i, el) => el.value).get() 
+  
+
   if data.selected_cases.length <= 0
     std_msg_error('Error: Nothing selected.',"", reload: false)
     return false
