@@ -595,10 +595,10 @@ class SenderDomainReputationDispute < ApplicationRecord
   end
 
   def domain_name
-
+    ascii_entry = SimpleIDN.to_ascii(self.sender_domain_entry)
     parser = URI::Parser.new
-    url = parser.escape(self.sender_domain_entry)
-    uri = parser.parse(parser.parse(self.sender_domain_entry).scheme.nil? ? "http://#{url}" : url)
+    url = parser.escape(ascii_entry)
+    uri = parser.parse(parser.parse(ascii_entry).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
 
     full_domain = ""
@@ -607,15 +607,14 @@ class SenderDomainReputationDispute < ApplicationRecord
     end
     full_domain += domain.domain
 
-    return full_domain
-
+    SimpleIDN.to_unicode(full_domain)
   end
 
   def self.domain_name_of(entry)
-
+    ascii_entry = SimpleIDN.to_ascii(entry)
     parser = URI::Parser.new
-    url = parser.escape(entry)
-    uri = parser.parse(parser.parse(entry).scheme.nil? ? "http://#{url}" : url)
+    url = parser.escape(ascii_entry)
+    uri = parser.parse(parser.parse(ascii_entry).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
 
     full_domain = ""
@@ -624,7 +623,7 @@ class SenderDomainReputationDispute < ApplicationRecord
     end
     full_domain += domain.domain
 
-    return full_domain
+    return SimpleIDN.to_unicode(full_domain)
 
   end
 
