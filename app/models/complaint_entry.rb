@@ -1200,7 +1200,7 @@ class ComplaintEntry < ApplicationRecord
     end
 
     # add credit for user's contribution to complaint entry
-    ComplaintEntryCredits::CreditProcessor.new(current_user, self).process
+    WebcatCredits::ComplaintEntries::CreditProcessor.new(current_user, self).process
     confirmation
   end
 
