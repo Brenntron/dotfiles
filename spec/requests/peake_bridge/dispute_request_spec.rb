@@ -54,6 +54,106 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
   end
 
 
+  let(:dispute_message_alt_json_positive) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute: {
+                source_type: 'Dispute',
+                source_key: 1001,
+                payload: {
+                    investigate_ips: {
+                        "64.70.56.99" => {
+                            "wbrs" => {
+                                "WBRS_SCORE"=>"-3.55",
+                                "WBRS_Rule_Hits"=>"dotq",
+                                "Hostname_ips"=>"",
+                                "rep_sugg"=>"Good",
+                                "category"=>"Not in our list"
+                            },
+                            "sbrs" => {
+                                "SBRS_SCORE"=>"No score",
+                                "SBRS_Rule_Hits"=>"",
+                                "Hostname"=>"www.dealer.com",
+                                "rep_sugg"=>"Good",
+                                "claim" => "false positive",
+                                "category"=>"Not in our list"
+                            }
+                        },
+                    },
+                    investigate_urls: {
+                    },
+                    problem: 'What do I need to do to improve the reputation',
+                    submission_type: 'e',
+                    name: "non-customer-name",
+                    user_company: "Guest",
+                    email: 'webmaster@cmim.org',
+                    email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
+                    email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
+                    user_ip: '64.70.56.99',
+                    domain: '355toyota.com',
+                    product_platform: 1001,
+                    product_version: "test_platform_version"
+                }
+            }
+        }
+    }
+  end
+
+  let(:dispute_message_alt_json_negative) do
+    {
+        envelope: {
+            channel: "ticket-event",
+            addressee: "analyst-console-escalations",
+            sender: "talos-intelligence"
+        },
+        message: {
+            dispute: {
+                source_type: 'Dispute',
+                source_key: 1001,
+                payload: {
+                    investigate_ips: {
+                        "64.70.56.99" => {
+                            "wbrs" => {
+                                "WBRS_SCORE"=>"-3.55",
+                                "WBRS_Rule_Hits"=>"dotq",
+                                "Hostname_ips"=>"",
+                                "rep_sugg"=>"Good",
+                                "category"=>"Not in our list"
+                            },
+                            "sbrs" => {
+                                "SBRS_SCORE"=>"No score",
+                                "SBRS_Rule_Hits"=>"",
+                                "Hostname"=>"www.dealer.com",
+                                "rep_sugg"=>"Good",
+                                "claim" => "false negative",
+                                "category"=>"Not in our list"
+                            }
+                        },
+                    },
+                    investigate_urls: {
+                    },
+                    problem: 'What do I need to do to improve the reputation',
+                    submission_type: 'e',
+                    name: "non-customer-name",
+                    user_company: "Guest",
+                    email: 'webmaster@cmim.org',
+                    email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
+                    email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
+                    user_ip: '64.70.56.99',
+                    domain: '355toyota.com',
+                    product_platform: 1001,
+                    product_version: "test_platform_version"
+                }
+            }
+        }
+    }
+  end
+
   let(:umbrella_dispute_message_json) do
     {
         envelope: {
@@ -453,6 +553,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
   end
 
   before(:each) do
+    DelayedJob.destroy_all
     @original_platform = Platform.new
     @original_platform.id = 1001
     @original_platform.public_name = "test"
@@ -666,7 +767,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
   end
 
-  it 'should close as matching disposition when product is Umbrella with score -7.0 or lower' do
+  it 'should close as matching disposition when product is Umbrella with score -6.0 or lower' do
 
     umbrella_platform = Platform.new
     umbrella_platform.id = 1000
@@ -679,10 +780,13 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     umbrella_platform.emailrep = true
     umbrella_platform.save
 
-    wbrs_response = {"wbrs" => {"score" => -7.0}}
+    wbrs_response = {"wbrs" => {"score" => -6.0}}
+
+    sbrs_response = {"sbrs" => {"score" => -6.0}}
 
     expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("355toyota.com", "wbrs").and_return(wbrs_response).at_least(:once)
 
+    expect(Sbrs::ManualSbrs).to receive(:call_sbrs).and_return(sbrs_response).at_least(:once)
     vrt_incoming
     guest_company
     FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
@@ -698,7 +802,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(DelayedJob.all.size).to eql(1)
 
     expect(dispute.dispute_entries.first.status).to eql("RESOLVED_CLOSED")
-    expect(dispute.dispute_entries.first.resolution).to eql("UNCHANGED")
+    expect(dispute.dispute_entries.first.resolution).to eql("AP - Match")
 
   end
 
@@ -715,10 +819,10 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     umbrella_platform.emailrep = true
     umbrella_platform.save
 
-    wbrs_response = {"wbrs" => {"score" => -6.9}}
-
+    wbrs_response = {"wbrs" => {"score" => -5.9}}
+    sbrs_response = {"sbrs" => {"score" => -5.9}}
     expect(Sbrs::Base).to receive(:remote_call_sds_v3).with("355toyota.com", "wbrs").and_return(wbrs_response).at_least(:once)
-
+    expect(Sbrs::ManualSbrs).to receive(:call_sbrs).and_return(sbrs_response).at_least(:once)
     vrt_incoming
     guest_company
     FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
@@ -732,9 +836,62 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute).to_not be_nil
     expect(Dispute.all.size).to eql(1)
     expect(DelayedJob.all.size).to eql(1)
-
+    expect(dispute.dispute_entries.first.resolution).to eql("")
     expect(dispute.dispute_entries.first.status).to eql("NEW")
 
+  end
+
+  it 'should close as matching disposition if its an ip address (email) false positive with an sbrs score greater than -1.9' do
+    wbrs_response = {"wbrs" => {"score" => -1.0}}
+
+    sbrs_response = {"sbrs" => {"score" => -1.0}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).and_return(wbrs_response).at_least(:once)
+
+    expect(Sbrs::ManualSbrs).to receive(:call_sbrs).and_return(sbrs_response).at_least(:once)
+    vrt_incoming
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+    #Dispute.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :user_id => User.all.first.id, :status => "NEW")
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_alt_json_positive
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(Dispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+    expect(dispute.dispute_entries.first.status).to eql("RESOLVED_CLOSED")
+    expect(dispute.dispute_entries.first.resolution).to eql("AP - Match")
+
+  end
+
+  it 'should close as matching disposition if its an ip address (email) false negative with an sbrs score less than -2.0' do
+    wbrs_response = {"wbrs" => {"score" => -2.1}}
+
+    sbrs_response = {"sbrs" => {"score" => -2.1}}
+
+    expect(Sbrs::Base).to receive(:remote_call_sds_v3).and_return(wbrs_response).at_least(:once)
+
+    expect(Sbrs::ManualSbrs).to receive(:call_sbrs).and_return(sbrs_response).at_least(:once)
+    vrt_incoming
+    guest_company
+    FactoryBot.create(:customer, name: customer_name, email: 'not-' + customer_email, company: existing_company)
+    #Dispute.create(:ticket_source_key => 1001, :customer_id => Customer.all.first.id, :user_id => User.all.first.id, :status => "NEW")
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_alt_json_negative
+
+    expect(response).to be_successful
+    dispute = Dispute.where(ticket_source_key: 1001).first
+
+    expect(dispute).to_not be_nil
+    expect(Dispute.all.size).to eql(1)
+    expect(DelayedJob.all.size).to eql(1)
+
+    expect(dispute.dispute_entries.first.status).to eql("RESOLVED_CLOSED")
+    expect(dispute.dispute_entries.first.resolution).to eql("AP - Match")
 
   end
 

@@ -102,9 +102,9 @@ class AutoResolve
       if sugg_disposition == "false negative"
         if dispute_entry.dispute.submitter_type == "NON-CUSTOMER"
           if dispute_entry.dispute.determine_platform.present? && dispute_entry.dispute.determine_platform.downcase.include?("umbrella")
-            matching_disposition = dispute_entry.is_disposition_matching?(entry_claim, true)
+            matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition, true)
           else
-            matching_disposition = dispute_entry.is_disposition_matching?(entry_claim)
+            matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition)
           end
           if !matching_disposition
             dispute_entry.status = DisputeEntry::NEW
