@@ -169,7 +169,7 @@
             .collapse.in#sdr-beaker-domain-content{'aria-labelledby': "domain-beaker-header"}
               .card-body
                 %pre.data-report-code-content.beaker-json-dump
-                  = @beaker_info
+                  = humanize_beaker_info(@beaker_info)
 
           - if @dispute.sender_domain_reputation_dispute_attachments.any?
             - @dispute.sender_domain_reputation_dispute_attachments.each do |attachment|
@@ -179,4 +179,4 @@
               .collapse{id: "beaker-attachment-#{attachment.id}-content", 'aria-labelledby': "beaker-attachment-#{attachment.id}-header"}
                 .card-body
                   %pre.data-report-code-content.beaker-json-dump
-                    = attachment.beaker_info
+                    = humanize_beaker_info(attachment.beaker_info)
