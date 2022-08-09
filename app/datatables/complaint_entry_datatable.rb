@@ -127,7 +127,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
     when 'complaint_entries.age_int'
       records.order("complaint_entries.created_at #{datatable.orders.first.direction}")
     when 'complaint_entries.domain'
-      records.order("complaint_entries.ip_address #{datatable.orders.first.direction}, complaint_entries.domain #{datatable.orders.first.direction}")
+      records.order("complaint_entries.domain #{datatable.orders.first.direction}, complaint_entries.ip_address #{datatable.orders.first.direction}")
     when 'complaint_entries.submitter_type'
       records.left_joins(:complaint).order("complaints.submitter_type #{datatable.orders.first.direction}")
     when 'complaint_entries.company_name'
