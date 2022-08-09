@@ -768,8 +768,8 @@ class SenderDomainReputationDispute < ApplicationRecord
       EXPORT_FIELD_NAMES.keys.each_with_index do |field_name, col_index|
         cell_data =
           case field_name
-          when 'plaform'
-            sdr_dispute.platform&.public_came
+          when 'platform'
+            sdr_dispute.platform&.public_name
           when 'user_id'
             sdr_dispute.user&.cvs_username
           when 'created_at'
@@ -780,6 +780,8 @@ class SenderDomainReputationDispute < ApplicationRecord
             sdr_dispute&.customer&.company&.name
           when 'customer_email'
             sdr_dispute&.customer&.email
+          when 'domain_name'
+            sdr_dispute.domain_name
           else
             sdr_dispute.attributes[field_name]
           end
