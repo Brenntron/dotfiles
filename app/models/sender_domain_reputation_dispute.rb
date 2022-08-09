@@ -35,6 +35,24 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   RESOLUTION_DUPLICATE = "DUPLICATE"
 
+  EXPORT_FIELD_NAMES = {
+    'id' => 'Case ID',
+    'domain_name' => 'Domain Name',
+    'status' => 'Status',
+    'resolution' => 'Resolution',
+    'resolution_comment' => 'Resolution Comment',
+    'platform' => 'Platform',
+    'source' => 'Source',
+    'suggested_disposition' => 'Suggested Dispostion',
+    'submitter_type' => 'Submitter Type',
+    'description' => 'Description',
+    'user_id' => 'Assignee',
+    'created_at' => 'Time Submitted',
+    'customer_name' => 'Customer Name',
+    'company_name' => 'Company Name',
+    'customer_email' => 'Customer Email'
+}.freeze
+
   def self.process_bridge_payload(message_payload)
     customer_payload = {
         customer_name: message_payload[:payload][:customer_name],
@@ -725,5 +743,52 @@ class SenderDomainReputationDispute < ApplicationRecord
     versioned_items = [self]
     sender_domain_reputation_dispute_comments.includes(:versions).map{ |sdrdc| versioned_items << sdrdc }
     versioned_items
+  end
+
+
+  def self.export_xlsx(search_params, current_user)
+    search_params = JSON.parse(search_params)
+    disputes = robust_search(search_params['search_type'],
+                                      search_name: search_params['search_name'],
+                                      params: search_params['search_conditions'],
+                                      user: current_user)
+    if search_params['selected_cases'].present? && search_params['selected_cases'].length > 0
+      disputes = disputes.where(id: search_params['selected_cases'])
+    end
+
+    workbook = RubyXL::Workbook.new
+    worksheet = workbook[0]
+ 
+    EXPORT_FIELD_NAMES.values.each_with_index  do |field_name, col_index|
+      worksheet.add_cell(0, col_index, field_name)
+      worksheet.sheet_data[0][col_index].change_font_bold(true)
+    end
+
+    disputes.each_with_index do |sdr_dispute, row_index|
+      EXPORT_FIELD_NAMES.keys.each_with_index do |field_name, col_index|
+        cell_data =
+          case field_name
+          when 'platform'
+            sdr_dispute.platform&.public_name
+          when 'user_id'
+            sdr_dispute.user&.cvs_username
+          when 'created_at'
+            sdr_dispute.created_at.utc.iso8601
+          when 'customer_name'
+            sdr_dispute.customer&.name
+          when 'company_name'
+            sdr_dispute&.customer&.company&.name
+          when 'customer_email'
+            sdr_dispute&.customer&.email
+          when 'domain_name'
+            sdr_dispute.domain_name
+          else
+            sdr_dispute.attributes[field_name]
+          end
+
+        worksheet.add_cell(row_index + 1, col_index, cell_data)
+      end
+    end
+    workbook
   end
 end

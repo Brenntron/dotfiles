@@ -654,3 +654,30 @@ window.sdr_build_named_search = (search_name) ->
   localStorage.sdr_search_name = search_name
   localStorage.removeItem('sdr_search_conditions')
   sdr_refresh_url()
+
+window.export_sdr_all = () ->
+  form = document.getElementById("sdr-disputes-export-form")
+
+  data = build_sdr_data()
+  if 'advanced' == data.search_type
+    data.search_name = null
+  data_json = JSON.stringify(data)
+  $('#index-export-data-input').val(data_json)
+  form.onsubmit = ""
+  form.submit()
+  form.onsubmit = () ->
+    return false
+
+window.export_sdr_selected = () ->
+  data = build_sdr_data()
+  data.selected_cases = $('.sdr_dispute_check_box:checked').map((i, el) => el.value).get() 
+  
+
+  if data.selected_cases.length <= 0
+    std_msg_error('Error: Nothing selected.',"", reload: false)
+    return false
+  if 'advanced' == data.search_type
+    data.search_name = null
+  data_json = JSON.stringify(data)
+  $('#index-export-data-input').val(data_json)
+  document.getElementById("sdr-disputes-export-form").onsubmit = ""
