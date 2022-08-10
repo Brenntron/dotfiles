@@ -392,7 +392,7 @@ class RepApi::Blacklist < RepApi::Base
 
     (1..times_to_try).each do |i|
       begin
-        response = call_json_request(:get, '/blacklist/classifications', body: {})
+        response = call_json_request(:get, '/api/v3/classifications/get', body: {})
 
         result = JSON.parse(response.body)
         if result.size > 1
