@@ -241,8 +241,10 @@ class SenderDomainReputationDispute < ApplicationRecord
   end
 
   def self.create_action(bugzilla_rest_session, sender_domain_entry, priority, suggested_disposition, platform, customer, description, user_id, status=NEW)
-
     validate_entry(sender_domain_entry)
+
+    sender_domain_entry = Mail::Address.new(sender_domain_entry).domain
+ 
     summary = "New Senders Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     # Does a description need to go in here and be in the form?
