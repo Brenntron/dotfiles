@@ -1,4 +1,6 @@
 class SenderDomainReputationDispute < ApplicationRecord
+  class SdrDisputeError < StandardError; end
+
   has_paper_trail on: [:update], ignore: [:updated_at, :user_id]
 
   belongs_to :customer, optional: true
@@ -230,8 +232,17 @@ class SenderDomainReputationDispute < ApplicationRecord
     Customer.find_by_email(email)
   end
 
+
+  def self.validate_entry(entry)
+    valid_email = !(URI::MailTo::EMAIL_REGEXP =~ entry).nil?
+    valid_domain = PublicSuffix.valid?(entry, default_rule: nil, ignore_private: true)
+    has_no_html = ActionView::Base.full_sanitizer.sanitize(entry) == entry
+    raise SdrDisputeError, "This is an invalid entry" unless has_no_html && (valid_email || valid_domain)
+  end
+
   def self.create_action(bugzilla_rest_session, sender_domain_entry, priority, suggested_disposition, platform, customer, description, user_id, status=NEW)
 
+    validate_entry(sender_domain_entry)
     summary = "New Senders Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     # Does a description need to go in here and be in the form?

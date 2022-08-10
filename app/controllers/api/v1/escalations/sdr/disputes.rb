@@ -91,9 +91,8 @@ module API
 
             end
 
-            post "" do
+            post do
               std_api_v2 do
-
                 new_dispute = SenderDomainReputationDispute.create_action(bugzilla_rest_session,
                                         permitted_params[:sender_domain_entry],
                                         permitted_params[:priority],
@@ -103,8 +102,7 @@ module API
                                         permitted_params[:description],
                                         current_user.id)
                 new_dispute.get_and_save_beaker_data
-                {:status => 'success'}.to_json
-
+                { status: 'success' }.to_json
               end
             end
 
