@@ -38,7 +38,8 @@ class Escalations::Sdr::DisputesController < ApplicationController
         sdr_attach = SenderDomainReputationDisputeAttachment.find(bug_attachment.id)
         split_file_name = sdr_attach.file_name.split('.')
         temp_file_name = "#{split_file_name.first}_#{(Time.now.to_i + offset).to_s}.#{split_file_name.last}"
-        File.open("#{zip_directory}/#{temp_file_name}", "w") { |f| f.write bug_attachment.file_contents.encode("UTF-8", invalid: :replace, undef: :replace, replace: '')}
+        enconding = bug_attachment.content_type.eql?("application/pdf") ? 'wb' : 'w'
+        File.open("#{zip_directory}/#{temp_file_name}", enconding) { |f| f.write bug_attachment.file_contents }
         file_attachments << temp_file_name
         offset += 1
       end
