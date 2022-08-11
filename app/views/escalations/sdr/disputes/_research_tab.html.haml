@@ -82,7 +82,8 @@
               .card-header.attachment-collapse-header{id: "attachment-#{attachment.id}-header"}
                 %input{type: "checkbox", class: 'corpus-attachment', 'data-id': "#{attachment.id}", 'data-filename': "#{attachment.file_name}"}
                 %a.sdr-attachment-link{href: "#{attachment.direct_upload_url}", download: "#{attachment.file_name}"}= attachment.file_name
-                %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "attachment-#{attachment.id}-content"}
+                -   if attachment.email_header_data
+                  %button.expand-row-button-inline{'data-toggle': 'collapse', type: 'button', 'data-target': "#attachment-#{attachment.id}-content", 'aria-expanded': 'false', 'aria-controls': "attachment-#{attachment.id}-content"}
               .collapse{id: "attachment-#{attachment.id}-content", 'aria-labelledby': "attachment-#{attachment.id}-header"}
                 .card-body.email-json-dump
                   = attachment.email_header_data

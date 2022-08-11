@@ -11,6 +11,8 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
   CORPUS_EMAIL_LIST= [CORPUS_SPAM, CORPUS_HAM, CORPUS_ADS, CORPUS_NOT_ADS, CORPUS_PHISH, CORPUS_VIRUS]
   ALL_POSSIBLE_TAGS = ["[SUSPECTED SPAM]", "[MARKETING]", "[SOCIAL NETWORK]", "[BULK]", "[WARNING: VIRUS DETECTED]"]
+  FILE_EXTENTIONS_TO_PROCESS = ['.eml', '.msg'].freeze
+
   def self.build_and_push_to_bugzilla(bugzilla_rest_session, payload, user, sender_domain_reputation_dispute, remote = true)
     new_local_attachment = nil
     if remote == true
@@ -49,7 +51,8 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   def parse_email_content(bug_attachment)
     file_data = bug_attachment.file_contents
 
-    if file_data.present?
+    if file_data.present? && FILE_EXTENTIONS_TO_PROCESS.include?(File.extname(file_name))
+
       header_json = SenderDomainReputationDisputeAttachment.parse_headers_to_array(file_data)
 
       self.email_header_data = header_json
@@ -80,7 +83,6 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   #tags can be: [SUSPECTED SPAM], [MARKETING], [SOCIAL NETWORK], [BULK], [WARNING: VIRUS DETECTED]
   # BugzillaRest::Session.default_session
   def send_to_corpus(corpus_submission_category, base_subject, tag, bugzilla_session)
-
     bug_proxy = bugzilla_session.build_bug(id: self.sender_domain_reputation_dispute.id)
     bug_attachments = bug_proxy.attachments
     file = nil
@@ -122,7 +124,6 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
 
   def push_to_aws(file)
-
     config_values = Rails.configuration.peakebridge.sources["snort-org"]
     Aws.config.update(
         {
@@ -145,8 +146,6 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
     s3_url = {file['filename'] => [object.key, file] }
 
     s3_url.values.flatten[0]
-
-
   end
 
   def s3_url(s3_path)
