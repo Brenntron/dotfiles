@@ -45,8 +45,7 @@ class CloudIntel::ThreatCatMap
   end
 
   def self.threat_category_by_id(id)
-    data = lookup([id]).first
-    return 'unknown' unless data
+    data = lookup([id]).first || {}
 
     data.dig('desc_short', 0, 'text') || 'uknown'
   end
