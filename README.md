@@ -1,19 +1,63 @@
-Analyst Console
-===============
-This is the home for the Analyst Console Project.
+# Analyst Console Escalations
 
--   User documentation for this project is in the
-    [wiki](https://git.vrt.sourcefire.com/talosweb/Analyst-Console/wiki).
+## TL;DR
+Run this command to build your image for the first time
+```sh
+./extras/docker_compose.sh
+```
 
--   Release notes for this project are also in the
-    [releases](https://git.vrt.sourcefire.com/talosweb/analyst-console/releases) page.
+After you have built this image once, you can then always launch it with
+```sh
+docker-compose up
+```
 
--   Issues (**bugs**) for this project go [here](https://git.vrt.sourcefire.com/talosweb/Analyst-Console/issues).
-    Please do not assign any priorities, labels, or personnel to any issues.
-    The team will do that in our weekly bug scrubs.
+The application always launches at
+`localhost:9002`
 
--   The Spark room for this project is [here](https://eurl.io/#S1Pj4fVAe).
-    Clicking this link will join you to that room.
+## Developer Setup
 
--   System documentation and developer setup for this project is found in this
-    [wiki](https://git.vrt.sourcefire.com/talosweb/analyst-console/wiki/Developer-and-System-Documentation).
+### Prerequisites
+
+* Have [Docker](https://www.docker.com) installed on your machine.
+* Complete the setup steps found in the [Databases for Docker](https://gitlab.vrt.sourcefire.com/talosweb/databases_for_docker) repo. Especially make sure that the data import step succeeds. **Pro Tip:** The most reliable way to do this is with the command line methods, documented in the Readme.
+* Make sure your database container is running.
+
+### Build the Docker image
+
+Make sure the following files exist on your machine (you need these for things other than this repo anyway, so you probably added them as part of some other onboarding):
+
+- /usr/local/etc/tess-ca_cert.pem
+- /usr/local/etc/tess-client.pem
+- /usr/local/etc/tess-pkey.key
+- /usr/local/etc/sds-certificate.pem
+- /usr/local/etc/sds-pkey.pem
+- /usr/local/etc/trusted-certificates.pem
+
+Run this command to build your image for the first time
+```sh
+./extras/docker_compose.sh
+```
+(this step takes a long time, but you only have to do it once)
+
+After you have built this image once, you can then always launch it with
+```sh
+docker-compose up
+```
+
+### Debugging
+
+*Note: The steps below are only enabled by the `stdin_open: true` and `tty: true` options in the docker-compose file. If we have to remove those lines when deploying for real, these steps won't work.*
+
+With the container running, you can open another Terminal window and run
+ 
+ ```sh
+ docker container ls 
+ ```
+
+ to find the container ID. Then,
+
+ ```sh
+ docker attach <id here>
+ ```
+
+ and in that window you can navigate break points.
