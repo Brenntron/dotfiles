@@ -23,6 +23,8 @@ services:
     networks:
       - atlas_database_network
       - atlas_bridge_network
+    stdin_open: true
+    tty: true
   delayed_job_worker:
     container_name: analyst_console_escalations_dj
     build: .
