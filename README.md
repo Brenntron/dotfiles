@@ -1,4 +1,18 @@
-# Analyst Console
+# Analyst Console Escalations
+
+## TL;DR
+Run this command to build your image for the first time
+```sh
+./extras/docker_compose.sh
+```
+
+After you have built this image once, you can then always launch it with
+```sh
+docker-compose up
+```
+
+The application always launches at
+`localhost:9002`
 
 ## Developer Setup
 
