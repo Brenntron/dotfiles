@@ -23,13 +23,15 @@ module Escalations::Sdr::DisputesHelper
 
   def humanize_beaker_info(beaker_info)
     beaker_data = JSON.parse(beaker_info).with_indifferent_access
+    return beaker_data.to_json if beaker_data['status'] == 'failed' || beaker_data.dig('response', 'data').empty?
+
     entry = beaker_data.dig('response', 'data').keys.first
     data = beaker_data.dig('response', 'data', entry)
     threat_categories = data['threat_cat_id'].map { |cat_id| CloudIntel::ThreatCatMap.threat_category_by_id(cat_id) }.join(', ')
     new_data = data.except('threat_level_id', 'query_ts', 'threat_cat_id').merge(
       {
         threat_level: CloudIntel::ThreatLevelMap.get_threat_level_mnemonic(data['threat_level_id']),
-        threat_category: threat_categories.empty? ? 'uknown' : threat_categories,
+        threat_category: threat_categories.empty? ? 'unknown' : threat_categories,
         query_time: Time.at(data['query_ts'] / 1000).strftime("%Y-%m-%d %H:%M:%S")
       }
     )

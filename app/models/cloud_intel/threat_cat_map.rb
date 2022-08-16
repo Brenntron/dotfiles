@@ -47,7 +47,7 @@ class CloudIntel::ThreatCatMap
   def self.threat_category_by_id(id)
     data = lookup([id]).first || {}
 
-    data.dig('desc_short', 0, 'text') || 'uknown'
+    data.dig('desc_short', 0, 'text') || 'unknown'
   end
 
   def self.check_version(new_version)
