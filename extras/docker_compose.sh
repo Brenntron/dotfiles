@@ -14,7 +14,7 @@ cp /usr/local/etc/sds-pkey.pem .
 echo "starting docker build script"
 
 #run the docker command to build the container
-docker compose build
+docker-compose up --build
 
 #wait for the docker command to finish
 PID = $!
