@@ -17,6 +17,8 @@ module API
         mount API::V1::Escalations::FileRep::DisputeComments
         mount API::V1::Escalations::FileRep::EmailTemplates
         mount API::V1::Escalations::FileRep::SampleZoo
+        mount API::V1::Escalations::Sdr::DisputeComments
+        mount API::V1::Escalations::Sdr::EmailTemplates
         mount API::V1::Escalations::Webrep::Disputes
         mount API::V1::Escalations::Webrep::DisputeEmails
         mount API::V1::Escalations::Webrep::DisputeComments
@@ -30,8 +32,10 @@ module API
         mount API::V1::Escalations::Webcat::Companies
         mount API::V1::Escalations::Webcat::Platforms
         mount API::V1::Escalations::CloudIntel::Whois
+        mount API::V1::Escalations::CloudIntel::Tea
         mount API::V1::Escalations::Admin::Tools
         mount API::V1::Escalations::WsaStatuses
+        mount API::V1::Escalations::Sdr::Disputes
       end
     end
   end

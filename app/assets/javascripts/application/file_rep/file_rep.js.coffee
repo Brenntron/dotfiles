@@ -473,7 +473,7 @@ $ ->
 
 
     $('.dispute_check_box:checked').each ->
-      case_id =  $(this).attr('value')
+      case_id = $(this).attr('value')
       data.selected_cases.push(case_id)
 
 
@@ -482,7 +482,7 @@ $ ->
 
   window.format_filerep_header = (data) ->
     container = $('#filerep_searchref_container')
-    container.html("")
+    container.html('')
     if data != undefined && container.length > 0
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="filerep_refresh()"></span>'
       {search_type, search_name} = data
@@ -563,7 +563,7 @@ $ ->
     form = document.getElementById("file-rep-disputes-index-export-form")
 
     data = build_data()
-
+    data.selected_cases = []
     if 'advanced' == data.search_type
       data.search_name = null
     data_json = JSON.stringify(data)

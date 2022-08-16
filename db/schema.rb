@@ -40,9 +40,7 @@ ActiveRecord::Schema.define(version: 2022_06_07_145233) do
     t.text "notes"
     t.text "public_notes"
     t.string "contact"
-    t.integer "table_sequence"
     t.text "private_engine_description"
-    t.index ["table_sequence"], name: "index_amp_naming_conventions_on_table_sequence", unique: true
   end
 
   create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
@@ -276,8 +274,8 @@ ActiveRecord::Schema.define(version: 2022_06_07_145233) do
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
-    t.text "bridge_packet", limit: 16777215
-    t.text "import_log", limit: 16777215
+    t.text "bridge_packet", limit: 4294967295
+    t.text "import_log", limit: 4294967295
     t.text "meta_data", limit: 16777215
     t.index ["channel", "customer_id"], name: "index_complaints_on_channel_and_customer_id"
     t.index ["customer_id"], name: "index_complaints_on_customer_id"
@@ -382,6 +380,7 @@ ActiveRecord::Schema.define(version: 2022_06_07_145233) do
     t.datetime "updated_at", null: false
     t.datetime "email_sent_at"
     t.bigint "file_reputation_dispute_id"
+    t.integer "sender_domain_reputation_dispute_id"
     t.index ["dispute_id"], name: "index_dispute_emails_on_dispute_id"
     t.index ["file_reputation_dispute_id"], name: "index_dispute_emails_on_file_reputation_dispute_id"
   end
@@ -509,8 +508,8 @@ ActiveRecord::Schema.define(version: 2022_06_07_145233) do
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
-    t.text "bridge_packet", limit: 16777215
-    t.text "import_log", limit: 16777215
+    t.text "bridge_packet", limit: 4294967295
+    t.text "import_log", limit: 4294967295
     t.text "meta_data", limit: 16777215
     t.index ["customer_id"], name: "index_disputes_on_customer_id"
   end
@@ -676,8 +675,8 @@ ActiveRecord::Schema.define(version: 2022_06_07_145233) do
     t.string "product_version"
     t.boolean "in_network"
     t.integer "platform_id"
-    t.text "bridge_packet", limit: 16777215
-    t.text "import_log", limit: 16777215
+    t.text "bridge_packet", limit: 4294967295
+    t.text "import_log", limit: 4294967295
     t.text "meta_data", limit: 16777215
     t.index ["created_at"], name: "index_file_reputation_disputes_on_created_at"
     t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
@@ -1017,7 +1016,14 @@ ActiveRecord::Schema.define(version: 2022_06_07_145233) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "email_header_data"
-    t.text "beaker_info", limit: 16777215
+  end
+
+  create_table "sender_domain_reputation_dispute_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "sender_domain_reputation_dispute_id"
+    t.integer "user_id"
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "sender_domain_reputation_disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
@@ -1041,6 +1047,18 @@ ActiveRecord::Schema.define(version: 2022_06_07_145233) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "priority"
+    t.text "beaker_info", limit: 16777215
+    t.datetime "case_responded_at"
+  end
+
+  create_table "sender_domain_reputation_email_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
+    t.string "template_name"
+    t.text "description"
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   end
 
   create_table "sessions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|

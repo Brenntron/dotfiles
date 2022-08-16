@@ -815,14 +815,13 @@ For future Web categorization requests, please open a Web categorization ticket 
     original_url = url
 
     begin
-      url = url.downcase
-      if url.first(3) == "ftp"
+      if url.first(3).downcase == "ftp"
         url = url.gsub("ftp://", '')
       end
 
       sanitized_url = ""
 
-      if url.first(4) != "http"
+      if url.first(4).downcase != "http"
         url = "http://" + url
       end
 
@@ -1574,7 +1573,7 @@ For future Web categorization requests, please open a Web categorization ticket 
 
       dispute.save!
       dispute.dispute_entries.each do |entry|
-        if resolution.present? && entry.status != Dispute::STATUS_RESOLVED
+        if resolution.present? && entry.resolution.blank?
           entry.resolution = resolution
           entry.resolution_comment = comment
           entry.case_closed_at = resolved_at
@@ -1774,21 +1773,31 @@ For future Web categorization requests, please open a Web categorization ticket 
     accepted_at = Time.now
 
     disputes_ary = []
-    Dispute.transaction do
-      disputes = Dispute.where(id: dispute_ids).where.not(status: [
-        Dispute::TI_NEW, Dispute::STATUS_RESOLVED, Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN,
-        Dispute::STATUS_RESOLVED_UNCHANGED
-      ])
-      disputes_ary = disputes.all.to_a
-      disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
 
-      entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
-      entries_ary = entries.all.to_a
+    disputes = Dispute.where(id: dispute_ids).where.not(status: [
+      Dispute::TI_NEW, Dispute::STATUS_RESOLVED, Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN,
+      Dispute::STATUS_RESOLVED_UNCHANGED
+    ])
+    disputes_ary = disputes.all.to_a
+    entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
+    entries_ary = entries.all.to_a
+    Dispute.transaction do
+      disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
       if entries_ary.any?
-        entries.update_all(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
-        Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries_ary)
+        entries_ary.each do |entry|
+          if entry.status != DisputeEntry::STATUS_RESOLVED
+            entry.status = DisputeEntry::ASSIGNED
+            entry.case_accepted_at = accepted_at
+            entry.save
+          end
+        end
+
       end
     end
+    #equivalent to #reload, get fresh values after transaction has committed all updated values to database.
+    entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
+    entries_ary = entries.all.to_a
+    Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries_ary)
 
     disputes_ary
   end
