@@ -443,6 +443,25 @@ module API
 
             end
 
+            params do
+              optional :entries, type: Array
+              optional :categories, type: Array
+              optional :category_ids, type: Array
+            end
+
+            post 'bulk_categorize' do
+
+              authorize!(:update, ComplaintEntry)
+              #bugzilla_rest_session = BugzillaRest::Session.default_session
+
+              response = Complaint.process_bulk_adhoc_categorizations(params, current_user, bugzilla_rest_session)
+              if response[:errors].present?
+                {:status => "error", :errors => response[:errors], :data => response[:data]}
+              else
+                {:status => "success", :data => response[:data]}
+              end
+            end
+
           end
         end
       end
