@@ -267,7 +267,7 @@ $ ->
         if is_customer
           resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
       when 'UNCHANGED'
-        resolution_comment += "Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file’s disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file’s disposition, if they understand the risks in doing so."
+        resolution_comment += "Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file's disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file's disposition, if they understand the risks in doing so."
         if is_customer
           resolution_comment += " Please open a TAC case and provide additional details if you need further assistance."
     $(".resolution-status-comment").html(resolution_comment)

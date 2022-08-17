@@ -63,7 +63,7 @@ class FileReputationDispute < ApplicationRecord
     Cisco Talos has concluded that the file is safe to access at this time. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case.
   HEREDOC
   RESOLUTION_AUTORESOLVED_UNCHANGED         = <<~HEREDOC
-    Cisco Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file’s disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file’s disposition, if they understand the risks in doing so. If you need further assistance, please open a TAC case and provide additional details.
+    Cisco Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file's disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file’s disposition, if they understand the risks in doing so. If you need further assistance, please open a TAC case and provide additional details.
   HEREDOC
 
 
