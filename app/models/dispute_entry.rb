@@ -290,6 +290,7 @@ class DisputeEntry < ApplicationRecord
   def self.safe_domain_of(url)
     begin
       url = url.strip
+      url = url.split("/").map {|m| SimpleIDN.to_ascii(m)}.join("/")
       if !url.start_with?( 'http', 'https')
         url = "http://" + url
       end
