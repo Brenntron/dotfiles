@@ -45,7 +45,6 @@ RSpec.describe "complaint bulk submit", type: :request do
 
     expect(response).to be_successful
     json_body = JSON.parse(response.body)
-    binding.pry
     expect(json_body["status"]).to eql("success")
     expect(json_body["data"]["created"].size).to eql(1)
     expect(json_body["data"]["completed"].size).to eql(1)
