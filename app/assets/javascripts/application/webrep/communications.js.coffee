@@ -382,6 +382,8 @@ $ ->
     position: { my: "left center", at: "left center", of: window }
   $('.new-email-button').on 'click', ->
     $('#newEmailDialog').dialog 'open'
+    customer_email = $('#dispute-customer-email')[0].innerText
+    $('input.receiver-email').val(customer_email)
     return
   $('.mng-templates-button').on 'click', ->
     $('#manageTemplatesDialog').dialog 'open'
