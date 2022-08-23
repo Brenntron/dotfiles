@@ -310,7 +310,8 @@ class Sbrs::Base
     request_string = "https://" + hostname + query_string
 
     if request_type == 'wbrs' && params["uri_item"]
-      request_string += params["uri_item"]
+      ascii_uri = params["uri_item"].split("/").map {|m| SimpleIDN.to_ascii(m)}.join("/")
+      request_string += ascii_uri
     end
 
     if request_string.present?

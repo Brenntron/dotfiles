@@ -115,6 +115,7 @@ gem 'elasticsearch'
 gem 'hashie'
 
 gem 'mail'
+gem 'simpleidn'
 group :production, :staging do
   gem 'elastic-apm', '~> 3.15', '>= 3.15.1'
 end
