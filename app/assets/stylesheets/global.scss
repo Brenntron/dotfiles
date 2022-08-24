@@ -5687,8 +5687,21 @@ input.table-entry-input:focus {
   position: unset;
   width: fit-content;
 
+  div {
+    border: none;
+  }
+
+  .loader-gears {
+    display: none;
+    margin: 0 auto;
+  }
+
   .webcat-research-categorize-url-button {
     background-image: url(image_path('icon_categorize.svg'));
+  }
+
+  .dropdown.open > .webcat-research-categorize-url-button {
+    background-image: url(image_path('icon_categorize_white.svg'));
   }
 
   .toolbar-dropdown {

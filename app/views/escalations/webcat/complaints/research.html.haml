@@ -22,7 +22,7 @@
             XBRS History
 
       .input-group.search-group#webcat-research-search
-        = text_field_tag 'general_search', "#{}", class: 'search-box', placeholder: 'Lookup History'
+        = text_field_tag 'webcat_research_search', "#{}", class: 'search-box', placeholder: 'Lookup History'
 
   .domain-table-wrapper
     %table.domain-table
@@ -48,6 +48,8 @@
         %button#webcat-research-categorize-url.webcat-research-categorize-url-button.toolbar-button.dropdown-toggle.esc-tooltipped{title: 'Categorize URL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text Categorize URL
         %div{'aria-labelledby': 'webcat-research-categorize-url', id: 'categorize-url-dropdown', class: 'dropdown-menu toolbar-dropdown'}
+          .loader-gears
+            =inline_svg 'icon_gears_loader.svg'
           .selected-urls-wrapper
             %label.selected-urls-label
               Selected URLs
@@ -55,9 +57,9 @@
           .selected-urls-categories-wrapper
             %label.selected-urls-categories-label
               Enter up to 5 categories
-            %input.input-group.search-group
+            %input#categorize-research-urls.input-group.search-group
             %button{type: 'submit', name: 'commit', id: 'cat-research', class: 'toolbar-button esc-tooltipped', onclick: 'detail_research(); return false', 'data-disable-with': 'Submit'}
-              %span.toolbar-button-text
+              %span#categorize-research-submit.toolbar-button-text
                 Submit
 
 
