@@ -808,7 +808,7 @@ class SenderDomainReputationDispute < ApplicationRecord
   end
 
   def self.assemble_initial_email(dispute, payload)
-    email_subject = payload[:summary_description].truncate(100)
+    email_subject = "SDR Entry: #{payload[:sender_domain_entry]}"
     email_body = assemble_email_body(dispute.created_at, payload)
 
     new_email = DisputeEmail.new
@@ -817,7 +817,7 @@ class SenderDomainReputationDispute < ApplicationRecord
     new_email.sender_domain_reputation_dispute_id = dispute.id
     new_email.status = 'unread'
     new_email.to = "sdr_disputes_#{dispute.id}@dispute.talosintelligence.com"
-    new_email_subject = email_subject
+    new_email.subject = email_subject
     new_email.save!
   end
 
@@ -827,21 +827,11 @@ class SenderDomainReputationDispute < ApplicationRecord
     contents += "____________________________________________________________" + "\n"
     contents += "Time: #{Time.now.to_formatted_s(:long)}" + "\n"
     contents += "Name: #{payload[:customer_name]}" + "\n"
-    contents += "E-mail: #{payload[:customer_email]}" + "\n"
-    contents += "Domain: #{payload[:customer_email]&.split("@")&.last || ''}" + "\n"
-    contents += "SDR Dispute Entry: #{payload[:sender_domain_entry]}" + "\n"
-    contents += "SDR Dispute Problem Summary: #{payload[:summary_descirption]}" + "\n\n"
-    contents += support_analysis(payload)
+    contents += "E-mail: #{payload[:customer_email]}" + "\n\n"
+    contents += "Sender Domain Entry: #{payload[:sender_domain_entry]}" + "\n"
+    contents += "Suggested Dispostion: #{payload[:suggested_disposition]}" + "\n"
+    contents += "Details:" + "\n"
+    contents += payload[:summary_description] || ''
     contents
-  end
-
-  def self.support_analysis(payload)
-    support_analysis = ''
-    support_analysis += "Detailed Descriptions:" + "\n"
-    support_analysis += payload[:problem_summary] || ''
-    support_analysis += "Suggested Dispostion:" + "\n"
-    support_analysis += payload[:suggested_disposition]
-    support_analysis += "\n\n"
-    support_analysis
   end
 end

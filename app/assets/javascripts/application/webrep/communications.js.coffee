@@ -138,6 +138,7 @@ $ ->
 
   $('.forward-button').on 'click', ->
     $('#newEmailDialog').dialog 'open'
+    $('input.receiver-email').val('')
     $('.new-subject').val("Fwd:" + $(".communication-subject")[0].textContent)
     $('.new-body').val("\n" + "###################################" + "\n" + "Begin Forwarded Message:" + "\n" + $('.email-msg-content')[0].innerText)
 
