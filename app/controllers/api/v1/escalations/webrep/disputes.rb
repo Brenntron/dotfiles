@@ -735,7 +735,7 @@ module API
                       comment = ""
                     end
 
-                    return_data.push(:entry => key, :classification => value[value.keys.first]["data"]["classifications"], :expiration => expiration, :status => value[value.keys.first]["data"]["status"].upcase, :comment => comment).to_json
+                    return_data.push(:entry => value.keys.first, :classification => value[value.keys.first]["data"]["classifications"], :expiration => expiration, :status => value[value.keys.first]["data"]["status"].upcase, :comment => comment).to_json
 
                   end
                 end
