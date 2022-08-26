@@ -714,22 +714,29 @@ module API
                 return_data = []
 
                 api_response.each do |key, value|
-                  if value == 'NOT_FOUND'
-                    return_data.push(:entry => key, :classification => "No active classifications", :expiration => "", :status => "INACTIVE", :comment => "")
+                  next if value == true || value == false
+                  if value[value.keys.first]["result"].downcase == 'not_found' || value[value.keys.first]["result"].downcase == 'failed'
+                    return_data.push(:entry => value.keys.first, :classification => "No active classifications", :expiration => "", :status => "INACTIVE", :comment => "")
                     # TODO Make expiration human readable - Just the date
                   else
+
                     expiration = ""
                     begin
-                      expiration = Date.parse(value["expiration"]).to_s
+                      expiration = Date.parse(value[value.keys.first]["data"]["expiration"]).to_s
                     rescue
-                      expiration = value["expiration"]
+                      expiration = value[value.keys.first]["data"]["expiration"]
                     end
 
                     comment = ""
 
-                    comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
+                    begin
+                      comment = value[value.keys.first]["data"]["sources"].fetch("VRT", {}).fetch("comment", "")
+                    rescue
+                      comment = ""
+                    end
 
-                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => comment).to_json
+                    return_data.push(:entry => value.keys.first, :classification => value[value.keys.first]["data"]["classifications"], :expiration => expiration, :status => value[value.keys.first]["data"]["status"].upcase, :comment => comment).to_json
+
                   end
                 end
                 return_data.to_json
