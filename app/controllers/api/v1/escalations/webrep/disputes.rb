@@ -716,7 +716,7 @@ module API
                 api_response.each do |key, value|
                   next if value == true || value == false
                   if value[value.keys.first]["result"].downcase == 'not_found' || value[value.keys.first]["result"].downcase == 'failed'
-                    return_data.push(:entry => key, :classification => "No active classifications", :expiration => "", :status => "INACTIVE", :comment => "")
+                    return_data.push(:entry => value.keys.first, :classification => "No active classifications", :expiration => "", :status => "INACTIVE", :comment => "")
                     # TODO Make expiration human readable - Just the date
                   else
 
