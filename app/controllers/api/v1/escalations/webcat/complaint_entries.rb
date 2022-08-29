@@ -532,6 +532,50 @@ module API
               end
             end
 
+            desc "get domain history for webcat research tool"
+            params do
+              optional :domain, type: String
+            end
+
+            get 'get_domain_history' do
+
+              response = {}
+              response[:status] = "success"
+              response[:data] = []
+
+              raw_records = []
+
+              prefix_records = Wbrs::Prefix.where({:urls => [URI.escape(params[:domain])]})
+              prefix_records.each do |prefix_record|
+                history_records = Wbrs::HistoryRecord.where({:prefix_id => prefix_record.prefix_id})
+                raw_records += history_records
+              end
+
+              raw_records = raw_records.sort_by {|history| DateTime.parse(history.time)}.reverse
+
+              raw_records.each do |record|
+                prefix = prefix_records.find {|prec| prec.prefix_id == record.prefix_id}
+                url_from_prefix = Complaint.compile_parts_to_uri({"subdomain" => prefix.subdomain, "domain" => prefix.domain, "path" => prefix.path })
+                data_point = {}
+
+                data_point[:is_important] = ComplaintEntry.self_importance(url_from_prefix)
+                data_point[:category] = record.category.descr
+                data_point[:domain] = prefix.domain
+                data_point[:subdomain] = prefix.subdomain
+                data_point[:path] = prefix.path
+                data_point[:action] = record.action
+                data_point[:confidence] = record.confidence
+                data_point[:time_of_action] = record.time
+                data_point[:description] = record.description
+                data_point[:user] = record.user
+
+                response[:data] << data_point
+              end
+
+              response
+
+            end
+
             desc 'Get XBRS data on complaint url'
             params do
               requires :url, type: String
