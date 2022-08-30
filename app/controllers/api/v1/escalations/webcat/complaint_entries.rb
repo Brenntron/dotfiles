@@ -553,13 +553,35 @@ module API
 
               raw_records = raw_records.sort_by {|history| DateTime.parse(history.time)}.reverse
 
+              response[:data] << {:is_important => ComplaintEntry.self_importance(params[:domain]),
+                                  :category => nil,
+                                  :url => params[:domain],
+                                  :domain => nil,
+                                  :subdomain => nil,
+                                  :path => nil,
+                                  :action => nil,
+                                  :confidence => nil,
+                                  :time_of_action => nil,
+                                  :description => "baseline domain",
+                                  :user => nil,
+                                  :entry_id => nil}
+
               raw_records.each do |record|
                 prefix = prefix_records.find {|prec| prec.prefix_id == record.prefix_id}
                 url_from_prefix = Complaint.compile_parts_to_uri({"subdomain" => prefix.subdomain, "domain" => prefix.domain, "path" => prefix.path })
                 data_point = {}
 
+                entry_id = nil
+
+                complaint_entry = ComplaintEntry.where("uri like '%#{url_from_prefix}%'").last
+
+                if complaint_entry.present?
+                  entry_id = complaint_entry.id
+                end
+
                 data_point[:is_important] = ComplaintEntry.self_importance(url_from_prefix)
                 data_point[:category] = record.category.descr
+                data_point[:url] = url_from_prefix
                 data_point[:domain] = prefix.domain
                 data_point[:subdomain] = prefix.subdomain
                 data_point[:path] = prefix.path
@@ -568,6 +590,7 @@ module API
                 data_point[:time_of_action] = record.time
                 data_point[:description] = record.description
                 data_point[:user] = record.user
+                data_point[:entry_id] = entry_id
 
                 response[:data] << data_point
               end
