@@ -214,8 +214,8 @@ window.submit_individual_reptool = (button) ->
   entry_content = $(entry).text().trim()
   current_classes = $($(dropdown).find('.reptool-entry-class')[0]).text()
   case_id = $('#dispute_id').text().trim()
-  force_commit = $(dropdown).find('.reptool-toolbar-force:checked')
-  if force_commit.length > 0
+  force_check = $(dropdown).find('.reptool-toolbar-force:checked')
+  if force_check.length > 0
     force_commit = true
 
   # Get reptool submission action
@@ -354,6 +354,9 @@ window.submit_bulk_reptool = () ->
   comm_typed_in = ''
   comm_generated = ''
   comment = ''
+  force_check = $(bulk_reptool_menu).find('.reptool-toolbar-force:checked')
+  if force_check.length > 0
+    force_commit = true
 
   #  Get the entries
   entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
@@ -396,11 +399,13 @@ window.submit_bulk_reptool = () ->
       'entries': entries
       'classifications': reptool_classes
       'comment': comment
+      'force': force_commit
     }
   else if submission_action == "reptool-drop"
     data = {
       'action': 'EXPIRED'
       'entries': entries
+      'force': force_commit
     }
   else if submission_action == "reptool-maintain"
     new_classifications = ''
@@ -425,6 +430,7 @@ window.submit_bulk_reptool = () ->
             'entries': [this.entry]
             'classifications': [new_classifications]
             'comment': comment
+            'force': force_commit
           }
           array_of_datas.push(temp_data)
         else
@@ -435,6 +441,7 @@ window.submit_bulk_reptool = () ->
             'entries': [this.entry]
             'classifications': [new_classifications]
             'comment': comment
+            'force': force_commit
           }
           array_of_datas.push(temp_data)
 
@@ -453,6 +460,7 @@ window.submit_bulk_reptool = () ->
             'entries': [this.entry]
             'classifications': [new_classifications]
             'comment': comment
+            'force': force_commit
           }
           array_of_datas.push(temp_data)
           data = array_of_datas
@@ -462,6 +470,7 @@ window.submit_bulk_reptool = () ->
           temp_data = {
             'action': 'expired'
             'entries': [this.entry]
+            'force': force_commit
           }
           array_of_datas.push(temp_data)
           data = array_of_datas
