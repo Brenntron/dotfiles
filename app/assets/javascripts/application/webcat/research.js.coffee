@@ -1,11 +1,39 @@
 $ ->
   headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
 
+  getDomainHistory = (domain) ->
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/get_domain_history'
+      method: 'GET'
+      headers: headers
+      data:
+        domain: domain
+      success: (response) ->
+        data = response.data
+
+        #the first entry is the domain itself so that should not count in the result total
+        $('.domain-table-listing').html("#{domain} (#{data.length - 1} found)")
+        $('.domain-table-current-category').html("#{data[0].category || 'None'}")
+        $('.domain-table-reputation').html("#{data[0].confidence || 0}")
+
+        for entry, index in data
+          #the first entry is the domain itself so that should be skipped
+          if index != 0
+            table_row = "<tr><th><input type='checkbox' name='#{entry.url}' class='categorize-url-button'</input><th>#{entry.entry_id || ''}</th><th>#{entry.category}</th><th class='domain-history-url'>#{entry.url}</th><th>#{entry.time_of_action}</th><th>#{entry.action}</th><th>#{entry.confidence}</th><th>#{entry.description}</th><th>#{entry.user}</th></tr>"
+            $('#domainHistoryTableBody').append(table_row)
+      error: (errorResponse) ->
+        std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
+    )
+
   $(document).ready(
     hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&')
     domain = hashes[0].split('=')[1]
 
-    $('#webcat_research_search').val(domain)
+    if domain
+      $('#webcat_research_search').val(domain)
+      $('.domain-table-listing').html(domain)
+
+      getDomainHistory(domain)
   )
 
   $('#webcat_research_search').on('keyup', (e) ->
@@ -28,7 +56,7 @@ $ ->
     }
   )
 
-  window.detail_research = () ->
+  window.apply_webcat_research_categories = () ->
     domain = $('#webcat_research_search').val()
     entries = [ domain ]
     category_ids = []

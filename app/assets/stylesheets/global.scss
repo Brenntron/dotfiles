@@ -11872,6 +11872,18 @@ input[type="radio"].resolution_radio_button {
   }
 }
 
+#domainHistoryTableBody {
+  th {
+    font-weight: normal;
+    padding: 5px 8px;
+    text-transform: capitalize;
+  }
+
+  .domain-history-url {
+    text-transform: none;
+  }
+}
+
 // styles for talos logo + copyright info in bottom-left of side nav
 .copyright-area {
   width: 150px;
