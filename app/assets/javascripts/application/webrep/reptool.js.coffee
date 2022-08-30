@@ -214,6 +214,9 @@ window.submit_individual_reptool = (button) ->
   entry_content = $(entry).text().trim()
   current_classes = $($(dropdown).find('.reptool-entry-class')[0]).text()
   case_id = $('#dispute_id').text().trim()
+  force_commit = $(dropdown).find('.reptool-toolbar-force:checked')
+  if force_commit.length > 0
+    force_commit = true
 
   # Get reptool submission action
   submission_action = $(dropdown).find("input[name='reptool-action-radio']:checked").val()
@@ -261,6 +264,7 @@ window.submit_individual_reptool = (button) ->
       'entries': entry_content
       'classifications': checked_classes.join(',')
       'comment': comment
+      'force': force_commit
     }
   else if submission_action == "reptool-drop"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
@@ -268,6 +272,7 @@ window.submit_individual_reptool = (button) ->
     data = {
       'action': 'EXPIRED'
       'entries': entry_content
+      'force': force_commit
     }
   else if submission_action == "reptool-maintain"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
@@ -305,6 +310,7 @@ window.submit_individual_reptool = (button) ->
         'entries': [entry_content]
         'classifications': [fin_classes.join(',')]
         'comment': comment
+        'force': force_commit
       }]
     }
   # Send to RepTool!
@@ -479,7 +485,7 @@ window.submit_bulk_reptool = () ->
           errormsg = [response.responseJSON.error]
         else
           errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+        std_msg_error('Error', ['Error adjusting Reptool classes'].concat(errormsg) )
     )
   else if submission_action == "reptool-maintain"
     std_msg_ajax(
@@ -499,7 +505,7 @@ window.submit_bulk_reptool = () ->
           errormsg = [response.responseJSON.error]
         else
           errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+        std_msg_error('Error', ['Error adjusting Reptool classes'].concat(errormsg) )
     )
   else if submission_action == "reptool-drop"
     std_msg_ajax(
@@ -519,7 +525,7 @@ window.submit_bulk_reptool = () ->
           errormsg = [response.responseJSON.error]
         else
           errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+        std_msg_error('Error', ['Error adjusting Reptool classes'].concat(errormsg) )
     )
 
 

@@ -102,7 +102,7 @@
                     %span.toolbar-button-text Adjust RepTool BL
                   .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'reptool_entries_button'}
                     .dropdown-tool-text-divider.secondary-text-divider
-                      Adjust Reptool Classification
+                      .inline-text  RepTool Classification
                     .inline-tool-content-wrapper
                       .row
                         .col-xs-12
@@ -364,7 +364,10 @@
                     %tbody
                   -# Each checked entry will populate information here
                   .dropdown-tool-text-divider.secondary-text-divider
-                    Adjust Reptool Classification
+                    .inline-text Adjust RepTool Classification
+                    .inline-label-wrapper.float-right
+                      %input.reptool-toolbar-force{id:"detailed-reptool-toolbar-force", type: 'checkbox', name: 'force', value: true}
+                      %label{for: "detailed-reptool-toolbar-force"} Force commit
                   .inline-tool-content-wrapper
                     .row
                       .col-xs-12
@@ -615,7 +618,11 @@
                               .dispute-reptool-adjust-wrapper
                                 %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
                                 %input.adjust-reptool-bl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
-                                %h3.reptool-dropdown-header Adjust RepTool Classification
+                                %h3.reptool-dropdown-header
+                                  .inline-text Adjust RepTool Classification
+                                  .inline-label-wrapper.float-right
+                                    %input.reptool-toolbar-force{id:"#{entry.id}-reptool-toolbar-force", type: 'checkbox', name: 'force', value: true}
+                                    %label{for: "#{entry.id}-reptool-toolbar-force"} Force commit
                                 %table.dispute_tool_current
                                   %thead
                                     %tr
