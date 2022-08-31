@@ -128,6 +128,10 @@ development:
     verify_mode: "verify-none"
     gssnegotiate: false
     auth_token: "redacted"
+  enrichment_service:
+    hostport: "grpc.talos.cisco.com:443"
+    cert_file: "/usr/local/etc/talos/tess-client.pem"
+    key_file: "/usr/local/etc/talos/tess-pkey.key"
 
 
  
