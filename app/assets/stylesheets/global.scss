@@ -5842,6 +5842,34 @@ input.table-entry-input:focus {
 .domain-table-wrapper {
   width: auto;
 
+  .domain-table-listing, .domain-table-current-category, .domain-table-reputation {
+    vertical-align: top;
+  }
+
+  .domain-table-listing {
+    display: inline-block;
+  }
+
+  .domain-name {
+    font-size: 18px;
+    float: left;
+  }
+
+  .result-total {
+    float: right;
+    margin-left: 10px;
+    margin-top: 5px;
+  }
+
+  .webcat-research-svg {
+    display: none;
+    float: left;
+    height: auto;
+    margin-right: 5px;
+    margin-top: -5px;
+    width: 20px;
+  }
+
   thead {
     color: #999;
 
@@ -5856,8 +5884,8 @@ input.table-entry-input:focus {
     padding-top: 0;
   }
 
-  &-listing {
-    font-size: 18px;
+  tbody tr {
+    margin-top: 5px;
   }
 }
 

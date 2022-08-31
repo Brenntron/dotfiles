@@ -37,8 +37,14 @@
       %tbody
         %tr
           %td.domain-table-listing
-          %td.domain-table-current-category
           %td.domain-table-reputation
+            #categoryCheck.webcat-research-svg
+              =inline_svg 'icon_check_grey.svg'
+          %td.domain-table-current-category
+            #redX.webcat-research-svg
+              =inline_svg 'icon_x_red.svg'
+            #greenCheck.webcat-research-svg
+              =inline_svg 'icon_check_green.svg'
 
   .toolbar.webcat-research-toolbar
     %div

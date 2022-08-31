@@ -12,9 +12,25 @@ $ ->
         data = response.data
 
         #the first entry is the domain itself so that should not count in the result total
-        $('.domain-table-listing').html("#{domain} (#{data.length - 1} found)")
-        $('.domain-table-current-category').html("#{data[0].category || 'None'}")
-        $('.domain-table-reputation').html("#{data[0].confidence || 0}")
+        $('.domain-table-listing').append("<p class='result-total'>(#{data.length - 1} found)</p>")
+
+        if data[0].category
+          $('.domain-table-current-category').append("<p>#{data[0].category}</p>")
+          $('#categoryCheck').show()
+        else
+          $('.domain-table-current-category').append("<p class='missing-data'>#{'NA'}</p>")
+          $('#categoryCheck').hide()
+
+        if data[0].score.indexOf('no data') != -1
+          $('.domain-table-reputation').addClass('missing-data')
+        else if data[0].score > 0
+          $('#redX').hide()
+          $('#greenCheck').show()
+        else if data[0].score < 0
+          $('#redX').show()
+          $('#greenCheck').hide()
+
+        $('.domain-table-reputation').html("#{data[0].score}")
 
         for entry, index in data
           #the first entry is the domain itself so that should be skipped
@@ -31,7 +47,7 @@ $ ->
 
     if domain
       $('#webcat_research_search').val(domain)
-      $('.domain-table-listing').html(domain)
+      $('.domain-table-listing').append("<p class='domain-name'>#{domain}</p>")
 
       getDomainHistory(domain)
   )
