@@ -4,6 +4,12 @@ Given(/^the following dispute comments exist:$/) do |dispute_comments|
   end
 end
 
+Given(/^the following SDR dispute comments exist:$/) do |dispute_comments|
+  dispute_comments.hashes.each do |dispute_comment|
+    FactoryBot.create(:sender_domain_reputation_dispute_comment, dispute_comment)
+  end
+end
+
 And(/^I click the note with text "(.*?)"$/) do |text|
   find('.note-block', :text => text).click
 end

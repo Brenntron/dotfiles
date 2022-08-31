@@ -5,6 +5,7 @@ class CreateUmbrellaCluster < ActiveRecord::Migration[5.2]
       t.references :platform, index: true
       t.string :category_ids
       t.integer :status, default: 0
+      t.integer :traffic_hits, default: 0
       t.string :comment
       t.timestamps
     end

@@ -29,9 +29,14 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
 
         # This is so the tests can stub out the `threaded?` method and test synchronously.
         if self.class.threaded? && Rails.env != "test"
-          Thread.new do
+          if obj_type == "SenderDomainReputationDispute"
             obj_type.constantize.process_bridge_payload(message_payload)
+          else
+            Thread.new do
+              obj_type.constantize.process_bridge_payload(message_payload)
+            end
           end
+
         else
           obj_type.constantize.process_bridge_payload(message_payload)
         end

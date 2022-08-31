@@ -1,0 +1,234 @@
+.sdr-dispute-case-priority-wrapper {
+  display: flex;
+}
+
+.sdr-dispute-priority-wrapper {
+  flex: 1;
+  margin-top: 15px;
+}
+
+.sdr-dispute-case-id-wrapper {
+  flex: 4;
+}
+
+.sdr-age-wrapper, .submitter-org-wrapper, .contact-email-wrapper {
+  margin-top: 10px;
+}
+
+.sdr-submitted-at-wrapper, .sdr-age-wrapper {
+  padding-left: 15px;
+}
+
+.sdr-dispute-owner-buttons-wrapper {
+  margin-top: 10px;
+  padding-left: 0;
+}
+
+.sdr-research-data-title, .sdr-dispute-info-title {
+  font-weight: 300;
+  margin-bottom: 30px;
+  padding-left: 0;
+}
+
+.sdr-dispute-info-title {
+  border-bottom-color: #41B1D7;
+}
+
+.sdr-research-data-title {
+  border-bottom-color: #2EB04A;
+}
+
+.sdr-research-data-wrapper {
+  border-left: 1px solid #eeeeee;
+  padding-left: 30px;
+
+  .data-report-table {
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+  hr.thin {
+    margin-bottom: 25px;
+  }
+}
+
+.sdr-details {
+  border: 1px solid #eeeeee;
+  padding: 8px;
+  pre {
+    background-color: transparent;
+    word-break: break-all;
+  }
+}
+
+.sdr-dispute-info-wrapper {
+  border-right: 1px solid #eeeeee;
+  padding-right: 30px;
+}
+
+.attachments-row {
+  margin-top: 30px;
+
+  .data-report-label {
+    width: initial;
+  }
+
+  .corpus-all-attachments {
+    margin: 0 5px;
+  }
+}
+
+input[type="checkbox"].corpus-attachment, .corpus-all-attachments {
+  margin-right: 5px;
+  vertical-align: sub;
+}
+
+.sdr-attachments-buttons {
+  text-align: right;
+}
+
+.sdr-attachments-button-wrapper {
+  display: flex;
+  justify-content: end;
+  margin-bottom: 5px;
+}
+
+.sdr-attachments-button {
+  background-color: #efefef;
+  background-position: 4px center;
+  background-repeat: no-repeat;
+  background-size: 18px 18px;
+  border: none;
+  border-radius: 2px;
+  margin-left: 4px;
+  padding: 5px 20px;
+
+  span, a {
+    color: #333;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 8px;
+    text-transform: uppercase;
+  }
+
+  a:hover {
+    text-decoration: none;
+  }
+}
+
+.sdr-corpus-button {
+  background-image: url(image_path('icon_submit_arrow_grey.svg'));
+}
+
+.open .sdr-corpus-button {
+  background-color: #60BFDD;
+  background-image: url(image_path('icon_submit_arrow.svg'));
+  color: white;
+}
+
+.sdr-entries {
+  margin-top: 10px;
+}
+
+.sdr-entries, .sdr-attachments {
+  .expand-row-button-inline {
+    float: right;
+  }
+}
+
+#sdr-research-tab .nested-data-row {
+  display: none;
+  margin-top: 10px;
+}
+
+.card-header .expand-row-button-inline {
+  float: right;
+  background-position: center;
+  width: 22px;
+  height: 25px;
+  margin-top: -1px;
+}
+
+.attachment-collapse-header, .beaker-collapse-header {
+  display: block;
+  height: 35px;
+  width: 100%;
+  padding: 5px;
+  border-top: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
+  .sdr-attachment-link, .sdr-beaker-item {
+    padding: 5px 5px 4px 0;
+    display: inline-block;
+    font-size: 12px;
+  }
+  .sdr-attachment-link {
+    color: #3F6F8D;
+    text-decoration: underline;
+  }
+}
+
+.email-json-dump {
+  padding: 10px;
+  background-color: #f5f5f5;
+
+  .email-headers-table {
+    font-family: "Fira Mono", monospace;
+    font-size: 11px;
+
+    th {
+      border-bottom: 1px solid #e9e9e9;
+      padding: 8px 0;
+    }
+
+    td {
+      word-break: break-all;
+      min-height: 28px;
+      border-bottom: 1px solid #e9e9e9;
+    }
+
+    color: #4E4E4E;
+  }
+}
+
+#sdr-index-toolbar {
+  margin-top: -10px;
+  z-index: 1;
+  width: fit-content;
+}
+
+#sdr-disputes-index_wrapper {
+  top: -55px;
+}
+
+.sdr-download-all-button {
+  background-image: url(image_path('icon_download_dk_grey.svg'));
+}
+
+#send-to-corpus-wrapper {
+  padding: 15px 15px 40px 15px;
+  .attachment-to-send-table {
+    margin-bottom: 20px;
+    th {
+      color: #999;
+      text-transform: none;
+      font-weight: 400;
+    }
+  }
+}
+
+.inline-msg {
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  text-align: left;
+  padding: 3px 0 3px 25px;
+  height: 18px;
+  background-position: left center;
+
+  &.success-msg {
+    color: #3c763d;
+    background-image: url(image_path('icon_success.svg'));
+  }
+  &.error-msg {
+    color: #fc4349;
+    background-image: url(image_path('icon_warning.svg'));
+  }
+}

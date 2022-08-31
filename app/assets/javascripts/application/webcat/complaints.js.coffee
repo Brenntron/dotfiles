@@ -1404,7 +1404,7 @@ format = (complaint_entry_row) ->
   else
     complaint_source = '<span class="missing-data">Source unknown</span>'
 
-  form_change_item = complaint_entry.domain || complaint_entry.ip_address
+  form_change_item = domain || complaint_entry.ip_address
 
   complaint_entry_html =
       complaint_table_row_html +
@@ -1443,7 +1443,7 @@ format = (complaint_entry_row) ->
       '<div>' + host  + '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" data-domain="' + domain + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
+      '" type="text" data-domain="' + form_change_item + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
       '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
@@ -1712,10 +1712,6 @@ window.click_table_buttons = (complaint_table, button)->
   data = row.data()
   cat_select = '#input_cat_'+ data.entry_id
 
-  if (!String.prototype.startsWith)
-    String.prototype.startsWith = (input, pos) ->
-      this.substr(!pos || pos < 0 ? 0 : +pos, input.length) == input
-
   if row.child.isShown()       # This row is already open - close it
     row.child.hide()
     tr.removeClass 'shown'
@@ -1754,9 +1750,18 @@ window.click_table_buttons = (complaint_table, button)->
           else
             $('#master-submit').prop('disabled', true)
         score: (input) ->
-          score = this.getScoreFunction(input)
+          #  Adding some customization for autofill
+          #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
           (item) ->
-            (item.category_name.toLowerCase().startsWith(input.toLowerCase()) || item.category_code.toLowerCase().startsWith(input.toLowerCase())) ? 1 : 0
+            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+              item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
+            else
+              0
       }
     else
       # need to initialize the selectize function but disable it here if entry is completed

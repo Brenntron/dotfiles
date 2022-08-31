@@ -605,7 +605,7 @@ class ComplaintEntry < ApplicationRecord
   # contains -- search many fields where supplied value is contained in the field.
   # nil -- all records.
   # @param [String] search_type variety of search
-  # @param [ActionController::Parameters] params supplied fields and values for search.
+  # @param [ActionController::Parameters, Hash, NilClass] params supplied fields and values for search.
   # @param [String] search_name name of saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
@@ -708,7 +708,7 @@ class ComplaintEntry < ApplicationRecord
 
   # Searches based on supplied fields and values.
   # Optionally takes a name to save this search as a saved search.
-  # @param [ActionController::Parameters] params supplied fields and values for search.
+  # @param [ActionController::Parameters, Hash, NilClass] params supplied fields and values for search.
   # @param [String] search_name name to save this search as a saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]

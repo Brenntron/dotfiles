@@ -42,8 +42,10 @@ gem 'her', '1.0.3'
 gem 'curb', '0.9.8' #Libcurl bindings for Ruby
 gem 'net-ssh', '5.0.2'
 gem 'peake-bridge-client', '0.1.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
+# gem 'peake-bridge-client', '0.1.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
 gem 'stomp', '1.4.6'
-gem 'aws-sdk', '2.11.170'
+#gem 'aws-sdk', '2.11.170'
+gem 'aws-sdk', '3.1.0'
 gem 'nokogiri' ,'1.10.4'
 gem 'grpc', '1.38.0'
 gem 'grpc-tools', '1.38.0'
@@ -103,7 +105,7 @@ gem 'inline_svg', '1.3.1'
 
 gem 'rubyXL', '3.3.30'
 
-gem 'public_suffix', '~> 3.0'
+gem 'public_suffix', '4.0.7'
 gem 'addressable', '~> 2.7.0'
 
 gem 'dotiw'
@@ -111,6 +113,7 @@ gem 'dotiw'
 gem 'elasticsearch'
 gem 'hashie'
 
+gem 'mail'
 group :production, :staging do
   gem 'elastic-apm', '~> 3.15', '>= 3.15.1'
 end
@@ -147,4 +150,3 @@ end
 gem 'httparty', '~> 0.15.3'
 gem 'turbolinks', '5.2.0'
 gem "sprockets", '~> 3.7.1'
-
