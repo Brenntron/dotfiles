@@ -553,6 +553,8 @@ module API
 
               raw_records = raw_records.sort_by {|history| DateTime.parse(history.time)}.reverse
 
+              base_score = Sbrs::Base.combo_call_sds_v3(url_from_prefix, [])["wbrs"]["score"] rescue "no data or error"
+
               response[:data] << {:is_important => ComplaintEntry.self_importance(params[:domain]),
                                   :category => nil,
                                   :url => params[:domain],
@@ -561,6 +563,7 @@ module API
                                   :path => nil,
                                   :action => nil,
                                   :confidence => nil,
+                                  :score => base_score,
                                   :time_of_action => nil,
                                   :description => "baseline domain",
                                   :user => nil,
@@ -579,6 +582,8 @@ module API
                   entry_id = complaint_entry.id
                 end
 
+                record_score = Sbrs::Base.combo_call_sds_v3(url_from_prefix, [])["wbrs"]["score"] rescue "no data or error"
+
                 data_point[:is_important] = ComplaintEntry.self_importance(url_from_prefix)
                 data_point[:category] = record.category.descr
                 data_point[:url] = url_from_prefix
@@ -587,6 +592,7 @@ module API
                 data_point[:path] = prefix.path
                 data_point[:action] = record.action
                 data_point[:confidence] = record.confidence
+                data_point[:score] = record_score
                 data_point[:time_of_action] = record.time
                 data_point[:description] = record.description
                 data_point[:user] = record.user
