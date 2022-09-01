@@ -306,6 +306,38 @@ class Hurl
     system "ssh #{@args.host}.vrt.sourcefire.com '#{disgorge_cmd}'"
   end
 
+  def peake_bridge_client(output_tar_path)
+    # force pull the peakebridge submodule repo
+    system "git submodule add --force https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client vendor/gems/peake-bridge-client"
+
+    # append peakebridge gemfiles
+    # uncompress tar.gz, add file, recompress
+    puts "untar #{output_tar_path} -C ../releases/"
+    system "tar -xf #{output_tar_path} -C ../releases/"
+    start_dir = __dir__
+
+    Dir.chdir('../releases')
+    dirs = Dir.glob('*').select {|f| File.directory? f}
+
+    puts "found #{dirs[0]}"
+
+    peake_bridge_gem = "#{start_dir}/../vendor/gems/peake-bridge-client/peake-bridge-client-0.1.0.0.gem"
+    peake_bridge_gemspec = "#{start_dir}/../vendor/gems/peake-bridge-client/peake-bridge-client.gemspec"
+
+    destination = "../releases/#{dirs[0]}/vendor/gems/peake-bridge-client/"
+
+    puts "copying #{peake_bridge_gem}"
+    FileUtils.cp(peake_bridge_gem, destination)
+    puts "copying #{peake_bridge_gemspec}"
+    FileUtils.cp(peake_bridge_gemspec, destination)
+    system "rm #{output_tar_path}"
+
+    puts "tar -czf #{output_tar_path} #{dirs[0]}"
+    system "tar -czf #{output_tar_path} #{dirs[0]}"
+    system "rm -rf #{dirs[0]}"
+
+  end
+
   def run
     if args.rebuild?
       output_tar_path = rebuild(args)
@@ -318,6 +350,8 @@ class Hurl
         # system "curl -Lku #{@args.user}:#{@args.git_auth_token}  https://gitlab.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
         puts "curl --header 'PRIVATE-TOKEN:#{@args.git_auth_token}' 'https://gitlab.vrt.sourcefire.com/api/v4/projects/talosweb%2F#{args.project}/repository/archive.tar.gz?sha=#{args.base_dir}' > #{output_tar_path}"
         system "curl --header 'PRIVATE-TOKEN:#{@args.git_auth_token}' 'https://gitlab.vrt.sourcefire.com/api/v4/projects/talosweb%2F#{args.project}/repository/archive.tar.gz?sha=#{args.base_dir}' > #{output_tar_path}"
+
+        peake_bridge_client(output_tar_path)
       end
     end
 
