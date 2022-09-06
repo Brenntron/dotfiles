@@ -443,6 +443,22 @@ module API
 
             end
 
+            params do
+              requires :domain, type: String
+            end
+
+            get 'domain_info' do
+              score = nil
+              category = "no category found"
+
+              score = Sbrs::Base.combo_call_sds_v3(params[:domain], [])["wbrs"]["score"]
+              category = ComplaintEntry.get_category_data(params[:domain])
+              
+              {:data => {:score => score, :category => category}}.to_json
+
+
+            end
+
           end
         end
       end
