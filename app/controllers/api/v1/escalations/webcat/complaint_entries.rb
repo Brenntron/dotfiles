@@ -580,6 +580,7 @@ module API
 
                 if complaint_entry.present?
                   entry_id = complaint_entry.id
+                  complaint_id = complaint_entry.complaint_id
                 end
 
                 record_score = Sbrs::Base.combo_call_sds_v3(url_from_prefix, [])["wbrs"]["score"] rescue "no data or error"
@@ -597,6 +598,7 @@ module API
                 data_point[:description] = record.description
                 data_point[:user] = record.user
                 data_point[:entry_id] = entry_id
+                data_point[:complaint_id] = complaint_id
 
                 response[:data] << data_point
               end

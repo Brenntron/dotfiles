@@ -3,8 +3,8 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 25 25" style="enable-background:new 0 0 25 25;" xml:space="preserve">
 <style type="text/css">
-	.icon-x-red{fill:#D83F0F;}
+	.icon-x-red{color:#D83F0F;fill:#D83F0F;}
 </style>
-<path id="Path_14" class="st0" d="M16.1,10.4l-1.5-1.5L12.5,11l-2.1-2.1l-1.5,1.5l2.1,2.1l-2.1,2.1l1.5,1.5l2.1-2.1l2.1,2.1l1.5-1.5
+<path id="Path_14" class="icon-x-red" d="M16.1,10.4l-1.5-1.5L12.5,11l-2.1-2.1l-1.5,1.5l2.1,2.1l-2.1,2.1l1.5,1.5l2.1-2.1l2.1,2.1l1.5-1.5
 	L14,12.5L16.1,10.4z"/>
 </svg>

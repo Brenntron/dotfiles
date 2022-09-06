@@ -5682,14 +5682,9 @@ input.table-entry-input:focus {
 .webcat-research-toolbar {
   color: $type-darkest;
   height: 32px;
-  margin: 0 0 20px;
-  margin-top: 50px;
+  margin: 30px 0 20px;
   position: unset;
   width: fit-content;
-
-  div {
-    border: none;
-  }
 
   .loader-gears {
     display: none;
@@ -5840,14 +5835,38 @@ input.table-entry-input:focus {
 }
 
 .domain-table-wrapper {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding-left: 3px;
   width: auto;
 
-  .domain-table-listing, .domain-table-current-category, .domain-table-reputation {
-    vertical-align: top;
+  .loader-gears {
+    display: none;
+    margin: 0 0 0 10px;
+    width: 30px;
   }
 
-  .domain-table-listing {
-    display: inline-block;
+  .domain-table-listing, .domain-table-current-category, .domain-table-reputation {
+    display: flex;
+    flex-direction: column;
+    min-width: 100px;
+
+    label {
+      margin-bottom: 5px;
+      position: initial;
+    }
+
+    .domain-data {
+      position: relative;
+      top: 3px;
+    }
+
+    .domain-table-listing-content, .domain-table-current-category-content, .domain-table-reputation-content {
+      display: flex;
+      flex-direction: row;
+    }
   }
 
   .domain-name {
@@ -5858,7 +5877,6 @@ input.table-entry-input:focus {
   .result-total {
     float: right;
     margin-left: 10px;
-    margin-top: 5px;
   }
 
   .webcat-research-svg {
@@ -5875,7 +5893,6 @@ input.table-entry-input:focus {
 
     th {
       font-weight: 400;
-      text-transform: none;
     }
   }
 
@@ -5891,6 +5908,14 @@ input.table-entry-input:focus {
 
 .webcat-research-wrapper {
   width: auto;
+
+  #domain-table-loading-gears {
+    display: none;
+  }
+}
+
+.domain-history-action {
+  text-transform: capitalize;
 }
 
 #disputes-research-table label, #edit-ticket-status-dropdown label {
@@ -11897,18 +11922,6 @@ input[type="radio"].resolution_radio_button {
   #research-tab-toolbar .toolbar-button-text, .webcat-research-toolbar .toolbar-button-text {
     display: none;
     margin-left: 8px;
-  }
-}
-
-#domainHistoryTableBody {
-  th {
-    font-weight: normal;
-    padding: 5px 8px;
-    text-transform: capitalize;
-  }
-
-  .domain-history-url {
-    text-transform: none;
   }
 }
 
