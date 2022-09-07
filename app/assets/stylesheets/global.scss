@@ -5680,11 +5680,7 @@ input.table-entry-input:focus {
 }
 
 .webcat-research-toolbar {
-  color: $type-darkest;
-  height: 32px;
-  margin: 30px 0 20px;
-  position: unset;
-  width: fit-content;
+  margin: 40px 0 10px;
 
   .loader-gears {
     display: none;
@@ -5838,9 +5834,10 @@ input.table-entry-input:focus {
   align-items: flex-start;
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  gap: 30px;
   padding-left: 3px;
   width: auto;
+  margin: 60px 0 20px 0;
 
   .loader-gears {
     display: none;
@@ -5883,9 +5880,9 @@ input.table-entry-input:focus {
     display: none;
     float: left;
     height: auto;
-    margin-right: 5px;
-    margin-top: -5px;
-    width: 20px;
+    margin-right: 3px;
+    margin-top: 0;
+    width: 18px;
   }
 
   thead {
@@ -6275,7 +6272,7 @@ h5.entry-details-table-header {
   margin-top: 0;
 }
 @media (min-width: 1100px) {
-  #research-tab-toolbar .toolbar-button-text, .webcat-research-toolbar .toolbar-button-text {
+  #research-tab-toolbar .toolbar-button-text {
     display: block;
     margin-left: 8px;
   }
@@ -10920,7 +10917,7 @@ button.secondary.view-report-external-button {
 
 // dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
 @media screen and (min-width: 1600px) {
-  #research-tab-toolbar .toolbar-button-label .toolbar-button-text, .webcat-research-toolbar .toolbar-button-label
+  #research-tab-toolbar .toolbar-button-label .toolbar-button-text, .toolbar-button-label
   .toolbar-button-text {
     padding-top: 1px;
   }
@@ -11841,7 +11838,7 @@ input[type="radio"].resolution_radio_button {
 }
 @media (min-width: 1700px) {
 
-  #webrep-index-toolbar, .webcat-research-toolbar {
+  #webrep-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
       padding-left: 13px;
@@ -11906,7 +11903,7 @@ input[type="radio"].resolution_radio_button {
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
 @media screen and (max-width: 1600px) and (min-width: 1401px) {
-  #research-tab-toolbar, .webcat-research-toolbar {
+  #research-tab-toolbar {
     .toolbar-button {
       background-position: 6px 6px;
       padding-left: 9px;
@@ -11919,7 +11916,7 @@ input[type="radio"].resolution_radio_button {
 }
 // fix the collapse breakpoint
 @media screen and (max-width: 1400px) {
-  #research-tab-toolbar .toolbar-button-text, .webcat-research-toolbar .toolbar-button-text {
+  #research-tab-toolbar .toolbar-button-text, .toolbar-button-text {
     display: none;
     margin-left: 8px;
   }
