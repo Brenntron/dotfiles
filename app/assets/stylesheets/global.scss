@@ -5918,6 +5918,12 @@ input.table-entry-input:focus {
   text-transform: capitalize;
 }
 
+.domain-history-table {
+  .domain-history-link {
+    text-decoration: underline;
+  }
+}
+
 #disputes-research-table label, #edit-ticket-status-dropdown label {
   font-weight: 700;
   text-transform: uppercase;
