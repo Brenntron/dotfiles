@@ -531,7 +531,7 @@ module API
                 response.to_json
               end
             end
-
+            
             desc 'Get XBRS data on complaint url'
             params do
               requires :url, type: String
