@@ -14,7 +14,7 @@ $ ->
 
         $('.domain-table-current-category .loader-gears').hide()
 
-        if data.category.category_names.length > 0
+        if data.category.category_names
           $('.domain-table-current-category-content').append("<p class='domain-data'>#{data.category.category_names.toString()}</p>")
           $('#categoryCheck').show()
         else
@@ -55,7 +55,7 @@ $ ->
         $('#domain-table-loading-gears').hide()
 
         for entry, index in data
-          table_row = "<tr><td><input type='checkbox' name='#{entry.url}' class='categorize-url-button'</input>" + (if entry.entry_id then "<td><a href='/escalations/webcat/complaints/#{entry.complaint_id}' target='_blank'>#{entry.entry_id}</a></td>" else "<td></td>") + "<td>#{entry.category || ''}</td>" + (if entry.score >= 0 then "<td href='#{entry.url}' target='_blank'>#{entry.url}</td>" else "<td>#{entry.url}</td>") + "<td>#{entry.time_of_action || ''}</td><td class='domain-history-action'>#{entry.action || ''}</td><td>#{entry.confidence || ''}</td><td>#{entry.description}</td><td>#{entry.user || ''}</td></tr>"
+          table_row = "<tr><td><input type='checkbox' name='#{entry.url}' class='categorize-url-button'</input>" + (if entry.entry_id then "<td><a href='/escalations/webcat/complaints/#{entry.complaint_id}' target='_blank'>#{entry.entry_id}</a></td>" else "<td></td>") + "<td>#{entry.category || ''}</td>" + (if entry.score >= 0 then "<td><a href='https://#{entry.url}' target='_blank' class='domain-history-link'>#{entry.url}</a></td>" else "<td>#{entry.url}</td>") + "<td>#{entry.time_of_action || ''}</td><td class='domain-history-action'>#{entry.action || ''}</td><td>#{entry.confidence || ''}</td><td>#{entry.description}</td><td>#{entry.user || ''}</td></tr>"
           $('#domainHistoryTableBody').append(table_row)
       error: (errorResponse) ->
         std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
