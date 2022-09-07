@@ -8,14 +8,13 @@
       %label.toolbar-section-label
         Current Category
       .domain-table-current-category-content
+        .webcat-research-svg
+          =inline_svg 'icon_check_grey'
     .domain-table-reputation
       %label.toolbar-section-label
         Reputation
       .domain-table-reputation-content
-        #redX.webcat-research-svg
-          =inline_svg 'icon_x_red.svg', class: 'icon-x-red'
-        #greenCheck.webcat-research-svg
-          =inline_svg 'icon_check_green.svg', class: 'icon-check-green'
+        %span.webcat-research-svg
 
   .toolbar.webcat-research-toolbar
     %div

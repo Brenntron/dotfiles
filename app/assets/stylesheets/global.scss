@@ -5881,12 +5881,13 @@ input.table-entry-input:focus {
   }
 
   .webcat-research-svg {
+    background-repeat: no-repeat;
     display: none;
     float: left;
-    height: auto;
+    height: 20px;
     margin-right: 3px;
     margin-top: 0;
-    width: 18px;
+    width: 20px;
   }
 
   thead {
@@ -5913,7 +5914,7 @@ input.table-entry-input:focus {
   .ajax-message-div {
     display: flex;
     flex-direction: row;
-    position: initial;
+    top: 245px;
   }
 }
 

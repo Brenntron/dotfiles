@@ -14,25 +14,20 @@ $ ->
 
         if data.category.category_names
           $('.domain-table-current-category-content').append("<p class='domain-data'>#{data.category.category_names.toString()}</p>")
-          $('#categoryCheck').show()
+          $('.domain-table-current-category-content .webcat-research-svg').show()
         else
           $('.domain-table-current-category-content').append("<p class='domain-data missing-data'>#{'NA'}</p>")
-          $('#categoryCheck').hide()
 
-        domain_reputation_class = 'domain-data'
+        rep = wbrs_display(data.score)
 
-        if !data.score || (data.score == 'no score')
-          domain_reputation_class = 'domain-data missing-data'
-        else if data.score > 0
-          $('#redX').hide()
-          $('#greenCheck').show()
+        $('.domain-table-reputation-content span.webcat-research-svg').addClass("icon-#{rep}")
+        $('.domain-table-reputation-content span.webcat-research-svg').show()
+
+        if data.score > 0
           $('.domain-name').remove()
           $('.domain-table-listing-content').append("<a class='domain-name' href='https://#{domain}' target='_blank'>#{domain}</a>")
-        else if data.score < 0
-          $('#redX').show()
-          $('#greenCheck').hide()
 
-        $('.domain-table-reputation-content').append("<p class='#{domain_reputation_class}'>#{data.score}</p>")
+        $('.domain-table-reputation-content').append("<p class='domain-data'>#{data.score}</p>")
       error: (response) ->
         std_api_error(errorResponse, "Domain info could not be retrieved.", reload: false)
     )
