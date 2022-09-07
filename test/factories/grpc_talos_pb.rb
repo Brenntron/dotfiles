@@ -38,4 +38,38 @@ FactoryBot.define do
       Google::Protobuf::RepeatedField.new(:message, Talos::IPD::IPResult, reputation_local)
     end
   end
+
+  factory :context_tag, class: Talos::ContextTag do
+    tag_type_id {1}
+    taxonomy_id {1}
+    taxonomy_entry_id {1}
+  end
+
+  factory :query_reply, class: Talos::ENRICH::QueryReply do
+    taxonomy_map_version {1}
+    context_tags {Google::Protobuf::RepeatedField.new(:message, Talos::ContextTag, [build(:context_tag)])}
+  end
+
+  factory :taxonomy_entry, class: Talos::TaxonomyEntry do
+    entry_id {1}
+    name {Google::Protobuf::RepeatedField.new(:message, Talos::LocalizedString, [build(:localized_string, {text: "entry"})])}
+    description {Google::Protobuf::RepeatedField.new(:message, Talos::LocalizedString, [build(:localized_string, {text: "this is a fake entry"})])}
+  end
+
+  factory :taxonomy, class: Talos::Taxonomy do
+    taxonomy_id {1}
+    name {"test taxonomy"}
+    description {"this is a fake taxonomy"}
+    entries {Google::Protobuf::RepeatedField.new(:message, Talos::TaxonomyEntry, [build(:taxonomy_entry)])}
+  end
+
+  factory :taxonomy_map, class: Talos::TaxonomyMap do
+    taxonomies {Google::Protobuf::RepeatedField.new(:message, Talos::Taxonomy, [build(:taxonomy)])}
+    version {1}
+  end
+
+  factory :localized_string, class: Talos::LocalizedString do
+    language {"en-us"}
+    text {"text"}
+  end
 end
