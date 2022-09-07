@@ -7,8 +7,6 @@
     .domain-table-current-category
       %label.toolbar-section-label
         Current Category
-      .loader-gears
-        =inline_svg 'icon_gears_loader.svg'
       .domain-table-current-category-content
     .domain-table-reputation
       %label.toolbar-section-label
@@ -18,8 +16,6 @@
           =inline_svg 'icon_x_red.svg', class: 'icon-x-red'
         #greenCheck.webcat-research-svg
           =inline_svg 'icon_check_green.svg', class: 'icon-check-green'
-      .loader-gears
-        =inline_svg 'icon_gears_loader.svg'
 
   .toolbar.webcat-research-toolbar
     %div
@@ -43,6 +39,11 @@
               %span#categorize-research-submit.toolbar-button-text
                 Submit
 
+  .ajax-message-div#domainHistoryLoader
+    .loader-gears
+      =inline_svg 'icon_gears_loader.svg'
+    %span.loader-msg Domain search processing, please wait...
+
   %table.domain-history-table
     %thead
       %tr
@@ -65,5 +66,3 @@
         %th
           User
     %tbody#domainHistoryTableBody
-  #domain-table-loading-gears.loader-gears
-    =inline_svg 'icon_gears_loader.svg'

@@ -12,8 +12,6 @@ $ ->
         parsedResponse = JSON.parse response
         data = parsedResponse.data
 
-        $('.domain-table-current-category .loader-gears').hide()
-
         if data.category.category_names
           $('.domain-table-current-category-content').append("<p class='domain-data'>#{data.category.category_names.toString()}</p>")
           $('#categoryCheck').show()
@@ -23,13 +21,13 @@ $ ->
 
         domain_reputation_class = 'domain-data'
 
-        $('.domain-table-reputation .loader-gears').hide()
-
         if !data.score || (data.score == 'no score')
           domain_reputation_class = 'domain-data missing-data'
         else if data.score > 0
           $('#redX').hide()
           $('#greenCheck').show()
+          $('.domain-name').remove()
+          $('.domain-table-listing-content').append("<a class='domain-name' href='https://#{domain}' target='_blank'>#{domain}</a>")
         else if data.score < 0
           $('#redX').show()
           $('#greenCheck').hide()
@@ -57,7 +55,12 @@ $ ->
         for entry, index in data
           table_row = "<tr><td><input type='checkbox' name='#{entry.url}' class='categorize-url-button'</input>" + (if entry.entry_id then "<td><a href='/escalations/webcat/complaints/#{entry.complaint_id}' target='_blank'>#{entry.entry_id}</a></td>" else "<td></td>") + "<td>#{entry.category || ''}</td>" + (if entry.score >= 0 then "<td><a href='https://#{entry.url}' target='_blank' class='domain-history-link'>#{entry.url}</a></td>" else "<td>#{entry.url}</td>") + "<td>#{entry.time_of_action || ''}</td><td class='domain-history-action'>#{entry.action || ''}</td><td>#{entry.confidence || ''}</td><td>#{entry.description}</td><td>#{entry.user || ''}</td></tr>"
           $('#domainHistoryTableBody').append(table_row)
+
+        $('.ajax-message-div').hide()
+        $('.domain-history-table').show()
       error: (errorResponse) ->
+        $('.ajax-message-div').hide()
+        $('.domain-history-table').show()
         std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
     )
 
@@ -68,9 +71,7 @@ $ ->
     if domain
       $('#webcat_research_search').val(domain)
       $('.domain-table-listing-content').append("<p class='domain-name'>#{domain}</p>")
-      $('#domain-table-loading-gears').show()
-      $('.domain-table-reputation .loader-gears').show()
-      $('.domain-table-current-category .loader-gears').show()
+      $('.ajax-message-div').show()
 
       getDomainInfo(domain)
       getDomainHistory(domain)
@@ -79,6 +80,7 @@ $ ->
   $('#webcat_research_search').on('keyup', (e) ->
     if e.key == 'Enter' || e.keyCode == 13
       domain = $(this).val()
+      domain = domain.replace(/https\:\/\//, '')
 
       if domain
         url = window.location.origin + window.location.pathname + "?domain=#{domain}"
@@ -136,7 +138,7 @@ $ ->
           std_msg_success('Categories were not created', [], reload: false)
       error: (response) ->
         $('#webcat-research-categorize-url').dropdown('toggle')
-        $('.loader-gears').toggle()
+        $('#webcat-research-categorize-urls .loader-gears').toggle()
         std_api_error(response, "Categories were not created.", reload: false)
     , this)
 

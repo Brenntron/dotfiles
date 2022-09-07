@@ -5906,8 +5906,10 @@ input.table-entry-input:focus {
 .webcat-research-wrapper {
   width: auto;
 
-  #domain-table-loading-gears {
-    display: none;
+  .ajax-message-div {
+    display: flex;
+    flex-direction: row;
+    position: initial;
   }
 }
 
@@ -5916,6 +5918,8 @@ input.table-entry-input:focus {
 }
 
 .domain-history-table {
+  display: none;
+
   .domain-history-link {
     text-decoration: underline;
   }
