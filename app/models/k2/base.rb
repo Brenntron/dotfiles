@@ -1,5 +1,6 @@
 class K2::Base
   include ApiRequester::ApiRequester
+  DEFAULT_ERROR_MESSAGE = 'Coud not fetch data from K2 API'
 
   Response = Struct.new(:body, :error, :code)
 
@@ -31,7 +32,7 @@ class K2::Base
 
   def self.handle_error_response(response = nil)
     return_response = Response.new
-    error_message = 'Coud not fetch data from K2 API'
+    error_message = DEFAULT_ERROR_MESSAGE
     return_response.code = response&.code
     error_message = response ? "HTTP response #{response&.code}. #{error_message}" : error_message
     Rails.logger.error(error_message)
