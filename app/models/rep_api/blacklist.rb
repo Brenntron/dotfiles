@@ -176,9 +176,13 @@ class RepApi::Blacklist < RepApi::Base
     raise "Missing parameter: author" unless input.has_key?('author')
     raise "Missing parameter: comment" unless input.has_key?('comment')
 
+    comment = input['comment'].blank? ? "" : input['comment']
+    comment += " | AUTHOR: #{input['author']}"
+
     conditions = {}
-    conditions[:source] = input['author'] rescue nil
-    conditions[:comment] = input['comment'] rescue nil
+    #leavin this out for the time being
+    #conditions[:source] = "VRT" #input['author'] rescue nil
+    conditions[:comment] = comment rescue nil
     conditions[:classification] = self.classifications rescue nil
     conditions[:entry] = self.entry rescue nil
 
