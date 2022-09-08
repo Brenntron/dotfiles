@@ -8,8 +8,6 @@
       %label.toolbar-section-label
         Current Category
       .domain-table-current-category-content
-        .webcat-research-svg
-          =inline_svg 'icon_check_grey'
     .domain-table-reputation
       %label.toolbar-section-label
         Reputation
@@ -43,7 +41,7 @@
       =inline_svg 'icon_gears_loader.svg'
     %span.loader-msg Domain search processing, please wait...
 
-  %table.domain-history-table
+  %table.domain-history-table.table#domain-history-table
     %thead
       %tr
         %th

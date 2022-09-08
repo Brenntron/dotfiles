@@ -10,25 +10,28 @@ $ ->
         domain: domain
       success: (response) ->
         parsedResponse = JSON.parse response
-        data = parsedResponse.data
+        { score, category } = parsedResponse.data
 
-        if data.category.category_names
-          $('.domain-table-current-category-content').append("<p class='domain-data'>#{data.category.category_names.toString()}</p>")
+        if category.category_names
+          $('.domain-table-current-category-content').append("<p class='domain-data'>#{category.category_names.toString()}</p>")
           $('.domain-table-current-category-content .webcat-research-svg').show()
         else
           $('.domain-table-current-category-content').append("<p class='domain-data missing-data'>#{'NA'}</p>")
 
-        rep = wbrs_display(data.score)
+        rep = wbrs_display(score)
 
         $('.domain-table-reputation-content span.webcat-research-svg').addClass("icon-#{rep}")
         $('.domain-table-reputation-content span.webcat-research-svg').show()
 
-        if data.score > 0
+        if score > 0
           $('.domain-name').remove()
           $('.domain-table-listing-content').append("<a class='domain-name' href='https://#{domain}' target='_blank'>#{domain}</a>")
 
-        $('.domain-table-reputation-content').append("<p class='domain-data'>#{data.score}</p>")
-      error: (response) ->
+        if score % 1 == 0
+          score = parseFloat(score).toFixed(1)
+
+        $('.domain-table-reputation-content').append("<p class='domain-data'>#{score}</p>")
+      error: (errorResponse) ->
         std_api_error(errorResponse, "Domain info could not be retrieved.", reload: false)
     )
 
@@ -47,16 +50,12 @@ $ ->
 
         $('.ajax-message-div').hide()
 
-       #for entry, index in data
-       #  table_row = "<tr><td><input type='checkbox' name='#{entry.url}' class='categorize-url-button'</input>" + (if entry.entry_id then "<td><a href='/escalations/webcat/complaints/#{entry.complaint_id}' target='_blank'>#{entry.entry_id}</a></td>" else "<td></td>") + "<td>#{entry.category || ''}</td>" + (if entry.score >= 0 then "<td><a href='https://#{entry.url}' target='_blank' class='domain-history-link'>#{entry.url}</a></td>" else "<td>#{entry.url}</td>") + "<td>#{entry.time_of_action || ''}</td><td class='domain-history-action'>#{entry.action || ''}</td><td>#{entry.confidence || ''}</td><td>#{entry.description}</td><td>#{entry.user || ''}</td></tr>"
-       #  $('#domainHistoryTableBody').append(table_row)
         $('.domain-history-table').DataTable({
           data: data
           dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
           columns: [
             {
               data: null
-              className: 'webcat-research-checkbox'
               render: (data, type, full) ->
                 { url } = data
                 "<input type='checkbox' name='#{url}' class='categorize-url-button'</input>"
@@ -112,13 +111,12 @@ $ ->
           pagingType: 'full_numbers'
         })
 
-        $('#complaints-index_filter input').addClass('restricted-table-search-input');
-        $('#DataTables_Table_0_filter').addClass('domain-table-search-label')
+        $('#domain-history-table_filter input').addClass('table-search-input domain-table-search-label')
 
-        $('.ajax-message-div').hide()
+        $('#domainHistoryLoader').hide()
         $('.domain-history-table').show()
       error: (errorResponse) ->
-        $('.ajax-message-div').hide()
+        $('#domainHistoryLoader').hide()
         $('.domain-history-table').show()
         std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
     )
@@ -130,7 +128,7 @@ $ ->
     if domain
       $('#webcat_research_search').val(domain)
       $('.domain-table-listing-content').append("<p class='domain-name'>#{domain}</p>")
-      $('.ajax-message-div').show()
+      $('#domainHistoryLoader').css('display', 'flex')
 
       getDomainInfo(domain)
       getDomainHistory(domain)
