@@ -26,8 +26,9 @@ $ ->
         $('.domain-table-reputation-content span.webcat-research-svg').show()
 
         if score > 0
-          $('.domain-name').remove()
-          $('.domain-table-listing-content').append("<a class='domain-name' href='https://#{domain}' target='_blank'>#{domain}</a>")
+          $('.domain-name').attr("href", "https://#{domain}")
+          $('.domain-name').attr('target', '_blank')
+          $('.domain-name').removeClass('domain-name-normal')
 
         if score % 1 == 0
           score = parseFloat(score).toFixed(1)
@@ -129,7 +130,7 @@ $ ->
 
     if domain
       $('#webcat_research_search').val(domain)
-      $('.domain-table-listing-content').append("<p class='domain-name'>#{domain}</p>")
+      $('.domain-table-listing-content').append("<a class='domain-name domain-name-normal'>#{domain}</a>")
       $('#domainHistoryLoader').css('display', 'flex')
 
       getDomainInfo(domain)
