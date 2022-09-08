@@ -5683,6 +5683,8 @@ input.table-entry-input:focus {
   margin: 0;
   position: absolute;
   top: 250px;
+  width: initial;
+  z-index: 1;
 
   .loader-gears {
     display: none;

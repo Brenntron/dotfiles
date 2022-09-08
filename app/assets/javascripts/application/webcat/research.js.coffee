@@ -13,7 +13,9 @@ $ ->
         { score, category } = parsedResponse.data
 
         if category.category_names
-          $('.domain-table-current-category-content').append("<p class='domain-data'>#{category.category_names.toString()}</p>")
+          spacedCategoryNames = category.category_names.toString().split(',').join(', ')
+
+          $('.domain-table-current-category-content').append("<p class='domain-data'>#{spacedCategoryNames}</p>")
           $('.domain-table-current-category-content .webcat-research-svg').show()
         else
           $('.domain-table-current-category-content').append("<p class='domain-data missing-data'>#{'NA'}</p>")
