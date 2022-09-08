@@ -45,11 +45,75 @@ $ ->
         #the first entry is the domain itself so that should not count in the result total
         $('.domain-table-listing-content').append("<p class='domain-data result-total'>(#{data.length - 1} found)</p>")
 
-        $('#domain-table-loading-gears').hide()
+        $('.ajax-message-div').hide()
 
-        for entry, index in data
-          table_row = "<tr><td><input type='checkbox' name='#{entry.url}' class='categorize-url-button'</input>" + (if entry.entry_id then "<td><a href='/escalations/webcat/complaints/#{entry.complaint_id}' target='_blank'>#{entry.entry_id}</a></td>" else "<td></td>") + "<td>#{entry.category || ''}</td>" + (if entry.score >= 0 then "<td><a href='https://#{entry.url}' target='_blank' class='domain-history-link'>#{entry.url}</a></td>" else "<td>#{entry.url}</td>") + "<td>#{entry.time_of_action || ''}</td><td class='domain-history-action'>#{entry.action || ''}</td><td>#{entry.confidence || ''}</td><td>#{entry.description}</td><td>#{entry.user || ''}</td></tr>"
-          $('#domainHistoryTableBody').append(table_row)
+       #for entry, index in data
+       #  table_row = "<tr><td><input type='checkbox' name='#{entry.url}' class='categorize-url-button'</input>" + (if entry.entry_id then "<td><a href='/escalations/webcat/complaints/#{entry.complaint_id}' target='_blank'>#{entry.entry_id}</a></td>" else "<td></td>") + "<td>#{entry.category || ''}</td>" + (if entry.score >= 0 then "<td><a href='https://#{entry.url}' target='_blank' class='domain-history-link'>#{entry.url}</a></td>" else "<td>#{entry.url}</td>") + "<td>#{entry.time_of_action || ''}</td><td class='domain-history-action'>#{entry.action || ''}</td><td>#{entry.confidence || ''}</td><td>#{entry.description}</td><td>#{entry.user || ''}</td></tr>"
+       #  $('#domainHistoryTableBody').append(table_row)
+        $('.domain-history-table').DataTable({
+          data: data
+          dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+          columns: [
+            {
+              data: null
+              className: 'webcat-research-checkbox'
+              render: (data, type, full) ->
+                { url } = data
+                "<input type='checkbox' name='#{url}' class='categorize-url-button'</input>"
+            }
+            {
+              data: null
+              render: (data, type, full) ->
+                { entry_id, complaint_id } = data
+                if entry_id
+                  "<a href='/escalations/webcat/complaints/#{complaint_id}' target='_blank'>#{entry_id}</a>"
+                else
+                  entry_id
+
+            }
+            {
+              data: 'category'
+            }
+            {
+              data: null
+              render: (data, type, full) ->
+                { url, score } = data
+
+                if score >= 0
+                  "<a href='https://#{url}' target='_blank' class='domain-history-link'>#{url}</a>"
+                else
+                  url
+            }
+            {
+              data: 'time_of_action'
+            }
+            {
+              data: 'action'
+            }
+            {
+              data: 'confidence'
+            }
+            {
+              data: 'description'
+            }
+            {
+              data: 'user'
+            }
+          ]
+          language: {
+            search: "_INPUT_"
+            searchPlaceholder: "Search within table"
+          }
+          lengthMenu: [50, 100, 200]
+          order: [ [
+            3
+            'desc'
+          ] ]
+          pagingType: 'full_numbers'
+        })
+
+        $('#complaints-index_filter input').addClass('restricted-table-search-input');
+        $('#DataTables_Table_0_filter').addClass('domain-table-search-label')
 
         $('.ajax-message-div').hide()
         $('.domain-history-table').show()

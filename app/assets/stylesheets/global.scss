@@ -5916,6 +5916,10 @@ input.table-entry-input:focus {
     flex-direction: row;
     top: 245px;
   }
+
+  .domain-table-search-label {
+    height: 100%;
+  }
 }
 
 .domain-history-action {
@@ -5927,6 +5931,10 @@ input.table-entry-input:focus {
 
   .domain-history-link {
     text-decoration: underline;
+  }
+
+  .webcat-research-checkbox {
+    padding-left: 18px;
   }
 }
 

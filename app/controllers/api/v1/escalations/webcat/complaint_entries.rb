@@ -567,7 +567,8 @@ module API
                                   :time_of_action => nil,
                                   :description => "baseline domain",
                                   :user => nil,
-                                  :entry_id => nil}
+                                  :entry_id => nil,
+                                  :complaint_id => nil}
 
               raw_records.each do |record|
                 prefix = prefix_records.find {|prec| prec.prefix_id == record.prefix_id}
