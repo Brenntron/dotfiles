@@ -154,6 +154,8 @@ class SenderDomainReputationDispute < ApplicationRecord
         new_dispute.get_and_save_beaker_data
       end
 
+      assemble_initial_email(new_dispute, message_payload[:payload])
+
       if message_payload["attachments"].present?
         message_payload["attachments"].each do |dispute_attachment|
           SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, dispute_attachment, user, new_dispute)
@@ -244,7 +246,7 @@ class SenderDomainReputationDispute < ApplicationRecord
     validate_entry(sender_domain_entry)
 
     sender_domain_entry = Mail::Address.new(sender_domain_entry).domain
- 
+
     summary = "New Senders Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     # Does a description need to go in here and be in the form?
@@ -770,7 +772,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     workbook = RubyXL::Workbook.new
     worksheet = workbook[0]
- 
+
     EXPORT_FIELD_NAMES.values.each_with_index  do |field_name, col_index|
       worksheet.add_cell(0, col_index, field_name)
       worksheet.sheet_data[0][col_index].change_font_bold(true)
@@ -802,5 +804,33 @@ class SenderDomainReputationDispute < ApplicationRecord
       end
     end
     workbook
+  end
+
+  def self.assemble_initial_email(dispute, payload)
+    email_subject = "SDR Entry: #{payload[:sender_domain_entry]}"
+    email_body = assemble_email_body(dispute.created_at, payload)
+
+    new_email = DisputeEmail.new
+    new_email.body = email_body
+    new_email.from = payload[:customer_email]
+    new_email.sender_domain_reputation_dispute_id = dispute.id
+    new_email.status = 'unread'
+    new_email.to = "sdr_disputes_#{dispute.id}@dispute.talosintelligence.com"
+    new_email.subject = email_subject
+    new_email.save!
+  end
+
+  def self.assemble_email_body(dispute_created_at, payload)
+    contents = "____________________________________________________________" + "\n"
+    contents += "User-entered Information:" + "\n"
+    contents += "____________________________________________________________" + "\n"
+    contents += "Time: #{Time.now.to_formatted_s(:long)}" + "\n"
+    contents += "Name: #{payload[:customer_name]}" + "\n"
+    contents += "E-mail: #{payload[:customer_email]}" + "\n\n"
+    contents += "Sender Domain Entry: #{payload[:sender_domain_entry]}" + "\n"
+    contents += "Suggested Dispostion: #{payload[:suggested_disposition]}" + "\n"
+    contents += "Details:" + "\n"
+    contents += payload[:summary_description] || ''
+    contents
   end
 end
