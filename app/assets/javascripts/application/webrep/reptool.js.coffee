@@ -259,12 +259,20 @@ window.submit_individual_reptool = (button) ->
   if submission_action == "reptool-override"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
     success = 'The following RepTool classes have been are assigned to: ' + entry_content
+    #the old way
+    #data = {
+    #  'action': 'ACTIVE'
+    #  'entries': entry_content
+    #  'classifications': checked_classes.join(',')
+    #  'comment': comment
+    #  'force': force_commit
+    #}
+    #the new way
     data = {
       'action': 'ACTIVE'
       'entries': entry_content
-      'classifications': checked_classes.join(',')
+      'classifications': checked_classes
       'comment': comment
-      'force': force_commit
     }
   else if submission_action == "reptool-drop"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
@@ -304,13 +312,23 @@ window.submit_individual_reptool = (button) ->
         !checked_classes.includes(a)
       )
       success = 'The following RepTool classes have been removed from: ' + entry_content
+    #this is the old way
+    #data = {
+    #  'data': [{
+    #    'action': 'ACTIVE'
+    #    'entries': [entry_content]
+    #    'classifications': [fin_classes.join(',')]
+    #    'comment': comment
+    #    'force': force_commit
+    #  }]
+    #}
+    #this is the new way
     data = {
       'data': [{
         'action': 'ACTIVE'
         'entries': [entry_content]
-        'classifications': [fin_classes.join(',')]
+        'classifications': fin_classes
         'comment': comment
-        'force': force_commit
       }]
     }
   # Send to RepTool!
@@ -416,35 +434,34 @@ window.submit_bulk_reptool = () ->
           new_classifications = this.classifications
           new_classifications_array = new_classifications.split(',')
           reptool_classes_array = reptool_classes.split(',')
-
           filtered = reptool_classes_array.filter((x) ->
             new_classifications_array.indexOf(x) < 0
           )
 
-          reptool_classes = filtered.join()
+          #reptool_classes = filtered.join()
 
-          new_classifications = new_classifications + ',' + reptool_classes
+          #new_classifications = new_classifications + ',' + reptool_classes
 
+          new_classifications_array = new_classifications_array + reptool_classes_array
           temp_data = {
             'action': 'ACTIVE'
             'entries': [this.entry]
-            'classifications': [new_classifications]
+            'classifications': [new_classifications_array]
             'comment': comment
             'force': force_commit
           }
           array_of_datas.push(temp_data)
         else
-          new_classifications = reptool_classes
+          new_classifications = reptool_classes.split(',')
 
           temp_data = {
             'action': 'ACTIVE'
             'entries': [this.entry]
-            'classifications': [new_classifications]
+            'classifications': new_classifications
             'comment': comment
             'force': force_commit
           }
           array_of_datas.push(temp_data)
-
         data = array_of_datas
     else
       $(current_entries_and_classes).each ->
