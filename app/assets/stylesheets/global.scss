@@ -10431,6 +10431,11 @@ input.assignee.form-control{
   background-image: url(image_path('icon_reverse.svg'));
 }
 
+.enrich-filerep-header{
+  border-bottom-color: $second-section-color;
+  background-image: url(image_path('icon_cat.svg'));
+}
+
 .sample-present-true, .sample-present-false {
   width: 30px;
   height: 40px;
@@ -11035,19 +11040,23 @@ div[aria-describedby='create-detection-dialog'] {
   display: none;
 }
 
+#enrich-file-rep {
+  margin-top: 16px;
+}
+
 .data-tts-filerep-name-label {
   float: left;
   width: fit-content;
-  margin: 12px 12px 12px 0;
+  margin: 0 12px 12px 0;
 }
 
 .data-tts-filerep-name {
-  margin-top: 12px;
+  margin-top: 0;
   float: left;
 }
 
 .data-tts-filerep-description-label {
-  margin: 6px 0;
+  margin: 4px 0;
 }
 
 #amp-naming-details-table {
