@@ -1257,6 +1257,58 @@ $ ->
        std_msg_error('Error with AMP', ['There was an error retrieving the AMP history.'])
     )
 
+  window.get_enrichment_service = (sha256_hash) ->
+    std_msg_ajax(
+      method: 'GET'
+      data: {'query_item': sha256_hash, 'query_type':'sha'}
+      url: '/escalations/api/v1/escalations/cloud_intel/enrichment_service/query/'
+      success_reload: false
+      success: (response) ->
+
+        combined_tags = []
+
+        #look for data in context_tags, email_context_tags and web_context_tags
+
+        if response?.data?.context_tags.length > 0
+          context_tags = response?.data?.context_tags
+          combined_tags = combined_tags.concat(context_tags)
+
+        if response?.data?.email_context_tags.length > 0
+          email_context_tags = response?.data?.email_context_tags
+          combined_tags = combined_tags.concat(email_context_tags)
+
+        if response?.data?.web_context_tags.length > 0
+          web_context_tags = response?.data?.web_context_tags
+          combined_tags = combined_tags.concat(web_context_tags)
+
+        $(combined_tags).each (index, tag)->
+
+          if tag.mapped_taxonomy?.name[0].text?
+            name = tag.mapped_taxonomy.name[0].text
+          else name = ''
+
+          if tag.mapped_taxonomy?.description[0].text?
+            description = tag.mapped_taxonomy.description[0].text
+          else description = ''
+
+          wrapper = $("<div></div>")
+
+          name_wrapper = $("<div><label class='data-report-label data-tts-filerep-name-label'>TTS Name</label><p class='data-tts-filerep-name'></p></div>")
+          $(name_wrapper).find('.data-tts-filerep-name').text(name)
+
+          description_wrapper = $("<div><label class='data-report-label data-tts-filerep-description-label'>TTS Description</label><p class='data-tts-filerep-description'></p></div>")
+          $(description_wrapper).find('.data-tts-filerep-description').text(description)
+
+          $(wrapper).append name_wrapper
+          $(wrapper).append description_wrapper
+          $('#enrich-file-rep').append(wrapper)
+
+        if combined_tags.length == 0
+          $('#enrich-file-rep').append('No enrichment service data found.')
+
+      error: (response) ->
+        std_msg_error('Error with Enrichment Service', ['There was an error.'])
+    )
 
 
 # TODO: This stuff maybe should be moved into its own file later, but dropping here because convenient
@@ -1336,6 +1388,10 @@ $ ->
       # Retrieve current AMP info and history
       detection_now(curr_sha256_hash)
       get_amp_history(curr_sha256_hash)
+
+      #query enrichment service
+      get_enrichment_service(curr_sha256_hash)
+
 
     $('select[name="file-rep-datatable_length"]').on "change", ->
       data = {}

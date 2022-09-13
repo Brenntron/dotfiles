@@ -11035,6 +11035,21 @@ div[aria-describedby='create-detection-dialog'] {
   display: none;
 }
 
+.data-tts-filerep-name-label {
+  float: left;
+  width: fit-content;
+  margin: 12px 12px 12px 0;
+}
+
+.data-tts-filerep-name {
+  margin-top: 12px;
+  float: left;
+}
+
+.data-tts-filerep-description-label {
+  margin: 6px 0;
+}
+
 #amp-naming-details-table {
   thead > tr > th {
     border-bottom: none;
