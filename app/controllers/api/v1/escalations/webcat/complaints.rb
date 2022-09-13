@@ -306,7 +306,6 @@ module API
             end
            
             get 'get_xbrs_domain_history' do
-              byebug
               K2::History.parsed_data_for(params['domains']).to_json
             end 
 

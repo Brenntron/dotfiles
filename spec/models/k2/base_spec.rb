@@ -1,11 +1,8 @@
 describe K2::Base do
   describe '.request' do
     it 'sets right headers' do
-      expected_headers = {
-        "Authorization"=>"Bearer 1.0 redached",
-        "Content-type"=>"application/json"
-      }
-      expect(described_class.request.headers).to eq(expected_headers)
+      expect(described_class.request.headers['Authorization'].split(' ').last).to eq('redached')
+      expect(described_class.request.headers['Content-type']).to eq('application/json')
     end
 
     it 'skip verify SSL' do
