@@ -119,6 +119,7 @@ window.research_data = (sha256_hash) ->
   window.get_reversinglabs_data(sha256_hash)
   window.get_run_status(sha256_hash)
   window.get_zoo_status(sha256_hash)
+  window.get_enrichment_service(sha256_hash)
 
 
 ########### SAMPLE ZOO STATUS ############
@@ -531,6 +532,54 @@ get_run_status = window.get_run_status = (sha256_hash) ->
   )
 
 
+########### ENRICHMENT API REPORT ############
+window.get_enrichment_service = (sha256_hash) ->
+  std_msg_ajax(
+    method: 'GET'
+    data: {'query_item': sha256_hash, 'query_type':'sha'}
+    url: '/escalations/api/v1/escalations/cloud_intel/enrichment_service/query/'
+    success_reload: false
+    success: (response) ->
+      combined_tags = []
+
+      #look for data in context_tags, email_context_tags and web_context_tags
+      if response?.data?.context_tags.length > 0
+        combined_tags = combined_tags.concat(response.data.context_tags)
+
+      if response?.data?.email_context_tags.length > 0
+        combined_tags = combined_tags.concat(response.data.email_context_tags)
+
+      if response?.data?.web_context_tags.length > 0
+        combined_tags = combined_tags.concat(response.data.web_context_tags)
+
+      $(combined_tags).each (index, tag) ->
+
+        if tag.mapped_taxonomy?.name[0].text?
+          name = tag.mapped_taxonomy.name[0].text
+        else name = ''
+
+        if tag.mapped_taxonomy?.description[0].text?
+          description = tag.mapped_taxonomy.description[0].text
+        else description = ''
+
+        wrapper = $("<div></div>")
+
+        name_wrapper = $("<div><label class='data-report-label data-tts-filerep-name-label'>TTS Name</label><p class='data-tts-filerep-name'></p></div>")
+        $(name_wrapper).find('.data-tts-filerep-name').text(name)
+
+        description_wrapper = $("<div><label class='data-report-label data-tts-filerep-description-label'>TTS Description</label><p class='data-tts-filerep-description'></p></div>")
+        $(description_wrapper).find('.data-tts-filerep-description').text(description)
+
+        $(wrapper).append name_wrapper
+        $(wrapper).append description_wrapper
+        $('#enrich-file-rep').append(wrapper)
+
+      if combined_tags.length == 0
+        $('#enrich-file-rep').append("<div><div class='text-center missing-data'>No enrichment service data found.</div></div>")
+
+    error: (response) ->
+      std_msg_error('Error with Enrichment Service', ['There was an error.'])
+  )
 
 ##### UPDATE FILE REP DATA #####
 # Refresh items from the reports that we store in the db & save them
