@@ -540,6 +540,8 @@ window.get_enrichment_service = (sha256_hash) ->
     url: '/escalations/api/v1/escalations/cloud_intel/enrichment_service/query/'
     success_reload: false
     success: (response) ->
+
+      $('#enrich-loader').hide()
       combined_tags = []
 
       #look for data in context_tags, email_context_tags and web_context_tags
@@ -552,30 +554,36 @@ window.get_enrichment_service = (sha256_hash) ->
       if response?.data?.web_context_tags.length > 0
         combined_tags = combined_tags.concat(response.data.web_context_tags)
 
-      $(combined_tags).each (index, tag) ->
+      #display any tag's name and description
+      if combined_tags.length > 0
 
-        if tag.mapped_taxonomy?.name[0].text?
-          name = tag.mapped_taxonomy.name[0].text
-        else name = ''
+        $('.enrich-file-rep-data-present').show()
 
-        if tag.mapped_taxonomy?.description[0].text?
-          description = tag.mapped_taxonomy.description[0].text
-        else description = ''
+        $(combined_tags).each (index, tag) ->
 
-        wrapper = $("<div></div>")
+          if tag.mapped_taxonomy?.name[0].text?
+            name = tag.mapped_taxonomy.name[0].text
+          else name = ''
 
-        name_wrapper = $("<div><label class='data-report-label data-tts-filerep-name-label'>TTS Name</label><p class='data-tts-filerep-name'></p></div>")
-        $(name_wrapper).find('.data-tts-filerep-name').text(name)
+          if tag.mapped_taxonomy?.description[0].text?
+            description = tag.mapped_taxonomy.description[0].text
+          else description = ''
 
-        description_wrapper = $("<div><label class='data-report-label data-tts-filerep-description-label'>TTS Description</label><p class='data-tts-filerep-description'></p></div>")
-        $(description_wrapper).find('.data-tts-filerep-description').text(description)
+          wrapper = $("<div></div>")
 
-        $(wrapper).append name_wrapper
-        $(wrapper).append description_wrapper
-        $('#enrich-file-rep').append(wrapper)
+          name_wrapper = $("<div><label class='data-report-label data-tts-filerep-name-label'>TTS Name</label><p class='data-tts-filerep-name'></p></div>")
+          $(name_wrapper).find('.data-tts-filerep-name').text(name)
 
-      if combined_tags.length == 0
-        $('#enrich-file-rep').append("<div><div class='text-center missing-data'>No enrichment service data found.</div></div>")
+          description_wrapper = $("<div><label class='data-report-label data-tts-filerep-description-label'>TTS Description</label><p class='data-tts-filerep-description'></p></div>")
+          $(description_wrapper).find('.data-tts-filerep-description').text(description)
+
+          $(wrapper).append name_wrapper
+          $(wrapper).append description_wrapper
+          $('.enrich-file-rep-data-present').append(wrapper)
+
+      #show empty message if no tags returned
+      else
+        $('.enrich-data-missing').show()
 
     error: (response) ->
       std_msg_error('Error with Enrichment Service', ['There was an error.'])

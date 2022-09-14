@@ -183,8 +183,14 @@
       .col-xs-12
         %div.data-report-wrapper
           %h2.enrich-filerep-header.research-data-header Enrich
-          #enrich-file-rep
-
+          #enrich-loader
+            .inline-loader-wrapper
+              .gear-loader-wrapper
+                = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+              %span.loader-msg Loading data...
+          .enrich-file-rep-data-present
+          .enrich-data-missing
+            .text-center.missing-data No enrichment service data found.
 
   .col-xs-12.col-sm-4#reversing-labs-report-wrapper
     %h2.research-data-header.reversinglab-header Reversing Labs

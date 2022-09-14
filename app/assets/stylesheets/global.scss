@@ -10711,13 +10711,15 @@ button.secondary.view-report-external-button {
 .sb-data-missing,
 .sb-report-run,
 .sdr-research-data-present,
-.sdr-research-data-missing {
+.sdr-research-data-missing,
+.enrich-data-missing{
   display: none;
 }
 
 .tg-data-missing,
 .sb-data-missing,
 .rl-data-missing,
+.enrich-data-missing,
 .sb-report-run,
 .tg-report-run,
 .rl-report-run {
@@ -11040,8 +11042,9 @@ div[aria-describedby='create-detection-dialog'] {
   display: none;
 }
 
-#enrich-file-rep {
+.enrich-file-rep-data-present {
   margin-top: 16px;
+  display: none;
 }
 
 .data-tts-filerep-name-label {
