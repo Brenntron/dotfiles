@@ -1,7 +1,7 @@
 describe K2::Base do
   describe '.request' do
     it 'sets right headers' do
-      expect(described_class.request.headers['Authorization'].split(' ').last).to eq('redached')
+      expect(described_class.request.headers['Authorization'].split(' ').last).to eq('redacted')
       expect(described_class.request.headers['Content-type']).to eq('application/json')
     end
 
