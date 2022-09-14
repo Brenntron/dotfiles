@@ -30,7 +30,7 @@ describe K2::History do
     let(:response) { HTTPI::Response.new(rand(200..299), {}, '') }
     context 'when search is failed' do
       before do
-        allow(HTTPI).to receive(:post).and_raise(:boom)
+        allow(HTTPI).to receive(:get).and_raise(:boom)
       end
 
       it 'calls handle_error_response method' do
@@ -42,7 +42,7 @@ describe K2::History do
     context 'when search is successfull' do
       let(:response) { HTTPI::Response.new(rand(200..2999), {}, response_body.to_json) }
       before do
-        allow(HTTPI).to receive(:post).and_return(response)
+        allow(HTTPI).to receive(:get).and_return(response)
       end
 
       it 'calls handle_error_response method with succsesfull response' do
