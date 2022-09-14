@@ -148,9 +148,11 @@ $ ->
       success: (response) ->
         data = JSON.parse response
         domainKey = Object.keys(data)[0]
-        data[domainKey][0].domain = domainKey
-        data = data[domainKey][0]
-        data = [data]
+
+        for entry in data[domainKey]
+          entry.domain = domainKey
+
+        data = data[domainKey]
 
         $('#xbrsHistoryLoader').hide()
 
