@@ -312,3 +312,7 @@
                         %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
                         %td= dispute_dup.case_opened_at.strftime('%F %T')
 
+:javascript
+  $(document).ready(function(){
+    setup_enrichment_section()
+  })

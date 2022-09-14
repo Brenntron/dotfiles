@@ -119,7 +119,7 @@ window.research_data = (sha256_hash) ->
   window.get_reversinglabs_data(sha256_hash)
   window.get_run_status(sha256_hash)
   window.get_zoo_status(sha256_hash)
-  window.get_enrichment_service(sha256_hash)
+  window.get_enrichment_service_filerep(sha256_hash)
 
 
 ########### SAMPLE ZOO STATUS ############
@@ -533,7 +533,7 @@ get_run_status = window.get_run_status = (sha256_hash) ->
 
 
 ########### ENRICHMENT API REPORT ############
-window.get_enrichment_service = (sha256_hash) ->
+window.get_enrichment_service_filerep = (sha256_hash) ->
   std_msg_ajax(
     method: 'GET'
     data: {'query_item': sha256_hash, 'query_type':'sha'}
