@@ -41,3 +41,13 @@ window.onkeydown = (e) ->
       expand_selected() #expand selected tickets
     else if (e.altKey && e.which == 71) #alt + g
       expand_all() #expand all tickets
+
+  else if $('body').hasClass('escalations--sdr--disputes-controller')
+    if (e.altKey && e.which == 84) #alt + t
+      take_sdr_disputes() #take ticket
+    else if (e.altKey && e.which == 82) #alt + r
+      return_sdr_disputes() #return ticket
+    else if (e.altKey && e.ctrlKey && e.shiftKey && e.which == 80) #alt + ctrl + shift + p
+      $('.export-all-btn').click() #export all files to .csv
+    else if (e.altKey && e.ctrlKey && e.which == 80) #alt + ctrl + p
+      webrep_export_selected_rows() #export selected files to .csv
