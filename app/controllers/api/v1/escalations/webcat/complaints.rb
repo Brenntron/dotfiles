@@ -299,6 +299,16 @@ module API
 
             end
 
+
+            desc 'get xbrs history from K2 API'
+            params do
+              requires :domains, type: String
+            end
+           
+            get 'get_xbrs_domain_history' do
+              K2::History.parsed_data_for(params['domains']).to_json
+            end 
+
             params do
               requires :uri, type: String
               requires :complaint_entry_id, type: Integer
