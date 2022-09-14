@@ -1,19 +1,57 @@
 .webcat-research-wrapper
-  %table.xbrs-history-table
+  .domain-table-wrapper
+    .domain-table-listing
+      %label.toolbar-section-label
+        Domain
+      #xbrsDomainTableListingContent.domain-table-listing-content
+    .domain-table-current-category
+      %label.toolbar-section-label
+        Current Categories
+      #xbrsDomainTableCurrentCategoryContent.domain-table-current-category-content
+    .domain-table-reputation
+      %label.toolbar-section-label
+        Reputation
+      #xbrsDomainTableReputation.domain-table-reputation-content
+        %span#xbrsHistorySvg.webcat-research-svg
+
+  .toolbar.webcat-research-toolbar
+    %div
+      %label.toolbar-section-label
+        Edit
+      %span.dropdown
+        %button#webcat-research-categorize-url.webcat-research-categorize-url-button.toolbar-button.dropdown-toggle.esc-tooltipped{title: 'Categorize URL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text Categorize URL
+        %div{'aria-labelledby': 'webcat-research-categorize-url', id: 'categorize-url-dropdown', class: 'dropdown-menu toolbar-dropdown'}
+          .loader-gears
+            =inline_svg 'icon_gears_loader.svg'
+          .selected-urls-wrapper
+            %label.selected-urls-label
+              Selected URLs
+            #selected-urls-list
+          .selected-urls-categories-wrapper
+            %label.selected-urls-categories-label
+              Enter up to 5 categories
+            %input#xbrs-history-categorize-research-urls.input-group.search-group
+            %button{type: 'submit', name: 'commit', id: 'cat-research', class: 'toolbar-button esc-tooltipped', onclick: 'apply_webcat_research_categories(); return false', 'data-disable-with': 'Submit'}
+              %span#categorize-research-submit.toolbar-button-text
+                Submit
+
+  .ajax-message-div#xbrsHistoryLoader
+    .loader-gears
+      =inline_svg 'icon_gears_loader.svg'
+    %span.loader-msg Domain search processing, please wait...
+
+  %table.xbrs-history-table.table#xbrs-history-table
     %thead
       %tr
         %th
           %input{type: "checkbox", name: "select all urls", class: 'categorize-url-button'}
         %th
-          Source
-        %th
           Category
         %th
           Domain
         %th
-          Entries
+          Rule Hits
         %th
-          Time of Action
-        %th
-          Operation
-    %tbody
+          Threat Cats
+    %tbody#xbrsHistoryTableBody

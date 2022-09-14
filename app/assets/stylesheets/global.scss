@@ -5930,13 +5930,13 @@ input.table-entry-input:focus {
   }
 }
 
-#domain-history-table_filter {
+#domain-history-table_filter, #xbrs-history-table_filter {
   label {
     height: 100%;
   }
 }
 
-.domain-history-table {
+.domain-history-table, #xbrs-history-table {
   display: none;
 
   .domain-history-link {

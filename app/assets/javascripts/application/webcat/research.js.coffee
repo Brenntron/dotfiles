@@ -15,25 +15,34 @@ $ ->
         if category.category_names
           spacedCategoryNames = category.category_names.toString().split(',').join(', ')
 
-          $('.domain-table-current-category-content').append("<p class='domain-data'>#{spacedCategoryNames}</p>")
-          $('.domain-table-current-category-content .webcat-research-svg').show()
+          $('#domainHistoryDomainTableCurrentCategoryContent').append("<p class='domain-data'>#{spacedCategoryNames}</p>")
+          $('#xbrsDomainTableCurrentCategoryContent').append("<p class='domain-data'>#{spacedCategoryNames}</p>")
+          $('#xbrsHistorySvg').show()
+          $('#domainHistorySvg').show()
         else
-          $('.domain-table-current-category-content').append("<p class='domain-data missing-data'>#{'NA'}</p>")
+          $('#xbrsDomainTableCurrentCategoryContent').append("<p class='domain-data missing-data'>#{'NA'}</p>")
+          $('#domainHistoryDomainTableCurrentCategoryContent').append("<p class='domain-data missing-data'>#{'NA'}</p>")
 
         rep = wbrs_display(score)
 
-        $('.domain-table-reputation-content span.webcat-research-svg').addClass("icon-#{rep}")
-        $('.domain-table-reputation-content span.webcat-research-svg').show()
+        $('#domainHistorySvg').addClass("icon-#{rep}")
+        $('#xbrsHistorySvg').addClass("icon-#{rep}")
+        $('#domainHistorySvg').show()
+        $('#xbrsHistorySvg').show()
 
         if score > 0
-          $('.domain-name').attr("href", "https://#{domain}")
-          $('.domain-name').attr('target', '_blank')
-          $('.domain-name').removeClass('domain-name-normal')
+          $('#domainHistoryDomainName').attr("href", "https://#{domain}")
+          $('#xbrsDomainName').attr("href", "https://#{domain}")
+          $('#domainHistoryDomainName').attr('target', '_blank')
+          $('#xbrsDomainName').attr('target', '_blank')
+          $('#domainHistoryDomainName').removeClass('domain-name-normal')
+          $('#xbrsDomainName').removeClass('domain-name-normal')
 
         if score % 1 == 0
           score = parseFloat(score).toFixed(1)
 
-        $('.domain-table-reputation-content').append("<p class='domain-data'>#{score}</p>")
+        $('#xbrsDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
+        $('#domainHistoryDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
       error: (errorResponse) ->
         std_api_error(errorResponse, "Domain info could not be retrieved.", reload: false)
     )
@@ -49,70 +58,75 @@ $ ->
         data = response.data
 
         #the first entry is the domain itself so that should not count in the result total
-        $('.domain-table-listing-content').append("<p class='domain-data result-total'>(#{data.length - 1} found)</p>")
+        $('#domainHistoryDomainTableListingContent').append("<p class='domain-data result-total'>(#{data.length - 1} found)</p>")
 
-        $('.ajax-message-div').hide()
+        $('#domainHistoryLoader').hide()
 
-        $('.domain-history-table').DataTable({
-          data: data
-          dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
-          columns: [
-            {
-              data: null
-              render: (data, type, full) ->
-                { url } = data
-                "<input type='checkbox' name='#{url}' class='categorize-url-button'</input>"
-            }
-            {
-              data: null
-              render: (data, type, full) ->
-                { entry_id, complaint_id } = data
-                if entry_id
-                  "<a href='/escalations/webcat/complaints/#{complaint_id}' target='_blank'>#{entry_id}</a>"
-                else
-                  entry_id
+        if $.fn.DataTable.isDataTable('.domain-history-table')
+          $('.domain-history-table').DataTable().rows.add(data)
+          $('.domain-history-table').DataTable().draw()
+          $('#domain-history-table_wrapper').show()
+        else
+          $('.domain-history-table').DataTable({
+            data: data
+            dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+            columns: [
+              {
+                data: null
+                render: (data, type, full) ->
+                  { url } = data
+                  "<input type='checkbox' name='#{url}' class='categorize-url-button'</input>"
+              }
+              {
+                data: null
+                render: (data, type, full) ->
+                  { entry_id, complaint_id } = data
+                  if entry_id
+                    "<a href='/escalations/webcat/complaints/#{complaint_id}' target='_blank'>#{entry_id}</a>"
+                  else
+                    entry_id
 
-            }
-            {
-              data: 'category'
-            }
-            {
-              data: null
-              render: (data, type, full) ->
-                { url, score } = data
+              }
+              {
+                data: 'category'
+              }
+              {
+                data: null
+                render: (data, type, full) ->
+                  { url, score } = data
 
-                if score >= 0
-                  "<a href='https://#{url}' target='_blank' class='domain-history-link'>#{url}</a>"
-                else
-                  url
+                  if score >= 0
+                    "<a href='https://#{url}' target='_blank' class='domain-history-link'>#{url}</a>"
+                  else
+                    url
+              }
+              {
+                data: 'time_of_action'
+              }
+              {
+                data: 'action'
+              }
+              {
+                data: 'confidence'
+              }
+              {
+                data: 'description'
+              }
+              {
+                data: 'user'
+              }
+            ]
+            language: {
+              search: "_INPUT_"
+              searchPlaceholder: "Search within table"
             }
-            {
-              data: 'time_of_action'
-            }
-            {
-              data: 'action'
-            }
-            {
-              data: 'confidence'
-            }
-            {
-              data: 'description'
-            }
-            {
-              data: 'user'
-            }
-          ]
-          language: {
-            search: "_INPUT_"
-            searchPlaceholder: "Search within table"
-          }
-          lengthMenu: [50, 100, 200]
-          order: [ [
-            3
-            'desc'
-          ] ]
-          pagingType: 'full_numbers'
-        })
+            lengthMenu: [50, 100, 200]
+            order: [ [
+              3
+              'desc'
+            ] ]
+            pagingType: 'full_numbers'
+          })
 
         $('#domain-history-table_filter input').addClass('table-search-input domain-table-search-label')
 
@@ -124,18 +138,85 @@ $ ->
         std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
     )
 
-  $(document).ready(
-    hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&')
-    domain = hashes[0].split('=')[1]
+  getXbrsHistory = (domain) ->
+    $.ajax(
+      url: "/escalations/api/v1/escalations/webcat/complaints/get_xbrs_domain_history"
+      method: 'GET'
+      headers: headers
+      data:
+        domains: domain
+      success: (response) ->
+        data = JSON.parse response
+        domainKey = Object.keys(data)[0]
+        data[domainKey][0].domain = domainKey
+        data = data[domainKey][0]
+        data = [data]
 
-    if domain
-      $('#webcat_research_search').val(domain)
-      $('.domain-table-listing-content').append("<a class='domain-name domain-name-normal'>#{domain}</a>")
-      $('#domainHistoryLoader').css('display', 'flex')
+        $('#xbrsHistoryLoader').hide()
 
-      getDomainInfo(domain)
-      getDomainHistory(domain)
-  )
+        if $.fn.DataTable.isDataTable('#xbrs-history-table')
+          $('#xbrs-history-table').DataTable().rows.add(data)
+          $('#xbrs-history-table').DataTable().draw()
+          $('#xbrs-history-table_wrapper').show()
+        else
+          $('#xbrs-history-table').DataTable({
+            data: data
+            dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+            columns: [
+              {
+                data: null
+                render: (data, type, full) ->
+                  "<input type='checkbox' name='https://#{data.domain}' class='categorize-url-button'</input>"
+              }
+              {
+                data: null
+                render: (data, type, full) ->
+                  cats = data.aups.map((aup) -> aup.cat).filter((value, index, self) ->
+                    self.indexOf(value) == index)
+
+                  cats = cats.toString().split(',').join(', ')
+                  return cats
+              }
+              {
+                data: 'domain'
+
+              }
+              {
+                data: null
+                render: (data, type, full) ->
+                  { ruleHits } = data
+                  ruleHits = ruleHits.toString().split(',').join(', ')
+                  return ruleHits
+              }
+              {
+                data: null
+                render: (data, type, full) ->
+                  { threatCats } = data
+                  threatCats = threatCats.toString().split(',').join(', ')
+                  return threatCats
+              }
+            ]
+            language: {
+              search: "_INPUT_"
+              searchPlaceholder: "Search within table"
+            }
+            lengthMenu: [50, 100, 200]
+            order: [ [
+              3
+              'desc'
+            ] ]
+            pagingType: 'full_numbers'
+          })
+
+        $('#xbrs-history-table_filter input').addClass('table-search-input domain-table-search-label')
+
+        $('#xbrsHistoryLoader').hide()
+        $('.xbrs-history-table').show()
+      error: (errorResponse) ->
+        $('#xbrsHistoryLoader').hide()
+        $('.xbrs-history-table').show()
+        std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
+    )
 
   $('#webcat_research_search').on('keyup', (e) ->
     if e.key == 'Enter' || e.keyCode == 13
@@ -143,15 +224,49 @@ $ ->
       domain = domain.replace(/https\:\/\//, '')
 
       if domain
-        url = window.location.origin + window.location.pathname + "?domain=#{domain}"
-      else
-        url = window.location.origin + window.location.pathname
+        $('#webcat_research_search').val(domain)
+        $('#domainHistorySvg').hide()
+        $('#xbrsHistorySvg').hide()
+        $('.domain-data').remove()
 
-      document.location.assign(url)
+        $('#xbrsDomainName').remove()
+        $('#xbrsDomainTableListingContent').append("<a id='xbrsDomainName' class='domain-name domain-name-normal'>#{domain}</a>")
+        $('#xbrs-history-table_wrapper').hide()
+        $('.xbrs-history-table').hide()
+
+        $('#domainHistoryDomainName').remove()
+        $('#domainHistoryDomainTableListingContent').append("<a id='domainHistoryDomainName' class='domain-name domain-name-normal'>#{domain}</a>")
+        $('#domain-history-table_wrapper').hide()
+        $('.domain-history-table').hide()
+
+        if $.fn.DataTable.isDataTable('.domain-history-table')
+          $('.domain-history-table').DataTable().clear()
+
+        if $.fn.DataTable.isDataTable('.xbrs-history-table')
+          $('.xbrs-history-table').DataTable().clear()
+
+        $('#domainHistoryLoader').css('display', 'flex')
+        $('#xbrsHistoryLoader').css('display', 'flex')
+
+        getDomainInfo(domain)
+        getDomainHistory(domain)
+        getXbrsHistory(domain)
   )
 
-  $('#webcat-research-categorize-url').click(() ->
-    $('#categorize-research-urls').selectize {
+  $('#domain-history-webcat-research-categorize-url').click(() ->
+    $('#domain-history-categorize-research-urls').selectize {
+      create: false,
+      labelField: 'category_name',
+      maxItems: 5,
+      options: AC.WebCat.createSelectOptions('#categorize-research-urls'),
+      persist: true,
+      searchField: ['category_name', 'category_code'],
+      valueField: 'category_id'
+    }
+  )
+
+  $('#xbrs-history-webcat-research-categorize-url').click(() ->
+    $('#xbrs-history-categorize-research-urls').selectize {
       create: false,
       labelField: 'category_name',
       maxItems: 5,
