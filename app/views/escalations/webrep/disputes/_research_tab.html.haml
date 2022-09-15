@@ -712,6 +712,11 @@
                             = entry.virustotals_negatives_count
                             \/
                             = entry.virustotals.count
+                        %td.input-col.enrich-input-wrapper
+                          %input.research-row-checkbox.enrich-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.enrich-label-cell
+                          %label Enrich
+                        %td.text-center.enrich-cell
                         %td.left-bordered.wlbl-tc-label-cell
                           %label WL/BL
                         %td.entry-data-wlbl.wlbl-tc-cell
@@ -798,6 +803,12 @@
                               = entry.blacklist.status
                             %span.inline-col-breakup.entry-reptool-comment
                               = entry.blacklist.metadata&.fetch('VRT', {})&.fetch('comment', {})
+
+                        -#Three empty cells to keep rows even for now
+                        %td
+                        %td
+                        %td
+
                         %td.left-bordered
                           %label Umbrella
                         %td.text-center.umbrella-cell{colspan: '2'}
@@ -1082,3 +1093,17 @@
                                     %td= entry.blacklist.primary_source
                                     %td= entry.blacklist.first_seen
                                     %td= entry.blacklist.last_seen
+
+                          .entry-details-table.enrich-details-table{'data-entry-id': "#{entry.id}"}
+                            %h5.entry-details-table-header Enrich
+                            %table.enrich-webrep-table-data-present
+                              %thead
+                                %tr
+                                  %th TTS Name
+                                  %th TTS Description
+                              %tbody
+                                %tr
+                            %table.enrich-webrep-table-data-missing
+                              %tbody
+                                %tr
+                                  %td.missing-data No enrichment services data.

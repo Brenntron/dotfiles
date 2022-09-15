@@ -6016,6 +6016,7 @@ table > tbody > tr > td.research-table-row-wrapper {
 .crosslisted-details-table { background-color: $warning-accent-color;}
 .virustotal-details-table { background-color: $rule-accent-color;}
 .reptool-details-table {background-color: $fifth-section-color;}
+.enrich-details-table {background-color: $escalations-section-color;}
 
 .entry-details-table table {
   background-color: $table-dark-body;
@@ -12450,6 +12451,10 @@ table > tbody > tr > td.no-padding {
   }
 }
 
+.enrich-webrep-table-data-missing {
+  display: none;
+}
+
 #research_tab {
   .research-first-row {
     td {
@@ -12512,6 +12517,12 @@ table > tbody > tr > td.no-padding {
   .virustotal-cell {
     width: 50px;
   }
+  .enrich-label-cell {
+    width: 50px;
+  }
+  .enrich-cell {
+    width: 50px;
+  }
   .wlbl-tc-label-cell {
     width: 2%;
   }
@@ -12555,6 +12566,9 @@ table > tbody > tr > td.no-padding {
     }
     .reptool-input-wrapper {
       background-color: $fifth-section-color;
+    }
+    .enrich-input-wrapper {
+      background-color: $escalations-section-color;
     }
   }
 }

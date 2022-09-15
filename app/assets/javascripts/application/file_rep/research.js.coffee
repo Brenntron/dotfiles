@@ -572,10 +572,10 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
           wrapper = $("<div></div>")
 
           name_wrapper = $("<div><label class='data-report-label data-tts-filerep-name-label'>TTS Name</label><p class='data-tts-filerep-name'></p></div>")
-          $(name_wrapper).find('.data-tts-filerep-name').text(name)
+          $(name_wrapper).find('.data-tts-filerep-name').text(name) #escaping to prevent xss attacks
 
           description_wrapper = $("<div><label class='data-report-label data-tts-filerep-description-label'>TTS Description</label><p class='data-tts-filerep-description'></p></div>")
-          $(description_wrapper).find('.data-tts-filerep-description').text(description)
+          $(description_wrapper).find('.data-tts-filerep-description').text(description) #escaping to prevent xss attacks
 
           $(wrapper).append name_wrapper
           $(wrapper).append description_wrapper
