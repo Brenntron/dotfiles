@@ -395,6 +395,18 @@ module API
               return {:status => "success", :data => attachment.id}
 
             end
+
+            params do
+              requires :dispute_id, type: Integer
+            end
+            get 'refresh_sdr_data/:dispute_id' do
+              std_api_v2 do
+                dispute = SenderDomainReputationDispute.find(permitted_params['dispute_id'])
+                dispute.get_and_save_beaker_data
+
+                {data: dispute.beaker_info}.to_json
+              end
+            end
           end
         end
       end
