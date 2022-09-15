@@ -1258,7 +1258,7 @@ $ ->
     )
 
 
-    
+
 # TODO: This stuff maybe should be moved into its own file later, but dropping here because convenient
 # (it's all for the comms tab of the show page)
 

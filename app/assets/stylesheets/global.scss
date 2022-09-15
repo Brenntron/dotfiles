@@ -11048,19 +11048,23 @@ div[aria-describedby='create-detection-dialog'] {
   display: none;
 }
 
-.data-tts-filerep-name-label {
+.data-enrich-filerep-name-label {
   float: left;
   width: fit-content;
-  margin: 0 12px 12px 0;
+  margin: 0 12px 10px 0;
 }
 
-.data-tts-filerep-name {
+.data-enrich-filerep-name {
   margin-top: 0;
   float: left;
 }
 
-.data-tts-filerep-description-label {
+.data-enrich-filerep-description-label {
   margin: 4px 0;
+}
+
+.data-enrich-filerep-wrapper {
+  margin-bottom: 26px;
 }
 
 #amp-naming-details-table {
