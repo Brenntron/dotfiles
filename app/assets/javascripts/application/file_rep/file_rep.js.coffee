@@ -1257,6 +1257,8 @@ $ ->
        std_msg_error('Error with AMP', ['There was an error retrieving the AMP history.'])
     )
 
+
+    
 # TODO: This stuff maybe should be moved into its own file later, but dropping here because convenient
 # (it's all for the comms tab of the show page)
 
@@ -1334,7 +1336,6 @@ $ ->
       # Retrieve current AMP info and history
       detection_now(curr_sha256_hash)
       get_amp_history(curr_sha256_hash)
-
 
     $('select[name="file-rep-datatable_length"]').on "change", ->
       data = {}
