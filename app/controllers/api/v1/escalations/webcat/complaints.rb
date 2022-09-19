@@ -299,6 +299,16 @@ module API
 
             end
 
+
+            desc 'get xbrs history from K2 API'
+            params do
+              requires :domains, type: String
+            end
+
+            get 'get_xbrs_domain_history' do
+              K2::History.parsed_data_for(params['domains']).to_json
+            end
+
             params do
               requires :uri, type: String
               requires :complaint_entry_id, type: Integer
@@ -460,8 +470,18 @@ module API
               else
                 {:status => "success", :data => response[:data]}
               end
+              requires :domain, type: String
             end
 
+            get 'domain_info' do
+              score = nil
+              category = "no category found"
+
+              score = Sbrs::Base.combo_call_sds_v3(params[:domain], [])["wbrs"]["score"]
+              category = ComplaintEntry.get_category_data(params[:domain])
+
+              {:data => {:score => score, :category => category}}.to_json
+            end
           end
         end
       end

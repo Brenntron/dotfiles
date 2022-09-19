@@ -5680,16 +5680,11 @@ input.table-entry-input:focus {
 }
 
 .webcat-research-toolbar {
-  color: $type-darkest;
-  height: 32px;
-  margin: 0 0 20px;
-  margin-top: 50px;
-  position: unset;
-  width: fit-content;
-
-  div {
-    border: none;
-  }
+  margin: 0;
+  position: absolute;
+  top: 250px;
+  width: initial;
+  z-index: 1;
 
   .loader-gears {
     display: none;
@@ -5839,15 +5834,75 @@ input.table-entry-input:focus {
   opacity: 0.3;
 }
 
+.research-tab-wrapper {
+  margin-bottom: 50px;
+}
+
 .domain-table-wrapper {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  padding-left: 3px;
   width: auto;
+  margin: 60px 0 40px 0;
+
+  .loader-gears {
+    display: none;
+    margin: 0 0 0 10px;
+    width: 30px;
+  }
+
+  .domain-table-listing, .domain-table-current-category, .domain-table-reputation {
+    display: flex;
+    flex-direction: column;
+    min-width: 100px;
+
+    label {
+      margin-bottom: 5px;
+      position: initial;
+    }
+
+    .domain-data {
+      position: relative;
+      top: 3px;
+    }
+
+    .domain-table-listing-content, .domain-table-current-category-content, .domain-table-reputation-content {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+
+  .domain-name-normal {
+    color: #333;
+  }
+
+  .domain-name {
+    font-size: 18px;
+    float: left;
+  }
+
+  .result-total {
+    float: right;
+    margin-left: 10px;
+  }
+
+  .webcat-research-svg {
+    background-repeat: no-repeat;
+    display: none;
+    float: left;
+    height: 20px;
+    margin-right: 3px;
+    margin-top: 0;
+    width: 20px;
+  }
 
   thead {
     color: #999;
 
     th {
       font-weight: 400;
-      text-transform: none;
     }
   }
 
@@ -5856,13 +5911,37 @@ input.table-entry-input:focus {
     padding-top: 0;
   }
 
-  &-listing {
-    font-size: 18px;
+  tbody tr {
+    margin-top: 5px;
   }
 }
 
 .webcat-research-wrapper {
   width: auto;
+
+  .ajax-message-div {
+    display: none;
+    flex-direction: row;
+    top: 243px;
+  }
+
+  .domain-table-search-label {
+    height: 100%;
+  }
+}
+
+#domain-history-table_filter, #xbrs-history-table_filter {
+  label {
+    height: 100%;
+  }
+}
+
+.domain-history-table, #xbrs-history-table {
+  display: none;
+
+  .domain-history-link {
+    text-decoration: underline;
+  }
 }
 
 #disputes-research-table label, #edit-ticket-status-dropdown label {
@@ -6114,6 +6193,7 @@ table > tbody > tr > td.research-table-row-wrapper {
   }
 }
 .content-wrapper.research-page{
+  min-height: 250px;
   min-width: 400px;
 }
 .entry-details-table {
@@ -6222,7 +6302,7 @@ h5.entry-details-table-header {
   margin-top: 0;
 }
 @media (min-width: 1100px) {
-  #research-tab-toolbar .toolbar-button-text, .webcat-research-toolbar .toolbar-button-text {
+  #research-tab-toolbar .toolbar-button-text {
     display: block;
     margin-left: 8px;
   }
@@ -10867,7 +10947,7 @@ button.secondary.view-report-external-button {
 
 // dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
 @media screen and (min-width: 1600px) {
-  #research-tab-toolbar .toolbar-button-label .toolbar-button-text, .webcat-research-toolbar .toolbar-button-label
+  #research-tab-toolbar .toolbar-button-label .toolbar-button-text, .toolbar-button-label
   .toolbar-button-text {
     padding-top: 1px;
   }
@@ -11788,7 +11868,7 @@ input[type="radio"].resolution_radio_button {
 }
 @media (min-width: 1700px) {
 
-  #webrep-index-toolbar, .webcat-research-toolbar {
+  #webrep-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
       padding-left: 13px;
@@ -11853,7 +11933,7 @@ input[type="radio"].resolution_radio_button {
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
 @media screen and (max-width: 1600px) and (min-width: 1401px) {
-  #research-tab-toolbar, .webcat-research-toolbar {
+  #research-tab-toolbar {
     .toolbar-button {
       background-position: 6px 6px;
       padding-left: 9px;
@@ -11866,7 +11946,7 @@ input[type="radio"].resolution_radio_button {
 }
 // fix the collapse breakpoint
 @media screen and (max-width: 1400px) {
-  #research-tab-toolbar .toolbar-button-text, .webcat-research-toolbar .toolbar-button-text {
+  #research-tab-toolbar .toolbar-button-text, .toolbar-button-text {
     display: none;
     margin-left: 8px;
   }

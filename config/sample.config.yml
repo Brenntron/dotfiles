@@ -128,6 +128,10 @@ development:
     verify_mode: "verify-none"
     gssnegotiate: false
     auth_token: "redacted"
+  k2:
+    host: "k2-api.sv4.ironport.com"
+    port: 443
+    token: "redacted"
 
 
  
@@ -260,7 +264,10 @@ test:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-
+  k2:
+    host: "k2-api.sv4.ironport.com"
+    port: 443
+    token: "redacted"
 staging:
   amp_poke:
     host: "localhost"
@@ -399,7 +406,10 @@ staging:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-
+  k2:
+    host: "k2-api.sv4.ironport.com"
+    port: 443
+    token: "redacted"
 production:
   amp_poke: 
     host: "poke.vrt.sourcefire.com"
@@ -539,4 +549,8 @@ production:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  k2:
+    host: "k2-api.sv4.ironport.com"
+    port: 443
+    token: "redacted"
 

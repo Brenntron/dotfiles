@@ -1,14 +1,5 @@
 .content-wrapper.research-page
   .webcat-research-search-wrapper
-    -# shared loader for detail and quick lookup
-    .ajax-message-div#domainHistoryLoader
-      .loader-gears
-        =inline_svg 'icon_gears_loader.svg'
-      %span.loader-msg Active search processing, please wait...
-    .ajax-message-div#xbrsHistoryLoader
-      .loader-gears
-        =inline_svg 'icon_gears_loader.svg'
-      %span.loader-msg Loading data...
     .research-header-wrapper
       %span.icon-research.top-info-icon
       %h1 Categorization Research
@@ -23,45 +14,6 @@
 
       .input-group.search-group#webcat-research-search
         = text_field_tag 'webcat_research_search', "#{}", class: 'search-box', placeholder: 'Lookup History'
-
-  .domain-table-wrapper
-    %table.domain-table
-      %thead
-        %tr
-          %th
-            Domain
-          %th
-            Current Category
-          %th
-            Reputation
-      %tbody
-        %tr
-          %td.domain-table-listing
-          %td.domain-table-current-category
-          %td.domain-table-reputation
-
-  .toolbar.webcat-research-toolbar
-    %div
-      %label.toolbar-section-label
-        Edit
-      %span.dropdown
-        %button#webcat-research-categorize-url.webcat-research-categorize-url-button.toolbar-button.dropdown-toggle.esc-tooltipped{title: 'Categorize URL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-          %span.toolbar-button-text Categorize URL
-        %div{'aria-labelledby': 'webcat-research-categorize-url', id: 'categorize-url-dropdown', class: 'dropdown-menu toolbar-dropdown'}
-          .loader-gears
-            =inline_svg 'icon_gears_loader.svg'
-          .selected-urls-wrapper
-            %label.selected-urls-label
-              Selected URLs
-            #selected-urls-list
-          .selected-urls-categories-wrapper
-            %label.selected-urls-categories-label
-              Enter up to 5 categories
-            %input#categorize-research-urls.input-group.search-group
-            %button{type: 'submit', name: 'commit', id: 'cat-research', class: 'toolbar-button esc-tooltipped', onclick: 'detail_research(); return false', 'data-disable-with': 'Submit'}
-              %span#categorize-research-submit.toolbar-button-text
-                Submit
-
 
   .research-tab-wrapper.tab-content
     .tab-pane.active#domain-history{role: 'tabpanel'}
