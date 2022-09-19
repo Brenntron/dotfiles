@@ -673,8 +673,8 @@
                           - else
                             %span.current-wbrs-score
                               = entry.wbrs_score
-                        %td.wbrs-rules-label-cell
-                          %label WBRS Rules
+                        -#%td.wbrs-rules-label-cell
+                        -#  %label WBRS Rules
                         %td.text-center.wbrs-rule-hits-cell
                           = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit != true }.length
 
@@ -766,8 +766,8 @@
                           - else
                             %span.current-sbrs-score
                               = entry.sbrs_score
-                        %td
-                          %label SBRS Rules
+                        -#%td
+                        -#  %label SBRS Rules
                         %td.text-center.sbrs-rule-hits-cell
                           = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.size
 
