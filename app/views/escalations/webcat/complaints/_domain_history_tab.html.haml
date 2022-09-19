@@ -1,13 +1,53 @@
 .webcat-research-wrapper
-  %table.domain-history-table
+  .domain-table-wrapper
+    .domain-table-listing
+      %label.toolbar-section-label
+        Domain
+      #domainHistoryDomainTableListingContent.domain-table-listing-content
+    .domain-table-current-category
+      %label.toolbar-section-label
+        Current Categories
+      #domainHistoryDomainTableCurrentCategoryContent.domain-table-current-category-content
+    .domain-table-reputation
+      %label.toolbar-section-label
+        Reputation
+      #domainHistoryDomainTableReputation.domain-table-reputation-content
+        %span#domainHistorySvg.webcat-research-svg
+
+  .toolbar.webcat-research-toolbar
+    %div
+      %label.toolbar-section-label
+        Edit
+      %span.dropdown
+        %button#domain-history-webcat-research-categorize-url.webcat-research-categorize-url-button.toolbar-button.dropdown-toggle.esc-tooltipped{title: 'Categorize URL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text Categorize URL
+        %div{'aria-labelledby': 'webcat-research-categorize-url', id: 'categorize-url-dropdown', class: 'dropdown-menu toolbar-dropdown'}
+          .loader-gears
+            =inline_svg 'icon_gears_loader.svg'
+          .selected-urls-wrapper
+            %label.selected-urls-label
+              Selected URLs
+            %ul#domainHistoryTableSelectedUrlsList
+          .selected-urls-categories-wrapper
+            %label.selected-urls-categories-label
+              Enter up to 5 categories
+            %input#domain-history-categorize-research-urls.input-group.search-group
+            %button{type: 'submit', name: 'commit', id: 'cat-research', class: 'toolbar-button esc-tooltipped', onclick: 'apply_webcat_research_categories(); return false', 'data-disable-with': 'Submit'}
+              %span#categorize-research-submit.toolbar-button-text
+                Submit
+
+  .ajax-message-div#domainHistoryLoader
+    .loader-gears
+      =inline_svg 'icon_gears_loader.svg'
+    %span.loader-msg Domain search processing, please wait...
+
+  %table.domain-history-table.table#domain-history-table
     %thead
       %tr
         %th
-          %input{type: "checkbox", name: "select all urls", class: 'categorize-url-button'}
+          %input{type: "checkbox", name: "select all urls", id: 'domainHistoryCheckAll'}
         %th
           Entry Id
-        %th
-          Source
         %th
           Category
         %th
@@ -22,4 +62,4 @@
           Description
         %th
           User
-    %tbody
+    %tbody#domainHistoryTableBody

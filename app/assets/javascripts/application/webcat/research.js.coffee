@@ -1,34 +1,336 @@
 $ ->
   headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
 
-  $(document).ready(
-    hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&')
-    domain = hashes[0].split('=')[1]
+  getDomainInfo = (domain) ->
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaints/domain_info'
+      method: 'GET'
+      headers: headers
+      data:
+        domain: domain
+      success: (response) ->
+        parsedResponse = JSON.parse response
+        { score, category } = parsedResponse.data
 
-    $('#webcat_research_search').val(domain)
-  )
+        if category.category_names
+          spacedCategoryNames = category.category_names.toString().split(',').join(', ')
+
+          $('#domainHistoryDomainTableCurrentCategoryContent').append("<p class='domain-data'>#{spacedCategoryNames}</p>")
+          $('#xbrsDomainTableCurrentCategoryContent').append("<p class='domain-data'>#{spacedCategoryNames}</p>")
+          $('#xbrsHistorySvg').show()
+          $('#domainHistorySvg').show()
+        else
+          $('#xbrsDomainTableCurrentCategoryContent').append("<p class='domain-data missing-data'>#{'NA'}</p>")
+          $('#domainHistoryDomainTableCurrentCategoryContent').append("<p class='domain-data missing-data'>#{'NA'}</p>")
+
+        rep = wbrs_display(score)
+
+        $('#domainHistorySvg').addClass("icon-#{rep}")
+        $('#xbrsHistorySvg').addClass("icon-#{rep}")
+        $('#domainHistorySvg').show()
+        $('#xbrsHistorySvg').show()
+
+        if score > 0
+          $('#domainHistoryDomainName').attr("href", "https://#{domain}")
+          $('#xbrsDomainName').attr("href", "https://#{domain}")
+          $('#domainHistoryDomainName').attr('target', '_blank')
+          $('#xbrsDomainName').attr('target', '_blank')
+          $('#domainHistoryDomainName').removeClass('domain-name-normal')
+          $('#xbrsDomainName').removeClass('domain-name-normal')
+
+        if score % 1 == 0
+          score = parseFloat(score).toFixed(1)
+
+        $('#xbrsDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
+        $('#domainHistoryDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
+      error: (errorResponse) ->
+        std_api_error(errorResponse, "Domain info could not be retrieved.", reload: false)
+    )
+
+  getDomainHistory = (domain) ->
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/get_domain_history'
+      method: 'GET'
+      headers: headers
+      data:
+        domain: domain
+      success: (response) ->
+        data = response.data
+
+        #the first entry is the domain itself so that should not count in the result total
+        $('#domainHistoryDomainTableListingContent').append("<p class='domain-data result-total'>(#{data.length - 1} found)</p>")
+
+        $('#domainHistoryLoader').hide()
+
+        if $.fn.DataTable.isDataTable('.domain-history-table')
+          $('.domain-history-table').DataTable().rows.add(data)
+          $('.domain-history-table').DataTable().draw()
+          $('#domain-history-table_wrapper').show()
+        else
+          $('.domain-history-table').DataTable({
+            data: data
+            dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+            columns: [
+              {
+                data: null
+                render: (data, type, full) ->
+                  { url } = data
+                  "<input type='checkbox' data-name='#{url}' class='domain-history-categorize-url-button categorize-url-button'</input>"
+                sortable: false
+              }
+              {
+                data: null
+                render: (data, type, full) ->
+                  { entry_id, complaint_id } = data
+                  if entry_id
+                    "<a href='/escalations/webcat/complaints/#{complaint_id}' target='_blank'>#{entry_id}</a>"
+                  else
+                    entry_id
+
+              }
+              {
+                data: 'category'
+              }
+              {
+                data: null
+                render: (data, type, full) ->
+                  { url, score } = data
+
+                  if score >= 0
+                    "<a href='https://#{url}' target='_blank' class='domain-history-link'>#{url}</a>"
+                  else
+                    url
+              }
+              {
+                data: 'time_of_action'
+              }
+              {
+                data: 'action'
+              }
+              {
+                data: 'confidence'
+              }
+              {
+                data: 'description'
+              }
+              {
+                data: 'user'
+              }
+            ]
+            language: {
+              search: "_INPUT_"
+              searchPlaceholder: "Search within table"
+            }
+            lengthMenu: [50, 100, 200]
+            order: [ [
+              3
+              'desc'
+            ] ]
+            pagingType: 'full_numbers'
+          })
+
+        $('#domain-history-table_filter input').addClass('table-search-input domain-table-search-label')
+
+        $('#domainHistoryLoader').hide()
+        $('.domain-history-table').show()
+      error: (errorResponse) ->
+        $('#domainHistoryLoader').hide()
+        $('.domain-history-table').show()
+        std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
+    )
+
+  getXbrsHistory = (domain) ->
+    $.ajax(
+      url: "/escalations/api/v1/escalations/webcat/complaints/get_xbrs_domain_history"
+      method: 'GET'
+      headers: headers
+      data:
+        domains: domain
+      success: (response) ->
+        data = JSON.parse response
+        domainKey = Object.keys(data)[0]
+        console.log data unless data.length
+
+        for entry in data[domainKey]
+          entry.domain = domainKey
+
+        data = data[domainKey]
+
+        $('#xbrsHistoryLoader').hide()
+
+        if $.fn.DataTable.isDataTable('#xbrs-history-table')
+          $('#xbrs-history-table').DataTable().rows.add(data)
+          $('#xbrs-history-table').DataTable().draw()
+          $('#xbrs-history-table_wrapper').show()
+        else
+          $('#xbrs-history-table').DataTable({
+            data: data
+            dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+            columns: [
+              {
+                data: null
+                render: (data, type, full) ->
+                  "<input type='checkbox' data-name='#{data.domain}' class='xbrs-categorize-url-button categorize-url-button'</input>"
+                sortable: false
+              }
+              {
+                data: null
+                render: (data, type, full) ->
+                  cats = data.aups.map((aup) -> aup.cat).filter((value, index, self) ->
+                    self.indexOf(value) == index)
+
+                  cats = cats.toString().split(',').join(', ')
+                  return cats
+              }
+              {
+                data: 'domain'
+
+              }
+              {
+                data: null
+                render: (data, type, full) ->
+                  { ruleHits } = data
+                  ruleHits = ruleHits.toString().split(',').join(', ')
+                  return ruleHits
+              }
+              {
+                data: null
+                render: (data, type, full) ->
+                  { threatCats } = data
+                  threatCats = threatCats.toString().split(',').join(', ')
+                  return threatCats
+              }
+            ]
+            language: {
+              search: "_INPUT_"
+              searchPlaceholder: "Search within table"
+            }
+            lengthMenu: [50, 100, 200]
+            order: [ [
+              3
+              'desc'
+            ] ]
+            pagingType: 'full_numbers'
+          })
+
+        $('#xbrs-history-table_filter input').addClass('table-search-input domain-table-search-label')
+
+        $('#xbrsHistoryLoader').hide()
+        $('.xbrs-history-table').show()
+      error: (errorResponse) ->
+        $('#xbrsHistoryLoader').hide()
+        $('.xbrs-history-table').show()
+        std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
+    )
 
   $('#webcat_research_search').on('keyup', (e) ->
     if e.key == 'Enter' || e.keyCode == 13
       domain = $(this).val()
-      hash = window.location.hash.split('?')[0]
-      url = window.location.origin + window.location.pathname + "?domain=#{domain}"
-      document.location.assign(url)
+      domain = domain.replace(/https\:\/\//, '')
+
+      if domain
+        $('#webcat_research_search').val(domain)
+        $('#domainHistorySvg').hide()
+        $('#xbrsHistorySvg').hide()
+        $('.domain-data').remove()
+
+        $('#xbrsDomainName').remove()
+        $('#xbrsDomainTableListingContent').append("<a id='xbrsDomainName' class='domain-name domain-name-normal'>#{domain}</a>")
+        $('#xbrs-history-table_wrapper').hide()
+        $('.xbrs-history-table').hide()
+
+        $('#domainHistoryDomainName').remove()
+        $('#domainHistoryDomainTableListingContent').append("<a id='domainHistoryDomainName' class='domain-name domain-name-normal'>#{domain}</a>")
+        $('#domain-history-table_wrapper').hide()
+        $('.domain-history-table').hide()
+
+        if $.fn.DataTable.isDataTable('.domain-history-table')
+          $('.domain-history-table').DataTable().clear()
+
+        if $.fn.DataTable.isDataTable('.xbrs-history-table')
+          $('.xbrs-history-table').DataTable().clear()
+
+        $('#domainHistoryLoader').css('display', 'flex')
+        $('#xbrsHistoryLoader').css('display', 'flex')
+
+        getDomainInfo(domain)
+        getDomainHistory(domain)
+        getXbrsHistory(domain)
   )
 
-  $('#webcat-research-categorize-url').click(() ->
-    $('#categorize-research-urls').selectize {
+  $('#domain-history-webcat-research-categorize-url').click(() ->
+    $('#domain-history-categorize-research-urls').selectize {
       create: false,
       labelField: 'category_name',
       maxItems: 5,
-      options: AC.WebCat.createSelectOptions('#categorize-research-urls'),
+      options: AC.WebCat.createSelectOptions('#domain-history-categorize-research-urls'),
       persist: true,
       searchField: ['category_name', 'category_code'],
       valueField: 'category_id'
     }
   )
 
-  window.detail_research = () ->
+  $('#xbrs-history-webcat-research-categorize-url').click(() ->
+    $('#xbrs-history-categorize-research-urls').selectize {
+      create: false,
+      labelField: 'category_name',
+      maxItems: 5,
+      options: AC.WebCat.createSelectOptions('#xbrs-history-categorize-research-urls'),
+      persist: true,
+      searchField: ['category_name', 'category_code'],
+      valueField: 'category_id'
+    }
+  )
+
+  $(document).on("click",'.xbrs-categorize-url-button', () ->
+    button = $(this)
+    buttonDomain = button.data().name
+
+    if button.is(':checked')
+      $('#xbrsHistorySelectedUrlsList').append("<li data-name='#{buttonDomain}'>#{buttonDomain}</li>")
+    else
+      $("li[data-name='#{buttonDomain}']").remove()
+  )
+
+  $(document).on("click", '.domain-history-categorize-url-button', () ->
+    button = $(this)
+    buttonDomain = button.data().name
+
+    if button.is(':checked')
+      $('#domainHistoryTableSelectedUrlsList').append("<li data-name='#{buttonDomain}'>#{buttonDomain}</li>")
+    else
+      $("li[data-name='#{buttonDomain}']").remove()
+  )
+
+  checkAll = (headerCheckBox, tableId) ->
+    checkAllValue = $(headerCheckBox).is(':checked')
+    tableCheckBoxes = $(tableId).find('.categorize-url-button')
+
+    if tableId.indexOf('domainHistory') != -1
+      urlList = $('#domainHistoryTableSelectedUrlsList')
+      tableClassPrepend = 'domain-history'
+    else
+      urlList = $('#xbrsHistorySelectedUrlsList')
+      tableClassPrepend = 'xbrs-history'
+
+    for checkBox in tableCheckBoxes
+      checkBoxDomain = $(checkBox).data().name
+      $(checkBox).prop('checked', checkAllValue)
+
+      if checkAllValue
+        urlList.append("<li class='#{tableClassPrepend}-#{checkBoxDomain}'-selected-item>#{checkBoxDomain}</li>")
+      else
+        $(".#{tableClassPrepend}-#{checkBoxDomain}-selected-item").remove()
+
+  $('#domainHistoryCheckAll').click(() ->
+    checkAll(this, '#domainHistoryTableBody')
+  )
+
+  $('#xbrsHistoryCheckAll').click(() ->
+    checkAll(this, '#xbrsHistoryTableBody')
+  )
+
+  window.apply_webcat_research_categories = () ->
     domain = $('#webcat_research_search').val()
     entries = [ domain ]
     category_ids = []
@@ -39,7 +341,7 @@ $ ->
 
       categories.push $('#categorize-research-urls')[0].selectize.getItem(id)[0].innerText
 
-    $('.loader-gears').toggle()
+    $('#webcat-research-categorize-urls .loader-gears').toggle()
     $('.selected-urls-wrapper').toggle()
     $('.selected-urls-categories-wrapper').toggle()
 
@@ -55,7 +357,7 @@ $ ->
         data = response.data
 
         $('#webcat-research-categorize-url').dropdown('toggle')
-        $('.loader-gears').toggle()
+        $('#webcat-research-categorize-urls .loader-gears').toggle()
         unless data.complete_failed.length > 0 || data.create_failed.length > 0
           $('#categorize-research-urls')[0].selectize.clear()
 
@@ -64,7 +366,6 @@ $ ->
           std_msg_success('Categories were not created', [], reload: false)
       error: (response) ->
         $('#webcat-research-categorize-url').dropdown('toggle')
-        $('.loader-gears').toggle()
+        $('#webcat-research-categorize-urls .loader-gears').toggle()
         std_api_error(response, "Categories were not created.", reload: false)
     , this)
-
