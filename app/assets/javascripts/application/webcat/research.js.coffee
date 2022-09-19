@@ -147,73 +147,83 @@ $ ->
         domains: domain
       success: (response) ->
         data = JSON.parse response
-        domainKey = Object.keys(data)[0]
 
-        for entry in data[domainKey]
-          entry.domain = domainKey
-
-        data = data[domainKey]
-
-        $('#xbrsHistoryLoader').hide()
-
-        if $.fn.DataTable.isDataTable('#xbrs-history-table')
-          $('#xbrs-history-table').DataTable().rows.add(data)
-          $('#xbrs-history-table').DataTable().draw()
-          $('#xbrs-history-table_wrapper').show()
+        if data.code == 413
+          $('#xbrsHistoryLoader').hide()
+          $('.xbrs-history-table').show()
+          std_api_error(response, "Entries could not be retrieved.", reload: false)
         else
-          $('#xbrs-history-table').DataTable({
-            data: data
-            dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
-            columns: [
-              {
-                data: null
-                render: (data, type, full) ->
-                  "<input type='checkbox' name='https://#{data.domain}' class='categorize-url-button'</input>"
-              }
-              {
-                data: null
-                render: (data, type, full) ->
-                  cats = data.aups.map((aup) -> aup.cat).filter((value, index, self) ->
-                    self.indexOf(value) == index)
 
-                  cats = cats.toString().split(',').join(', ')
-                  return cats
-              }
-              {
-                data: 'domain'
+          domainKey = Object.keys(data)[0]
 
-              }
-              {
-                data: null
-                render: (data, type, full) ->
-                  { ruleHits } = data
-                  ruleHits = ruleHits.toString().split(',').join(', ')
-                  return ruleHits
-              }
-              {
-                data: null
-                render: (data, type, full) ->
-                  { threatCats } = data
-                  threatCats = threatCats.toString().split(',').join(', ')
-                  return threatCats
-              }
-            ]
-            language: {
-              search: "_INPUT_"
-              searchPlaceholder: "Search within table"
-            }
-            lengthMenu: [50, 100, 200]
-            order: [ [
-              3
-              'desc'
-            ] ]
-            pagingType: 'full_numbers'
-          })
+          for entry in data[domainKey]
+            entry.domain = domainKey
 
-        $('#xbrs-history-table_filter input').addClass('table-search-input domain-table-search-label')
+          data = data[domainKey]
 
-        $('#xbrsHistoryLoader').hide()
-        $('.xbrs-history-table').show()
+          $('#xbrsHistoryLoader').hide()
+
+          if $.fn.DataTable.isDataTable('#xbrs-history-table')
+            $('#xbrs-history-table').DataTable().rows.add(data)
+            $('#xbrs-history-table').DataTable().draw()
+            $('#xbrs-history-table_wrapper').show()
+          else
+            $('#xbrs-history-table').DataTable({
+              data: data
+              dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+              columns: [
+                {
+                  data: null
+                  render: (data, type, full) ->
+                    "<input type='checkbox' name='https://#{data.domain}' class='categorize-url-button'</input>"
+                }
+                {
+                  data: null
+                  render: (data, type, full) ->
+                    cats = data.aups.map((aup) -> aup.cat).filter((value, index, self) ->
+                      self.indexOf(value) == index)
+
+                    cats = cats.toString().split(',').join(', ')
+                    return cats
+                }
+                {
+                  data: 'domain'
+
+                }
+                {
+                  data: null
+                  render: (data, type, full) ->
+                    { ruleHits } = data
+                    ruleHits = ruleHits.toString().split(',').join(', ')
+                    return ruleHits
+                }
+                {
+                  data: null
+                  render: (data, type, full) ->
+                    { threatCats } = data
+                    threatCats = threatCats.toString().split(',').join(', ')
+                    return threatCats
+                }
+                {
+                  data: 'score'
+                }
+              ]
+              language: {
+                search: "_INPUT_"
+                searchPlaceholder: "Search within table"
+              }
+              lengthMenu: [50, 100, 200]
+              order: [ [
+                3
+                'desc'
+              ] ]
+              pagingType: 'full_numbers'
+            })
+
+          $('#xbrs-history-table_filter input').addClass('table-search-input domain-table-search-label')
+
+          $('#xbrsHistoryLoader').hide()
+          $('.xbrs-history-table').show()
       error: (errorResponse) ->
         $('#xbrsHistoryLoader').hide()
         $('.xbrs-history-table').show()
