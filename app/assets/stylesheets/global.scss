@@ -12459,6 +12459,20 @@ table > tbody > tr > td.no-padding {
   display: none;
 }
 
+.enrich-webrep-external-references-col {
+  display: none;
+}
+
+.enrich-cell-external-references {
+  display: flex;
+  flex-direction: column;
+}
+
+.enrich-external-reference-link, .enrich-external-reference-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
 #research_tab {
   .research-first-row {
     td {
