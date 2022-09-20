@@ -22,17 +22,17 @@
         %button#domain-history-webcat-research-categorize-url.webcat-research-categorize-url-button.toolbar-button.dropdown-toggle.esc-tooltipped{title: 'Categorize URL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text Categorize URL
         %div{'aria-labelledby': 'webcat-research-categorize-url', id: 'categorize-url-dropdown', class: 'dropdown-menu toolbar-dropdown'}
-          .loader-gears
+          .loader-gears#domain-categorize-loader-gears
             =inline_svg 'icon_gears_loader.svg'
-          .selected-urls-wrapper
+          .selected-urls-wrapper#domain-history-selected-urls-wrapper
             %label.selected-urls-label
               Selected URLs
             %ul#domainHistoryTableSelectedUrlsList
-          .selected-urls-categories-wrapper
+          .selected-urls-categories-wrapper#domain-history-selected-urls-categories-wrapper
             %label.selected-urls-categories-label
               Enter up to 5 categories
             %input#domain-history-categorize-research-urls.input-group.search-group
-            %button{type: 'submit', name: 'commit', id: 'cat-research', class: 'toolbar-button esc-tooltipped', onclick: 'apply_webcat_research_categories("#domainHistoryTableSelectedUrlsList", "#domain-history-categorize-research-urls"); return false', 'data-disable-with': 'Submit'}
+            %button{type: 'submit', name: 'commit', id: 'cat-research', class: 'toolbar-button esc-tooltipped', onclick: 'apply_webcat_research_categories("domain-history"); return false', 'data-disable-with': 'Submit'}
               %span#categorize-research-submit.toolbar-button-text
                 Submit
 

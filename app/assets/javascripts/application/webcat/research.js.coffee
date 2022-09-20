@@ -349,7 +349,10 @@ $ ->
     checkAll(this, '#xbrsHistoryTableBody')
   )
 
-  window.apply_webcat_research_categories = (listId, inputId, buttonId) ->
+  window.apply_webcat_research_categories = (tab) ->
+    listId = if tab == 'xbrs' then '#xbrsHistorySelectedUrlsList' else "#domainHistoryTableSelectedUrlsList"
+    inputId = if tab == 'xbrs' then "#xbrs-history-categorize-research-urls" else "#domain-history-categorize-research-urls"
+    buttonId = if tab == 'xbrs' then "#xbrs-history-webcat-research-categorize-url" else "#domain-history-webcat-research-categorize-url"
     entries = []
     category_ids = []
     categories = []
@@ -365,8 +368,14 @@ $ ->
 
       categories.push $(inputId)[0].selectize.getItem(id)[0].innerText
 
-    $(buttonId).dropdown('toggle')
-    $("#{buttonId} .loader-gears").toggle()
+    if tab == 'xbrs'
+      $("#xbrs-categorize-loader-gears").toggle()
+      $('#xbrs-selected-urls-wrapper').toggle()
+      $('#xbrs-selected-urls-categories-wrapper').toggle()
+    else
+      $("#domain-categorize-loader-gears").toggle()
+      $('#domain-history-selected-urls-wrapper').toggle()
+      $('#domain-history-selected-urls-categories-wrapper').toggle()
 
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaints/bulk_categorize'
@@ -379,13 +388,22 @@ $ ->
       success: (response) ->
         data = response.data
 
-        $("#{buttonId} .loader-gears").toggle()
+        if tab == 'xbrs'
+          $("#xbrs-categorize-loader-gears").toggle()
+          $('#xbrs-selected-urls-wrapper').toggle()
+          $('#xbrs-selected-urls-categories-wrapper').toggle()
+        else
+          $("#domain-categorize-loader-gears").toggle()
+          $('#domain-history-selected-urls-wrapper').toggle()
+          $('#domain-history-selected-urls-categories-wrapper').toggle()
+
         unless data.complete_failed.length > 0 || data.create_failed.length > 0
           $(inputId)[0].selectize.clear()
 
           std_msg_success('Categories Submitted', [], reload: false)
         else
-          std_msg_success('Categories were not created', [], reload: false)
+          failed = data.complete_failed.concat data.created_failed
+          std_msg_success('Categories were not created', failed, reload: false)
       error: (response) ->
         $('#webcat-research-categorize-url').dropdown('toggle')
         $('#webcat-research-categorize-urls .loader-gears').toggle()
