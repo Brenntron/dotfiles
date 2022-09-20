@@ -210,11 +210,12 @@ $ ->
                   data: null
                   render: (data, type, full) ->
                     { score } = data
+                    rep = wbrs_display(score)
 
                     if score % 1 == 0
                       score = parseFloat(score).toFixed(1)
 
-                    return score
+                    return "<span class='webcat-research-svg icon-#{rep}'></span><p>#{score}</p>"
                 }
               ]
               language: {

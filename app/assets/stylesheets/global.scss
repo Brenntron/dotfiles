@@ -5888,16 +5888,6 @@ input.table-entry-input:focus {
     margin-left: 10px;
   }
 
-  .webcat-research-svg {
-    background-repeat: no-repeat;
-    display: none;
-    float: left;
-    height: 20px;
-    margin-right: 3px;
-    margin-top: 0;
-    width: 20px;
-  }
-
   thead {
     color: #999;
 
@@ -5927,6 +5917,20 @@ input.table-entry-input:focus {
 
   .domain-table-search-label {
     height: 100%;
+  }
+
+  .webcat-research-svg {
+    background-repeat: no-repeat;
+    display: none;
+    float: left;
+    height: 20px;
+    margin-right: 3px;
+    margin-top: 0;
+    width: 20px;
+  }
+
+  .table .webcat-research-svg {
+    display: initial;
   }
 }
 
