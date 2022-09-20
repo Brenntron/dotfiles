@@ -338,16 +338,19 @@ $ ->
     checkAll(this, '#xbrsHistoryTableBody')
   )
 
-  window.apply_webcat_research_categories = () ->
-    domain = $('#webcat_research_search').val()
-    entries = [ domain ]
+  window.apply_webcat_research_categories = (listId, inputId) ->
+    entries = []
     category_ids = []
     categories = []
+    urlsListItems = $(listId).find('li')
 
-    for id in $('#categorize-research-urls').val().split(',')
+    for listItem in urlsListItems
+      entries.push $(listItem).data().name
+
+    for id in $(inputId).val().split(',')
       category_ids.push id
 
-      categories.push $('#categorize-research-urls')[0].selectize.getItem(id)[0].innerText
+      categories.push $(inputId)[0].selectize.getItem(id)[0].innerText
 
     $('#webcat-research-categorize-urls .loader-gears').toggle()
     $('.selected-urls-wrapper').toggle()
