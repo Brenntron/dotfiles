@@ -151,7 +151,7 @@ $ ->
         if data.code == 413
           $('#xbrsHistoryLoader').hide()
           $('.xbrs-history-table').show()
-          std_api_error(response, "Entries could not be retrieved.", reload: false)
+          alert("Entries could not be retrieved.")
         else
 
           domainKey = Object.keys(data)[0]
@@ -162,6 +162,8 @@ $ ->
           data = data[domainKey]
 
           $('#xbrsHistoryLoader').hide()
+
+          $('#xbrsDomainTableListingContent').append("<p class='domain-data result-total'>(#{data.length} found)</p>")
 
           if $.fn.DataTable.isDataTable('#xbrs-history-table')
             $('#xbrs-history-table').DataTable().rows.add(data)
@@ -205,7 +207,14 @@ $ ->
                     return threatCats
                 }
                 {
-                  data: 'score'
+                  data: null
+                  render: (data, type, full) ->
+                    { score } = data
+
+                    if score % 1 == 0
+                      score = parseFloat(score).toFixed(1)
+
+                    return score
                 }
               ]
               language: {
