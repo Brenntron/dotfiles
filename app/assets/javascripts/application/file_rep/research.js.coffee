@@ -548,6 +548,8 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
       if response?.data?.context_tags.length > 0
         combined_tags = combined_tags.concat(response.data.context_tags)
 
+
+
       if response?.data?.email_context_tags.length > 0
         combined_tags = combined_tags.concat(response.data.email_context_tags)
 
