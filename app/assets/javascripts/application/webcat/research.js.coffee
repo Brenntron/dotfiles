@@ -178,7 +178,8 @@ $ ->
                 {
                   data: null
                   render: (data, type, full) ->
-                    "<input type='checkbox' name='https://#{data.domain}' class='categorize-url-button'</input>"
+                    "<input type='checkbox' name='https://#{data.domain}' class='xbrs-categorize-url-button'</input>"
+                  sortable: false;
                 }
                 {
                   data: null
