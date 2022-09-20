@@ -73,9 +73,9 @@ $ ->
             columns: [
               {
                 data: null
-                render: (data, type, full) ->
+                render: (data, type, full, meta) ->
                   { url } = data
-                  "<input type='checkbox' data-name='#{url}' class='domain-history-categorize-url-button categorize-url-button'</input>"
+                  "<input type='checkbox' data-name='#{url}' data-row=#{meta.row} class='domain-history-categorize-url-button categorize-url-button'</input>"
                 sortable: false
               }
               {
@@ -135,7 +135,6 @@ $ ->
         $('.domain-history-table').show()
       error: (errorResponse) ->
         $('#domainHistoryLoader').hide()
-        $('.domain-history-table').show()
         std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
     )
 
@@ -151,10 +150,8 @@ $ ->
 
         if data.code == 413
           $('#xbrsHistoryLoader').hide()
-          $('.xbrs-history-table').show()
           std_msg_error(data.error, [])
         else
-
           domainKey = Object.keys(data)[0]
 
           for entry in data[domainKey]
@@ -177,8 +174,8 @@ $ ->
               columns: [
                 {
                   data: null
-                  render: (data, type, full) ->
-                    "<input type='checkbox' name='https://#{data.domain}' class='xbrs-categorize-url-button'</input>"
+                  render: (data, type, full, meta) ->
+                    "<input type='checkbox' data-name='#{data.domain}' data-row='#{meta.row}' class='xbrs-categorize-url-button categorize-url-button'</input>"
                   sortable: false;
                 }
                 {
@@ -232,13 +229,12 @@ $ ->
               pagingType: 'full_numbers'
             })
 
-          $('#xbrs-history-table_filter input').addClass('table-search-input domain-table-search-label')
+            $('#xbrs-history-table_filter input').addClass('table-search-input domain-table-search-label')
 
-          $('#xbrsHistoryLoader').hide()
-          $('.xbrs-history-table').show()
+            $('#xbrsHistoryLoader').hide()
+            $('.xbrs-history-table').show()
       error: (errorResponse) ->
         $('#xbrsHistoryLoader').hide()
-        $('.xbrs-history-table').show()
         std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
     )
 
@@ -280,47 +276,49 @@ $ ->
   )
 
   $('#domain-history-webcat-research-categorize-url').click(() ->
-    $('#domain-history-categorize-research-urls').selectize {
-      create: false,
-      labelField: 'category_name',
-      maxItems: 5,
-      options: AC.WebCat.createSelectOptions('#domain-history-categorize-research-urls'),
-      persist: true,
-      searchField: ['category_name', 'category_code'],
-      valueField: 'category_id'
-    }
+    unless $('#domain-history-categorize-research-urls')[0].selectize
+      $('#domain-history-categorize-research-urls').selectize {
+        create: false,
+        labelField: 'category_name',
+        maxItems: 5,
+        options: AC.WebCat.createSelectOptions('#domain-history-categorize-research-urls'),
+        persist: true,
+        searchField: ['category_name', 'category_code'],
+        valueField: 'category_id'
+      }
   )
 
   $('#xbrs-history-webcat-research-categorize-url').click(() ->
-    $('#xbrs-history-categorize-research-urls').selectize {
-      create: false,
-      labelField: 'category_name',
-      maxItems: 5,
-      options: AC.WebCat.createSelectOptions('#xbrs-history-categorize-research-urls'),
-      persist: true,
-      searchField: ['category_name', 'category_code'],
-      valueField: 'category_id'
-    }
+    unless $('#xbrs-history-categorize-research-urls')[0].selectize
+      $('#xbrs-history-categorize-research-urls').selectize {
+        create: false,
+        labelField: 'category_name',
+        maxItems: 5,
+        options: AC.WebCat.createSelectOptions('#xbrs-history-categorize-research-urls'),
+        persist: true,
+        searchField: ['category_name', 'category_code'],
+        valueField: 'category_id'
+      }
   )
 
   $(document).on("click",'.xbrs-categorize-url-button', () ->
     button = $(this)
-    buttonDomain = button.data().name
+    { name, row } = button.data()
 
     if button.is(':checked')
-      $('#xbrsHistorySelectedUrlsList').append("<li data-name='#{buttonDomain}'>#{buttonDomain}</li>")
+      $('#xbrsHistorySelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'>#{name}</li>")
     else
-      $("li[data-name='#{buttonDomain}']").remove()
+      $("li[data-row='#{row}']").remove()
   )
 
   $(document).on("click", '.domain-history-categorize-url-button', () ->
     button = $(this)
-    buttonDomain = button.data().name
+    { name, row } = button.data()
 
     if button.is(':checked')
-      $('#domainHistoryTableSelectedUrlsList').append("<li data-name='#{buttonDomain}'>#{buttonDomain}</li>")
+      $('#domainHistoryTableSelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'>#{name}</li>")
     else
-      $("li[data-name='#{buttonDomain}']").remove()
+      $("li[data-row='#{row}']").remove()
   )
 
   checkAll = (headerCheckBox, tableId) ->
@@ -351,7 +349,7 @@ $ ->
     checkAll(this, '#xbrsHistoryTableBody')
   )
 
-  window.apply_webcat_research_categories = (listId, inputId) ->
+  window.apply_webcat_research_categories = (listId, inputId, buttonId) ->
     entries = []
     category_ids = []
     categories = []
@@ -360,14 +358,15 @@ $ ->
     for listItem in urlsListItems
       entries.push $(listItem).data().name
 
+    entries = $.unique(entries)
+
     for id in $(inputId).val().split(',')
       category_ids.push id
 
       categories.push $(inputId)[0].selectize.getItem(id)[0].innerText
 
-    $('#webcat-research-categorize-urls .loader-gears').toggle()
-    $('.selected-urls-wrapper').toggle()
-    $('.selected-urls-categories-wrapper').toggle()
+    $(buttonId).dropdown('toggle')
+    $("#{buttonId} .loader-gears").toggle()
 
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaints/bulk_categorize'
@@ -380,10 +379,9 @@ $ ->
       success: (response) ->
         data = response.data
 
-        $('#webcat-research-categorize-url').dropdown('toggle')
-        $('#webcat-research-categorize-urls .loader-gears').toggle()
+        $("#{buttonId} .loader-gears").toggle()
         unless data.complete_failed.length > 0 || data.create_failed.length > 0
-          $('#categorize-research-urls')[0].selectize.clear()
+          $(inputId)[0].selectize.clear()
 
           std_msg_success('Categories Submitted', [], reload: false)
         else

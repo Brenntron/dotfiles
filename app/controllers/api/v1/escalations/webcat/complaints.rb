@@ -470,6 +470,9 @@ module API
               else
                 {:status => "success", :data => response[:data]}
               end
+            end
+
+            params do
               requires :domain, type: String
             end
 
