@@ -151,7 +151,7 @@ $ ->
         if data.code == 413
           $('#xbrsHistoryLoader').hide()
           $('.xbrs-history-table').show()
-          alert("Entries could not be retrieved.")
+          std_msg_error(data.error, [])
         else
 
           domainKey = Object.keys(data)[0]
@@ -248,7 +248,9 @@ $ ->
       if domain
         $('#webcat_research_search').val(domain)
         $('#domainHistorySvg').hide()
+        $('#domainHistorySvg').removeClass('icon-unkown icon-untrusted icon-questionable icon-neutral icon-favorable icon-trusted')
         $('#xbrsHistorySvg').hide()
+        $('#xbrsHistorySvg').removeClass('icon-unkown icon-untrusted icon-questionable icon-neutral icon-favorable icon-trusted')
         $('.domain-data').remove()
 
         $('#xbrsDomainName').remove()
