@@ -453,6 +453,35 @@ module API
 
             end
 
+            params do
+              optional :entries, type: Array
+              optional :categories, type: Array
+              optional :category_ids, type: Array
+            end
+
+            post 'bulk_categorize' do
+
+              authorize!(:update, ComplaintEntry)
+              #bugzilla_rest_session = BugzillaRest::Session.default_session
+
+              response = Complaint.process_bulk_adhoc_categorizations(params, current_user, bugzilla_rest_session)
+              if response[:errors].present?
+                {:status => "error", :errors => response[:errors], :data => response[:data]}
+              else
+                {:status => "success", :data => response[:data]}
+              end
+              requires :domain, type: String
+            end
+
+            get 'domain_info' do
+              score = nil
+              category = "no category found"
+
+              score = Sbrs::Base.combo_call_sds_v3(params[:domain], [])["wbrs"]["score"]
+              category = ComplaintEntry.get_category_data(params[:domain])
+
+              {:data => {:score => score, :category => category}}.to_json
+            end
           end
         end
       end
