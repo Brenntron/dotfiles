@@ -555,8 +555,7 @@ class AutoResolve
     begin
       if classification.present?
 
-        RepApi::Blacklist.add_from_hosts(hostnames: [ dispute_entry.hostlookup ], classifications: [ classification ], author: author, comment: comment)
-
+        RepApi::Blacklist.add_from_hosts(hostnames: [ dispute_entry.hostlookup ], classifications: [ classification ], author: author, comment: comment, force: true)
         result[:success] = true
       end
 
@@ -590,7 +589,8 @@ class AutoResolve
     RepApi::Blacklist.add_from_hosts(hostnames: [ uri ],
                                      classifications: [ 'malware' ],
                                      author: author,
-                                     comment: comment)
+                                     comment: comment,
+                                     force: true)
   end
 
   def self.bad_email_mnem?(rule_hit)

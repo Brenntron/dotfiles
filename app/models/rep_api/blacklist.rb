@@ -176,15 +176,25 @@ class RepApi::Blacklist < RepApi::Base
     raise "Missing parameter: author" unless input.has_key?('author')
     raise "Missing parameter: comment" unless input.has_key?('comment')
 
+    comment = input['comment'].blank? ? "" : input['comment']
+    comment += " | AUTHOR: #{input['author']}"
+
     conditions = {}
-    conditions[:source] = input['author'] rescue nil
-    conditions[:comment] = input['comment'] rescue nil
+    #leavin this out for the time being
+    #conditions[:source] = "VRT" #input['author'] rescue nil
+    conditions[:comment] = comment rescue nil
     conditions[:classification] = self.classifications rescue nil
     conditions[:entry] = self.entry rescue nil
 
+
+    base_url = "/api/v3/blocklist/add"
+    if input['force'].present?
+      base_url += "?force=True"
+    end
+
     #response = call_json_request(:post, '/escalations/add', body: build_request_body(input))
 
-    response = call_json_request(:post, '/api/v3/blocklist/add', body: conditions)
+    response = call_json_request(:post, base_url, body: conditions)
 
     blocklist_objects = []
 
@@ -282,10 +292,10 @@ class RepApi::Blacklist < RepApi::Base
   # @param [String] author: moniker of who is adding or updating this entry.
   # @param [String] comment: comment to use for blacklist.
   # @return [Array<RepApi::Blacklist>] collection of responses with entry, expiration, and message.
-  def self.add_from_hosts(hostnames:, classifications:, author:, comment:)
+  def self.add_from_hosts(hostnames:, classifications:, author:, comment:, force: false)
     blacklist = RepApi::Blacklist.new(entry: hostnames,
                                       classifications: classifications)
-    blacklist.save!(author: author, comment: comment)
+    blacklist.save!(author: author, comment: comment, force: force)
   end
 
   # Save the blacklist object.
@@ -308,11 +318,17 @@ class RepApi::Blacklist < RepApi::Base
     else
       reptool_entries = entries
     end
+    if params['force'].present?
+      force = true
+    else
+      force = nil
+    end
 
     add_from_hosts(hostnames: reptool_entries,
                    classifications:params['classifications'],
                    author: username,
-                   comment: params['comment'])
+                   comment: params['comment'],
+                   force: force)
   end
 
   def self.delete_from_params(params)
