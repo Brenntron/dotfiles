@@ -128,7 +128,10 @@ development:
     verify_mode: "verify-none"
     gssnegotiate: false
     auth_token: "redacted"
-
+  umbrella_data_fetcher:
+    aws:
+      access_key_id: "redacted"
+      secret_access_key: "redacted"
 
  
 test:
@@ -260,6 +263,10 @@ test:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  umbrella_data_fetcher:
+    aws:
+      access_key_id: "redacted"
+      secret_access_key: "redacted"
 
 staging:
   amp_poke:
@@ -399,6 +406,10 @@ staging:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  umbrella_data_fetcher:
+    aws:
+      access_key_id: "redacted"
+      secret_access_key: "redacted"
 
 production:
   amp_poke: 
@@ -539,4 +550,8 @@ production:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  umbrella_data_fetcher:
+    aws:
+      access_key_id: "redacted"
+      secret_access_key: "redacted"
 
