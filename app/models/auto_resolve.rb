@@ -360,7 +360,7 @@ class AutoResolve
     result[:log] = ""
     begin
       rep_result = RepApi::Whitelist.get_whitelist_info({:entries => [entry]})
-      if rep_result[rep_result.keys.last]["status"] == "ACTIVE"
+      if rep_result[rep_result.keys.last]["status"].upcase == "ACTIVE"
         result[:pass] = true
         result[:log] = "ACTIVE entry on Reptool whitelist, manual review."
       else
@@ -554,11 +554,8 @@ class AutoResolve
     comment = "TE SecHub-Auto-#{dispute_entry.dispute_id}"
     begin
       if classification.present?
-        RepApi::Blacklist.add_from_hosts(hostnames: [ dispute_entry.hostlookup ],
-                                         classifications: [ classification ],
-                                         author: author,
-                                         comment: comment)
 
+        RepApi::Blacklist.add_from_hosts(hostnames: [ dispute_entry.hostlookup ], classifications: [ classification ], author: author, comment: comment, force: true)
         result[:success] = true
       end
 
@@ -592,7 +589,8 @@ class AutoResolve
     RepApi::Blacklist.add_from_hosts(hostnames: [ uri ],
                                      classifications: [ 'malware' ],
                                      author: author,
-                                     comment: comment)
+                                     comment: comment,
+                                     force: true)
   end
 
   def self.bad_email_mnem?(rule_hit)

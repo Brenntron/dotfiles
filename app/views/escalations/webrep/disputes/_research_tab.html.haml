@@ -170,7 +170,10 @@
                       -# Each checked entry will populate information here
 
                   .dropdown-tool-text-divider.secondary-text-divider
-                    Adjust RepTool Classification
+                    .inline-text Adjust RepTool Classification
+                    .inline-label-wrapper.float-right
+                      %input#reptool-toolbar-force.reptool-toolbar-force{type: 'checkbox', name: 'force', value: true}
+                      %label{for: "reptool-toolbar-force"} Force commit
 
                   .inline-tool-content-wrapper
                     .row
@@ -519,7 +522,12 @@
                             .dispute-reptool-adjust-wrapper
                               %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
                               %input.adjust-reptool-bl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
-                              %h3.reptool-dropdown-header Adjust RepTool Classification
+                              %h3.reptool-dropdown-header
+                                .inline-text Adjust RepTool Classification
+                                .inline-label-wrapper.float-right
+                                  %input.reptool-toolbar-force{id:"#{entry.id}-reptool-toolbar-force", type: 'checkbox', name: 'force', value: true}
+                                  %label{for: "#{entry.id}-reptool-toolbar-force"} Force commit
+
                               %table.dispute_tool_current
                                 %thead
                                   %tr
