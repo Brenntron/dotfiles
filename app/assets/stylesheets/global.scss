@@ -10713,14 +10713,14 @@ button.secondary.view-report-external-button {
 .sb-report-run,
 .sdr-research-data-present,
 .sdr-research-data-missing,
-.enrich-data-missing{
+.enrich-filerep-data-missing{
   display: none;
 }
 
 .tg-data-missing,
 .sb-data-missing,
 .rl-data-missing,
-.enrich-data-missing,
+.enrich-filerep-data-missing,
 .sb-report-run,
 .tg-report-run,
 .rl-report-run {
@@ -11041,30 +11041,6 @@ div[aria-describedby='create-detection-dialog'] {
 }
 .active-editing-buttons {
   display: none;
-}
-
-.enrich-file-rep-data-present {
-  margin-top: 16px;
-  display: none;
-}
-
-.data-enrich-filerep-name-label {
-  float: left;
-  width: fit-content;
-  margin: 0 12px 10px 0;
-}
-
-.data-enrich-filerep-name {
-  margin-top: 0;
-  float: left;
-}
-
-.data-enrich-filerep-description-label {
-  margin: 4px 0;
-}
-
-.data-enrich-filerep-wrapper {
-  margin-bottom: 26px;
 }
 
 #amp-naming-details-table {
@@ -13145,6 +13121,77 @@ table > tbody > tr > td.no-padding {
   #file-index-table-show-columns-dropdown ul li {
     cursor: default;
   }
+}
+
+//Filerep enrich data section
+
+.enrich-filerep-data-present {
+  display: none;
+}
+
+.data-enrich-filerep-name-label {
+  float: left;
+  width: fit-content;
+  margin: 0 12px 10px 0;
+}
+
+.data-enrich-filerep-name {
+  margin-top: 0;
+  float: left;
+}
+
+.data-enrich-filerep-description-label {
+  margin: 4px 0;
+}
+
+.enrich-filerep-section-header {
+  border-bottom: 1px solid #f2f2f2;
+  padding: 22px 0 7px 0;
+}
+
+.filerep-enrich-taxonomy-header-wrapper {
+  display: flex;
+  align-items: baseline;
+}
+
+.filerep-enrich-taxonomy-label {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.filerep-enrich-taxonomy-header {
+  font-weight: 400;
+  font-size: 12px;
+  padding-left: 24px;
+}
+
+.filerep-enrich-taxonomy-table td{
+  border: none;
+}
+.filerep-enrich-table-body-row {
+  border-top: 1px solid #f2f2f2;
+}
+
+.filerep-enrich-table-description-th {
+  padding: 8px 8px 6px 8px;
+}
+
+.filerep-enrich-cell-external-references {
+  padding: 0;
+}
+
+.filerep-enrich-cell-name {
+  min-width: 85px;
+  padding: 0;
+}
+
+.filerep-enrich-cell-external-references {
+  width: 16%;
+  text-align: right;
+}
+
+.filerep-enrich-external-ref {
+  text-decoration: underline;
 }
 
 

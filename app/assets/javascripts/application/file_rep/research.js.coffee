@@ -565,13 +565,15 @@ create_filerep_enrich_section = (tags, context) ->
 
     #create section wrapper
     section_wrapper = $("<div class='enrich-filerep-section-wrapper'></div>")
-    section_header = "<h4>#{context}</h4>"
-    taxonomy_header = "<div><label class='enrich-taxonomy-filerep-label'>Taxonomy:</label><h5>#{taxonomy_name}</h5></div>"
-
+    section_header = "<h4 class='enrich-filerep-section-header'>#{context}</h4>"
+    taxonomy_header = "<div class='filerep-enrich-taxonomy-header-wrapper'><label class='filerep-enrich-taxonomy-label'>Taxonomy:</label><h5 class='filerep-enrich-taxonomy-header'>#{taxonomy_name}</h5></div>"
     $(section_wrapper).append section_header
     $(section_wrapper).append taxonomy_header
+    #create table wrapper
+    table_wrapper = $("<table class='filerep-enrich-taxonomy-table'></table>")
+    #loop through each tag in group
 
-    $(tag_group).each (i, tag) ->
+    $(tag_group).each (index, tag) ->
       name = ''
       description = ''
 
@@ -588,18 +590,18 @@ create_filerep_enrich_section = (tags, context) ->
           $(tag.mapped_taxonomy?.external_references).each (index, external_ref) ->
             combined_external_refs = combined_external_refs.concat external_ref
 
-      #create table wrapper
-      table_wrapper = $("<table></table>")
-      table_header = "<tr><th>Name</th><th>Description</th><th>External Ref</th></tr>"
+      #create table header if first result
+      if index == 0
+        table_header = "<tr class='filerep-enrich-table-header-row'><th>Name</th><th class='filerep-enrich-table-description-th'>Description</th><th>External Ref</th></tr>"
+        $(table_wrapper).append table_header
 
-      $(table_wrapper).append table_header
       name_wrapper = $("<td class='filerep-enrich-cell-name'></td>")
       $(name_wrapper).text(name) #escaping to prevent xss attacks
       description_wrapper = $("<td class='filerep-enrich-cell-description'></td>")
       $(description_wrapper).text(description) #escaping to prevent xss attacks
       external_ref_wrapper = $("<td class='filerep-enrich-cell-external-references'></td>")
 
-      row_wrapper = $("<tr></tr>")
+      row_wrapper = $("<tr class='filerep-enrich-table-body-row'></tr>")
       $(row_wrapper).append name_wrapper
       $(row_wrapper).append description_wrapper
       $(row_wrapper).append external_ref_wrapper
@@ -609,7 +611,7 @@ create_filerep_enrich_section = (tags, context) ->
 
         $('.enrich-webrep-external-references-col').show()
         $(combined_external_refs).each (index, external_ref) ->
-          individual_wrapper = $("<span class='enrich-external-ref' id='enrich-external-ref-#{index}'></span>")
+          individual_wrapper = $("<span class='filerep-enrich-external-ref' id='filerep-enrich-external-ref-#{index}'></span>")
           link_wrapper = ''
           source = ''
           url = ''
@@ -628,8 +630,9 @@ create_filerep_enrich_section = (tags, context) ->
           $(external_ref_wrapper).append individual_wrapper
 
       $(table_wrapper).append row_wrapper
-      $(section_wrapper).append table_wrapper
-      $('.enrich-file-rep-data-present').append section_wrapper
+
+    $(section_wrapper).append table_wrapper
+    $('.enrich-filerep-data-present').append section_wrapper
 
 ########### ENRICHMENT API REPORT ############
 window.get_enrichment_service_filerep = (sha256_hash) ->
@@ -656,7 +659,7 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
 
       #check if any data returned and show section
       if email_context_tags.length > 0 || web_context_tags.length > 0 || enrichment_context_tags.length > 0
-        $('.enrich-file-rep-data-present').show()
+        $('.enrich-filerep-data-present').show()
 
         ## Enrichment Section - Email Section
         if email_context_tags.length > 0
@@ -672,7 +675,7 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
 
       #show empty message if no tags returned
       else
-        $('.enrich-data-missing').show()
+        $('.enrich-filerep-data-missing').show()
 
     error: (response) ->
       std_msg_error('Error with Enrichment Service', ['There was an error.'])
