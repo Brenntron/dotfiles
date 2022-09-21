@@ -232,9 +232,9 @@ get_threat_data = window.get_threatgrid_data = () ->
         loader.hide()
         $(tg_report_running).hide()
 
-    error: (response) ->
-      loader.hide()
-      std_api_error(response, "There was a problem retrieving data from ThreatGrid", reload: false)
+#    error: (response) ->
+#      loader.hide()
+#      std_api_error(response, "There was a problem retrieving data from ThreatGrid", reload: false)
   )
 
 
@@ -299,9 +299,9 @@ window.get_reversinglabs_data = (sha256_hash) ->
         $(report_present).hide()
         $(report_missing).show()
 
-    error: (response) ->
-      $('#rl-loader').hide()
-      std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
+#    error: (response) ->
+#      $('#rl-loader').hide()
+#      std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
   )
 
 
@@ -436,7 +436,7 @@ window.get_sandbox_report = (runid, sha256_hash) ->
 
     error: (response) ->
       $('#sb-loader').hide()
-      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
+#      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
 
 
@@ -531,6 +531,15 @@ get_run_status = window.get_run_status = (sha256_hash) ->
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
 
+#group taxonomies by ID
+group_by_tag = (object_array, property) ->
+  blank_object = {}
+  return object_array.reduce (acc, obj) ->
+    key = obj[property]
+    if (!blank_object[key])
+      blank_object[key] = []
+    blank_object[key].push(obj)
+    return blank_object
 
 ########### ENRICHMENT API REPORT ############
 window.get_enrichment_service_filerep = (sha256_hash) ->
@@ -543,45 +552,105 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
 
       $('#enrich-loader').hide()
       combined_tags = []
+      context_tags = []
+      email_context = null
+      web_context = null
 
-      #look for data in context_tags, email_context_tags and web_context_tags
       if response?.data?.context_tags.length > 0
         combined_tags = combined_tags.concat(response.data.context_tags)
+        context_tags = combined_tags.concat(response.data.context_tags)
 
-
-
+      #look for data in context_tags, email_context_tags and web_context_tags
       if response?.data?.email_context_tags.length > 0
+        email_context = combined_tags.concat(response.data.email_context_tags)
         combined_tags = combined_tags.concat(response.data.email_context_tags)
 
       if response?.data?.web_context_tags.length > 0
+        web_context = response.data.web_context_tags[0]
         combined_tags = combined_tags.concat(response.data.web_context_tags)
 
-      #display any tag's name and description
+      #check if any data returned
       if combined_tags.length > 0
 
         $('.enrich-file-rep-data-present').show()
 
-        $(combined_tags).each (index, tag) ->
+        ## Enrichment Section - Enrichment (Other) Section
+        if context_tags.length > 0
+          taxonomy_object = group_by_tag(combined_tags, 'taxonomy_id')
+          taxonomy_array = Object.entries(taxonomy_object)
 
-          if tag.mapped_taxonomy?.name[0].text?
-            name = tag.mapped_taxonomy.name[0].text
-          else name = ''
+          #loop through each group of tags and put each in their own section
+          $(taxonomy_array).each (i, group) ->
+            tag_group = $(group)[1]
+            taxonomy_name = tag_group[0].taxonomy_name
 
-          if tag.mapped_taxonomy?.description[0].text?
-            description = tag.mapped_taxonomy.description[0].text
-          else description = ''
+            #create section wrapper
+            section_wrapper = $("<div class='enrich-filerep-section-wrapper'></div>")
+            section_header = "<h4>Enrichment</h4>"
+            taxonomy_header = "<div><label class='enrich-taxonomy-filerep-label'>Taxonomy:</label><h5>#{taxonomy_name}</h5></div>"
 
-          wrapper = $("<div class='data-enrich-filerep-wrapper'></div>")
+            $(section_wrapper).append section_header
+            $(section_wrapper).append taxonomy_header
 
-          name_wrapper = $("<div><label class='data-report-label data-enrich-filerep-name-label'>TTS Name</label><p class='data-enrich-filerep-name'></p></div>")
-          $(name_wrapper).find('.data-enrich-filerep-name').text(name) #escaping to prevent xss attacks
+            $(tag_group).each (i, tag) ->
+              name = ''
+              description = ''
 
-          description_wrapper = $("<div><label class='data-report-label data-enrich-filerep-description-label'>TTS Description</label><p class='data-enrich-filerep-description'></p></div>")
-          $(description_wrapper).find('.data-enrich-filerep-description').text(description) #escaping to prevent xss attacks
+              if tag.mapped_taxonomy?.name[0].text?
+                name = tag.mapped_taxonomy.name[0].text
 
-          $(wrapper).append name_wrapper
-          $(wrapper).append description_wrapper
-          $('.enrich-file-rep-data-present').append(wrapper)
+              if tag.mapped_taxonomy?.description[0].text?
+                description = tag.mapped_taxonomy.description[0].text
+
+              #look for any external reference data
+              combined_external_refs = []
+              if tag.mapped_taxonomy?.external_references?
+                if tag.mapped_taxonomy?.external_references.length > 0
+                  $(tag.mapped_taxonomy?.external_references).each (index, external_ref) ->
+                    combined_external_refs = combined_external_refs.concat external_ref
+
+              #create table wrapper
+              table_wrapper = $("<tr></tr>")
+              table_header = "<tr><th>Name</th><th>Description</th><th>External Ref</th></tr>"
+
+              $(table_wrapper).append table_header
+              name_wrapper = $("<td class='filerep-enrich-cell-name'></td>")
+              $(name_wrapper).text(name) #escaping to prevent xss attacks
+              description_wrapper = $("<td class='filerep-enrich-cell-description'></td>")
+              $(description_wrapper).text(description) #escaping to prevent xss attacks
+              external_ref_wrapper = $("<td class='filerep-enrich-cell-external-references'></td>")
+
+              row_wrapper = $("<tr></tr>")
+              $(row_wrapper).append name_wrapper
+              $(row_wrapper).append description_wrapper
+              $(row_wrapper).append external_ref_wrapper
+
+              #if any external references are returned show column and append data
+              if combined_external_refs.length > 0
+
+                $('.enrich-webrep-external-references-col').show()
+                $(combined_external_refs).each (index, external_ref) ->
+                  individual_wrapper = $("<span class='enrich-external-ref' id='enrich-external-ref-#{index}'></span>")
+                  link_wrapper = ''
+                  source = ''
+                  url = ''
+
+                  if external_ref.source?
+                    source = external_ref.source
+
+                  if external_ref.url?
+                    url = external_ref.url
+
+                  if source != '' && url != ''
+                    link_wrapper = $("<a href=#{url} class='filerep-enrich-external-reference-link' target='blank'></a>")
+                    $(link_wrapper).text(source)
+
+                  $(individual_wrapper).append link_wrapper
+                  $(external_ref_wrapper).append individual_wrapper
+
+              $(table_wrapper).append row_wrapper
+              $(section_wrapper).append table_wrapper
+              $('.enrich-file-rep-data-present').append section_wrapper
 
       #show empty message if no tags returned
       else
