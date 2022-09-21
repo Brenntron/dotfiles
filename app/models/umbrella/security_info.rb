@@ -24,6 +24,20 @@ class Umbrella::SecurityInfo
     HTTPI.get(request)
   end
 
+  def self.query_malicious_domains(address)
+    full_url = "https://investigate.api.umbrella.com/pdns/ip/" + address
+    full_url += "?sortorder=desc&includefeatures=true"
+
+    request = HTTPI::Request.new(full_url)
+    request.ssl = true
+    request.auth.ssl.verify_mode = :peer
+    request.headers['Authorization'] = "Bearer #{Rails.configuration.umbrella.api_key}"
+
+    request.headers['Content-Type'] = 'application/json'
+
+    HTTPI.get(request).body
+  end
+
   def self.health_check
     health_report = {}
 

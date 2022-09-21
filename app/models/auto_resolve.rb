@@ -16,10 +16,11 @@ class AutoResolve
 
   #entry point
   def self.process_auto_resolution(auto_args)
+
     umbrella_no_reply = Platform.find_by_all_names("Umbrella - No Reply")
     dispute_entry = auto_args[:dispute_entry]
     sugg_disposition = auto_args[:entry_claim]
-
+    is_ip_address = !!(dispute_entry.hostlookup  =~ Resolv::IPv4::Regex)
     submission_type = dispute_entry.dispute.submission_type
 
     #######################################################################################################################################
@@ -36,9 +37,17 @@ class AutoResolve
           end
           if sugg_disposition == "false negative"
             if dispute_entry.determine_platform_record.present? && dispute_entry.determine_platform_record.id == umbrella_no_reply.id
-              dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+              if is_ip_address
+                dispute_entry = AutoResolve.attempt_ai_conviction_of_ip(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+              else
+                dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry, true)
+              end
             else
-              dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+              if is_ip_address
+                dispute_entry = AutoResolve.attempt_ai_conviction_of_ip(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+              else
+                dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+              end
             end
           end
         end
@@ -49,7 +58,11 @@ class AutoResolve
             dispute_entry.update(status: DisputeEntry::NEW)
           end
           if sugg_disposition == "false negative"
-            dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+            if is_ip_address
+              dispute_entry = AutoResolve.attempt_ai_conviction_of_ip(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+            else
+              dispute_entry = AutoResolve.attempt_ai_conviction(dispute_entry.dispute_rule_hits.pluck(:name), dispute_entry)
+            end
           end
         end
       end
@@ -82,24 +95,24 @@ class AutoResolve
 
         else
           ## for customer specific stuff
-          dispute_entry.status == DisputeEntry::NEW
+          dispute_entry.status = DisputeEntry::NEW
         end
       end
 
       if sugg_disposition == "false negative"
         if dispute_entry.dispute.submitter_type == "NON-CUSTOMER"
           if dispute_entry.dispute.determine_platform.present? && dispute_entry.dispute.determine_platform.downcase.include?("umbrella")
-            matching_disposition = dispute_entry.is_disposition_matching?(entry_claim, true)
+            matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition, true)
           else
-            matching_disposition = dispute_entry.is_disposition_matching?(entry_claim)
+            matching_disposition = dispute_entry.is_disposition_matching?(sugg_disposition)
           end
           if !matching_disposition
-            dispute_entry.status == DisputeEntry::NEW
+            dispute_entry.status = DisputeEntry::NEW
           end
 
         else
           ## for customer specific stuff
-          dispute_entry.status == DisputeEntry::NEW
+          dispute_entry.status = DisputeEntry::NEW
         end
 
       end
@@ -111,7 +124,7 @@ class AutoResolve
     dispute_entry.save
   end
 
-
+  ####NON-IP URL BASED AUTO CONVICTION#########
   #start auto resolution algorithm here
   def self.attempt_ai_conviction(rulehits, dispute_entry, skip_human_review = false)
 
@@ -251,7 +264,186 @@ class AutoResolve
     results
   end
 
-  def self.process_interrogation_results(result, dispute_entry, skip_human_review)
+  ######################END NON IP URL "WEB" #################################################################
+
+  #######################IP BASED URL "WEB" CONVICTION #######################################################
+  def self.attempt_ai_conviction_of_ip(rulehits, dispute_entry, skip_human_review = false)
+    if auto_resolve_toggle
+      results = process_web_ip_interrogation(rulehits, dispute_entry)
+    else
+      results = {}
+      results[:action] = :do_not_resolve
+      results[:log] = ["auto resolution is turned off or is experiencing configuration error"]
+    end
+    dispute_entry = process_interrogation_results(results, dispute_entry, skip_human_review, true)
+
+    dispute_entry
+  end
+
+  def self.process_web_ip_interrogation(rulehits, dispute_entry)
+    baseline_results = process_web_ip_baseline_requirements(rulehits, dispute_entry)
+
+    if baseline_results[:action] == :do_not_resolve
+      return baseline_results
+    end
+
+    conviction_results = process_web_ip_conviction_requirements(dispute_entry.hostlookup, baseline_results)
+
+    return conviction_results
+  end
+
+  def self.process_web_ip_baseline_requirements(rulehits, dispute_entry)
+
+    results = {}
+    results[:log ] = []
+    results[:action] = nil
+    results[:popularity] = nil
+
+    begin
+
+      send_to_virustotal_for_scanning(dispute_entry.hostlookup)
+
+      sds_result = check_sds_allow_list(rulehits)
+      results[:log] << sds_result[:log]
+
+      if sds_result[:pass]
+        results[:action] = :do_not_resolve
+        return results
+      end
+
+      reptool_result = check_reptool_for_allow_list(dispute_entry.hostlookup)
+      results[:log] << reptool_result[:log]
+      if reptool_result[:pass]
+        results[:action] = :do_not_resolve
+        return results
+      end
+
+      #############################
+
+      #umbrella_popularity_result = check_umbrella_popularity_for_ip(dispute_entry.hostlookup)
+      #results[:log] << umbrella_popularity_result[:log]
+      #results[:popularity] = umbrella_popularity_result[:popularity]
+      #if umbrella_popularity_result[:pass]
+      #  results[:action] = :do_not_resolve
+      #  return results
+      #end
+
+      ##################
+      return results
+    rescue Exception => e
+      Rails.logger.error(e.message)
+      results[:action] = :do_not_resolve
+      results[:log] << "there was an error in baseline requirements, halting auto conviction process"
+      return results
+    end
+
+  end
+
+  def self.process_web_ip_conviction_requirements(entry, baseline_results)
+
+    high_mark = false
+    results = {}
+    results[:action] = nil
+    results[:log] = baseline_results[:log]
+    total_domain_count = 0
+    malicious_domain_count = 0
+
+    begin
+      ip_domain_info = JSON.parse(Umbrella::SecurityInfo.query_malicious_domains(entry))
+      malicious_domain_count = ip_domain_info['recordInfo']['totalMaliciousDomain']
+      total_domain_count = ip_domain_info['features']['rr_count']
+    rescue Exception => e
+      Rails.logger.error(e.message)
+      results[:action] = :do_not_resolve
+      results[:log] << "there was an error in conviction requirements, halting auto conviction process"
+      return results
+    end
+
+    if total_domain_count > 100
+      high_mark = true
+    else
+      ip_domain_info["records"].each do |record|
+        popularity_for_record = check_umbrella_popularity_for_ip(record["rr"])
+        if popularity_for_record > 40
+          high_mark = true
+        end
+      end
+    end
+
+    if high_mark == true
+      #vt stuff
+      virustotal_results = check_virustotal_hits(entry)
+      trusted_hits = number_of_virustotal_trusted_hits(virustotal_results[:positive_scans])
+
+      if virustotal_results[:positives] >= 12 || trusted_hits > 1
+        results[:action] = :commit_malware
+        return results
+      end
+
+      #70%
+      if (malicious_domain_count.to_f / total_domain_count.to_f) >= 0.7
+        results[:action] = :commit_malware
+        return results
+      else
+        results[:log] << "malicious domain ratio was under 70%"
+      end
+
+      #action is do_not_resolve or
+    else
+      #vt stuff
+      virustotal_results = check_virustotal_hits(entry)
+      trusted_hits = number_of_virustotal_trusted_hits(virustotal_results[:positive_scans])
+
+      if virustotal_results[:positives] >= 3 || trusted_hits > 0
+        results[:action] = :commit_malware
+        return results
+      else
+        results[:log] << "virustotal hits under thresholds"
+      end
+
+      #asn block list
+      begin
+        asn_blocklist = [8452,4134,45609,45899,4837,17488,7552,7713,36947,45595]
+        ip_whois_info = JSON.parse(Umbrella::DomainInfo.ip_whois(entry))
+        if ip_whois_info.present?
+          spamhaus_code = ip_whois_info[0]['asn']
+        else
+          spamhaus_code = 0
+        end
+
+        if asn_blocklist.include?(spamhaus_code)
+          results[:action] = :commit_malware
+          return results
+        else
+          results[:log] << "not found in spamhaus list"
+        end
+
+
+      rescue Exception => e
+        Rails.logger.error(e.message)
+        results[:action] = :do_not_resolve
+        results[:log] << "there was an error in conviction requirements, halting auto conviction process"
+        return results
+      end
+
+      #20% malicious ratio
+      if (malicious_domain_count.to_f / total_domain_count.to_f) >= 0.2
+        results[:action] = :commit_malware
+        return results
+      else
+        results[:log] << "malicious domain ratio was under 20%"
+      end
+    end
+
+
+    results[:action] = :do_not_resolve
+
+    results
+
+  end
+  #######################END IP BASED URL "WEB "##############################################################
+
+  def self.process_interrogation_results(result, dispute_entry, skip_human_review, add_additional_blocklist = false)
 
     action = result[:action]
 
@@ -270,7 +462,22 @@ class AutoResolve
     else
       resolved_at = Time.now
       reptool_result = commit_to_reptool(action, dispute_entry)
+
       if reptool_result[:success]
+        if add_additional_blocklist == true
+          begin
+            wlbl_params = {}
+            wlbl_params[:urls] = [dispute_entry.hostlookup]
+            wlbl_params[:trgt_list] = ["BL-heavy"]
+            wlbl_params[:thrt_cat_ids] = [23]
+            wlbl_params[:note] = "TE SecHub-Auto-#{dispute_entry.dispute_id}"
+            Wbrs::ManualWlbl.adjust_urls_from_params(wlbl_params, username: "vrtincom")
+          rescue
+            dispute_entry.status = DisputeEntry::NEW
+            result[:log] << "Error attempting to commit BLH to RuleAPI, setting status to NEW for manual review. (Reptool was successful)"
+          end
+
+        end
         dispute_entry.status = DisputeEntry::STATUS_RESOLVED
         dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_FN
         dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
@@ -279,7 +486,11 @@ class AutoResolve
       else
         dispute_entry.status = DisputeEntry::NEW
         result[:log] << "Error attempting to commit to reptool, setting status to NEW for manual review."
+        if add_additional_blocklist == true
+          result[:log] << "Error in Reptool caused halt to adding blh rulehit to RuleAPI."
+        end
       end
+
     end
 
     dispute_entry.auto_resolve_log = dispute_entry.auto_resolve_log.blank? ? result[:log].join("<br><br>") : dispute_entry.auto_resolve_log += result[:log].join("<br><br>")
@@ -313,6 +524,12 @@ class AutoResolve
       Rails.logger.error(e.message)
       return false
     end
+  end
+
+  def self.check_umbrella_popularity_for_ip(entry)
+    response = Umbrella::SecurityInfo.query_info(address: entry)
+    data = JSON.parse(response.body)
+    return data["popularity"]
   end
 
   def self.check_umbrella_popularity(raw_entry)
@@ -532,6 +749,10 @@ class AutoResolve
     result
   end
 
+  def self.send_to_virustotal_for_scanning(entry)
+    Virustotal::Scan.send_to_scan(entry)
+  end
+
   ###############################################################################################################
 
 
@@ -552,6 +773,7 @@ class AutoResolve
     end
 
     comment = "TE SecHub-Auto-#{dispute_entry.dispute_id}"
+    
     begin
       if classification.present?
 
@@ -560,6 +782,7 @@ class AutoResolve
       end
 
     rescue Exception => e
+
       Rails.logger.error(e.message)
       result[:success] = false
     end
