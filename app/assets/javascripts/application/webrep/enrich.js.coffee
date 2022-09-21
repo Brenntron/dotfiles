@@ -1,5 +1,5 @@
 ################################################################################
-# FUNCTIONS FOR POPULATING THE ENRICH SECTION
+# FUNCTIONS FOR POPULATING THE WEBREP ENRICHMENT SECTION
 ################################################################################
 #data is loaded separately and fed into the Research Data, similar to wbrs
 
@@ -13,9 +13,81 @@ window.get_enrichment_service = (query_item, query_type) ->
       return response
   )
 
-window.setup_enrichment_section = () ->
+##create each enrichment section under webrep research tab
+create_webrep_enrichment_section = (tags, context, enrich_toolbar_cell, table) ->
 
-  #TODO: determine query_type somehow?
+  $(tags).each (index, tag) ->
+    name = ''
+    description = ''
+    taxonomy = ''
+
+    if tag.mapped_taxonomy?.name[0].text?
+      name = tag.mapped_taxonomy.name[0].text
+
+    if tag.mapped_taxonomy?.description[0].text?
+      description = tag.mapped_taxonomy.description[0].text
+
+    if tag.taxonomy_name?
+      taxonomy = tag.taxonomy_name
+
+    #set first returned name as toolbar value
+    if index == 0
+      $(enrich_toolbar_cell).text(name)
+
+    #look for any external reference data
+    combined_external_refs = []
+    if tag.mapped_taxonomy?.external_references?
+      if tag.mapped_taxonomy?.external_references.length > 0
+        $(tag.mapped_taxonomy?.external_references).each (index, external_ref) ->
+          combined_external_refs = combined_external_refs.concat external_ref
+
+    #create new table row
+    wrapper = $("<tr></tr>")
+
+    context_wrapper = $("<td class='enrich-cell-context'>#{context}</td>")
+
+    taxonomy_wrapper = $("<td class='enrich-cell-taxonomy'></td>")
+    $(taxonomy_wrapper).text(taxonomy) #escaping to prevent xss attacks
+
+    name_wrapper = $("<td class='enrich-cell-name'></td>")
+    $(name_wrapper).text(name) #escaping to prevent xss attacks
+
+    description_wrapper = $("<td class='enrich-cell-description'></td>")
+    $(description_wrapper).text(description) #escaping to prevent xss attacks
+
+    external_ref_wrapper = $("<td class='enrich-cell-external-references'></td>")
+
+    #if any external references are returned show column and append data
+    if combined_external_refs.length > 0
+
+      $(combined_external_refs).each (index, external_ref) ->
+        individual_wrapper = $("<span class='enrich-external-ref' id='enrich-external-ref-#{index}'></span>")
+        link_wrapper = ''
+
+        if external_ref.source?
+          source = external_ref.source
+        else source = ''
+
+        if external_ref.url?
+          url = external_ref.url
+        else url = ''
+
+        if source != '' && url != ''
+          link_wrapper = $("<a href=#{url} class='enrich-external-reference-link' target='blank'></a>")
+          $(link_wrapper).text(source)
+
+        $(individual_wrapper).append link_wrapper
+        $(external_ref_wrapper).append individual_wrapper
+
+    #Create new row in Enrichment table
+    $(wrapper).append context_wrapper
+    $(wrapper).append taxonomy_wrapper
+    $(wrapper).append name_wrapper
+    $(wrapper).append description_wrapper
+    $(wrapper).append external_ref_wrapper
+    $(table).append wrapper
+
+window.setup_enrichment_section = () ->
 
   if $('#research-tab').length || $('.reputation-research-search-wrapper').length
     $('.research-table-row').each ->
@@ -31,83 +103,32 @@ window.setup_enrichment_section = () ->
 
       enrich_promise.then (response) ->
 
-        combined_tags = []
+        email_context_tags = []
+        web_context_tags = []
+        enrichment_context_tags = []
 
         #look for data in context_tags, email_context_tags and web_context_tags
         #multiple entries are possible in each so loop through to grab them all
-        if response?.data?.context_tags.length > 0
-          $(response.data.context_tags).each (index, tag) ->
-            combined_tags = combined_tags.concat(tag)
-
         if response?.data?.email_context_tags.length > 0
-          $(response.data.email_context_tags).each (index, tag) ->
-            combined_tags = combined_tags.concat(tag)
+          email_context_tags = response.data.email_context_tags
 
         if response?.data?.web_context_tags.length > 0
-          $(response.data.web_context_tags).each (index, tag) ->
-            combined_tags = combined_tags.concat(tag)
+          web_context_tags = response.data.web_context_tags
 
-        if combined_tags.length > 0
-          $(combined_tags).each (index, tag) ->
+        if response?.data?.context_tags.length > 0
+          enrichment_context_tags = response.data.context_tags
 
-            #get the Name and Description from each tag
-            if tag.mapped_taxonomy?.name[0].text?
-              name = tag.mapped_taxonomy.name[0].text
-            else name = ''
+        if email_context_tags.length > 0 || web_context_tags.length > 0 || enrichment_context_tags.length > 0
 
-            #set first returned name as toolbar value
-            if index == 0
-              $(enrich_toolbar_cell).text(name)
+          if email_context_tags.length > 0
+            create_webrep_enrichment_section(email_context_tags, 'Email',  enrich_toolbar_cell, table)
 
-            if tag.mapped_taxonomy?.description[0].text?
-              description = tag.mapped_taxonomy.description[0].text
-            else description = ''
+          if web_context_tags.length > 0
+            create_webrep_enrichment_section(web_context_tags, 'Web',  enrich_toolbar_cell, table)
 
-            #look for any exteranl reference data
-            combined_external_refs = []
-            if tag.mapped_taxonomy?.external_references?
-              if tag.mapped_taxonomy?.external_references.length > 0
-                $(tag.mapped_taxonomy?.external_references).each (index, external_ref) ->
-                  combined_external_refs = combined_external_refs.concat external_ref
-
-            wrapper = $("<tr></tr>")
-            name_wrapper = $("<td class='enrich-cell-name'></td>")
-            $(name_wrapper).text(name) #escaping to prevent xss attacks
-
-            description_wrapper = $("<td class='enrich-cell-description'></td>")
-            $(description_wrapper).text(description) #escaping to prevent xss attacks
-
-            external_ref_wrapper = $("<td class='enrich-cell-external-references'></td>")
-
-            #if any external references are returned show column and append data
-            if combined_external_refs.length > 0
-
-              $('.enrich-webrep-external-references-col').show()
-
-              $(combined_external_refs).each (index, external_ref) ->
-                individual_wrapper = $("<span class='enrich-external-ref' id='enrich-external-ref-#{index}'></span>")
-                link_wrapper = ''
-
-                if external_ref.source?
-                  source = external_ref.source
-                else source = ''
-
-                if external_ref.url?
-                  url = external_ref.url
-                else url = ''
-
-                if source != '' && url != ''
-                  link_wrapper = $("<a href=#{url} class='enrich-external-reference-link' target='blank'></a>")
-                  $(link_wrapper).text(source)
-
-                $(individual_wrapper).append link_wrapper
-                $(external_ref_wrapper).append individual_wrapper
-
-            #Create new row in Enrich table
-            $(wrapper).append name_wrapper
-            $(wrapper).append description_wrapper
-            $(wrapper).append external_ref_wrapper
-            $(table).append wrapper
+          #need to pass the tags, context, enrich_toolbar_cell and table to function
+          if enrichment_context_tags.length > 0
+            create_webrep_enrichment_section(enrichment_context_tags, 'Enrichment',  enrich_toolbar_cell, table)
 
         else
           $('.enrich-webrep-table-data-present').hide()

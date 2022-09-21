@@ -592,7 +592,7 @@ create_filerep_enrich_section = (tags, context) ->
 
       #create table header if first result
       if index == 0
-        table_header = "<tr class='filerep-enrich-table-header-row'><th>Name</th><th class='filerep-enrich-table-description-th'>Description</th><th>External Ref</th></tr>"
+        table_header = "<tr class='filerep-enrich-table-header-row'><th>Name</th><th class='filerep-enrich-table-description-th'>Description</th><th class='text-right'>External Ref</th></tr>"
         $(table_wrapper).append table_header
 
       name_wrapper = $("<td class='filerep-enrich-cell-name'></td>")

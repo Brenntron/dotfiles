@@ -715,7 +715,7 @@
                         %td.input-col.enrich-input-wrapper
                           %input.research-row-checkbox.enrich-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                         %td.enrich-label-cell
-                          %label Enrich
+                          %label Enrichment
                         %td.text-center.enrich-cell
                         %td.left-bordered.wlbl-tc-label-cell
                           %label WL/BL
@@ -1095,13 +1095,15 @@
                                     %td= entry.blacklist.last_seen
 
                           .entry-details-table.enrich-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header Enrich
+                            %h5.entry-details-table-header Enrichment
                             %table.enrich-webrep-table-data-present
                               %thead
                                 %tr
-                                  %th TTS Name
-                                  %th TTS Description
-                                  %th.enrich-webrep-external-references-col External References
+                                  %th Context
+                                  %th Taxonomy
+                                  %th Name
+                                  %th Description
+                                  %th External References
                               %tbody
                                 %tr
                             %table.enrich-webrep-table-data-missing
