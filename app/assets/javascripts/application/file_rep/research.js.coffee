@@ -531,15 +531,105 @@ get_run_status = window.get_run_status = (sha256_hash) ->
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
 
-#group taxonomies by ID
-group_by_tag = (object_array, property) ->
-  blank_object = {}
-  return object_array.reduce (acc, obj) ->
-    key = obj[property]
-    if (!blank_object[key])
-      blank_object[key] = []
-    blank_object[key].push(obj)
-    return blank_object
+########### ENRICHMENT SERVICES SECTION ############
+# This function is called on the page load with the rest of the Research tab
+# Three sections: Email, Web and Enrichment. Enrichment usually has the most results.
+# Sections are then sorted into taxonomies if there are multiple tags in each section.
+
+#group taxonomies by ID - for Enrichment section
+group_by_tag = (array, key) ->
+  array.reduce (acc, obj) ->
+    property = obj[key]
+    acc[property] = acc[property] || []
+    acc[property].push obj
+    acc
+  , {}
+
+create_filerep_enrich_section = (tags, context) ->
+
+  #organize tags by taxonomy_id if there are multiple
+  if tags.length > 1
+    taxonomy_object = group_by_tag(tags, 'taxonomy_id')
+    taxonomy_array = Object.entries(taxonomy_object)
+  else taxonomy_array = [tags]
+
+  #loop through each group of tags and put each in their own section
+  $(taxonomy_array).each (i, group) ->
+
+    #single objects have different structure than multiple entries
+    if group.length > 1
+      tag_group = $(group)[1]
+    else tag_group = group
+
+    taxonomy_name = tag_group[0].taxonomy_name
+
+    #create section wrapper
+    section_wrapper = $("<div class='enrich-filerep-section-wrapper'></div>")
+    section_header = "<h4>#{context}</h4>"
+    taxonomy_header = "<div><label class='enrich-taxonomy-filerep-label'>Taxonomy:</label><h5>#{taxonomy_name}</h5></div>"
+
+    $(section_wrapper).append section_header
+    $(section_wrapper).append taxonomy_header
+
+    $(tag_group).each (i, tag) ->
+      name = ''
+      description = ''
+
+      if tag.mapped_taxonomy?.name[0].text?
+        name = tag.mapped_taxonomy.name[0].text
+
+      if tag.mapped_taxonomy?.description[0].text?
+        description = tag.mapped_taxonomy.description[0].text
+
+      #look for any external reference data
+      combined_external_refs = []
+      if tag.mapped_taxonomy?.external_references?
+        if tag.mapped_taxonomy?.external_references.length > 0
+          $(tag.mapped_taxonomy?.external_references).each (index, external_ref) ->
+            combined_external_refs = combined_external_refs.concat external_ref
+
+      #create table wrapper
+      table_wrapper = $("<table></table>")
+      table_header = "<tr><th>Name</th><th>Description</th><th>External Ref</th></tr>"
+
+      $(table_wrapper).append table_header
+      name_wrapper = $("<td class='filerep-enrich-cell-name'></td>")
+      $(name_wrapper).text(name) #escaping to prevent xss attacks
+      description_wrapper = $("<td class='filerep-enrich-cell-description'></td>")
+      $(description_wrapper).text(description) #escaping to prevent xss attacks
+      external_ref_wrapper = $("<td class='filerep-enrich-cell-external-references'></td>")
+
+      row_wrapper = $("<tr></tr>")
+      $(row_wrapper).append name_wrapper
+      $(row_wrapper).append description_wrapper
+      $(row_wrapper).append external_ref_wrapper
+
+      #if any external references are returned show column and append data
+      if combined_external_refs.length > 0
+
+        $('.enrich-webrep-external-references-col').show()
+        $(combined_external_refs).each (index, external_ref) ->
+          individual_wrapper = $("<span class='enrich-external-ref' id='enrich-external-ref-#{index}'></span>")
+          link_wrapper = ''
+          source = ''
+          url = ''
+
+          if external_ref.source?
+            source = external_ref.source
+
+          if external_ref.url?
+            url = external_ref.url
+
+          if source != '' && url != ''
+            link_wrapper = $("<a href=#{url} class='filerep-enrich-external-reference-link' target='blank'></a>")
+            $(link_wrapper).text(source)
+
+          $(individual_wrapper).append link_wrapper
+          $(external_ref_wrapper).append individual_wrapper
+
+      $(table_wrapper).append row_wrapper
+      $(section_wrapper).append table_wrapper
+      $('.enrich-file-rep-data-present').append section_wrapper
 
 ########### ENRICHMENT API REPORT ############
 window.get_enrichment_service_filerep = (sha256_hash) ->
@@ -551,106 +641,34 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
     success: (response) ->
 
       $('#enrich-loader').hide()
-      combined_tags = []
-      context_tags = []
-      email_context = null
-      web_context = null
+      email_context_tags = []
+      web_context_tags = []
+      enrichment_context_tags = []
 
-      if response?.data?.context_tags.length > 0
-        combined_tags = combined_tags.concat(response.data.context_tags)
-        context_tags = combined_tags.concat(response.data.context_tags)
-
-      #look for data in context_tags, email_context_tags and web_context_tags
       if response?.data?.email_context_tags.length > 0
-        email_context = combined_tags.concat(response.data.email_context_tags)
-        combined_tags = combined_tags.concat(response.data.email_context_tags)
+        email_context_tags = response.data.email_context_tags
 
       if response?.data?.web_context_tags.length > 0
-        web_context = response.data.web_context_tags[0]
-        combined_tags = combined_tags.concat(response.data.web_context_tags)
+        web_context_tags = response.data.web_context_tags
 
-      #check if any data returned
-      if combined_tags.length > 0
+      if response?.data?.context_tags.length > 0
+        enrichment_context_tags = response.data.context_tags
 
+      #check if any data returned and show section
+      if email_context_tags.length > 0 || web_context_tags.length > 0 || enrichment_context_tags.length > 0
         $('.enrich-file-rep-data-present').show()
 
+        ## Enrichment Section - Email Section
+        if email_context_tags.length > 0
+          create_filerep_enrich_section(email_context_tags, 'Email')
+
+        ## Enrichment Section - Web Section
+        if web_context_tags.length > 0
+          create_filerep_enrich_section(web_context_tags, 'Web')
+
         ## Enrichment Section - Enrichment (Other) Section
-        if context_tags.length > 0
-          taxonomy_object = group_by_tag(combined_tags, 'taxonomy_id')
-          taxonomy_array = Object.entries(taxonomy_object)
-
-          #loop through each group of tags and put each in their own section
-          $(taxonomy_array).each (i, group) ->
-            tag_group = $(group)[1]
-            taxonomy_name = tag_group[0].taxonomy_name
-
-            #create section wrapper
-            section_wrapper = $("<div class='enrich-filerep-section-wrapper'></div>")
-            section_header = "<h4>Enrichment</h4>"
-            taxonomy_header = "<div><label class='enrich-taxonomy-filerep-label'>Taxonomy:</label><h5>#{taxonomy_name}</h5></div>"
-
-            $(section_wrapper).append section_header
-            $(section_wrapper).append taxonomy_header
-
-            $(tag_group).each (i, tag) ->
-              name = ''
-              description = ''
-
-              if tag.mapped_taxonomy?.name[0].text?
-                name = tag.mapped_taxonomy.name[0].text
-
-              if tag.mapped_taxonomy?.description[0].text?
-                description = tag.mapped_taxonomy.description[0].text
-
-              #look for any external reference data
-              combined_external_refs = []
-              if tag.mapped_taxonomy?.external_references?
-                if tag.mapped_taxonomy?.external_references.length > 0
-                  $(tag.mapped_taxonomy?.external_references).each (index, external_ref) ->
-                    combined_external_refs = combined_external_refs.concat external_ref
-
-              #create table wrapper
-              table_wrapper = $("<tr></tr>")
-              table_header = "<tr><th>Name</th><th>Description</th><th>External Ref</th></tr>"
-
-              $(table_wrapper).append table_header
-              name_wrapper = $("<td class='filerep-enrich-cell-name'></td>")
-              $(name_wrapper).text(name) #escaping to prevent xss attacks
-              description_wrapper = $("<td class='filerep-enrich-cell-description'></td>")
-              $(description_wrapper).text(description) #escaping to prevent xss attacks
-              external_ref_wrapper = $("<td class='filerep-enrich-cell-external-references'></td>")
-
-              row_wrapper = $("<tr></tr>")
-              $(row_wrapper).append name_wrapper
-              $(row_wrapper).append description_wrapper
-              $(row_wrapper).append external_ref_wrapper
-
-              #if any external references are returned show column and append data
-              if combined_external_refs.length > 0
-
-                $('.enrich-webrep-external-references-col').show()
-                $(combined_external_refs).each (index, external_ref) ->
-                  individual_wrapper = $("<span class='enrich-external-ref' id='enrich-external-ref-#{index}'></span>")
-                  link_wrapper = ''
-                  source = ''
-                  url = ''
-
-                  if external_ref.source?
-                    source = external_ref.source
-
-                  if external_ref.url?
-                    url = external_ref.url
-
-                  if source != '' && url != ''
-                    link_wrapper = $("<a href=#{url} class='filerep-enrich-external-reference-link' target='blank'></a>")
-                    $(link_wrapper).text(source)
-
-                  $(individual_wrapper).append link_wrapper
-                  $(external_ref_wrapper).append individual_wrapper
-
-              $(table_wrapper).append row_wrapper
-              $(section_wrapper).append table_wrapper
-              $('.enrich-file-rep-data-present').append section_wrapper
+        if enrichment_context_tags.length > 0
+          create_filerep_enrich_section(enrichment_context_tags, 'Enrichment')
 
       #show empty message if no tags returned
       else
