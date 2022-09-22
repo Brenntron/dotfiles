@@ -5723,7 +5723,12 @@ input.table-entry-input:focus {
       span.highlight {
         float: none;
         font-size: 11px;
+        padding: 0
       }
+    }
+
+    ul > li {
+      padding: 4px 0px;
     }
 
     .selected-urls-label {

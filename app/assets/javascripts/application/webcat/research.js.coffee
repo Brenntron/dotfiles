@@ -333,7 +333,8 @@ $ ->
     button = $(this)
     { name, row } = button.data()
 
-    if button.is(':checked') && selectLimiter < 10 && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
+    if button.is(':checked') && selectLimiter < 10 && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length is 0) && ($("#xbrsHistorySelectedUrlsList > li[data-row='#{row}']").length is 0)
+
       $('#xbrsHistorySelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='xbrs-history-#{row}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
       $("#xbrs-history-#{row}").selectize {
         create: false,
@@ -372,9 +373,13 @@ $ ->
       }
 
       selectLimiter += selectLimiter
+      $('#xbrs-history-webcat-research-categorize-url').removeAttr('disabled')
     else if !button.is(':checked') && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length isnt 0)
       $("#xbrsHistorySelectedUrlsList > li[data-row='#{row}']").remove()
       selectLimiter -= selectLimiter
+
+      if selectLimiter is 0
+        $('#xbrs-history-webcat-research-categorize-url').attr('disabled', 'disabled')
     else
       button.prop('checked', false)
 
@@ -386,7 +391,7 @@ $ ->
     button = $(this)
     { name, row } = button.data()
 
-    if button.is(':checked') && selectLimiter < 10 && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length isnt 0)
+    if button.is(':checked') && selectLimiter < 10 && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length is 0) && ($("#domainHistorySelectedUrlsList > li[data-row='#{row}']").length is 0)
       $('#domainHistoryTableSelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='domain-history-#{row}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
       $("#domain-history-#{row}").selectize {
         create: false,
@@ -425,9 +430,13 @@ $ ->
       }
 
       selectLimiter += selectLimiter
+      $('#xbrs-history-webcat-research-categorize-url').removeAttr('disabled')
     else if !button.is(':checked') && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length isnt 0)
       $("#domainHistoryTableSelectedUrlsList > li[data-row='#{row}']").remove()
       selectLimiter -= selectLimiter
+
+      if selectLimiter is 0
+        $('#xbrs-history-webcat-research-categorize-url').attr('disabled', 'disabled')
     else
       button.prop('checked', false)
 
@@ -450,7 +459,7 @@ $ ->
     for checkBox in tableCheckBoxes
       { name, row } = $(checkBox).data()
 
-      if checkAllValue && (urlList.find("li[data-name='#{name}']").length is 0)
+      if checkAllValue && (urlList.find("li[data-name='#{name}']").length is 0) && (urlList.find("li[data-row='#{row}']").length is 0)
         break if selectLimiter > 9
 
         $(checkBox).prop('checked', checkAllValue)
@@ -494,10 +503,14 @@ $ ->
         }
 
         selectLimiter += selectLimiter
+        $('#xbrs-history-webcat-research-categorize-url').removeAttr('disabled')
       else if !checkAllValue && (urlList.find("li[data-name='#{name}']").length > 0)
         urlList.find("li[data-name='#{name}']").remove()
         selectLimiter -= selectLimiter
         $("input[data-name='#{name}'").prop('checked', checkAllValue)
+
+        if selectLimiter is 0
+          $("##{tableClassPrepend}-webcat-research-categorize-url").attr('disabled', 'disabled')
 
   $('#domainHistoryCheckAll').click(() ->
     checkAll(this, '#domainHistoryTableBody')
