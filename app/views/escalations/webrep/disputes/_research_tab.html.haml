@@ -673,8 +673,6 @@
                           - else
                             %span.current-wbrs-score
                               = entry.wbrs_score
-                        -#%td.wbrs-rules-label-cell
-                        -#  %label WBRS Rules
                         %td.text-center.wbrs-rule-hits-cell
                           = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit != true }.length
 
@@ -793,7 +791,8 @@
                           %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                         %td
                           %label RepTool Class
-                        %td.entry-reptool-data.reptool-class-cell
+                        -#strech Reptool cell to balance out the new Enrichment section
+                        %td.entry-reptool-data.reptool-class-cell{colspan: '4'}
                           - if entry.classifications.first.nil?
                             %span.missing-data.entry-reptool-class Not on RepTool
                           - else
@@ -803,11 +802,6 @@
                               = entry.blacklist.status
                             %span.inline-col-breakup.entry-reptool-comment
                               = entry.blacklist.metadata&.fetch('VRT', {})&.fetch('comment', {})
-
-                        -#Three empty cells to keep rows even for now
-                        %td
-                        %td
-                        %td
 
                         %td.left-bordered
                           %label Umbrella
