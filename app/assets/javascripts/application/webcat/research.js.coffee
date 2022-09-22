@@ -331,7 +331,6 @@ $ ->
 
   $(document).on("click",'.xbrs-categorize-url-button', () ->
     button = $(this)
-    categories = button.parent('td').siblings('.xbrs-history-categories-cell').find('p')
     { name, row } = button.data()
 
     if button.is(':checked') && selectLimiter < 10 && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
@@ -340,6 +339,19 @@ $ ->
         create: false,
         labelField: 'category_name',
         maxItems: 5,
+        onOptionAdd: () ->
+          rowId = this.$input.parent().data().row
+          catCell = $("td.xbrs-history-categories-cell > p[data-row='#{rowId}']")
+          if catCell.attr('data-catids')?
+            { catids } = catCell.data()
+
+            if typeof catids is 'number'
+              catids = [catids]
+            else
+              catids = catids.split(',')
+
+            for catId in catids
+              this.addItem(catId)
         options: AC.WebCat.createSelectOptions("#xbrs-history-#{row}"),
         persist: true,
         score: (input) ->
@@ -358,17 +370,7 @@ $ ->
         searchField: ['category_name', 'category_code'],
         valueField: 'category_id'
       }
-      # An promise adds the options so we have to use an event handler to add the items.
-      $("#xbrs-history-#{row}")[0].selectize.on('option_add', () ->
-        catids = $(categories).data().catids
-        if typeof catids is 'number'
-          catids = [catids]
-        else
-          catids = catids.split(',')
 
-        for catId in catids
-          $("#xbrs-history-#{row}")[0].selectize.addItem(catId)
-      )
       selectLimiter += selectLimiter
     else if !button.is(':checked') && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length isnt 0)
       $("#xbrsHistorySelectedUrlsList > li[data-row='#{row}']").remove()
@@ -382,7 +384,6 @@ $ ->
 
   $(document).on("click", '.domain-history-categorize-url-button', () ->
     button = $(this)
-    categories = button.parent('td').siblings('.domain-history-categories-cell').find('p')
     { name, row } = button.data()
 
     if button.is(':checked') && selectLimiter < 10 && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length isnt 0)
@@ -391,6 +392,19 @@ $ ->
         create: false,
         labelField: 'category_name',
         maxItems: 5,
+        onOptionAdd: () ->
+          rowId = this.$input.parent().data().row
+          catCell = $("td.domain-history-categories-cell > p[data-row='#{rowId}']")
+          if catCell.attr('data-catids')?
+            { catids } = catCell.data()
+
+            if typeof catids is 'number'
+              catids = [catids]
+            else
+              catids = catids.split(',')
+
+            for catId in catids
+              this.addItem(catId)
         options: AC.WebCat.createSelectOptions("#domain-history-#{row}"),
         persist: true,
         score: (input) ->
@@ -409,17 +423,6 @@ $ ->
         searchField: ['category_name', 'category_code'],
         valueField: 'category_id'
       }
-
-      # An promise adds the options so we have to use an event handler to add the items.
-      $("#domain-history-#{row}")[0].selectize.on('option_add', () ->
-        catids = $(categories).data().catids
-        if typeof catids is 'number'
-          catids = [catids]
-        else
-          catids = catids.split(',')
-        for catId in catids
-          $("#domain-history-#{row}")[0].selectize.addItem(catId)
-      )
 
       selectLimiter += selectLimiter
     else if !button.is(':checked') && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length isnt 0)
