@@ -5699,12 +5699,27 @@ input.table-entry-input:focus {
     background-image: url(image_path('icon_categorize_white.svg'));
   }
 
+  .toolbar .selectize-input input:focus {
+    border: none !important;
+  }
+
   .toolbar-dropdown {
     min-width: 350px;
   }
 
   .selected-urls-wrapper {
     padding: 10px;
+
+    .input-group.search-group {
+      border: 2px solid #ccc;
+      border-radius: 2px;
+      margin: 10px 0;
+      z-index: 0;
+
+      input:focus {
+        border: none !important;
+      }
+    }
 
     .selected-urls-label {
       margin-bottom: 5px;
@@ -5715,12 +5730,6 @@ input.table-entry-input:focus {
     display: flex;
     flex-direction: column;
     padding: 10px;
-
-    .input-group {
-      border: 2px solid #ccc;
-      border-radius: 2px;
-      margin: 10px 0;
-    }
 
     .toolbar-button {
       padding: 0 30px;

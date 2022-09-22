@@ -1,5 +1,15 @@
 $ ->
   headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
+  categoryList = []
+
+  $(document).ready(() ->
+    AC.WebCat.getAUPCategories().then((categories) ->
+      for key, value of categories
+        cat_code = key.split(' - ')[1]
+        value_name = key.split(' - ')[0]
+        categoryList.push {category_id: value, category_name: value_name, category_code: cat_code}
+    )
+  )
 
   getDomainInfo = (domain) ->
     $.ajax(
@@ -57,6 +67,7 @@ $ ->
       success: (response) ->
         data = response.data
 
+        $('#domainHistoryDomainTableListingContent > .domain-data.result-total').remove()
         #the first entry is the domain itself so that should not count in the result total
         $('#domainHistoryDomainTableListingContent').append("<p class='domain-data result-total'>(#{data.length - 1} found)</p>")
 
@@ -82,14 +93,23 @@ $ ->
                 data: null
                 render: (data, type, full) ->
                   { entry_id, complaint_id } = data
-                  if entry_id
+                  if entry_id? && complain_id?
                     "<a href='/escalations/webcat/complaints/#{complaint_id}' target='_blank'>#{entry_id}</a>"
                   else
-                    entry_id
+                    ''
 
               }
               {
-                data: 'category'
+                data: null
+                className: 'domain-history-categories-cell'
+                render: (data, type, full) ->
+                  { category } = data
+
+                  if category?
+                    catIds = categoryList.filter((cat) -> category.indexOf(cat.category_name) >= 0).map((cat) -> cat.category_id)
+                    return "<p data-catids='#{catIds}'>#{category}</p>"
+                  else
+                    ''
               }
               {
                 data: null
@@ -148,7 +168,7 @@ $ ->
       success: (response) ->
         data = JSON.parse response
 
-        if data.code == 413
+        if data.error?
           $('#xbrsHistoryLoader').hide()
           std_msg_error(data.error, [])
         else
@@ -162,6 +182,7 @@ $ ->
           $('#xbrsHistoryLoader').hide()
 
           $('#xbrsDomainTableListingContent').append("<p class='domain-data result-total'>(#{data.length} found)</p>")
+          $('#xbrsDomainTableListingContent > .domain-data.result-total').remove()
 
           if $.fn.DataTable.isDataTable('#xbrs-history-table')
             $('#xbrs-history-table').DataTable().rows.add(data)
@@ -180,12 +201,14 @@ $ ->
                 }
                 {
                   data: null
+                  className: 'xbrs-history-categories-cell'
                   render: (data, type, full) ->
-                    cats = data.aups.map((aup) -> aup.cat).filter((value, index, self) ->
-                      self.indexOf(value) == index)
+                    if data.aups.length > 0
+                      cats = $.unique(data.aups.map((aup) -> aup.cat))
 
-                    cats = cats.toString().split(',').join(', ')
-                    return cats
+                      catIds = categoryList.filter((cat) -> cat.category_code in cats).map((cat) -> cat.category_id)
+                      cats = cats.toString().split(',').join(', ')
+                      return "<p data-catids='#{catIds}'>#{cats}</p>"
                 }
                 {
                   data: 'domain'
@@ -275,55 +298,74 @@ $ ->
         getXbrsHistory(domain)
   )
 
-  $('#domain-history-webcat-research-categorize-url').click(() ->
-    unless $('#domain-history-categorize-research-urls')[0].selectize
-      $('#domain-history-categorize-research-urls').selectize {
-        create: false,
-        labelField: 'category_name',
-        maxItems: 5,
-        options: AC.WebCat.createSelectOptions('#domain-history-categorize-research-urls'),
-        persist: true,
-        searchField: ['category_name', 'category_code'],
-        valueField: 'category_id'
-      }
-  )
-
-  $('#xbrs-history-webcat-research-categorize-url').click(() ->
-    unless $('#xbrs-history-categorize-research-urls')[0].selectize
-      $('#xbrs-history-categorize-research-urls').selectize {
-        create: false,
-        labelField: 'category_name',
-        maxItems: 5,
-        options: AC.WebCat.createSelectOptions('#xbrs-history-categorize-research-urls'),
-        persist: true,
-        searchField: ['category_name', 'category_code'],
-        valueField: 'category_id'
-      }
-  )
-
   $(document).on("click",'.xbrs-categorize-url-button', () ->
     button = $(this)
+    categories = button.parent('td').siblings('.xbrs-history-categories-cell').find('p')
     { name, row } = button.data()
 
     if button.is(':checked')
-      $('#xbrsHistorySelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'>#{name}</li>")
+      $('#xbrsHistorySelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='xbrs-history-#{row}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
+      $("#xbrs-history-#{row}").selectize {
+        create: false,
+        highlight: false,
+        labelField: 'category_name',
+        maxItems: 5,
+        options: AC.WebCat.createSelectOptions("#xbrs-history-#{row}"),
+        persist: true,
+        searchField: ['category_name', 'category_code'],
+        valueField: 'category_id'
+      }
+      # An promise adds the options so we have to use an event handler to add the items.
+      $("#xbrs-history-#{row}")[0].selectize.on('option_add', () ->
+        catids = $(categories).data().catids
+        if typeof catids is 'number'
+          catids = [catids]
+        else
+          catids = catids.split(',')
+
+        for catId in catids
+          $("#xbrs-history-#{row}")[0].selectize.addItem(catId)
+      )
     else
-      $("li[data-row='#{row}']").remove()
+      $("#xbrsHistorySelectedUrlsList > li[data-row='#{row}']").remove()
   )
 
   $(document).on("click", '.domain-history-categorize-url-button', () ->
     button = $(this)
+    categories = button.parent('td').siblings('.domain-history-categories-cell').find('p')
     { name, row } = button.data()
 
     if button.is(':checked')
-      $('#domainHistoryTableSelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'>#{name}</li>")
+      $('#domainHistoryTableSelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='domain-history-#{row}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
+      $("#domain-history-#{row}").selectize {
+        create: false,
+        highlight: false,
+        labelField: 'category_name',
+        maxItems: 5,
+        options: AC.WebCat.createSelectOptions("#domain-history-#{row}"),
+        persist: true,
+        searchField: ['category_name', 'category_code'],
+        valueField: 'category_id'
+      }
+
+      # An promise adds the options so we have to use an event handler to add the items.
+      $("#domain-history-#{row}")[0].selectize.on('option_add', () ->
+        catids = $(categories).data().catids
+        if typeof catids is 'number'
+          catids = [catids]
+        else
+          catids = catids.split(',')
+        for catId in catids
+          $("#domain-history-#{row}")[0].selectize.addItem(catId)
+      )
     else
-      $("li[data-row='#{row}']").remove()
+      $("#domainHistoryTableSelectedUrlsList > li[data-row='#{row}']").remove()
   )
 
   checkAll = (headerCheckBox, tableId) ->
     checkAllValue = $(headerCheckBox).is(':checked')
     tableCheckBoxes = $(tableId).find('.categorize-url-button')
+    urlList
 
     if tableId.indexOf('domainHistory') != -1
       urlList = $('#domainHistoryTableSelectedUrlsList')
@@ -333,13 +375,39 @@ $ ->
       tableClassPrepend = 'xbrs-history'
 
     for checkBox in tableCheckBoxes
-      checkBoxDomain = $(checkBox).data().name
+      categories = $(checkBox).parent('td').siblings(".#{tableClassPrepend}-categories-cell").find('p')
+      { name, row } = $(checkBox).data()
+
       $(checkBox).prop('checked', checkAllValue)
 
-      if checkAllValue
-        urlList.append("<li class='#{tableClassPrepend}-#{checkBoxDomain}'-selected-item>#{checkBoxDomain}</li>")
-      else
-        $(".#{tableClassPrepend}-#{checkBoxDomain}-selected-item").remove()
+      if checkAllValue && (urlList.find("li[data-name='#{name}']").length is 0)
+        # Row will change to the value of the last item in the loop so we have to capture the id.
+        selectId = "#{tableClassPrepend}-#{row}"
+        urlList.append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='#{selectId}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
+        $("##{tableClassPrepend}-#{row}").selectize {
+          create: false,
+          highlight: false,
+          labelField: 'category_name',
+          maxItems: 5,
+          options: AC.WebCat.createSelectOptions("##{tableClassPrepend}-#{row}"),
+          persist: true,
+          searchField: ['category_name', 'category_code'],
+          valueField: 'category_id'
+        }
+
+        # An promise adds the options so we have to use an event handler to add the items.
+        $("##{tableClassPrepend}-#{row}")[0].selectize.on('option_add', () ->
+          catids = $(categories).data().catids
+          if typeof catids is 'number'
+            catids = [catids]
+          else
+            catids = catids.split(',')
+
+          for catId in catids
+            $("##{selectId}")[0].selectize.addItem(catId)
+        )
+      else if !checkAllValue && (urlList.find("li[data-name='#{name}']").length > 0)
+        urlList.find("li[data-name='#{name}']").remove()
 
   $('#domainHistoryCheckAll').click(() ->
     checkAll(this, '#domainHistoryTableBody')
@@ -351,11 +419,7 @@ $ ->
 
   window.apply_webcat_research_categories = (tab) ->
     listId = if tab == 'xbrs' then '#xbrsHistorySelectedUrlsList' else "#domainHistoryTableSelectedUrlsList"
-    inputId = if tab == 'xbrs' then "#xbrs-history-categorize-research-urls" else "#domain-history-categorize-research-urls"
-    buttonId = if tab == 'xbrs' then "#xbrs-history-webcat-research-categorize-url" else "#domain-history-webcat-research-categorize-url"
     entries = []
-    category_ids = []
-    categories = []
     urlsListItems = $(listId).find('li')
 
     for listItem in urlsListItems
@@ -363,49 +427,53 @@ $ ->
 
     entries = $.unique(entries)
 
-    for id in $(inputId).val().split(',')
-      category_ids.push id
+    for entry, index in entries
+      category_ids = []
+      categories = []
+      urlsListItems = $(listId).find('li')
+      selectize = $($(urlsListItems)[index]).find('select')[0].selectize
 
-      categories.push $(inputId)[0].selectize.getItem(id)[0].innerText
+      for item in selectize.items
+        category_ids.push item
 
-    if tab == 'xbrs'
-      $("#xbrs-categorize-loader-gears").toggle()
-      $('#xbrs-selected-urls-wrapper').toggle()
-      $('#xbrs-selected-urls-categories-wrapper').toggle()
-    else
-      $("#domain-categorize-loader-gears").toggle()
-      $('#domain-history-selected-urls-wrapper').toggle()
-      $('#domain-history-selected-urls-categories-wrapper').toggle()
+        categories.push selectize.getItem(item)[0].innerText
 
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaints/bulk_categorize'
-      method: 'POST'
-      headers: headers
-      data:
-        entries: entries,
-        category_ids: category_ids,
-        categories: categories
-      success: (response) ->
-        data = response.data
+      if tab == 'xbrs'
+        $("#xbrs-categorize-loader-gears").toggle()
+        $('#xbrs-selected-urls-wrapper').toggle()
+        $('#xbrs-selected-urls-categories-wrapper').toggle()
+      else
+        $("#domain-categorize-loader-gears").toggle()
+        $('#domain-history-selected-urls-wrapper').toggle()
+        $('#domain-history-selected-urls-categories-wrapper').toggle()
 
-        if tab == 'xbrs'
-          $("#xbrs-categorize-loader-gears").toggle()
-          $('#xbrs-selected-urls-wrapper').toggle()
-          $('#xbrs-selected-urls-categories-wrapper').toggle()
-        else
-          $("#domain-categorize-loader-gears").toggle()
-          $('#domain-history-selected-urls-wrapper').toggle()
-          $('#domain-history-selected-urls-categories-wrapper').toggle()
+      $.ajax(
+        url: '/escalations/api/v1/escalations/webcat/complaints/bulk_categorize'
+        method: 'POST'
+        headers: headers
+        data:
+          entries: [entry],
+          category_ids: category_ids,
+          categories: categories
+        success: (response) ->
+          data = response.data
 
-        unless data.complete_failed.length > 0 || data.create_failed.length > 0
-          $(inputId)[0].selectize.clear()
+          if tab == 'xbrs'
+            $("#xbrs-categorize-loader-gears").toggle()
+            $('#xbrs-selected-urls-wrapper').toggle()
+            $('#xbrs-selected-urls-categories-wrapper').toggle()
+          else
+            $("#domain-categorize-loader-gears").toggle()
+            $('#domain-history-selected-urls-wrapper').toggle()
+            $('#domain-history-selected-urls-categories-wrapper').toggle()
 
-          std_msg_success('Categories Submitted', [], reload: false)
-        else
-          failed = data.complete_failed.concat data.created_failed
-          std_msg_success('Categories were not created', failed, reload: false)
-      error: (response) ->
-        $('#webcat-research-categorize-url').dropdown('toggle')
-        $('#webcat-research-categorize-urls .loader-gears').toggle()
-        std_api_error(response, "Categories were not created.", reload: false)
-    , this)
+          unless data.complete_failed.length > 0 || data.create_failed.length > 0
+            std_msg_success('Categories Submitted', [], reload: false)
+          else
+            failed = data.complete_failed.concat data.create_failed
+            std_msg_success('Categories were not created', failed, reload: false)
+        error: (response) ->
+          $('#webcat-research-categorize-url').dropdown('toggle')
+          $('#webcat-research-categorize-urls .loader-gears').toggle()
+          std_api_error(response, "Categories were not created.", reload: false)
+      , this)
