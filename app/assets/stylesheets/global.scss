@@ -13146,12 +13146,13 @@ table > tbody > tr > td.no-padding {
 
 .enrich-filerep-section-header {
   border-bottom: 1px solid #f2f2f2;
-  padding: 22px 0 7px 0;
+  padding-top: 22px;
 }
 
 .filerep-enrich-taxonomy-header-wrapper {
   display: flex;
   align-items: baseline;
+  padding-bottom: 4px;
 }
 
 .filerep-enrich-taxonomy-label {
