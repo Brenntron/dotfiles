@@ -3,6 +3,9 @@
 ################################################################################
 #data is loaded separately and fed into the Research Data, similar to wbrs
 
+#track first tag processed and show it as the Enrichment toolbar header status
+create_index = 0
+
 window.get_enrichment_service = (query_item, query_type) ->
   data = {'query_item': query_item, 'query_type', query_type}
   std_msg_ajax(
@@ -30,8 +33,9 @@ create_webrep_enrichment_section = (tags, context, enrich_toolbar_cell, table) -
     if tag.taxonomy_name?
       taxonomy = tag.taxonomy_name
 
+    create_index++
     #set first returned name as toolbar value
-    if index == 0
+    if create_index == 1
       $(enrich_toolbar_cell).text(name)
 
     #look for any external reference data
