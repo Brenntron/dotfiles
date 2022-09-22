@@ -3,9 +3,6 @@
 ################################################################################
 #data is loaded separately and fed into the Research Data, similar to wbrs
 
-#track first tag processed and show it as the Enrichment toolbar header status
-create_index = 0
-
 window.get_enrichment_service = (query_item, query_type) ->
   data = {'query_item': query_item, 'query_type', query_type}
   std_msg_ajax(
@@ -17,7 +14,7 @@ window.get_enrichment_service = (query_item, query_type) ->
   )
 
 ##create each enrichment section under webrep research tab
-create_webrep_enrichment_section = (tags, context, enrich_toolbar_cell, table) ->
+create_webrep_enrichment_section = (tags, context, enrich_toolbar_cell, table, create_index) ->
 
   $(tags).each (index, tag) ->
     name = ''
@@ -33,9 +30,9 @@ create_webrep_enrichment_section = (tags, context, enrich_toolbar_cell, table) -
     if tag.taxonomy_name?
       taxonomy = tag.taxonomy_name
 
-    create_index++
     #set first returned name as toolbar value
     if create_index == 1
+      create_index++
       $(enrich_toolbar_cell).text(name)
 
     #look for any external reference data
@@ -95,7 +92,7 @@ window.setup_enrichment_section = () ->
 
   if $('#research-tab').length || $('.reputation-research-search-wrapper').length
     $('.research-table-row').each ->
-
+      create_index = 0 #track if first entry in table
       ip_uri = $(this).find('.entry-data-content').text().trim()
       table = $(this).find('.enrich-webrep-table-data-present tbody')
       enrich_toolbar_cell = $(this).find('.enrich-cell')
@@ -125,14 +122,17 @@ window.setup_enrichment_section = () ->
         if email_context_tags.length > 0 || web_context_tags.length > 0 || enrichment_context_tags.length > 0
 
           if email_context_tags.length > 0
-            create_webrep_enrichment_section(email_context_tags, 'Email',  enrich_toolbar_cell, table)
+            create_index++
+            create_webrep_enrichment_section(email_context_tags, 'Email',  enrich_toolbar_cell, table, create_index)
 
           if web_context_tags.length > 0
-            create_webrep_enrichment_section(web_context_tags, 'Web',  enrich_toolbar_cell, table)
+            create_index++
+            create_webrep_enrichment_section(web_context_tags, 'Web',  enrich_toolbar_cell, table, create_index)
 
           #need to pass the tags, context, enrich_toolbar_cell and table to function
           if enrichment_context_tags.length > 0
-            create_webrep_enrichment_section(enrichment_context_tags, 'Enrichment',  enrich_toolbar_cell, table)
+            create_index++
+            create_webrep_enrichment_section(enrichment_context_tags, 'Enrichment',  enrich_toolbar_cell, table, create_index)
 
         else
           $('.enrich-webrep-table-data-present').hide()
