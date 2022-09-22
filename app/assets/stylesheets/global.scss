@@ -5719,6 +5719,11 @@ input.table-entry-input:focus {
       input:focus {
         border: none !important;
       }
+
+      span.highlight {
+        float: none;
+        font-size: 11px;
+      }
     }
 
     .selected-urls-label {

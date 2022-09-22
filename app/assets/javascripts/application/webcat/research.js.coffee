@@ -1,6 +1,7 @@
 $ ->
   headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
   categoryList = []
+  selectLimiter = 0
 
   $(document).ready(() ->
     AC.WebCat.getAUPCategories().then((categories) ->
@@ -77,6 +78,7 @@ $ ->
           $('.domain-history-table').DataTable().rows.add(data)
           $('.domain-history-table').DataTable().draw()
           $('#domain-history-table_wrapper').show()
+          $('.domain-history-table').show()
         else
           $('.domain-history-table').DataTable({
             data: data
@@ -102,12 +104,12 @@ $ ->
               {
                 data: null
                 className: 'domain-history-categories-cell'
-                render: (data, type, full) ->
+                render: (data, type, full, meta) ->
                   { category } = data
 
                   if category?
                     catIds = categoryList.filter((cat) -> category.indexOf(cat.category_name) >= 0).map((cat) -> cat.category_id)
-                    return "<p data-catids='#{catIds}'>#{category}</p>"
+                    return "<p data-row='#{meta.row}' data-catids='#{catIds}'>#{category}</p>"
                   else
                     ''
               }
@@ -153,6 +155,7 @@ $ ->
 
         $('#domainHistoryLoader').hide()
         $('.domain-history-table').show()
+        $('#domain-history-table_wrapper').show()
       error: (errorResponse) ->
         $('#domainHistoryLoader').hide()
         std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
@@ -188,6 +191,7 @@ $ ->
             $('#xbrs-history-table').DataTable().rows.add(data)
             $('#xbrs-history-table').DataTable().draw()
             $('#xbrs-history-table_wrapper').show()
+            $('#xbrs-history-table').show()
           else
             $('#xbrs-history-table').DataTable({
               data: data
@@ -202,13 +206,15 @@ $ ->
                 {
                   data: null
                   className: 'xbrs-history-categories-cell'
-                  render: (data, type, full) ->
+                  render: (data, type, full, meta) ->
                     if data.aups.length > 0
                       cats = $.unique(data.aups.map((aup) -> aup.cat))
 
                       catIds = categoryList.filter((cat) -> cat.category_code in cats).map((cat) -> cat.category_id)
                       cats = cats.toString().split(',').join(', ')
-                      return "<p data-catids='#{catIds}'>#{cats}</p>"
+                      return "<p data-row='#{meta.row}' data-catids='#{catIds}'>#{cats}</p>"
+                    else
+                      ''
                 }
                 {
                   data: 'domain'
@@ -255,11 +261,33 @@ $ ->
             $('#xbrs-history-table_filter input').addClass('table-search-input domain-table-search-label')
 
             $('#xbrsHistoryLoader').hide()
+            $('.xbrs-history-table_wrapper').show()
             $('.xbrs-history-table').show()
       error: (errorResponse) ->
         $('#xbrsHistoryLoader').hide()
         std_api_error(errorResponse, "Entries could not be retrieved.", reload: false)
     )
+
+  removeCategoryUrlItems = (tab) ->
+    tableCheckBoxes
+    tableClassPrepend
+    urlList
+
+    if tab == 'xbrs-history'
+      tableCheckBoxes = $('#xbrsHistoryTableBody')
+      tableClassPrepend = 'xbrs-history'
+      urlList = $('#xbrsHistorySelectedUrlsList')
+      $('#xbrsHistoryCheckAll').prop('checked', false)
+    else
+      tableCheckBoxes = $('#domainHistoryTableBody')
+      tableClassPrepend = 'domain-history'
+      urlList = $('#domainHistorySelectedUrlsList')
+      $('#domainHistoryCheckAll').prop('checked', false)
+
+    for checkBox in tableCheckBoxes
+      $(checkBox).prop('checked', false)
+      urlList.find("li").remove()
+      selectLimiter -= selectLimiter
 
   $('#webcat_research_search').on('keyup', (e) ->
     if e.key == 'Enter' || e.keyCode == 13
@@ -277,12 +305,15 @@ $ ->
         $('#xbrsDomainName').remove()
         $('#xbrsDomainTableListingContent').append("<a id='xbrsDomainName' class='domain-name domain-name-normal'>#{domain}</a>")
         $('#xbrs-history-table_wrapper').hide()
-        $('.xbrs-history-table').hide()
+        $('#xbrs-history-table').hide()
 
         $('#domainHistoryDomainName').remove()
         $('#domainHistoryDomainTableListingContent').append("<a id='domainHistoryDomainName' class='domain-name domain-name-normal'>#{domain}</a>")
         $('#domain-history-table_wrapper').hide()
         $('.domain-history-table').hide()
+
+        removeCategoryUrlItems('domain-history')
+        removeCategoryUrlItems('xbrs-history')
 
         if $.fn.DataTable.isDataTable('.domain-history-table')
           $('.domain-history-table').DataTable().clear()
@@ -303,15 +334,27 @@ $ ->
     categories = button.parent('td').siblings('.xbrs-history-categories-cell').find('p')
     { name, row } = button.data()
 
-    if button.is(':checked')
+    if button.is(':checked') && selectLimiter < 10 && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
       $('#xbrsHistorySelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='xbrs-history-#{row}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
       $("#xbrs-history-#{row}").selectize {
         create: false,
-        highlight: false,
         labelField: 'category_name',
         maxItems: 5,
         options: AC.WebCat.createSelectOptions("#xbrs-history-#{row}"),
         persist: true,
+        score: (input) ->
+          #  Adding some customization for autofill
+          #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
+          (item) ->
+            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+              item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
+            else
+              0
         searchField: ['category_name', 'category_code'],
         valueField: 'category_id'
       }
@@ -326,8 +369,15 @@ $ ->
         for catId in catids
           $("#xbrs-history-#{row}")[0].selectize.addItem(catId)
       )
-    else
+      selectLimiter += selectLimiter
+    else if !button.is(':checked') && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length isnt 0)
       $("#xbrsHistorySelectedUrlsList > li[data-row='#{row}']").remove()
+      selectLimiter -= selectLimiter
+    else
+      button.prop('checked', false)
+
+    if $('#xbrsHistorySelectedUrlsList').find('li').length is 0
+      $('#xbrsHistoryCheckAll').prop('checked', false)
   )
 
   $(document).on("click", '.domain-history-categorize-url-button', () ->
@@ -335,15 +385,27 @@ $ ->
     categories = button.parent('td').siblings('.domain-history-categories-cell').find('p')
     { name, row } = button.data()
 
-    if button.is(':checked')
+    if button.is(':checked') && selectLimiter < 10 && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length isnt 0)
       $('#domainHistoryTableSelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='domain-history-#{row}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
       $("#domain-history-#{row}").selectize {
         create: false,
-        highlight: false,
         labelField: 'category_name',
         maxItems: 5,
         options: AC.WebCat.createSelectOptions("#domain-history-#{row}"),
         persist: true,
+        score: (input) ->
+          #  Adding some customization for autofill
+          #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
+          (item) ->
+            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+              item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
+            else
+              0
         searchField: ['category_name', 'category_code'],
         valueField: 'category_id'
       }
@@ -358,8 +420,16 @@ $ ->
         for catId in catids
           $("#domain-history-#{row}")[0].selectize.addItem(catId)
       )
-    else
+
+      selectLimiter += selectLimiter
+    else if !button.is(':checked') && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length isnt 0)
       $("#domainHistoryTableSelectedUrlsList > li[data-row='#{row}']").remove()
+      selectLimiter -= selectLimiter
+    else
+      button.prop('checked', false)
+
+    if $('#xbrsHistorySelectedUrlsList').find('li').length is 0
+      $('#xbrsHistoryCheckAll').prop('checked', false)
   )
 
   checkAll = (headerCheckBox, tableId) ->
@@ -375,39 +445,56 @@ $ ->
       tableClassPrepend = 'xbrs-history'
 
     for checkBox in tableCheckBoxes
-      categories = $(checkBox).parent('td').siblings(".#{tableClassPrepend}-categories-cell").find('p')
       { name, row } = $(checkBox).data()
 
-      $(checkBox).prop('checked', checkAllValue)
-
       if checkAllValue && (urlList.find("li[data-name='#{name}']").length is 0)
+        break if selectLimiter > 9
+
+        $(checkBox).prop('checked', checkAllValue)
         # Row will change to the value of the last item in the loop so we have to capture the id.
         selectId = "#{tableClassPrepend}-#{row}"
         urlList.append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='#{selectId}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
         $("##{tableClassPrepend}-#{row}").selectize {
           create: false,
-          highlight: false,
           labelField: 'category_name',
           maxItems: 5,
-          options: AC.WebCat.createSelectOptions("##{tableClassPrepend}-#{row}"),
+          onOptionAdd: () ->
+            rowId = this.$input.parent().data().row
+            catCell = $("td.#{tableClassPrepend}-categories-cell > p[data-row='#{rowId}']")
+            if catCell.attr('data-catids')?
+              { catids } = catCell.data()
+
+              if typeof catids is 'number'
+                catids = [catids]
+              else
+                catids = catids.split(',')
+
+              for catId in catids
+                this.addItem(catId)
+          options: AC.WebCat.createSelectOptions("##{selectId}"),
           persist: true,
+          score: (input) ->
+            #  Adding some customization for autofill
+            #  restricting on certain cats to avoid accidental categorization
+            #  (replaces selectize's built-in `getScoreFunction()` with our own)
+            (item) ->
+              if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+                item.category_code == input ? 1 : 0
+              else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+                1
+              else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+                0.9
+              else
+                0
           searchField: ['category_name', 'category_code'],
           valueField: 'category_id'
         }
 
-        # An promise adds the options so we have to use an event handler to add the items.
-        $("##{tableClassPrepend}-#{row}")[0].selectize.on('option_add', () ->
-          catids = $(categories).data().catids
-          if typeof catids is 'number'
-            catids = [catids]
-          else
-            catids = catids.split(',')
-
-          for catId in catids
-            $("##{selectId}")[0].selectize.addItem(catId)
-        )
+        selectLimiter += selectLimiter
       else if !checkAllValue && (urlList.find("li[data-name='#{name}']").length > 0)
         urlList.find("li[data-name='#{name}']").remove()
+        selectLimiter -= selectLimiter
+        $("input[data-name='#{name}'").prop('checked', checkAllValue)
 
   $('#domainHistoryCheckAll').click(() ->
     checkAll(this, '#domainHistoryTableBody')
