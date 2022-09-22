@@ -13129,6 +13129,7 @@ table > tbody > tr > td.no-padding {
   display: none;
 }
 
+
 .data-enrich-filerep-name-label {
   float: left;
   width: fit-content;
@@ -13168,10 +13169,8 @@ table > tbody > tr > td.no-padding {
   padding-left: 24px;
 }
 
-@media (max-width: 768px) {
-  .filerep-enrich-taxonomy-table {
-    table-layout: fixed;
-  }
+.filerep-enrich-cell-description {
+  word-break: break-word;
 }
 
 .filerep-enrich-taxonomy-table td{
