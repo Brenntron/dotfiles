@@ -13147,17 +13147,19 @@ table > tbody > tr > td.no-padding {
 .enrich-filerep-section-header {
   border-bottom: 1px solid #f2f2f2;
   padding-top: 22px;
+  padding-left: 4px;
 }
 
 .filerep-enrich-taxonomy-header-wrapper {
   display: flex;
   align-items: baseline;
-  padding-bottom: 4px;
+  padding: 0 0 4px 4px
 }
 
 .filerep-enrich-taxonomy-label {
   font-weight: 700;
   text-transform: uppercase;
+  font-size: 8pt;
 }
 
 .filerep-enrich-taxonomy-header {
@@ -13178,6 +13180,14 @@ table > tbody > tr > td.no-padding {
 
 .filerep-enrich-table-body-row {
   border-top: 1px solid #f2f2f2;
+}
+
+.filerep-enrich-table-header-row th:first-child {
+  padding-left: 4px;
+}
+
+.filerep-enrich-table-header-row th:last-child {
+  padding-right: 4px;
 }
 
 .filerep-enrich-table-description-th {

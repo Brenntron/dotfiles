@@ -570,7 +570,7 @@ create_filerep_enrich_section = (tags, context) ->
     $(section_wrapper).append section_header
     $(section_wrapper).append taxonomy_header
     #create table wrapper
-    table_wrapper = $("<table class='filerep-enrich-taxonomy-table'></table>")
+    table_wrapper = $("<table class='filerep-enrich-taxonomy-table data-report-table'></table>")
     #loop through each tag in group
 
     $(tag_group).each (index, tag) ->
