@@ -232,9 +232,9 @@ get_threat_data = window.get_threatgrid_data = () ->
         loader.hide()
         $(tg_report_running).hide()
 
-#    error: (response) ->
-#      loader.hide()
-#      std_api_error(response, "There was a problem retrieving data from ThreatGrid", reload: false)
+    error: (response) ->
+      loader.hide()
+      std_api_error(response, "There was a problem retrieving data from ThreatGrid", reload: false)
   )
 
 
@@ -299,9 +299,9 @@ window.get_reversinglabs_data = (sha256_hash) ->
         $(report_present).hide()
         $(report_missing).show()
 
-#    error: (response) ->
-#      $('#rl-loader').hide()
-#      std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
+    error: (response) ->
+      $('#rl-loader').hide()
+      std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
   )
 
 
@@ -436,7 +436,7 @@ window.get_sandbox_report = (runid, sha256_hash) ->
 
     error: (response) ->
       $('#sb-loader').hide()
-#      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
+      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
 
 
