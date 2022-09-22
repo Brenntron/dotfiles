@@ -13165,9 +13165,16 @@ table > tbody > tr > td.no-padding {
   padding-left: 24px;
 }
 
+@media (max-width: 768px) {
+  .filerep-enrich-taxonomy-table {
+    table-layout: fixed;
+  }
+}
+
 .filerep-enrich-taxonomy-table td{
   border: none;
 }
+
 .filerep-enrich-table-body-row {
   border-top: 1px solid #f2f2f2;
 }
@@ -13186,7 +13193,7 @@ table > tbody > tr > td.no-padding {
 }
 
 .filerep-enrich-cell-external-references {
-  width: 16%;
+  min-width: 86px;
   text-align: right;
 }
 
