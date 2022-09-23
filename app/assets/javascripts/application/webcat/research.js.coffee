@@ -7,8 +7,14 @@ $ ->
   setDhSelectLimiter = (term) ->
     domainHistorySelectLimiter += term
 
+  getDhSelectLimiter = () ->
+    domainHistorySelectLimiter
+
   setXbrsSelectLimiter = (term) ->
     xbrsSelectLimiter += term
+
+  getXbrsSelectLimiter = () ->
+    xbrsSelectLimiter
 
 
   $(document).ready(() ->
@@ -286,14 +292,12 @@ $ ->
     $('#domainHistoryCheckAll').prop('checked', false)
 
     for item in xbrsUrlList.find('li')
-      console.log 'item to be removed', item
       { row } = $(item).data().row
       $(item).remove()
       $(".xbrs-history-checkbox > input[data-row='#{row}']").prop('checked', false)
       setXbrsSelectLimiter -= 1
 
     for item in dhUrlList.find('li')
-      console.log 'item to be removed', item
       { row } = $(item).data().row
       $(item).remove()
       $(".domain-history-checkbox > input[data-row='#{row}']").prop('checked', false)
@@ -390,8 +394,8 @@ $ ->
       $("#xbrsHistorySelectedUrlsList > li[data-row='#{row}']").remove()
       setXbrsSelectLimiter(-1)
 
-      if xbrsSelectLimiter is 0
-        $('#xbrs-history-webcat-research-categorize-url').attr('disabled', 'disabled')
+    if xbrsSelectLimiter is 0
+      $('#xbrs-history-webcat-research-categorize-url').attr('disabled', 'disabled')
 
     if $('#xbrsHistorySelectedUrlsList').find('li').length is 0
       $('#xbrsHistoryCheckAll').prop('checked', false)
@@ -440,14 +444,14 @@ $ ->
         valueField: 'category_id'
       }
 
-      setDhSelectLimiter(1)
+      domainHistorySelectLimiter += 1
       $('#domain-history-webcat-research-categorize-url').removeAttr('disabled')
     else if !button.is(':checked') && ($("#domainHistoryTableSelectedUrlsList > li[data-name='#{name}']").length isnt 0)
       $("#domainHistoryTableSelectedUrlsList > li[data-row='#{row}']").remove()
-      setDhSelectLimiter(-1)
+      domainHistorySelectLimiter -= 1
 
-      if domainHistorySelectLimiter is 0
-        $('#domain-history-webcat-research-categorize-url').attr('disabled', 'disabled')
+    if domainHistorySelectLimiter is 0
+      $('#domain-history-webcat-research-categorize-url').attr('disabled', 'disabled')
 
     if $('#domainHistorySelectedUrlsList').find('li').length is 0
       $('#domainHistoryCheckAll').prop('checked', false)
@@ -522,8 +526,8 @@ $ ->
         setSelectLimiter(-1)
         $("input[data-name='#{name}'").prop('checked', checkAllValue)
 
-        if selectLimiter is 0
-          $("##{tableClassPrepend}-webcat-research-categorize-url").attr('disabled', 'disabled')
+      if selectLimiter() is 0
+        $("##{tableClassPrepend}-webcat-research-categorize-url").attr('disabled', 'disabled')
 
   $('#domainHistoryCheckAll').click(() ->
     checkAll(this, '#domainHistoryTableBody')
@@ -590,6 +594,6 @@ $ ->
             std_msg_success('Categories were not created', failed, reload: false)
         error: (response) ->
           $('#webcat-research-categorize-url').dropdown('toggle')
-          $('#webcat-research-categorize-urls .loader-gears').toggle()
+          $('#webcat-research-categorize-url .loader-gears').toggle()
           std_api_error(response, "Categories were not created.", reload: false)
       , this)
