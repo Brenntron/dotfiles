@@ -566,7 +566,7 @@ create_filerep_enrich_section = (tags, context) ->
     #create section wrapper
     section_wrapper = $("<div class='enrich-filerep-section-wrapper'></div>")
     section_header = "<h4 class='enrich-filerep-section-header data-report-label'>#{context}</h4>"
-    taxonomy_header = "<div class='filerep-enrich-taxonomy-header-wrapper'><label class='filerep-enrich-taxonomy-label'>Taxonomy:</label><h5 class='filerep-enrich-taxonomy-header'>#{taxonomy_name}</h5></div>"
+    taxonomy_header = "<div class='filerep-enrich-taxonomy-header-wrapper data-report-content'><label class='filerep-enrich-taxonomy-label'>Taxonomy:</label><h5 class='filerep-enrich-taxonomy-header'>#{taxonomy_name}</h5></div>"
     $(section_wrapper).append section_header
     $(section_wrapper).append taxonomy_header
     #create table wrapper
