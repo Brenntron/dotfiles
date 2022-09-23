@@ -465,7 +465,7 @@ $ ->
     if tableId.indexOf('domainHistory') != -1
       urlList = $('#domainHistoryTableSelectedUrlsList')
       tableClassPrepend = 'domain-history'
-      selectLimiter = getDomainHistorySelectLimiter
+      selectLimiter = getDhSelectLimiter
       setSelectLimiter = setDhSelectLimiter
     else
       urlList = $('#xbrsHistorySelectedUrlsList')
@@ -476,10 +476,11 @@ $ ->
     for checkBox in tableCheckBoxes
       { name, row } = $(checkBox).data()
 
+      $(checkBox).prop('checked', checkAllValue)
+
       if checkAllValue && (urlList.find("li[data-name='#{name}']").length is 0) && (urlList.find("li[data-row='#{row}']").length is 0)
         break if selectLimiter() > 9
 
-        $(checkBox).prop('checked', checkAllValue)
         # Row will change to the value of the last item in the loop so we have to capture the id.
         selectId = "#{tableClassPrepend}-#{row}"
         urlList.append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='#{selectId}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
