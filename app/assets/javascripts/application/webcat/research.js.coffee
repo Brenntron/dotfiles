@@ -284,10 +284,10 @@ $ ->
       urlList = $('#domainHistorySelectedUrlsList')
       $('#domainHistoryCheckAll').prop('checked', false)
 
-    for checkBox in tableCheckBoxes
+    for item in urlList.find('li')
+      $(item).remove()
       $(checkBox).prop('checked', false)
-      urlList.find("li").remove()
-      selectLimiter -= selectLimiter
+      selectLimiter -= 1
 
   $('#webcat_research_search').on('keyup', (e) ->
     if e.key == 'Enter' || e.keyCode == 13
@@ -372,16 +372,14 @@ $ ->
         valueField: 'category_id'
       }
 
-      selectLimiter += selectLimiter
+      selectLimiter += 1
       $('#xbrs-history-webcat-research-categorize-url').removeAttr('disabled')
-    else if !button.is(':checked') && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length isnt 0)
+    else if !button.is(':checked') && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}']").length isnt 0)
       $("#xbrsHistorySelectedUrlsList > li[data-row='#{row}']").remove()
-      selectLimiter -= selectLimiter
+      selectLimiter -= 1
 
       if selectLimiter is 0
         $('#xbrs-history-webcat-research-categorize-url').attr('disabled', 'disabled')
-    else
-      button.prop('checked', false)
 
     if $('#xbrsHistorySelectedUrlsList').find('li').length is 0
       $('#xbrsHistoryCheckAll').prop('checked', false)
@@ -392,6 +390,7 @@ $ ->
     { name, row } = button.data()
 
     if button.is(':checked') && selectLimiter < 10 && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length is 0) && ($("#domainHistorySelectedUrlsList > li[data-row='#{row}']").length is 0)
+
       $('#domainHistoryTableSelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='domain-history-#{row}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
       $("#domain-history-#{row}").selectize {
         create: false,
@@ -429,19 +428,17 @@ $ ->
         valueField: 'category_id'
       }
 
-      selectLimiter += selectLimiter
-      $('#xbrs-history-webcat-research-categorize-url').removeAttr('disabled')
-    else if !button.is(':checked') && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length isnt 0)
+      selectLimiter += 1
+      $('#domain-history-webcat-research-categorize-url').removeAttr('disabled')
+    else if !button.is(':checked') && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}']").length isnt 0)
       $("#domainHistoryTableSelectedUrlsList > li[data-row='#{row}']").remove()
-      selectLimiter -= selectLimiter
+      selectLimiter -= 1
 
       if selectLimiter is 0
-        $('#xbrs-history-webcat-research-categorize-url').attr('disabled', 'disabled')
-    else
-      button.prop('checked', false)
+        $('#domain-history-webcat-research-categorize-url').attr('disabled', 'disabled')
 
-    if $('#xbrsHistorySelectedUrlsList').find('li').length is 0
-      $('#xbrsHistoryCheckAll').prop('checked', false)
+    if $('#domainHistorySelectedUrlsList').find('li').length is 0
+      $('#domainHistoryCheckAll').prop('checked', false)
   )
 
   checkAll = (headerCheckBox, tableId) ->
@@ -502,11 +499,11 @@ $ ->
           valueField: 'category_id'
         }
 
-        selectLimiter += selectLimiter
-        $('#xbrs-history-webcat-research-categorize-url').removeAttr('disabled')
+        selectLimiter += 1
+        $("##{tableClassPrepend}-webcat-research-categorize-url").removeAttr('disabled')
       else if !checkAllValue && (urlList.find("li[data-name='#{name}']").length > 0)
         urlList.find("li[data-name='#{name}']").remove()
-        selectLimiter -= selectLimiter
+        selectLimiter -= 1
         $("input[data-name='#{name}'").prop('checked', checkAllValue)
 
         if selectLimiter is 0
