@@ -217,7 +217,7 @@ $ ->
                   className: 'xbrs-history-checkbox'
                   render: (data, type, full, meta) ->
                     "<input type='checkbox' data-name='#{data.domain}' data-row='#{meta.row}' class='xbrs-categorize-url-button categorize-url-button'</input>"
-                  sortable: false;
+                  sortable: false
                 }
                 {
                   data: null
@@ -351,7 +351,11 @@ $ ->
 
     if button.is(':checked') && xbrsSelectLimiter < 10 && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length is 0) && ($("#xbrsHistorySelectedUrlsList > li[data-row='#{row}']").length is 0)
 
-      $('#xbrsHistorySelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='xbrs-history-#{row}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
+      selectize_url_li =
+        "<li data-name='#{name}' data-row='#{row}'>#{name}" +
+        "<select id='xbrs-history-#{row}' class='form-control selectize' placeholder='Enter up to 5 categories' value='' multiple='multiple'></select>" +
+        "</li>"
+      $('#xbrsHistorySelectedUrlsList').append(selectize_url_li)
       $("#xbrs-history-#{row}").selectize {
         create: false,
         labelField: 'category_name',
