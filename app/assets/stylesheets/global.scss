@@ -5694,6 +5694,10 @@ input.table-entry-input:focus {
   .webcat-research-categorize-url-button {
     background-image: url(image_path('icon_categorize.svg'));
 
+    &:disabled {
+      opacity: 0.5;
+    }
+
     span.toolbar-button-text {
       display: block;
     }
@@ -5709,6 +5713,10 @@ input.table-entry-input:focus {
 
   .toolbar-dropdown {
     min-width: 350px;
+
+    ul li:hover {
+      background-color: white;
+    }
   }
 
   .selected-urls-wrapper {
