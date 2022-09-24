@@ -417,7 +417,11 @@ $ ->
     { name, url } = button.data()
 
     if button.is(':checked') && domainHistorySelectLimiter < 10 && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
-      $('#domainHistoryTableSelectedUrlsList').append("<li data-name='#{name}'><p>#{url}</p><select id='domain-history-#{name}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
+      selectize_url_li =
+        "<li data-name='#{name}' data-row='#{row}'>#{name}" +
+          "<select id='domain-history-#{row}' class='form-control selectize' placeholder='Enter up to 5 categories' value='' multiple='multiple'></select>" +
+          "</li>"
+      $('#domainHistoryTableSelectedUrlsList').append(selectize_url_li)
       $("#domain-history-#{name}").selectize {
         create: false,
         labelField: 'category_name',
@@ -501,7 +505,11 @@ $ ->
       if checkAllValue && (urlList.find("li[data-name='#{name}']").length is 0) && (selectLimiter() < 10)
         # Row will change to the value of the last item in the loop so we have to capture the id.
         selectId = "#{tableClassPrepend}-#{name}"
-        urlList.append("<li data-name='#{name}'><p>#{url}</p><select id='#{selectId}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
+        selectize_url_li =
+          "<li data-name='#{name}' data-row='#{row}'>#{name}" +
+            "<select id='#{selectId}' class='form-control selectize' placeholder='Enter up to 5 categories' value='' multiple='multiple'></select>" +
+            "</li>"
+        urlList.append(selectize_url_li)
         $("##{tableClassPrepend}-#{name}").selectize {
           create: false,
           labelField: 'category_name',
@@ -622,6 +630,6 @@ $ ->
             std_msg_success('Categories were not created', failed, reload: false)
         error: (response) ->
           $('#webcat-research-categorize-url').dropdown('toggle')
-          $('#webcat-research-categorize-url .loader-gears').toggle()
+          $('#webcat-research-categorize-url .webcat-research-dd-loader-wrapper').toggle()
           std_api_error(response, "Categories were not created.", reload: false)
       , this)

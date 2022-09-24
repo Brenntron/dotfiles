@@ -3614,6 +3614,7 @@ fieldset.top-content {
 .gear-loader-wrapper {
   display: inline-block;
   margin: 5px 20px 0 14px;
+  padding: 0 !important;
   width: 30px;
   height: 30px;
 }
@@ -4621,6 +4622,7 @@ button.primary, button.secondary, button.tertiary, input.button_primary {
   border: none !important;
   margin: 12px 6px 0 6px;
   color: $content-bg-color;
+  width: auto;
 }
 
 button.primary, input.button_primary {
@@ -5686,11 +5688,6 @@ input.table-entry-input:focus {
   width: initial;
   z-index: 1;
 
-  .loader-gears {
-    display: none;
-    margin: 0 auto;
-  }
-
   .webcat-research-categorize-url-button {
     background-image: url(image_path('icon_categorize.svg'));
 
@@ -5713,6 +5710,7 @@ input.table-entry-input:focus {
 
   .toolbar-dropdown {
     min-width: 350px;
+    margin-top: 0;
 
     ul li:hover {
       background-color: white;
@@ -5720,27 +5718,16 @@ input.table-entry-input:focus {
   }
 
   .selected-urls-wrapper {
-    padding: 10px;
+    padding: 10px 10px 0 10px;
 
-    //.input-group.search-group {
-    //  border: 2px solid #ccc;
-    //  border-radius: 2px;
-    //  margin: 10px 0;
-    //  z-index: 0;
-    //
-    //  input:focus {
-    //    border: none !important;
-    //  }
-    //
       span.highlight {
         float: none;
         font-size: 11px;
         padding: 0
       }
-    //}
 
     ul > li {
-      padding: 4px 0px;
+      padding: 4px 0;
     }
 
     .selected-urls-label {
@@ -5749,21 +5736,8 @@ input.table-entry-input:focus {
   }
 
   .selected-urls-categories-wrapper {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-
-    .toolbar-button {
-      padding: 0 30px;
-    }
-
-    .toolbar-button, .toolbar-button-text {
-      margin: auto;
-    }
-
-    .toolbar-button-text {
-      padding: 0;
-    }
+    padding-bottom: 20px;
+    text-align: center;
   }
 }
 
@@ -7612,6 +7586,29 @@ table.dispute-entry-table tbody tr.selected {
   height: 100%;
 }
 
+.webcat-research-categorize-dropdown .form-control.selectize {
+  min-height: 30px !important;
+}
+
+.webcat-research-categorize-dropdown .form-control.selectize {
+  margin-top: 6px;
+  margin-bottom: 4px;
+  font-size: 8pt;
+  input {
+    font-size: 8pt;
+  }
+}
+
+.webcat-research-categorize-dropdown li::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
 .category-column .form-control.selectize {
   height: 30px !important;
   margin: -4px 0;
@@ -7628,18 +7625,27 @@ table.dispute-entry-table tbody tr.selected {
   background-color: $content-bg-color !important;
 }
 
-#categorize-urls-form-wrapper .selectize-dropdown.multi.form-control.selectize {
+#categorize-urls-form-wrapper .selectize-dropdown.multi.form-control.selectize,
+.webcat-research-categorize-dropdown .selectize-dropdown.multi.form-control.selectize
+{
   margin-top: 8px;
 }
 
-.nav-tool-content-wrapper .form-control.selectize .selectize-input, #categorize-urls-form-wrapper .form-control.selectize .selectize-input {
+.nav-tool-content-wrapper .form-control.selectize .selectize-input,
+.form-control.selectize .selectize-input,
+.webcat-research-categorize-dropdown .form-control.selectize .selectize-input
+{
   padding: 2px;
   margin-left: -2px;
   box-shadow: none;
   width: 100%;
 }
 
-.nav-tool-content-wrapper .form-control.selectize .selectize-input input, #advanced-search-wrapper .form-control.selectize .selectize-input input, #categorize-urls-form-wrapper .form-control.selectize .selectize-input input {
+.nav-tool-content-wrapper .form-control.selectize .selectize-input input,
+#advanced-search-wrapper .form-control.selectize .selectize-input input,
+#categorize-urls-form-wrapper .form-control.selectize .selectize-input input,
+.webcat-research-categorize-dropdown .form-control.selectize .selectize-input input
+{
   outline: none !important;
 }
 
@@ -7739,7 +7745,10 @@ table.dispute-entry-table tbody tr.selected {
   }
 }
 
-.nav-tool-content-wrapper select.form-control, #categorize-urls-form-wrapper select.form-control {
+.nav-tool-content-wrapper select.form-control,
+#categorize-urls-form-wrapper select.form-control
+.webcat-research-categorize-dropdown select.form-control
+{
   background-color: transparent;
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
@@ -9401,7 +9410,7 @@ td.text-center span {
   margin-top: 4px !important;
 }
 
-.cluster-mgt-loader-wrapper, .webcat-loader-wrapper, .webrep-loader-wrapper  {
+.cluster-mgt-loader-wrapper, .webcat-loader-wrapper, .webrep-loader-wrapper {
   display: block;
   position: absolute;
   width: 170px;
@@ -13333,6 +13342,16 @@ table > tbody > tr > td.no-padding {
 .table-ip-input:focus {
   background-color: #fff7cd;
   outline-offset: 0;
+}
+
+.webcat-research-categorize-dropdown .selectize-control.multi .selectize-input .item {
+    font-size: 8pt;
+    line-height: 12pt;
+    margin: 3px 2px 0 !important; // override needed
+}
+
+.selectize-input > input:focus {
+  border: none !important;
 }
 
 // CATEGORIZE URLs dropdown - vertical spacing tightening (below the radio buttons)
