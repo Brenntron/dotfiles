@@ -16,7 +16,6 @@ $ ->
   getXbrsSelectLimiter = () ->
     xbrsSelectLimiter
 
-
   $(document).ready(() ->
     AC.WebCat.getAUPCategories().then((categories) ->
       for key, value of categories
@@ -101,14 +100,16 @@ $ ->
               {
                 data: null
                 className: 'domain-history-checkbox'
-                render: (data, type, full, meta) ->
+                render: (data) ->
                   { url } = data
-                  "<input type='checkbox' data-name='#{url}' data-row=#{meta.row} class='domain-history-categorize-url-button categorize-url-button'</input>"
+                  formattedUrl = url.replace(/\//g, '-')
+
+                  "<input type='checkbox' data-name='#{formattedUrl}' data-url='#{url}' class='domain-history-categorize-url-button categorize-url-button'</input>"
                 sortable: false
               }
               {
                 data: null
-                render: (data, type, full) ->
+                render: (data) ->
                   { entry_id, complaint_id } = data
                   if entry_id? && complain_id?
                     "<a href='/escalations/webcat/complaints/#{complaint_id}' target='_blank'>#{entry_id}</a>"
@@ -120,11 +121,10 @@ $ ->
                 data: null
                 className: 'domain-history-categories-cell'
                 render: (data, type, full, meta) ->
-                  { category } = data
+                  { category, url } = data
 
                   if category?
-                    catIds = categoryList.filter((cat) -> category.indexOf(cat.category_name) >= 0).map((cat) -> cat.category_id)
-                    return "<p data-row='#{meta.row}' data-catids='#{catIds}'>#{category}</p>"
+                    return "<p data-name='#{url}''>#{category}</p>"
                   else
                     ''
               }
@@ -215,20 +215,18 @@ $ ->
                 {
                   data: null
                   className: 'xbrs-history-checkbox'
-                  render: (data, type, full, meta) ->
-                    "<input type='checkbox' data-name='#{data.domain}' data-row='#{meta.row}' class='xbrs-categorize-url-button categorize-url-button'</input>"
+                  render: (data) ->
+                    formattedDomain = data.domain.replace(/\//g, '-')
+                    "<input type='checkbox' data-name='#{formattedDomain}' data-url='#{data.domain}' class='xbrs-categorize-url-button categorize-url-button'</input>"
                   sortable: false
                 }
                 {
                   data: null
                   className: 'xbrs-history-categories-cell'
-                  render: (data, type, full, meta) ->
+                  render: (data) ->
                     if data.aups.length > 0
-                      cats = $.unique(data.aups.map((aup) -> aup.cat))
-
-                      catIds = categoryList.filter((cat) -> cat.category_code in cats).map((cat) -> cat.category_id)
-                      cats = cats.toString().split(',').join(', ')
-                      return "<p data-row='#{meta.row}' data-catids='#{catIds}'>#{cats}</p>"
+                      cats = $.unique(data.aups.map((aup) -> aup.cat)).toString().split(',').join(', ')
+                      return "<p data-name='#{data.domain}'>#{cats}</p>"
                     else
                       ''
                 }
@@ -292,16 +290,16 @@ $ ->
     $('#domainHistoryCheckAll').prop('checked', false)
 
     for item in xbrsUrlList.find('li')
-      { row } = $(item).data().row
+      { name } = $(item).data().name
       $(item).remove()
-      $(".xbrs-history-checkbox > input[data-row='#{row}']").prop('checked', false)
-      setXbrsSelectLimiter -= 1
+      $(".xbrs-history-checkbox > input[data-name='#{name}']").prop('checked', false)
+      xbrsSelectLimiter -= 1
 
     for item in dhUrlList.find('li')
-      { row } = $(item).data().row
+      { name } = $(item).data().name
       $(item).remove()
-      $(".domain-history-checkbox > input[data-row='#{row}']").prop('checked', false)
-      setDhSelectLimiter -= 1
+      $(".domain-history-checkbox > input[data-name='#{name}']").prop('checked', false)
+      domainHistorySelectLimiter -= 1
 
     $('#xbrs-history-webcat-research-categorize-url').attr('disabled', 'disabled')
     $('#domain-history-webcat-research-categorize-url').attr('disabled', 'disabled')
@@ -347,33 +345,38 @@ $ ->
 
   $(document).on("click",'.xbrs-categorize-url-button', () ->
     button = $(this)
-    { name, row } = button.data()
+    { name, url } = button.data()
 
-    if button.is(':checked') && xbrsSelectLimiter < 10 && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length is 0) && ($("#xbrsHistorySelectedUrlsList > li[data-row='#{row}']").length is 0)
-
+    if button.is(':checked') && xbrsSelectLimiter < 10 && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
       selectize_url_li =
-        "<li data-name='#{name}' data-row='#{row}'>#{name}" +
-        "<select id='xbrs-history-#{row}' class='form-control selectize' placeholder='Enter up to 5 categories' value='' multiple='multiple'></select>" +
+        "<li data-name='#{name}'>#{url}" +
+        "<select id='xbrs-history-#{name}' class='form-control selectize' placeholder='Enter up to 5 categories' value='' multiple='multiple'></select>" +
         "</li>"
       $('#xbrsHistorySelectedUrlsList').append(selectize_url_li)
-      $("#xbrs-history-#{row}").selectize {
+      $("#xbrs-history-#{name}").selectize {
         create: false,
         labelField: 'category_name',
         maxItems: 5,
         onOptionAdd: () ->
-          rowId = this.$input.parent().data().row
-          catCell = $("td.xbrs-history-categories-cell > p[data-row='#{rowId}']")
-          if catCell.attr('data-catids')?
-            { catids } = catCell.data()
+          domain = this.$input.parent().data().name
+          selectize = this
+          $.ajax(
+            url: '/escalations/api/v1/escalations/webcat/complaints/domain_info'
+            method: 'GET'
+            headers: headers
+            data:
+              domain: domain
+            success: (response) ->
+              parsedResponse = JSON.parse response
+              { category } = parsedResponse.data
 
-            if typeof catids is 'number'
-              catids = [catids]
-            else
-              catids = catids.split(',')
-
-            for catId in catids
-              this.addItem(catId)
-        options: AC.WebCat.createSelectOptions("#xbrs-history-#{row}"),
+              if category.category_ids?
+                for category_id in category.category_ids
+                  selectize.addItem(category_id)
+            error: (errorResponse) ->
+              std_api_error(errorResponse, "Domain info could not be retrieved.", reload: false)
+          )
+        options: AC.WebCat.createSelectOptions("#xbrs-history-#{name}"),
         persist: true,
         score: (input) ->
           #  Adding some customization for autofill
@@ -394,12 +397,16 @@ $ ->
 
       setXbrsSelectLimiter(1)
       $('#xbrs-history-webcat-research-categorize-url').removeAttr('disabled')
-    else if !button.is(':checked') && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}']").length isnt 0)
-      $("#xbrsHistorySelectedUrlsList > li[data-row='#{row}']").remove()
+    else if !button.is(':checked') && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}']").length isnt 0) && $(".xbrs-categorize-url-button:checked[data-name='#{name}']").length is 0
+      $("#xbrsHistorySelectedUrlsList > li[data-name='#{name}']").remove()
       setXbrsSelectLimiter(-1)
 
-    if xbrsSelectLimiter is 0
-      $('#xbrs-history-webcat-research-categorize-url').attr('disabled', 'disabled')
+    $categorizeButton = $('#xbrs-history-webcat-research-categorize-url')
+
+    if (xbrsSelectLimiter is 0) && !$categorizeButton.attr('disabled')?
+      $categorizeButton.attr('disabled', 'disabled')
+    else if (xbrsSelectLimiter isnt 0) && $categorizeButton.attr('disabled')?
+      $categorizeButton.removeAttr('disabled')
 
     if $('#xbrsHistorySelectedUrlsList').find('li').length is 0
       $('#xbrsHistoryCheckAll').prop('checked', false)
@@ -407,29 +414,34 @@ $ ->
 
   $(document).on("click", '.domain-history-categorize-url-button', () ->
     button = $(this)
-    { name, row } = button.data()
+    { name, url } = button.data()
 
-    if button.is(':checked') && domainHistorySelectLimiter < 10 && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length is 0) && ($("#domainHistorySelectedUrlsList > li[data-row='#{row}']").length is 0)
-
-      $('#domainHistoryTableSelectedUrlsList').append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='domain-history-#{row}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
-      $("#domain-history-#{row}").selectize {
+    if button.is(':checked') && domainHistorySelectLimiter < 10 && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
+      $('#domainHistoryTableSelectedUrlsList').append("<li data-name='#{name}'><p>#{url}</p><select id='domain-history-#{name}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
+      $("#domain-history-#{name}").selectize {
         create: false,
         labelField: 'category_name',
         maxItems: 5,
         onOptionAdd: () ->
-          rowId = this.$input.parent().data().row
-          catCell = $("td.domain-history-categories-cell > p[data-row='#{rowId}']")
-          if catCell.attr('data-catids')?
-            { catids } = catCell.data()
+          domain = this.$input.parent().data().name
+          selectize = this
+          $.ajax(
+            url: '/escalations/api/v1/escalations/webcat/complaints/domain_info'
+            method: 'GET'
+            headers: headers
+            data:
+              domain: domain
+            success: (response) ->
+              parsedResponse = JSON.parse response
+              { category } = parsedResponse.data
 
-            if typeof catids is 'number'
-              catids = [catids]
-            else
-              catids = catids.split(',')
-
-            for catId in catids
-              this.addItem(catId)
-        options: AC.WebCat.createSelectOptions("#domain-history-#{row}"),
+              if category.category_ids?
+                for category_id in category.category_ids
+                  selectize.addItem(category_id)
+            error: (errorResponse) ->
+              std_api_error(errorResponse, "Domain info could not be retrieved.", reload: false)
+          )
+        options: AC.WebCat.createSelectOptions("#domain-history-#{name}"),
         persist: true,
         score: (input) ->
           #  Adding some customization for autofill
@@ -449,13 +461,16 @@ $ ->
       }
 
       domainHistorySelectLimiter += 1
-      $('#domain-history-webcat-research-categorize-url').removeAttr('disabled')
-    else if !button.is(':checked') && ($("#domainHistoryTableSelectedUrlsList > li[data-name='#{name}']").length isnt 0)
-      $("#domainHistoryTableSelectedUrlsList > li[data-row='#{row}']").remove()
+    else if !button.is(':checked') && ($("#domainHistoryTableSelectedUrlsList > li[data-name='#{name}']").length isnt 0) && $(".domain-history-categorize-url-button:checked[data-name='#{name}']").length is 0
+      $("#domainHistoryTableSelectedUrlsList > li[data-name='#{name}']").remove()
       domainHistorySelectLimiter -= 1
 
-    if domainHistorySelectLimiter is 0
-      $('#domain-history-webcat-research-categorize-url').attr('disabled', 'disabled')
+    $categorizeButton = $('#domain-history-webcat-research-categorize-url')
+
+    if (domainHistorySelectLimiter is 0) && !$categorizeButton.attr('disabled')?
+      $categorizeButton.attr('disabled', 'disabled')
+    else if (domainHistorySelectLimiter isnt 0) && $categorizeButton.attr('disabled')?
+      $categorizeButton.removeAttr('disabled')
 
     if $('#domainHistorySelectedUrlsList').find('li').length is 0
       $('#domainHistoryCheckAll').prop('checked', false)
@@ -478,33 +493,38 @@ $ ->
       setSelectLimiter = setXbrsSelectLimiter
 
     for checkBox in tableCheckBoxes
-      { name, row } = $(checkBox).data()
+      $checkBox = $(checkBox)
+      { name, url } = $checkBox.data()
 
-      $(checkBox).prop('checked', checkAllValue)
+      $checkBox.prop('checked', checkAllValue)
 
-      if checkAllValue && (urlList.find("li[data-name='#{name}']").length is 0) && (urlList.find("li[data-row='#{row}']").length is 0)
-        break if selectLimiter() > 9
-
+      if checkAllValue && (urlList.find("li[data-name='#{name}']").length is 0) && (selectLimiter() < 10)
         # Row will change to the value of the last item in the loop so we have to capture the id.
-        selectId = "#{tableClassPrepend}-#{row}"
-        urlList.append("<li data-name='#{name}' data-row='#{row}'><p>#{name}</p><select id='#{selectId}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
-        $("##{tableClassPrepend}-#{row}").selectize {
+        selectId = "#{tableClassPrepend}-#{name}"
+        urlList.append("<li data-name='#{name}'><p>#{url}</p><select id='#{selectId}' class='input-group search-group' placeholder='Enter up to 5 categories' value=''></select></li>")
+        $("##{tableClassPrepend}-#{name}").selectize {
           create: false,
           labelField: 'category_name',
           maxItems: 5,
           onOptionAdd: () ->
-            rowId = this.$input.parent().data().row
-            catCell = $("td.#{tableClassPrepend}-categories-cell > p[data-row='#{rowId}']")
-            if catCell.attr('data-catids')?
-              { catids } = catCell.data()
+            domain = this.$input.parent().data().name
+            selectize = this
+            $.ajax(
+              url: '/escalations/api/v1/escalations/webcat/complaints/domain_info'
+              method: 'GET'
+              headers: headers
+              data:
+                domain: domain
+              success: (response) ->
+                parsedResponse = JSON.parse response
+                { category } = parsedResponse.data
 
-              if typeof catids is 'number'
-                catids = [catids]
-              else
-                catids = catids.split(',')
-
-              for catId in catids
-                this.addItem(catId)
+                if category.category_ids?
+                  for category_id in category.category_ids
+                    selectize.addItem(category_id)
+              error: (errorResponse) ->
+                std_api_error(errorResponse, "Domain info could not be retrieved.", reload: false)
+            )
           options: AC.WebCat.createSelectOptions("##{selectId}"),
           persist: true,
           score: (input) ->
@@ -525,14 +545,17 @@ $ ->
         }
 
         setSelectLimiter(1)
-        $("##{tableClassPrepend}-webcat-research-categorize-url").removeAttr('disabled')
-      else if !checkAllValue && (urlList.find("li[data-name='#{name}']").length > 0)
+      else if !checkAllValue && (urlList.find("li[data-name='#{name}']").length isnt 0)
         urlList.find("li[data-name='#{name}']").remove()
         setSelectLimiter(-1)
         $("input[data-name='#{name}'").prop('checked', checkAllValue)
 
-      if selectLimiter() is 0
-        $("##{tableClassPrepend}-webcat-research-categorize-url").attr('disabled', 'disabled')
+      $categorizeButton = $("##{tableClassPrepend}-webcat-research-categorize-url")
+
+      if (selectLimiter() is 0) && !$categorizeButton.attr('disabled')?
+        $categorizeButton.attr('disabled', 'disabled')
+      else if (selectLimiter() isnt 0) && $categorizeButton.attr('disabled')?
+        $categorizeButton.removeAttr('disabled')
 
   $('#domainHistoryCheckAll').click(() ->
     checkAll(this, '#domainHistoryTableBody')
