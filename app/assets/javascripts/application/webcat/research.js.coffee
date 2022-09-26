@@ -363,25 +363,24 @@ $ ->
         onInitialize: () ->
           domain = this.$input.parent().data().url
           selectize = this
-          $.ajax(
-            url: '/escalations/api/v1/escalations/webcat/complaints/domain_info'
-            method: 'GET'
-            headers: headers
-            data:
-              'domain': domain
-            success: (response) ->
-              parsedResponse = JSON.parse response
-              { category } = parsedResponse.data
 
-              if category.category_ids?
-                for category_id in category.category_ids
-                  if !selectize.getOption(category_id)?
+          $.ajax(
+            url: '/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
+            headers: headers
+            method: 'POST'
+            data: { 'urls': [domain] }
+            success: (response) ->
+              data = response.json
+              for domainKey in Object.keys(data)
+                for category_key in Object.keys(data[domainKey])
+                  category_id = data[domainKey][category_key]
+                  if Object.keys(selectize.getOption(category_id)).length < 1
                     categoryOption = categoryList.filter (cat) -> cat.category_id is category_id
                     selectize.addOption(categoryOption)
 
                   selectize.addItem(category_id)
             error: (errorResponse) ->
-              std_api_error(errorResponse, "Domain info for #{domain} could not be retrieved.", reload: false)
+              std_api_error(errorResponse, "Category info for #{domain} could not be retrieved.", reload: false)
           )
         options: AC.WebCat.createSelectOptions("#xbrs-history-#{name}"),
         persist: true,
@@ -440,25 +439,24 @@ $ ->
         onInitialize: () ->
           domain = this.$input.parent().data().url
           selectize = this
-          $.ajax(
-            url: '/escalations/api/v1/escalations/webcat/complaints/domain_info'
-            method: 'GET'
-            headers: headers
-            data:
-              'domain': domain
-            success: (response) ->
-              parsedResponse = JSON.parse response
-              { category } = parsedResponse.data
 
-              if category.category_ids?
-                for category_id in category.category_ids
-                  if !selectize.getOption(category_id)?
+          $.ajax(
+            url: '/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
+            headers: headers
+            method: 'POST'
+            data: { 'urls': [domain] }
+            success: (response) ->
+              data = response.json
+              for domainKey in Object.keys(data)
+                for category_key in Object.keys(data[domainKey])
+                  category_id = data[domainKey][category_key]
+                  if Object.keys(selectize.getOption(category_id)).length < 1
                     categoryOption = categoryList.filter (cat) -> cat.category_id is category_id
                     selectize.addOption(categoryOption)
 
                   selectize.addItem(category_id)
             error: (errorResponse) ->
-              std_api_error(errorResponse, "Domain info for #{domain} could not be retrieved.", reload: false)
+              std_api_error(errorResponse, "Category info for #{domain} could not be retrieved.", reload: false)
           )
         options: AC.WebCat.createSelectOptions("#domain-history-#{name}"),
         persist: true,
@@ -536,27 +534,26 @@ $ ->
           onInitialize: () ->
             domain = this.$input.parent().data().url
             selectize = this
-            $.ajax(
-              url: '/escalations/api/v1/escalations/webcat/complaints/domain_info'
-              method: 'GET'
-              headers: headers
-              data:
-                'domain': domain
-              success: (response) ->
-                parsedResponse = JSON.parse response
-                { category } = parsedResponse.data
 
-                if Object.keys(category).length > 0
-                  for category_id in category.category_ids
-                    if !selectize.getOption(category_id)?
+            $.ajax(
+              url: '/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
+              headers: headers
+              method: 'POST'
+              data: { 'urls': [domain] }
+              success: (response) ->
+                data = response.json
+                for domainKey in Object.keys(data)
+                  for category_key in Object.keys(data[domainKey])
+                    category_id = data[domainKey][category_key]
+                    if Object.keys(selectize.getOption(category_id)).length < 1
                       categoryOption = categoryList.filter (cat) -> cat.category_id is category_id
-                      console.log 'categoryOption: ', categoryOption
                       selectize.addOption(categoryOption)
 
                     selectize.addItem(category_id)
               error: (errorResponse) ->
-                std_api_error(errorResponse, "Domain info for #{domain} could not be retrieved.", reload: false)
+                std_api_error(errorResponse, "Category info for #{domain} could not be retrieved.", reload: false)
             )
+
           options: AC.WebCat.createSelectOptions("##{selectId}"),
           persist: true,
           score: (input) ->
@@ -586,12 +583,12 @@ $ ->
       else if checkAllValue && (selectLimiter() is 10)
         $("##{tableClassPrepend}-limit-warning").show()
 
-      $categorizeButton = $("##{tableClassPrepend}-webcat-research-categorize-url")
+    $categorizeButton = $("##{tableClassPrepend}-webcat-research-categorize-url")
 
-      if (selectLimiter() is 0) && !$categorizeButton.attr('disabled')?
-        $categorizeButton.attr('disabled', 'disabled')
-      else if (selectLimiter() isnt 0) && $categorizeButton.attr('disabled')?
-        $categorizeButton.removeAttr('disabled')
+    if (selectLimiter() is 0) && !$categorizeButton.attr('disabled')?
+      $categorizeButton.attr('disabled', 'disabled')
+    else if (selectLimiter() isnt 0) && $categorizeButton.attr('disabled')?
+      $categorizeButton.removeAttr('disabled')
 
   $('#domainHistoryCheckAll').click(() ->
     checkAll(this, '#domainHistoryTableBody')
