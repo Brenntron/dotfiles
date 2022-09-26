@@ -644,7 +644,7 @@ $ ->
           unless data.complete_failed.length > 0 || data.create_failed.length > 0
             successfulCalls.push data.completed[0]
           else
-            failedCalss.push data.complete_failed[0]
+            failedCalls.push data.complete_failed[0]
         error: (response) ->
           callsCompleted += 1
           erroredCalls.push response.responseText
