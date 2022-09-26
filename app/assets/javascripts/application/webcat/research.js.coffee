@@ -404,9 +404,13 @@ $ ->
 
       setXbrsSelectLimiter(1)
       $('#xbrs-history-webcat-research-categorize-url').removeAttr('disabled')
+      $("##{tableClassPrepend}-limit-warning").hide()
     else if !button.is(':checked') && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}']").length isnt 0) && $(".xbrs-categorize-url-button:checked[data-name='#{name}']").length is 0
       $("#xbrsHistorySelectedUrlsList > li[data-name='#{name}']").remove()
       setXbrsSelectLimiter(-1)
+      $("##{tableClassPrepend}-limit-warning").hide()
+    else if button.is(':checked') && xbrsSelectLimiter is 10
+      $("##{tableClassPrepend}-limit-warning").show()
 
     $categorizeButton = $('#xbrs-history-webcat-research-categorize-url')
 
@@ -476,9 +480,13 @@ $ ->
       }
 
       domainHistorySelectLimiter += 1
+      $("#domain-history-limit-warning").hide()
     else if !button.is(':checked') && ($("#domainHistoryTableSelectedUrlsList > li[data-name='#{name}']").length isnt 0) && $(".domain-history-categorize-url-button:checked[data-name='#{name}']").length is 0
       $("#domainHistoryTableSelectedUrlsList > li[data-name='#{name}']").remove()
       domainHistorySelectLimiter -= 1
+      $("#domain-history-limit-warning").hide()
+    else if button.is(':checked') && domainHistorySelectLimiter is 10
+      $("#domain-history-limit-warning").show()
 
     $categorizeButton = $('#domain-history-webcat-research-categorize-url')
 
@@ -538,10 +546,11 @@ $ ->
                 parsedResponse = JSON.parse response
                 { category } = parsedResponse.data
 
-                if category.category_ids?
+                if Object.keys(category).length > 0
                   for category_id in category.category_ids
                     if !selectize.getOption(category_id)?
                       categoryOption = categoryList.filter (cat) -> cat.category_id is category_id
+                      console.log 'categoryOption: ', categoryOption
                       selectize.addOption(categoryOption)
 
                     selectize.addItem(category_id)
@@ -568,10 +577,14 @@ $ ->
         }
 
         setSelectLimiter(1)
+        $("##{tableClassPrepend}-limit-warning").hide()
       else if !checkAllValue && (urlList.find("li[data-name='#{name}']").length isnt 0)
         urlList.find("li[data-name='#{name}']").remove()
         setSelectLimiter(-1)
         $("input[data-name='#{name}'").prop('checked', checkAllValue)
+        $("##{tableClassPrepend}-limit-warning").hide()
+      else if checkAllValue && (selectLimiter() is 10)
+        $("##{tableClassPrepend}-limit-warning").show()
 
       $categorizeButton = $("##{tableClassPrepend}-webcat-research-categorize-url")
 
@@ -616,13 +629,9 @@ $ ->
         categories.push selectize.getItem(item)[0].innerText
 
       if tab == 'xbrs'
-        $("#xbrs-categorize-loader-gears").toggle()
-        $('#xbrs-selected-urls-wrapper').toggle()
-        $('#xbrs-selected-urls-categories-wrapper').toggle()
+        $("#xbrsHistoryLoader").toggle()
       else
-        $("#domain-categorize-loader-gears").toggle()
-        $('#domain-history-selected-urls-wrapper').toggle()
-        $('#domain-history-selected-urls-categories-wrapper').toggle()
+        $("#domainHistoryLoader").toggle()
 
       $.ajax(
         url: '/escalations/api/v1/escalations/webcat/complaints/bulk_categorize'
@@ -636,23 +645,20 @@ $ ->
           data = response.data
           callsCompleted += 1
           unless data.complete_failed.length > 0 || data.create_failed.length > 0
-            successfulCalls.push "Complaint ID: #{data.completed[0]}"
+            successfulCalls.push data.completed[0]
           else
-            failed = "Complaint ID: #{data.complete_failed[0]}"
-            failedCalls.push failed
+            failedCalss.push data.complete_failed[0]
         error: (response) ->
           callsCompleted += 1
           erroredCalls.push response.responseText
         complete: (response) ->
           if callsToMake == callsCompleted
             if tab == 'xbrs'
-              $("#xbrs-categorize-loader-gears").toggle()
-              $('#xbrs-selected-urls-wrapper').toggle()
-              $('#xbrs-selected-urls-categories-wrapper').toggle()
+              $("#xbrs-history-webcat-research-categorize-url").dropdown('toggle')
+              $("#xbrsHistoryLoader").toggle()
             else
-              $("#domain-categorize-loader-gears").toggle()
-              $('#domain-history-selected-urls-wrapper').toggle()
-              $('#domain-history-selected-urls-categories-wrapper').toggle()
+              $("#domain-history-selected-urls-wrapper").dropdown('toggle')
+              $("#domainHistoryLoader").toggle()
 
             if erroredCalls.length > 0
               std_msg_error("Categories were not created.", erroredCalls, reload: false)
@@ -662,6 +668,6 @@ $ ->
               std_msg_success(
                 'URLs categorized successfully',
                 ["Pending complaint entries have been created for #{entries.join(', ')}",
-                successfulCalls.join(', ')],
+                "Complaint IDs: #{successfulCalls.join(', ')}"],
                 reload: false)
         , this)

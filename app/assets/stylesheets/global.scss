@@ -5738,6 +5738,10 @@ input.table-entry-input:focus {
   .selected-urls-categories-wrapper {
     padding-bottom: 20px;
     text-align: center;
+
+    .warning-limit {
+      display: none;
+    }
   }
 }
 
