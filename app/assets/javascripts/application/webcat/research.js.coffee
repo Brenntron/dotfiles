@@ -68,7 +68,7 @@ $ ->
         $('#xbrsDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
         $('#domainHistoryDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
       error: (errorResponse) ->
-        std_api_error(errorResponse, "Domain info could not be retrieved.", reload: false)
+        std_api_error(errorResponse, "Domain info for #{domain} could not be retrieved.", reload: false)
     )
 
   getDomainHistory = (domain) ->
@@ -189,6 +189,9 @@ $ ->
         if data.error?
           $('#xbrsHistoryLoader').hide()
           std_msg_error(data.error, [])
+        else if Object.keys(data).length is 0
+          $('#xbrsHistoryLoader').hide()
+          std_msg_error('Empty Response from Server', [])
         else
           domainKey = Object.keys(data)[0]
 
@@ -357,8 +360,8 @@ $ ->
         create: false,
         labelField: 'category_name',
         maxItems: 5,
-        onOptionAdd: () ->
-          domain = this.$input.parent().data().name
+        onInitialize: () ->
+          domain = this.$input.parent().data().url
           selectize = this
           $.ajax(
             url: '/escalations/api/v1/escalations/webcat/complaints/domain_info'
@@ -372,9 +375,13 @@ $ ->
 
               if category.category_ids?
                 for category_id in category.category_ids
+                  if !selectize.getOption(category_id)?
+                    categoryOption = categoryList.filter (cat) -> cat.category_id is category_id
+                    selectize.addOption(categoryOption)
+
                   selectize.addItem(category_id)
             error: (errorResponse) ->
-              std_api_error(errorResponse, "Domain info could not be retrieved.", reload: false)
+              std_api_error(errorResponse, "Domain info for #{domain} could not be retrieved.", reload: false)
           )
         options: AC.WebCat.createSelectOptions("#xbrs-history-#{name}"),
         persist: true,
@@ -426,8 +433,8 @@ $ ->
         create: false,
         labelField: 'category_name',
         maxItems: 5,
-        onOptionAdd: () ->
-          domain = this.$input.parent().data().name
+        onInitialize: () ->
+          domain = this.$input.parent().data().url
           selectize = this
           $.ajax(
             url: '/escalations/api/v1/escalations/webcat/complaints/domain_info'
@@ -441,9 +448,13 @@ $ ->
 
               if category.category_ids?
                 for category_id in category.category_ids
+                  if !selectize.getOption(category_id)?
+                    categoryOption = categoryList.filter (cat) -> cat.category_id is category_id
+                    selectize.addOption(categoryOption)
+
                   selectize.addItem(category_id)
             error: (errorResponse) ->
-              std_api_error(errorResponse, "Domain info could not be retrieved.", reload: false)
+              std_api_error(errorResponse, "Domain info for #{domain} could not be retrieved.", reload: false)
           )
         options: AC.WebCat.createSelectOptions("#domain-history-#{name}"),
         persist: true,
@@ -514,8 +525,8 @@ $ ->
           create: false,
           labelField: 'category_name',
           maxItems: 5,
-          onOptionAdd: () ->
-            domain = this.$input.parent().data().name
+          onInitialize: () ->
+            domain = this.$input.parent().data().url
             selectize = this
             $.ajax(
               url: '/escalations/api/v1/escalations/webcat/complaints/domain_info'
@@ -529,9 +540,13 @@ $ ->
 
                 if category.category_ids?
                   for category_id in category.category_ids
+                    if !selectize.getOption(category_id)?
+                      categoryOption = categoryList.filter (cat) -> cat.category_id is category_id
+                      selectize.addOption(categoryOption)
+
                     selectize.addItem(category_id)
               error: (errorResponse) ->
-                std_api_error(errorResponse, "Domain info could not be retrieved.", reload: false)
+                std_api_error(errorResponse, "Domain info for #{domain} could not be retrieved.", reload: false)
             )
           options: AC.WebCat.createSelectOptions("##{selectId}"),
           persist: true,
@@ -646,6 +661,7 @@ $ ->
             else
               std_msg_success(
                 'URLs categorized successfully',
-                ["Pending complaint entries have been created for #{entry}", successfulCalls],
+                ["Pending complaint entries have been created for #{entries.join(', ')}",
+                successfulCalls.join(', ')],
                 reload: false)
         , this)
