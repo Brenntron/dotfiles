@@ -1036,4 +1036,15 @@ For future web and email reputation requests, please open a web and email reputa
     response
   end
 
+  def self.valid_tld?(uri)
+    parser = URI::Parser.new
+    begin
+      parsed_uri = parser.parse(uri)
+      parsed_uri = parser.parse("http://" + uri) if parsed_uri.scheme.nil?
+      PublicSuffix.valid?(parsed_uri.host, default_rule: nil, ignore_private: true)
+    rescue
+      false
+    end
+  end
+
 end
