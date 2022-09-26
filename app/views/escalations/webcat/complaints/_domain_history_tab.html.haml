@@ -26,7 +26,7 @@
             %h5 Selected urls to categorize
             %ul#domainHistoryTableSelectedUrlsList
           .selected-urls-categories-wrapper#domain-history-selected-urls-categories-wrapper
-            %label#domain-history-limit-warning.label.warning-limit
+            %span#domain-history-limit-warning.warning-limit
               A maximum of 10 items can be submitted for categorization at a time. Some items have been ignored
             %button.primary{type: 'submit', name: 'commit', id: 'cat-research', onclick: 'apply_webcat_research_categories("domain-history"); return false', 'data-disable-with': 'Submit'}
               Submit
