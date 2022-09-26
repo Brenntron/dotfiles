@@ -31,7 +31,7 @@ $ ->
       method: 'GET'
       headers: headers
       data:
-        domain: domain
+        'domain': domain
       success: (response) ->
         parsedResponse = JSON.parse response
         { score, category } = parsedResponse.data
@@ -77,7 +77,7 @@ $ ->
       method: 'GET'
       headers: headers
       data:
-        domain: domain
+        'domain': domain
       success: (response) ->
         data = response.data
 
@@ -102,7 +102,7 @@ $ ->
                 className: 'domain-history-checkbox'
                 render: (data) ->
                   { url } = data
-                  formattedUrl = url.replace(/\//g, '-')
+                  formattedUrl = url.replace(/\/|\./g, '-')
 
                   "<input type='checkbox' data-name='#{formattedUrl}' data-url='#{url}' class='domain-history-categorize-url-button categorize-url-button'</input>"
                 sortable: false
@@ -182,7 +182,7 @@ $ ->
       method: 'GET'
       headers: headers
       data:
-        domains: domain
+        'domains': domain
       success: (response) ->
         data = JSON.parse response
 
@@ -216,7 +216,7 @@ $ ->
                   data: null
                   className: 'xbrs-history-checkbox'
                   render: (data) ->
-                    formattedDomain = data.domain.replace(/\//g, '-')
+                    formattedDomain = data.domain.replace(/\/|\./g, '-')
                     "<input type='checkbox' data-name='#{formattedDomain}' data-url='#{data.domain}' class='xbrs-categorize-url-button categorize-url-button'</input>"
                   sortable: false
                 }
@@ -349,7 +349,7 @@ $ ->
 
     if button.is(':checked') && xbrsSelectLimiter < 10 && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
       selectize_url_li =
-        "<li data-name='#{name}'>#{url}" +
+        "<li data-name='#{name}' data-url='#{url}'>#{url}" +
         "<select id='xbrs-history-#{name}' class='form-control selectize' placeholder='Enter up to 5 categories' value='' multiple='multiple'></select>" +
         "</li>"
       $('#xbrsHistorySelectedUrlsList').append(selectize_url_li)
@@ -365,7 +365,7 @@ $ ->
             method: 'GET'
             headers: headers
             data:
-              domain: domain
+              'domain': domain
             success: (response) ->
               parsedResponse = JSON.parse response
               { category } = parsedResponse.data
@@ -418,8 +418,8 @@ $ ->
 
     if button.is(':checked') && domainHistorySelectLimiter < 10 && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
       selectize_url_li =
-        "<li data-name='#{name}' data-row='#{row}'>#{name}" +
-          "<select id='domain-history-#{row}' class='form-control selectize' placeholder='Enter up to 5 categories' value='' multiple='multiple'></select>" +
+        "<li data-name='#{name}' data-url='#{url}'>#{url}" +
+          "<select id='domain-history-#{name}' class='form-control selectize' placeholder='Enter up to 5 categories' value='' multiple='multiple'></select>" +
           "</li>"
       $('#domainHistoryTableSelectedUrlsList').append(selectize_url_li)
       $("#domain-history-#{name}").selectize {
@@ -434,7 +434,7 @@ $ ->
             method: 'GET'
             headers: headers
             data:
-              domain: domain
+              'domain': domain
             success: (response) ->
               parsedResponse = JSON.parse response
               { category } = parsedResponse.data
@@ -506,7 +506,7 @@ $ ->
         # Row will change to the value of the last item in the loop so we have to capture the id.
         selectId = "#{tableClassPrepend}-#{name}"
         selectize_url_li =
-          "<li data-name='#{name}' data-row='#{row}'>#{name}" +
+          "<li data-name='#{name}' data-url='#{url}'>#{url}" +
             "<select id='#{selectId}' class='form-control selectize' placeholder='Enter up to 5 categories' value='' multiple='multiple'></select>" +
             "</li>"
         urlList.append(selectize_url_li)
@@ -522,7 +522,7 @@ $ ->
               method: 'GET'
               headers: headers
               data:
-                domain: domain
+                'domain': domain
               success: (response) ->
                 parsedResponse = JSON.parse response
                 { category } = parsedResponse.data
@@ -576,12 +576,18 @@ $ ->
   window.apply_webcat_research_categories = (tab) ->
     listId = if tab == 'xbrs' then '#xbrsHistorySelectedUrlsList' else "#domainHistoryTableSelectedUrlsList"
     entries = []
-    urlsListItems = $(listId).find('li')
+    successfulCalls = []
+    failedCalls = []
+    erroredCalls = []
+    callsToMake = 0
+    callsCompleted = 0
+    urlListItems = $(listId).find('li')
 
-    for listItem in urlsListItems
-      entries.push $(listItem).data().name
+    for listItem in urlListItems
+      entries.push $(listItem).data().url
 
     entries = $.unique(entries)
+    callsToMake = entries.length
 
     for entry, index in entries
       category_ids = []
@@ -608,28 +614,38 @@ $ ->
         method: 'POST'
         headers: headers
         data:
-          entries: [entry],
-          category_ids: category_ids,
-          categories: categories
+          'entries': [entry],
+          'category_ids': category_ids,
+          'categories': categories
         success: (response) ->
           data = response.data
-
-          if tab == 'xbrs'
-            $("#xbrs-categorize-loader-gears").toggle()
-            $('#xbrs-selected-urls-wrapper').toggle()
-            $('#xbrs-selected-urls-categories-wrapper').toggle()
-          else
-            $("#domain-categorize-loader-gears").toggle()
-            $('#domain-history-selected-urls-wrapper').toggle()
-            $('#domain-history-selected-urls-categories-wrapper').toggle()
-
+          callsCompleted += 1
           unless data.complete_failed.length > 0 || data.create_failed.length > 0
-            std_msg_success('Categories Submitted', [], reload: false)
+            successfulCalls.push "Complaint ID: #{data.completed[0]}"
           else
-            failed = data.complete_failed.concat data.create_failed
-            std_msg_success('Categories were not created', failed, reload: false)
+            failed = "Complaint ID: #{data.complete_failed[0]}"
+            failedCalls.push failed
         error: (response) ->
-          $('#webcat-research-categorize-url').dropdown('toggle')
-          $('#webcat-research-categorize-url .webcat-research-dd-loader-wrapper').toggle()
-          std_api_error(response, "Categories were not created.", reload: false)
-      , this)
+          callsCompleted += 1
+          erroredCalls.push response.responseText
+        complete: (response) ->
+          if callsToMake == callsCompleted
+            if tab == 'xbrs'
+              $("#xbrs-categorize-loader-gears").toggle()
+              $('#xbrs-selected-urls-wrapper').toggle()
+              $('#xbrs-selected-urls-categories-wrapper').toggle()
+            else
+              $("#domain-categorize-loader-gears").toggle()
+              $('#domain-history-selected-urls-wrapper').toggle()
+              $('#domain-history-selected-urls-categories-wrapper').toggle()
+
+            if erroredCalls.length > 0
+              std_msg_error("Categories were not created.", erroredCalls, reload: false)
+            else if failedCalls.length > 0
+              std_msg_error('Categories were not created', failedCalls, reload: false)
+            else
+              std_msg_success(
+                'URLs categorized successfully',
+                ["Pending complaint entries have been created for #{entry}", successfulCalls],
+                reload: false)
+        , this)
