@@ -191,7 +191,7 @@ $ ->
           std_msg_error(data.error, [])
         else if Object.keys(data).length is 0
           $('#xbrsHistoryLoader').hide()
-          std_msg_error('Empty Response from Server', [])
+          std_msg_error('Not a valid domain.', [])
         else
           domainKey = Object.keys(data)[0]
 
@@ -614,6 +614,13 @@ $ ->
     entries = $.unique(entries)
     callsToMake = entries.length
 
+    if tab == 'xbrs'
+      $("#xbrs-history-webcat-research-categorize-url").dropdown('toggle')
+      $("#xbrsHistoryLoader").toggle()
+    else
+      $("#domain-history-webcat-research-categorize-url").dropdown('toggle')
+      $("#domainHistoryLoader").toggle()
+
     for entry, index in entries
       category_ids = []
       categories = []
@@ -624,11 +631,6 @@ $ ->
         category_ids.push item
 
         categories.push selectize.getItem(item)[0].innerText
-
-      if tab == 'xbrs'
-        $("#xbrsHistoryLoader").toggle()
-      else
-        $("#domainHistoryLoader").toggle()
 
       $.ajax(
         url: '/escalations/api/v1/escalations/webcat/complaints/bulk_categorize'
@@ -651,10 +653,8 @@ $ ->
         complete: (response) ->
           if callsToMake == callsCompleted
             if tab == 'xbrs'
-              $("#xbrs-history-webcat-research-categorize-url").dropdown('toggle')
               $("#xbrsHistoryLoader").toggle()
             else
-              $("#domain-history-selected-urls-wrapper").dropdown('toggle')
               $("#domainHistoryLoader").toggle()
 
             if erroredCalls.length > 0
