@@ -12,7 +12,7 @@ $(document).on 'change','.nested-table-input','.selectize-input', ->
 #### WBNP Reporting ####
 webcat_loader_timeout = ''
 $(document).ready ->
-  sessionStorage.removeItem("touchedForm");
+  sessionStorage.removeItem("touchedForm")
   loader = $('#inline-webcat')
   $(this).bind(
     ajaxStart: () ->

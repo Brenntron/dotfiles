@@ -454,9 +454,9 @@ module API
             end
 
             params do
-              optional :entries, type: Array
-              optional :categories, type: Array
-              optional :category_ids, type: Array
+              requires :entries, type: Array
+              requires :categories, type: Array
+              requires :category_ids, type: Array
             end
 
             post 'bulk_categorize' do
@@ -470,6 +470,9 @@ module API
               else
                 {:status => "success", :data => response[:data]}
               end
+            end
+
+            params do
               requires :domain, type: String
             end
 

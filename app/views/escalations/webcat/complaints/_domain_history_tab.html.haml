@@ -19,22 +19,17 @@
       %label.toolbar-section-label
         Edit
       %span.dropdown
-        %button#domain-history-webcat-research-categorize-url.webcat-research-categorize-url-button.toolbar-button.dropdown-toggle.esc-tooltipped{title: 'Categorize URL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %button#domain-history-webcat-research-categorize-url.webcat-research-categorize-url-button.toolbar-button.dropdown-toggle.esc-tooltipped{disabled: 'disabled', title: 'Categorize URL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text Categorize URL
-        %div{'aria-labelledby': 'webcat-research-categorize-url', id: 'categorize-url-dropdown', class: 'dropdown-menu toolbar-dropdown'}
-          .loader-gears
-            =inline_svg 'icon_gears_loader.svg'
-          .selected-urls-wrapper
-            %label.selected-urls-label
-              Selected URLs
-            #selected-urls-list
-          .selected-urls-categories-wrapper
-            %label.selected-urls-categories-label
-              Enter up to 5 categories
-            %input#domain-history-categorize-research-urls.input-group.search-group
-            %button{type: 'submit', name: 'commit', id: 'cat-research', class: 'toolbar-button esc-tooltipped', onclick: 'apply_webcat_research_categories(); return false', 'data-disable-with': 'Submit'}
-              %span#categorize-research-submit.toolbar-button-text
-                Submit
+        %div{'aria-labelledby': 'webcat-research-categorize-url', class: 'dropdown-menu toolbar-dropdown webcat-research-categorize-dropdown'}
+          .selected-urls-wrapper#domain-history-selected-urls-wrapper
+            %h5 Selected urls to categorize
+            %ul#domainHistoryTableSelectedUrlsList
+          .selected-urls-categories-wrapper#domain-history-selected-urls-categories-wrapper
+            %span#domain-history-limit-warning.warning-limit
+              A maximum of 10 items can be submitted for categorization at a time. Some items have been ignored
+            %button.primary{type: 'submit', name: 'commit', id: 'cat-research', onclick: 'apply_webcat_research_categories("domain-history"); return false', 'data-disable-with': 'Submit'}
+              Submit
 
   .ajax-message-div#domainHistoryLoader
     .loader-gears
@@ -45,7 +40,7 @@
     %thead
       %tr
         %th
-          %input{type: "checkbox", name: "select all urls", class: 'categorize-url-button'}
+          %input{type: "checkbox", name: "select all urls", id: 'domainHistoryCheckAll'}
         %th
           Entry Id
         %th

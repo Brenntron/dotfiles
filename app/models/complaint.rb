@@ -1073,7 +1073,7 @@ For future web and email reputation requests, please open a web and email reputa
         uri_as_categorized = prefix
         internal_comment = "Complaint ID: #{new_complaint.id} | RESEARCH TOOL AUTO GENERATED CASE"
         resolution_comment = "Complaint ID: #{new_complaint.id} | RESEARCH TOOL AUTO GENERATED CASE"
-
+        
         new_complaint_entry.change_category(
             prefix,
             categories_to_submit,
@@ -1090,7 +1090,9 @@ For future web and email reputation requests, please open a web and email reputa
         Rails.logger.error e
         Rails.logger.error e.backtrace.join("\n")
         response[:errors] << ["error trying to process complaint for #{new_complaint.complaint_entries.first.hostlookup}"]
-        response[:data][:complete_failed] << new_complaint.id
+        response[:data][:complete_failed] << new_complaint.complaint_entries.first.hostlookup
+        new_complaint.complaint_entries.first.destroy
+        new_complaint.destroy
       end
 
     end
