@@ -646,7 +646,7 @@ $ ->
           unless data.complete_failed.length > 0 || data.create_failed.length > 0
             successfulCalls.push data.completed[0]
           else
-            failedCalls.push data.complete_failed[0]
+            failedCalls.push data.complete_failed[0] || data.create_failed[0]
         error: (response) ->
           callsCompleted += 1
           erroredCalls.push response.responseText
@@ -658,13 +658,15 @@ $ ->
               $("#domainHistoryLoader").toggle()
 
             if erroredCalls.length > 0
-              std_msg_error("Categories were not created.", erroredCalls, reload: false)
+              erroredCalls.unshift 'Tickets were not created for the following items.'
+              std_msg_error('Categories were not assigned.', erroredCalls, reload: false)
             else if failedCalls.length > 0
-              std_msg_error('Categories were not created', failedCalls, reload: false)
+              failedCalls.unshift 'Tickets were not created for the following items.'
+              std_msg_error('Categories were not assigned.', failedCalls, reload: false)
             else
+              entries.unshift 'Tickets have been created for the following items:'
               std_msg_success(
                 'URLs categorized successfully',
-                ["Pending complaint entries have been created for #{entries.join(', ')}",
-                "Complaint IDs: #{successfulCalls.join(', ')}"],
+                entries,
                 reload: false)
         , this)
