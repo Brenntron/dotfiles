@@ -67,6 +67,43 @@ describe K2::History do
         result = described_class.parsed_data_for(domain)
         expect(result['cisco.com'].first['time']).to eq(Time.at(time_ingeger/1000).strftime(described_class::DATE_FORMAT))
       end
+      
+      describe 'is_important flag' do
+        context 'when element is important' do
+          before do
+            allow(ComplaintEntry).to receive(:self_importance).and_return(true)
+          end
+
+          it 'sets is_important flag to true' do
+            result = described_class.parsed_data_for(domain)
+            expect(result['cisco.com'].sample['is_important']).to eq(true)
+          end
+        end
+
+        context 'when element is not important' do
+          before do
+            allow(ComplaintEntry).to receive(:self_importance).and_return(false)
+          end
+
+          it 'returns true' do
+            allow(ComplaintEntry).to receive(:self_importance).and_return(false)
+
+            result = described_class.parsed_data_for(domain)
+            expect(result['cisco.com'].sample['is_important']).to eq(false)
+          end
+        end
+
+        context 'when XBRS retuns nil' do
+          before do
+            allow(ComplaintEntry).to receive(:self_importance).and_return(nil)
+          end
+
+          it 'returns false' do
+            result = described_class.parsed_data_for(domain)
+            expect(result['cisco.com'].sample['is_important']).to eq(false)
+          end
+        end
+      end
     end
   end
 end

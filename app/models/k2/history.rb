@@ -29,9 +29,10 @@ class K2::History < K2::Base
     else
       response.body['queryResults'].each_with_object({}) do |item, result|
         result[item['element']] = []
-
+        is_important = ComplaintEntry.self_importance(item['element']) || false
         item['timelines'].each do |timeline|
           timeline['time'] = Time.at(timeline['time'] / MILISECONDS_IN_SECOND).strftime(DATE_FORMAT)
+          timeline['is_important'] = is_important
           result[item['element']] << timeline
         end
       end
