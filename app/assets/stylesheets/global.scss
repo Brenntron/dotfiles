@@ -5968,6 +5968,17 @@ input.table-entry-input:focus {
   .domain-history-link {
     text-decoration: underline;
   }
+
+  .is-important {
+    background-image: url(image_path('icon_important.svg'));
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+  }
+
+  .important-flag-col {
+    max-width: 50px !important;
+  }
 }
 
 #disputes-research-table label, #edit-ticket-status-dropdown label {
