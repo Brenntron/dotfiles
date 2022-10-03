@@ -109,9 +109,22 @@ $ ->
               }
               {
                 data: null
+                defaultContent: '<span></span>'
+                orderable: false
+                render: ( data ) ->
+                  { is_important } = data
+
+                  if is_important
+                    return '<div class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></div>'
+                searchable: false
+                sortable: false
+                width: '10px'
+              }
+              {
+                data: null
                 render: (data) ->
                   { entry_id, complaint_id } = data
-                  if entry_id? && complain_id?
+                  if entry_id? && complaint_id?
                     "<a href='/escalations/webcat/complaints/#{complaint_id}' target='_blank'>#{entry_id}</a>"
                   else
                     ''
@@ -222,6 +235,19 @@ $ ->
                     formattedDomain = data.domain.replace(/\/|\./g, '-')
                     "<input type='checkbox' data-name='#{formattedDomain}' data-url='#{data.domain}' class='xbrs-categorize-url-button categorize-url-button'</input>"
                   sortable: false
+                }
+                {
+                  data: null
+                  defaultContent: '<span></span>'
+                  orderable: false
+                  render: ( data ) ->
+                    { is_important } = data
+
+                    if is_important
+                      return '<div class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></div>'
+                  searchable: false
+                  sortable: false
+                  width: '10px'
                 }
                 {
                   data: null
