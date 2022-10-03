@@ -27,7 +27,6 @@ Plug 'benmills/vimux'
 Plug 'jeetsukumaran/vim-buffergator'
 Plug 'gilsondev/searchtasks.vim'
 Plug 'chrisbra/Colorizer'
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
 Plug 'tpope/vim-dispatch'
 Plug 'dense-analysis/ale'
 Plug 'dbakker/vim-projectroot'
@@ -41,7 +40,7 @@ Plug 'tomtom/tcomment_vim'
 Plug 'tobyS/vmustache'
 Plug 'janko-m/vim-test'
 Plug 'maksimr/vim-jsbeautify'
-Plug 'christoomey/vim-tmux-navigator'
+Plug 'knubie/vim-kitty-navigator', {'do': 'cp ./*.py ~/.config/kitty/'}
 Plug 'ntpeters/vim-better-whitespace'
 
 " Markdown / Writting
@@ -202,17 +201,12 @@ let g:ale_elixir_elixir_ls_release = '/Users/Brenntron/code/elixir_ls/rel'
 let g:airline#extensions#ale#enabled = 1
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#coc#enabeld = 1
 
 let g:airline_powerline_fonts = 1
 
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 
-let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
-let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(),0)}'
-
-let g:airline#extensions#coc#error_symbol = 'Error:'
 let g:airline#extensions#ale#error_symbol = 'E:'
 let g:airline#extensions#ale#warning_symbol = 'W:'
 
@@ -355,14 +349,6 @@ nmap <Leader>j :tag <C-R><C-W>
 
 " RipGrep config
 nmap <Leader>s :Rg <C-R><C-W>
-
-" Remap keys for coc gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-command! -nargs=0 Prettier :call CocAction('runCommand',. 'prettier.formatFile')
 
 " fzf config
 nmap ; :Buffers<CR>
