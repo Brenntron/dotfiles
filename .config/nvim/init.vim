@@ -99,7 +99,6 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'sjl/badwolf'
 Plug 'tomasr/molokai'
 Plug 'morhetz/gruvbox'
-Plug 'zenorocha/dracula-theme', {'rtp': 'vim/'}
 Plug 'junegunn/limelight.vim'
 Plug 'mkarmona/colorsbox'
 Plug 'romainl/Apprentice'
@@ -107,14 +106,12 @@ Plug 'Lokaltog/vim-distinguished'
 Plug 'chriskempson/base16-vim'
 Plug 'w0ng/vim-hybrid'
 Plug 'AlessandroYorba/Sierra'
-Plug 'daylerees/colour-schemes'
 Plug 'ajh17/Spacegray.vim'
 Plug 'atelierbram/Base2Tone-vim'
 Plug 'colepeters/spacemacs-theme.vim'
-Plug 'flazz/vim-colorschemes'
-Plug 'rafi/awesome-vim-colorschemes'
-Plug 'exitface/synthwave.vim'
 Plug 'liuchengxu/space-vim-dark'
+Plug 'dracula/vim', { 'as': 'dracula' }
+
 
 call plug#end()
 
@@ -270,7 +267,7 @@ endif
 "nmap <silent> t<C-g> :TestVisit<CR>   " t Ctrl+g
 
 " Colorscheme
-color space-vim-dark
+color dracula
 set termguicolors
 hi LineNr ctermbg=NONE guibg=NONE
 hi Comment cterm=italic
