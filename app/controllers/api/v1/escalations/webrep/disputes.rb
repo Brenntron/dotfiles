@@ -11,59 +11,59 @@ module API
               PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
             desc 'get all disputes'
-            params do
-              optional :search_type, type: String
-              optional :search_name, type: String
-              optional :value, type: String
-              optional :case_id, type: String
-              optional :org_domain, type: String
-              optional :case_owner_username, type: String
-              optional :status, type: String
-              optional :priority, type: String
-              optional :resolution, type: String
-              optional :submission_type, type: Array[String]
-              optional :submitter_type, type: String
-              optional :platform_ids, type: String
-              optional :submitted_older, type: Date
-              optional :submitted_newer, type: Date
-              optional :age_older, type: String
-              optional :age_newer, type: String
-              optional :modified_older, type: Date
-              optional :modified_newer, type: Date
-              optional :reload, type: Boolean
-              optional :customer, type: Hash do
-                optional :name, type: String
-                optional :email, type: String
-                optional :company_name, type: String
-              end
-              optional :dispute_entries, type: Hash do
-                optional :ip_or_uri, type: String
-                optional :suggested_disposition, type: String
-              end
-            end
+            # params do
+            #   optional :search_type, type: String
+            #   optional :search_name, type: String
+            #   optional :value, type: String
+            #   optional :case_id, type: String
+            #   optional :org_domain, type: String
+            #   optional :case_owner_username, type: String
+            #   optional :status, type: String
+            #   optional :priority, type: String
+            #   optional :resolution, type: String
+            #   optional :submission_type, type: Array[String]
+            #   optional :submitter_type, type: String
+            #   optional :platform_ids, type: String
+            #   optional :submitted_older, type: Date
+            #   optional :submitted_newer, type: Date
+            #   optional :age_older, type: String
+            #   optional :age_newer, type: String
+            #   optional :modified_older, type: Date
+            #   optional :modified_newer, type: Date
+            #   optional :reload, type: Boolean
+            #   optional :customer, type: Hash do
+            #     optional :name, type: String
+            #     optional :email, type: String
+            #     optional :company_name, type: String
+            #   end
+            #   optional :dispute_entries, type: Hash do
+            #     optional :ip_or_uri, type: String
+            #     optional :suggested_disposition, type: String
+            #   end
+            # end
 
             get "" do
               authorize!(:index, Dispute)
-              disputes = Dispute.robust_search(permitted_params['search_type'],
-                                               search_name: permitted_params['search_name'],
-                                               params: permitted_params,
-                                               user: current_user,
-                                               reload: permitted_params['reload']).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
-              title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
-              json_packet = Dispute.to_data_packet(disputes, user: current_user)
 
-              response_data = {status: "success", title: title, data: json_packet}
-              if 'advanced' == permitted_params['search_type']
-                if permitted_params['search_name'].present?
-                  search_name = permitted_params['search_name']
-                  response_data['search_name'] = search_name
-                  named_search = NamedSearch.where(user: current_user, name: search_name).first
-                  response_data['search_id'] = named_search&.id
-                end
-              end
+              # disputes = Dispute.limit(1).robust_search(permitted_params['search_type'],
+              #                                  search_name: permitted_params['search_name'],
+              #                                  params: permitted_params,
+              #                                  user: current_user,
+              #                                  reload: permitted_params['reload']).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
+              # title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
+              # json_packet = Dispute.to_data_packet(disputes, user: current_user)
 
-              response_data.to_json
-
+              # response_data = {status: "success", title: title, data: json_packet}
+              # if 'advanced' == permitted_params['search_type']
+              #   if permitted_params['search_name'].present?
+              #     search_name = permitted_params['search_name']
+              #     response_data['search_name'] = search_name
+              #     named_search = NamedSearch.where(user: current_user, name: search_name).first
+              #     response_data['search_id'] = named_search&.id
+              #   end
+              # end
+              search_params = {search_type: params[:search_type] || '', search_name: params[:search_name] || ''}
+              WebRepDatatable.new(params, search_params, user: current_user).as_json
             end
 
             desc 'project new score'

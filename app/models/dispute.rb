@@ -1670,7 +1670,7 @@ For future Web categorization requests, please open a Web categorization ticket 
 
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
-      dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status}</span>"
+      dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status}</span>".html_safe
       if dispute.status_comment.present?
         dispute_packet[:status_comment] = dispute.status_comment
       elsif dispute.resolution_comment.present?
@@ -1678,7 +1678,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       else
         dispute_packet[:status_comment] = nil
       end
-      dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
+      dispute_packet[:case_link] = ("<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>").html_safe
       dispute_packet[:submitter_org] = dispute.customer_org
       dispute_packet[:submitter_type] = dispute.submitter_type
       dispute_packet[:submitter_domain] = dispute.org_domain
@@ -1700,30 +1700,30 @@ For future Web categorization requests, please open a Web categorization ticket 
         if dispute.resolution_comment.blank?
           dispute_packet[:dispute_resolution] = dispute.resolution
         else
-          dispute_packet[:dispute_resolution] = "<span class='esc-tooltipped' title='#{dispute.resolution_comment}'>" + dispute.resolution + "</span>"
+          dispute_packet[:dispute_resolution] = ("<span class='esc-tooltipped' title='#{dispute.resolution_comment}'>" + dispute.resolution + "</span>").html_safe
         end
       end
 
       dispute_packet[:dispute_entry_content] = entry_content_for(dispute)
-      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, rendered_platform: de.determine_platform, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}
+      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de.attributes, rendered_platform: de.determine_platform, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}.to_json
       dispute_packet[:submission_type] = dispute.submission_type
-      dispute_packet[:d_entry_preview] = dispute_packet[:dispute_entry_content].first.to_s + "<span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
+      dispute_packet[:d_entry_preview] = (dispute_packet[:dispute_entry_content].first.to_s + "<span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>").html_safe
       case
         when dispute.assignee == 'Unassigned'
           dispute_packet[:assigned_to] =
-              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
+              ("<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>").html_safe
 
         when dispute.user_id?
           if dispute.user_id == user.id
             dispute_packet[:assigned_to] =
-                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
+                ("<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>").html_safe
           else
             dispute_packet[:assigned_to] =
-                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
+                ("<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>").html_safe
           end
       end
 
-      dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
+      dispute_packet[:actions] = ("<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>").html_safe
 
       dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
       dispute_packet[:case_age] = dispute.dispute_age
