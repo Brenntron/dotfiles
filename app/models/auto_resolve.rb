@@ -619,7 +619,7 @@ class AutoResolve
     result[:log] = ""
 
     begin
-      response = Umbrella::DomainVolume.query_domain_volume(address: entry)
+      response = Umbrella::DomainVolume.query_domain_volume(address: DisputeEntry.safe_domain_of(entry))
 
       if response.code == 200
         data = JSON.parse(response.body)["queries"]
@@ -681,7 +681,7 @@ class AutoResolve
     result = {}
     result[:rating] = nil
     result[:log] = ""
-    response = Umbrella::Scan.scan_result(address: entry)
+    response = Umbrella::Scan.scan_result(address: DisputeEntry.safe_domain_of(entry))
 
     if response.code == 200
       data = JSON.parse(response.body)
