@@ -63,7 +63,7 @@ module API
               #   end
               # end
               search_params = {search_type: params[:search_type] || '', search_name: params[:search_name] || ''}
-              WebRepDatatable.new(params, search_params, user: current_user).as_json
+              WebRepDatatable.new(ActionController::Parameters.new(params).permit!, search_params, user: current_user).as_json
             end
 
             desc 'project new score'

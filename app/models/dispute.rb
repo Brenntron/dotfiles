@@ -1336,10 +1336,8 @@ For future Web categorization requests, please open a Web categorization ticket 
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:, reload: false)
-
-    dispute_fields =
-        params.to_h.slice(*%w{status org_domain priority resolution submitter_type
-                              case_id case_owner_username})
+    fields = %w{status org_domain priority resolution submitter_type case_id case_owner_username}
+    dispute_fields = params.to_h.slice(*fields)
     dispute_fields['id'] = dispute_fields.delete('case_id')
 
     if dispute_fields['priority'] && /(?<priority_digits>\d+)/ =~ dispute_fields.delete('priority')
@@ -1421,7 +1419,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     end
 
     company_name = nil
-    customer_params = params.fetch('customer', {}).slice(*%w{name email company_name})
+    customer_params = params.fetch('customer', {}).slice(*%w{name email company_name}).to_h
     customer_params = customer_params.select{|ignore_key, value| value.present?}
     if customer_params.any?
       if customer_params['company_name'].present?
@@ -1438,7 +1436,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       relation = relation.where(customers: customer_where)
     end
 
-    entry_params = params.fetch('dispute_entries', {})
+    entry_params = params.fetch('dispute_entries', {}).to_h
     entry_params = entry_params.select{|ignore_key, value| value.present?}
     if entry_params.any?
       dispute_entry_fields = entry_params.slice(*%w{suggested_disposition})
@@ -1543,7 +1541,7 @@ For future Web categorization requests, please open a Web categorization ticket 
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
     dispute_fields = %w{disputes.id case_number case_guid org_domain subject description
-                        source_ip_address problem_summary research_notes}
+                        source_ip_address problem_summary research_notes status}
     dispute_where = dispute_fields.map{|field| "#{field} like :pattern"}.join(' or ')
 
     customer_where = %w{name email}.map{|field| "customers.#{field} like :pattern"}.join(' or ')
