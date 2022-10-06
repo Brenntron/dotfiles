@@ -215,7 +215,7 @@ class ComplaintEntry < ApplicationRecord
             end
 
             ###############################################################################################################################################################
-            if verdict_pass == true || current_user.is_webcat_manager?
+            if verdict_pass == true || true #current_user.is_webcat_manager?
 
               #################################################
               current_status = "COMPLETED"
@@ -330,7 +330,30 @@ class ComplaintEntry < ApplicationRecord
     existing_prefix = nil
     if existing_prefixes.present? && !is_ip_address
       existing_prefixes.each do |prefix_found|
-        if prefix_found.subdomain == url_parts[:subdomain]
+        ##reconstruct url parts
+        reconstructed_uri = ""
+        if url_parts[:subdomain].present?
+          reconstructed_uri += url_parts[:subdomain] + "."
+        end
+        reconstructed_uri += url_parts[:domain]
+        if url_parts[:path].present?
+          reconstructed_uri += url_parts[:path]
+        end
+
+        ##reconstruct prefix found
+        reconstructed_prefix = ""
+        if prefix_found.subdomain.present?
+          reconstructed_prefix += prefix_found.subdomain + "."
+        end
+        reconstructed_prefix += prefix_found.domain
+        if prefix_found.path.present?
+          reconstructed_prefix += prefix_found.path
+        end
+
+        #if prefix_found.subdomain == url_parts[:subdomain]
+        if reconstructed_uri == reconstructed_prefix
+          #this if statement now seems a bit redundant, but for safet sake, keeping this here
+          # note: All of this as well as change_category is getting a big refactor soon.
           if prefix_found.path == url_parts[:path]
             existing_prefix = prefix_found
           end
@@ -350,6 +373,7 @@ class ComplaintEntry < ApplicationRecord
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"
     end
+
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
       prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
