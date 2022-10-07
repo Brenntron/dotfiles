@@ -215,7 +215,7 @@ class ComplaintEntry < ApplicationRecord
             end
 
             ###############################################################################################################################################################
-            if verdict_pass == true || true #current_user.is_webcat_manager?
+            if verdict_pass == true || current_user.is_webcat_manager?
 
               #################################################
               current_status = "COMPLETED"
