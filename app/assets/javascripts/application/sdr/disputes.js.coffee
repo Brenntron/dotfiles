@@ -154,7 +154,7 @@ $ ->
   $('#sdr-resolution-selector input.sdr-ticket-resolution-radio').click (event)->
     fixed_fp_message_types = ['FIXED_FP_SUDDEN_SPIKE', 'FIXED_FP_DOMAIN_AGE', 'FIXED_FP_NEGATIVE_WEBREP']
 
-    resolution_comments = 
+    resolution_comments =
       'FIXED_FP_SUDDEN_SPIKE': 'The domain was impacted due to Talos sensors observing suspicious behavior typically indicative of spamming. This behavior is no longer observed and the reputation has been adjusted accordingly.'
       'FIXED_FP_DOMAIN_AGE': 'The domains were penalized by SDR due to a combination of domain registration and sending attributes prevalent in spam sending domains. The issue has been rectified and the domain reputation has been adjusted accordingly.'
       'FIXED_FP_NEGATIVE_WEBREP': 'This domain was penalized by SDR as it used to have a Untrusted Web Reputation score due to malicious or suspicious behavior. The issue has been rectified and the domain reputation has been adjusted accordingly.'
@@ -167,7 +167,7 @@ $ ->
       $('input#FIXED_FP').prop('checked', true)
     else
       $("input[name='dispute-preset-resolution']").prop('checked', false)
- 
+
     $(".ticket-resolution-comment").html(comment)
 
 
@@ -391,7 +391,7 @@ window.sdr_show_page_edit_status = (dispute_id) ->
 
   if statusName == 'RESOLVED_CLOSED'
     resolution = $("#show-edit-ticket-status-dropdown").find('input[name=dispute-resolution]:checked').val()
-  if statusName == 'ASSIGNED' && $('#dispute-assignee').hasClass('missing-data')
+  else if statusName == 'ASSIGNED' && $('#dispute-assignee').hasClass('missing-data')
     std_msg_error('This ticket is unassigned', ['Please select an assignee.'])
     return
 
@@ -456,9 +456,19 @@ window.take_single_sdr_dispute = (id) ->
     $('#index_target_assignee').val(currentUser)
     window.sdr_toolbar_show_change_assignee()
 
+window.sdr_toolbar_index_change_assignee = () ->
+  disputeIdArray = $('.sdr_dispute_check_box:checkbox:checked').map(() ->
+    Number(this.value)
+  ).toArray()
+
+  sdr_change_assignee(disputeIdArray)
+
 window.sdr_toolbar_show_change_assignee = () ->
   singleId = $('#dispute_id').text()
   disputeIdArray = [singleId]
+  sdr_change_assignee(disputeIdArray)
+
+sdr_change_assignee = (disputeIdArray) ->
   new_assignee = $('#index_target_assignee option:selected').val()
   data = {
     'dispute_ids': disputeIdArray,
@@ -677,8 +687,8 @@ window.sdr_build_named_search = (search_name) ->
 
 window.export_sdr_all = () ->
   form = document.getElementById("sdr-disputes-export-form")
-
   data = build_sdr_data()
+
   if 'advanced' == data.search_type
     data.search_name = null
   data_json = JSON.stringify(data)
@@ -690,8 +700,7 @@ window.export_sdr_all = () ->
 
 window.export_sdr_selected = () ->
   data = build_sdr_data()
-  data.selected_cases = $('.sdr_dispute_check_box:checked').map((i, el) => el.value).get() 
-  
+  data.selected_cases = $('.sdr_dispute_check_box:checked').map((i, el) => el.value).get()
 
   if data.selected_cases.length <= 0
     std_msg_error('Error: Nothing selected.',"", reload: false)
@@ -701,3 +710,80 @@ window.export_sdr_selected = () ->
   data_json = JSON.stringify(data)
   $('#index-export-data-input').val(data_json)
   document.getElementById("sdr-disputes-export-form").onsubmit = ""
+
+window.sdr_index_edit_ticket_status = () ->
+    dropdown = $('#index-edit-ticket-status-dropdown').parent()
+    if ($('.sdr_dispute_check_box:checked').length > 0)
+# Select Status
+      $('.ticket-status-radio-label').click ->
+        radio_button = $(this).prev('.ticket-status-radio')
+        $(radio_button[0]).trigger('click')
+        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#index-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
+
+      $('.ticket-status-radio').click ->
+        all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+        if $(this).is(':checked')
+          wrapper = $(this).parent()
+          $(all_stat_radios).removeClass('selected')
+          $(wrapper).addClass('selected')
+        if $(this).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#index-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
+    else
+      std_msg_error('No rows selected', ['Please select at least one row.'])
+
+window.sdr_index_change_ticket_status = () ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
+  resolution = ""
+  checkboxes = $('#sdr-disputes-index').find('.sdr_dispute_check_box')
+  checked_dispute_ids = []
+  successfully_closed_disputes = []
+
+  $(checkboxes).each ->
+    if $(this).is(':checked')
+      dispute_id = $(this).val()
+      checked_dispute_ids.push(dispute_id)
+
+  if status == 'RESOLVED_CLOSED'
+    resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+  else if status == 'ASSIGNED' && $('#dispute-assignee').hasClass('missing-data')
+    std_msg_error('This ticket is unassigned', ['Please select an assignee.'])
+    return
+
+  data = {
+    comment: $('.ticket-status-comment').val() || '',
+    dispute_ids: checked_dispute_ids,
+    resolution: resolution,
+    status: status
+  }
+
+  $.ajax(
+    url: '/escalations/api/v1/escalations/sdr/disputes/set_disputes_status'
+    method: 'POST'
+    headers: headers
+    data: data
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      popup_response_error(response, 'Error Updating Status')
+)
+
