@@ -185,7 +185,7 @@ class AdminTask
     morsel.save
   end
 
-  def ngfw_clusters_import(morsel_id, args)
+  def umbrella_clusters_import(morsel_id, args)
     morsel = Morsel.find(morsel_id)
     morsel.output += "############################################\n"
     morsel.output += "starting Umbrella clusters import now.\n"
