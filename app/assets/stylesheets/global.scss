@@ -5443,10 +5443,6 @@ table > tbody > tr > td.dispute_rep_tools {
   padding: 10px;
 }
 
-.sdr-ticket-status-radio-label {
-  margin-top: 4px;
-}
-
 .dropdown-menu-content-block ul {
   padding: 10px;
   display: inline-block;
@@ -6328,6 +6324,10 @@ input[type="radio"].ticket-status-radio {
 .inline-dropdown-menu input[type='radio'], .toolbar-dropdown input[type='radio'] {
   box-shadow: none;
   float: left;
+}
+
+.toolbar-dropdown .sdr-ticket-status-radio-label, #sdr-index-dispute-resolution-submenu .radio-label {
+  margin-top: 4px;
 }
 
 .resolution-comment-wrapper {

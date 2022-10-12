@@ -277,7 +277,7 @@ window.take_sdr_disputes = () ->
   dispute_ids = selected_sdr_disputes()
 
   if dispute_ids.length == 0
-    std_msg_error('No Tickets Selected', ['Please select at least one ticket to assign.'])
+    show_message('error', 'No Tickets Selected. Please select at least one ticket to assign.', 5, '#alertMessage')
     return
 
   std_msg_ajax(
@@ -288,12 +288,9 @@ window.take_sdr_disputes = () ->
     success: (response) ->
       for dispute_id in response.dispute_ids
         assign_sdr_dispute_on_me_on_view(dispute_id, response.username)
-      std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.username])
+      show_message('success', "#{response.dispute_ids.length} tickets have been assigned to #{response.username}.", 5, '#alertMessage')
     error: (error) ->
-      std_msg_error('Assign Issue(s) Error', [
-        'Failed to assign ' + dispute_ids.length + ' issue(s).',
-        'Due to: ' + error.responseJSON.message
-      ])
+      show_message('error', "Assign Issue(s) Error. Failed to assign #{dispute_ids.length} issue(s) due to: #{error.responseJSON.message}", 5, '#alertMessage')
   )
 
 window.take_sdr_dispute = (dispute_id) ->
@@ -305,6 +302,7 @@ window.take_sdr_dispute = (dispute_id) ->
     error_prefix: 'Error updating ticket'
     success: (response) ->
       assign_sdr_dispute_on_me_on_view(response.dispute_id, response.username)
+      show_message('success', "SDR Dispute #{dispute_id} has been assigned to #{response.username}.", false, '#alertMessage')
   )
 
 window.return_sdr_dispute = (dispute_id) ->
@@ -316,6 +314,11 @@ window.return_sdr_dispute = (dispute_id) ->
     error_prefix: 'Error updating ticket'
     success: (response) ->
       return_sdr_dispute_on_view(dispute_id)
+      show_message('success', "SDR Dispute #{dispute_id} has been returned.", false, '#alertMessage')
+    error: (error) ->
+      show_message('error', [
+        "Failed to return #{dispute_id} due to: #{error.responseJSON.message}"
+      ], 5, '#alertMessage')
   )
 
 window.return_sdr_disputes = () ->
@@ -323,7 +326,7 @@ window.return_sdr_disputes = () ->
   dispute_ids = selected_sdr_disputes()
 
   if dispute_ids.length == 0
-    std_msg_error('No Tickets Selected', ['Please select at least one ticket to return.'])
+    show_message('error', 'No Tickets Selected. Please select at least one ticket to return.')
     return
 
   std_msg_ajax(
@@ -338,15 +341,13 @@ window.return_sdr_disputes = () ->
       for dispute_id in response.returned_ids
         return_sdr_dispute_on_view(dispute_id, response.username)
       if response.dispute_ids.length == response.returned_ids.length
-        show_message('success', ["#{response.dispute_ids.length} disputes have been returned"], false, '#alertMessage')
+        show_message('success', "#{response.dispute_ids.length} disputes have been returned", 5, '#alertMessage')
       else if response.returned_ids.length == 0
-        show_message('error', ["No disputes have been returned. You can only return disputes assigned to you."], false, '#alertMessage')
+        show_message('error', "No disputes have been returned. You can only return disputes assigned to you.", 5, '#alertMessage')
       else
-        show_message('error', ["#{response.returned_ids.length} disputes have been returned. #{response.dispute_ids.length - response.returned_ids.length} were not. You can only return disputes assigned to you."], false, '#alertMessage')
+        show_message('error', "#{response.returned_ids.length} disputes have been returned. #{response.dispute_ids.length - response.returned_ids.length} were not. You can only return disputes assigned to you.", false, '#alertMessage')
     error: (error) ->
-      show_message('error', [
-        "Failed to return #{dispute_ids.length} issue(s). Due to: #{error.responseJSON.message}"
-      ], 5, '#alertMessage')
+      show_message('error', "Failed to return #{dispute_ids.length} issue(s) due to: #{error.responseJSON.message}", 5, '#alertMessage')
   )
 
 window.selected_sdr_disputes = () ->
@@ -507,7 +508,7 @@ sdr_change_assignee = (disputeIdArray) ->
       else
         show_message('error', 'No tickets updated. Closed tickets cannot change their assignee.', 5, '#alertMessage')
     error: (error) ->
-      std_msg_error('Change Issue(s) Error', [error.responseJSON.message])
+      show_message('error', "Change Issue(s) Error: #{error.responseJSON.message}", 5, '#alertMessage')
   )
 
 window.advanced_search_sdr_index_table = () ->
@@ -772,10 +773,11 @@ window.sdr_index_edit_ticket_status = () ->
 
 window.sdr_index_change_ticket_status = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
+  status = $('#sdr-index-edit-ticket-status-dropdown').find('.sdr-ticket-status-radio:checked').val()
   resolution = ""
   checkboxes = $('#sdr-disputes-index').find('.sdr_dispute_check_box')
   checked_dispute_ids = []
+  comment = ''
   successfully_closed_disputes = []
 
   $(checkboxes).each ->
@@ -783,14 +785,20 @@ window.sdr_index_change_ticket_status = () ->
       dispute_id = $(this).val()
       checked_dispute_ids.push(dispute_id)
 
-  if status == 'RESOLVED_CLOSED'
-    resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
-  else if status == 'ASSIGNED' && $('#dispute-assignee').hasClass('missing-data')
-    std_msg_error('This ticket is unassigned', ['Please select an assignee.'])
+  if status == 'RESOLVED_CLOSED' && $('#sdr-index-edit-ticket-status-dropdown').find('.ticket-resolution-radio').is(':checked')
+    resolution = $('#sdr-index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+    comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+  else if status == 'RESOLVED_CLOSED'
+    show_message('error', 'No resolution selected. Please select a ticket resolution.', 5, '#alertmessage')
     return
+  else if status == 'ASSIGNED' && $('#dispute-assignee').hasClass('missing-data')
+    show_message('error', 'This ticket is unassigned. Please select an assignee.', 5, '#alertmessage')
+    return
+  else
+    comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
 
   data = {
-    comment: $('.ticket-status-comment').val() || '',
+    comment: comment,
     dispute_ids: checked_dispute_ids,
     resolution: resolution,
     status: status
@@ -802,7 +810,7 @@ window.sdr_index_change_ticket_status = () ->
     headers: headers
     data: data
     success: (response) ->
-      show_message('success', 'Ticket assignment has been updated!', false, '#alertMessage')
+      show_message('success', 'Ticket status has been updated!', false, '#alertMessage')
       setTimeout ->
         window.location.reload()
       , 5000
