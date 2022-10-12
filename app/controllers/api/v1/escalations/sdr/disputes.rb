@@ -57,15 +57,17 @@ module API
             desc 'Return list of SDR disputes'
             params do
               requires :dispute_ids, type: Array[Integer]
+              requires :current_user_id, type: Integer
             end
 
             patch 'return_disputes' do
               std_api_v2 do
                 authorize!(:update, SenderDomainReputationDispute)
 
-                SenderDomainReputationDispute.where(id: permitted_params[:dispute_ids]).each(&:return_dispute)
+                returnedSdrDisputes = SenderDomainReputationDispute.where(id: permitted_params[:dispute_ids], user_id: permitted_params[:current_user_id]).each(&:return_dispute)
+                returned_ids = returnedSdrDisputes.map { |sdrDispute| sdrDispute.id }
 
-                { username: current_user.cvs_username, dispute_ids: permitted_params[:dispute_ids] }
+                { username: current_user.cvs_username, dispute_ids: permitted_params[:dispute_ids], returned_ids: returned_ids }
               end
             end
 

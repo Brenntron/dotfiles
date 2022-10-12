@@ -5443,6 +5443,10 @@ table > tbody > tr > td.dispute_rep_tools {
   padding: 10px;
 }
 
+.sdr-ticket-status-radio-label {
+  margin-top: 4px;
+}
+
 .dropdown-menu-content-block ul {
   padding: 10px;
   display: inline-block;
@@ -6154,7 +6158,8 @@ h5.entry-details-table-header {
   width: 350px;
 }
 
-.ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label, #index-entry-resolution-submenu .radio-label  {
+.ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label, #index-entry-resolution-submenu
+.radio-label, #sdr-index-dispute-resolution-submenu .radio-label  {
   color: $content-bg-color  !important;
   font-size: 9pt  !important;
 }
@@ -6908,7 +6913,7 @@ td.ticket-total::before {
   background-color: $faint-neutral-color !important;
 }
 
-#index-ticket-resolution-submenu, #index-entry-resolution-submenu {
+#index-ticket-resolution-submenu, #index-entry-resolution-submenu, #sdr-index-dispute-resolution-submenu {
   width: 340px;
   left: 100%;
   padding: 0;
