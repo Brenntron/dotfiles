@@ -219,10 +219,18 @@ $ ->
 
   set_icon_for_favorite_filter = (filter_name) ->
     filter_dropdown = $("#filter-dropdown > #filter-cases-list a[href='#{filter_name}']")
-    saved_search = $("#saved-search-tbody a:contains('#{filter_name}')")
+
+    saved_search = null
+    $("#saved-search-tbody a").each((i, elem) ->
+      # trim() is needed for filter_name in case if there is extra space in saved filter
+      if elem.text.trim() == filter_name.trim()
+        saved_search = $(elem)
+        return
+    )
+
     if filter_dropdown.length > 0
       filter_dropdown.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
-    else if saved_search.length > 0
+    else if saved_search
       saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
 
   use_user_preference_filter = () ->
