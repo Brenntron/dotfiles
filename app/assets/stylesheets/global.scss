@@ -9195,7 +9195,7 @@ td.text-center span {
   margin-top: 4px !important;
 }
 
-.cluster-mgt-loader-wrapper, .webcat-loader-wrapper, .webrep-loader-wrapper  {
+.cluster-mgt-loader-wrapper, .webcat-loader-wrapper, .webrep-loader-wrapper, .sdr-loader-wrapper  {
   display: block;
   position: absolute;
   width: 170px;
@@ -9215,8 +9215,12 @@ td.text-center span {
   font-weight: 200;
 }
 
-.webcat-loader-wrapper, .webrep-loader-wrapper {
+.webcat-loader-wrapper, .webrep-loader-wrapper, .sdr-loader-wrapper {
   margin: 0 37%;
+}
+
+.sdr-loader-wrapper {
+  top: 5px;
 }
 
 .loader-msg {
