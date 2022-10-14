@@ -286,8 +286,7 @@ window.take_sdr_disputes = () ->
     data: { dispute_ids: dispute_ids }
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      for dispute_id in response.dispute_ids
-        assign_sdr_dispute_on_me_on_view(dispute_id, response.username)
+      $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
       show_message('success', "#{response.dispute_ids.length} tickets have been assigned to #{response.username}.", 5, '#alertMessage')
     error: (error) ->
       show_message('error', "Assign Issue(s) Error. Failed to assign #{dispute_ids.length} issue(s) due to: #{error.responseJSON.message}", 5, '#alertMessage')
@@ -301,8 +300,8 @@ window.take_sdr_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      assign_sdr_dispute_on_me_on_view(response.dispute_id, response.username)
-      show_message('success', "SDR Dispute #{dispute_id} has been assigned to #{response.username}.", false, '#alertMessage')
+      $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
+      show_message('success', "SDR Dispute #{dispute_id} has been assigned to #{response.username}.", 5, '#alertMessage')
   )
 
 window.return_sdr_dispute = (dispute_id) ->
@@ -313,8 +312,8 @@ window.return_sdr_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      return_sdr_dispute_on_view(dispute_id)
-      show_message('success', "SDR Dispute #{dispute_id} has been returned.", false, '#alertMessage')
+      $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
+      show_message('success', "SDR Dispute #{dispute_id} has been returned.", 5, '#alertMessage')
     error: (error) ->
       show_message('error', [
         "Failed to return #{dispute_id} due to: #{error.responseJSON.message}"
@@ -338,14 +337,14 @@ window.return_sdr_disputes = () ->
     }
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      for dispute_id in response.returned_ids
-        return_sdr_dispute_on_view(dispute_id, response.username)
       if response.dispute_ids.length == response.returned_ids.length
         show_message('success', "#{response.dispute_ids.length} disputes have been returned", 5, '#alertMessage')
       else if response.returned_ids.length == 0
         show_message('error', "No disputes have been returned. You can only return disputes assigned to you.", 5, '#alertMessage')
       else
-        show_message('error', "#{response.returned_ids.length} disputes have been returned. #{response.dispute_ids.length - response.returned_ids.length} were not. You can only return disputes assigned to you.", false, '#alertMessage')
+        show_message('error', "#{response.returned_ids.length} disputes have been returned. #{response.dispute_ids.length - response.returned_ids.length} were not. You can only return disputes assigned to you.", 5, '#alertMessage')
+
+      $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
     error: (error) ->
       show_message('error', "Failed to return #{dispute_ids.length} issue(s) due to: #{error.responseJSON.message}", 5, '#alertMessage')
   )
@@ -355,16 +354,6 @@ window.selected_sdr_disputes = () ->
     this.dataset['entryId']
     this.value
   ).toArray()
-
-window.return_sdr_dispute_on_view = (dispute_id) ->
-  $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='esc-tooltipped take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='take_sdr_dispute(#{dispute_id});'></button>")
-  $("#owner_#{dispute_id}").text("Unassigned").addClass('missing-data')
-  $('#status_' + dispute_id).text("NEW")
-
-window.assign_sdr_dispute_on_me_on_view = (dispute_id, user_name) ->
-  $("#owner_#{dispute_id}").text(user_name).removeClass('missing-data')
-  $('#status_' + dispute_id).text("ASSIGNED")
-  $(".inline-take-dispute-#{dispute_id}").replaceWith("<button class='esc-tooltipped return-ticket-button inline-return-ticket-#{dispute_id}' title='Return ticket' onclick='return_sdr_dispute(#{dispute_id});'></button>")
 
 window.hide_loading_gears = () ->
   loader = $('#sdr-loading-gear')
@@ -451,15 +440,12 @@ window.take_single_sdr_dispute = (id) ->
       url: "/escalations/api/v1/escalations/sdr/disputes/take_disputes"
       data: { dispute_ids: dispute_ids }
       error_prefix: 'Error updating ticket.'
-      success_reload: true
       success: (response) ->
         if response.dispute_ids.length > 0
-          show_message('success', 'Ticket assignment has been updated!', false, '#alertMessage')
-          setTimeout ->
-            window.location.reload()
-          , 5000
+          show_message('success', 'Ticket assignment has been updated!', 5, '#alertMessage')
+          $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
         else
-          show_message('error', 'Ticket assnigment could not be updated.', 5)
+          show_message('error', 'Ticket assnigment could not be updated.', 5, '#alertMessage')
     )
   else
     currentUser = $('input[name="current_user_id"]').val()
@@ -494,17 +480,14 @@ sdr_change_assignee = (disputeIdArray) ->
     dataType: 'json'
     success: (response) ->
       responseData = JSON.parse(response).data
+      page = $('#sdr-disputes-index').DataTable().page
 
       if responseData.length > 0 && (data.dispute_ids.length == responseData.length)
-        show_message('success', "#{responseData.length} ticket assignment(s) updated!", false, '#alertMessage')
-        setTimeout ->
-          window.location.reload()
-        , 5000
+        show_message('success', "#{responseData.length} ticket assignment(s) updated!", 5, '#alertMessage')
+        $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
       else if responseData.length > 0 && (data.dispute_ids.length != responseData.length)
-        show_message('success', "#{responseData.length} ticket assignment(s) updated, but not every ticket was updated. Closed tickets cannot change their assignee", false, '#alertMessage')
-        setTimeout ->
-          window.location.reload()
-        , 5000
+        show_message('success', "#{responseData.length} ticket assignment(s) updated, but not every ticket was updated. Closed tickets cannot change their assignee", 5, '#alertMessage')
+        $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
       else
         show_message('error', 'No tickets updated. Closed tickets cannot change their assignee.', 5, '#alertMessage')
     error: (error) ->
@@ -626,15 +609,16 @@ window.format_sdr_header = (data) ->
   if data != undefined && container.length > 0
     reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="sdr_search_refresh()"></span>'
     { search_type, search_name } = data
+
     if search_type == 'standard'
       if search_name == 'all'
         reset_icon = ''
-      new_header =
-        '<div>' +
-          '<span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span>' +
-          reset_icon +
-          '</div>'
+      else if search_name == 'my_disputes'
+        search_name = 'my'
+      else if search_name == 'team_disputes'
+        search_name = "my team's"
 
+      new_header = "<div><span class='text-capitalize'>#{search_name.replace(/_/g, " ")} tickets</span>#{reset_icon}</div>"
     else if search_type == 'advanced'
       search_conditions = JSON.parse(localStorage.sdr_search_conditions)
       new_header = '<div>Results for Advanced Search ' + reset_icon + '</div>'
@@ -810,10 +794,7 @@ window.sdr_index_change_ticket_status = () ->
     headers: headers
     data: data
     success: (response) ->
-      show_message('success', 'Ticket status has been updated!', false, '#alertMessage')
-      setTimeout ->
-        window.location.reload()
-      , 5000
+      show_message('success', 'Ticket status has been updated!', 5, '#alertMessage')
     error: (response) ->
       popup_response_error(response, 'Error Updating Status')
 )
