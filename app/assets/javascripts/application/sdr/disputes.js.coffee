@@ -266,8 +266,9 @@ window.initialize_sdr_disputes_datatable = () ->
   )
 
 window.reload_sdr_dispute = () ->
-  $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
-  $('#sdr_disputes_check_box').prop('checked', false)
+  #$('#sdr-disputes-index').DataTable().ajax.reload(null, false)
+  $('#sdr-disputes-index').DataTable().draw('page')
+  #$('#sdr_disputes_check_box').prop('checked', false)
 
 
 window.sdr_disputes_select_all_check_box = () ->
@@ -405,6 +406,8 @@ window.sdr_show_page_edit_status = (dispute_id) ->
   if resolution
     data.resolution = resolution
     data.comment = $('.ticket-resolution-comment').val()
+  else
+    data.comment = $('.ticket-status-comment').val()
 
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/sdr/disputes/set_disputes_status'

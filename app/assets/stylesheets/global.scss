@@ -6909,6 +6909,16 @@ td.ticket-total::before {
   margin: 20px auto 8px auto;
 }
 
+#sdr-index-toolbar .non-resolution-submit-wrapper {
+  .button-row-center {
+    padding: 0;
+  }
+
+  button {
+    margin-top: 10px;
+  }
+}
+
 .non-resolution-submit-wrapper:hover {
   background-color: $faint-neutral-color !important;
 }

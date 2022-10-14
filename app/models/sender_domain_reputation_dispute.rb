@@ -342,6 +342,7 @@ class SenderDomainReputationDispute < ApplicationRecord
     resolved_at = Time.now
     disputes.each do |dispute|
       dispute.status = status
+
       if resolution.present?
         dispute.resolution = resolution
         dispute.resolution_comment = comment
@@ -349,6 +350,10 @@ class SenderDomainReputationDispute < ApplicationRecord
       else
         dispute.resolution = nil
         dispute.resolution_comment = nil
+
+        SenderDomainReputationDisputeComment.create!(user_id: current_user.id,
+                                                     comment: comment,
+                                                     sender_domain_reputation_dispute_id: dispute.id)
       end
 
       unless [STATUS_NEW, STATUS_ASSIGNED].include?(dispute.status)
@@ -356,10 +361,6 @@ class SenderDomainReputationDispute < ApplicationRecord
       end
 
       dispute.save!
-
-      #if comment.present?
-      #  DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute.id)
-      #end
 
       dispute.reload
 
