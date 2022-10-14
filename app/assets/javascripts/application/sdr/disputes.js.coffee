@@ -265,6 +265,11 @@ window.initialize_sdr_disputes_datatable = () ->
     ]
   )
 
+window.reload_sdr_dispute = () ->
+  $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
+  $('#sdr_disputes_check_box').prop('checked', false)
+
+
 window.sdr_disputes_select_all_check_box = () ->
   $('.sdr_dispute_check_box').prop('checked', $('#sdr_disputes_check_box').prop('checked'))
   row = $('.sdr_dispute_check_box').parents('tr')
@@ -286,7 +291,6 @@ window.take_sdr_disputes = () ->
     data: { dispute_ids: dispute_ids }
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
       show_message('success', "#{response.dispute_ids.length} tickets have been assigned to #{response.username}.", 5, '#alertMessage')
     error: (error) ->
       show_message('error', "Assign Issue(s) Error. Failed to assign #{dispute_ids.length} issue(s) due to: #{error.responseJSON.message}", 5, '#alertMessage')
@@ -300,7 +304,7 @@ window.take_sdr_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
+      reload_sdr_dispute()
       show_message('success', "SDR Dispute #{dispute_id} has been assigned to #{response.username}.", 5, '#alertMessage')
   )
 
@@ -312,7 +316,7 @@ window.return_sdr_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
+      reload_sdr_dispute()
       show_message('success', "SDR Dispute #{dispute_id} has been returned.", 5, '#alertMessage')
     error: (error) ->
       show_message('error', [
@@ -344,7 +348,7 @@ window.return_sdr_disputes = () ->
       else
         show_message('error', "#{response.returned_ids.length} disputes have been returned. #{response.dispute_ids.length - response.returned_ids.length} were not. You can only return disputes assigned to you.", 5, '#alertMessage')
 
-      $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
+    reload_sdr_dispute()
     error: (error) ->
       show_message('error', "Failed to return #{dispute_ids.length} issue(s) due to: #{error.responseJSON.message}", 5, '#alertMessage')
   )
@@ -428,7 +432,7 @@ window.sdr_toolbar_unassign_dispute = () ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error removing assignee')
+      show_customer_cb('error', "Error removing assignee. #{response}", 5, '#alertMessage')
   )
 
 window.take_single_sdr_dispute = (id) ->
@@ -442,8 +446,8 @@ window.take_single_sdr_dispute = (id) ->
       error_prefix: 'Error updating ticket.'
       success: (response) ->
         if response.dispute_ids.length > 0
-          show_message('success', 'Ticket assignment has been updated!', 5, '#alertMessage')
-          $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
+          show_message('success', 'Ticket assignment has been updated.', 5, '#alertMessage')
+          reload_sdr_dispute()
         else
           show_message('error', 'Ticket assnigment could not be updated.', 5, '#alertMessage')
     )
@@ -483,11 +487,11 @@ sdr_change_assignee = (disputeIdArray) ->
       page = $('#sdr-disputes-index').DataTable().page
 
       if responseData.length > 0 && (data.dispute_ids.length == responseData.length)
-        show_message('success', "#{responseData.length} ticket assignment(s) updated!", 5, '#alertMessage')
-        $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
+        show_message('success', "#{responseData.length} ticket assignment(s) updated.", 5, '#alertMessage')
+        reload_sdr_dispute()
       else if responseData.length > 0 && (data.dispute_ids.length != responseData.length)
         show_message('success', "#{responseData.length} ticket assignment(s) updated, but not every ticket was updated. Closed tickets cannot change their assignee", 5, '#alertMessage')
-        $('#sdr-disputes-index').DataTable().ajax.reload(null, false)
+        reload_sdr_dispute()
       else
         show_message('error', 'No tickets updated. Closed tickets cannot change their assignee.', 5, '#alertMessage')
     error: (error) ->
@@ -641,10 +645,6 @@ window.format_sdr_header = (data) ->
             condition_name = 'TIME SUBMITTED (OLDER)'
 
           condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
-
-#          if typeof condition == 'object'
-#            condition_HTML = '<span>' + condition.from  + ' - ' + condition.to+ '</span>'
-#          else
           condition_HTML = '<span>' + condition + '</span>'
 
           container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
@@ -718,6 +718,7 @@ window.export_sdr_selected = () ->
 
 window.sdr_index_edit_ticket_status = () ->
     dropdown = $('#sdr-index-edit-ticket-status-dropdown').parent()
+
     if ($('.sdr_dispute_check_box:checked').length > 0)
 # Select Status
       $('.sdr-ticket-status-radio-label').click ->
@@ -756,12 +757,13 @@ window.sdr_index_edit_ticket_status = () ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
 window.sdr_index_change_ticket_status = () ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  status = $('#sdr-index-edit-ticket-status-dropdown').find('.sdr-ticket-status-radio:checked').val()
-  resolution = ""
   checkboxes = $('#sdr-disputes-index').find('.sdr_dispute_check_box')
   checked_dispute_ids = []
   comment = ''
+  dropdown = $('#sdr-index-edit-ticket-status-dropdown').parent()
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  resolution = ""
+  status = $('#sdr-index-edit-ticket-status-dropdown').find('.sdr-ticket-status-radio:checked').val()
   successfully_closed_disputes = []
 
   $(checkboxes).each ->
@@ -781,6 +783,8 @@ window.sdr_index_change_ticket_status = () ->
   else
     comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
 
+  dropdown.dropdown('toggle')
+
   data = {
     comment: comment,
     dispute_ids: checked_dispute_ids,
@@ -794,8 +798,10 @@ window.sdr_index_change_ticket_status = () ->
     headers: headers
     data: data
     success: (response) ->
-      show_message('success', 'Ticket status has been updated!', 5, '#alertMessage')
+      $('.ticket-status-comment').val('')
+      show_message('success', 'Ticket status has been updated.', 5, '#alertMessage')
+      reload_sdr_dispute()
     error: (response) ->
-      popup_response_error(response, 'Error Updating Status')
+      show_message('error', "Error Updating Status. #{response}", 5, '#alertMessage')
 )
 
