@@ -6905,6 +6905,18 @@ td.ticket-total::before {
   min-height: 50px;
 }
 
+#sdr-index-dispute-resolution-submenu .resolution-comment-wrapper, #show-ticket-resolution-submenu .resolution-comment-wrapper {
+  width: 100%;
+}
+
+#sdr-index-dispute-resolution-submenu .resolution-comment-wrapper textarea {
+  min-height: 170px;
+}
+
+#show-ticket-resolution-submenu .resolution-comment-wrapper textarea {
+  min-height: 180px;
+}
+
 .non-resolution-submit-wrapper button {
   margin: 20px auto 8px auto;
 }
@@ -6923,11 +6935,19 @@ td.ticket-total::before {
   background-color: $faint-neutral-color !important;
 }
 
+#sdr-index-edit-ticket-status-dropdown, #show-ticket-resolution-menu {
+  min-width: 160px;
+}
+
 #index-ticket-resolution-submenu, #index-entry-resolution-submenu, #sdr-index-dispute-resolution-submenu {
   width: 340px;
   left: 100%;
   padding: 0;
   margin-top: -56px;
+}
+
+#sdr-index-dispute-resolution-submenu {
+  width: 475px;
 }
 
 .non-resolution-submit-wrapper {

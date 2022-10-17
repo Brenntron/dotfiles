@@ -47,7 +47,7 @@
                       %input.sdr-ticket-status-radio.resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESOLVED}", value: "#{Dispute::STATUS_RESOLVED}"}
                       %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_RESOLVED}"} Resolved / Closed
                       .dropdown-menu#show-ticket-resolution-submenu
-                        .col-xs-6.submenu-left-wrapper{id: "sdr-resolution-selector"}
+                        .col-xs-5.submenu-left-wrapper{id: "sdr-resolution-selector"}
                           .submenu-header
                             Ticket Resolution
                           %ul
@@ -79,7 +79,7 @@
                             %li
                               %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
                               %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
-                        .col-xs-6.submenu-right-wrapper
+                        .col-xs-7.submenu-right-wrapper
                           .resolution-comment-wrapper
                             %label.content-label-sm.customer-facing-comment
                               Customer Facing Comment
