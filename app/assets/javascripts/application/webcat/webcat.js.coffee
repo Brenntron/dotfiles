@@ -220,13 +220,7 @@ $ ->
   set_icon_for_favorite_filter = (filter_name) ->
     filter_dropdown = $("#filter-dropdown > #filter-cases-list a[href='#{filter_name}']")
 
-    saved_search = null
-    $("#saved-search-tbody a").each((i, elem) ->
-      # trim() is needed for filter_name in case if there is extra space in saved filter
-      if elem.text.trim() == filter_name.trim()
-        saved_search = $(elem)
-        return
-    )
+    saved_search = window.find_saved_search_by_name(filter_name)
 
     if filter_dropdown.length > 0
       filter_dropdown.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
@@ -455,44 +449,17 @@ $ ->
 
             if localStorage.webcat_search_name
               { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
-              last_tr = $('.webcat-named-search-list .saved-search').last().text()
+              text_check = !window.find_saved_search_by_name(webcat_search_name)
               ### check variables below
-                  text_check makes sure that the last table row doesn't match the named search being saved now
+                  text_check makes sure that the table doesn't have the named search with the same name being saved now
                   search_name_check makes sure that the search is being saved as a named search
                   Not super complicated, but that if statement was looking gross and confusing
               ###
-              text_check = last_tr.trim() != webcat_search_name.trim()
+#              text_check = last_tr.trim() != webcat_search_name.trim()
               search_name_check = webcat_search_name != ''
               if webcat_search_type == 'advanced' && search_name_check && text_check
-                ###
-                  creating temporary tr for the filter dropdown
-                  attributes added then onclick events
-                ###
-                new_tr = document.createElement('tr')
-                new_td = document.createElement('td')
-                new_link =  document.createElement('a')
-                new_delete_image = document.createElement('img')
-                new_delete = document.createElement('a')
-
-                $(new_tr).attr('id','temp_row')
-                $(new_link).addClass('input-truncate saved-search esc-tooltipped')
-                  .attr('title', webcat_search_name)
-                  .text(webcat_search_name)
-                $(new_delete).addClass("delete-search")
-                $(new_delete_image).addClass('delete-search-image')
-
-                $(new_link).on 'click', () ->
-                  window.build_webcat_named_search(webcat_search_name)
-
-                $(new_delete).on 'click', () ->
-                  window.delete_disputes_named_search(this,  webcat_search_name)
-                  refresh_localStorage()
-
-                $(new_tr).append(new_td)
-                $(new_td).append(new_link)
-                $(new_td).append(new_delete)
-                $(new_delete).append(new_delete_image)
-                $('.webcat-named-search-list tbody').append(new_tr)
+                window.add_tmp_tr_to_named_search_list(webcat_search_name)
+                window.sort_named_search_list()
 
           pagingType: 'full_numbers'
           order: [ [
@@ -1034,6 +1001,51 @@ window.copyToClipboard = (text) ->
   document.execCommand 'copy'
   document.body.removeChild dummy
 
+window.add_tmp_tr_to_named_search_list = (webcat_search_name) ->
+  new_tr = document.createElement('tr')
+  new_td = document.createElement('td')
+  new_link =  document.createElement('a')
+  new_delete_image = document.createElement('img')
+  new_delete = document.createElement('a')
+  new_fav_icon = document.createElement('span')
+
+  $(new_tr).attr('id','temp_row')
+  $(new_link).addClass('input-truncate saved-search esc-tooltipped')
+    .attr('title', webcat_search_name)
+    .text(webcat_search_name)
+  $(new_delete).addClass("delete-search")
+  $(new_delete_image).addClass('delete-search-image')
+  $(new_fav_icon).addClass('nav-dropdown-icon favorite-search-icon')
+
+  $(new_link).on 'click', () ->
+    window.build_webcat_named_search(webcat_search_name)
+
+  $(new_delete).on 'click', () ->
+    window.delete_disputes_named_search(this,  webcat_search_name)
+    refresh_localStorage()
+
+  $(new_tr).append(new_td)
+  $(new_td).append(new_link)
+  $(new_td).append(new_delete)
+  $(new_delete).append(new_delete_image)
+  $(new_td).append(new_fav_icon)
+  $('.webcat-named-search-list tbody').append(new_tr)
+
+window.sort_named_search_list = ->
+  tbody = $('.webcat-named-search-list tbody')
+  tbody.find('tr').sort((a, b) ->
+    return $('td:first a:first', b).text().localeCompare($('td:first a:first', a).text())
+  ).appendTo(tbody)
+
+window.find_saved_search_by_name = (name) ->
+  saved_search = null
+  $("#saved-search-tbody a").each((i, elem) ->
+    # trim() is needed for filter_name in case if there is extra space in saved filter
+    if elem.text.trim() == name.trim()
+      saved_search = $(elem)
+      return
+  )
+  return saved_search
 $ ->
   # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
   $('#complaints-index').on 'draw.dt', ->
