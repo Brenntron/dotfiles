@@ -449,13 +449,12 @@ $ ->
 
             if localStorage.webcat_search_name
               { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
-              text_check = !window.find_saved_search_by_name(webcat_search_name)
               ### check variables below
                   text_check makes sure that the table doesn't have the named search with the same name being saved now
                   search_name_check makes sure that the search is being saved as a named search
                   Not super complicated, but that if statement was looking gross and confusing
               ###
-#              text_check = last_tr.trim() != webcat_search_name.trim()
+              text_check = !window.find_saved_search_by_name(webcat_search_name)
               search_name_check = webcat_search_name != ''
               if webcat_search_type == 'advanced' && search_name_check && text_check
                 window.add_tmp_tr_to_named_search_list(webcat_search_name)
