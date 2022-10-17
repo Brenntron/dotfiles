@@ -351,9 +351,6 @@ class SenderDomainReputationDispute < ApplicationRecord
         dispute.resolution = nil
         dispute.resolution_comment = nil
 
-        SenderDomainReputationDisputeComment.create!(user_id: current_user.id,
-                                                     comment: comment,
-                                                     sender_domain_reputation_dispute_id: dispute.id)
       end
 
       unless [STATUS_NEW, STATUS_ASSIGNED].include?(dispute.status)
@@ -361,6 +358,10 @@ class SenderDomainReputationDispute < ApplicationRecord
       end
 
       dispute.save!
+
+      SenderDomainReputationDisputeComment.create!(user_id: current_user.id,
+                                                   comment: comment,
+                                                   sender_domain_reputation_dispute_id: dispute.id)
 
       dispute.reload
 
