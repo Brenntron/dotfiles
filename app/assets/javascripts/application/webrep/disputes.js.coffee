@@ -222,9 +222,8 @@ window.named_webrep_index_table = (search_name) ->
     search_type: 'named'
     search_name: search_name
   }
-  window.current_search_data = data
-  window.populate_webrep_index_table(data)
-
+  localStorage.filters = JSON.stringify(data)
+  refresh_webrep_url()
 
 window.call_contains_search = (search_form) ->
   refresh_localStorage()

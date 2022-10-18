@@ -1310,8 +1310,8 @@ For future Web categorization requests, please open a Web categorization ticket 
 
     named_search =
         user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name, project_type: project_type)
-
-    params.each do |field_name, value|
+    
+    params.to_h.each do |field_name, value|
       case
         when value.kind_of?(Hash)
           value.each do |sub_field_name, sub_value|
