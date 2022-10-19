@@ -132,10 +132,29 @@ $ ->
         platform: platform,
         tags: tags
       success: (response) ->
-        std_msg_success('Complaint Created.', [], reload: true)
+        debugger
+        parsed = JSON.parse(response)
+
+        if parsed.status == "error"
+          if parsed.successful_entries_count > 0
+            message = "Not all complaints were able to be created"
+            fail_msg = "The following #{parsed.failed_entries_count} complaints were not able to be created"
+            success_msg = "The following #{parsed.successful_entries_count} complaints were successfully created"
+            parsed.failed_entries.unshift(fail_msg)
+            parsed.successful_entries.unshift(success_msg)
+            merged_entry_msg = parsed.failed_entries.concat(parsed.successful_entries)
+            std_msg_error(message, merged_entry_msg, reload: true)
+          else
+            message = "The following #{parsed.failed_entries_count} complaints were not able to be created"
+            std_msg_error(message, parsed.failed_entries, reload: false)
+
+        else if parsed.status == 'success'
+          message = "The following #{parsed.successful_entries_count} complaints were successfully created"
+          std_msg_success(message, parsed.successful_entries, reload: true)
+
       error: (response) ->
         console.log response
-        std_api_error(response, "Complaint was not created.", reload: false)
+        std_api_error(response, "Complaints were not created.", reload: false)
     )
 
   $('#cancel_complaint').on 'click', ->
