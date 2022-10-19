@@ -132,7 +132,6 @@ $ ->
         platform: platform,
         tags: tags
       success: (response) ->
-        debugger
         parsed = JSON.parse(response)
 
         if parsed.status == "error"
