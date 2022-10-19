@@ -868,48 +868,71 @@ For future web and email reputation requests, please open a web and email reputa
 
   def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, platform, status=NEW, categories = nil, user_email = nil)
 
-    summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+    response = {}
+    response[:status] = "success"
+    response[:total_entries] = 0
+    response[:successful_entries_count] = 0
+    response[:failed_entries_count] = 0
+    response[:successful_entries] = []
+    response[:failed_entries] = []
 
-    full_description = <<~HEREDOC
-          IPs/URIs: #{ips_urls}
-          Problem Summary: #{description}
-    HEREDOC
-    bug_attrs = {
-        'product' => 'Escalations Console',
-        'component' => 'Categorization',
-        'summary' => summary,
-        'version' => 'unspecified', #self.version,
-        'description' => full_description,
-        'priority' => 'Unspecified',
-        'classification' => 'unclassified',
-    }
+    begin
+      summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+      full_description = <<~HEREDOC
+            IPs/URIs: #{ips_urls}
+            Problem Summary: #{description}
+      HEREDOC
+      bug_attrs = {
+          'product' => 'Escalations Console',
+          'component' => 'Categorization',
+          'summary' => summary,
+          'version' => 'unspecified', #self.version,
+          'description' => full_description,
+          'priority' => 'Unspecified',
+          'classification' => 'unclassified',
+      }
 
-
-    cust = find_customer(customer) if customer
-    platform_record = Platform.find_by_public_name(platform) if platform
-    new_complaint = Complaint.create(id: bug_proxy.id,
-                                     description: description,
-                                     customer_id: cust&.id,
-                                     platform_id: platform_record&.id,
-                                     status: status,
-                                     channel: INT_CHANNEL)
+      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
 
-    handle_tags(new_complaint, tags) if tags
+      cust = find_customer(customer) if customer
+      platform_record = Platform.find_by_public_name(platform) if platform
+      new_complaint = Complaint.create(id: bug_proxy.id,
+                                       description: description,
+                                       customer_id: cust&.id,
+                                       platform_id: platform_record&.id,
+                                       status: status,
+                                       channel: INT_CHANNEL)
 
-    user = if user_email
-      User.find_by_email(user_email)
-    else
-      User.where(display_name:"Vrt Incoming").first
+
+      handle_tags(new_complaint, tags) if tags
+
+      user = if user_email
+        User.find_by_email(user_email)
+      else
+        User.where(display_name:"Vrt Incoming").first
+      end
+
+      ips_urls.split(' ').each do |ip_url|
+        response[:total_entries] += 1
+        begin
+          raise 'breakage'
+          ComplaintEntry.create_complaint_entry(new_complaint, ip_url, platform_record, user, status, categories)
+          response[:successful_entries_count] += 1
+          response[:successful_entries] << ip_url
+        rescue
+          response[:failed_entries_count] += 1
+          response[:failed_entries] << ip_url
+          response[:status] = "error"
+        end
+
+      end
+    rescue
+
     end
 
-    ips_urls.split(' ').each do |ip_url|
-      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, platform_record, user, status, categories)
-    end
-
-    bug_proxy
+    response
   end
 
   def self.find_customer(customer)
