@@ -1,6 +1,6 @@
 class K2::Base
   include ApiRequester::ApiRequester
-  DEFAULT_ERROR_MESSAGE = 'Coud not fetch data from K2 API'
+  DEFAULT_ERROR_MESSAGE = 'Could not fetch data from K2 API'.freeze
 
   Response = Struct.new(:body, :error, :code)
 
