@@ -151,6 +151,26 @@ $ ->
         $('#advanced-search-dropdown').show()
     )
 
+  $('#sdr-resolution-selector input.sdr-ticket-resolution-radio').click (event)->
+    fixed_fp_message_types = ['FIXED_FP_SUDDEN_SPIKE', 'FIXED_FP_DOMAIN_AGE', 'FIXED_FP_NEGATIVE_WEBREP']
+
+    resolution_comments = 
+      'FIXED_FP_SUDDEN_SPIKE': 'The domain was impacted due to Talos sensors observing suspicious behavior typically indicative of spamming. This behavior is no longer observed and the reputation has been adjusted accordingly.'
+      'FIXED_FP_DOMAIN_AGE': 'The domains were penalized by SDR due to a combination of domain registration and sending attributes prevalent in spam sending domains. The issue has been rectified and the domain reputation has been adjusted accordingly.'
+      'FIXED_FP_NEGATIVE_WEBREP': 'This domain was penalized by SDR as it used to have a Untrusted Web Reputation score due to malicious or suspicious behavior. The issue has been rectified and the domain reputation has been adjusted accordingly.'
+      'FIXED_FN': "Talos has concluded that the submission has been associated with recent spam campaigns; the submission's reputation has been decreased. This update will be publicly visible in the next 24 hours."
+      'UNCHANGED': "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission's reputation because it can negatively affect our customers."
+    value = $(event.target.closest('input')).val()
+    comment = resolution_comments[value] || ''
+    if  value in fixed_fp_message_types
+      $("input[name='dispute-resolution']").prop('checked', false)
+      $('input#FIXED_FP').prop('checked', true)
+    else
+      $("input[name='dispute-preset-resolution']").prop('checked', false)
+ 
+    $(".ticket-resolution-comment").html(comment)
+
+
 window.initialize_sdr_disputes_datatable = () ->
   $('#sdr-disputes-index').DataTable(
     processing: true
@@ -654,3 +674,30 @@ window.sdr_build_named_search = (search_name) ->
   localStorage.sdr_search_name = search_name
   localStorage.removeItem('sdr_search_conditions')
   sdr_refresh_url()
+
+window.export_sdr_all = () ->
+  form = document.getElementById("sdr-disputes-export-form")
+
+  data = build_sdr_data()
+  if 'advanced' == data.search_type
+    data.search_name = null
+  data_json = JSON.stringify(data)
+  $('#index-export-data-input').val(data_json)
+  form.onsubmit = ""
+  form.submit()
+  form.onsubmit = () ->
+    return false
+
+window.export_sdr_selected = () ->
+  data = build_sdr_data()
+  data.selected_cases = $('.sdr_dispute_check_box:checked').map((i, el) => el.value).get() 
+  
+
+  if data.selected_cases.length <= 0
+    std_msg_error('Error: Nothing selected.',"", reload: false)
+    return false
+  if 'advanced' == data.search_type
+    data.search_name = null
+  data_json = JSON.stringify(data)
+  $('#index-export-data-input').val(data_json)
+  document.getElementById("sdr-disputes-export-form").onsubmit = ""

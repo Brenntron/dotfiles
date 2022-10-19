@@ -290,6 +290,7 @@ class DisputeEntry < ApplicationRecord
   def self.safe_domain_of(url)
     begin
       url = url.strip
+      url = url.split("/").map {|m| SimpleIDN.to_ascii(m)}.join("/")
       if !url.start_with?( 'http', 'https')
         url = "http://" + url
       end
@@ -1383,25 +1384,54 @@ class DisputeEntry < ApplicationRecord
       end
 
       wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
+      sbrs_api_response = Sbrs::ManualSbrs.call_sbrs('ip' => self.hostlookup)
+      raw_sbrs_score = sbrs_api_response['sbrs']['score'] rescue nil
+      raw_wbrs_score = wbrs_stuff["wbrs"]["score"] rescue nil
 
-      raw_score = wbrs_stuff["wbrs"]["score"]
+      submission_type = self.dispute.submission_type
 
-
+      if submission_type == "e"
+        raw_score = raw_sbrs_score
+      end
+      if submission_type == "w"
+        raw_score = raw_wbrs_score
+      end
 
       if entry_claim == "false negative"
 
-        if is_umbrella == true
-          if raw_score.to_f <= -7.0
-            self.status = STATUS_RESOLVED
-            self.resolution = STATUS_AUTO_RESOLVED_MATCH
-            self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. Talos does not reduce the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers is able to access the submission, that is due to relaxed settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case."
-            self.save
+        if submission_type == "w"
 
-            return true
+          if is_umbrella == true
+            if raw_score.present? && raw_score.to_f <= -6.0
+              self.status = STATUS_RESOLVED
+              self.resolution = STATUS_AUTO_RESOLVED_MATCH
+              self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. Talos does not reduce the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers is able to access the submission, that is due to relaxed settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case."
+              self.save
+
+              return true
+            end
+          else
+
+            if raw_score.present? && raw_score.to_f <= -6.0
+              self.status = STATUS_RESOLVED
+              self.resolution = STATUS_AUTO_RESOLVED_MATCH
+              if self.dispute.submitter_type == "NON-CUSTOMER"
+                self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. Talos does not decrease the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers can access the submission, that is due to lax settings on their side and can only be fixed locally by that customer."
+              else
+                self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. Talos does not decrease the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers can access the submission, that is due to lax settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a Cisco TAC case."
+              end
+
+              self.save
+
+              return true
+            end
+
           end
-        else
 
-          if ["Untrusted", "Poor"].include?(running_verdict)
+        end
+
+        if submission_type == "e"
+          if raw_score.present? && raw_score.to_f <= -2.0
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_AUTO_RESOLVED_MATCH
             if self.dispute.submitter_type == "NON-CUSTOMER"
@@ -1413,8 +1443,8 @@ class DisputeEntry < ApplicationRecord
             self.save
 
             return true
-          end
 
+          end
         end
 
       end
@@ -1425,13 +1455,64 @@ class DisputeEntry < ApplicationRecord
           return false
         else
 
-          results = RepApi::Blacklist.where(entries: [ self.hostlookup ]) rescue nil
+          if submission_type == "w"
 
-          is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
 
-          if ['Trusted', 'Favorable', 'Neutral', 'Good', 'Unknown', 'Questionable'].include?(running_verdict) && !is_blacklisted
+            if raw_score.present? && raw_score.to_f <= -6.0
+              return false
+            end
+
+            results = RepApi::Blacklist.where(entries: [ self.hostlookup ]) rescue nil
+
+            is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
+
+            if !is_blacklisted
+
+              ##Check for web category existence, as no-category can be a source of blocking on some network setups
+
+              current_cat = DisputeEntry.get_primary_category(self.hostlookup)
+              #for now, only take this path when single entry ticket
+
+              if current_cat.blank? && self.dispute.dispute_entries.size == 1
+                # ticket conversion action here
+                conversion_packet = {}
+                conversion_packet[:dispute_id] = self.dispute.id
+                conversion_packet[:summary] = self.dispute.problem_summary
+                conversion_packet[:suggested_categories] = []
+                conversion_packet[:suggested_categories] << [{}, {"entry" => self.hostlookup, "suggested_categories" => "Business and Industry"}]
+                user = User.where(cvs_username:"vrtincom").first
+
+                Dispute.convert_to_complaint(conversion_packet, user, true)
+
+                return true
+              end
+
+
+              self.status = STATUS_RESOLVED
+              self.resolution = STATUS_AUTO_RESOLVED_MATCH
+
+              if self.dispute.submitter_type == "NON-CUSTOMER"
+                self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer."
+              else
+                self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a Cisco TAC case."
+              end
+
+              self.save
+
+              return true
+            end
+
+          end
+
+          if submission_type == "e"
+
+            if raw_score.present? && raw_score.to_f < -1.9
+              return false
+            end
+
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_AUTO_RESOLVED_MATCH
+
             if self.dispute.submitter_type == "NON-CUSTOMER"
               self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer."
             else
@@ -1441,15 +1522,19 @@ class DisputeEntry < ApplicationRecord
             self.save
 
             return true
+
           end
 
         end
+
       end
 
 
       return false
 
-    rescue
+    rescue => e
+      Rails.logger.error e
+      Rails.logger.error e.backtrace.join("\n")
       return false
     end
   end

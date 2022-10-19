@@ -36,6 +36,23 @@ class Umbrella::DomainInfo
   end
 
 
+  def self.ip_whois(ip)
+    full_url = "https://investigate.api.umbrella.com/bgp_routes/ip/" + ip
+    full_url += "/as_for_ip.json"
+
+    request = HTTPI::Request.new(full_url)
+    request.ssl = true
+    request.auth.ssl.verify_mode = :peer
+    request.headers['Authorization'] = "Bearer #{Rails.configuration.umbrella.api_key}"
+
+    request.headers['Content-Type'] = 'application/json'
+
+    HTTPI.get(request).body
+
+  end
+
+
+
   def self.health_check
     health_report = {}
 

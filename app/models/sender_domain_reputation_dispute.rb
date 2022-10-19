@@ -1,4 +1,6 @@
 class SenderDomainReputationDispute < ApplicationRecord
+  class SdrDisputeError < StandardError; end
+
   has_paper_trail on: [:update], ignore: [:updated_at, :user_id]
 
   belongs_to :customer, optional: true
@@ -34,6 +36,24 @@ class SenderDomainReputationDispute < ApplicationRecord
   SUBMITTER_TYPE_INTERNAL = "INTERNAL"
 
   RESOLUTION_DUPLICATE = "DUPLICATE"
+
+  EXPORT_FIELD_NAMES = {
+    'id' => 'Case ID',
+    'domain_name' => 'Domain Name',
+    'status' => 'Status',
+    'resolution' => 'Resolution',
+    'resolution_comment' => 'Resolution Comment',
+    'platform' => 'Platform',
+    'source' => 'Source',
+    'suggested_disposition' => 'Suggested Dispostion',
+    'submitter_type' => 'Submitter Type',
+    'description' => 'Description',
+    'user_id' => 'Assignee',
+    'created_at' => 'Time Submitted',
+    'customer_name' => 'Customer Name',
+    'company_name' => 'Company Name',
+    'customer_email' => 'Customer Email'
+}.freeze
 
   def self.process_bridge_payload(message_payload)
     customer_payload = {
@@ -134,6 +154,8 @@ class SenderDomainReputationDispute < ApplicationRecord
         new_dispute.get_and_save_beaker_data
       end
 
+      assemble_initial_email(new_dispute, message_payload[:payload])
+
       if message_payload["attachments"].present?
         message_payload["attachments"].each do |dispute_attachment|
           SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, dispute_attachment, user, new_dispute)
@@ -212,7 +234,18 @@ class SenderDomainReputationDispute < ApplicationRecord
     Customer.find_by_email(email)
   end
 
+
+  def self.validate_entry(entry)
+    valid_email = !(URI::MailTo::EMAIL_REGEXP =~ entry).nil?
+    valid_domain = PublicSuffix.valid?(entry, default_rule: nil, ignore_private: true)
+    has_no_html = ActionView::Base.full_sanitizer.sanitize(entry) == entry
+    raise SdrDisputeError, "This is an invalid entry" unless has_no_html && (valid_email || valid_domain)
+  end
+
   def self.create_action(bugzilla_rest_session, sender_domain_entry, priority, suggested_disposition, platform, customer, description, user_id, status=NEW)
+    validate_entry(sender_domain_entry)
+    extracted_domain = Mail::Address.new(sender_domain_entry).domain
+    sender_domain_entry = extracted_domain.nil? ? sender_domain_entry : extracted_domain
 
     summary = "New Senders Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -595,10 +628,10 @@ class SenderDomainReputationDispute < ApplicationRecord
   end
 
   def domain_name
-
+    ascii_entry = SimpleIDN.to_ascii(self.sender_domain_entry)
     parser = URI::Parser.new
-    url = parser.escape(self.sender_domain_entry)
-    uri = parser.parse(parser.parse(self.sender_domain_entry).scheme.nil? ? "http://#{url}" : url)
+    url = parser.escape(ascii_entry)
+    uri = parser.parse(parser.parse(ascii_entry).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
 
     full_domain = ""
@@ -607,15 +640,14 @@ class SenderDomainReputationDispute < ApplicationRecord
     end
     full_domain += domain.domain
 
-    return full_domain
-
+    SimpleIDN.to_unicode(full_domain)
   end
 
   def self.domain_name_of(entry)
-
+    ascii_entry = SimpleIDN.to_ascii(entry)
     parser = URI::Parser.new
-    url = parser.escape(entry)
-    uri = parser.parse(parser.parse(entry).scheme.nil? ? "http://#{url}" : url)
+    url = parser.escape(ascii_entry)
+    uri = parser.parse(parser.parse(ascii_entry).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
 
     full_domain = ""
@@ -624,7 +656,7 @@ class SenderDomainReputationDispute < ApplicationRecord
     end
     full_domain += domain.domain
 
-    return full_domain
+    return SimpleIDN.to_unicode(full_domain)
 
   end
 
@@ -725,5 +757,80 @@ class SenderDomainReputationDispute < ApplicationRecord
     versioned_items = [self]
     sender_domain_reputation_dispute_comments.includes(:versions).map{ |sdrdc| versioned_items << sdrdc }
     versioned_items
+  end
+
+
+  def self.export_xlsx(search_params, current_user)
+    search_params = JSON.parse(search_params)
+    disputes = robust_search(search_params['search_type'],
+                                      search_name: search_params['search_name'],
+                                      params: search_params['search_conditions'],
+                                      user: current_user)
+    if search_params['selected_cases'].present? && search_params['selected_cases'].length > 0
+      disputes = disputes.where(id: search_params['selected_cases'])
+    end
+
+    workbook = RubyXL::Workbook.new
+    worksheet = workbook[0]
+
+    EXPORT_FIELD_NAMES.values.each_with_index  do |field_name, col_index|
+      worksheet.add_cell(0, col_index, field_name)
+      worksheet.sheet_data[0][col_index].change_font_bold(true)
+    end
+
+    disputes.each_with_index do |sdr_dispute, row_index|
+      EXPORT_FIELD_NAMES.keys.each_with_index do |field_name, col_index|
+        cell_data =
+          case field_name
+          when 'platform'
+            sdr_dispute.platform&.public_name
+          when 'user_id'
+            sdr_dispute.user&.cvs_username
+          when 'created_at'
+            sdr_dispute.created_at.utc.iso8601
+          when 'customer_name'
+            sdr_dispute.customer&.name
+          when 'company_name'
+            sdr_dispute&.customer&.company&.name
+          when 'customer_email'
+            sdr_dispute&.customer&.email
+          when 'domain_name'
+            sdr_dispute.domain_name
+          else
+            sdr_dispute.attributes[field_name]
+          end
+
+        worksheet.add_cell(row_index + 1, col_index, cell_data)
+      end
+    end
+    workbook
+  end
+
+  def self.assemble_initial_email(dispute, payload)
+    email_subject = "SDR Entry: #{payload[:sender_domain_entry]}"
+    email_body = assemble_email_body(dispute.created_at, payload)
+
+    new_email = DisputeEmail.new
+    new_email.body = email_body
+    new_email.from = payload[:customer_email]
+    new_email.sender_domain_reputation_dispute_id = dispute.id
+    new_email.status = 'unread'
+    new_email.to = "sdr_disputes_#{dispute.id}@dispute.talosintelligence.com"
+    new_email.subject = email_subject
+    new_email.save!
+  end
+
+  def self.assemble_email_body(dispute_created_at, payload)
+    contents = "____________________________________________________________" + "\n"
+    contents += "User-entered Information:" + "\n"
+    contents += "____________________________________________________________" + "\n"
+    contents += "Time: #{Time.now.to_formatted_s(:long)}" + "\n"
+    contents += "Name: #{payload[:customer_name]}" + "\n"
+    contents += "E-mail: #{payload[:customer_email]}" + "\n\n"
+    contents += "Sender Domain Entry: #{payload[:sender_domain_entry]}" + "\n"
+    contents += "Suggested Dispostion: #{payload[:suggested_disposition]}" + "\n"
+    contents += "Details:" + "\n"
+    contents += payload[:summary_description] || ''
+    contents
   end
 end

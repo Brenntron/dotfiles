@@ -3,7 +3,7 @@
     %label.toolbar-section-label
       View
     %span.dropdown
-      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Show/Hide Columns
       .dropdown-menu.toolbar-dropdown#sdr-index-table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button', style: ''}
@@ -48,15 +48,27 @@
 
   %div
     %label.toolbar-section-label
-      Assign
+      Assignee
 
-    %button.take-ticket-toolbar-button#index_ticket_assign.toolbar-button.esc-tooltipped.toolbar-button-spacer{ onclick: 'take_sdr_disputes();' }
+    %button.take-ticket-toolbar-button#index_ticket_assign.toolbar-button.esc-tooltipped.toolbar-button-spacer{ onclick: 'take_sdr_disputes();', title: 'Take (alt + t)' }
       %span.toolbar-button-text
         Take Ticket
 
-    %button.toolbar-button.return-ticket-toolbar-button.esc-tooltipped{ onclick: 'return_sdr_disputes()', type: 'button' }
+    %button.toolbar-button.return-ticket-toolbar-button.esc-tooltipped{ onclick: 'return_sdr_disputes()', type: 'button', title: 'Return (alt + r)' }
       %span.toolbar-button-text
         Return
+  %div
+    %label.toolbar-section-label
+      File
+    %form#sdr-disputes-export-form{action: escalations_sdr_disputes_path(format: :xlsx), method: :get,  onsubmit: 'return false'}
+      = hidden_field_tag('data_json', '{}', id: 'index-export-data-input')
+      %button.toolbar-button.toolbar-button-spacer.export-button.esc-tooltipped{onclick: 'export_sdr_all();', title: 'Export All to CSV (alt + ctrl + shift + p)'}
+        %span.toolbar-button-text
+          Export All to CSV
+      %button.toolbar-button.export-button.esc-tooltipped{onclick: 'export_sdr_selected();', title: 'Export Selected to CSV (alt + ctrl + p)'}
+        %span.toolbar-button-text
+          Export Selected to CSV
+
 
   -#  Add later with functionality or remove
   -#%div

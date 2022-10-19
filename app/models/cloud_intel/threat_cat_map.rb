@@ -44,10 +44,15 @@ class CloudIntel::ThreatCatMap
     results
   end
 
+  def self.threat_category_by_id(id)
+    data = lookup([id]).first || {}
+
+    data.dig('desc_short', 0, 'text') || 'unknown'
+  end
+
   def self.check_version(new_version)
     if new_version > version
       cache_map
     end
   end
-
 end

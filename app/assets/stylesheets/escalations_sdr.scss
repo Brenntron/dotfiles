@@ -232,3 +232,9 @@ input[type="checkbox"].corpus-attachment, .corpus-all-attachments {
     background-image: url(image_path('icon_warning.svg'));
   }
 }
+
+li.preset-resolution {
+  input, label {
+    margin-left: 12px;
+  }
+}
