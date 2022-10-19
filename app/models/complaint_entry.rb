@@ -570,6 +570,8 @@ class ComplaintEntry < ApplicationRecord
 
       end
     rescue Exception => e
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
       raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
     begin
