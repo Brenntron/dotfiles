@@ -352,6 +352,9 @@ class AutoResolve
       ip_domain_info = JSON.parse(Umbrella::SecurityInfo.query_malicious_domains(entry))
       malicious_domain_count = ip_domain_info['recordInfo']['totalMaliciousDomain']
       total_domain_count = ip_domain_info['features']['rr_count']
+
+      malicious_domain_count = 0 if malicious_domain_count.blank?
+      total_domain_count = 0 if total_domain_count.blank?
     rescue Exception => e
       Rails.logger.error(e.message)
       results[:action] = :do_not_resolve
