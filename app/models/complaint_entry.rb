@@ -561,13 +561,24 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.save
 
       if user != User.where(display_name:"Vrt Incoming").first
-        WebcatCredits::ComplaintEntries::CreditProcessor.new(user, new_complaint_entry).process
+        begin
+          WebcatCredits::ComplaintEntries::CreditProcessor.new(user, new_complaint_entry).process
+        rescue Exception => e
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
+        end
+
       end
     rescue Exception => e
       raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
+    begin
+      ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+    rescue Exception => e
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
+    end
 
-    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
     max_wait_for_job = 15 #seconds
     ###this should be eventually removed, but commenting out for now to see if it speeds up the NEW button for bulk entries
 
