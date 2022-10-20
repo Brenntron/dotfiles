@@ -417,6 +417,11 @@ $ ->
     ####
     comment = $('#confirmation-modal').find('.comment-input').text()
     error_array = []
+    force_check = $('#quick-lookup-reptool-toolbar-force')
+    if force_check.is(":checked")
+      force_commit = true
+    else
+      force_commit = false
 
     ajax_count = Object.keys(disputes).length - 1
     dispute_calls = setInterval(()->
@@ -441,6 +446,7 @@ $ ->
                   'entries': [dispute]
                   'classifications': classifications
                   'comment': comment
+                  'force': force_commit
                 }]
 
                 maintain_reptool_bl(data).then( (response)=>
@@ -457,6 +463,7 @@ $ ->
                   'entries': [dispute]
                   'classifications': classifications
                   'comment': comment
+                  'force': force_commit
                 }]
 
                 maintain_reptool_bl(data).then((response)=>
@@ -471,6 +478,7 @@ $ ->
                   'entries': [dispute]
                   'comment':  comment
                   'classifications': act[key]
+                  'force': force_commit
                 }
                 drop_reptool_bl(data).then((response)=>
                   ajax_count--
