@@ -999,6 +999,8 @@ $ ->
     pagingType: 'full_numbers'
     processing: true
     serverSide: true
+    drawCallback: (settings) ->
+      $('#inline-webrep').addClass('hidden')
     ajax:
       url: '/escalations/api/v1/escalations/webrep/disputes'
       method: 'GET'
@@ -2790,6 +2792,7 @@ window.convert_dispute_to_webcat = () ->
   )
 
 window.build_data = () ->
+  $('#inline-webrep').removeClass('hidden')
   data = {
     search_type: '',
     search_name: '',
@@ -2811,4 +2814,3 @@ window.build_data = () ->
 
 window.refresh_localStorage = () ->
   localStorage.removeItem('filters')
-
