@@ -182,6 +182,7 @@ module API
               status_response[:servers][:virustotal] = Rails.configuration.virustotal.host
               status_response[:servers][:umbrella] = Rails.configuration.umbrella.url
               status_response[:servers][:amp] = Rails.configuration.amp_poke.host
+              status_response[:servers][:enrichment_service] = Rails.configuration.enrichment_service.hostport
 
               begin
                 status_response[:reptool] = RepApi::Blacklist.health_check
@@ -195,6 +196,7 @@ module API
                 status_response[:virustotal] = Virustotal::GetVirustotal.health_check
                 status_response[:umbrella] = Umbrella::Scan.health_check
                 status_response[:amp] = FileReputationApi::Detection.health_check
+                status_response[:enrichment_service] = EnrichmentService::QueryInterface.health_check
 
                 status_response[:status] = "success"
 

@@ -673,8 +673,6 @@
                           - else
                             %span.current-wbrs-score
                               = entry.wbrs_score
-                        %td.wbrs-rules-label-cell
-                          %label WBRS Rules
                         %td.text-center.wbrs-rule-hits-cell
                           = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit != true }.length
 
@@ -712,6 +710,11 @@
                             = entry.virustotals_negatives_count
                             \/
                             = entry.virustotals.count
+                        %td.input-col.enrich-input-wrapper
+                          %input.research-row-checkbox.enrich-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.enrich-label-cell
+                          %label Enrichment
+                        %td.text-center.enrich-cell
                         %td.left-bordered.wlbl-tc-label-cell
                           %label WL/BL
                         %td.entry-data-wlbl.wlbl-tc-cell
@@ -761,8 +764,8 @@
                           - else
                             %span.current-sbrs-score
                               = entry.sbrs_score
-                        %td
-                          %label SBRS Rules
+                        -#%td
+                        -#  %label SBRS Rules
                         %td.text-center.sbrs-rule-hits-cell
                           = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.size
 
@@ -788,7 +791,8 @@
                           %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                         %td
                           %label RepTool Class
-                        %td.entry-reptool-data.reptool-class-cell
+                        -#strech Reptool cell to balance out the new Enrichment section
+                        %td.entry-reptool-data.reptool-class-cell{colspan: '4'}
                           - if entry.classifications.first.nil?
                             %span.missing-data.entry-reptool-class Not on RepTool
                           - else
@@ -798,6 +802,7 @@
                               = entry.blacklist.status
                             %span.inline-col-breakup.entry-reptool-comment
                               = entry.blacklist.metadata&.fetch('VRT', {})&.fetch('comment', {})
+
                         %td.left-bordered
                           %label Umbrella
                         %td.text-center.umbrella-cell{colspan: '2'}
@@ -1082,3 +1087,20 @@
                                     %td= entry.blacklist.primary_source
                                     %td= entry.blacklist.first_seen
                                     %td= entry.blacklist.last_seen
+
+                          .entry-details-table.enrich-details-table{'data-entry-id': "#{entry.id}"}
+                            %h5.entry-details-table-header Enrichment
+                            %table.enrich-webrep-table-data-present
+                              %thead
+                                %tr
+                                  %th Context
+                                  %th Taxonomy
+                                  %th Name
+                                  %th Description
+                                  %th.enrich-webrep-external-ref-header External References
+                              %tbody
+                                %tr
+                            %table.enrich-webrep-table-data-missing
+                              %tbody
+                                %tr
+                                  %td.missing-data No enrichment services data.

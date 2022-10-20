@@ -432,6 +432,13 @@ $ ->
       else
         $(rt_table).hide()
 
+    if $(this).hasClass('enrich-checkbox')
+      enrich_table = $(entry_row).find('.enrich-details-table')[0]
+      if $(this).prop('checked')
+        $(enrich_table).show()
+      else
+        $(enrich_table).hide()
+
 
 
 
