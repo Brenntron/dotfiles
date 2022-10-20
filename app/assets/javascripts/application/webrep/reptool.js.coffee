@@ -214,6 +214,9 @@ window.submit_individual_reptool = (button) ->
   entry_content = $(entry).text().trim()
   current_classes = $($(dropdown).find('.reptool-entry-class')[0]).text()
   case_id = $('#dispute_id').text().trim()
+  force_check = $(dropdown).find('.reptool-toolbar-force:checked')
+  if force_check.length > 0
+    force_commit = true
 
   # Get reptool submission action
   submission_action = $(dropdown).find("input[name='reptool-action-radio']:checked").val()
@@ -256,10 +259,19 @@ window.submit_individual_reptool = (button) ->
   if submission_action == "reptool-override"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
     success = 'The following RepTool classes have been are assigned to: ' + entry_content
+    #the old way
+    #data = {
+    #  'action': 'ACTIVE'
+    #  'entries': entry_content
+    #  'classifications': checked_classes.join(',')
+    #  'comment': comment
+    #  'force': force_commit
+    #}
+    #the new way
     data = {
       'action': 'ACTIVE'
       'entries': entry_content
-      'classifications': checked_classes.join(',')
+      'classifications': checked_classes
       'comment': comment
     }
   else if submission_action == "reptool-drop"
@@ -268,6 +280,7 @@ window.submit_individual_reptool = (button) ->
     data = {
       'action': 'EXPIRED'
       'entries': entry_content
+      'force': force_commit
     }
   else if submission_action == "reptool-maintain"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
@@ -299,11 +312,22 @@ window.submit_individual_reptool = (button) ->
         !checked_classes.includes(a)
       )
       success = 'The following RepTool classes have been removed from: ' + entry_content
+    #this is the old way
+    #data = {
+    #  'data': [{
+    #    'action': 'ACTIVE'
+    #    'entries': [entry_content]
+    #    'classifications': [fin_classes.join(',')]
+    #    'comment': comment
+    #    'force': force_commit
+    #  }]
+    #}
+    #this is the new way
     data = {
       'data': [{
         'action': 'ACTIVE'
         'entries': [entry_content]
-        'classifications': [fin_classes.join(',')]
+        'classifications': fin_classes
         'comment': comment
       }]
     }
@@ -348,6 +372,9 @@ window.submit_bulk_reptool = () ->
   comm_typed_in = ''
   comm_generated = ''
   comment = ''
+  force_check = $(bulk_reptool_menu).find('.reptool-toolbar-force:checked')
+  if force_check.length > 0
+    force_commit = true
 
   #  Get the entries
   entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
@@ -390,11 +417,13 @@ window.submit_bulk_reptool = () ->
       'entries': entries
       'classifications': reptool_classes
       'comment': comment
+      'force': force_commit
     }
   else if submission_action == "reptool-drop"
     data = {
       'action': 'EXPIRED'
       'entries': entries
+      'force': force_commit
     }
   else if submission_action == "reptool-maintain"
     new_classifications = ''
@@ -405,33 +434,34 @@ window.submit_bulk_reptool = () ->
           new_classifications = this.classifications
           new_classifications_array = new_classifications.split(',')
           reptool_classes_array = reptool_classes.split(',')
-
           filtered = reptool_classes_array.filter((x) ->
             new_classifications_array.indexOf(x) < 0
           )
 
-          reptool_classes = filtered.join()
+          #reptool_classes = filtered.join()
 
-          new_classifications = new_classifications + ',' + reptool_classes
+          #new_classifications = new_classifications + ',' + reptool_classes
 
+          new_classifications_array = new_classifications_array + reptool_classes_array
           temp_data = {
             'action': 'ACTIVE'
             'entries': [this.entry]
-            'classifications': [new_classifications]
+            'classifications': [new_classifications_array]
             'comment': comment
+            'force': force_commit
           }
           array_of_datas.push(temp_data)
         else
-          new_classifications = reptool_classes
+          new_classifications = reptool_classes.split(',')
 
           temp_data = {
             'action': 'ACTIVE'
             'entries': [this.entry]
-            'classifications': [new_classifications]
+            'classifications': new_classifications
             'comment': comment
+            'force': force_commit
           }
           array_of_datas.push(temp_data)
-
         data = array_of_datas
     else
       $(current_entries_and_classes).each ->
@@ -447,6 +477,7 @@ window.submit_bulk_reptool = () ->
             'entries': [this.entry]
             'classifications': [new_classifications]
             'comment': comment
+            'force': force_commit
           }
           array_of_datas.push(temp_data)
           data = array_of_datas
@@ -456,6 +487,7 @@ window.submit_bulk_reptool = () ->
           temp_data = {
             'action': 'expired'
             'entries': [this.entry]
+            'force': force_commit
           }
           array_of_datas.push(temp_data)
           data = array_of_datas
@@ -479,7 +511,7 @@ window.submit_bulk_reptool = () ->
           errormsg = [response.responseJSON.error]
         else
           errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+        std_msg_error('Error', ['Error adjusting Reptool classes'].concat(errormsg) )
     )
   else if submission_action == "reptool-maintain"
     std_msg_ajax(
@@ -499,7 +531,7 @@ window.submit_bulk_reptool = () ->
           errormsg = [response.responseJSON.error]
         else
           errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+        std_msg_error('Error', ['Error adjusting Reptool classes'].concat(errormsg) )
     )
   else if submission_action == "reptool-drop"
     std_msg_ajax(
@@ -519,7 +551,7 @@ window.submit_bulk_reptool = () ->
           errormsg = [response.responseJSON.error]
         else
           errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+        std_msg_error('Error', ['Error adjusting Reptool classes'].concat(errormsg) )
     )
 
 

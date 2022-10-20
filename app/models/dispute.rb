@@ -77,6 +77,19 @@ class Dispute < ApplicationRecord
 
 For future Web categorization requests, please open a Web categorization ticket using the \"Web Categorization Requests\" form: https://talosintelligence.com/reputation_center/support#reputation_center_support_ticket"
 
+  AUTO_TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web categorization requests. A new Web categorization ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all updates regarding this request on the new ticket.
+
+Please note that by default, a submission with a Trusted, Favorable, Neutral, or Questionable reputation should be accessible by our customers. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission after successful web categorization, that is due to aggressive settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case.
+
+For future Web categorization requests, please open a Web categorization ticket using the \"Web Categorization Requests\" form: https://talosintelligence.com/reputation_center/support#reputation_center_support_ticket"
+
+
+  AUTO_NC_TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web categorization requests. A new Web categorization ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all updates regarding this request on the new ticket.
+
+Please note that by default, a submission with a Trusted, Favorable, Neutral, or Questionable reputation should be accessible by our customers. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission after successful web categorization, that is due to aggressive settings on their side and can only be fixed locally by that customer.
+
+For future Web categorization requests, please open a Web categorization ticket using the \"Web Categorization Requests\" form: https://talosintelligence.com/reputation_center/support#reputation_center_support_ticket"
+
   scope :open_disputes, -> { where(status: NEW) }
   scope :assigned_disputes, -> { where(status: STATUS_ASSIGNED) }
   scope :closed_disputes, -> { where(status: RESOLVED) }
@@ -1203,11 +1216,15 @@ For future Web categorization requests, please open a Web categorization ticket 
 
           dispute_entry.auto_resolve_log += initial_log
           dispute_entry.save!
+          begin
+            AutoResolve.process_auto_resolution(auto_resolve_params)
+          rescue Exception => e
 
-          AutoResolve.process_auto_resolution(auto_resolve_params)
-
+            Rails.logger.error e
+            Rails.logger.error e.backtrace.join("\n")
+          end
           dispute_entry.save
-
+          dispute_entry.reload
           return_payload[dispute_entry.hostlookup] = dispute_entry.new_payload_item
           return_payload[dispute_entry.hostlookup]['sugg_type'] = dispute_entry.suggested_disposition
 
@@ -2672,7 +2689,7 @@ For future Web categorization requests, please open a Web categorization ticket 
   end
 
 
-  def self.convert_to_complaint(params, current_user)
+  def self.convert_to_complaint(params, current_user, auto_resolve = nil)
     dispute = Dispute.find(params[:dispute_id])
     suggested_category_entries = params[:suggested_categories]
 
@@ -2685,6 +2702,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     package[:email] = dispute&.customer&.email
     package[:name] = dispute&.customer&.name
     package[:company_name] = dispute&.customer&.company&.name
+
     suggested_category_entries.each do |sugg|
       if dispute.platform_id.present?
         platform_id = dispute.platform_id
@@ -2715,13 +2733,33 @@ For future Web categorization requests, please open a Web categorization ticket 
 
     dispute.status = STATUS_RESOLVED
     dispute.resolution = STATUS_RESOLVED_INVALID
-    dispute.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+    if auto_resolve.present?
+      if dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
+        dispute.resolution_comment = AUTO_TICKET_CONVERSION_CUSTOMER_MESSAGE
+      else
+        dispute.resolution_comment = AUTO_NC_TICKET_CONVERSION_CUSTOMER_MESSAGE
+      end
+      dispute.resolution_comment = AUTO_TICKET_CONVERSION_CUSTOMER_MESSAGE
+    else
+      dispute.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+    end
+
     dispute.save
 
     dispute.dispute_entries.each do |d_entry|
       d_entry.status = DisputeEntry::STATUS_RESOLVED
       d_entry.resolution = DisputeEntry::STATUS_RESOLVED_INVALID
-      d_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+      if auto_resolve.present?
+        if dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
+          d_entry.resolution_comment = AUTO_TICKET_CONVERSION_CUSTOMER_MESSAGE
+        else
+          d_entry.resolution_comment = AUTO_NC_TICKET_CONVERSION_CUSTOMER_MESSAGE
+        end
+
+      else
+        d_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+      end
+
       d_entry.save
     end
 
