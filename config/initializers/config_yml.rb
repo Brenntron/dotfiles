@@ -102,6 +102,14 @@ Rails.configuration.elastic.password    = elastic_config['password']
 Rails.configuration.elastic.tls         = true
 
 
+enrichment_service_config = env_config['enrichment_service']
+raise "config.yml missing enrichment_service section" unless enrichment_service_config
+Rails.configuration.enrichment_service           = OpenStruct.new
+Rails.configuration.enrichment_service.cert_file = enrichment_service_config['cert_file']
+Rails.configuration.enrichment_service.key_file  = enrichment_service_config['key_file']
+Rails.configuration.enrichment_service.hostport  = enrichment_service_config['hostport']
+
+
 file_reputation_sandbox = env_config['file_reputation_sandbox']
 raise 'config.yml missing file reputation sandbox section' unless file_reputation_sandbox
 Rails.configuration.file_reputation_sandbox        = ApiRequester::ApiRequester.config_of(file_reputation_sandbox)
