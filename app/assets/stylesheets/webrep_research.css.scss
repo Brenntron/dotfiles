@@ -1,0 +1,19 @@
+.toolbar-dropdown div.dropdown-tool-text-divider, .reptool-dropdown-header {
+  min-height: 30px;
+  label {
+    color: white;
+    margin: 5px 0 5px 6px;
+    float: right;
+    cursor: pointer;
+  }
+  .inline-label-wrapper {
+    margin-top: -4px;
+    input, label {
+      display: inline-block;
+    }
+  }
+}
+
+.reptool-dropdown-header .inline-label-wrapper input {
+  margin-top: 7px;
+}

@@ -12440,7 +12440,7 @@ table > tbody > tr > td.no-padding {
   flex-direction: column;
 }
 
-.enrich-external-reference-link, .enrich-external-reference-link:hover {
+.enrich-external-reference-link, .enrich-external-reference-link:hover, .enrich-external-reference-link:focus {
   color: #fff;
   text-decoration: underline;
 }
@@ -13165,7 +13165,11 @@ table > tbody > tr > td.no-padding {
 .filerep-enrich-taxonomy-header {
   font-weight: 400;
   font-size: 8pt;
-  padding-left: 34px;
+  padding-left: 25px;
+}
+
+.filerep-enrich-table-name-th {
+  width: 88px;
 }
 
 .filerep-enrich-cell-description {

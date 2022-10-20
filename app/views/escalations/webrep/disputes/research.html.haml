@@ -102,7 +102,7 @@
                     %span.toolbar-button-text Adjust RepTool BL
                   .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'reptool_entries_button'}
                     .dropdown-tool-text-divider.secondary-text-divider
-                      Adjust Reptool Classification
+                      .inline-text  RepTool Classification
                     .inline-tool-content-wrapper
                       .row
                         .col-xs-12
@@ -364,7 +364,10 @@
                     %tbody
                   -# Each checked entry will populate information here
                   .dropdown-tool-text-divider.secondary-text-divider
-                    Adjust Reptool Classification
+                    .inline-text Adjust RepTool Classification
+                    .inline-label-wrapper.float-right
+                      %input.reptool-toolbar-force{id:"detailed-reptool-toolbar-force", type: 'checkbox', name: 'force', value: true}
+                      %label{for: "detailed-reptool-toolbar-force"} Force commit
                   .inline-tool-content-wrapper
                     .row
                       .col-xs-12
@@ -610,12 +613,16 @@
                         %span.dropdown
                           %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{onclick: "get_current_reptool(this, 'research')", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                           -# TODO - these items don't have entry ids since they are fresh lookups, need to avoid the id syntax below as its creating dup ids
-                          .dropdown-menu.toolbar-dropdown.reptool-inline-dropdown{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
+                          .dropdown-menu.toolbar-dropdown.reptool-inline-dropdown{id: "reptool_adjust_#{i}", 'aria-labelledby': "reptool_button_#{i}"}
                             = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                               .dispute-reptool-adjust-wrapper
                                 %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
                                 %input.adjust-reptool-bl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
-                                %h3.reptool-dropdown-header Adjust RepTool Classification
+                                %h3.reptool-dropdown-header
+                                  .inline-text Adjust RepTool Classification
+                                  .inline-label-wrapper.float-right
+                                    %input.reptool-toolbar-force{id:"#{i}-reptool-toolbar-force", type: 'checkbox', name: 'force', value: true}
+                                    %label{for: "#{i}-reptool-toolbar-force"} Force commit
                                 %table.dispute_tool_current
                                   %thead
                                     %tr

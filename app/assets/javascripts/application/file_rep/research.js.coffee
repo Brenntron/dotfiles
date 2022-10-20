@@ -592,7 +592,7 @@ create_filerep_enrich_section = (tags, context) ->
 
       #create table header if first result
       if index == 0
-        table_header = "<tr class='filerep-enrich-table-header-row'><th>Name</th><th class='filerep-enrich-table-description-th'>Description</th><th class='text-right'>External Ref</th></tr>"
+        table_header = "<tr class='filerep-enrich-table-header-row'><th class='filerep-enrich-table-name-th'>Name</th><th class='filerep-enrich-table-description-th'>Description</th><th class='text-right'>External Ref</th></tr>"
         $(table_wrapper).append table_header
 
       name_wrapper = $("<td class='filerep-enrich-cell-name'></td>")
@@ -615,6 +615,7 @@ create_filerep_enrich_section = (tags, context) ->
           link_wrapper = ''
           source = ''
           url = ''
+          external_id = ''
 
           if external_ref.source?
             source = external_ref.source
@@ -622,9 +623,18 @@ create_filerep_enrich_section = (tags, context) ->
           if external_ref.url?
             url = external_ref.url
 
+          if external_ref.external_id?
+            external_id = external_ref.external_id
+
           if source != '' && url != ''
+
             link_wrapper = $("<a href=#{url} class='filerep-enrich-external-reference-link' target='blank'></a>")
-            $(link_wrapper).text(source)
+
+            #use ID as link text if that is available
+            if external_id != ''
+              $(link_wrapper).text(external_id)
+            else
+              $(link_wrapper).text(source)
 
           $(individual_wrapper).append link_wrapper
           $(external_ref_wrapper).append individual_wrapper

@@ -64,18 +64,28 @@ create_webrep_enrichment_section = (tags, context, enrich_toolbar_cell, table, c
       $(combined_external_refs).each (index, external_ref) ->
         individual_wrapper = $("<span class='enrich-external-ref' id='enrich-external-ref-#{index}'></span>")
         link_wrapper = ''
+        source = ''
+        url = ''
+        external_id = ''
 
         if external_ref.source?
           source = external_ref.source
-        else source = ''
 
         if external_ref.url?
           url = external_ref.url
-        else url = ''
+
+        if external_ref.external_id?
+          external_id = external_ref.external_id
 
         if source != '' && url != ''
+
           link_wrapper = $("<a href=#{url} class='enrich-external-reference-link' target='blank'></a>")
-          $(link_wrapper).text(source)
+
+          #use ID as link text if that is available
+          if external_id != ''
+            $(link_wrapper).text(external_id)
+          else
+            $(link_wrapper).text(source)
 
         $(individual_wrapper).append link_wrapper
         $(external_ref_wrapper).append individual_wrapper

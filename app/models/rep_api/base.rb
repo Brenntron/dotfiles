@@ -104,6 +104,7 @@ class RepApi::Base
   end
 
   def self.call_request(method, request)
+
     case method
       when :post
         if gssnegotiate?
@@ -144,16 +145,19 @@ class RepApi::Base
   def self.call_json_request(method, path, body:)
     request = new_request(path)
 
-    request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-    request.body =
-        case body
-          when Hash
-            body.map{ |key, value| "#{key}=#{value}" }.join('&')
-          when Array
-            body.join('&')
-          else
-            body
-        end
+    #request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    request.headers['Content-Type'] = 'application/json'
+
+    #request.body =
+    #    case body
+    #      when Hash
+    #        body.map{ |key, value| "#{key}=#{value}" }.join('&')
+    #      when Array
+    #        body.join('&')
+    #      else
+    #        body
+    #    end
+    request.body = body.to_json
 
     request_error_handling(call_request(method, request))
   end
