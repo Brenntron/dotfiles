@@ -1,5 +1,4 @@
 class WebRepDatatable < AjaxDatatablesRails::ActiveRecord
-# FileRepDatatable.new(params, initialize_params,user: current_user)
 
   def initialize(params, initialize_params, user:)
     @search_string = params['search']&.fetch('value', nil) # Native datatables search string

@@ -1478,33 +1478,6 @@ For future Web categorization requests, please open a Web categorization ticket 
     advanced_search(search_params, search_name: nil, user: user, reload: reload)
   end
 
-  def self.standard_search_title(search_name)
-    case search_name
-      when 'recently_viewed'
-        'Recently Viewed Tickets'
-      when 'my_open'
-        'My Open Tickets'
-      when 'my_disputes'
-        'My Tickets'
-      when 'team_disputes'
-        'My Team\'s Tickets'
-      when 'unassigned'
-        'Unassigned Tickets'
-      when 'open'
-        'Open Tickets'
-      when 'open_email'
-        'Open Email Tickets'
-      when 'open_web'
-        'Open Web Tickets'
-      when 'closed'
-        'Closed Tickets'
-      when 'all'
-        'All Tickets'
-      else
-        raise "No search named '#{search_name}' known."
-    end
-  end
-
   # Searches based on standard pre-determined filters.
   # @param [String] search_name name of the filter.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
@@ -1549,21 +1522,6 @@ For future Web categorization requests, please open a Web categorization ticket 
 
     where_str = "#{dispute_where} or #{customer_where} or #{company_where}"
     left_joins(customer: :company).where(where_str, pattern: "%#{value}%")
-  end
-
-  def self.robust_search_title(search_type, search_name: nil)
-    case search_type
-      when 'advanced'
-        search_name.present? ? search_name + ' Search' : 'Advanced Search'
-      when 'named'
-        search_name + ' Search'
-      when 'standard'
-        standard_search_title(search_name)
-      when 'contains'
-        'Substring Search'
-      else
-        'All Tickets'
-    end
   end
 
   def self.process_status_changes(disputes, status, resolution = nil, comment = nil, current_user = nil)

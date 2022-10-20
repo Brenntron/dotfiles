@@ -11,10 +11,9 @@ module API
               PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
             desc 'get all disputes'
-            
             get "" do
               authorize!(:index, Dispute)
-              params = {search_type: params[:search_type] || '', search_name: params[:search_name] || ''}
+              search_params = {search_type: params[:search_type] || '', search_name: params[:search_name] || ''}
               WebRepDatatable.new(ActionController::Parameters.new(params).permit!, search_params, user: current_user).as_json
             end
 
