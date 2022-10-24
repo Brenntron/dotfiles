@@ -310,15 +310,18 @@ $ ->
   $('#webcat_research_search').on('keyup', (e) ->
     if e.key == 'Enter' || e.keyCode == 13
       domain = $(this).val()
-      domain = domain.replace(/https\:\/\//, '')
 
       if domain
+        domain = domain.replace(/https\:\/\//, '')
+
         $('#webcat_research_search').val(domain)
         $('#domainHistorySvg').hide()
         $('#domainHistorySvg').removeClass('icon-unkown icon-untrusted icon-questionable icon-neutral icon-favorable icon-trusted')
         $('#xbrsHistorySvg').hide()
         $('#xbrsHistorySvg').removeClass('icon-unkown icon-untrusted icon-questionable icon-neutral icon-favorable icon-trusted')
         $('.domain-data').remove()
+
+        domain = domain.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')
 
         $('#xbrsDomainName').remove()
         $('#xbrsDomainTableListingContent').append("<a id='xbrsDomainName' class='domain-name domain-name-normal'>#{domain}</a>")
