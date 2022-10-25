@@ -42,7 +42,7 @@ class SdrDisputeDatatable < AjaxDatatablesRails::ActiveRecord
         status:                 dispute.status,
         resolution:             dispute.resolution,
         assignee:               dispute.user&.cvs_username,
-        source:                 dispute.source,
+        source:                 dispute.source || 'Internal',
         priority:               dispute.priority,
         suggested_disposition:  dispute.suggested_disposition,
         platform:               dispute.platform&.public_name,
