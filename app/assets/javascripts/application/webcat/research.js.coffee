@@ -72,6 +72,8 @@ $ ->
         getXbrsHistory(domain)
       error: (errorResponse) ->
         std_api_error(errorResponse, "Domain info for #{domain} could not be retrieved.", reload: false)
+        $('#domainHistoryLoader').hide()
+        $('#xbrsHistoryLoader').hide()
     )
 
   getDomainHistory = (domain) ->
