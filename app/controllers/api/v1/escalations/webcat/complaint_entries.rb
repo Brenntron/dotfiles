@@ -543,12 +543,28 @@ module API
               response[:status] = "success"
               response[:data] = []
 
-              raw_records = []
+              pre_raw_records = []
 
               prefix_records = Wbrs::Prefix.where({:urls => [URI.escape(params[:domain])]})
               prefix_records.each do |prefix_record|
                 history_records = Wbrs::HistoryRecord.where({:prefix_id => prefix_record.prefix_id})
-                raw_records += history_records
+                pre_raw_records += history_records
+              end
+
+              raw_records = []
+
+              ### this change is to de-duplicate the records that come in from a combo Prefix and HistoryRecord call
+              # uniq doesn't work, and it needs to be tested against 3 different attributes.
+              pre_raw_records.each do |raw_record|
+                skip = false
+                raw_records.each do |raw_check|
+                  if raw_record.event_id == raw_check.event_id && raw_record.prefix_id == raw_check.prefix_id && raw_record.category.category_id == raw_check.category.category_id
+                    skip = true
+                  end
+                end
+                if skip == false
+                  raw_records << raw_record
+                end
               end
 
               raw_records = raw_records.sort_by {|history| DateTime.parse(history.time)}.reverse
