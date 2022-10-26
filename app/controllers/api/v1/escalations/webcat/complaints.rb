@@ -480,7 +480,8 @@ module API
               score = nil
               category = "no category found"
 
-              score = Sbrs::Base.combo_call_sds_v3(params[:domain], [])["wbrs"]["score"]
+              parsedSbrs = JSON.parse Sbrs::Base.combo_call_sds_v3(params[:domain], [])
+              score = parsedSbrs.dig(:wbrs, :score)
               category = ComplaintEntry.get_category_data(params[:domain])
 
               {:data => {:score => score, :category => category}}.to_json
