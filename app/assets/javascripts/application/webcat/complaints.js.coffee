@@ -2146,8 +2146,7 @@ window.master_submit = () ->
   thingsSelected = getTouchedFormCount()
   if thingsSelected > selectedItems.length
     std_msg_confirm(
-      "I noticed you have made changes to at least " + thingsSelected +  " complaints but you only have " + selectedItems.length + " items selected. Do you want to proceed with updating these items? It will reload the page and you will lose your other changes.",
-      [],
+      "Changes have been made to at least " + thingsSelected +  " complaints but only " + selectedItems.length + " items are selected.", ["Updating selected items will reload the page and other changes will be lost."],
       {
         reload: false,
         confirm_dismiss: true,
