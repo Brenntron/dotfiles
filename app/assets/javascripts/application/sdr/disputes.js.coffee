@@ -293,6 +293,7 @@ window.take_sdr_disputes = () ->
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       show_message('success', "#{response.dispute_ids.length} tickets have been assigned to #{response.username}.", 5, '#alertMessage')
+      reload_sdr_dispute()
     error: (error) ->
       show_message('error', "Assign Issue(s) Error. Failed to assign #{dispute_ids.length} issue(s) due to: #{error.responseJSON.message}", 5, '#alertMessage')
   )
@@ -349,7 +350,7 @@ window.return_sdr_disputes = () ->
       else
         show_message('error', "#{response.returned_ids.length} disputes have been returned. #{response.dispute_ids.length - response.returned_ids.length} were not. You can only return disputes assigned to you.", 5, '#alertMessage')
 
-    reload_sdr_dispute()
+      reload_sdr_dispute()
     error: (error) ->
       show_message('error', "Failed to return #{dispute_ids.length} issue(s) due to: #{error.responseJSON.message}", 5, '#alertMessage')
   )
