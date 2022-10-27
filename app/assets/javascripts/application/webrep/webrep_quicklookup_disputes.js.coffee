@@ -417,12 +417,6 @@ $ ->
     ####
     comment = $('#confirmation-modal').find('.comment-input').text()
     error_array = []
-    force_check = $('#quick-lookup-reptool-toolbar-force')
-    if force_check.is(":checked")
-      force_commit = true
-    else
-      force_commit = false
-
     ajax_count = Object.keys(disputes).length - 1
     dispute_calls = setInterval(()->
 
@@ -431,6 +425,9 @@ $ ->
          clearInterval(dispute_calls)
          quick_bulk_update(disputes, error_array)
     , 200);
+
+#    TODO: update later ofc
+    force_commit = 'false'
 
     for dispute, value of disputes
       dispute = dispute.trim()
@@ -643,6 +640,7 @@ $ ->
         for action, i in actions
           action_tags = []
           class_list = $(action).attr('class')
+          force_commit = $(action).attr('data-force-commit')
 
           if stringIncludes(class_list, 'reptool') && !stringIncludes(class_list, 'drop')
             action_tags = $(action).attr('reptool_classes').split(',')
@@ -797,11 +795,17 @@ $ ->
                   <td>"
           for child in children
             classes = $(child).attr("class")
+
+            #read force_commit value off of table entries and update
+            if $(child).attr('data-force-commit') == 'true'
+              force_commit = true
+            else force_commit = false
+
             if !isEmpty(classes) && classes != undefined
               threat_cat_data = ''
               if classes == 'threat-cat-col'
                 threat_cat_data = "data='#{$(child).attr('data')}'"
-              html += "<div #{existing_reptool} #{wlbl_list} #{threat_cat_data} class='#{classes} repuation-dispute-modal'>#{$(child).html()}</div>"
+              html += "<div #{existing_reptool} #{wlbl_list} #{threat_cat_data} class='#{classes} repuation-dispute-modal' data-force-commit='#{force_commit}'>#{$(child).html()}</div>"
           html += '</td> </tr>'
           confirmation_dialog.push( html )
 
@@ -834,6 +838,7 @@ $ ->
     check_list = ''
     error_array = []
     error_header = "<h4>Cannot #{reptool_add} the following Reptool Classification dispute<h4>"
+    force_commit = $('#quick-lookup-reptool-toolbar-force').is(':checked')
 
     switch (class_reptool)
       when 'maintain'
@@ -918,7 +923,7 @@ $ ->
           error_html = "<div>#{error_message}<div>"
           error_array.push(error_html)
 
-        col_dialog = "<p class='#{reptool_class} #{status_class} reptool-action-col' data='#{check_list}'> #{status_string} #{col_tag_format(check_list)} <p>"
+        col_dialog = "<p class='#{reptool_class} #{status_class} reptool-action-col' data='#{check_list}' data-force-commit=#{force_commit}> #{status_string} #{col_tag_format(check_list)} <p>"
         drop_check = reptool_add  == 'drop' && existing_reptool.length
         if check_list.length || drop_check
           clear_col.show()
