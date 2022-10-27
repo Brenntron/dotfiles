@@ -775,37 +775,40 @@ window.sdr_index_change_ticket_status = () ->
       dispute_id = $(this).val()
       checked_dispute_ids.push(dispute_id)
 
-  if status == 'RESOLVED_CLOSED' && $('#sdr-index-edit-ticket-status-dropdown').find('.ticket-resolution-radio').is(':checked')
-    resolution = $('#sdr-index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
-    comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+  if status == 'RESOLVED_CLOSED' && $('#sdr-index-edit-ticket-status-dropdown').find('.sdr-ticket-resolution-radio').is(':checked')
+    resolution = $('#sdr-index-edit-ticket-status-dropdown').find('.sdr-ticket-resolution-radio:checked').val()
+    comment = $('.resolution-comment-wrapper').find('.ticket-resolution-comment').val()
   else if status == 'RESOLVED_CLOSED'
-    show_message('error', 'No resolution selected. Please select a ticket resolution.', 5, '#alertmessage')
+    show_message('error', 'No resolution selected. Please select a ticket resolution.', 5, '#alertMessage')
     return
   else if status == 'ASSIGNED' && $('#dispute-assignee').hasClass('missing-data')
-    show_message('error', 'This ticket is unassigned. Please select an assignee.', 5, '#alertmessage')
+    show_message('error', 'This ticket is unassigned. Please select an assignee.', 5, '#alertMessage')
     return
   else
     comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
 
   dropdown.dropdown('toggle')
 
-  data = {
-    comment: comment,
-    dispute_ids: checked_dispute_ids,
-    resolution: resolution,
-    status: status
-  }
+  if comment
+    data = {
+      comment: comment,
+      dispute_ids: checked_dispute_ids,
+      resolution: resolution,
+      status: status
+    }
 
-  $.ajax(
-    url: '/escalations/api/v1/escalations/sdr/disputes/set_disputes_status'
-    method: 'POST'
-    headers: headers
-    data: data
-    success: (response) ->
-      $('.ticket-status-comment').val('')
-      show_message('success', 'Ticket status has been updated.', 5, '#alertMessage')
-      reload_sdr_dispute()
-    error: (response) ->
-      show_message('error', "Error Updating Status. #{response}", 5, '#alertMessage')
-)
+    $.ajax(
+      url: '/escalations/api/v1/escalations/sdr/disputes/set_disputes_status'
+      method: 'POST'
+      headers: headers
+      data: data
+      success: (response) ->
+        $('.ticket-status-comment').val('')
+        show_message('success', 'Ticket status has been updated.', 5, '#alertMessage')
+        reload_sdr_dispute()
+      error: (response) ->
+        show_message('error', "Error Updating Status. #{response}", 5, '#alertMessage')
+    )
+  else
+    show_message('error', "Ticket status can't be changed without a comment.", 5, '#alertMessage')
 
