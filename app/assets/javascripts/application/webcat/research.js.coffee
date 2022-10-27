@@ -67,8 +67,13 @@ $ ->
 
         $('#xbrsDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
         $('#domainHistoryDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
+
+        getDomainHistory(domain)
+        getXbrsHistory(domain)
       error: (errorResponse) ->
         std_api_error(errorResponse, "Domain info for #{domain} could not be retrieved.", reload: false)
+        $('#domainHistoryLoader').hide()
+        $('#xbrsHistoryLoader').hide()
     )
 
   getDomainHistory = (domain) ->
@@ -81,11 +86,14 @@ $ ->
       success: (response) ->
         data = response.data
 
+        $('#domainHistoryLoader').hide()
+
+        if (data.length -1) == 0
+          return
+
         $('#domainHistoryDomainTableListingContent > .domain-data.result-total').remove()
         #the first entry is the domain itself so that should not count in the result total
         $('#domainHistoryDomainTableListingContent').append("<p class='domain-data result-total'>(#{data.length - 1} found)</p>")
-
-        $('#domainHistoryLoader').hide()
 
         if $.fn.DataTable.isDataTable('.domain-history-table')
           $('.domain-history-table').DataTable().rows.add(data)
@@ -205,6 +213,7 @@ $ ->
         else if Object.keys(data).length is 0
           $('#xbrsHistoryLoader').hide()
           std_msg_error('Not a valid domain.', [])
+          return
         else
           domainKey = Object.keys(data)[0]
 
@@ -336,7 +345,7 @@ $ ->
   $('#webcat_research_search').on('keyup', (e) ->
     if e.key == 'Enter' || e.keyCode == 13
       domain = $(this).val()
-      domain = domain.replace(/https\:\/\//, '')
+      domain = domain.replace(/https\:\/\//, '').replace(/http\:\/\//, '')
 
       if domain
         $('#webcat_research_search').val(domain)
@@ -368,8 +377,6 @@ $ ->
         $('#xbrsHistoryLoader').css('display', 'flex')
 
         getDomainInfo(domain)
-        getDomainHistory(domain)
-        getXbrsHistory(domain)
   )
 
   $(document).on("click",'.xbrs-categorize-url-button', () ->
