@@ -920,7 +920,9 @@ For future web and email reputation requests, please open a web and email reputa
           ComplaintEntry.create_complaint_entry(new_complaint, ip_url, platform_record, user, status, categories)
           response[:successful_entries_count] += 1
           response[:successful_entries] << ip_url
-        rescue
+        rescue Exception => e
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
           response[:failed_entries_count] += 1
           response[:failed_entries] << ip_url
           response[:status] = "error"
