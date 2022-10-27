@@ -67,8 +67,13 @@ $ ->
 
         $('#xbrsDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
         $('#domainHistoryDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
+
+        getDomainHistory(domain)
+        getXbrsHistory(domain)
       error: (errorResponse) ->
         std_api_error(errorResponse, "Domain info for #{domain} could not be retrieved.", reload: false)
+        $('#domainHistoryLoader').hide()
+        $('#xbrsHistoryLoader').hide()
     )
 
   getDomainHistory = (domain) ->
@@ -81,11 +86,14 @@ $ ->
       success: (response) ->
         data = response.data
 
+        $('#domainHistoryLoader').hide()
+
+        if (data.length -1) == 0
+          return
+
         $('#domainHistoryDomainTableListingContent > .domain-data.result-total').remove()
         #the first entry is the domain itself so that should not count in the result total
         $('#domainHistoryDomainTableListingContent').append("<p class='domain-data result-total'>(#{data.length - 1} found)</p>")
-
-        $('#domainHistoryLoader').hide()
 
         if $.fn.DataTable.isDataTable('.domain-history-table')
           $('.domain-history-table').DataTable().rows.add(data)
@@ -109,9 +117,22 @@ $ ->
               }
               {
                 data: null
+                defaultContent: '<span></span>'
+                orderable: false
+                render: ( data ) ->
+                  { is_important } = data
+
+                  if is_important
+                    return '<div class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></div>'
+                searchable: false
+                sortable: false
+                width: '10px'
+              }
+              {
+                data: null
                 render: (data) ->
                   { entry_id, complaint_id } = data
-                  if entry_id? && complain_id?
+                  if entry_id? && complaint_id?
                     "<a href='/escalations/webcat/complaints/#{complaint_id}' target='_blank'>#{entry_id}</a>"
                   else
                     ''
@@ -192,6 +213,7 @@ $ ->
         else if Object.keys(data).length is 0
           $('#xbrsHistoryLoader').hide()
           std_msg_error('Not a valid domain.', [])
+          return
         else
           domainKey = Object.keys(data)[0]
 
@@ -222,6 +244,19 @@ $ ->
                     formattedDomain = data.domain.replace(/\/|\./g, '-')
                     "<input type='checkbox' data-name='#{formattedDomain}' data-url='#{data.domain}' class='xbrs-categorize-url-button categorize-url-button'</input>"
                   sortable: false
+                }
+                {
+                  data: null
+                  defaultContent: '<span></span>'
+                  orderable: false
+                  render: ( data ) ->
+                    { is_important } = data
+
+                    if is_important
+                      return '<div class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></div>'
+                  searchable: false
+                  sortable: false
+                  width: '10px'
                 }
                 {
                   data: null
@@ -310,10 +345,9 @@ $ ->
   $('#webcat_research_search').on('keyup', (e) ->
     if e.key == 'Enter' || e.keyCode == 13
       domain = $(this).val()
+      domain = domain.replace(/https\:\/\//, '').replace(/http\:\/\//, '')
 
       if domain
-        domain = domain.replace(/https\:\/\//, '')
-
         $('#webcat_research_search').val(domain)
         $('#domainHistorySvg').hide()
         $('#domainHistorySvg').removeClass('icon-unkown icon-untrusted icon-questionable icon-neutral icon-favorable icon-trusted')
@@ -345,8 +379,6 @@ $ ->
         $('#xbrsHistoryLoader').css('display', 'flex')
 
         getDomainInfo(domain)
-        getDomainHistory(domain)
-        getXbrsHistory(domain)
   )
 
   $(document).on("click",'.xbrs-categorize-url-button', () ->
