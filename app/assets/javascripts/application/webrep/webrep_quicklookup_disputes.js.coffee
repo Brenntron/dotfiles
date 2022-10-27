@@ -888,6 +888,10 @@ $ ->
             check_class = '.add'
 
         existing_actions = rep_list
+
+        #trim out empty quote strings from existing_actions array
+        existing_actions = existing_actions.filter (e) -> e != ''
+
         $(actions).find("#{check_class} .col-tag").each () -> existing_actions.push( this.innerText )
 
         if reptool_add.toLowerCase() == 'remove'
