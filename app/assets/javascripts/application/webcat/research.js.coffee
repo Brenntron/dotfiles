@@ -88,7 +88,7 @@ $ ->
 
         $('#domainHistoryLoader').hide()
 
-        if (data.length -1) == 0
+        if (data.length - 1) == 0
           return
 
         $('#domainHistoryDomainTableListingContent > .domain-data.result-total').remove()
