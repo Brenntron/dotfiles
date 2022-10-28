@@ -207,6 +207,11 @@ raise 'config.yml missing xbrs section' unless xbrs_config
 Rails.configuration.xbrs                = ApiRequester::ApiRequester.config_of(xbrs_config)
 Rails.configuration.xbrs.consumer_key   = xbrs_config['consumer_key']
 
+k2_config = env_config.fetch('k2', nil)
+raise 'config.yml missing k2 section' unless k2_config
+Rails.configuration.k2                  = ApiRequester::ApiRequester.config_of(k2_config)
+Rails.configuration.k2.token            = k2_config['token']
+
 umbrella_fetcher_config = env_config.fetch('umbrella_data_fetcher', nil)
 raise 'config.yml missing umbrella_data_fetcher aws section' unless umbrella_fetcher_config
 umbrella_aws_config = OpenStruct.new

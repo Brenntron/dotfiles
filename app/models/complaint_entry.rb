@@ -908,8 +908,10 @@ class ComplaintEntry < ApplicationRecord
     return {} unless prefix_results.any?
 
     parsed_uri = Complaint.parse_url(uri)
-    parsed_uri['path'] = '' unless parsed_uri['path'].present?
-    parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
+    parsed_uri['path'] = ''
+    parsed_uri['subdomain'] = ''
+    parsed_uri['path'] = parsed_uri[:path] unless parsed_uri[:path].blank?
+    parsed_uri['subdomain'] = parsed_uri[:subdomain] unless parsed_uri[:subdomain].blank?
 
     final_results = []
 

@@ -12,7 +12,7 @@ $(document).on 'change','.nested-table-input','.selectize-input', ->
 #### WBNP Reporting ####
 webcat_loader_timeout = ''
 $(document).ready ->
-  sessionStorage.removeItem("touchedForm");
+  sessionStorage.removeItem("touchedForm")
   loader = $('#inline-webcat')
   $(this).bind(
     ajaxStart: () ->
@@ -2347,7 +2347,7 @@ $ ->
     return
 
   $(document).ready ->
-    if window.location.pathname != '/escalations/webcat/complaints'
+    if (window.location.pathname != '/escalations/webcat/complaints' && window.location.pathname != '/escalations/webcat/research')
       $('#filter-complaints-nav').hide()
       $('#fetch').hide()
       $('#complaints-nav-search-wrapper').hide()
