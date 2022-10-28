@@ -559,7 +559,10 @@ $ ->
 
     for checkBox in tableCheckBoxes
       $checkBox = $(checkBox)
-      { name, url } = $checkBox.data()
+      data = $checkBox.data()
+
+      name = data.name.replace(/\<|\>/g, '')
+      url = data.url.replace(/\<|\>/g, '')
 
       $checkBox.prop('checked', checkAllValue)
 
