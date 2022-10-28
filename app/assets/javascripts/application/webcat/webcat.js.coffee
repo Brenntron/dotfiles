@@ -163,6 +163,7 @@ $ ->
         }
       when 'standard'
         urlParams = new URLSearchParams(location.search);
+        refresh_localStorage()
         data = {
           search_type: webcat_search_type
           search_name: urlParams.get('f')
@@ -172,13 +173,13 @@ $ ->
           search_type: webcat_search_type
           search_name: webcat_search_name
         }
-    build_header(data)
+    $.when(pull_user_preference_filter()).done -> build_header(data)
     return data
 
   refresh_url = (href) ->
     { webcat_search_type, webcat_search_name } = localStorage
-    url_check = current_url.split('/escalations/file_rep/disputes/')[0]
-    new_url = '/escalations/file_rep/disputes'
+    url_check = current_url.split('/escalations/webcat/complaints/')[0]
+    new_url = '/escalations/webcat/complaints'
     if href != undefined
       window.location.replace( new_url + href )
     if !href && typeof parseInt(url_check) == 'number'
@@ -190,6 +191,86 @@ $ ->
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
 
+  $('#filter-dropdown').on 'click', '.favorite-search-icon', () ->
+    name = $(this).parent().find('a').attr('href') || $(this).parent().find('a').text().trim()
+    data = { name: name }
+    icon = $(this)
+
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/user_preferences/update'
+      method: 'POST'
+      data: { data, name: 'webcat_complaints_filter' }
+      dataType: 'json'
+      success: (response) ->
+        $('.favorite-search-icon-active').removeClass('favorite-search-icon-active').addClass('favorite-search-icon')
+        icon.removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+    )
+
+  $('#filter-dropdown').on 'click', '.favorite-search-icon-active', () ->
+    icon = $(this)
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/user_preferences/destroy'
+      method: 'DELETE'
+      data: { name: 'webcat_complaints_filter' }
+      dataType: 'json'
+      success: (response) ->
+        icon.removeClass('favorite-search-icon-active').addClass('favorite-search-icon')
+    )
+
+  set_icon_for_favorite_filter = (filter_name) ->
+    filter_dropdown = $("#filter-dropdown > #filter-cases-list a[href='#{filter_name}']")
+
+    saved_search = window.find_saved_search_by_name(filter_name)
+
+    if filter_dropdown.length > 0
+      filter_dropdown.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+    else if saved_search
+      saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+
+  use_user_preference_filter = () ->
+    return if window.location.pathname != '/escalations/webcat/complaints'
+
+    { icon, link, name } = chosen_default_filter()
+
+    return if icon.length == 0 && link.length == 0
+
+    # do not redirect if there is already some chosen search/filter (not from the settings)
+    return if localStorage.webcat_search_type || window.location.search
+
+    refresh_localStorage()
+    if is_default_filter(icon) then refresh_url(name) else build_webcat_named_search(name);
+
+
+  is_default_filter = (chosen_icon) ->
+    chosen_icon.closest('#filter-dropdown > #filter-cases-list').length > 0
+
+  chosen_default_filter = ->
+    fav_icon = $('.favorite-search-icon-active')
+    link = fav_icon.parent().find('a')
+    name = if is_default_filter(fav_icon) then link.attr('href') else link.text().trim()
+    { icon: fav_icon, link: link, name: name }
+
+  current_page_is_favourite = ->
+    { icon, name } = chosen_default_filter()
+    if is_default_filter(icon)
+      return name == decodeURIComponent(window.location.search)
+    else
+      return name == localStorage.webcat_search_name
+
+  pull_user_preference_filter = () ->
+    return if window.location.pathname != '/escalations/webcat/complaints'
+
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/user_preferences/'
+      data: { name: 'webcat_complaints_filter' }
+      success: (response) ->
+        return unless response?
+        name = JSON.parse(response).name
+        set_icon_for_favorite_filter(name)
+    )
+
+  pull_user_preference_filter()
 
   for select in $('select.cat_new_url')
 
@@ -264,7 +345,7 @@ $ ->
     ###
     container = $('#webcat_searchref_container')
     if data != undefined && container.length > 0
-      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="webcat_refresh()"></span>'
+      reset_icon = "<span #{if current_page_is_favourite() then 'hidden style="display: none"' else ''} id='refresh-filter-button' class='reset-filter esc-tooltipped' title='Clear Search Results' onclick='webcat_refresh()'></span>"
       {search_type, search_name} = data
 
       try
@@ -354,6 +435,8 @@ $ ->
               ###
               refresh_localStorage()
               refresh_url()
+            complete: ->
+              use_user_preference_filter()
           drawCallback: ( settings ) ->
             if localStorage.webcat_reset_page
               localStorage.removeItem('webcat_reset_page')
@@ -364,44 +447,16 @@ $ ->
 
             if localStorage.webcat_search_name
               { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
-              last_tr = $('.webcat-named-search-list .saved-search').last().text()
               ### check variables below
-                  text_check makes sure that the last table row doesn't match the named search being saved now
+                  text_check makes sure that the table doesn't have the named search with the same name being saved now
                   search_name_check makes sure that the search is being saved as a named search
                   Not super complicated, but that if statement was looking gross and confusing
               ###
-              text_check = last_tr.trim() != webcat_search_name.trim()
+              text_check = !window.find_saved_search_by_name(webcat_search_name)
               search_name_check = webcat_search_name != ''
               if webcat_search_type == 'advanced' && search_name_check && text_check
-                ###
-                  creating temporary tr for the filter dropdown
-                  attributes added then onclick events
-                ###
-                new_tr = document.createElement('tr')
-                new_td = document.createElement('td')
-                new_link =  document.createElement('a')
-                new_delete_image = document.createElement('img')
-                new_delete = document.createElement('a')
-
-                $(new_tr).attr('id','temp_row')
-                $(new_link).addClass('input-truncate saved-search esc-tooltipped')
-                  .attr('title', webcat_search_name)
-                  .text(webcat_search_name)
-                $(new_delete).addClass("delete-search")
-                $(new_delete_image).addClass('delete-search-image')
-
-                $(new_link).on 'click', () ->
-                  window.build_webcat_named_search(webcat_search_name)
-
-                $(new_delete).on 'click', () ->
-                  window.delete_disputes_named_search(this,  webcat_search_name)
-                  refresh_localStorage()
-
-                $(new_tr).append(new_td)
-                $(new_td).append(new_link)
-                $(new_td).append(new_delete)
-                $(new_delete).append(new_delete_image)
-                $('.webcat-named-search-list tbody').append(new_tr)
+                window.add_tmp_tr_to_named_search_list(webcat_search_name)
+                window.sort_named_search_list()
 
           pagingType: 'full_numbers'
           order: [ [
@@ -486,7 +541,7 @@ $ ->
                 render: (data, type, full, meta) ->
                   { age, status } = full
                   unless status == 'COMPLETED' || status == 'RESOLVED'
-                    if age.indexOf('h') != -1 && age.indexOf('h') < 4
+                    if age.indexOf('h') != -1 && age.indexOf('h') >= 3
                       hour = parseInt( age.split("h")[0] )
                       if hour>= 3 && hour < 12
                         age_class = 'ticket-age-over3hr'
@@ -494,7 +549,7 @@ $ ->
                         age_class = 'ticket-age-over12hr'
                     else if age.indexOf('mo') != -1
                       age_class = 'ticket-age-over12hr'
-                    else if age.indexOf('m') != -1 && age.indexOf('m') < 4
+                    else if (age.indexOf('m') != -1) || (age.indexOf('s') != -1)
                       age_class = ''
                     else
                       age_class = 'ticket-age-over12hr'
@@ -943,6 +998,51 @@ window.copyToClipboard = (text) ->
   document.execCommand 'copy'
   document.body.removeChild dummy
 
+window.add_tmp_tr_to_named_search_list = (webcat_search_name) ->
+  new_tr = document.createElement('tr')
+  new_td = document.createElement('td')
+  new_link =  document.createElement('a')
+  new_delete_image = document.createElement('img')
+  new_delete = document.createElement('a')
+  new_fav_icon = document.createElement('span')
+
+  $(new_tr).attr('id','temp_row')
+  $(new_link).addClass('input-truncate saved-search esc-tooltipped')
+    .attr('title', webcat_search_name)
+    .text(webcat_search_name)
+  $(new_delete).addClass("delete-search")
+  $(new_delete_image).addClass('delete-search-image')
+  $(new_fav_icon).addClass('nav-dropdown-icon favorite-search-icon')
+
+  $(new_link).on 'click', () ->
+    window.build_webcat_named_search(webcat_search_name)
+
+  $(new_delete).on 'click', () ->
+    window.delete_disputes_named_search(this,  webcat_search_name)
+    refresh_localStorage()
+
+  $(new_tr).append(new_td)
+  $(new_td).append(new_link)
+  $(new_td).append(new_delete)
+  $(new_delete).append(new_delete_image)
+  $(new_td).append(new_fav_icon)
+  $('.webcat-named-search-list tbody').append(new_tr)
+
+window.sort_named_search_list = ->
+  tbody = $('.webcat-named-search-list tbody')
+  tbody.find('tr').sort((a, b) ->
+    return $('td:first a:first', b).text().localeCompare($('td:first a:first', a).text())
+  ).appendTo(tbody)
+
+window.find_saved_search_by_name = (name) ->
+  saved_search = null
+  $("#saved-search-tbody a").each((i, elem) ->
+    # trim() is needed for filter_name in case if there is extra space in saved filter
+    if elem.text.trim() == name.trim()
+      saved_search = $(elem)
+      return
+  )
+  return saved_search
 $ ->
   # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
   $('#complaints-index').on 'draw.dt', ->

@@ -145,45 +145,17 @@
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-complaints', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
-    .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
+    .dropdown-menu.nav-tools-dropdown#filter-dropdown.webcat-filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
-        - if current_user.is_webcat_manager?
-          %li{class: ("selected" if params[:f] == "MANAGER QUEUE")}
-            %a{href: '?f=MANAGER QUEUE'}
-              %span.nav-dropdown-icon.icon-my-bugs
-              Manager Queue
-        %li{class: ("selected" if params[:f] == "MY COMPLAINTS")}
-          %a{href: '?f=MY COMPLAINTS'}
-            %span.nav-dropdown-icon.icon-my-bugs
-            My Tickets
-        %li{class: ("selected" if params[:f] == "MY OPEN COMPLAINTS")}
-          %a{href: '?f=MY OPEN COMPLAINTS'}
-            %span.nav-dropdown-icon.icon-my-open-bugs
-            My Open Tickets
-        %li{class: ("selected" if params[:f] == "MY CLOSED COMPLAINTS")}
-          %a{href: '?f=MY CLOSED COMPLAINTS'}
-            %span.nav-dropdown-icon.icon-fixed-bugs
-            My Closed Tickets
-        %li{class: ("selected" if params[:f] == "ACTIVE")}
-          %a{href: '?f=ACTIVE'}
-            %span.nav-dropdown-icon.icon-team-bugs
-            Active Tickets
-        %li{class: ("selected" if params[:f] == "NEW")}
-          %a{href: '?f=NEW'}
-            %span.nav-dropdown-icon.icon-open-bugs
-            New Tickets
-        %li{class: ("selected" if params[:f] == "REVIEW")}
-          %a{href: '?f=REVIEW'}
-            %span.nav-dropdown-icon.icon-pending-bugs
-            Waiting for Review
-        %li{class: ("selected" if params[:f] == "COMPLETED")}
-          %a{href: '?f=COMPLETED'}
-            %span.nav-dropdown-icon.icon-fixed-bugs
-            Completed Tickets
-        %li{class: ("selected" if params[:f] == "ALL")}
-          %a{href: '?f=ALL'}
-            %span.nav-dropdown-icon.icon-recently-viewed
-            All Tickets
+        - Complaint::FILTER_VIEW_OPTIONS.each do |filter|
+          - if filter[:label] == 'Manager Queue' && current_user.is_webcat_manager? || filter[:label] != 'Manager Queue'
+            %li{class: ('selected' if params[:f] == filter[:param])}
+              %a{href: "?f=#{filter[:param]}"}
+                %span.nav-dropdown-icon{class: filter[:icon]}
+                = filter[:label]
+              %span.nav-dropdown-icon.favorite-search-icon
+        %li.favorite-instruction
+          Star filter to set as default
 
       #saved-searches-wrapper.webcat-named-search-list.nav-tool-content-wrapper
         %h3.nav-tool-dropdown-header
@@ -198,6 +170,7 @@
                     = named_search.name
                   %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                     = image_tag('icon_cancel_grey.svg')
+                  %span.nav-dropdown-icon.favorite-search-icon
 
 
   .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown#filter-clusters-nav

@@ -34,16 +34,13 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
       data = data.pending
     end
 
-    if regex.present?
-      regexp = Regexp.new(regex)
-      data = data.select { |cluster| !(cluster.domain =~ regexp).nil? }
-    end
+    data = data.where('domain REGEXP ?', regex) if regex.present?
 
     case filter[:cluster_type]
     when 'domain'
-      data = data.select { |cluster| (cluster.domain =~ Resolv::IPv4::Regex).nil? }
+      data = data.where('!IS_IPV4(domain)')
     when 'ip'
-      data = data.select { |cluster| !(cluster.domain =~ Resolv::IPv4::Regex).nil? }
+      data = data.where('IS_IPV4(domain)')
     else
       data
     end

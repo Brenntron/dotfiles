@@ -864,6 +864,9 @@ button {
   cursor: pointer;
   width: 20px !important;
   margin-top: -15px;
+  right: 40px;
+  height: 20px !important;
+  position: absolute;
 }
 
 .convert-ticket-button:disabled {
@@ -2461,6 +2464,22 @@ a.static-nav-item {
 }
 
 #advanced-search-dropdown {
+  min-width: 400px;
+  z-index: 51;
+}
+
+#sdr-advanced-search-button {
+  margin-top: -4px;
+  background-color: transparent;
+  color: $type-lighter-color;
+}
+
+#sdr-advanced-search-button::before {
+  content: '|';
+  color: $bug-accent-color;
+}
+
+#sdr-advanced-search-dropdown {
   min-width: 400px;
   z-index: 51;
 }
@@ -4193,7 +4212,7 @@ input.communication-subject {
 
 .note-edit-button {background-image: url(image_path('icon_edit.svg'));}
 .note-copy-button {background-image: url(image_path('icon_copy.svg'));}
-.note-delete-button, .filerep-note-delete-button {background-image: url(image_path('icon_delete.svg'));}
+.note-delete-button, .filerep-note-delete-button, .sdr-note-delete-button {background-image: url(image_path('icon_delete.svg'));}
 .note-save-button {background-image: url(image_path('icon_save_grey.svg'));}
 .note-cancel-button {background-image: url(image_path('icon_cancel.svg'));}
 
@@ -4497,7 +4516,8 @@ td.wbrs-highlight, td.sbrs-highlight {
 .escalations--webcat--complaints-controller,
 .escalations--webcat--reports-controller,
 .users-controller,
-.escalations--file_rep--disputes-controller {
+.escalations--file_rep--disputes-controller,
+.escalations--sdr--disputes-controller {
   #nav-banner {
     background-color: $table-dark-body;
     color: $content-bg-color;
@@ -4538,6 +4558,22 @@ td.wbrs-highlight, td.sbrs-highlight {
   #advanced-search-button::before {
     display: none;
   }
+
+  #sdr-advanced-search-button {
+    background-color: darken($faint-neutral-color, 5%);
+    color: $type-lighter-color;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin: -3px 0 0 0;
+    height: 28px;
+    border-radius: 0 4px 4px 0;
+    padding: 0 16px;
+    position: absolute;
+    right: 0;
+  }
+  #sdr-advanced-search-button::before {
+    display: none;
+  }
   .search-box {
     background-image: url(image_path('layout/search_icon_lighter.svg'));
   }
@@ -4554,7 +4590,8 @@ td.wbrs-highlight, td.sbrs-highlight {
 #advanced-search-wrapper input,
 #new-complaint-form input,
 #categorize-urls-form-wrapper input,
-.new-dispute-form input {
+.new-dispute-form input,
+#new-sdr-dispute-form input {
   margin-bottom: 8px;
   background-color: transparent;
   border: 1px solid darken($faint-neutral-color, 5%);
@@ -5401,6 +5438,15 @@ table > tbody > tr > td.dispute_rep_tools {
 
 #table-show-columns-dropdown {
   min-width: 750px;
+}
+
+#sdr-index-table-show-columns-dropdown {
+  min-width: 400px;
+}
+
+#sdr-index-table-show-columns-dropdown ul {
+  display: block;
+  padding: 10px;
 }
 
 .dropdown-menu-content-block ul {
@@ -6252,6 +6298,7 @@ table > tbody > tr > td.research-table-row-wrapper {
 .crosslisted-details-table { background-color: $warning-accent-color;}
 .virustotal-details-table { background-color: $rule-accent-color;}
 .reptool-details-table {background-color: $fifth-section-color;}
+.enrich-details-table {background-color: $escalations-section-color;}
 
 .entry-details-table table {
   background-color: $table-dark-body;
@@ -7108,7 +7155,7 @@ td.ticket-total::before {
     background-color: $bug-section-color !important;
   }
 }
-.container_unassign{
+.container_unassign {
   display: inline-block;
   float: right;
 }
@@ -8393,6 +8440,10 @@ table#duplicates a {
   opacity: .5 !important;
 }
 
+li.disabled-link {
+  display: none;
+}
+
 .disabled-link:hover {
   text-decoration: none !important;
 }
@@ -9381,6 +9432,30 @@ td.text-center span {
   background-color: $nav-toolbar-color;
 }
 
+.sdr-whois-btn {
+  background-color: $nav-toolbar-color;
+  background-image: url(image_path('icon_whois_grey.svg'));
+  background-position: 4px center;
+  background-repeat: no-repeat;
+  border-radius: 2px;
+  border: none;
+  float: right;
+  height: 20px;
+  padding: 0 10px 0 20px;
+}
+
+.sdr-adjust-rep-btn {
+  background-color: $nav-toolbar-color;
+  background-image: url(image_path('icon_reputation_star_grey.svg'));
+  background-position: 4px center;
+  background-repeat: no-repeat;
+  border-radius: 2px;
+  border: none;
+  float: right;
+  height: 20px;
+  padding: 0 10px 0 20px;
+}
+
 .google-btn {
   background-image: url(image_path('icon_google_grey.svg'));
   background-color: $nav-toolbar-color;
@@ -10183,7 +10258,7 @@ hr.thin.form-divider {
   display: block;
 }
 
-#complaints-index {
+#complaints-index, #sdr-disputes-index {
   background-color: #fff;
 }
 
@@ -10334,7 +10409,7 @@ hr.thin.form-divider {
   margin-left: 35px;
 }
 
-#filerep_searchref_container, #webcat_searchref_container{
+#filerep_searchref_container, #webcat_searchref_container, #sdr_searchref_container{
   & {
     color: $primary-section-color;
     max-width: 100%;
@@ -10679,6 +10754,11 @@ input.assignee.form-control{
   background-image: url(image_path('icon_reverse.svg'));
 }
 
+.enrich-filerep-header{
+  border-bottom-color: $second-section-color;
+  background-image: url(image_path('icon_cat.svg'));
+}
+
 .sample-present-true, .sample-present-false {
   width: 30px;
   height: 40px;
@@ -10703,6 +10783,7 @@ input.assignee.form-control{
   font-weight: 700;
   color: $type-lighter-color;
   padding-bottom: 5px;
+  font-size: 12px;
 }
 
 .data-report-score {
@@ -10760,6 +10841,11 @@ button.secondary.view-report-external-button {
     height: 28px;
   }
 
+  .input-group.search-group #sdr-advanced-search-button {
+    padding: 0 12px 0 18px;
+    height: 28px;
+  }
+
   // adding the down caret icon using the sort_by svg for advanced search button
   .input-group.search-group #advanced-search-button::after {
     content: '';
@@ -10774,6 +10860,18 @@ button.secondary.view-report-external-button {
     float: right;
   }
 
+  .input-group.search-group #sdr-advanced-search-button::after {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 14px;
+    right: 0;
+    background-image: url(image_path('icon_sort_by.svg'));
+    background-repeat: no-repeat;
+    background-position: 30% 92%;
+    background-size: 26px 26px;
+    float: right;
+  }
 
   // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
   @media screen and (min-width: 1200px) {
@@ -10923,6 +11021,7 @@ button.secondary.view-report-external-button {
   font-family: "Fira Mono", monospace;
   border-radius: 0;
   line-height: 1.25em;
+  font-size: 11px;
 }
 
 .tg-data-present,
@@ -10933,13 +11032,17 @@ button.secondary.view-report-external-button {
 .rl-report-run,
 .sb-data-present,
 .sb-data-missing,
-.sb-report-run {
+.sb-report-run,
+.sdr-research-data-present,
+.sdr-research-data-missing,
+.enrich-filerep-data-missing{
   display: none;
 }
 
 .tg-data-missing,
 .sb-data-missing,
 .rl-data-missing,
+.enrich-filerep-data-missing,
 .sb-report-run,
 .tg-report-run,
 .rl-report-run {
@@ -10999,7 +11102,7 @@ button.secondary.view-report-external-button {
   }
 }
 
-#rl-loader, #tg-loader, #sb-loader {
+#rl-loader, #tg-loader, #sb-loader, #sdr-research-loader {
   width: 100%;
 }
 
@@ -12651,6 +12754,24 @@ table > tbody > tr > td.no-padding {
   }
 }
 
+.enrich-webrep-table-data-missing {
+  display: none;
+}
+
+.enrich-cell-external-references {
+  display: flex;
+  flex-direction: column;
+}
+
+.enrich-external-reference-link, .enrich-external-reference-link:hover, .enrich-external-reference-link:focus {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.enrich-webrep-external-ref-header {
+  width: 137px;
+}
+
 #research_tab {
   .research-first-row {
     td {
@@ -12713,6 +12834,12 @@ table > tbody > tr > td.no-padding {
   .virustotal-cell {
     width: 50px;
   }
+  .enrich-label-cell {
+    width: 50px;
+  }
+  .enrich-cell {
+    width: 50px;
+  }
   .wlbl-tc-label-cell {
     width: 2%;
   }
@@ -12756,6 +12883,9 @@ table > tbody > tr > td.no-padding {
     }
     .reptool-input-wrapper {
       background-color: $fifth-section-color;
+    }
+    .enrich-input-wrapper {
+      background-color: $escalations-section-color;
     }
   }
 }
@@ -13306,6 +13436,11 @@ table > tbody > tr > td.no-padding {
     margin-bottom: 0;
     display: inline;  // ensure no used vertical space when empty
   }
+
+  #sdr_searchref_container {
+    margin-bottom: 0;
+    display: inline;  // ensure no used vertical space when empty
+  }
   // show 25 entries
   #file-rep-datatable_length label {
     margin-left: 3px;
@@ -13315,6 +13450,97 @@ table > tbody > tr > td.no-padding {
   #file-index-table-show-columns-dropdown ul li {
     cursor: default;
   }
+}
+
+//Filerep enrich data section
+
+.enrich-filerep-data-present {
+  display: none;
+}
+
+.data-enrich-filerep-name-label {
+  float: left;
+  width: fit-content;
+  margin: 0 12px 10px 0;
+}
+
+.data-enrich-filerep-name {
+  margin-top: 0;
+  float: left;
+}
+
+.data-enrich-filerep-description-label {
+  margin: 4px 0;
+}
+
+.enrich-filerep-section-header {
+  border-bottom: 1px solid #f2f2f2;
+  padding-top: 22px;
+  padding-left: 4px;
+}
+
+.filerep-enrich-taxonomy-header-wrapper {
+  display: flex;
+  align-items: baseline;
+  padding: 0 0 4px 4px
+}
+
+.filerep-enrich-taxonomy-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 8pt;
+}
+
+.filerep-enrich-taxonomy-header {
+  font-weight: 400;
+  font-size: 8pt;
+  padding-left: 25px;
+}
+
+.filerep-enrich-table-name-th {
+  width: 88px;
+}
+
+.filerep-enrich-cell-description {
+  word-break: break-word;
+}
+
+.filerep-enrich-taxonomy-table td{
+  border: none;
+}
+
+.filerep-enrich-table-body-row {
+  border-top: 1px solid #f2f2f2;
+}
+
+.filerep-enrich-table-header-row th:first-child {
+  padding-left: 4px;
+}
+
+.filerep-enrich-table-header-row th:last-child {
+  padding-right: 4px;
+}
+
+.filerep-enrich-table-description-th {
+  padding: 8px 8px 6px 8px;
+}
+
+.filerep-enrich-cell-external-references {
+  padding: 0;
+}
+
+.filerep-enrich-cell-name {
+  min-width: 85px;
+  padding: 0;
+}
+
+.filerep-enrich-cell-external-references {
+  min-width: 86px;
+  text-align: right;
+}
+
+.filerep-enrich-external-ref {
+  text-decoration: underline;
 }
 
 
@@ -13492,6 +13718,19 @@ table > tbody > tr > td.no-padding {
 
 // adding the down caret icon using the sort_by svg for advanced search button
 #advanced-search-button::after {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 14px;
+  right: 0;
+  background-image: url(image_path('icon_sort_by.svg'));
+  background-repeat: no-repeat;
+  background-position: 30% 92%;
+  background-size: 26px 26px;
+  float: right;
+}
+
+#sdr-advanced-search-button::after {
   content: '';
   display: block;
   width: 16px;
@@ -13813,6 +14052,13 @@ input.wl-bl-list-inline {
   background-position: 6px center;
 }
 
+.input-col {
+  padding: 4px 4px;
+}
+
+.no-border {
+  border: none !important;
+}
 // Rulehit Resolution Mailer Templates
 #new_rulehit_resolution_mailer_template, .edit_rulehit_resolution_mailer_template {
   max-width: 292px;

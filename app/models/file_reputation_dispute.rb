@@ -63,13 +63,40 @@ class FileReputationDispute < ApplicationRecord
     Cisco Talos has concluded that the file is safe to access at this time. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case.
   HEREDOC
   RESOLUTION_AUTORESOLVED_UNCHANGED         = <<~HEREDOC
-    Cisco Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file’s disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file’s disposition, if they understand the risks in doing so. If you need further assistance, please open a TAC case and provide additional details.
+    Cisco Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file's disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file’s disposition, if they understand the risks in doing so. If you need further assistance, please open a TAC case and provide additional details.
   HEREDOC
 
 
   AC_SUCCESS = 'CREATE_ACK'
   AC_FAILED = 'CREATE_FAILED'
   AC_PENDING = 'CREATE_PENDING'
+
+  EXPORT_FIELD_NAMES = {
+    'id' => 'Case ID',
+    'status' => 'Status',
+    'resolution' => 'Resolution',
+    'file_name' => 'File Name',
+    'sha256_hash' => 'SHA256',
+    'file_size' => 'File Size',
+    'platform' => 'Platform',
+    'sample_type' => 'Sample Type',
+    'disposition' => 'AMP Disposition',
+    'detection_name' => 'AMP Detection Name',
+    'detection_last_set' => 'AMP Detection Last Set',
+    'in_zoo' => 'In Zoo',
+    'sandbox_score' => 'Sandbox Score',
+    'threatgrid_score' => 'TG Score',
+    'reversing_labs_score' => 'Reversing Labs Hits',
+    'reversing_labs_count' => 'RL Scanners Total',
+    'disposition_suggested' => 'Suggested Disposition',
+    'created_at' => 'Dispute Summary/Details',
+    'submitter_type' => 'Time Submitted',
+    'customer_name' => 'Submitter Type',
+    'company_name' => 'Customer Name',
+    'customer_email' => 'Customer Organization',
+    'user_id' => 'Customer Email',
+    'description' => 'Assignee'
+}.freeze
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
   validates :sha256_hash, format: { with: /\A\h{64}\z/, message: "only 64 nibble (256 bit) hex code" }
@@ -1087,11 +1114,6 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def self.export_xlsx(search_params_json, current_user:)
-    fields = %w{id status resolution file_name sha256_hash file_size platform sample_type
-                disposition detection_name detection_last_set
-                in_zoo sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
-                disposition_suggested created_at submitter_type
-                customer_name company_name customer_email user_id description}
     search_params = JSON.parse(search_params_json)
 
     file_rep_disputes = robust_search(search_params['search_type'],
@@ -1106,39 +1128,35 @@ class FileReputationDispute < ApplicationRecord
     workbook = RubyXL::Workbook.new
     worksheet = workbook[0]
 
-    %w{Case\ ID Status Resolution File\ Name SHA256 File\ Size Platform Sample\ Type
-       AMP\ Disposition AMP\ Detection\ Name AMP\ Detection\ Last\ Set
-       In\ Zoo Sandbox\ Score TG\ Score Reversing\ Labs\ Hits RL\ Scanners\ Total
-       Suggested\ Disposition Dispute\ Summary/Details Time\ Submitted Submitter\ Type
-       Customer\ Name Customer\ Organization Customer\ Email Assignee}.each_with_index do |field_name, col_index|
+    EXPORT_FIELD_NAMES.values.each_with_index do |field_name, col_index|
       worksheet.add_cell(0, col_index, field_name)
       worksheet.sheet_data[0][col_index].change_font_bold(true)
     end
 
     file_rep_disputes.each_with_index do |fr_dispute, row_index|
-      fields.each_with_index do |field_name, col_index|
+      EXPORT_FIELD_NAMES.keys.each_with_index do |field_name, col_index|
 
         cell_data =
-            case field_name
-            when 'platform'
-              fr_dispute.determine_platform
-            when 'detection_last_set'
-              fr_dispute.detection_last_set&.utc&.iso8601
-            when 'in_zoo'
-              fr_dispute.in_zoo? ? 'True' : 'False'
-            when 'created_at'
-              fr_dispute.created_at.utc.iso8601
-            when 'customer_name'
-              fr_dispute.customer_name
-            when 'customer_email'
-              fr_dispute.customer_email
-            when 'company_name'
-              fr_dispute.customer_company_name
-            when 'user_id'
-              fr_dispute.user&.cvs_username
-            else
-              fr_dispute.attributes[field_name]
-            end
+          case field_name
+          when 'platform'
+            fr_dispute.determine_platform
+          when 'detection_last_set'
+            fr_dispute.detection_last_set&.utc&.iso8601
+          when 'in_zoo'
+            fr_dispute.in_zoo?.to_s.camelize
+          when 'created_at'
+            fr_dispute.created_at.utc.iso8601
+          when 'customer_name'
+            fr_dispute.customer_name
+          when 'customer_email'
+            fr_dispute.customer_email
+          when 'company_name'
+            fr_dispute.customer_company_name
+          when 'user_id'
+            fr_dispute.user&.cvs_username
+          else
+            fr_dispute.attributes[field_name]
+          end
 
         worksheet.add_cell(row_index + 1, col_index, cell_data)
       end

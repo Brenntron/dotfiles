@@ -64,7 +64,7 @@ class Dispute < ApplicationRecord
   STATUS_RESOLVED_QUICK_BULK = "QUICK_BULK" #tickets created and closed using the quick bulk entry form.
 
   #AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
-  AUTORESOLVED_UNCHANGED_MESSAGE = "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission’s reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission’s reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
+  AUTORESOLVED_UNCHANGED_MESSAGE = "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission's reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission's reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
 
 
   #labels for charts on webrep dashboard
@@ -74,6 +74,19 @@ class Dispute < ApplicationRecord
   LABEL_RESOLVED_OTHER = "Other"
 
   TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web categorization requests. A new Web categorization ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all updates regarding this request on the new ticket.
+
+For future Web categorization requests, please open a Web categorization ticket using the \"Web Categorization Requests\" form: https://talosintelligence.com/reputation_center/support#reputation_center_support_ticket"
+
+  AUTO_TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web categorization requests. A new Web categorization ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all updates regarding this request on the new ticket.
+
+Please note that by default, a submission with a Trusted, Favorable, Neutral, or Questionable reputation should be accessible by our customers. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission after successful web categorization, that is due to aggressive settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case.
+
+For future Web categorization requests, please open a Web categorization ticket using the \"Web Categorization Requests\" form: https://talosintelligence.com/reputation_center/support#reputation_center_support_ticket"
+
+
+  AUTO_NC_TICKET_CONVERSION_CUSTOMER_MESSAGE = "Thank you for your request; this has now been forwarded to the team responsible for Web categorization requests. A new Web categorization ticket has been created on your behalf and should be visible in your ticket submission queue. Please see all updates regarding this request on the new ticket.
+
+Please note that by default, a submission with a Trusted, Favorable, Neutral, or Questionable reputation should be accessible by our customers. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission after successful web categorization, that is due to aggressive settings on their side and can only be fixed locally by that customer.
 
 For future Web categorization requests, please open a Web categorization ticket using the \"Web Categorization Requests\" form: https://talosintelligence.com/reputation_center/support#reputation_center_support_ticket"
 
@@ -815,14 +828,13 @@ For future Web categorization requests, please open a Web categorization ticket 
     original_url = url
 
     begin
-      url = url.downcase
-      if url.first(3) == "ftp"
+      if url.first(3).downcase == "ftp"
         url = url.gsub("ftp://", '')
       end
 
       sanitized_url = ""
 
-      if url.first(4) != "http"
+      if url.first(4).downcase != "http"
         url = "http://" + url
       end
 
@@ -1204,11 +1216,15 @@ For future Web categorization requests, please open a Web categorization ticket 
 
           dispute_entry.auto_resolve_log += initial_log
           dispute_entry.save!
+          begin
+            AutoResolve.process_auto_resolution(auto_resolve_params)
+          rescue Exception => e
 
-          AutoResolve.process_auto_resolution(auto_resolve_params)
-
+            Rails.logger.error e
+            Rails.logger.error e.backtrace.join("\n")
+          end
           dispute_entry.save
-
+          dispute_entry.reload
           return_payload[dispute_entry.hostlookup] = dispute_entry.new_payload_item
           return_payload[dispute_entry.hostlookup]['sugg_type'] = dispute_entry.suggested_disposition
 
@@ -1574,7 +1590,7 @@ For future Web categorization requests, please open a Web categorization ticket 
 
       dispute.save!
       dispute.dispute_entries.each do |entry|
-        if resolution.present? && entry.status != Dispute::STATUS_RESOLVED
+        if resolution.present? && entry.resolution.blank?
           entry.resolution = resolution
           entry.resolution_comment = comment
           entry.case_closed_at = resolved_at
@@ -1774,21 +1790,31 @@ For future Web categorization requests, please open a Web categorization ticket 
     accepted_at = Time.now
 
     disputes_ary = []
-    Dispute.transaction do
-      disputes = Dispute.where(id: dispute_ids).where.not(status: [
-        Dispute::TI_NEW, Dispute::STATUS_RESOLVED, Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN,
-        Dispute::STATUS_RESOLVED_UNCHANGED
-      ])
-      disputes_ary = disputes.all.to_a
-      disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
 
-      entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
-      entries_ary = entries.all.to_a
+    disputes = Dispute.where(id: dispute_ids).where.not(status: [
+      Dispute::TI_NEW, Dispute::STATUS_RESOLVED, Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN,
+      Dispute::STATUS_RESOLVED_UNCHANGED
+    ])
+    disputes_ary = disputes.all.to_a
+    entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
+    entries_ary = entries.all.to_a
+    Dispute.transaction do
+      disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
       if entries_ary.any?
-        entries.update_all(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
-        Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries_ary)
+        entries_ary.each do |entry|
+          if entry.status != DisputeEntry::STATUS_RESOLVED
+            entry.status = DisputeEntry::ASSIGNED
+            entry.case_accepted_at = accepted_at
+            entry.save
+          end
+        end
+
       end
     end
+    #equivalent to #reload, get fresh values after transaction has committed all updated values to database.
+    entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
+    entries_ary = entries.all.to_a
+    Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries_ary)
 
     disputes_ary
   end
@@ -2663,7 +2689,7 @@ For future Web categorization requests, please open a Web categorization ticket 
   end
 
 
-  def self.convert_to_complaint(params, current_user)
+  def self.convert_to_complaint(params, current_user, auto_resolve = nil)
     dispute = Dispute.find(params[:dispute_id])
     suggested_category_entries = params[:suggested_categories]
 
@@ -2676,6 +2702,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     package[:email] = dispute&.customer&.email
     package[:name] = dispute&.customer&.name
     package[:company_name] = dispute&.customer&.company&.name
+
     suggested_category_entries.each do |sugg|
       if dispute.platform_id.present?
         platform_id = dispute.platform_id
@@ -2706,13 +2733,33 @@ For future Web categorization requests, please open a Web categorization ticket 
 
     dispute.status = STATUS_RESOLVED
     dispute.resolution = STATUS_RESOLVED_INVALID
-    dispute.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+    if auto_resolve.present?
+      if dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
+        dispute.resolution_comment = AUTO_TICKET_CONVERSION_CUSTOMER_MESSAGE
+      else
+        dispute.resolution_comment = AUTO_NC_TICKET_CONVERSION_CUSTOMER_MESSAGE
+      end
+      dispute.resolution_comment = AUTO_TICKET_CONVERSION_CUSTOMER_MESSAGE
+    else
+      dispute.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+    end
+
     dispute.save
 
     dispute.dispute_entries.each do |d_entry|
       d_entry.status = DisputeEntry::STATUS_RESOLVED
       d_entry.resolution = DisputeEntry::STATUS_RESOLVED_INVALID
-      d_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+      if auto_resolve.present?
+        if dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
+          d_entry.resolution_comment = AUTO_TICKET_CONVERSION_CUSTOMER_MESSAGE
+        else
+          d_entry.resolution_comment = AUTO_NC_TICKET_CONVERSION_CUSTOMER_MESSAGE
+        end
+
+      else
+        d_entry.resolution_comment = TICKET_CONVERSION_CUSTOMER_MESSAGE
+      end
+
       d_entry.save
     end
 

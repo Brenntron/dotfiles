@@ -138,6 +138,7 @@ $ ->
 
   $('.forward-button').on 'click', ->
     $('#newEmailDialog').dialog 'open'
+    $('input.receiver-email').val('')
     $('.new-subject').val("Fwd:" + $(".communication-subject")[0].textContent)
     $('.new-body').val("\n" + "###################################" + "\n" + "Begin Forwarded Message:" + "\n" + $('.email-msg-content')[0].innerText)
 
@@ -242,14 +243,16 @@ $ ->
     form_data.append('to', $('.new-receiver').val())
     form_data.append('subject', $('.new-subject').val())
     form_data.append('cc', $('.cc-email').val())
-    
+
     if window.location.href.includes('/file_rep/disputes')
       form_data.append('dispute_type', "FileReputationDispute")
     else if  window.location.href.includes('/webrep/disputes')
       form_data.append('dispute_type', "WebReputationDispute")
+    else if window.location.href.includes('sdr/disputes')
+      form_data.append('dispute_type', "SenderDomainReputationDispute")
 
     dispute_id = $('input[name="dispute_id"]').val()
-    
+
     if $('form')[0].checkValidity() == true
       e.preventDefault()
       if dispute_id
@@ -380,6 +383,8 @@ $ ->
     position: { my: "left center", at: "left center", of: window }
   $('.new-email-button').on 'click', ->
     $('#newEmailDialog').dialog 'open'
+    customer_email = $('#dispute-customer-email')[0].innerText
+    $('input.receiver-email').val(customer_email)
     return
   $('.mng-templates-button').on 'click', ->
     $('#manageTemplatesDialog').dialog 'open'
@@ -646,6 +651,7 @@ $ ->
     $('#edit-template-form-wrapper').contents().hide()
     $('#create-email-template').hide()
     $('#save-email-template').addClass('hidden')
+    $('#save-sdr-email-template').addClass('hidden')
     $('#save-filerep-email-template').addClass('hidden')
     $('#create-email-template').show()
     $('#cancel-edit-email-template').addClass('hidden')
@@ -712,6 +718,7 @@ $ ->
       $('#new-template-form-wrapper').contents().show()
       $('#create-email-template').text('Cancel')
       $('#save-email-template').removeClass('hidden')
+      $('#save-sdr-email-template').removeClass('hidden')
       $('#save-filerep-email-template').removeClass('hidden')
       $('#new-template-form-wrapper').animate {
         height: 200
@@ -721,6 +728,7 @@ $ ->
       $('#new-template-form-wrapper').contents().hide()
       $('#create-email-template').text('Create New Template')
       $('#save-email-template').addClass('hidden')
+      $('#save-sdr-email-template').addClass('hidden')
       $('#save-filerep-email-template').addClass('hidden')
       $('#new-template-form-wrapper').animate {
         height: 0

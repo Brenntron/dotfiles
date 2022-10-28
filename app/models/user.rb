@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :complaint_entries
   has_many :disputes
   has_many :file_reputation_disputes
+  has_many :sender_domain_reputation_disputes
   has_many :saved_searches
   has_and_belongs_to_many :roles, dependent: :destroy
   has_many :named_searches
@@ -14,6 +15,7 @@ class User < ApplicationRecord
   has_many :recent_dispute_views, class_name: 'Dispute', through: :dispute_peeks, source: :dispute
   has_many :user_preferences
   has_many :webcat_credits
+  has_many :sender_domain_reputation_dispute_comments
 
   validates :cvs_username, presence: true, uniqueness: true
 
