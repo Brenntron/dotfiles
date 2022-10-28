@@ -102,9 +102,12 @@ For future web and email reputation requests, please open a web and email reputa
   end
 
   def self.parse_url(url)
-    parser = URI::Parser.new
-    url = parser.escape(url)
-    uri = parser.parse(parser.parse(url).scheme.nil? ? "http://#{url}" : url)
+    #leaving this for disposal later. We've used URI::Parser so hesitatnt to totally delete
+    # but Addressable::URI seems to handle non latin characters much better.
+    #parser = URI::Parser.new
+    #url = parser.escape(url)
+    #uri = parser.parse(parser.parse(url).scheme.nil? ? "http://#{url}" : url)
+    uri = Addressable::URI.parse(Addressable::URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
     #subdomain = uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{domain.domain}$"), '')
     {

@@ -67,8 +67,13 @@ $ ->
 
         $('#xbrsDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
         $('#domainHistoryDomainTableReputation').append("<p class='domain-data'>#{score}</p>")
+
+        getDomainHistory(domain)
+        getXbrsHistory(domain)
       error: (errorResponse) ->
         std_api_error(errorResponse, "Domain info for #{domain} could not be retrieved.", reload: false)
+        $('#domainHistoryLoader').hide()
+        $('#xbrsHistoryLoader').hide()
     )
 
   getDomainHistory = (domain) ->
@@ -81,11 +86,14 @@ $ ->
       success: (response) ->
         data = response.data
 
+        $('#domainHistoryLoader').hide()
+
+        if (data.length - 1) == 0
+          return
+
         $('#domainHistoryDomainTableListingContent > .domain-data.result-total').remove()
         #the first entry is the domain itself so that should not count in the result total
         $('#domainHistoryDomainTableListingContent').append("<p class='domain-data result-total'>(#{data.length - 1} found)</p>")
-
-        $('#domainHistoryLoader').hide()
 
         if $.fn.DataTable.isDataTable('.domain-history-table')
           $('.domain-history-table').DataTable().rows.add(data)
@@ -102,9 +110,9 @@ $ ->
                 className: 'domain-history-checkbox'
                 render: (data) ->
                   { url } = data
-                  formattedUrl = url.replace(/\/|\./g, '-')
+                  formattedUrl = url.replace(/\/|\./g, '-').replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\<|\>|\(|\)/g, '')
 
-                  "<input type='checkbox' data-name='#{formattedUrl}' data-url='#{url}' class='domain-history-categorize-url-button categorize-url-button'</input>"
+                  "<input type='checkbox' data-name='#{formattedUrl}' data-url='#{url.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\<|\>|\(|\)/g, '')}' class='domain-history-categorize-url-button categorize-url-button'</input>"
                 sortable: false
               }
               {
@@ -137,7 +145,7 @@ $ ->
                   { category, url } = data
 
                   if category?
-                    return "<p data-name='#{url}''>#{category}</p>"
+                    return "<p data-name='#{url.replace(/\<|\>|\(|\)/g, '')}''>#{category}</p>"
                   else
                     ''
               }
@@ -205,6 +213,9 @@ $ ->
         else if Object.keys(data).length is 0
           $('#xbrsHistoryLoader').hide()
           std_msg_error('Not a valid domain.', [])
+          return
+        else if (data.length - 1) == 0
+          return
         else
           domainKey = Object.keys(data)[0]
 
@@ -232,8 +243,9 @@ $ ->
                   data: null
                   className: 'xbrs-history-checkbox'
                   render: (data) ->
-                    formattedDomain = data.domain.replace(/\/|\./g, '-')
-                    "<input type='checkbox' data-name='#{formattedDomain}' data-url='#{data.domain}' class='xbrs-categorize-url-button categorize-url-button'</input>"
+                    formattedDomain = data.domain.replace(/\/|\./g, '-').replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\<|\>/g, '')
+
+                    "<input type='checkbox' data-name='#{formattedDomain}' data-url='#{data.domain.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\<|\>|\(|\)/g, '')}' class='xbrs-categorize-url-button categorize-url-button'</input>"
                   sortable: false
                 }
                 {
@@ -255,7 +267,7 @@ $ ->
                   render: (data) ->
                     if data.aups.length > 0
                       cats = $.unique(data.aups.map((aup) -> aup.cat)).toString().split(',').join(', ')
-                      return "<p data-name='#{data.domain}'>#{cats}</p>"
+                      return "<p data-name='#{data.domain.replace(/\<|\>|\(|\)/g, '')}'>#{cats}</p>"
                     else
                       ''
                 }
@@ -336,7 +348,7 @@ $ ->
   $('#webcat_research_search').on('keyup', (e) ->
     if e.key == 'Enter' || e.keyCode == 13
       domain = $(this).val()
-      domain = domain.replace(/https\:\/\//, '')
+      domain = domain.replace(/https\:\/\//, '').replace(/http\:\/\//, '')
 
       if domain
         $('#webcat_research_search').val(domain)
@@ -345,6 +357,8 @@ $ ->
         $('#xbrsHistorySvg').hide()
         $('#xbrsHistorySvg').removeClass('icon-unkown icon-untrusted icon-questionable icon-neutral icon-favorable icon-trusted')
         $('.domain-data').remove()
+
+        domain = domain.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')
 
         $('#xbrsDomainName').remove()
         $('#xbrsDomainTableListingContent').append("<a id='xbrsDomainName' class='domain-name domain-name-normal'>#{domain}</a>")
@@ -368,13 +382,14 @@ $ ->
         $('#xbrsHistoryLoader').css('display', 'flex')
 
         getDomainInfo(domain)
-        getDomainHistory(domain)
-        getXbrsHistory(domain)
   )
 
   $(document).on("click",'.xbrs-categorize-url-button', () ->
     button = $(this)
-    { name, url } = button.data()
+    data = button.data()
+
+    name = data.name.replace(/\<|\>|\(|\)/g, '')
+    url = data.url.replace(/\<|\>|\(|\)/g, '')
 
     if button.is(':checked') && xbrsSelectLimiter < 10 && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
       selectize_url_li =
@@ -429,13 +444,13 @@ $ ->
 
       setXbrsSelectLimiter(1)
       $('#xbrs-history-webcat-research-categorize-url').removeAttr('disabled')
-      $("##{tableClassPrepend}-limit-warning").hide()
+      $("#xbrs-history-limit-warning").hide()
     else if !button.is(':checked') && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}']").length isnt 0) && $(".xbrs-categorize-url-button:checked[data-name='#{name}']").length is 0
       $("#xbrsHistorySelectedUrlsList > li[data-name='#{name}']").remove()
       setXbrsSelectLimiter(-1)
-      $("##{tableClassPrepend}-limit-warning").hide()
+      $("#xbrs-history-limit-warning").hide()
     else if button.is(':checked') && xbrsSelectLimiter is 10
-      $("##{tableClassPrepend}-limit-warning").show()
+      $("#xbrs-history-limit-warning").show()
 
     $categorizeButton = $('#xbrs-history-webcat-research-categorize-url')
 
@@ -450,7 +465,10 @@ $ ->
 
   $(document).on("click", '.domain-history-categorize-url-button', () ->
     button = $(this)
-    { name, url } = button.data()
+    data = button.data()
+
+    name = data.name.replace(/\<|\>|\(|\)/g, '')
+    url = data.url.replace(/\<|\>|\(|\)/g, '')
 
     if button.is(':checked') && domainHistorySelectLimiter < 10 && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
       selectize_url_li =
@@ -541,7 +559,10 @@ $ ->
 
     for checkBox in tableCheckBoxes
       $checkBox = $(checkBox)
-      { name, url } = $checkBox.data()
+      data = $checkBox.data()
+
+      name = data.name.replace(/\<|\>|\(|\)/g, '')
+      url = data.url.replace(/\<|\>|\(|\)/g, '')
 
       $checkBox.prop('checked', checkAllValue)
 
