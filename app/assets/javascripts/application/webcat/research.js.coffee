@@ -110,9 +110,9 @@ $ ->
                 className: 'domain-history-checkbox'
                 render: (data) ->
                   { url } = data
-                  formattedUrl = url.replace(/\/|\./g, '-').replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\<|\>/g, '')
+                  formattedUrl = url.replace(/\/|\./g, '-').replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\<|\>|\(|\)/g, '')
 
-                  "<input type='checkbox' data-name='#{formattedUrl}' data-url='#{url.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\<|\>/g, '')}' class='domain-history-categorize-url-button categorize-url-button'</input>"
+                  "<input type='checkbox' data-name='#{formattedUrl}' data-url='#{url.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\<|\>|\(|\)/g, '')}' class='domain-history-categorize-url-button categorize-url-button'</input>"
                 sortable: false
               }
               {
@@ -145,7 +145,7 @@ $ ->
                   { category, url } = data
 
                   if category?
-                    return "<p data-name='#{url.replace(/\<|\>/g, '')}''>#{category}</p>"
+                    return "<p data-name='#{url.replace(/\<|\>|\(|\)/g, '')}''>#{category}</p>"
                   else
                     ''
               }
@@ -245,7 +245,7 @@ $ ->
                   render: (data) ->
                     formattedDomain = data.domain.replace(/\/|\./g, '-').replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\<|\>/g, '')
 
-                    "<input type='checkbox' data-name='#{formattedDomain}' data-url='#{data.domain.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\<|\>/g, '')}' class='xbrs-categorize-url-button categorize-url-button'</input>"
+                    "<input type='checkbox' data-name='#{formattedDomain}' data-url='#{data.domain.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\<|\>|\(|\)/g, '')}' class='xbrs-categorize-url-button categorize-url-button'</input>"
                   sortable: false
                 }
                 {
@@ -267,7 +267,7 @@ $ ->
                   render: (data) ->
                     if data.aups.length > 0
                       cats = $.unique(data.aups.map((aup) -> aup.cat)).toString().split(',').join(', ')
-                      return "<p data-name='#{data.domain.replace(/\<|\>/g, '')}'>#{cats}</p>"
+                      return "<p data-name='#{data.domain.replace(/\<|\>|\(|\)/g, '')}'>#{cats}</p>"
                     else
                       ''
                 }
@@ -388,8 +388,8 @@ $ ->
     button = $(this)
     data = button.data()
 
-    name = data.name.replace(/\<|\>/g, '')
-    url = data.url.replace(/\<|\>/g, '')
+    name = data.name.replace(/\<|\>|\(|\)/g, '')
+    url = data.url.replace(/\<|\>|\(|\)/g, '')
 
     if button.is(':checked') && xbrsSelectLimiter < 10 && ($("#xbrsHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
       selectize_url_li =
@@ -467,8 +467,8 @@ $ ->
     button = $(this)
     data = button.data()
 
-    name = data.name.replace(/\<|\>/g, '')
-    url = data.url.replace(/\<|\>/g, '')
+    name = data.name.replace(/\<|\>|\(|\)/g, '')
+    url = data.url.replace(/\<|\>|\(|\)/g, '')
 
     if button.is(':checked') && domainHistorySelectLimiter < 10 && ($("#domainHistorySelectedUrlsList > li[data-name='#{name}'").length is 0)
       selectize_url_li =
@@ -561,8 +561,8 @@ $ ->
       $checkBox = $(checkBox)
       data = $checkBox.data()
 
-      name = data.name.replace(/\<|\>/g, '')
-      url = data.url.replace(/\<|\>/g, '')
+      name = data.name.replace(/\<|\>|\(|\)/g, '')
+      url = data.url.replace(/\<|\>|\(|\)/g, '')
 
       $checkBox.prop('checked', checkAllValue)
 
