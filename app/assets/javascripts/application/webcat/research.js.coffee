@@ -110,9 +110,9 @@ $ ->
                 className: 'domain-history-checkbox'
                 render: (data) ->
                   { url } = data
-                  formattedUrl = url.replace(/\/|\./g, '-')
+                  formattedUrl = url.replace(/\/|\./g, '-').replace(/\</g, '&lt;').replace(/\>/g, '&gt;')
 
-                  "<input type='checkbox' data-name='#{formattedUrl}' data-url='#{url}' class='domain-history-categorize-url-button categorize-url-button'</input>"
+                  "<input type='checkbox' data-name='#{formattedUrl}' data-url='#{url.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')}' class='domain-history-categorize-url-button categorize-url-button'</input>"
                 sortable: false
               }
               {
@@ -214,6 +214,8 @@ $ ->
           $('#xbrsHistoryLoader').hide()
           std_msg_error('Not a valid domain.', [])
           return
+        else if (data.length - 1) == 0
+          return
         else
           domainKey = Object.keys(data)[0]
 
@@ -241,8 +243,8 @@ $ ->
                   data: null
                   className: 'xbrs-history-checkbox'
                   render: (data) ->
-                    formattedDomain = data.domain.replace(/\/|\./g, '-')
-                    "<input type='checkbox' data-name='#{formattedDomain}' data-url='#{data.domain}' class='xbrs-categorize-url-button categorize-url-button'</input>"
+                    formattedDomain = data.domain.replace(/\/|\./g, '-').replace(/\</g, '&lt;').replace(/\>/g, '&gt;')
+                    "<input type='checkbox' data-name='#{formattedDomain}' data-url='#{data.domain.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')}' class='xbrs-categorize-url-button categorize-url-button'</input>"
                   sortable: false
                 }
                 {
