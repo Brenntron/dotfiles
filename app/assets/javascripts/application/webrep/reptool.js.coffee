@@ -282,6 +282,7 @@ window.submit_individual_reptool = (button) ->
       'entries': [entry_content]
       'force': force_commit
     }
+    checked_classes = ''
   else if submission_action == "reptool-maintain"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
     fin_classes = []
@@ -332,7 +333,11 @@ window.submit_individual_reptool = (button) ->
     method: 'POST'
     data: data
     success: (response) ->
-      std_msg_success(success, [reptool_classes])
+      if submission_action == "reptool-drop"
+        std_msg_success(success, [])
+      else
+        reptool_classes = checked_classes.join(', ')
+        std_msg_success(success, [reptool_classes])
     error: (response) ->
       if response.responseJSON == undefined
         response_lines = response.responseText.split("\n")
