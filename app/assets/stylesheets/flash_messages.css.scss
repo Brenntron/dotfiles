@@ -9,12 +9,13 @@
   border: none;
   display: block;
   font-size: 9pt;
-  height: 30px;
+  height: 32px;
   line-height: 14pt;
   margin: 0 auto;
   max-height: 80px;
-  max-width: 800px;
-  min-width: 260px;
+  max-width: 1000px;
+  min-width: 300px;
+  overflow: hidden;
   overflow-y: auto;  // some errors get huge, keep them handled
   padding: 7px 50px 7px 32px;
   position: relative;  // ensures close icon placement
