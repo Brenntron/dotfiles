@@ -116,10 +116,3 @@
 %input{type: "hidden", name: "xml_token", value: "#{xml_token}"}
 
 = render template: "layouts/rocket"
-
-- if params[:f]
-  :javascript
-    $(document).ready(function(){
-      window.filter_param = "#{params[:f]}";
-      standard_sdr_index_table("#{params[:f]}")
-    })
