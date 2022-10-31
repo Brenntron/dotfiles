@@ -6437,7 +6437,8 @@ h5.entry-details-table-header {
   width: 350px;
 }
 
-.ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label, #index-entry-resolution-submenu .radio-label  {
+.ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label, #index-entry-resolution-submenu
+.radio-label, #sdr-index-dispute-resolution-submenu .radio-label  {
   color: $content-bg-color  !important;
   font-size: 9pt  !important;
 }
@@ -6608,6 +6609,10 @@ input[type="radio"].ticket-status-radio {
   float: left;
 }
 
+.toolbar-dropdown .sdr-ticket-status-radio-label, #sdr-index-dispute-resolution-submenu .radio-label {
+  margin-top: 4px;
+}
+
 .resolution-comment-wrapper {
   display: inline-block;
   background-color: $content-bg-color;
@@ -6625,6 +6630,11 @@ textarea.ticket-resolution-comment {
 
 .non-resolution-submit-wrapper .content-label-sm {
   margin-top: 12px;
+}
+
+.sdr-non-resolution-submit-wrapper .content-label-sm {
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .resolution-message-template-select {
@@ -7175,6 +7185,10 @@ td.ticket-total::before {
   height: 100%;
 }
 
+.sdr-non-resolution-submit-wrapper {
+  padding-top: 6px !important;
+}
+
 .non-resolution-submit-wrapper textarea, .resolution-comment-wrapper textarea {
   width: 100%;
   margin: auto;
@@ -7184,15 +7198,41 @@ td.ticket-total::before {
   min-height: 50px;
 }
 
+#sdr-index-dispute-resolution-submenu .resolution-comment-wrapper, #show-ticket-resolution-submenu .resolution-comment-wrapper {
+  width: 100%;
+}
+
+#sdr-index-dispute-resolution-submenu .resolution-comment-wrapper textarea {
+  min-height: 170px;
+}
+
+#show-ticket-resolution-submenu .resolution-comment-wrapper textarea {
+  min-height: 180px;
+}
+
 .non-resolution-submit-wrapper button {
   margin: 20px auto 8px auto;
+}
+
+#sdr-index-toolbar .non-resolution-submit-wrapper {
+  .button-row-center {
+    padding: 0;
+  }
+
+  button {
+    margin-top: 10px;
+  }
 }
 
 .non-resolution-submit-wrapper:hover {
   background-color: $faint-neutral-color !important;
 }
 
-#index-ticket-resolution-submenu, #index-entry-resolution-submenu {
+#sdr-index-edit-ticket-status-dropdown {
+  min-width: 162px;
+}
+
+#index-ticket-resolution-submenu, #index-entry-resolution-submenu, #sdr-index-dispute-resolution-submenu {
   width: 340px;
   left: 100%;
   padding: 0;
@@ -7578,7 +7618,7 @@ table.dispute-entry-table tbody tr.selected {
 #show-ticket-resolution-submenu {
   left: 159px;
   border-radius: 0 4px 4px 4px;
-  width: 600px;
+  width: 475px;
   margin-top: -55px;
   padding: 0;
   .resolution-status-comment{
@@ -7589,6 +7629,10 @@ table.dispute-entry-table tbody tr.selected {
   button.primary{
     margin: 2% 0px 0px 33%
   }
+}
+
+#sdr-index-dispute-resolution-submenu {
+  width: 475px;
 }
 
 #show-ticket-resolution-submenu .radio-label {
@@ -9513,7 +9557,7 @@ td.text-center span {
   margin-top: 4px !important;
 }
 
-.cluster-mgt-loader-wrapper, .webcat-loader-wrapper, .webrep-loader-wrapper {
+.cluster-mgt-loader-wrapper, .webcat-loader-wrapper, .webrep-loader-wrapper, .sdr-loader-wrapper  {
   display: block;
   position: absolute;
   width: 170px;
@@ -9533,8 +9577,12 @@ td.text-center span {
   font-weight: 200;
 }
 
-.webcat-loader-wrapper, .webrep-loader-wrapper {
+.webcat-loader-wrapper, .webrep-loader-wrapper, .sdr-loader-wrapper {
   margin: 0 37%;
+}
+
+.sdr-loader-wrapper {
+  top: 5px;
 }
 
 .loader-msg {

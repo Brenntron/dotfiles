@@ -22,4 +22,5 @@
  *= require utility_classes
  *= require webrep_research
  *= require escalations_sdr
+ *= require flash_messages
  */
