@@ -226,8 +226,6 @@ window.submit_individual_reptool = (button) ->
   if $(dropdown).find('.reptool-class-cb:checked').length > 0
     $(dropdown).find('.reptool-class-cb:checked').each ->
       checked_classes.push($(this).val())
-  # Convert to string for data submission
-  reptool_classes = checked_classes.join(', ')
 
   classification_action = $($(dropdown).find("input[name='reptool-classes-radio']:checked")).val()
   comm_typed_in = ''
@@ -255,6 +253,7 @@ window.submit_individual_reptool = (button) ->
   console.log comment
   # End: comment is now a single-line, and ready for Reptool now
 
+  data = {}
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
@@ -270,21 +269,23 @@ window.submit_individual_reptool = (button) ->
     #the new way
     data = {
       'action': 'ACTIVE'
-      'entries': entry_content
+      'entries': [entry_content]
       'classifications': checked_classes
       'comment': comment
+      'force': force_commit
     }
   else if submission_action == "reptool-drop"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
     success = 'All RepTool classes have been removed from: ' + entry_content
     data = {
       'action': 'EXPIRED'
-      'entries': entry_content
+      'entries': [entry_content]
       'force': force_commit
     }
   else if submission_action == "reptool-maintain"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
     fin_classes = []
+
     # Put current classes into an array (if there are any)
     if current_classes != "No active classifications"
       current_arry = current_classes.split(', ')
@@ -293,19 +294,11 @@ window.submit_individual_reptool = (button) ->
 
     if classification_action == "add"
       # Checked classes plus current classes, make sure there aren't dupes
-      if current_arry.length > 1
-        $(current_arry).each ->
-          checked_classes.push(this)
-      else
-        checked_classes.push(current_arry[0])
-
-      fin_classes = checked_classes.filter(((a) ->
-        if !@[a]
-          @[a] = 1
-          return a
-        return
-      ), {})
+      fin_classes = current_arry.concat checked_classes.filter((item) ->
+        current_arry.indexOf(item) == -1
+      )
       success = 'The following RepTool classifications have been added to: ' + entry_content
+
     else # classification action == 'remove'
       # Subtract checked classes from current classes
       fin_classes = current_arry.filter((a) ->
@@ -329,8 +322,10 @@ window.submit_individual_reptool = (button) ->
         'entries': [entry_content]
         'classifications': fin_classes
         'comment': comment
+        'force': force_commit
       }]
     }
+
   # Send to RepTool!
   std_msg_ajax(
     url: api_url
