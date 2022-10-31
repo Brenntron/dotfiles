@@ -410,7 +410,7 @@ $ ->
     else
       $(tc_row).removeClass('hidden')
 
-  window.call_action_switchboard = (disputes) ->
+  window.call_action_switchboard = (disputes, disputes_new) ->
     $('#confirmation-modal').modal('hide')
     ####
     # data is set and each action calls the appropriate endpoint here
@@ -426,98 +426,93 @@ $ ->
          quick_bulk_update(disputes, error_array)
     , 200);
 
-#    TODO: update later ofc
-    force_commit = 'false'
-
-    for dispute, value of disputes
+    for dispute, value of disputes_new
       dispute = dispute.trim()
-      { action } = value
-      if action != undefined
-        for act in action
-          for key, value of act
-            switch key
-              when 'maintain'
-                classifications = Array.from(new Set(act[key]))
-                data = [{
-                  'action': 'ACTIVE'
-                  'entries': [dispute]
-                  'classifications': classifications
-                  'comment': comment
-                  'force': force_commit
-                }]
+      act = value.action[0]
 
-                maintain_reptool_bl(data).then( (response)=>
-                  ajax_count--
-                  if !response
-                    error_message = "<p>Unable to update all reptool entries.</p>"
-                    error_array.push(error_message)
-                )
+      if act != undefined
+        switch act.action
 
-              when 'override'
-                classifications = Array.from(new Set(act[key]))
-                data = [{
-                  'action': 'ACTIVE'
-                  'entries': [dispute]
-                  'classifications': classifications
-                  'comment': comment
-                  'force': force_commit
-                }]
+          when 'maintain'
+            data = [{
+              'action': 'ACTIVE'
+              'entries': [dispute]
+              'classifications': act.list
+              'comment': comment
+              'force': act.force
+            }]
 
-                maintain_reptool_bl(data).then((response)=>
-                  ajax_count--
-                  if !response
-                    error_message = "<p>Unable to update all reptool entries.</p>"
-                    error_array.push(error_message)
-                )
-              when 'drop'
-                data = {
-                  'action': 'EXPIRED'
-                  'entries': [dispute]
-                  'comment':  comment
-                  'classifications': act[key]
-                  'force': force_commit
-                }
-                drop_reptool_bl(data).then((response)=>
-                  ajax_count--
-                  if !response
-                    error_message = "<p>Unable to drop all reptool entries.</p>"
-                    error_array.push(error_message)
-                )
-              when 'add'
+            maintain_reptool_bl(data).then( (response)=>
+              ajax_count--
+              if !response
+                error_message = "<p>Unable to update all reptool entries.</p>"
+                error_array.push(error_message)
+            )
 
-                data = {
-                  'urls':[dispute]
-                  'trgt_list': act[key]
-                  'note': comment
-                }
+          when 'override'
+            data = [{
+              'action': 'ACTIVE'
+              'entries': [dispute]
+              'classifications': act.list
+              'comment': comment
+              'force': act.force
+            }]
 
-                if stringIncludes(act[key][0], 'BL')
-                  for el in action
-                    #####
-                    # set the values of threat_cat ids if the BL is being set
-                    #####
-                    if el.tc_ids
-                      data.thrt_cat_ids = el.tc_ids
+            maintain_reptool_bl(data).then((response)=>
+              ajax_count--
+              if !response
+                error_message = "<p>Unable to update all reptool entries.</p>"
+                error_array.push(error_message)
+            )
+          when 'drop'
+            data = {
+              'action': 'EXPIRED'
+              'entries': [dispute]
+              'comment':  comment
+              'classifications': act.list
+              'force': act.force
+            }
+            drop_reptool_bl(data).then((response)=>
+              ajax_count--
+              if !response
+                error_message = "<p>Unable to drop all reptool entries.</p>"
+                error_array.push(error_message)
+            )
+          when 'add'
 
-                adjust_wlbl(data).then((response) =>
-                  ajax_count--
-                  if !response
-                    error_message = "<p>Unable to adjust all wlbl entries.</p>"
-                    error_array.push(error_message)
-                )
+            data = {
+              'urls':[dispute]
+              'trgt_list': act.list
+              'note': comment
+            }
 
-              when 'remove'
-                data = {
-                  'ip_uris': [dispute]
-                  'list_types': act[key]
-                  'note': comment
-                }
-                remove_wlbl(data).then((response)=>
-                  ajax_count--
-                  if !response
-                    error_message = "<p>Unable to remove all wlbl entries.</p>"
-                    error_array.push(error_message)
-                )
+            if stringIncludes(act.list[0], 'BL')
+              for el in act.list
+                #####
+                # set the values of threat_cat ids if the BL is being set
+                #####
+                if el.tc_ids
+                  data.thrt_cat_ids = el.tc_ids
+
+            adjust_wlbl(data).then((response) =>
+              ajax_count--
+              if !response
+                error_message = "<p>Unable to adjust all wlbl entries.</p>"
+                error_array.push(error_message)
+            )
+
+          when 'remove'
+            data = {
+              'ip_uris': [dispute]
+              'list_types': act.list
+              'note': comment
+            }
+            remove_wlbl(data).then((response)=>
+              ajax_count--
+              if !response
+                error_message = "<p>Unable to remove all wlbl entries.</p>"
+                error_array.push(error_message)
+            )
 
 
   window.maintain_reptool_bl = (data)->
@@ -630,9 +625,12 @@ $ ->
     $('#confirmation-modal').modal('toggle');
     $('#quick-lookup-loader').addClass('visible-ajax-message')
     disputes = {}
+    disputes_new = {}
 
     $( confirmation_rows ).each ->
         action_list = []
+        action_list_new = []
+
         cells = $(this).find('td')
         dispute = $( cells[0] ).text().trim()
         actions = $( cells[1] ).children()
@@ -642,6 +640,10 @@ $ ->
           class_list = $(action).attr('class')
           force_commit = $(action).attr('data-force-commit')
 
+          if force_commit == 'true'
+            force_commit = true
+          else force_commit = false
+
           if stringIncludes(class_list, 'reptool') && !stringIncludes(class_list, 'drop')
             action_tags = $(action).attr('reptool_classes').split(',')
           if stringIncludes(class_list, 'wlbl')
@@ -650,10 +652,27 @@ $ ->
             action_tags = $(action).attr('data').split(',').map((x) -> return parseInt(x) )
 
           formatted_action = check_actions(class_list)
+
+          #setting up new action object data
+          action_object = {}
+          action_object.action = formatted_action
+          action_object.list = action_tags
+          action_object.force = force_commit
+          action_list_new.push action_object
+
+          #keep old data format intact
           action_list.push( "#{formatted_action}": action_tags )
 
+        #Splitting into two formats to use the old one with quick_bulk_update endpoint
+
+        #legacy action format for quick_bulk_update
         actions = action: action_list
         disputes[dispute] = actions
+
+        #new action format to fit in force_commit property
+        actions_new = action: action_list_new
+        disputes_new[dispute] = actions_new
+
         dispute_check = true
 
         for key, value of disputes
@@ -663,7 +682,7 @@ $ ->
               break
 
         if dispute_check
-          call_action_switchboard(disputes)
+          call_action_switchboard(disputes, disputes_new)
 
 
   window.set_action_wlbl_col = () ->
