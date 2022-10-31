@@ -1385,8 +1385,8 @@ class DisputeEntry < ApplicationRecord
 
       wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
       sbrs_api_response = Sbrs::ManualSbrs.call_sbrs('ip' => self.hostlookup)
-      raw_sbrs_score = sbrs_api_response['sbrs']['score']
-      raw_wbrs_score = wbrs_stuff["wbrs"]["score"]
+      raw_sbrs_score = sbrs_api_response['sbrs']['score'] rescue nil
+      raw_wbrs_score = wbrs_stuff["wbrs"]["score"] rescue nil
 
       submission_type = self.dispute.submission_type
 
@@ -1402,7 +1402,7 @@ class DisputeEntry < ApplicationRecord
         if submission_type == "w"
 
           if is_umbrella == true
-            if raw_score.to_f <= -6.0
+            if raw_score.present? && raw_score.to_f <= -6.0
               self.status = STATUS_RESOLVED
               self.resolution = STATUS_AUTO_RESOLVED_MATCH
               self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. Talos does not reduce the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers is able to access the submission, that is due to relaxed settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a TAC case."
@@ -1412,7 +1412,7 @@ class DisputeEntry < ApplicationRecord
             end
           else
 
-            if raw_score.to_f <= -6.0
+            if raw_score.present? && raw_score.to_f <= -6.0
               self.status = STATUS_RESOLVED
               self.resolution = STATUS_AUTO_RESOLVED_MATCH
               if self.dispute.submitter_type == "NON-CUSTOMER"
@@ -1431,7 +1431,7 @@ class DisputeEntry < ApplicationRecord
         end
 
         if submission_type == "e"
-          if raw_score.to_f <= -2.0
+          if raw_score.present? && raw_score.to_f <= -2.0
             self.status = STATUS_RESOLVED
             self.resolution = STATUS_AUTO_RESOLVED_MATCH
             if self.dispute.submitter_type == "NON-CUSTOMER"
@@ -1458,7 +1458,7 @@ class DisputeEntry < ApplicationRecord
           if submission_type == "w"
 
 
-            if raw_score.to_f <= -6.0
+            if raw_score.present? && raw_score.to_f <= -6.0
               return false
             end
 
@@ -1506,7 +1506,7 @@ class DisputeEntry < ApplicationRecord
 
           if submission_type == "e"
 
-            if raw_score.to_f < -1.9
+            if raw_score.present? && raw_score.to_f < -1.9
               return false
             end
 
@@ -1532,7 +1532,9 @@ class DisputeEntry < ApplicationRecord
 
       return false
 
-    rescue
+    rescue => e
+      Rails.logger.error e
+      Rails.logger.error e.backtrace.join("\n")
       return false
     end
   end

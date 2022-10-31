@@ -1216,11 +1216,15 @@ For future Web categorization requests, please open a Web categorization ticket 
 
           dispute_entry.auto_resolve_log += initial_log
           dispute_entry.save!
+          begin
+            AutoResolve.process_auto_resolution(auto_resolve_params)
+          rescue Exception => e
 
-          AutoResolve.process_auto_resolution(auto_resolve_params)
-
+            Rails.logger.error e
+            Rails.logger.error e.backtrace.join("\n")
+          end
           dispute_entry.save
-
+          dispute_entry.reload
           return_payload[dispute_entry.hostlookup] = dispute_entry.new_payload_item
           return_payload[dispute_entry.hostlookup]['sugg_type'] = dispute_entry.suggested_disposition
 

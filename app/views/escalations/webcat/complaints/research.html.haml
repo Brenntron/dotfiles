@@ -1,0 +1,22 @@
+.content-wrapper.research-page
+  .webcat-research-search-wrapper
+    .research-header-wrapper
+      %span.icon-research.top-info-icon
+      %h1 Categorization Research
+
+      %ul#research-tabs.nav.nav-tabs{role: 'tablist'}
+        %li.no-transition.active{role: 'presentation', data: "domain-history"}
+          %a.esc-tooltipped.no-transition#webcat-research-domain-history-link{href:'#domain-history','aria-controls':'domain-history', 'aria-label': 'Domain history tab','data-toggle':'tab', role:"tab", title:"Domain History"}
+            Domain History
+        %li.no-transition{role: 'presentation', data: "xbrs-history"}
+          %a.esc-tooltipped.no-transition#webcat-research-xbrs-history-link{href: "#xbrs-history", class: "xbrs-history-tab", 'aria-controls': 'xbrs-history', 'aria-label': 'Xbrs history tab', 'data-toggle': 'tab', role: "tab", title: "XBRS History"}
+            XBRS History
+
+      .input-group.search-group#webcat-research-search
+        = text_field_tag 'webcat_research_search', "#{}", class: 'search-box', placeholder: 'Lookup History'
+
+  .research-tab-wrapper.tab-content
+    .tab-pane.active#domain-history{role: 'tabpanel'}
+      = render 'escalations/webcat/complaints/domain_history_tab'
+    .tab-pane#xbrs-history{role: 'tabpanel'}
+      = render 'escalations/webcat/complaints/xbrs_history_tab'

@@ -12,7 +12,7 @@ $(document).on 'change','.nested-table-input','.selectize-input', ->
 #### WBNP Reporting ####
 webcat_loader_timeout = ''
 $(document).ready ->
-  sessionStorage.removeItem("touchedForm");
+  sessionStorage.removeItem("touchedForm")
   loader = $('#inline-webcat')
   $(this).bind(
     ajaxStart: () ->
@@ -1776,12 +1776,10 @@ window.click_table_buttons = (complaint_table, button)->
               (item) ->
                 if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
                   item.category_code == input ? 1 : 0
-                else if item.category_code.toLowerCase().includes(input.toLowerCase())
-                  0.9
                 else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
-                  0.8
-                else if item.category_name.toLowerCase().includes(input.toLowerCase())
-                  0.7
+                  1
+                else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+                  0.9
                 else
                   0
           }
@@ -2349,7 +2347,7 @@ $ ->
     return
 
   $(document).ready ->
-    if window.location.pathname != '/escalations/webcat/complaints'
+    if (window.location.pathname != '/escalations/webcat/complaints' && window.location.pathname != '/escalations/webcat/research')
       $('#filter-complaints-nav').hide()
       $('#fetch').hide()
       $('#complaints-nav-search-wrapper').hide()
