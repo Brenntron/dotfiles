@@ -19,6 +19,7 @@
   padding: 7px 50px 7px 32px;
   position: relative;  // ensures close icon placement
   right: 1vw;  // slight centering adjustment
+  scrollbar-width: none;
   top: 85;
   width: -moz-fit-content;
   width: fit-content;
@@ -62,6 +63,10 @@
     right: 12px;
     top: 3px;
   }
+}
+
+.alert-dismissable::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
 }
 
 // ensure flash/on-page messages appear below modals
