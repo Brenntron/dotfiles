@@ -486,13 +486,10 @@ $ ->
               'note': comment
             }
 
-            if stringIncludes(act.list[0], 'BL')
-              for el in act.list
-                #####
-                # set the values of threat_cat ids if the BL is being set
-                #####
-                if el.tc_ids
-                  data.thrt_cat_ids = el.tc_ids
+            #need to loop back through at higher level and grab tc_ids
+            $(value.action).each (e, i) ->
+              if i.action == 'tc_ids'
+                data.thrt_cat_ids = i.list
 
             adjust_wlbl(data).then((response) =>
               ajax_count--
