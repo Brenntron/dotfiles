@@ -262,6 +262,7 @@ $ ->
     row = $(this).parents('tr')[0]
     col_clear = $(row).find('.col-clear-actions')[0]
     action_col = $(row).find('.row-action-clear')[0]
+    force_col = $(row).find('.force-col-tag')[0]
     if action_p.getAttribute("wlbl_data") != undefined && action_p.getAttribute("wlbl_data") != null
       data_type = "wlbl_data"
     else
@@ -287,9 +288,21 @@ $ ->
 
     else
       unless $.trim(action_edit) == 'Threat Categories'
-        col_dialog = "#{action_edit}: #{col_tag_format(data)}"
+
+        #add back force commit tag if it was present originally
+        if force_col != undefined
+          force_col_html = "<span data-force-commit='true' class='force-col-tag float-right'>F</span>"
+        else force_col_html = ''
+
+        col_dialog = "#{action_edit}: #{col_tag_format(data)} #{force_col_html}"
         $(action_p).html(col_dialog)
 
+  #remove force commit tag when clicked on
+  $(document).on 'click', '.col-actions .force-col-tag', () ->
+    action = this.getAttribute("data");
+    action_p = $(this).parents('p')[0]
+    $(action_p).attr('data-force-commit', false)
+    $(this).remove()
 
   $(document).on 'change', '#select-all-bulk', (e) ->
     ####
@@ -943,7 +956,11 @@ $ ->
           error_html = "<div>#{error_message}<div>"
           error_array.push(error_html)
 
-        col_dialog = "<p class='#{reptool_class} #{status_class} reptool-action-col' data='#{check_list}' data-force-commit=#{force_commit}> #{status_string} #{col_tag_format(check_list)} <p>"
+        if force_commit == true
+          force_commit_col = "<span data-force-commit='#{force_commit}' class='force-col-tag float-right'>F</span>"
+        else force_commit_col = ''
+
+        col_dialog = "<p class='#{reptool_class} #{status_class} reptool-action-col' data='#{check_list}' data-force-commit=#{force_commit}> #{status_string} #{col_tag_format(check_list)} #{force_commit_col}<p>"
         drop_check = reptool_add  == 'drop' && existing_reptool.length
         if check_list.length || drop_check
           clear_col.show()
