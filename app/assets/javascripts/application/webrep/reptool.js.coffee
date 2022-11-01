@@ -143,37 +143,39 @@ window.bulk_get_current_reptool = (page) ->
           response = JSON.parse(response)
 
           for entry in response
-            if entry['status'] == "ACTIVE"
-              rep_class_exp = entry['expiration']
-              rep_class_list = entry['classification']
-              # remove dupes from array then add space after each entry
-              rep_class_list = rep_class_list.filter((elem, index, self) -> index == self.indexOf(elem))
-              rep_class_list = rep_class_list.join(', ')
-              rep_class_td_content = rep_class_list
+            if entry.status == "ACTIVE"
+              rep_entry = entry.entry
+              rep_class_exp = entry.expiration
+              rep_class_list = entry.classification
+              rep_class_td_content = rep_class_list.join(', ')
+              comment = entry.comment
             else
+              rep_entry = entry.entry
               rep_class_exp = ''
+              rep_class_list = ''
               rep_class_td_content = '<span class="missing-data">No active classifications</span>'
+              comment = ''
 
             entry_row =
-              '<tr class="reptool-entry-row" data-case-id="' + case_id + '">' +
-                '<td class="reptool-entry-name">' + entry['entry'] + '</td>' +
+              '<tr class="reptool-entry-row" data-case-id="' + entry_case_id + '">' +
+                '<td class="reptool-entry-name">' + rep_entry + '</td>' +
                 '<td class="reptool-entry-class" data-classification="' + rep_class_list + '">' + rep_class_td_content + '</td>' +
                 '<td>' + rep_class_exp + '</td>' +
-                '<td class="reptool-entry-comment">' + entry['comment'] + '</td>' +
+                '<td class="reptool-entry-comment">' + comment + '</td>' +
               '</tr>'
             tbody.append(entry_row)
 
-          # ellipsis-trick the comment if too huge for reptool dropdown
-          if entry['comment'].length > 50
-            entry_comment_trunc = entry['comment'].substring(0, 50) + '...'
-            $('.reptool-entry-comment').text(entry_comment_trunc)
-            $('.reptool-entry-comment').addClass('esc-tooltipped')
-            $('.esc-tooltipped').attr('title', entry['comment'])
-          else
-            $('.reptool-entry-comment').text(entry['comment'])
+            # ellipsis-trick the comment if too huge for reptool dropdown
+            if comment.length > 50
+              entry_comment_trunc = entry['comment'].substring(0, 50) + '...'
+              $('.reptool-entry-comment').text(entry_comment_trunc)
+              $('.reptool-entry-comment').addClass('esc-tooltipped')
+              $('.esc-tooltipped').attr('title', comment)
+            else
+              $('.reptool-entry-comment').text(comment)
 
-          # put the auto-generated comment into the read-only div
-          $('.reptool-generated-comment').html(comment_trail)
+            # put the auto-generated comment into the read-only div
+            $('.reptool-generated-comment').html(comment_trail)
         error: (response) ->
           std_api_error(response, "Error retrieving Reptool Data", reload: false)
       )
@@ -409,7 +411,7 @@ window.submit_bulk_reptool = () ->
     current_classes = $($(this).find('.reptool-entry-class')[0]).attr('data-classification')
     current_entries_and_classes.push {
       'entry': $(entry).text()
-      'classifications': current_classes
+      'classifications': current_classes.split(', ')
     }
 
   # Comment reconstruction for Reptool, it needs a single-line format now without any newlines
@@ -434,7 +436,6 @@ window.submit_bulk_reptool = () ->
   # End: comment is now a single-line, and ready for Reptool now
 
   data = {}
-  debugger
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
@@ -457,69 +458,68 @@ window.submit_bulk_reptool = () ->
       'force': force_commit
     }
   else if submission_action == "reptool-maintain"
-    new_classifications = ''
+    api_url = '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
     array_of_datas = []
+
     if classification_action == 'add'
+      success = 'The following RepTool classifications have been added:'
+      success_msg_arry = []
       $(current_entries_and_classes).each ->
-        if this.classifications.length > 0
-          new_classifications = this.classifications
-          new_classifications_array = new_classifications.split(',')
-          reptool_classes_array = reptool_classes.split(',')
-          filtered = reptool_classes_array.filter((x) ->
-            new_classifications_array.indexOf(x) < 0
+        current_classes = this.classifications
+        fin_classes = []
+
+        if (current_classes.length > 0) && (current_classes[0] != '')
+          # Combine existing classes & checked classes to add to entry
+          fin_classes = current_classes.concat checked_classes.filter((item) ->
+            current_classes.indexOf(item) == -1
+          )
+        else
+          # Only need new checked classes
+          fin_classes = checked_classes
+
+        entry_data = {
+          'action': 'ACTIVE'
+          'entries': [this.entry]
+          'classifications': fin_classes
+          'comment': comment
+          'force': force_commit
+        }
+        array_of_datas.push(entry_data)
+        succ_msg_entry = this.entry + ':<br/>' + checked_classes.join(', ')
+        success_msg_arry.push(succ_msg_entry)
+        data = array_of_datas
+
+    else # classification action == 'remove'
+      debugger
+      # Remove specific classes
+      # There is an edge case where user can maintain -> remove ALL of the classes on ALL
+      # selected entries and it will fail, but it's unlikely since they can use the 'Drop All' action instead.
+      # Therefore not handling at this time.
+      success = 'The following RepTool classes have been removed:'
+      success_msg_arry = []
+      $(current_entries_and_classes).each ->
+        current_classes = this.classifications
+        fin_classes = []
+
+        if (current_classes.length > 0) && (current_classes[0] != '')
+          fin_classes = current_classes.filter((x) ->
+            !checked_classes.includes(x)
           )
 
-          #new_classifications = new_classifications + ',' + reptool_classes
-
-          new_classifications_array = new_classifications_array + reptool_classes_array
-          temp_data = {
+          entry_data = {
             'action': 'ACTIVE'
             'entries': [this.entry]
-            'classifications': [new_classifications_array]
+            'classifications': fin_classes
             'comment': comment
             'force': force_commit
           }
-          array_of_datas.push(temp_data)
-        else
-          new_classifications = reptool_classes.split(',')
-
-          temp_data = {
-            'action': 'ACTIVE'
-            'entries': [this.entry]
-            'classifications': new_classifications
-            'comment': comment
-            'force': force_commit
-          }
-          array_of_datas.push(temp_data)
-        data = array_of_datas
-    else
-      $(current_entries_and_classes).each ->
-        current = this.classifications.split(',')
-        subtracted = current.filter((x) ->
-          checked_classes.indexOf(x) < 0
-        )
-        new_classifications = subtracted.join()
-
-        if new_classifications.length > 0
-          temp_data = {
-            'action': 'ACTIVE'
-            'entries': [this.entry]
-            'classifications': [new_classifications]
-            'comment': comment
-            'force': force_commit
-          }
-          array_of_datas.push(temp_data)
+          array_of_datas.push(entry_data)
+          succ_msg_entry = this.entry + ':<br/>' + checked_classes.join(', ')
+          success_msg_arry.push(succ_msg_entry)
           data = array_of_datas
         else
-          submission_action == "reptool-drop"
-
-          temp_data = {
-            'action': 'expired'
-            'entries': [this.entry]
-            'force': force_commit
-          }
-          array_of_datas.push(temp_data)
-          data = array_of_datas
+          # entry has no current classes, nothing to remove
+          # add entry info to response message
 
   # send separate api calls for each type of submission
   if submission_action == "reptool-override"
@@ -543,12 +543,16 @@ window.submit_bulk_reptool = () ->
         std_msg_error('Error', ['Error adjusting Reptool classes'].concat(errormsg) )
     )
   else if submission_action == "reptool-maintain"
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') were changed on the following entries:', [entries])
+        debugger
+        console.log success
+        console.log success_msg_arry
+        std_msg_success(success, success_msg_arry)
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
