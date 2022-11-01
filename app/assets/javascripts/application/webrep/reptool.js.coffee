@@ -78,16 +78,11 @@ window.get_current_reptool =(button, page) ->
 ##  Populating the toolbar Adjust RepTool BL dropdown
 ## (bulk submission form) - works on index, research page, and show page
 window.bulk_get_current_reptool = (page) ->
-# Define the variables based on the page
-  if page == "show"
+  # Define the variables based on the page
+  if page == "show" || page == "research"
     checkbox = $('.dispute_check_box:checked')
-    case_id = $('#dispute_id').text()
-  else if page == "research"
-    checkbox = $('.dispute_check_box:checked')
-    case_id = ''
   else if page == "index"
     checkbox = $('.dispute-entry-checkbox:checked')
-    case_id = []
 
   ## Clear out any residual data
   # Empty table
@@ -103,63 +98,85 @@ window.bulk_get_current_reptool = (page) ->
     ip_uris = []
     comment_trail = ''
     comment_array = []
+    closed_status = false
+    entry_status = ''
+    entry_case_id = ''
     $(checkbox).each ->
       if page == "show" || page == "research"
         entry_row = $(this).parents('.research-table-row')[0]
         entry_content = $(entry_row).find('.entry-data-content').text().trim()
+        # Note - status and id do not exist on BFRP
+        entry_status = $(entry_row).find('.entry-data-status').text().trim()
+        entry_case_id = $('#dispute_id').text()
       else if page == "index"
         entry_row = $(this).parents('.index-entry-row')[0]
         entry_content = $(entry_row).find('.entry-col-content').text().trim()
+        entry_status = $(entry_row).find('.entry-col-status').text().trim()
         entry_case_id = $(entry_row).attr('data-case-id')
-        comment_array.push('TE.ACE-' + entry_case_id)
 
       # Prep entry content to send to reptool
       ip_uris.push(entry_content)
 
+    entry_comment = 'TE.ACE-' + entry_case_id
+    if comment_array.indexOf(entry_comment) == -1
+      comment_array.push(entry_comment)
+
     if page == "show"
-      comment_trail = 'AC Bulk Submission: \n TE.ACE-' + case_id
+      comment_trail = 'AC INDIVIDUAL SUBMISSION: \n' + comment_array.join('\n')
     else if page == "research"
       comment_trail = 'AC Research Bulk Submission: \n' + ip_uris.join('\n')
     else if page == "index"
       comment_trail = 'AC Bulk Submission: \n' + comment_array.join('\n')
 
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
-      method: 'POST'
-      data: { ip_uris: ip_uris }
-      success: (response) ->
-        response = JSON.parse(response)
-        for entry in response
-          if entry['status'] == "ACTIVE"
-            rep_class_exp = entry['expiration']
-            rep_class_list = entry['classification']
-            rep_class_attr = ''
-            # remove dupes from array then add space after each entry
-            rep_class_list = rep_class_list.filter((elem, index, self) -> index == self.indexOf(elem))
-            rep_class_list = rep_class_list.join(', ')
+    if entry_status ==  "RESOLVED_CLOSED"
+      closed_status = true
 
+    if closed_status
+      std_msg_error('Error', ['Please reopen dispute before adjusting reptool.'])
+    else
+      #TODO - back end is accepting multiple entries but only returning one here
+      std_msg_ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
+        method: 'POST'
+        data: { ip_uris: ip_uris }
+        success: (response) ->
+          response = JSON.parse(response)
+
+          for entry in response
+            if entry['status'] == "ACTIVE"
+              rep_class_exp = entry['expiration']
+              rep_class_list = entry['classification']
+              # remove dupes from array then add space after each entry
+              rep_class_list = rep_class_list.filter((elem, index, self) -> index == self.indexOf(elem))
+              rep_class_list = rep_class_list.join(', ')
+              rep_class_td_content = rep_class_list
+            else
+              rep_class_exp = ''
+              rep_class_td_content = '<span class="missing-data">No active classifications</span>'
+
+            entry_row =
+              '<tr class="reptool-entry-row" data-case-id="' + case_id + '">' +
+                '<td class="reptool-entry-name">' + entry['entry'] + '</td>' +
+                '<td class="reptool-entry-class" data-classification="' + rep_class_list + '">' + rep_class_td_content + '</td>' +
+                '<td>' + rep_class_exp + '</td>' +
+                '<td class="reptool-entry-comment">' + entry['comment'] + '</td>' +
+              '</tr>'
+            tbody.append(entry_row)
+
+          # ellipsis-trick the comment if too huge for reptool dropdown
+          if entry['comment'].length > 50
+            entry_comment_trunc = entry['comment'].substring(0, 50) + '...'
+            $('.reptool-entry-comment').text(entry_comment_trunc)
+            $('.reptool-entry-comment').addClass('esc-tooltipped')
+            $('.esc-tooltipped').attr('title', entry['comment'])
           else
-            rep_class_attr = 'No active classifications'
-            rep_class_exp = ''
-            rep_class_list = '<span class="missing-data">No active classifications</span>'
+            $('.reptool-entry-comment').text(entry['comment'])
 
-          tbody.append('<tr class="reptool-entry-row" data-case-id="' + case_id + '"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class_attr + '">' + rep_class_list + '</td><td>' + rep_class_exp + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
-
-
-        # ellipsis-trick the comment if too huge for reptool dropdown
-        if entry['comment'].length > 50
-          entry_comment_trunc = entry['comment'].substring(0, 50) + '...'
-          $('.reptool-entry-comment').text(entry_comment_trunc)
-          $('.reptool-entry-comment').addClass('esc-tooltipped')
-          $('.esc-tooltipped').attr('title', entry['comment'])
-        else
-          $('.reptool-entry-comment').text(entry['comment'])
-
-        # put the auto-generated comment into the read-only div
-        $('.reptool-generated-comment').html(comment_trail)
-      error: (response) ->
-        std_api_error(response, "Error retrieving Reptool Data", reload: false)
-    )
+          # put the auto-generated comment into the read-only div
+          $('.reptool-generated-comment').html(comment_trail)
+        error: (response) ->
+          std_api_error(response, "Error retrieving Reptool Data", reload: false)
+      )
   else
     std_msg_error('Error', ['Please select one row'])
     return false
@@ -232,7 +249,7 @@ window.submit_individual_reptool = (button) ->
   comm_generated = ''
   comment = ''
 
-  # Begin: Comment reconstruction for Reptool, it needs a single-line format now w/o newlines
+  # Comment reconstruction for Reptool, it needs a single-line format now w/o newlines
   # get the 'typed in' part of the comment from the dropdown for inline
   comm_typed_in = $(dropdown).find('.typed-in-comment-inline').val()  # get the 'typed in' part of the comment, textarea
   comm_typed_in = comm_typed_in.replace(/(\r\n|\n|\r)/gm, " ")  # replace newlines w/ spaces if there are any
@@ -257,17 +274,9 @@ window.submit_individual_reptool = (button) ->
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    success = 'The following RepTool classes have been are assigned to: ' + entry_content
+    success = 'The following RepTool classes have been assigned to: <br/>' + entry_content
     reptool_classes = checked_classes.join(', ')
-    #the old way
-    #data = {
-    #  'action': 'ACTIVE'
-    #  'entries': entry_content
-    #  'classifications': checked_classes.join(',')
-    #  'comment': comment
-    #  'force': force_commit
-    #}
-    #the new way
+
     data = {
       'action': 'ACTIVE'
       'entries': [entry_content]
@@ -277,7 +286,7 @@ window.submit_individual_reptool = (button) ->
     }
   else if submission_action == "reptool-drop"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
-    success = 'All RepTool classes have been removed from: ' + entry_content
+    success = 'All RepTool classes have been removed from: <br/>' + entry_content
     reptool_classes = ''
     data = {
       'action': 'EXPIRED'
@@ -299,7 +308,7 @@ window.submit_individual_reptool = (button) ->
       fin_classes = current_arry.concat checked_classes.filter((item) ->
         current_arry.indexOf(item) == -1
       )
-      success = 'The following RepTool classifications have been added to: ' + entry_content
+      success = 'The following RepTool classifications have been added to: <br/>' + entry_content
       reptool_classes = checked_classes.join(', ')
 
       data = {
@@ -321,7 +330,7 @@ window.submit_individual_reptool = (button) ->
       # User is removing all classes currently on entry
       if fin_classes.length < 1
         api_url = '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
-        success = 'All RepTool classes have been removed from: ' + entry_content
+        success = 'All RepTool classes have been removed from: <br/>' + entry_content
         reptool_classes = ''
         data = {
           'action': 'EXPIRED'
@@ -331,7 +340,7 @@ window.submit_individual_reptool = (button) ->
 
       else
         api_url = '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
-        success = 'The following RepTool classes have been removed from: ' + entry_content
+        success = 'The following RepTool classes have been removed from:<br/> ' + entry_content
         reptool_classes = checked_classes.join(', ')
 
         data = {
@@ -343,18 +352,6 @@ window.submit_individual_reptool = (button) ->
             'force': force_commit
           }]
         }
-
-    #this is the old way
-    #data = {
-    #  'data': [{
-    #    'action': 'ACTIVE'
-    #    'entries': [entry_content]
-    #    'classifications': [fin_classes.join(',')]
-    #    'comment': comment
-    #    'force': force_commit
-    #  }]
-    #}
-
 
   # Send to RepTool!
   std_msg_ajax(
@@ -393,8 +390,6 @@ window.submit_bulk_reptool = () ->
   if $(bulk_reptool_menu).find('.reptool-class-cb:checked').length > 0
     $(bulk_reptool_menu).find('.reptool-class-cb:checked').each ->
       checked_classes.push($(this).val())
-  # Convert to string for data submission
-  reptool_classes = checked_classes.join()
 
   classification_action = $(bulk_reptool_menu).find("input[name='reptool-classes-radio']:checked").val()
   comm_typed_in = ''
@@ -438,16 +433,24 @@ window.submit_bulk_reptool = () ->
   console.log comment
   # End: comment is now a single-line, and ready for Reptool now
 
+  data = {}
+  debugger
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
+    api_url = '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+    success = 'The following RepTool classes have been assigned to: <br/>' + entries.join('<br/>')
+    success_msg_arry = checked_classes
     data = {
       'action': 'ACTIVE'
       'entries': entries
-      'classifications': reptool_classes
+      'classifications': checked_classes
       'comment': comment
       'force': force_commit
     }
   else if submission_action == "reptool-drop"
+    api_url = '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
+    success = 'All RepTool classes have been removed from: '
+    success_msg_arry = entries
     data = {
       'action': 'EXPIRED'
       'entries': entries
@@ -465,8 +468,6 @@ window.submit_bulk_reptool = () ->
           filtered = reptool_classes_array.filter((x) ->
             new_classifications_array.indexOf(x) < 0
           )
-
-          #reptool_classes = filtered.join()
 
           #new_classifications = new_classifications + ',' + reptool_classes
 
@@ -523,11 +524,11 @@ window.submit_bulk_reptool = () ->
   # send separate api calls for each type of submission
   if submission_action == "reptool-override"
     std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+      url: api_url
       method: 'POST'
       data: data
       success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') are assigned to the following entries:', [entries])
+        std_msg_success(success, success_msg_arry)
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
@@ -563,11 +564,11 @@ window.submit_bulk_reptool = () ->
     )
   else if submission_action == "reptool-drop"
     std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
+      url: api_url
       method: 'POST'
       data: data
       success: (response) ->
-        std_msg_success('All RepTool classes have been removed from the following entries:', [entries])
+        std_msg_success(success, entries)
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
