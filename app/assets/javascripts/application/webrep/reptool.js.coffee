@@ -411,7 +411,7 @@ window.submit_bulk_reptool = () ->
     current_classes = $($(this).find('.reptool-entry-class')[0]).attr('data-classification')
     current_entries_and_classes.push {
       'entry': $(entry).text()
-      'classifications': current_classes.split(', ')
+      'classifications': current_classes
     }
 
   # Comment reconstruction for Reptool, it needs a single-line format now without any newlines
@@ -465,10 +465,15 @@ window.submit_bulk_reptool = () ->
       success = 'The following RepTool classifications have been added:'
       success_msg_arry = []
       $(current_entries_and_classes).each ->
+        # current_classes is a string from data-classifications attribute
         current_classes = this.classifications
         fin_classes = []
 
-        if (current_classes.length > 0) && (current_classes[0] != '')
+        if current_classes != ''
+          if current_classes.includes(',')
+            current_classes = current_classes.split(',')
+          else
+            current_classes = [current_classes]
           # Combine existing classes & checked classes to add to entry
           fin_classes = current_classes.concat checked_classes.filter((item) ->
             current_classes.indexOf(item) == -1
@@ -490,7 +495,6 @@ window.submit_bulk_reptool = () ->
         data = array_of_datas
 
     else # classification action == 'remove'
-      debugger
       # Remove specific classes
       # There is an edge case where user can maintain -> remove ALL of the classes on ALL
       # selected entries and it will fail, but it's unlikely since they can use the 'Drop All' action instead.
@@ -501,11 +505,15 @@ window.submit_bulk_reptool = () ->
         current_classes = this.classifications
         fin_classes = []
 
-        if (current_classes.length > 0) && (current_classes[0] != '')
+        if current_classes != ''
+          if current_classes.includes(',')
+            current_classes = current_classes.split(',')
+          else
+            current_classes = [current_classes]
+
           fin_classes = current_classes.filter((x) ->
             !checked_classes.includes(x)
           )
-
           entry_data = {
             'action': 'ACTIVE'
             'entries': [this.entry]
@@ -520,6 +528,7 @@ window.submit_bulk_reptool = () ->
         else
           # entry has no current classes, nothing to remove
           # add entry info to response message
+    console.log data
 
   # send separate api calls for each type of submission
   if submission_action == "reptool-override"
@@ -549,9 +558,6 @@ window.submit_bulk_reptool = () ->
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        debugger
-        console.log success
-        console.log success_msg_arry
         std_msg_success(success, success_msg_arry)
       error: (response) ->
         if response.responseJSON == undefined
