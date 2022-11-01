@@ -32,7 +32,8 @@ class Umbrella::Importer
         raise 'Umbrella platform not found' if platform.blank?
 
         Umbrella::DataFetcher.fetch(date).each do |umbrella_record|
-          UmbrellaCluster.find_or_create_by(domain: umbrella_record[:domain], platform_id: platform.id)
+          domain = PublicSuffix.parse(umbrella_record[:domain], ignore_private: true).domain
+          UmbrellaCluster.find_or_create_by(domain: domain, platform_id: platform.id)
         end
       end
 
