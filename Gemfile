@@ -3,8 +3,8 @@ source 'https://rubygems.org'
 ruby "2.7.4"
 
 # Web-framework
-gem 'rack', '>= 2.1.3'
-gem 'rails', '5.2.2.1'
+gem 'rack', '>= 2.1.4.1'
+gem 'rails', '5.2.8.1'
 gem 'rack-cors', '0.4.1', require: 'rack/cors'
 gem 'active_model_serializers', '0.10.8'
 gem 'grape', '1.3.1'
@@ -69,12 +69,12 @@ gem 'diffy', '3.2.1'
 gem 'gzip', '1.0'
 gem 'chart-js-rails', '~> 0.1.2'
 gem 'chartkick', '~> 2.2.4'
-gem 'awesome_nested_set', '3.1.4'
-gem 'will_paginate', '3.1.6'
+gem 'awesome_nested_set', '3.5.0'
+gem 'will_paginate', '3.3.1'
 gem 'kaminari', '1.1.1'
 gem 'jquery-datatables', '~> 1.10.19'
 gem 'ajax-datatables-rails', '~> 1.0.0'
-gem 'rmagick', '~> 2.16.0'
+gem 'rmagick', '5.0.0'
 gem 'psych', '3.2.0'
 gem 'rubyXL', '3.3.30'
 
@@ -122,7 +122,7 @@ group :production, :staging do
 end
 
 group :development do
-  gem 'puma', '3.12.0'
+  gem 'puma', '6.0.0'
   gem 'awesome_print', '1.8.0'
   gem 'guard','2.14.2'
 
