@@ -424,6 +424,7 @@ $ ->
       $(tc_row).removeClass('hidden')
 
   window.call_action_switchboard = (disputes, disputes_new) ->
+
     $('#confirmation-modal').modal('hide')
     ####
     # data is set and each action calls the appropriate endpoint here
@@ -441,88 +442,90 @@ $ ->
 
     for dispute, value of disputes_new
       dispute = dispute.trim()
-      act = value.action[0]
 
-      if act != undefined
-        switch act.action
+      #loop through actions in dispute
+      $(value.action).each (e, act) ->
 
-          when 'maintain'
-            data = [{
-              'action': 'ACTIVE'
-              'entries': [dispute]
-              'classifications': act.list
-              'comment': comment
-              'force': act.force
-            }]
+        if act != undefined
+          switch act.action
 
-            maintain_reptool_bl(data).then( (response)=>
-              ajax_count--
-              if !response
-                error_message = "<p>Unable to update all reptool entries.</p>"
-                error_array.push(error_message)
-            )
+            when 'maintain'
+              data = [{
+                'action': 'ACTIVE'
+                'entries': [dispute]
+                'classifications': act.list
+                'comment': comment
+                'force': act.force
+              }]
 
-          when 'override'
-            data = [{
-              'action': 'ACTIVE'
-              'entries': [dispute]
-              'classifications': act.list
-              'comment': comment
-              'force': act.force
-            }]
+              maintain_reptool_bl(data).then( (response)=>
+                ajax_count--
+                if !response
+                  error_message = "<p>Unable to update all reptool entries.</p>"
+                  error_array.push(error_message)
+              )
 
-            maintain_reptool_bl(data).then((response)=>
-              ajax_count--
-              if !response
-                error_message = "<p>Unable to update all reptool entries.</p>"
-                error_array.push(error_message)
-            )
-          when 'drop'
-            data = {
-              'action': 'EXPIRED'
-              'entries': [dispute]
-              'comment':  comment
-              'classifications': act.list
-              'force': act.force
-            }
-            drop_reptool_bl(data).then((response)=>
-              ajax_count--
-              if !response
-                error_message = "<p>Unable to drop all reptool entries.</p>"
-                error_array.push(error_message)
-            )
-          when 'add'
+            when 'override'
+              data = [{
+                'action': 'ACTIVE'
+                'entries': [dispute]
+                'classifications': act.list
+                'comment': comment
+                'force': act.force
+              }]
 
-            data = {
-              'urls':[dispute]
-              'trgt_list': act.list
-              'note': comment
-            }
+              maintain_reptool_bl(data).then((response)=>
+                ajax_count--
+                if !response
+                  error_message = "<p>Unable to update all reptool entries.</p>"
+                  error_array.push(error_message)
+              )
+            when 'drop'
+              data = {
+                'action': 'EXPIRED'
+                'entries': [dispute]
+                'comment':  comment
+                'classifications': act.list
+                'force': act.force
+              }
+              drop_reptool_bl(data).then((response)=>
+                ajax_count--
+                if !response
+                  error_message = "<p>Unable to drop all reptool entries.</p>"
+                  error_array.push(error_message)
+              )
+            when 'add'
 
-            #need to loop back through at higher level and grab tc_ids
-            $(value.action).each (e, i) ->
-              if i.action == 'tc_ids'
-                data.thrt_cat_ids = i.list
+              data = {
+                'urls':[dispute]
+                'trgt_list': act.list
+                'note': comment
+              }
 
-            adjust_wlbl(data).then((response) =>
-              ajax_count--
-              if !response
-                error_message = "<p>Unable to adjust all wlbl entries.</p>"
-                error_array.push(error_message)
-            )
+              #need to loop back through at higher level and grab tc_ids
+              $(value.action).each (e, i) ->
+                if i.action == 'tc_ids'
+                  data.thrt_cat_ids = i.list
 
-          when 'remove'
-            data = {
-              'ip_uris': [dispute]
-              'list_types': act.list
-              'note': comment
-            }
-            remove_wlbl(data).then((response)=>
-              ajax_count--
-              if !response
-                error_message = "<p>Unable to remove all wlbl entries.</p>"
-                error_array.push(error_message)
-            )
+              adjust_wlbl(data).then((response) =>
+                ajax_count--
+                if !response
+                  error_message = "<p>Unable to adjust all wlbl entries.</p>"
+                  error_array.push(error_message)
+              )
+
+            when 'remove'
+              data = {
+                'ip_uris': [dispute]
+                'list_types': act.list
+                'note': comment
+              }
+              remove_wlbl(data).then((response)=>
+                ajax_count--
+                if !response
+                  error_message = "<p>Unable to remove all wlbl entries.</p>"
+                  error_array.push(error_message)
+              )
 
 
   window.maintain_reptool_bl = (data)->
