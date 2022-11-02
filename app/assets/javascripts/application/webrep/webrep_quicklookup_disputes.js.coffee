@@ -963,7 +963,7 @@ $ ->
           force_commit_col = "<span data-force-commit='#{force_commit}' class='force-col-tag float-right'>F</span>"
         else force_commit_col = ''
 
-        col_dialog = "<p class='#{reptool_class} #{status_class} reptool-action-col' data='#{check_list}' data-force-commit=#{force_commit}> #{status_string} #{col_tag_format(check_list)} #{force_commit_col}<p>"
+        col_dialog = "<p class='#{reptool_class} #{status_class} reptool-action-col' data='#{check_list}' data-force-commit=#{force_commit}> #{status_string} #{col_tag_format(check_list)} #{force_commit_col}</p>"
         drop_check = reptool_add  == 'drop' && existing_reptool.length
         if check_list.length || drop_check
           clear_col.show()
