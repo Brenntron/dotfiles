@@ -423,7 +423,7 @@ $ ->
     else
       $(tc_row).removeClass('hidden')
 
-  window.call_action_switchboard = (disputes, disputes_new) ->
+  window.call_action_switchboard = (disputes, disputes_new_format) ->
 
     $('#confirmation-modal').modal('hide')
     ####
@@ -440,7 +440,7 @@ $ ->
          quick_bulk_update(disputes, error_array)
     , 200);
 
-    for dispute, value of disputes_new
+    for dispute, value of disputes_new_format
       dispute = dispute.trim()
 
       #loop through actions in dispute
@@ -638,7 +638,7 @@ $ ->
     $('#confirmation-modal').modal('toggle');
     $('#quick-lookup-loader').addClass('visible-ajax-message')
     disputes = {}
-    disputes_new = {}
+    disputes_new_format = {}
 
     $( confirmation_rows ).each ->
         action_list = []
@@ -666,25 +666,25 @@ $ ->
 
           formatted_action = check_actions(class_list)
 
-          #setting up new action object data
+          #Currently using two formats of data, one for quick_bulk_update endpoint and the other for individual endpoints
+
+          #setting up new action object data to use in individual endpoints
           action_object = {}
           action_object.action = formatted_action
           action_object.list = action_tags
           action_object.force = force_commit
           action_list_new.push action_object
 
-          #keep old data format intact
+          #keep old data format intact for quick_bulk_update
           action_list.push( "#{formatted_action}": action_tags )
-
-        #Splitting into two formats to use the old one with quick_bulk_update endpoint
 
         #legacy action format for quick_bulk_update
         actions = action: action_list
         disputes[dispute] = actions
 
         #new action format to fit in force_commit property
-        actions_new = action: action_list_new
-        disputes_new[dispute] = actions_new
+        actions_new_format = action: action_list_new
+        disputes_new_format[dispute] = actions_new_format
 
         dispute_check = true
 
@@ -695,7 +695,7 @@ $ ->
               break
 
         if dispute_check
-          call_action_switchboard(disputes, disputes_new)
+          call_action_switchboard(disputes, disputes_new_format)
 
 
   window.set_action_wlbl_col = () ->
