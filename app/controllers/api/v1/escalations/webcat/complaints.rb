@@ -480,7 +480,7 @@ module API
               score = nil
               category = "no category found"
 
-              sbrs_data = Sbrs::Base.combo_call_sds_v3(params[:domain], [])
+              sbrs_data = Sbrs::Base.combo_call_sds_v3(SimpleIDN.to_ascii(params[:domain]), [])
 
               if sbrs_data.include? 'request failed'
                 score = nil
@@ -488,7 +488,7 @@ module API
                 score = sbrs_data.dig('wbrs', 'score')
               end
 
-              category = ComplaintEntry.get_category_data(params[:domain])
+              category = ComplaintEntry.get_category_data(SimpleIDN.to_ascii(params[:domain]))
 
               {:data => {:score => score, :category => category}}.to_json
             end

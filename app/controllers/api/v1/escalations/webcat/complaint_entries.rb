@@ -545,7 +545,7 @@ module API
 
               pre_raw_records = []
 
-              prefix_records = Wbrs::Prefix.where({:urls => [URI.escape(params[:domain])]})
+              prefix_records = Wbrs::Prefix.where({:urls => [URI.escape(SimpleIDN.to_ascii(params[:domain]))]})
               prefix_records.each do |prefix_record|
                 history_records = Wbrs::HistoryRecord.where({:prefix_id => prefix_record.prefix_id})
                 pre_raw_records += history_records
@@ -604,10 +604,10 @@ module API
 
                 data_point[:is_important] = ComplaintEntry.self_importance(url_from_prefix)
                 data_point[:category] = record.category.descr
-                data_point[:url] = url_from_prefix
-                data_point[:domain] = prefix.domain
-                data_point[:subdomain] = prefix.subdomain
-                data_point[:path] = prefix.path
+                data_point[:url] = SimpleIDN.to_unicode(url_from_prefix)
+                data_point[:domain] = SimpleIDN.to_unicode(prefix.domain)
+                data_point[:subdomain] = SimpleIDN.to_unicode(prefix.subdomain)
+                data_point[:path] = SimpleIDN.to_unicode(prefix.path)
                 data_point[:action] = record.action
                 data_point[:confidence] = record.confidence
                 data_point[:score] = record_score

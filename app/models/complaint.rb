@@ -1081,7 +1081,7 @@ For future web and email reputation requests, please open a web and email reputa
         new_complaint.save
         new_complaint_entry.save
 
-        prefix = new_complaint_entry.hostlookup
+        prefix = SimpleIDN.to_ascii(new_complaint_entry.hostlookup)
 
         category_names_to_submit = categories.join(",")
         categories_to_submit = category_ids.join(",")
