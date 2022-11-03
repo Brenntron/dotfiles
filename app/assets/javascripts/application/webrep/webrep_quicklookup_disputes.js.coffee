@@ -802,7 +802,7 @@ $ ->
         else
           current_threat_cats = ''
 
-        col_dialog = "<p class='wlbl-action-col #{list_action}' wlbl_data='#{check_list_array}'>#{action_desc}  #{check_list} #{current_threat_cats}<p>"
+        col_dialog = "<p class='wlbl-action-col #{list_action}' wlbl_data='#{check_list_array}'>#{action_desc}  #{check_list} #{current_threat_cats}</p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 
         if error_message.endsWith('</span>')
