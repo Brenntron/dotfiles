@@ -165,9 +165,25 @@ $ ->
     if !$(list).has('label').length
       build_checkbox_list(wlbl_options, list, type)
 
+  #Set up Force commit tooltip
   $('body').on 'mouseenter', '#research-table .force-col-tag:not(.tooltipstered)', ->
     $(this).tooltipster(
       side: 'top'
+      theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+    ).tooltipster 'open'
+
+  #Show different tooltip for Force tags in confirmation modal.
+  $('body').on 'mouseenter', '#confirmation-modal .force-col-tag.tooltipstered', ->
+    $(this).tooltipster(
+      side: 'top'
+      content: 'Force Commit'
+      theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+    ).tooltipster 'open'
+
+  $('body').on 'mouseenter', '#confirmation-modal .force-col-tag:not(.tooltipstered)', ->
+    $(this).tooltipster(
+      side: 'top'
+      content: 'Force Commit'
       theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
     ).tooltipster 'open'
 
