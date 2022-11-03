@@ -165,6 +165,12 @@ $ ->
     if !$(list).has('label').length
       build_checkbox_list(wlbl_options, list, type)
 
+  $('body').on 'mouseenter', '#research-table .force-col-tag:not(.tooltipstered)', ->
+    $(this).tooltipster(
+      side: 'top'
+      theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+    ).tooltipster 'open'
+
   window.select_all_detailed = (check)->
     is_checked = $(check).prop('checked')
     $('.dispute_check_box').prop('checked', is_checked)
@@ -850,7 +856,7 @@ $ ->
       row = $(this).closest('tr')
       col_actions = row.find('.col-actions').children().length
       col_length = col_length + col_actions
-    if col_length > 1
+    if col_length >= 1
       $('#submit-rep-changes').attr('disabled', false)
     else
       $('#submit-rep-changes').attr('disabled', true)
@@ -960,7 +966,7 @@ $ ->
           error_array.push(error_html)
 
         if force_commit == true
-          force_commit_col = "<span data-force-commit='#{force_commit}' class='force-col-tag float-right'>F</span>"
+          force_commit_col = "<span data-force-commit='#{force_commit}' title='Click to remove Force' class='force-col-tag float-right' >F</span>"
         else force_commit_col = ''
 
         col_dialog = "<p class='#{reptool_class} #{status_class} reptool-action-col' data='#{check_list}' data-force-commit=#{force_commit}> #{status_string} #{col_tag_format(check_list)} #{force_commit_col}</p>"
