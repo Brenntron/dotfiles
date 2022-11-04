@@ -1374,6 +1374,7 @@ $ ->
         $('#company-list').empty()
         $('#resolution-list').empty()
 
+
         $('#platform-input').selectize {
           persist: false
           create: false
@@ -1406,6 +1407,10 @@ $ ->
 
         for resolution in response.json.resolutions
           $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
+
+        for priority in ['P1', 'P2', 'P3', 'P4', 'P5']
+          $('#priority-list').append '<option value=\'' + priority + '\'></option>'
+
     )
 
 
@@ -2675,10 +2680,58 @@ window.format_webrep_header = (data) ->
       else
         new_header = 'All Tickets'
     else if search_type == 'advanced'
+      search_conditions = JSON.parse(localStorage.webRepFilters)
       new_header =
         '<div>Results for Advanced Search ' +
         reset_icon +
         '</div>'
+      selectedFilters = []
+      condition_types = {
+        age_newer: 'Age more than'
+        age_older: 'Age less than'
+        case_id: 'Case IDs'
+        case_owner_username: 'Case owner'
+        modified_newer: 'Updated after'
+        modified_older: 'Updated before'
+        org_domain: 'Submitter domain'
+        platform_ids: 'Platform'
+        priority: 'Priority'
+        resolution: 'Resolution'
+        status: 'Status'
+        submitted_newer: 'Submitted after'
+        submitted_older: 'Submitted before'
+        submitter_type: 'Submitter Type'
+      }
+      for conditionName, condition of search_conditions
+        if condition == '' || ['search', 'search_name', 'search_type'].includes(conditionName)
+          continue
+        
+        if conditionName == 'customer'
+          for customer_type, customer_value of search_conditions[conditionName]
+            if customer_value == ''
+             continue 
+            if customer_type == 'name'
+              selectedFilters.push({name: 'Contact Name', value: customer_value})
+            if customer_type == 'email'
+              selectedFilters.push({name: 'Contact Email', value: customer_value})
+            if customer_type == 'company_name'
+              selectedFilters.push({name: 'Company Name', value: customer_value})
+        else if conditionName == 'dispute_entries'
+          for key, value of search_conditions[conditionName]
+            if value  == ''
+             continue 
+            if key == 'ip_or_uri'
+              selectedFilters.push({name: 'Dispute (URL/IP/Domain)', value: value})
+            if key == 'suggested_disposition'
+              selectedFilters.push({name: 'Suggested Disposition', value: value})
+        else if conditionName == 'submission_type'
+          selectedFilters.push({name: 'Submission Type', value: search_conditions[conditionName].map((e) => e.toUpperCase()).join(', ')})
+        else if condition_types[conditionName] 
+          selectedFilters.push({name: condition_types[conditionName], value: search_conditions[conditionName]})
+        container = $('#dispute-advaced-search-selected-filters')
+      for item in selectedFilters
+        html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value + '</span>'
+        $('#dispute-advaced-search-selected-filters').append(html)
     else if search_type == 'named'
       new_header =
         '<div>Results for "' + search_name + '" Saved Search' +

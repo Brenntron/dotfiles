@@ -8392,10 +8392,6 @@ table#duplicates a {
   content: '';
 }
 
-#dispute-index-title {
-  display: inline-block;
-}
-
 .refresh-message {
   display: inline-block;
   float: right;
@@ -10512,7 +10508,7 @@ hr.thin.form-divider {
   margin-left: 35px;
 }
 
-#filerep_searchref_container, #webcat_searchref_container, #sdr_searchref_container{
+#filerep_searchref_container, #webcat_searchref_container, #sdr_searchref_container, #dispute-advaced-search-selected-filters{
   & {
     color: $primary-section-color;
     max-width: 100%;

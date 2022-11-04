@@ -1340,10 +1340,6 @@ For future Web categorization requests, please open a Web categorization ticket 
     dispute_fields = params.to_h.slice(*fields)
     dispute_fields['id'] = dispute_fields.delete('case_id')
 
-    if dispute_fields['priority'] && /(?<priority_digits>\d+)/ =~ dispute_fields.delete('priority')
-      dispute_fields['priority'] = priority_digits
-    end
-
     if dispute_fields['case_owner_username'].present?
       user = User.where(cvs_username: dispute_fields.delete('case_owner_username')).first
       dispute_fields['user_id'] = user.id
@@ -1353,7 +1349,6 @@ For future Web categorization requests, please open a Web categorization ticket 
     if dispute_fields['id'].present?
       dispute_fields['id'] = dispute_fields['id'].split(/[\s,]+/)
     end
-
     relation = where(dispute_fields)
 
 
@@ -1441,8 +1436,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     if entry_params.any?
       dispute_entry_fields = entry_params.slice(*%w{suggested_disposition})
       ip_or_uri = entry_params['ip_or_uri']
-
-      relation = relation.joins(:dispute_entries).group(:id)
+      relation = relation.joins(:dispute_entries)
       relation = relation.where(dispute_entries: dispute_entry_fields) if dispute_entry_fields.present?
 
       if ip_or_uri.present?
