@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 ruby "2.7.4"
 
 # Web-framework
-gem 'rack', '>= 2.1.4.1'
+gem 'rack', '>= 2.2.4'
 gem 'rails', '5.2.8.1'
 gem 'rack-cors', '0.4.1', require: 'rack/cors'
 gem 'active_model_serializers', '0.10.8'
