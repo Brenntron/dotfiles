@@ -293,7 +293,7 @@
             %td
 
       - if @user.child?
-        - coworkers_total = current_user.siblings.length
+        - coworkers_total = current_user.siblings.length + 1
         - @user.siblings.each_with_index do |user, index|
           %tr.peer
             - if index == 0
