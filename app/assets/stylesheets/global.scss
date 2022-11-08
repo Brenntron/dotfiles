@@ -4723,6 +4723,8 @@ button.tertiary {
 .col-bulk-dispute:focus{
   background-color: $faint-alt-highlight;
   line-height: 1.5em;
+  outline: 1px solid #e6e6e6;
+  padding: 2px;
 }
 
 #advanced-search-dropdown .form-group input[type='checkbox']:not(#in-sample-zoo-input) {
@@ -5708,7 +5710,7 @@ input.table-entry-input:focus {
 /* quicklookup > bulk dispute div functions as an input */
 .col-bulk-dispute{
   min-width: 150px;
-  min-height: 39px;
+  min-height: 12px;
   vertical-align: top;
   line-height: 1.5em;
 }
@@ -5716,7 +5718,7 @@ input.table-entry-input:focus {
 .col-bulk-dispute:empty {
   outline: 1px solid darken($content-bg-color, 10%);
   padding: 2px;
-  margin: 3px 20px 3px 0;
+  margin: 0 20px -1px 0;
 }
 .col-bulk-dispute:empty:after {
   content: 'Enter one or more URLs or IPs here...';
