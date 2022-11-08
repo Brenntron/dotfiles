@@ -172,18 +172,18 @@ $ ->
       theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
     ).tooltipster 'open'
 
-  #Show different tooltip for Force tags in confirmation modal.
+  #Show tooltip for Force tags in confirmation modal.
   $('body').on 'mouseenter', '#confirmation-modal .force-col-tag.tooltipstered', ->
     $(this).tooltipster(
       side: 'top'
-      content: 'Force Commit'
+      content: 'Force commit'
       theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
     ).tooltipster 'open'
 
   $('body').on 'mouseenter', '#confirmation-modal .force-col-tag:not(.tooltipstered)', ->
     $(this).tooltipster(
       side: 'top'
-      content: 'Force Commit'
+      content: 'Force commit'
       theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
     ).tooltipster 'open'
 
@@ -982,7 +982,7 @@ $ ->
           error_array.push(error_html)
 
         if force_commit == true
-          force_commit_col = "<span data-force-commit='#{force_commit}' title='Click to remove Force' class='force-col-tag float-right' >F</span>"
+          force_commit_col = "<span data-force-commit='#{force_commit}' title='Force commit' class='force-col-tag float-right' >F</span>"
         else force_commit_col = ''
 
         col_dialog = "<p class='#{reptool_class} #{status_class} reptool-action-col' data='#{check_list}' data-force-commit=#{force_commit}> #{status_string} #{col_tag_format(check_list)} #{force_commit_col}</p>"
