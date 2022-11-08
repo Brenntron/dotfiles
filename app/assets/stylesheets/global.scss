@@ -788,6 +788,7 @@ button {
     width: 20px;
     border: none;
     background-color: unset;
+    float: right;
   }
 .expand-button    {background-image: url(image_path('icon_expand.svg'));}
 .expand-row-button {background-image: url(image_path('icon_expand2.svg'));}
@@ -5687,6 +5688,7 @@ input.table-entry-input:focus {
   }
   td {
     padding: 8px 8px 8px 10px;
+    vertical-align: middle;
   }
   .tc_header{
     text-transform: none;
@@ -9716,6 +9718,15 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 .platform-col{
   white-space: nowrap;
 }
+
+.col-wbrs {
+  text-align: right;
+}
+
+.col-wbrs-rule-hits {
+  text-align: center;
+}
+
 .col-tag, .force-col-tag{
   background: $faint-neutral-color;
   font-weight: 200;
