@@ -60,7 +60,7 @@
             %td
 
       - if @user.has_role?('manager')
-        - team_total = @user.descendants.length + 1
+        - team_total = @user.descendants.length
         %tr.self
           %td#team-cell.user-group{rowspan: "#{team_total}", 'data-rowspan': "#{team_total}"} Team
           %td.alt-col.user-col-divider.user-displayname-col= @user.display_name
@@ -293,7 +293,7 @@
             %td
 
       - if @user.child?
-        - coworkers_total = current_user.siblings.length + 1
+        - coworkers_total = current_user.siblings.length
         - @user.siblings.each_with_index do |user, index|
           %tr.peer
             - if index == 0
