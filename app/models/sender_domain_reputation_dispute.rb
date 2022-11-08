@@ -798,6 +798,8 @@ class SenderDomainReputationDispute < ApplicationRecord
             sdr_dispute&.customer&.email
           when 'domain_name'
             sdr_dispute.domain_name
+          when 'source'
+            sdr_dispute.source || 'Internal'
           else
             sdr_dispute.attributes[field_name]
           end

@@ -1730,7 +1730,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       dispute_packet[:age_int] = (Time.now - dispute.created_at).to_i
       # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
       dispute_packet[:suggested_disposition] = dispute.suggested_d
-      dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
+      dispute_packet[:source] = dispute.ticket_source.nil? ? "Internal" : dispute.ticket_source
       dispute_packet[:source_type] = dispute.ticket_source_type
 
       dispute_packet[:wbrs_score] = ''
