@@ -150,9 +150,9 @@ $ ->
     list = $(dropdown).find('ul')
     type = 'reptool'
 
-    reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
-      "dga", "exploitkit", "malware", "open_proxy", "open_relay",
-      "phishing", "response", "spam", "suspicious", "tor_exit_node"]
+    reptool_options = [ "attackers", "banking_fraud", "bogon", "bots", "cnc", "cryptomining",
+      "dga", "exploitkit", "high_risk", "ioc", "link_sharing", "malicious", "malware", "newly_seen",
+      "open_proxy", "open_relay", "phishing", "response", "spam", "spyware", "suspicious", "tor_exit_node"]
 
     if !$(list).has('label').length
       build_checkbox_list(reptool_options, list, type)
