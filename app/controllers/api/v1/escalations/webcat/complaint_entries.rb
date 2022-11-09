@@ -552,7 +552,7 @@ module API
               end
               clean_domain = URI.escape(SimpleIDN.to_ascii(params[:domain]))
 
-              rule_lib_records = Wbrs::Prefix.get_certainty_sources_for_urls([clean_domain])[clean_domain]
+              rule_lib_records = Wbrs::Prefix.get_certainty_sources_for_urls([clean_domain], 0)[clean_domain]
               if rule_lib_records.blank?
                 rule_lib_records = []
               end
