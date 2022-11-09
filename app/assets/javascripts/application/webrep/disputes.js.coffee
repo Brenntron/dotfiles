@@ -951,7 +951,7 @@ $ ->
       url: '/escalations/api/v1/escalations/webrep/disputes'
       method: 'GET'
       headers: {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-      data: build_data()
+      data: build_webrep_data()
     order: [ [
       9
       'desc'
@@ -2630,7 +2630,7 @@ window.convert_dispute_to_webcat = () ->
       std_msg_error(response, ['Reputation Dispute unable to be converted to Categorization Complaint.'], reload: false)
   )
 
-window.build_data = () ->
+window.build_webrep_data = () ->
   $('#inline-webrep').removeClass('hidden')
   data = {
     search_type: '',
@@ -2641,7 +2641,7 @@ window.build_data = () ->
     urlParams = new URLSearchParams(location.search);
 #      if the location.search has value, it is a standard search
     data =  {
-      search_type : 'standart'
+      search_type : 'standard'
       search_name : urlParams.get('f')
       selected_cases: []
     }
