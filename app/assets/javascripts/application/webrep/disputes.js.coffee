@@ -2637,31 +2637,37 @@ window.convert_dispute_to_webcat = () ->
 
 window.build_webrep_data = () ->
   $('#inline-webrep').removeClass('hidden')
-  data = {
-    search_type: '',
-    search_name: '',
-    selected_cases: []
-  }
   if location.search != ''
     urlParams = new URLSearchParams(location.search);
 #      if the location.search has value, it is a standard search
     data =  {
       search_type : 'standard'
       search_name : urlParams.get('f')
-      selected_cases: []
     }
   
   else if localStorage.webRepFilters
     data = JSON.parse(localStorage.webRepFilters)
    
+  else
+    # default scope for disputes is 'unassigned'
+    data =  {
+      search_type : 'standart'
+      search_name : 'unassigned'
+    }
+  
   format_webrep_header(data)
+
   data
 
 window.format_webrep_header = (data) ->
   return if window.location.pathname != '/escalations/webrep/disputes'
 
   if data != undefined
-    reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="reset_webrep_page()"></span>'
+    if data.search_name == 'unassigned' && location.search == ''
+      reset_icon = ''
+    else
+      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="reset_webrep_page()"></span>'
+
     { search_type, search_name } = data
     if search_type == 'standart'
       search_text = 
