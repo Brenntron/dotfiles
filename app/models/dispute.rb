@@ -1493,7 +1493,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       when 'team_disputes'
         where(user_id: user.my_team)
       when 'unassigned'
-        where(status: [STATUS_NEW, STATUS_REOPENED], user_id: User.where(display_name: 'Vrt Incoming').first.id)
+        where(user_id: [nil, User.vrtincoming.id]).where.not(status: [STATUS_RESOLVED, CLOSED])
       when 'open'
         where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
       when 'open_email'
