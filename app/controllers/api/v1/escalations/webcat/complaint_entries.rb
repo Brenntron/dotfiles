@@ -532,6 +532,141 @@ module API
               end
             end
 
+            desc "get domain history for webcat research tool"
+            params do
+              optional :domain, type: String
+            end
+
+            get 'get_domain_history' do
+
+              response = {}
+              response[:status] = "success"
+              response[:data] = []
+
+              pre_raw_records = []
+
+              prefix_records = Wbrs::Prefix.where({:urls => [URI.escape(SimpleIDN.to_ascii(params[:domain]))]})
+              prefix_records.each do |prefix_record|
+                history_records = Wbrs::HistoryRecord.where({:prefix_id => prefix_record.prefix_id})
+                pre_raw_records += history_records
+              end
+              clean_domain = URI.escape(SimpleIDN.to_ascii(params[:domain]))
+
+              rule_lib_records = Wbrs::Prefix.get_certainty_sources_for_urls([clean_domain], 0)[clean_domain]
+              if rule_lib_records.blank?
+                rule_lib_records = []
+              end
+              raw_records = []
+
+              ### this change is to de-duplicate the records that come in from a combo Prefix and HistoryRecord call
+              # uniq doesn't work, and it needs to be tested against 3 different attributes.
+              pre_raw_records.each do |raw_record|
+                skip = false
+                raw_records.each do |raw_check|
+                  if raw_record.event_id == raw_check.event_id && raw_record.prefix_id == raw_check.prefix_id && raw_record.category.category_id == raw_check.category.category_id
+                    skip = true
+                  end
+                end
+                if skip == false
+                  raw_records << raw_record
+                end
+              end
+
+              raw_records = raw_records.sort_by {|history| DateTime.parse(history.time)}.reverse
+
+              base_score = Sbrs::Base.combo_call_sds_v3(url_from_prefix, [])["wbrs"]["score"] rescue "no data or error"
+
+              response[:data] << {:is_important => ComplaintEntry.self_importance(params[:domain]),
+                                  :category => nil,
+                                  :url => params[:domain],
+                                  :domain => nil,
+                                  :subdomain => nil,
+                                  :path => nil,
+                                  :action => nil,
+                                  :confidence => nil,
+                                  :score => base_score,
+                                  :time_of_action => nil,
+                                  :description => "baseline domain",
+                                  :user => nil,
+                                  :entry_id => nil,
+                                  :complaint_id => nil}
+
+              raw_records.each do |record|
+                prefix = prefix_records.find {|prec| prec.prefix_id == record.prefix_id}
+                url_from_prefix = Complaint.compile_parts_to_uri({"subdomain" => prefix.subdomain, "domain" => prefix.domain, "path" => prefix.path })
+                data_point = {}
+
+                entry_id = nil
+                complaint_id = nil
+
+                complaint_entry = ComplaintEntry.where("uri like '%#{url_from_prefix}%'").last
+
+                if complaint_entry.present?
+                  entry_id = complaint_entry.id
+                  complaint_id = complaint_entry.complaint_id
+                end
+
+                record_score = Sbrs::Base.combo_call_sds_v3(url_from_prefix, [])["wbrs"]["score"] rescue "no data or error"
+
+                data_point[:is_important] = ComplaintEntry.self_importance(url_from_prefix)
+                data_point[:category] = record.category.descr
+                data_point[:url] = SimpleIDN.to_unicode(url_from_prefix)
+                data_point[:domain] = SimpleIDN.to_unicode(prefix.domain)
+                data_point[:subdomain] = SimpleIDN.to_unicode(prefix.subdomain)
+                data_point[:path] = SimpleIDN.to_unicode(prefix.path)
+                data_point[:action] = record.action
+                data_point[:confidence] = record.confidence
+                data_point[:score] = record_score
+                data_point[:time_of_action] = record.time
+                data_point[:description] = record.description
+                data_point[:user] = record.user
+                data_point[:entry_id] = entry_id
+                data_point[:complaint_id] = complaint_id
+
+                response[:data] << data_point
+              end
+
+              rule_lib_records.each do |record|
+
+                data_point = {}
+
+                url_from_prefix = Complaint.compile_parts_to_uri({"subdomain" => record["subdomain"], "domain" => record["domain"], "path" => record["path"] })
+
+                entry_id = nil
+                complaint_id = nil
+
+                complaint_entry = ComplaintEntry.where("uri like '%#{url_from_prefix}%'").last
+
+                if complaint_entry.present?
+                  entry_id = complaint_entry.id
+                  complaint_id = complaint_entry.complaint_id
+                end
+
+                record_score = Sbrs::Base.combo_call_sds_v3(url_from_prefix, [])["wbrs"]["score"] rescue "no data or error"
+
+                data_point[:is_important] = ComplaintEntry.self_importance(url_from_prefix)
+                data_point[:category] = record["description"]
+                data_point[:url] = SimpleIDN.to_unicode(url_from_prefix)
+                data_point[:domain] = SimpleIDN.to_unicode(record["domain"])
+                data_point[:subdomain] = SimpleIDN.to_unicode(record["subdomain"])
+                data_point[:path] = SimpleIDN.to_unicode(record["path"])
+                data_point[:action] = ""
+                data_point[:confidence] = "#{record["confidence"]}|certainty: #{record["certainty"]} "
+                data_point[:score] = record_score
+                data_point[:time_of_action] = ""
+                data_point[:description] = record["source_description"]
+                data_point[:user] = "Rulelib Database"
+                data_point[:entry_id] = entry_id
+                data_point[:complaint_id] = complaint_id
+
+                response[:data] << data_point
+              end
+
+
+              response
+
+            end
+
             desc 'Get XBRS data on complaint url'
             params do
               requires :url, type: String

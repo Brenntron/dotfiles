@@ -102,9 +102,12 @@ For future web and email reputation requests, please open a web and email reputa
   end
 
   def self.parse_url(url)
-    parser = URI::Parser.new
-    url = parser.escape(url)
-    uri = parser.parse(parser.parse(url).scheme.nil? ? "http://#{url}" : url)
+    #leaving this for disposal later. We've used URI::Parser so hesitatnt to totally delete
+    # but Addressable::URI seems to handle non latin characters much better.
+    #parser = URI::Parser.new
+    #url = parser.escape(url)
+    #uri = parser.parse(parser.parse(url).scheme.nil? ? "http://#{url}" : url)
+    uri = Addressable::URI.parse(Addressable::URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
     #subdomain = uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{domain.domain}$"), '')
     {
@@ -1034,6 +1037,83 @@ For future web and email reputation requests, please open a web and email reputa
     end
 
     response
+  end
+
+  def self.process_bulk_adhoc_categorizations(params, user, bugzilla_rest_session)
+
+    #someday this will probably need to be something different
+    ti_platform = Platform.where("public_name like '%talosintelligence%'").first
+
+    response = {}
+    response[:errors] = []
+    response[:data] = {}
+
+    response[:data][:created] = []
+    response[:data][:completed] = []
+
+    response[:data][:create_failed] = []
+    response[:data][:complete_failed] = []
+
+    adhoc_entries = params[:entries]
+    categories = params[:categories]
+    category_ids = params[:category_ids]
+    description = "RESEARCH TOOL AUTO GENERATED CASE"
+
+    new_complaints = []
+    adhoc_entries.each do |entry|
+      begin
+        bug_proxy = Complaint.create_action(bugzilla_rest_session, entry, description, nil, nil, ti_platform, nil)
+        new_complaints << Complaint.find(bug_proxy.id)
+        response[:data][:created] << bug_proxy.id
+      rescue => e
+        Rails.logger.error e
+        Rails.logger.error e.backtrace.join("\n")
+        response[:errors] << ["error trying to create complaint for #{entry}"]
+        response[:data][:create_failed] << "#{entry}"
+      end
+
+    end
+
+    new_complaints.each do |new_complaint|
+      begin
+        new_complaint_entry = new_complaint.complaint_entries.first
+        new_complaint_entry.user_id = user.id
+        new_complaint.save
+        new_complaint_entry.save
+
+        prefix = SimpleIDN.to_ascii(new_complaint_entry.hostlookup)
+
+        category_names_to_submit = categories.join(",")
+        categories_to_submit = category_ids.join(",")
+        uri_as_categorized = prefix
+        internal_comment = "Complaint ID: #{new_complaint.id} | RESEARCH TOOL AUTO GENERATED CASE"
+        resolution_comment = "Complaint ID: #{new_complaint.id} | RESEARCH TOOL AUTO GENERATED CASE"
+        
+        new_complaint_entry.change_category(
+            prefix,
+            categories_to_submit,
+            category_names_to_submit,
+            Complaint::RESOLUTION_FIXED,
+            internal_comment,
+            resolution_comment,
+            uri_as_categorized,
+            user,
+            nil
+        )
+        response[:data][:completed] << new_complaint.id
+      rescue => e
+        Rails.logger.error e
+        Rails.logger.error e.backtrace.join("\n")
+        response[:errors] << ["error trying to process complaint for #{new_complaint.complaint_entries.first.hostlookup}"]
+        response[:data][:complete_failed] << new_complaint.complaint_entries.first.hostlookup
+        new_complaint.complaint_entries.first.destroy
+        new_complaint.destroy
+      end
+
+    end
+
+    response
+
   end
 
 end

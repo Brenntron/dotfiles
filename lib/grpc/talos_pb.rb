@@ -116,6 +116,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :product_version, :string, 4
       optional :tenant_id, :bytes, 5
       optional :perf_testing, :bool, 6
+      repeated :service_chain, :string, 7
     end
     add_message "Talos.GeoCoords" do
       optional :longitude, :float, 1
@@ -139,6 +140,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :raw_url, :string, 1
       repeated :endpoint, :message, 2, "Talos.IPEndpoint"
       optional :source, :enum, 3, "Talos.URLSource"
+      optional :do_not_crawl, :bool, 4
     end
     add_message "Talos.VersionRange" do
       optional :starting, :uint32, 1
@@ -240,10 +242,16 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       repeated :entries, :message, 5, "Talos.TaxonomyEntry"
       optional :version, :uint32, 6
       optional :version_meta, :message, 7, "Talos.VersionMeta"
+      optional :mnemonic, :string, 8
     end
     add_message "Talos.IntelSpecificDescription" do
       optional :intelligence_type_id, :uint32, 1
       repeated :description, :message, 2, "Talos.LocalizedString"
+    end
+    add_message "Talos.TaxonomyExtRef" do
+      optional :url, :string, 1
+      optional :external_id, :string, 2
+      optional :source, :string, 3
     end
     add_message "Talos.TaxonomyEntry" do
       optional :entry_id, :uint32, 1
@@ -256,6 +264,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :is_avail, :bool, 8
       repeated :parent_entries, :message, 9, "Talos.TaxonomyRelation"
       repeated :intelligence_type_ids, :uint32, 10
+      repeated :external_references, :message, 11, "Talos.TaxonomyExtRef"
+      optional :sort_index, :uint32, 12
+      optional :mnemonic, :string, 13
     end
     add_message "Talos.TaxonomyRelation" do
       optional :taxonomy_id, :uint32, 1
@@ -269,6 +280,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :tag_val_uint64, :uint64, 5
       optional :tag_val_string, :string, 6
       optional :tag_val_bytes, :bytes, 7
+      optional :tag_key_string, :string, 8
+      optional :external_id, :string, 9
     end
     add_message "Talos.ContextGroup" do
       optional :taxonomy_id, :uint32, 1
@@ -280,7 +293,19 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :message_type, :string, 2
       optional :data, :bytes, 3
     end
+    add_message "Talos.EmptyRequest" do
+    end
     add_message "Talos.EmptyReply" do
+    end
+    add_message "Talos.IPAddress" do
+      oneof :address do
+        optional :ipv4_addr, :fixed32, 1
+        optional :ipv6_addr, :bytes, 2
+      end
+    end
+    add_message "Talos.IPAddressRange" do
+      optional :ip_start, :message, 1, "Talos.IPAddress"
+      optional :ip_end, :message, 2, "Talos.IPAddress"
     end
     add_enum "Talos.URLSource" do
       value :URL_LOCATION_UNSPECIFIED, 0
@@ -332,11 +357,15 @@ module Talos
   TaxonomyMap = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.TaxonomyMap").msgclass
   Taxonomy = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.Taxonomy").msgclass
   IntelSpecificDescription = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.IntelSpecificDescription").msgclass
+  TaxonomyExtRef = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.TaxonomyExtRef").msgclass
   TaxonomyEntry = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.TaxonomyEntry").msgclass
   TaxonomyRelation = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.TaxonomyRelation").msgclass
   ContextTag = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.ContextTag").msgclass
   ContextGroup = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.ContextGroup").msgclass
   ServiceData = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.ServiceData").msgclass
+  EmptyRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.EmptyRequest").msgclass
   EmptyReply = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.EmptyReply").msgclass
+  IPAddress = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.IPAddress").msgclass
+  IPAddressRange = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.IPAddressRange").msgclass
   URLSource = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.URLSource").enummodule
 end

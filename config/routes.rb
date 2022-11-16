@@ -49,6 +49,7 @@ Rails.application.routes.draw do
 
       get 'show_multiple', to: 'complaints#show_multiple'
       get 'clusters', to: 'complaints#clusters'
+      get 'research', to: 'complaints#research'
 
       resources :reports, only: [:index] do
         collection do
