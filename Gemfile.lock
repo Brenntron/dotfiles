@@ -1884,7 +1884,7 @@ DEPENDENCIES
   xmlrpc
 
 RUBY VERSION
-   ruby 2.7.4p191
+   ruby 2.7.6p219
 
 BUNDLED WITH
    2.2.28
