@@ -1468,24 +1468,28 @@ class DisputeEntry < ApplicationRecord
 
             if !is_blacklisted
 
+              ###SHUTTING DOWN WEBCAT CHECK AND CONVERT
+              # reason I'm not just removing the code is for convenience.  I have reason to believe this will be coming back in the future
+              # when TE/SDO have fleshed out the troublesome procedural edge cases that plagued this initial release in prod environment.
+
               ##Check for web category existence, as no-category can be a source of blocking on some network setups
 
-              current_cat = DisputeEntry.get_primary_category(self.hostlookup)
+              #current_cat = DisputeEntry.get_primary_category(self.hostlookup)
               #for now, only take this path when single entry ticket
 
-              if current_cat.blank? && self.dispute.dispute_entries.size == 1
+              #if current_cat.blank? && self.dispute.dispute_entries.size == 1
                 # ticket conversion action here
-                conversion_packet = {}
-                conversion_packet[:dispute_id] = self.dispute.id
-                conversion_packet[:summary] = self.dispute.problem_summary
-                conversion_packet[:suggested_categories] = []
-                conversion_packet[:suggested_categories] << [{}, {"entry" => self.hostlookup, "suggested_categories" => "Business and Industry"}]
-                user = User.where(cvs_username:"vrtincom").first
+              #  conversion_packet = {}
+              #  conversion_packet[:dispute_id] = self.dispute.id
+              #  conversion_packet[:summary] = self.dispute.problem_summary
+              #  conversion_packet[:suggested_categories] = []
+              #  conversion_packet[:suggested_categories] << [{}, {"entry" => self.hostlookup, "suggested_categories" => "Business and Industry"}]
+              #  user = User.where(cvs_username:"vrtincom").first
 
-                Dispute.convert_to_complaint(conversion_packet, user, true)
+              #  Dispute.convert_to_complaint(conversion_packet, user, true)
 
-                return true
-              end
+              #  return true
+              #end
 
 
               self.status = STATUS_RESOLVED

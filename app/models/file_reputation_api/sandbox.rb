@@ -185,7 +185,7 @@ class FileReputationApi::Sandbox
   end
 
   def self.run_sample(sha256_hash)
-    endpoint = "/api/2/run/hash"
+    endpoint = "/ntu/1/tgsubmit"
 
     query_string = {
         "hash" => sha256_hash,

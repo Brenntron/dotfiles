@@ -158,10 +158,10 @@ class Wbrs::Prefix < Wbrs::Base
     response_body
   end
 
-  def self.get_certainty_sources_for_urls(urls)
+  def self.get_certainty_sources_for_urls(urls, strict_matching = 1)
     options = {}
     options[:urls] = urls
-    options[:strict_matching] = 1
+    options[:strict_matching] = strict_matching
 
     response = Wbrs::Prefix.post_request(path: '/v1/wbrsrulelib/cat/rules',
                                          body: Wbrs::Prefix.stringkey_params(options))

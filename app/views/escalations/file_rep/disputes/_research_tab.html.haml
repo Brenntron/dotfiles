@@ -46,81 +46,88 @@
 .row
   .col-xs-12.col-sm-4#sandbox-report-wrapper
     %h2.research-data-header.sandbox-header Talos Sandbox
-    #sb-loader
-      .inline-loader-wrapper
-        .gear-loader-wrapper
-          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
-        %span.loader-msg Loading data...
-    .sb-data-present
-      %span.sample-present-true
-      %div.data-report-wrapper
-        .row
-          .col-xs-4.col-lg-5
-            %label.data-report-label Latest Run
-            %span.data-report-content#sb-run-date
-          .col-xs-4.col-lg-3
-            %label.data-report-label Run Status
-            %span.data-report-content#sb-run-status
-          -#  TODO Add html report call information here
-          -#.col-xs-4
-          -#  %button.secondary.view-report-external-button
-          -#    View HTML Report
-          .col-xs-4.col-lg-4.text-right
-            .data-report-score#sb-score
-            %label.content-label-sm Sandbox Score
-        %hr.thin
-        .row
-          .col-xs-12
-            %label.data-report-label Contacted IPs
-            %div.data-report-content.multi-col#sb-contacted-ips
-        %hr.thin
-        .row
-          .col-xs-12
-            %label.data-report-label Contacted Domain Names
-            %div.data-report-content.multi-col#sb-contacted-domains
-        %hr.thin
-        .row
-          .col-xs-12#sb-ioc-col
-            %label.data-report-label Indicators of Compromise
-
-        %hr.thin
-        .row
-          .col-xs-12#sb-dropped-files-col
-            %label.data-report-label Dropped Files
-        %hr.thin
-        .row
-          .col-xs-12#sb-processes-col
-            %label.data-report-label Processes
-        %hr.thin
-        .row
-          .col-xs-12.text-center
-            -#%a{href: '#', target: '_blank'}
-            -#%button.secondary.view-report-external-button.data-report-button#sb-report-html{onclick: 'sandbox_html_report();'}
-            %a.btn.view-report-external-button.data-report-button#sb-report-html{href: "/escalations/file_rep/sandbox-html-report", target: "_blank"}
-              View HTML Report
-            %a.btn.view-report-external-button.data-report-button#sb-report-html-download{href: ""}
-              Download HTML Report
-        %hr.thin
-        .row
-          .col-xs-6
-            %label.data-report-label Full Json
-          .col-xs-6
-            %button.expand-toggle-button.tooltipped{'data-toggle': 'collapse', 'aria-expanded': true, 'data-target': "#collapse_sb_json", 'aria-controls': "collapse_sb_json", 'title': 'Expand / Collapse'}
-            %a.download-small-button.tooltipped#download-sb-json{'title': 'Download JSON'}
-        .row.collapse_area.collapse.in#collapse_sb_json
-          .col-xs-12.report-size
-            %pre.data-report-code-content#sb-full
+    -# Temp message since we are no longer sending to Ti Sandbox
     .sb-data-missing.text-center
       %span.sample-present-false
       %div.data-report-wrapper
-        %span.missing-data#sandbox-status-message
-        %br
-        %button.primary#sandbox-run-button{onclick: 'run_sample_in_sandbox()'}
-          Push Sample to Sandbox and Run
-    .sb-report-run.text-center
-      %div.data-report-wrapper.missing-data
-        Sample is running.
-        %br Running a sample can take 10 minutes or longer.
+        %span.missing-data Talos Sandbox no longer in use. Interface updates coming soon.
+
+    -# Keep below for reference until this is updated with new TG report or removed entirely
+    -##sb-loader
+    -#  .inline-loader-wrapper
+    -#    .gear-loader-wrapper
+    -#      = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    -#    %span.loader-msg Loading data...
+    -#.sb-data-present
+    -#  %span.sample-present-true
+    -#  %div.data-report-wrapper
+    -#    .row
+    -#      .col-xs-4.col-lg-5
+    -#        %label.data-report-label Latest Run
+    -#        %span.data-report-content#sb-run-date
+    -#      .col-xs-4.col-lg-3
+    -#        %label.data-report-label Run Status
+    -#        %span.data-report-content#sb-run-status
+    -#      -#  TODO Add html report call information here
+    -#      -#.col-xs-4
+    -#      -#  %button.secondary.view-report-external-button
+    -#      -#    View HTML Report
+    -#      .col-xs-4.col-lg-4.text-right
+    -#        .data-report-score#sb-score
+    -#        %label.content-label-sm Sandbox Score
+    -#    %hr.thin
+    -#    .row
+    -#      .col-xs-12
+    -#        %label.data-report-label Contacted IPs
+    -#        %div.data-report-content.multi-col#sb-contacted-ips
+    -#    %hr.thin
+    -#    .row
+    -#      .col-xs-12
+    -#        %label.data-report-label Contacted Domain Names
+    -#        %div.data-report-content.multi-col#sb-contacted-domains
+    -#    %hr.thin
+    -#    .row
+    -#      .col-xs-12#sb-ioc-col
+    -#        %label.data-report-label Indicators of Compromise
+    -#
+    -#    %hr.thin
+    -#    .row
+    -#      .col-xs-12#sb-dropped-files-col
+    -#        %label.data-report-label Dropped Files
+    -#    %hr.thin
+    -#    .row
+    -#      .col-xs-12#sb-processes-col
+    -#        %label.data-report-label Processes
+    -#    %hr.thin
+    -#    .row
+    -#      .col-xs-12.text-center
+    -#        -#%a{href: '#', target: '_blank'}
+    -#        -#%button.secondary.view-report-external-button.data-report-button#sb-report-html{onclick: 'sandbox_html_report();'}
+    -#        %a.btn.view-report-external-button.data-report-button#sb-report-html{href: "/escalations/file_rep/sandbox-html-report", target: "_blank"}
+    -#          View HTML Report
+    -#        %a.btn.view-report-external-button.data-report-button#sb-report-html-download{href: ""}
+    -#          Download HTML Report
+    -#    %hr.thin
+    -#    .row
+    -#      .col-xs-6
+    -#        %label.data-report-label Full Json
+    -#      .col-xs-6
+    -#        %button.expand-toggle-button.tooltipped{'data-toggle': 'collapse', 'aria-expanded': true, 'data-target': "#collapse_sb_json", 'aria-controls': "collapse_sb_json", 'title': 'Expand / Collapse'}
+    -#        %a.download-small-button.tooltipped#download-sb-json{'title': 'Download JSON'}
+    -#    .row.collapse_area.collapse.in#collapse_sb_json
+    -#      .col-xs-12.report-size
+    -#        %pre.data-report-code-content#sb-full
+    -#.sb-data-missing.text-center
+    -#  %span.sample-present-false
+    -#  %div.data-report-wrapper
+    -#    %span.missing-data#sandbox-status-message
+    -#    %br
+    -#    %button.primary#sandbox-run-button{onclick: 'run_sample_in_sandbox()'}
+    -#      Push Sample to Sandbox and Run
+    -#.sb-report-run.text-center
+    -#  %div.data-report-wrapper.missing-data
+    -#    Sample is running.
+    -#    %br Running a sample can take 10 minutes or longer.
 
   .col-xs-12.col-sm-4#threatgrid-report-wrapper
     %h2.research-data-header.threatgrid-header Threat Grid
