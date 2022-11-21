@@ -1789,15 +1789,15 @@ For future Web categorization requests, please open a Web categorization ticket 
     user_id = user.kind_of?(User) ? user.id : user
     accepted_at = Time.now
 
-    disputes_ary = []
-
     disputes = Dispute.where(id: dispute_ids).where.not(status: [
       Dispute::TI_NEW, Dispute::STATUS_RESOLVED, Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN,
       Dispute::STATUS_RESOLVED_UNCHANGED
     ])
-    disputes_ary = disputes.all.to_a
-    entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
+
+    disputes_ary = disputes.includes(:dispute_entries)
+    entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED, DisputeEntry::ASSIGNED])
     entries_ary = entries.all.to_a
+
     Dispute.transaction do
       disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
       if entries_ary.any?
@@ -1811,10 +1811,13 @@ For future Web categorization requests, please open a Web categorization ticket 
 
       end
     end
-    #equivalent to #reload, get fresh values after transaction has committed all updated values to database.
-    entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
-    entries_ary = entries.all.to_a
-    Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries_ary)
+    # send entries for separately to avoid bug in DisputeEntryUpdateStatusEvent#post entries
+    # when we send ticket_source_key and status for first element in disputes_ary array
+    disputes_ary.each do |dispute|
+      entries = dispute.dispute_entries.where(status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED, DisputeEntry::ASSIGNED])
+
+      Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries.to_a)
+    end 
 
     disputes_ary
   end
