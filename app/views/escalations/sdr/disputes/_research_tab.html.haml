@@ -101,8 +101,12 @@
         %span.loader-msg Loading data...
     .sdr-research-data-present
       .row
-        .col-xs-12
+        .col-xs-9
           %label.data-report-label Reputation information (tea)
+        .col-xs-3
+          %button.secondary.refresh-sdr-button{onclick:"refresh_sdr_data(#{@dispute.id})"} Refresh
+      .row
+        .col-xs-12
           %table.data-report-table#sdr-reputation-data-table
             %thead
               %tr

@@ -276,6 +276,17 @@ window.submit_to_corpus = (attachment_data) ->
       $(att_feedback_col).html(err_msg)
   )
 
+window.refresh_sdr_data = (dispute_id) ->
+  $.ajax(
+    url: "/escalations/api/v1/escalations/sdr/disputes/refresh_sdr_data/#{dispute_id}"
+    method: 'GET'
+    headers: headers
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      std_api_error(response, "Error retrieving SDR data", reload: true)
+  )
+
 
 
 $ ->
