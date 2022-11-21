@@ -9754,6 +9754,10 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   cursor: pointer;
 }
 
+.force-col-tag {
+  margin-left: 3px;
+}
+
 .modal{
   .force-col-tag{
     white-space: nowrap;
