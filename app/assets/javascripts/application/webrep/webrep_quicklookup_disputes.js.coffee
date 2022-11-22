@@ -957,8 +957,16 @@ $ ->
                 return true
             )
             reptool_tags = $(action_col).attr( 'reptool_classes').split(',')
-            action_tags = reptool_tags.filter( (val) => if check_list.indexOf(val) == -1  && val != 'ACTIVE' && val != 'EXPIRED' then return val )
-            $(action_col).attr( 'reptool_classes', action_tags )
+
+            #filter out empty strings from array
+            reptool_tags_trimmed = reptool_tags.filter (e) ->
+              e != ''
+
+            if reptool_tags_trimmed.length > 0
+              action_tags = reptool_tags.filter( (val) => if check_list.indexOf(val) == -1  && val != 'ACTIVE' && val != 'EXPIRED' then return val )
+              $(action_col).attr( 'reptool_classes', action_tags )
+            else
+              $(action_col).attr( 'reptool_classes', check_list.concat(existing_actions) )
 
         else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
