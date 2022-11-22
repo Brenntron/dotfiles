@@ -9734,7 +9734,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   background-color: $faint-neutral-color;
   background-image: url(image_path('icon_delete_tag.svg'));
   font-weight: 200;
-  padding: 0 16px 0 0;
+  padding: 0 16px 0 3px;
   font-size: 8pt;
   font-family: "Fira Mono", monospace;
   background-position-x: right;
@@ -9755,10 +9755,6 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   cursor: pointer;
   background-color: #d7dadb;
   background-image: url(image_path('icon_delete_tag_hover.svg'));
-}
-
-.force-col-tag {
-  margin-left: 3px;
 }
 
 .modal{
