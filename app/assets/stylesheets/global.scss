@@ -9744,6 +9744,8 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 .modal{
   .col-tag{
     white-space: nowrap;
+    background-image: none;
+    padding-right: 1px;
   }
 }
 .submit-search-msg{
@@ -9762,6 +9764,8 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 .modal{
   .force-col-tag{
     white-space: nowrap;
+    background-image: none;
+    padding-right: 1px;
   }
 }
 .col-actions .force-col-tag:hover{
