@@ -14,14 +14,6 @@ $(document).ready ->
           text = text.join(', ').replace(/, ([^,]*)$/, ', and $1')
         text = text.replace(/(, and| and |, )/g, '<span class="unset-text">$1</span>')
         return $('.searched-for-url').html(text)
-  # Hide loader cogs when page is done loading
-  loader = $('#inline-webrep')
-  $(this).bind(
-    ajaxStart: () ->
-      loader.removeClass('hidden')
-    ajaxStop: () ->
-      loader.addClass('hidden')
-  )
 
   if window.location.pathname == '/escalations/webrep/disputes'
     std_msg_ajax(
@@ -100,13 +92,6 @@ window.select_or_deselect_all = (dispute_id)->
 window.advanced_webrep_index_table = () ->
 
   form = $('#disputes-advanced-search-form')
-  submission_types = []
-  if form.find('input[name="advanced_search[submission_type]"][value="w"]').is(':checked')
-    submission_types.push('w')
-  if form.find('input[name="advanced_search[submission_type]"][value="e"]').is(':checked')
-    submission_types.push('e')
-  if form.find('input[name="advanced_search[submission_type]"][value="ew"]').is(':checked')
-    submission_types.push('ew')
   dispute_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   data = {
     search : {
@@ -140,6 +125,17 @@ window.advanced_webrep_index_table = () ->
     modified_older: form.find('input[id="modified-older-input"]').val()
     modified_newer: form.find('input[id="modified-newer-input"]').val()
   }
+  unless form.find('#submission-type').parent().hasClass('hidden')
+    submission_types = []
+    if form.find('input[name="advanced_search[submission_type]"][value="w"]').is(':checked')
+      submission_types.push('w')
+    if form.find('input[name="advanced_search[submission_type]"][value="e"]').is(':checked')
+      submission_types.push('e')
+    if form.find('input[name="advanced_search[submission_type]"][value="ew"]').is(':checked')
+      submission_types.push('ew')
+    data['submission_type'] = submission_types
+  
+
   if dispute_save_search_format.test(data.search_name) == true
     std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
   else
@@ -943,7 +939,9 @@ $ ->
       return false
 
   # Create index table
-  window.dispute_table = $('#disputes-index').DataTable(
+  window.dispute_table = $('#disputes-index').on(
+    'preXhr.dt': ->
+      $('#inline-webrep').removeClass('hidden')).DataTable(
     pagingType: 'full_numbers'
     processing: true
     serverSide: true
@@ -952,6 +950,8 @@ $ ->
       method: 'GET'
       headers: {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       data: build_webrep_data()
+      complete: () ->
+        $('#inline-webrep').addClass('hidden')
     order: [ [
       9
       'desc'
@@ -2691,7 +2691,7 @@ window.format_webrep_header = (data) ->
         age_newer: 'Age more than'
         age_older: 'Age less than'
         case_id: 'Case IDs'
-        case_owner_username: 'Case owner'
+        case_owner_username: 'Assignee'
         modified_newer: 'Updated after'
         modified_older: 'Updated before'
         org_domain: 'Submitter domain'
