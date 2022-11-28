@@ -2648,12 +2648,7 @@ window.build_webrep_data = () ->
   else if localStorage.webRepFilters
     data = JSON.parse(localStorage.webRepFilters)
    
-  else
-    # default scope for disputes is 'unassigned'
-    data =  {
-      search_type : 'standart'
-      search_name : 'unassigned'
-    }
+
   
   format_webrep_header(data)
 
@@ -2669,7 +2664,7 @@ window.format_webrep_header = (data) ->
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="reset_webrep_page()"></span>'
 
     { search_type, search_name } = data
-    if search_type == 'standart'
+    if search_type == 'standard'
       search_text = 
         if search_name == 'my_disputes'
           'My Tickets'
