@@ -3517,8 +3517,8 @@ fieldset.top-content {
   pointer-events: none;
   border-color: rgba(136, 183, 213, 0);
   border-right-color: $content-bg-color;
-  border-width: 10px;
-  margin-top: -24px;
+  border-width: 14px;
+  margin-top: -28px;
   margin-right: -1px;
   float: right;
 }
@@ -7835,6 +7835,9 @@ table.dispute-entry-table tbody tr.selected {
 #advanced-search-wrapper {
   input {
     min-height: 34px;
+  }
+  #submission-type input {
+    min-height: 0;
   }
   .form-control.selectize{
     min-height: 34px;

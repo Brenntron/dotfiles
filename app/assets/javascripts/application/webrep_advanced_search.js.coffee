@@ -1,5 +1,5 @@
 $(document).ready ->
-
+  window.set_advanced_search_pref()
   $('#add-search-items-button').click ->
     $('#search-criteria-options').show()
     false
@@ -95,7 +95,7 @@ window.toggle_search_criteria = (element) ->
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/user_preferences/update"
     method: 'POST'
-    data: {data, name: 'WebCatAdvancedSearchFieldsDisplayed'}
+    data: {data, name: 'WebRepAdvancedSearchFieldsDisplayed'}
     dataType: 'json'
     success: (response) ->
       return false
@@ -107,7 +107,7 @@ window.set_advanced_search_pref = () ->
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: 'WebCatAdvancedSearchFieldsDisplayed'}
+    data: {name: 'WebRepAdvancedSearchFieldsDisplayed'}
     success: (response) ->
       response = JSON.parse(response)
       if response?

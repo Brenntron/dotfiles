@@ -127,11 +127,11 @@ window.advanced_webrep_index_table = () ->
   }
   unless form.find('#submission-type').parent().hasClass('hidden')
     submission_types = []
-    if form.find('input[name="advanced_search[submission_type]"][value="w"]').is(':checked')
+    if form.find('input#submission-type-w-cb').is(':checked')
       submission_types.push('w')
-    if form.find('input[name="advanced_search[submission_type]"][value="e"]').is(':checked')
+    if form.find('input#submission-type-e-cb').is(':checked')
       submission_types.push('e')
-    if form.find('input[name="advanced_search[submission_type]"][value="ew"]').is(':checked')
+    if form.find('input#submission-type-ew-cb').is(':checked')
       submission_types.push('ew')
     data['submission_type'] = submission_types
   
@@ -1387,11 +1387,21 @@ $ ->
             window.toggle_selectize_layer(this, 'false')
         }
 
+
+        $('#status-input').selectize {
+          persist: false
+          create: false
+          valueField: 'id',
+          labelField: 'public_name',
+          options: response.json.statuses
+          onFocus: () ->
+            window.toggle_selectize_layer(this, 'true')
+          onBlur: () ->
+            window.toggle_selectize_layer(this, 'false')
+        }
+
         for user in response.json.case_owners
           $('#user-list').append '<option value=\'' + user.cvs_username + '\'></option>'
-
-        for status in response.json.statuses
-          $('#status-list').append '<option value=\'' + status + '\'></option>'
 
         for type in response.json.submitter_types
           $('#submittertype-list').append '<option value=\'' + type + '\'></option>'
@@ -2658,7 +2668,7 @@ window.format_webrep_header = (data) ->
   return if window.location.pathname != '/escalations/webrep/disputes'
 
   if data != undefined
-    if data.search_name == 'unassigned' && location.search == ''
+    if data.search_name == 'unassigned'
       reset_icon = ''
     else
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="reset_webrep_page()"></span>'
@@ -2750,4 +2760,4 @@ window.format_webrep_header = (data) ->
 
 window.reset_webrep_page = () ->
   localStorage.removeItem('webRepFilters')
-  refresh_webrep_url()
+  refresh_webrep_url('?f=unassigned')

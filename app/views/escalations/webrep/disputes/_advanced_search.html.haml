@@ -16,7 +16,7 @@
     %button.remove-input#remove-criteria-assignee
   .form-group.search-item
     %label.content-label-sm Status
-    %input.form-control#status-input{name: 'status', list: 'status-list'}
+    %input.form-control#status-input.selectize{name: 'status', list: 'status-list', multiple: 'multiple', tabindex: '-1', data: 'webrep'}
     %datalist#status-list
     %button.remove-input#remove-criteria-status
   .form-group.search-item.hidden

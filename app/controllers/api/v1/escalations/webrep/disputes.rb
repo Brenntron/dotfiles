@@ -893,7 +893,7 @@ module API
             get 'autopopulate_advanced_search' do
               case_owners = User.where.not(cvs_username: nil).order(cvs_username: :asc).uniq
               statuses = [Dispute::NEW, Dispute::STATUS_RESEARCHING,Dispute::STATUS_ESCALATED,Dispute::STATUS_CUSTOMER_PENDING, Dispute::ASSIGNED,
-                          Dispute::STATUS_ON_HOLD,Dispute::STATUS_RESOLVED,Dispute::STATUS_REOPENED]
+                          Dispute::STATUS_ON_HOLD,Dispute::STATUS_RESOLVED,Dispute::STATUS_REOPENED].map {|item| {id: item, public_name: item }}
               submitter_types = ['Customer', 'Non-Customer']
               contacts = Customer.all.order(name: :asc)
               companies = Company.all.order(name: :asc)

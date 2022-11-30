@@ -1336,10 +1336,10 @@ For future Web categorization requests, please open a Web categorization ticket 
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:, reload: false)
-    fields = %w{status org_domain priority resolution submitter_type case_id case_owner_username}
+    fields = %w{org_domain priority resolution submitter_type case_id case_owner_username}
     dispute_fields = params.to_h.slice(*fields)
     dispute_fields['id'] = dispute_fields.delete('case_id')
-
+    
     if dispute_fields['case_owner_username'].present?
       user = User.where(cvs_username: dispute_fields.delete('case_owner_username')).first
       dispute_fields['user_id'] = user.id
@@ -1351,7 +1351,10 @@ For future Web categorization requests, please open a Web categorization ticket 
     end
     relation = where(dispute_fields)
 
-
+    if params['status'].present?
+      relation = relation.where(status: params['status'].split(','))
+    end
+    
     if params['submitted_newer'].present?
       relation =
           relation.where('case_opened_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
