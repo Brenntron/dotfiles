@@ -1,11 +1,12 @@
 class Bridge::FileRepCreatedEvent < Bridge::BaseMessage
-  def initialize(addressee:, source_authority: nil, source_key: nil, ac_id:)
+  def initialize(addressee:, source_authority: nil, source_key: nil, ac_id:nil, ticket_status: nil)
     super(channel: 'ticket-acknowledge',
           addressee: addressee)
     Delayed::Worker.logger.info("FileRep create init")
     @ac_id = ac_id
     @source_authority = source_authority
     @source_key = source_key
+    @ticket_status = ticket_status
   end
 
   def post(payload, source_authority: @source_authority, source_key: @source_key, ac_id: @ac_id)
@@ -13,7 +14,8 @@ class Bridge::FileRepCreatedEvent < Bridge::BaseMessage
                     source_authority: source_authority,
                     source_key: source_key,
                     ticket_entries: payload,
-                    ac_status: FileReputationDispute::AC_SUCCESS
+                    ac_status: FileReputationDispute::AC_SUCCESS,
+                    ticket_status: @ticket_status
     })
     Delayed::Worker.logger.info("FileRep create even sending to bridge")
   end

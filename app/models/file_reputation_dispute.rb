@@ -754,8 +754,7 @@ class FileReputationDispute < ApplicationRecord
         status: self.status,
         sugg_type: self.disposition_suggested
     }
-
-    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
+    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id, ticket_status: self.status)
     conn.post(return_payload)
   end
 
@@ -1043,8 +1042,7 @@ class FileReputationDispute < ApplicationRecord
         status: dispute.status,
         sugg_type: dispute.disposition_suggested
         }
-
-    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.ticket_source_key, ac_id: dispute.id)
+    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.ticket_source_key, ac_id: dispute.id, ticket_status: dispute.status)
     conn.post(return_payload)
   end
 
@@ -1090,16 +1088,14 @@ class FileReputationDispute < ApplicationRecord
 
 
   def self.assign(dispute_ids, user:)
-    disputes_ary = []
     user_id = user.kind_of?(User) ? user.id : user
+    disputes = FileReputationDispute.where(id: dispute_ids)
 
     FileReputationDispute.transaction do
-      disputes = FileReputationDispute.where(id: dispute_ids)
-      disputes_ary = disputes.all.to_a
-
       disputes.update_all(user_id: user_id, status: FileReputationDispute::STATUS_ASSIGNED)
     end
-
+    disputes.each(&:manual_sync)
+    disputes_ary = disputes.all.to_a
     disputes_ary
   end
 

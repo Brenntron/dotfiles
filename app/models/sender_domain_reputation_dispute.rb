@@ -314,13 +314,12 @@ class SenderDomainReputationDispute < ApplicationRecord
     # Unable to autoload constant Bridge::BaseMessage, expected /analyst-console-escalations/app/models/bridge/base_message.rb to define it (LoadError)
     # having Bridge as a retry of ::Bridge *seems* to work.  i suspect there's a deeper problem here but not prepared for that rabbit hole
     begin
-      conn = ::Bridge::SdrDisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
+      conn = ::Bridge::SdrDisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id, ticket_status: self.status)
       conn.post(return_payload)
     rescue
-      conn = Bridge::SdrDisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
+      conn = Bridge::SdrDisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id, ticket_status: self.status)
       conn.post(return_payload)
     end
-
   end
 
 
@@ -332,6 +331,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   def return_dispute
     update!(user_id: User.vrtincoming.id, status: STATUS_NEW)
+    Bridge::SdrDisputeUpdateStatusEvent.new.post(self.reload, :source_key => self.ticket_source_key)
   end
 
   def case_id_str
@@ -365,8 +365,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
       dispute.reload
 
-      message = Bridge::SdrDisputeUpdateStatusEvent.new
-      message.post(dispute, :source_key => dispute.ticket_source_key)
+      Bridge::SdrDisputeUpdateStatusEvent.new.post(dispute, :source_key => dispute.ticket_source_key)
 
     end
   end
@@ -389,6 +388,10 @@ class SenderDomainReputationDispute < ApplicationRecord
       disputes_ary = disputes.to_a
 
       disputes.update_all(user_id: user_id, status: STATUS_ASSIGNED, case_assigned_at: assigned_at)
+      disputes.each do |dispute|
+        message = Bridge::SdrDisputeUpdateStatusEvent.new
+        message.post(dispute, :source_key => dispute.ticket_source_key)
+      end
     end
     disputes_ary
   end

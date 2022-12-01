@@ -382,7 +382,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       new_dispute_entry.save
     end
 
-    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: dispute.id)
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: dispute.id, status: dispute.reload.status)
     conn.post(return_payload, "")
 
   end
@@ -865,7 +865,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     record_exists = Dispute.where(:ticket_source_key => message_payload["source_key"]).first
 
     if record_exists.present?
-      conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id)
+      conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id, status: record_exists.status)
       return_payload = record_exists.build_ti_payload
       case_email = DisputeEmail.generate_case_email_address(record_exists.id)
       return conn.post(return_payload, case_email)
@@ -1241,7 +1241,7 @@ For future Web categorization requests, please open a Web categorization ticket 
 
       case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
       Rails.logger.info "_+_+_+_+_+_+_+_+_Setting up Bridge post_+_+_+_+_+_+_+_+_"
-      conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_dispute.id)
+      conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_dispute.id, status: new_dispute.status)
       Rails.logger.info "_+_+_+_+_+_+_+_+_Running Connection POST_+_+_+_+_+_+_+_+_"
       conn.post(return_payload, case_email)
 
