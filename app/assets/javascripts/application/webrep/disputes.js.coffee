@@ -117,13 +117,14 @@ window.advanced_webrep_index_table = () ->
     resolution: form.find('input[id="resolution-input"]').val()
     submission_type: submission_types
     submitter_type: form.find('input[id="submitter-input"]').val()
-    platform_ids: form.find('input[id="platform-input"]').val()
+    platform_names: form.find('input[id="platform-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
     submitted_newer: form.find('input[id="submitted-newer-input"]').val()
     age_older: form.find('input[id="age-older-input"]').val()
     age_newer: form.find('input[id="age-newer-input"]').val()
     modified_older: form.find('input[id="modified-older-input"]').val()
     modified_newer: form.find('input[id="modified-newer-input"]').val()
+    case_origin: form.find('input[id="case-origin-input"]').val()
   }
   unless form.find('#submission-type').parent().hasClass('hidden')
     submission_types = []
@@ -1373,7 +1374,7 @@ $ ->
         $('#contactemail-list').empty()
         $('#company-list').empty()
         $('#resolution-list').empty()
-
+        $('#case-origin-list').empty()
 
         $('#platform-input').selectize {
           persist: false
@@ -1387,6 +1388,17 @@ $ ->
             window.toggle_selectize_layer(this, 'false')
         }
 
+        $('#resolution-input').selectize {
+          persist: false
+          create: false
+          valueField: 'id',
+          labelField: 'public_name',
+          options: response.json.resolutions
+          onFocus: () ->
+            window.toggle_selectize_layer(this, 'true')
+          onBlur: () ->
+            window.toggle_selectize_layer(this, 'false')
+        }
 
         $('#status-input').selectize {
           persist: false
@@ -1394,6 +1406,18 @@ $ ->
           valueField: 'id',
           labelField: 'public_name',
           options: response.json.statuses
+          onFocus: () ->
+            window.toggle_selectize_layer(this, 'true')
+          onBlur: () ->
+            window.toggle_selectize_layer(this, 'false')
+        }
+
+        $('#priority-input').selectize {
+          persist: false
+          create: false
+          valueField: 'id',
+          labelField: 'public_name',
+          options: response.json.priorities
           onFocus: () ->
             window.toggle_selectize_layer(this, 'true')
           onBlur: () ->
@@ -1415,11 +1439,8 @@ $ ->
         for company in response.json.companies
           $('#company-list').append '<option value=\'' + company.name + '\'></option>'
 
-        for resolution in response.json.resolutions
-          $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
-
-        for priority in ['P1', 'P2', 'P3', 'P4', 'P5']
-          $('#priority-list').append '<option value=\'' + priority + '\'></option>'
+        for source in response.json.sources
+          $('#case-origin-list').append '<option value=\'' + source + '\'></option>'
 
     )
 
@@ -2705,13 +2726,14 @@ window.format_webrep_header = (data) ->
         modified_newer: 'Updated after'
         modified_older: 'Updated before'
         org_domain: 'Submitter domain'
-        platform_ids: 'Platform'
+        platform_names: 'Platform'
         priority: 'Priority'
         resolution: 'Resolution'
         status: 'Status'
         submitted_newer: 'Submitted after'
         submitted_older: 'Submitted before'
         submitter_type: 'Submitter Type'
+        case_origin: 'Case Origin'
       }
       for conditionName, condition of search_conditions
         if condition == '' || ['search', 'search_name', 'search_type'].includes(conditionName)
@@ -2726,7 +2748,7 @@ window.format_webrep_header = (data) ->
             if customer_type == 'email'
               selectedFilters.push({name: 'Contact Email', value: customer_value})
             if customer_type == 'company_name'
-              selectedFilters.push({name: 'Company Name', value: customer_value})
+              selectedFilters.push({name: 'Submitter Org', value: customer_value})
         else if conditionName == 'dispute_entries'
           for key, value of search_conditions[conditionName]
             if value  == ''
@@ -2741,7 +2763,7 @@ window.format_webrep_header = (data) ->
           selectedFilters.push({name: condition_types[conditionName], value: search_conditions[conditionName]})
         container = $('#dispute-advaced-search-selected-filters')
       for item in selectedFilters
-        html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value + '</span>'
+        html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value.split(',').join(', ') + '</span>'
         $('#dispute-advaced-search-selected-filters').append(html)
     else if search_type == 'named'
       new_header =

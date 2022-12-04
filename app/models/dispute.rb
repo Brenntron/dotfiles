@@ -42,6 +42,8 @@ class Dispute < ApplicationRecord
   PRIORITY_4 = 'P4'
   PRIORITY_5 = 'P5'
 
+  PRIORITIES = [PRIORITY_1, PRIORITY_2, PRIORITY_3, PRIORITY_4, PRIORITY_5]
+
   # It's possible that some of this is duplicates of the above but I'm too scared to try and consolidate
   # them. These strings apply specifically to the "Status" dropdown on **Disputes**. To edit these strings
   # for a **DisputeEntry**, see `models/dispute_entry.rb`
@@ -62,6 +64,18 @@ class Dispute < ApplicationRecord
   STATUS_RESOLVED_TEST = "TEST_TRAINING"
   STATUS_RESOLVED_OTHER = "OTHER"
   STATUS_RESOLVED_QUICK_BULK = "QUICK_BULK" #tickets created and closed using the quick bulk entry form.
+  RESOLUTIONS = [
+    ALL_AUTO_RESOLVED,
+    DUPLICATE,
+    STATUS_RESOLVED_FIXED_FP,
+    STATUS_RESOLVED_FIXED_FN,
+    STATUS_RESOLVED_INVALID,
+    STATUS_RESOLVED_OTHER,
+    STATUS_RESOLVED_TEST,
+    STATUS_RESOLVED_UNCHANGED,
+    STATUS_RESOLVED_QUICK_BULK
+  ]
+  SOURCES = ['Internal', 'talos-intelligence', 'talos-intelligence-api']
 
   #AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
   AUTORESOLVED_UNCHANGED_MESSAGE = "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission's reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission's reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
@@ -1351,6 +1365,14 @@ For future Web categorization requests, please open a Web categorization ticket 
     end
     relation = where(dispute_fields)
 
+    if params['case_origin']
+      if params['case_origin'] == 'Internal'
+        relation = relation.where(ticket_source: nil)
+      else
+        relation = relation.where(ticket_source: params['case_origin'])
+      end
+    end
+   
     if params['status'].present?
       relation = relation.where(status: params['status'].split(','))
     end
@@ -1411,8 +1433,9 @@ For future Web categorization requests, please open a Web categorization ticket 
       end
     end
 
-    if params['platform_ids'].present?
-      ids = params['platform_ids'].split(',').map {|m| m.to_i}
+    if params['platform_names'].present?
+      platform_names = params['platform_names'].split(',').map {|m| m.to_i}
+      ids = Platform.where(public_name: platform_names).pluck(:id)
       relation = relation.joins(:dispute_entries).where("disputes.platform_id in (:ids) or dispute_entries.platform_id in (:ids)", ids: ids)
     end
 

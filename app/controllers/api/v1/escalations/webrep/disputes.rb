@@ -897,12 +897,13 @@ module API
               submitter_types = ['Customer', 'Non-Customer']
               contacts = Customer.all.order(name: :asc)
               companies = Company.all.order(name: :asc)
-              resolutions = [Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN, Dispute::STATUS_RESOLVED_UNCHANGED,
-                             Dispute::STATUS_RESOLVED_INVALID, Dispute::STATUS_RESOLVED_TEST, Dispute::STATUS_RESOLVED_OTHER]
-              platforms = Platform.all.order(public_name: :asc).map {|m| {id: m.id, public_name: m.public_name}}
+              resolutions = Dispute::RESOLUTIONS.map {|item| {id: item, public_name: item }}
+              priorities = Dispute::PRIORITIES.map {|item| {id: item, public_name: item }}
+              sources = Dispute::SOURCES
+              platforms = Platform.all.order(public_name: :asc).map {|m| {id: m.public_name, public_name: m.public_name}}
               render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
                             contacts: contacts, companies: companies, resolutions: resolutions,
-                            platforms: platforms}
+                            platforms: platforms, priorities: priorities, sources: sources}
             end
 
             desc 'Auto-populate fields on New Dispute'
@@ -1079,8 +1080,6 @@ module API
                 return {:status => "success", :messages => results[:messages]}
               end
             end
-
-
           end
         end
       end

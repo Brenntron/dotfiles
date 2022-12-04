@@ -21,7 +21,7 @@
     %button.remove-input#remove-criteria-status
   .form-group.search-item.hidden
     %label.content-label-sm Priority
-    %input.form-control#priority-input{name: 'priority', list: 'priority-list' }
+    %input.form-control#priority-input.selectize{name: 'priority', list: 'priority-list', multiple: 'multiple', tabindex: '-1', data: 'webrep'}
     %datalist#priority-list
     %button.remove-input#remove-criteria-owner
   .form-group.search-item.hidden
@@ -30,7 +30,7 @@
     %button.remove-input#remove-criteria-disposition
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
-    %input.form-control#resolution-input{name: 'resolution', list: 'resolution-list'}
+    %input.form-control#resolution-input.selectize{name: 'resolution', list: 'resolution-list', multiple: 'multiple', tabindex: '-1', data: 'webrep'}
     %datalist#resolution-list
     %button.remove-input#remove-criteria-resolution
   .form-group.search-item.hidden
@@ -63,7 +63,7 @@
     %datalist#contactemail-list
     %button.remove-input#remove-criteria-contact-email
   .form-group.search-item.hidden
-    %label.content-label-sm Company
+    %label.content-label-sm Submitter Org
     %input.form-control#company-input{name: 'company', list: 'company-list'}
     %datalist#company-list
     %button.remove-input#remove-criteria-company
@@ -83,6 +83,11 @@
     %label.content-label-sm Date Submitted (Older)
     %input.form-control#submitted-older-input{type: 'date', name: 'date-submitted-older'}
     %button.remove-input#remove-criteria-submitted-older
+  .form-group.search-item.hidden
+    %label.content-label-sm Case Origin
+    %input.form-control#case-origin-input{name: 'case-origin', list: 'case-origin-list'}
+    %datalist#case-origin-list
+    %button.remove-input#remove-criteria-case-origin
   .form-group.search-item.hidden
     %label.content-label-sm Case Age (Newer) ex: 30d 12h
     %input.form-control#age-newer-input{name: 'age'}
@@ -152,7 +157,7 @@
         %li
           %label.search-criteria-label
             %input.search-checkbox#company-cb{type: 'checkbox', name: 'search-criteria', value: 'Company', for: 'company-input'}
-            Company
+            Submitter Org
         %li
           %label.search-criteria-label
             %input.search-checkbox#domain-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Domain', for: 'domain-input'}
@@ -177,6 +182,10 @@
           %label.search-criteria-label
             %input.search-checkbox#age-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Age', for: 'age-older-input'}
             Case Age (Older)
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#case-origin-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Origin', for: 'case-origin-input'}
+            Case Origin
         %li
           %label.search-criteria-label
             %input.search-checkbox#modified-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified (Newer)', for: 'modified-newer-input'}
