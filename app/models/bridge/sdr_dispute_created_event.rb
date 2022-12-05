@@ -15,7 +15,7 @@ class Bridge::SdrDisputeCreatedEvent < Bridge::BaseMessage
                     source_key: source_key,
                     ticket_entries: payload,
                     ac_status: SenderDomainReputationDispute::AC_SUCCESS,
-                    ticket_status: @ticke_status
+                    ticket_status: @ticket_status
     })
     Delayed::Worker.logger.info("SDR Dispute create even sending to bridge")
   end
