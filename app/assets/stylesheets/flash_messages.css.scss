@@ -1,0 +1,195 @@
+//*************** Flash Message Styles ****************//
+
+// alert/flash messaging styles, both "alert" and "flash" should look consistent, handle both here
+.alert-dismissable, .flash {
+  background-position: 6px 5px;
+  background-repeat: no-repeat;
+  background-size: 18px 20px;
+  border-radius: 3px;
+  border: none;
+  display: block;
+  font-size: 9pt;
+  height: 32px;
+  line-height: 14pt;
+  margin: 0 auto;
+  max-height: 80px;
+  min-width: 300px;
+  overflow: hidden;
+  overflow-y: auto;  // some errors get huge, keep them handled
+  padding: 7px 50px 7px 32px;
+  position: relative;  // ensures close icon placement
+  right: 1vw;  // slight centering adjustment
+  scrollbar-width: none;
+  top: 85;
+  width: -moz-fit-content;
+  width: fit-content;
+
+  &.flash {
+    margin-left: 5px;
+  }
+
+  &.flash-error, &.flash-notice, &.flash-info {
+    border-radius: 2px;
+    margin-bottom: 20px;
+    margin-left: 15px;
+  }
+
+  &.flash-deleted {
+    font-weight: 600;  // this needs emphasis
+    margin: 8px 15px;
+  }
+
+  &.alert-success, &.alert-info, &.flash-notice {
+    background-image: url(image_path('icon_success.svg'));
+  }
+
+  &.alert-danger, &.flash-error, &.flash-info {
+    background-image: url(image_path('icon_error.svg'));
+  }
+
+  &.alert-danger {
+    margin-bottom: 5px;
+  }
+
+  &.alert-streamlined {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+  }
+
+  .close {
+    font-size: 18pt;   // size of icon controlled by font-size
+    position: absolute; // absolute needs relative container
+    right: 12px;
+    top: 3px;
+  }
+}
+
+.alert-dismissable::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+}
+
+// ensure flash/on-page messages appear below modals
+.alert-success, .alert-info, .alert-danger, .flash-notice, .flash-error, .flash-info, .alert-streamlined {
+  z-index: 9999;
+}
+
+// ensure modals higher than messages
+.modal, #msg-modal {
+  z-index: 99999;
+}
+
+
+#alert_message {
+  display: inline-block;
+  width: 200px;
+
+  &:empty {
+    display:none
+  }
+
+  &:not(:empty) {
+    margin-bottom: 5px;
+  }
+
+  .flash-msg {
+    display: inline-block;
+    height: 20px;
+    width:170px;
+  }
+}
+
+.ac_flash_button{
+  right:5px;
+  top: 5px;
+}
+
+.flash-wrapper{
+  position: relative;
+
+  button.close{
+    top: -9px;
+    right: -9px;
+  }
+}
+
+.inpage-msg-wrapper {
+  display: inline-block;
+  margin-left: 30px;
+  margin-top: 10px;
+}
+
+#inpage-message-text {
+  height: 22px;
+
+  .message-text {
+    display: inline-block;
+    margin-top: 6px;
+  }
+}
+
+.message-div {
+  border: 2px solid;
+  clear: left;  // ensure flash messages don't overlap headers
+  display: block;
+  margin: 15px auto 0 auto !important;
+  padding: 12px 20px;
+  text-align: center;
+  width: 100%;
+
+  &::before {
+    background-position: center;
+    background-repeat: no-repeat;
+    content: '';
+    display: block;
+    height: 22px;
+    margin-bottom: 3px;
+    margin-top: -24px;
+    position: relative;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+.content-wrapper.additional-wrapper {
+  margin-top: 20px;
+}
+
+.side-divider-line {
+  border-right: 1px solid;
+  margin-right: 10px;
+  padding-right: 12px;
+}
+
+.message-text .code-snippet{
+  width: 200px;
+}
+
+.table-error-message{
+  margin: 10px auto;
+  width: 400px!important;
+
+  a{
+    white-space: nowrap;
+    width: fit-content;
+  }
+
+  .code-snippet{
+    width: 400px;
+  }
+
+  .rule-message{
+    border: none;
+    padding: 0 0 5px 0;
+    text-align: left;
+    width: fit-content;
+  }
+
+  .rule-name{
+    border: none;
+    padding-top: 0;
+    text-align: left;
+    vertical-align: top;
+    width: 50px;
+  }
+}

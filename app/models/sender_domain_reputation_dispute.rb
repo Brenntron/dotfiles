@@ -244,8 +244,8 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   def self.create_action(bugzilla_rest_session, sender_domain_entry, priority, suggested_disposition, platform, customer, description, user_id, status=NEW)
     validate_entry(sender_domain_entry)
-
-    sender_domain_entry = Mail::Address.new(sender_domain_entry).domain
+    extracted_domain = Mail::Address.new(sender_domain_entry).domain
+    sender_domain_entry = extracted_domain.nil? ? sender_domain_entry : extracted_domain
 
     summary = "New Senders Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -342,6 +342,7 @@ class SenderDomainReputationDispute < ApplicationRecord
     resolved_at = Time.now
     disputes.each do |dispute|
       dispute.status = status
+
       if resolution.present?
         dispute.resolution = resolution
         dispute.resolution_comment = comment
@@ -349,6 +350,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       else
         dispute.resolution = nil
         dispute.resolution_comment = nil
+
       end
 
       unless [STATUS_NEW, STATUS_ASSIGNED].include?(dispute.status)
@@ -357,9 +359,9 @@ class SenderDomainReputationDispute < ApplicationRecord
 
       dispute.save!
 
-      #if comment.present?
-      #  DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute.id)
-      #end
+      SenderDomainReputationDisputeComment.create!(user_id: current_user.id,
+                                                   comment: comment,
+                                                   sender_domain_reputation_dispute_id: dispute.id)
 
       dispute.reload
 
@@ -666,18 +668,13 @@ class SenderDomainReputationDispute < ApplicationRecord
     beaker_data[:response] = {}
     beaker_data[:response][:data] = {}
 
-    mail_data_params = {}
-    mail_data_params[:dkim_disp] = [{}]
-    mail_data_params[:dmarc_disp] = {}
-    mail_data_params[:email_list] = {}
-
     begin
 
-      mail_data_params[:from_hdr] = [{"addr" => self.sender_domain_entry}]
+      smtp_envelope_params = { mail_from: self.sender_domain_entry, spf_results: {} }
       begin
-        data_response = ::Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        data_response = ::Beaker::Sdr.data_query('127.0.0.1', smtp_envelope_params: smtp_envelope_params).to_h
       rescue
-        data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        data_response = Beaker::Sdr.data_query('127.0.0.1', smtp_envelope_params: smtp_envelope_params).to_h
       end
 
       if data_response.present?
@@ -796,6 +793,8 @@ class SenderDomainReputationDispute < ApplicationRecord
             sdr_dispute&.customer&.email
           when 'domain_name'
             sdr_dispute.domain_name
+          when 'source'
+            sdr_dispute.source || 'Internal'
           else
             sdr_dispute.attributes[field_name]
           end

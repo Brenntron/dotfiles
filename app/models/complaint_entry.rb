@@ -354,7 +354,7 @@ class ComplaintEntry < ApplicationRecord
       prefix_object = Wbrs::Prefix.new
       prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
     else
-      Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
+      Wbrs::Prefix.create_from_url(url: SimpleIDN.to_ascii(ip_or_uri), categories: category_ids_array, user: user, description: description)
     end
   end
 
@@ -561,39 +561,54 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.save
 
       if user != User.where(display_name:"Vrt Incoming").first
-        WebcatCredits::ComplaintEntries::CreditProcessor.new(user, new_complaint_entry).process
+        begin
+          WebcatCredits::ComplaintEntries::CreditProcessor.new(user, new_complaint_entry).process
+        rescue Exception => e
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
+        end
+
       end
     rescue Exception => e
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
       raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
-
-    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-    max_wait_for_job = 15 #seconds
     begin
-      #this is where screen grabs happen.
-      screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
-      screenshot_entry.grab_screenshot
-    rescue Timeout::Error => e
-      #couldnt complete in time
-      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-       ces.screenshot = f.read
-      end
-      ces.save!
+      ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
     rescue Exception => e
-      Rails.logger.error("#{e.message}")
-      # do nothing, it was worth a try. kittens are sad now
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-       ces.screenshot = f.read
-      end
-      ces.save!
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
     end
+
+    max_wait_for_job = 15 #seconds
+    ###this should be eventually removed, but commenting out for now to see if it speeds up the NEW button for bulk entries
+
+    #begin
+      #this is where screen grabs happen.
+    #  screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
+    #  screenshot_entry.grab_screenshot
+    #rescue Timeout::Error => e
+      #couldnt complete in time
+    #  Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+    #  ces = ComplaintEntryScreenshot.new
+    #  ces.error_message = e.message
+    #  ces.complaint_entry_id = new_complaint_entry.id
+    #  open("app/assets/images/failed_screenshot.jpg") do |f|
+    #   ces.screenshot = f.read
+    #  end
+    #  ces.save!
+    #rescue Exception => e
+    #  Rails.logger.error("#{e.message}")
+      # do nothing, it was worth a try. kittens are sad now
+    #  ces = ComplaintEntryScreenshot.new
+    #  ces.error_message = e.message
+    #  ces.complaint_entry_id = new_complaint_entry.id
+    #  open("app/assets/images/failed_screenshot.jpg") do |f|
+    #   ces.screenshot = f.read
+    #  end
+    #  ces.save!
+    #end
   end
 
   # Searches in a variety of ways.
@@ -908,8 +923,10 @@ class ComplaintEntry < ApplicationRecord
     return {} unless prefix_results.any?
 
     parsed_uri = Complaint.parse_url(uri)
-    parsed_uri['path'] = '' unless parsed_uri['path'].present?
-    parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
+    parsed_uri['path'] = ''
+    parsed_uri['subdomain'] = ''
+    parsed_uri['path'] = parsed_uri[:path] unless parsed_uri[:path].blank?
+    parsed_uri['subdomain'] = parsed_uri[:subdomain] unless parsed_uri[:subdomain].blank?
 
     final_results = []
 
@@ -1200,7 +1217,7 @@ class ComplaintEntry < ApplicationRecord
     end
 
     # add credit for user's contribution to complaint entry
-    ComplaintEntryCredits::CreditProcessor.new(current_user, self).process
+    WebcatCredits::ComplaintEntries::CreditProcessor.new(current_user, self).process
     confirmation
   end
 

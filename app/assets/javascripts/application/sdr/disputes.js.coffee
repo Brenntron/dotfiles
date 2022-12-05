@@ -2,50 +2,51 @@ $(document).ready ->
 
   hide_loading_gears()
   # TODO: move it to flexible method populate_dt_columns_from_settings(datatable, data_name)
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: 'SdrColumns'}
-    success: (response) ->
-      response = JSON.parse(response)
-      if response?
-        $.each response, (column, state) ->
-          if state == true
-            $("##{column}-checkbox").prop('checked', true)
-            $('#sdr-disputes-index').DataTable().column("##{column}").visible true
-          else
-            $("##{column}-checkbox").prop('checked', false)
-            $('#sdr-disputes-index').DataTable().column("##{column}").visible false
-  )
-
-  # pull entries per page setting
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: 'SdrEntriesPerPage'}
-    success: (response) ->
-      response = JSON.parse(response)
-      if response?
-        $('select[name="sdr-disputes-index_length"]').val(response.entries_per_page)
-        $('#sdr-disputes-index').DataTable().page.len(response.entries_per_page).draw('page')
-  )
+  if window.location.pathname == '/escalations/sdr/disputes'
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/user_preferences/"
+      data: {name: 'SdrColumns'}
+      success: (response) ->
+        response = JSON.parse(response)
+        if response?
+          $.each response, (column, state) ->
+            if state == true
+              $("##{column}-checkbox").prop('checked', true)
+              $('#sdr-disputes-index').DataTable().column("##{column}").visible true
+            else
+              $("##{column}-checkbox").prop('checked', false)
+              $('#sdr-disputes-index').DataTable().column("##{column}").visible false
+    )
+  if window.location.pathname == '/escalations/sdr/disputes'
+    # pull entries per page setting
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/user_preferences/"
+      data: {name: 'SdrEntriesPerPage'}
+      success: (response) ->
+        response = JSON.parse(response)
+        if response?
+          $('select[name="sdr-disputes-index_length"]').val(response.entries_per_page)
+          $('#sdr-disputes-index').DataTable().page.len(response.entries_per_page).draw('page')
+    )
 $ ->
   initialize_sdr_disputes_datatable()
 
   $('#sdr-disputes-index_filter input').addClass('table-search-input');
   $('#sdr-disputes-index_filter label').addClass('table-search-label');
-
-  # save entries per page setting
-  $('#sdr-disputes-index').DataTable().on 'length.dt', (e, settings, len) ->
-    data = {}
-    data['entries_per_page'] = $('select[name="sdr-disputes-index_length"]').val()
-    std_msg_ajax(
-      url: "/escalations/api/v1/escalations/user_preferences/update"
-      method: 'POST'
-      data: {data, name: 'SdrEntriesPerPage'}
-      dataType: 'json'
-      success: (response) ->
-  )
+  if window.location.pathname == '/escalations/sdr/disputes'
+    # save entries per page setting
+    $('#sdr-disputes-index').DataTable().on 'length.dt', (e, settings, len) ->
+      data = {}
+      data['entries_per_page'] = $('select[name="sdr-disputes-index_length"]').val()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'SdrEntriesPerPage'}
+        dataType: 'json'
+        success: (response) ->
+    )
 
   $('.toggle-vis-sdr').each ->
     column = $('#sdr-disputes-index').DataTable().column($(this).attr('data-column'))
@@ -154,7 +155,7 @@ $ ->
   $('#sdr-resolution-selector input.sdr-ticket-resolution-radio').click (event)->
     fixed_fp_message_types = ['FIXED_FP_SUDDEN_SPIKE', 'FIXED_FP_DOMAIN_AGE', 'FIXED_FP_NEGATIVE_WEBREP']
 
-    resolution_comments = 
+    resolution_comments =
       'FIXED_FP_SUDDEN_SPIKE': 'The domain was impacted due to Talos sensors observing suspicious behavior typically indicative of spamming. This behavior is no longer observed and the reputation has been adjusted accordingly.'
       'FIXED_FP_DOMAIN_AGE': 'The domains were penalized by SDR due to a combination of domain registration and sending attributes prevalent in spam sending domains. The issue has been rectified and the domain reputation has been adjusted accordingly.'
       'FIXED_FP_NEGATIVE_WEBREP': 'This domain was penalized by SDR as it used to have a Untrusted Web Reputation score due to malicious or suspicious behavior. The issue has been rectified and the domain reputation has been adjusted accordingly.'
@@ -167,7 +168,7 @@ $ ->
       $('input#FIXED_FP').prop('checked', true)
     else
       $("input[name='dispute-preset-resolution']").prop('checked', false)
- 
+
     $(".ticket-resolution-comment").html(comment)
 
 
@@ -265,6 +266,12 @@ window.initialize_sdr_disputes_datatable = () ->
     ]
   )
 
+window.reload_sdr_dispute = () ->
+  #$('#sdr-disputes-index').DataTable().ajax.reload(null, false)
+  $('#sdr-disputes-index').DataTable().draw('page')
+  #$('#sdr_disputes_check_box').prop('checked', false)
+
+
 window.sdr_disputes_select_all_check_box = () ->
   $('.sdr_dispute_check_box').prop('checked', $('#sdr_disputes_check_box').prop('checked'))
   row = $('.sdr_dispute_check_box').parents('tr')
@@ -277,7 +284,7 @@ window.take_sdr_disputes = () ->
   dispute_ids = selected_sdr_disputes()
 
   if dispute_ids.length == 0
-    std_msg_error('No Tickets Selected', ['Please select at least one ticket to assign.'])
+    show_message('error', 'No Tickets Selected. Please select at least one ticket to assign.', 5, '#alertMessage')
     return
 
   std_msg_ajax(
@@ -286,14 +293,10 @@ window.take_sdr_disputes = () ->
     data: { dispute_ids: dispute_ids }
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      for dispute_id in response.dispute_ids
-        assign_sdr_dispute_on_me_on_view(dispute_id, response.username)
-      std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.username])
+      show_message('success', "#{response.dispute_ids.length} tickets have been assigned to #{response.username}.", 5, '#alertMessage')
+      reload_sdr_dispute()
     error: (error) ->
-      std_msg_error('Assign Issue(s) Error', [
-        'Failed to assign ' + dispute_ids.length + ' issue(s).',
-        'Due to: ' + error.responseJSON.message
-      ])
+      show_message('error', "Assign Issue(s) Error. Failed to assign #{dispute_ids.length} issue(s) due to: #{error.responseJSON.message}", 5, '#alertMessage')
   )
 
 window.take_sdr_dispute = (dispute_id) ->
@@ -304,7 +307,8 @@ window.take_sdr_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      assign_sdr_dispute_on_me_on_view(response.dispute_id, response.username)
+      reload_sdr_dispute()
+      show_message('success', "SDR Dispute #{dispute_id} has been assigned to #{response.username}.", 5, '#alertMessage')
   )
 
 window.return_sdr_dispute = (dispute_id) ->
@@ -315,30 +319,41 @@ window.return_sdr_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      return_sdr_dispute_on_view(dispute_id)
+      reload_sdr_dispute()
+      show_message('success', "SDR Dispute #{dispute_id} has been returned.", 5, '#alertMessage')
+    error: (error) ->
+      show_message('error', [
+        "Failed to return #{dispute_id} due to: #{error.responseJSON.message}"
+      ], 5, '#alertMessage')
   )
 
 window.return_sdr_disputes = () ->
+  currentUser = $('input[name="current_user_id"]').val()
   dispute_ids = selected_sdr_disputes()
 
   if dispute_ids.length == 0
-    std_msg_error('No Tickets Selected', ['Please select at least one ticket to return.'])
+    show_message('error', 'No Tickets Selected. Please select at least one ticket to return.')
     return
 
   std_msg_ajax(
     method: 'PATCH'
     url: "/escalations/api/v1/escalations/sdr/disputes/return_disputes"
-    data: { dispute_ids: dispute_ids }
+    data: {
+      dispute_ids: dispute_ids,
+      current_user_id: currentUser
+    }
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      for dispute_id in response.dispute_ids
-        return_sdr_dispute_on_view(dispute_id, response.username)
-      std_msg_success('Tickets successfully returned', [response.dispute_ids.length + ' have been returned '])
+      if response.dispute_ids.length == response.returned_ids.length
+        show_message('success', "#{response.dispute_ids.length} disputes have been returned", 5, '#alertMessage')
+      else if response.returned_ids.length == 0
+        show_message('error', "No disputes have been returned. You can only return disputes assigned to you.", 5, '#alertMessage')
+      else
+        show_message('error', "#{response.returned_ids.length} disputes have been returned. #{response.dispute_ids.length - response.returned_ids.length} were not. You can only return disputes assigned to you.", 5, '#alertMessage')
+
+      reload_sdr_dispute()
     error: (error) ->
-      std_msg_error('Return Issue(s) Error', [
-        'Failed to return ' + dispute_ids.length + ' issue(s).',
-        'Due to: ' + error.responseJSON.message
-      ])
+      show_message('error', "Failed to return #{dispute_ids.length} issue(s) due to: #{error.responseJSON.message}", 5, '#alertMessage')
   )
 
 window.selected_sdr_disputes = () ->
@@ -346,16 +361,6 @@ window.selected_sdr_disputes = () ->
     this.dataset['entryId']
     this.value
   ).toArray()
-
-window.return_sdr_dispute_on_view = (dispute_id) ->
-  $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='esc-tooltipped take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='take_sdr_dispute(#{dispute_id});'></button>")
-  $("#owner_#{dispute_id}").text("Unassigned").addClass('missing-data')
-  $('#status_' + dispute_id).text("NEW")
-
-window.assign_sdr_dispute_on_me_on_view = (dispute_id, user_name) ->
-  $("#owner_#{dispute_id}").text(user_name).removeClass('missing-data')
-  $('#status_' + dispute_id).text("ASSIGNED")
-  $(".inline-take-dispute-#{dispute_id}").replaceWith("<button class='esc-tooltipped return-ticket-button inline-return-ticket-#{dispute_id}' title='Return ticket' onclick='return_sdr_dispute(#{dispute_id});'></button>")
 
 window.hide_loading_gears = () ->
   loader = $('#sdr-loading-gear')
@@ -391,7 +396,7 @@ window.sdr_show_page_edit_status = (dispute_id) ->
 
   if statusName == 'RESOLVED_CLOSED'
     resolution = $("#show-edit-ticket-status-dropdown").find('input[name=dispute-resolution]:checked').val()
-  if statusName == 'ASSIGNED' && $('#dispute-assignee').hasClass('missing-data')
+  else if statusName == 'ASSIGNED' && $('#dispute-assignee').hasClass('missing-data')
     std_msg_error('This ticket is unassigned', ['Please select an assignee.'])
     return
 
@@ -403,6 +408,8 @@ window.sdr_show_page_edit_status = (dispute_id) ->
   if resolution
     data.resolution = resolution
     data.comment = $('.ticket-resolution-comment').val()
+  else
+    data.comment = $('.ticket-status-comment').val()
 
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/sdr/disputes/set_disputes_status'
@@ -430,7 +437,7 @@ window.sdr_toolbar_unassign_dispute = () ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error removing assignee')
+      show_customer_cb('error', "Error removing assignee. #{response}", 5, '#alertMessage')
   )
 
 window.take_single_sdr_dispute = (id) ->
@@ -442,23 +449,31 @@ window.take_single_sdr_dispute = (id) ->
       url: "/escalations/api/v1/escalations/sdr/disputes/take_disputes"
       data: { dispute_ids: dispute_ids }
       error_prefix: 'Error updating ticket.'
-      success_reload: true
       success: (response) ->
         if response.dispute_ids.length > 0
-          show_message('success', 'Ticket assignment has been updated!', 5)
-          location.reload()
+          show_message('success', 'Ticket assignment has been updated.', 5, '#alertMessage')
+          reload_sdr_dispute()
         else
-          show_message('error', 'Ticket assnigment could not be updated.', 5)
-          location.reload()
+          show_message('error', 'Ticket assnigment could not be updated.', 5, '#alertMessage')
     )
   else
     currentUser = $('input[name="current_user_id"]').val()
     $('#index_target_assignee').val(currentUser)
     window.sdr_toolbar_show_change_assignee()
 
+window.sdr_toolbar_index_change_assignee = () ->
+  disputeIdArray = $('.sdr_dispute_check_box:checkbox:checked').map(() ->
+    Number(this.value)
+  ).toArray()
+  $('#index_change_assign').dropdown('toggle')
+  sdr_change_assignee(disputeIdArray)
+
 window.sdr_toolbar_show_change_assignee = () ->
   singleId = $('#dispute_id').text()
   disputeIdArray = [singleId]
+  sdr_change_assignee(disputeIdArray)
+
+sdr_change_assignee = (disputeIdArray) ->
   new_assignee = $('#index_target_assignee option:selected').val()
   data = {
     'dispute_ids': disputeIdArray,
@@ -473,11 +488,19 @@ window.sdr_toolbar_show_change_assignee = () ->
     data: data
     dataType: 'json'
     success: (response) ->
-      show_message('success', 'Ticket assignment has been updated!', 5)
-      window.location.reload()
-    error: (response) ->
-      show_message('error', 'Ticket assignment could not be updated.', 5)
-      std_msg_error('No Tickets Selected', ['Select at least one ticket to assign to yourself.'])
+      responseData = JSON.parse(response).data
+      page = $('#sdr-disputes-index').DataTable().page
+
+      if responseData.length > 0 && (data.dispute_ids.length == responseData.length)
+        show_message('success', "#{responseData.length} ticket assignment(s) updated.", 5, '#alertMessage')
+        reload_sdr_dispute()
+      else if responseData.length > 0 && (data.dispute_ids.length != responseData.length)
+        show_message('success', "#{responseData.length} ticket assignment(s) updated, but not every ticket was updated. Closed tickets cannot change their assignee", 5, '#alertMessage')
+        reload_sdr_dispute()
+      else
+        show_message('error', 'No tickets updated. Closed tickets cannot change their assignee.', 5, '#alertMessage')
+    error: (error) ->
+      show_message('error', "Change Issue(s) Error: #{error.responseJSON.message}", 5, '#alertMessage')
   )
 
 window.advanced_search_sdr_index_table = () ->
@@ -595,15 +618,16 @@ window.format_sdr_header = (data) ->
   if data != undefined && container.length > 0
     reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="sdr_search_refresh()"></span>'
     { search_type, search_name } = data
+
     if search_type == 'standard'
       if search_name == 'all'
         reset_icon = ''
-      new_header =
-        '<div>' +
-          '<span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span>' +
-          reset_icon +
-          '</div>'
+      else if search_name == 'my_disputes'
+        search_name = 'my'
+      else if search_name == 'team_disputes'
+        search_name = "my team's"
 
+      new_header = "<div><span class='text-capitalize'>#{search_name.replace(/_/g, " ")} tickets</span>#{reset_icon}</div>"
     else if search_type == 'advanced'
       search_conditions = JSON.parse(localStorage.sdr_search_conditions)
       new_header = '<div>Results for Advanced Search ' + reset_icon + '</div>'
@@ -626,10 +650,6 @@ window.format_sdr_header = (data) ->
             condition_name = 'TIME SUBMITTED (OLDER)'
 
           condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
-
-#          if typeof condition == 'object'
-#            condition_HTML = '<span>' + condition.from  + ' - ' + condition.to+ '</span>'
-#          else
           condition_HTML = '<span>' + condition + '</span>'
 
           container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
@@ -677,8 +697,8 @@ window.sdr_build_named_search = (search_name) ->
 
 window.export_sdr_all = () ->
   form = document.getElementById("sdr-disputes-export-form")
-
   data = build_sdr_data()
+
   if 'advanced' == data.search_type
     data.search_name = null
   data_json = JSON.stringify(data)
@@ -690,8 +710,7 @@ window.export_sdr_all = () ->
 
 window.export_sdr_selected = () ->
   data = build_sdr_data()
-  data.selected_cases = $('.sdr_dispute_check_box:checked').map((i, el) => el.value).get() 
-  
+  data.selected_cases = $('.sdr_dispute_check_box:checked').map((i, el) => el.value).get()
 
   if data.selected_cases.length <= 0
     std_msg_error('Error: Nothing selected.',"", reload: false)
@@ -701,3 +720,96 @@ window.export_sdr_selected = () ->
   data_json = JSON.stringify(data)
   $('#index-export-data-input').val(data_json)
   document.getElementById("sdr-disputes-export-form").onsubmit = ""
+
+window.sdr_index_edit_ticket_status = () ->
+    dropdown = $('#sdr-index-edit-ticket-status-dropdown').parent()
+
+    if ($('.sdr_dispute_check_box:checked').length > 0)
+# Select Status
+      $('.sdr-ticket-status-radio-label').click ->
+        radio_button = $(this).prev('.sdr-ticket-status-radio')
+        $(radio_button[0]).trigger('click')
+        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+          $('#sdr-index-dispute-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#sdr-index-dispute-resolution-submenu').hide()
+          $(res_comment[0]).val('')
+
+      $('.sdr-ticket-status-radio').click ->
+        all_stat_radios = $('#sdr-index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+        if $(this).is(':checked')
+          wrapper = $(this).parent()
+          $(all_stat_radios).removeClass('selected')
+          $(wrapper).addClass('selected')
+        if $(this).attr('id') == 'RESOLVED_CLOSED'
+          $('#sdr-index-dispute-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#sdr-index-dispute-resolution-submenu').hide()
+          $(res_comment[0]).val('')
+    else
+      std_msg_error('No rows selected', ['Please select at least one row.'])
+
+window.sdr_index_change_ticket_status = () ->
+  checkboxes = $('#sdr-disputes-index').find('.sdr_dispute_check_box')
+  checked_dispute_ids = []
+  comment = ''
+  dropdown = $('#sdr-index-edit-ticket-status-dropdown').parent()
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  resolution = ""
+  status = $('#sdr-index-edit-ticket-status-dropdown').find('.sdr-ticket-status-radio:checked').val()
+  successfully_closed_disputes = []
+
+  $(checkboxes).each ->
+    if $(this).is(':checked')
+      dispute_id = $(this).val()
+      checked_dispute_ids.push(dispute_id)
+
+  if status == 'RESOLVED_CLOSED' && $('#sdr-index-edit-ticket-status-dropdown').find('.sdr-ticket-resolution-radio').is(':checked')
+    resolution = $('#sdr-index-edit-ticket-status-dropdown').find('.sdr-ticket-resolution-radio:checked').val()
+    comment = $('.resolution-comment-wrapper').find('.ticket-resolution-comment').val()
+  else if status == 'RESOLVED_CLOSED'
+    show_message('error', 'No resolution selected. Please select a ticket resolution.', 5, '#alertMessage')
+    return
+  else if status == 'ASSIGNED' && $('#dispute-assignee').hasClass('missing-data')
+    show_message('error', 'This ticket is unassigned. Please select an assignee.', 5, '#alertMessage')
+    return
+  else
+    comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
+
+  dropdown.dropdown('toggle')
+
+  if comment
+    data = {
+      comment: comment,
+      dispute_ids: checked_dispute_ids,
+      resolution: resolution,
+      status: status
+    }
+
+    $.ajax(
+      url: '/escalations/api/v1/escalations/sdr/disputes/set_disputes_status'
+      method: 'POST'
+      headers: headers
+      data: data
+      success: (response) ->
+        $('.ticket-status-comment').val('')
+        show_message('success', 'Ticket status has been updated.', 5, '#alertMessage')
+        reload_sdr_dispute()
+      error: (response) ->
+        show_message('error', "Error Updating Status. #{response}", 5, '#alertMessage')
+    )
+  else
+    show_message('error', "Ticket status can't be changed without a comment.", 5, '#alertMessage')
+

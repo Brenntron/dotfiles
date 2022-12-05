@@ -21,8 +21,11 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
     ids = params["selected_ids"]&.split(',') || nil
     @complaints = Complaint.where(id:ids)
   end
-  def advanced_search
 
+  def research
+  end
+
+  def advanced_search
   end
 
   def named_search
