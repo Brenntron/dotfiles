@@ -88,9 +88,6 @@ $ ->
 
         $('#domainHistoryLoader').hide()
 
-        if (data.length - 1) == 0
-          return
-
         $('#domainHistoryDomainTableListingContent > .domain-data.result-total').remove()
         #the first entry is the domain itself so that should not count in the result total
         $('#domainHistoryDomainTableListingContent').append("<p class='domain-data result-total'>(#{data.length - 1} found)</p>")
@@ -210,12 +207,6 @@ $ ->
         if data.error?
           $('#xbrsHistoryLoader').hide()
           std_msg_error(data.error, [])
-        else if Object.keys(data).length is 0
-          $('#xbrsHistoryLoader').hide()
-          std_msg_error('Not a valid domain.', [])
-          return
-        else if (data.length - 1) == 0
-          return
         else
           domainKey = Object.keys(data)[0]
 

@@ -11,7 +11,7 @@ class Umbrella::DataFetcher
       date = date.strftime('%Y-%m-%d')
       filename = date + FILENAME_SUFFIX
       file_content = s3_client.get_object(bucket: BUCKET_NAME, key: filename).body.read
-      file_content.split("\n").filter_map { |domain| { domain: domain } unless first_line_of_empty_file?(domain) }
+      file_content.split("\n").filter_map { |domain| { domain: domain.strip } unless first_line_of_empty_file?(domain) }
     rescue Aws::S3::Errors::NoSuchKey
       msg = "File named #{filename} for #{BUCKET_NAME} bucket on #{REGION} region was not found"
       Rails.logger.error(msg)

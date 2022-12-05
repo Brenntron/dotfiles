@@ -103,6 +103,10 @@
                   .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'reptool_entries_button'}
                     .dropdown-tool-text-divider.secondary-text-divider
                       .inline-text  RepTool Classification
+                      .inline-label-wrapper.float-right
+                        %input.reptool-toolbar-force{id:"quick-lookup-reptool-toolbar-force", type: 'checkbox', name: 'quick-lookup-reptool-toolbar-force'}
+                        %label#quick-lookup-reptool-toolbar-force-label{for: "quick-lookup-reptool-toolbar-force"} Force commit
+
                     .inline-tool-content-wrapper
                       .row
                         .col-xs-12
@@ -368,6 +372,7 @@
                     .inline-label-wrapper.float-right
                       %input.reptool-toolbar-force{id:"detailed-reptool-toolbar-force", type: 'checkbox', name: 'force', value: true}
                       %label{for: "detailed-reptool-toolbar-force"} Force commit
+
                   .inline-tool-content-wrapper
                     .row
                       .col-xs-12

@@ -2144,8 +2144,7 @@ window.master_submit = () ->
   thingsSelected = getTouchedFormCount()
   if thingsSelected > selectedItems.length
     std_msg_confirm(
-      "I noticed you have made changes to at least " + thingsSelected +  " complaints but you only have " + selectedItems.length + " items selected. Do you want to proceed with updating these items? It will reload the page and you will lose your other changes.",
-      [],
+      "Changes have been made to at least " + thingsSelected +  " complaints but only " + selectedItems.length + " items are selected.", ["Updating selected items will reload the page and other changes will be lost."],
       {
         reload: false,
         confirm_dismiss: true,
@@ -2400,23 +2399,6 @@ $ ->
         )
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
-
-$ ->
-  set_complaints_link = () ->
-    url = '/escalations/webcat/complaints'
-    search = if window.location.pathname == url # only if we're on index page
-      window.location.search
-    else
-      localStorage.webcat_search_name
-
-    if search && window.location.href.indexOf('webcat') > 0
-      localStorage.setItem('webcat_search_name', search)
-      link = url + search
-      $('#cat-link').attr('href', link)
-      $('#cat-icon-link').attr('href', link)
-      $('#complaints').attr('href', link)
-
-  set_complaints_link()
 
 # Convert webcat to webrep
 # Enable / disable button to attempt based on if anything is selected
