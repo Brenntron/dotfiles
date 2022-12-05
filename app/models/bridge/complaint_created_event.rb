@@ -13,7 +13,7 @@ class Bridge::ComplaintCreatedEvent < Bridge::BaseMessage
                     source_key: source_key,
                     ticket_entries: payload,
                     ac_status: Complaint::AC_SUCCESS,
-                    ac_id: ac_id
+                    ac_id: ac_id,
                     ticket_status: @ticket_status
                     })
   end
