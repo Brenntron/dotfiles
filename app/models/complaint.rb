@@ -1065,6 +1065,17 @@ For future web and email reputation requests, please open a web and email reputa
     response
   end
 
+  def self.valid_tld?(uri)
+
+    begin
+      parsed_uri = Addressable::URI.parse(uri)
+      parsed_uri = Addressable::URI.parse("http://" + uri) if parsed_uri.scheme.nil?
+      PublicSuffix.valid?(parsed_uri.host, default_rule: nil, ignore_private: true)
+    rescue
+      false
+    end
+  end
+
   def self.process_bulk_adhoc_categorizations(params, user, bugzilla_rest_session)
 
     #someday this will probably need to be something different
