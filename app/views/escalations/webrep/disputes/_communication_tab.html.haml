@@ -38,7 +38,7 @@
                 %span.case-history-icon.note-icon{:data => {:history_kind => "note"}}
               %td
                 %span.case-history-author
-                  =comment.user.cvs_username
+                  =comment.user.display_username
                 %span.case-history-preview
                   =comment.comment.truncate(75, omission: '...')
               %td.alt-col.case-history-datetime{:data => {:db_date => comment.created_at}}
@@ -237,7 +237,7 @@
             .note-info-item.author-notation
               Written by
               %span.author-username
-                =comment.user.cvs_username
+                =comment.user.display_username
               = distance_of_time_in_words(Time.now, comment.created_at) + " ago."
             %br.hidden-break
             .note-info-item.time-stamp

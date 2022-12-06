@@ -65,6 +65,10 @@ class User < ApplicationRecord
           name_pattern: "%#{name}%")
   end
 
+  def display_username
+    cvs_username || cec_username
+  end
+
   def record(action)
     record = { resource: 'user',
                action: action,
