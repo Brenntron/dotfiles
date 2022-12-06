@@ -81,6 +81,9 @@ For future web and email reputation requests, please open a web and email reputa
       when COMPLETED
         update!(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
     end
+    Bridge::ComplaintUpdateStatusEvent.new.post_complaint(self)
+
+
   end
 
   def self.can_visit_url?(url)
@@ -255,7 +258,7 @@ For future web and email reputation requests, please open a web and email reputa
       create_complaint_entry_credit(new_complaint_entry)
     end
 
-    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: complaint.id)
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: complaint.id, status: complaint.status)
     conn.post(return_payload, "")
 
   end
@@ -290,7 +293,7 @@ For future web and email reputation requests, please open a web and email reputa
 
       if record_exists.present?
         return_payload = record_exists.build_ti_payload
-        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id)
+        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id, ticket_status: record_exists.status)
         return conn.post(return_payload)
       end
 
@@ -513,7 +516,7 @@ For future web and email reputation requests, please open a web and email reputa
         conn.post
         return
       else
-        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_complaint.id)
+        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_complaint.id, ticket_status: new_complaint.status)
         conn.post(return_payload)
       end
 

@@ -382,7 +382,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       new_dispute_entry.save
     end
 
-    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: dispute.id)
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: dispute.id, status: dispute.reload.status)
     conn.post(return_payload, "")
 
   end
@@ -865,7 +865,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     record_exists = Dispute.where(:ticket_source_key => message_payload["source_key"]).first
 
     if record_exists.present?
-      conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id)
+      conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id, status: record_exists.status)
       return_payload = record_exists.build_ti_payload
       case_email = DisputeEmail.generate_case_email_address(record_exists.id)
       return conn.post(return_payload, case_email)
@@ -1241,7 +1241,7 @@ For future Web categorization requests, please open a Web categorization ticket 
 
       case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
       Rails.logger.info "_+_+_+_+_+_+_+_+_Setting up Bridge post_+_+_+_+_+_+_+_+_"
-      conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_dispute.id)
+      conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_dispute.id, status: new_dispute.status)
       Rails.logger.info "_+_+_+_+_+_+_+_+_Running Connection POST_+_+_+_+_+_+_+_+_"
       conn.post(return_payload, case_email)
 
@@ -1745,15 +1745,15 @@ For future Web categorization requests, please open a Web categorization ticket 
     user_id = user.kind_of?(User) ? user.id : user
     accepted_at = Time.now
 
-    disputes_ary = []
-
     disputes = Dispute.where(id: dispute_ids).where.not(status: [
       Dispute::TI_NEW, Dispute::STATUS_RESOLVED, Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN,
       Dispute::STATUS_RESOLVED_UNCHANGED
     ])
-    disputes_ary = disputes.all.to_a
-    entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
+
+    disputes_ary = disputes.includes(:dispute_entries)
+    entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED, DisputeEntry::ASSIGNED])
     entries_ary = entries.all.to_a
+
     Dispute.transaction do
       disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
       if entries_ary.any?
@@ -1767,10 +1767,13 @@ For future Web categorization requests, please open a Web categorization ticket 
 
       end
     end
-    #equivalent to #reload, get fresh values after transaction has committed all updated values to database.
-    entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
-    entries_ary = entries.all.to_a
-    Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries_ary)
+    # send entries for separately to avoid bug in DisputeEntryUpdateStatusEvent#post entries
+    # when we send ticket_source_key and status for first element in disputes_ary array
+    disputes_ary.each do |dispute|
+      entries = dispute.dispute_entries.where(status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED, DisputeEntry::ASSIGNED])
+
+      Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries.to_a)
+    end 
 
     disputes_ary
   end
