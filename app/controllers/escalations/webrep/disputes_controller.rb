@@ -25,7 +25,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def show
     @dispute = Dispute.eager_load([:dispute_comments, :dispute_emails]).eager_load(:dispute_entries => [:dispute_rule_hits, :dispute_entry_preload]).where(:id => params[:id]).first
     @versioned_items = @dispute.compose_versioned_items
-
     #to compare against entry.dispute_rule_hits:
     # rulehit = @all_rulehits.find({|hit| hit.mnemonic == dispute_rule_hit.name})
     #
@@ -493,7 +492,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           'SBRS',
           'SBRS Rule Hits',
           'SBRS Rules',
-          'XBRS History',
+          'XBRS Timeline',
           'Crosslisted URLs',
           'VirusTotal Negatives',
           'VirusTotal Total',
@@ -515,7 +514,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
             entry.sbrs_score,
             entry.dispute_rule_hits.sbrs_rule_hits.count,
             "\"#{entry.dispute_rule_hits.sbrs_rule_hits.map {|wbrs_hit| wbrs_hit.name}.join(', ')}\"",
-            entry.hostlookup && entry.find_xbrs[1]['data'].count,
+            entry.hostlookup && entry.xbrs_timeline.count,
             entry.wbrs_xlist.count,
             entry.virustotals_negatives_count,
             entry.virustotals.count,
@@ -544,7 +543,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           'SBRS',
           'SBRS Rule Hits',
           'SBRS Rules',
-          'XBRS History',
+          'XBRS Timeline',
           'Crosslisted URLs',
           'VirusTotal Negatives',
           'VirusTotal Total',
@@ -566,7 +565,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
             entry.sbrs_score,
             entry.dispute_rule_hits.sbrs_rule_hits.count,
             "\"#{entry.dispute_rule_hits.sbrs_rule_hits.map {|wbrs_hit| wbrs_hit.name}.join(', ')}\"",
-            entry.hostlookup && entry.find_xbrs[1]['data'].count,
+            entry.hostlookup && entry.xbrs_timeline.count,
             entry.wbrs_xlist.count,
             entry.virustotals_negatives_count,
             entry.virustotals.count,

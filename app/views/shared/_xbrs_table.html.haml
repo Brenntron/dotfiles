@@ -1,10 +1,11 @@
+- xbrs_timeline = entry.xbrs_timeline
 .entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
   %h5.entry-details-table-header
-    Current XBRS Hits
-    - unless entry.hostlookup.nil?
-      %span.nested-table-tally
-        = entry.xbrs_data['data'].count
-  - if entry.xbrs_data['data'].empty?
+    XBRS Timeline
+
+    %span.nested-table-tally
+      = xbrs_timeline.count
+  - if xbrs_timeline.empty?
     %table
       %thead
         %tr
@@ -12,41 +13,36 @@
             %span.missing-data
               No XBRS data available.
   - else
-    %table{ :class => ("table-scrollable" if entry.xbrs_data['data'].count > 8)}
-      %thead{ :id => "current-xbrs-table-head"}
-        %tr
-          - entry.xbrs_data['legend'].each do |header|
-            %th= header
-      %tbody{ :id => "current-xbrs-table-body"}
-        - unless entry.hostlookup.nil?
-          - entry.xbrs_data['data'].each do |data|
-            %tr
-              - data.each do |datapoint|
-                %td= datapoint
-
-
-.entry-details-table.xbrs-details-table{'data-entry-id': "#{entry.id}"}
-  %h5.entry-details-table-header
-    XBRS History
-    - unless entry.hostlookup.nil?
-      %span.nested-table-tally
-        = entry.xbrs_history['data'].count
-  - if entry.xbrs_history['data'].empty?
     %table
       %thead
         %tr
-          %th
-            %span.missing-data
-              No XBRS history available.
-  - else
-    %table{ :class => ("table-scrollable" if entry.xbrs_history['data'].count > 8)}
-      %thead
-        %tr
-          - entry.xbrs_history['legend'].each do |header|
-            %th= header
+          %th Timestamp
+          %th.text-center Score
+          %th V2 Content Cat
+          %th V3 Content Cats
+          %th Threat Cats
+          %th Rule Hits
+
       %tbody
-        - unless entry.hostlookup.nil?
-          - entry.xbrs_history['data'].each do |data|
+        - unless xbrs_timeline.empty?
+          - xbrs_timeline.each do |timeline_row|
             %tr
-              - data.each do |datapoint|
-                %td= datapoint
+              %td= Time.at(timeline_row['time'] / 1000).strftime("%B %e, %Y at %I:%M %p")
+              %td.text-center
+                - if timeline_row['score'] < 0
+                  %span.mal-highlight= timeline_row['score'] || '-'
+                - else
+                  = timeline_row['score'] == '-'
+              %td
+                - timeline_row['aups'].each do |aup|
+                  - if aup['version'] == 'V2'
+                    =aup['cat'] || '-'
+              %td
+                - multicats = []
+                - timeline_row['aups'].each do |aup|
+                  - if aup['version'] == 'V3'
+                    - multicats.push(aup['cat']) 
+                =multicats.empty? ? '-' : multicats.join(", ")
+              
+              %td= timeline_row['threatCats'].empty? ? '-' : timeline_row['threatCats'].join(", ")
+              %td= timeline_row['ruleHits'].empty? ? '-' : timeline_row['ruleHits'].join(", ")

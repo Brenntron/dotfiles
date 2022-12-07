@@ -201,12 +201,6 @@ Rails.configuration.wbrs                = ApiRequester::ApiRequester.config_of(w
 # TODO convert auth_token to api_key so it is set by config_of method.
 Rails.configuration.wbrs.auth_token     = wbrs_config['auth_token']
 
-
-xbrs_config = env_config.fetch('xbrs', nil)
-raise 'config.yml missing xbrs section' unless xbrs_config
-Rails.configuration.xbrs                = ApiRequester::ApiRequester.config_of(xbrs_config)
-Rails.configuration.xbrs.consumer_key   = xbrs_config['consumer_key']
-
 k2_config = env_config.fetch('k2', nil)
 raise 'config.yml missing k2 section' unless k2_config
 Rails.configuration.k2                  = ApiRequester::ApiRequester.config_of(k2_config)
