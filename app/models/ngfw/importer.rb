@@ -30,13 +30,13 @@ class Ngfw::Importer
         raise 'NGFW platform not found' if platform.blank?
   
         pending_clusters = NgfwCluster.pluck(:domain) # all the rest clusters were deleted by destroy_existing_clusters!
-  
-        Ngfw::DataFetcher.fetch.each do |ngfw_record|
+        arrow_table = Ngfw::DataFetcher.fetch
+        arrow_table.each_record do |ngfw_record|
           # skip pending clusters domains - they are already in progress
-          next if pending_clusters.include?(ngfw_record[:domain])
+          next if pending_clusters.include?(ngfw_record[0])
           NgfwCluster.create(
-            domain: ngfw_record[:domain],
-            traffic_hits: ngfw_record[:traffic_hits],
+            domain: ngfw_record[0],
+            traffic_hits: ngfw_record[1],
             platform_id: platform.id
           )
         end

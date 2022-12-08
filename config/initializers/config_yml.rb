@@ -218,3 +218,10 @@ umbrella_aws_config = OpenStruct.new
 umbrella_aws_config.aws_access_key_id = umbrella_fetcher_config.dig('aws', 'access_key_id')
 umbrella_aws_config.aws_secret_access_key = umbrella_fetcher_config.dig('aws', 'secret_access_key')
 Rails.configuration.umbrella_data_fetcher = umbrella_aws_config
+
+ngfw_telemetry_config = env_config.fetch('ngfw_telemetry', nil)
+raise 'config.yml missing ngfw_telemetry section' unless ngfw_telemetry_config
+ngfw_telemetry_aws_config = OpenStruct.new
+ngfw_telemetry_aws_config.aws_access_key_id = ngfw_telemetry_config.dig('aws', 'access_key_id')
+ngfw_telemetry_aws_config.aws_secret_access_key = ngfw_telemetry_config.dig('aws', 'secret_access_key')
+Rails.configuration.ngfw_telemetry = ngfw_telemetry_aws_config
