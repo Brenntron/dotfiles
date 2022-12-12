@@ -1362,87 +1362,89 @@ $ ->
     )
 
   $('#webrep-advanced-search-button').click ->
-    std_msg_ajax(
-      method: 'GET'
-      url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
-      success: (response) ->
+    # if we have already loaded the advanced search, with all options no need to load it again 
+    if $('#company-list').find('option').size() == 0
+      std_msg_ajax(
+        method: 'GET'
+        url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
+        success: (response) ->
+          $('#user-list').empty()
+          $('#status-list').empty()
+          $('#submittertype-list').empty()
+          $('#contactname-list').empty()
+          $('#contactemail-list').empty()
+          $('#company-list').empty()
+          $('#resolution-list').empty()
+          $('#case-origin-list').empty()
 
-        $('#user-list').empty()
-        $('#status-list').empty()
-        $('#submittertype-list').empty()
-        $('#contactname-list').empty()
-        $('#contactemail-list').empty()
-        $('#company-list').empty()
-        $('#resolution-list').empty()
-        $('#case-origin-list').empty()
 
-        $('#platform-input').selectize {
-          persist: false
-          create: false
-          valueField: 'id',
-          labelField: 'public_name',
-          options: response.json.platforms
-          onFocus: () ->
-            window.toggle_selectize_layer(this, 'true')
-          onBlur: () ->
-            window.toggle_selectize_layer(this, 'false')
-        }
+          $('#platform-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.platforms
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
 
-        $('#resolution-input').selectize {
-          persist: false
-          create: false
-          valueField: 'id',
-          labelField: 'public_name',
-          options: response.json.resolutions
-          onFocus: () ->
-            window.toggle_selectize_layer(this, 'true')
-          onBlur: () ->
-            window.toggle_selectize_layer(this, 'false')
-        }
+          $('#resolution-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.resolutions
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
 
-        $('#status-input').selectize {
-          persist: false
-          create: false
-          valueField: 'id',
-          labelField: 'public_name',
-          options: response.json.statuses
-          onFocus: () ->
-            window.toggle_selectize_layer(this, 'true')
-          onBlur: () ->
-            window.toggle_selectize_layer(this, 'false')
-        }
+          $('#status-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.statuses
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
 
-        $('#priority-input').selectize {
-          persist: false
-          create: false
-          valueField: 'id',
-          labelField: 'public_name',
-          options: response.json.priorities
-          onFocus: () ->
-            window.toggle_selectize_layer(this, 'true')
-          onBlur: () ->
-            window.toggle_selectize_layer(this, 'false')
-        }
+          $('#priority-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.priorities
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
 
-        for user in response.json.case_owners
-          $('#user-list').append '<option value=\'' + user.cvs_username + '\'></option>'
+          for user in response.json.case_owners
+            $('#user-list').append '<option value=\'' + user + '\'></option>'
 
-        for type in response.json.submitter_types
-          $('#submittertype-list').append '<option value=\'' + type + '\'></option>'
+          for type in response.json.submitter_types
+            $('#submittertype-list').append '<option value=\'' + type + '\'></option>'
 
-        for contact in response.json.contacts
-          $('#contactname-list').append '<option value=\'' + contact.name + '\'></option>'
+          for contact in response.json.contacts
+            $('#contactname-list').append '<option value=\'' + contact.name + '\'></option>'
 
-        for contact in response.json.contacts
-          $('#contactemail-list').append '<option value=\'' + contact.email + '\'></option>'
+          for contact in response.json.contacts
+            $('#contactemail-list').append '<option value=\'' + contact.email + '\'></option>'
 
-        for company in response.json.companies
-          $('#company-list').append '<option value=\'' + company.name + '\'></option>'
+          for company in response.json.companies
+            $('#company-list').append '<option value=\'' + company + '\'></option>'
 
-        for source in response.json.sources
-          $('#case-origin-list').append '<option value=\'' + source + '\'></option>'
+          for source in response.json.sources
+            $('#case-origin-list').append '<option value=\'' + source + '\'></option>'
 
-    )
+      )
 
 
    

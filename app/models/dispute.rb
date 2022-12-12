@@ -1359,13 +1359,18 @@ For future Web categorization requests, please open a Web categorization ticket 
       dispute_fields['user_id'] = user.id
     end
 
+
     dispute_fields = dispute_fields.select{|ignore_key, value| value.present?}
-    if dispute_fields['id'].present?
-      dispute_fields['id'] = dispute_fields['id'].split(/[\s,]+/)
+
+
+    ['id', 'priority', 'resolution'].each do|field|
+      next unless dispute_fields[field].present?
+      dispute_fields[field] = dispute_fields[field].split(/[\s,]+/)
     end
+
     relation = where(dispute_fields)
 
-    if params['case_origin']
+    unless params['case_origin'].empty?
       if params['case_origin'] == 'Internal'
         relation = relation.where(ticket_source: nil)
       else
@@ -1442,6 +1447,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     company_name = nil
     customer_params = params.fetch('customer', {}).slice(*%w{name email company_name}).to_h
     customer_params = customer_params.select{|ignore_key, value| value.present?}
+  
     if customer_params.any?
       if customer_params['company_name'].present?
         company_name = customer_params.delete('company_name')
