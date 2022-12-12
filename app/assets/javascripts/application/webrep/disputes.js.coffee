@@ -1361,7 +1361,7 @@ $ ->
       success: (response) ->
     )
 
-  $('#advanced-search-button').click ->
+  $('#webrep-advanced-search-button').click ->
     std_msg_ajax(
       method: 'GET'
       url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
@@ -1694,7 +1694,7 @@ window.get_threat_levels = (uri) ->
   )
 
 $ ->
-  $('#advanced-search-button').click ->
+  $('#webrep-advanced-search-button').click ->
     $('#advanced-search-dropdown').show()
 
   $('#submit-advanced-search').click ->

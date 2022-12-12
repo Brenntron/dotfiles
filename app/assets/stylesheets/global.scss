@@ -2463,13 +2463,13 @@ a.static-nav-item {
   font-size: 9pt;
 }
 
-#advanced-search-button {
+#advanced-search-button, #webrep-advanced-search-button {
   margin-top: -4px;
   background-color: transparent;
   color: $type-lighter-color;
 }
 
-#advanced-search-button::before {
+#advanced-search-button::before, #webrep-advanced-search-button::before {
   content: '|';
   color: $bug-accent-color;
 }
@@ -4554,7 +4554,7 @@ td.wbrs-highlight, td.sbrs-highlight {
     }
   }
 
-  #advanced-search-button {
+  #advanced-search-button, #webrep-advanced-search-button {
     background-color: darken($faint-neutral-color, 5%);
     color: $type-lighter-color;
     text-transform: uppercase;
@@ -4566,7 +4566,7 @@ td.wbrs-highlight, td.sbrs-highlight {
     position: absolute;
     right: 0;
   }
-  #advanced-search-button::before {
+  #advanced-search-button::before, #webrep-advanced-search-button::before {
     display: none;
   }
 
@@ -10938,7 +10938,7 @@ button.secondary.view-report-external-button {
   }
 
   // advanced search button
-  .input-group.search-group #advanced-search-button {
+  .input-group.search-group #advanced-search-button, .input-group.search-group #webrep-advanced-search-button {
     padding: 0 12px 0 18px;
     height: 28px;
   }
@@ -10949,7 +10949,7 @@ button.secondary.view-report-external-button {
   }
 
   // adding the down caret icon using the sort_by svg for advanced search button
-  .input-group.search-group #advanced-search-button::after {
+  .input-group.search-group #advanced-search-button::after, .input-group.search-group #webrep-advanced-search-button::after {
     content: '';
     display: block;
     width: 16px;
@@ -13819,7 +13819,7 @@ table > tbody > tr > td.no-padding {
 }
 
 // adding the down caret icon using the sort_by svg for advanced search button
-#advanced-search-button::after {
+#advanced-search-button::after, #webrep-advanced-search-button::after {
   content: '';
   display: block;
   width: 16px;
