@@ -970,6 +970,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       ##########################################################################################################
 
       ActiveRecord::Base.transaction do
+        entry_platform = nil
         ##### create an IPS bug for this webrep entry if someone from tifpapi uses the network=true parameter
         if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
           ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
@@ -1002,6 +1003,9 @@ For future Web categorization requests, please open a Web categorization ticket 
 
           if entry[:sbrs]["platform"].present?
             entry_platform = Platform.find(entry[:sbrs]["platform"].to_i) rescue nil
+          end
+          if entry_platform.blank? && new_dispute.platform_id.present?
+            entry_platform = Platform.find(new_dispute.platform_id)
           end
 
           new_dispute_entry = DisputeEntry.new
@@ -1065,7 +1069,9 @@ For future Web categorization requests, please open a Web categorization ticket 
           if entry["platform"].present?
             entry_platform = Platform.find(entry["platform"].to_i) rescue nil
           end
-
+          if entry_platform.blank? && new_dispute.platform_id.present?
+            entry_platform = Platform.find(new_dispute.platform_id)
+          end
           sanitized_url = sanitize_url(url)
 
           new_dispute_entry = DisputeEntry.new
