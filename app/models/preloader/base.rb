@@ -68,10 +68,12 @@ class Preloader::Base
     while counter < TRIES
       begin
         if is_ip_address === true
-          xbrs_history = Xbrs::GetXbrs.by_ip4(host, true)
+          k2_response = K2::History.ip_lookup(host)
         else
-          xbrs_history = Xbrs::GetXbrs.by_domain(host, true)
+          k2_response = K2::History.url_lookup(host)
         end
+
+        xbrs_history = {k2: k2_response.body&.dig('queryResults')&.first&.dig('timelines') }.to_json
         break
       rescue
         counter = counter + 1

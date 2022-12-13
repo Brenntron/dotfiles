@@ -775,10 +775,10 @@
                           %td.input-col.xbrs-input-wrapper
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %td.xbrs-history-label-cell
-                            %label XBRS History
+                            %label XBRS Timeline
                           %td.text-center.xbrs-history-cell
                             - unless entry.hostlookup.nil?
-                              = entry.find_xbrs[1]['data'].count
+                              = entry.xbrs_timeline.count
                           %td.input-col.virus-total-input-wrapper
                             %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %td.virustotal-label-cell
