@@ -13,9 +13,15 @@ class Ngfw::DataFetcher
       client = Aws::S3::Client.new(region: AWS_REGION, credentials: creds)
 
       output = client.list_objects({bucket: BUCKET, prefix: PREFIX})
-      latest_timestamp = output.contents.map {|m| m.key.split(PREFIX).last.split('/').first.split('_').first}.sort.last
-      file_key = client.list_objects({bucket: BUCKET, prefix: "#{PREFIX}#{latest_timestamp}#{PRODUCT_FAMILY}"})&.contents&.first&.key
-      raise "Error picking data file" unless file_key
+      timestamp_list = output.contents.map {|m| m.key.split(PREFIX).last.split('/').first.split('_').first}.uniq.sort.reverse
+
+      file_key = nil
+      timestamp_list.each do |timestamp|
+        file_key = client.list_objects({bucket: BUCKET, prefix: "#{PREFIX}#{timestamp}#{PRODUCT_FAMILY}"})&.contents&.first&.key
+        break if file_key.present?
+      end
+
+      raise "Unable to find data file" unless file_key
       tempfile = Tempfile.new(['data', '.snappy.parquet'])
       client.get_object({bucket: BUCKET, key: file_key, response_target: tempfile.path})
       tempfile.rewind
