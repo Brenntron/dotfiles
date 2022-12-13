@@ -58,7 +58,7 @@
                     <select  class="form-control" name="bug[user_id]">
                       <option value=""> -- </option>
                       <% @users.each do |user| %>
-                          <option value=<%= user.id %>><%= user.display_username %></option>
+                          <option value=<%= user.id %>><%= user.cvs_username %></option>
                       <% end %>
                     </select>
                   </div>
@@ -75,7 +75,7 @@
                     <select  class="form-control" name="bug[committer_id]">
                       <option value=""> -- </option>
                       <% User.joins(:committed_bugs).group(:id).order(:cvs_username).each do |user| %>
-                          <option value=<%= user.id %>><%= user.display_username %></option>
+                          <option value=<%= user.id %>><%= user.cvs_username %></option>
                       <% end %>
                     </select>
                   </div>

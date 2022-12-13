@@ -163,7 +163,7 @@ For future Web categorization requests, please open a Web categorization ticket 
   end
 
   def assignee
-    is_assigned? ? user.display_username : "Unassigned"
+    is_assigned? ? user.cvs_username : "Unassigned"
   end
 
   def suggested_d
@@ -190,7 +190,7 @@ For future Web categorization requests, please open a Web categorization ticket 
   end
 
   def last_updated_by_username
-    last_updated_by&.display_username
+    last_updated_by&.cvs_username
   end
 
   def dispute_age

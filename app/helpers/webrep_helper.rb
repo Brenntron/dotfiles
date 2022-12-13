@@ -2,7 +2,7 @@ module WebrepHelper
 
   def whodunnit_helper(version)
    user = User.where(id: version.whodunnit).first
-   user.present? ? user.display_username : 'Automated'
+   user.present? ? user.cvs_username : 'Automated'
   end
 
   def field_changeset_handler(field, changed_from)

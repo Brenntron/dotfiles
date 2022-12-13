@@ -8,7 +8,7 @@
       .user-profile-wrapper
         %label.content-label-sm User Profile
         %br
-        %h1.username_header=@user.display_username
+        %h1.username_header=@user.cvs_username
         .users-flash-wrapper.profile-flash-wrapper
           = render partial: 'users_flash_messages', flash: flash
         %br
@@ -49,9 +49,9 @@
       .user-buttons
         - if @user != current_user
           %a{href: "mailto:#{@user.email}"}
-            %button.toolbar-button.email-button.tooltipped.toolbar-button-spacer{title: "Send Message to #{@user.display_username}"}
+            %button.toolbar-button.email-button.tooltipped.toolbar-button-spacer{title: "Send Message to #{@user.cvs_username}"}
         - if can?(:manage, @user) || current_user.has_role?('admin')
-          %button.toolbar-button.edit-button.tooltipped.toolbar-button-spacer{title: "Edit #{@user.display_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{@user.id}"}
+          %button.toolbar-button.edit-button.tooltipped.toolbar-button-spacer{title: "Edit #{@user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{@user.id}"}
 
     .col-xs-8.col-with-divider
       .row
@@ -69,7 +69,7 @@
                   %div
                     = link_to user.display_name, escalations_user_path(user), class: 'related-user'
                     %br
-                    = link_to user.display_username, escalations_user_path(user), class: 'related-username'
+                    = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
           .col-xs-6.user-col-wrapper
             - if @user.parent.present?
@@ -80,7 +80,7 @@
                     %span.related-user
                       = link_for_manager(current_user, @user, display_name: @user.parent.display_name)
                     %br
-                    = link_for_manager(current_user, @user, display_name: @user.parent.display_username)
+                    = link_for_manager(current_user, @user, display_name: @user.parent.cvs_username)
 
             - if @user.child?
               .user-relationship-wrapper
@@ -90,7 +90,7 @@
                     %div
                       = link_to user.display_name, escalations_user_path(user), class: 'related-user'
                       %br
-                      = link_to user.display_username, escalations_user_path(user), class: 'related-username'
+                      = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
         - else
           .col-xs-12.user-col-wrapper
@@ -102,7 +102,7 @@
                     %span.related-user
                       = link_for_manager(current_user, @user, display_name: @user.parent.display_name)
                     %br
-                    = link_for_manager(current_user, @user, display_name: @user.parent.display_username)
+                    = link_for_manager(current_user, @user, display_name: @user.parent.cvs_username)
             - if @user.child?
               .user-relationship-wrapper
                 %h5.content-label-sm Peers
@@ -111,7 +111,7 @@
                     %div
                       = link_to user.display_name, escalations_user_path(user), class: 'related-user'
                       %br
-                      = link_to user.display_username, escalations_user_path(user), class: 'related-username'
+                      = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
 
 

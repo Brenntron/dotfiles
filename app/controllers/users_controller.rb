@@ -62,9 +62,9 @@ class UsersController < ApplicationController
     @user.update(user_params)
     redirect_back(fallback_location: :back)
     if @user.save
-      flash[:notice] = "#{@user.display_username} updated successfully."
+      flash[:notice] = "#{@user.cvs_username} updated successfully."
     else
-      flash[:alert] = "Unable to update #{@user.display_username}."
+      flash[:alert] = "Unable to update #{@user.cvs_username}."
     end
   end
 
@@ -74,9 +74,9 @@ class UsersController < ApplicationController
     if @child
       @child.move_to_child_of(@user)
       if @child.save
-        flash[:notice] = "#{@child.display_username} successfully added to #{@user.display_username}'s team."
+        flash[:notice] = "#{@child.cvs_username} successfully added to #{@user.cvs_username}'s team."
       else
-        flash[:alert] = "Unable to add #{@child.display_username} to #{@user.display_username}'s team."
+        flash[:alert] = "Unable to add #{@child.cvs_username} to #{@user.cvs_username}'s team."
       end
     else
       flash[:alert] = "Please select a team member from the list."
@@ -89,9 +89,9 @@ class UsersController < ApplicationController
     @child.update(parent_id: nil)
     redirect_back(fallback_location: :back)
     if @child.save
-      flash[:notice] = "#{@child.display_username} successfully removed from team."
+      flash[:notice] = "#{@child.cvs_username} successfully removed from team."
     else
-      flash[:alert] = "Unable to remove #{@child.display_username} from team."
+      flash[:alert] = "Unable to remove #{@child.cvs_username} from team."
     end
   end
 
