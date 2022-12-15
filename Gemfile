@@ -104,7 +104,7 @@ gem 'clipboard-rails', '1.7.1'
 
 gem 'capybara', '2.11.0'
 gem 'poltergeist', '1.18.1'
-gem 'selenium-webdriver'
+gem 'selenium-webdriver', "~> 3.142.7"
 
 
 gem 'public_suffix', '4.0.7'
