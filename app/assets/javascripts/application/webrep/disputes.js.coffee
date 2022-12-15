@@ -90,7 +90,6 @@ window.select_or_deselect_all = (dispute_id)->
 
 
 window.advanced_webrep_index_table = () ->
-
   form = $('#disputes-advanced-search-form')
   dispute_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   data = {
@@ -1447,7 +1446,6 @@ $ ->
       )
 
 
-   
 
     if window.location.pathname.includes('/escalations/file_rep') ||  window.location.pathname.includes('/escalations/webrep')
       $('#filter-cases').show()

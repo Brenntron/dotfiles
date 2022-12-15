@@ -112,15 +112,15 @@ window.set_advanced_search_pref = () ->
       response = JSON.parse(response)
       if response?
         $.each response, (criteria, state) ->
+          # submission type has a different DOM stucture, so need to remove the -w-cb
+          criteria = criteria.replace(/-w-cb/g, '')
           criteria_id   = '#' + criteria
           search_input  = $($(criteria_id)[0]).parents('.search-item')[0]
           search_toggle = $($('input[for="' + criteria + '"]')[0]).parents('li')[0]
-
           if state == 'true'
             $(search_input).removeClass('hidden')
             $(search_toggle).addClass('hidden')
           else
             $(search_input).addClass('hidden')
             $(search_toggle).removeClass('hidden')
-
   )
