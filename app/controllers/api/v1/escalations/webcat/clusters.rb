@@ -175,7 +175,11 @@ module API
               }.to_json
             end
 
-            delete "searches/:search_name" do
+            desc "Delete saved regex searches for webcat clusters"
+            params do
+              requires :search_name, type: String, desc: 'filter'
+            end
+            delete "searches" do
               # TODO determine access control policy for named searches
               search = NamedSearch.where(name: params['search_name'], user: current_user, project_type: 'webcat_clusters_regex')
               search.destroy_all

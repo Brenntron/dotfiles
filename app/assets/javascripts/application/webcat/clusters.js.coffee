@@ -92,10 +92,11 @@ window.build_webcat_clusters_named_search = (search_name) ->
 
 # Delete saved regex searches
 window.delete_clusters_named_search = (close_button, search_name) ->
+  data = { search_name: search_name }
   std_msg_ajax(
     method: 'DELETE'
-    url: "/escalations/api/v1/escalations/webcat/clusters/searches/#{search_name}"
-    data: {}
+    url: "/escalations/api/v1/escalations/webcat/clusters/searches"
+    data: data
     error_prefix: 'Error deleting saved search.'
     failure_reload: false
     tr_tag: close_button.closest('tr')
