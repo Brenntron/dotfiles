@@ -9475,6 +9475,21 @@ td.text-center span {
   }
 }
 
+.clusters-nav-regex-container {
+  align-items: center;
+  display: flex;
+  height: 30px;
+  margin: 9px 0 0 0;
+
+  input {
+    margin: 0;
+  }
+
+  label {
+    margin: 0 5px 0 15px;
+  }
+}
+
 #wsa_statuses{
   font-family: "Open Sans", sans-serif !important;
   min-width: 300px;

@@ -32,6 +32,7 @@ module API
               optional :f, type: String, desc: 'filter'
               optional :platform, type: String, desc: 'platform filter(WSA/NGFW/Umbrella)'
               optional :cluster_type, type: String, desc: 'cluster type filter(ip/domain)'
+              optional :save_regex, type: Boolean, desc: 'Save regex'
             end
 
             # Uses class Beaker::Verdicts in old Beaker namespace.
@@ -42,7 +43,7 @@ module API
                 platform: params[:platform],
                 cluster_type: params[:cluster_type]
               }
-              clusters = ::Clusters::Fetcher.new(filter, params[:regex], current_user).fetch
+              clusters = ::Clusters::Fetcher.new(filter, params[:regex], params[:save_regex], current_user).fetch
 
               {:status => "success", :data => clusters}.to_json
             end
@@ -66,7 +67,6 @@ module API
               cluster_id = params[:id]
               cluster_info = Wbrs::Cluster.retrieve(cluster_id)
               sorted_limited_cluster_info = cluster_info.sort { |x,y| y['glob_volume'] <=> x['glob_volume'] }.first(300)
-
 
               { status: 'success', data: sorted_limited_cluster_info }.to_json
             end
@@ -173,6 +173,13 @@ module API
                   status: 'failed',
                   error: e.message
               }.to_json
+            end
+
+            delete "searches/:search_name" do
+              # TODO determine access control policy for named searches
+              search = NamedSearch.where(name: params['search_name'], user: current_user, project_type: 'webcat_clusters_regex')
+              search.destroy_all
+              true
             end
           end
         end

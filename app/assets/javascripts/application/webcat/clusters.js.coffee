@@ -35,8 +35,12 @@ window.apply_filter_to_table = () ->
   filter = $("#cluster_filter_field").val()
 
   # if they have entered a regex, show the regex in upper-left area
-  if filter != '' then $('.regex-area').removeClass('hidden')
-  else $('.regex-area').addClass('hidden')
+  if filter != ''
+    $('.regex-area').removeClass('hidden')
+    $('#saveRegex').removeClass('hidden')
+  else
+    $('.regex-area').addClass('hidden')
+    $('#saveRegex').addClass('hidden')
 
   $('#regex-filter').html(filter)
   populate_clusters_index_table(filter);
@@ -45,11 +49,16 @@ window.populate_clusters_index_table = (filter) ->
   if $('#clusters-index_wrapper').length > 0
     loader = $('.cluster-mgt-loader-wrapper')
     loader.removeClass('hidden')
+
     filter_param = window.location.search
+    save_regex = $('#saveRegex')[0].checked
+
     if filter_param.length == 0
       filter_param += "?f=all"
     if filter && filter_param
       filter_param += "&regex=" + filter
+    if save_regex && filter_param
+      filter_param += "&save_regex=" + save_regex
 
     $.ajax(
       url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
@@ -76,6 +85,23 @@ window.populate_clusters_index_table = (filter) ->
         std_msg_error('Table Error', [response.responseText])
     , this)
 
+window.build_webcat_clusters_named_search = (search_name) ->
+  $("#cluster_filter_field").val(search_name)
+  apply_filter_to_table()
+
+
+# Delete saved regex searches
+window.delete_clusters_named_search = (close_button, search_name) ->
+  std_msg_ajax(
+    method: 'DELETE'
+    url: "/escalations/api/v1/escalations/webcat/clusters/searches/#{search_name}"
+    data: {}
+    error_prefix: 'Error deleting saved search.'
+    failure_reload: false
+    tr_tag: close_button.closest('tr')
+    success: (response) ->
+      this.tr_tag.remove();
+  )
 
 
 # categorize clusters submission - review_action (optional) is "bulk_accept", "bulk_deny", or empty (default)
@@ -84,6 +110,7 @@ window.categorize_clusters = (review_action) ->
   loader.removeClass('hidden')
   user_id = $("#user_id").val()
   comment = $("#cluster_comment_field").val()
+  saveRegex = $('#saveRegex')[0].checked
 
   #cluster_id comment category_ids
   clusters = $ '[id$=\'_categories\']'
@@ -345,7 +372,7 @@ window.collapse_all_clusters = (tableId) ->
 #  expand selected funtionality
 window.expand_selected_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
-  clusterIds = selectedRows.map (i, row) -> 
+  clusterIds = selectedRows.map (i, row) ->
     parseInt($(row).find('.cluster_identifier').text())
   window.get_data_for_clusters(selectedRows, clusterIds.toArray())
 
@@ -572,7 +599,7 @@ window.expandSingleRow = (currentRow, preloadedData=[])->
 
     missing_data = '<span class="missing-data">Missing data</span>'
     entry_rows = []
-    if preloadedData.length != 0 
+    if preloadedData.length != 0
       entry = preloadedData
       total_shown_entries = 0
       total_entries = $($(tr[0]).find('.entry-count')[0]).text()
@@ -649,7 +676,7 @@ window.expandSingleRow = (currentRow, preloadedData=[])->
               wbrs_rep = window.wbrs_display(wbrs_score)
               if wbrs_rep == undefined then wbrs_rep = 'unknown'
               if wbrs_rep == 'unknown'then wbrs_score = '--'
-  
+
               entry_rows.push window.cluster_detail_row(wbrs_rep, wbrs_score, url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume)
               total_shown_entries = i + 1
               return
@@ -713,7 +740,7 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
               wbrs_score = '--'
             else
               wbrs_score = parseFloat(wbrs_score).toFixed(1)
-          
+
               entry_rows.push window.cluster_detail_row(wbrs_rep, wbrs_score, url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume)
             return
 
@@ -1138,4 +1165,4 @@ $ ->
       else
         $("input.show-cluster-types-filter").prop('checked', false)
         $("input.show-cluster-types-filter[name='show-cluster-#{cluster_type}'").prop('checked', true)
-        
+

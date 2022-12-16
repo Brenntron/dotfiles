@@ -1,5 +1,5 @@
 class Clusters::Fetcher
-  attr_accessor :filter, :regex, :user
+  attr_accessor :filter, :regex, :user, :save_regex
 
   PLATFORM_TO_DATA_PROVIDER = {
     Clusters::Wbnp::DataFetcher::DATA_PATFORM => Clusters::Wbnp::DataFetcher,
@@ -13,9 +13,10 @@ class Clusters::Fetcher
   # and they are not shown in the table because of sorting by global_volume field
   CLUSTERS_PAGE_LIMIT = 10000
 
-  def initialize(filter, regex, user)
+  def initialize(filter, regex, save_regex, user)
     @filter = filter
     @regex = regex
+    @save_regex = save_regex
     @user = user
   end
 
@@ -24,6 +25,11 @@ class Clusters::Fetcher
     clusters_data = populate_3rd_party_clusters_data(clusters_data)
     clusters_data = nest_duplicates(clusters_data)
     filtered_clusters = Clusters::Filter.new(clusters_data, filter, user).filter
+
+    if save_regex
+      save_named_search(filter)
+    end
+
     filtered_clusters.sort_by { |cluster| cluster[:global_volume] }.reverse.first(CLUSTERS_PAGE_LIMIT)
   end
 
@@ -103,5 +109,13 @@ class Clusters::Fetcher
   def cluster_important?(cluster, top_urls)
     top_url_clusters = top_urls.filter { |top_url| top_url.url == cluster[:domain] }
     top_url_clusters.first&.is_important
+  end
+
+  def save_named_search(filter)
+    NamedSearchCriterion.where(named_search_id: NamedSearch.where(user_id: user.id, name: regex).ids).delete_all
+
+    found_search = user.named_searches.where(name: regex).first
+    named_search = found_search || NamedSearch.create!(user: user, name: regex, project_type:
+                                                       'webcat_clusters_regex')
   end
 end
