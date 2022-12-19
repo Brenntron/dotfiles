@@ -163,7 +163,7 @@ For future Web categorization requests, please open a Web categorization ticket 
   end
 
   def assignee
-    is_assigned? ? user.email : "Unassigned"
+    is_assigned? ? user.cvs_username : "Unassigned"
   end
 
   def suggested_d
