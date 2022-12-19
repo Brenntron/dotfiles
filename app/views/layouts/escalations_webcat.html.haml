@@ -6,7 +6,7 @@
     %a#complaints.nav-page-button{href: '/escalations/webcat/complaints', class: ("active" if current_page?('/escalations/webcat/complaints'))}
       %span.nav-toolbar-icon-large.icon-queue
 
-    %a#rules.nav-page-button{href: '/escalations/webcat/clusters', class: ("active" if current_page?('/escalations/webcat/clusters'))}
+    %a#rules.nav-page-button{href: '/escalations/webcat/clusters'}
       %span.nav-toolbar-icon-large.icon-categories
 
     %a#reports.nav-page-button{href: '/escalations/webcat/reports', class: ("active" if current_page?('/escalations/webcat/reports'))}
@@ -172,44 +172,6 @@
                     = image_tag('icon_cancel_grey.svg')
                   %span.nav-dropdown-icon.favorite-search-icon
 
-
-  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown#filter-clusters-nav
-    %a{href: '#', class: 'dropdown-toggle', id: 'filter-clusters', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-      %span{class: 'nav-toolbar-icon icon-filter-white'}
-      Filter
-    .dropdown-menu.nav-tools-dropdown.webcat-filter-dropdown{'aria-labelledby': 'filter-cases'}
-      %ul#filter-cases-list
-        %li{class: ("selected" if params[:f] == "my")}
-          %a{href: '?f=my'}
-            %span.nav-dropdown-icon.icon-my-bugs
-            My Clusters
-        %li{class: ("selected" if params[:f] == "unassigned")}
-          %a{href: '?f=unassigned'}
-            %span.nav-dropdown-icon.icon-open-bugs
-            Unassigned Clusters
-        %li{class: ("selected" if params[:f] == "pending")}
-          %a{href: '?f=pending'}
-            %span.nav-dropdown-icon.icon-pending-bugs
-            Waiting For Review
-        %li{class: ("selected" if params[:f] == "all")}
-          %a{href: '?f=all'}
-            %span.nav-dropdown-icon.icon-recently-viewed
-            All Clusters
-
-      #saved-searches-wrapper.webcat-named-search-list.nav-tool-content-wrapper
-        %h3.nav-tool-dropdown-header
-          %span.nav-dropdown-content-icon.icon-saved-search
-          My Saved Searches
-        %table{class: 'table', id: 'saved-search'}
-          %tbody#saved-search-tbody
-            - current_user.named_searches.where_project_type('webcat_clusters_regex').order(:name).each do |named_search|
-              %tr{id: "saved_search_#{named_search.id}"}
-                %td
-                  %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_webcat_clusters_named_search(this);", title: named_search.name, name: named_search.name, :'data-search_conditions' => search_condition_json(named_search)}
-                    = named_search.name
-                  %a.delete-search{title: 'Delete Saved Search', name: named_search.name, onclick: "delete_clusters_named_search(this);"}
-                    = image_tag('icon_cancel_grey.svg')
-
   .nav-tool-blocks.col-xs-2.col-sm-3.col-lg-3.search-wrapper#complaints-nav-search-wrapper
     .input-group.search-group#web-cat-search
       = text_field_tag 'general_search', "#{}", class: 'search-box', placeholder: 'Search'
@@ -221,15 +183,6 @@
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
           = render 'escalations/webcat/complaints/advanced_search'
-
-  .nav-tool-blocks.col-xs-1.col-sm-3.col-lg-3.search-wrapper#clusters-nav-regex-wrapper
-    .input-group.search-group
-      %input#cluster_filter_field.text_field.search-box{placeholder: 'Filter clusters via regex', autofocus: 'true'}
-      %button#apply-regex-btn{onclick: 'apply_filter_to_table()'} Apply Regex
-    .nav-tool-blocks.col-xs-1.clusters-nav-regex-container
-      %label
-        Save Regex
-      %input#saveRegex{type: 'checkbox'}
 
   - if current_user
     #login-div.nav-tool-block.col-sm-2.col-lg-3

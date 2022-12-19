@@ -9457,7 +9457,6 @@ td.text-center span {
     min-width: 110px;
     background-size: 17px;
   }
-
 }
 
 .copycat-tool-footer .cluster-button{
@@ -9476,19 +9475,23 @@ td.text-center span {
 }
 
 #clusters-nav-regex-wrapper {
-  display: flex;
+  .input-group.search-group {
+    float: left;
+    width: 80%;
+  }
 
   .clusters-nav-regex-container {
-    align-items: center;
-    display: flex;
-    height: 30px;
-    margin: 9px 0 0 0;
+    float: right;
+    margin: 15px 0 0 0;
+    width: 80px;
 
     input {
+      float: right;
       margin: 0;
     }
 
     label {
+      float: left;
       font-size: 11px;
       font-weight: 400;
       margin: 0 5px 0 0;
