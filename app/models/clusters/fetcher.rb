@@ -27,7 +27,7 @@ class Clusters::Fetcher
     filtered_clusters = Clusters::Filter.new(clusters_data, filter, user).filter
 
     if save_regex
-      save_named_search(filter)
+      save_named_search()
     end
 
     filtered_clusters.sort_by { |cluster| cluster[:global_volume] }.reverse.first(CLUSTERS_PAGE_LIMIT)
@@ -111,9 +111,7 @@ class Clusters::Fetcher
     top_url_clusters.first&.is_important
   end
 
-  def save_named_search(filter)
-    NamedSearchCriterion.where(named_search_id: NamedSearch.where(user_id: user.id, name: regex).ids).delete_all
-
+  def save_named_search()
     found_search = user.named_searches.where(name: regex).first
     named_search = found_search || NamedSearch.create!(user: user, name: regex, project_type:
                                                        'webcat_clusters_regex')

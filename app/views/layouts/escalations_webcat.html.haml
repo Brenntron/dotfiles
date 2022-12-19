@@ -205,9 +205,9 @@
             - current_user.named_searches.where_project_type('webcat_clusters_regex').order(:name).each do |named_search|
               %tr{id: "saved_search_#{named_search.id}"}
                 %td
-                  %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_webcat_clusters_named_search('#{named_search.name}');", title: named_search.name, :'data-search_conditions' => search_condition_json(named_search)}
+                  %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_webcat_clusters_named_search(this);", title: named_search.name, name: named_search.name, :'data-search_conditions' => search_condition_json(named_search)}
                     = named_search.name
-                  %a.delete-search{title: 'Delete Saved Search', onclick: "delete_clusters_named_search(this, '#{named_search.name}');"}
+                  %a.delete-search{title: 'Delete Saved Search', name: named_search.name, onclick: "delete_clusters_named_search(this);"}
                     = image_tag('icon_cancel_grey.svg')
 
   .nav-tool-blocks.col-xs-2.col-sm-3.col-lg-3.search-wrapper#complaints-nav-search-wrapper
@@ -226,10 +226,10 @@
     .input-group.search-group
       %input#cluster_filter_field.text_field.search-box{placeholder: 'Filter clusters via regex', autofocus: 'true'}
       %button#apply-regex-btn{onclick: 'apply_filter_to_table()'} Apply Regex
-  .nav-tool-blocks.col-xs-1.clusters-nav-regex-container
-    %label
-      Save Regex
-    %input#saveRegex{type: 'checkbox'}
+    .nav-tool-blocks.col-xs-1.clusters-nav-regex-container
+      %label
+        Save Regex
+      %input#saveRegex{type: 'checkbox'}
 
   - if current_user
     #login-div.nav-tool-block.col-sm-2.col-lg-3

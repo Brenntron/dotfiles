@@ -9475,18 +9475,24 @@ td.text-center span {
   }
 }
 
-.clusters-nav-regex-container {
-  align-items: center;
+#clusters-nav-regex-wrapper {
   display: flex;
-  height: 30px;
-  margin: 9px 0 0 0;
 
-  input {
-    margin: 0;
-  }
+  .clusters-nav-regex-container {
+    align-items: center;
+    display: flex;
+    height: 30px;
+    margin: 9px 0 0 0;
 
-  label {
-    margin: 0 5px 0 15px;
+    input {
+      margin: 0;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 400;
+      margin: 0 5px 0 0;
+    }
   }
 }
 

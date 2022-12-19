@@ -85,14 +85,14 @@ window.populate_clusters_index_table = (filter) ->
         std_msg_error('Table Error', [response.responseText])
     , this)
 
-window.build_webcat_clusters_named_search = (search_name) ->
-  $("#cluster_filter_field").val(search_name)
+window.build_webcat_clusters_named_search = (namedSearch) ->
+  $("#cluster_filter_field").val($(namedSearch).attr('name'))
   apply_filter_to_table()
 
 
 # Delete saved regex searches
-window.delete_clusters_named_search = (close_button, search_name) ->
-  data = { search_name: search_name }
+window.delete_clusters_named_search = (close_button) ->
+  data = { search_name: $(close_button).attr('name') }
   std_msg_ajax(
     method: 'DELETE'
     url: "/escalations/api/v1/escalations/webcat/clusters/searches"
