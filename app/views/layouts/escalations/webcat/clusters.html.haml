@@ -201,11 +201,6 @@
       %span.dropdown
         %span#user-settings-dropdown-button.dropdown-toggle.esc-tooltipped{'title': 'Login to Bugzilla', 'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
         #user-settings-dropdown.dropdown-menu{'aria-labelledby': 'user-settings-dropdown-button'}
-          -#    If user is logged into Bugzilla
-          -#.message-text Log out of Bugzilla
-          -# Logout button
-
-          -#-#    Else
           .message-text Log into Bugzilla
           %form#top_banner_bugzilla_login_form
             .form-group.text-left
@@ -222,7 +217,5 @@
 
       %a.nav-username{href: "/escalations/users/#{current_user[:id]}"}
         = current_user[:display_name]
-
-    -##username= current_user.cvs_username
 
 = render template: "layouts/rocket"

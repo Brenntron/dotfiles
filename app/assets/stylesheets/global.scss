@@ -9477,6 +9477,7 @@ td.text-center span {
 #clusters-nav-regex-wrapper {
   .input-group.search-group {
     float: left;
+    margin-right: 0;
     width: 80%;
   }
 
@@ -9486,7 +9487,6 @@ td.text-center span {
     width: 80px;
 
     input {
-      float: right;
       margin: 0;
     }
 
