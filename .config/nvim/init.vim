@@ -1,6 +1,6 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
-syntax on
+set syntax = on
 set nowrap
 set encoding=utf8
 
@@ -20,10 +20,9 @@ Plug 'sheerun/vim-polyglot'
 Plug 'schickling/vim-bufonly'
 Plug 'wesQ3/vim-windowswap'
 Plug 'SirVer/ultisnips'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'wincent/ferret'
-Plug 'benmills/vimux'
 Plug 'jeetsukumaran/vim-buffergator'
 Plug 'gilsondev/searchtasks.vim'
 Plug 'chrisbra/Colorizer'
@@ -31,6 +30,10 @@ Plug 'tpope/vim-dispatch'
 Plug 'dense-analysis/ale'
 Plug 'dbakker/vim-projectroot'
 Plug 'scrooloose/nerdtree'
+
+" Kitty Support
+Plug 'knubie/vim-kitty-navigator', {'do': 'cp ./*.py ~/.config/kitty/'}
+Plug 'fladson/vim-kitty'
 
 " Generic Programming Support
 Plug 'ludovicchabant/vim-gutentags'
@@ -40,8 +43,8 @@ Plug 'tomtom/tcomment_vim'
 Plug 'tobyS/vmustache'
 Plug 'janko-m/vim-test'
 Plug 'maksimr/vim-jsbeautify'
-Plug 'knubie/vim-kitty-navigator', {'do': 'cp ./*.py ~/.config/kitty/'}
 Plug 'ntpeters/vim-better-whitespace'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " Markdown / Writting
 Plug 'reedes/vim-pencil'
@@ -69,11 +72,11 @@ Plug 'jadercorrea/elixir_generator.vim'
 
 " Ruby Support
 Plug 'vim-ruby/vim-ruby'
-Plug 'hackhowtofaq/vim-solargraph'
+" Solargraphy support'
 Plug 'autozimu/LanguageClient-neovim', {
-  \ 'branch': 'next',
-  \ 'do': 'bash install.sh',
-  \ }
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
 
 " Freemarker Support
 Plug 'andreshazard/vim-freemarker'
@@ -158,6 +161,7 @@ syn region javaScriptStringS	start=+'+ skip=+\\\\\|\\'+ end=+'\|$+	contains=java
 syn match javaScriptSpecialCharacter "'\\.'"
 syn match javaScriptNumber	"-\=\<\d\+L\=\>\|0[xX][0-9a-fA-F]\+\>"
 autocmd FileType json syntax match Comment +\/\/.\+$+
+autocmd BufEnter * :syntax sync fromstart
 
 " Ale Configuration
 let g:ale_linter_aliases = {'es6': ['javascript'], 'jsx': ['css', 'javascript']}
@@ -201,19 +205,34 @@ let g:ale_elixir_elixir_ls_release = '/Users/Brenntron/code/elixir_ls/rel'
 let g:airline#extensions#ale#enabled = 1
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#coc#enabeld = 1
 
 let g:airline_powerline_fonts = 1
 
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 
+let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
+let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(),0)}'
+
+let g:airline#extensions#coc#error_symbol = 'Error:'
 let g:airline#extensions#ale#error_symbol = 'E:'
 let g:airline#extensions#ale#warning_symbol = 'W:'
 
 " language client server
+" Required for operations modifying multiple buffers like rename.
+set hidden
+
 let g:LanguageClient_serverCommands = {
-  \ 'ruby': ['tcp://localhost:7658']
-  \ }
+    \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
+    \ 'javascript': ['/usr/local/bin/javascript-typescript-stdio'],
+    \ 'javascript.jsx': ['tcp://127.0.0.1:2089'],
+    \ 'python': ['/usr/local/bin/pyls'],
+    \ 'ruby': ['~/.rbenv/shims/solargraph', 'stdio'],
+    \ }
+
+" note that if you are using Plug mapping you should not use `noremap` mappings.
+nmap <F5> <Plug>(lcn-menu)
 let g:LanguageClient_autoStop = 0
 
 " vim-vinegar settings
@@ -260,12 +279,6 @@ endif
 "nmap <silent> t<C-l> :TestLast<CR>    " t Ctrl+l
 "nmap <silent> t<C-g> :TestVisit<CR>   " t Ctrl+g
 
-" Colorscheme
-color dracula
-set termguicolors
-hi LineNr ctermbg=NONE guibg=NONE
-hi Comment cterm=italic
-
 " Markdown Syntax Support
 augroup markdown
     au!
@@ -302,7 +315,7 @@ function! s:my_cr_function()
 endfunction
 
 " Close popup by <Space>.
-"inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
+inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
 
 " AutoComplPop like behavior.
 
@@ -350,6 +363,52 @@ nmap <Leader>j :tag <C-R><C-W>
 " RipGrep config
 nmap <Leader>s :Rg <C-R><C-W>
 
+" coc settings
+set nobackup
+set nowritebackup
+set updatetime=300
+set signcolumn=yes
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: There's always complete item selected by default, you may want to enable
+" no select by `"suggest.noselect": true` in your configuration file.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice.
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Remap keys for coc gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+command! -nargs=0 Prettier :call CocAction('runCommand',. 'prettier.formatFile')
+
+" Use <c-space> to trigger completion.
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+
+" Add (Neo)Vim's native statusline support.
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline.
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
 " fzf config
 nmap ; :Buffers<CR>
 nmap <Leader>f :Files<CR>
@@ -371,7 +430,7 @@ let g:fzf_action = {
   \ 'ctrl-v': 'vsplit' }
 
 let g:gutentags_cache_dir = expand('~/.gutentags_cache')
-let g:gutentags_exclude_filetypes = ['gitcommit', 'gitconfig', 'gitrebase', 'gitsendemail', 'git']
+let g:gutentags_exclude_filetypes = ['gitcommit', 'gitconfig', 'gitrebase', 'gitsendemail', 'git', 'man']
 let g:gutentags_ctags_exclude = [
 \  '*.git', '*.svn', '*.hg',
 \  'cache', 'build', 'dist', 'bin', 'node_modules', 'bower_components',
@@ -418,3 +477,13 @@ command! -bang -nargs=* Rg
   \   <bang>0 ? fzf#vim#with_preview('up:60%')
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
+
+" CoC Options
+let g:coc_global_extensions = ['coc-json', 'coc-git', 'coc-css', 'coc-solargraph', 'coc-html', 'coc-prettier']
+let g:coc_node_path = '/Users/jewillin/.asdf/shims/node'
+
+" Colorscheme
+syntax enable
+colorscheme dracula
+hi LineNr ctermbg=NONE guibg=NONE
+hi Comment cterm=italic
