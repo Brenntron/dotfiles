@@ -9476,17 +9476,28 @@ td.text-center span {
 
 #clusters-nav-regex-wrapper {
   .input-group.search-group {
-    float: left;
+    display: inline-block;
     margin-right: 0;
-    width: 80%;
+    top: -4px;
+    width: 60%;
+
+    @media (min-width: 1000px) {
+      width: 70%;
+    }
+
+    @media (min-width: 1400px) {
+      width: 80%;
+    }
   }
 
   .clusters-nav-regex-container {
-    float: right;
+    display: inline-block;
+    height: 15px;
     margin: 15px 0 0 0;
     width: 80px;
 
     input {
+      float: right;
       margin: 0;
     }
 
