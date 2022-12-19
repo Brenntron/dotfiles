@@ -117,6 +117,8 @@ gem 'hashie'
 
 gem 'mail'
 gem 'simpleidn'
+gem 'red-parquet'
+
 group :production, :staging do
   gem 'elastic-apm', '~> 3.15', '>= 3.15.1'
 end

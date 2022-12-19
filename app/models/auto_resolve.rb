@@ -213,6 +213,7 @@ class AutoResolve
 
       if trusted_hits > 0
         results[:action] = :commit_malware
+        results[:resolve_category] = "1 or more trusted VT hits"
         return results
       end
 
@@ -220,6 +221,7 @@ class AutoResolve
       results[:log] << umbrella_rating_results[:log]
       if umbrella_rating_results[:rating] == "malicious"
         results[:action] = :commit_malware
+        results[:resolve_category] = "Malicious Umbrella Rating"
         return results
       elsif umbrella_rating_results[:rating].blank?
         results[:action] =  :do_not_resolve
@@ -229,6 +231,7 @@ class AutoResolve
 
       if virustotal_results[:positives] > 5
         results[:action] = :commit_malware
+        results[:resolve_category] = ">= 5 VT count"
         results[:log] << "total vt hits > 5, committing to reptool."
         return results
       end
@@ -237,6 +240,7 @@ class AutoResolve
       results[:log] << umbrella_domain_volume_results[:log]
 
       if umbrella_domain_volume_results[:pass] == false
+        results[:resolve_category] = "Suspicious domain volume ratio"
         results[:action] = :commit_phishing
 
         return results
@@ -246,7 +250,7 @@ class AutoResolve
       results[:log] << umbrella_whois_popularity_results[:log]
       if umbrella_whois_popularity_results[:pass] == false
         results[:action] = :commit_malware
-
+        results[:resolve_category] = "Low popularity low age domain."
         return results
       end
 
@@ -380,12 +384,14 @@ class AutoResolve
 
       if virustotal_results[:positives] >= 12 || trusted_hits > 1
         results[:action] = :commit_malware
+        results[:resolve_category] = "Trusted/High Count VT hit(s)/high domain count"
         return results
       end
 
       #70%
       if (malicious_domain_count.to_f / total_domain_count.to_f) >= 0.7
         results[:action] = :commit_malware
+        results[:resolve_category] = "70% malicious ratio/high domain count"
         return results
       else
         results[:log] << "malicious domain ratio was under 70%"
@@ -399,6 +405,7 @@ class AutoResolve
 
       if virustotal_results[:positives] >= 3 || trusted_hits > 0
         results[:action] = :commit_malware
+        results[:resolve_category] = "Trusted/High Count VT hit(s)/low domain count"
         return results
       else
         results[:log] << "virustotal hits under thresholds"
@@ -416,6 +423,7 @@ class AutoResolve
 
         if asn_blocklist.include?(spamhaus_code)
           results[:action] = :commit_malware
+          results[:resolve_category] = "ASN block list/low domain count"
           return results
         else
           results[:log] << "not found in spamhaus list"
@@ -432,6 +440,7 @@ class AutoResolve
       #20% malicious ratio
       if (malicious_domain_count.to_f / total_domain_count.to_f) >= 0.2
         results[:action] = :commit_malware
+        results[:resolve_category] = "20% malicious ratio/low domain count"
         return results
       else
         results[:log] << "malicious domain ratio was under 20%"
@@ -484,6 +493,7 @@ class AutoResolve
         dispute_entry.status = DisputeEntry::STATUS_RESOLVED
         dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_FN
         dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+        dispute_entry.auto_resolve_category = result[:resolve_category]
         dispute_entry.case_closed_at = resolved_at
         dispute_entry.case_resolved_at = resolved_at
       else
@@ -622,7 +632,7 @@ class AutoResolve
     result[:log] = ""
 
     begin
-      response = Umbrella::DomainVolume.query_domain_volume(address: entry)
+      response = Umbrella::DomainVolume.query_domain_volume(address: DisputeEntry.safe_domain_of(entry))
 
       if response.code == 200
         data = JSON.parse(response.body)["queries"]
@@ -684,7 +694,7 @@ class AutoResolve
     result = {}
     result[:rating] = nil
     result[:log] = ""
-    response = Umbrella::Scan.scan_result(address: entry)
+    response = Umbrella::Scan.scan_result(address: DisputeEntry.safe_domain_of(entry))
 
     if response.code == 200
       data = JSON.parse(response.body)

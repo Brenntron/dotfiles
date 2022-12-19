@@ -922,7 +922,6 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
     expect(dispute_entry_1.auto_resolve_log).to eql("--------Starting Data---------<br>suggested disposition: Poor<br>effective disposition info: \"Neutral\"<br>-----------------------------<br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>virustotal hits under thresholds<br><br>not found in spamhaus list<br><br>malicious domain ratio was under 20%")
 
-
   end
 
   ##############
@@ -970,6 +969,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("AP - FN")
     expect(dispute_entry_1.resolution_comment).to eql("Talos has lowered our reputation score for the URL/Domain/Host to block access.")
 
+    expect(dispute_entry_1.auto_resolve_category).to eql("Trusted/High Count VT hit(s)/high domain count")
   end
 
   it 'should auto resolve if malicious domains >= 70%' do
@@ -1016,7 +1016,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("AP - FN")
     expect(dispute_entry_1.resolution_comment).to eql("Talos has lowered our reputation score for the URL/Domain/Host to block access.")
 
-
+    expect(dispute_entry_1.auto_resolve_category).to eql("70% malicious ratio/high domain count")
 
   end
 
@@ -1066,7 +1066,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("AP - FN")
     expect(dispute_entry_1.resolution_comment).to eql("Talos has lowered our reputation score for the URL/Domain/Host to block access.")
 
-
+    expect(dispute_entry_1.auto_resolve_category).to eql("Trusted/High Count VT hit(s)/low domain count")
   end
 
   it 'should auto resolve if hosted domains < 100, highest popularity < 40, asn on block list' do
@@ -1114,6 +1114,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("AP - FN")
     expect(dispute_entry_1.resolution_comment).to eql("Talos has lowered our reputation score for the URL/Domain/Host to block access.")
 
+    expect(dispute_entry_1.auto_resolve_category).to eql("ASN block list/low domain count")
   end
 
   it 'should auto resolve if hosted domains < 100, highest popularity < 40, malciious domains >= 20%' do
@@ -1161,7 +1162,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("AP - FN")
     expect(dispute_entry_1.resolution_comment).to eql("Talos has lowered our reputation score for the URL/Domain/Host to block access.")
 
-
+    expect(dispute_entry_1.auto_resolve_category).to eql("20% malicious ratio/low domain count")
 
   end
 

@@ -151,6 +151,7 @@ module API
                 end
 
                 raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == vrt.id
+                Bridge::SdrDisputeUpdateStatusEvent.new.post(d.reload, :source_key => d.ticket_source_key)
                 json_packet << d
               end
               {:status => "success", :data => json_packet}.to_json

@@ -2201,8 +2201,15 @@ a.static-nav-item {
 .nav-toolbar-icon, .nav-dropdown-icon, .nav-dropdown-content-icon {
   background-repeat: no-repeat;
   display: inline-block;
-  margin-bottom: -3px;
   background-position: center;
+}
+
+.nav-toolbar-icon, .nav-dropdown-content-icon {
+  margin-bottom: -3px;
+}
+
+.nav-dropdown-icon {
+  margin-bottom: -4px;
 }
 
 .nav-toolbar-icon  {
@@ -2236,8 +2243,12 @@ a.static-nav-item {
 .icon-web-tix {background-image: url(image_path('icon_open_web_tix.svg'));}
 .icon-fixed-bugs   {background-image: url(image_path('icon_fixedbugs.svg'));}
 .icon-all-bugs     {background-image: url(image_path('bugs_icon.svg'));}
-.icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
+.icon-all-tickets  {background-image: url(image_path('icon_all_tickets_white.svg'));}
 .icon-all-tickets-grey  {background-image: url(image_path('icon_ticket_grey.svg'));}
+.icon-manager-queue {background-image: url(image_path('icon_manager_queue_white.svg'));}
+.icon-my-closed-tickets {background-image: url(image_path('icon_my_closed_tickets_white.svg'));}
+.icon-new-tickets {background-image: url(image_path('icon_new_tickets_white.svg')); background-size: 18px;}
+.icon-active-tickets {background-image: url(image_path('icon_active_tickets_white.svg')); background-size: 18px;}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
 .icon-team-grey {background-image: url(image_path('icon_team_grey.svg'));}

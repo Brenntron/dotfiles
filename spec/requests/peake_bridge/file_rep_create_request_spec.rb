@@ -262,7 +262,7 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
     expect(DelayedJob.all.size).to eql(1)
 
     expect(dispute.status).to eql("RESOLVED_CLOSED")
-    expect(dispute.resolution).to eql("Auto Resolved")
+    expect(dispute.resolution).to eql("AP - No File")
 
 
   end

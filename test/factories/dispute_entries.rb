@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :dispute_entry do
     dispute_id      { 1 }
     uri             { 'talosintelligence.com' }
+    entry_type      { 'URI/DOMAIN' }
     status          { 'NEW' }
     case_opened_at  { Time.now }
   end

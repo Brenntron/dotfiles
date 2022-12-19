@@ -8,15 +8,15 @@ class Complaint < ApplicationRecord
   delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
 
   FILTER_VIEW_OPTIONS = [
-    { label: 'Manager Queue', param: 'MANAGER QUEUE', icon: 'icon-my-bugs' },
-    { label: 'My Tickets', param: 'MY COMPLAINTS', icon: 'icon-my-bugs' },
     { label: 'My Open Tickets', param: 'MY OPEN COMPLAINTS', icon: 'icon-my-open-bugs' },
-    { label: 'My Closed Tickets', param: 'MY CLOSED COMPLAINTS', icon: 'icon-fixed-bugs' },
-    { label: 'Active Tickets', param: 'ACTIVE', icon: 'icon-team-bugs' },
-    { label: 'New Tickets', param: 'NEW', icon: 'icon-open-bugs' },
+    { label: 'New Tickets', param: 'NEW', icon: 'icon-new-tickets' },
+    { label: 'Manager Queue', param: 'MANAGER QUEUE', icon: 'icon-manager-queue' },
     { label: 'Waiting for Review', param: 'REVIEW', icon: 'icon-pending-bugs' },
+    { label: 'Active Tickets', param: 'ACTIVE', icon: 'icon-active-tickets' },
+    { label: 'My Tickets', param: 'MY COMPLAINTS', icon: 'icon-my-bugs' },
+    { label: 'My Closed Tickets', param: 'MY CLOSED COMPLAINTS', icon: 'icon-my-closed-tickets' },
     { label: 'Completed Tickets', param: 'COMPLETED', icon: 'icon-fixed-bugs' },
-    { label: 'All Tickets', param: 'ALL', icon: 'icon-recently-viewed' },
+    { label: 'All Tickets', param: 'ALL', icon: 'icon-all-tickets' },
   ].freeze
 
   RESOLUTION_FIXED                      = 'FIXED'
@@ -81,6 +81,9 @@ For future web and email reputation requests, please open a web and email reputa
       when COMPLETED
         update!(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
     end
+    Bridge::ComplaintUpdateStatusEvent.new.post_complaint(self)
+
+
   end
 
   def self.can_visit_url?(url)
@@ -255,7 +258,7 @@ For future web and email reputation requests, please open a web and email reputa
       create_complaint_entry_credit(new_complaint_entry)
     end
 
-    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: complaint.id)
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: complaint.id, status: complaint.status)
     conn.post(return_payload, "")
 
   end
@@ -290,7 +293,7 @@ For future web and email reputation requests, please open a web and email reputa
 
       if record_exists.present?
         return_payload = record_exists.build_ti_payload
-        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id)
+        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id, ticket_status: record_exists.status)
         return conn.post(return_payload)
       end
 
@@ -513,7 +516,7 @@ For future web and email reputation requests, please open a web and email reputa
         conn.post
         return
       else
-        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_complaint.id)
+        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_complaint.id, ticket_status: new_complaint.status)
         conn.post(return_payload)
       end
 
@@ -1063,6 +1066,17 @@ For future web and email reputation requests, please open a web and email reputa
     end
 
     response
+  end
+
+  def self.valid_tld?(uri)
+
+    begin
+      parsed_uri = Addressable::URI.parse(uri)
+      parsed_uri = Addressable::URI.parse("http://" + uri) if parsed_uri.scheme.nil?
+      PublicSuffix.valid?(parsed_uri.host, default_rule: nil, ignore_private: true)
+    rescue
+      false
+    end
   end
 
   def self.process_bulk_adhoc_categorizations(params, user, bugzilla_rest_session)

@@ -673,38 +673,20 @@ module API
             end
 
             post 'xbrs' do
-              #raise 'simulated breakage'
-              response = Xbrs::GetXbrs.by_domain(permitted_params['url'])
-              return [] if response.is_a?(Hash) && response[:error].present?
-              data = response.last['data']
-              columns = response.last['legend']
-
-              mtime_column_index = nil
-              ctime_column_index = nil
-
-              columns.each_with_index do |col, index|
-                if col == 'ctime'
-                  ctime_column_index = index
-                end
-                if col == 'mtime'
-                  mtime_column_index = index
-                end
-              end
-
+              data = K2::History.url_lookup(params['url']).body.dig('queryResults')&.first&.fetch('timelines') || []
+              
               formatted_data = []
-
-              data.each do |datum|
-                if ctime_column_index
-                  datum[ctime_column_index] = Time.at(datum[ctime_column_index])
-                end
-                if mtime_column_index
-                  datum[mtime_column_index] = Time.at(datum[mtime_column_index])
-                end
-
-                formatted_data << datum
+              formatted_data = data.each_with_object([]) do |item, result|
+                row = {}
+                row[:time] = Time.at(item['time'] / 1000).strftime('%B %e, %Y at %I:%M %p')
+                row[:score] = item['score']
+                row[:v2] = item['aups'].select { |aup| aup['version'] == 'V2' }.pluck('cat').join(', ')
+                row[:v3] = item['aups'].select { |aup| aup['version'] == 'V3' }.pluck('cat').join(', ')
+                row[:threatCats] = item['threatCats'].join(', ')
+                row[:ruleHits] = item['ruleHits'].join(', ')
+                result << row
               end
-
-              {:status => "success", :data => formatted_data, :columns => columns}
+              { status: 'success', data: formatted_data }
             end
 
             desc "Reopen a complaint entry"
