@@ -1940,7 +1940,7 @@ DEPENDENCIES
   rails (= 5.2.8.1)
   rails_admin (~> 2.2.1)
   rb-fsevent (= 0.10.3)
-  red-parquet
+  red-parquet (= 10.0.0)
   redis
   rmagick (= 5.0.0)
   rspec-rails (= 3.8.1)
