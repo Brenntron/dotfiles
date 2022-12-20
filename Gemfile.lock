@@ -1739,14 +1739,14 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    red-arrow (10.0.0)
-      bigdecimal (>= 3.1.0)
+    red-arrow (8.0.0)
+      bigdecimal (>= 2.0.3)
       extpp (>= 0.0.7)
       gio2 (>= 3.5.0)
       native-package-installer
       pkg-config
-    red-parquet (10.0.0)
-      red-arrow (= 10.0.0)
+    red-parquet (8.0.0)
+      red-arrow (= 8.0.0)
     redis (5.0.5)
       redis-client (>= 0.9.0)
     redis-client (0.11.1)
@@ -1940,7 +1940,7 @@ DEPENDENCIES
   rails (= 5.2.8.1)
   rails_admin (~> 2.2.1)
   rb-fsevent (= 0.10.3)
-  red-parquet (= 10.0.0)
+  red-parquet (= 8.0.0)
   redis
   rmagick (= 5.0.0)
   rspec-rails (= 3.8.1)
