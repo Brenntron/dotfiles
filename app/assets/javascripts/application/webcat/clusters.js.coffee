@@ -37,10 +37,8 @@ window.apply_filter_to_table = () ->
   # if they have entered a regex, show the regex in upper-left area
   if filter != ''
     $('.regex-area').removeClass('hidden')
-    $('#saveRegex').removeClass('hidden')
   else
     $('.regex-area').addClass('hidden')
-    $('#saveRegex').addClass('hidden')
 
   $('#regex-filter').html(filter)
   populate_clusters_index_table(filter);
