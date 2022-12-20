@@ -186,6 +186,7 @@ window.initialize_sdr_disputes_datatable = () ->
       data: build_sdr_data()
     pagingType: 'full_numbers'
     order: [[ 5, 'desc' ]]  # that's tmp default sorting column
+    stateSave: true
     columnDefs: [
       {
         # remove sorting from age column
