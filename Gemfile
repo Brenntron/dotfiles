@@ -64,7 +64,7 @@ gem 'xmlrpc'
 gem 'bugzilla', require: 'bugzilla'
 
 # Formatting and Presentation
-gem 'nokogiri' ,'1.13.9'
+gem 'nokogiri' ,'1.10.4'
 gem 'diffy', '3.2.1'
 gem 'gzip', '1.0'
 gem 'chart-js-rails', '~> 0.1.2'
