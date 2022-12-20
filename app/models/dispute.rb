@@ -42,6 +42,8 @@ class Dispute < ApplicationRecord
   PRIORITY_4 = 'P4'
   PRIORITY_5 = 'P5'
 
+  PRIORITIES = [PRIORITY_1, PRIORITY_2, PRIORITY_3, PRIORITY_4, PRIORITY_5]
+
   # It's possible that some of this is duplicates of the above but I'm too scared to try and consolidate
   # them. These strings apply specifically to the "Status" dropdown on **Disputes**. To edit these strings
   # for a **DisputeEntry**, see `models/dispute_entry.rb`
@@ -62,6 +64,18 @@ class Dispute < ApplicationRecord
   STATUS_RESOLVED_TEST = "TEST_TRAINING"
   STATUS_RESOLVED_OTHER = "OTHER"
   STATUS_RESOLVED_QUICK_BULK = "QUICK_BULK" #tickets created and closed using the quick bulk entry form.
+  RESOLUTIONS = [
+    ALL_AUTO_RESOLVED,
+    DUPLICATE,
+    STATUS_RESOLVED_FIXED_FP,
+    STATUS_RESOLVED_FIXED_FN,
+    STATUS_RESOLVED_INVALID,
+    STATUS_RESOLVED_OTHER,
+    STATUS_RESOLVED_TEST,
+    STATUS_RESOLVED_UNCHANGED,
+    STATUS_RESOLVED_QUICK_BULK
+  ]
+  SOURCES = ['Internal', 'talos-intelligence', 'talos-intelligence-api']
 
   #AUTORESOLVED_UNCHANGED_MESSAGE = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please use the Email Support Regarding this Ticket link to send it to us for review."
   AUTORESOLVED_UNCHANGED_MESSAGE = "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission's reputation because it can negatively affect our customers. However, a customer has the option of locally changing a submission's reputation, if they understand the risks in doing so. Please open a TAC case and provide additional details if you need further assistance."
@@ -1316,7 +1330,6 @@ For future Web categorization requests, please open a Web categorization ticket 
 
     named_search =
         user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name, project_type: project_type)
-    
     params.to_h.each do |field_name, value|
       case
         when value.kind_of?(Hash)
@@ -1342,30 +1355,41 @@ For future Web categorization requests, please open a Web categorization ticket 
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:, reload: false)
-    fields = %w{status org_domain priority resolution submitter_type case_id case_owner_username}
+    fields = %w{org_domain priority resolution submitter_type case_id case_owner_username}
     dispute_fields = params.to_h.slice(*fields)
     dispute_fields['id'] = dispute_fields.delete('case_id')
 
-    if dispute_fields['priority'] && /(?<priority_digits>\d+)/ =~ dispute_fields.delete('priority')
-      dispute_fields['priority'] = priority_digits
-    end
+    dispute_fields = dispute_fields.select { |ignore_key, value| value.present? }
 
     if dispute_fields['case_owner_username'].present?
       user = User.where(cvs_username: dispute_fields.delete('case_owner_username')).first
-      dispute_fields['user_id'] = user.id
+      dispute_fields['user_id'] = user&.id
     end
 
-    dispute_fields = dispute_fields.select{|ignore_key, value| value.present?}
-    if dispute_fields['id'].present?
-      dispute_fields['id'] = dispute_fields['id'].split(/[\s,]+/)
+    if params['case_origin'].present?
+      
+      if params['case_origin'] == 'Internal'
+        dispute_fields['ticket_source'] = nil
+      else
+        dispute_fields['ticket_source'] = params['case_origin']
+      end
+    end
+
+
+    ['id', 'priority', 'resolution'].each do|field|
+      next unless dispute_fields[field].present?
+      dispute_fields[field] = dispute_fields[field].split(/[\s,]+/)
     end
 
     relation = where(dispute_fields)
-
-
+    
+    if params['status'].present?
+      relation = relation.where(status: params['status'].split(','))
+    end
+    
     if params['submitted_newer'].present?
       relation =
-          relation.where('case_opened_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
+          relation.where('disputes.case_opened_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
     end
 
     if params['submission_type'].present?
@@ -1378,10 +1402,10 @@ For future Web categorization requests, please open a Web categorization ticket 
     if params['submitted_older'].present?
       if params['submitted_older'].kind_of?(Date)
         relation =
-          relation.where('case_opened_at < :submitted_older', submitted_older: (params['submitted_older'])+1)
+          relation.where('disputes.case_opened_at < :submitted_older', submitted_older: (params['submitted_older'])+1)
       elsif params['submitted_older'].kind_of?(String)
         relation =
-          relation.where('case_opened_at < :submitted_older', submitted_older: Date.parse(params['submitted_older'])+1)
+          relation.where('disputes.case_opened_at < :submitted_older', submitted_older: Date.parse(params['submitted_older'])+1)
       end
     end
 
@@ -1390,7 +1414,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       unless 0 == seconds_ago
         age_newer_cutoff = Time.now - seconds_ago
         relation =
-            relation.where('case_opened_at >= :submitted_newer', submitted_newer: age_newer_cutoff)
+            relation.where('disputes.case_opened_at >= :submitted_newer', submitted_newer: age_newer_cutoff)
 
       end
     end
@@ -1400,33 +1424,35 @@ For future Web categorization requests, please open a Web categorization ticket 
       unless 0 == seconds_ago
         age_older_cutoff = Time.now - seconds_ago
         relation =
-            relation.where('case_opened_at < :submitted_older', submitted_older: age_older_cutoff)
+            relation.where('disputes.case_opened_at < :submitted_older', submitted_older: age_older_cutoff)
       end
     end
 
     if params['modified_newer'].present?
       relation =
-          relation.where('updated_at >= :modified_newer', modified_newer: params['modified_newer'])
+          relation.where('disputes.updated_at >= :modified_newer', modified_newer: params['modified_newer'])
     end
 
     if params['modified_older'].present?
       if params['modified_older'].kind_of?(Date)
         relation =
-          relation.where('updated_at < :modified_older', modified_older: params['modified_older']+1)
+          relation.where('disputes.updated_at < :modified_older', modified_older: params['modified_older']+1)
       elsif params['modified_older'].kind_of?(String)
         relation =
-          relation.where('updated_at < :modified_older', modified_older: Date.parse(params['modified_older'])+1)
+          relation.where('disputes.updated_at < :modified_older', modified_older: Date.parse(params['modified_older'])+1)
       end
     end
 
-    if params['platform_ids'].present?
-      ids = params['platform_ids'].split(',').map {|m| m.to_i}
+    if params['platform_names'].present?
+      platform_names = params['platform_names'].split(',')
+      ids = Platform.where(public_name: platform_names).pluck(:id)
       relation = relation.joins(:dispute_entries).where("disputes.platform_id in (:ids) or dispute_entries.platform_id in (:ids)", ids: ids)
     end
 
     company_name = nil
     customer_params = params.fetch('customer', {}).slice(*%w{name email company_name}).to_h
     customer_params = customer_params.select{|ignore_key, value| value.present?}
+  
     if customer_params.any?
       if customer_params['company_name'].present?
         company_name = customer_params.delete('company_name')
@@ -1447,8 +1473,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     if entry_params.any?
       dispute_entry_fields = entry_params.slice(*%w{suggested_disposition})
       ip_or_uri = entry_params['ip_or_uri']
-
-      relation = relation.joins(:dispute_entries).group(:id)
+      relation = relation.joins(:dispute_entries)
       relation = relation.where(dispute_entries: dispute_entry_fields) if dispute_entry_fields.present?
 
       if ip_or_uri.present?
@@ -1461,7 +1486,6 @@ For future Web categorization requests, please open a Web categorization ticket 
     if params.present? && search_name.present? && reload == false
       save_named_search(search_name, params, user: user, project_type: 'Dispute')
     end
-
     relation
   end
 
@@ -1472,6 +1496,7 @@ For future Web categorization requests, please open a Web categorization ticket 
   def self.named_search(search_name, user:, reload: false)
     named_search = user.named_searches.where(name: search_name).first
     raise "No search named '#{search_name}' found." unless named_search
+
     search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
       if /\A(?<super_name>[^~]*)~(?<sub_name>[^~]*)\z/ =~ criterion.field_name
         search_params[super_name] ||= {}
