@@ -120,7 +120,7 @@ gem 'simpleidn'
 gem 'red-parquet', '8.0.0'
 
 group :production, :staging do
-  gem 'elastic-apm', '~> 3.15', '>= 3.15.1'
+  gem 'elastic-apm', '4.5.0'
 end
 
 group :development do
