@@ -23,7 +23,9 @@ module AnalystConsoleEscalations
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
+    # config.autoloader = :classic
     config.autoload_paths += %W(#{config.root}/lib/grpc)
+
     # This is a monkey patch for https://jira.vrt.sourcefire.com/browse/WEB-7362
     # The problem was this: https://github.com/paper-trail-gem/paper_trail/issues/1267
     # And the fix is (1) upgrade to latest paper_trail, (2) install the psych gem
