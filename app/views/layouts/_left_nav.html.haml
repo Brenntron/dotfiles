@@ -33,11 +33,11 @@
                 = inline_svg 'icon_filerep_tix_grey.svg'
           - if can?(:index, Dispute)
             %li{class: 'rep-link'}
-              %a{href: escalations_webrep_disputes_path, id: 'rep-icon-link'}
+              %a{href: escalations_webrep_disputes_path + "?f=unassigned", id: 'rep-icon-link'}
                 =inline_svg 'icon_webrep_tix_grey.svg'
           - if can?(:index, SenderDomainReputationDispute)
             %li{class: 'sdr-link'}
-              %a{href: escalations_sdr_disputes_path, id: 'sdr-icon-link'}
+              %a{href: escalations_sdr_disputes_path + "?f=unassigned", id: 'sdr-icon-link'}
                 =inline_svg 'icon_sender_rep.svg'
           - if can?(:index, Complaint)
             %li{class: 'cat-link'}
@@ -116,10 +116,10 @@
                 %a{href: escalations_file_rep_disputes_path + "?f=open", id: 'amp-link'} File Reputation
             - if can?(:index, Dispute)
               %li{class: 'rep-link'}
-                %a{href: escalations_webrep_disputes_path, id: 'rep-link'} Web Reputation
+                %a{href: escalations_webrep_disputes_path + "?f=unassigned", id: 'rep-link'} Web Reputation
             - if can?(:index, SenderDomainReputationDispute)
               %li{class: 'sdr-link'}
-                %a{href: escalations_sdr_disputes_path, id: 'sdr-icon-link'} Sender Domain Rep
+                %a{href: escalations_sdr_disputes_path+ "?f=unassigned", id: 'sdr-icon-link'} Sender Domain Rep
             - if can?(:index, Complaint)
               %li{class: 'cat-link'}
                 %a{href: escalations_webcat_complaints_path, id: 'cat-link'} Web Categorization

@@ -846,9 +846,9 @@ class AutoResolve
   end
 
   def self.build_resolution_message(rule_hits)
-    #look for ia* and dh* rulehits (DhL DhM DhH) (IaL IaM IaH)
-    has_ia = rule_hits.select{|rulehit| rulehit.downcase.strip.starts_with?("ia")}.present?
-    has_dh = rule_hits.select{|rulehit| rulehit.downcase.strip.starts_with?("dh")}.present?
+    #look for ia* and dh* rulehits (DhL DhM DhH) (IaL IaM IaH)   UPDATE: Ia has become rs (RsM/H); dh has become rh (RhM/H)
+    has_ia = rule_hits.select{|rulehit| rulehit.downcase.strip.starts_with?("rs")}.present?
+    has_dh = rule_hits.select{|rulehit| rulehit.downcase.strip.starts_with?("rh")}.present?
 
     #look for *bl rulehits (Sbl, Pbl, Cbl)
 
@@ -858,16 +858,16 @@ class AutoResolve
     message = ""
 
     if has_ia || has_dh
-      message += "Our worldwide sensor network indicates that spam originated from your IP."
+      message += "Our worldwide sensor network indicates that spam originated from your IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP: "
 
       if has_dh
-        message += " In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses."
+        message += "*Audit your mailing list(s) to ensure you are NOT sending to invalid email addresses; "
       end
-      message += " It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence."
+      message += "*A server, user computer, router or switch on your network may be compromised by a trojan spam virus; *There is an open port 25 through which a spammer may be gaining access and sending out spam; *One of your users is sending spam through the IP; *Compromised hosting or mail accounts, which are then used to authenticate and send through other ports."
     end
 
     if has_bl
-      message += " Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://www.spamhaus.org/) Review the status and reason(s) by visiting https://www.spamhaus.org/lookup/and entering your IP. Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours."
+      message += " Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://check.spamhaus.org/) Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours."
     end
 
     message

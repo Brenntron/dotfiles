@@ -59,6 +59,8 @@ gem 'httparty', '~> 0.15.3'
 # gem 'peake-bridge-client', '0.1.0.0'
 # gem 'peake-bridge-client', '0.1.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 gem 'peake-bridge-client', '0.2.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
+# gem 'peake-bridge-client', '0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
+# gem 'peake-bridge-client', '0.1.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'
 gem 'aws-sdk', '3.1.0'
@@ -110,7 +112,7 @@ gem 'clipboard-rails', '1.7.1'
 
 gem 'capybara', '2.11.0'
 gem 'poltergeist', '1.18.1'
-gem 'selenium-webdriver'
+gem 'selenium-webdriver', "~> 3.142.7"
 
 
 gem 'public_suffix', '4.0.7'
@@ -123,8 +125,10 @@ gem 'hashie'
 
 gem 'mail'
 gem 'simpleidn'
+gem 'red-parquet', '8.0.0'
+
 group :production, :staging do
-  gem 'elastic-apm', '~> 3.15', '>= 3.15.1'
+  gem 'elastic-apm', '4.5.0'
 end
 
 group :development do

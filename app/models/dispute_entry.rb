@@ -1230,6 +1230,11 @@ class DisputeEntry < ApplicationRecord
       raw_sbrs_score = sbrs_api_response['sbrs']['score'] rescue nil
       raw_wbrs_score = wbrs_stuff["wbrs"]["score"] rescue nil
 
+      extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.hostlookup, [])
+      extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
+      includes_phishtank_rulehit = extra_wbrs_stuff_rulehits.include?("phtk")
+
       submission_type = self.dispute.submission_type
 
       if submission_type == "e"
@@ -1308,7 +1313,11 @@ class DisputeEntry < ApplicationRecord
 
             is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
 
-            if !is_blacklisted
+            #WEB-10157
+            #if is blacklisted OR has phishtank rulehit, then send to auto resolve : else hit the below block matching disposition/cat check
+            # true || true === !false && !false
+            #De Morgan's Laws always catch me off guard.
+            if !is_blacklisted && !includes_phishtank_rulehit
 
               ###SHUTTING DOWN WEBCAT CHECK AND CONVERT
               # reason I'm not just removing the code is for convenience.  I have reason to believe this will be coming back in the future
