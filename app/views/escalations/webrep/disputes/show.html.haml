@@ -31,7 +31,7 @@
             %span#dispute-assignee= @dispute.assignee || "None"
           - if can? :update, Dispute
             .dispute-owner-buttons-wrapper
-              - if @dispute.assignee == current_user.email
+              - if @dispute.assignee == current_user.cvs_username
                 - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                   %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
               - else

@@ -2201,8 +2201,15 @@ a.static-nav-item {
 .nav-toolbar-icon, .nav-dropdown-icon, .nav-dropdown-content-icon {
   background-repeat: no-repeat;
   display: inline-block;
-  margin-bottom: -3px;
   background-position: center;
+}
+
+.nav-toolbar-icon, .nav-dropdown-content-icon {
+  margin-bottom: -3px;
+}
+
+.nav-dropdown-icon {
+  margin-bottom: -4px;
 }
 
 .nav-toolbar-icon  {
@@ -2236,8 +2243,12 @@ a.static-nav-item {
 .icon-web-tix {background-image: url(image_path('icon_open_web_tix.svg'));}
 .icon-fixed-bugs   {background-image: url(image_path('icon_fixedbugs.svg'));}
 .icon-all-bugs     {background-image: url(image_path('bugs_icon.svg'));}
-.icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
+.icon-all-tickets  {background-image: url(image_path('icon_all_tickets_white.svg'));}
 .icon-all-tickets-grey  {background-image: url(image_path('icon_ticket_grey.svg'));}
+.icon-manager-queue {background-image: url(image_path('icon_manager_queue_white.svg'));}
+.icon-my-closed-tickets {background-image: url(image_path('icon_my_closed_tickets_white.svg'));}
+.icon-new-tickets {background-image: url(image_path('icon_new_tickets_white.svg')); background-size: 18px;}
+.icon-active-tickets {background-image: url(image_path('icon_active_tickets_white.svg')); background-size: 18px;}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
 .icon-team-grey {background-image: url(image_path('icon_team_grey.svg'));}
@@ -2463,13 +2474,13 @@ a.static-nav-item {
   font-size: 9pt;
 }
 
-#advanced-search-button {
+#advanced-search-button, #webrep-advanced-search-button {
   margin-top: -4px;
   background-color: transparent;
   color: $type-lighter-color;
 }
 
-#advanced-search-button::before {
+#advanced-search-button::before, #webrep-advanced-search-button::before {
   content: '|';
   color: $bug-accent-color;
 }
@@ -3517,8 +3528,8 @@ fieldset.top-content {
   pointer-events: none;
   border-color: rgba(136, 183, 213, 0);
   border-right-color: $content-bg-color;
-  border-width: 10px;
-  margin-top: -24px;
+  border-width: 14px;
+  margin-top: -28px;
   margin-right: -1px;
   float: right;
 }
@@ -4554,7 +4565,7 @@ td.wbrs-highlight, td.sbrs-highlight {
     }
   }
 
-  #advanced-search-button {
+  #advanced-search-button, #webrep-advanced-search-button {
     background-color: darken($faint-neutral-color, 5%);
     color: $type-lighter-color;
     text-transform: uppercase;
@@ -4566,7 +4577,7 @@ td.wbrs-highlight, td.sbrs-highlight {
     position: absolute;
     right: 0;
   }
-  #advanced-search-button::before {
+  #advanced-search-button::before, #webrep-advanced-search-button::before {
     display: none;
   }
 
@@ -7836,6 +7847,9 @@ table.dispute-entry-table tbody tr.selected {
   input {
     min-height: 34px;
   }
+  #submission-type input {
+    min-height: 0;
+  }
   .form-control.selectize{
     min-height: 34px;
     border-left: 4px solid $content-bg-color;
@@ -8390,10 +8404,6 @@ table#duplicates a {
   height: 20px;
   background-repeat: no-repeat;
   content: '';
-}
-
-#dispute-index-title {
-  display: inline-block;
 }
 
 .refresh-message {
@@ -10547,7 +10557,7 @@ hr.thin.form-divider {
   margin-left: 35px;
 }
 
-#filerep_searchref_container, #webcat_searchref_container, #sdr_searchref_container{
+#filerep_searchref_container, #webcat_searchref_container, #sdr_searchref_container, #dispute-advaced-search-selected-filters{
   & {
     color: $primary-section-color;
     max-width: 100%;
@@ -10974,7 +10984,7 @@ button.secondary.view-report-external-button {
   }
 
   // advanced search button
-  .input-group.search-group #advanced-search-button {
+  .input-group.search-group #advanced-search-button, .input-group.search-group #webrep-advanced-search-button {
     padding: 0 12px 0 18px;
     height: 28px;
   }
@@ -10985,7 +10995,7 @@ button.secondary.view-report-external-button {
   }
 
   // adding the down caret icon using the sort_by svg for advanced search button
-  .input-group.search-group #advanced-search-button::after {
+  .input-group.search-group #advanced-search-button::after, .input-group.search-group #webrep-advanced-search-button::after {
     content: '';
     display: block;
     width: 16px;
@@ -13855,7 +13865,7 @@ table > tbody > tr > td.no-padding {
 }
 
 // adding the down caret icon using the sort_by svg for advanced search button
-#advanced-search-button::after {
+#advanced-search-button::after, #webrep-advanced-search-button::after {
   content: '';
   display: block;
   width: 16px;

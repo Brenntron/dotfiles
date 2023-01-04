@@ -185,7 +185,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                                          },
                                          "sbrs" => {
                                              "SBRS_SCORE"=>"-53",
-                                             "SBRS_Rule_Hits"=>"DhH, IaM, Pbl",
+                                             "SBRS_Rule_Hits"=>"RsM, RhM, Pbl",
                                              "Hostname"=>"www.dealer.com",
                                              "rep_sugg"=>"Good",
                                              "claim" => "false positive",
@@ -665,7 +665,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.status).to eql("RESOLVED_CLOSED")
 
     expect(dispute_entry_1.resolution).to eql(DisputeEntry::STATUS_AUTO_RESOLVED_UNCHANGED)
-    expect(dispute_entry_1.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence. Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://www.spamhaus.org/) Review the status and reason(s) by visiting https://www.spamhaus.org/lookup/and entering your IP. Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours.")
+    expect(dispute_entry_1.resolution_comment).to eql("Our worldwide sensor network indicates that spam originated from your IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP: *Audit your mailing list(s) to ensure you are NOT sending to invalid email addresses; *A server, user computer, router or switch on your network may be compromised by a trojan spam virus; *There is an open port 25 through which a spammer may be gaining access and sending out spam; *One of your users is sending spam through the IP; *Compromised hosting or mail accounts, which are then used to authenticate and send through other ports. Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://check.spamhaus.org/) Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours.")
 
   end
 
@@ -922,7 +922,6 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
     expect(dispute_entry_1.auto_resolve_log).to eql("--------Starting Data---------<br>suggested disposition: Poor<br>effective disposition info: \"Neutral\"<br>-----------------------------<br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>virustotal hits under thresholds<br><br>not found in spamhaus list<br><br>malicious domain ratio was under 20%")
 
-
   end
 
   ##############
@@ -970,6 +969,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("AP - FN")
     expect(dispute_entry_1.resolution_comment).to eql("Talos has lowered our reputation score for the URL/Domain/Host to block access.")
 
+    expect(dispute_entry_1.auto_resolve_category).to eql("Trusted/High Count VT hit(s)/high domain count")
   end
 
   it 'should auto resolve if malicious domains >= 70%' do
@@ -1016,7 +1016,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("AP - FN")
     expect(dispute_entry_1.resolution_comment).to eql("Talos has lowered our reputation score for the URL/Domain/Host to block access.")
 
-
+    expect(dispute_entry_1.auto_resolve_category).to eql("70% malicious ratio/high domain count")
 
   end
 
@@ -1066,7 +1066,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("AP - FN")
     expect(dispute_entry_1.resolution_comment).to eql("Talos has lowered our reputation score for the URL/Domain/Host to block access.")
 
-
+    expect(dispute_entry_1.auto_resolve_category).to eql("Trusted/High Count VT hit(s)/low domain count")
   end
 
   it 'should auto resolve if hosted domains < 100, highest popularity < 40, asn on block list' do
@@ -1114,6 +1114,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("AP - FN")
     expect(dispute_entry_1.resolution_comment).to eql("Talos has lowered our reputation score for the URL/Domain/Host to block access.")
 
+    expect(dispute_entry_1.auto_resolve_category).to eql("ASN block list/low domain count")
   end
 
   it 'should auto resolve if hosted domains < 100, highest popularity < 40, malciious domains >= 20%' do
@@ -1161,7 +1162,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute_entry_1.resolution).to eql("AP - FN")
     expect(dispute_entry_1.resolution_comment).to eql("Talos has lowered our reputation score for the URL/Domain/Host to block access.")
 
-
+    expect(dispute_entry_1.auto_resolve_category).to eql("20% malicious ratio/low domain count")
 
   end
 

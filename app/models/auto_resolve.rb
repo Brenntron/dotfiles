@@ -213,6 +213,7 @@ class AutoResolve
 
       if trusted_hits > 0
         results[:action] = :commit_malware
+        results[:resolve_category] = "1 or more trusted VT hits"
         return results
       end
 
@@ -220,6 +221,7 @@ class AutoResolve
       results[:log] << umbrella_rating_results[:log]
       if umbrella_rating_results[:rating] == "malicious"
         results[:action] = :commit_malware
+        results[:resolve_category] = "Malicious Umbrella Rating"
         return results
       elsif umbrella_rating_results[:rating].blank?
         results[:action] =  :do_not_resolve
@@ -229,6 +231,7 @@ class AutoResolve
 
       if virustotal_results[:positives] > 5
         results[:action] = :commit_malware
+        results[:resolve_category] = ">= 5 VT count"
         results[:log] << "total vt hits > 5, committing to reptool."
         return results
       end
@@ -237,6 +240,7 @@ class AutoResolve
       results[:log] << umbrella_domain_volume_results[:log]
 
       if umbrella_domain_volume_results[:pass] == false
+        results[:resolve_category] = "Suspicious domain volume ratio"
         results[:action] = :commit_phishing
 
         return results
@@ -246,7 +250,7 @@ class AutoResolve
       results[:log] << umbrella_whois_popularity_results[:log]
       if umbrella_whois_popularity_results[:pass] == false
         results[:action] = :commit_malware
-
+        results[:resolve_category] = "Low popularity low age domain."
         return results
       end
 
@@ -380,12 +384,14 @@ class AutoResolve
 
       if virustotal_results[:positives] >= 12 || trusted_hits > 1
         results[:action] = :commit_malware
+        results[:resolve_category] = "Trusted/High Count VT hit(s)/high domain count"
         return results
       end
 
       #70%
       if (malicious_domain_count.to_f / total_domain_count.to_f) >= 0.7
         results[:action] = :commit_malware
+        results[:resolve_category] = "70% malicious ratio/high domain count"
         return results
       else
         results[:log] << "malicious domain ratio was under 70%"
@@ -399,6 +405,7 @@ class AutoResolve
 
       if virustotal_results[:positives] >= 3 || trusted_hits > 0
         results[:action] = :commit_malware
+        results[:resolve_category] = "Trusted/High Count VT hit(s)/low domain count"
         return results
       else
         results[:log] << "virustotal hits under thresholds"
@@ -416,6 +423,7 @@ class AutoResolve
 
         if asn_blocklist.include?(spamhaus_code)
           results[:action] = :commit_malware
+          results[:resolve_category] = "ASN block list/low domain count"
           return results
         else
           results[:log] << "not found in spamhaus list"
@@ -432,6 +440,7 @@ class AutoResolve
       #20% malicious ratio
       if (malicious_domain_count.to_f / total_domain_count.to_f) >= 0.2
         results[:action] = :commit_malware
+        results[:resolve_category] = "20% malicious ratio/low domain count"
         return results
       else
         results[:log] << "malicious domain ratio was under 20%"
@@ -484,6 +493,7 @@ class AutoResolve
         dispute_entry.status = DisputeEntry::STATUS_RESOLVED
         dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_FN
         dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+        dispute_entry.auto_resolve_category = result[:resolve_category]
         dispute_entry.case_closed_at = resolved_at
         dispute_entry.case_resolved_at = resolved_at
       else
@@ -836,9 +846,9 @@ class AutoResolve
   end
 
   def self.build_resolution_message(rule_hits)
-    #look for ia* and dh* rulehits (DhL DhM DhH) (IaL IaM IaH)
-    has_ia = rule_hits.select{|rulehit| rulehit.downcase.strip.starts_with?("ia")}.present?
-    has_dh = rule_hits.select{|rulehit| rulehit.downcase.strip.starts_with?("dh")}.present?
+    #look for ia* and dh* rulehits (DhL DhM DhH) (IaL IaM IaH)   UPDATE: Ia has become rs (RsM/H); dh has become rh (RhM/H)
+    has_ia = rule_hits.select{|rulehit| rulehit.downcase.strip.starts_with?("rs")}.present?
+    has_dh = rule_hits.select{|rulehit| rulehit.downcase.strip.starts_with?("rh")}.present?
 
     #look for *bl rulehits (Sbl, Pbl, Cbl)
 
@@ -848,16 +858,16 @@ class AutoResolve
     message = ""
 
     if has_ia || has_dh
-      message += "Our worldwide sensor network indicates that spam originated from your IP."
+      message += "Our worldwide sensor network indicates that spam originated from your IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP: "
 
       if has_dh
-        message += " In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses."
+        message += "*Audit your mailing list(s) to ensure you are NOT sending to invalid email addresses; "
       end
-      message += " It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP. In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence."
+      message += "*A server, user computer, router or switch on your network may be compromised by a trojan spam virus; *There is an open port 25 through which a spammer may be gaining access and sending out spam; *One of your users is sending spam through the IP; *Compromised hosting or mail accounts, which are then used to authenticate and send through other ports."
     end
 
     if has_bl
-      message += " Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://www.spamhaus.org/) Review the status and reason(s) by visiting https://www.spamhaus.org/lookup/and entering your IP. Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours."
+      message += " Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://check.spamhaus.org/) Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours."
     end
 
     message

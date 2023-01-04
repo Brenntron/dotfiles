@@ -14,14 +14,6 @@ $(document).ready ->
           text = text.join(', ').replace(/, ([^,]*)$/, ', and $1')
         text = text.replace(/(, and| and |, )/g, '<span class="unset-text">$1</span>')
         return $('.searched-for-url').html(text)
-  # Hide loader cogs when page is done loading
-  loader = $('#inline-webrep')
-  $(this).bind(
-    ajaxStart: () ->
-      loader.removeClass('hidden')
-    ajaxStop: () ->
-      loader.addClass('hidden')
-  )
 
   if window.location.pathname == '/escalations/webrep/disputes'
     std_msg_ajax(
@@ -98,15 +90,7 @@ window.select_or_deselect_all = (dispute_id)->
 
 
 window.advanced_webrep_index_table = () ->
-
   form = $('#disputes-advanced-search-form')
-  submission_types = []
-  if form.find('input[name="advanced_search[submission_type]"][value="w"]').is(':checked')
-    submission_types.push('w')
-  if form.find('input[name="advanced_search[submission_type]"][value="e"]').is(':checked')
-    submission_types.push('e')
-  if form.find('input[name="advanced_search[submission_type]"][value="ew"]').is(':checked')
-    submission_types.push('ew')
   dispute_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   data = {
     search : {
@@ -132,14 +116,26 @@ window.advanced_webrep_index_table = () ->
     resolution: form.find('input[id="resolution-input"]').val()
     submission_type: submission_types
     submitter_type: form.find('input[id="submitter-input"]').val()
-    platform_ids: form.find('input[id="platform-input"]').val()
+    platform_names: form.find('input[id="platform-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
     submitted_newer: form.find('input[id="submitted-newer-input"]').val()
     age_older: form.find('input[id="age-older-input"]').val()
     age_newer: form.find('input[id="age-newer-input"]').val()
     modified_older: form.find('input[id="modified-older-input"]').val()
     modified_newer: form.find('input[id="modified-newer-input"]').val()
+    case_origin: form.find('input[id="case-origin-input"]').val()
   }
+  unless form.find('#submission-type').parent().hasClass('hidden')
+    submission_types = []
+    if form.find('input#submission-type-w-cb').is(':checked')
+      submission_types.push('w')
+    if form.find('input#submission-type-e-cb').is(':checked')
+      submission_types.push('e')
+    if form.find('input#submission-type-ew-cb').is(':checked')
+      submission_types.push('ew')
+    data['submission_type'] = submission_types
+  
+
   if dispute_save_search_format.test(data.search_name) == true
     std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
   else
@@ -943,7 +939,9 @@ $ ->
       return false
 
   # Create index table
-  window.dispute_table = $('#disputes-index').DataTable(
+  window.dispute_table = $('#disputes-index').on(
+    'preXhr.dt': ->
+      $('#inline-webrep').removeClass('hidden')).DataTable(
     pagingType: 'full_numbers'
     processing: true
     serverSide: true
@@ -952,6 +950,8 @@ $ ->
       method: 'GET'
       headers: {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       data: build_webrep_data()
+      complete: () ->
+        $('#inline-webrep').addClass('hidden')
     order: [ [
       9
       'desc'
@@ -1360,56 +1360,92 @@ $ ->
       success: (response) ->
     )
 
-  $('#advanced-search-button').click ->
-    std_msg_ajax(
-      method: 'GET'
-      url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
-      success: (response) ->
-
-        $('#user-list').empty()
-        $('#status-list').empty()
-        $('#submittertype-list').empty()
-        $('#contactname-list').empty()
-        $('#contactemail-list').empty()
-        $('#company-list').empty()
-        $('#resolution-list').empty()
-
-        $('#platform-input').selectize {
-          persist: false
-          create: false
-          valueField: 'id',
-          labelField: 'public_name',
-          options: response.json.platforms
-          onFocus: () ->
-            window.toggle_selectize_layer(this, 'true')
-          onBlur: () ->
-            window.toggle_selectize_layer(this, 'false')
-        }
-
-        for user in response.json.case_owners
-          $('#user-list').append '<option value=\'' + user.cvs_username + '\'></option>'
-
-        for status in response.json.statuses
-          $('#status-list').append '<option value=\'' + status + '\'></option>'
-
-        for type in response.json.submitter_types
-          $('#submittertype-list').append '<option value=\'' + type + '\'></option>'
-
-        for contact in response.json.contacts
-          $('#contactname-list').append '<option value=\'' + contact.name + '\'></option>'
-
-        for contact in response.json.contacts
-          $('#contactemail-list').append '<option value=\'' + contact.email + '\'></option>'
-
-        for company in response.json.companies
-          $('#company-list').append '<option value=\'' + company.name + '\'></option>'
-
-        for resolution in response.json.resolutions
-          $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
-    )
+  $('#webrep-advanced-search-button').click ->
+    # if we have already loaded the advanced search, with all options no need to load it again 
+    if $('#company-list').find('option').size() == 0
+      std_msg_ajax(
+        method: 'GET'
+        url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
+        success: (response) ->
+          $('#user-list').empty()
+          $('#status-list').empty()
+          $('#submittertype-list').empty()
+          $('#contactname-list').empty()
+          $('#contactemail-list').empty()
+          $('#company-list').empty()
+          $('#resolution-list').empty()
+          $('#case-origin-list').empty()
 
 
-   
+          $('#platform-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.platforms
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
+
+          $('#resolution-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.resolutions
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
+
+          $('#status-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.statuses
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
+
+          $('#priority-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.priorities
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
+
+          for user in response.json.case_owners
+            $('#user-list').append '<option value=\'' + user + '\'></option>'
+
+          for type in response.json.submitter_types
+            $('#submittertype-list').append '<option value=\'' + type + '\'></option>'
+
+          for contact in response.json.contacts
+            $('#contactname-list').append '<option value=\'' + contact.name + '\'></option>'
+
+          for contact in response.json.contacts
+            $('#contactemail-list').append '<option value=\'' + contact.email + '\'></option>'
+
+          for company in response.json.companies
+            $('#company-list').append '<option value=\'' + company + '\'></option>'
+
+          for source in response.json.sources
+            $('#case-origin-list').append '<option value=\'' + source + '\'></option>'
+
+      )
+
+
 
     if window.location.pathname.includes('/escalations/file_rep') ||  window.location.pathname.includes('/escalations/webrep')
       $('#filter-cases').show()
@@ -1658,7 +1694,7 @@ window.get_threat_levels = (uri) ->
   )
 
 $ ->
-  $('#advanced-search-button').click ->
+  $('#webrep-advanced-search-button').click ->
     $('#advanced-search-dropdown').show()
 
   $('#submit-advanced-search').click ->
@@ -2632,33 +2668,34 @@ window.convert_dispute_to_webcat = () ->
 
 window.build_webrep_data = () ->
   $('#inline-webrep').removeClass('hidden')
-  data = {
-    search_type: '',
-    search_name: '',
-    selected_cases: []
-  }
   if location.search != ''
     urlParams = new URLSearchParams(location.search);
 #      if the location.search has value, it is a standard search
     data =  {
       search_type : 'standard'
       search_name : urlParams.get('f')
-      selected_cases: []
     }
   
   else if localStorage.webRepFilters
     data = JSON.parse(localStorage.webRepFilters)
    
+
+  
   format_webrep_header(data)
+
   data
 
 window.format_webrep_header = (data) ->
   return if window.location.pathname != '/escalations/webrep/disputes'
 
   if data != undefined
-    reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="reset_webrep_page()"></span>'
+    if data.search_name == 'unassigned'
+      reset_icon = ''
+    else
+      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="reset_webrep_page()"></span>'
+
     { search_type, search_name } = data
-    if search_type == 'standart'
+    if search_type == 'standard'
       search_text = 
         if search_name == 'my_disputes'
           'My Tickets'
@@ -2675,10 +2712,59 @@ window.format_webrep_header = (data) ->
       else
         new_header = 'All Tickets'
     else if search_type == 'advanced'
+      search_conditions = JSON.parse(localStorage.webRepFilters)
       new_header =
         '<div>Results for Advanced Search ' +
         reset_icon +
         '</div>'
+      selectedFilters = []
+      condition_types = {
+        age_newer: 'Age more than'
+        age_older: 'Age less than'
+        case_id: 'Case IDs'
+        case_owner_username: 'Assignee'
+        modified_newer: 'Updated after'
+        modified_older: 'Updated before'
+        org_domain: 'Submitter domain'
+        platform_names: 'Platform'
+        priority: 'Priority'
+        resolution: 'Resolution'
+        status: 'Status'
+        submitted_newer: 'Submitted after'
+        submitted_older: 'Submitted before'
+        submitter_type: 'Submitter Type'
+        case_origin: 'Case Origin'
+      }
+      for conditionName, condition of search_conditions
+        if condition == '' || ['search', 'search_name', 'search_type'].includes(conditionName)
+          continue
+        
+        if conditionName == 'customer'
+          for customer_type, customer_value of search_conditions[conditionName]
+            if customer_value == ''
+             continue 
+            if customer_type == 'name'
+              selectedFilters.push({name: 'Contact Name', value: customer_value})
+            if customer_type == 'email'
+              selectedFilters.push({name: 'Contact Email', value: customer_value})
+            if customer_type == 'company_name'
+              selectedFilters.push({name: 'Submitter Org', value: customer_value})
+        else if conditionName == 'dispute_entries'
+          for key, value of search_conditions[conditionName]
+            if value  == ''
+             continue 
+            if key == 'ip_or_uri'
+              selectedFilters.push({name: 'Dispute (URL/IP/Domain)', value: value})
+            if key == 'suggested_disposition'
+              selectedFilters.push({name: 'Suggested Disposition', value: value})
+        else if conditionName == 'submission_type'
+          selectedFilters.push({name: 'Submission Type', value: search_conditions[conditionName].map((e) => e.toUpperCase()).join(', ')})
+        else if condition_types[conditionName] 
+          selectedFilters.push({name: condition_types[conditionName], value: search_conditions[conditionName]})
+        container = $('#dispute-advaced-search-selected-filters')
+      for item in selectedFilters
+        html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value.split(',').join(', ') + '</span>'
+        $('#dispute-advaced-search-selected-filters').append(html)
     else if search_type == 'named'
       new_header =
         '<div>Results for "' + search_name + '" Saved Search' +
@@ -2696,4 +2782,4 @@ window.format_webrep_header = (data) ->
 
 window.reset_webrep_page = () ->
   localStorage.removeItem('webRepFilters')
-  refresh_webrep_url()
+  refresh_webrep_url('?f=unassigned')

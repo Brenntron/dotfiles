@@ -1033,7 +1033,7 @@ window.retrieve_history = (position) ->
   for url_position in [1..5]
     $("#url_#{url_position}").css("border-width", "")
     $("#url_#{url_position}").css("border-color", "")
-
+  
   url = $("#url_" + position).val()
 
   if url.length > 0
@@ -1499,7 +1499,7 @@ window.history_dialog = (id, url) ->
               </li>
                <li class='nav-item' role='presentation'>
                 <a class='nav-link' role='tab' data-toggle='tab' href='#xbrs-history-tab' aria-controls='xbrs-history-tab' onclick='get_xbrs_history(\"#{url}\", this)'>
-                  XBRS History
+                  XBRS Timeline
                 </a>
                </li>
             </ul>
@@ -1564,7 +1564,7 @@ window.history_dialog = (id, url) ->
         history_dialog_content +=
           "
            <div class='tab-pane' role='tabpanel' id='xbrs-history-tab'>
-            <h5>XBRS History</h5>
+            <h5>XBRS Timeline</h5>
               <table class=''history-table xbrs-history-table' id='webcat-xbrs-history'></table>
             </div>
            "
@@ -1607,44 +1607,29 @@ window.get_xbrs_history = (url, tab) ->
       if response.data.length < 1
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
-        { columns, data:current_data } = response
+        
+        
         $(xbrs_table).append(document.createElement('thead'))
         $(xbrs_table).append(document.createElement('tbody'))
         thead = $(xbrs_table).find('thead')
         tbody = $(xbrs_table).find('tbody')
+        table_headers = ['Timestamp', 'Scrore', 'V2 Content Cat', 'V3 Content Cats', 'Threat Cats', 'Rule Hits']
+
         parsed_rows = []
         thead_row = ''
 
-        for row, i in current_data
-          parsed_rows[i] = { ctime:'', row_data: '' }
-
-        for col, index in columns
-          # We only want the values/headers for these columns
-          if col == "domain" || col == "subdomain" || col == "ctime" || col == "mtime" || col == "mnemonic" || col == "operation" || col == "path"
-            if col == "ctime" then col = "Creation Time"
-            if col == "mtime" then col = 'Last Modified'
-            thead_row += "<th> #{col }</th>"
-            for row, i in current_data
-              if col == "Creation Time"
-                #set ctime/Creation Time value to check against for every row
-                parsed_rows[i].ctime = row[index]
-              # build cells for each row corresponding data to proper column. if values are null or undefined set '-'
-              parse_data = row[index]
-              if parse_data == null || parse_data == undefined
-                parsed_rows[i].row_data += "<td> - </td>"
-              else
-                parsed_rows[i].row_data += "<td>#{parse_data}</td>"
-
-        #sort rows by ctime
-        parsed_rows.sort (a,b) ->
-            if a.ctime == b.ctime then return 0
-            if a.ctime > b.ctime then 1 else -1
-
-        #  add all rows to table
+        table_headers.forEach (header)->
+          thead_row += "<th> #{header}</th>"       
         thead.append(thead_row)
-        for key, value of parsed_rows
-          tbody.append("<tr>#{value.row_data}</tr>")
 
+        response.data.forEach (row)->
+          data_row = ""
+
+          for key, value of row
+            data_row += "<td>#{value || '-'}</td>"
+
+          tbody.append("<tr>#{data_row}</tr>")
+          
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)

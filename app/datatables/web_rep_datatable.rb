@@ -40,7 +40,6 @@ class WebRepDatatable < AjaxDatatablesRails::ActiveRecord
     Dispute.all
   end
 
-
   def filter_records(records)
     base_search =
       if  @search_string.present?
