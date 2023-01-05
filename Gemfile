@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby "2.7.7"
+ruby "2.7.6"
 
 # Web-framework
 gem 'rack', '>= 2.2.4'
