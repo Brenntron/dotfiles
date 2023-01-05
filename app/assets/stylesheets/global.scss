@@ -1039,7 +1039,6 @@ button {
 .return-ticket-toolbar-button:hover,
 .collapse-all:hover,
 .sync-button:hover,
-.pin-to-top-button:hover,
 .expand-all:hover,
 .approve-all-button:hover,
 .reject-all-button:hover {
@@ -1065,7 +1064,6 @@ button {
 .return-ticket-toolbar-button:focus,
 .collapse-all:focus,
 .sync-button:focus,
-.pin-to-top-button:focus,
 .expand-all:focus,
 .approve-all-button:focus,
 .reject-all-button:focus {
@@ -12207,15 +12205,23 @@ input[type="radio"].resolution_radio_button {
   }
 }
 .toolbar#webcat-index-toolbar{
-  margin: 25px 0 -35px 0;
+  margin: 2px 0 -35px 0;
   z-index: 1;
   float: left;
-  width: auto;
-}
-
-.toolbar#webcat-index-toolbar.pinned-toolbar {
-  margin-top: 2px;
   width: 100%;
+  background: $content-bg-color;
+  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
+  position: relative;
+  bottom: 18px;
+  padding: 4px 20px;
+  .toolbar-checkbox-wrapper {
+    padding-top: 0;
+    padding-left: 5px;
+    font-weight: normal;
+  }
+  label {
+    display: none;
+  }
 }
 
 #complaints-index_wrapper .datatable-top-tools {
@@ -12734,29 +12740,6 @@ table > tbody > tr > td.no-padding {
   position: sticky;
   top: 0;
   z-index: 999;
-}
-
-.pin-to-top-button {
-  background-image: url(image_path('icon_pin1.svg'));
-  background-size: 22px 22px;
-  background-position: 3px 3px;
-  padding-left: 18px;
-}
-
-.pinned-toolbar {
-  background: $content-bg-color;
-  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
-  position: relative;
-  bottom: 18px;
-  padding: 4px 20px;
-  .toolbar-checkbox-wrapper {
-    padding-top: 0;
-    padding-left: 5px;
-    font-weight: normal;
-  }
-  label {
-    display: none;
-  }
 }
 
 #webcat_searchref_container {
@@ -13452,10 +13435,6 @@ table > tbody > tr > td.no-padding {
   .complaint-mgt-top-area {
     padding: 10px 15px 10px;
   }
-}
-
-#webcat-index-toolbar {
-  margin: 20px 0 5px;
 }
 
 #webcat-index-title {
