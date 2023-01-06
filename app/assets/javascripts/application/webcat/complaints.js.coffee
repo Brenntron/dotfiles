@@ -923,6 +923,31 @@ window.return_selected = ()->
   else
     std_msg_error('no rows selected', ['Please select at least one row.'])
 
+window.webcat_change_assignee = () ->
+
+  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    Number(this.value)
+  ).toArray()
+
+  new_assignee = $('#index_target_assignee option:selected').val()
+  data = {
+    'dispute_ids': entry_ids,
+    'new_assignee': new_assignee
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/change_assignee'
+    method: 'POST'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      std_msg_error('no rows selected', ['Please select at least one row to change assignee.'])
+  )
+
 window.select_cat_text_field = (id) ->
   if (typeof numericalValue)
     $( "#category_input"+id ).select();

@@ -58,6 +58,21 @@
     %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
       %span.toolbar-button-text Return
     %span.dropdown
+      %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Change Assignee
+      .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+        .toolbar
+          %div
+            %label.toolbar-section-label Assignee
+            %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
+              - User.joins(roles: :org_subset).where(org_subsets: { name: 'webcat' }).distinct.order(:cvs_username).each do |u|
+                %option{id: u.id, value: u.id, label: u.cvs_username}
+                  = u.cvs_username
+          %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'webcat_change_assignee();'}
+            Assign
+
+    %span.dropdown
       %button#convert-ticket-button.toolbar-button.convert-ticket-button.esc-tooltipped.dropdown-toggle{type: 'button', title: 'Convert ticket to web reputation ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled', onclick: 'prep_complaint_to_convert();'}
         %span.toolbar-button-text Convert to Webrep
       .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'convert-ticket-button'}
