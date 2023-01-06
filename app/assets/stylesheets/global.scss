@@ -12224,6 +12224,13 @@ input[type="radio"].resolution_radio_button {
   }
 }
 
+//sticky toolbar needs extra top spacing on small screens
+@media (max-width: 999px) {
+  .toolbar#webcat-index-toolbar {
+    margin-top: 18px;
+  }
+}
+
 #complaints-index_wrapper .datatable-top-tools {
   margin-bottom: 10px !important;
 }
