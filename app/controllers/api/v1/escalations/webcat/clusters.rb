@@ -44,8 +44,13 @@ module API
                 cluster_type: params[:cluster_type]
               }
               clusters = ::Clusters::Fetcher.new(filter, params[:regex], params[:save_regex], current_user).fetch
+              named_search = current_user.named_searches.where(name: params[:regex]).first
 
-              {:status => "success", :data => clusters}.to_json
+              if params[:save_regex]
+                named_search = NamedSearch.create!(user: current_user, name: params[:regex], project_type: 'webcat_clusters_regex') unless named_search
+              end
+
+              {:status => "success", :data => clusters, :named_search => named_search}.to_json
             end
 
             #returns an array of hashes about urls associated with a cluster_id

@@ -41,7 +41,8 @@ window.apply_filter_to_table = () ->
     $('.regex-area').addClass('hidden')
 
   $('#regex-filter').html(filter)
-  populate_clusters_index_table(filter);
+
+  populate_clusters_index_table(filter)
 
 window.populate_clusters_index_table = (filter) ->
   if $('#clusters-index_wrapper').length > 0
@@ -76,6 +77,9 @@ window.populate_clusters_index_table = (filter) ->
           datatable.draw();
           selectize_category_inputs();
           populate_cat_select(json.data)
+
+          if save_regex
+            $('#saved-search-tbody').append("<tr id='saved_search_#{json.named_search.id}'><td><a class='input-truncate saved-search esc-tooltipped tooltipstered' name='#{filter}' onclick='build_webcat_clusters_named_search(this);'>#{filter}</a><a class='delete-search' name='#{filter}' onclick='delete_clusters_named_search(this);' title='Delete Saved Search'><img src='/assets/icon_cancel_grey.svg'></a></td></tr>")
 
 
       error: (response) ->

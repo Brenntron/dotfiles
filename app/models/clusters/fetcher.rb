@@ -26,10 +26,6 @@ class Clusters::Fetcher
     clusters_data = nest_duplicates(clusters_data)
     filtered_clusters = Clusters::Filter.new(clusters_data, filter, user).filter
 
-    if save_regex
-      save_named_search()
-    end
-
     filtered_clusters.sort_by { |cluster| cluster[:global_volume] }.reverse.first(CLUSTERS_PAGE_LIMIT)
   end
 
@@ -109,11 +105,5 @@ class Clusters::Fetcher
   def cluster_important?(cluster, top_urls)
     top_url_clusters = top_urls.filter { |top_url| top_url.url == cluster[:domain] }
     top_url_clusters.first&.is_important
-  end
-
-  def save_named_search()
-    found_search = user.named_searches.where(name: regex).first
-    named_search = found_search || NamedSearch.create!(user: user, name: regex, project_type:
-                                                       'webcat_clusters_regex')
   end
 end
