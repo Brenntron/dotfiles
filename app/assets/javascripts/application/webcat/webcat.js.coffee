@@ -736,7 +736,7 @@ $ ->
         return options
 
     assignee_input = $('#assignee-input').selectize {
-      persist: false
+      persist: true
       create: false
       valueField: 'name',
       labelField: 'display_name',
