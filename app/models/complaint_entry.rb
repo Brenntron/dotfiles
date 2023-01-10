@@ -887,10 +887,22 @@ class ComplaintEntry < ApplicationRecord
     end
 
     complaint_fields = present_params.to_h.slice(*%w{description channel})
-    if complaint_fields.present?
-      relation = relation.includes(:complaint).where(complaints: complaint_fields)
+
+    if present_params['submitter_type'].present?
+      submitter_type_params = present_params['submitter_type'].split(', ').map(&:upcase).uniq.reduce([]) do |memo, type|
+        if type == Complaint::SUBMITTER_TYPE_CUSTOMER
+          memo << Complaint::SUBMITTER_TYPE_CUSTOMER
+        else 'GUEST'
+          memo.push(Complaint::SUBMITTER_TYPE_NONCUSTOMER, nil)
+        end
+        memo
+      end
+      complaint_fields.merge!(submitter_type: submitter_type_params)
     end
 
+    if complaint_fields.present?
+      relation = relation.includes(:complaint).where(complaints: complaint_fields)
+    end 
     # Save this search as a named search
     if present_params.present? && search_name.present?
       Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')

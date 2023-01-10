@@ -56,6 +56,8 @@ $ ->
     entry_ids = if $('#entryid-input')[0].selectize? then $('#entryid-input')[0].selectize.items else []
     complaint_ids = if $('#complaintid-input')[0].selectize? then $('#complaintid-input')[0].selectize.items else []
     platform_ids = if $('#platform-input')[0].selectize? then $('#platform-input')[0].selectize.items else []
+    submitter_types = if $('#submitter-type-input')[0].selectize? then $('#submitter-type-input')[0].selectize.items else []
+
 
     if tags.length
       form['tags'] = tags.join(', ')
@@ -80,6 +82,8 @@ $ ->
       form['complaint_id'] = complaint_ids.join(', ')
     if user_id.length
       form['user_id'] = user_id.join(', ')
+    if submitter_types.length
+      form['submitter_type'] = submitter_types.join(', ')
 
     form['platform_display'] = []
     if platform_ids.length
@@ -117,6 +121,7 @@ $ ->
       submitted_older: form.date_submitted_older
       tags: form.tags
       user_id: form.user_id
+      submitter_type: form.submitter_type
     )
     refresh_url()
 
@@ -874,6 +879,19 @@ $ ->
           value: input
           text: input
         }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
+
+    $('#submitter-type-input').selectize {
+      delimiter: ',',
+      persist: false,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
+      options: [{name: "Customer"}, {name: "Guest"}]
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
