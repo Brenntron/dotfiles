@@ -923,7 +923,7 @@ window.return_selected = ()->
   else
     std_msg_error('no rows selected', ['Please select at least one row.'])
 
-window.webcat_remove_assignee = ()->
+window.webcat_remove_assignee = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length > 0
     entry_ids = []
@@ -939,7 +939,7 @@ window.webcat_remove_assignee = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('Error Returning Entries', json.error)
+          std_msg_error('Error Removing Assignees', json.error)
         else
           for row, i in selected_rows[0]
             selected_rows.data().cell(row,14).data("Vrt Incoming").draw()
