@@ -840,6 +840,7 @@ button {
   left: 7px;}
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 .sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
+.remove-assignee-button {background-image: url(image_path('icon_unassign_grey.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -12233,6 +12234,10 @@ input[type="radio"].resolution_radio_button {
 
 #complaints-index_wrapper .datatable-top-tools {
   margin-bottom: 10px !important;
+}
+
+#webcat-index-toolbar .dropdown.open {
+  background-color: transparent !important;
 }
 
 

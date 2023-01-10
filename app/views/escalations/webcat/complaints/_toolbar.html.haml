@@ -57,6 +57,9 @@
       %span.toolbar-button-text Take
     %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
       %span.toolbar-button-text Return
+    %button#webcat_remove_assign.toolbar-button.remove-assignee-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span.toolbar-button-text
+        Remove Assignee
     %span.dropdown
       %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
