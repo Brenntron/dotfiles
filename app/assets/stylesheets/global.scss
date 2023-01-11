@@ -840,7 +840,7 @@ button {
   left: 7px;}
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 .sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
-.remove-assignee-button {background-image: url(image_path('icon_unassign_grey.svg'));}
+.remove-assignee-toolbar-button {background-image: url(image_path('icon_unassign_grey.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -1038,6 +1038,7 @@ button {
 .open-all:hover,
 .take-ticket-button:hover,
 .return-ticket-toolbar-button:hover,
+.remove-assignee-toolbar-button:hover,
 .collapse-all:hover,
 .sync-button:hover,
 .expand-all:hover,
@@ -1056,6 +1057,7 @@ button {
 .adjust-wlbl-button:focus,
 .export-button:focus,
 .take-ticket-toolbar-button:focus,
+.remove-assignee-toolbar-button:focus,
 .take-ticket-button:focus,
 .open-viewable:focus,
 .open-nonviewable:focus,
