@@ -14206,3 +14206,8 @@ input.wl-bl-list-inline {
     background-color: #ccc;
   }
 }
+
+.text-wrap {
+  max-width: 300px;
+  word-wrap: break-word;
+}

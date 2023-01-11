@@ -249,7 +249,11 @@ window.initialize_sdr_disputes_datatable = () ->
       }
       { data: 'source' }
       { data: 'platform' }
-      { data: 'dispute' }
+      {
+        data: 'dispute'
+        render: (data) ->
+          return "<div class='text-wrap'>#{data}</div>"
+      }
       #current_rep
       { data: null, visible: false, render: ( data )-> '' }
       #rules
