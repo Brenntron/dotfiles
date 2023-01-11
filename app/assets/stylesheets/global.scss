@@ -12761,6 +12761,27 @@ table > tbody > tr > td.no-padding {
   padding: 0 0 6px 0;
 }
 
+//For combo style toolbar buttons that are joined together
+.toolbar-concise-button-area {
+  //need to overwrite 'toolbar span' styles currently
+  padding-left: 0 !important;
+  float: left !important;
+}
+
+.toolbar-concise-button-area .concise-button {
+  border-radius: 0;
+}
+
+.toolbar-concise-button-area .concise-button-first {
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.toolbar-concise-button-area .concise-button-last {
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
 // tooltipster adjustments for pinned toolbar tooltips
 .pinned-toolbar-true .tooltipster-sidetip .tooltipster-box {
   padding: 4px 6px;
