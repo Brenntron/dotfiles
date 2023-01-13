@@ -12782,6 +12782,17 @@ table > tbody > tr > td.no-padding {
   border-bottom-right-radius: 2px;
 }
 
+//fixes for widescreen issues with concise button area
+@media screen and (min-width: 1951px) {
+  .toolbar-concise-button-area {
+    height: 27px;
+  }
+
+  #webcat_remove_assign {
+    margin-right: 3px;
+  }
+}
+
 // tooltipster adjustments for pinned toolbar tooltips
 .pinned-toolbar-true .tooltipster-sidetip .tooltipster-box {
   padding: 4px 6px;
