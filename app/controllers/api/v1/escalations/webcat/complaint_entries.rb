@@ -213,6 +213,35 @@ module API
             end
 
 
+            desc "Remove assignee from a group of complaint entry IDs (revert to vrtincoming)"
+            params do
+              requires :complaint_entry_ids, type: Array[Integer], desc: "analyst-console database id"
+            end
+            post "unassign_all" do
+              results = []
+              params[:complaint_entry_ids].each do |id|
+                entry = ComplaintEntry.find(id: id)
+                result = entry.unassign
+                results << {id: id, result: result}
+              end
+              
+              {:status => "success", :data => results}.to_json
+            end
+
+
+            desc "Reassign complaint entry to another user"
+            params do
+              requires :complaint_entry_id, type: Integer, desc: "analyst-console database id"
+              requires :user_id, type: Integer, desc: "analyst-console database id"
+            end
+            post "change_assignee" do
+              entry = ComplaintEntry.find(params[:complaint_entry_id])
+              user = User.find(params[:user_id])
+              result = entry.reassign(user)
+
+              {:status => "success", :data => {id: id, result: result}}.to_json
+            end
+
 
             desc 'Get the history'
             params do
