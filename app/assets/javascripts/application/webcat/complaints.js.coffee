@@ -931,7 +931,7 @@ window.webcat_remove_assignee = () ->
       entry_ids.push(selected_rows.data()[i].entry_id)
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/unassign_all'
       method: 'POST'
       headers: headers
       data: 'complaint_entry_ids': entry_ids
