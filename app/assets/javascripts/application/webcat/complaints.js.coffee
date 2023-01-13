@@ -958,10 +958,11 @@ window.webcat_change_assignee = () ->
     for row, i in selected_rows[0]
       entry_ids.push(selected_rows.data()[i].entry_id)
 
-    new_assignee = $('#index_target_assignee option:selected').val()
+    user_id = $('#index_target_assignee option:selected').val()
+
     data = {
       'complaint_entry_ids': entry_ids,
-      'new_assignee': new_assignee
+      'user_id': user_id
     }
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -978,7 +979,6 @@ window.webcat_change_assignee = () ->
           std_msg_error('Error Assigning Entries', json.error)
         else
           for row, i in selected_rows[0]
-            selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
             selected_rows.data().cell(selected_rows[0][i],4).data("ASSIGNED").draw()
     )
   else
