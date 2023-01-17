@@ -12787,10 +12787,15 @@ table > tbody > tr > td.no-padding {
   .toolbar-concise-button-area {
     height: 27px;
   }
+}
 
-  .concise-button-first {
-    margin-right: 3px;
-  }
+.darkened-button {
+  background-color: #c7c7c7;
+}
+
+//for buttons in concise groups that do not have label text on large screens
+.concise-button-no-text {
+  min-width: 24px;
 }
 
 // tooltipster adjustments for pinned toolbar tooltips
