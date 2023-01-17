@@ -28,7 +28,9 @@ window.onkeydown = (e) ->
     if (e.altKey && e.which == 84) #alt + t
       take_selected() #take ticket
     else if (e.altKey && e.which == 82) #alt + r
-      return_selected() #return ticket†
+      return_selected() #return ticket
+    else if (e.altKey && e.which == 85) #alt + u
+      webcat_remove_assignee() #remove assignee of ticket
     else if (e.altKey && e.shiftKey && e.which == 79) #alt + shift + o
       open_all() #open all
     else if (e.altKey && e.which == 79) #alt + o
