@@ -17,6 +17,9 @@ class Complaint < ApplicationRecord
     { label: 'My Closed Tickets', param: 'MY CLOSED COMPLAINTS', icon: 'icon-my-closed-tickets' },
     { label: 'Completed Tickets', param: 'COMPLETED', icon: 'icon-fixed-bugs' },
     { label: 'All Tickets', param: 'ALL', icon: 'icon-all-tickets' },
+    { label: 'New Talos Tickets', param: 'NEW TALOS', icon: 'icon-talos-white' },
+    { label: 'New WBNP Tickets', param: 'NEW WBNP', icon: 'icon-web-white' },
+    { label: 'New Internal Tickets', param: 'NEW INTERNAL', icon: 'icon-company-white' },
   ].freeze
 
   RESOLUTION_FIXED                      = 'FIXED'
@@ -546,7 +549,7 @@ For future web and email reputation requests, please open a web and email reputa
   end
 
   def self.get_latest_wbnp_complaints(skip_thread = false)
-    
+
     max_attempts = 3
 
     #status reason
@@ -1128,7 +1131,7 @@ For future web and email reputation requests, please open a web and email reputa
         uri_as_categorized = prefix
         internal_comment = "Complaint ID: #{new_complaint.id} | RESEARCH TOOL AUTO GENERATED CASE"
         resolution_comment = "Complaint ID: #{new_complaint.id} | RESEARCH TOOL AUTO GENERATED CASE"
-        
+
         new_complaint_entry.change_category(
             prefix,
             categories_to_submit,
