@@ -634,7 +634,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   def domain_name
     ascii_entry = SimpleIDN.to_ascii(self.sender_domain_entry)
-    parser = URI::Parser.new
+    parser = Addressable::URI
     url = parser.escape(ascii_entry)
     uri = parser.parse(parser.parse(ascii_entry).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
@@ -650,7 +650,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   def self.domain_name_of(entry)
     ascii_entry = SimpleIDN.to_ascii(entry)
-    parser = URI::Parser.new
+    parser = Addressable::URI
     url = parser.escape(ascii_entry)
     uri = parser.parse(parser.parse(ascii_entry).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
