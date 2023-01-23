@@ -9666,7 +9666,7 @@ td.text-center span {
   font-weight: bold;
 }
 
-.ticket-age-over12hr{
+.ticket-age-over12hr, .ticket-age-over18hr {
   color: $second-section-color;
   font-weight: bold;
 }
@@ -13488,7 +13488,7 @@ table > tbody > tr > td.no-padding {
 }
 
 // ensure text doesn't break/wrap in data table
-.ticket-age-over12hr {
+.ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
 }
 

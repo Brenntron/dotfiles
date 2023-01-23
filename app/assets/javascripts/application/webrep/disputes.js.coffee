@@ -134,7 +134,7 @@ window.advanced_webrep_index_table = () ->
     if form.find('input#submission-type-ew-cb').is(':checked')
       submission_types.push('ew')
     data['submission_type'] = submission_types
-  
+
 
   if dispute_save_search_format.test(data.search_name) == true
     std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
@@ -1050,24 +1050,22 @@ $ ->
               dispute_latency = data
             if dispute_duration.includes('hour')
               hours = parseInt(dispute_duration.replace(/[^0-9]/g, ''))
-              if hours <= 3
+              if hours <= 18
                 dispute_latency = data
               else
-                dispute_latency = '<span class="ticket-age-over3hr">' + data + '</span>'
-              if hours > 12
-                dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+                dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             else
-              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             if dispute_duration.includes('day')
               day = parseInt(data.replace(/[^0-9]/g, ''))
               if day >= 1
-                dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+                dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             if dispute_duration.includes('months')
               month = parseInt(data.replace(/[^0-9]/g, ''))
-              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             if dispute_duration.includes('year')
               year = parseInt(data.replace(/[^0-9]/g, ''))
-              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             dispute_latency
           else
             data
@@ -1361,7 +1359,7 @@ $ ->
     )
 
   $('#webrep-advanced-search-button').click ->
-    # if we have already loaded the advanced search, with all options no need to load it again 
+    # if we have already loaded the advanced search, with all options no need to load it again
     if $('#company-list').find('option').size() == 0
       std_msg_ajax(
         method: 'GET'
@@ -2675,12 +2673,12 @@ window.build_webrep_data = () ->
       search_type : 'standard'
       search_name : urlParams.get('f')
     }
-  
+
   else if localStorage.webRepFilters
     data = JSON.parse(localStorage.webRepFilters)
-   
 
-  
+
+
   format_webrep_header(data)
 
   data
@@ -2696,7 +2694,7 @@ window.format_webrep_header = (data) ->
 
     { search_type, search_name } = data
     if search_type == 'standard'
-      search_text = 
+      search_text =
         if search_name == 'my_disputes'
           'My Tickets'
         else if search_name == 'team_disputes'
@@ -2738,11 +2736,11 @@ window.format_webrep_header = (data) ->
       for conditionName, condition of search_conditions
         if condition == '' || ['search', 'search_name', 'search_type'].includes(conditionName)
           continue
-        
+
         if conditionName == 'customer'
           for customer_type, customer_value of search_conditions[conditionName]
             if customer_value == ''
-             continue 
+             continue
             if customer_type == 'name'
               selectedFilters.push({name: 'Contact Name', value: customer_value})
             if customer_type == 'email'
@@ -2752,14 +2750,14 @@ window.format_webrep_header = (data) ->
         else if conditionName == 'dispute_entries'
           for key, value of search_conditions[conditionName]
             if value  == ''
-             continue 
+             continue
             if key == 'ip_or_uri'
               selectedFilters.push({name: 'Dispute (URL/IP/Domain)', value: value})
             if key == 'suggested_disposition'
               selectedFilters.push({name: 'Suggested Disposition', value: value})
         else if conditionName == 'submission_type'
           selectedFilters.push({name: 'Submission Type', value: search_conditions[conditionName].map((e) => e.toUpperCase()).join(', ')})
-        else if condition_types[conditionName] 
+        else if condition_types[conditionName]
           selectedFilters.push({name: condition_types[conditionName], value: search_conditions[conditionName]})
         container = $('#dispute-advaced-search-selected-filters')
       for item in selectedFilters
