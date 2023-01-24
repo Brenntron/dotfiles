@@ -7450,7 +7450,7 @@ table.dispute-entry-table tbody tr.selected {
   margin-left: 10px;
 }
 
-.dispute-owner-buttons-wrapper .dropdown.open {
+.dispute-owner-buttons-wrapper .dropdown.open, .webrep-change-assignee-wrapper .dropdown.open{
   background-color: transparent !important;
 }
 
@@ -12822,6 +12822,31 @@ table > tbody > tr > td.no-padding {
   .toolbar-concise-button-area {
     height: 27px;
   }
+}
+
+.webrep-change-assignee-wrapper .dropdown-menu {
+  border-radius: 0 4px 4px 4px;
+  border: none;
+  background-color: #6dbcdb;
+  min-width: 200px;
+  top: 29px;
+  left: -2px;
+}
+
+.webrep-change-assignee-wrapper .toolbar label {
+  display: block !important;
+}
+
+.webrep-change-assignee-wrapper .dropdown-menu h3 {
+  color: $content-bg-color;
+  padding: 0 10px;
+  font-weight: 400;
+  font-size: 9pt;
+  margin: 8px 0 8px 0;
+}
+
+.webrep-change-assignee-wrapper .inline-tool-content-wrapper {
+  padding: 4px 10px 20px 4px;
 }
 
 .darkened-button {
