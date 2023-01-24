@@ -25,6 +25,14 @@ $ ->
   if $('body').hasClass("escalations--webcat--complaints-controller")
     $('#nav-banner').addClass('fixed-nav')
 
+    #pin webcat toolbar under navigation bar, add padding
+    toolbar = $('#webcat-index-toolbar')
+    $('#nav-banner').append(toolbar)
+    $('#page-content-wrapper').css('padding-top','60px')
+
+    #align tooltips under toolbar
+    $('body').addClass('pinned-toolbar-true')
+
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
     { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
