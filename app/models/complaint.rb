@@ -20,9 +20,6 @@ class Complaint < ApplicationRecord
     { label: 'My Closed Tickets', param: 'MY CLOSED COMPLAINTS', icon: 'icon-my-closed-tickets' },
     { label: 'Completed Tickets', param: 'COMPLETED', icon: 'icon-fixed-bugs' },
     { label: 'All Tickets', param: 'ALL', icon: 'icon-all-tickets' },
-    { label: 'New Talos Tickets', param: 'NEW TALOS', icon: 'icon-talos-white' },
-    { label: 'New WBNP Tickets', param: 'NEW WBNP', icon: 'icon-web-white' },
-    { label: 'New Internal Tickets', param: 'NEW INTERNAL', icon: 'icon-company-white' },
   ].freeze
 
   RESOLUTION_FIXED                      = 'FIXED'
