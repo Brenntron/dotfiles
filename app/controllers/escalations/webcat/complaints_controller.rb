@@ -15,6 +15,7 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
   end
 
   def clusters
+    render layout: "escalations/webcat/clusters"
   end
 
   def show_multiple

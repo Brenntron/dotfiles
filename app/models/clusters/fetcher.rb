@@ -1,5 +1,5 @@
 class Clusters::Fetcher
-  attr_accessor :filter, :regex, :user
+  attr_accessor :filter, :regex, :user, :save_regex
 
   PLATFORM_TO_DATA_PROVIDER = {
     Clusters::Wbnp::DataFetcher::DATA_PATFORM => Clusters::Wbnp::DataFetcher,
@@ -13,9 +13,10 @@ class Clusters::Fetcher
   # and they are not shown in the table because of sorting by global_volume field
   CLUSTERS_PAGE_LIMIT = 10000
 
-  def initialize(filter, regex, user)
+  def initialize(filter, regex, save_regex, user)
     @filter = filter
     @regex = regex
+    @save_regex = save_regex
     @user = user
   end
 
@@ -24,6 +25,7 @@ class Clusters::Fetcher
     clusters_data = populate_3rd_party_clusters_data(clusters_data)
     clusters_data = nest_duplicates(clusters_data)
     filtered_clusters = Clusters::Filter.new(clusters_data, filter, user).filter
+
     filtered_clusters.sort_by { |cluster| cluster[:global_volume] }.reverse.first(CLUSTERS_PAGE_LIMIT)
   end
 

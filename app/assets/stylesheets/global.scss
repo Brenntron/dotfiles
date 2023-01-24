@@ -9468,7 +9468,6 @@ td.text-center span {
     min-width: 110px;
     background-size: 17px;
   }
-
 }
 
 .copycat-tool-footer .cluster-button{
@@ -9482,6 +9481,42 @@ td.text-center span {
     width: unset;
     &:hover {
       background-color: darken($nav-toolbar-color, 10%)!important;
+    }
+  }
+}
+
+#clusters-nav-regex-wrapper {
+  .input-group.search-group {
+    display: inline-block;
+    margin-right: 0;
+    top: -4px;
+    width: 60%;
+
+    @media (min-width: 1000px) {
+      width: 70%;
+    }
+
+    @media (min-width: 1400px) {
+      width: 80%;
+    }
+  }
+
+  .clusters-nav-regex-container {
+    display: inline-block;
+    height: 15px;
+    margin: 15px 0 0 0;
+    width: 80px;
+
+    input {
+      float: right;
+      margin: 0;
+    }
+
+    label {
+      float: left;
+      font-size: 11px;
+      font-weight: 400;
+      margin: 0 5px 0 0;
     }
   }
 }
@@ -9667,7 +9702,7 @@ td.text-center span {
   font-weight: bold;
 }
 
-.ticket-age-over12hr{
+.ticket-age-over12hr, .ticket-age-over18hr {
   color: $second-section-color;
   font-weight: bold;
 }
@@ -13495,7 +13530,7 @@ table > tbody > tr > td.no-padding {
 }
 
 // ensure text doesn't break/wrap in data table
-.ticket-age-over12hr {
+.ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
 }
 
@@ -14212,4 +14247,9 @@ input.wl-bl-list-inline {
   .btn.submit-rulehit-resolution:hover {
     background-color: #ccc;
   }
+}
+
+.text-wrap {
+  max-width: 300px;
+  word-wrap: break-word;
 }
