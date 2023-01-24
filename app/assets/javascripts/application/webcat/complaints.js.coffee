@@ -2336,21 +2336,11 @@ $ ->
       $('#fetch').hide()
       $('#complaints-nav-search-wrapper').hide()
       $('#new-complaint-nav-wrapper').hide()
-      $('#filter-clusters-nav').hide()
-      $('#clusters-nav-regex-wrapper').hide()
     else
       $('#filter-complaints').show()
       $('#fetch').show()
       $('#complaints-nav-search-wrapper').show()
       $('#new-complaint-nav-wrapper').show()
-      $('#filter-clusters-nav').hide()
-      $('#clusters-nav-regex-wrapper').hide()
-
-    if window.location.pathname == '/escalations/webcat/clusters'
-      $('#filter-complaints-nav').hide()
-      $('#filter-clusters-nav').show()
-      $('#clusters-nav-regex-wrapper').show()
-
 
   # If a stupidly long email address is returned it will wrap
   # rather than pushing the column into the column beside it

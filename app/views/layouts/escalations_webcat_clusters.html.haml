@@ -1,34 +1,18 @@
-- content_for(:title) do
-  Escalations WebCat - Analyst Console
-
 - content_for(:nav_banner) do
   .form-group
     %input{type:'hidden', name: 'token', value: "#{current_user.authentication_token}"}
     %input{type:'hidden', name: 'xml_token', value: "#{xml_token}"}
     %input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
 
-  .nav-tool-blocks.nav-page-button-wrapper.col-xs-4.col-sm-4.col-md-3.col-lg-2
-    %a#complaints.nav-page-button{href: '/escalations/webcat/complaints', class: ("active" if current_page?('/escalations/webcat/complaints'))}
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-4.col-md-3.col-lg-2
+    %a#complaints.nav-page-button{href: '/escalations/webcat/complaints'}
       %span.nav-toolbar-icon-large.icon-queue
-
-    %a#rules.nav-page-button{href: '/escalations/webcat/clusters'}
+    %a#rules.nav-page-button{href: '/escalations/webcat/clusters', class: "active"}
       %span.nav-toolbar-icon-large.icon-categories
-
-    %a#reports.nav-page-button{href: '/escalations/webcat/reports', class: ("active" if current_page?('/escalations/webcat/reports'))}
+    %a#reports.nav-page-button{href: '/escalations/webcat/reports'}
       %span.nav-toolbar-icon-large.icon-reports-white
-    %a#reports.nav-page-button{href: '/escalations/webcat/research', class: ("active" if current_page?('/escalations/webcat/research'))}
+    %a#reports.nav-page-button{href: '/escalations/webcat/research'}
       %span.nav-toolbar-icon-large.icon-research
-
-
-  .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown#new-complaint-nav-wrapper
-    %a{href: '#', class: 'dropdown-toggle', id: 'new-complaint', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-      %span{class: 'nav-toolbar-icon icon-new-white'}
-      New
-    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-complaint'}
-      %h3.nav-tool-dropdown-header.inverse
-        New Complaint
-      .nav-tool-content-wrapper#new-complaint-wrapper
-        = render 'escalations/webcat/complaints/new'
 
   .nav-tool-blocks.col-xs-3.col-sm-2.col-lg-2.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'categorize-urls', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -145,22 +129,28 @@
                 %span.loader-msg Loading data...
               %button.primary#cat_multiple_urls{:type => "button", :onclick=>"multiple_url_categorization()"} Categorize URLs
 
-
-  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown#filter-complaints-nav
-    %a{href: '#', class: 'dropdown-toggle', id: 'filter-complaints', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+  .nav-tool-blocks.col-xs-3.col-sm-1.col-lg-1.dropdown#filter-clusters-nav
+    %a{href: '#', class: 'dropdown-toggle', id: 'filter-clusters', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
-    .dropdown-menu.nav-tools-dropdown#filter-dropdown.webcat-filter-dropdown{'aria-labelledby': 'filter-cases'}
+    .dropdown-menu.nav-tools-dropdown.webcat-filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
-        - Complaint::FILTER_VIEW_OPTIONS.each do |filter|
-          - if filter[:label] == 'Manager Queue' && current_user.is_webcat_manager? || filter[:label] != 'Manager Queue'
-            %li{class: ('selected' if params[:f] == filter[:param])}
-              %a{href: "?f=#{filter[:param]}"}
-                %span.nav-dropdown-icon{class: filter[:icon]}
-                = filter[:label]
-              %span.nav-dropdown-icon.favorite-search-icon
-        %li.favorite-instruction
-          Star filter to set as default
+        %li{class: ("selected" if params[:f] == "my")}
+          %a{href: '?f=my'}
+            %span.nav-dropdown-icon.icon-my-bugs
+            My Clusters
+        %li{class: ("selected" if params[:f] == "unassigned")}
+          %a{href: '?f=unassigned'}
+            %span.nav-dropdown-icon.icon-open-bugs
+            Unassigned Clusters
+        %li{class: ("selected" if params[:f] == "pending")}
+          %a{href: '?f=pending'}
+            %span.nav-dropdown-icon.icon-pending-bugs
+            Waiting For Review
+        %li{class: ("selected" if params[:f] == "all")}
+          %a{href: '?f=all'}
+            %span.nav-dropdown-icon.icon-recently-viewed
+            All Clusters
 
       #saved-searches-wrapper.webcat-named-search-list.nav-tool-content-wrapper
         %h3.nav-tool-dropdown-header
@@ -168,38 +158,29 @@
           My Saved Searches
         %table{class: 'table', id: 'saved-search'}
           %tbody#saved-search-tbody
-            - current_user.named_searches.where_project_type('Complaint').order(:name).each do |named_search|
+            - current_user.named_searches.where_project_type('webcat_clusters_regex').order(:name).each do |named_search|
               %tr{id: "saved_search_#{named_search.id}"}
                 %td
-                  %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_webcat_named_search('#{named_search.name}');", title: named_search.name, :'data-search_conditions' => search_condition_json(named_search)}
+                  %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_webcat_clusters_named_search(this);", title: named_search.name, name: named_search.name, :'data-search_conditions' => search_condition_json(named_search)}
                     = named_search.name
-                  %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
+                  %a.delete-search{title: 'Delete Saved Search', name: named_search.name, onclick: "delete_clusters_named_search(this);"}
                     = image_tag('icon_cancel_grey.svg')
-                  %span.nav-dropdown-icon.favorite-search-icon
 
-  .nav-tool-blocks.col-xs-2.col-sm-3.col-lg-3.search-wrapper#complaints-nav-search-wrapper
-    .input-group.search-group#web-cat-search
-      = text_field_tag 'general_search', "#{}", class: 'search-box', placeholder: 'Search'
-
-      %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-        Advanced
-      .dropdown-menu.nav-tools-dropdown#advanced-search-dropdown{'aria-labelledby': 'advanced-search-button'}
-        %h3.nav-tool-dropdown-header.inverse
-          Advanced Search
-        #advanced-search-wrapper.nav-tool-content-wrapper
-          = render 'escalations/webcat/complaints/advanced_search'
+  .nav-tool-blocks.col-xs-3.col-sm-5.col-lg-4.search-wrapper.row#clusters-nav-regex-wrapper
+    .input-group.search-group
+      %input#cluster_filter_field.text_field.search-box{placeholder: 'Filter clusters via regex', autofocus: 'true'}
+      %button#apply-regex-btn{onclick: 'apply_filter_to_table()'} Apply Regex
+    .clusters-nav-regex-container
+      %label
+        Save Regex
+      %input#saveRegex{type: 'checkbox'}
 
   - if current_user
-    #login-div.nav-tool-block.col-sm-2.col-lg-3
+    #login-div.nav-tool-block.col-md-1.col-lg-3
       = bugzilla_rest_login_icon(bugzilla_rest_session)
       %span.dropdown
         %span#user-settings-dropdown-button.dropdown-toggle.esc-tooltipped{'title': 'Login to Bugzilla', 'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
         #user-settings-dropdown.dropdown-menu{'aria-labelledby': 'user-settings-dropdown-button'}
-          -#    If user is logged into Bugzilla
-          -#.message-text Log out of Bugzilla
-          -# Logout button
-
-          -#-#    Else
           .message-text Log into Bugzilla
           %form#top_banner_bugzilla_login_form
             .form-group.text-left
@@ -216,7 +197,5 @@
 
       %a.nav-username{href: "/escalations/users/#{current_user[:id]}"}
         = current_user[:display_name]
-
-    -##username= current_user.cvs_username
 
 = render template: "layouts/rocket"
