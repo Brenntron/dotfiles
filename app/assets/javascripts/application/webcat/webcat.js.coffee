@@ -1071,6 +1071,7 @@ window.find_saved_search_by_name = (name) ->
   return saved_search
 $ ->
 
+#  Webcat toolbar and wbnp status report tooltips need slight adjustment
   $('.esc-tooltipped-webcat-toolbar').tooltipster
     theme: [
       'tooltipster-borderless'
@@ -1078,8 +1079,9 @@ $ ->
       'tooltipster-borderless-comment'
     ]
     debug: false
-    maxWidth: 600
+    maxWidth: 500
     position: 'bottom'
+    distance: [-8, 0]
 
   $('.esc-tooltipped-webcat-toolbar:disabled').tooltipster
     disable: true
