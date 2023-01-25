@@ -940,10 +940,6 @@ window.webcat_remove_assignee = () ->
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Removing Assignees', json.error)
-        else
-          for row, i in selected_rows[0]
-            selected_rows.data().cell(row,14).data("Vrt Incoming").draw()
-            selected_rows.data().cell(row,4).data("NEW").draw()
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -977,9 +973,7 @@ window.webcat_change_assignee = () ->
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Assigning Entries', json.error)
-        else
-          for row, i in selected_rows[0]
-            selected_rows.data().cell(selected_rows[0][i],4).data("ASSIGNED").draw()
+
     )
   else
     std_msg_error('no rows selected', ['Please select at least one row.'])
