@@ -940,6 +940,9 @@ window.webcat_remove_assignee = () ->
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Removing Assignees', json.error)
+        else
+          #reload table data
+          $('#complaints-index').DataTable().draw()
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -973,6 +976,9 @@ window.webcat_change_assignee = () ->
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Assigning Entries', json.error)
+        else
+          #reload table data
+          $('#complaints-index').DataTable().draw()
 
     )
   else
