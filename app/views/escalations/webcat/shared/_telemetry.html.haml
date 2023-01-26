@@ -8,46 +8,52 @@
   .main-metrics
     .row
       .metrics-col
-        %span.metric-header TALOS:
+        %span.metric-header#allTalosTickets
+          %a{href: '?=ALL_TALOS'} TALOS:
         .number-container
-          %span#ti-new-count.metric-number= @ti_new_count
-          %span.metric-label New
+          %a.metric-new#newTalosTickets{href: '?=NEW_TALOS'}
+            %span#ti-new-count.metric-number= @ti_new_count
+            %span.metric-label New
           %span.metric-overdue
             (
             %span#ti-overdue-count.metric-number= @ti_overdue_count
             Overdue)
-          %span.metric-assigned
+          %span.metric-assigned#assignedTalosTickets{href: '?=TALOS_ASSIGNED'}
             %span#ti-assigned-count.metric-number= @ti_assigned_count
             Assigned
 
       .metrics-col
-        %span.metric-header WBNP:
+        %span.metric-header#allWbnpTickets
+          %a{href: '?=ALL_WBNP'} WBNP:
         .number-container
-          %span#wbnp-new-count.metric-number= @wbnp_new_count
-          %span.metric-label New
+          %a.metric-new#newWbnpTickets{href: '?=NEW_WBNP'}
+            %span#wbnp-new-count.metric-number= @wbnp_new_count
+            %span.metric-label New
           %span#wbnp-overdue-count.metric-overdue
             (
             %span.metric-number= @wbnp_overdue_count
             Overdue)
-          %span.metric-assigned
+          %a.metric-assigned#assignedTalosTickets{href: '?=WBNP_ASSIGNED'}
             %span#wbnp-assigned-count.metric-number= @wbnp_assigned_count
             Assigned
 
       .metrics-col
-        %span.metric-header INTERNAL:
+        %span.metric-header#allIntTickets
+          %a{href: '?=ALL_INTERNAL'}INTERNAL:
         .number-container
-          %span#int-new-count.metric-number= @int_new_count
-          %span.metric-label New
+          %a.metric-new#newIntTickets{href: '?=NEW_INTERNAL'}
+            %span#int-new-count.metric-number= @int_new_count
+            %span.metric-label New
           %span.metric-overdue
             (
             %span#int-overdue-count.metric-number= @int_overdue_count
             Overdue)
-          %span.metric-assigned
+          %a.metric-assigned#assignedIntTickets{href: '?=INTERNAL_ASSIGNED'}
             %span#int-assigned-count.metric-number= @int_assigned_count
             Assigned
 
       .metrics-col
-        %span.metric-header PENDING:
+        %span.metric-header#allPendingTickets PENDING:
         %span#pending-new-count.metric-number= @pending_new_count
         %span.metric-overdue
           (

@@ -711,10 +711,20 @@ class ComplaintEntry < ApplicationRecord
         closed.where(user_id: user.id)
       when "MANAGER QUEUE"
         joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
+      when "TALOS"
+        where(complaint_id: Complaint.from_ti)
       when "NEW TALOS"
         where(status: 'NEW', complaint_id: Complaint.from_ti)
+      when "TALOS ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_ti)
+      when "ALL WBNP"
+        where(complaint_id: Complaint.from_wbnp)
       when "NEW WBNP"
         where(status: 'NEW', complaint_id: Complaint.from_wbnp)
+      when "WBNP_ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_wbnp)
+      when "ALL INTERNAL"
+        where(complaint_id: Complaint.from_int)
       when "NEW INTERNAL"
         where(status: 'NEW', complaint_id: Complaint.from_int)
       when "ALL"
@@ -908,7 +918,7 @@ class ComplaintEntry < ApplicationRecord
 
     if complaint_fields.present?
       relation = relation.includes(:complaint).where(complaints: complaint_fields)
-    end 
+    end
     # Save this search as a named search
     if present_params.present? && search_name.present?
       Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')
