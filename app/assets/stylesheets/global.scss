@@ -13254,7 +13254,7 @@ table > tbody > tr > td.no-padding {
   }
   .metrics-col {
     padding: 4px 4px 4px 22px;
-    max-width: 380px;
+    max-width: 400px;
     display: inline-block;
     vertical-align: middle;
   }
@@ -13297,6 +13297,7 @@ table > tbody > tr > td.no-padding {
   }
   a {
       color: #fff;
+      text-decoration: underline;
   }
   .wbnp-area {
     float: right;

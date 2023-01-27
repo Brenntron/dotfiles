@@ -13,10 +13,9 @@
         .number-container
           %a#ti-new-count.metric-number.metric-new{href: '?f=NEW%20TALOS'}
             = "#{@ti_new_count} New"
-          %span.metric-overdue
-            (
-            %span#ti-overdue-count.metric-number= @ti_overdue_count
-            Overdue)
+          %a.metric-overdue{href: '?f=TALOS%20OVERDUE'}
+            %span#ti-overdue-count.metric-number
+              = "(#{@ti_overdue_count} Overdue)"
           %a#ti-assigned-count.metric-number.metric-assigned{href: '?f=TALOS%20ASSIGNED'}
             = "#{@ti_assigned_count} Assigned"
 
@@ -26,10 +25,9 @@
         .number-container
           %a#wbnp-new-count.metric-number.metric-new{href: '?f=NEW%20WBNP'}
             = "#{@wbnp_new_count} New"
-          %span#wbnp-overdue-count.metric-overdue
-            (
-            %span.metric-number= @wbnp_overdue_count
-            Overdue)
+          %a#wbnp-overdue-count.metric-overdue{href: '?f=WBNP%20OVERDUE'}
+            %span.metric-number
+              = "(#{@wbnp_overdue_count} Overdue)"
           %a#wbnp-assigned-count.metric-number.metric-assigned{href: '?f=WBNP%20ASSIGNED'}
             = "#{@wbnp_assigned_count} Assigned"
 
@@ -39,20 +37,18 @@
         .number-container
           %a#int-new-count.metric-number.metric-new{href: '?f=NEW%20INTERNAL'}
             = "#{@int_new_count} New"
-          %span.metric-overdue
-            (
-            %span#int-overdue-count.metric-number= @int_overdue_count
-            Overdue)
+          %a.metric-overdue{href: '?f=INTERNAL%20OVERDUE'}
+            %span#int-overdue-count.metric-number
+              = "(#{@int_overdue_count} Overdue)"
           %a#int-assigned-count.metric-assigned.metric-number{href: '?f=INTERNAL%20ASSIGNED'}
             = "#{@int_assigned_count} Assigned"
 
       .metrics-col
-        %span.metric-header#allPendingTickets PENDING:
-        %span#pending-new-count.metric-number= @pending_new_count
-        %span.metric-overdue
-          (
-          %span#pending-overdue-count.metric-number= @pending_overdue_count
-          Overdue)
+        %a.metric-header#allPendingTickets{href: '?f=PENDING'} PENDING:
+        %a#pending-new-count.metric-number{href: '?f=PENDING'}= @pending_new_count
+        %a.metric-overdue{href: '?f=PENDING%20OVERDUE'}
+          %span#pending-overdue-count.metric-number
+            = "(#{@pending_overdue_count} Overdue)"
 
       // right column
       .metrics-col.wbnp-area
