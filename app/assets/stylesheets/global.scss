@@ -840,6 +840,7 @@ button {
   left: 7px;}
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 .sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
+.remove-assignee-toolbar-button {background-image: url(image_path('icon_unassign_grey.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -1037,6 +1038,7 @@ button {
 .open-all:hover,
 .take-ticket-button:hover,
 .return-ticket-toolbar-button:hover,
+.remove-assignee-toolbar-button:hover,
 .collapse-all:hover,
 .sync-button:hover,
 .expand-all:hover,
@@ -1055,6 +1057,7 @@ button {
 .adjust-wlbl-button:focus,
 .export-button:focus,
 .take-ticket-toolbar-button:focus,
+.remove-assignee-toolbar-button:focus,
 .take-ticket-button:focus,
 .open-viewable:focus,
 .open-nonviewable:focus,
@@ -7454,7 +7457,7 @@ table.dispute-entry-table tbody tr.selected {
   margin-left: 10px;
 }
 
-.dispute-owner-buttons-wrapper .dropdown.open {
+.dispute-owner-buttons-wrapper .dropdown.open, .webrep-change-assignee-wrapper .dropdown.open{
   background-color: transparent !important;
 }
 
@@ -12277,6 +12280,10 @@ input[type="radio"].resolution_radio_button {
   margin-bottom: 10px !important;
 }
 
+#webcat-index-toolbar .dropdown.open {
+  background-color: transparent !important;
+}
+
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
 @media screen and (max-width: 1600px) and (min-width: 1401px) {
@@ -12796,14 +12803,71 @@ table > tbody > tr > td.no-padding {
   padding: 0 0 6px 0;
 }
 
+//For combo style toolbar buttons that are joined together
+.toolbar-concise-button-area {
+  //need to overwrite 'toolbar span' styles currently
+  padding-left: 0 !important;
+  float: left !important;
+}
+
+.toolbar-concise-button-area .concise-button {
+  border-radius: 0;
+}
+
+.toolbar-concise-button-area .concise-button-first {
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.toolbar-concise-button-area .concise-button-last {
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+//fixes for widescreen issues with concise button area
+@media screen and (min-width: 1951px) {
+  .toolbar-concise-button-area {
+    height: 27px;
+  }
+}
+
+.webrep-change-assignee-wrapper .dropdown-menu {
+  border-radius: 0 4px 4px 4px;
+  border: none;
+  background-color: #6dbcdb;
+  min-width: 200px;
+  top: 29px;
+  left: -2px;
+}
+
+.webrep-change-assignee-wrapper .toolbar label {
+  display: block !important;
+}
+
+.webrep-change-assignee-wrapper .dropdown-menu h3 {
+  color: $content-bg-color;
+  padding: 0 10px;
+  font-weight: 400;
+  font-size: 9pt;
+  margin: 8px 0 8px 0;
+}
+
+.webrep-change-assignee-wrapper .inline-tool-content-wrapper {
+  padding: 4px 10px 20px 4px;
+}
+
+.darkened-button {
+  background-color: #c7c7c7;
+}
+
+//for buttons in concise groups that do not have label text on large screens
+.concise-button-no-text {
+  min-width: 24px;
+}
+
 // tooltipster adjustments for pinned toolbar tooltips
 .pinned-toolbar-true .tooltipster-sidetip .tooltipster-box {
   padding: 4px 6px;
-}
-
-// one-off override
-.pinned-toolbar-true .tooltipster-sidetip {
-  top: 85px !important;
 }
 
 // correction to reduce extraneous vertical space
@@ -13670,6 +13734,9 @@ table > tbody > tr > td.no-padding {
   }
 }
 
+.escalations--webcat--complaints-controller .tooltipster-box {
+  margin-top: 7px !important;
+}
 
 .inline-edit-ip-button {
   background-image: url(image_path('icon_edit_white.svg'));

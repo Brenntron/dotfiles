@@ -3,7 +3,7 @@
     %label.toolbar-section-label
       View
     %span.dropdown
-      %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Show/Hide Columns
       .dropdown-menu.toolbar-dropdown#webcat-index-table-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
@@ -46,19 +46,37 @@
   %div
     %label.toolbar-section-label
       Open in Tab
-    %button.toolbar-button.open-selected.esc-tooltipped.toolbar-button-spacer{onclick: 'open_selected()', type: 'button', title: 'Open Selected (alt + o)'}
+    %button.toolbar-button.open-selected.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'open_selected()', type: 'button', title: 'Open Selected (alt + o)'}
       %span.toolbar-button-text Selected
-    %button.toolbar-button.open-all.esc-tooltipped{onclick: 'open_all()', type: 'button', title: 'Open All (shift + alt + o)'}
+    %button.toolbar-button.open-all.esc-tooltipped-webcat-toolbar{onclick: 'open_all()', type: 'button', title: 'Open All (shift + alt + o)'}
       %span.toolbar-button-text.text-button-all All
   %div
     %label.toolbar-section-label
       Edit
-    %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped.toolbar-button-spacer{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)'}
+    %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)'}
       %span.toolbar-button-text Take
-    %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
+    %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
       %span.toolbar-button-text Return
+    %span.toolbar-concise-button-area.webrep-change-assignee-wrapper
+      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span.dropdown
+        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.concise-button.concise-button-last.darkened-button{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text
+            Change Assignee
+        .dropdown-menu.toolbar-dropdown{'aria-labelledby': 'index_change_assign'}
+          %h3 Change Assignee
+          .inline-tool-content-wrapper
+            .toolbar
+              %div
+                %label.toolbar-section-label Assignee
+                %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
+                  - User.joins(roles: :org_subset).where(org_subsets: { name: 'webcat' }).distinct.order(:cvs_username).each do |u|
+                    %option{id: u.id, value: u.id, label: u.cvs_username}
+                      = u.cvs_username
+              %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'webcat_change_assignee();'}
+                Assign
     %span.dropdown
-      %button#convert-ticket-button.toolbar-button.convert-ticket-button.esc-tooltipped.dropdown-toggle{type: 'button', title: 'Convert ticket to web reputation ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled', onclick: 'prep_complaint_to_convert();'}
+      %button#convert-ticket-button.toolbar-button.convert-ticket-button.esc-tooltipped-webcat-toolbar.dropdown-toggle{type: 'button', title: 'Convert ticket to web reputation ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled', onclick: 'prep_complaint_to_convert();'}
         %span.toolbar-button-text Convert to Webrep
       .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{'aria-labelledby': 'convert-ticket-button'}
         .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
@@ -105,33 +123,36 @@
             %button#convert-to-webrep.primary.dropdown-submit-button{type: 'button', disabled: 'disabled'}
               Convert Ticket
 
+
+
+
   %div
     %label.toolbar-section-label
       Collapse
-    %button.toolbar-button.collapse-button.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_selected()', type: 'button', title: 'Collapse Selected (alt + f)'}
+    %button.toolbar-button.collapse-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'collapse_selected()', type: 'button', title: 'Collapse Selected (alt + f)'}
       %span.toolbar-button-text Selected
-    %button.toolbar-button.collapse-all.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_all()', type: 'button', title: 'Collapse All (alt + h)'}
+    %button.toolbar-button.collapse-all.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'collapse_all()', type: 'button', title: 'Collapse All (alt + h)'}
       %span.toolbar-button-text.text-button-all All
   %div
     %label.toolbar-section-label
       Expand
-    %button.toolbar-button.expand-row-button.esc-tooltipped.toolbar-button-spacer{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected (alt + d)'}
+    %button.toolbar-button.expand-row-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected (alt + d)'}
       %span.toolbar-button-text Selected
-    %button.toolbar-button.expand-all.esc-tooltipped{type: 'button', title: 'Expand All (alt + g)'}
+    %button.toolbar-button.expand-all.esc-tooltipped-webcat-toolbar{type: 'button', title: 'Expand All (alt + g)'}
       %span.toolbar-button-text.text-button-all All
   %div
     %label.toolbar-section-label Fetch Data
-    %button.toolbar-button.sync-button#fetch.esc-tooltipped.toolbar-button-spacer{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
+    %button.toolbar-button.sync-button#fetch.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
       %span.toolbar-button-text Complaints
-    %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
+    %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped-webcat-toolbar{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
       %span.toolbar-button-text WBNP Data
   %div
     %label.toolbar-section-label Bulk
     - if params[:f] != "REVIEW"
-      %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped.toolbar-button-spacer{ onclick: 'master_submit();', title: 'Submit Changes'}
+      %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'master_submit();', title: 'Submit Changes'}
         %span.toolbar-button-text Submit Changes
       %span.dropdown
-      %button#index_update_resolution.toolbar-button.resolution-submit-button.dropdown-toggle.esc-tooltipped{title: 'Submit Resolution', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_update_resolution.toolbar-button.resolution-submit-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Submit Resolution', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Submit Resolution
       .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_update_resolution'}
@@ -147,7 +168,7 @@
           %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
             Update
     - else
-      %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
+      %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
         %span.toolbar-button-text Confirm Review
 
   %div.toolbar-checkbox-wrapper

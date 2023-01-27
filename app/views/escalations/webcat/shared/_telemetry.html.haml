@@ -59,7 +59,7 @@
         .metric-header
           %span.wbnp-loading-spinner.sync-button-white.sync_rotate
           WBNP Report Status:
-        %a#wbnp-report-status-link.esc-tooltipped{'data-tooltip-content':'#tooltip-wbnp-content'}
+        %a#wbnp-report-status-link.esc-tooltipped-webcat-toolbar{'data-tooltip-content':'#tooltip-wbnp-content'}
           .wbnp-report-status Checking...
         - if current_user.is_webcat_manager?
           %button#wbnp-report-button.wbnp-full-report.icon-reports-white

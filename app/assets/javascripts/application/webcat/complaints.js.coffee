@@ -923,6 +923,67 @@ window.return_selected = ()->
   else
     std_msg_error('no rows selected', ['Please select at least one row.'])
 
+window.webcat_remove_assignee = () ->
+  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  if selected_rows[0].length > 0
+    entry_ids = []
+    for row, i in selected_rows[0]
+      entry_ids.push(selected_rows.data()[i].entry_id)
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/unassign_all'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': entry_ids
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          std_msg_error('Error Removing Assignees', json.error)
+        else
+          #reload table data
+          $('#complaints-index').DataTable().draw()
+
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+    , this)
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+
+window.webcat_change_assignee = () ->
+  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  if selected_rows[0].length > 0
+    entry_ids = []
+    for row, i in selected_rows[0]
+      entry_ids.push(selected_rows.data()[i].entry_id)
+
+    user_id = $('#index_target_assignee option:selected').val()
+
+    data = {
+      'complaint_entry_ids': entry_ids,
+      'user_id': user_id
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/change_assignee'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          std_msg_error('Error Assigning Entries', json.error)
+        else
+          #reload table data
+          $('#complaints-index').DataTable().draw()
+
+    )
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+
 window.select_cat_text_field = (id) ->
   if (typeof numericalValue)
     $( "#category_input"+id ).select();

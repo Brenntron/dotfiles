@@ -126,6 +126,48 @@ class ComplaintEntry < ApplicationRecord
     return("Complaint returned")
   end
 
+  def unassign
+    if self.user == User.vrtincoming
+      return("Complaint is already assigned to Vrt Incoming")
+    else
+      if !self.is_important
+        if status!="COMPLETED"
+          self.update(user: User.vrtincoming, status:"NEW")
+          complaint.set_status("NEW")
+        else
+          return("Already completed")
+        end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: User.vrtincoming, status:"NEW")
+        complaint.set_status("NEW")
+      else
+        return("Status is pending")
+      end
+    end
+    return("Complaint unassigned")
+  end
+
+  def reassign(user)
+    if self.user == user
+      return("Complaint is already assigned to #{user.cvs_username}")
+    else
+      if !self.is_important
+        if status!="COMPLETED"
+          self.update(user: user, status:"ASSIGNED", case_assigned_at: Time.now)
+          complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
+        else
+          return("Already completed")
+        end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: user, status:"ASSIGNED", case_assigned_at: Time.now)
+        complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
+      else
+        return("Status is pending")
+      end
+    end
+    return("Complaint assigned to #{user.cvs_username}")
+  end
+
   def is_pending?
     "PENDING" == status
   end
