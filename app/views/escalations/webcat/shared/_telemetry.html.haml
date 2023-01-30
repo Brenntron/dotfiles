@@ -44,8 +44,8 @@
             = "#{@int_assigned_count} Assigned"
 
       .metrics-col
-        %a.metric-header#allPendingTickets{href: '?f=PENDING'} PENDING:
-        %a#pending-new-count.metric-number{href: '?f=PENDING'}= @pending_new_count
+        %a.metric-header#allPendingTickets{href: '?f=ALL%20PENDING'} PENDING:
+        %a#pending-new-count.metric-number{href: '?f=ALL%20PENDING'}= @pending_new_count
         %a.metric-overdue{href: '?f=PENDING%20OVERDUE'}
           %span#pending-overdue-count.metric-number
             = "(#{@pending_overdue_count} Overdue)"

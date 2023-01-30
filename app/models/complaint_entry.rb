@@ -711,7 +711,7 @@ class ComplaintEntry < ApplicationRecord
         closed.where(user_id: user.id)
       when "MANAGER QUEUE"
         joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
-      when "TALOS"
+      when "ALL TALOS"
         where(complaint_id: Complaint.from_ti)
       when "NEW TALOS"
         where(status: 'NEW', complaint_id: Complaint.from_ti)
