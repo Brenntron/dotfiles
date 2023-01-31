@@ -13318,7 +13318,7 @@ table > tbody > tr > td.no-padding {
   }
   .metrics-col {
     padding: 4px 4px 4px 22px;
-    max-width: 380px;
+    max-width: 400px;
     display: inline-block;
     vertical-align: middle;
   }
@@ -13337,12 +13337,8 @@ table > tbody > tr > td.no-padding {
   .metrics-col > .metric-number:last-of-type {
     padding-right: 20px;
   }
-  .metric-label {
-    padding-left: 2px;
-    padding-right: 4px;
-  }
   .metric-overdue {
-    padding-left: 0;
+    padding-left: 4px;
     color: $warning-accent-color;
     border-right: solid 1px lighten($bug-accent-color, 20%);
     margin-right: 8px;
@@ -13359,9 +13355,13 @@ table > tbody > tr > td.no-padding {
       padding-right: 2px;
     }
   }
-  .metric-overdue:last-of-type {
+  .metric-overdue:last-child {
     border-right: none;
     margin-left: 3px;
+  }
+  a {
+      color: #fff;
+      text-decoration: underline;
   }
   .wbnp-area {
     float: right;

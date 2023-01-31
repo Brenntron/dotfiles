@@ -753,12 +753,34 @@ class ComplaintEntry < ApplicationRecord
         closed.where(user_id: user.id)
       when "MANAGER QUEUE"
         joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
+      when "ALL TALOS"
+        where(complaint_id: Complaint.from_ti)
       when "NEW TALOS"
         where(status: 'NEW', complaint_id: Complaint.from_ti)
+      when "TALOS OVERDUE"
+        where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "TALOS ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_ti)
+      when "ALL WBNP"
+        where(complaint_id: Complaint.from_wbnp)
       when "NEW WBNP"
         where(status: 'NEW', complaint_id: Complaint.from_wbnp)
+      when "WBNP OVERDUE"
+        where(complaint_id: Complaint.from_wbnp).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "WBNP ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_wbnp)
+      when "ALL INTERNAL"
+        where(complaint_id: Complaint.from_int)
       when "NEW INTERNAL"
         where(status: 'NEW', complaint_id: Complaint.from_int)
+      when "INTERNAL OVERDUE"
+        where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "INTERNAL ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_int)
+      when "ALL PENDING"
+        where(status: 'PENDING')
+      when "PENDING OVERDUE"
+        where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
       when "ALL"
         all
       else
@@ -950,7 +972,7 @@ class ComplaintEntry < ApplicationRecord
 
     if complaint_fields.present?
       relation = relation.includes(:complaint).where(complaints: complaint_fields)
-    end 
+    end
     # Save this search as a named search
     if present_params.present? && search_name.present?
       Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')
