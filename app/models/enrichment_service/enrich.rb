@@ -30,6 +30,28 @@ class EnrichmentService::Enrich < EnrichmentService::EnrichmentServiceBase
     remote_stub.query_sha(query_sha_request)
   end
 
+  # Request prevalence data for a hash.
+  def self.query_hash_prevalence(hash_string)
+    hash_prevalence_request = Talos::ENRICH::HashPrevalenceRequest.new(
+        app_info: get_app_info,
+        hash_string: hash_string,
+        hash_type: 'sha256'
+    )
+    remote_stub.query_hash_prevalence(hash_prevalence_request)
+  end
+
+  # Request prevalence data for a host.
+  def self.query_domain_prevalence(domain)
+    domain_prevalence_request = Talos::ENRICH::DomainPrevalenceRequest.new(app_info: get_app_info, domain: domain)
+    remote_stub.query_domain_prevalence(domain_prevalence_request)
+  end
+
+  # Request prevalence data for an IP address.
+  def self.query_ip_prevalence(ipaddress)
+    ip_prevalence_request = Talos::ENRICH::IPPrevalenceRequest.new(app_info: get_app_info, ipaddress: ipaddress)
+    remote_stub.query_ip_prevalence(ip_prevalence_request)
+  end
+
   def self.remote_stub
     @remote_stub ||= Talos::Service::ENRICH::Stub.new(hostport, creds)
   end
