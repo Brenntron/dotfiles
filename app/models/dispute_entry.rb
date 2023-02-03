@@ -460,18 +460,30 @@ class DisputeEntry < ApplicationRecord
   end
 
   def xbrs_timeline
-    sync_up unless dispute_entry_preload
-    
-    cached_data = JSON.parse(self.reload.dispute_entry_preload.xbrs_history)
-
-    if JSON.parse(self.reload.dispute_entry_preload.xbrs_history).is_a?(Array)# determine if preload record contains data from XBRS or K2
-      timeline = entry_type == 'IP' ? K2::History.ip_lookup(ip_address) : K2::History.url_lookup(uri)
-      data = timeline.body.dig('queryResults')&.first['timelines']
-      self.reload.dispute_entry_preload.update(xbrs_history: {k2: data}.to_json)
-      data || []
+    if self.new_record?
+      if self.uri.present?
+        timeline = K2::History.url_lookup(self.uri)
+      elsif self.ip_address.present?
+        timeline = K2::History.ip_lookup(self.ip_address)
+      else
+        return []
+      end
+      timeline.body&.dig('queryResults')&.first['timelines'] || []
     else
-      cached_data['k2'] || []
+      sync_up unless dispute_entry_preload
+
+      cached_data = JSON.parse(self.reload.dispute_entry_preload.xbrs_history)
+
+      if JSON.parse(self.reload.dispute_entry_preload.xbrs_history).is_a?(Array)# determine if preload record contains data from XBRS or K2
+        timeline = entry_type == 'IP' ? K2::History.ip_lookup(ip_address) : K2::History.url_lookup(uri)
+        data = timeline.body.dig('queryResults')&.first['timelines']
+        self.reload.dispute_entry_preload.update(xbrs_history: {k2: data}.to_json)
+        data || []
+      else
+        cached_data['k2'] || []
+      end
     end
+
   end
   
   def umbrellaresult
