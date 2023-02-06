@@ -288,10 +288,10 @@ $ ->
           html = "<span ondblclick='copy_domain(\"#{domain}\", this)'> #{domain} </span>"
 
           # only show WHOIS lookup button for normal domains, not ip addresses
-          if !is_ip.test(domain)
-            html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='domain_whois(\"#{domain}\")'></button>"
-          else
-            html += "<button type='button' class='whois-btn right-margin domain-spacer'></button>"
+         #if !is_ip.test(domain)
+         #  html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='domain_whois(\"#{domain}\")'></button>"
+         # else
+          html += "<button type='button' class='whois-btn right-margin domain-spacer'></button>"
 
           html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
                    <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
