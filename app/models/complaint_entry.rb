@@ -330,7 +330,30 @@ class ComplaintEntry < ApplicationRecord
     existing_prefix = nil
     if existing_prefixes.present? && !is_ip_address
       existing_prefixes.each do |prefix_found|
-        if prefix_found.subdomain == url_parts[:subdomain]
+        ##reconstruct url parts
+        reconstructed_uri = ""
+        if url_parts[:subdomain].present?
+          reconstructed_uri += url_parts[:subdomain] + "."
+        end
+        reconstructed_uri += url_parts[:domain]
+        if url_parts[:path].present?
+          reconstructed_uri += url_parts[:path]
+        end
+
+        ##reconstruct prefix found
+        reconstructed_prefix = ""
+        if prefix_found.subdomain.present?
+          reconstructed_prefix += prefix_found.subdomain + "."
+        end
+        reconstructed_prefix += prefix_found.domain
+        if prefix_found.path.present?
+          reconstructed_prefix += prefix_found.path
+        end
+
+        #if prefix_found.subdomain == url_parts[:subdomain]
+        if reconstructed_uri == reconstructed_prefix
+          #this if statement now seems a bit redundant, but for safet sake, keeping this here
+          # note: All of this as well as change_category is getting a big refactor soon.
           if prefix_found.path == url_parts[:path]
             existing_prefix = prefix_found
           end
@@ -350,6 +373,7 @@ class ComplaintEntry < ApplicationRecord
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"
     end
+
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
       prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
@@ -561,39 +585,54 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.save
 
       if user != User.where(display_name:"Vrt Incoming").first
-        WebcatCredits::ComplaintEntries::CreditProcessor.new(user, new_complaint_entry).process
+        begin
+          WebcatCredits::ComplaintEntries::CreditProcessor.new(user, new_complaint_entry).process
+        rescue Exception => e
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
+        end
+
       end
     rescue Exception => e
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
       raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
-
-    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-    max_wait_for_job = 15 #seconds
     begin
-      #this is where screen grabs happen.
-      screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
-      screenshot_entry.grab_screenshot
-    rescue Timeout::Error => e
-      #couldnt complete in time
-      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-       ces.screenshot = f.read
-      end
-      ces.save!
+      ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
     rescue Exception => e
-      Rails.logger.error("#{e.message}")
-      # do nothing, it was worth a try. kittens are sad now
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-       ces.screenshot = f.read
-      end
-      ces.save!
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
     end
+
+    max_wait_for_job = 15 #seconds
+    ###this should be eventually removed, but commenting out for now to see if it speeds up the NEW button for bulk entries
+
+    #begin
+      #this is where screen grabs happen.
+    #  screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
+    #  screenshot_entry.grab_screenshot
+    #rescue Timeout::Error => e
+      #couldnt complete in time
+    #  Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+    #  ces = ComplaintEntryScreenshot.new
+    #  ces.error_message = e.message
+    #  ces.complaint_entry_id = new_complaint_entry.id
+    #  open("app/assets/images/failed_screenshot.jpg") do |f|
+    #   ces.screenshot = f.read
+    #  end
+    #  ces.save!
+    #rescue Exception => e
+    #  Rails.logger.error("#{e.message}")
+      # do nothing, it was worth a try. kittens are sad now
+    #  ces = ComplaintEntryScreenshot.new
+    #  ces.error_message = e.message
+    #  ces.complaint_entry_id = new_complaint_entry.id
+    #  open("app/assets/images/failed_screenshot.jpg") do |f|
+    #   ces.screenshot = f.read
+    #  end
+    #  ces.save!
+    #end
   end
 
   # Searches in a variety of ways.
@@ -1202,7 +1241,7 @@ class ComplaintEntry < ApplicationRecord
     end
 
     # add credit for user's contribution to complaint entry
-    ComplaintEntryCredits::CreditProcessor.new(current_user, self).process
+    WebcatCredits::ComplaintEntries::CreditProcessor.new(current_user, self).process
     confirmation
   end
 

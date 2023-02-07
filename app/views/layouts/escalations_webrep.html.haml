@@ -129,10 +129,3 @@
     -##username= current_user.cvs_username
 
 = render template: "layouts/rocket"
-
-- if params[:f]
-  :javascript
-    $(document).ready(function(){
-      window.filter_param = "#{params[:f]}";
-      standard_webrep_index_table("#{params[:f]}")
-    })

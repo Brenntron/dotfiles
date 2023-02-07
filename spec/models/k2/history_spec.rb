@@ -25,9 +25,9 @@ describe K2::History do
       }]
     }
   end
+  let(:response) { HTTPI::Response.new(rand(200..299), {}, '') }
  
-  describe '.search' do
-    let(:response) { HTTPI::Response.new(rand(200..299), {}, '') }
+  describe '.url_lookup' do
     context 'when search is failed' do
       before do
         allow(HTTPI).to receive(:get).and_raise(:boom)
@@ -35,7 +35,7 @@ describe K2::History do
 
       it 'calls handle_error_response method' do
         expect(described_class).to receive(:handle_error_response).with(nil)
-        described_class.search(domain)
+        described_class.url_lookup(domain)
       end
     end
 
@@ -47,7 +47,7 @@ describe K2::History do
 
       it 'calls handle_error_response method with succsesfull response' do
         expect(described_class).to receive(:handle_error_response).with(response)
-        described_class.search(domain)
+        k2_data = described_class.url_lookup(domain)
       end
     end
 
@@ -103,6 +103,32 @@ describe K2::History do
             expect(result['cisco.com'].sample['is_important']).to eq(false)
           end
         end
+      end
+    end
+  end
+
+  describe '.ip_lookup' do
+    let(:ip_address) { '192.168.1.1' }
+    context 'when search is failed' do
+      before do
+        allow(HTTPI).to receive(:get).and_raise(:boom)
+      end
+
+      it 'calls handle_error_response method' do
+        expect(described_class).to receive(:handle_error_response).with(nil)
+        described_class.ip_lookup(ip_address)
+      end
+    end
+
+    context 'when search is successfull' do
+      let(:response) { HTTPI::Response.new(rand(200..2999), {}, response_body) }
+      before do
+        allow(HTTPI).to receive(:get).and_return(response)
+      end
+
+      it 'calls handle_error_response method with succsesfull response' do
+        expect(described_class).to receive(:handle_error_response).with(response)
+        described_class.ip_lookup(ip_address)
       end
     end
   end

@@ -372,150 +372,6 @@ class DisputeEntry < ApplicationRecord
     RESOLVED == status ? Dispute::TI_RESOLVED : Dispute::TI_NEW
   end
 
-  def get_xbrs_value
-
-    if dispute_entry_preload.present? && dispute_entry_preload.xbrs_history.present?
-      xbrs = Xbrs::GetXbrs.load_from_prefetch(dispute_entry_preload.xbrs_history)
-    else
-      case
-        when self.entry_type == "IP"
-          begin
-            xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address.gsub(/\r\n?/, "\n").strip)
-          rescue Exception => e
-            Rails.logger.error e
-            Rails.logger.error e&.backtrace&.join("\n")
-            Rails.logger.info e
-            Rails.logger.error e&.backtrace&.join("\n")
-            Rails.logger.warn e
-            Rails.logger.error e&.backtrace&.join("\n")
-            xbrs = [{}, {'data' => [], 'legend' => []}]
-          end
-        when self.entry_type == "URI/DOMAIN"
-          begin
-            xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
-          rescue Exception => e
-            Rails.logger.error e
-            Rails.logger.error e&.backtrace&.join("\n")
-            Rails.logger.info e
-            Rails.logger.error e&.backtrace&.join("\n")
-            Rails.logger.warn e
-            Rails.logger.error e&.backtrace&.join("\n")
-            xbrs = [{}, {'data' => [], 'legend' => []}]
-          end
-      else
-        begin
-          self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
-        rescue Exception => e
-          Rails.logger.error e
-          Rails.logger.error e&.backtrace&.join("\n")
-          Rails.logger.info e
-          Rails.logger.error e&.backtrace&.join("\n")
-          Rails.logger.warn e
-          Rails.logger.error e&.backtrace&.join("\n")
-          xbrs = [{}, {'data' => [], 'legend' => []}]
-        end
-      end
-    end
-    if xbrs[1].blank?
-      xbrs = [{}, {'data' => [], 'legend' => []}]
-    end
-
-    # Starting here, we are cleaning up this data to remove columns that are completely empty.
-    datacounter = 0
-    @columns_to_remove = []
-    while (datacounter < xbrs[1]['data'].length)
-      i = 0
-      nil_entries = []
-      while (i < xbrs[1]['data'][datacounter].length)
-        nil_entries = xbrs[1]['data'][datacounter].each_index.select{ |v| !xbrs[1]['data'][datacounter][v].present? }
-        i += 1
-      end
-
-      @columns_to_remove << nil_entries
-
-      datacounter += 1
-    end
-
-    if @columns_to_remove.reduce(:&)
-      @columns_to_remove = @columns_to_remove.reduce(:&)
-      xbrs[1]['data'].each do |data_row|
-        data_row.delete_if.with_index{|_, index| @columns_to_remove.include? index}
-      end
-      xbrs[1]['legend'].delete_if.with_index{|_, index| @columns_to_remove.include? index}
-    end
-    # End remove empty columns
-
-    xbrs
-  end
-  #TODO: find a better way to handle large xbrs results
-  #right now it's capped at 100 entries if data size is greater than 1,000. I suspect that will not fly with analysts in the long run.
-  def find_xbrs(reload: false)
-    @xbrs = nil if reload
-    @xbrs ||= get_xbrs_value
-
-    formatted_data = []
-    formatted_data << {}
-    formatted_data << {}
-    formatted_data.last['data'] = []
-    formatted_data.last['legend'] = @xbrs.last['legend']
-    data = @xbrs.last['data']
-    columns = @xbrs.last['legend']
-
-    mtime_column_index = nil
-    ctime_column_index = nil
-
-    columns.each_with_index do |col, index|
-      if col == 'ctime'
-        ctime_column_index = index
-      end
-      if col == 'mtime'
-        mtime_column_index = index
-      end
-    end
-
-    if data.size > 1000
-      doable_data = data.first(100)
-    else
-      doable_data = data
-    end
-    doable_data.each do |datum|
-      if ctime_column_index
-        datum[ctime_column_index] = Time.at(datum[ctime_column_index])
-      end
-      if mtime_column_index
-        datum[mtime_column_index] = Time.at(datum[mtime_column_index])
-      end
-
-      formatted_data.last['data'] << datum
-
-    end
-
-    columns_to_remove = %w(rule_id row_id genid cidr exclusion ip proto userpass port query fragment attr attr_truncated path_truncated query_truncated unique_hash)
-    is_ip_address = !!(self.uri  =~ Resolv::IPv4::Regex)
-    if is_ip_address
-      # If this is an IP address, we can also remove the 'subdomain' and 'path' headers
-      columns_to_remove << 'subdomain'
-      columns_to_remove << 'path'
-    end
-
-
-    indices_to_delete = []
-    formatted_data[1]['legend'].each_with_index do |name, index|
-      if columns_to_remove.include? name
-        indices_to_delete << index
-      end
-    end
-
-    formatted_data[1]['legend'] = formatted_data[1]['legend'].reject.with_index { |e, i| indices_to_delete.include? i }
-    formatted_data[1]['data'].each_with_index do |d, index|
-      formatted_data[1]['data'][index] = d.reject.with_index { |e, i| indices_to_delete.include? i}
-    end
-
-
-    formatted_data
-
-  end
-
   def blacklist(reload: false)
     @blacklist_loaded = false if reload
     unless @blacklist_loaded
@@ -603,35 +459,21 @@ class DisputeEntry < ApplicationRecord
     virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
   end
 
-  def xbrs_data
-    # Current XBRS hits for a URL
-    # This method is different from `xbrs_history` because of https://jira.vrt.sourcefire.com/browse/WEB-6770
-    result = find_xbrs[1]
-    current_array = []
-    result['data'].each do |data|
-      if data.last == "full"
-        current_array << data
-      end
+  def xbrs_timeline
+    sync_up unless dispute_entry_preload
+    
+    cached_data = JSON.parse(self.reload.dispute_entry_preload.xbrs_history)
+
+    if JSON.parse(self.reload.dispute_entry_preload.xbrs_history).is_a?(Array)# determine if preload record contains data from XBRS or K2
+      timeline = entry_type == 'IP' ? K2::History.ip_lookup(ip_address) : K2::History.url_lookup(uri)
+      data = timeline.body.dig('queryResults')&.first['timelines']
+      self.reload.dispute_entry_preload.update(xbrs_history: {k2: data}.to_json)
+      data || []
+    else
+      cached_data['k2'] || []
     end
-    result['data'] = current_array
-    result
-
   end
-
-  def xbrs_history
-    # XBRS history for a URL
-    # This method is different from `xbrs_data` because of https://jira.vrt.sourcefire.com/browse/WEB-6770
-    result = find_xbrs[1]
-    current_array = []
-    result['data'].each do |data|
-      if data.last != "full"
-        current_array << data
-      end
-    end
-    result['data'] = current_array
-    result
-  end
-
+  
   def umbrellaresult
     if dispute_entry_preload.present? && dispute_entry_preload.umbrella.present?
       @umbrellaresult = dispute_entry_preload.umbrella
@@ -1388,6 +1230,11 @@ class DisputeEntry < ApplicationRecord
       raw_sbrs_score = sbrs_api_response['sbrs']['score'] rescue nil
       raw_wbrs_score = wbrs_stuff["wbrs"]["score"] rescue nil
 
+      extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.hostlookup, [])
+      extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
+      includes_phishtank_rulehit = extra_wbrs_stuff_rulehits.include?("phtk")
+
       submission_type = self.dispute.submission_type
 
       if submission_type == "e"
@@ -1466,7 +1313,11 @@ class DisputeEntry < ApplicationRecord
 
             is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
 
-            if !is_blacklisted
+            #WEB-10157
+            #if is blacklisted OR has phishtank rulehit, then send to auto resolve : else hit the below block matching disposition/cat check
+            # true || true === !false && !false
+            #De Morgan's Laws always catch me off guard.
+            if !is_blacklisted && !includes_phishtank_rulehit
 
               ###SHUTTING DOWN WEBCAT CHECK AND CONVERT
               # reason I'm not just removing the code is for convenience.  I have reason to believe this will be coming back in the future

@@ -8,15 +8,15 @@ class Complaint < ApplicationRecord
   delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
 
   FILTER_VIEW_OPTIONS = [
-    { label: 'Manager Queue', param: 'MANAGER QUEUE', icon: 'icon-my-bugs' },
-    { label: 'My Tickets', param: 'MY COMPLAINTS', icon: 'icon-my-bugs' },
     { label: 'My Open Tickets', param: 'MY OPEN COMPLAINTS', icon: 'icon-my-open-bugs' },
-    { label: 'My Closed Tickets', param: 'MY CLOSED COMPLAINTS', icon: 'icon-fixed-bugs' },
-    { label: 'Active Tickets', param: 'ACTIVE', icon: 'icon-team-bugs' },
-    { label: 'New Tickets', param: 'NEW', icon: 'icon-open-bugs' },
+    { label: 'New Tickets', param: 'NEW', icon: 'icon-new-tickets' },
+    { label: 'Manager Queue', param: 'MANAGER QUEUE', icon: 'icon-manager-queue' },
     { label: 'Waiting for Review', param: 'REVIEW', icon: 'icon-pending-bugs' },
+    { label: 'Active Tickets', param: 'ACTIVE', icon: 'icon-active-tickets' },
+    { label: 'My Tickets', param: 'MY COMPLAINTS', icon: 'icon-my-bugs' },
+    { label: 'My Closed Tickets', param: 'MY CLOSED COMPLAINTS', icon: 'icon-my-closed-tickets' },
     { label: 'Completed Tickets', param: 'COMPLETED', icon: 'icon-fixed-bugs' },
-    { label: 'All Tickets', param: 'ALL', icon: 'icon-recently-viewed' },
+    { label: 'All Tickets', param: 'ALL', icon: 'icon-all-tickets' },
   ].freeze
 
   RESOLUTION_FIXED                      = 'FIXED'
@@ -874,48 +874,74 @@ For future web and email reputation requests, please open a web and email reputa
 
   def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, platform, status=NEW, categories = nil, user_email = nil)
 
-    summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+    response = {}
+    response[:status] = "success"
+    response[:total_entries] = 0
+    response[:successful_entries_count] = 0
+    response[:failed_entries_count] = 0
+    response[:successful_entries] = []
+    response[:failed_entries] = []
 
-    full_description = <<~HEREDOC
-          IPs/URIs: #{ips_urls}
-          Problem Summary: #{description}
-    HEREDOC
-    bug_attrs = {
-        'product' => 'Escalations Console',
-        'component' => 'Categorization',
-        'summary' => summary,
-        'version' => 'unspecified', #self.version,
-        'description' => full_description,
-        'priority' => 'Unspecified',
-        'classification' => 'unclassified',
-    }
+    begin
+      summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+      full_description = <<~HEREDOC
+            IPs/URIs: #{ips_urls}
+            Problem Summary: #{description}
+      HEREDOC
+      bug_attrs = {
+          'product' => 'Escalations Console',
+          'component' => 'Categorization',
+          'summary' => summary,
+          'version' => 'unspecified', #self.version,
+          'description' => full_description,
+          'priority' => 'Unspecified',
+          'classification' => 'unclassified',
+      }
 
-
-    cust = find_customer(customer) if customer
-    platform_record = Platform.find_by_public_name(platform) if platform
-    new_complaint = Complaint.create(id: bug_proxy.id,
-                                     description: description,
-                                     customer_id: cust&.id,
-                                     platform_id: platform_record&.id,
-                                     status: status,
-                                     channel: INT_CHANNEL)
+      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
 
-    handle_tags(new_complaint, tags) if tags
+      cust = find_customer(customer) if customer
+      platform_record = Platform.find_by_public_name(platform) if platform
+      new_complaint = Complaint.create(id: bug_proxy.id,
+                                       description: description,
+                                       customer_id: cust&.id,
+                                       platform_id: platform_record&.id,
+                                       status: status,
+                                       channel: INT_CHANNEL)
 
-    user = if user_email
-      User.find_by_email(user_email)
-    else
-      User.where(display_name:"Vrt Incoming").first
+
+      handle_tags(new_complaint, tags) if tags
+
+      user = if user_email
+        User.find_by_email(user_email)
+      else
+        User.where(display_name:"Vrt Incoming").first
+      end
+
+      ips_urls.split(' ').each do |ip_url|
+        response[:total_entries] += 1
+        begin
+          ComplaintEntry.create_complaint_entry(new_complaint, ip_url, platform_record, user, status, categories)
+          response[:successful_entries_count] += 1
+          response[:successful_entries] << ip_url
+        rescue Exception => e
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
+          response[:failed_entries_count] += 1
+          response[:failed_entries] << ip_url
+          response[:status] = "error"
+        end
+
+      end
+    rescue Exception => e
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
+      raise "error creating bug."
     end
 
-    ips_urls.split(' ').each do |ip_url|
-      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, platform_record, user, status, categories)
-    end
-
-    bug_proxy
+    response
   end
 
   def self.find_customer(customer)
@@ -1040,6 +1066,17 @@ For future web and email reputation requests, please open a web and email reputa
     end
 
     response
+  end
+
+  def self.valid_tld?(uri)
+
+    begin
+      parsed_uri = Addressable::URI.parse(uri)
+      parsed_uri = Addressable::URI.parse("http://" + uri) if parsed_uri.scheme.nil?
+      PublicSuffix.valid?(parsed_uri.host, default_rule: nil, ignore_private: true)
+    rescue
+      false
+    end
   end
 
   def self.process_bulk_adhoc_categorizations(params, user, bugzilla_rest_session)

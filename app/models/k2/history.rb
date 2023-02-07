@@ -1,11 +1,12 @@
 class K2::History < K2::Base
   HISTORY_PATH = "security/insight/k2/1.0".freeze
+  TIMELINE_PATH = 'security/insight/k2/3.0'.freeze
   DATE_FORMAT = "%Y-%m-%d %H:%M %Z".freeze
   MILISECONDS_IN_SECOND = 1000.freeze
   DAYS_LOOKBACK_PERIOD = 150.freeze
   TEST_HOST = 'youtube.com'.freeze
 
-  def self.search(domain)
+  def self.url_lookup(domain)
     http_req = request
     url = URI("https://#{host}/#{HISTORY_PATH}")
     domain = domain.is_a?(Array) ? domain : [domain]
@@ -24,7 +25,7 @@ class K2::History < K2::Base
   end
 
   def self.parsed_data_for(domain)
-    response = search(domain)
+    response = url_lookup(domain)
     if response.error
       response.to_h
     else
@@ -37,6 +38,25 @@ class K2::History < K2::Base
           result[item['element']] << timeline
         end
       end
+    end
+  end
+
+  def self.ip_lookup(ip_address)
+    http_req = request
+    ip_address = ip_address.is_a?(Array) ? ip_adress : [ip_address]
+    url = URI("https://#{host}/#{TIMELINE_PATH}")
+
+    url.query = {
+      src: 'web',
+      ips: ip_address.join(',')
+    }.to_query
+
+    http_req.url = url.to_s
+    begin
+      response = HTTPI.get(http_req)
+      request_error_handling(response)
+    rescue
+      handle_error_response(response)
     end
   end
 

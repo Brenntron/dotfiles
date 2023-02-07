@@ -150,9 +150,9 @@ $ ->
     list = $(dropdown).find('ul')
     type = 'reptool'
 
-    reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
-      "dga", "exploitkit", "malware", "open_proxy", "open_relay",
-      "phishing", "response", "spam", "suspicious", "tor_exit_node"]
+    reptool_options = [ "attackers", "banking_fraud", "bogon", "bots", "cnc", "cryptomining",
+      "dga", "exploitkit", "high_risk", "ioc", "link_sharing", "malicious", "malware", "newly_seen",
+      "open_proxy", "open_relay", "phishing", "response", "spam", "spyware", "suspicious", "tor_exit_node"]
 
     if !$(list).has('label').length
       build_checkbox_list(reptool_options, list, type)
@@ -164,6 +164,28 @@ $ ->
 
     if !$(list).has('label').length
       build_checkbox_list(wlbl_options, list, type)
+
+  #Set up Force commit tooltip
+  $('body').on 'mouseenter', '#research-table .force-col-tag:not(.tooltipstered)', ->
+    $(this).tooltipster(
+      side: 'top'
+      theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+    ).tooltipster 'open'
+
+  #Show tooltip for Force tags in confirmation modal.
+  $('body').on 'mouseenter', '#confirmation-modal .force-col-tag.tooltipstered', ->
+    $(this).tooltipster(
+      side: 'top'
+      content: 'Force commit'
+      theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+    ).tooltipster 'open'
+
+  $('body').on 'mouseenter', '#confirmation-modal .force-col-tag:not(.tooltipstered)', ->
+    $(this).tooltipster(
+      side: 'top'
+      content: 'Force commit'
+      theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+    ).tooltipster 'open'
 
   window.select_all_detailed = (check)->
     is_checked = $(check).prop('checked')
@@ -262,6 +284,7 @@ $ ->
     row = $(this).parents('tr')[0]
     col_clear = $(row).find('.col-clear-actions')[0]
     action_col = $(row).find('.row-action-clear')[0]
+    force_col = $(row).find('.force-col-tag')[0]
     if action_p.getAttribute("wlbl_data") != undefined && action_p.getAttribute("wlbl_data") != null
       data_type = "wlbl_data"
     else
@@ -287,9 +310,21 @@ $ ->
 
     else
       unless $.trim(action_edit) == 'Threat Categories'
-        col_dialog = "#{action_edit}: #{col_tag_format(data)}"
+
+        #add back force commit tag if it was present originally
+        if force_col != undefined
+          force_col_html = "<span data-force-commit='true' class='force-col-tag float-right'>F</span>"
+        else force_col_html = ''
+
+        col_dialog = "#{action_edit}: #{col_tag_format(data)} #{force_col_html}"
         $(action_p).html(col_dialog)
 
+  #remove force commit tag when clicked on
+  $(document).on 'click', '.col-actions .force-col-tag', () ->
+    action = this.getAttribute("data");
+    action_p = $(this).parents('p')[0]
+    $(action_p).attr('data-force-commit', false)
+    $(this).remove()
 
   $(document).on 'change', '#select-all-bulk', (e) ->
     ####
@@ -410,14 +445,14 @@ $ ->
     else
       $(tc_row).removeClass('hidden')
 
-  window.call_action_switchboard = (disputes) ->
+  window.call_action_switchboard = (disputes, disputes_new_format) ->
+
     $('#confirmation-modal').modal('hide')
     ####
     # data is set and each action calls the appropriate endpoint here
     ####
     comment = $('#confirmation-modal').find('.comment-input').text()
     error_array = []
-
     ajax_count = Object.keys(disputes).length - 1
     dispute_calls = setInterval(()->
 
@@ -427,92 +462,92 @@ $ ->
          quick_bulk_update(disputes, error_array)
     , 200);
 
-    for dispute, value of disputes
+    for dispute, value of disputes_new_format
       dispute = dispute.trim()
-      { action } = value
-      if action != undefined
-        for act in action
-          for key, value of act
-            switch key
-              when 'maintain'
-                classifications = Array.from(new Set(act[key]))
-                data = [{
-                  'action': 'ACTIVE'
-                  'entries': [dispute]
-                  'classifications': classifications
-                  'comment': comment
-                }]
 
-                maintain_reptool_bl(data).then( (response)=>
-                  ajax_count--
-                  if !response
-                    error_message = "<p>Unable to update all reptool entries.</p>"
-                    error_array.push(error_message)
-                )
+      #loop through actions in dispute
+      $(value.action).each (e, act) ->
 
-              when 'override'
-                classifications = Array.from(new Set(act[key]))
-                data = [{
-                  'action': 'ACTIVE'
-                  'entries': [dispute]
-                  'classifications': classifications
-                  'comment': comment
-                }]
+        if act != undefined
+          switch act.action
 
-                maintain_reptool_bl(data).then((response)=>
-                  ajax_count--
-                  if !response
-                    error_message = "<p>Unable to update all reptool entries.</p>"
-                    error_array.push(error_message)
-                )
-              when 'drop'
-                data = {
-                  'action': 'EXPIRED'
-                  'entries': [dispute]
-                  'comment':  comment
-                  'classifications': act[key]
-                }
-                drop_reptool_bl(data).then((response)=>
-                  ajax_count--
-                  if !response
-                    error_message = "<p>Unable to drop all reptool entries.</p>"
-                    error_array.push(error_message)
-                )
-              when 'add'
+            when 'maintain'
+              data = [{
+                'action': 'ACTIVE'
+                'entries': [dispute]
+                'classifications': act.list
+                'comment': comment
+                'force': act.force
+              }]
 
-                data = {
-                  'urls':[dispute]
-                  'trgt_list': act[key]
-                  'note': comment
-                }
+              maintain_reptool_bl(data).then( (response)=>
+                ajax_count--
+                if !response
+                  error_message = "<p>Unable to update all reptool entries.</p>"
+                  error_array.push(error_message)
+              )
 
-                if stringIncludes(act[key][0], 'BL')
-                  for el in action
-                    #####
-                    # set the values of threat_cat ids if the BL is being set
-                    #####
-                    if el.tc_ids
-                      data.thrt_cat_ids = el.tc_ids
+            when 'override'
+              data = [{
+                'action': 'ACTIVE'
+                'entries': [dispute]
+                'classifications': act.list
+                'comment': comment
+                'force': act.force
+              }]
 
-                adjust_wlbl(data).then((response) =>
-                  ajax_count--
-                  if !response
-                    error_message = "<p>Unable to adjust all wlbl entries.</p>"
-                    error_array.push(error_message)
-                )
+              maintain_reptool_bl(data).then((response)=>
+                ajax_count--
+                if !response
+                  error_message = "<p>Unable to update all reptool entries.</p>"
+                  error_array.push(error_message)
+              )
+            when 'drop'
+              data = {
+                'action': 'EXPIRED'
+                'entries': [dispute]
+                'comment':  comment
+                'classifications': act.list
+                'force': act.force
+              }
+              drop_reptool_bl(data).then((response)=>
+                ajax_count--
+                if !response
+                  error_message = "<p>Unable to drop all reptool entries.</p>"
+                  error_array.push(error_message)
+              )
+            when 'add'
 
-              when 'remove'
-                data = {
-                  'ip_uris': [dispute]
-                  'list_types': act[key]
-                  'note': comment
-                }
-                remove_wlbl(data).then((response)=>
-                  ajax_count--
-                  if !response
-                    error_message = "<p>Unable to remove all wlbl entries.</p>"
-                    error_array.push(error_message)
-                )
+              data = {
+                'urls':[dispute]
+                'trgt_list': act.list
+                'note': comment
+              }
+
+              #need to loop back through at higher level and grab tc_ids
+              $(value.action).each (e, i) ->
+                if i.action == 'tc_ids'
+                  data.thrt_cat_ids = i.list
+
+              adjust_wlbl(data).then((response) =>
+                ajax_count--
+                if !response
+                  error_message = "<p>Unable to adjust all wlbl entries.</p>"
+                  error_array.push(error_message)
+              )
+
+            when 'remove'
+              data = {
+                'ip_uris': [dispute]
+                'list_types': act.list
+                'note': comment
+              }
+              remove_wlbl(data).then((response)=>
+                ajax_count--
+                if !response
+                  error_message = "<p>Unable to remove all wlbl entries.</p>"
+                  error_array.push(error_message)
+              )
 
 
   window.maintain_reptool_bl = (data)->
@@ -625,9 +660,12 @@ $ ->
     $('#confirmation-modal').modal('toggle');
     $('#quick-lookup-loader').addClass('visible-ajax-message')
     disputes = {}
+    disputes_new_format = {}
 
     $( confirmation_rows ).each ->
         action_list = []
+        action_list_new = []
+
         cells = $(this).find('td')
         dispute = $( cells[0] ).text().trim()
         actions = $( cells[1] ).children()
@@ -635,6 +673,11 @@ $ ->
         for action, i in actions
           action_tags = []
           class_list = $(action).attr('class')
+          force_commit = $(action).attr('data-force-commit')
+
+          if force_commit == 'true'
+            force_commit = true
+          else force_commit = false
 
           if stringIncludes(class_list, 'reptool') && !stringIncludes(class_list, 'drop')
             action_tags = $(action).attr('reptool_classes').split(',')
@@ -644,10 +687,27 @@ $ ->
             action_tags = $(action).attr('data').split(',').map((x) -> return parseInt(x) )
 
           formatted_action = check_actions(class_list)
+
+          #Currently using two formats of data, one for quick_bulk_update endpoint and the other for individual endpoints
+
+          #setting up new action object data to use in individual endpoints
+          action_object = {}
+          action_object.action = formatted_action
+          action_object.list = action_tags
+          action_object.force = force_commit
+          action_list_new.push action_object
+
+          #keep old data format intact for quick_bulk_update
           action_list.push( "#{formatted_action}": action_tags )
 
+        #legacy action format for quick_bulk_update
         actions = action: action_list
         disputes[dispute] = actions
+
+        #new action format to fit in force_commit property
+        actions_new_format = action: action_list_new
+        disputes_new_format[dispute] = actions_new_format
+
         dispute_check = true
 
         for key, value of disputes
@@ -657,7 +717,7 @@ $ ->
               break
 
         if dispute_check
-          call_action_switchboard(disputes)
+          call_action_switchboard(disputes, disputes_new_format)
 
 
   window.set_action_wlbl_col = () ->
@@ -742,7 +802,7 @@ $ ->
         else
           current_threat_cats = ''
 
-        col_dialog = "<p class='wlbl-action-col #{list_action}' wlbl_data='#{check_list_array}'>#{action_desc}  #{check_list} #{current_threat_cats}<p>"
+        col_dialog = "<p class='wlbl-action-col #{list_action}' wlbl_data='#{check_list_array}'>#{action_desc}  #{check_list} #{current_threat_cats}</p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 
         if error_message.endsWith('</span>')
@@ -789,11 +849,17 @@ $ ->
                   <td>"
           for child in children
             classes = $(child).attr("class")
+
+            #read force_commit value off of table entries and update
+            if $(child).attr('data-force-commit') == 'true'
+              force_commit = true
+            else force_commit = false
+
             if !isEmpty(classes) && classes != undefined
               threat_cat_data = ''
               if classes == 'threat-cat-col'
                 threat_cat_data = "data='#{$(child).attr('data')}'"
-              html += "<div #{existing_reptool} #{wlbl_list} #{threat_cat_data} class='#{classes} repuation-dispute-modal'>#{$(child).html()}</div>"
+              html += "<div #{existing_reptool} #{wlbl_list} #{threat_cat_data} class='#{classes} repuation-dispute-modal' data-force-commit='#{force_commit}'>#{$(child).html()}</div>"
           html += '</td> </tr>'
           confirmation_dialog.push( html )
 
@@ -806,7 +872,7 @@ $ ->
       row = $(this).closest('tr')
       col_actions = row.find('.col-actions').children().length
       col_length = col_length + col_actions
-    if col_length > 1
+    if col_length >= 1
       $('#submit-rep-changes').attr('disabled', false)
     else
       $('#submit-rep-changes').attr('disabled', true)
@@ -826,6 +892,7 @@ $ ->
     check_list = ''
     error_array = []
     error_header = "<h4>Cannot #{reptool_add} the following Reptool Classification dispute<h4>"
+    force_commit = $('#quick-lookup-reptool-toolbar-force').is(':checked')
 
     switch (class_reptool)
       when 'maintain'
@@ -852,7 +919,7 @@ $ ->
             rep_list = action_data.trim().split(',')
 
         rep_list = this.innerText.split(',')
-        if (class_reptool == 'maintain' || class_reptool == 'drop') && existing_reptool.length && !isEmpty(data)
+        if (class_reptool == 'maintain') && existing_reptool.length && !isEmpty(data)
           reptools =  $(existing_reptool).text().split(/[\s,]+/)
           reptool_array = reptools.filter( (val) => return val != 'ACTIVE' && val != 'EXPIRED')
           reptool_classes = Array.from(new Set(reptool_array)).join(',')
@@ -875,6 +942,10 @@ $ ->
             check_class = '.add'
 
         existing_actions = rep_list
+
+        #trim out empty quote strings from existing_actions array
+        existing_actions = existing_actions.filter (e) -> e != ''
+
         $(actions).find("#{check_class} .col-tag").each () -> existing_actions.push( this.innerText )
 
         if reptool_add.toLowerCase() == 'remove'
@@ -886,8 +957,16 @@ $ ->
                 return true
             )
             reptool_tags = $(action_col).attr( 'reptool_classes').split(',')
-            action_tags = reptool_tags.filter( (val) => if check_list.indexOf(val) == -1  && val != 'ACTIVE' && val != 'EXPIRED' then return val )
-            $(action_col).attr( 'reptool_classes', action_tags )
+
+            #filter out empty strings from array
+            reptool_tags_trimmed = reptool_tags.filter (e) ->
+              e != ''
+
+            if reptool_tags_trimmed.length > 0
+              action_tags = reptool_tags.filter( (val) => if check_list.indexOf(val) == -1  && val != 'ACTIVE' && val != 'EXPIRED' then return val )
+              $(action_col).attr( 'reptool_classes', action_tags )
+            else
+              $(action_col).attr( 'reptool_classes', check_list.concat(existing_actions) )
 
         else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
@@ -910,7 +989,11 @@ $ ->
           error_html = "<div>#{error_message}<div>"
           error_array.push(error_html)
 
-        col_dialog = "<p class='#{reptool_class} #{status_class} reptool-action-col' data='#{check_list}'> #{status_string} #{col_tag_format(check_list)} <p>"
+        if force_commit == true
+          force_commit_col = "<span data-force-commit='#{force_commit}' title='Force commit' class='force-col-tag' >F</span>"
+        else force_commit_col = ''
+
+        col_dialog = "<p class='#{reptool_class} #{status_class} reptool-action-col' data='#{check_list}' data-force-commit=#{force_commit}> #{status_string} #{col_tag_format(check_list)} #{force_commit_col}</p>"
         drop_check = reptool_add  == 'drop' && existing_reptool.length
         if check_list.length || drop_check
           clear_col.show()

@@ -72,13 +72,13 @@ module API
 
             post "" do
               std_api_v2 do
-                Complaint.create_action(bugzilla_rest_session,
+                response = Complaint.create_action(bugzilla_rest_session,
                                         permitted_params[:ips_urls],
                                         permitted_params[:description],
                                         permitted_params[:customer],
                                         permitted_params[:tags],
                                         permitted_params[:platform])
-                {:status => 'success'}.to_json
+                response.to_json
               end
             end
 

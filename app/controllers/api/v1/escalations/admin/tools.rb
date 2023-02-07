@@ -178,7 +178,6 @@ module API
               status_response[:servers][:threatgrid] = Rails.configuration.threatgrid.host
               status_response[:servers][:reversing_lab] = Rails.configuration.reversing_labs.host
               status_response[:servers][:sandbox] = Rails.configuration.file_reputation_sandbox.host
-              status_response[:servers][:xbrs] = Rails.configuration.xbrs.host
               status_response[:servers][:virustotal] = Rails.configuration.virustotal.host
               status_response[:servers][:umbrella] = Rails.configuration.umbrella.url
               status_response[:servers][:amp] = Rails.configuration.amp_poke.host
@@ -192,7 +191,6 @@ module API
                 status_response[:threatgrid] = Threatgrid::Search.health_check
                 status_response[:reversing_lab] = FileReputationApi::ReversingLabs.health_check
                 status_response[:sandbox] = FileReputationApi::Sandbox.health_check
-                status_response[:xbrs] = Xbrs::GetXbrs.health_check
                 status_response[:virustotal] = Virustotal::GetVirustotal.health_check
                 status_response[:umbrella] = Umbrella::Scan.health_check
                 status_response[:amp] = FileReputationApi::Detection.health_check

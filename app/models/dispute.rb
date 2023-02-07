@@ -163,7 +163,7 @@ For future Web categorization requests, please open a Web categorization ticket 
   end
 
   def assignee
-    is_assigned? ? user.email : "Unassigned"
+    is_assigned? ? user.cvs_username : "Unassigned"
   end
 
   def suggested_d
@@ -970,6 +970,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       ##########################################################################################################
 
       ActiveRecord::Base.transaction do
+        entry_platform = nil
         ##### create an IPS bug for this webrep entry if someone from tifpapi uses the network=true parameter
         if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
           ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
@@ -1002,6 +1003,9 @@ For future Web categorization requests, please open a Web categorization ticket 
 
           if entry[:sbrs]["platform"].present?
             entry_platform = Platform.find(entry[:sbrs]["platform"].to_i) rescue nil
+          end
+          if entry_platform.blank? && new_dispute.platform_id.present?
+            entry_platform = Platform.find(new_dispute.platform_id)
           end
 
           new_dispute_entry = DisputeEntry.new
@@ -1065,7 +1069,9 @@ For future Web categorization requests, please open a Web categorization ticket 
           if entry["platform"].present?
             entry_platform = Platform.find(entry["platform"].to_i) rescue nil
           end
-
+          if entry_platform.blank? && new_dispute.platform_id.present?
+            entry_platform = Platform.find(new_dispute.platform_id)
+          end
           sanitized_url = sanitize_url(url)
 
           new_dispute_entry = DisputeEntry.new
@@ -1310,8 +1316,8 @@ For future Web categorization requests, please open a Web categorization ticket 
 
     named_search =
         user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name, project_type: project_type)
-
-    params.each do |field_name, value|
+    
+    params.to_h.each do |field_name, value|
       case
         when value.kind_of?(Hash)
           value.each do |sub_field_name, sub_value|
@@ -1336,10 +1342,8 @@ For future Web categorization requests, please open a Web categorization ticket 
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:, reload: false)
-
-    dispute_fields =
-        params.to_h.slice(*%w{status org_domain priority resolution submitter_type
-                              case_id case_owner_username})
+    fields = %w{status org_domain priority resolution submitter_type case_id case_owner_username}
+    dispute_fields = params.to_h.slice(*fields)
     dispute_fields['id'] = dispute_fields.delete('case_id')
 
     if dispute_fields['priority'] && /(?<priority_digits>\d+)/ =~ dispute_fields.delete('priority')
@@ -1421,7 +1425,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     end
 
     company_name = nil
-    customer_params = params.fetch('customer', {}).slice(*%w{name email company_name})
+    customer_params = params.fetch('customer', {}).slice(*%w{name email company_name}).to_h
     customer_params = customer_params.select{|ignore_key, value| value.present?}
     if customer_params.any?
       if customer_params['company_name'].present?
@@ -1438,7 +1442,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       relation = relation.where(customers: customer_where)
     end
 
-    entry_params = params.fetch('dispute_entries', {})
+    entry_params = params.fetch('dispute_entries', {}).to_h
     entry_params = entry_params.select{|ignore_key, value| value.present?}
     if entry_params.any?
       dispute_entry_fields = entry_params.slice(*%w{suggested_disposition})
@@ -1480,33 +1484,6 @@ For future Web categorization requests, please open a Web categorization ticket 
     advanced_search(search_params, search_name: nil, user: user, reload: reload)
   end
 
-  def self.standard_search_title(search_name)
-    case search_name
-      when 'recently_viewed'
-        'Recently Viewed Tickets'
-      when 'my_open'
-        'My Open Tickets'
-      when 'my_disputes'
-        'My Tickets'
-      when 'team_disputes'
-        'My Team\'s Tickets'
-      when 'unassigned'
-        'Unassigned Tickets'
-      when 'open'
-        'Open Tickets'
-      when 'open_email'
-        'Open Email Tickets'
-      when 'open_web'
-        'Open Web Tickets'
-      when 'closed'
-        'Closed Tickets'
-      when 'all'
-        'All Tickets'
-      else
-        raise "No search named '#{search_name}' known."
-    end
-  end
-
   # Searches based on standard pre-determined filters.
   # @param [String] search_name name of the filter.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
@@ -1522,7 +1499,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       when 'team_disputes'
         where(user_id: user.my_team)
       when 'unassigned'
-        where(status: [STATUS_NEW, STATUS_REOPENED], user_id: User.where(display_name: 'Vrt Incoming').first.id)
+        where(user_id: [nil, User.vrtincoming.id]).where.not(status: [STATUS_RESOLVED, CLOSED])
       when 'open'
         where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
       when 'open_email'
@@ -1543,7 +1520,7 @@ For future Web categorization requests, please open a Web categorization ticket 
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
     dispute_fields = %w{disputes.id case_number case_guid org_domain subject description
-                        source_ip_address problem_summary research_notes}
+                        source_ip_address problem_summary research_notes status}
     dispute_where = dispute_fields.map{|field| "#{field} like :pattern"}.join(' or ')
 
     customer_where = %w{name email}.map{|field| "customers.#{field} like :pattern"}.join(' or ')
@@ -1551,21 +1528,6 @@ For future Web categorization requests, please open a Web categorization ticket 
 
     where_str = "#{dispute_where} or #{customer_where} or #{company_where}"
     left_joins(customer: :company).where(where_str, pattern: "%#{value}%")
-  end
-
-  def self.robust_search_title(search_type, search_name: nil)
-    case search_type
-      when 'advanced'
-        search_name.present? ? search_name + ' Search' : 'Advanced Search'
-      when 'named'
-        search_name + ' Search'
-      when 'standard'
-        standard_search_title(search_name)
-      when 'contains'
-        'Substring Search'
-      else
-        'All Tickets'
-    end
   end
 
   def self.process_status_changes(disputes, status, resolution = nil, comment = nil, current_user = nil)
@@ -1670,7 +1632,7 @@ For future Web categorization requests, please open a Web categorization ticket 
 
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
-      dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status}</span>"
+      dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status}</span>".html_safe
       if dispute.status_comment.present?
         dispute_packet[:status_comment] = dispute.status_comment
       elsif dispute.resolution_comment.present?
@@ -1678,7 +1640,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       else
         dispute_packet[:status_comment] = nil
       end
-      dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
+      dispute_packet[:case_link] = ("<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>").html_safe
       dispute_packet[:submitter_org] = dispute.customer_org
       dispute_packet[:submitter_type] = dispute.submitter_type
       dispute_packet[:submitter_domain] = dispute.org_domain
@@ -1700,37 +1662,37 @@ For future Web categorization requests, please open a Web categorization ticket 
         if dispute.resolution_comment.blank?
           dispute_packet[:dispute_resolution] = dispute.resolution
         else
-          dispute_packet[:dispute_resolution] = "<span class='esc-tooltipped' title='#{dispute.resolution_comment}'>" + dispute.resolution + "</span>"
+          dispute_packet[:dispute_resolution] = ("<span class='esc-tooltipped' title='#{dispute.resolution_comment}'>" + dispute.resolution + "</span>").html_safe
         end
       end
 
       dispute_packet[:dispute_entry_content] = entry_content_for(dispute)
-      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, rendered_platform: de.determine_platform, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}
+      dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de.attributes, rendered_platform: de.determine_platform, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}.to_json
       dispute_packet[:submission_type] = dispute.submission_type
-      dispute_packet[:d_entry_preview] = dispute_packet[:dispute_entry_content].first.to_s + "<span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
+      dispute_packet[:d_entry_preview] = (dispute_packet[:dispute_entry_content].first.to_s + "<span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>").html_safe
       case
         when dispute.assignee == 'Unassigned'
           dispute_packet[:assigned_to] =
-              "<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
+              ("<span class='dispute_username' id='owner_#{dispute.id}'>Unassigned</span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>").html_safe
 
         when dispute.user_id?
           if dispute.user_id == user.id
             dispute_packet[:assigned_to] =
-                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>"
+                ("<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>").html_safe
           else
             dispute_packet[:assigned_to] =
-                "<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>"
+                ("<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>").html_safe
           end
       end
 
-      dispute_packet[:actions] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>"
+      dispute_packet[:actions] = ("<a href='/escalations/webrep/disputes/#{dispute.id}'>edit</a>").html_safe
 
       dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
       dispute_packet[:case_age] = dispute.dispute_age
       dispute_packet[:age_int] = (Time.now - dispute.created_at).to_i
       # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
       dispute_packet[:suggested_disposition] = dispute.suggested_d
-      dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
+      dispute_packet[:source] = dispute.ticket_source.nil? ? "Internal" : dispute.ticket_source
       dispute_packet[:source_type] = dispute.ticket_source_type
 
       dispute_packet[:wbrs_score] = ''

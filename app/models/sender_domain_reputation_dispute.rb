@@ -634,7 +634,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   def domain_name
     ascii_entry = SimpleIDN.to_ascii(self.sender_domain_entry)
-    parser = URI::Parser.new
+    parser = Addressable::URI
     url = parser.escape(ascii_entry)
     uri = parser.parse(parser.parse(ascii_entry).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
@@ -650,7 +650,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   def self.domain_name_of(entry)
     ascii_entry = SimpleIDN.to_ascii(entry)
-    parser = URI::Parser.new
+    parser = Addressable::URI
     url = parser.escape(ascii_entry)
     uri = parser.parse(parser.parse(ascii_entry).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
@@ -671,18 +671,13 @@ class SenderDomainReputationDispute < ApplicationRecord
     beaker_data[:response] = {}
     beaker_data[:response][:data] = {}
 
-    mail_data_params = {}
-    mail_data_params[:dkim_disp] = [{}]
-    mail_data_params[:dmarc_disp] = {}
-    mail_data_params[:email_list] = {}
-
     begin
 
-      mail_data_params[:from_hdr] = [{"addr" => self.sender_domain_entry}]
+      smtp_envelope_params = { mail_from: self.sender_domain_entry, spf_results: {} }
       begin
-        data_response = ::Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        data_response = ::Beaker::Sdr.data_query('127.0.0.1', smtp_envelope_params: smtp_envelope_params).to_h
       rescue
-        data_response = Beaker::Sdr.data_query('127.0.0.1', :mail_data_params => mail_data_params).to_h
+        data_response = Beaker::Sdr.data_query('127.0.0.1', smtp_envelope_params: smtp_envelope_params).to_h
       end
 
       if data_response.present?
@@ -801,6 +796,8 @@ class SenderDomainReputationDispute < ApplicationRecord
             sdr_dispute&.customer&.email
           when 'domain_name'
             sdr_dispute.domain_name
+          when 'source'
+            sdr_dispute.source || 'Internal'
           else
             sdr_dispute.attributes[field_name]
           end
