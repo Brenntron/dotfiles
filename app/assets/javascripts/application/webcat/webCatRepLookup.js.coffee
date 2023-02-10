@@ -1,5 +1,5 @@
 namespace 'WebCat.RepLookup', (exports) ->
-  exports.whoIsLookups = (queryEntry, ipDomain) ->
+  exports.whoIsLookups = (ipDomain) ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     selected_rows = $("tr.highlight-second-review.shown")
 
@@ -9,33 +9,44 @@ namespace 'WebCat.RepLookup', (exports) ->
       headers: headers
       data: {'lookup': ipDomain}
       success: (response) ->
+        console.log 'response:', response
         info = $.parseJSON(response)
+        console.log 'info:', info
         if info.error
           notice_html = "<p>Something went wrong: #{info.error}</p>"
           alert(info.error)
         else
-          dialog_content = $(format_domain_info(info))
+          dialog_content = $(formatIanaInfo(info, ipDomain))
 
-          if $("#complaint_button_dialog").length
-            complaint_dialog = this
-
-            $('#complaint_button_dialog').html("")
-            $('body').innerHTML=""
-
-            $('body').append(complaint_dialog)
-            $('#complaint_button_dialog').append(dialog_content[0])
-            $('#complaint_button_dialog').dialog
-              autoOpen: true
-              minWidth: 400
-              position: { my: "right bottom", at: "right bottom", of: window }
+          if $("#lookup_content").length
+            $('#iana_whois > .dialog-content-wrapper').remove()
+            $('#iana_whois').html(dialog_content[0])
+            $('#lookup_content').dialog('open')
           else
-            complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
-            $('body').append(complaint_dialog)
-            $('#complaint_button_dialog').append(dialog_content[0])
-            $('#complaint_button_dialog').dialog
+            lookup_content = "<div id='lookup_content' class='ui-dialog-content ui-widget-content' title='Whois for: #{ipDomain}'>
+                                <div id='lookup_tabs'>
+                                  <ul class='nav nav-tabs'>
+                                    <li class='nav-item active' role='presentation'>
+                                      <a href='#iana_whois' data-toggle='tab'>IANA WHOIS</a>
+                                    </li>
+                                    <li class='nav-item' role='presentation'>
+                                      <a href='#icann_whois' data-toggle='tab'>ICANN WHOIS</a>
+                                    </li>
+                                  </ul>
+                                </div>
+                                <div id='iana_whois' class='tab-pane active' role='tabpanel'></div>
+                                <div id='icann_whois' class='tab-pane' role='tabpanel'></div>
+                              </div>"
+            $('body').append(lookup_content)
+            $('#iana_whois').append(dialog_content[0])
+            $('#lookup_content').dialog
               autoOpen: true
-              minWidth: 400
-              position: { my: "right bottom", at: "right bottom", of: window }
+              classes: {
+                'ui-dialog': 'webcat-whois-dialog',
+                'ui-dialog-content': 'webcat-whois-dialog-content'
+              }
+              minWidth: 1000
+              position: { my: "right center", at: "right center", of: window }
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
@@ -45,25 +56,43 @@ namespace 'WebCat.RepLookup', (exports) ->
       url: '/escalations/api/v1/escalations/cloud_intel/whois/lookup'
       headers: headers
       data:
-        name: queryEntry
+        name: ipDomain
       success: (response) ->
+        console.log 'response:', response
         if response != null
-          whois = response.data
-          if $("#whois_content").length
-            $("#whois_content").html("<div class='dialog-content-wrapper'>#{whois}</div> ")
-            $('#whois_content').dialog('open')
+          parsedResponse = formatIcannInfo(response.data)
+          if $("#lookup_content").length
+            $("#icann_whois").html("<div class='dialog-content-wrapper'>#{parsedResponse}</div> ")
+            $('#lookup_content').dialog('open')
           else
-            whois_content = '<div id="whois_content" class="ui-dialog-content ui-widget-content" title="Lookup Information"></div>'
-            $('body').append(whois_content)
-            html = "<div class='dialog-content-wrapper'>#{whois}</div> "
-            $('#whois_content').append(html)
-            $('#whois_content').dialog
+            lookup_content = "<div id='lookup_content' class='ui-dialog-content ui-widget-content' title='Whois for: #{ipDomain}'>
+                                <div id='lookup_tabs'>
+                                  <ul class='nav nav-tabs'>
+                                    <li class='nav-item active' role='presentation'>
+                                      <a href='#iana_whois' data-toggle='tab'>IANA WHOIS</a>
+                                    </li>
+                                    <li class='nav-item' role='presentation'>
+                                      <a href='#icann_whois' data-toggle='tab'>ICANN WHOIS</a>
+                                    </li>
+                                  </ul>
+                                </div>
+                                <div id='iana_whois' class='tab-pane active' role='tabpanel'></div>
+                                <div id='icann_whois' class='tab-pane' role='tabpanel'></div>
+                              </div>"
+            $('body').append(lookup_content)
+            html = "<div class='dialog-content-wrapper'>#{parsedResponse}</div> "
+            $('#icann_whois').append(html)
+            $('#lookup_content').dialog
               autoOpen: true
-              minWidth: 600
-              position: { my: "right bottom", at: "right bottom", of: window }
+              classes: {
+                'ui-dialog': 'webcat-whois-dialog',
+                'ui-dialog-content': 'webcat-whois-dialog-content'
+              }
+              minWidth: 1000
+              position: { my: "right center", at: "right center", of: window }
         else
           message = "No available responses. The IP address may be unallocated or its whois server is unavailable."
-          $('#whois_content').append message
+          $('#lookup_content').append message
       error: (response) ->
         if response != null
           {responseJSON} = response
@@ -80,69 +109,112 @@ namespace 'WebCat.RepLookup', (exports) ->
           )
     )
 
-  format_domain_info = (info)->
-    '<div class="dialog-content-wrapper">' +
-      '<h5>Domain Name</h5>' +
-      '<p>' + info['domain'] + '</p>' +
-      '<hr class="thin">' +
-      '<h5>Registrant </h5>' +
-      '<table class="nested-dialog-table">' +
-        '<tr>' +
-          '<td class="table-side-header">' +
-             'Organization' +
-          '</td>' +
-          '<td>' +
-            info['organisation'] +
-        '</tr><tr>' +
-          '<td class="table-side-header">' +
-            'Country' +
-          '</td>' +
-          '<td>' +
-            info['registrant_country'] +
-          '</td>' +
-        '</tr><tr>' +
-          '<td class="table-side-header">' +
-          'State/Province' +
-          '</td>' +
-          '<td>' +
-            info['registrant_state/province'] +
-          '</td>' +
-        '</tr>' +
-      '</table>' +
-      '<hr class="thin">' +
-      '<h5>Name Servers</h5>'+
-      name_servers(info['nserver']) +
-      '<hr class="thin">' +
-      '<h5> Dates</h5>'+
-      '<table class="nested-dialog-table">' +
-        '<tr>' +
-          '<td class="table-side-header">' +
-            'Created' +
-          '</td>' +
-          '<td>' + info['created'] + '</td>'+
-        '</tr><tr>' +
-          '<td class="table-side-header">' +
-            'Last updated' +
-          '</td>' +
-          '<td>' +
-            info['changed'] +
-          '</td>' +
-        '</tr><tr>' +
-          '<td class="table-side-header">' +
-            'Expiry_date' +
-          '</td>' +
-          '<td>' +
-            info['registry_expiry_date'] +
-          '</td>' +
-        '</tr>' +
-      '</table>' +
-    '</div>'
+  formatIanaInfo = (info, ipDomain) ->
+    "<div class='dialog-content-wrapper iana-content-wrapper'>
+      <h5>Domain Name</h5>
+      <p>#{ipDomain}</p>
+      <h5>Registrant</h5>
+      <table class='nested-dialog-table'>
+        <tr>
+          <td class='table-side-header'>
+             Organization
+          </td>
+          <td>
+            #{info['organisation']}
+          </td>
+        </tr>
+        <tr>
+          <td class='table-side-header'>
+            Country
+          </td>
+          <td>
+            #{info['registrant_country']}
+          </td>
+        </tr>
+        <tr>
+          <td class='table-side-header'>
+            State/Province
+          </td>
+          <td>
+            #{info['registrant_state/province']}
+          </td>
+        </tr>
+      </table>
+      <h5>Name Servers</h5>
+      #{name_servers(info['nserver'])}
+      <h5> Dates</h5>
+      <table class='nested-dialog-table'>
+        <tr>
+          <td class='table-side-header'>
+            Created
+          </td>
+          <td>#{info['created']}</td>
+        </tr><tr>
+          <td class='table-side-header'>
+            Last updated
+          </td>
+          <td>
+            #{info['changed']}
+          </td>
+        </tr><tr>
+          <td class='table-side-header'>
+            Expiry_date
+          </td>
+          <td>
+            #{info['registry_expiry_date']}
+          </td>
+        </tr>
+      </table>
+    </div>"
 
-  name_servers =(server_list)->
+  formatIcannInfo = (whoisData) ->
+    parsedInfo = parseIcannInfo(whoisData)
+    stringifyedInfo = stringifyInfo(parsedInfo)
+
+  name_servers = (server_list)->
     if undefined == server_list
       ''
     else
       text = ""
       for server in server_list
-        text += server + '<br>'
+        text += "<p>#{server}</p>"
       text
+
+  parseIcannInfo = (whoisData) ->
+    splitData = whoisData.split(/\r?\n/).filter((str) -> str)
+    scrapIndex = splitData.findIndex((str) -> str.includes('URL of the ICANN'))
+    releventData = splitData.splice(0, scrapIndex).map((s) -> keyify(s)).filter((str) -> str)
+
+  keyify = (s) ->
+    kv = s.split(': ')
+    if kv[0].trim() == 'Name Server'
+      return
+    else
+      return { "#{kv[0].trim()}": kv[1].trim() }
+
+  stringifyInfo = (parsedInfo) ->
+    infoString = ''
+    tempDomainStatuses = []
+
+    domainStatusFirstIndex = parsedInfo.findIndex((info) -> info['Domain Status']?)
+    domainStatusLastIndex = parsedInfo.findLastIndex((info) -> info['Domain Status']?)
+    domainStatusInfo = parsedInfo.slice(domainStatusFirstIndex, domainStatusLastIndex + 1)
+
+    for domainStatus in domainStatusInfo
+      tempDomainStatuses.push domainStatus['Domain Status']
+
+    parsedInfo.splice(domainStatusFirstIndex, tempDomainStatuses.length, { "Domain Status": tempDomainStatuses })
+
+    for info in parsedInfo
+      if info['Domain Status']?
+        domainStatus = '<div class="icann-section row"><h5 class="icann-title col-sm-4">Domain Status</h5><div class="col-sm-8">'
+
+        for dsi in info['Domain Status']
+          domainStatus += "<p class='icann-info'>#{dsi}</p>"
+
+        domainStatus += '</div></div>'
+        infoString += domainStatus
+      else
+        infoString += "<div class='icann-section row'><h5 class='icann-title col-sm-4'>#{Object.keys(info)[0]}</h5><p class='icann-info col-sm-8'>#{Object.values(info)[0]}</p></div>"
+
+    infoString

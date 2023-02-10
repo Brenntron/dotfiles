@@ -9704,6 +9704,110 @@ td.text-center span {
     }
 }
 
+.webcat-whois-dialog {
+  border: none !important;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  z-index: 999;
+
+  .nav-tabs::before {
+    border-color: $nav-toolbar-color;
+    border-top: 1px solid $nav-toolbar-color;
+    border-top-right-radius: 0;
+    width: 316px;
+  }
+
+  .nav-item {
+    a {
+      border-color: $nav-toolbar-color !important;
+    }
+
+    &.active {
+      z-index: 2;
+
+      a {
+        background-color: #fefefe;
+        border-bottom: 0;
+        padding-bottom: 12px;
+      }
+    }
+  }
+
+  .ui-dialog-titlebar {
+    background-color: $primary-section-color;
+
+    .ui-dialog-title {
+      background-image: url(image_path('icon_whois_white.svg'));
+      background-position: left -2px;
+      background-repeat: no-repeat;
+      background-size: 22px 22px;
+      height: 20px;
+      line-height: 1rem;
+      padding-left: 25px;
+    }
+  }
+}
+
+.webcat-whois-dialog-content {
+  margin: auto;
+  width: 95% !important;
+
+  .tab-pane {
+    border: 1px solid #c2c2c2;
+  }
+
+  .iana-content-wrapper {
+    padding-top: 0;
+  }
+
+  h5:first-of-type {
+    margin-top: 20px;
+  }
+
+  h5 {
+    border-bottom: 1px solid #eeeeee;
+    font-size: 12px;
+    line-height: 1rem;
+    margin-top: 30px;
+  }
+
+  p {
+    font-size: 12px;
+    margin: 5px 0;
+  }
+
+  table > tbody > tr > td {
+    border: 0;
+    padding: 8px 0;
+  }
+
+  .icann-section {
+    border-bottom: 1px solid #f2f2f2;
+    margin: 0;
+
+    .icann-title {
+      border: 0;
+      float: left;
+      margin-top: 5px;
+      padding-left: 0;
+    }
+
+    .icann-info {
+      line-height: 1rem;
+    }
+  }
+
+  .icann-section:last-child {
+    border: 0;
+  }
+
+  .tab-pane {
+    max-height: 500px!important;
+    margin-bottom: 20px;
+    overflow-y: scroll;
+  }
+}
+
 .ticket-age-over3hr {
   color: $warning-accent-color;
   font-weight: bold;
@@ -10036,19 +10140,6 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 #edit-dispute-button {
   background-color: $faint-neutral-color;
-}
-
-#whois_content {
-  margin: 17px auto;
-  display: flex;
-  white-space: pre-wrap;
-  justify-content: center;
-  align-items: center;
-  .dialog-content-wrapper{
-    max-height: 500px!important;
-    width: 90%;
-    overflow-y: scroll;
-  }
 }
 
 .dropdown-tool-text-divider {
