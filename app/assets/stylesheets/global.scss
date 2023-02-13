@@ -9726,9 +9726,15 @@ td.text-center span {
       z-index: 2;
 
       a {
-        background-color: #fefefe;
-        border-bottom: 0;
+        background-color:  $content-bg-color;
+        border-bottom: 0 !important;
+        box-shadow: none;
         padding-bottom: 12px;
+
+        &:hover {
+          background-color: $content-bg-color;
+          border-color: $nav-toolbar-color;
+        }
       }
     }
   }
@@ -9753,7 +9759,7 @@ td.text-center span {
   width: 95% !important;
 
   .tab-pane {
-    border: 1px solid #c2c2c2;
+    border: 1px solid $nav-toolbar-color;
   }
 
   .iana-content-wrapper {
@@ -9768,7 +9774,7 @@ td.text-center span {
     border-bottom: 1px solid #eeeeee;
     font-size: 12px;
     line-height: 1rem;
-    margin-top: 30px;
+    margin-top: 25px;
   }
 
   p {
