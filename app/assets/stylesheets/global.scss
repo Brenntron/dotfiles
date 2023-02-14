@@ -9766,6 +9766,7 @@ td.text-center span {
 
   .tab-pane {
     border: 1px solid $nav-toolbar-color;
+    padding-top: 10px;
   }
 
   .iana-content-wrapper {
@@ -9790,7 +9791,7 @@ td.text-center span {
   }
 
   .icann-section {
-    border-bottom: 1px solid #f2f2f2;
+    border-bottom: 1px solid $faint-neutral-color;
     margin: 0;
     padding: 0 15px;
 
@@ -9802,7 +9803,11 @@ td.text-center span {
     }
 
     .icann-info {
-      margin-top: 10px;
+      line-height: 1rem;
+    }
+
+    &:last-of-type {
+      margin-bottom: 5px;
     }
   }
 
