@@ -4,7 +4,6 @@ namespace 'WebCat.RepLookup', (exports) ->
     selected_rows = $("tr.highlight-second-review.shown")
     $('#ianaLoaderDive').show()
     $('#icannLoaderDive').show()
-    $('#lookup_content').attr('title', "Whois for: #{ipDomain}")
 
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/domain_whois'
@@ -30,6 +29,7 @@ namespace 'WebCat.RepLookup', (exports) ->
             }
             minWidth: 800
             position: { my: "right center", at: "right center", of: window }
+            title: "Whois for: #{ipDomain}"
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
@@ -54,6 +54,7 @@ namespace 'WebCat.RepLookup', (exports) ->
             }
             minWidth: 800
             position: { my: "right center", at: "right center", of: window }
+            title: "Whois for: #{ipDomain}"
         else
           message = "No available responses. The IP address may be unallocated or its whois server is unavailable."
           $('#lookup_content').append message
