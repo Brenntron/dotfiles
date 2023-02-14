@@ -2,6 +2,9 @@ namespace 'WebCat.RepLookup', (exports) ->
   exports.whoIsLookups = (ipDomain) ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     selected_rows = $("tr.highlight-second-review.shown")
+    $('#ianaLoaderDive').show()
+    $('#icannLoaderDive').show()
+    $('#lookup_content').attr('title', "Whois for: #{ipDomain}")
 
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/domain_whois'
@@ -9,44 +12,24 @@ namespace 'WebCat.RepLookup', (exports) ->
       headers: headers
       data: {'lookup': ipDomain}
       success: (response) ->
-        console.log 'response:', response
         info = $.parseJSON(response)
-        console.log 'info:', info
         if info.error
           notice_html = "<p>Something went wrong: #{info.error}</p>"
-          alert(info.error)
+          std_api_error(info.error)
         else
           dialog_content = $(formatIanaInfo(info, ipDomain))
 
-          if $("#lookup_content").length
-            $('#iana_whois > .dialog-content-wrapper').remove()
-            $('#iana_whois').html(dialog_content[0])
-            $('#lookup_content').dialog('open')
-          else
-            lookup_content = "<div id='lookup_content' class='ui-dialog-content ui-widget-content' title='Whois for: #{ipDomain}'>
-                                <div id='lookup_tabs'>
-                                  <ul class='nav nav-tabs'>
-                                    <li class='nav-item active' role='presentation'>
-                                      <a href='#iana_whois' data-toggle='tab'>IANA WHOIS</a>
-                                    </li>
-                                    <li class='nav-item' role='presentation'>
-                                      <a href='#icann_whois' data-toggle='tab'>ICANN WHOIS</a>
-                                    </li>
-                                  </ul>
-                                </div>
-                                <div id='iana_whois' class='tab-pane active' role='tabpanel'></div>
-                                <div id='icann_whois' class='tab-pane' role='tabpanel'></div>
-                              </div>"
-            $('body').append(lookup_content)
-            $('#iana_whois').append(dialog_content[0])
-            $('#lookup_content').dialog
-              autoOpen: true
-              classes: {
-                'ui-dialog': 'webcat-whois-dialog',
-                'ui-dialog-content': 'webcat-whois-dialog-content'
-              }
-              minWidth: 1000
-              position: { my: "right center", at: "right center", of: window }
+          $('.iana-content-wrapper').remove()
+          $('#ianaLoaderDive').hide()
+          $('#iana_whois').html(dialog_content[0])
+          $('#lookup_content').dialog
+            autoOpen: true
+            classes: {
+              'ui-dialog': 'webcat-whois-dialog',
+              'ui-dialog-content': 'webcat-whois-dialog-content'
+            }
+            minWidth: 800
+            position: { my: "right center", at: "right center", of: window }
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
@@ -58,46 +41,25 @@ namespace 'WebCat.RepLookup', (exports) ->
       data:
         name: ipDomain
       success: (response) ->
-        console.log 'response:', response
         if response != null
           parsedResponse = formatIcannInfo(response.data)
-          if $("#lookup_content").length
-            $("#icann_whois").html("<div class='dialog-content-wrapper'>#{parsedResponse}</div> ")
-            $('#lookup_content').dialog('open')
-          else
-            lookup_content = "<div id='lookup_content' class='ui-dialog-content ui-widget-content' title='Whois for: #{ipDomain}'>
-                                <div id='lookup_tabs'>
-                                  <ul class='nav nav-tabs'>
-                                    <li class='nav-item active' role='presentation'>
-                                      <a href='#iana_whois' data-toggle='tab'>IANA WHOIS</a>
-                                    </li>
-                                    <li class='nav-item' role='presentation'>
-                                      <a href='#icann_whois' data-toggle='tab'>ICANN WHOIS</a>
-                                    </li>
-                                  </ul>
-                                </div>
-                                <div id='iana_whois' class='tab-pane active' role='tabpanel'></div>
-                                <div id='icann_whois' class='tab-pane' role='tabpanel'></div>
-                              </div>"
-            $('body').append(lookup_content)
-            html = "<div class='dialog-content-wrapper'>#{parsedResponse}</div> "
-            $('#icann_whois').append(html)
-            $('#lookup_content').dialog
-              autoOpen: true
-              classes: {
-                'ui-dialog': 'webcat-whois-dialog',
-                'ui-dialog-content': 'webcat-whois-dialog-content'
-              }
-              minWidth: 1000
-              position: { my: "right center", at: "right center", of: window }
+
+          $("#icann_whois").html("<div class='icann-content-wrapper'>#{parsedResponse}</div> ")
+          $('#icannLoaderDive').hide()
+          $('#lookup_content').dialog
+            autoOpen: true
+            classes: {
+              'ui-dialog': 'webcat-whois-dialog',
+              'ui-dialog-content': 'webcat-whois-dialog-content'
+            }
+            minWidth: 800
+            position: { my: "right center", at: "right center", of: window }
         else
           message = "No available responses. The IP address may be unallocated or its whois server is unavailable."
           $('#lookup_content').append message
       error: (response) ->
         if response != null
           {responseJSON} = response
-
-          console.log response
 
           if !responseJSON
             std_msg_error("Error retrieving WHOIS query.","")
@@ -110,7 +72,7 @@ namespace 'WebCat.RepLookup', (exports) ->
     )
 
   formatIanaInfo = (info, ipDomain) ->
-    "<div class='dialog-content-wrapper iana-content-wrapper'>
+    "<div class='iana-content-wrapper'>
       <h5>Domain Name</h5>
       <p>#{ipDomain}</p>
       <h5>Registrant</h5>
@@ -181,40 +143,35 @@ namespace 'WebCat.RepLookup', (exports) ->
       text
 
   parseIcannInfo = (whoisData) ->
-    splitData = whoisData.split(/\r?\n/).filter((str) -> str)
-    scrapIndex = splitData.findIndex((str) -> str.includes('URL of the ICANN'))
-    releventData = splitData.splice(0, scrapIndex).map((s) -> keyify(s)).filter((str) -> str)
+    splitData = whoisData.split(/\r?\n/)
+    splitData.map((s) -> keyify(s)).filter((str) -> str)
 
   keyify = (s) ->
+    unneededKeys = ['URL of the ICANN', 'Last update of', 'NOTICE', 'TERMS OF USE', 'by the following terms of use', 'to']
     kv = s.split(': ')
-    if kv[0].trim() == 'Name Server'
+
+    if !kv[1]? || (unneededKeys.filter((uk) -> kv[0].includes(uk)).length > 0)
       return
     else
       return { "#{kv[0].trim()}": kv[1].trim() }
 
   stringifyInfo = (parsedInfo) ->
+    domainStatus = '<div class="icann-section row"><h5 class="icann-title col-sm-4">Domain Status</h5><div class="col-sm-8">'
     infoString = ''
+    nameServers = '<div class="icann-section row"><h5 class="icann-title col-sm-4">Nameservers</h5><div class="col-sm-8">'
     tempDomainStatuses = []
-
-    domainStatusFirstIndex = parsedInfo.findIndex((info) -> info['Domain Status']?)
-    domainStatusLastIndex = parsedInfo.findLastIndex((info) -> info['Domain Status']?)
-    domainStatusInfo = parsedInfo.slice(domainStatusFirstIndex, domainStatusLastIndex + 1)
-
-    for domainStatus in domainStatusInfo
-      tempDomainStatuses.push domainStatus['Domain Status']
-
-    parsedInfo.splice(domainStatusFirstIndex, tempDomainStatuses.length, { "Domain Status": tempDomainStatuses })
 
     for info in parsedInfo
       if info['Domain Status']?
-        domainStatus = '<div class="icann-section row"><h5 class="icann-title col-sm-4">Domain Status</h5><div class="col-sm-8">'
-
-        for dsi in info['Domain Status']
-          domainStatus += "<p class='icann-info'>#{dsi}</p>"
-
-        domainStatus += '</div></div>'
-        infoString += domainStatus
+        dsi = Object.values(info)[0]
+        domainStatus += "<p class='icann-info'>#{dsi}</p>" unless dsi.includes('www')
+      else if info['Name Server']
+        nsi = Object.values(info)[0]
+        nameServers += "<p class='icann-info'>#{nsi.toLowerCase()}</p>"
       else
         infoString += "<div class='icann-section row'><h5 class='icann-title col-sm-4'>#{Object.keys(info)[0]}</h5><p class='icann-info col-sm-8'>#{Object.values(info)[0]}</p></div>"
 
-    infoString
+    nameServers += '</div></div>'
+    domainStatus += '</div></div>'
+
+    infoString += "#{domainStatus}#{nameServers}"

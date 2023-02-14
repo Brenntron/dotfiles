@@ -3,6 +3,29 @@
 - content_for(:webcat_icon) do
   icon-queue
 
+#lookup_content.ui-dialog-content.ui-widget-content
+  .dialog-content-wrapper
+    .lookup_tabs
+      %ul.nav.nav-tabs
+        %li.nav-item.active{role:'presentation'}
+          %a{href:'#iana_whois', data: {toggle:'tab'}, role:'tab'}
+            IANA WHOIS
+        %li.nav-item{role:'presentation'}
+          %a{href:'#icann_whois', data: {toggle:'tab'}, role:'tab'}
+            ICANN WHOIS
+    #iana_whois.tab-pane.active{role:'tabpanel'}
+      #IanaloadingDiv.message-div
+        %h1
+          Loading Data...
+        .loader-gears
+          =inline_svg 'icon_gears_loader.svg'
+    #icann_whois.tab-pane{role:'tabpanel'}
+      #icannLoadingDiv.message-div
+        %h1
+          Loading Data...
+        .loader-gears
+          =inline_svg 'icon_gears_loader.svg'
+
 .content-wrapper
   .complaint-mgt-top-area
     = render "escalations/webcat/shared/telemetry"

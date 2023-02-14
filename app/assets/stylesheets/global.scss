@@ -9704,11 +9704,19 @@ td.text-center span {
     }
 }
 
+#lookup_content {
+  display: none;
+}
+
 .webcat-whois-dialog {
   border: none !important;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   z-index: 999;
+
+  .nav-tabs {
+    margin-top: 0;
+  }
 
   .nav-tabs::before {
     border-color: $nav-toolbar-color;
@@ -9747,7 +9755,6 @@ td.text-center span {
       background-position: left -2px;
       background-repeat: no-repeat;
       background-size: 22px 22px;
-      height: 20px;
       line-height: 1rem;
       padding-left: 25px;
     }
@@ -9755,8 +9762,7 @@ td.text-center span {
 }
 
 .webcat-whois-dialog-content {
-  margin: auto;
-  width: 95% !important;
+  padding: 0 15px 15px;
 
   .tab-pane {
     border: 1px solid $nav-toolbar-color;
@@ -9764,6 +9770,14 @@ td.text-center span {
 
   .iana-content-wrapper {
     padding-top: 0;
+
+    h5, p, table {
+      padding: 0 15px;
+    }
+
+    p {
+      margin-top: 5px;
+    }
   }
 
   h5:first-of-type {
@@ -9772,45 +9786,28 @@ td.text-center span {
 
   h5 {
     border-bottom: 1px solid #eeeeee;
-    font-size: 12px;
-    line-height: 1rem;
     margin-top: 25px;
-  }
-
-  p {
-    font-size: 12px;
-    margin: 5px 0;
-  }
-
-  table > tbody > tr > td {
-    border: 0;
-    padding: 8px 0;
   }
 
   .icann-section {
     border-bottom: 1px solid #f2f2f2;
     margin: 0;
+    padding: 0 15px;
 
     .icann-title {
       border: 0;
       float: left;
       margin-top: 5px;
-      padding-left: 0;
+      padding: 0;
     }
 
     .icann-info {
-      line-height: 1rem;
+      margin-top: 10px;
     }
   }
 
   .icann-section:last-child {
     border: 0;
-  }
-
-  .tab-pane {
-    max-height: 500px!important;
-    margin-bottom: 20px;
-    overflow-y: scroll;
   }
 }
 
