@@ -147,7 +147,6 @@ namespace 'WebCat.RepLookup', (exports) ->
   parseIcannInfo = (whoisData) ->
     domainStatuses = []
     nameServers = []
-    output = {}
 
     splitData = whoisData.split(/\r?\n/)
     keyedData = splitData.map((s) -> keyify(s)).filter((str) -> str)
