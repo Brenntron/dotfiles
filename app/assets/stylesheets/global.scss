@@ -9764,6 +9764,10 @@ td.text-center span {
 .webcat-whois-dialog-content {
   padding: 0 15px 15px;
 
+  .message-div {
+    border-color: $faint-neutral-color;
+  }
+
   .tab-pane {
     border: 1px solid $nav-toolbar-color;
     padding-top: 10px;
@@ -9772,7 +9776,7 @@ td.text-center span {
   .iana-content-wrapper {
     padding-top: 0;
 
-    h5, p, table {
+    h5, p {
       padding: 0 15px;
     }
 
@@ -9804,6 +9808,7 @@ td.text-center span {
 
     .icann-info {
       line-height: 1rem;
+      margin-top: 5px;
     }
 
     &:last-of-type {

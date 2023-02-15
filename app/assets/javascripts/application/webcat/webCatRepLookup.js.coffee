@@ -2,8 +2,8 @@ namespace 'WebCat.RepLookup', (exports) ->
   exports.whoIsLookups = (ipDomain) ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     selected_rows = $("tr.highlight-second-review.shown")
-    $('#ianaLoaderDive').show()
-    $('#icannLoaderDive').show()
+    $('#ianaLoadingDiv').show()
+    $('#icannLoadingDiv').show()
 
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/domain_whois'
@@ -19,8 +19,8 @@ namespace 'WebCat.RepLookup', (exports) ->
           dialog_content = $(formatIanaInfo(info, ipDomain))
 
           $('.iana-content-wrapper').remove()
-          $('#ianaLoaderDive').hide()
-          $('#iana_whois').html(dialog_content[0])
+          $('#ianaLoadingDiv').hide()
+          $('#iana_whois').append(dialog_content[0])
           $('#lookup_content').dialog
             autoOpen: true
             classes: {
@@ -44,8 +44,9 @@ namespace 'WebCat.RepLookup', (exports) ->
         if response != null
           parsedResponse = formatIcannInfo(response.data)
 
-          $("#icann_whois").html("<div class='icann-content-wrapper'>#{parsedResponse}</div> ")
-          $('#icannLoaderDive').hide()
+          $('.icann-content-wrapper').remove()
+          $('#icannLoadingDiv').hide()
+          $("#icann_whois").append("<div class='icann-content-wrapper'>#{parsedResponse}</div> ")
           $('#lookup_content').dialog
             autoOpen: true
             classes: {
@@ -144,8 +145,33 @@ namespace 'WebCat.RepLookup', (exports) ->
       text
 
   parseIcannInfo = (whoisData) ->
+    domainStatuses = []
+    nameServers = []
+    output = {}
+
     splitData = whoisData.split(/\r?\n/)
-    splitData.map((s) -> keyify(s)).filter((str) -> str)
+    keyedData = splitData.map((s) -> keyify(s)).filter((str) -> str)
+
+    for data in keyedData
+      key = Object.keys(data)[0]
+      value = Object.values(data)[0]
+
+      if key == 'Domain Status'
+        domainStatuses.push(value)
+      else if key == 'Name Server'
+        nameServers.push(value)
+
+    reducedData = keyedData.reduce((accumulator, currentValue) ->
+      key = Object.keys(currentValue)[0]
+      value = Object.values(currentValue)[0]
+      accumulator[key] = value
+      accumulator
+    )
+
+    reducedData['Domain Status'] = domainStatuses
+    reducedData['Name Server'] = nameServers
+    reducedData['Domain Name'] = reducedData['Domain Name'].toLowerCase()
+    return reducedData
 
   keyify = (s) ->
     unneededKeys = ['URL of the ICANN', 'Last update of', 'NOTICE', 'TERMS OF USE', 'by the following terms of use', 'to']
@@ -162,15 +188,15 @@ namespace 'WebCat.RepLookup', (exports) ->
     nameServers = '<div class="icann-section row"><h5 class="icann-title col-sm-4">Nameservers</h5><div class="col-sm-8">'
     tempDomainStatuses = []
 
-    for info in parsedInfo
-      if info['Domain Status']?
-        dsi = Object.values(info)[0]
-        domainStatus += "<p class='icann-info'>#{dsi}</p>" unless dsi.includes('www')
-      else if info['Name Server']
-        nsi = Object.values(info)[0]
-        nameServers += "<p class='icann-info'>#{nsi.toLowerCase()}</p>"
+    for k,v of parsedInfo
+      if k == 'Domain Status'
+        for ds in v
+          domainStatus += "<p class='icann-info'>#{ds}</p>" unless ds.includes('www')
+      else if k == 'Name Server'
+        for ns in v
+          nameServers += "<p class='icann-info'>#{ns.toLowerCase()}</p>"
       else
-        infoString += "<div class='icann-section row'><h5 class='icann-title col-sm-4'>#{Object.keys(info)[0]}</h5><p class='icann-info col-sm-8'>#{Object.values(info)[0]}</p></div>"
+        infoString += "<div class='icann-section row'><h5 class='icann-title col-sm-4'>#{k}</h5><p class='icann-info col-sm-8'>#{v}</p></div>"
 
     nameServers += '</div></div>'
     domainStatus += '</div></div>'
