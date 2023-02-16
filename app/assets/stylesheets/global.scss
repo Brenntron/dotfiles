@@ -9720,7 +9720,6 @@ td.text-center span {
 
   .nav-tabs::before {
     border-color: $nav-toolbar-color;
-    border-top: 1px solid $nav-toolbar-color;
     border-top-right-radius: 0;
     width: 316px;
   }
@@ -9737,7 +9736,6 @@ td.text-center span {
         background-color:  $content-bg-color;
         border-bottom: 0 !important;
         box-shadow: none;
-        padding-bottom: 12px;
 
         &:hover {
           background-color: $content-bg-color;
