@@ -9704,10 +9704,6 @@ td.text-center span {
     }
 }
 
-#lookup_content {
-  display: none;
-}
-
 .webcat-whois-dialog {
   border: none !important;
   border-top-left-radius: 3px;
@@ -9761,10 +9757,6 @@ td.text-center span {
 
 .webcat-whois-dialog-content {
   padding: 0 15px 15px;
-
-  .message-div {
-    border-color: $faint-neutral-color;
-  }
 
   .tab-pane {
     border: 1px solid $nav-toolbar-color;
