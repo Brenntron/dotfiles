@@ -9760,6 +9760,7 @@ td.text-center span {
 
   .tab-pane {
     border: 1px solid $nav-toolbar-color;
+    min-height: 60px;
     padding-top: 10px;
   }
 

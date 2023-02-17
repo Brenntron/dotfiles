@@ -4,7 +4,7 @@ namespace 'WebCat.RepLookup', (exports) ->
     selected_rows = $("tr.highlight-second-review.shown")
 
     if $('#whoisContent').length > 0
-      $('#whoisContent').dialog('open')
+      $('#whoisContent').dialog(title: "Whois for: #{ipDomain}").dialog('open')
     else
       whoisContent = "<div id='whoisContent' class='webcat-whois-dialog-content' title='Whois for: #{ipDomain}'>
                         <div class='dialog-content-wrapper'>
@@ -22,8 +22,20 @@ namespace 'WebCat.RepLookup', (exports) ->
                               </li>
                             </ul>
                           </div>
-                          <div id='iana_whois' class='tab-pane active' role='tabpanel'></div>
-                          <div id='icann_whois' class='tab-pane' role='tabpanel'></div>
+                          <div id='iana_whois' class='tab-pane active' role='tabpanel'>
+                            <div id='inline-webcat' class='webcat-loader-wrapper'>
+                              <span class='loader-msg'>
+                                Loading Data...
+                              </span>
+                            </div>
+                          </div>
+                          <div id='icann_whois' class='tab-pane' role='tabpanel'>
+                            <div id='inline-webcat' class='webcat-loader-wrapper'>
+                              <span class='loader-msg'>
+                                Loading Data...
+                              <span>
+                            </div>
+                          </div>
                         </div>
                       </div>"
 
@@ -36,7 +48,11 @@ namespace 'WebCat.RepLookup', (exports) ->
         position: { my: "right center", at: "right center", of: window }
         title: "Whois for: #{ipDomain}"
 
-    $('.lookup-drop-loader').removeClass('hidden')
+    $('.iana-content-wrapper').remove()
+    $('#iana_whois > .webcat-loader-wrapper').show()
+
+    $('.icann-content-wrapper').remove()
+    $('#icann_whois > .webcat-loader-wrapper').show()
 
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/domain_whois'
@@ -51,11 +67,9 @@ namespace 'WebCat.RepLookup', (exports) ->
         else
           dialog_content = $(formatIanaInfo(info, ipDomain))
 
-          $('.iana-content-wrapper').remove()
           $('#iana_whois').append(dialog_content[0])
 
-        if $('.lookup-drop-loader').hasClass('hidden')
-          $('.lookup-drop-loader').removeClass('hidden')
+        $('#iana_whois > .webcat-loader-wrapper').hide()
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
@@ -70,14 +84,12 @@ namespace 'WebCat.RepLookup', (exports) ->
         if response != null
           parsedResponse = formatIcannInfo(response.data)
 
-          $('.icann-content-wrapper').remove()
           $("#icann_whois").append("<div class='icann-content-wrapper'>#{parsedResponse}</div> ")
         else
           message = "No available responses. The IP address may be unallocated or its whois server is unavailable."
           $('#whois_content').append message
 
-        if $('.lookup-drop-loader').hasClass('hidden')
-          $('.lookup-drop-loader').removeClass('hidden')
+        $('#icann_whois > .webcat-loader-wrapper').hide()
       error: (response) ->
         if response != null
           {responseJSON} = response
@@ -188,7 +200,7 @@ namespace 'WebCat.RepLookup', (exports) ->
 
     reducedData['Domain Status'] = domainStatuses
     reducedData['Name Server'] = nameServers
-    reducedData['Domain Name'] = reducedData['Domain Name'].toLowerCase()
+    reducedData['Domain Name'] = reducedData['Domain Name'].toLowerCase() if reducedData['Domain Name']?
     return reducedData
 
   keyify = (s) ->
