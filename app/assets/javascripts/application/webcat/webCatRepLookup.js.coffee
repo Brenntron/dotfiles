@@ -108,6 +108,7 @@ namespace 'WebCat.RepLookup', (exports) ->
     "<div class='iana-content-wrapper'>
       <h5>Domain Name</h5>
       <p>#{ipDomain}</p>
+      <hr class='thin'/>
       <h5>Registrant</h5>
       <table class='nested-dialog-table'>
         <tr>
@@ -135,8 +136,12 @@ namespace 'WebCat.RepLookup', (exports) ->
           </td>
         </tr>
       </table>
+      <hr class='thin'/>
       <h5>Name Servers</h5>
+      <table>
       #{name_servers(info['nserver'])}
+      </table>
+      <hr class='thin'/>
       <h5> Dates</h5>
       <table class='nested-dialog-table'>
         <tr>
@@ -172,7 +177,7 @@ namespace 'WebCat.RepLookup', (exports) ->
     else
       text = ""
       for server in server_list
-        text += "<p>#{server}</p>"
+        text += "<tr><td>#{server}</td></tr>"
       text
 
   parseIcannInfo = (whoisData) ->
