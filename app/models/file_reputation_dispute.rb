@@ -632,7 +632,7 @@ class FileReputationDispute < ApplicationRecord
     customer = Customer.file_rep_process_and_get_customer(customer_payload)
 
     bugzilla_rest_session = message_payload[:bugzilla_rest_session]
-
+    message_payload.delete(:bugzilla_rest_session)
     summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     full_description = <<~HEREDOC
@@ -699,15 +699,17 @@ class FileReputationDispute < ApplicationRecord
       new_dispute.update_amp_detection
     end
 
-    if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
-      ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
-      linked_dispute_comment = FileRepComment.new
-      linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
-      linked_dispute_comment.user_id = user.id
-      linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
-      linked_dispute_comment.save(:validate => false)
+    # commenting this functionality out until bugzilla snort bugs have been successfully moved to JIRA, then
+    # this functionality will need to be rebuilt, if it's even necessary (since this feature isn't even being used)
+    #if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
+    #  ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
+    #  linked_dispute_comment = FileRepComment.new
+    #  linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
+    #  linked_dispute_comment.user_id = user.id
+    #  linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+    #  linked_dispute_comment.save(:validate => false)
 
-    end
+    #end
 
     if is_duplicate == true
       return new_dispute
@@ -1282,29 +1284,30 @@ class FileReputationDispute < ApplicationRecord
       Rails.logger.error("Error saving updated detection information -- #{$!.message}")
     end
   end
+  #this is part of a feature that isn't being used, and will need to be rebuilt at some point if it intends to be used
+  # after switching from BZ to JIRA
+  #def self.build_ips_bug(bugzilla_rest_session, filename, sha256, problem, original_bug_id)
+  #  summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-  def self.build_ips_bug(bugzilla_rest_session, filename, sha256, problem, original_bug_id)
-    summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+  #  full_description = <<~HEREDOC
+  #        File name: #{filename}
+  #        File Rep Sha: #{sha256}
 
-    full_description = <<~HEREDOC
-          File name: #{filename}
-          File Rep Sha: #{sha256}
+  #        Summary: #{problem}
+  #  HEREDOC
 
-          Summary: #{problem}
-    HEREDOC
+  #  bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
+  #  logger.debug "Creating bugzilla bug"
 
-    bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
-    logger.debug "Creating bugzilla bug"
+  #  research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-    research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+  #  linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
+  #  linked_bug_proxy.save!
 
-    linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
-    linked_bug_proxy.save!
+  #  new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
 
-    new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
-
-    research_bug_proxy
-  end
+  #  research_bug_proxy
+  #end
 
 
   def get_email_meta_data
