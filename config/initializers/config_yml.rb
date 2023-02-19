@@ -219,3 +219,8 @@ ngfw_telemetry_aws_config = OpenStruct.new
 ngfw_telemetry_aws_config.aws_access_key_id = ngfw_telemetry_config.dig('aws', 'access_key_id')
 ngfw_telemetry_aws_config.aws_secret_access_key = ngfw_telemetry_config.dig('aws', 'secret_access_key')
 Rails.configuration.ngfw_telemetry = ngfw_telemetry_aws_config
+
+file_mgmt_config = env_config.fetch('file_mgmt', nil)
+raise 'config.yml missing file_mgmt section' unless file_mgmt_config
+Rails.configuration.base_host_path = file_mgmt_config['base_host_path']
+Rails.configuration.base_file_path = file_mgmt_config['base_file_path']

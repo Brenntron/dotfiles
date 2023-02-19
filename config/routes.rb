@@ -80,6 +80,7 @@ Rails.application.routes.draw do
         end
         member do
           get :export
+          get 'download_email_attachment_file/:id', to: 'disputes#download_email_attachment_file'
         end
       end
       resources :dispute_emails         # TODO This route has no controller so determine if it should be removed.
@@ -95,6 +96,7 @@ Rails.application.routes.draw do
     namespace :sdr do
       root 'root#index'
       resources :disputes, only: [:index, :show]
+
     end
 
     namespace :file_rep do
@@ -109,6 +111,7 @@ Rails.application.routes.draw do
       root 'root#index'
       resources :disputes, only: [:index, :show] do
         get :all_attachments
+        get 'download_sdr_attachment_file/:id', to: 'disputes#download_sdr_attachment_file'
       end
     end
 

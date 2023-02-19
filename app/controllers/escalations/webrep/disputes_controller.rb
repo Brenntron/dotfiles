@@ -22,6 +22,16 @@ class Escalations::Webrep::DisputesController < ApplicationController
     end
   end
 
+  def download_email_attachment_file
+    dispute_email_attachment = DisputeEmailAttachment.find(params[:id])
+
+    dispute_file_name = dispute_email_attachment.file_name
+
+    file_data = open(dispute_email_attachment.direct_upload_url)
+
+    send_data file_data, filename: dispute_file_name, disposition: 'attachment'
+  end
+
   def show
     @dispute = Dispute.eager_load([:dispute_comments, :dispute_emails]).eager_load(:dispute_entries => [:dispute_rule_hits, :dispute_entry_preload]).where(:id => params[:id]).first
     @versioned_items = @dispute.compose_versioned_items
