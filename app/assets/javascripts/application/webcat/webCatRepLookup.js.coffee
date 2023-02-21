@@ -1,7 +1,6 @@
 namespace 'WebCat.RepLookup', (exports) ->
   exports.whoIsLookups = (ipDomain) ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    selected_rows = $("tr.highlight-second-review.shown")
 
     if $('#whoisContent').length > 0
       $('#whoisContent').dialog(title: "Whois for: #{ipDomain}").dialog('open')
@@ -51,7 +50,7 @@ namespace 'WebCat.RepLookup', (exports) ->
     $('.iana-content-wrapper').remove()
     $('#iana_whois > .webcat-loader-wrapper').show()
 
-    $('.icann-content-wrapper').remove()
+    $('.icann-table').remove()
     $('#icann_whois > .webcat-loader-wrapper').show()
 
     $.ajax(
@@ -84,7 +83,7 @@ namespace 'WebCat.RepLookup', (exports) ->
         if response != null
           parsedResponse = formatIcannInfo(response.data)
 
-          $("#icann_whois").append("<div class='icann-content-wrapper'>#{parsedResponse}</div> ")
+          $("#icann_whois").append(parsedResponse)
         else
           message = "No available responses. The IP address may be unallocated or its whois server is unavailable."
           $('#whois_content').append message
@@ -136,7 +135,6 @@ namespace 'WebCat.RepLookup', (exports) ->
           </td>
         </tr>
       </table>
-      <hr class='thin'/>
       <h5>Name Servers</h5>
       <table>
       #{name_servers(info['nserver'])}
@@ -218,22 +216,23 @@ namespace 'WebCat.RepLookup', (exports) ->
       return { "#{kv[0].trim()}": kv[1].trim() }
 
   stringifyInfo = (parsedInfo) ->
-    domainStatus = '<div class="icann-section row"><h5 class="icann-title col-sm-4">Domain Status</h5><div class="col-sm-8">'
-    infoString = ''
-    nameServers = '<div class="icann-section row"><h5 class="icann-title col-sm-4">Nameservers</h5><div class="col-sm-8">'
+    domainStatus = '<h5>Domain Status</h5><table class="nested-dialog-table">'
+    infoString = '<table>'
+    nameServers = '<h5>Nameservers</h5><table class="nested-dialog-table">'
     tempDomainStatuses = []
 
     for k,v of parsedInfo
       if k == 'Domain Status'
         for ds in v
-          domainStatus += "<p class='icann-info'>#{ds}</p>" unless ds.includes('www')
+          domainStatus += "<tr><td>#{ds}</td></tr>" unless ds.includes('www')
       else if k == 'Name Server'
         for ns in v
-          nameServers += "<p class='icann-info'>#{ns.toLowerCase()}</p>"
+          nameServers += "<tr><td>#{ns.toLowerCase()}</tr></td>"
       else
-        infoString += "<div class='icann-section row'><h5 class='icann-title col-sm-4'>#{k}</h5><p class='icann-info col-sm-8'>#{v}</p></div>"
+        infoString += "<tr><th scope='row'>#{k}</th><td>#{v}</td></tr>"
 
-    nameServers += '</div></div>'
-    domainStatus += '</div></div>'
+    infoString += '</table>'
+    domainStatus += '</table>'
+    nameServers += '</table>'
 
     infoString += "#{domainStatus}#{nameServers}"

@@ -5148,7 +5148,7 @@ table > tbody > tr > td.dispute_rep_tools {
 #reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
   width: 400px;
 }
-[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"],[aria-describedby="whois_content"]  {
+[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"],[aria-describedby="whoisContent"]  {
   z-index: 999;
 }
 
@@ -9712,6 +9712,12 @@ td.text-center span {
       line-height: 1rem;
       padding-left: 25px;
     }
+  }
+}
+
+#icann_whois {
+  th {
+    border-bottom: 1px solid $faint-neutral-color;
   }
 }
 
