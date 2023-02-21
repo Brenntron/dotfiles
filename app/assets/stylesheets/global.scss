@@ -9719,12 +9719,6 @@ td.text-center span {
   }
 }
 
-#icann_whois {
-  th {
-    border-bottom: 1px solid $faint-neutral-color;
-  }
-}
-
 .ticket-age-over3hr {
   color: $warning-accent-color;
   font-weight: bold;
@@ -10570,6 +10564,12 @@ hr.thin.form-divider {
       padding: 4px 8px !important;
       line-height: 1.25em !important;
       font-size: 12px;
+    }
+    th {
+      padding: 4px 8px !important;
+      border-bottom: 1px solid $faint-neutral-color;
+      height: 24px;
+      line-height: 1.25em !important;
     }
   }
   hr.thin {
