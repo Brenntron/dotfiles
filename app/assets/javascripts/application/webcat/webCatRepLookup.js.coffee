@@ -181,6 +181,7 @@ namespace 'WebCat.RepLookup', (exports) ->
   parseIcannInfo = (whoisData) ->
     domainStatuses = []
     nameServers = []
+    nservers = []
 
     splitData = whoisData.split(/\r?\n/)
     keyedData = splitData.map((s) -> keyify(s)).filter((str) -> str)
@@ -193,6 +194,8 @@ namespace 'WebCat.RepLookup', (exports) ->
         domainStatuses.push(value)
       else if key == 'Name Server'
         nameServers.push(value)
+      else if key == 'Nserver'
+        nservers.push(value)
 
     reducedData = keyedData.reduce((accumulator, currentValue) ->
       key = Object.keys(currentValue)[0]
@@ -201,38 +204,46 @@ namespace 'WebCat.RepLookup', (exports) ->
       accumulator
     )
 
-    reducedData['Domain Status'] = domainStatuses
-    reducedData['Name Server'] = nameServers
+    reducedData['Domain Status'] = domainStatuses if domainStatuses.length > 0
+    reducedData['Name Server'] = nameServers if nameServers.length > 0
+    reducedData['Nserver'] = nservers if nservers.length > 0
     reducedData['Domain Name'] = reducedData['Domain Name'].toLowerCase() if reducedData['Domain Name']?
     return reducedData
 
   keyify = (s) ->
-    unneededKeys = ['URL of the ICANN', 'Last update of', 'NOTICE', 'TERMS OF USE', 'by the following terms of use', 'to']
+    unneededKeys = ['URL of the ICANN', 'Last update of', 'NOTICE', 'TERMS OF USE', 'by the following terms of use', 'to', 'note']
     kv = s.split(': ')
 
     if !kv[1]? || (unneededKeys.filter((uk) -> kv[0].includes(uk)).length > 0)
       return
     else
-      return { "#{kv[0].trim()}": kv[1].trim() }
+      return { "#{kv[0].trim().replace('&quot;', '')}": kv[1].trim() }
 
   stringifyInfo = (parsedInfo) ->
-    domainStatus = '<h5>Domain Status</h5><table class="nested-dialog-table">'
     infoString = '<table>'
-    nameServers = '<h5>Nameservers</h5><table class="nested-dialog-table">'
-    tempDomainStatuses = []
+    domainStatus = ''
+    nameServers = ''
+    nservers = ''
 
     for k,v of parsedInfo
       if k == 'Domain Status'
+        domainStatus = '<h5>Domain Status</h5><table class="nested-dialog-table">'
         for ds in v
           domainStatus += "<tr><td>#{ds}</td></tr>" unless ds.includes('www')
       else if k == 'Name Server'
+        nameServers = '<h5>Nameservers</h5><table class="nested-dialog-table">'
         for ns in v
           nameServers += "<tr><td>#{ns.toLowerCase()}</tr></td>"
+      else if k == 'Nserver'
+        nservers = '<h5>Nservers</h5><table class="nested-dialog-table"'
+        for ns in v
+          nservers += "<tr><td>#{ns}</td></tr>"
       else
         infoString += "<tr><th scope='row'>#{k}</th><td>#{v}</td></tr>"
 
     infoString += '</table>'
-    domainStatus += '</table>'
-    nameServers += '</table>'
+    domainStatus += '</table>' if domainStatus.length > 0
+    nameServers += '</table>' if nameServers.length > 0
+    nservers += '</table>' if nservers.length > 0
 
-    infoString += "#{domainStatus}#{nameServers}"
+    infoString += "#{domainStatus}#{nameServers}#{nservers}"
