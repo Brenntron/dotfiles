@@ -9701,6 +9701,10 @@ td.text-center span {
   border: none !important;
   z-index: 999;
 
+  .tab-pane {
+    min-height: 200px;
+  }
+
   .ui-dialog-titlebar {
     background-color: $primary-section-color;
 
