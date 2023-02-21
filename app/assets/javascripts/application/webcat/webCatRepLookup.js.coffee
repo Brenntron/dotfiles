@@ -50,7 +50,7 @@ namespace 'WebCat.RepLookup', (exports) ->
     $('.iana-content-wrapper').remove()
     $('#iana_whois > .webcat-loader-wrapper').show()
 
-    $('.icann-table').remove()
+    $('#icannContent').remove()
     $('#icann_whois > .webcat-loader-wrapper').show()
 
     $.ajax(
@@ -83,7 +83,7 @@ namespace 'WebCat.RepLookup', (exports) ->
         if response != null
           parsedResponse = formatIcannInfo(response.data)
 
-          $("#icann_whois").append(parsedResponse)
+          $("#icann_whois").append("<div id='icannContent'>#{parsedResponse}</div>")
         else
           message = "No available responses. The IP address may be unallocated or its whois server is unavailable."
           $('#whois_content').append message
