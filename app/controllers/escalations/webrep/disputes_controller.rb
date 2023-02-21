@@ -1,5 +1,5 @@
 class Escalations::Webrep::DisputesController < ApplicationController
-  load_and_authorize_resource class: 'Dispute'
+  load_and_authorize_resource class: 'Dispute', :except => :download_email_attachment_file
 
   before_action :require_login
 
@@ -27,7 +27,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
     dispute_file_name = dispute_email_attachment.file_name
 
-    file_data = open(dispute_email_attachment.direct_upload_url)
+    file_data = open(dispute_email_attachment.direct_upload_url).read
 
     send_data file_data, filename: dispute_file_name, disposition: 'attachment'
   end

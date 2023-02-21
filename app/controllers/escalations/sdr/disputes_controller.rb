@@ -21,7 +21,7 @@ class Escalations::Sdr::DisputesController < ApplicationController
 
     dispute_file_name = sender_domain_reputation_dispute_attachment.file_name
 
-    file_data = open(sender_domain_reputation_dispute_attachment.direct_upload_url)
+    file_data = open(sender_domain_reputation_dispute_attachment.direct_upload_url).read
 
     send_data file_data, filename: dispute_file_name, disposition: 'attachment'
   end
