@@ -51,7 +51,7 @@ class Escalations::Sdr::DisputesController < ApplicationController
         #enconding = bug_attachment.content_type.eql?("application/pdf") ? 'wb' : 'w'
         encoding = "wb"
 
-        File.open("#{zip_directory}/#{temp_file_name}", enconding) { |f| f.write open(bug_attachment.direct_upload_url).read }
+        File.open("#{zip_directory}/#{temp_file_name}", encoding) { |f| f.write open(bug_attachment.direct_upload_url).read }
         file_attachments << temp_file_name
         offset += 1
       end
