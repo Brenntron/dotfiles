@@ -4,37 +4,46 @@ class EnrichmentService::QueryInterface
 
   def self.interpreted_query(query_item)
     suggestion = get_suggestion(query_item)
+    prevalence_response = nil
     case suggestion
     when 'domain'
-      response = EnrichmentService::Enrich.query_domain(query_item)
+      response = ::EnrichmentService::Enrich.query_domain(query_item)
+      prevalence_response = ::EnrichmentService::Enrich.query_domain_prevalence([query_item])
     when 'ip'
-      response = EnrichmentService::Enrich.query_ip(query_item)
+      response = ::EnrichmentService::Enrich.query_ip(query_item)
+      prevalence_response = ::EnrichmentService::Enrich.query_ip_prevalence([query_item])
     when 'url'
-      response = EnrichmentService::Enrich.query_url(query_item)
+      response = ::EnrichmentService::Enrich.query_url(query_item)
+      prevalence_response = ::EnrichmentService::Enrich.query_domain_prevalence([DisputeEntry.safe_domain_of(query_item)])
     when 'sha'
-      response = EnrichmentService::Enrich.query_sha(query_item)
+      response = ::EnrichmentService::Enrich.query_sha(query_item)
+      prevalence_response = ::EnrichmentService::Enrich.query_hash_prevalence([query_item])
     end
-    process_response(response)
+    process_response(response, prevalence_response)
   end
 
   def self.domain_query(query_item)
-    response = EnrichmentService::Enrich.query_domain(query_item)
-    process_response(response)
+    response = ::EnrichmentService::Enrich.query_domain(query_item)
+    prevalence_response = ::EnrichmentService::Enrich.query_domain_prevalence([query_item])
+    process_response(response, prevalence_response)
   end
 
   def self.ip_query(query_item)
-    response = EnrichmentService::Enrich.query_ip(query_item)
-    process_response(response)
+    response = ::EnrichmentService::Enrich.query_ip(query_item)
+    prevalence_response = ::EnrichmentSerivce::Enrich.query_ip_prevalence([query_item])
+    process_response(response, prevalence_response)
   end
 
   def self.url_query(query_item)
-    response = EnrichmentService::Enrich.query_url(query_item)
-    process_response(response)
+    response = ::EnrichmentService::Enrich.query_url(query_item)
+    prevalence_response = ::EnrichmentService::Enrich.query_domain_prevalence([DisputeEntry.safe_domain_of(query_item)])
+    process_response(response, prevalence_response)
   end
 
   def self.sha_query(query_item)
-    response = EnrichmentService::Enrich.query_sha(query_item)
-    process_response(response)
+    response = ::EnrichmentService::Enrich.query_sha(query_item)
+    prevalence_response = ::EnrichmentService::Enrich.query_hash_prevalence([query_item])
+    process_response(response, prevalence_response)
   end
 
   def self.get_suggestion(query_item)
@@ -47,7 +56,7 @@ class EnrichmentService::QueryInterface
 
   private
 
-  def self.process_response(response)
+  def self.process_response(response, prevalence = nil)
     EnrichmentService::TaxonomyMap.check_version(response.taxonomy_map_version)
     response_hash = JSON.parse(response.to_h.to_json)
     response_hash['context_tags'].each do |context_tag|
@@ -70,6 +79,10 @@ class EnrichmentService::QueryInterface
       context_tag['taxonomy_name'] = extra_params['taxonomy_name']
       context_tag['taxonomy_description'] = extra_params['taxonomy_description']
       context_tag['mapped_taxonomy'] = extra_params['mapped_taxonomy']
+    end
+    if prevalence.present?
+      prevalence_hash = JSON.parse(prevalence.to_h.to_json)
+      response_hash['prevalence'] = prevalence_hash
     end
     response_hash
   end

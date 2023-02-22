@@ -6334,6 +6334,7 @@ table > tbody > tr > td.research-table-row-wrapper {
 .virustotal-details-table { background-color: $rule-accent-color;}
 .reptool-details-table {background-color: $fifth-section-color;}
 .enrich-details-table {background-color: $escalations-section-color;}
+.prevalence-details-table {background-color: $escalations-section-color;}
 
 .entry-details-table table {
   background-color: $table-dark-body;
@@ -10915,6 +10916,11 @@ input.assignee.form-control{
   background-image: url(image_path('icon_cat.svg'));
 }
 
+.prevalence-filerep-header{
+  border-bottom-color: $second-section-color;
+  background-image: url(image_path('icon_cat.svg'));
+}
+
 .sample-present-true, .sample-present-false {
   width: 30px;
   height: 40px;
@@ -11191,6 +11197,7 @@ button.secondary.view-report-external-button {
 .sb-report-run,
 .sdr-research-data-present,
 .sdr-research-data-missing,
+.prevalence-filerep-data-missing,
 .enrich-filerep-data-missing{
   display: none;
 }
@@ -11199,6 +11206,7 @@ button.secondary.view-report-external-button {
 .sb-data-missing,
 .rl-data-missing,
 .enrich-filerep-data-missing,
+.prevalence-filerep-data-missing,
 .sb-report-run,
 .tg-report-run,
 .rl-report-run {
@@ -12947,6 +12955,10 @@ table > tbody > tr > td.no-padding {
 }
 
 .enrich-webrep-table-data-missing {
+  display: none;
+}
+
+.prevalence-webrep-table-data-missing {
   display: none;
 }
 
