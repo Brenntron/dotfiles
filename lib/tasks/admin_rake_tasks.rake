@@ -396,6 +396,10 @@ namespace :bugs do
 
   def convert_files_from_bugzilla_to_local
 
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+
+
+
     #HANDLE DISPUTE EMAIL ATTACHMENTS
 
     all_attachments = DisputeEmailAttachment.all
@@ -442,8 +446,6 @@ namespace :bugs do
         dispute_email_attachment.direct_upload_url = full_file_path
         dispute_email_attachment.save
       end
-    end
-
     end
 
   end

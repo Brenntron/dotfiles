@@ -17,10 +17,13 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
   FULL_FILE_DIRECTORY_PATH = Rails.configuration.base_host_path + Rails.configuration.base_file_path + MODEL_PATH
 
-  def self.build_and_push_to_bugzilla(bugzilla_rest_session, payload, user, sender_domain_reputation_dispute, remote = true)
+  def self.build_and_push_to_bugzilla(payload, sender_domain_reputation_dispute, remote = true)
     new_local_attachment = nil
+    if payload[:url].blank? && payload["url"].present?
+      payload[:url] = payload["url"]
+    end
     if remote == true
-      file_content = open(payload["url"]).read
+      file_content = open(payload[:url]).read
     else
       file_content = payload[:file_content].read
     end
