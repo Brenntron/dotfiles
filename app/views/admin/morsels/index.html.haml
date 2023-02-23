@@ -1,0 +1,23 @@
+
+#alert_message{:role => "alert"}
+  = render "shared/flash_messages", flash: flash
+
+.content-wrapper
+  .row
+    .col-sm-8
+      %h1 Morsels
+      %table.table.table-responsive
+        %thead
+          %tr
+            %th created_at
+            %th updated_at
+            %th id
+            %th actions
+        %tbody
+          - @morsels.each do |morsel|
+            %tr
+              %td.created_at= morsel.created_at
+              %td.updated_at= morsel.updated_at
+              %td.id=  morsel.id
+              %td
+                = link_to "View Output", admin_morsel_path(morsel.id), :class=>"btn btn-primary btn-xs"
