@@ -81,7 +81,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       customer = Customer.file_rep_process_and_get_customer(customer_payload)
 
       bugzilla_rest_session = message_payload[:bugzilla_rest_session]
-
+      message_payload.delete(:bugzilla_rest_session)
       summary = "New Sender Domain Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
       full_description = <<~HEREDOC
