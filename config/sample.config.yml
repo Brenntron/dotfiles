@@ -1,4 +1,7 @@
 development:
+  file_mgmt:
+    base_host_path: "/tmp/"
+    base_file_path: "/analyst_console/escalations/"
   api_timeout:
     timeout: 15
   app_info:

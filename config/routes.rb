@@ -77,6 +77,7 @@ Rails.application.routes.draw do
           get :export_per_customer_report
           get :resolution_age_report
           get :export_resolution_age_report
+          get 'download_email_attachment_file/:id', to: 'disputes#download_email_attachment_file'
         end
         member do
           get :export
@@ -95,6 +96,7 @@ Rails.application.routes.draw do
     namespace :sdr do
       root 'root#index'
       resources :disputes, only: [:index, :show]
+
     end
 
     namespace :file_rep do
@@ -108,6 +110,9 @@ Rails.application.routes.draw do
     namespace :sdr do
       root 'root#index'
       resources :disputes, only: [:index, :show] do
+        collection do
+          get 'download_sdr_attachment_file/:id', to: 'disputes#download_sdr_attachment_file'
+        end
         get :all_attachments
       end
     end

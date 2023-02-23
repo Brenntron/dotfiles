@@ -393,4 +393,60 @@ namespace :bugs do
       raise "Missing bugzilla_username or bugzilla_password."
     end
   end
+
+  def convert_files_from_bugzilla_to_local
+
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+
+
+
+    #HANDLE DISPUTE EMAIL ATTACHMENTS
+
+    all_attachments = DisputeEmailAttachment.all
+
+    dispute_ids = all_email_attachments.map {|att| att.dispute_email.dispute&.id}
+
+    dispute_ids.each do |dispute_id|
+      bug_proxy = bugzilla_rest_session.build_bug(id: dispute_id)
+      bug_attachments = bug_proxy.attachments
+
+      bug_attachments.each do |bug_attachment|
+        full_file_path = DisputeEmailAttachment::FULL_FILE_DIRECTORY_PATH + "#{bug_attachment.id}/#{bug_attachment.file_name}"
+
+        directory_to_create = Pathname(full_file_path)
+        directory_to_create.dirname.mkpath
+
+        File.open(full_file_path, 'wb') { |f| f.write bug_attachment.file_contents }
+
+        dispute_email_attachment = all_attachments.find {|attach| attach.id == bug_attachment.id}
+        dispute_email_attachment.direct_upload_url = full_file_path
+        dispute_email_attachment.save
+      end
+    end
+
+    #HANDLE SDR ATTACHMENTS
+
+    all_attachments = SenderDomainReputationDisputeAttachment.all
+
+    dispute_ids = all_email_attachments.map {|att| att.dispute_email.dispute&.id}
+
+    dispute_ids.each do |dispute_id|
+      bug_proxy = bugzilla_rest_session.build_bug(id: dispute_id)
+      bug_attachments = bug_proxy.attachments
+
+      bug_attachments.each do |bug_attachment|
+        full_file_path = SenderDomainReputationDisputeAttachment::FULL_FILE_DIRECTORY_PATH + "#{bug_attachment.id}/#{bug_attachment.file_name}"
+
+        directory_to_create = Pathname(full_file_path)
+        directory_to_create.dirname.mkpath
+
+        File.open(full_file_path, 'wb') { |f| f.write bug_attachment.file_contents }
+
+        dispute_email_attachment = all_attachments.find {|attach| attach.id == bug_attachment.id}
+        dispute_email_attachment.direct_upload_url = full_file_path
+        dispute_email_attachment.save
+      end
+    end
+
+  end
 end

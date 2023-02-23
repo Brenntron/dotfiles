@@ -158,14 +158,14 @@ class SenderDomainReputationDispute < ApplicationRecord
 
       if message_payload["attachments"].present?
         message_payload["attachments"].each do |dispute_attachment|
-          SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, dispute_attachment, user, new_dispute)
+          SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(dispute_attachment, new_dispute)
         end
         #retry for sometimes it gets weird
         if new_dispute.sender_domain_reputation_dispute_attachments.size != message_payload["attachments"].size
           new_dispute.sender_domain_reputation_dispute_attachments.destroy_all
           new_dispute.reload
           message_payload["attachments"].each do |dispute_attachment|
-            SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, dispute_attachment, user, new_dispute)
+            SenderDomainReputationDisputeAttachment.build_and_push_to_bugzilla(dispute_attachment, new_dispute)
           end
         end
 
