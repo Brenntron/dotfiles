@@ -16,17 +16,6 @@ class ApplicationController < ActionController::Base
     session[:previous_url] = request.url
   end
 
-  def bugzilla_session()
-    xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-    xmlrpc.token = request.headers['Xmlrpc-Token'] ? request.headers['Xmlrpc-Token'] : xml_token
-    xmlrpc
-  end
-
-  def bugzilla_rest_session
-    token = session['bugzilla_rest_api_token']
-    BugzillaRest::Session.new(api_key: current_user.bugzilla_api_key, token: token)
-  end
-
   def current_user
     user_from_request = User.from_request(params, request)
     if user_from_request && !session[:email]

@@ -19,8 +19,8 @@ Feature: Disputes
     And the following customers exist:
     |id| name            |
     |1 | Dispute Analyst |
-    And bugzilla rest api always saves
-    And the user is logged into bugzilla
+#    And bugzilla rest api always saves
+#    And the user is logged into bugzilla
     And ThreatGrid API call is stubbed
     And ThreatGrid API data is stubbed
     And Reversing Labs certificates API call is stubbed
@@ -49,8 +49,8 @@ Feature: Disputes
     And the following FileRep disputes exist:
       | sha256_hash                                                       |
       | 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54  |
-    And bugzilla rest api always saves
-    And the user is logged into bugzilla
+#    And bugzilla rest api always saves
+#    And the user is logged into bugzilla
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
@@ -74,8 +74,8 @@ Feature: Disputes
     And the following FileRep disputes exist:
     | sha256_hash                                                       |
     | 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54  |
-    And bugzilla rest api always saves
-    And the user is logged into bugzilla
+#    And bugzilla rest api always saves
+#    And the user is logged into bugzilla
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
@@ -99,8 +99,8 @@ Feature: Disputes
     And the following FileRep disputes exist:
       | sha256_hash                                                       |
       | 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54  |
-    And bugzilla rest api always saves
-    And the user is logged into bugzilla
+#    And bugzilla rest api always saves
+#    And the user is logged into bugzilla
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
@@ -513,8 +513,8 @@ Feature: Disputes
     And the following customers exist:
     |id| name            |
     |1 | Dispute Analyst |
-    And the user is logged into bugzilla
-    And bugzilla rest api always saves
+#    And the user is logged into bugzilla
+#    And bugzilla rest api always saves
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
@@ -538,8 +538,8 @@ Feature: Disputes
     And the following customers exist:
       |id| name            |
       |1 | Dispute Analyst |
-    And the user is logged into bugzilla
-    And bugzilla rest api always saves
+#    And the user is logged into bugzilla
+#    And bugzilla rest api always saves
     And ThreatGrid API call is stubbed
     And ThreatGrid API data is stubbed
     And Reversing Labs certificates API call is stubbed
