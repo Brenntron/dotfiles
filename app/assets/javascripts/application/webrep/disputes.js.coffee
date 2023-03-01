@@ -1368,8 +1368,8 @@ $ ->
         #note: any selectize filters need to be populated after the selectize options are created
         filters = JSON.parse(localStorage.webRepFilters)
 
-        #Need to check if this a saved filter, since those don't load in the data to the cookie
-        if filters.search_type != 'named'
+        #Need to check if this a saved or basic search, since those don't load in the data to the local storage
+        if filters.search_type != 'named' && filters.search_type != 'contains'
           local_storage_filters = true
 
           #Case ID field
@@ -1492,7 +1492,6 @@ $ ->
               priority_input = $('#priority-input').selectize()
               priorities = filters.priority.split(',')
               priority_input[0].selectize.setValue(priorities)
-
 
           for user in response.json.case_owners
             $('#user-list').append '<option value=\'' + user + '\'></option>'
