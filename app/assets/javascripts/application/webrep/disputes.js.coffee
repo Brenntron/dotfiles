@@ -1361,6 +1361,50 @@ $ ->
   $('#webrep-advanced-search-button').click ->
     # if we have already loaded the advanced search, with all options no need to load it again
     if $('#company-list').find('option').size() == 0
+
+      if localStorage.getItem('webRepFilters') != null
+        local_storage_filters = false
+        #populate any non-selectize fields with current filters
+        #note: any selectize filters need to be populated after the selectize options are created
+        filters = JSON.parse(localStorage.webRepFilters)
+
+        #Need to check if this a saved filter, since those don't load in the data to the cookie
+        if filters.search_type != 'named'
+          local_storage_filters = true
+
+          #Case ID field
+          $('#caseid-input').val filters.case_id
+          #Dispute (URL/IP/Domain)
+          $('#dispute-input').val filters.dispute_entries.ip_or_uri
+          #Assignee
+          $('#owner-input').val filters.case_owner_username
+          #Suggested Disposition
+          $('#disposition-input').val filters.dispute_entries.suggested_disposition
+          #Submitter Type
+          $('#submitter-input').val filters.submitter_type
+          #Contact Name
+          $('#name-input').val filters.customer.name
+          #Contact Email
+          $('#email-input').val filters.customer.email
+          #Submitter Org
+          $('#company-input').val filters.customer.company_name
+          #Submitter Domain
+          $('#domain-input').val filters.org_domain
+          #Date Submitted (Newer)
+          $('#submitted-newer-input').val filters.submitted_newer
+          #Date Submitted (Older)
+          $('#submitted-older-input').val filters.submitted_older
+          #Case Origin
+          $('#case-origin-input').val filters.case_origin
+          #Case Age (Newer) ex: 30d 12h
+          $('#age-newer-input').val filters.age_newer
+          #Case Age (Older) ex: 7d 12h
+          $('#age-older-input').val filters.age_older
+          #Last Modified (Newer)
+          $('#modified-newer-input').val filters.modified_newer
+          #Last Modified (Older)
+          $('#modified-older-input').val filters.modified_older
+
       std_msg_ajax(
         method: 'GET'
         url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
@@ -1373,7 +1417,6 @@ $ ->
           $('#company-list').empty()
           $('#resolution-list').empty()
           $('#case-origin-list').empty()
-
 
           $('#platform-input').selectize {
             persist: false
@@ -1422,6 +1465,34 @@ $ ->
             onBlur: () ->
               window.toggle_selectize_layer(this, 'false')
           }
+
+          #populate selectize fields if correct localstorage is found
+          if local_storage_filters == true
+
+            #populate platform
+            if filters.platform_names != ''
+              platform_input = $('#platform-input').selectize()
+              platform_names = filters.platform_names.split(',')
+              platform_input[0].selectize.setValue(platform_names)
+
+            #populate resolution
+            if filters.resolution != ''
+              resolution_input = $('#resolution-input').selectize()
+              resolutions = filters.resolution.split(',')
+              resolution_input[0].selectize.setValue(resolutions)
+
+            #populate status
+            if filters.status != ''
+              status_input = $('#status-input').selectize()
+              statuses = filters.status.split(',')
+              status_input[0].selectize.setValue(statuses)
+
+            #populate priority
+            if filters.priority != ''
+              priority_input = $('#priority-input').selectize()
+              priorities = filters.priority.split(',')
+              priority_input[0].selectize.setValue(priorities)
+
 
           for user in response.json.case_owners
             $('#user-list').append '<option value=\'' + user + '\'></option>'
