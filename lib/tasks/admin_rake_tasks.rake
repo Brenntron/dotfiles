@@ -135,9 +135,9 @@ namespace :escalations do
 
             File.open(full_file_path, 'wb') { |f| f.write bug_attachment.file_contents }
             if open(full_file_path).read != nil
-              dispute_email_attachment = all_attachments.find {|attach| attach.id == bug_attachment.id}
-              dispute_email_attachment.direct_upload_url = full_file_path
-              dispute_email_attachment.save
+              dispute_attachment = all_attachments.find {|attach| attach.id == bug_attachment.id}
+              dispute_attachment.direct_upload_url = full_file_path
+              dispute_attachment.save
             else
               morsel.output += "attachment #{bug_attachment.id} was blank, didn't save. investigate \n"
             end

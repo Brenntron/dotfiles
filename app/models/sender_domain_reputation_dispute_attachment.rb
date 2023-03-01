@@ -97,15 +97,15 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   end
   #tags can be: [SUSPECTED SPAM], [MARKETING], [SOCIAL NETWORK], [BULK], [WARNING: VIRUS DETECTED]
   # BugzillaRest::Session.default_session
-  def send_to_corpus(corpus_submission_category, base_subject, tag, bugzilla_session)
-    bug_proxy = bugzilla_session.build_bug(id: self.sender_domain_reputation_dispute.id)
-    bug_attachments = bug_proxy.attachments
-    file = nil
-    bug_attachments.each do |bug_attachment|
-      if bug_attachment.id == self.id
-        file = bug_attachment
-      end
-    end
+  def send_to_corpus(corpus_submission_category, base_subject, tag, bugzilla_session=nil)
+    #bug_proxy = bugzilla_session.build_bug(id: self.sender_domain_reputation_dispute.id)
+    #bug_attachments = bug_proxy.attachments
+    file = open(self.direct_upload_url)
+    #bug_attachments.each do |bug_attachment|
+    #  if bug_attachment.id == self.id
+    #    file = bug_attachment
+    #  end
+    #end
 
 
     email_args = {}
@@ -122,7 +122,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
     attachment = {}
     attachment["filename"] = self.file_name
-    attachment["data"] = file.file_contents
+    attachment["data"] = file.read
 
     s3_file_path = self.push_to_aws(attachment)
     new_attachment = {}
