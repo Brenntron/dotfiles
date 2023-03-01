@@ -179,7 +179,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
       ###seperating this to try to prevent cases where email_header_data is "nil" in retrieve_attachments_beaker_data even though there is data.
       if new_dispute.sender_domain_reputation_dispute_attachments.present?
-        new_dispute.parse_all_email_file_headers(bugzilla_rest_session)
+        new_dispute.parse_all_email_file_headers
       end
       new_dispute.reload
       if new_dispute.sender_domain_reputation_dispute_attachments.present?
@@ -618,16 +618,11 @@ class SenderDomainReputationDispute < ApplicationRecord
     end
   end
 
-  def parse_all_email_file_headers(bugzilla_rest_session)
+  def parse_all_email_file_headers
 
-    bug_proxy = bugzilla_rest_session.build_bug(id: self.id)
-
-    bug_attachments = bug_proxy.attachments
-
-    bug_attachments.each do |bug_attachment|
-      sdr_attachment = sender_domain_reputation_dispute_attachments.where(:id => bug_attachment.id).first
+    sender_domain_reputation_dispute_attachments.each do |sdr_attachment|
       if sdr_attachment.present?
-        sdr_attachment.parse_email_content(bug_attachment)
+        sdr_attachment.parse_email_content(sdr_attachment)
       end
     end
   end

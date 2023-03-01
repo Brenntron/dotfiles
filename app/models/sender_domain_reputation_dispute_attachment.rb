@@ -13,7 +13,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   ALL_POSSIBLE_TAGS = ["[SUSPECTED SPAM]", "[MARKETING]", "[SOCIAL NETWORK]", "[BULK]", "[WARNING: VIRUS DETECTED]"]
   FILE_EXTENTIONS_TO_PROCESS = ['.eml', '.msg'].freeze
 
-  MODEL_PATH = "/file_reputation_dispute_attachments/"
+  MODEL_PATH = "/sender_domain_reputation_dispute_attachments/"
 
   FULL_FILE_DIRECTORY_PATH = Rails.configuration.base_host_path + Rails.configuration.base_file_path + MODEL_PATH
 
@@ -63,10 +63,10 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
     new_local_attachment
   end
 
-  def parse_email_content(bug_attachment)
-    file_data = bug_attachment.file_contents
+  def parse_email_content
+    file_data = open(self.direct_upload_url).read
 
-    if file_data.present? && FILE_EXTENTIONS_TO_PROCESS.include?(File.extname(file_name))
+    if file_data.present? && FILE_EXTENTIONS_TO_PROCESS.include?(File.extname(self.file_name))
 
       header_json = SenderDomainReputationDisputeAttachment.parse_headers_to_array(file_data)
 
