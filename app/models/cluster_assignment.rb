@@ -39,7 +39,7 @@ class ClusterAssignment < ApplicationRecord
       create(domain: cluster[:domain], cluster_id: cluster[:cluster_id].to_i, user_id: user.id)
     end
 
-    def assign_pemanent!(cluster, user)
+    def assign_permanent!(cluster, user)
       destroy_expired_assignments!
       where(domain: cluster[:domain]).destroy_all
       create(domain: cluster[:domain], cluster_id: cluster[:cluster_id].to_i, user_id: user.id, permanent: true)

@@ -54,7 +54,6 @@ class Escalations::FileRep::DisputesController < ApplicationController
     @conventions = AmpNamingConvention.all
   end
 
-
   private
 
   def datatables_search_params

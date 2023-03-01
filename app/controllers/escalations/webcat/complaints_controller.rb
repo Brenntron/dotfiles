@@ -15,14 +15,18 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
   end
 
   def clusters
+    render layout: "escalations/webcat/clusters"
   end
 
   def show_multiple
     ids = params["selected_ids"]&.split(',') || nil
     @complaints = Complaint.where(id:ids)
   end
-  def advanced_search
 
+  def research
+  end
+
+  def advanced_search
   end
 
   def named_search

@@ -67,7 +67,7 @@ $ ->
     return
 
 window.show_message = (status, content, timer, selector) ->
-  $('#flash_modal').modal('hide')  # hide residuals
+  $('.modal').modal('hide')  # hide residuals
   $('.alert-dismissable').remove()
   $('.inline-loader-wrapper:not(.upper-left)').addClass('hidden')  # hide residual gears
 
@@ -76,16 +76,17 @@ window.show_message = (status, content, timer, selector) ->
     when "error" then div_start = "<div class='alert alert-danger alert-dismissable'>"
     when "info" then div_start = "<div class='alert alert-info alert-dismissable'>"
 
-  div_start = div_start.replace('alert-dismissable', 'alert-dismissable alert-streamlined')
   div_end = "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a></div>"
-  div_full = "#{div_start} #{content} #{div_end}"
 
-  # default alert placement here is near top-center, to right of h1
+  # selector of 'undefined' is default, other placements can be added
   if selector != undefined
-    $(selector).before(div_full)
+    div_start = div_start.replace('alert-dismissable', 'alert-dismissable alert-streamlined')
+
+    # build the full alert div html
+    $(selector).before("#{div_start} #{content} #{div_end}")
   else
-    $('#flash-modal-title').after(div_full)   # place the alert
-    $('#flash_modal').modal('show')
+    # default alert placement here is near top-center
+    $('.tab-top:visible').append("#{div_start} #{content} #{div_end}")
 
   # if timer is defined, auto-dismiss the alert. if timer not defined (or false), leave alerts alone
   if timer != undefined && timer != false
@@ -97,3 +98,14 @@ window.show_message = (status, content, timer, selector) ->
   # after activated, toolbar buttons should hide residual alerts
   $('.toolbar-button').mouseup ->
     $('.alert-dismissable').remove()  # use mouseup() above instead of click()
+
+$ ->
+  # dropdowns should be able to be closed on clicking outside of the dropdown
+  # but should NOT be closed if a user is dismissing a success or error modal
+  # should work across ACE
+  $('.dropdown').on 'hide.bs.dropdown', (e) ->
+    dropdown = this
+    if $('body').hasClass('modal-open')
+      e.preventDefault()
+      # clear loader if exists
+      $(this).find('.lookup-drop-loader').addClass('hidden')

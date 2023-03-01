@@ -1,0 +1,2 @@
+CREATE TABLE `sender_domain_reputation_email_templates` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `template_name` varchar(255), `description` text, `body` text, `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL);
+INSERT INTO `schema_migrations` (`version`) VALUES ('20220419144202');

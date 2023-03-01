@@ -1,0 +1,218 @@
+-#view single record
+- unless @dispute.customer.nil? || @dispute.customer.company.nil?
+  %input{type:'hidden', name: 'sdr-dispute-customer-company-name', value: "#{@dispute.customer.company.name}"}
+%input{type: 'hidden', name: 'sdr-dispute-submitter-type', value: "#{@dispute.submitter_type}"}
+
+.content-wrapper.top-case-info
+  .row
+    .col-xs-2.col-with-divider.sdr-dispute-case-priority-wrapper
+      .sdr-dispute-priority-wrapper
+        %span.bug-state-info.bug-priority#dispute-priority-icon{class: "p-#{@dispute.priority}"}
+      .sdr-dispute-case-id-wrapper
+        %label.content-label-sm
+          Case ID
+        .bug-top-id
+          -# Creating notation for future change. This is neither a link nor part of a dropdown. Should be changed
+          -# to a span and have the dropdown class removed.
+          %a.case-id-tag.related-dropdown-text#dispute_id= @dispute.case_id_str
+        .dispute-status-col-wrapper
+          %label.content-label-sm
+            Status
+          %br
+          -##bugzilla_popover_state
+          - if (@dispute.resolution != Dispute::DUPLICATE)
+            %span.dropdown
+              %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "sdr_dispute_status_drop_down(#{@dispute.id})"}
+                - if @dispute.status.nil?
+                  NEW
+                - else
+                  = @dispute.status
+
+              - if can? :update, Dispute
+                .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
+                  %ul
+                    %li.status-radio-wrapper
+                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESEARCHING}", value: "#{Dispute::STATUS_RESEARCHING}"}
+                      %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_RESEARCHING}"} Researching
+                    %li.status-radio-wrapper
+                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ESCALATED}", value: "#{Dispute::STATUS_ESCALATED}"}
+                      %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_ESCALATED}"} Escalated
+                    %li.status-radio-wrapper
+                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_CUSTOMER_PENDING}", value: "#{Dispute::STATUS_CUSTOMER_PENDING}"}
+                      %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_CUSTOMER_PENDING}"} Customer Pending
+                    %li.status-radio-wrapper
+                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ON_HOLD}", value: "#{Dispute::STATUS_ON_HOLD}"}
+                      %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_ON_HOLD}"} On Hold
+                    %li.status-radio-wrapper
+                      %input.sdr-ticket-status-radio.resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESOLVED}", value: "#{Dispute::STATUS_RESOLVED}"}
+                      %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_RESOLVED}"} Resolved / Closed
+                      .dropdown-menu#show-ticket-resolution-submenu
+                        .col-xs-5.submenu-left-wrapper{id: "sdr-resolution-selector"}
+                          .submenu-header
+                            Ticket Resolution
+                          %ul
+                            %li
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
+                              %ul
+                                %li.preset-resolution
+                                  %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_SUDDEN_SPIKE", value: "FIXED_FP_SUDDEN_SPIKE"}
+                                  %label.ticket-res-radio-label.radio-label{for: "FIXED_FP_SUDDEN_SPIKE"} Sudden Spike
+                                %li.preset-resolution
+                                  %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_DOMAIN_AGE", value: "FIXED_FP_DOMAIN_AGE"}
+                                  %label.ticket-res-radio-label.radio-label{for: "FIXED_FP_DOMAIN_AGE"} Domain Age
+                                %li.preset-resolution
+                                  %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_NEGATIVE_WEBREP", value: "FIXED_FP_NEGATIVE_WEBREP"}
+                                  %label.ticket-res-radio-label.radio-label{for: "FIXED_FP_NEGATIVE_WEBREP"} Negative Webrep
+                            %li
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
+                            %li
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", value: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"} Unchanged
+                            %li
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_INVALID}", value: "#{Dispute::STATUS_RESOLVED_INVALID}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
+                            %li
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_TEST}", value: "#{Dispute::STATUS_RESOLVED_TEST}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_TEST}"} Test / Training
+                            %li
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
+                        .col-xs-7.submenu-right-wrapper
+                          .resolution-comment-wrapper
+                            %label.content-label-sm.customer-facing-comment
+                              Customer Facing Comment
+                            %textarea.ticket-resolution-comment
+                            %button.primary{onClick: 'sdr_show_page_edit_status()'}
+                              Submit
+
+                    %li.status-radio-wrapper
+                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
+                      %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
+                    %li.non-resolution-submit-wrapper.sdr-non-resolution-submit-wrapper#ticket-non-res-submit
+                      %label.content-label-sm
+                        Comment
+                      %textarea.ticket-status-comment
+                      .button-row-center
+                        %button.primary{onClick: 'sdr_show_page_edit_status()'}
+                          Submit
+
+            - if @dispute&.resolution_comment.present?
+              %button.status-comment-button.esc-tooltipped{title: @dispute&.resolution_comment}
+
+          - else
+            .duplicate-status-notice
+              =@dispute.resolution
+
+    .col-xs-2.col-with-divider.row
+      .dispute-owner-wrapper.col-xs-12
+        %label.content-label-sm
+          Assignee
+        %div
+          - if @dispute.user_id == nil || @dispute.user.cvs_username == 'vrtincom'
+            %span.missing-data#dispute-assignee Unassigned
+          - else
+            %span#dispute-assignee= @dispute.user&.cvs_username || Unassigned
+      - if can? :update, Dispute
+        .dispute-owner-buttons-wrapper.sdr-dispute-owner-buttons-wrapper.col-xs-12
+          - if @dispute.user_id == current_user.id
+            - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+              %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'sdr_toolbar_unassign_dispute();'}
+          - else
+            %span.dropdown
+              - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+                %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_sdr_dispute(#{@dispute.id});"}
+                %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+              .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+                .change-assignee-dropdown-wrapper
+                  %h3 Change Assignee
+                  .inline-tool-content-wrapper
+                    .toolbar
+                      %div
+                        %label.toolbar-section-label Assignee
+                        =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+                      %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'sdr_toolbar_show_change_assignee();'}
+                        Assign
+
+          - if (!@dispute.user_id.nil? && @dispute.user.cvs_username != 'vrtincom')
+            .container_unassign
+              %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'sdr_toolbar_unassign_dispute();'}
+                Unassign
+
+    .col-xs-2.col-with-divider
+      .sdr-submitted-at-wrapper
+        %label.content-label-sm
+          Submitted At
+        %p.submitted-time
+          = @dispute.created_at
+      .sdr-age-wrapper
+        %label.content-label-sm
+          Age
+        %p.sdr-dispute-age
+          = dispute_age @dispute.created_at
+
+    .col-xs-2.col-with-divider
+      .platform-wrapper
+        %label.content-label-sm
+          Platform
+        .disposition
+          - unless @dispute.platform.blank?
+            = @dispute.platform.public_name
+        %br
+      .dispute-source-wrapper
+        %label.content-label-sm
+          Source
+        %div#dispute-source-text
+          - if @dispute.source?
+            - if @dispute.source == 'talos-intelligence'
+              TI Webform
+            - elsif @dispute.source == 'talos-intelligence-api'
+              TI API
+            - else
+              = @dispute.source
+          - else
+            Internal
+
+    .col-xs-2.col-with-divider
+      .submitter-type-wrapper
+        %label.content-label-sm
+          Submitter Type
+        %p= @dispute.submitter_type
+      .submitter-org-wrapper
+        %label.content-label-sm
+          Submitter Organization
+        %p= @dispute.customer_org
+
+    .col-xs-2
+      .contact-name-wrapper
+        %label.content-label-sm
+          Contact Name
+        %p.dispute-edit-field#dispute-customer-name= @dispute.customer_name
+        %input.dispute-edit-input#dispute-customer-name-input{type: 'text', value: "#{@dispute.customer_name}"}
+
+      .contact-email-wrapper
+        %label.content-label-sm
+          Contact Email
+        %p.dispute-edit-field#dispute-customer-email= @dispute.customer_email
+        %input.dispute-edit-input#dispute-customer-email-input{type: 'text', value: "#{@dispute.customer_email}"}
+
+%ul.nav.nav-tabs#research-tab{role: 'tablist'}
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
+      Research
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+      Communication
+
+.tab-content.content-wrapper#bug-tab-content
+  .tab-pane.active#research_tab{role: 'tabpanel'}
+    = render 'escalations/sdr/disputes/research_tab'
+  .tab-pane#communication_tab{role: 'tabpanel'}
+    = render 'escalations/sdr/disputes/communication_tab'
+
+:javascript
+  $(document).ready(function(){
+  get_sdr_research_data("#{@dispute.sender_domain_entry}")
+  })
+

@@ -2,15 +2,22 @@
   Escalations WebCat - Analyst Console
 
 - content_for(:nav_banner) do
-  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-3.col-lg-2
+  .form-group
+    %input{type:'hidden', name: 'token', value: "#{current_user.authentication_token}"}
+    %input{type:'hidden', name: 'xml_token', value: "#{xml_token}"}
+    %input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
+
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-4.col-sm-4.col-md-3.col-lg-2
     %a#complaints.nav-page-button{href: '/escalations/webcat/complaints', class: ("active" if current_page?('/escalations/webcat/complaints'))}
       %span.nav-toolbar-icon-large.icon-queue
 
-    %a#rules.nav-page-button{href: '/escalations/webcat/clusters', class: ("active" if current_page?('/escalations/webcat/clusters'))}
+    %a#rules.nav-page-button{href: '/escalations/webcat/clusters'}
       %span.nav-toolbar-icon-large.icon-categories
 
     %a#reports.nav-page-button{href: '/escalations/webcat/reports', class: ("active" if current_page?('/escalations/webcat/reports'))}
       %span.nav-toolbar-icon-large.icon-reports-white
+    %a#reports.nav-page-button{href: '/escalations/webcat/research', class: ("active" if current_page?('/escalations/webcat/research'))}
+      %span.nav-toolbar-icon-large.icon-research
 
 
   .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown#new-complaint-nav-wrapper
@@ -143,45 +150,17 @@
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-complaints', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
-    .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
+    .dropdown-menu.nav-tools-dropdown#filter-dropdown.webcat-filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
-        - if current_user.is_webcat_manager?
-          %li{class: ("selected" if params[:f] == "MANAGER QUEUE")}
-            %a{href: '?f=MANAGER QUEUE'}
-              %span.nav-dropdown-icon.icon-my-bugs
-              Manager Queue
-        %li{class: ("selected" if params[:f] == "MY COMPLAINTS")}
-          %a{href: '?f=MY COMPLAINTS'}
-            %span.nav-dropdown-icon.icon-my-bugs
-            My Tickets
-        %li{class: ("selected" if params[:f] == "MY OPEN COMPLAINTS")}
-          %a{href: '?f=MY OPEN COMPLAINTS'}
-            %span.nav-dropdown-icon.icon-my-open-bugs
-            My Open Tickets
-        %li{class: ("selected" if params[:f] == "MY CLOSED COMPLAINTS")}
-          %a{href: '?f=MY CLOSED COMPLAINTS'}
-            %span.nav-dropdown-icon.icon-fixed-bugs
-            My Closed Tickets
-        %li{class: ("selected" if params[:f] == "ACTIVE")}
-          %a{href: '?f=ACTIVE'}
-            %span.nav-dropdown-icon.icon-team-bugs
-            Active Tickets
-        %li{class: ("selected" if params[:f] == "NEW")}
-          %a{href: '?f=NEW'}
-            %span.nav-dropdown-icon.icon-open-bugs
-            New Tickets
-        %li{class: ("selected" if params[:f] == "REVIEW")}
-          %a{href: '?f=REVIEW'}
-            %span.nav-dropdown-icon.icon-pending-bugs
-            Waiting for Review
-        %li{class: ("selected" if params[:f] == "COMPLETED")}
-          %a{href: '?f=COMPLETED'}
-            %span.nav-dropdown-icon.icon-fixed-bugs
-            Completed Tickets
-        %li{class: ("selected" if params[:f] == "ALL")}
-          %a{href: '?f=ALL'}
-            %span.nav-dropdown-icon.icon-recently-viewed
-            All Tickets
+        - Complaint::FILTER_VIEW_OPTIONS.each do |filter|
+          - if filter[:label] == 'Manager Queue' && current_user.is_webcat_manager? || filter[:label] != 'Manager Queue'
+            %li{class: ('selected' if params[:f] == filter[:param])}
+              %a{href: "?f=#{filter[:param]}"}
+                %span.nav-dropdown-icon{class: filter[:icon]}
+                = filter[:label]
+              %span.nav-dropdown-icon.favorite-search-icon
+        %li.favorite-instruction
+          Star filter to set as default
 
       #saved-searches-wrapper.webcat-named-search-list.nav-tool-content-wrapper
         %h3.nav-tool-dropdown-header
@@ -196,30 +175,7 @@
                     = named_search.name
                   %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                     = image_tag('icon_cancel_grey.svg')
-
-
-  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown#filter-clusters-nav
-    %a{href: '#', class: 'dropdown-toggle', id: 'filter-clusters', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-      %span{class: 'nav-toolbar-icon icon-filter-white'}
-      Filter
-    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'filter-cases'}
-      %ul#filter-cases-list
-        %li{class: ("selected" if params[:f] == "my")}
-          %a{href: '?f=my'}
-            %span.nav-dropdown-icon.icon-my-bugs
-            My Clusters
-        %li{class: ("selected" if params[:f] == "unassigned")}
-          %a{href: '?f=unassigned'}
-            %span.nav-dropdown-icon.icon-open-bugs
-            Unassigned Clusters
-        %li{class: ("selected" if params[:f] == "pending")}
-          %a{href: '?f=pending'}
-            %span.nav-dropdown-icon.icon-pending-bugs
-            Waiting For Review
-        %li{class: ("selected" if params[:f] == "all")}
-          %a{href: '?f=all'}
-            %span.nav-dropdown-icon.icon-recently-viewed
-            All Clusters
+                  %span.nav-dropdown-icon.favorite-search-icon
 
   .nav-tool-blocks.col-xs-2.col-sm-3.col-lg-3.search-wrapper#complaints-nav-search-wrapper
     .input-group.search-group#web-cat-search
@@ -232,11 +188,6 @@
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
           = render 'escalations/webcat/complaints/advanced_search'
-
-  .nav-tool-blocks.col-xs-2.col-sm-4.col-lg-4.search-wrapper#clusters-nav-regex-wrapper
-    .input-group.search-group
-      %input#cluster_filter_field.text_field.search-box{placeholder: 'Filter clusters via regex', autofocus: 'true'}
-      %button#apply-regex-btn{onclick: 'apply_filter_to_table()'} Apply Regex
 
   - if current_user
     #login-div.nav-tool-block.col-sm-2.col-lg-3

@@ -1,0 +1,55 @@
+.webcat-research-wrapper
+  .domain-table-wrapper
+    .domain-table-listing
+      %label.toolbar-section-label
+        Domain
+      #xbrsDomainTableListingContent.domain-table-listing-content
+    .domain-table-current-category
+      %label.toolbar-section-label
+        Current Categories
+      #xbrsDomainTableCurrentCategoryContent.domain-table-current-category-content
+    .domain-table-reputation
+      %label.toolbar-section-label
+        Reputation
+      #xbrsDomainTableReputation.domain-table-reputation-content
+        %span#xbrsHistorySvg.webcat-research-svg
+
+  .toolbar.webcat-research-toolbar
+    %div
+      %label.toolbar-section-label
+        Edit
+      %span.dropdown
+        %button#xbrs-history-webcat-research-categorize-url.webcat-research-categorize-url-button.toolbar-button.dropdown-toggle.esc-tooltipped{disabled: 'disabled', title: 'Categorize URL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text Categorize URL
+        %div{'aria-labelledby': 'webcat-research-categorize-url', class: 'dropdown-menu toolbar-dropdown webcat-research-categorize-dropdown'}
+          .selected-urls-wrapper#xbrs-selected-urls-wrapper
+            %h5 Selected urls to categorize
+            %ul#xbrsHistorySelectedUrlsList
+          .selected-urls-categories-wrapper#xbrs-selected-urls-categories-wrapper
+            %span#xbrs-history-limit-warning.warning-limit
+              A maximum of 10 items can be submitted for categorization at a time. Some items have been ignored
+            %button.primary{type: 'submit', name: 'commit', id: 'cat-research', onclick: 'apply_webcat_research_categories("xbrs"); return false', 'data-disable-with': 'Submit'}
+              Submit
+
+  .ajax-message-div#xbrsHistoryLoader
+    .loader-gears
+      =inline_svg 'icon_gears_loader.svg'
+    %span.loader-msg Domain search processing, please wait...
+
+  %table.xbrs-history-table.table#xbrs-history-table
+    %thead
+      %tr
+        %th
+          %input{type: "checkbox", name: "select all urls", id: 'xbrsHistoryCheckAll'}
+        %th
+        %th
+          Category Mnemonics
+        %th
+          Domain
+        %th
+          Rule Hits
+        %th
+          Threat Cats
+        %th
+          Score
+    %tbody#xbrsHistoryTableBody

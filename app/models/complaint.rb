@@ -7,6 +7,21 @@ class Complaint < ApplicationRecord
 
   delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
 
+  FILTER_VIEW_OPTIONS = [
+    { label: 'My Open Tickets', param: 'MY OPEN COMPLAINTS', icon: 'icon-my-open-bugs' },
+    { label: 'New Tickets', param: 'NEW', icon: 'icon-new-tickets' },
+    { label: 'New Talos Tickets', param: 'NEW TALOS', icon: 'icon-talos-white' },
+    { label: 'New WBNP Tickets', param: 'NEW WBNP', icon: 'icon-web-white' },
+    { label: 'New Internal Tickets', param: 'NEW INTERNAL', icon: 'icon-company-white' },
+    { label: 'Manager Queue', param: 'MANAGER QUEUE', icon: 'icon-manager-queue' },
+    { label: 'Waiting for Review', param: 'REVIEW', icon: 'icon-pending-bugs' },
+    { label: 'Active Tickets', param: 'ACTIVE', icon: 'icon-active-tickets' },
+    { label: 'My Tickets', param: 'MY COMPLAINTS', icon: 'icon-my-bugs' },
+    { label: 'My Closed Tickets', param: 'MY CLOSED COMPLAINTS', icon: 'icon-my-closed-tickets' },
+    { label: 'Completed Tickets', param: 'COMPLETED', icon: 'icon-fixed-bugs' },
+    { label: 'All Tickets', param: 'ALL', icon: 'icon-all-tickets' },
+  ].freeze
+
   RESOLUTION_FIXED                      = 'FIXED'
   RESOLUTION_INVALID                    = 'INVALID'
   RESOLUTION_UNCHANGED                  = 'UNCHANGED'
@@ -69,6 +84,9 @@ For future web and email reputation requests, please open a web and email reputa
       when COMPLETED
         update!(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
     end
+    Bridge::ComplaintUpdateStatusEvent.new.post_complaint(self)
+
+
   end
 
   def self.can_visit_url?(url)
@@ -90,13 +108,16 @@ For future web and email reputation requests, please open a web and email reputa
   end
 
   def self.parse_url(url)
-    parser = URI::Parser.new
-    url = parser.escape(url)
-    uri = parser.parse(parser.parse(url).scheme.nil? ? "http://#{url}" : url)
+    #leaving this for disposal later. We've used URI::Parser so hesitatnt to totally delete
+    # but Addressable::URI seems to handle non latin characters much better.
+    #parser = URI::Parser.new
+    #url = parser.escape(url)
+    #uri = parser.parse(parser.parse(url).scheme.nil? ? "http://#{url}" : url)
+    uri = Addressable::URI.parse(Addressable::URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
     #subdomain = uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{domain.domain}$"), '')
     {
-        subdomain: domain.trd,
+        subdomain: domain.trd || '',
         domain: domain.domain,
         path: uri.path,
         query: uri.query
@@ -240,7 +261,7 @@ For future web and email reputation requests, please open a web and email reputa
       create_complaint_entry_credit(new_complaint_entry)
     end
 
-    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: complaint.id)
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: complaint.id, status: complaint.status)
     conn.post(return_payload, "")
 
   end
@@ -275,7 +296,7 @@ For future web and email reputation requests, please open a web and email reputa
 
       if record_exists.present?
         return_payload = record_exists.build_ti_payload
-        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id)
+        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: record_exists.id, ticket_status: record_exists.status)
         return conn.post(return_payload)
       end
 
@@ -498,7 +519,7 @@ For future web and email reputation requests, please open a web and email reputa
         conn.post
         return
       else
-        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_complaint.id)
+        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_complaint.id, ticket_status: new_complaint.status)
         conn.post(return_payload)
       end
 
@@ -528,7 +549,7 @@ For future web and email reputation requests, please open a web and email reputa
   end
 
   def self.get_latest_wbnp_complaints(skip_thread = false)
-    
+
     max_attempts = 3
 
     #status reason
@@ -856,48 +877,74 @@ For future web and email reputation requests, please open a web and email reputa
 
   def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, platform, status=NEW, categories = nil, user_email = nil)
 
-    summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+    response = {}
+    response[:status] = "success"
+    response[:total_entries] = 0
+    response[:successful_entries_count] = 0
+    response[:failed_entries_count] = 0
+    response[:successful_entries] = []
+    response[:failed_entries] = []
 
-    full_description = <<~HEREDOC
-          IPs/URIs: #{ips_urls}
-          Problem Summary: #{description}
-    HEREDOC
-    bug_attrs = {
-        'product' => 'Escalations Console',
-        'component' => 'Categorization',
-        'summary' => summary,
-        'version' => 'unspecified', #self.version,
-        'description' => full_description,
-        'priority' => 'Unspecified',
-        'classification' => 'unclassified',
-    }
+    begin
+      summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+      full_description = <<~HEREDOC
+            IPs/URIs: #{ips_urls}
+            Problem Summary: #{description}
+      HEREDOC
+      bug_attrs = {
+          'product' => 'Escalations Console',
+          'component' => 'Categorization',
+          'summary' => summary,
+          'version' => 'unspecified', #self.version,
+          'description' => full_description,
+          'priority' => 'Unspecified',
+          'classification' => 'unclassified',
+      }
 
-
-    cust = find_customer(customer) if customer
-    platform_record = Platform.find_by_public_name(platform) if platform
-    new_complaint = Complaint.create(id: bug_proxy.id,
-                                     description: description,
-                                     customer_id: cust&.id,
-                                     platform_id: platform_record&.id,
-                                     status: status,
-                                     channel: INT_CHANNEL)
+      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
 
-    handle_tags(new_complaint, tags) if tags
+      cust = find_customer(customer) if customer
+      platform_record = Platform.find_by_public_name(platform) if platform
+      new_complaint = Complaint.create(id: bug_proxy.id,
+                                       description: description,
+                                       customer_id: cust&.id,
+                                       platform_id: platform_record&.id,
+                                       status: status,
+                                       channel: INT_CHANNEL)
 
-    user = if user_email
-      User.find_by_email(user_email)
-    else
-      User.where(display_name:"Vrt Incoming").first
+
+      handle_tags(new_complaint, tags) if tags
+
+      user = if user_email
+        User.find_by_email(user_email)
+      else
+        User.where(display_name:"Vrt Incoming").first
+      end
+
+      ips_urls.split(' ').each do |ip_url|
+        response[:total_entries] += 1
+        begin
+          ComplaintEntry.create_complaint_entry(new_complaint, ip_url, platform_record, user, status, categories)
+          response[:successful_entries_count] += 1
+          response[:successful_entries] << ip_url
+        rescue Exception => e
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
+          response[:failed_entries_count] += 1
+          response[:failed_entries] << ip_url
+          response[:status] = "error"
+        end
+
+      end
+    rescue Exception => e
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
+      raise "error creating bug."
     end
 
-    ips_urls.split(' ').each do |ip_url|
-      ComplaintEntry.create_complaint_entry(new_complaint, ip_url, platform_record, user, status, categories)
-    end
-
-    bug_proxy
+    response
   end
 
   def self.find_customer(customer)
@@ -1022,6 +1069,94 @@ For future web and email reputation requests, please open a web and email reputa
     end
 
     response
+  end
+
+  def self.valid_tld?(uri)
+
+    begin
+      parsed_uri = Addressable::URI.parse(uri)
+      parsed_uri = Addressable::URI.parse("http://" + uri) if parsed_uri.scheme.nil?
+      PublicSuffix.valid?(parsed_uri.host, default_rule: nil, ignore_private: true)
+    rescue
+      false
+    end
+  end
+
+  def self.process_bulk_adhoc_categorizations(params, user, bugzilla_rest_session)
+
+    #someday this will probably need to be something different
+    ti_platform = Platform.where("public_name like '%talosintelligence%'").first
+
+    response = {}
+    response[:errors] = []
+    response[:data] = {}
+
+    response[:data][:created] = []
+    response[:data][:completed] = []
+
+    response[:data][:create_failed] = []
+    response[:data][:complete_failed] = []
+
+    adhoc_entries = params[:entries]
+    categories = params[:categories]
+    category_ids = params[:category_ids]
+    description = "RESEARCH TOOL AUTO GENERATED CASE"
+
+    new_complaints = []
+    adhoc_entries.each do |entry|
+      begin
+        bug_proxy = Complaint.create_action(bugzilla_rest_session, entry, description, nil, nil, ti_platform, nil)
+        new_complaints << Complaint.find(bug_proxy.id)
+        response[:data][:created] << bug_proxy.id
+      rescue => e
+        Rails.logger.error e
+        Rails.logger.error e.backtrace.join("\n")
+        response[:errors] << ["error trying to create complaint for #{entry}"]
+        response[:data][:create_failed] << "#{entry}"
+      end
+
+    end
+
+    new_complaints.each do |new_complaint|
+      begin
+        new_complaint_entry = new_complaint.complaint_entries.first
+        new_complaint_entry.user_id = user.id
+        new_complaint.save
+        new_complaint_entry.save
+
+        prefix = SimpleIDN.to_ascii(new_complaint_entry.hostlookup)
+
+        category_names_to_submit = categories.join(",")
+        categories_to_submit = category_ids.join(",")
+        uri_as_categorized = prefix
+        internal_comment = "Complaint ID: #{new_complaint.id} | RESEARCH TOOL AUTO GENERATED CASE"
+        resolution_comment = "Complaint ID: #{new_complaint.id} | RESEARCH TOOL AUTO GENERATED CASE"
+
+        new_complaint_entry.change_category(
+            prefix,
+            categories_to_submit,
+            category_names_to_submit,
+            Complaint::RESOLUTION_FIXED,
+            internal_comment,
+            resolution_comment,
+            uri_as_categorized,
+            user,
+            nil
+        )
+        response[:data][:completed] << new_complaint.id
+      rescue => e
+        Rails.logger.error e
+        Rails.logger.error e.backtrace.join("\n")
+        response[:errors] << ["error trying to process complaint for #{new_complaint.complaint_entries.first.hostlookup}"]
+        response[:data][:complete_failed] << new_complaint.complaint_entries.first.hostlookup
+        new_complaint.complaint_entries.first.destroy
+        new_complaint.destroy
+      end
+
+    end
+
+    response
+
   end
 
 end

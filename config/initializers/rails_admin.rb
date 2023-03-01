@@ -72,9 +72,14 @@ RailsAdmin.config do |config|
       "NgfwCluster",
       "Platform",
       "ResolutionMessageTemplate",
+      "SenderDomainReputationDispute",
+      "SenderDomainReputationDisputeAttachment",
+      "SenderDomainReputationDisputeComment",
+      "SenderDomainReputationEmailTemplate",
       "User",
       "UserApiKey",
       "UserPreference",
+      "WebcatCredit"
   ]
 
   config.actions do

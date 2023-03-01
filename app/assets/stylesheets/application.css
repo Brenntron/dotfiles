@@ -17,6 +17,7 @@
  *= require selectize.default
  *= require bootstrap-multiselect
  *= require bootstrap-table.min
+ *= require flash_messages
  *= require_tree
  *= require_self
  *= stub global

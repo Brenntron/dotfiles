@@ -49,6 +49,7 @@ Rails.application.routes.draw do
 
       get 'show_multiple', to: 'complaints#show_multiple'
       get 'clusters', to: 'complaints#clusters'
+      get 'research', to: 'complaints#research'
 
       resources :reports, only: [:index] do
         collection do
@@ -91,12 +92,24 @@ Rails.application.routes.draw do
       get :export_selected_dispute_entry_rows, to: 'disputes#export_selected_dispute_entry_rows'
     end
 
+    namespace :sdr do
+      root 'root#index'
+      resources :disputes, only: [:index, :show]
+    end
+
     namespace :file_rep do
       root 'disputes#index'
       resources :disputes, only: [:index, :show]
 
       get 'naming_guide', to: 'disputes#naming_guide'
       get 'sandbox-html-report', to: 'disputes#sandbox_html_report'
+    end
+
+    namespace :sdr do
+      root 'root#index'
+      resources :disputes, only: [:index, :show] do
+        get :all_attachments
+      end
     end
 
 

@@ -11,59 +11,10 @@ module API
               PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
             desc 'get all disputes'
-            params do
-              optional :search_type, type: String
-              optional :search_name, type: String
-              optional :value, type: String
-              optional :case_id, type: String
-              optional :org_domain, type: String
-              optional :case_owner_username, type: String
-              optional :status, type: String
-              optional :priority, type: String
-              optional :resolution, type: String
-              optional :submission_type, type: Array[String]
-              optional :submitter_type, type: String
-              optional :platform_ids, type: String
-              optional :submitted_older, type: Date
-              optional :submitted_newer, type: Date
-              optional :age_older, type: String
-              optional :age_newer, type: String
-              optional :modified_older, type: Date
-              optional :modified_newer, type: Date
-              optional :reload, type: Boolean
-              optional :customer, type: Hash do
-                optional :name, type: String
-                optional :email, type: String
-                optional :company_name, type: String
-              end
-              optional :dispute_entries, type: Hash do
-                optional :ip_or_uri, type: String
-                optional :suggested_disposition, type: String
-              end
-            end
-
             get "" do
               authorize!(:index, Dispute)
-              disputes = Dispute.robust_search(permitted_params['search_type'],
-                                               search_name: permitted_params['search_name'],
-                                               params: permitted_params,
-                                               user: current_user,
-                                               reload: permitted_params['reload']).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
-              title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
-              json_packet = Dispute.to_data_packet(disputes, user: current_user)
-
-              response_data = {status: "success", title: title, data: json_packet}
-              if 'advanced' == permitted_params['search_type']
-                if permitted_params['search_name'].present?
-                  search_name = permitted_params['search_name']
-                  response_data['search_name'] = search_name
-                  named_search = NamedSearch.where(user: current_user, name: search_name).first
-                  response_data['search_id'] = named_search&.id
-                end
-              end
-
-              response_data.to_json
-
+              search_params = {search_type: params[:search_type] || '', search_name: params[:search_name] || ''}
+              WebRepDatatable.new(ActionController::Parameters.new(params).permit!, search_params, user: current_user).as_json
             end
 
             desc 'project new score'
@@ -389,8 +340,11 @@ module API
             end
             post "maintain_reptool_bl" do
               std_api_v2 do
+
                 permitted_params['data'].each do |entry|
-                  entry["classifications"][0].slice! "No active classifications,"
+                  if entry['action'] != "expired"
+                    entry["classifications"][0].slice! "No active classifications,"
+                  end
                   RepApi::Blacklist.adjust_from_params(entry, username: current_user.cvs_username)
                 end
                 true
@@ -714,22 +668,29 @@ module API
                 return_data = []
 
                 api_response.each do |key, value|
-                  if value == 'NOT_FOUND'
-                    return_data.push(:entry => key, :classification => "No active classifications", :expiration => "", :status => "INACTIVE", :comment => "")
+                  next if value == true || value == false
+                  if value[value.keys.first]["result"].downcase == 'not_found' || value[value.keys.first]["result"].downcase == 'failed'
+                    return_data.push(:entry => value.keys.first, :classification => "No active classifications", :expiration => "", :status => "INACTIVE", :comment => "")
                     # TODO Make expiration human readable - Just the date
                   else
+
                     expiration = ""
                     begin
-                      expiration = Date.parse(value["expiration"]).to_s
+                      expiration = Date.parse(value[value.keys.first]["data"]["expiration"]).to_s
                     rescue
-                      expiration = value["expiration"]
+                      expiration = value[value.keys.first]["data"]["expiration"]
                     end
 
                     comment = ""
 
-                    comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
+                    begin
+                      comment = value[value.keys.first]["data"]["sources"].fetch("VRT", {}).fetch("comment", "")
+                    rescue
+                      comment = ""
+                    end
 
-                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => comment).to_json
+                    return_data.push(:entry => value.keys.first, :classification => value[value.keys.first]["data"]["classifications"], :expiration => expiration, :status => value[value.keys.first]["data"]["status"].upcase, :comment => comment).to_json
+
                   end
                 end
                 return_data.to_json
@@ -930,18 +891,27 @@ module API
 
             desc 'Autopopulate fields on Advanced Search'
             get 'autopopulate_advanced_search' do
-              case_owners = User.joins(:disputes).where.not(cvs_username: nil).order(cvs_username: :asc).uniq
-              statuses = [Dispute::STATUS_RESEARCHING,Dispute::STATUS_ESCALATED,Dispute::STATUS_CUSTOMER_PENDING,
-                          Dispute::STATUS_ON_HOLD,Dispute::STATUS_RESOLVED,Dispute::STATUS_REOPENED]
+              case_owners = Rails.cache.fetch('user_svs_names_list') do
+                 User.where.not(cvs_username: nil).order(cvs_username: :asc).uniq.pluck(:cvs_username)
+              end
+              statuses = [Dispute::NEW, Dispute::STATUS_RESEARCHING,Dispute::STATUS_ESCALATED,Dispute::STATUS_CUSTOMER_PENDING, Dispute::ASSIGNED,
+                          Dispute::STATUS_ON_HOLD,Dispute::STATUS_RESOLVED,Dispute::STATUS_REOPENED].map {|item| {id: item, public_name: item }}
               submitter_types = ['Customer', 'Non-Customer']
-              contacts = Customer.all.order(name: :asc)
-              companies = Company.all.order(name: :asc)
-              resolutions = [Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN, Dispute::STATUS_RESOLVED_UNCHANGED,
-                             Dispute::STATUS_RESOLVED_INVALID, Dispute::STATUS_RESOLVED_TEST, Dispute::STATUS_RESOLVED_OTHER]
-              platforms = Platform.all.order(public_name: :asc).map {|m| {id: m.id, public_name: m.public_name}}
+              contacts =  Rails.cache.fetch('all_contacts_list') do
+                Customer.all.order(name: :asc).map {|customer| { name: customer.name, email: customer.email }}
+              end
+              companies = Rails.cache.fetch('all_companies_list') do
+                Company.order(name: :asc).pluck(:name)
+              end
+              resolutions = Dispute::RESOLUTIONS.map {|item| {id: item, public_name: item }}
+              priorities = Dispute::PRIORITIES.map {|item| {id: item, public_name: item }}
+              sources = Dispute::SOURCES
+              platforms =  Rails.cache.fetch('platforms_list') do
+                Platform.all.order(public_name: :asc).map {|m| {id: m.public_name, public_name: m.public_name}}
+              end
               render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
                             contacts: contacts, companies: companies, resolutions: resolutions,
-                            platforms: platforms}
+                            platforms: platforms, priorities: priorities, sources: sources}
             end
 
             desc 'Auto-populate fields on New Dispute'
@@ -1118,8 +1088,6 @@ module API
                 return {:status => "success", :messages => results[:messages]}
               end
             end
-
-
           end
         end
       end

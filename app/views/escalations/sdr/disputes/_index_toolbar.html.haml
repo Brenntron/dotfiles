@@ -1,0 +1,180 @@
+.toolbar#sdr-index-toolbar
+  %div
+    %label.toolbar-section-label
+      View
+    %span.dropdown
+      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Show/Hide Columns
+      .dropdown-menu.toolbar-dropdown#sdr-index-table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button', style: ''}
+        .dropdown-menu-content-block{style: 'width: 100%'}
+          %ul
+            %li.toggle-vis-sdr-{'data-column':'1'}
+              %input{type: 'checkbox', checked: true, id: 'priority-checkbox'} Priority
+            %li.toggle-vis-sdr{'data-column':'2'}
+              %input{type: 'checkbox', checked: true, id: 'case-id-checkbox'} Case ID
+            %li.toggle-vis-sdr{'data-column':'3'}
+              %input{type: 'checkbox', checked: true, id: 'status-checkbox'} Status
+            %li.toggle-vis-sdr{'data-column':'4'}
+              %input{type: 'checkbox', id: 'resolution-checkbox'} Resolution
+            %li.toggle-vis-sdr{'data-column':'5'}
+              %input{type: 'checkbox', id: 'time-submitted-checkbox'} Time Submitted
+            %li.toggle-vis-sdr{'data-column':'6'}
+              %input{type: 'checkbox', checked: true, id: 'age-checkbox'} Age
+            %li.toggle-vis-sdr{'data-column':'7'}
+              %input{type: 'checkbox', checked: true, id: 'assignee-checkbox'} Assignee
+            %li.toggle-vis-sdr{'data-column':'8'}
+              %input{type: 'checkbox', checked: true, id: 'case-origin-checkbox'} Case Origin
+            %li.toggle-vis-sdr{'data-column':'9'}
+              %input{type: 'checkbox', checked: true, id: 'platform-checkbox'} Platform
+
+          %ul
+            %li.toggle-vis-sdr{'data-column':'10'}
+              %input{type: 'checkbox', checked: true, id: 'dispute-checkbox' } Dispute
+            -#%li.toggle-vis-sdr{'data-column':'11'}
+            -#  %input{type: 'checkbox', id: 'current-rep-checkbox'} Current Rep
+            -#%li.toggle-vis-sdr{'data-column':'12'}
+            -#  %input{type: 'checkbox', id: 'rules-checkbox'} Rules
+            %li.toggle-vis-sdr{'data-column':'13'}
+              %input{type: 'checkbox', id: 'suggested-rep-checkbox'} Suggested Rep
+            %li.toggle-vis-sdr{'data-column':'14'}
+              %input{type: 'checkbox', id: 'submitter-type-checkbox'} Submitter Type
+            %li.toggle-vis-sdr{'data-column':'15'}
+              %input{type: 'checkbox', id: 'contact-name-checkbox'} Contact Name
+            %li.toggle-vis-sdr{'data-column':'16'}
+              %input{type: 'checkbox', id: 'contact-email-checkbox'} Contact Email
+            %li.toggle-vis-sdr{'data-column':'17'}
+              %input{type: 'checkbox', id: 'submitter-org-checkbox'} Submitter Org
+
+  %div
+    %label.toolbar-section-label
+      Assignee
+
+    %button.take-ticket-toolbar-button#index_ticket_assign.toolbar-button.esc-tooltipped.toolbar-button-spacer{ onclick: 'take_sdr_disputes();', title: 'Take (alt + t)' }
+      %span.toolbar-button-text
+        Take Ticket
+
+    %button.toolbar-button-spacer.toolbar-button.return-ticket-toolbar-button.esc-tooltipped{ onclick: 'return_sdr_disputes()', type: 'button', title: 'Return (alt + r)' }
+      %span.toolbar-button-text
+        Return
+
+    %span.dropdown
+      %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Change Assignee
+      .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'sdr_index_change_assign'}
+        .toolbar
+          %div
+            %label.toolbar-section-label Assignee
+            =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+          %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'sdr_toolbar_index_change_assignee();'}
+            Assign
+
+  - if can? :update, Dispute
+    %div
+      %label.toolbar-section-label
+        Edit Ticket
+
+      %span.dropdown
+        %button#sdr_index_ticket_status.toolbar-button.ticket-status-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'sdr_index_edit_ticket_status()'}
+          %span.toolbar-button-text
+            Edit Ticket Status
+        .dropdown-menu.toolbar-dropdown#sdr-index-edit-ticket-status-dropdown{'aria-labelledby': 'index_ticket_status'}
+          %ul
+            %li.status-radio-wrapper
+              %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: 'RESEARCHING', value:'RESEARCHING' }
+              %label.sdr-ticket-status-radio-label.radio-label{for: 'RESEARCHING'} Researching
+            %li.status-radio-wrapper
+              %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: 'ESCALATED', value: 'ESCALATED'}
+              %label.sdr-ticket-status-radio-label.radio-label{for: 'ESCALATED'} Escalated
+            %li.status-radio-wrapper
+              %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: 'CUSTOMER_PENDING', value: 'CUSTOMER_PENDING'}
+              %label.sdr-ticket-status-radio-label.radio-label{for: 'CUSTOMER_PENDING'} Customer Pending
+            %li.status-radio-wrapper
+              %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: 'ON_HOLD', value: 'ON_HOLD'}
+              %label.sdr-ticket-status-radio-label.radio-label{for: 'ON_HOLD'} On Hold
+            %li.status-radio-wrapper
+              %input.sdr-ticket-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: 'RESOLVED_CLOSED', value: 'RESOLVED_CLOSED'}
+              %label.sdr-ticket-status-radio-label.radio-label{for: 'RESOLVED_CLOSED'} Resolved / Closed
+              .dropdown-menu#sdr-index-dispute-resolution-submenu
+                .col-xs-5.submenu-left-wrapper{id: 'sdr-resolution-selector'}
+                  .submenu-header
+                    Ticket Resolution
+                  %ul
+                    %li
+                      %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"}
+                      %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
+                      %ul
+                        %li.preset-resolution
+                          %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_SUDDEN_SPIKE", value: "FIXED_FP_SUDDEN_SPIKE"}
+                          %label.ticket-res-radio-label.radio-label{for: "FIXED_FP_SUDDEN_SPIKE"} Sudden Spike
+                        %li.preset-resolution
+                          %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_DOMAIN_AGE", value: "FIXED_FP_DOMAIN_AGE"}
+                          %label.ticket-res-radio-label.radio-label{for: "FIXED_FP_DOMAIN_AGE"} Domain Age
+                        %li.preset-resolution
+                          %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_NEGATIVE_WEBREP", value: "FIXED_FP_NEGATIVE_WEBREP"}
+                          %label.ticket-res-radio-label.radio-label{for: "FIXED_FP_NEGATIVE_WEBREP"} Negative Webrep
+                    %li
+                      %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"}
+                      %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
+                    %li
+                      %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", value: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"}
+                      %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"} Unchanged
+                    %li
+                      %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_INVALID}", value: "#{Dispute::STATUS_RESOLVED_INVALID}"}
+                      %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
+                    %li
+                      %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_TEST}", value: "#{Dispute::STATUS_RESOLVED_TEST}"}
+                      %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_TEST}"} Test / Training
+                    %li
+                      %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
+                      %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
+                .col-xs-7.submenu-right-wrapper
+                  .resolution-comment-wrapper
+                    %label.content-label-sm.customer-facing-comment
+                      Customer Facing Comment
+                    %textarea.ticket-resolution-comment
+                    .button-row-center
+                      %button.primary.change_ticket_status_button{type:'button', id:'webrep_resolve_ticket', onclick:'sdr_index_change_ticket_status();'}
+                        Submit
+
+            %li.status-radio-wrapper
+              %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: 'RE-OPENED', value: 'RE-OPENED'}
+              %label.sdr-ticket-status-radio-label.radio-label{for: 'RE-OPENED'} Re-Opened
+            %li.non-resolution-submit-wrapper.sdr-non-resolution-submit-wrapper#ticket-non-res-submit
+              %label.content-label-sm
+                Comment
+              %textarea.ticket-status-comment
+              .button-row-center
+                %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'sdr_index_change_ticket_status();'}
+                  Submit
+
+  %div
+    %label.toolbar-section-label
+      File
+    %form#sdr-disputes-export-form{action: escalations_sdr_disputes_path(format: :xlsx), method: :get,  onsubmit: 'return false'}
+      = hidden_field_tag('data_json', '{}', id: 'index-export-data-input')
+      %button.toolbar-button.toolbar-button-spacer.export-button.esc-tooltipped{onclick: 'export_sdr_all();', title: 'Export All to CSV (alt + ctrl + shift + p)'}
+        %span.toolbar-button-text
+          Export All to CSV
+      %button.toolbar-button.export-button.esc-tooltipped{onclick: 'export_sdr_selected();', title: 'Export Selected to CSV (alt + ctrl + p)'}
+        %span.toolbar-button-text
+          Export Selected to CSV
+
+
+  -#  Add later with functionality or remove
+  -#%div
+  -#  %label.toolbar-section-label
+  -#    Info
+  -#
+  -#  %button.toolbar-button#sdr-whois-index-btn.esc-tooltipped.sdr-whois-btn{ disabled: true }
+  -#    %span.toolbar-button-text
+  -#      WHOIS
+  -#
+  -#%div
+  -#  %label.toolbar-section-label
+  -#    Edit
+  -#
+  -#  %button.toolbar-button#sdr-adjust-rep-index-btn.esc-tooltipped.sdr-adjust-rep-btn{ disabled: true }
+  -#    %span.toolbar-button-text
+  -#      Adjust Reputation

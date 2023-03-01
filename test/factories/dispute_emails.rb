@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory :dispute_email do
+    sender_domain_reputation_dispute_id { 1 }
     dispute_id      { 1 }
     from            { 'customer@customer.com' }
     to              { 'cisco@cisco.com' }

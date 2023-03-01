@@ -45,7 +45,17 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   def data
-    records.map do |complaint_entry|
+
+    # Call pluck because using records in the where clause produces a "not supported" error.
+    complaint_entry_ids = records.pluck(:id)
+
+    # Get one page of records separate from the eager loading and do the eagar loading from those ids.
+    # complaint_entries = ComplaintEntry.includes(complaint: [{customer: :company}, :complaint_tags], user: {}).references(:complaint).where(id: complaint_entry_ids)
+    complaint_entries = ComplaintEntry.includes(complaint: [{customer: :company}], user: {}).where(id: complaint_entry_ids).sort_by do |entry|
+      complaint_entry_ids.index(entry.id)
+    end
+
+    complaint_entries.map do |complaint_entry|
       complaint = complaint_entry.complaint
       suggested_dispositions = complaint_entry.suggested_disposition&.split(',')
 
@@ -53,7 +63,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           entry_id:         complaint_entry.id,
           created_at:       complaint_entry.created_at,
           age_int:          (Time.now - complaint_entry.created_at).to_i,
-          age:              ComplaintEntry.first_two_time_layers(time_ago_in_words(complaint_entry.created_at, {scope: 'datetime.distance_in_words',include_seconds: false})),
+          age:              ComplaintEntry.first_two_time_layers(time_ago_in_words(complaint_entry.created_at.to_time, {scope: 'datetime.distance_in_words', include_seconds: false})),
           status:           complaint_entry.status,
           subdomain:        complaint_entry.subdomain,
           domain:           complaint_entry.domain,
@@ -67,7 +77,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           customer_name:    complaint_entry.customer_name,
           company_name:     complaint_entry.customer_company_name,
           customer_email:   complaint.customer&.email,
-          complaint_source: complaint.ticket_source,
+          complaint_source: complaint.ticket_source || 'Internal',
           assigned_to:      complaint_entry.user&.display_name,
 
           uri:              complaint_entry.uri,
@@ -90,10 +100,11 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
     end
   end
 
-  # private
+  private
 
   def get_raw_records
-    ComplaintEntry.includes(complaint: [{customer: :company}, :complaint_tags], user: {}).references(:complaint)
+    # ComplaintEntry.includes(complaint: [{customer: :company}, :complaint_tags], user: {}).references(:complaint)
+    ComplaintEntry
   end
 
   def filter_records(records)
@@ -115,6 +126,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
     case datatable.orders.first.column.sort_query
     when 'complaint_entries.age_int'
       records.order("complaint_entries.created_at #{datatable.orders.first.direction}")
+    when 'complaint_entries.domain'
+      records.order("complaint_entries.domain #{datatable.orders.first.direction}, complaint_entries.ip_address #{datatable.orders.first.direction}")
     when 'complaint_entries.submitter_type'
       records.left_joins(:complaint).order("complaints.submitter_type #{datatable.orders.first.direction}")
     when 'complaint_entries.company_name'

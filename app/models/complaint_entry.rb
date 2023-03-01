@@ -126,6 +126,48 @@ class ComplaintEntry < ApplicationRecord
     return("Complaint returned")
   end
 
+  def unassign
+    if self.user == User.vrtincoming
+      return("Complaint is already assigned to Vrt Incoming")
+    else
+      if !self.is_important
+        if status!="COMPLETED"
+          self.update(user: User.vrtincoming, status:"NEW")
+          complaint.set_status("NEW")
+        else
+          return("Already completed")
+        end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: User.vrtincoming, status:"NEW")
+        complaint.set_status("NEW")
+      else
+        return("Status is pending")
+      end
+    end
+    return("Complaint unassigned")
+  end
+
+  def reassign(user)
+    if self.user == user
+      return("Complaint is already assigned to #{user.cvs_username}")
+    else
+      if !self.is_important
+        if status!="COMPLETED"
+          self.update(user: user, status:"ASSIGNED", case_assigned_at: Time.now)
+          complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
+        else
+          return("Already completed")
+        end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: user, status:"ASSIGNED", case_assigned_at: Time.now)
+        complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
+      else
+        return("Status is pending")
+      end
+    end
+    return("Complaint assigned to #{user.cvs_username}")
+  end
+
   def is_pending?
     "PENDING" == status
   end
@@ -330,7 +372,30 @@ class ComplaintEntry < ApplicationRecord
     existing_prefix = nil
     if existing_prefixes.present? && !is_ip_address
       existing_prefixes.each do |prefix_found|
-        if prefix_found.subdomain == url_parts[:subdomain]
+        ##reconstruct url parts
+        reconstructed_uri = ""
+        if url_parts[:subdomain].present?
+          reconstructed_uri += url_parts[:subdomain] + "."
+        end
+        reconstructed_uri += url_parts[:domain]
+        if url_parts[:path].present?
+          reconstructed_uri += url_parts[:path]
+        end
+
+        ##reconstruct prefix found
+        reconstructed_prefix = ""
+        if prefix_found.subdomain.present?
+          reconstructed_prefix += prefix_found.subdomain + "."
+        end
+        reconstructed_prefix += prefix_found.domain
+        if prefix_found.path.present?
+          reconstructed_prefix += prefix_found.path
+        end
+
+        #if prefix_found.subdomain == url_parts[:subdomain]
+        if reconstructed_uri == reconstructed_prefix
+          #this if statement now seems a bit redundant, but for safet sake, keeping this here
+          # note: All of this as well as change_category is getting a big refactor soon.
           if prefix_found.path == url_parts[:path]
             existing_prefix = prefix_found
           end
@@ -347,7 +412,6 @@ class ComplaintEntry < ApplicationRecord
     end
 
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
-
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"
     end
@@ -356,7 +420,7 @@ class ComplaintEntry < ApplicationRecord
       prefix_object = Wbrs::Prefix.new
       prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
     else
-      Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
+      Wbrs::Prefix.create_from_url(url: SimpleIDN.to_ascii(ip_or_uri), categories: category_ids_array, user: user, description: description)
     end
   end
 
@@ -563,39 +627,54 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.save
 
       if user != User.where(display_name:"Vrt Incoming").first
-        WebcatCredits::ComplaintEntries::CreditProcessor.new(user, new_complaint_entry).process
+        begin
+          WebcatCredits::ComplaintEntries::CreditProcessor.new(user, new_complaint_entry).process
+        rescue Exception => e
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
+        end
+
       end
     rescue Exception => e
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
       raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
-
-    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-    max_wait_for_job = 15 #seconds
     begin
-      #this is where screen grabs happen.
-      screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
-      screenshot_entry.grab_screenshot
-    rescue Timeout::Error => e
-      #couldnt complete in time
-      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-       ces.screenshot = f.read
-      end
-      ces.save!
+      ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
     rescue Exception => e
-      Rails.logger.error("#{e.message}")
-      # do nothing, it was worth a try. kittens are sad now
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-       ces.screenshot = f.read
-      end
-      ces.save!
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
     end
+
+    max_wait_for_job = 15 #seconds
+    ###this should be eventually removed, but commenting out for now to see if it speeds up the NEW button for bulk entries
+
+    #begin
+      #this is where screen grabs happen.
+    #  screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
+    #  screenshot_entry.grab_screenshot
+    #rescue Timeout::Error => e
+      #couldnt complete in time
+    #  Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+    #  ces = ComplaintEntryScreenshot.new
+    #  ces.error_message = e.message
+    #  ces.complaint_entry_id = new_complaint_entry.id
+    #  open("app/assets/images/failed_screenshot.jpg") do |f|
+    #   ces.screenshot = f.read
+    #  end
+    #  ces.save!
+    #rescue Exception => e
+    #  Rails.logger.error("#{e.message}")
+      # do nothing, it was worth a try. kittens are sad now
+    #  ces = ComplaintEntryScreenshot.new
+    #  ces.error_message = e.message
+    #  ces.complaint_entry_id = new_complaint_entry.id
+    #  open("app/assets/images/failed_screenshot.jpg") do |f|
+    #   ces.screenshot = f.read
+    #  end
+    #  ces.save!
+    #end
   end
 
   # Searches in a variety of ways.
@@ -605,7 +684,7 @@ class ComplaintEntry < ApplicationRecord
   # contains -- search many fields where supplied value is contained in the field.
   # nil -- all records.
   # @param [String] search_type variety of search
-  # @param [ActionController::Parameters] params supplied fields and values for search.
+  # @param [ActionController::Parameters, Hash, NilClass] params supplied fields and values for search.
   # @param [String] search_name name of saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
@@ -674,6 +753,34 @@ class ComplaintEntry < ApplicationRecord
         closed.where(user_id: user.id)
       when "MANAGER QUEUE"
         joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
+      when "ALL TALOS"
+        where(complaint_id: Complaint.from_ti)
+      when "NEW TALOS"
+        where(status: 'NEW', complaint_id: Complaint.from_ti)
+      when "TALOS OVERDUE"
+        where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "TALOS ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_ti)
+      when "ALL WBNP"
+        where(complaint_id: Complaint.from_wbnp)
+      when "NEW WBNP"
+        where(status: 'NEW', complaint_id: Complaint.from_wbnp)
+      when "WBNP OVERDUE"
+        where(complaint_id: Complaint.from_wbnp).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "WBNP ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_wbnp)
+      when "ALL INTERNAL"
+        where(complaint_id: Complaint.from_int)
+      when "NEW INTERNAL"
+        where(status: 'NEW', complaint_id: Complaint.from_int)
+      when "INTERNAL OVERDUE"
+        where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "INTERNAL ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_int)
+      when "ALL PENDING"
+        where(status: 'PENDING')
+      when "PENDING OVERDUE"
+        where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
       when "ALL"
         all
       else
@@ -708,7 +815,7 @@ class ComplaintEntry < ApplicationRecord
 
   # Searches based on supplied fields and values.
   # Optionally takes a name to save this search as a saved search.
-  # @param [ActionController::Parameters] params supplied fields and values for search.
+  # @param [ActionController::Parameters, Hash, NilClass] params supplied fields and values for search.
   # @param [String] search_name name to save this search as a saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
@@ -850,10 +957,22 @@ class ComplaintEntry < ApplicationRecord
     end
 
     complaint_fields = present_params.to_h.slice(*%w{description channel})
+
+    if present_params['submitter_type'].present?
+      submitter_type_params = present_params['submitter_type'].split(', ').map(&:upcase).uniq.reduce([]) do |memo, type|
+        if type == Complaint::SUBMITTER_TYPE_CUSTOMER
+          memo << Complaint::SUBMITTER_TYPE_CUSTOMER
+        else 'GUEST'
+          memo.push(Complaint::SUBMITTER_TYPE_NONCUSTOMER, nil)
+        end
+        memo
+      end
+      complaint_fields.merge!(submitter_type: submitter_type_params)
+    end
+
     if complaint_fields.present?
       relation = relation.includes(:complaint).where(complaints: complaint_fields)
     end
-
     # Save this search as a named search
     if present_params.present? && search_name.present?
       Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')
@@ -882,7 +1001,7 @@ class ComplaintEntry < ApplicationRecord
       if prefix_results.first&.is_active == 1
 
         qualified_prefixes =
-            prefix_results.find_all {|result| result.path == self.path && result.subdomain == self.subdomain}
+            prefix_results.find_all {|result| result.path == self.path && result.subdomain == (self.subdomain || '')}
         category_names = Wbrs::Prefix.category_names(qualified_prefixes)
 
         self.url_primary_category = category_names
@@ -910,8 +1029,10 @@ class ComplaintEntry < ApplicationRecord
     return {} unless prefix_results.any?
 
     parsed_uri = Complaint.parse_url(uri)
-    parsed_uri['path'] = '' unless parsed_uri['path'].present?
-    parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
+    parsed_uri['path'] = ''
+    parsed_uri['subdomain'] = ''
+    parsed_uri['path'] = parsed_uri[:path] unless parsed_uri[:path].blank?
+    parsed_uri['subdomain'] = parsed_uri[:subdomain] unless parsed_uri[:subdomain].blank?
 
     final_results = []
 
@@ -965,7 +1086,7 @@ class ComplaintEntry < ApplicationRecord
     certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([domain_of])
 
     qualified_prefixes = prefix_results.find_all do |result|
-      result.path == self.path && ((result.subdomain == self.subdomain) || (self.subdomain == 'www'))
+      result.path == self.path && ((result.subdomain == (self.subdomain || '')) || (self.subdomain == 'www'))
     end
 
     final_current_categories = {}
@@ -1058,13 +1179,17 @@ class ComplaintEntry < ApplicationRecord
   def historic_category_data
 
     prefix_history = []
+    ids_checked = []
     prefixes = remote_prefixes
     prefixes.each do |prefix|
-      if prefix.subdomain == self.subdomain && prefix.path == self.path
-        prefix_id = prefix.prefix_id
-        response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
-        response.each do |resp|
-          prefix_history << resp
+      unless ids_checked.include?(prefix.id)
+        if prefix.subdomain == (self.subdomain || '') && prefix.path == self.path
+          prefix_id = prefix.prefix_id
+          response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
+          response.each do |resp|
+            prefix_history << resp
+          end
+          ids_checked << prefix_id
         end
       end
     end
@@ -1198,7 +1323,7 @@ class ComplaintEntry < ApplicationRecord
     end
 
     # add credit for user's contribution to complaint entry
-    ComplaintEntryCredits::CreditProcessor.new(current_user, self).process
+    WebcatCredits::ComplaintEntries::CreditProcessor.new(current_user, self).process
     confirmation
   end
 

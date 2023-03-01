@@ -102,7 +102,11 @@
                     %span.toolbar-button-text Adjust RepTool BL
                   .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'reptool_entries_button'}
                     .dropdown-tool-text-divider.secondary-text-divider
-                      Adjust Reptool Classification
+                      .inline-text  RepTool Classification
+                      .inline-label-wrapper.float-right
+                        %input.reptool-toolbar-force{id:"quick-lookup-reptool-toolbar-force", type: 'checkbox', name: 'quick-lookup-reptool-toolbar-force'}
+                        %label#quick-lookup-reptool-toolbar-force-label{for: "quick-lookup-reptool-toolbar-force"} Force commit
+
                     .inline-tool-content-wrapper
                       .row
                         .col-xs-12
@@ -364,7 +368,11 @@
                     %tbody
                   -# Each checked entry will populate information here
                   .dropdown-tool-text-divider.secondary-text-divider
-                    Adjust Reptool Classification
+                    .inline-text Adjust RepTool Classification
+                    .inline-label-wrapper.float-right
+                      %input.reptool-toolbar-force{id:"detailed-reptool-toolbar-force", type: 'checkbox', name: 'force', value: true}
+                      %label{for: "detailed-reptool-toolbar-force"} Force commit
+
                   .inline-tool-content-wrapper
                     .row
                       .col-xs-12
@@ -610,12 +618,16 @@
                         %span.dropdown
                           %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{onclick: "get_current_reptool(this, 'research')", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                           -# TODO - these items don't have entry ids since they are fresh lookups, need to avoid the id syntax below as its creating dup ids
-                          .dropdown-menu.toolbar-dropdown.reptool-inline-dropdown{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
+                          .dropdown-menu.toolbar-dropdown.reptool-inline-dropdown{id: "reptool_adjust_#{i}", 'aria-labelledby': "reptool_button_#{i}"}
                             = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                               .dispute-reptool-adjust-wrapper
                                 %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
                                 %input.adjust-reptool-bl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
-                                %h3.reptool-dropdown-header Adjust RepTool Classification
+                                %h3.reptool-dropdown-header
+                                  .inline-text Adjust RepTool Classification
+                                  .inline-label-wrapper.float-right
+                                    %input.reptool-toolbar-force{id:"#{i}-reptool-toolbar-force", type: 'checkbox', name: 'force', value: true}
+                                    %label{for: "#{i}-reptool-toolbar-force"} Force commit
                                 %table.dispute_tool_current
                                   %thead
                                     %tr
@@ -741,8 +753,6 @@
                             %label WBRS
                           %td.text-center.entry-data-wbrs-score.wbrs-score-cell
                             = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
-                          %td.wbrs-rules-label-cell
-                            %label WBRS Rules
                           %td.text-center.wbrs-rule-hits-cell
                             - wbrs_rules = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS' && hit.is_multi_ip_rulehit != true}
                             = wbrs_rules.count
@@ -765,10 +775,10 @@
                           %td.input-col.xbrs-input-wrapper
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %td.xbrs-history-label-cell
-                            %label XBRS History
+                            %label XBRS Timeline
                           %td.text-center.xbrs-history-cell
                             - unless entry.hostlookup.nil?
-                              = entry.find_xbrs[1]['data'].count
+                              = entry.xbrs_timeline.count
                           %td.input-col.virus-total-input-wrapper
                             %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %td.virustotal-label-cell
@@ -780,6 +790,11 @@
                               = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
                               \/
                               = entry.virustotals.count
+                          %td.input-col.enrich-input-wrapper
+                            %input.research-row-checkbox.enrich-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.enrich-label-cell
+                            %label Enrichment
+                          %td.text-center.enrich-cell
                           %td.left-bordered.wlbl-tc-label-cell
                             %label WL/BL
                           %td.wlbl-and-tc-area.wlbl-tc-cell
@@ -824,8 +839,6 @@
                           %td
                             %label SBRS
                           %td.text-center.sbrs-score-cell= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
-                          %td
-                            %label SBRS Rules
                           %td.text-center.sbrs-rule-hits-cell
                             = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count
 
@@ -853,7 +866,7 @@
                             %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %td
                             %label RepTool Class
-                            %td.entry-reptool-data.reptool-class-cell
+                            %td.entry-reptool-data.reptool-class-cell{colspan: '4'}
                               - if entry.classifications.first.nil?
                                 %span.missing-data.entry-reptool-class Not on RepTool
                               - else
@@ -1135,6 +1148,43 @@
                                       %td= entry.blacklist.first_seen
                                       %td= entry.blacklist.last_seen
 
+                            .entry-details-table.enrich-details-table{'data-entry-id': "#{entry.id}"}
+                              %h5.entry-details-table-header Enrichment
+                              %table.enrich-webrep-table-data-present
+                                %thead
+                                  %tr
+                                    %th Context
+                                    %th Taxonomy
+                                    %th Name
+                                    %th Description
+                                    %th.enrich-webrep-external-ref-header External References
+                                %tbody
+                                  %tr
+                              %table.enrich-webrep-table-data-missing
+                                %tbody
+                                  %tr
+                                    %td.missing-data No enrichment services data.
+
+                            .entry-details-table.prevalence-details-table{'data-entry-id': "#{entry.id}"}
+                              %h5.entry-details-table-header Prevalence
+                              %table.prevalence-webrep-table-data-present
+                                %thead
+                                  %tr
+                                    %th Dataset
+                                    %th Count
+                                    %th First Seen
+                                    %th Last Seen
+                                %tbody
+                              %table.prevalence-webrep-table-data-missing
+                                %tbody
+                                  %tr
+                                    %td.missing-data No Prevalence Data
+
 = render 'escalations/webrep/disputes/new_email_dialog'
 %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
 %input{:name => "xml_token", :type => "hidden", :value => "#{xml_token}"}
+
+:javascript
+  $(document).ready(function(){
+    setup_enrichment_section()
+  })

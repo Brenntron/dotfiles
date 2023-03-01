@@ -1,35 +1,47 @@
 class Clusters::Fetcher
-  attr_accessor :filter, :regex, :user
+  attr_accessor :filter, :regex, :user, :save_regex
 
-  WSA_DATA_PROVIDER = Clusters::Wbnp::DataFetcher
-  NGFW_DATA_PROVIDER = Clusters::Ngfw::DataFetcher
+  PLATFORM_TO_DATA_PROVIDER = {
+    Clusters::Wbnp::DataFetcher::DATA_PATFORM => Clusters::Wbnp::DataFetcher,
+    Clusters::Ngfw::DataFetcher::DATA_PATFORM => Clusters::Ngfw::DataFetcher,
+    Clusters::Umbrella::DataFetcher::DATA_PLATFORM => Clusters::Umbrella::DataFetcher,
+  }.freeze
 
-  ALL_DATA_PROVIDERS = [
-    WSA_DATA_PROVIDER,
-    NGFW_DATA_PROVIDER
-  ]
+  ALL_DATA_PROVIDERS = PLATFORM_TO_DATA_PROVIDER.values.freeze
 
-  CLUSTERS_PAGE_LIMIT = 1000
+  # changed this value because Umbrella clusters do not have any global_volume value
+  # and they are not shown in the table because of sorting by global_volume field
+  CLUSTERS_PAGE_LIMIT = 10000
 
-  def initialize(filter, regex, user)
+  def initialize(filter, regex, save_regex, user)
     @filter = filter
     @regex = regex
+    @save_regex = save_regex
     @user = user
   end
 
   def fetch
     clusters_data = fetch_clusters
     clusters_data = populate_3rd_party_clusters_data(clusters_data)
+    clusters_data = nest_duplicates(clusters_data)
     filtered_clusters = Clusters::Filter.new(clusters_data, filter, user).filter
+
     filtered_clusters.sort_by { |cluster| cluster[:global_volume] }.reverse.first(CLUSTERS_PAGE_LIMIT)
   end
 
   private
 
+  def nest_duplicates(clusters)
+    clusters = clusters.deep_dup
+    clusters.each do |cluster|
+      duplicates = clusters.select { |c| c[:domain] == cluster[:domain] && c != cluster }
+      cluster[:duplicates] = duplicates
+      clusters.reject! { |c| duplicates.include?(c) }
+    end
+    clusters
+  end
+
   def fetch_clusters
-
-    cluster_type = filter ? filter[:cluster_type] : nil
-
     data_providers_list.map do |provider_class|
       provider_class.new(regex, filter, user).fetch
     end.flatten
@@ -39,16 +51,11 @@ class Clusters::Fetcher
     # this is the data filtering that should be a part Clusters::filter
     # but, for page load speedup purposes that will be more efficient to filter by platform
     # before data select
-    return ALL_DATA_PROVIDERS if filter.blank?
+    return ALL_DATA_PROVIDERS if filter[:platform].blank?
 
-    case filter[:platform]
-    when Clusters::Wbnp::DataFetcher::DATA_PATFORM
-      [WSA_DATA_PROVIDER]
-    when Clusters::Ngfw::DataFetcher::DATA_PATFORM
-      [NGFW_DATA_PROVIDER]
-    else
-      ALL_DATA_PROVIDERS
-    end
+    data_providers = filter[:platform].split(',').filter_map { |platform| PLATFORM_TO_DATA_PROVIDER[platform] }
+
+    data_providers.present? ? data_providers : ALL_DATA_PROVIDERS
   end
 
   def populate_3rd_party_clusters_data(clusters)

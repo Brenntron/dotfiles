@@ -1,0 +1,196 @@
+-#%form#search-webrep-cases-form{method: 'get', 'accept-charset': 'UTF-8'}
+-#=simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
+= form_for :advanced_search, html: {id: 'sdr-disputes-advanced-search-form'}, url: escalations_sdr_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |advanced_search_form|
+  .form-group.search-item
+    %label.content-label-sm Case IDs
+    %input.form-control#caseid-input{name: 'case_id'}
+    %button.remove-input#remove-criteria-caseid
+  .form-group.search-item
+    %label.content-label-sm Dispute (URL/IP/Domain)
+    %input.form-control#dispute-input{name: 'ip_or_uri'}
+    %button.remove-input#remove-criteria-dispute
+  .form-group.search-item
+    %label.content-label-sm Assignee
+    %input.form-control#owner-input{name: 'username', list: 'user-list'}
+    %datalist#user-list
+    %button.remove-input#remove-criteria-assignee
+  .form-group.search-item
+    %label.content-label-sm Status
+    %input.form-control#status-input{name: 'status', list: 'status-list'}
+    %datalist#status-list
+    %button.remove-input#remove-criteria-status
+  .form-group.search-item.hidden
+    %label.content-label-sm Priority
+    %input.form-control#priority-input{name: 'priority', list: 'priority-list'}
+    %datalist#priority-list
+    %button.remove-input#remove-criteria-owner
+  .form-group.search-item.hidden
+    %label.content-label-sm Suggested Rep
+    %input.form-control#suggested-rep-input{name: 'suggested-rep'}
+    %button.remove-input#remove-criteria-disposition
+  .form-group.search-item.hidden
+    %label.content-label-sm Resolution
+    %input.form-control#resolution-input{name: 'resolution', list: 'resolution-list'}
+    %datalist#resolution-list
+    %button.remove-input#remove-criteria-resolution
+  .form-group.search-item.hidden
+    %label.content-label-sm Submitter Type
+    %input.form-control#submitter-input{name: 'submitter', list: 'submittertype-list'}
+    %datalist#submittertype-list
+    %button.remove-input#remove-criteria-submitter
+  .form-group.search-item.hidden
+    %label.content-label-sm Contact Name
+    %input.form-control#name-input{name: 'contact-name', list: 'contactname-list'}
+    %datalist#contactname-list
+    %button.remove-input#remove-criteria-contact-name
+  .form-group.search-item.hidden
+    %label.content-label-sm Contact Email
+    %input.form-control#email-input{name: 'contact-email', list: 'contactemail-list'}
+    %datalist#contactemail-list
+    %button.remove-input#remove-criteria-contact-email
+  .form-group.search-item.hidden
+    %label.content-label-sm Submitter Org
+    %input.form-control#submitter-org-input{name: 'submitter-org', list: 'submitter-org-list'}
+    %datalist#submitter-org-list
+    %button.remove-input#remove-criteria-company
+  .form-group.search-item.hidden
+    %label.content-label-sm Platform
+    %input.form-control.selectize#platform-input{name: 'platform', multiple: 'multiple', tabindex: '-1', data: 'webrep'}
+    %button#remove-criteria-platform.remove-input{onclick: 'clearSelectize("platform-input")'}
+  .form-group.search-item.hidden
+    %label.content-label-sm Time Submitted (Newer)
+    %input.form-control#submitted-newer-input{type: 'date', name: 'date-submitted-newer'}
+    %button.remove-input#remove-criteria-submitted-newer
+  .form-group.search-item.hidden
+    %label.content-label-sm Time Submitted (Older)
+    %input.form-control#submitted-older-input{type: 'date', name: 'date-submitted-older'}
+    %button.remove-input#remove-criteria-submitted-older
+  .form-group.search-item.hidden
+    %label.content-label-sm Case Age (Newer) ex: 30d 12h
+    %input.form-control#age-newer-input{name: 'age'}
+    %button.remove-input#remove-criteria-age-newer
+  .form-group.search-item.hidden
+    %label.content-label-sm Case Age (Older) ex: 7d 12h
+    %input.form-control#age-older-input{name: 'age'}
+    %button.remove-input#remove-criteria-age-older
+  -#.form-group.search-item.hidden
+  -#  %label.content-label-sm Last Modified (Newer)
+  -#  %input.form-control#modified-newer-input{type: 'date', name: 'date-modified-newer'}
+  -#  %button.remove-input#remove-criteria-modified-newer
+  -#.form-group.search-item.hidden
+  -#  %label.content-label-sm Last Modified (Older)
+  -#  %input.form-control#modified-older-input{type: 'date', name: 'date-modified-older'}
+  -#  %button.remove-input#remove-criteria-modified-older
+
+  %button#add-search-items-button
+    Add Search Criteria
+  #search-criteria-options
+    .multicol-2
+      %ul
+        %li.hidden
+          %label.search-criteria-label
+            %input.search-checkbox#caseid-cb{type: 'checkbox', name: 'search-criteria', value: 'Case IDs', for: 'caseid-input'}
+            Case IDs
+        %li.hidden
+          %label.search-criteria-label
+            %input.search-checkbox#dispute-cb{type: 'checkbox', name: 'search-criteria', value: 'Dispute (URL/IP/Domain)', for: 'dispute-input'}
+            Dispute (URL/IP/Domain)
+        %li.hidden
+          %label.search-criteria-label
+            %input.search-checkbox#owner-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Owner', for: 'owner-input'}
+            Assignee
+        %li.hidden
+          %label.search-criteria-label
+            %input.search-checkbox#status-cb{type: 'checkbox', name: 'search-criteria', value: 'Status', for: 'status-input'}
+            Status
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#priority-cb{type: 'checkbox', name: 'search-criteria', value: 'Priority', for: 'priority-input'}
+            Priority
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#suggested-rep-cb{type: 'checkbox', name: 'search-criteria', value: 'Suggested Rep', for: 'suggested-rep-input'}
+            Suggested Rep
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria', value: 'Resolution', for: 'resolution-input' }
+            Resolution
+        %li
+          -#%label.search-criteria-label
+          -#  %input.search-checkbox#submission-type-cb{type: 'checkbox', name: 'search-criteria', value: 'SubmissionType', for: 'submission-type'}
+          -#  Submission Type
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#submitter-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Type', for: 'submitter-input'}
+            Submitter Type
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#name-cb{type: 'checkbox', name: 'search-criteria', value: 'Contact Name', for: 'name-input'}
+            Contact Name
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#email-cb{type: 'checkbox', name: 'search-criteria', value: 'Contact Email', for: 'email-input'}
+            Contact Email
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#submitter-org-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Org', for: 'submitter-org-input'}
+            Submitter Org
+        -#%li
+        -#  %label.search-criteria-label
+        -#    %input.search-checkbox#domain-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Domain', for: 'domain-input'}
+        -#    Submitter Domain
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#platform-cb{type: 'checkbox', name: 'search-criteria', value: 'Platform', for: 'platform-input'}
+            Platform
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#submitted-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Newer)', for: 'submitted-newer-input'}
+            Time Submitted (Newer)
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#submitted-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Older)', for: 'submitted-older-input'}
+            Time Submitted (Older)
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#age-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Age', for: 'age-newer-input'}
+            Case Age (Newer)
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#age-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Age', for: 'age-older-input'}
+            Case Age (Older)
+        -#%li
+        -#  %label.search-criteria-label
+        -#    %input.search-checkbox#modified-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified (Newer)', for: 'modified-newer-input'}
+        -#    Last Modified (Newer)
+        -#%li
+        -#  %label.search-criteria-label
+        -#    %input.search-checkbox#modified-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified (Older)', for: 'modified-older-input'}
+        -#    Last Modified (Older)
+    .form-group.text-center
+      %button.tertiary#cancel-add-criteria
+        Close
+
+  %hr.thin
+  .form-group
+    %label.content-label-sm
+      Add Name to save this search criteria to My Saved Searches
+    %input.form-control#search_name{name: 'search_name', :type => 'text', :maxlength => '50'}
+  .form-group.text-center
+    %button.primary#submit-advanced-search{type: 'button', value: 'submit', onclick: 'advanced_search_sdr_index_table();'}
+      Submit Search
+    %button.secondary#reset-advanced-search.reset{type: 'button', onclick: 'sdr_reset_search()'}
+      Reset Search
+
+
+-#= simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
+-#  = dispute_form.input :search_type, as: :hidden, input_html: {value: 'advanced'}
+-#  = dispute_form.input :customer_name
+-#  = dispute_form.input :customer_email
+-#  = dispute_form.input :customer_company_name
+-#  = dispute_form.input :status
+-#  = dispute_form.input :resolution
+-#  = dispute_form.input :subject
+-#  = dispute_form.input :search_name, input_html: {value: ''}
+-#  = dispute_form.submit 'Search'
+

@@ -904,4 +904,36 @@ describe Dispute do
     Dispute.convert_to_complaint(params, current_user)
   end
 
+  describe '.assign' do
+    let!(:user) { FactoryBot.create(:user) }
+    customer = FactoryBot.create(:customer, name: 'Some Customer')
+
+    let!(:dispute) { FactoryBot.create(:dispute, user: user, customer: customer, status: 'NEW') }
+
+    let!(:dispute_entry) { FactoryBot.create(:dispute_entry, dispute: dispute, status: 'NEW') }
+
+    context 'when one dispute' do
+      it 'should assign dispute to user' do
+        described_class.assign(user, [dispute.id])
+
+        expect(dispute.reload.status).to eq('ASSIGNED')
+        expect(dispute.user).to eq(user)
+        expect(dispute.dispute_entries.pluck(:status).uniq).to eq(['ASSIGNED'])
+      end
+    end
+    
+    context 'when multiple disputes' do
+      let!(:dispute2) { FactoryBot.create(:dispute, user: user, customer: customer, status: 'NEW') }
+      let!(:dispute_entry2) { FactoryBot.create(:dispute_entry, uri: 'cisco.com', dispute: dispute2, status: 'NEW') }
+
+      it 'should assign dispute to user user' do
+        described_class.assign(user, [dispute.id, dispute2.id])
+
+        expect(dispute2.reload.status).to eq('ASSIGNED')
+        expect(dispute2.user).to eq(user)
+        expect(dispute.dispute_entries.pluck(:status).uniq).to eq(['ASSIGNED'])
+
+      end
+    end
+  end
 end

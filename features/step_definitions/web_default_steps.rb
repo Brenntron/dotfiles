@@ -220,6 +220,11 @@ Then(/^I click checkbox with value "(.*?)"$/) do |checkbox_value|
   checkbox.should be_checked
 end
 
+Then(/^I click checkbox with name "(.*?)"$/) do |checkbox_name|
+  checkbox = page.find(:xpath, "//input[@type='checkbox' and @name='#{checkbox_name}']")
+  checkbox.click
+  checkbox.should be_checked
+end
 
 Given(/^I click an image button in table "(.*?)" at row "(.*?)" and col "(.*?)" with class name "(.*?)"$/) do |table, row, column,class_name|
   page.find(:xpath, "//table[#{table}]//tr[#{row}]//td[#{column}]//*[contains(@class, '#{class_name}')]").click
@@ -568,8 +573,8 @@ Then(/^button with id "(.*?)" should be disabled$/) do |id_name|
 end
 
 Then(/^button with id "(.*?)" should be enabled$/) do |id_name|
-  # page.find(:xpath, "//button[@id='#{id_name}']")
-  find_button("button##{id_name}", disabled: false)
+  button = find(:xpath, "//button[contains(@id, '#{id_name}')]")
+  button.disabled?.should be false
 end
 
 Given(/^I fill in selectized with "(.*?)"$/) do |value|

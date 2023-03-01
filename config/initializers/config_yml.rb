@@ -102,6 +102,14 @@ Rails.configuration.elastic.password    = elastic_config['password']
 Rails.configuration.elastic.tls         = true
 
 
+enrichment_service_config = env_config['enrichment_service']
+raise "config.yml missing enrichment_service section" unless enrichment_service_config
+Rails.configuration.enrichment_service           = OpenStruct.new
+Rails.configuration.enrichment_service.cert_file = enrichment_service_config['cert_file']
+Rails.configuration.enrichment_service.key_file  = enrichment_service_config['key_file']
+Rails.configuration.enrichment_service.hostport  = enrichment_service_config['hostport']
+
+
 file_reputation_sandbox = env_config['file_reputation_sandbox']
 raise 'config.yml missing file reputation sandbox section' unless file_reputation_sandbox
 Rails.configuration.file_reputation_sandbox        = ApiRequester::ApiRequester.config_of(file_reputation_sandbox)
@@ -193,9 +201,21 @@ Rails.configuration.wbrs                = ApiRequester::ApiRequester.config_of(w
 # TODO convert auth_token to api_key so it is set by config_of method.
 Rails.configuration.wbrs.auth_token     = wbrs_config['auth_token']
 
+k2_config = env_config.fetch('k2', nil)
+raise 'config.yml missing k2 section' unless k2_config
+Rails.configuration.k2                  = ApiRequester::ApiRequester.config_of(k2_config)
+Rails.configuration.k2.token            = k2_config['token']
 
-xbrs_config = env_config.fetch('xbrs', nil)
-raise 'config.yml missing xbrs section' unless xbrs_config
-Rails.configuration.xbrs                = ApiRequester::ApiRequester.config_of(xbrs_config)
-Rails.configuration.xbrs.consumer_key   = xbrs_config['consumer_key']
+umbrella_fetcher_config = env_config.fetch('umbrella_data_fetcher', nil)
+raise 'config.yml missing umbrella_data_fetcher aws section' unless umbrella_fetcher_config
+umbrella_aws_config = OpenStruct.new
+umbrella_aws_config.aws_access_key_id = umbrella_fetcher_config.dig('aws', 'access_key_id')
+umbrella_aws_config.aws_secret_access_key = umbrella_fetcher_config.dig('aws', 'secret_access_key')
+Rails.configuration.umbrella_data_fetcher = umbrella_aws_config
 
+ngfw_telemetry_config = env_config.fetch('ngfw_telemetry', nil)
+raise 'config.yml missing ngfw_telemetry section' unless ngfw_telemetry_config
+ngfw_telemetry_aws_config = OpenStruct.new
+ngfw_telemetry_aws_config.aws_access_key_id = ngfw_telemetry_config.dig('aws', 'access_key_id')
+ngfw_telemetry_aws_config.aws_secret_access_key = ngfw_telemetry_config.dig('aws', 'secret_access_key')
+Rails.configuration.ngfw_telemetry = ngfw_telemetry_aws_config

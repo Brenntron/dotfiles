@@ -35,21 +35,29 @@ window.apply_filter_to_table = () ->
   filter = $("#cluster_filter_field").val()
 
   # if they have entered a regex, show the regex in upper-left area
-  if filter != '' then $('.regex-area').removeClass('hidden')
-  else $('.regex-area').addClass('hidden')
+  if filter != ''
+    $('.regex-area').removeClass('hidden')
+  else
+    $('.regex-area').addClass('hidden')
 
   $('#regex-filter').html(filter)
-  populate_clusters_index_table(filter);
+
+  populate_clusters_index_table(filter)
 
 window.populate_clusters_index_table = (filter) ->
   if $('#clusters-index_wrapper').length > 0
     loader = $('.cluster-mgt-loader-wrapper')
     loader.removeClass('hidden')
+
     filter_param = window.location.search
+    save_regex = $('#saveRegex')[0].checked
+
     if filter_param.length == 0
       filter_param += "?f=all"
     if filter && filter_param
       filter_param += "&regex=" + filter
+    if save_regex && filter_param
+      filter_param += "&save_regex=" + save_regex
 
     $.ajax(
       url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
@@ -70,12 +78,33 @@ window.populate_clusters_index_table = (filter) ->
           selectize_category_inputs();
           populate_cat_select(json.data)
 
+          if save_regex && $(".saved-search[name='#{filter}']").length < 1
+            $('#saved-search-tbody').append("<tr id='saved_search_#{json.named_search.id}'><td><a class='input-truncate saved-search esc-tooltipped tooltipstered' name='#{filter}' onclick='build_webcat_clusters_named_search(this);'>#{filter}</a><a class='delete-search' name='#{filter}' onclick='delete_clusters_named_search(this);' title='Delete Saved Search'><img src='/assets/icon_cancel_grey.svg'></a></td></tr>")
+
 
       error: (response) ->
         loader.addClass('hidden')
         std_msg_error('Table Error', [response.responseText])
     , this)
 
+window.build_webcat_clusters_named_search = (namedSearch) ->
+  $("#cluster_filter_field").val($(namedSearch).attr('name'))
+  apply_filter_to_table()
+
+
+# Delete saved regex searches
+window.delete_clusters_named_search = (close_button) ->
+  data = { search_name: $(close_button).attr('name') }
+  std_msg_ajax(
+    method: 'DELETE'
+    url: "/escalations/api/v1/escalations/webcat/clusters/searches"
+    data: data
+    error_prefix: 'Error deleting saved search.'
+    failure_reload: false
+    tr_tag: close_button.closest('tr')
+    success: (response) ->
+      this.tr_tag.remove();
+  )
 
 
 # categorize clusters submission - review_action (optional) is "bulk_accept", "bulk_deny", or empty (default)
@@ -84,6 +113,7 @@ window.categorize_clusters = (review_action) ->
   loader.removeClass('hidden')
   user_id = $("#user_id").val()
   comment = $("#cluster_comment_field").val()
+  saveRegex = $('#saveRegex')[0].checked
 
   #cluster_id comment category_ids
   clusters = $ '[id$=\'_categories\']'
@@ -98,6 +128,7 @@ window.categorize_clusters = (review_action) ->
   data["user_id"] = user_id
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data()
   clusters = []
+
   for selected_row in selected_rows
     selected_row["comment"] = comment
     escaped_domain = selected_row.domain.replaceAll('.', '_')
@@ -110,8 +141,12 @@ window.categorize_clusters = (review_action) ->
         $(categories).each ->
           value = $(this).attr('value')
           category_values.push value
-        selected_row["categories"] = category_values
+        selected_row['categories'] = category_values
+        for duplicate in selected_row.duplicates
+          duplicate['categories'] = category_values
+
     clusters.push(selected_row)
+    clusters = clusters.concat(selected_row.duplicates) if selected_row.duplicates
 
   data["clusters"] = JSON.stringify(clusters)
 
@@ -246,11 +281,12 @@ $ ->
       {
         data: null
         className: 'domain-column',
-        render: (data) ->
-          {domain, cluster_size, platform} = data  # get domain string and cluster_size out of the data
+        render:  (data, _type, _full, meta) ->
+          {domain, cluster_size, platform, duplicates} = data  # get domain string and cluster_size out of the data
           is_ip = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
 
           html = "<span ondblclick='copy_domain(\"#{domain}\", this)'> #{domain} </span>"
+
           # only show WHOIS lookup button for normal domains, not ip addresses
           if !is_ip.test(domain)
             html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='domain_whois(\"#{domain}\")'></button>"
@@ -259,7 +295,11 @@ $ ->
 
           html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
                    <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
-          if platform != 'NGFW'
+
+          if duplicates && duplicates.length > 0
+            html += "<button type='button' class='cluster-dup-btn right-margin esc-tooltipped' title='Show duplicates' onclick='show_duplicates(#{meta.row})'></button>"
+
+          if platform == 'WSA'
             html += "<span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
           return html
       }
@@ -335,7 +375,7 @@ window.collapse_all_clusters = (tableId) ->
 #  expand selected funtionality
 window.expand_selected_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
-  clusterIds = selectedRows.map (i, row) -> 
+  clusterIds = selectedRows.map (i, row) ->
     parseInt($(row).find('.cluster_identifier').text())
   window.get_data_for_clusters(selectedRows, clusterIds.toArray())
 
@@ -412,6 +452,19 @@ window.copycat_dialog = () ->
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions('#copycat_dialog #copycat-categories')
+        score: (input) ->
+          #  Adding some customization for autofill
+          #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
+          (item) ->
+            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+              item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
+            else
+              0
       }
   });
 
@@ -467,6 +520,19 @@ window.selectize_category_inputs = () ->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
+        score: (input) ->
+          #  Adding some customization for autofill
+          #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
+          (item) ->
+            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+              item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
+            else
+              0
       }
   AC.WebCat.createSelectOptionsForIds(input_ids)
 
@@ -536,7 +602,7 @@ window.expandSingleRow = (currentRow, preloadedData=[])->
 
     missing_data = '<span class="missing-data">Missing data</span>'
     entry_rows = []
-    if preloadedData.length != 0 
+    if preloadedData.length != 0
       entry = preloadedData
       total_shown_entries = 0
       total_entries = $($(tr[0]).find('.entry-count')[0]).text()
@@ -613,7 +679,7 @@ window.expandSingleRow = (currentRow, preloadedData=[])->
               wbrs_rep = window.wbrs_display(wbrs_score)
               if wbrs_rep == undefined then wbrs_rep = 'unknown'
               if wbrs_rep == 'unknown'then wbrs_score = '--'
-  
+
               entry_rows.push window.cluster_detail_row(wbrs_rep, wbrs_score, url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume)
               total_shown_entries = i + 1
               return
@@ -677,7 +743,7 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
               wbrs_score = '--'
             else
               wbrs_score = parseFloat(wbrs_score).toFixed(1)
-          
+
               entry_rows.push window.cluster_detail_row(wbrs_rep, wbrs_score, url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume)
             return
 
@@ -891,6 +957,11 @@ $ ->
         'tooltipster-borderless-customized'
       ]
 
+  $('#duplicate-clusters-dialog').dialog({
+    autoOpen : false
+    width: 750
+  });
+
 window.take_selected_clusters = ()->
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data().toArray()
   if selected_rows.length > 0
@@ -907,6 +978,7 @@ window.take_selected_clusters = ()->
           std_msg_error('Error Taking Clusters', [json.error])
         else
           for cluster, i in json.clusters
+            change_assignee_for_duplicates(cluster.domain, json.username)
             escaped_domain = cluster.domain.replaceAll('.', '_')
             $("#owner_#{escaped_domain}_#{cluster.platform}").text(json.username)
 
@@ -915,6 +987,12 @@ window.take_selected_clusters = ()->
     , this)
   else
     std_msg_error('No rows selected', ['Please select at least one row.'])
+
+window.change_assignee_for_duplicates = (domain, username) ->
+  selected_rows = $("#clusters-index").DataTable().rows('.selected').data().toArray()
+  row = (row for row in selected_rows when row.domain is domain)[0]
+  for duplicate in row.duplicates
+    duplicate.assigned_to = username
 
 window.return_selected_clusters = ()->
   selected_rows = $("#clusters-index").DataTable().rows('.selected').data().toArray()
@@ -931,6 +1009,7 @@ window.return_selected_clusters = ()->
           std_msg_error('Error Returning Clusters', [json.error])
         else
           for entry, i in selected_rows
+            change_assignee_for_duplicates(entry.domain, '')
             escaped_domain = entry.domain.replaceAll('.', '_')
             $("#owner_#{escaped_domain}_#{entry.platform}").text('')
 
@@ -1004,12 +1083,55 @@ window.build_clusters_header = () ->
 window.webcat_clusters_refresh = () ->
   window.location.replace('/escalations/webcat/clusters');
 
+window.show_duplicates = (row) ->
+  AC.WebCat.getAUPCategories().then((categories) ->
+    $('#clusters-index-duplicates').find('tbody').html('')
+    reverted_categories = {}
+    for key, value of categories
+      reverted_categories[value] = key.split(' - ')[0]
+
+    data = window.clusters_table.row(row).data()
+    duplicates = data.duplicates
+
+    for duplicate in duplicates
+      row = "<tr>"
+      # check if already converted ids to names
+      if duplicate.categories.every((element) -> return !isNaN(element))
+        duplicate.categories = category_ids_to_names(reverted_categories, duplicate.categories)
+
+      attribites = [
+        duplicate.cluster_id,
+        duplicate.domain,
+        duplicate.global_volume,
+        duplicate.wbrs_score,
+        duplicate.platform,
+        duplicate.assigned_to,
+        duplicate.categories.join(', ')
+      ]
+
+      for attribute in attribites
+        if attribute || attribute == 0
+          row = row + "<td>#{attribute}</td>"
+        else
+          row = row + "<td></td>"
+      $('#clusters-index-duplicates').find('tbody').append(row + "</tr>");
+    $('#duplicate-clusters-dialog').dialog('open')
+  )
+
+# convert categories_ids to categories names
+window.category_ids_to_names = (categories_hash, category_ids) ->
+  categories = []
+  for category_id in category_ids
+    categories.push(categories_hash[category_id])
+  return categories
+
 window.webcat_platform_filter = () ->
   platforms = $("input.show-platforms-filter:checked")
-  if $(platforms).length > 1 || $(platforms).length == 0
+  if $(platforms).length == 3 || $(platforms).length == 0
     selected_platform = 'All'
   else
-    selected_platform = $("input.show-platforms-filter:checked").val()
+    selected_platform = []
+    platforms.each -> selected_platform.push($(this).val());
   url = new URL(document.location.href)
   url.searchParams.set('platform', selected_platform)
   document.location = url;
@@ -1035,8 +1157,10 @@ $ ->
       if platform == 'All'
         $("input.show-platforms-filter").prop('checked', true)
       else
+        platforms = platform.split(',')
         $("input.show-platforms-filter").prop('checked', false)
-        $("input.show-platforms-filter[name='show-platform-#{platform}'").prop('checked', true)
+        for platform in platforms
+          $("input.show-platforms-filter[name='show-platform-#{platform}'").prop('checked', true)
 
     if(cluster_type)
       if cluster_type == 'all'
@@ -1044,14 +1168,4 @@ $ ->
       else
         $("input.show-cluster-types-filter").prop('checked', false)
         $("input.show-cluster-types-filter[name='show-cluster-#{cluster_type}'").prop('checked', true)
-
-    $('#categorize-urls').on 'click', (e) ->
-      dropdownShouldToggle = !dropdownShouldToggle
-
-      if dropdownShouldToggle == true
-        $('#categorize-urls').dropdown('toggle')
-
-    $('.nav-tool-blocks.col-xs-3.col-sm-2.col-lg-2.dropdown').on 'hide.bs.dropdown', (e) ->
-      if dropdownShouldToggle == false
-        e.preventDefault()
 

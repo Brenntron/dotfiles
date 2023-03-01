@@ -102,16 +102,40 @@ class RepApi::Whitelist < RepApi::Base
     freeze
     true
   end
-
+  #old format:
+  # {"google.com"=>{"hostname"=>"google.com", "expiration"=>"NEVER", "_id"=>"57165ecb673ca5a24b1b66db", "status"=>"ACTIVE", "ident"=>"", "source"=>"From whitelist_ips in PostgreSQL", "comment"=>""}}
+  #new format:
+  # {"google.com"=>{"found"=>true, "result"=>{"_id"=>{"$oid"=>"57165ecb673ca5a24b1b66db"}, "comment"=>"", "hostname"=>"google.com", "ident"=>"", "source"=>"From whitelist_ips in PostgreSQL"}}}
+  
   def self.get_whitelist_info(conditions = {})
-    params = stringkey_params(conditions)
 
-    entries = params.delete('entries')
+    if conditions[:entries].present?
+      conditions[:entry] = conditions[:entries]
+      conditions.delete(:entries)
+    end
 
-    string_array = entries.map {|entry| "entry=#{entry}"}
 
-    response = call_json_request(:post, '/whitelist/gethostname', body: build_request_body(string_array))
+    response = call_json_request(:post, '/api/v3/allowlist/get', body: conditions)
 
     response_body = JSON.parse(response.body)
+
+    new_response = {}
+    response_body.keys.each do |host|
+      if response_body[host]["found"] == false
+        raise RepApi::RepApiNotFoundError, "HTTP response 404"
+      end
+      new_response[host] = {}
+      new_response[host]["status"] = "ACTIVE"
+      new_response[host]["_id"] = response_body[host]["result"]["_id"]["$oid"]
+      new_response[host]["source"] = response_body[host]["result"]["source"]
+      new_response[host]["comment"] = response_body[host]["result"]["comment"]
+      new_response[host]["ident"] = response_body[host]["result"]["ident"]
+      new_response[host]["hostname"] = response_body[host]["result"]["hostname"]
+      new_response[host]["expiration"] = "NEVER"
+    end
+
+    new_response
   end
+
+
 end

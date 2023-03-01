@@ -1,5 +1,5 @@
 $(document).ready ->
-
+  window.set_advanced_search_pref()
   $('#add-search-items-button').click ->
     $('#search-criteria-options').show()
     false
@@ -24,7 +24,10 @@ $(document).ready ->
         field_name = 'category-input'
       if attr_for == field_name || attr_for == field_wrapper
         $( parent ).parent().removeClass('hidden')
-    $( field ).addClass('hidden')
+    if field.attr('id') == 'submission-type'
+      $(field).parent().addClass('hidden')
+    else
+      $(field).addClass('hidden')
     false
 
   $('#search-webrep-cases-form').on 'click', '.remove-input', ->
@@ -70,15 +73,13 @@ window.toggle_search_criteria = (element) ->
     # hide criteria
     input_wrapper = $(element).parents('.search-item')[0]
     search_input = $(input_wrapper).find('.form-control')[0]
-    criteria = $(search_input).attr('id')
+    criteria = $(search_input).attr('id').replace(/-w-cb/g, '')
     criteria_toggle = $(search_wrapper).find('input[for="' + criteria + '"]')
     criteria_wrapper = $(criteria_toggle).parents('li')[0]
     $('#add-search-items-button').removeClass('hidden')
-
     $(input_wrapper).addClass('hidden')
     $(criteria_toggle).prop('checked', false)
     $(criteria_wrapper).removeClass('hidden')
-
   # grab visible criteria
   search_criteria = $(search_wrapper).find('.search-item')
   search_pref = {}
@@ -94,7 +95,7 @@ window.toggle_search_criteria = (element) ->
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/user_preferences/update"
     method: 'POST'
-    data: {data, name: 'WebCatAdvancedSearchFieldsDisplayed'}
+    data: {data, name: 'WebRepAdvancedSearchFieldsDisplayed'}
     dataType: 'json'
     success: (response) ->
       return false
@@ -106,20 +107,20 @@ window.set_advanced_search_pref = () ->
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: 'WebCatAdvancedSearchFieldsDisplayed'}
+    data: {name: 'WebRepAdvancedSearchFieldsDisplayed'}
     success: (response) ->
       response = JSON.parse(response)
       if response?
         $.each response, (criteria, state) ->
+          # submission type has a different DOM stucture, so need to remove the -w-cb
+          criteria = criteria.replace(/-w-cb/g, '')
           criteria_id   = '#' + criteria
           search_input  = $($(criteria_id)[0]).parents('.search-item')[0]
           search_toggle = $($('input[for="' + criteria + '"]')[0]).parents('li')[0]
-
           if state == 'true'
             $(search_input).removeClass('hidden')
             $(search_toggle).addClass('hidden')
           else
             $(search_input).addClass('hidden')
             $(search_toggle).removeClass('hidden')
-
   )

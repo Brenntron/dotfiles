@@ -297,7 +297,7 @@ class Sbrs::Base
 
   def self.remote_lookup_sds_v3(params)
     hostname = "#{params["hostname"]}"
-    query_string = "#{params["query_string"]}"
+    query_string = query_escape(params["query_string"]) #"#{params["query_string"]}"
     request_type = "#{params["sds_type"]}"
 
     if request_type.blank? && query_string.match?('/score/single/json')
@@ -310,7 +310,8 @@ class Sbrs::Base
     request_string = "https://" + hostname + query_string
 
     if request_type == 'wbrs' && params["uri_item"]
-      request_string += params["uri_item"]
+      ascii_uri = params["uri_item"].split("/").map {|m| SimpleIDN.to_ascii(m)}.join("/")
+      request_string += ascii_uri
     end
 
     if request_string.present?
@@ -517,4 +518,16 @@ class Sbrs::Base
 
     health_report
   end
+
+
+  def self.query_escape(query_string)
+    path, seprator, query = query_string.partition(/\?/)
+    query = query.split('&').map do |key_value|
+      key, query_separator, value = key_value.partition('=')
+      value = CGI.escape(value)
+      [key, query_separator, value].join
+    end
+    [path, seprator, query].join
+  end
+
 end

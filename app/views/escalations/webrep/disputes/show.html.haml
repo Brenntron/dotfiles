@@ -12,7 +12,7 @@
         %span.bug-state-info.bug-priority#dispute-priority-icon{class: "p-#{@dispute.priority}"}
         =select_tag(:'dispute-priority-select', options_for_select([["#{Dispute::PRIORITY_1}"], ["#{Dispute::PRIORITY_2}"], ["#{Dispute::PRIORITY_3}"], ["#{Dispute::PRIORITY_4}"], ["#{Dispute::PRIORITY_5}"]], @dispute.priority))
         %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
-        =select_tag(:'dispute-submission-type-select', options_for_select([["E"], ["W"], ["EW"]], @dispute.submission_type.upcase))
+        =select_tag(:'dispute-submission-type-select', options_for_select([["E"], ["W"], ["EW"]], @dispute.submission_type&.upcase))
       .case-id-wrapper
         %label.content-label-sm
           Case ID
@@ -31,7 +31,7 @@
             %span#dispute-assignee= @dispute.assignee || "None"
           - if can? :update, Dispute
             .dispute-owner-buttons-wrapper
-              - if @dispute.assignee == current_user.email
+              - if @dispute.assignee == current_user.cvs_username
                 - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                   %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
               - else
@@ -156,7 +156,7 @@
             - else
               = @dispute.ticket_source
           - else
-            %span.missing-data Source unknown
+            Internal
 
 
     .col-xs-3.col-with-divider
@@ -312,3 +312,7 @@
                         %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
                         %td= dispute_dup.case_opened_at.strftime('%F %T')
 
+:javascript
+  $(document).ready(function(){
+    setup_enrichment_section()
+  })

@@ -44,9 +44,13 @@ class FileReputationDispute < ApplicationRecord
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
   SUBMITTER_TYPE_INTERNAL = "INTERNAL"
 
-  RESOLUTION_AUTORESOLVED_STATUS_FP = "AUTO_FIXED_FP"
-  RESOLUTION_AUTORESOLVED               = 'Auto Resolved'
-  RESOLUTION_DUPLICATE              = 'DUPLICATE'
+  STATUS_AUTO_RESOLVED_FP        = "AP - FP"
+  STATUS_AUTO_RESOLVED_FN        = "AP - FN"
+  STATUS_AUTO_RESOLVED_NO_FILE   = "AP - No File"
+  STATUS_AUTO_RESOLVED_MATCH     = "AP - Match"
+  STATUS_AUTO_RESOLVED_DUPLICATE = "AP - Duplicate"
+  STATUS_AUTO_RESOLVED_UNCHANGED = "AP - Unchanged"
+
   RESOLUTION_AUTORESOLVED_COMMENT       = <<~HEREDOC
     This ticket has been auto-resolved, the suggested disposition and the cloud disposition of the file already match.  If your device or endpoint client is not reflecting this disposition, please open a TAC case for the Advanced Threat Team at http://support.cisco.com
   HEREDOC
@@ -63,13 +67,40 @@ class FileReputationDispute < ApplicationRecord
     Cisco Talos has concluded that the file is safe to access at this time. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case.
   HEREDOC
   RESOLUTION_AUTORESOLVED_UNCHANGED         = <<~HEREDOC
-    Cisco Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file’s disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file’s disposition, if they understand the risks in doing so. If you need further assistance, please open a TAC case and provide additional details.
+    Cisco Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file's disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file’s disposition, if they understand the risks in doing so. If you need further assistance, please open a TAC case and provide additional details.
   HEREDOC
 
 
   AC_SUCCESS = 'CREATE_ACK'
   AC_FAILED = 'CREATE_FAILED'
   AC_PENDING = 'CREATE_PENDING'
+
+  EXPORT_FIELD_NAMES = {
+    'id' => 'Case ID',
+    'status' => 'Status',
+    'resolution' => 'Resolution',
+    'file_name' => 'File Name',
+    'sha256_hash' => 'SHA256',
+    'file_size' => 'File Size',
+    'platform' => 'Platform',
+    'sample_type' => 'Sample Type',
+    'disposition' => 'AMP Disposition',
+    'detection_name' => 'AMP Detection Name',
+    'detection_last_set' => 'AMP Detection Last Set',
+    'in_zoo' => 'In Zoo',
+    'sandbox_score' => 'Sandbox Score',
+    'threatgrid_score' => 'TG Score',
+    'reversing_labs_score' => 'Reversing Labs Hits',
+    'reversing_labs_count' => 'RL Scanners Total',
+    'disposition_suggested' => 'Suggested Disposition',
+    'created_at' => 'Dispute Summary/Details',
+    'submitter_type' => 'Time Submitted',
+    'customer_name' => 'Submitter Type',
+    'company_name' => 'Customer Name',
+    'customer_email' => 'Customer Organization',
+    'user_id' => 'Customer Email',
+    'description' => 'Assignee'
+}.freeze
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
   validates :sha256_hash, format: { with: /\A\h{64}\z/, message: "only 64 nibble (256 bit) hex code" }
@@ -727,8 +758,7 @@ class FileReputationDispute < ApplicationRecord
         status: self.status,
         sugg_type: self.disposition_suggested
     }
-
-    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
+    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id, ticket_status: self.status)
     conn.post(return_payload)
   end
 
@@ -785,7 +815,7 @@ class FileReputationDispute < ApplicationRecord
       ar_log += "--------------------------------\n"
 
       if (self.clean? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
-        self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT, auto_resolve_log: ar_log)
+        self.update(status: STATUS_RESOLVED, resolution: STATUS_AUTO_RESOLVED_MATCH, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT, auto_resolve_log: ar_log)
 
         auto_resolved_boolean = true
       end
@@ -843,7 +873,7 @@ class FileReputationDispute < ApplicationRecord
           # self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
           ### Temporary bypass of no sample auto resolve per WEB-6062 until WEB-5623 is resolved
           self.status = STATUS_RESOLVED
-          self.resolution = RESOLUTION_AUTORESOLVED
+          self.resolution = STATUS_AUTO_RESOLVED_NO_FILE
           self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
 
           self.save
@@ -894,7 +924,7 @@ class FileReputationDispute < ApplicationRecord
         #notify customer that there is no sample and to escalate via TAC with sample
         file_rep.disposition = DISPOSITION_MALICIOUS
         file_rep.status = STATUS_RESOLVED
-        file_rep.resolution = RESOLUTION_AUTORESOLVED
+        file_rep.resolution = STATUS_AUTO_RESOLVED_FN
         file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT
         file_rep.auto_resolve_log += ar_log
         file_rep.save
@@ -929,7 +959,7 @@ class FileReputationDispute < ApplicationRecord
         end
         file_rep.disposition = DISPOSITION_CLEAN
         file_rep.status = STATUS_RESOLVED
-        file_rep.resolution = RESOLUTION_AUTORESOLVED_STATUS_FP
+        file_rep.resolution = STATUS_AUTO_RESOLVED_FP
         file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_FP_CLEAN
         file_rep.auto_resolve_log += ar_log
         file_rep.save
@@ -980,7 +1010,7 @@ class FileReputationDispute < ApplicationRecord
         ar_log += "critical scanners: #{critical_mals.to_s}\n\n"
         file_rep.auto_resolve_log += ar_log
         file_rep.status = STATUS_RESOLVED
-        file_rep.resolution = RESOLUTION_AUTORESOLVED
+        file_rep.resolution = STATUS_AUTO_RESOLVED_UNCHANGED
         file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_UNCHANGED
         file_rep.save
 
@@ -1002,7 +1032,7 @@ class FileReputationDispute < ApplicationRecord
 
   def self.auto_resolve_on_duplicate(dispute)
     dispute.status = STATUS_RESOLVED
-    dispute.resolution = RESOLUTION_DUPLICATE
+    dispute.resolution = STATUS_AUTO_RESOLVED_DUPLICATE
     dispute.resolution_comment = RESOLUTION_DUPLICATE_COMMENT
 
     dispute.save
@@ -1016,8 +1046,7 @@ class FileReputationDispute < ApplicationRecord
         status: dispute.status,
         sugg_type: dispute.disposition_suggested
         }
-
-    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.ticket_source_key, ac_id: dispute.id)
+    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.ticket_source_key, ac_id: dispute.id, ticket_status: dispute.status)
     conn.post(return_payload)
   end
 
@@ -1063,16 +1092,14 @@ class FileReputationDispute < ApplicationRecord
 
 
   def self.assign(dispute_ids, user:)
-    disputes_ary = []
     user_id = user.kind_of?(User) ? user.id : user
+    disputes = FileReputationDispute.where(id: dispute_ids)
 
     FileReputationDispute.transaction do
-      disputes = FileReputationDispute.where(id: dispute_ids)
-      disputes_ary = disputes.all.to_a
-
       disputes.update_all(user_id: user_id, status: FileReputationDispute::STATUS_ASSIGNED)
     end
-
+    disputes.each(&:manual_sync)
+    disputes_ary = disputes.all.to_a
     disputes_ary
   end
 
@@ -1087,11 +1114,6 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def self.export_xlsx(search_params_json, current_user:)
-    fields = %w{id status resolution file_name sha256_hash file_size platform sample_type
-                disposition detection_name detection_last_set
-                in_zoo sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
-                disposition_suggested created_at submitter_type
-                customer_name company_name customer_email user_id description}
     search_params = JSON.parse(search_params_json)
 
     file_rep_disputes = robust_search(search_params['search_type'],
@@ -1106,39 +1128,35 @@ class FileReputationDispute < ApplicationRecord
     workbook = RubyXL::Workbook.new
     worksheet = workbook[0]
 
-    %w{Case\ ID Status Resolution File\ Name SHA256 File\ Size Platform Sample\ Type
-       AMP\ Disposition AMP\ Detection\ Name AMP\ Detection\ Last\ Set
-       In\ Zoo Sandbox\ Score TG\ Score Reversing\ Labs\ Hits RL\ Scanners\ Total
-       Suggested\ Disposition Dispute\ Summary/Details Time\ Submitted Submitter\ Type
-       Customer\ Name Customer\ Organization Customer\ Email Assignee}.each_with_index do |field_name, col_index|
+    EXPORT_FIELD_NAMES.values.each_with_index do |field_name, col_index|
       worksheet.add_cell(0, col_index, field_name)
       worksheet.sheet_data[0][col_index].change_font_bold(true)
     end
 
     file_rep_disputes.each_with_index do |fr_dispute, row_index|
-      fields.each_with_index do |field_name, col_index|
+      EXPORT_FIELD_NAMES.keys.each_with_index do |field_name, col_index|
 
         cell_data =
-            case field_name
-            when 'platform'
-              fr_dispute.determine_platform
-            when 'detection_last_set'
-              fr_dispute.detection_last_set&.utc&.iso8601
-            when 'in_zoo'
-              fr_dispute.in_zoo? ? 'True' : 'False'
-            when 'created_at'
-              fr_dispute.created_at.utc.iso8601
-            when 'customer_name'
-              fr_dispute.customer_name
-            when 'customer_email'
-              fr_dispute.customer_email
-            when 'company_name'
-              fr_dispute.customer_company_name
-            when 'user_id'
-              fr_dispute.user&.cvs_username
-            else
-              fr_dispute.attributes[field_name]
-            end
+          case field_name
+          when 'platform'
+            fr_dispute.determine_platform
+          when 'detection_last_set'
+            fr_dispute.detection_last_set&.utc&.iso8601
+          when 'in_zoo'
+            fr_dispute.in_zoo?.to_s.camelize
+          when 'created_at'
+            fr_dispute.created_at.utc.iso8601
+          when 'customer_name'
+            fr_dispute.customer_name
+          when 'customer_email'
+            fr_dispute.customer_email
+          when 'company_name'
+            fr_dispute.customer_company_name
+          when 'user_id'
+            fr_dispute.user&.cvs_username
+          else
+            fr_dispute.attributes[field_name]
+          end
 
         worksheet.add_cell(row_index + 1, col_index, cell_data)
       end
@@ -1223,7 +1241,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def self.check_and_unsubscribe
-    candidates = FileReputationDispute.where({:status => STATUS_RESOLVED, :resolution => RESOLUTION_AUTORESOLVED_STATUS_FP}).where("case_closed_at <= '#{90.days.ago}' and case_closed_at >= '#{97.days.ago}'")
+    candidates = FileReputationDispute.where({:status => STATUS_RESOLVED, :resolution => STATUS_AUTO_RESOLVED_FP}).where("case_closed_at <= '#{90.days.ago}' and case_closed_at >= '#{97.days.ago}'")
     candidates.each do |candidate|
       FileReputationApi::ReversingLabs.unsubscribe(candidate.sha256_hash)
     end

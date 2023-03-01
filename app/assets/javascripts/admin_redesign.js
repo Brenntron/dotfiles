@@ -27,6 +27,10 @@
 //= require application/webrep/disputes-support
 //= require application/webrep/disputes
 //= require application/webrep/communications
+//= require application/sdr/disputes
+//= require application/sdr/research
+//= require application/sdr/communications
+//= require application/sdr/sdr_form
 //= require application/helpers
 //= require clipboard
 //= require moment
@@ -40,6 +44,7 @@
 //= require application/webrep_advanced_search
 //= require application/webcat/complaints
 //= require application/webcat/clusters
+//= require application/sdr/disputes
 //= require application/webcat/complaint_form
 //= require application/webrep/dispute_form
 //= require application/webrep_research_tab
@@ -48,6 +53,7 @@
 //= require application/webcat/webcat
 //= require application/webcat/categories
 //= require application/webcat/advanced_search
+//= require application/webcat/research
 //= require application/escalations_users
 //= require application/webcat/webCatRepLookup
 //= require application/webrep/webrep-report-engine
@@ -59,4 +65,5 @@
 //= require application/users
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
+//= require application/webrep/enrich
 //= require admin/admin-tools

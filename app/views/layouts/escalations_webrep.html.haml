@@ -89,7 +89,7 @@
       = form_tag('/tickets', method: :get, onsubmit: 'call_contains_search(this);return false;') do
         = text_field_tag 'case[id]', "#{}", class: 'search-box', placeholder: 'Search by Substring'
 
-      %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#webrep-advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         Advanced
       .dropdown-menu.nav-tools-dropdown#advanced-search-dropdown{'aria-labelledby': 'advanced-search-button'}
         %h3.nav-tool-dropdown-header.inverse
@@ -129,10 +129,3 @@
     -##username= current_user.cvs_username
 
 = render template: "layouts/rocket"
-
-- if params[:f]
-  :javascript
-    $(document).ready(function(){
-      window.filter_param = "#{params[:f]}";
-      standard_webrep_index_table("#{params[:f]}")
-    })

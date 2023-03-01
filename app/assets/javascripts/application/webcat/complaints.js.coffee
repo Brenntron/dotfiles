@@ -12,7 +12,7 @@ $(document).on 'change','.nested-table-input','.selectize-input', ->
 #### WBNP Reporting ####
 webcat_loader_timeout = ''
 $(document).ready ->
-  sessionStorage.removeItem("touchedForm");
+  sessionStorage.removeItem("touchedForm")
   loader = $('#inline-webcat')
   $(this).bind(
     ajaxStart: () ->
@@ -207,7 +207,6 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#domain_#{complaint_entry_id}").tooltipster('content', uri);
         $("#site-search-#{complaint_entry_id}").tooltipster('content', uri);
         $("#entry-uri-#{complaint_entry_id}").tooltipster('content', uri);
-
         $.each current_categories, (key, entry) ->
           $(".simple-nested-table#entry-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
 
@@ -924,6 +923,67 @@ window.return_selected = ()->
   else
     std_msg_error('no rows selected', ['Please select at least one row.'])
 
+window.webcat_remove_assignee = () ->
+  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  if selected_rows[0].length > 0
+    entry_ids = []
+    for row, i in selected_rows[0]
+      entry_ids.push(selected_rows.data()[i].entry_id)
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/unassign_all'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': entry_ids
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          std_msg_error('Error Removing Assignees', json.error)
+        else
+          #reload table data
+          $('#complaints-index').DataTable().draw()
+
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+    , this)
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+
+window.webcat_change_assignee = () ->
+  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  if selected_rows[0].length > 0
+    entry_ids = []
+    for row, i in selected_rows[0]
+      entry_ids.push(selected_rows.data()[i].entry_id)
+
+    user_id = $('#index_target_assignee option:selected').val()
+
+    data = {
+      'complaint_entry_ids': entry_ids,
+      'user_id': user_id
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/change_assignee'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          std_msg_error('Error Assigning Entries', json.error)
+        else
+          #reload table data
+          $('#complaints-index').DataTable().draw()
+
+    )
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+
 window.select_cat_text_field = (id) ->
   if (typeof numericalValue)
     $( "#category_input"+id ).select();
@@ -1034,7 +1094,7 @@ window.retrieve_history = (position) ->
   for url_position in [1..5]
     $("#url_#{url_position}").css("border-width", "")
     $("#url_#{url_position}").css("border-color", "")
-
+  
   url = $("#url_" + position).val()
 
   if url.length > 0
@@ -1317,6 +1377,7 @@ format = (complaint_entry_row) ->
           new_cat = '<li>' + cat + '</li>'
           $(master_categories_list).append(new_cat)
 
+      $(".simple-nested-table#entry-table-#{complaint_entry.entry_id} tbody > tr").remove()
       $.each current_categories, (key, value) ->
         active =  $(this).attr("is_active")
         if active == true
@@ -1404,7 +1465,7 @@ format = (complaint_entry_row) ->
   else
     complaint_source = '<span class="missing-data">Source unknown</span>'
 
-  form_change_item = complaint_entry.domain || complaint_entry.ip_address
+  form_change_item = domain || complaint_entry.ip_address
 
   complaint_entry_html =
       complaint_table_row_html +
@@ -1443,7 +1504,7 @@ format = (complaint_entry_row) ->
       '<div>' + host  + '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" data-domain="' + domain + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
+      '" type="text" data-domain="' + form_change_item + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
       '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
@@ -1499,7 +1560,7 @@ window.history_dialog = (id, url) ->
               </li>
                <li class='nav-item' role='presentation'>
                 <a class='nav-link' role='tab' data-toggle='tab' href='#xbrs-history-tab' aria-controls='xbrs-history-tab' onclick='get_xbrs_history(\"#{url}\", this)'>
-                  XBRS History
+                  XBRS Timeline
                 </a>
                </li>
             </ul>
@@ -1564,7 +1625,7 @@ window.history_dialog = (id, url) ->
         history_dialog_content +=
           "
            <div class='tab-pane' role='tabpanel' id='xbrs-history-tab'>
-            <h5>XBRS History</h5>
+            <h5>XBRS Timeline</h5>
               <table class=''history-table xbrs-history-table' id='webcat-xbrs-history'></table>
             </div>
            "
@@ -1607,44 +1668,29 @@ window.get_xbrs_history = (url, tab) ->
       if response.data.length < 1
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
-        { columns, data:current_data } = response
+        
+        
         $(xbrs_table).append(document.createElement('thead'))
         $(xbrs_table).append(document.createElement('tbody'))
         thead = $(xbrs_table).find('thead')
         tbody = $(xbrs_table).find('tbody')
+        table_headers = ['Timestamp', 'Scrore', 'V2 Content Cat', 'V3 Content Cats', 'Threat Cats', 'Rule Hits']
+
         parsed_rows = []
         thead_row = ''
 
-        for row, i in current_data
-          parsed_rows[i] = { ctime:'', row_data: '' }
-
-        for col, index in columns
-          # We only want the values/headers for these columns
-          if col == "domain" || col == "subdomain" || col == "ctime" || col == "mtime" || col == "mnemonic" || col == "operation" || col == "path"
-            if col == "ctime" then col = "Creation Time"
-            if col == "mtime" then col = 'Last Modified'
-            thead_row += "<th> #{col }</th>"
-            for row, i in current_data
-              if col == "Creation Time"
-                #set ctime/Creation Time value to check against for every row
-                parsed_rows[i].ctime = row[index]
-              # build cells for each row corresponding data to proper column. if values are null or undefined set '-'
-              parse_data = row[index]
-              if parse_data == null || parse_data == undefined
-                parsed_rows[i].row_data += "<td> - </td>"
-              else
-                parsed_rows[i].row_data += "<td>#{parse_data}</td>"
-
-        #sort rows by ctime
-        parsed_rows.sort (a,b) ->
-            if a.ctime == b.ctime then return 0
-            if a.ctime > b.ctime then 1 else -1
-
-        #  add all rows to table
+        table_headers.forEach (header)->
+          thead_row += "<th> #{header}</th>"       
         thead.append(thead_row)
-        for key, value of parsed_rows
-          tbody.append("<tr>#{value.row_data}</tr>")
 
+        response.data.forEach (row)->
+          data_row = ""
+
+          for key, value of row
+            data_row += "<td>#{value || '-'}</td>"
+
+          tbody.append("<tr>#{data_row}</tr>")
+          
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -1705,16 +1751,10 @@ window.lookup_dialog  = (id) ->
       std_msg_error("<p>Something went wrong: #{response.responseText}","")
   , this)
 
-
+## This is for expanding and collapsing the nested rows ##
 window.click_table_buttons = (complaint_table, button)->
   tr = $(button).closest('tr')
   row = complaint_table.row(tr)
-  data = row.data()
-  cat_select = '#input_cat_'+ data.entry_id
-
-  if (!String.prototype.startsWith)
-    String.prototype.startsWith = (input, pos) ->
-      this.substr(!pos || pos < 0 ? 0 : +pos, input.length) == input
 
   if row.child.isShown()       # This row is already open - close it
     row.child.hide()
@@ -1726,69 +1766,103 @@ window.click_table_buttons = (complaint_table, button)->
 
   else
     # Open this row
-    row.child(format(row)).show()
-    nested_tooltip()
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
+      method: 'GET'
+      headers: headers
+      success: (response) ->
+        data = row.data()
+        cat_select = '#input_cat_'+ data.entry_id
 
-    tr.removeClass 'not-shown'
-    tr.addClass 'shown'
-    td = $(tr).next('tr').find('td:first')
-    unless $(td).hasClass 'nested-complaint-data-wrapper'
-      $(td).addClass 'nested-complaint-data-wrapper'
-    if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
-      $( cat_select ).selectize {
-        persist: true,
-        create: false,
-        maxItems: 5,
-        closeAfterSelect: true,
-        valueField: 'category_id',
-        labelField: 'category_name',
-        searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(cat_select),
-        items: AC.WebCat.getCategoryIds(selected_options(data.category), cat_select),
-        onItemAdd: ->
-          if verifyMasterSubmit() == true
-            $('#master-submit').prop('disabled', false)
-        onItemRemove: ->
-          if verifyMasterSubmit() == true
-            $('#master-submit').prop('disabled', false)
-          else
-            $('#master-submit').prop('disabled', true)
-        score: (input) ->
-          score = this.getScoreFunction(input)
-          (item) ->
-            (item.category_name.toLowerCase().startsWith(input.toLowerCase()) || item.category_code.toLowerCase().startsWith(input.toLowerCase())) ? 1 : 0
-      }
-    else
-      # need to initialize the selectize function but disable it here if entry is completed
-      $completed_selectize = $( cat_select ).selectize {
-        persist: true,
-        create: false,
-        maxItems: 5,
-        closeAfterSelect: true,
-        valueField: 'category_id',
-        labelField: 'category_name',
-        searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(cat_select),
-        items: AC.WebCat.getCategoryIds(selected_options(data.category), cat_select),
-      }
-      select_complete = $completed_selectize[0].selectize
-      select_complete.disable()
+        webcat_options = []
+        for key, value of response
+          cat_code = key.split(' - ')[1]
+          value_name = key.split(' - ')[0]
+          webcat_options.push({category_id: value, category_name: value_name, category_code: cat_code})
 
-    # Check to see which columns should be displayed
-    $('.toggle-vis-nested').each ->
-      checkbox_trigger = $(button).attr('data-column')
-      checkbox = $(this).find('input')
-      if $(checkbox).prop('checked')
-        $('.complaint-entry-table td, .complaint-entry-table th').each ->
-          if $(button).hasClass(checkbox_trigger)
-            $(button).show()
-      else if $(checkbox).prop('checked') == false
-        $('.complaint-entry-table td, .complaint-entry-table th').each ->
-          if $(button).hasClass(checkbox_trigger)
-            $(button).hide()
+        category_ids = []
+        for name in selected_options(data.category)
+          for x, y of response
+            value_name = x.split(' - ')[0]
+            if name.trim() == value_name
+              category_ids.push(y)
 
-    if verifyMasterSubmit() == true
-      $('#master-submit').prop('disabled', false)
+        row.child(format(row)).show()
+        nested_tooltip()
+
+        tr.removeClass 'not-shown'
+        tr.addClass 'shown'
+        td = $(tr).next('tr').find('td:first')
+        unless $(td).hasClass 'nested-complaint-data-wrapper'
+          $(td).addClass 'nested-complaint-data-wrapper'
+        if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
+          $( cat_select ).selectize {
+            persist: true,
+            create: false,
+            maxItems: 5,
+            closeAfterSelect: true,
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: webcat_options,
+            items: category_ids,
+            onItemAdd: ->
+              if verifyMasterSubmit() == true
+                $('#master-submit').prop('disabled', false)
+            onItemRemove: ->
+              if verifyMasterSubmit() == true
+                $('#master-submit').prop('disabled', false)
+              else
+                $('#master-submit').prop('disabled', true)
+            score: (input) ->
+              #  Adding some customization for autofill
+              #  restricting on certain cats to avoid accidental categorization
+              #  (replaces selectize's built-in `getScoreFunction()` with our own)
+              (item) ->
+                if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+                  item.category_code == input ? 1 : 0
+                else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+                  1
+                else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+                  0.9
+                else
+                  0
+          }
+        else
+          # need to initialize the selectize function but disable it here if entry is completed
+          $completed_selectize = $( cat_select ).selectize {
+            persist: true,
+            create: false,
+            maxItems: 5,
+            closeAfterSelect: true,
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: webcat_options,
+            items: category_ids,
+          }
+          select_complete = $completed_selectize[0].selectize
+          select_complete.disable()
+
+        # Check to see which columns should be displayed
+        $('.toggle-vis-nested').each ->
+          checkbox_trigger = $(button).attr('data-column')
+          checkbox = $(this).find('input')
+          if $(checkbox).prop('checked')
+            $('.complaint-entry-table td, .complaint-entry-table th').each ->
+              if $(button).hasClass(checkbox_trigger)
+                $(button).show()
+          else if $(checkbox).prop('checked') == false
+            $('.complaint-entry-table td, .complaint-entry-table th').each ->
+              if $(button).hasClass(checkbox_trigger)
+                $(button).hide()
+
+        if verifyMasterSubmit() == true
+          $('#master-submit').prop('disabled', false)
+      error: (response) ->
+        std_msg_error("<p>Something went wrong</p>","")
+    , this)
 
 window.display_preview_window = (entry) ->
   {domain, category, id} = entry
@@ -1885,27 +1959,6 @@ toggle_selected = (selectedRows, expand)->
         $(row).find('.expand-row-button-inline').click()
         $(row).addClass('selected')
   $(selectState).addClass('selected')
-
-# webcat: pin/unpin toolbar to top on webcat
-window.pin_to_top = () ->
-  if !$('#pin-to-top').hasClass('pinned')
-    toolbar = $('#webcat-index-toolbar').detach()  # detach every time
-    $(toolbar).addClass('pinned-toolbar')
-    $('#nav-banner').append(toolbar)
-
-    $('#pin-to-top span').text('Unpin Toolbar from Top')
-    $('#page-content-wrapper').css('padding-top','60px')
-    $('#pin-to-top').addClass('pinned')
-    $('body').addClass('pinned-toolbar-true')
-  else  # already pinned to top?
-    toolbar = $('#webcat-index-toolbar').detach()
-    $(toolbar).removeClass('pinned-toolbar')
-    $('.webcat-main-area').prepend(toolbar)
-
-    $('#pin-to-top span').text('Pin Toolbar to Top')
-    $('#page-content-wrapper').css('padding-top','15px')
-    $('#pin-to-top').removeClass('pinned')
-    $('body').removeClass('pinned-toolbar-true')
 
 window.collapse_selected =()->
   selectedRows = $('.selected')
@@ -2116,8 +2169,7 @@ window.master_submit = () ->
   thingsSelected = getTouchedFormCount()
   if thingsSelected > selectedItems.length
     std_msg_confirm(
-      "I noticed you have made changes to at least " + thingsSelected +  " complaints but you only have " + selectedItems.length + " items selected. Do you want to proceed with updating these items? It will reload the page and you will lose your other changes.",
-      [],
+      "Changes have been made to at least " + thingsSelected +  " complaints but only " + selectedItems.length + " items are selected.", ["Updating selected items will reload the page and other changes will be lost."],
       {
         reload: false,
         confirm_dismiss: true,
@@ -2254,11 +2306,6 @@ $ ->
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
 
-  # webcat: hot key/shortcut to pin toolbar (shift + 6)
-  $(document).keypress (e) ->
-    if e.key == '^'
-      pin_to_top()
-
   $(document).on 'change', '.resolution_radio_button', ->
     id = this.name.split("resolution")[1]
     domain = $("#complaint_prefix_"+id)[0].dataset.domain
@@ -2285,7 +2332,7 @@ $ ->
         unless $(td).hasClass 'nested-complaint-data-wrapper'
           tr.find('td:first').addClass 'nested-complaint-data-wrapper'
 
-        cat_select = $('#input_cat_'+ row.data().entry_id)
+        cat_select = '#input_cat_'+ row.data().entry_id
         $(cat_select).selectize {
           persist: false,
           create: false,
@@ -2319,26 +2366,16 @@ $ ->
     return
 
   $(document).ready ->
-    if window.location.pathname != '/escalations/webcat/complaints'
+    if (window.location.pathname != '/escalations/webcat/complaints' && window.location.pathname != '/escalations/webcat/research')
       $('#filter-complaints-nav').hide()
       $('#fetch').hide()
       $('#complaints-nav-search-wrapper').hide()
       $('#new-complaint-nav-wrapper').hide()
-      $('#filter-clusters-nav').hide()
-      $('#clusters-nav-regex-wrapper').hide()
     else
       $('#filter-complaints').show()
       $('#fetch').show()
       $('#complaints-nav-search-wrapper').show()
       $('#new-complaint-nav-wrapper').show()
-      $('#filter-clusters-nav').hide()
-      $('#clusters-nav-regex-wrapper').hide()
-
-    if window.location.pathname == '/escalations/webcat/clusters'
-      $('#filter-complaints-nav').hide()
-      $('#filter-clusters-nav').show()
-      $('#clusters-nav-regex-wrapper').show()
-
 
   # If a stupidly long email address is returned it will wrap
   # rather than pushing the column into the column beside it
@@ -2372,23 +2409,6 @@ $ ->
         )
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
-
-$ ->
-  set_complaints_link = () ->
-    url = '/escalations/webcat/complaints'
-    search = if window.location.pathname == url # only if we're on index page
-      window.location.search
-    else
-      localStorage.webcat_search_name
-
-    if search && window.location.href.indexOf('webcat') > 0
-      localStorage.setItem('webcat_search_name', search)
-      link = url + search
-      $('#cat-link').attr('href', link)
-      $('#cat-icon-link').attr('href', link)
-      $('#complaints').attr('href', link)
-
-  set_complaints_link()
 
 # Convert webcat to webrep
 # Enable / disable button to attempt based on if anything is selected

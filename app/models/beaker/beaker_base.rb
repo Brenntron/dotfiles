@@ -34,13 +34,19 @@ class Beaker::BeakerBase
   end
 
   def self.get_ip_endpoint(ip)
-    if ip.kind_of?(Integer)
-      Talos::IPEndpoint.new(ipv4_addr: ip)
-    else
+
+    begin
       ip_addr = IPAddr.new(ip)
-      Talos::IPEndpoint.new(
-          ipv4_addr: ip_addr.to_i
-      )
+      if ip_addr.ipv4?
+        Talos::IPEndpoint.new(ipv4_addr: ip_addr.to_i)
+      elsif ip_addr.ipv6?
+        Talos::IPEndpoint.new(ipv6_addr: ip_addr.hton)
+      end
+    rescue IPAddr::AddressFamilyError, IPAddr::InvalidAddressError
+      assembled_ip = [ip.to_i].pack('N').unpack('C4').join('.')
+      ip_addr = IPAddr.new(assembled_ip)
+      Talos::IPEndpoint.new(ipv4_addr: ip_addr.to_i)
     end
+
   end
 end
