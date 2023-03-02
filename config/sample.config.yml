@@ -268,18 +268,15 @@ test:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-<<<<<<< HEAD
   k2:
     host: "k2-api.sv4.ironport.com"
     port: 443
     token: "redacted"
-=======
   umbrella_data_fetcher:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
 
->>>>>>> development
 staging:
   amp_poke:
     host: "localhost"
@@ -418,18 +415,15 @@ staging:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-<<<<<<< HEAD
   k2:
     host: "k2-api.sv4.ironport.com"
     port: 443
     token: "redacted"
-=======
   umbrella_data_fetcher:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
 
->>>>>>> development
 production:
   amp_poke: 
     host: "poke.vrt.sourcefire.com"
@@ -569,15 +563,12 @@ production:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-<<<<<<< HEAD
   k2:
     host: "k2-api.sv4.ironport.com"
     port: 443
     token: "redacted"
-=======
   umbrella_data_fetcher:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
->>>>>>> development
 
