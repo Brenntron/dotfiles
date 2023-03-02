@@ -1363,14 +1363,14 @@ $ ->
     if $('#company-list').find('option').size() == 0
 
       if localStorage.getItem('webRepFilters') != null
-        local_storage_filters = false
+        filter_data_found = false
         #populate any non-selectize fields with current filters
         #note: any selectize filters need to be populated after the selectize options are created
         filters = JSON.parse(localStorage.webRepFilters)
 
         #Need to check if this a saved or basic search, since those don't load in the data to the local storage
         if filters.search_type != 'named' && filters.search_type != 'contains'
-          local_storage_filters = true
+          filter_data_found = true
 
           #Case ID field
           $('#caseid-input').val filters.case_id
@@ -1467,7 +1467,7 @@ $ ->
           }
 
           #populate selectize fields if correct localstorage is found
-          if local_storage_filters == true
+          if filter_data_found == true
 
             #populate platform
             if filters.platform_names != ''
