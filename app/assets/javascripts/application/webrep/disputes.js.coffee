@@ -1405,6 +1405,16 @@ $ ->
           #Last Modified (Older)
           $('#modified-older-input').val filters.modified_older
 
+          #uncheck any Submission Types that are not included in filters
+          if filters.submission_type.includes('w') == false
+            $('#submission-type-w-cb').prop('checked', false)
+
+          if filters.submission_type.includes('ew') == false
+            $('#submission-type-ew-cb').prop('checked', false)
+
+          if filters.submission_type.includes('e') == false
+            $('#submission-type-e-cb').prop('checked', false)
+
       std_msg_ajax(
         method: 'GET'
         url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
