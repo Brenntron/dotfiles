@@ -126,6 +126,48 @@ class ComplaintEntry < ApplicationRecord
     return("Complaint returned")
   end
 
+  def unassign
+    if self.user == User.vrtincoming
+      return("Complaint is already assigned to Vrt Incoming")
+    else
+      if !self.is_important
+        if status!="COMPLETED"
+          self.update(user: User.vrtincoming, status:"NEW")
+          complaint.set_status("NEW")
+        else
+          return("Already completed")
+        end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: User.vrtincoming, status:"NEW")
+        complaint.set_status("NEW")
+      else
+        return("Status is pending")
+      end
+    end
+    return("Complaint unassigned")
+  end
+
+  def reassign(user)
+    if self.user == user
+      return("Complaint is already assigned to #{user.cvs_username}")
+    else
+      if !self.is_important
+        if status!="COMPLETED"
+          self.update(user: user, status:"ASSIGNED", case_assigned_at: Time.now)
+          complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
+        else
+          return("Already completed")
+        end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: user, status:"ASSIGNED", case_assigned_at: Time.now)
+        complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
+      else
+        return("Status is pending")
+      end
+    end
+    return("Complaint assigned to #{user.cvs_username}")
+  end
+
   def is_pending?
     "PENDING" == status
   end
@@ -711,6 +753,34 @@ class ComplaintEntry < ApplicationRecord
         closed.where(user_id: user.id)
       when "MANAGER QUEUE"
         joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
+      when "ALL TALOS"
+        where(complaint_id: Complaint.from_ti)
+      when "NEW TALOS"
+        where(status: 'NEW', complaint_id: Complaint.from_ti)
+      when "TALOS OVERDUE"
+        where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "TALOS ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_ti)
+      when "ALL WBNP"
+        where(complaint_id: Complaint.from_wbnp)
+      when "NEW WBNP"
+        where(status: 'NEW', complaint_id: Complaint.from_wbnp)
+      when "WBNP OVERDUE"
+        where(complaint_id: Complaint.from_wbnp).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "WBNP ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_wbnp)
+      when "ALL INTERNAL"
+        where(complaint_id: Complaint.from_int)
+      when "NEW INTERNAL"
+        where(status: 'NEW', complaint_id: Complaint.from_int)
+      when "INTERNAL OVERDUE"
+        where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "INTERNAL ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_int)
+      when "ALL PENDING"
+        where(status: 'PENDING')
+      when "PENDING OVERDUE"
+        where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
       when "ALL"
         all
       else
@@ -887,10 +957,22 @@ class ComplaintEntry < ApplicationRecord
     end
 
     complaint_fields = present_params.to_h.slice(*%w{description channel})
+
+    if present_params['submitter_type'].present?
+      submitter_type_params = present_params['submitter_type'].split(', ').map(&:upcase).uniq.reduce([]) do |memo, type|
+        if type == Complaint::SUBMITTER_TYPE_CUSTOMER
+          memo << Complaint::SUBMITTER_TYPE_CUSTOMER
+        else 'GUEST'
+          memo.push(Complaint::SUBMITTER_TYPE_NONCUSTOMER, nil)
+        end
+        memo
+      end
+      complaint_fields.merge!(submitter_type: submitter_type_params)
+    end
+
     if complaint_fields.present?
       relation = relation.includes(:complaint).where(complaints: complaint_fields)
     end
-
     # Save this search as a named search
     if present_params.present? && search_name.present?
       Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')

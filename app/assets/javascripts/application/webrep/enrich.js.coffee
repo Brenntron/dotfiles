@@ -98,6 +98,54 @@ create_webrep_enrichment_section = (tags, context, enrich_toolbar_cell, table, c
     $(wrapper).append external_ref_wrapper
     $(table).append wrapper
 
+create_webrep_prevalence_section = (prevalence_data, table) ->
+  response_key = Object.keys(prevalence_data)[0]
+  data = prevalence_data[response_key]
+  if data.count == 0
+    $('.prevalence-webrep-table-data-present').hide()
+    $('.prevalence-webrep-table-data-missing').show()
+  else
+    total_row = $("<tr></tr>")
+    $(total_row).append($("<td>Total</td>"))
+
+    total_count = $("<td></td>")
+    $(total_count).text(data.count)
+    $(total_row).append(total_count)
+
+    total_first_seen = $("<td></td>")
+    $(total_first_seen).text(data.first_seen)
+    $(total_row).append(total_first_seen)
+
+    total_last_seen = $("<td></td>")
+    $(total_last_seen).text(data.last_seen)
+    $(total_row).append(total_last_seen)
+
+    $(table).append(total_row)
+
+    dataset_keys = Object.keys(data.datasets)
+    for key in dataset_keys
+      new_row = $("<tr></tr>")
+
+      dataset = $("<td></td>")
+      $(dataset).text(key)
+      $(new_row).append(dataset)
+
+      count = $("<td></td>")
+      $(count).text(data.datasets[key].count)
+      $(new_row).append(count)
+
+      first_seen = $("<td></td>")
+      $(first_seen).text(data.datasets[key].first_seen)
+      $(new_row).append(first_seen)
+
+      last_seen = $("<td></td>")
+      $(last_seen).text(data.datasets[key].last_seen)
+      $(new_row).append(last_seen)
+
+      $(table).append(new_row)
+
+
+
 window.setup_enrichment_section = () ->
 
   if $('#research-tab').length || $('.reputation-research-search-wrapper').length
@@ -105,6 +153,7 @@ window.setup_enrichment_section = () ->
       create_index = 0 #track if first entry in table
       ip_uri = $(this).find('.entry-data-content').text().trim()
       table = $(this).find('.enrich-webrep-table-data-present tbody')
+      prevalence_table = $(this).find('.prevalence-webrep-table-data-present tbody')
       enrich_toolbar_cell = $(this).find('.enrich-cell')
 
       # enrichment services uses a separate API call - needs to be handled w/ a js promise (1-2 sec lag)
@@ -147,3 +196,9 @@ window.setup_enrichment_section = () ->
         else
           $('.enrich-webrep-table-data-present').hide()
           $('.enrich-webrep-table-data-missing').show()
+
+        if response?.data?.prevalence?.responses?
+          create_webrep_prevalence_section(response.data.prevalence.responses, prevalence_table)
+        else
+          $('.prevalence-webrep-table-data-present').hide()
+          $('.prevalence-webrep-table-data-missing').show()

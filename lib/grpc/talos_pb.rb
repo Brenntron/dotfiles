@@ -307,6 +307,10 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :ip_start, :message, 1, "Talos.IPAddress"
       optional :ip_end, :message, 2, "Talos.IPAddress"
     end
+    add_message "Talos.HTTPHeader" do
+      optional :name, :string, 1
+      optional :value, :string, 2
+    end
     add_enum "Talos.URLSource" do
       value :URL_LOCATION_UNSPECIFIED, 0
       value :URL_LOCATION_PROXY, 1
@@ -367,5 +371,6 @@ module Talos
   EmptyReply = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.EmptyReply").msgclass
   IPAddress = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.IPAddress").msgclass
   IPAddressRange = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.IPAddressRange").msgclass
+  HTTPHeader = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.HTTPHeader").msgclass
   URLSource = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Talos.URLSource").enummodule
 end

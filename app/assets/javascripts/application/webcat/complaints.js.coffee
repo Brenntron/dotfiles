@@ -923,6 +923,67 @@ window.return_selected = ()->
   else
     std_msg_error('no rows selected', ['Please select at least one row.'])
 
+window.webcat_remove_assignee = () ->
+  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  if selected_rows[0].length > 0
+    entry_ids = []
+    for row, i in selected_rows[0]
+      entry_ids.push(selected_rows.data()[i].entry_id)
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/unassign_all'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': entry_ids
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          std_msg_error('Error Removing Assignees', json.error)
+        else
+          #reload table data
+          $('#complaints-index').DataTable().draw()
+
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+    , this)
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+
+window.webcat_change_assignee = () ->
+  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  if selected_rows[0].length > 0
+    entry_ids = []
+    for row, i in selected_rows[0]
+      entry_ids.push(selected_rows.data()[i].entry_id)
+
+    user_id = $('#index_target_assignee option:selected').val()
+
+    data = {
+      'complaint_entry_ids': entry_ids,
+      'user_id': user_id
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/change_assignee'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          std_msg_error('Error Assigning Entries', json.error)
+        else
+          #reload table data
+          $('#complaints-index').DataTable().draw()
+
+    )
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+
 window.select_cat_text_field = (id) ->
   if (typeof numericalValue)
     $( "#category_input"+id ).select();
@@ -1899,27 +1960,6 @@ toggle_selected = (selectedRows, expand)->
         $(row).addClass('selected')
   $(selectState).addClass('selected')
 
-# webcat: pin/unpin toolbar to top on webcat
-window.pin_to_top = () ->
-  if !$('#pin-to-top').hasClass('pinned')
-    toolbar = $('#webcat-index-toolbar').detach()  # detach every time
-    $(toolbar).addClass('pinned-toolbar')
-    $('#nav-banner').append(toolbar)
-
-    $('#pin-to-top span').text('Unpin Toolbar from Top')
-    $('#page-content-wrapper').css('padding-top','60px')
-    $('#pin-to-top').addClass('pinned')
-    $('body').addClass('pinned-toolbar-true')
-  else  # already pinned to top?
-    toolbar = $('#webcat-index-toolbar').detach()
-    $(toolbar).removeClass('pinned-toolbar')
-    $('.webcat-main-area').prepend(toolbar)
-
-    $('#pin-to-top span').text('Pin Toolbar to Top')
-    $('#page-content-wrapper').css('padding-top','15px')
-    $('#pin-to-top').removeClass('pinned')
-    $('body').removeClass('pinned-toolbar-true')
-
 window.collapse_selected =()->
   selectedRows = $('.selected')
   expand = false;
@@ -2266,11 +2306,6 @@ $ ->
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
 
-  # webcat: hot key/shortcut to pin toolbar (shift + 6)
-  $(document).keypress (e) ->
-    if e.key == '^'
-      pin_to_top()
-
   $(document).on 'change', '.resolution_radio_button', ->
     id = this.name.split("resolution")[1]
     domain = $("#complaint_prefix_"+id)[0].dataset.domain
@@ -2336,21 +2371,11 @@ $ ->
       $('#fetch').hide()
       $('#complaints-nav-search-wrapper').hide()
       $('#new-complaint-nav-wrapper').hide()
-      $('#filter-clusters-nav').hide()
-      $('#clusters-nav-regex-wrapper').hide()
     else
       $('#filter-complaints').show()
       $('#fetch').show()
       $('#complaints-nav-search-wrapper').show()
       $('#new-complaint-nav-wrapper').show()
-      $('#filter-clusters-nav').hide()
-      $('#clusters-nav-regex-wrapper').hide()
-
-    if window.location.pathname == '/escalations/webcat/clusters'
-      $('#filter-complaints-nav').hide()
-      $('#filter-clusters-nav').show()
-      $('#clusters-nav-regex-wrapper').show()
-
 
   # If a stupidly long email address is returned it will wrap
   # rather than pushing the column into the column beside it

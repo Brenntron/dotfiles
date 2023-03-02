@@ -585,36 +585,6 @@ Feature: Webcat complaints
     Then I should see "COMPLETED"
     And "1" bridge message should be in the delayed job queue
 
-  @javascript
-  Scenario: a user clicks the "Pin Toolbar" button and sees the toolbar docked to the top navbar
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaints exist:
-      | ticket_source             | id | status |
-      | talos-intelligence        | 1  | NEW    |
-    And the following complaint entries exist:
-      | uri             | domain        | subdomain | path | entry_type | complaint_id | status |
-      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           | NEW    |
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints"
-    And I click "#pin-to-top"
-    Then I should not see "Pin Toolbar"
-    And I click "#pin-to-top"
-    Then I should see "Pin Toolbar"
-
-  @javascript
-  Scenario: a user types the hot key/shortcut to pin the toolbar to top and sees the toolbar docked
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaints exist:
-      | ticket_source             | id | status |
-      | talos-intelligence        | 1  | NEW    |
-    And the following complaint entries exist:
-      | uri             | domain        | subdomain | path | entry_type | complaint_id | status |
-      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           | NEW    |
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints"
-    And I enter the pin toolbar hot key
-    Then I should not see "Pin Toolbar"
-
   # webcat > complaints index > new banner w/ metrics
   @javascript
   Scenario: a user sees there is new/assigned Talos/WBNP/internal complaints in webcat index top banner

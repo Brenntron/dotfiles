@@ -64,8 +64,8 @@ gem 'peake-bridge-client', '0.2.0.0', git: "git@gitlab.vrt.sourcefire.com:talosw
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'
 gem 'aws-sdk', '3.1.0'
-gem 'grpc', '1.38.0'
-gem 'grpc-tools', '1.38.0'
+gem 'grpc', '1.45.0'
+gem 'grpc-tools', '1.45.0'
 
 # Bugzilla
 gem 'xmlrpc'

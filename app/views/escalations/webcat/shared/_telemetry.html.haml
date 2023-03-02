@@ -8,58 +8,54 @@
   .main-metrics
     .row
       .metrics-col
-        %span.metric-header TALOS:
+        %span.metric-header#allTalosTickets
+          %a{href: '?f=ALL%20TALOS'} TALOS:
         .number-container
-          %span#ti-new-count.metric-number= @ti_new_count
-          %span.metric-label New
-          %span.metric-overdue
-            (
-            %span#ti-overdue-count.metric-number= @ti_overdue_count
-            Overdue)
-          %span.metric-assigned
-            %span#ti-assigned-count.metric-number= @ti_assigned_count
-            Assigned
+          %a#ti-new-count.metric-number.metric-new{href: '?f=NEW%20TALOS'}
+            = "#{@ti_new_count} New"
+          %a.metric-overdue{href: '?f=TALOS%20OVERDUE'}
+            %span#ti-overdue-count.metric-number
+              = "(#{@ti_overdue_count} Overdue)"
+          %a#ti-assigned-count.metric-number.metric-assigned{href: '?f=TALOS%20ASSIGNED'}
+            = "#{@ti_assigned_count} Assigned"
 
       .metrics-col
-        %span.metric-header WBNP:
+        %span.metric-header#allWbnpTickets
+          %a{href: '?f=ALL%20WBNP'} WBNP:
         .number-container
-          %span#wbnp-new-count.metric-number= @wbnp_new_count
-          %span.metric-label New
-          %span#wbnp-overdue-count.metric-overdue
-            (
-            %span.metric-number= @wbnp_overdue_count
-            Overdue)
-          %span.metric-assigned
-            %span#wbnp-assigned-count.metric-number= @wbnp_assigned_count
-            Assigned
+          %a#wbnp-new-count.metric-number.metric-new{href: '?f=NEW%20WBNP'}
+            = "#{@wbnp_new_count} New"
+          %a#wbnp-overdue-count.metric-overdue{href: '?f=WBNP%20OVERDUE'}
+            %span.metric-number
+              = "(#{@wbnp_overdue_count} Overdue)"
+          %a#wbnp-assigned-count.metric-number.metric-assigned{href: '?f=WBNP%20ASSIGNED'}
+            = "#{@wbnp_assigned_count} Assigned"
 
       .metrics-col
-        %span.metric-header INTERNAL:
+        %span.metric-header#allIntTickets
+          %a{href: '?f=ALL%20INTERNAL'}INTERNAL:
         .number-container
-          %span#int-new-count.metric-number= @int_new_count
-          %span.metric-label New
-          %span.metric-overdue
-            (
-            %span#int-overdue-count.metric-number= @int_overdue_count
-            Overdue)
-          %span.metric-assigned
-            %span#int-assigned-count.metric-number= @int_assigned_count
-            Assigned
+          %a#int-new-count.metric-number.metric-new{href: '?f=NEW%20INTERNAL'}
+            = "#{@int_new_count} New"
+          %a.metric-overdue{href: '?f=INTERNAL%20OVERDUE'}
+            %span#int-overdue-count.metric-number
+              = "(#{@int_overdue_count} Overdue)"
+          %a#int-assigned-count.metric-assigned.metric-number{href: '?f=INTERNAL%20ASSIGNED'}
+            = "#{@int_assigned_count} Assigned"
 
       .metrics-col
-        %span.metric-header PENDING:
-        %span#pending-new-count.metric-number= @pending_new_count
-        %span.metric-overdue
-          (
-          %span#pending-overdue-count.metric-number= @pending_overdue_count
-          Overdue)
+        %a.metric-header#allPendingTickets{href: '?f=ALL%20PENDING'} PENDING:
+        %a#pending-new-count.metric-number{href: '?f=ALL%20PENDING'}= @pending_new_count
+        %a.metric-overdue{href: '?f=PENDING%20OVERDUE'}
+          %span#pending-overdue-count.metric-number
+            = "(#{@pending_overdue_count} Overdue)"
 
       // right column
       .metrics-col.wbnp-area
         .metric-header
           %span.wbnp-loading-spinner.sync-button-white.sync_rotate
           WBNP Report Status:
-        %a#wbnp-report-status-link.esc-tooltipped{'data-tooltip-content':'#tooltip-wbnp-content'}
+        %a#wbnp-report-status-link.esc-tooltipped-webcat-toolbar{'data-tooltip-content':'#tooltip-wbnp-content'}
           .wbnp-report-status Checking...
         - if current_user.is_webcat_manager?
           %button#wbnp-report-button.wbnp-full-report.icon-reports-white
