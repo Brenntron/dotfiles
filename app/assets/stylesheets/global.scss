@@ -5148,7 +5148,7 @@ table > tbody > tr > td.dispute_rep_tools {
 #reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
   width: 400px;
 }
-[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"],[aria-describedby="whois_content"]  {
+[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"],[aria-describedby="whoisContent"]  {
   z-index: 999;
 }
 
@@ -8199,7 +8199,7 @@ table.dispute-entry-table tbody tr.selected {
 .tab-pane:not(.active){
   display: none
 }
-.cat-history-dialog .tab-pane{
+.dialog-content-wrapper .tab-pane{
   border: 1px solid #d9d9d9;
   padding: 15px;
 }
@@ -8278,14 +8278,7 @@ table.dispute-entry-table tbody tr.selected {
   max-height: 42px!important;
   overflow-y: scroll;
 }
-.history-table {
-  font-size: 8pt;
-}
 
-.history-table td {
-  padding: 4px 8px;
-  line-height: 1.25em;
-}
 .uneditable_urls{
   font-size: 8pt;
   padding: 0!important;
@@ -9705,6 +9698,28 @@ td.text-center span {
     }
 }
 
+.webcat-whois-dialog {
+  border: none !important;
+  z-index: 999;
+
+  .tab-pane {
+    min-height: 200px;
+  }
+
+  .ui-dialog-titlebar {
+    background-color: $primary-section-color;
+
+    .ui-dialog-title {
+      background-image: url(image_path('icon_whois_white.svg'));
+      background-position: left -2px;
+      background-repeat: no-repeat;
+      background-size: 22px 22px;
+      line-height: 1rem;
+      padding-left: 25px;
+    }
+  }
+}
+
 .ticket-age-over3hr {
   color: $warning-accent-color;
   font-weight: bold;
@@ -10037,19 +10052,6 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 #edit-dispute-button {
   background-color: $faint-neutral-color;
-}
-
-#whois_content {
-  margin: 17px auto;
-  display: flex;
-  white-space: pre-wrap;
-  justify-content: center;
-  align-items: center;
-  .dialog-content-wrapper{
-    max-height: 500px!important;
-    width: 90%;
-    overflow-y: scroll;
-  }
 }
 
 .dropdown-tool-text-divider {
@@ -10519,26 +10521,28 @@ hr.thin.form-divider {
   padding: 10px 15px;
   box-shadow: none;
   background-color: darken($content-label-color, 10%);
+  border-bottom: none;
 }
 
 .nav-tabs.dialog-tabs > li.active > a {
   background-color: $content-bg-color;
   border: 1px solid darken($faint-neutral-color, 10%);
+  border-bottom: 1px solid $ac-nav-bg-color;
+  box-shadow: 0 1px 0 0 $ac-nav-bg-color;
 }
 
 .nav-tabs.dialog-tabs > li.active::before {
   content: '';
   border-left: 1px solid darken($faint-neutral-color, 10%);
-  border-right: 1px solid darken($faint-neutral-color, 10%);
   background-color: $content-bg-color;
   width: 100%;
-  height: 1px;
+  height: 2px;
   display: block;
   position: absolute;
   left: 0;
   padding: 0;
   z-index: 55;
-  margin-top: 39px;
+  margin-top: 40px;
   margin-left: -1px;
 }
 
@@ -10546,19 +10550,38 @@ hr.thin.form-divider {
   display: none;
 }
 
-.dialog-tab-content {
+.dialog-tab-content, .dialog-content-wrapper {
   border: 1px solid darken($faint-neutral-color, 10%);
   padding: 15px;
+
+  p {
+    font-size: 12px !important;
+  }
+  table {
+    background-color: $content-bg-color;
+    font-size: 8pt !important;
+    margin-bottom: 20px;
+    tbody > tr > td {
+      padding: 4px 8px !important;
+      line-height: 1.25em !important;
+      font-size: 12px;
+    }
+    th {
+      padding: 4px 8px !important;
+      border-bottom: 1px solid $faint-neutral-color;
+      height: 24px;
+      line-height: 1.25em !important;
+    }
+  }
+  hr.thin {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
 }
 
 #xbrs-history-tab {
   overflow: scroll;
 }
-
-.history-table {
-  background-color: $content-bg-color;
-}
-
 
 // dbinebri: the new ticket file rep container needs to be wide and slightly positioned to the right
 .escalations--file_rep--disputes-controller .nav-tools-dropdown {
