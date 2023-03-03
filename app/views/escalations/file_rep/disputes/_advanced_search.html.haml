@@ -96,7 +96,7 @@
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Customer Company
-    %input.form-control#customer-company-input{name: 'customer_company'}
+    %input.form-control#customer-company-input{name: 'customer_company', multiple: true, tabindex:'-1'}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Platform
@@ -137,11 +137,6 @@
     %label.content-label-sm Contact Email
     %input.form-control#email-input{name: 'contact-email', list: 'contactemail-list'}
     %datalist#contactemail-list
-    %button.remove-input
-  .form-group.search-item.hidden
-    %label.content-label-sm Company
-    %input.form-control#company-input{name: 'company', list: 'company-list'}
-    %datalist#company-list
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Domain

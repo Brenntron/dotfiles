@@ -6,7 +6,7 @@ namespace 'AC.FileRep', (exports) ->
       url: "/escalations/api/v1/escalations/webcat/companies"
       success_reload: false
       success: (response) ->
-        element = $('#company-input')
+        element = $('#customer-company-input')
         selectize = element[0].selectize
 
         json = JSON.parse(response)
@@ -30,7 +30,7 @@ namespace 'AC.FileRep', (exports) ->
       url: "/escalations/api/v1/escalations/webcat/customers_names_selectize"
       success_reload: false
       success: (response) ->
-        element = $('#name-input')
+        element = $('#customer-name-input')
         selectize = element[0].selectize
 
         json = JSON.parse(response)
@@ -56,7 +56,7 @@ namespace 'AC.FileRep', (exports) ->
       success: (response) ->
         element = $('#assignee-input')
         selectize = element[0].selectize
-        debugger
+
         json = JSON.parse(response)
 
         for assignee in json

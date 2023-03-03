@@ -1509,3 +1509,46 @@ $ ->
       $('#queue').attr('href', link)
 
   set_file_rep_link()
+
+  assignee_input = $('#assignee-input').selectize {
+    persist: true
+    create: false
+    valueField: 'name',
+    labelField: 'display_name',
+    searchField: ['name', 'display_name'],
+    options: AC.FileRep.createAssigneeOptions()
+    render:
+      option: (item, escape) ->
+        name = item.display_name
+        cvs_name = item.name
+        '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(cvs_name) + ')' + '</span></div>'
+    onFocus: () ->
+      window.toggle_selectize_layer(this, 'true')
+    onBlur: () ->
+      window.toggle_selectize_layer(this, 'false')
+  }
+
+  company_input = $('#customer-company-input').selectize {
+    persist: false,
+    create: false,
+    valueField: 'company_name',
+    labelField: 'company_name',
+    searchField: 'company_name',
+    onFocus: () ->
+      window.toggle_selectize_layer(this, 'true')
+    onBlur: () ->
+      window.toggle_selectize_layer(this, 'false')
+  }
+
+
+  customer_input = $('#customer-name-input').selectize {
+    persist: false,
+    create: false,
+    valueField: 'name',
+    labelField: 'name',
+    searchField: 'name',
+    onFocus: () ->
+      window.toggle_selectize_layer(this, 'true')
+    onBlur: () ->
+      window.toggle_selectize_layer(this, 'false')
+  }
