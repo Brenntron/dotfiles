@@ -333,6 +333,7 @@ class FileReputationDispute < ApplicationRecord
   def self.advanced_search(params, search_name:, user:)
     search_hash = non_blank_fields(params)
     sha256_hash = search_hash.delete('sha256_hash')
+    assignee = search_hash.delete('assigned')
     file_name = search_hash.delete('file_name')
     platform_ids = search_hash.delete('platform_ids')
     threatgrid_range = search_hash.delete('threatgrid_score') || {}
@@ -340,6 +341,11 @@ class FileReputationDispute < ApplicationRecord
     created_at_range = search_hash.delete('created_at') || {}
     updated_at_range = search_hash.delete('updated_at') || {}
     dispute_fields = matching_field(search_hash)
+
+    if assignee.present?
+      user = User.where(cvs_username: assignee).first
+      dispute_fields['user_id'] = user.id if user.present?
+    end
 
     relation = where(dispute_fields)
 
