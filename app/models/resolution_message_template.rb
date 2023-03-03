@@ -10,10 +10,11 @@ class ResolutionMessageTemplate < ApplicationRecord
 
   enum status: { in_progress: 0, resolved: 1 }
 
-  validates_presence_of :name
+  validates_presence_of :name, :ticket_type
   validates :body, presence: true, if: :in_progress?
   validate :resolved_message?
 
+  scope :for_disputes, -> { where(ticket_type: 'Dispute')}
   private
 
   def resolved_message?

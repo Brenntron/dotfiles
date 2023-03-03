@@ -35,6 +35,7 @@ module API
             params do
               requires :name, type: String, desc: "The resolution message template's template name."
               requires :body, type: String, desc: "The contents of the template."
+              requires :ticket_type, type: String, desc: "Ticket type of the template."
               optional :description, type: String, desc: "The description of the template."
             end
 
