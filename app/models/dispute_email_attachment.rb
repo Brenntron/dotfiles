@@ -1,7 +1,7 @@
 class DisputeEmailAttachment < ApplicationRecord
   belongs_to :dispute_email
 
-  MODEL_PATH = "/dispute_email_attachments/"
+  MODEL_PATH = "dispute_email_attachments/"
 
   FULL_FILE_DIRECTORY_PATH = Rails.configuration.base_host_path + Rails.configuration.base_file_path + MODEL_PATH
 
