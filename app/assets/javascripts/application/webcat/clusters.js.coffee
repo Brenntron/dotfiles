@@ -359,7 +359,13 @@ $ ->
   $(document).ready ->
     # uncheck the select all checkbox on page change.
     $('#clusters-index').DataTable().on('page.dt', () ->
-      $('#clusters_check_box').prop('checked', false)
+      if $('#clusters_check_box').prop('checked')
+        $('#clusters_check_box').prop('checked', false)
+        $('#clusters-index').DataTable().rows().deselect()
+
+        rows = $('table#clusters-index input[type="checkbox"]')
+        for row in rows
+          $(row)[0].checked = false
     )
 
 # expand all functionality
