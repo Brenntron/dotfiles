@@ -60,9 +60,9 @@ $ ->
           AC.WebCat.populateSearchCriteria()
 
         if window.location.pathname.includes('file_rep')
-          AC.FileRep.createCompanyOptions()
-          AC.FileRep.createCustomerNameOptions()
           AC.FileRep.createAssigneeOptions()
+          AC.FileRep.populateSearchCriteria()
+          AC.FileRep.createPlatformOptions()
     )
 
 
