@@ -1369,7 +1369,7 @@ $ ->
         filters = JSON.parse(localStorage.webRepFilters)
 
         #Need to check if this a saved or basic search, since those don't load in the data to the local storage
-        if filters.search_type != 'named' && filters.search_type != 'contains'
+        if filters.search_type != 'named' && filters.search_type != 'contains' && $('#dispute-advaced-search-selected-filters').html() != ''
           filter_data_found = true
 
           #Case ID field
