@@ -114,7 +114,6 @@ window.advanced_webrep_index_table = () ->
     status: form.find('input[id="status-input"]').val()
     priority: form.find('input[id="priority-input"]').val()
     resolution: form.find('input[id="resolution-input"]').val()
-    submission_type: submission_types
     submitter_type: form.find('input[id="submitter-input"]').val()
     platform_names: form.find('input[id="platform-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
@@ -1405,15 +1404,17 @@ $ ->
           #Last Modified (Older)
           $('#modified-older-input').val filters.modified_older
 
-          #uncheck any Submission Types that are not included in filters
-          if filters.submission_type.includes('w') == false
-            $('#submission-type-w-cb').prop('checked', false)
+          #check for submission types parameter - if field is hidden there is no .submission_type attached
+          if filters.submission_type?
+            #uncheck any Submission Types that are not included in filters
+            if filters.submission_type.includes('w') == false
+              $('#submission-type-w-cb').prop('checked', false)
 
-          if filters.submission_type.includes('ew') == false
-            $('#submission-type-ew-cb').prop('checked', false)
+            if filters.submission_type.includes('ew') == false
+              $('#submission-type-ew-cb').prop('checked', false)
 
-          if filters.submission_type.includes('e') == false
-            $('#submission-type-e-cb').prop('checked', false)
+            if filters.submission_type.includes('e') == false
+              $('#submission-type-e-cb').prop('checked', false)
 
       std_msg_ajax(
         method: 'GET'
