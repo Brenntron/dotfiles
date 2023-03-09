@@ -7,6 +7,5 @@ FactoryBot.define do
     notes                           {"Notes"}
     public_notes                    {"Public Notes"}
     contact                         {"Contact"}
-    table_sequence                  {1}
   end
 end
