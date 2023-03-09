@@ -10,7 +10,9 @@ module AnalystConsoleEscalations
   class Application < Rails::Application
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.1
+    config.load_defaults 6.1
+    config.autoloader = :classic
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
@@ -23,7 +25,9 @@ module AnalystConsoleEscalations
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
+    # config.autoloader = :classic
     config.autoload_paths += %W(#{config.root}/lib/grpc)
+
     # This is a monkey patch for https://jira.vrt.sourcefire.com/browse/WEB-7362
     # The problem was this: https://github.com/paper-trail-gem/paper_trail/issues/1267
     # And the fix is (1) upgrade to latest paper_trail, (2) install the psych gem
