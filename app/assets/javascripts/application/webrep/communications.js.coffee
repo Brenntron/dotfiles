@@ -139,7 +139,7 @@ $ ->
   $('.forward-button').on 'click', ->
     $('#newEmailDialog').dialog 'open'
     $('input.receiver-email').val('')
-    $('.new-subject').val("Fwd:" + $(".communication-subject")[0].textContent)
+    $('.new-subject').val("Fwd:" + $(".communication-subject")[0].innerText)
     $('.new-body').val("\n" + "###################################" + "\n" + "Begin Forwarded Message:" + "\n" + $('.email-msg-content')[0].innerText)
 
   $('.delete-email').on 'click', ->
@@ -181,7 +181,7 @@ $ ->
 
     form_data.append('body', $('.email-reply-body').val() + "\n" + $('.email-msg-content')[0].innerText)
     form_data.append('dispute_id', $('input[name="dispute_id"]').val())
-    form_data.append('to', $('.receiver-email')[1].textContent)
+    form_data.append('to', $('.receiver-email')[1].innerText)
     form_data.append('subject', $('input[type=text].reply-subject').val())
     form_data.append('dispute_email_id', $('.current-email-view').attr('email_id')) if $('.current-email-view').attr('email_id')
     form_data.append('dispute_type', $('input[name="dispute_type"]').val())
