@@ -356,7 +356,7 @@ class DisputeEmail < ApplicationRecord
   end
 
   def self.generate_case_email_address(dispute_id)
-    email_user = "rep_disputes_#{dispute_id}@#{EMAIL_DOMAIN}"
+    email_user = "Cisco Talos Reputation Center <rep_disputes_#{dispute_id}@#{EMAIL_DOMAIN}>"
 
     email_user
   end

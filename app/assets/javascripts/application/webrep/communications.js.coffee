@@ -173,14 +173,13 @@ $ ->
 
 
   $('#send-reply').on 'click', ->
-
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-    form_data = new FormData()
+    form_data = new FormData();
     $.each $('.file_attachment'), (attachment) ->
       form_data.append("attachments[#{attachment}]", $('.file_attachment')[attachment].files[0])
 
-    form_data.append('body', $('.email-reply-body').val() + "\n" + $('.email-msg-content')[0].textContent)
+    form_data.append('body', $('.email-reply-body').val() + "\n" + $('.email-msg-content')[0].innerText)
     form_data.append('dispute_id', $('input[name="dispute_id"]').val())
     form_data.append('to', $('.receiver-email')[1].textContent)
     form_data.append('subject', $('input[type=text].reply-subject').val())
