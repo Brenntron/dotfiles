@@ -48,23 +48,7 @@ $ ->
 
 
 ####### FUNCTIONS FOR THE NAMING GUIDE PAGE #######
-  # Keep columns of rows consistent while they are moved
-  maintain_col_width = (e, ui) ->
-    ui.children().each ->
-      $(this).width $(this).width()
-      return
-    ui
-
-  # Store original sorting numbers in case edits are cancelled
-  window.get_original_sort_array = () ->
-    # Making temporary attribute for storing original sequence number
-    rows = $('#amp-naming-details-table tbody').find('tr')
-    $(rows).each ->
-      org_seq = $(this).attr('data-sort-sequence')
-      $(this).attr('data-org-seq', org_seq)
-
-
-  # Show editing buttons and make table rows movable (sortable)
+  # Show editing buttons
   window.edit_amp_naming_conventions = () ->
     inputs_array = []
     inputs_string = ''
@@ -73,16 +57,6 @@ $ ->
     $('#amp-edit-button').hide()
     $('.formatted-contact').hide()
     $('.active-editing-buttons').show()
-    window.get_original_sort_array()
-
-    $('#amp-naming-details-table tbody').sortable(
-      helper: maintain_col_width
-      classes: 'ui-sortable-helper': 'selected'
-      placeholder: 'sortable-placeholder'
-      stop: (event, ui) ->
-        window.update_sequence_numbers()
-        return
-    ).disableSelection()
 
     # Inputs: Save the original state of inputs + textareas in case of Ajax error on Save.
     $('#amp-naming-details-table :input').each ->
@@ -94,24 +68,15 @@ $ ->
         input_new = $(this).val()
       inputs_array.push(input_new)
 
+    $('#amp-naming-details-table tbody').addClass 'ui-sortable'
+
     inputs_string = inputs_array.join(',')
     localStorage.setItem('amp_input_values', inputs_string)
-
-
-
-  # Update sequence numbers if rows are moved
-  window.update_sequence_numbers = (row_order) ->
-    rows = $('#amp-naming-details-table').find('.ui-sortable-handle')
-    r = 0
-    $(rows).each ->
-      new_sort = r + 1
-      $(this).attr('data-sort-sequence', new_sort)
-      r++
-
 
   window.cancel_amp_naming_conventions = () ->
     # On cancel, restore the ready-to-delete rows
     $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
+    $('#amp-naming-details-table tbody').removeClass 'ui-sortable'
     $('.delete-patterns-area').addClass('hidden')
     $('.delete-patterns-queue').empty()
     $('.formatted-contact').show()
@@ -126,9 +91,6 @@ $ ->
     # Redefining after the dead rows are gone
     rows = $('#amp-naming-details-table tbody').find('tr')
 
-    # Turn off sortability
-    $('#amp-naming-details-table tbody').sortable('destroy')
-
     # Hide active editing buttons
     $('#amp-edit-button').show()
     $('.active-editing-buttons').hide()
@@ -139,68 +101,51 @@ $ ->
       cells = $(this).find('td')
       $(cells).each ->
         if $($(this).find('input')).length > 0
-          input = $($(this).find('input')).val()
           content = $($(this).find('.table-content')).text()
           if $(this).hasClass('amp-pattern')
             content = $($(this).find('.table-code')).text()
-          input == content
+          $($(this).find('input')).val(content.trim())
         else
-          textarea = $($(this).find('textarea')).val()
           content = $($(this).find('.table-content')).text()
-          textarea == content
-      # Revert original sort NUMBERS, remove temp data attribute
-      org_seq = $(this).attr('data-org-seq')
-      $(this).attr('data-sort-sequence', org_seq)
-      $(this).removeAttr('data-org-seq')
-
-    # Revert to original sort ORDER
-    rows =
-      $ rows.sort((a, b) ->
-        aVal = parseInt(a.getAttribute('data-sort-sequence'))
-        bVal = parseInt(b.getAttribute('data-sort-sequence'))
-        aVal - bVal
-      )
-
-    $('#amp-naming-details-table tbody').empty()
-    $(rows).appendTo('#amp-naming-details-table tbody')
-
+          $($(this).find('textarea')).val(content.trim())
 
   # Create new row in table
   window.add_amp_naming_conventions = () ->
     number_of_rows = $('#amp-naming-details-table tbody').find('tr').length
     new_sequence_number = number_of_rows + 1
-    new_row =
-      '<tr class="amp-naming-row" data-sort-sequence="' + new_sequence_number + '" data-id="" data-unsaved-id="' + new_sequence_number + '">' +
-      '<td class="amp-pattern">' +
-      '<span class="table-content"><span class="table-code"></span></span>' +
-      '<span class="table-form-content"><input class="code-input" type="text"></input></span>' +
-      '</td>' +
-      '<td class="amp-example">' +
-      '<span class="table-content"></span>' +
-      '<span class="table-form-content"><input class="example-input" type="text"></input></span>' +
-      '</td>' +
-      '<td class="engine-description">' +
-      '<span class="table-content"></span>' +
-      '<span class="table-form-content"><textarea class="engine-description-textarea" type="text"></textarea></span>' +
-      '</td>' +
-      '<td class="private-engine-description">' +
-      '<span class="table-content"></span>' +
-      '<span class="table-form-content"><textarea class="private-engine-description-textarea" ></textarea></span>' +
-      '</td>' +
-      '<td class="amp-contact">' +
-      '<span class="table-content"></span>' +
-      '<span class="table-form-content"><textarea class="contact-textarea"></textarea></span>' +
-      '<span class="delete-button" onclick="delete_amp_naming_convention(' + new_sequence_number + ', \'\')"></span>' +
-      '</td>' +
-      '<td class="amp-notes">' +
-      '<span class="table-content"></span>' +
-      '<span class="table-form-content"><textarea class="notes-input"></textarea></span>' +
-      '</td>' +
-      '<td class="amp-public-notes">' +
-      '<span class="table-content"></span>' +
-      '<span class="table-form-content"><textarea class="notes-public-textarea"></textarea></span>' +
-      '</td>' +
-      '</tr>'
+    new_row = """
+      <tr class='amp-naming-row' data-id='' data-unsaved-id='#{new_sequence_number}'>'
+      <td class='amp-pattern'>
+      <span class='table-content'><span class='table-code'></span></span>
+      <span class='table-form-content'><input class='code-input' type='text'></input></span>
+      </td>
+      <td class='amp-example'>
+      <span class='table-content'></span>
+      <span class='table-form-content'><input class='example-input' type='text'></input></span>
+      </td>
+      <td class='engine-description'>
+      <span class='table-content'></span>
+      <span class='table-form-content'><textarea class='engine-description-textarea' type='text'></textarea></span>
+      </td>
+      <td class='private-engine-description'>
+      <span class='table-content'></span>
+      <span class='table-form-content'><textarea class='private-engine-description-textarea'></textarea></span>
+      </td>
+      <td class='amp-contact'>
+      <span class='table-content'></span>
+      <span class='table-form-content'><textarea class='contact-textarea'></textarea></span>
+      <span class='delete-button' onclick="delete_amp_naming_convention('#{new_sequence_number}', '')"></span>
+      </td>
+      <td class='amp-notes'>
+      <span class='table-content'></span>
+      <span class='table-form-content'><textarea class='notes-input'></textarea></span>
+      </td>
+      <td class='amp-public-notes'>
+      <span class='table-content'></span>
+      <span class='table-form-content'><textarea class='notes-public-textarea'></textarea></span>
+      </td>
+      </tr>
+      """
 
     $('#amp-naming-details-table').append(new_row)
 
@@ -211,6 +156,8 @@ $ ->
     # and prep for saving
     rows = $('#amp-naming-details-table tbody').find('tr')
     rows_changed = []
+    newRowsWithErrors = []
+    sendToTI = true
 
     $(rows).each ->
       row = this
@@ -240,15 +187,16 @@ $ ->
           text = $(this).find('.table-content')
           content = $(text).text()
           content = $.trim(content)
+          if $(this).hasClass('amp-contact')
+            textarea = textarea.replace(/(\r\n|\n|\r|<|>|\(|\))/gm, "")
+            content = content.replace(/(\r\n|\n|\r|<|>|\(|\))/gm, "")
+          else
+            textarea = textarea.replace(/(\r\n|\n|\r)/gm, "")
+            content = content.replace(/(\r\n|\n|\r)/gm, "")
           if content != textarea
             nochange = false
           content = textarea
           $(text).text(content)
-
-      # Check to see if sequence order has been changed
-      org_seq = $(row).attr('data-org-seq')
-      if $(this).attr('data-sort-sequence') != org_seq
-        nochange = false
 
       # Remove temp attribute
       $(row).removeAttr('data-org-seq')
@@ -257,20 +205,12 @@ $ ->
       if nochange == false
         rows_changed.push(this)
 
-    # Turn off sortability
-    $('#amp-naming-details-table tbody').sortable('destroy')
-
-    # Hide active editing buttons
-    $('#amp-edit-button').show()
-    $('.active-editing-buttons').hide()
-
     # Prep new arrays for sending to db
     # This may need to change, not sure how we'll want this formatted
     rows_to_update = []
     rows_to_add = []
     $(rows_changed).each ->
       id = $(this).attr('data-id')
-      sequence = $(this).attr('data-sort-sequence')
       pattern = $($(this).find('.amp-pattern')[0]).find('.table-code').text()
       example = $($(this).find('.amp-example')[0]).find('.table-content').text()
       private_engine_desc = $($(this).find('.private-engine-description')[0]).find('.table-content').text()
@@ -283,6 +223,8 @@ $ ->
       if pattern == '' && example == '' && private_engine_desc == '' && engine_desc == '' && notes == '' && public_notes == '' && contact == ''
         $(this).remove()
 
+      else if pattern == '' || example == '' || private_engine_desc == '' || engine_desc == ''
+        newRowsWithErrors.push($(this))
       else
         unless id == ''
           rows_to_update.push(
@@ -293,8 +235,7 @@ $ ->
             'engine_description': engine_desc,
             'notes': notes,
             'public_notes': public_notes,
-            'contact': contact,
-            'table_sequence': sequence
+            'contact': contact
           )
         # New rows won't have an id yet
         else
@@ -305,14 +246,27 @@ $ ->
             'engine_description': engine_desc,
             'notes': notes,
             'public_notes': public_notes,
-            'contact': contact,
-            'table_sequence': sequence
+            'contact': contact
           )
 
+    if newRowsWithErrors.length > 0
+      showNewRowErrorMessage()
+      return
+
+    # Hide active editing buttons
+    $('#amp-edit-button').show()
+    $('.active-editing-buttons').hide()
+    $('#amp-naming-details-table tbody').removeClass 'ui-sortable'
+
+    sendToTI = if rows_to_update.length > 0 then false else true
+
     if rows_to_add.length > 0
-      window.create_amp_naming_conventions([rows_to_add])
+      window.create_amp_naming_conventions([rows_to_add], sendToTI)
+
+    sendToTI = if $('.delete-pattern').length > 0 then false else true
+
     if rows_to_update.length > 0
-      window.update_amp_naming_conventions([rows_to_update])
+      window.update_amp_naming_conventions([rows_to_update], sendToTI)
 
     # Bulk delete on save, are records ready for deletion? Then pass id's array to back-end
     if $('.delete-pattern').length > 0
@@ -335,15 +289,17 @@ $ ->
       std_msg_ajax(
         method: 'DELETE'
         url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
-        data: { 'ids': delete_id_array }
+        # delete should always update ti
+        data: { 'ids': delete_id_array, 'send_to_ti': true }
         success: (response) ->
-          std_msg_success('AMP Naming Convention(s) Below Has Been Deleted.', [delete_pattern_list], reload: false)
+          std_msg_success('Secure Endpoint Naming Convention(s) Have Been Deleted.', [delete_pattern_list], reload: false)
         error: (response) ->
           # On ajax error, restore the ready-to-delete rows
           $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
           $('.delete-patterns-area').addClass('hidden')
           $('.delete-patterns-queue').empty()
           std_msg_error('Error Deleting ' + delete_pattern_list, [response.responseText], reload: true)
+        async: false
       )
 
 
@@ -370,8 +326,7 @@ $ ->
       $('.delete-patterns-queue').append(delete_pattern_html)
 
 
-
-  window.create_amp_naming_conventions = ([data]) ->
+  window.create_amp_naming_conventions = ([data], sendToTI) ->
     # Pulling out just patterns for response message
     response_data = ""
     if data.length > 1
@@ -382,16 +337,26 @@ $ ->
     std_msg_ajax(
       method: 'POST'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
-      data: { patterns: data }
+      data: { patterns: data, send_to_ti: sendToTI }
       success: (response) ->
-        std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
+        std_msg_success('The Following Secure Endpoint Naming Conventions Have Been Created:', [response_data], reload: false)
+        if $('[data-unsaved-id]').length > 0
+          $('[data-unsaved-id]').each ->
+            newRecords = response['json']['new_records']
+            patternValue = $(@).find('.amp-pattern').attr('defaultValue')
+            matchingRecord = (record for record in newRecords when record.pattern is patternValue)[0]
+            if matchingRecord
+              $(@).attr('data-id', matchingRecord.id)
+              $(@).removeAttr('data-unsaved-id')
+              $(@).find('.delete-button').attr('onclick',"delete_amp_naming_convention('#{matchingRecord.id}', '#{matchingRecord.pattern}')")
       error: (response) ->
         $('tr[data-unsaved-id]').hide()
-        std_msg_error('Error Creating AMP Naming Conventions', [response.responseText], reload: false)
+        std_msg_error('Error Creating Secure Endpoint Naming Conventions', [response.responseText], reload: false)
+      async: false
     )
 
 
-  window.update_amp_naming_conventions = ([data]) ->
+  window.update_amp_naming_conventions = ([data], sendToTI) ->
     # Pulling out just patterns for response message
     response_data = ""
     if data.length > 1
@@ -403,15 +368,15 @@ $ ->
     std_msg_ajax(
       method: 'PATCH'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
-      data: { patterns: data }
+      data: { patterns: data, send_to_ti: sendToTI }
       success: (response) ->
-        std_msg_success('AMP Naming Conventions Have Been Updated', ["Relevant changes have also been sent to TI."], reload: true)
+        std_msg_success('Secure Endpoint Naming Conventions Have Been Updated', ["Relevant changes have also been sent to TI."], reload: true)
         contacts = $('.amp-contact .table-content')
         format_amp_contacts(contacts)
       error: (response) ->
-        window.get_original_sort_array()
         window.restore_input_values()
-        std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: true)
+        std_msg_error('Error Updating Secure Endpoint Naming Conventions', [response.responseText], reload: true)
+      async: false
     )
 
 
@@ -452,3 +417,6 @@ $ ->
 
   $('#nav-banner #naming-guide').click ->
     $('#naming-guide-dialog').dialog('open')
+
+  showNewRowErrorMessage = () ->
+    std_msg_error('Error Adding Secure Endpoint Naming Convention', ['Pattern, Example, Engine Description, and Private Engine Description are required fields.'], reload: false)
