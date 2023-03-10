@@ -817,6 +817,15 @@ window.webrep_reset_search = () ->
   for i in inputs
     i.value = ""
 
+  #clear selectize fields
+  $("#platform-input")[0].selectize.clear()
+  $("#status-input")[0].selectize.clear()
+  $("#priority-input")[0].selectize.clear()
+  $("#resolution-input")[0].selectize.clear()
+
+window.clearSelectize = (input) ->
+  $("##{input}")[0].selectize.clear()
+
 $ ->
 
 #  Opens ticket status resolution back up after modal close
