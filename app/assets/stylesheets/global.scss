@@ -1777,7 +1777,10 @@ fieldset.tight {
           );
 }
 #index-change-assign-dropdown{
+  left: initial;
   padding: 20px 0 12px 0!important;
+  top: 80%;
+
   #internal_comment ,#customer_facing_comment{
     font-size: inherit;
     height: 30px;
