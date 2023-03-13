@@ -4010,7 +4010,7 @@ fieldset.top-content {
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
 .nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
 
-.email-msg-body pre {
+.email-msg-content {
   background-color: $content-bg-color;
   color: $type-lighter-color;
   line-height: 1.4em;
@@ -4429,6 +4429,7 @@ input.communication-subject {
   font-size: 8pt;
   border-radius: 0;
   border: 1px solid darken($faint-neutral-color, 5%);
+  width: 100%;
   max-width: 475px;
 }
 
