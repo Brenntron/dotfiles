@@ -2,7 +2,7 @@
   %div
     %div.webcat-toolbar-select-all-wrapper
       %input{type: 'checkbox', id:'complaints_select_all'}
-      %label Select All
+      %label{for: 'complaints_select_all'} Select All
   %div
     %label.toolbar-section-label
       View
@@ -58,12 +58,13 @@
   %div
     %label.toolbar-section-label
       Edit
-    %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)'}
-      %span.toolbar-button-text Take
-    %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
-      %span.toolbar-button-text Return
+    %span.toolbar-concise-button-area
+      %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)'}
+        %span.toolbar-button-text Take
+      %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
+        %span.toolbar-button-text Return
     %span.toolbar-concise-button-area.webrep-change-assignee-wrapper
-      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text.toolbar-button-spacer{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span.dropdown
         %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text
@@ -176,4 +177,4 @@
         %span.toolbar-button-text Confirm Review
   %div.webcat-toolbar-tall-wrapper
     %input{type: 'checkbox', id:'self_review'}
-    %label Allow Self Review
+    %label{for: 'self_review'} Allow Self Review
