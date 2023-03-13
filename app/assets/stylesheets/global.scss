@@ -848,6 +848,7 @@ button {
   background-image: url(image_path('icon_submit_arrow.svg'));
   background-color: $warning-accent-color;
 }
+.master-submit-button:disabled {background-image: url(image_path('icon_submit_arrow_grey_disabled.svg'));}
 .resolution-submit-button {background-image: url(image_path('icon_bulk_resolve_white.svg'));}
 .open-viewable {background-image: url(image_path('icon_open_viewable.svg'));}
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
