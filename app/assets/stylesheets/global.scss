@@ -12332,8 +12332,12 @@ input[type="radio"].resolution_radio_button {
   }
 
   .webcat-toolbar-bulk-res {
-    background-color: #255c7d;
-    color: $type-lightest;
+    background-color: #255c7d !important;
+    color: $type-lightest !important;
+
+    &:disabled {
+      opacity: 0.5;
+    }
   }
 
   .webcat-toolbar-tall-wrapper {
