@@ -153,7 +153,7 @@
 
   %div.webcat-toolbar-push
     - if params[:f] != "REVIEW"
-      %button#index_update_resolution.toolbar-button.resolution-submit-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Bulk Resolution Tool', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_update_resolution.toolbar-button.resolution-submit-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span
           Bulk Resolution Tool
       .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_update_resolution'}
@@ -168,7 +168,7 @@
             %input.form-control#customer_facing_comment{:name => "customer_facing_comment", :placeholder => "Add a comment for the customer.", :type => "text", :value => ""}
           %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
             Update
-      %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'master_submit();', title: 'Bulk Submit'}
+      %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'master_submit();', title: 'Submit multiple selected entries with any changes entered by row'}
         %span
           Bulk Submit
       %span.dropdown
