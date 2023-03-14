@@ -18,12 +18,12 @@
     %label.content-label-sm Status
     %input.form-control#status-input.selectize{name: 'status', list: 'status-list', multiple: 'multiple', tabindex: '-1', data: 'webrep'}
     %datalist#status-list
-    %button.remove-input#remove-criteria-status
+    %button.remove-input#remove-criteria-status{onclick: 'clearSelectize("status-input")'}
   .form-group.search-item.hidden
     %label.content-label-sm Priority
     %input.form-control#priority-input.selectize{name: 'priority', list: 'priority-list', multiple: 'multiple', tabindex: '-1', data: 'webrep'}
     %datalist#priority-list
-    %button.remove-input#remove-criteria-owner
+    %button.remove-input#remove-criteria-owner{onclick: 'clearSelectize("priority-input")'}
   .form-group.search-item.hidden
     %label.content-label-sm Suggested Disposition
     %input.form-control#disposition-input{name: 'disposition'}
@@ -32,7 +32,7 @@
     %label.content-label-sm Resolution
     %input.form-control#resolution-input.selectize{name: 'resolution', list: 'resolution-list', multiple: 'multiple', tabindex: '-1', data: 'webrep'}
     %datalist#resolution-list
-    %button.remove-input#remove-criteria-resolution
+    %button.remove-input#remove-criteria-resolution{onclick: 'clearSelectize("resolution-input")'}
   .form-group.search-item.hidden
     #submission-type
       %label.content-label-sm Submission Type
