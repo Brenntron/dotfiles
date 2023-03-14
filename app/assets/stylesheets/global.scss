@@ -5212,7 +5212,7 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: $bug-section-color;
   color: $content-bg-color;
 }
-
+.dispute-inline-buttons.edit-button{background-image: url(image_path('icon_edit_white.svg'));}
 .dispute-inline-buttons.adjust-wlbl-button, .toolbar .dropdown.open .adjust-wlbl-button  { background-image: url(image_path('icon_wlbl_white.svg')); }
 .dispute-inline-buttons.adjust-reptool-button, .toolbar .dropdown.open .adjust-reptool-button { background-image: url(image_path('icon_blacklist_white.svg')); }
 
