@@ -896,7 +896,7 @@ module API
               end
               statuses = [Dispute::NEW, Dispute::STATUS_RESEARCHING,Dispute::STATUS_ESCALATED,Dispute::STATUS_CUSTOMER_PENDING, Dispute::ASSIGNED,
                           Dispute::STATUS_ON_HOLD,Dispute::STATUS_RESOLVED,Dispute::STATUS_REOPENED].map {|item| {id: item, public_name: item }}
-              submitter_types = ['Customer', 'Non-Customer']
+              submitter_types = ['Customer', 'Non-Customer', 'Internal']
               contacts =  Rails.cache.fetch('all_contacts_list') do
                 Customer.all.order(name: :asc).map {|customer| { name: customer.name, email: customer.email }}
               end
