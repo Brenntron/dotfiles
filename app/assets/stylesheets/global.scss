@@ -2268,7 +2268,6 @@ a.static-nav-item {
 .icon-submit{background-image: url(image_path('icon_submit_arrow.svg'));}
 .icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 .icon-guest-user {background-image: url(image_path('icon_guest_grey.svg'));}
-.icon-talos-sandbox {background-image: url(image_path('icon_sandbox2.svg'));}
 .icon-threat-grid {background-image: url(image_path('icon_grid.svg'));}
 .icon-reversing-labs {background-image: url(image_path('icon_reverse.svg'));}
 .icon-reversing-labs-light {background-image: url(image_path('icon_reverse_light.svg'));}
@@ -10919,11 +10918,6 @@ input.assignee.form-control{
   background-position: left -2px;
 }
 
-.sandbox-header {
-  border-bottom-color: $warning-accent-color;
-  background-image: url(image_path('icon_sandbox2.svg'));
-}
-
 .threatgrid-header {
   border-bottom-color: $communication-accent-color;
   background-image: url(image_path('icon_grid.svg'));
@@ -11292,24 +11286,6 @@ button.secondary.view-report-external-button {
 #rl-loader, #tg-loader, #sb-loader, #sdr-research-loader {
   width: 100%;
 }
-
-// Specific styles for sandbox report
-.vertical-data-report-table {
-  margin: 10px 0 15px 0;
-  tr td, tr th {
-    border-bottom: none;
-    padding: 4px;
-    font-size: 8pt;
-  }
-  .code-wrap-col {
-    padding-top: 2px;
-    padding-bottom: 2px;
-  }
-  .code-snippet {
-    font-size: 8pt;
-  }
-}
-
 
 // dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
 @media screen and (min-width: 1600px) {
@@ -11866,13 +11842,6 @@ table.rl-content {
 // this is the triangle, make color match the top row of rl hover table
 .tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover.tooltipster-bottom .tooltipster-arrow-border {
   border-bottom-color: darken($table-dark-body, 5%);
-}
-
-// dbinebri: ensuring create new report button gets icon
-.create-new-run-button {
-  background-image: url(image_path('icon_sandbox_report.svg'));
-  background-position: 6px center;
-  padding-left: 15px;
 }
 
 // Datatables special display to get rid of sorting by placeholder 'Na' or 'Missing' etc. values
