@@ -6334,14 +6334,17 @@ table > tbody > tr > td.research-table-row-wrapper {
 .virustotal-details-table { background-color: $rule-accent-color;}
 .reptool-details-table {background-color: $fifth-section-color;}
 .enrich-details-table, .prevalence-details-table  {background-color: $escalations-section-color;}
-.auto-resolve-details-table { background-color: $content-label-color;}
+.auto-resolve-details-table {
+  background-color: $content-label-color;
+  div{
+    font-size: 8pt;
+    padding: 6px 8px 10px 8px;
+  }
+}
 .entry-details-table {
     table, div {
     background-color: $table-dark-body;
     color: $content-bg-color;
-  }
-  div{
-    padding: 6px 8px;
   }
 }
 .entry-details-table table > thead > tr > th {
@@ -6349,6 +6352,7 @@ table > tbody > tr > td.research-table-row-wrapper {
   font-weight: 600;
   padding: 8px;
 }
+
 
 .entry-details-table table > tbody > tr > td{
   border-bottom: none;
