@@ -6327,14 +6327,14 @@ table > tbody > tr > td.research-table-row-wrapper {
   margin: 20px 20px 20px 0;
 }
 
-.wbrs-details-table, .prevalence-details-table { background-color: $bug-section-color;}
+.wbrs-details-table { background-color: $bug-section-color;}
 .sbrs-details-table, .auto-resolve-details-table { background-color: $success-color;}
 .xbrs-details-table { background-color: $communication-accent-color;}
 .crosslisted-details-table { background-color: $warning-accent-color;}
 .virustotal-details-table { background-color: $rule-accent-color;}
 .reptool-details-table {background-color: $fifth-section-color;}
-.enrich-details-table {background-color: $escalations-section-color;}
-
+.enrich-details-table, .prevalence-details-table  {background-color: $escalations-section-color;}
+.auto-resolve-details-table { background-color: $content-label-color;}
 .entry-details-table {
     table, div {
     background-color: $table-dark-body;

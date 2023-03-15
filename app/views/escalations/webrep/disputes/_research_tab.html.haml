@@ -1005,6 +1005,10 @@
                                       - else
                                         %td.unclean-site-result= virustotal[:result]
 
+                          .entry-details-table.auto-resolve-details-table{'data-entry-id': "#{entry.id}"}
+                            %h5.entry-details-table-header
+                              Auto Resolve Log
+                            %div= (entry.auto_resolve_log.html_safe rescue "")
                         .col-sm-8
                           = render 'shared/xbrs_table', :entry => entry
                           .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
@@ -1125,8 +1129,3 @@
                               %tbody
                                 %tr
                                   %td.missing-data No prevalence data
-
-                          .entry-details-table.auto-resolve-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header
-                              Auto Resolve Log
-                            %div= (entry.auto_resolve_log.html_safe rescue "")
