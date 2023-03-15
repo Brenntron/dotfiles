@@ -833,7 +833,7 @@ window.take_selected = ()->
 
 
 
-$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+$(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
   rows = $('#complaints-index').DataTable().rows('.selected').data()
   reopened = false
   invalid_unchanged = false
@@ -2356,11 +2356,16 @@ $ ->
                 $(button).hide()
 
 
-  $('#complaints_check_box').click ->
-    if $('#complaints_check_box').prop('checked')
+  $('#complaints_check_box, #complaints_select_all').click ->
+    checked = $(this).prop('checked')
+
+    if checked
       $('#complaints-index').DataTable().rows( { page: 'current' } ).select()
     else
       $('#complaints-index').DataTable().rows().deselect()
+
+    $("#complaints_check_box").prop('checked', checked)
+    $("#complaints_select_all").prop('checked', checked)
     return
 
   $(document).ready ->
@@ -2410,7 +2415,7 @@ $ ->
 
 # Convert webcat to webrep
 # Enable / disable button to attempt based on if anything is selected
-$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+$(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
   if $('tr.selected').length == 1
     $('#convert-ticket-button').removeAttr('disabled')
   else
