@@ -134,7 +134,11 @@ development:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
-
+  jira:
+      host: "fmd-drgjr-01tst.vrt.sourcefire.com"
+      username: "TBD.gen"
+      password: "redacted"
+      verify_mode: "verify-none"
  
 test:
   api_timeout:
@@ -265,18 +269,19 @@ test:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-<<<<<<< HEAD
   k2:
     host: "k2-api.sv4.ironport.com"
     port: 443
     token: "redacted"
-=======
   umbrella_data_fetcher:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
-
->>>>>>> development
+  jira:
+    host: "fmd-drgjr-01tst.vrt.sourcefire.com"
+    username: "TBD.gen"
+    password: "redacted"
+    verify_mode: "verify-none"
 staging:
   amp_poke:
     host: "localhost"
@@ -415,18 +420,19 @@ staging:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-<<<<<<< HEAD
   k2:
     host: "k2-api.sv4.ironport.com"
     port: 443
     token: "redacted"
-=======
   umbrella_data_fetcher:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
-
->>>>>>> development
+  jira:
+    host: "fmd-drgjr-01tst.vrt.sourcefire.com"
+    username: "TBD.gen"
+    password: "redacted"
+    verify_mode: "verify-none"
 production:
   amp_poke: 
     host: "poke.vrt.sourcefire.com"
@@ -566,15 +572,16 @@ production:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-<<<<<<< HEAD
   k2:
     host: "k2-api.sv4.ironport.com"
     port: 443
     token: "redacted"
-=======
   umbrella_data_fetcher:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
->>>>>>> development
-
+ jira:
+    host: "fmd-drgjr-01tst.vrt.sourcefire.com"
+    username: "TBD.gen"
+    password: "redacted"
+    verify_mode: "verify-none"

@@ -219,3 +219,7 @@ ngfw_telemetry_aws_config = OpenStruct.new
 ngfw_telemetry_aws_config.aws_access_key_id = ngfw_telemetry_config.dig('aws', 'access_key_id')
 ngfw_telemetry_aws_config.aws_secret_access_key = ngfw_telemetry_config.dig('aws', 'secret_access_key')
 Rails.configuration.ngfw_telemetry = ngfw_telemetry_aws_config
+
+jira_config = env_config['jira']
+raise "config.yml missing jira section" unless jira_config
+Rails.configuration.jira                = ApiRequester::ApiRequester.config_of(jira_config)
