@@ -231,7 +231,8 @@
               %button.hidden.note-save-button{class: "note-save-button#{comment.id}", onclick: "updateSdrNote(#{comment.id})"}
               %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
-              %button.sdr-note-delete-button{onclick: "deleteSdrNote(#{comment.id})"}
+              - if comment.user.cvs_username == current_user.cvs_username
+                %button.sdr-note-delete-button{onclick: "deleteSdrNote(#{comment.id})"}
 
         .row
           .col-xs-12
