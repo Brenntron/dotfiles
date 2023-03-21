@@ -649,7 +649,7 @@
                   %td.sugg-tc-cell
                     %label Suggested Threat Category
                     - unless entry[:suggested_threat_category].nil?
-                      = JSON.parse(entry[:suggested_threat_category]).join(", ")
+                      = entry[:suggested_threat_category].gsub(/,(?![ ])/, ', ')
                   %td.sugg-cell{colspan: '2'}
                     %label Suggested Disposition
                     - unless entry[:suggested_disposition].nil?
