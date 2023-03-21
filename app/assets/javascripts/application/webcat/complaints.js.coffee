@@ -1911,10 +1911,13 @@ window.fetch_complaints = () ->
 
 
 open_selected = (selected_rows, toggle) ->
-  for selected_row in selected_rows.data()
-    { viewable, subdomain, domain, path, ip_address } = selected_row
-    if viewable == toggle
+  low_rep_entries = []
 
+  for selected_row in selected_rows.data()
+    { viewable, subdomain, domain, path, ip_address, wbrs_score } = selected_row
+    if parseInt(wbrs_score) <= -6
+      low_rep_entries.push selected_row
+    else if viewable == toggle
       new_subdomain = ""
       new_domain = ""
       new_path = ""
@@ -1927,6 +1930,18 @@ open_selected = (selected_rows, toggle) ->
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
         window.open("http://"+selected_row.ip_address)
+
+  if low_rep_entries.length > 0
+    domains_and_ips = []
+
+    for lre in low_rep_entries
+      if lre.domain
+        domains_and_ips.push lre.domain
+      else
+        domains_and_ips.push lre.ip_address
+
+    error_message = "<span>#{domains_and_ips.join(', ')}</span>"
+    std_msg_error("#{low_rep_entries.length} row(s) could not open due to low WBRS Scores", [error_message])
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
