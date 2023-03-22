@@ -2,6 +2,7 @@ class Wbrs::Category < Wbrs::Base
   FIELD_NAMES = %w{category_id desc_long descr mnem is_active}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
+  SERVICE_STATUS_NAME = "RULEAPI:CATEGORY"
   attr_accessor *FIELD_SYMS
 
   alias_method(:id, :category_id)
@@ -17,6 +18,18 @@ class Wbrs::Category < Wbrs::Base
     super
   end
 
+  def self.service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
+  def self.system_reload
+    begin
+      RuntimeConfig.get_category_reload
+    rescue
+      false
+    end
+  end
+
   def self.new_from_datum(datum)
     datum['category_id'] = datum.delete('category') if datum['category'].present?
     new(datum)
@@ -25,12 +38,38 @@ class Wbrs::Category < Wbrs::Base
   # Get all the categories.
   # @return [Array<Wbrs::Category>] Array of the results.
   def self.all(reload: false)
-    unless @all || reload
+    service_status_data = {}
+    unless @all.present? || reload || system_reload
       response = call_json_request(:get, '/v1/cat/categories', body: '')
-
-      response_body = JSON.parse(response.body)
+      response_body = JSON.parse(response.body) rescue {}
       @all = response_body['data'].map {|datum| new_from_datum(datum)}
+      #retry 3 times, otherwise push alert to system
+      if @all.blank?
+        (0..2).each do
+          response = call_json_request(:get, '/v1/cat/categories', body: '')
+          response_body = JSON.parse(response.body) rescue {}
+          @all = response_body['data'].map {|datum| new_from_datum(datum)}
+          if @all.present?
+            break
+          end
+        end
+      end
+
+      if @all.blank?
+
+        service_status_data[:type] = "outage"
+        service_status_data[:exception] = "/v1/cat/categories not loading or responding"
+        service_status_data[:exception_details] = response.error rescue response.body
+
+        service_status.log(service_status_data)
+      else
+        service_status_data[:type] = "working"
+        service_status.log(service_status_data)
+      end
+
+
     end
+
     @all
   end
 
