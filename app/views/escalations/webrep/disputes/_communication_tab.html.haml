@@ -238,7 +238,7 @@
               Written by
               %span.author-username
                 =comment.user.cvs_username
-              = distance_of_time_in_words(Time.now, comment.created_at) + " ago."
+              = distance_of_time_in_words(Time.now, comment.created_at, false, highest_measure_only: true) + " ago."
             %br.hidden-break
             .note-info-item.time-stamp
               = format_timestamp(comment.created_at)
