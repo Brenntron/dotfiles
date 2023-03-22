@@ -311,60 +311,33 @@ $ ->
 
   # Show / hide the different research tables in the expanded row
   $('.research-row-checkbox').click ->
-    entry_id = $(this).val()
     entry_row = $(this).parents('.research-table-row')[0]
+
     if $(this).hasClass('wbrs-checkbox')
-      wbrs_table = $(entry_row).find('.wbrs-details-table')[0]
-      if $(this).prop('checked')
-        $(wbrs_table).show()
-      else
-        $(wbrs_table).hide()
+      table = $(entry_row).find('.wbrs-details-table')[0]
 
     if $(this).hasClass('sbrs-checkbox')
-      sbrs_table = $(entry_row).find('.sbrs-details-table')[0]
-      if $(this).prop('checked')
-        $(sbrs_table).show()
-      else
-        $(sbrs_table).hide()
+      table = $(entry_row).find('.sbrs-details-table')[0]
 
     if $(this).hasClass('virus-total-checkbox')
-      vt_table = $(entry_row).find('.virustotal-details-table')[0]
-      if $(this).prop('checked')
-        $(vt_table).show()
-      else
-        $(vt_table).hide()
+      table = $(entry_row).find('.virustotal-details-table')[0]
 
     if $(this).hasClass('xbrs-checkbox')
-      xbrs_table = $(entry_row).find('.xbrs-details-table')
-      if $(this).prop('checked')
-        $(xbrs_table).show()
-      else
-        $(xbrs_table).hide()
+      table = $(entry_row).find('.xbrs-details-table')
 
     if $(this).hasClass('crosslisted-checkbox')
-      cl_table = $(entry_row).find('.crosslisted-details-table')[0]
-      if $(this).prop('checked')
-        $(cl_table).show()
-      else
-        $(cl_table).hide()
+      table = $(entry_row).find('.crosslisted-details-table')[0]
 
     if $(this).hasClass('reptool-checkbox')
-      rt_table = $(entry_row).find('.reptool-details-table')[0]
-      if $(this).prop('checked')
-        $(rt_table).show()
-      else
-        $(rt_table).hide()
+      table = $(entry_row).find('.reptool-details-table')[0]
 
     if $(this).hasClass('enrich-checkbox')
-      enrich_table = $(entry_row).find('.enrich-details-table')[0]
-      if $(this).prop('checked')
-        $(enrich_table).show()
-      else
-        $(enrich_table).hide()
+      table = $(entry_row).find('.enrich-details-table, .prevalence-details-table')
 
-
-
-
+    if $(this).prop('checked')
+      $(table).show()
+    else
+      $(table).hide()
 
   # Scrollable tables in the expanded rows
   $('.table-scrollable').DataTable({

@@ -5214,7 +5214,7 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: $bug-section-color;
   color: $content-bg-color;
 }
-
+.dispute-inline-buttons.edit-button{background-image: url(image_path('icon_edit_white.svg'));}
 .dispute-inline-buttons.adjust-wlbl-button, .toolbar .dropdown.open .adjust-wlbl-button  { background-image: url(image_path('icon_wlbl_white.svg')); }
 .dispute-inline-buttons.adjust-reptool-button, .toolbar .dropdown.open .adjust-reptool-button { background-image: url(image_path('icon_blacklist_white.svg')); }
 
@@ -6330,26 +6330,33 @@ table > tbody > tr > td.research-table-row-wrapper {
 }
 
 .wbrs-details-table { background-color: $bug-section-color;}
-.sbrs-details-table { background-color: $success-color;}
+.sbrs-details-table, .auto-resolve-details-table { background-color: $success-color;}
 .xbrs-details-table { background-color: $communication-accent-color;}
 .crosslisted-details-table { background-color: $warning-accent-color;}
 .virustotal-details-table { background-color: $rule-accent-color;}
 .reptool-details-table {background-color: $fifth-section-color;}
-.enrich-details-table {background-color: $escalations-section-color;}
-.prevalence-details-table {background-color: $escalations-section-color;}
-
-.entry-details-table table {
-  background-color: $table-dark-body;
-  color: $content-bg-color;
+.enrich-details-table, .prevalence-details-table  {background-color: $escalations-section-color;}
+.auto-resolve-details-table {
+  background-color: $content-label-color;
+  div{
+    font-size: 8pt;
+    padding: 6px 8px 10px 8px;
+  }
 }
-
+.entry-details-table {
+    table, div {
+    background-color: $table-dark-body;
+    color: $content-bg-color;
+  }
+}
 .entry-details-table table > thead > tr > th {
   border-bottom: 1px solid $table-dark-header;
   font-weight: 600;
   padding: 8px;
 }
 
-.entry-details-table table > tbody > tr > td {
+
+.entry-details-table table > tbody > tr > td{
   border-bottom: none;
   font-size: 8pt;
   font-weight: 300;
@@ -13039,14 +13046,6 @@ table > tbody > tr > td.no-padding {
   .rep-tools-cell button {
     margin-right: 0;
   }
-}
-
-.enrich-webrep-table-data-missing {
-  display: none;
-}
-
-.prevalence-webrep-table-data-missing {
-  display: none;
 }
 
 .enrich-cell-external-references {
