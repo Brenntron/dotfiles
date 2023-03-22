@@ -960,6 +960,8 @@ $ ->
       data: build_webrep_data()
       complete: () ->
         $('#inline-webrep').addClass('hidden')
+        #cache current filters for export_all form
+        $('#disputes-index-export-data-input').val(JSON.stringify(build_webrep_data()))
     order: [ [
       9
       'desc'
