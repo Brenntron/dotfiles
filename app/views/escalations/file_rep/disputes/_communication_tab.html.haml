@@ -314,7 +314,8 @@
               %button.hidden.note-save-button.filerep-update-note{class: "note-save-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
-              %button.filerep-note-delete-button{comment_id: "#{comment.id}"}
+              - if comment&.user&.cvs_username == current_user.cvs_username
+                %button.filerep-note-delete-button{comment_id: "#{comment.id}"}
 
         .row
           .col-xs-12
