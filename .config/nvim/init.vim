@@ -38,6 +38,7 @@ Plug 'fladson/vim-kitty'
 
 " Generic Programming Support
 Plug 'ludovicchabant/vim-gutentags'
+Plug 'skywind3000/gutentags_plus'
 Plug 'honza/vim-snippets'
 Plug 'Townk/vim-autoclose'
 Plug 'tomtom/tcomment_vim'
@@ -79,20 +80,15 @@ Plug 'autozimu/LanguageClient-neovim', {
     \ 'do': 'bash install.sh',
     \ }
 
-" Freemarker Support
-Plug 'andreshazard/vim-freemarker'
-
-" TypeScript Support
-Plug 'leafgarland/typescript-vim'
-
 " JavaScript Support
 Plug 'flowtype/vim-flow'
 
-" Coffeescript
+" Coffeescript Support
 Plug 'kchmck/vim-coffee-script'
 
-" Vue.js
-Plug 'posva/vim-vue'
+" Yaml Support
+Plug 'stephpy/vim-yaml'
+Plug 'pedrohdz/vim-yaml-folds'
 
 " Theme / Interface
 Plug 'vim-scripts/AnsiEsc.vim'
@@ -193,20 +189,19 @@ let g:ale_fixers = {
 \  'ruby': ['rubocop']
 \}
 
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_enabled = 1
+let g:ale_fix_on_save = 0
+let g:ale_keep_list_window_open = 1
 let g:ale_lint_on_text_changed = 1
+let g:ale_linter_explicit = 1
+let g:ale_open_list = 1
 let g:ale_set_loclist = 0
 let g:ale_set_quickfix = 1
 let g:ale_sign_column_always = 1
-let g:ale_open_list = 1
-let g:ale_keep_list_window_open = 1
-let g:ale_fix_on_save = 0
-let g:ale_linter_explicit = 1
-let g:ale_sign_error = 'X'
+let g:ale_sign_error = '✗'
 let g:ale_sign_warning = '?'
 let g:ale_statusline_format = ['X %d', '? %d', '']
-let g:ale_echo_msg_format = '%linter% says %s'
-let g:ale_elixir_elixir_ls_release = '/Users/Brenntron/code/elixir_ls/rel'
 
 " Airline
 let g:airline#extensions#ale#enabled = 1
@@ -415,6 +410,7 @@ endif
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
 " provide custom statusline: lightline.vim, vim-airline.
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+set statusline+=%{gutentags#statusline()}
 
 " fzf config
 nmap ; :Buffers<CR>
@@ -436,30 +432,19 @@ let g:fzf_action = {
   \ 'ctrl-x': 'split',
   \ 'ctrl-v': 'vsplit' }
 
+" gutentags config
+let g:gutentags_modules = ['ctags', 'gtags_cscope']
 let g:gutentags_cache_dir = expand('~/.gutentags_cache')
 let g:gutentags_exclude_filetypes = ['gitcommit', 'gitconfig', 'gitrebase', 'gitsendemail', 'git', 'man']
 let g:gutentags_ctags_exclude = [
-\  '*.git', '*.svn', '*.hg',
-\  'cache', 'build', 'dist', 'bin', 'node_modules', 'bower_components',
-\  '*-lock.json',  '*.lock',
-\  '*.min.*',
-\  '*.bak',
-\  '*.zip',
-\  '*.pyc',
-\  '*.class',
-\  '*.sln',
-\  '*.csproj', '*.csproj.user',
-\  '*.tmp',
-\  '*.cache',
-\  '*.vscode',
-\  '*.pdb',
-\  '*.exe', '*.dll', '*.bin',
-\  '*.mp3', '*.ogg', '*.flac',
-\  '*.swp', '*.swo',
-\  '.DS_Store', '*.plist',
-\  '*.bmp', '*.gif', '*.ico', '*.jpg', '*.png', '*.svg',
-\  '*.rar', '*.zip', '*.tar', '*.tar.gz', '*.tar.xz', '*.tar.bz2',
-\  '*.pdf', '*.doc', '*.docx', '*.ppt', '*.pptx', '*.xls',
+\  '*-lock.json', '*.bak', '*.bin','*.bmp', '*.cache', '*.class', '*.csproj',
+\  '*.csproj.user', '*.dll', '*.doc', '*.docx', '*.exe', '*.flac', '*.gif',
+\  '*.git', '*.hg', '*.ico', '*.jpg', '*.lock', '*.min.*', '*.mp3', '*.ogg',
+\  '*.pdb', '*.pdf', '*.plist', '*.png', '*.ppt', '*.pptx', '*.pyc', '*.rar',
+\  '*.sln', '*.svg', '*.svn', '*.swo', '*.swp', '*.tar', '*.tar.bz2',
+\  '*.tar.gz', '*.tar.xz', '*.tmp', '*.vscode', '*.xls', '*.zip', '*.zip',
+\  '.DS_Store', 'BOWER_COMPONENTS', 'bin', 'build', 'cache', 'dist', 'extras',
+\  'node_modules', 'vendor'
 \]
 
 " Customize fzf colors to match your color scheme
@@ -487,7 +472,7 @@ command! -bang -nargs=* Rg
 
 " CoC Options
 let g:coc_global_extensions = ['coc-json', 'coc-git', 'coc-css', 'coc-solargraph', 'coc-html', 'coc-prettier']
-let g:coc_node_path = '/Users/jewillin/.asdf/shims/node'
+let g:coc_node_path = '$HOME/.asdf/shims/node'
 
 " Colorscheme
 colorscheme dracula
