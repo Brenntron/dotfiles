@@ -677,7 +677,7 @@ class DisputeEntry < ApplicationRecord
 
 
     if extra_wbrs_stuff.present?
-      self.score = extra_wbrs_stuff["wbrs"]["score"]
+      self.score = extra_wbrs_stuff["wbrs"]&["score"]
 
       threat_cats = extra_wbrs_stuff["threat_cats"]
 

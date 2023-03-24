@@ -28,7 +28,7 @@ module API
               authorize!(:update, ResolutionMessageTemplate)
               template = ResolutionMessageTemplate.find(permitted_params[:id])
               authorize!(:update, template)
-              template.update_attributes(permitted_params)
+              template.update(permitted_params)
             end
 
             desc "create an resolution message template"

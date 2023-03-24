@@ -2,9 +2,10 @@ require "rails_helper"
 
 RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
-  UmbrellaSecurityInfoResponse = Struct.new(:code, :body)
-  UmbrellaVolumeResponse = Struct.new(:code, :body)
-  UmbrellaScanResponse = Struct.new(:code, :body)
+  # dummy replacement to avoid warning about already initialized constant
+  let!(:UmbrellaSecurityInfoResponse) { Struct.new(:code, :body) }
+  let!(:UmbrellaVolumeResponse) { Struct.new(:code, :body) }
+  let!(:UmbrellaScanResponse) { Struct.new(:code, :body) }
 
 
   let(:virus_total_conviction_hash) {
