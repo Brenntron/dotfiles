@@ -178,14 +178,12 @@ plugins=(
   fzf
   git
   ruby
-  ssh-agent
   thefuck
   yarn
   zsh-syntax-highlighting
 )
 
-zstyle :omz:plugins:ssh-agent agent-forwarding on
-zstyle :omz:plugins:ssh-agent identities cisco_id_rsa gitlab_id_rsa
+ssh-add --apple-use-keychain
 
 export ZPLUG_HOME=/usr/local/opt/zplug
 source $ZPLUG_HOME/init.zsh
@@ -241,12 +239,10 @@ if [ -x "$(command -v exa)" ]; then
     alias ls="exa"
     alias la="exa --long --all --group"
 fi
-export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
-export PATH="/usr/local/opt/mysql/bin:$PATH"
+
 export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
 export PATH="/usr/local/opt/openssl@3/bin:$PATH"
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-export PATH="/usr/local/opt/postgresql@13/bin:$PATH"
 export RUBY_CONFIGURE_OPTS="--enable-shared --with-openssl-dir=$(brew --prefix openssl@1.1) --with-libyaml-dir=$(brew --prefix libyaml)"
 export RUBY_EXTRA_CONFIGURE_OPTIONS="--enable-shared"
 export PATH="/usr/local/sbin:$PATH"
