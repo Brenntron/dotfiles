@@ -223,3 +223,9 @@ Rails.configuration.ngfw_telemetry = ngfw_telemetry_aws_config
 jira_config = env_config['jira']
 raise "config.yml missing jira section" unless jira_config
 Rails.configuration.jira                = ApiRequester::ApiRequester.config_of(jira_config)
+
+
+bast_config = env_config.fetch('bast', nil)
+raise 'config.yml missing bast section' unless bast_config
+Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)
+
