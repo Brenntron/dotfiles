@@ -16,7 +16,7 @@ namespace 'AC.FileRep', (exports) ->
           selectize.addOption(assignee)
     )
 
-    exports.createPlatformOptions = ->
+  exports.createPlatformOptions = ->
     std_msg_ajax(
       method: 'GET'
       url: '/escalations/api/v1/escalations/webcat/platforms_names'
