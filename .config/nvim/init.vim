@@ -1,6 +1,6 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
-set syntax = on
+set syntax=on
 set nowrap
 set encoding=utf8
 
@@ -30,6 +30,7 @@ Plug 'tpope/vim-dispatch'
 Plug 'dense-analysis/ale'
 Plug 'dbakker/vim-projectroot'
 Plug 'scrooloose/nerdtree'
+Plug 'tpope/vim-haml'
 
 " Kitty Support
 Plug 'knubie/vim-kitty-navigator', {'do': 'cp ./*.py ~/.config/kitty/'}
@@ -117,7 +118,10 @@ Plug 'dracula/vim', { 'as': 'dracula' }
 
 call plug#end()
 
+filetype plugin on
 filetype plugin indent on
+
+syntax on
 set omnifunc=syntaxcomplete#Complete
 
 
@@ -151,6 +155,9 @@ autocmd BufNewFile,BufRead *.js.erb set filetype=javascript
 autocmd BufNewFile,BufRead *.js.erb set syntax=javascript
 autocmd BufNewFile,BufRead *.ts set filetype=javascript
 autocmd BufNewFile,BufRead *.ts set syntax=javascript
+au BufRead,BufNewFile *.vim setfiletype vim
+au BufRead,BufNewFile *.scss set filetype=scss
+au BufRead,BufNewFile *.haml set filetype=haml
 autocmd BufWritePre * :%s/\s\+$//e
 augroup FiletypeGroup
   autocmd!
@@ -483,7 +490,7 @@ let g:coc_global_extensions = ['coc-json', 'coc-git', 'coc-css', 'coc-solargraph
 let g:coc_node_path = '/Users/jewillin/.asdf/shims/node'
 
 " Colorscheme
-syntax enable
 colorscheme dracula
 hi LineNr ctermbg=NONE guibg=NONE
 hi Comment cterm=italic
+syntax enable

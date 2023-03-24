@@ -235,6 +235,7 @@ export CFLAGS="-O2 -g -fno-stack-check"
 export KERL_CONFIGURE_OPTIONS="--disable-hipe --with-ssl=$(brew --prefix openssl)"
 
 . ~/.asdf/plugins/java/set-java-home.zsh
+. /usr/local/opt/asdf/libexec/asdf.sh
 
 if [ -x "$(command -v exa)" ]; then
     alias ls="exa"
@@ -245,3 +246,7 @@ export PATH="/usr/local/opt/mysql/bin:$PATH"
 export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
 export PATH="/usr/local/opt/openssl@3/bin:$PATH"
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+export PATH="/usr/local/opt/postgresql@13/bin:$PATH"
+export RUBY_CONFIGURE_OPTS="--enable-shared --with-openssl-dir=$(brew --prefix openssl@1.1) --with-libyaml-dir=$(brew --prefix libyaml)"
+export RUBY_EXTRA_CONFIGURE_OPTIONS="--enable-shared"
+export PATH="/usr/local/sbin:$PATH"
