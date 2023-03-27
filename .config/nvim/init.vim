@@ -1,8 +1,6 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
-set syntax=on
 set nowrap
-set encoding=utf8
 
 if empty(glob('~/.vim/autoload/plug.vim'))
   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
@@ -87,11 +85,10 @@ Plug 'flowtype/vim-flow'
 Plug 'kchmck/vim-coffee-script'
 
 " Yaml Support
-Plug 'stephpy/vim-yaml'
 Plug 'pedrohdz/vim-yaml-folds'
 
 " Theme / Interface
-Plug 'vim-scripts/AnsiEsc.vim'
+Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'ryanoasis/vim-devicons'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -105,7 +102,6 @@ Plug 'Lokaltog/vim-distinguished'
 Plug 'chriskempson/base16-vim'
 Plug 'w0ng/vim-hybrid'
 Plug 'AlessandroYorba/Sierra'
-Plug 'ajh17/Spacegray.vim'
 Plug 'atelierbram/Base2Tone-vim'
 Plug 'colepeters/spacemacs-theme.vim'
 Plug 'liuchengxu/space-vim-dark'
@@ -116,10 +112,6 @@ call plug#end()
 
 filetype plugin on
 filetype plugin indent on
-
-syntax on
-set omnifunc=syntaxcomplete#Complete
-
 
 " OSX stupid backspace fix
 set backspace=indent,eol,start
@@ -140,25 +132,24 @@ set softtabstop=2
 set smarttab
 set expandtab
 set noshiftround
-let g:node_host_prog = '/Users/Brenntron/.asdf/installs/nodejs/16.3.0/bin/npm'
+
+let g:loaded_perl_provider = 0
 
 syn match javaScriptCommentSkip "^[ \t]*\*\($\|[ \t]\+\)"
 syn region javaScriptComment start="/\*" end="\*/" contains=@Spell,javaScriptCommentTodo
 syn match javaScriptSpecial "\\\d\d\d\|\\."
-autocmd BufNewFile,BufRead *.js.es6 set filetype=javascript
-autocmd BufNewFile,BufRead *.js.es6 set syntax=javascript
-autocmd BufNewFile,BufRead *.js.erb set filetype=javascript
-autocmd BufNewFile,BufRead *.js.erb set syntax=javascript
-autocmd BufNewFile,BufRead *.ts set filetype=javascript
-autocmd BufNewFile,BufRead *.ts set syntax=javascript
-au BufRead,BufNewFile *.vim setfiletype vim
-au BufRead,BufNewFile *.scss set filetype=scss
-au BufRead,BufNewFile *.haml set filetype=haml
-autocmd BufWritePre * :%s/\s\+$//e
 augroup FiletypeGroup
-  autocmd!
+  au!
+  au BufNewFile,BufRead *.js.es6 set filetype=javascript
   au BufNewFile,BufRead *.es6 set filetype=javascript
+  au BufNewFile,BufRead *.js.erb set filetype=javascript
+  au BufNewFile,BufRead *.ts set filetype=javascript
+  au BufNewFile,BufRead *.vim setfiletype vim
+  au BufNewFile,BufRead *.scss set filetype=scss
+  au BufNewFile,BufRead *.haml set filetype=haml
+  au BufNewFile,BufRead *.yml set filetype=yaml
 augroup END
+autocmd BufWritePre * :%s/\s\+$//e
 syn region javaScriptStringD	start=+"+ skip=+\\\\\|\\"+ end=+"\|$+	contains=javaScriptSpecial,@htmlPreproc
 syn region javaScriptStringS	start=+'+ skip=+\\\\\|\\'+ end=+'\|$+	contains=javaScriptSpecial,@htmlPreproc
 syn match javaScriptSpecialCharacter "'\\.'"
@@ -305,16 +296,9 @@ augroup END
 
 " Vim-UtilSnips Configuration
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 let g:UltiSnipsEditSplit="vertical" " If you want :UltiSnipsEdit to split your window.
-
-function! s:my_cr_function()
-  return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-  " For no inserting <CR> key.
-  "return pumvisible() ? "\<C-y>" : "\<CR>"
-endfunction
 
 " Close popup by <Space>.
 inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
@@ -376,21 +360,24 @@ set signcolumn=yes
 " no select by `"suggest.noselect": true` in your configuration file.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
 inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? coc#pum#next(1) :
       \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
-inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+inoremap <silent><expr> <c-space> coc#refresh()
+
+inoremap <expr> <Tab> coc#pum#visible() ? coc#pum#next(1) : "\<Tab>"
+inoremap <expr> <S-Tab> coc#pum#visible() ? coc#pum#prev(1) : "\<S-Tab>"
 
 " Make <CR> to accept selected completion item or notify coc.nvim to format
 " <C-g>u breaks current undo, please make your own choice.
 inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
                               \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-
-function! CheckBackspace() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
 
 " Remap keys for coc gotos
 nmap <silent> gd <Plug>(coc-definition)
@@ -411,6 +398,7 @@ endif
 " provide custom statusline: lightline.vim, vim-airline.
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 set statusline+=%{gutentags#statusline()}
+set statusline+=%{FugitiveStatusline()}
 
 " fzf config
 nmap ; :Buffers<CR>
@@ -433,8 +421,10 @@ let g:fzf_action = {
   \ 'ctrl-v': 'vsplit' }
 
 " gutentags config
-let g:gutentags_modules = ['ctags', 'gtags_cscope']
-let g:gutentags_cache_dir = expand('~/.gutentags_cache')
+let g:gutentags_ctags_executable = '/usr/local/bin/ctags'
+let g:gutentags_modules = ['ctags']
+let g:gutentags_cache_dir = '~/.gutentags_cache'
+let g:gutentags_project_root = ['.git']
 let g:gutentags_exclude_filetypes = ['gitcommit', 'gitconfig', 'gitrebase', 'gitsendemail', 'git', 'man']
 let g:gutentags_ctags_exclude = [
 \  '*-lock.json', '*.bak', '*.bin','*.bmp', '*.cache', '*.class', '*.csproj',
@@ -444,8 +434,16 @@ let g:gutentags_ctags_exclude = [
 \  '*.sln', '*.svg', '*.svn', '*.swo', '*.swp', '*.tar', '*.tar.bz2',
 \  '*.tar.gz', '*.tar.xz', '*.tmp', '*.vscode', '*.xls', '*.zip', '*.zip',
 \  '.DS_Store', 'BOWER_COMPONENTS', 'bin', 'build', 'cache', 'dist', 'extras',
-\  'node_modules', 'vendor'
+\  'node_modules', 'vendor', '*.yml'
 \]
+let g:gutentags_generate_on_new = 1
+let g:gutentags_generate_on_missing = 1
+let g:gutentags_generate_on_write = 1
+let g:gutentags_generate_on_empty_buffer = 0
+let g:gutentags_ctags_extra_args = [
+      \ '--tag-relative=yes',
+      \ '--fields=+ailmnS',
+      \ ]
 
 " Customize fzf colors to match your color scheme
 let g:fzf_colors =
