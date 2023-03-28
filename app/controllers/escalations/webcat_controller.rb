@@ -4,20 +4,26 @@ class Escalations::WebcatController < ApplicationController
   private   #because in ruby, private is protected not private
 
   def dashboard_metrics
-    @assigned = ComplaintEntry.assigned_count
-    @pending = ComplaintEntry.pending_count
-    @new = ComplaintEntry.new_count
-    @overdue = ComplaintEntry.overdue_count
+    @entries_reports = {
+        Assigned: ComplaintEntry.assigned_count,
+        Pending: ComplaintEntry.pending_count,
+        New: ComplaintEntry.new_count,
+        Overdue: ComplaintEntry.overdue_count
+    }
 
-    @ti_comp_guest = ComplaintEntry.where(complaint_id: Complaint.from_ti.by_guest.open_comps).count
-    @ti_comp_cust = ComplaintEntry.where(complaint_id: Complaint.from_ti.by_cust.open_comps).count
-    @int_comp_entries = ComplaintEntry.where(complaint_id: Complaint.from_int.open_comps).count
-    @wbnp = ComplaintEntry.where(complaint_id: Complaint.from_wbnp.open_comps).count
+    @submitter_reports = {
+        Customer: ComplaintEntry.where(complaint_id: Complaint.from_ti.by_guest.open_comps).count,
+        Guest: ComplaintEntry.where(complaint_id: Complaint.from_ti.by_guest.open_comps).count,
+        Internal: ComplaintEntry.where(complaint_id: Complaint.from_int.open_comps).count,
+        WBNP: ComplaintEntry.where(complaint_id: Complaint.from_wbnp.open_comps).count
+    }
 
-    @active_comp = Complaint.active_count
-    @completed_comp = Complaint.completed_count
-    @new_comp = Complaint.new_count
-    @overdue_comp = Complaint.overdue_count
+    @complaints_reports ={
+        Active:Complaint.active_count,
+        Completed:Complaint.completed_count,
+        New: Complaint.new_count,
+        Overdue:  Complaint.overdue_count
+    }
 
     @ti_new_count = ComplaintEntry.where(complaint_id: Complaint.from_ti).where(status:"NEW").count
     @ti_overdue_count = ComplaintEntry.where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours).count

@@ -1357,21 +1357,27 @@ thead th.sorting.center {
   background-repeat: no-repeat;
   background-size: 26px;
   background-position: 5px center;
-}
 
-.nav-tabs > li > a#admin-rule-tab-link, .nav-tabs > li > a#bug-rules-tab-link {background-image: url(image_path('icon_rules.svg'));}
-.nav-tabs > li > a#admin-validations-tab-link {background-image: url(image_path('icon_validations.svg'));}
-.nav-tabs > li > a#bug-overview-tab-link {background-image: url(image_path('icon_overview.svg'));}
-.nav-tabs > li > a#bug-attachments-tab-link {background-image: url(image_path('icon_attachments.svg'));}
-.nav-tabs > li > a#bug-jobs-tab-link {background-image: url(image_path('icon_jobs.svg'));}
-.nav-tabs > li > a#bug-notes-tab-link {background-image: url(image_path('icon_notes.svg'));}
-.nav-tabs > li > a#user-open-bugs-tab {background-image: url(image_path('icon_open.svg'));}
-.nav-tabs > li > a#user-pending-bugs-tab {background-image: url(image_path('icon_pending.svg'));}
-.nav-tabs > li > a#user-closed-bugs-tab {background-image: url(image_path('icon_closed.svg'));}
+  &:hover, &:focus {
+    background-color: $sidebar-nav-base;
+    border-color: transparent;
+  }
 
-.nav-tabs > li > a.active {
-  background-color: $content-bg-color;
-  color: $type-lighter-color;
+  &.active {
+    background-color: $content-bg-color;
+    color: $type-lighter-color;
+  }
+  &#admin-rule-tab-link, &#bug-rules-tab-link {background-image: url(image_path('icon_rules.svg'));}
+  &#admin-validations-tab-link {background-image: url(image_path('icon_validations.svg'));}
+  &#bug-overview-tab-link {background-image: url(image_path('icon_overview.svg'));}
+  &#bug-attachments-tab-link {background-image: url(image_path('icon_attachments.svg'));}
+  &#bug-jobs-tab-link {background-image: url(image_path('icon_jobs.svg'));}
+  &#bug-notes-tab-link {background-image: url(image_path('icon_notes.svg'));}
+  &#user-open-bugs-tab {background-image: url(image_path('icon_open.svg'));}
+  &#user-pending-bugs-tab {background-image: url(image_path('icon_pending.svg'));}
+  &#user-closed-bugs-tab {background-image: url(image_path('icon_closed.svg'));}
+  &#generate-reports-tab-link {background-image: url(image_path('icon-generate-reports.svg'));}
+  &#mothra-tab-link{background-image: url(image_path('icon_mothra.svg'));}
 }
 
 .nav-tabs > li.active > a {
@@ -1389,11 +1395,6 @@ thead th.sorting.center {
   border-top-right-radius: 2px;
   margin-left: -1px;
   border-left: 1px solid $faint-neutral-color;
-}
-
-.nav > li > a:hover, .nav > li > a:focus {
-  background-color: $sidebar-nav-base;
-  border-color: transparent;
 }
 
 .tab-label {
@@ -1423,8 +1424,6 @@ thead th.sorting.center {
 }
 
 /******** Messages / Warnings ********/
-
-.content-wrapper .message-div {}
 
 .message-div {
   border: 2px solid $content-bg-color;
@@ -6008,7 +6007,9 @@ input.table-entry-input:focus {
     margin-top: 5px;
   }
 }
-
+.webcat-reports-wrapper {
+  width: auto;
+}
 .webcat-research-wrapper {
   width: auto;
 
@@ -6994,16 +6995,32 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-E, .dispute-e {background-image: url(image_path('icon_type_email.svg'));}
 .dispute-EW, .dispute-ew {background-image: url(image_path('icon_type_email_web.svg'));}
 
-
-.team-dashboard-header-area, .dashboard-header-area, .complaint-mgt-top-area, .reputation-research-search-wrapper,
+.team-dashboard-header-area, .dashboard-header-area, .reputation-research-search-wrapper,
 .webcat-research-search-wrapper {
   background-color: $content-tab-color;
-  margin-top: -15px;
-  margin-right: -15px;
-  margin-left: -15px;
   border-radius: 4px 4px 0 0;
   color: $content-bg-color;
   padding: 15px;
+  margin: -15px -15px 0 -15px;
+}
+
+.webcat-reports-top-content{
+  background-color: $content-tab-color;
+  margin: -15px;
+  border-radius: 4px 4px 0 0;
+  .header-content{
+    padding-top: 15px;
+    display: flex;
+    h1{color: $content-bg-color!important;}
+    .top-info-icon{ padding-right: 55px;}
+  }
+  .complaint-mgt-top-area{
+    color: $type-base-color;
+    background-color: $content-bg-color;;
+    padding: 15px;
+    border-radius: 0 4px 0 0;
+    margin-right: -15px ;
+  }
 }
 
 .dashboard-header-area {
