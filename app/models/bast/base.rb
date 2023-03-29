@@ -3,13 +3,13 @@ class Bast::Base
     @host ||= Rails.configuration.bast.host
   end
 
-  def self.api_token
-    @api_token ||= Rails.configuration.bast.api_token
+  def self.token
+    @token ||= Rails.configuration.bast.token
   end
 
   def self.headers
     {
-        'Token' => api_token
+        'Token' => token
     }
   end
 

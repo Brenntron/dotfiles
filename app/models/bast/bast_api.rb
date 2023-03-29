@@ -20,7 +20,7 @@ class Bast::BastApi < Bast::Base
   def self.create_task(urls)
     bast_params = {
         "Urls" => urls,
-        "Intel" => ['catoscope', 'top_1m']
+        "Intel" => ['catoscope', 'top_1m'] #TODO: which intel options to use
     }
     make_request(method: :post, path: "/api/create_task", body: bast_params)
   end
