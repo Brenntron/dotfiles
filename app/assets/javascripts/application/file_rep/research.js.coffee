@@ -17,7 +17,7 @@ window.refresh_research_data = (sha256_hash) ->
 
 
 # Resubmit file sha hash to all the analysis engines
-# services: threatgrid reversinglab or seperately, sandbox
+# services: threatgrid, reversinglab
 # space delimited
 window.evaluate_file =  (services) ->
   sha256_hash = $('#sha256_hash')[0].innerText
@@ -74,21 +74,6 @@ window.evaluate_file =  (services) ->
           $(rl_report_running).show()
           $('#rl-loader').show()
           services += service + ' '
-        when 'sandbox'
-          sb_report_present = wrapper.find('.sb-data-present')[0]
-          sb_report_missing = wrapper.find('.sb-data-missing')[0]
-          sb_report_running = wrapper.find('.sb-report-run')[0]
-          $(sb_report_present).hide()
-          $(sb_report_missing).hide()
-          # Clear residual data
-          $(sb_report_present).find('.data-report-content').each ->
-            $(this).empty()
-          $(sb_report_running).show()
-          $('#sb-loader').show()
-          this_api = 'false'
-          magic = 'false'
-          # Sandbox hits a different api endpoint than TG and RL
-          run_sample_in_sandbox()
 
   if this_api == 'true'
     std_msg_ajax(
@@ -117,7 +102,6 @@ window.evaluate_file =  (services) ->
 window.research_data = (sha256_hash) ->
   window.get_threatgrid_data(sha256_hash)
   window.get_reversinglabs_data(sha256_hash)
-  window.get_run_status(sha256_hash)
   window.get_zoo_status(sha256_hash)
   window.get_enrichment_service_filerep(sha256_hash)
 
@@ -302,233 +286,6 @@ window.get_reversinglabs_data = (sha256_hash) ->
     error: (response) ->
       $('#rl-loader').hide()
       std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
-  )
-
-
-
-########### TALOS SANDBOX REPORT ############
-# Sandbox report api, get full report (json) from runid returned from the sandbox call above
-window.get_sandbox_report = (runid, sha256_hash) ->
-  wrapper = $('#sandbox-report-wrapper')
-  report_present = wrapper.find('.sb-data-present')[0]
-  report_missing = wrapper.find('.sb-data-missing')[0]
-  report_running = wrapper.find('.sb-report-run')[0]
-  $(report_running).hide()
-
-  std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_report/" + runid + '/' + sha256_hash
-    success_reload: false
-    success: (response) ->
-      sb_report = response.json.data
-      $('#sb-loader').hide()
-      $(report_present).show()
-      $(report_missing).hide()
-
-      # dbinebri: use moment.js to make date readable
-      sb_formatted_run_date = moment(new Date(sb_report.date)).format('MMM D, YYYY h:mm A')
-
-      $('#sb-run-date').text(sb_formatted_run_date)
-      $('#sb-run-status').text(sb_report.status)
-      $('#sb-score').text(sb_report.score)
-
-
-      # Contacted ips and domains
-      contacted_ips = ""
-      contacted_domains = ""
-
-      if sb_report.contact.ips.length > 0
-        $(sb_report.contact.ips).each ->
-          contacted_ips += this.ip + '<br/>'
-        $('#sb-contacted-ips').append(contacted_ips)
-      else
-        $('#sb-contacted-ips').html('<span class="missing-data">No IPs contacted</span>')
-
-      if sb_report.contact.domainnames.length > 0
-        $(sb_report.contact.domainnames).each ->
-          contacted_domains += this.domainname + '<br/>'
-        $('#sb-contacted-domains').append(contacted_domains)
-      else
-        $('#sb-contacted-domains').html('<span class="missing-data">No domains contacted</span>')
-
-
-      # Indicators of compromise (IOC's)
-      iocs = sb_report.ioc
-      unless iocs.length > 0
-        $('#sb-ioc-col').append('<span class="missing-data">No IOCs detected</span>')
-      else
-        ioc_table = '<table class="data-report-table"><thead><tr><th>Name</th><th class="text-center">Alerts</th></tr></thead><tbody>'
-        $(iocs).each ->
-          ioc_table += '<tr><td>' + this.name + '</td><td class="text-center overdue">' + this.alerts.length + '</td></tr>'
-        ioc_table += '</tbody></table>'
-        $('#sb-ioc-col').append(ioc_table)
-
-
-      # Dropped Files
-      dropped_files = sb_report.dropped_files
-      dropped_files_tables = ""
-      file_table = ""
-      unless dropped_files.length > 0
-        $('#sb-dropped-files-col').html('<span class="missing-data">No dropped files</span>')
-      else
-        $(dropped_files).each ->
-          file_table =
-            '<table class="vertical-data-report-table">' +
-              '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.MD5 + '</span></td></tr>' +
-              '<tr><th class="text-right">SHA1</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA1 + '</span></td></tr>' +
-              '<tr><th class="text-right">SHA256</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA256 + '</span></td></tr>' +
-              '<tr><th class="text-right">mime</th><td>' + this.mime + '</td></tr>' +
-              '<tr><th class="text-right">path</th><td>' + this.path + '</td></tr>' +
-              '<tr><th class="text-right">size</th><td>' + this.size + '</td></tr>' +
-              '</table>'
-
-          dropped_files_tables += file_table
-        $('#sb-dropped-files-col').append(dropped_files_tables)
-
-
-      # Processes
-      processes = sb_report.processes
-      processes_tables = ""
-      process_table = ""
-      unless processes.length > 0
-        $('#sb-processes-col').html('<span class="missing-data">No processes</span>')
-      else
-        $(processes).each ->
-          process_table =
-            '<table class="vertical-data-report-table">' +
-              '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.md5 + '</span></td></tr>' +
-              '<tr><th class="text-right">Name</th><td>' + this.name + '</td></tr>' +
-              '<tr><th class="text-right">PID</th><td>' + this.pid + '</td></tr>'
-          if this.pname?
-            process_table += '<tr><th class="text-right">pname</th><td>' + this.pname + '</td></tr>'
-          if this.ppid?
-            process_table += '<tr><th class="text-right">PPID</th><td>' + this.ppid + '</td></tr>'
-          process_table += '</table>'
-          processes_tables += process_table
-        $('#sb-processes-col').append(processes_tables)
-
-
-      # Adding full json report in case it's needed
-      full_report = JSON.stringify(response.json, null, 2)
-      $('#sb-full').text(full_report)
-
-      # Adding link to see sandbox html report
-      html = $('#sb-report-html')
-      html.attr('data-sha', sha256_hash)
-      html.attr('data-runid', runid)
-      html.attr('href', "/escalations/file_rep/sandbox-html-report?run_id=" + runid + "&sha256_hash=" + sha256_hash)
-      $('#sb-report-html-download').attr('href', "/escalations/file_rep/sandbox-html-report.gzip?run_id=" + runid + "&sha256_hash=" + sha256_hash)
-
-
-      # dbinebri: Convert the Talos Sandbox full_report to a downloadable file, add the Download button hyperlink
-      # build a formatted date string to add into the filename for download
-      sb_today = new Date()
-      sb_formatted_day =
-        String(sb_today.getMonth() + 1).padStart(2, '0') + '_' +
-        String(sb_today.getDate()).padStart(2, '0') + '_' + sb_today.getFullYear()
-
-      # create a downloadable file out of the json with the filename preset + date
-      sb_json_file = 'text/json; charset=utf-8,' + encodeURIComponent(full_report)
-      sb_filename = 'sandbox_' + sb_formatted_day + '.json'
-      sb_json_link = '<a href="data:' + sb_json_file + '" download="' + sb_filename + '"></a>'
-      $('#download-sb-json').wrap sb_json_link
-
-
-    error: (response) ->
-      $('#sb-loader').hide()
-      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
-  )
-
-
-########### TALOS SANDBOX:: RUN SAMPLE & GET REPORT ############
-# This function can be called if there is no report present
-# (so the sample has not been run in the sandbox) but the sample
-# does exist in the zoo and therefore CAN be run in the sandbox.
-
-window.run_sample_in_sandbox = () ->
-  sha256_hash = $('#sha256_hash')[0].innerText
-  report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
-  report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
-  report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
-  $(report_present).hide()
-  $(report_missing).hide()
-  # Clear residual data
-  $(report_present).find('.data-report-content').each ->
-    $(this).empty()
-  $(report_running).show()
-  $('#sb-loader').show()
-
-  # Create a new run in the sandbox (assuming sample CAN be run in sandbox)
-  std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_run_sample/" + sha256_hash
-    success_reload: false
-    success: (response) ->
-      # Wait 1 minute so the run status is getting a new status
-      # and not the complete status of the last report
-      setTimeout(get_run_status, 60000)
-    error: (response) ->
-      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
-)
-
-
-########### GET SANDBOX CURRENT RUN STATUS & MOST RECENT RUN ID ############
-#### This is needed prior to getting full report & needed for checking a report status
-get_run_status = window.get_run_status = (sha256_hash) ->
-  # Sandbox - send file hash, show loader while fetching data
-  $('#sb-loader').show()
-  sha256_hash = $('#sha256_hash')[0].innerText
-  report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
-  report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
-  report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
-
-  std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
-    success_reload: false
-    success: (response) ->
-      unless response.json.success == false
-        run_id = response.json.data.runid
-        status = response.json.data.status
-
-        # If report status is complete, send runid to get report
-        if status == "Complete"
-          clearInterval(get_run_status)
-          window.get_sandbox_report(run_id, sha256_hash)
-        else if status == "Error"
-          clearInterval(get_run_status)
-          $('#sb-loader').hide()
-          $(report_missing).show()
-          $('#sandbox-status-message').text('Error running sample. Report not generated.')
-        else if status == "Unsupported File Type"
-          clearInterval(get_run_status)
-          $('#sb-loader').hide()
-          $(report_missing).show()
-          $('#sandbox-status-message').text('Unsupported file type. Report not generated.')
-        else if status == "Cancelled"
-          clearInterval(get_run_status)
-          $('#sb-loader').hide()
-          $(report_missing).show()
-          $('#sandbox-status-message').text('Report was cancelled.')
-        else if status == "Running" || "JoeBox Analysis Running" || "Reports Generating" || "Enqueued to Report Generation"
-          $(report_running).show()
-
-        setTimeout(get_run_status, 600000)
-
-      else
-        $('#sb-loader').hide()
-        $(report_present).hide()
-        $(report_missing).show()
-        if $('#sample-zoo-status').attr('data-zoo-status') == 'YES'
-          $('#sandbox-status-message').text('No report available')
-          $('#sandbox-run-button').show()
-        else
-          $('#sandbox-status-message').text('Not in Talos Sample Zoo')
-          $('#sandbox-run-button').hide()
-
-
-    error: (response) ->
-      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
 
 ########### ENRICHMENT SERVICES SECTION ############
@@ -815,16 +572,13 @@ $ ->
 
 
   # dbinebri: refactoring this. this is checkbox toggle column visible + widths on Show Page, Research tab
-  $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
   $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
   $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
 
-  wrapper_list = $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper')
+  wrapper_list = $('#threatgrid-report-wrapper, #reversing-labs-report-wrapper')
 
-  $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
+  $('#data-show-tg-cb, #data-show-reversing-cb').click ->
     if $('.dataset-cb:checked').length == 1
-      $(wrapper_list).removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
+      $(wrapper_list).removeClass('col-sm-6').addClass('col-sm-12')
     else if $('.dataset-cb:checked').length == 2
-      $(wrapper_list).removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
-    else if $('.dataset-cb:checked').length == 3
-      $(wrapper_list).removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
+      $(wrapper_list).removeClass('col-sm-12').addClass('col-sm-6')

@@ -2,7 +2,7 @@ class DisputeExport
   attr_reader :disputes
 
   def initialize(disputes_given, user_preferences)
-    @disputes = disputes_given
+    @disputes = disputes_given.includes(:dispute_entries)
     @user_preferences = user_preferences
   end
 
@@ -69,9 +69,11 @@ class DisputeExport
       headers_to_export = EXPORT_HEADERS.filter{|k, _v| visible_columns_setup.include?(k)}.values
 
       sheet_insert_row(worksheet, headers_to_export, "h1")
-
       @disputes.each do |dispute|
         dispute.dispute_entries.each do |dispute_entry|
+          wbrs_rule_hits = assemble_rule_hits(dispute_entry, "WBRS")
+          sbrs_rule_hits = assemble_rule_hits(dispute_entry, "SBRS")
+
           entry_data = {
              'priority' => dispute_entry.dispute.priority,
              'case-id' => dispute_entry.dispute.case_id_str,
@@ -96,12 +98,12 @@ class DisputeExport
              'entry-resolution' => dispute_entry.resolution,
              'suggested-disposition' => dispute_entry.suggested_disposition,
              'category' => dispute_entry.primary_category,
-             'wbrs-hits' => assemble_rule_hits(dispute_entry, "WBRS"),
+             'wbrs-hits' => wbrs_rule_hits.join(', '),
              'wbrs-score' => dispute_entry.wbrs_score,
-             'wbrs-total-rule-hits' => dispute_entry.dispute_rule_hits.wbrs_rule_hits.count,
-             'sbrs-hits' => assemble_rule_hits(dispute_entry, "SBRS"),
+             'wbrs-total-rule-hits' => wbrs_rule_hits.size,
+             'sbrs-hits' => sbrs_rule_hits.join(', '),
              'sbrs-score' => dispute_entry.sbrs_score,
-             'sbrs-total-rule-hits' => dispute_entry.dispute_rule_hits.sbrs_rule_hits.count
+             'sbrs-total-rule-hits' => sbrs_rule_hits.size
           }
 
           # filter export data according to user filter setup
@@ -136,6 +138,6 @@ class DisputeExport
       # You could golf this down to one line but let's do a little Defensive Coding instead
       rule_hit_list << rule_hit.name
     end
-    rule_hit_list.join(", ")
+    rule_hit_list
   end
 end

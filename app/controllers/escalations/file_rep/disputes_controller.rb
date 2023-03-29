@@ -1,7 +1,7 @@
 class Escalations::FileRep::DisputesController < ApplicationController
 
   def index
-    @conventions = AmpNamingConvention.order(:table_sequence).all
+    @conventions = AmpNamingConvention.all
 
     respond_to do |format|
       format.html {  }
@@ -21,9 +21,9 @@ class Escalations::FileRep::DisputesController < ApplicationController
     @file_rep_dispute = FileReputationDispute.find(params[:id])
 
     @platform_name = @file_rep_dispute.determine_platform
-    
+
     @versioned_items = @file_rep_dispute.compose_versioned_items
-    @conventions = AmpNamingConvention.order(:table_sequence).all
+    @conventions = AmpNamingConvention.all
   end
 
   def sandbox_html_report
@@ -51,7 +51,7 @@ class Escalations::FileRep::DisputesController < ApplicationController
 
   def naming_guide
     # Sort records by table sequence
-    @conventions = AmpNamingConvention.order(:table_sequence).all
+    @conventions = AmpNamingConvention.all
   end
 
   private

@@ -355,9 +355,18 @@ $ ->
   window.populate_clusters_index_table()
   window.build_clusters_header()
 
-
 $ ->
   $(document).ready ->
+    # uncheck the select all checkbox on page change.
+    $('#clusters-index').DataTable().on('page.dt', () ->
+      if $('#clusters_check_box').prop('checked')
+        $('#clusters_check_box').prop('checked', false)
+        $('#clusters-index').DataTable().rows().deselect()
+
+        rows = $('table#clusters-index input[type="checkbox"]')
+        for row in rows
+          $(row)[0].checked = false
+    )
 
 # expand all functionality
 window.expand_all_clusters = (tableId) ->
@@ -566,8 +575,8 @@ window.toggle_all_checkboxes = () ->
 
     for i in [1..row_count]
       $(rows[i - 1])[0].checked = true
-      $('#clusters-index').DataTable().rows(i - 1).select()
-
+      rowNumber = $(rows[i-1]).attr('id').replace('cluster_row_', '')
+      $('#clusters-index').DataTable().rows(rowNumber).select()
   else
     $('#clusters-index').DataTable().rows().deselect()
     rows = $('table#clusters-index input[type="checkbox"]')
