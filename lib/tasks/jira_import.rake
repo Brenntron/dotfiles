@@ -14,7 +14,7 @@ namespace :jira do
       if import_task.present?
         next
       else
-        import_task = JiraImportTask.create(issue_key: issue.key, submitter: issue.reporter.name)
+        import_task = JiraImportTask.create!(issue_key: issue.key, submitter: issue.reporter.name)
         import_task.process_import
       end
     end

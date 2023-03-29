@@ -2,7 +2,6 @@ class JiraImportTask < ApplicationRecord
   has_many :import_urls
 
   validates :issue_key, presence: true, uniqueness: true
-  validates :bast_task, uniqueness: true
 
   STATUS_COMPLETE = "Complete"
   STATUS_FAILURE = "Failure"
@@ -22,14 +21,15 @@ class JiraImportTask < ApplicationRecord
     end
     attachment_to_process = attachments.first
     if attachment_to_process[:type] == VALID_FILE_TYPE
-      raw_data = attachment_to_process[:content]
-      filtered_data = raw_data.map {|m| m.gsub("\"", '').gsub(',', '').strip}.reject {|r| r.blank?}
-      filtered_data.each do |url|
+      csv_data = attachment_to_process[:content]
+      urls = csv_data.map {|m| m[0]&.strip}.reject {|r| r.blank?}
+
+      urls.each do |url|
         import_urls.find_or_create_by(submitted_url: url)
       end
 
       begin
-        response = Bast::BastApi.create_task(filtered_data)
+        response = Bast::BastApi.create_task(urls)
       rescue Bast::BastError => e
         update(status: STATUS_FAILURE, result: e.message)
       end

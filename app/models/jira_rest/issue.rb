@@ -37,7 +37,7 @@ module JiraRest
       @issue.attachments.map do |attachment|
         {
           filename: attachment.filename,
-          content: get_attachment_content(attachment).split("\n"),
+          content: get_attachment_content(attachment),
           type: attachment.mimeType
         }
       end      
@@ -46,7 +46,12 @@ module JiraRest
     private
     
     def get_attachment_content(attachment)
-      @session.client.get(attachment.content).body
+      case attachment.mimeType
+      when "text/csv"
+        CSV.parse(@session.client.get(attachment.content).body)
+      else
+        @session.client.get(attachment.content).body.split("\n")
+      end
     end
   end
 end
