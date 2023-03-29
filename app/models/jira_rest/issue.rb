@@ -37,7 +37,8 @@ module JiraRest
       @issue.attachments.map do |attachment|
         {
           filename: attachment.filename,
-          content: get_attachment_content(attachment).split("\n")
+          content: get_attachment_content(attachment).split("\n"),
+          type: attachment.mimeType
         }
       end      
     end
