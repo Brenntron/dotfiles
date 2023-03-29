@@ -23,6 +23,11 @@ class JiraImportTask < ApplicationRecord
     if attachment_to_process[:type] == VALID_FILE_TYPE
       csv_data = attachment_to_process[:content]
       urls = csv_data.map {|m| m[0]&.strip}.reject {|r| r.blank?}
+      
+      if urls.empty?
+        update(status: STATUS_FAILURE, result: "No URLs to import")
+        return
+      end
 
       urls.each do |url|
         import_urls.find_or_create_by(submitted_url: url)
