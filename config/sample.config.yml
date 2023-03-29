@@ -139,6 +139,8 @@ development:
       username: "TBD.gen"
       password: "redacted"
       verify_mode: "verify-none"
+      auth_type: "basic" #basic or cookie
+      project_key: "SD"
  
 test:
   api_timeout:
