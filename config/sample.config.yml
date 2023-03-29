@@ -141,6 +141,9 @@ development:
       verify_mode: "verify-none"
       auth_type: "basic" #basic or cookie
       project_key: "SD"
+  bast:
+    host: "prod-webcat-app2.sv4.ironport.com:5000"
+    token: "redacted"
  
 test:
   api_timeout:
