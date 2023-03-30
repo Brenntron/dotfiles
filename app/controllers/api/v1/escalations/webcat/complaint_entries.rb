@@ -22,6 +22,7 @@ module API
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
               optional :uri_as_categorized, type: String, desc: 'Value of the `Edit Uri` box at the time analyst submitted it'
+              optional :self_review, type: Boolean, desc: 'If a category change could be done with a self review'
             end
             post 'update'do
               std_api_v2 do
@@ -36,7 +37,9 @@ module API
                                        permitted_params['comment'],
                                        permitted_params['resolution_comment'],
                                        uri_as_categorized,
-                                       current_user, "")
+                                       current_user,
+                                       "",
+                                       permitted_params['self_review'])
 
                 Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
@@ -707,7 +710,7 @@ module API
 
             post 'xbrs' do
               data = K2::History.url_lookup(params['url']).body.dig('queryResults')&.first&.fetch('timelines') || []
-              
+
               formatted_data = []
               formatted_data = data.each_with_object([]) do |item, result|
                 row = {}
