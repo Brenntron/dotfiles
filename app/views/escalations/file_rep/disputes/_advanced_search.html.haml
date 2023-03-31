@@ -23,6 +23,8 @@
     %label.content-label-sm Resolution
     %input.form-control#resolution-input{name: 'resolution', list: 'resolution-list'}
     %datalist#resolution-list
+      - Dispute::RESOLUTIONS.map { |x| x == Dispute::ALL_AUTO_RESOLVED ? 'Auto Resolved' : x }.each do |resolution_status|
+        %option{value: resolution_status}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm File Name
@@ -52,11 +54,11 @@
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm AMP Detection - Last Set
-    %input.form-control#amp-detection-created-input{name: 'amp_detection_created'}
+    %input.form-control#amp-detection-created-input{name: 'amp_detection_created', placeholder: Date.today.strftime('%Y-%m-%d')}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Assignee
-    %input.form-control#assignee-input{name: 'assignee'}
+    %input.form-control.selectize#assignee-input{name: 'assignee', multiple: 'multiple', tabindex: '-1' }
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm{for:'sandbox_score'} Sandbox Score
@@ -84,7 +86,11 @@
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
-    %input.form-control#submitter-type-input{name: 'submitter_type'}
+    %input.form-control#submitter-type-input{name: 'submitter_type', list: 'submitter-type-list'}
+    %datalist#submitter-type-list
+      %option{value: FileReputationDispute::SUBMITTER_TYPE_CUSTOMER}
+      %option{value: FileReputationDispute::SUBMITTER_TYPE_NONCUSTOMER}
+      %option{value: FileReputationDispute::SUBMITTER_TYPE_INTERNAL}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Customer Name
@@ -137,11 +143,6 @@
     %label.content-label-sm Contact Email
     %input.form-control#email-input{name: 'contact-email', list: 'contactemail-list'}
     %datalist#contactemail-list
-    %button.remove-input
-  .form-group.search-item.hidden
-    %label.content-label-sm Company
-    %input.form-control#company-input{name: 'company', list: 'company-list'}
-    %datalist#company-list
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Domain
