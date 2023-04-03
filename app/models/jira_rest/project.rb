@@ -7,8 +7,9 @@ module JiraRest
       @project = @session.client.Project.find(project_key)
     end
 
-    def issues
-      @issues ||= JIRA::Resource::Issue.jql(session.client,"PROJECT = '#{project.key}' ORDER BY created DESC")
+    def issues(filters=[])
+      filters = filters.map {|m| "AND #{m}"}.join(" ")
+      @issues ||= JIRA::Resource::Issue.jql(session.client,"PROJECT = '#{project.key}' #{filters} ORDER BY created DESC")
     end
   end
 end
