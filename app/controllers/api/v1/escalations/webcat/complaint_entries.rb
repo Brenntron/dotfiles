@@ -578,12 +578,12 @@ module API
 
               pre_raw_records = []
 
-              prefix_records = Wbrs::Prefix.where({:urls => [URI.escape(SimpleIDN.to_ascii(params[:domain]))]})
+              prefix_records = Wbrs::Prefix.where({:urls => [Addressable::URI.escape(SimpleIDN.to_ascii(params[:domain]))]})
               prefix_records.each do |prefix_record|
                 history_records = Wbrs::HistoryRecord.where({:prefix_id => prefix_record.prefix_id})
                 pre_raw_records += history_records
               end
-              clean_domain = URI.escape(SimpleIDN.to_ascii(params[:domain]))
+              clean_domain = Addressable::URI.escape(SimpleIDN.to_ascii(params[:domain]))
 
               rule_lib_records = Wbrs::Prefix.get_certainty_sources_for_urls([clean_domain], 0)[clean_domain]
               if rule_lib_records.blank?

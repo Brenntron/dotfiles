@@ -711,14 +711,14 @@ For future web and email reputation requests, please open a web and email reputa
     end
     uri = "#{subdomain}#{parts["domain"]}#{parts["path"]}"
 
-    URI.escape(uri)
+    Addressable::URI.escape(uri)
   end
 
   def self.validate_url(uri, new_ui_complaint)
     begin
       URI.parse(uri.strip)
 
-      first_test_url = URI.escape(uri)
+      first_test_url = Addressable::URI.escape(uri)
       first_test_uri = URI.parse(URI.parse(first_test_url).scheme.nil? ? "http://#{first_test_url}" : first_test_url)
       first_test_domain = PublicSuffix.parse(first_test_uri.host, :ignore_private => true)
       first_test_uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{first_test_domain.domain}$"), '')
