@@ -223,9 +223,11 @@ Rails.configuration.ngfw_telemetry = ngfw_telemetry_aws_config
 jira_config = env_config['jira']
 raise "config.yml missing jira section" unless jira_config
 Rails.configuration.jira                = ApiRequester::ApiRequester.config_of(jira_config)
-
+Rails.configuration.jira.project_key    = jira_config['project_key']
+Rails.configuration.jira.token          = jira_config['token']
+Rails.configuration.jira.auth_type      = jira_config['auth_type'].to_sym
+Rails.configuration.jira.use_cookies    = jira_config['auth_type'] == "cookie"
 
 bast_config = env_config.fetch('bast', nil)
 raise 'config.yml missing bast section' unless bast_config
 Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)
-

@@ -14,7 +14,8 @@ module JiraRest
         password:     Rails.configuration.jira.password,
         site:         Rails.configuration.jira.host,
         context_path: '',
-        auth_type:    :basic
+        auth_type:    Rails.configuration.jira.auth_type,
+        use_cookies:  Rails.configuration.jira.use_cookies
       }
     end
   end

@@ -36,4 +36,3 @@ class Bast::Base
     call_request_parsed(:get, "api/download_json/#{task_id}")
   end
 end
-
