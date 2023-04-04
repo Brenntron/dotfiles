@@ -31,26 +31,57 @@ $(document).ready ->
               $("##{column}-checkbox").prop('checked', false)
               window.dispute_table.column("##{column}").visible false
   )
+  $('.toggle-vis').click ->
+    data = {}
+    data['priority'] = $("#priority-checkbox").is(':checked')
+    data['case-id'] = $("#case-id-checkbox").is(':checked')
+    data['status'] = $("#status-checkbox").is(':checked')
+    data['resolution'] = $("#resolution-checkbox").is(':checked')
+    data['submission-type'] = $("#submission-type-checkbox").is(':checked')
+    data['dispute'] = $("#dispute-checkbox").is(':checked')
+    data['owner'] = $("#owner-checkbox").is(':checked')
+    data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
+    data['age'] = $("#age-checkbox").is(':checked')
+    data['case-origin'] = $("#case-origin-checkbox").is(':checked')
+    data['submitter-type'] = $("#submitter-type-checkbox").is(':checked')
+    data['submitter-org'] = $("#submitter-org-checkbox").is(':checked')
+    data['submitter-domain'] = $("#submitter-domain-checkbox").is(':checked')
+    data['contact-name'] = $("#contact-name-checkbox").is(':checked')
+    data['contact-email'] = $("#contact-email-checkbox").is(':checked')
+    data['status-comment'] = $("#status-comment-checkbox").is(':checked')
+    data['last-updated'] = $("#last-updated-checkbox").is(':checked')
+    data['platform'] = $("#platform-checkbox").is(':checked')
+    std_msg_ajax(
+      url: "/escalations/api/v1/escalations/user_preferences/update"
+      method: 'POST'
+      data: {data, name: 'WebRepColumns'}
+      dataType: 'json'
+      success: (response) ->
+    )
 
   $('.toggle-vis-nested').click ->
-    checkboxes = $.map( $(".toggle-vis-nested input"), (n, i) -> return n.id )
     data = {}
-    for check in checkboxes
-      name = check.replace('-checkbox', '')
-      val = $("##{check}").is(':checked')
-      data[name] = val
+    data['dispute-entry'] = $("#dispute-entry-checkbox").is(':checked')
+    data['entry-status'] = $("#entry-status-checkbox").is(':checked')
+    data['entry-resolution'] = $("#entry-resolution-checkbox").is(':checked')
+    data['suggested-disposition'] = $("#suggested-disposition-checkbox").is(':checked')
+    data['category'] = $("#category-checkbox").is(':checked')
+    data['platform-entry'] = $("#platform-entry-checkbox").is(':checked')
+    data['wbrs-score'] = $("#wbrs-score-checkbox").is(':checked')
+    data['wbrs-total-rule-hits'] = $("#wbrs-total-rule-hits-checkbox").is(':checked')
+    data['wbrs-rules'] = $("#wbrs-rules-checkbox").is(':checked')
+    data['sbrs-score'] = $("#sbrs-score-checkbox").is(':checked')
+    data['sbrs-total-rule-hits'] = $("#sbrs-total-rule-hits-checkbox").is(':checked')
+    data['sbrs-rules'] = $("#sbrs-rules-checkbox").is(':checked')
 
     std_msg_ajax(
       url: "/escalations/api/v1/escalations/user_preferences/update"
       method: 'POST'
-      data: {
-        data,
-        name: 'WebRepColumns'
-      }
+      data: {data, name: 'WebRepColumns'}
       dataType: 'json'
       success: (response) ->
-        console.log response
     )
+
 window.select_or_deselect_all = (dispute_id)->
 
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
@@ -83,7 +114,6 @@ window.advanced_webrep_index_table = () ->
     status: form.find('input[id="status-input"]').val()
     priority: form.find('input[id="priority-input"]').val()
     resolution: form.find('input[id="resolution-input"]').val()
-    submission_type: submission_types
     submitter_type: form.find('input[id="submitter-input"]').val()
     platform_names: form.find('input[id="platform-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
@@ -787,6 +817,15 @@ window.webrep_reset_search = () ->
   for i in inputs
     i.value = ""
 
+  #clear selectize fields
+  $("#platform-input")[0].selectize.clear()
+  $("#status-input")[0].selectize.clear()
+  $("#priority-input")[0].selectize.clear()
+  $("#resolution-input")[0].selectize.clear()
+
+window.clearSelectize = (input) ->
+  $("##{input}")[0].selectize.clear()
+
 $ ->
 
 #  Opens ticket status resolution back up after modal close
@@ -921,6 +960,8 @@ $ ->
       data: build_webrep_data()
       complete: () ->
         $('#inline-webrep').addClass('hidden')
+        #cache current filters for export_all form
+        $('#disputes-index-export-data-input').val(JSON.stringify(build_webrep_data()))
     order: [ [
       9
       'desc'
@@ -1086,7 +1127,6 @@ $ ->
     entry_rows = []
     $(entry).each ->
       {ip_address, uri, primary_category} = this.entry
-
       platform = this.rendered_platform
       entry_content = missing_data
       if ip_address != null
@@ -1261,7 +1301,6 @@ $ ->
       $(checkbox).prop 'checked', !checkbox.prop('checked')
       return
     return
-
   $('.toggle-vis-nested').each ->
     checkbox_trigger = $(this).attr('data-column')
     checkbox = $(this).find('input')
@@ -1332,6 +1371,62 @@ $ ->
   $('#webrep-advanced-search-button').click ->
     # if we have already loaded the advanced search, with all options no need to load it again
     if $('#company-list').find('option').size() == 0
+
+      if localStorage.getItem('webRepFilters') != null
+        filter_data_found = false
+        #populate any non-selectize fields with current filters
+        #note: any selectize filters need to be populated after the selectize options are created
+        filters = JSON.parse(localStorage.webRepFilters)
+
+        #Need to check if this a saved or basic search, since those don't load in the data to the local storage
+        if filters.search_type != 'named' && filters.search_type != 'contains' && $('#dispute-advaced-search-selected-filters').html() != ''
+          filter_data_found = true
+
+          #Case ID field
+          $('#caseid-input').val filters.case_id
+          #Dispute (URL/IP/Domain)
+          $('#dispute-input').val filters.dispute_entries.ip_or_uri
+          #Assignee
+          $('#owner-input').val filters.case_owner_username
+          #Suggested Disposition
+          $('#disposition-input').val filters.dispute_entries.suggested_disposition
+          #Submitter Type
+          $('#submitter-input').val filters.submitter_type
+          #Contact Name
+          $('#name-input').val filters.customer.name
+          #Contact Email
+          $('#email-input').val filters.customer.email
+          #Submitter Org
+          $('#company-input').val filters.customer.company_name
+          #Submitter Domain
+          $('#domain-input').val filters.org_domain
+          #Date Submitted (Newer)
+          $('#submitted-newer-input').val filters.submitted_newer
+          #Date Submitted (Older)
+          $('#submitted-older-input').val filters.submitted_older
+          #Case Origin
+          $('#case-origin-input').val filters.case_origin
+          #Case Age (Newer) ex: 30d 12h
+          $('#age-newer-input').val filters.age_newer
+          #Case Age (Older) ex: 7d 12h
+          $('#age-older-input').val filters.age_older
+          #Last Modified (Newer)
+          $('#modified-newer-input').val filters.modified_newer
+          #Last Modified (Older)
+          $('#modified-older-input').val filters.modified_older
+
+          #check for submission types parameter - if field is hidden there is no .submission_type attached
+          if filters.submission_type?
+            #uncheck any Submission Types that are not included in filters
+            if filters.submission_type.includes('w') == false
+              $('#submission-type-w-cb').prop('checked', false)
+
+            if filters.submission_type.includes('ew') == false
+              $('#submission-type-ew-cb').prop('checked', false)
+
+            if filters.submission_type.includes('e') == false
+              $('#submission-type-e-cb').prop('checked', false)
+
       std_msg_ajax(
         method: 'GET'
         url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
@@ -1344,7 +1439,6 @@ $ ->
           $('#company-list').empty()
           $('#resolution-list').empty()
           $('#case-origin-list').empty()
-
 
           $('#platform-input').selectize {
             persist: false
@@ -1393,6 +1487,33 @@ $ ->
             onBlur: () ->
               window.toggle_selectize_layer(this, 'false')
           }
+
+          #populate selectize fields if correct localstorage is found
+          if filter_data_found == true
+
+            #populate platform
+            if filters.platform_names != ''
+              platform_input = $('#platform-input').selectize()
+              platform_names = filters.platform_names.split(',')
+              platform_input[0].selectize.setValue(platform_names)
+
+            #populate resolution
+            if filters.resolution != ''
+              resolution_input = $('#resolution-input').selectize()
+              resolutions = filters.resolution.split(',')
+              resolution_input[0].selectize.setValue(resolutions)
+
+            #populate status
+            if filters.status != ''
+              status_input = $('#status-input').selectize()
+              statuses = filters.status.split(',')
+              status_input[0].selectize.setValue(statuses)
+
+            #populate priority
+            if filters.priority != ''
+              priority_input = $('#priority-input').selectize()
+              priorities = filters.priority.split(',')
+              priority_input[0].selectize.setValue(priorities)
 
           for user in response.json.case_owners
             $('#user-list').append '<option value=\'' + user + '\'></option>'
