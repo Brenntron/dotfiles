@@ -135,11 +135,15 @@ development:
       access_key_id: "redacted"
       secret_access_key: "redacted"
   jira:
-      host: "fmd-drgjr-01tst.vrt.sourcefire.com"
-      username: "TBD.gen"
-      password: "redacted"
-      verify_mode: "verify-none"
- 
+    host: "fmd-drgjr-01tst.vrt.sourcefire.com"
+    username: "TBD.gen"
+    password: "redacted"
+    verify_mode: "verify-none"
+  bast:
+    host: "prod-webcat-app3.sv4.ironport.com"
+    port: 500
+    api_key: "redacted"
+    tls: "verify-none"  
 test:
   api_timeout:
     timeout: 15
