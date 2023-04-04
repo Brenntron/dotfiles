@@ -1380,12 +1380,12 @@ For future Web categorization requests, please open a Web categorization ticket 
       dispute_fields[field] = dispute_fields[field].split(/[\s,]+/)
     end
 
-    relation = where(dispute_fields)
-
     ['status', 'resolution'].each do |field|
       next unless params[field].present?
-      relation = relation.where(field => params[field].split(','))
+      dispute_fields[field] = params[field].split(',')
     end
+
+    relation = where(dispute_fields)
 
     if params['submitted_newer'].present?
       relation =
