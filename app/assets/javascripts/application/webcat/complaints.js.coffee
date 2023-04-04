@@ -16,7 +16,22 @@ $(document).ready ->
   if window.location.pathname == '/escalations/webcat/reports'
     $('#webcat-imports-index').DataTable(
       data:[],
-      dom: '<"webcat-imports-index-dt-tools datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+      order:[]
+      dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+      language: {
+        search: "_INPUT_"
+        searchPlaceholder: "Search within table"
+      }
+      columnDefs: [
+        {
+          targets: [ 0,1 ]
+          orderable: false
+          searchable: false
+        }
+
+      ]
+      initComplete: () ->
+        $('#webcat-imports-index_filter input').addClass('table-search-input');
     )
 
   sessionStorage.removeItem("touchedForm")
