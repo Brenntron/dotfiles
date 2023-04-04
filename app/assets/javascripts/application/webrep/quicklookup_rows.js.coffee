@@ -20,12 +20,15 @@ $ ->
     parent_index = parent_row.rowIndex
     prev_row = existing_rows.eq(parent_index - 2)[0].innerText
     $(existing_rows).each ->
-      data = $(this).find('.col-bulk-dispute').attr('data').trim()
-      text_list = text_list.filter( (text)-> return !text_list.includes(data) )
+      data = $(this).find('.col-bulk-dispute').attr('data')
 
-      if !isEmpty(data)
-        disputes_data.push(data)
-        disputes.push(this)
+      if data?
+        data = data.trim()
+        text_list = text_list.filter( (text)-> return !text_list.includes(data) )
+
+        if !isEmpty(data)
+          disputes_data.push(data)
+          disputes.push(this)
     if !isEmpty(parent_data) && text_list.includes(parent_data)
       index = disputes.indexOf(parent_data)
       disputes.splice(index, 1)
