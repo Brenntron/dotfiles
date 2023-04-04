@@ -1,3 +1,14 @@
 %h1 JIRA Imports
 .row
   .col-xs-12
+    %table#webcat-imports-index
+      %thead
+        %tr
+          %th.sorting_disabled
+            %input{type: 'checkbox'}
+          %th Jira Ticket
+          %th Submitter
+          %th Imported On
+          %th
+            Entries (Imported | Unimported)
+          %th Result

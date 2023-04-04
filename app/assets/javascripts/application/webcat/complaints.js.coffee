@@ -28,6 +28,45 @@ $(document).ready ->
     window.check_wbnp_status()
 
 
+window.build_imports_table = () ->
+  $('#webcat-imports-index').DataTable()
+  $("#webcat-imports-index").DataTable(
+    data:[],
+    dom: '<"webcat-imports-index-dt-tools datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    columns: [
+      {
+        data:null,
+        render:()->
+        'hey'
+      },
+      {
+        data:null,
+        render:()->
+          'hey'
+      },
+      {
+        data:null,
+        render:()->
+          'hey'
+      },
+      {
+        data:null,
+        render: ()->
+          'hey'
+      },
+      {
+        data:null,
+        render: ()->
+          'hey'
+      },
+      {
+        data:null,
+        render:()->
+          'hey'
+      }
+    ]
+  )
+
 # WBNP - Get report id
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
@@ -49,10 +88,13 @@ window.fetch_wbnp_data = () ->
     error: (response) ->
       std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
   )
-
+if location.pathname == "/escalations/webcat/reports"
+  console.log 'HEY HEY'
+  $('#webcat-imports-index').DataTable({})
+  build_imports_table()
 
 # WBNP - Check report info
-check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
+window.check_wbnp_status = (wbnp_report_id) ->
   if $('#wbnp-full-report').length > 0
     # this is a webcat manager and they get the full WBNP report
     data = {}
@@ -110,7 +152,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
           wbnp_status = 'Checking report status in 45 seconds...'
           $(wbnp_check).removeClass('active')
           $(wbnp_check).text(wbnp_status)
-          setTimeout(check_wbnp, 45000)
+          setTimeout(check_wbnp_status(), 45000)
 
         $('#current-wbnp-report .wbnp-status').text(status)
         $('#current-wbnp-report .wbnp-status-msg').text(status_message)
@@ -1715,27 +1757,22 @@ window.get_xbrs_history = (url, tab) ->
 
 
 parse_lookup_dialog_content = (json) ->
-  lookup_dialog_content = '<div class="dialog-content-wrapper">' +
-    '<h5> Lookup info for ' + json["prefix"] + '</h5>' +
-    '<table class="lookup-table">' +
-    '<tbody>'
-  categories = json["current_categories"]
+  lookup_dialog_content = "<div class='dialog-content-wrapper'><h5> Lookup info for #{json['prefix']} </h5><table class='lookup-table'><tbody>"
+  categories = json['current_categories']
   $.each categories, (key, value) ->
     category = this
-    active =  $(this).attr("is_active")
+    active =  $(category).attr("is_active")
     if active == 1
-      { confidence, mnemonic, name, category_id: cat_id, certainty: certainties } = this
-      top_certainty = this.certainty[0].source_certainty
-
+      { mnemonic, name, category_id: cat_id, certainty: certainties } = category
       category_row = '<tr><td>' + mnemonic + ' - ' + name + '</td></tr>'
-      lookup_dialog_content = lookup_dialog_content + category_row
-      lookup_dialog_content = lookup_dialog_content + '<tr> <table class="lookup-certanty-table">' +
-        '<thead><tr><th></th><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead>' +
-        '<tbody>'
+      lookup_dialog_content += category_row
+      lookup_dialog_content += "<tr> <table class='lookup-certanty-table'>
+        <thead><tr><th></th><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead>
+         <tbody>"
       $(certainties).each ->
-        {source_confidence, source_certainty, source_category, source: source_name } = this
+        {source_confidence, source_certainty, source: source_name } = this
 
-        lookup_dialog_content = lookup_dialog_content + '<tr><td></td><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
+        lookup_dialog_content += "<tr><td></td><td>#{source_confidence}</td><td>#{source_name}</td><td>#{source_certainty}</td></tr>"
       lookup_dialog_content += '</tbody></table></tr>'
   lookup_dialog_content += '</tbody></table>'
 
@@ -1863,7 +1900,7 @@ window.click_table_buttons = (complaint_table, button)->
           select_complete = $completed_selectize[0].selectize
           select_complete.disable()
 
-        # Check to see which columns should be displayed
+        ## Check to see which columns should be displayed
         $('.toggle-vis-nested').each ->
           checkbox_trigger = $(button).attr('data-column')
           checkbox = $(this).find('input')

@@ -1,24 +1,24 @@
-#naming-guide-dialog{title: 'AMP Naming Conventions Guide'}
-  - if @conventions.any?
-    %table.table
-      %thead
-        %tr
-          %th Pattern
-          %th Example
-          %th Contact
-          %th.text-center Notes
-      %tbody
-        - @conventions.each do |convention|
-          %tr
-            %td
-              %span= convention.pattern
-            %td= convention.example
-            %td.contact-col
-              = convention.contact
-            %td.text-center
-              - if convention.notes
-                %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped', title: "#{convention.notes}"}
-
-  - else
-    %h3
-      No naming conventions defined
+-##naming-guide-dialog{title: 'AMP Naming Conventions Guide'}
+-#  - if @conventions.any?
+-#    %table.table
+-#      %thead
+-#        %tr
+-#          %th Pattern
+-#          %th Example
+-#          %th Contact
+-#          %th.text-center Notes
+-#      %tbody
+-#        - @conventions.each do |convention|
+-#          %tr
+-#            %td
+-#              %span= convention.pattern
+-#            %td= convention.example
+-#            %td.contact-col
+-#              = convention.contact
+-#            %td.text-center
+-#              - if convention.notes.any?
+-#                %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped', title: "#{convention.notes}"}
+-#
+-#  - else
+-#    %h3
+-#      No naming conventions defined
