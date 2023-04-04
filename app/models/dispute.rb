@@ -1375,18 +1375,18 @@ For future Web categorization requests, please open a Web categorization ticket 
       end
     end
 
-
-    ['id', 'priority', 'resolution'].each do|field|
+    ['id', 'priority'].each do|field|
       next unless dispute_fields[field].present?
       dispute_fields[field] = dispute_fields[field].split(/[\s,]+/)
     end
 
     relation = where(dispute_fields)
-    
-    if params['status'].present?
-      relation = relation.where(status: params['status'].split(','))
+
+    ['status', 'resolution'].each do |field|
+      next unless params[field].present?
+      relation = relation.where(field => params[field].split(','))
     end
-    
+
     if params['submitted_newer'].present?
       relation =
           relation.where('disputes.case_opened_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
