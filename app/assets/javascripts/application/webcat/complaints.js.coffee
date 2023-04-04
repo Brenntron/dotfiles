@@ -12,6 +12,13 @@ $(document).on 'change','.nested-table-input','.selectize-input', ->
 #### WBNP Reporting ####
 webcat_loader_timeout = ''
 $(document).ready ->
+
+  if window.location.pathname == '/escalations/webcat/reports'
+    $('#webcat-imports-index').DataTable(
+      data:[],
+      dom: '<"webcat-imports-index-dt-tools datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    )
+
   sessionStorage.removeItem("touchedForm")
   loader = $('#inline-webcat')
   $(this).bind(
@@ -27,45 +34,6 @@ $(document).ready ->
      $('body').hasClass('index-action')
     window.check_wbnp_status()
 
-
-window.build_imports_table = () ->
-  $('#webcat-imports-index').DataTable()
-  $("#webcat-imports-index").DataTable(
-    data:[],
-    dom: '<"webcat-imports-index-dt-tools datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
-    columns: [
-      {
-        data:null,
-        render:()->
-        'hey'
-      },
-      {
-        data:null,
-        render:()->
-          'hey'
-      },
-      {
-        data:null,
-        render:()->
-          'hey'
-      },
-      {
-        data:null,
-        render: ()->
-          'hey'
-      },
-      {
-        data:null,
-        render: ()->
-          'hey'
-      },
-      {
-        data:null,
-        render:()->
-          'hey'
-      }
-    ]
-  )
 
 # WBNP - Get report id
 window.fetch_wbnp_data = () ->
@@ -88,13 +56,10 @@ window.fetch_wbnp_data = () ->
     error: (response) ->
       std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
   )
-if location.pathname == "/escalations/webcat/reports"
-  console.log 'HEY HEY'
-  $('#webcat-imports-index').DataTable({})
-  build_imports_table()
+
 
 # WBNP - Check report info
-window.check_wbnp_status = (wbnp_report_id) ->
+check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
   if $('#wbnp-full-report').length > 0
     # this is a webcat manager and they get the full WBNP report
     data = {}
@@ -118,103 +83,83 @@ window.check_wbnp_status = (wbnp_report_id) ->
       # Turn off loader indicator
       $('.wbnp-loading-spinner').hide()
 
-      if full_report
+      if full_report == true
         # Clear old data
-        $('.wbnp-status, .wbnp-status-msg, .wbnp-full-report-table tbody, .wbnp-notes').empty();
+        $('.wbnp-status').empty();
+        $('.wbnp-status-msg').empty();
+        $('.wbnp-full-report-table tbody').empty();
+        $('.wbnp-notes').empty();
 
         curr_report = response.data[0]
         last_report = response.data[1]
+        currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
 
-        {id, attempts, total_new_cases, cases_imported, cases_failed,created_at,updated_at,status,status_message, cases_skipped, notes} = curr_report
-
-        curr_cases_skipped =  if cases_skipped? then cases_skipped else '0'
         # Add current report info to top bar report area
-        $('.wbnp-report-status').text(status)
-        $('#wbnp-report-attempted').text(total_new_cases)
-        $('#wbnp-report-succeeded').text(cases_imported)
-        $('#wbnp-report-rejected').text(cases_failed)
-        $('#wbnp-quick-report-skipped, #wbnp-full-report-skipped').text(curr_cases_skipped)
+        $('.wbnp-report-status').text(curr_report.status)
+        $('#wbnp-report-attempted').text(curr_report.total_new_cases)
+        $('#wbnp-report-succeeded').text(curr_report.cases_imported)
+        $('#wbnp-report-rejected').text(curr_report.cases_failed)
+        $('#wbnp-quick-report-skipped').text(currentSkippedText)
+        $('#wbnp-full-report-skipped').text(currentSkippedText)
 
-#        # Build the full report for webcat managers
-#        wbnp_dialog = $('#wbnp-full-report')
+        # Build the full report for webcat managers
+        wbnp_dialog = $('#wbnp-full-report')
 
         # Current report:
-        if status == 'complete'
+        if curr_report.status == 'complete'
           $('#current-wbnp-report .wbnp-status').addClass('status_complete')
-          $('.wbnp-full-report-title-status').remove()
         else
           $('#current-wbnp-report .wbnp-status').removeClass('status_complete')
+        $('#current-wbnp-report .wbnp-status').text(curr_report.status)
+        $('#current-wbnp-report .wbnp-status-msg').text(curr_report.status_message)
+        current_table = $('#current-wbnp-report .wbnp-full-report-table')
+        curr_table_content = '<tr><td>' + curr_report.id + '</td><td>' + curr_report.attempts + '</td><td>' + curr_report.total_new_cases + '</td><td>' + curr_report.cases_imported + '</td><td>' + curr_report.cases_failed + '</td><td>' + currentSkippedText + '</td><td>' + curr_report.created_at + '</td><td>' + curr_report.updated_at + '</td></tr>'
+        $(current_table).append(curr_table_content)
+        $('#current-wbnp-report .wbnp-notes').html(curr_report.notes)
 
-          # Keep checking / updating if Current report is unfinished
+        # Previous report:
+        if last_report?
+          lastSkippedText = if last_report.cases_skipped? then last_report.cases_skipped else '0'
+          if last_report.status == 'complete'
+            $('#previous-wbnp-report .wbnp-status').addClass('status_complete')
+          else
+            $('#previous-wbnp-report .wbnp-status').removeClass('status_complete')
+          $('#previous-wbnp-report .wbnp-status').text(last_report.status)
+          $('#previous-wbnp-report .wbnp-status-msg').text(last_report.status_message)
+          prev_table = $('#previous-wbnp-report .wbnp-full-report-table')
+          prev_table_content = '<tr><td>' + last_report.id + '</td><td>' + last_report.attempts + '</td><td>' + last_report.total_new_cases + '</td><td>' + last_report.cases_imported + '</td><td>' + last_report.cases_failed + '</td><td>' + lastSkippedText + '</td><td>' + last_report.created_at + '</td><td>' + last_report.updated_at + '</td></tr>'
+          $(prev_table).append(prev_table_content)
+          $('#previous-wbnp-report .wbnp-notes').html(last_report.notes)
+
+        # Keep checking / updating if Current report is unfinished
+        if curr_report.status != 'complete'
           if $('.wbnp-full-report-title-status').length == 0
             $('.ui-dialog .ui-dialog-title').append('<span class="wbnp-full-report-title-status"></span>')
           wbnp_check = $('.wbnp-full-report-title-status')[0]
           wbnp_status = 'Checking report status in 45 seconds...'
           $(wbnp_check).removeClass('active')
           $(wbnp_check).text(wbnp_status)
-          setTimeout(check_wbnp_status(), 45000)
+          setTimeout(check_wbnp, 45000)
+        else
+          $('.wbnp-full-report-title-status').remove()
 
-        $('#current-wbnp-report .wbnp-status').text(status)
-        $('#current-wbnp-report .wbnp-status-msg').text(status_message)
-        current_table = $('#current-wbnp-report .wbnp-full-report-table')
-        curr_table_content = "<tr>
-                                <td>#{id}</td>
-                                <td>#{attempts}</td>
-                                <td>#{total_new_cases}</td>
-                                <td>#{cases_imported}</td>
-                                <td>#{cases_failed}</td>
-                                <td>#{cases_skipped}</td>
-                                <td>#{created_at}</td>
-                                <td>#{updated_at}</td>
-                              </tr>"
-
-        $(current_table).append(curr_table_content)
-        $('#current-wbnp-report .wbnp-notes').html(notes)
-
-        # Previous report:
-        if last_report?
-          {cases_skipped,id,attempts,total_new_cases,cases_imported,cases_failed,created_at,updated_at,status,status_message}=last_report
-          last_cases_skipped = if cases_skipped? then cases_skipped else '0'
-          if status == 'complete'
-            $('#previous-wbnp-report .wbnp-status').addClass('status_complete')
-          else
-            $('#previous-wbnp-report .wbnp-status').removeClass('status_complete')
-          $('#previous-wbnp-report .wbnp-status').text(status)
-          $('#previous-wbnp-report .wbnp-status-msg').text(status_message)
-          prev_table = $('#previous-wbnp-report .wbnp-full-report-table')
-
-          prev_table_content = "<tr>
-                                  <td>#{id}</td>
-                                  <td>#{attempts}</td>
-                                  <td>#{total_new_cases}</td>
-                                  <td>#{cases_imported}</td>
-                                  <td>#{cases_failed}</td>
-                                  <td>#{last_cases_skipped}</td>
-                                  <td>#{created_at}</td>
-                                  <td>#{updated_at}</td>
-                                 </tr>"
-
-          $(prev_table).append(prev_table_content)
-          $('#previous-wbnp-report .wbnp-notes').html(last_report.notes)
 
 
       else
         curr_report = response.data
-        {total_new_cases, cases_imported, cases_failed,status,total_new_cases, cases_skipped} = curr_report
-
-        curr_cases_skipped = if cases_skipped? then cases_skipped else '0'
-
+        currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
         # Add current report info to top bar report area
-        $('.wbnp-report-status').text(status)
-        $('#wbnp-report-attempted').text(total_new_cases)
-        $('#wbnp-report-succeeded').text(cases_imported)
-        $('#wbnp-report-rejected').text(cases_failed)
-        $('#wbnp-quick-report-skipped, #wbnp-full-report-skipped').text(curr_cases_skipped)
+        $('.wbnp-report-status').text(curr_report.status)
+        $('#wbnp-report-attempted').text(curr_report.total_new_cases)
+        $('#wbnp-report-succeeded').text(curr_report.cases_imported)
+        $('#wbnp-report-rejected').text(curr_report.cases_failed)
+        $('#wbnp-quick-report-skipped').text(currentSkippedText)
+        $('#wbnp-full-report-skipped').text(currentSkippedText)
 
     error: (response) ->
       $('.wbnp-loading-spinner').hide()
 
-      std_msg_error("Unable to pull wbnp status.", [], reload: false)
+      std_msg_error("Unable to pull wbnp status", [], reload: false)
   )
 
 window.touchedFormChange = (url) ->
@@ -255,9 +200,11 @@ window.updateURI = (event, complaint_entry_id) ->
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
       {current_categories, category, wbrs_score, domain, subdomain, path, status} = response.json
-      qual_subdomain = domain
+
       if subdomain
-        qual_subdomain = "#{subdomain}.#{domain}"
+        qual_subdomain = subdomain + '.' + domain
+      else
+        qual_subdomain = domain
 
       $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
 
@@ -1757,22 +1704,27 @@ window.get_xbrs_history = (url, tab) ->
 
 
 parse_lookup_dialog_content = (json) ->
-  lookup_dialog_content = "<div class='dialog-content-wrapper'><h5> Lookup info for #{json['prefix']} </h5><table class='lookup-table'><tbody>"
-  categories = json['current_categories']
+  lookup_dialog_content = '<div class="dialog-content-wrapper">' +
+    '<h5> Lookup info for ' + json["prefix"] + '</h5>' +
+    '<table class="lookup-table">' +
+    '<tbody>'
+  categories = json["current_categories"]
   $.each categories, (key, value) ->
     category = this
-    active =  $(category).attr("is_active")
+    active =  $(this).attr("is_active")
     if active == 1
-      { mnemonic, name, category_id: cat_id, certainty: certainties } = category
-      category_row = '<tr><td>' + mnemonic + ' - ' + name + '</td></tr>'
-      lookup_dialog_content += category_row
-      lookup_dialog_content += "<tr> <table class='lookup-certanty-table'>
-        <thead><tr><th></th><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead>
-         <tbody>"
-      $(certainties).each ->
-        {source_confidence, source_certainty, source: source_name } = this
+      { confidence, mnemonic, name, category_id: cat_id, certainty: certainties } = this
+      top_certainty = this.certainty[0].source_certainty
 
-        lookup_dialog_content += "<tr><td></td><td>#{source_confidence}</td><td>#{source_name}</td><td>#{source_certainty}</td></tr>"
+      category_row = '<tr><td>' + mnemonic + ' - ' + name + '</td></tr>'
+      lookup_dialog_content = lookup_dialog_content + category_row
+      lookup_dialog_content = lookup_dialog_content + '<tr> <table class="lookup-certanty-table">' +
+        '<thead><tr><th></th><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead>' +
+        '<tbody>'
+      $(certainties).each ->
+        {source_confidence, source_certainty, source_category, source: source_name } = this
+
+        lookup_dialog_content = lookup_dialog_content + '<tr><td></td><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
       lookup_dialog_content += '</tbody></table></tr>'
   lookup_dialog_content += '</tbody></table>'
 
@@ -1900,7 +1852,7 @@ window.click_table_buttons = (complaint_table, button)->
           select_complete = $completed_selectize[0].selectize
           select_complete.disable()
 
-        ## Check to see which columns should be displayed
+        # Check to see which columns should be displayed
         $('.toggle-vis-nested').each ->
           checkbox_trigger = $(button).attr('data-column')
           checkbox = $(this).find('input')
