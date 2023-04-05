@@ -21,7 +21,6 @@ $(document).ready ->
       data:''
       success:(response)->
         build_imports_table(response)
-        console.log response.data
       error:(response)->
         console.log response
     )
@@ -90,7 +89,6 @@ $(document).on 'click', '#show-failed, #show-complete',->
 
   table.rows().every( ()->
     status = this.data().status
-    console.log status
     switch status
       when'Failure'
         if show_failed
