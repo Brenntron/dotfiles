@@ -13,7 +13,7 @@ module API
             std_api_v2 do
               tasks = JiraImportTask.includes(:import_urls).order("imported_at desc").paginate(page: params[:page], per_page: params[:per_page])
               task_array = tasks.map {|m| m.to_hash}
-              {tasks: task_array, total_pages: tasks.total_pages}
+              {data: task_array, total_pages: tasks.total_pages}
             end
           end
         end

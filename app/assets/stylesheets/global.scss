@@ -358,6 +358,7 @@ table.dataTable.no-footer {
   background-position: 3px center;
   color: $type-lighter-color;
 }
+
 #webcat-imports-index_wrapper .table-search-input {
   width: 96%;
   padding: 3px 3px 4px 25px;
@@ -365,7 +366,9 @@ table.dataTable.no-footer {
     padding-left: 28px;
   }
 }
-
+.total-imports{
+  font-weight: 600;
+}
 .restricted-table-search-input {
   height: 100%;
   padding: 0 8px;
@@ -671,7 +674,7 @@ button {
   border: none;
 }
 
-.toolbar-button, .toolbar-button-animated {
+.toolbar-button, .toolbar-button-animated, .inline-retry-button{
   background-color: $nav-toolbar-color;
   border: none;
   border-radius: 2px;
@@ -686,7 +689,7 @@ button {
   transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-.toolbar-button {
+.toolbar-button,.inline-retry-button{
   background-repeat: no-repeat;
   background-size: 20px 20px;
   background-position: 4px center;
@@ -11003,6 +11006,11 @@ button.secondary.view-report-external-button {
 #report-tab-content{
   .toolbar-select-wrapper input[type='checkbox'] {
     margin-top: 3px;
+  }
+  .entries-th {
+    text-transform: none;
+    font-weight: 600;
+    font-size: 10px;
   }
 }
 // dbinebri: updates below for file rep navbar layout new

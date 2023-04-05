@@ -4,29 +4,29 @@
   %div.view-container.toolbar-container
     %label.toolbar-section-label
       View
-    %button.toolbar-button.list-button.toolbar-button-spacer.active.tooltipped{id: "hey", title: 'List All Jira Imports'}
+    %button.toolbar-button.list-button.toolbar-button-spacer.active.tooltipped{title: 'List All Jira Imports'}
       %span.toolbar-button-text List
-    %button.toolbar-button.view-rules.view-button.tooltipped{id:"hey", title: 'Detailed Import View'}
+    %button.toolbar-button.view-rules.view-button.tooltipped{title: 'Detailed Import View'}
       %span.toolbar-button-text View
 
   %div.toolbar-container
     %label.toolbar-section-label.show-rule-sets-label
       Show Tickets
-    %span.toolbar-select-wrapper
+    %span.toolbar-select-wrapper.show-tickets
       %span
-        %label.toolbar-button-label.tooltipped{for: 'show-snort-3', title: 'Show All Failed'}
-          %input.toolbar-checkbox{type: 'checkbox',  name: 'show-failed', checked: true}
+        %label.show-failed.toolbar-button-label.tooltipped{for: 'show-failed', title: 'Show All Failed'}
+          %input#show-failed.toolbar-checkbox{type: 'checkbox',  name: 'show-failed', checked: true}
           %span.toolbar-button-select All Failed
       %span
-        %label.toolbar-button-label.tooltipped{for: 'show-snort-2', title: 'Show All Complete'}
-          %input.toolbar-checkbox{type: 'checkbox',  name: 'show-file-types', id: 'show-complete', checked: true}
+        %label.show-complete.toolbar-button-label.tooltipped{for: 'show-complete', title: 'Show All Complete'}
+          %input#show-complete#show-completed.toolbar-checkbox{type: 'checkbox',  name: 'show-complete', id: 'show-complete', checked: true}
           %span.toolbar-button-select All Complete
 
   %div.actions-container.toolbar-container
     %label.toolbar-section-label Actions
-    %button.toolbar-button.retry-button.toolbar-button-spacer.tooltipped{id: "heyactions", title: 'Retry'}
+    %button.toolbar-button.retry-button.toolbar-button-spacer.tooltipped{title: 'Retry'}
       %span.toolbar-button-text Retry
-    %button.toolbar-button.export-button.tooltipped{id:"heyhey", title: 'Export CSV'}
+    %button.toolbar-button.export-button.tooltipped{title: 'Export CSV'}
       %span.toolbar-button-text Export CSV
 
 .row
@@ -40,5 +40,6 @@
           %th Submitter
           %th Imported On
           %th
-            Entries (Imported | Unimported)
+            Entries
+            %span.entries-th (Imported | Unimported)
           %th Result
