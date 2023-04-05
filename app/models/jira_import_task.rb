@@ -46,4 +46,20 @@ class JiraImportTask < ApplicationRecord
     end
   end
   handle_asynchronously :process_import, :queue => "process_jira_import", :priority => 1
+
+  def to_hash
+    {
+        issue_key: issue_key,
+        status: status,
+        result: result,
+        submitter: submitter,
+        bast_task: bast_task,
+        imported_at: imported_at,
+        created_at: created_at,
+        updated_at: updated_at,
+        total_urls: import_urls.count,
+        unimported_urls: import_urls.where(bast_status: nil).count,  # TODO: bast statuses are unknown at the moment, these are placeholders
+        imported_urls: import_urls.where.not(bast_status: nil).count #
+    }
+  end
 end

@@ -37,6 +37,7 @@ module API
         mount API::V1::Escalations::Admin::Tools
         mount API::V1::Escalations::WsaStatuses
         mount API::V1::Escalations::Sdr::Disputes
+        mount API::V1::Escalations::JiraImportTasks
       end
     end
   end
