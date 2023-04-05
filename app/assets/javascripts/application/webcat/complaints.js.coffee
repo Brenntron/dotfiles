@@ -12,27 +12,8 @@ $(document).on 'change','.nested-table-input','.selectize-input', ->
 #### WBNP Reporting ####
 webcat_loader_timeout = ''
 $(document).ready ->
-
   if window.location.pathname == '/escalations/webcat/reports'
-    $('#webcat-imports-index').DataTable(
-      data:[],
-      order:[]
-      dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
-      language: {
-        search: "_INPUT_"
-        searchPlaceholder: "Search within table"
-      }
-      columnDefs: [
-        {
-          targets: [ 0,1 ]
-          orderable: false
-          searchable: false
-        }
-
-      ]
-      initComplete: () ->
-        $('#webcat-imports-index_filter input').addClass('table-search-input');
-    )
+    build_imports_table()
 
   sessionStorage.removeItem("touchedForm")
   loader = $('#inline-webcat')
@@ -49,7 +30,25 @@ $(document).ready ->
      $('body').hasClass('index-action')
     window.check_wbnp_status()
 
-
+window.build_imports_table = () ->
+  $('#webcat-imports-index').DataTable(
+    data:[],
+    order:[]
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    language: {
+      search: "_INPUT_"
+      searchPlaceholder: "Search within table"
+    }
+    columnDefs: [
+      {
+        targets: [ 0 ]
+        orderable: false
+        searchable: false
+      }
+    ]
+    initComplete: () ->
+      $('#webcat-imports-index_filter input').addClass('table-search-input');
+  )
 # WBNP - Get report id
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
@@ -2599,3 +2598,4 @@ $ ->
 
   $('#wbnp-report-button').click ->
     $('#wbnp-full-report').dialog('open')
+

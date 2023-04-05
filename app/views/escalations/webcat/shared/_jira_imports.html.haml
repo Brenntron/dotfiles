@@ -1,4 +1,34 @@
 %h1 JIRA Imports
+
+.toolbar.webcat-reports-toolbar
+  %div.view-container.toolbar-container
+    %label.toolbar-section-label
+      View
+    %button.toolbar-button.list-button.toolbar-button-spacer.active.tooltipped{id: "hey", title: 'List All Jira Imports'}
+      %span.toolbar-button-text List
+    %button.toolbar-button.view-rules.view-button.tooltipped{id:"hey", title: 'Detailed Import View'}
+      %span.toolbar-button-text View
+
+  %div.toolbar-container
+    %label.toolbar-section-label.show-rule-sets-label
+      Show Tickets
+    %span.toolbar-select-wrapper
+      %span
+        %label.toolbar-button-label.tooltipped{for: 'show-snort-3', title: 'Show All Failed'}
+          %input.toolbar-checkbox{type: 'checkbox',  name: 'show-failed', checked: true}
+          %span.toolbar-button-select All Failed
+      %span
+        %label.toolbar-button-label.tooltipped{for: 'show-snort-2', title: 'Show All Complete'}
+          %input.toolbar-checkbox{type: 'checkbox',  name: 'show-file-types', id: 'show-complete', checked: true}
+          %span.toolbar-button-select All Complete
+
+  %div.actions-container.toolbar-container
+    %label.toolbar-section-label Actions
+    %button.toolbar-button.retry-button.toolbar-button-spacer.tooltipped{id: "heyactions", title: 'Retry'}
+      %span.toolbar-button-text Retry
+    %button.toolbar-button.export-button.tooltipped{id:"heyhey", title: 'Export CSV'}
+      %span.toolbar-button-text Export CSV
+
 .row
   .col-xs-12
     %table.table.responsive.dataTable.no-footer#webcat-imports-index{role:'datatable'}

@@ -358,9 +358,12 @@ table.dataTable.no-footer {
   background-position: 3px center;
   color: $type-lighter-color;
 }
-.webcat-imports-index_wrapper .table-search-input {
+#webcat-imports-index_wrapper .table-search-input {
   width: 96%;
   padding: 3px 3px 4px 25px;
+  .toolbar-button{
+    padding-left: 28px;
+  }
 }
 
 .restricted-table-search-input {
@@ -774,6 +777,7 @@ button {
 .rmt-delete-button    {background-image: url(image_path('icon_delete.svg'));}
 .list-button      {background-image: url(image_path('icon_list.svg'));}
 .view-button      {background-image: url(image_path('icon_view.svg'));}
+.retry-button      {background-image: url(image_path('icon_retry_grey.svg'));}
 .splitview-button {background-image: url(image_path('icon_splitview.svg'));}
 .duplicate-button {background-image: url(image_path('icon_duplicate.svg'));}
 .smtp-button      {background-image: url(image_path('icon_smtp.svg'));}
@@ -10988,12 +10992,19 @@ button.secondary.view-report-external-button {
   margin-right: 0;
 }
 
-.toolbar-select-wrapper .toolbar-button-text {
-  padding-left: 22px;
-  padding-right: 6px;
-  line-height: 1.65em;
+.toolbar-select-wrapper {
+  .toolbar-button-text{padding-left: 22px;}
+  .toolbar-button-text{padding-left: 8px;}
+  .toolbar-button-text, .toolbar-button-select {
+    padding-right: 6px;
+    line-height: 1.65em;
+  }
 }
-
+#report-tab-content{
+  .toolbar-select-wrapper input[type='checkbox'] {
+    margin-top: 3px;
+  }
+}
 // dbinebri: updates below for file rep navbar layout new
 .escalations--file_rep--disputes-controller {
   .nav-tool-blocks.search-wrapper {
