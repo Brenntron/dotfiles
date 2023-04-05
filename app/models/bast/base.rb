@@ -1,63 +1,38 @@
 class Bast::Base
-  def self.host
-    @host ||= Rails.configuration.bast.host
-  end
+  include ApiRequester::ApiRequester
 
-  def self.token
-    @token ||= Rails.configuration.bast.token
-  end
+  INTEL_OPTION = 'ace'
 
-  def self.headers
-    {
-        'Token' => token
+  set_api_requester_config Rails.configuration.bast
+  set_default_headers({ 'Token' => api_key })
+
+  # usage:
+  #  Bast::Base.create_task(['pravda.com.ua', 'cisco.com'])
+  # response example:
+  #   {"status"=>"success", "task_id"=>293}
+  def self.create_task(domains)
+    body = {
+      'Urls'=> domains,
+      'Intel'=> [INTEL_OPTION]
     }
+
+    call_request_parsed(:post, '/api/create_task', request_type: :form_data, input: body)
   end
 
-  def self.make_request(method:, path:, body: nil)
-    request = new_request(path)
-    request.query = body
-
-    case method
-    when :post
-      response = HTTPI.post(request)
-    else
-      response = HTTPI.get(request)
-    end
-
-    if response.code != 200
-      request_error_handling(response)
-    else
-      JSON.parse(response.body)
-    end
+  # usage:
+  #   Bast::Base.get_task_status(293)
+  # response example:
+  #   {"status"=>"Completed", "task_id"=>293}
+  def self.get_task_status(task_id)
+    call_request_parsed(:get, "/api/task_status/#{task_id}")
   end
 
-  def self.new_request(path)
-    raise 'Path required' unless path.present?
-    raise 'Path must start with slash (/)' unless '/' == path[0]
 
-    request = HTTPI::Request.new("http://#{host}#{path}")
-
-    request.read_timeout = Rails.configuration.api_master_timeout
-    request.open_timeout = Rails.configuration.api_master_timeout
-
-
-    request.ssl = true
-    request.auth.ssl.verify_mode = :none
-
-    request.headers = headers
-
-    request
+  # usage:
+  # Bast::Base.get_task_status(293)
+  # response example:
+    # {"cisco.com"=>{"import"=>true, "category"=>"comp", "umbrella_rank"=>434, "wbnp_rank"=>62, "alexa_rank"=>1570}, "pravda.com.ua"=>{"import"=>true, "category"=>"news", "umbrella_rank"=>65475, "wbnp_rank"=>41868, "alexa_rank"=>2783}}
+  def self.get_task_result(task_id)
+    call_request_parsed(:get, "api/download_json/#{task_id}")
   end
-
-  def self.request_error_handling(response)
-    case
-    when 300 > response.code
-      body = JSON.parse(response.body)
-      raise Bast::BastError, "Unexpected Bast response, check request parameters" unless body.kind_of?(Hash)
-    else
-      body = JSON.parse(response.body)
-      raise Bast::BastError, "HTTP response #{response.code} #{body['error']}"
-    end
-  end
-
 end

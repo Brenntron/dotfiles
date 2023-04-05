@@ -34,8 +34,8 @@ class JiraImportTask < ApplicationRecord
       end
 
       begin
-        response = Bast::BastApi.create_task(urls)
-      rescue Bast::BastError => e
+        response = Bast::Base.create_task(urls)
+      rescue ApiRequester::ApiRequester::ApiRequesterError => e
         update(status: STATUS_FAILURE, result: e.message)
       end
 

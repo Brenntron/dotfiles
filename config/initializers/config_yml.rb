@@ -228,8 +228,6 @@ Rails.configuration.jira.token          = jira_config['token']
 Rails.configuration.jira.auth_type      = jira_config['auth_type'].to_sym
 Rails.configuration.jira.use_cookies    = jira_config['auth_type'] == "cookie"
 
-bast_config = env_config['bast']
-raise "config.yml missing bast section" unless bast_config
-Rails.configuration.bast              = OpenStruct.new
-Rails.configuration.bast.host         = bast_config['host']
-Rails.configuration.bast.token        = bast_config['token']
+bast_config = env_config.fetch('bast', nil)
+raise 'config.yml missing bast section' unless bast_config
+Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)
