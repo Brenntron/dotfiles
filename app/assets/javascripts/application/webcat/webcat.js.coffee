@@ -145,6 +145,20 @@ $ ->
 
     refresh_url()
 
+  window.search_for_tag = (tag) ->
+    { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+
+    try
+      webcat_search_conditions = JSON.parse webcat_search_conditions
+    catch e
+      webcat_search_conditions = {}
+
+    webcat_search_conditions.tags = tag
+
+    localStorage.webcat_search_conditions = JSON.stringify webcat_search_conditions
+
+    refresh_url()
+
   build_data = () ->
     ###
     # This function builds the argument to get data from the backend for DataTables
@@ -589,7 +603,7 @@ $ ->
                       tag_items = ''
                       tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
                       for tag in tag_list
-                        item = '<span class="tag-capsule">' + tag + '</span>'
+                        item = "<span class='tag-capsule' onclick='search_for_tag(\"#{tag}\")'>" + tag + "</span>"
                         tag_items += item
 
                   tag_items
@@ -1069,6 +1083,7 @@ window.find_saved_search_by_name = (name) ->
       return
   )
   return saved_search
+
 $ ->
 
 #  Webcat toolbar and wbnp status report tooltips need slight adjustment
