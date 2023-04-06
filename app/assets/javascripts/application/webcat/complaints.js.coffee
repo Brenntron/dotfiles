@@ -83,7 +83,6 @@ fake_data = [
   ]
 $(document).on 'click', '#show-failed, #show-complete',->
   table = $('#webcat-imports-index').DataTable()
-
   show_failed = $('#show-failed').prop('checked')
   show_complete = $('#show-complete').prop('checked')
 
@@ -92,16 +91,14 @@ $(document).on 'click', '#show-failed, #show-complete',->
     switch status
       when'Failure'
         if show_failed
-          $(this).show()
+          $('.failed').show()
         else
-          $(this).show()
-      when 'Complete'
-        if show_complete
-          $(this).show()
-        else
-          $(this).hide()
+          $('.failed').hide()
       else
-        $(this).show()
+        if show_complete
+          $('.complete-pending').show()
+        else
+          $('.complete-pending').hide()
   )
 
 
@@ -132,6 +129,8 @@ window.build_imports_table = (data) ->
       {status} = data
       if status != 'Complete' && status != 'Pending'
         $(row).addClass('failed')
+      else
+        $(row).addClass('complete-pending')
     columns:[
       {
         data:'issue_key',
