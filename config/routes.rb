@@ -61,6 +61,9 @@ Rails.application.routes.draw do
           get :export_complaint_entry
         end
       end
+
+      resources :jira_import_tasks, only: [:index]
+
     end
 
     namespace :webrep do

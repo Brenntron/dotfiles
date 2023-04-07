@@ -58,8 +58,16 @@ class JiraImportTask < ApplicationRecord
         created_at: created_at,
         updated_at: updated_at,
         total_urls: import_urls.count,
-        unimported_urls: import_urls.where(bast_status: nil).count,  # TODO: bast statuses are unknown at the moment, these are placeholders
-        imported_urls: import_urls.where.not(bast_status: nil).count #
+        unimported_urls: unimported_urls.count,  # TODO: bast statuses are unknown at the moment, these are placeholders
+        imported_urls: imported_urls.count       #
     }
+  end
+
+  def unimported_urls
+    import_urls.where(bast_status: nil)
+  end
+
+  def imported_urls
+    import_urls.where.not(bast_status: nil)
   end
 end

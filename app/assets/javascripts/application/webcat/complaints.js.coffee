@@ -14,16 +14,7 @@ webcat_loader_timeout = ''
 
 $(document).ready ->
   if window.location.pathname == '/escalations/webcat/reports'
-    std_msg_ajax(
-      method: 'GET'
-      url: "/escalations/api/v1/escalations/jira_import_tasks"
-      dataType: 'json'
-      data:''
-      success:(response)->
-        build_imports_table(response)
-      error:(response)->
-        console.log response
-    )
+    build_imports_table()
 
   sessionStorage.removeItem("touchedForm")
   loader = $('#inline-webcat')
@@ -40,47 +31,6 @@ $(document).ready ->
      $('body').hasClass('index-action')
     window.check_wbnp_status()
 
-fake_data = [
-    {
-      "issue_key": "SD-44",
-      "status": "Failure",
-      "result": "No URLs to import",
-      "submitter": "timoport",
-      "bast_task": null,
-      "imported_at": "2023-04-05T17:24:33.000Z",
-      "created_at": "2023-04-05T17:24:33.000Z",
-      "updated_at": "2023-04-05T17:24:33.000Z",
-      "total_urls": 0,
-      "unimported_urls": 0,
-      "imported_urls": 0
-    },
-    {
-      "issue_key": "SD-45",
-      "status": "Pending",
-      "result": "",
-      "submitter": "timoport",
-      "bast_task": 3284,
-      "imported_at": "2023-04-05T17:24:33.000Z",
-      "created_at": "2023-04-05T17:24:33.000Z",
-      "updated_at": "2023-04-05T17:24:33.000Z",
-      "total_urls": 0,
-      "unimported_urls": 0,
-      "imported_urls": 0
-    },
-    {
-      "issue_key": "SD-46",
-      "status": "Pending",
-      "result": null,
-      "submitter": "timoport",
-      "bast_task": 3286,
-      "imported_at": "2023-04-05T17:24:33.000Z",
-      "created_at": "2023-04-05T17:24:33.000Z",
-      "updated_at": "2023-04-05T17:24:33.000Z",
-      "total_urls": 0,
-      "unimported_urls": 0,
-      "imported_urls": 0
-    }
-  ]
 $(document).on 'click', '#show-failed, #show-complete',->
   table = $('#webcat-imports-index').DataTable()
   show_failed = $('#show-failed').prop('checked')
@@ -102,10 +52,13 @@ $(document).on 'click', '#show-failed, #show-complete',->
   )
 
 
-
-window.build_imports_table = (data) ->
+window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
-    data: fake_data
+    serverSide: true
+    processing: true
+    ajax: {
+      url: "/escalations/webcat/jira_import_tasks.json"
+    }
     order:[]
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     language: {
@@ -127,7 +80,7 @@ window.build_imports_table = (data) ->
     ]
     createdRow:(row, data, dataIndex) ->
       {status} = data
-      if status != 'Complete' && status != 'Pending'
+      if status == 'Failure'
         $(row).addClass('failed')
       else
         $(row).addClass('complete-pending')
@@ -151,10 +104,15 @@ window.build_imports_table = (data) ->
         render: (data,type,full,meta) ->
           {status, result}=full
 
-          html = "<span>#{result}</span>"
-          if status != 'Complete' && status != 'Pending'
+          if result
+            html = "<span>#{status} - #{result}</span>"
+          else
+            html = "<span>#{status}</span>"
+
+          if status == 'Failure'
             html += '<button class="inline-retry-button retry-button tooltipped tooltipstered" title="Retry"></button>'
 
+          return html
       }
     ]
   )
