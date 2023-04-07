@@ -227,8 +227,10 @@ source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
 export LDFLAGS="-L/usr/local/opt/zlib/lib -L/usr/local/opt/bzip2/lib"
 export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/bzip2/include"
 export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
-export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
+
+export FZF_DEFAULT_COMMAND='rg --files --hidden'
 export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4 --preview "bat --color=always {}" --preview-window "~3"'
+
 export CFLAGS="-O2 -g -fno-stack-check"
 export KERL_CONFIGURE_OPTIONS="--disable-hipe --with-ssl=$(brew --prefix openssl)"
 
@@ -240,9 +242,14 @@ if [ -x "$(command -v exa)" ]; then
     alias la="exa --long --all --group"
 fi
 
+export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+
 export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
 export PATH="/usr/local/opt/openssl@3/bin:$PATH"
+
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 export RUBY_CONFIGURE_OPTS="--enable-shared --with-openssl-dir=$(brew --prefix openssl@1.1) --with-libyaml-dir=$(brew --prefix libyaml)"
 export RUBY_EXTRA_CONFIGURE_OPTIONS="--enable-shared"
 export PATH="/usr/local/sbin:$PATH"
+export XDG_CONFIG_HOME="${HOME}/.config"
+export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
