@@ -163,7 +163,6 @@ null_ls.setup({
         -- diagnostics
         null_ls.builtins.diagnostics.codespell,
         null_ls.builtins.diagnostics.credo, null_ls.builtins.diagnostics.jshint,
-        null_ls.builtins.diagnostics.luacheck,
         null_ls.builtins.diagnostics.tidy, null_ls.builtins.diagnostics.vint,
         null_ls.builtins.diagnostics.zsh, -- formatting
         null_ls.builtins.formatting.codespell,
