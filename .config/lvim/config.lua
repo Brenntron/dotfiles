@@ -11,7 +11,7 @@ an executable
 -- general
 lvim.log.level = "warn"
 lvim.format_on_save.enabled = false
-lvim.colorscheme = "dracula"
+lvim.colorscheme = "tokyonight-moon"
 -- to disable icons and use a minimalist setup, uncomment the following
 -- lvim.use_icons = false
 
@@ -69,6 +69,7 @@ lvim.plugins = {
         require("lsp-rooter").setup()
       end,
     },
+    {'folke/tokyonight.nvim'},
     {
       "folke/trouble.nvim",
       cmd = "TroubleToggle",
@@ -232,6 +233,8 @@ require("mason-lspconfig").setup({
   }
 })
 
+require('lspconfig').coffesense.setup()
+
 -- Telescope plugin update
 lvim.builtin.telescope.on_config_done = function(telescope)
   pcall(telescope.load_extension, "fzy_native")
@@ -242,14 +245,10 @@ end
 local formatters = require "lvim.lsp.null-ls.formatters"
 local linters = require "lvim.lsp.null-ls.linters"
 
-formatters.setup {
-  { command = "coffeelint", filetypes = { "coffeelint" } },
-}
-
 linters.setup {
-  { command = "coffeelint", filetypes = { "coffeescript" } },
+  { command = "coffeelint", filetypes = { "coffee" } },
   { command = "shellcheck", extra_args = { "--severity", "warning" }, },
-  { command = "codespell", filetypes = { "javascript", "python" }, },
+  { command = "codespell", filetypes = { "haml", "html", "javascript", "markdown", "python", "ruby" }, },
 }
 
 -- generic options
@@ -267,21 +266,21 @@ vim.filetype.add {
 -- generic LSP settings
 
 -- -- make sure server will always be installed even if the server is in skipped_servers list
--- lvim.lsp.installer.setup.ensure_installed = {
---     "sumneko_lua",
---     "jsonls",
--- }
+lvim.lsp.installer.setup.ensure_installed = {
+    "sumneko_lua",
+    "jsonls",
+}
 -- -- change UI setting of `LspInstallInfo`
 -- -- see <https://github.com/williamboman/nvim-lsp-installer#default-configuration>
--- lvim.lsp.installer.setup.ui.check_outdated_servers_on_open = false
--- lvim.lsp.installer.setup.ui.border = "rounded"
--- lvim.lsp.installer.setup.ui.keymaps = {
---     uninstall_server = "d",
---     toggle_server_expand = "o",
--- }
+lvim.lsp.installer.setup.ui.check_outdated_servers_on_open = false
+lvim.lsp.installer.setup.ui.border = "rounded"
+lvim.lsp.installer.setup.ui.keymaps = {
+    uninstall_server = "d",
+    toggle_server_expand = "o",
+}
 
 -- ---@usage disable automatic installation of servers
--- lvim.lsp.installer.setup.automatic_installation = false
+lvim.lsp.installer.setup.automatic_installation = false
 
 -- ---configure a server manually. !!Requires `:LvimCacheReset` to take effect!!
 -- ---see the full default list `:lua print(vim.inspect(lvim.lsp.automatic_configuration.skipped_servers))`
@@ -304,40 +303,6 @@ vim.filetype.add {
 --   --Enable completion triggered by <c-x><c-o>
 --   buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
 -- end
-
--- -- set a formatter, this will override the language server formatting capabilities (if it exists)
--- local formatters = require "lvim.lsp.null-ls.formatters"
--- formatters.setup {
---   { command = "black", filetypes = { "python" } },
---   { command = "isort", filetypes = { "python" } },
---   {
---     -- each formatter accepts a list of options identical to https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md#Configuration
---     command = "prettier",
---     ---@usage arguments to pass to the formatter
---     -- these cannot contain whitespaces, options such as `--line-width 80` become either `{'--line-width', '80'}` or `{'--line-width=80'}`
---     extra_args = { "--print-with", "100" },
---     ---@usage specify which filetypes to enable. By default a providers will attach to all the filetypes it supports.
---     filetypes = { "typescript", "typescriptreact" },
---   },
--- }
-
--- -- set additional linters
--- local linters = require "lvim.lsp.null-ls.linters"
--- linters.setup {
---   { command = "flake8", filetypes = { "python" } },
---   {
---     -- each linter accepts a list of options identical to https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md#Configuration
---     command = "shellcheck",
---     ---@usage arguments to pass to the formatter
---     -- these cannot contain whitespaces, options such as `--line-width 80` become either `{'--line-width', '80'}` or `{'--line-width=80'}`
---     extra_args = { "--severity", "warning" },
---   },
---   {
---     command = "codespell",
---     ---@usage specify which filetypes to enable. By default a providers will attach to all the filetypes it supports.
---     filetypes = { "javascript", "python" },
---   },
--- }
 
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
 -- vim.api.nvim_create_autocmd("BufEnter", {
