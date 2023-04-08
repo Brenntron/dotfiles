@@ -77,6 +77,20 @@ lvim.plugins = {
         require("trouble").setup {}
       end
     },
+    -- automatically install all the formatters and linters specified by the following
+    -- config options:
+    -- * linters.setup
+    -- * formatters.setup
+    { "jayp0521/mason-null-ls.nvim",
+     config = function()
+      require("mason-null-ls").setup({
+       automatic_installation = false,
+       automatic_setup = true,
+       ensure_installed = nil,
+      })
+      require("mason-null-ls").setup_handlers()
+     end,
+    },
     {'Mofiqul/dracula.nvim'},
     {
       "nvim-telescope/telescope-fzy-native.nvim",
@@ -199,16 +213,56 @@ lvim.builtin.treesitter.ensure_installed = {
 lvim.builtin.treesitter.ignore_install = { "haskell" }
 lvim.builtin.treesitter.highlight.enable = true
 
+-- Add additional languages
+require("mason-lspconfig").setup({
+  ensure_installed = {
+    "bashls",
+    "cssls",
+    "dockerls",
+    "grammarly",
+    "html",
+    "jsonls",
+    "sumneko_lua",
+    "marksman",
+    "pyright",
+    "pylsp",
+    "solargraph",
+    "sqlls",
+    "yamlls"
+  }
+})
+
 -- Telescope plugin update
 lvim.builtin.telescope.on_config_done = function(telescope)
   pcall(telescope.load_extension, "fzy_native")
   -- any other extensions loading
 end
 
+-- Custom linter and formatter for null-ls
+local formatters = require "lvim.lsp.null-ls.formatters"
+local linters = require "lvim.lsp.null-ls.linters"
+
+formatters.setup {
+  { command = "coffeelint", filetypes = { "coffeelint" } },
+}
+
+linters.setup {
+  { command = "coffeelint", filetypes = { "coffeescript" } },
+  { command = "shellcheck", extra_args = { "--severity", "warning" }, },
+  { command = "codespell", filetypes = { "javascript", "python" }, },
+}
+
 -- generic options
 vim.opt.clipboard = "unnamedplus" -- allows neovim to access the system clipboard
 vim.opt.tabstop = 2 -- insert 2 spaces for a tab
 vim.opt.relativenumber = true -- set relative numbered lines
+
+-- add filetypes
+vim.filetype.add {
+ extension = {
+   coffee = 'coffeescript',
+ },
+}
 
 -- generic LSP settings
 
