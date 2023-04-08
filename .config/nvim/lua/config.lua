@@ -91,8 +91,7 @@ require("mason-lspconfig").setup {
 
 local lspz = require('lsp-zero').preset({})
 
-lspz.on_attach(
-    function(_, bufnr) lspz.default_keymaps({buffer = bufnr}) end)
+lspz.on_attach(function(_, bufnr) lspz.default_keymaps({buffer = bufnr}) end)
 
 lspz.format_mapping('gq', {
     format_opts = {async = false, timeout_ms = 10000},
@@ -103,6 +102,7 @@ lspz.set_sign_icons({error = '✘', warn = '▲', hint = '⚑', info = '»'})
 
 -- lsp config
 local servers = {
+    codespell = {},
     coffeesense = {},
     cssls = {},
     cucumber_language_server = {},
@@ -110,7 +110,9 @@ local servers = {
     dockerls = {},
     eslint = {},
     html = {},
-    lua_ls = lspz.nvim_lua_ls(),
+    lua_ls = lspz.nvim_lua_ls({
+        settings = {Lua = {diagnostics = {globals = {'vim'}}}}
+    }),
     pyright = {},
     rubocop = {},
     solargraph = {},
