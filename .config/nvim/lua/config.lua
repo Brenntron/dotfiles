@@ -102,7 +102,6 @@ lspz.set_sign_icons({error = '✘', warn = '▲', hint = '⚑', info = '»'})
 
 -- lsp config
 local servers = {
-    codespell = {},
     coffeesense = {},
     cssls = {},
     cucumber_language_server = {},
@@ -114,11 +113,8 @@ local servers = {
         settings = {Lua = {diagnostics = {globals = {'vim'}}}}
     }),
     pyright = {},
-    rubocop = {},
     solargraph = {},
     sqlls = {},
-    stylelint_lsp = {},
-    yamlls = {}
 }
 
 -- Actually setup the language servers so that they're available for our
@@ -147,8 +143,8 @@ require("mason-null-ls").setup({
     automatic_installation = true,
     automatic_setup = true,
     ensure_installed = {
-        "erb-lint", "eslint-lsp", "haml-lint", "jq", "jsonlint", "luacheck",
-        "luaformatter", "marksman", "misspell", "pylint", "rubocop", "sqlfluff",
+        "erb-lint", "eslint-lsp", "haml-lint", "jq", "luaformatter",
+        "marksman", "misspell", "pylint", "rubocop", "sqlfluff",
         "stylelint-lsp", "yamllint"
     }
 })
@@ -158,20 +154,22 @@ local null_ls = require("null-ls")
 null_ls.setup({
     sources = {
         -- code actions
-        null_ls.builtins.code_actions.refactoring, -- completions
+        null_ls.builtins.code_actions.refactoring,
+        -- completions
         null_ls.builtins.completion.spell, null_ls.builtins.completion.tags,
         -- diagnostics
         null_ls.builtins.diagnostics.codespell,
-        null_ls.builtins.diagnostics.credo, null_ls.builtins.diagnostics.jshint,
         null_ls.builtins.diagnostics.tidy, null_ls.builtins.diagnostics.vint,
-        null_ls.builtins.diagnostics.zsh, -- formatting
+        null_ls.builtins.diagnostics.zsh,
+        -- formatting
         null_ls.builtins.formatting.codespell,
         null_ls.builtins.formatting.erb_format,
         null_ls.builtins.formatting.htmlbeautifier,
         null_ls.builtins.formatting.mix,
         null_ls.builtins.formatting.prettier_eslint,
         null_ls.builtins.formatting.tidy,
-        null_ls.builtins.formatting.trim_whitespace, -- hover
+        null_ls.builtins.formatting.trim_whitespace,
+        -- hover
         null_ls.builtins.hover.dictionary, null_ls.builtins.hover.printenv
     }
 })
