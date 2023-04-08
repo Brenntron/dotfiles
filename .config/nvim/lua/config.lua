@@ -5,6 +5,71 @@ vim.g.loaded_netrwPlugin = 1
 -- set termguicolors to enable highlight groups
 vim.opt.termguicolors = true
 
+-- Set up nvim-cmp.
+require("nvim-autopairs").setup {}
+
+local cmp = require 'cmp'
+local cmp_action = require('lsp-zero').cmp_action()
+
+cmp.setup({
+    mapping = cmp.mapping.preset.insert({
+        ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+        ['<C-f>'] = cmp_action.luasnip_jump_forward(),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-e>'] = cmp.mapping.abort(),
+        -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+        ['<CR>'] = cmp.mapping.confirm({select = true})
+    }),
+    sources = {
+        {name = 'path', option = {trailing_slash = true}}, {name = 'nvim_lsp'},
+        {name = 'buffer', keyword_length = 3},
+        {name = 'luasnip', keyword_length = 2}
+    }
+})
+
+-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline({'/', '?'}, {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {{name = 'buffer'}}
+})
+
+-- Setup nvim-autopairs
+local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+local npairs = require("nvim-autopairs")
+local Rule = require('nvim-autopairs.rule')
+local ts_conds = require('nvim-autopairs.ts-conds')
+
+require('nvim-autopairs').setup()
+
+cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+
+npairs.setup({check_ts = true, fast_wrap = {}})
+
+-- press % => %% only while inside a comment or string
+npairs.add_rules({
+    Rule("%", "%", "lua"):with_pair(ts_conds.is_ts_node({'string', 'comment'})),
+    Rule("$", "$", "lua"):with_pair(ts_conds.is_not_ts_node({'function'}))
+})
+
+-- Set configuration for specific filetype.
+cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+        {name = 'cmp_git'} -- You can specify the `cmp_git` source if you were installed it.
+    }, {{name = 'buffer'}})
+})
+
+-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline({'/', '?'}, {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {{name = 'buffer'}}
+})
+
+-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({{name = 'path'}}, {{name = 'cmdline'}})
+})
+
 -- Mason and Mason-lspconfig setup
 -- makes sure the language servers configured later with lspconfig are
 -- actually available, and install them automatically if they're not
@@ -27,19 +92,14 @@ require("mason-lspconfig").setup {
 local lspz = require('lsp-zero').preset({})
 
 lspz.on_attach(
-    function(client, bufnr) lspz.default_keymaps({buffer = bufnr}) end)
+    function(_, bufnr) lspz.default_keymaps({buffer = bufnr}) end)
 
 lspz.format_mapping('gq', {
     format_opts = {async = false, timeout_ms = 10000},
     servers = {['null-ls'] = {'css', 'javascript', 'lua', 'ruby', 'scss'}}
 })
 
-lspz.set_sign_icons({
-  error = '✘',
-  warn = '▲',
-  hint = '⚑',
-  info = '»'
-})
+lspz.set_sign_icons({error = '✘', warn = '▲', hint = '⚑', info = '»'})
 
 -- lsp config
 local servers = {
@@ -128,73 +188,6 @@ require'mason-null-ls'.setup_handlers {
     end
 }
 
--- Set up nvim-cmp.
-require("nvim-autopairs").setup {}
-
-local cmp = require 'cmp'
-local cmp_action = require('lsp-zero').cmp_action()
-
-cmp.setup({
-    mapping = cmp.mapping.preset.insert({
-        ['<C-b>'] = cmp_action.luasnip_jump_backward(),
-        ['<C-f>'] = cmp_action.luasnip_jump_forward(),
-        ['<C-Space>'] = cmp.mapping.complete(),
-        ['<C-e>'] = cmp.mapping.abort(),
-        -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-        ['<CR>'] = cmp.mapping.confirm({select = true})
-    }),
-    sources = {
-        {name = 'path'}, {name = 'nvim_lsp'},
-        {name = 'buffer', keyword_length = 3},
-        {name = 'luasnip', keyword_length = 2}
-    }
-})
-
--- Setup nvim-autopairs
-local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-local npairs = require("nvim-autopairs")
-local Rule = require('nvim-autopairs.rule')
-local ts_conds = require('nvim-autopairs.ts-conds')
-
-require('nvim-autopairs').setup()
-
-cmp.event:on(
-  'confirm_done',
-  cmp_autopairs.on_confirm_done()
-)
-
-npairs.setup({
-    check_ts = true,
-    fast_wrap = {}
-})
-
--- press % => %% only while inside a comment or string
-npairs.add_rules({
-  Rule("%", "%", "lua")
-    :with_pair(ts_conds.is_ts_node({'string','comment'})),
-  Rule("$", "$", "lua")
-    :with_pair(ts_conds.is_not_ts_node({'function'}))
-})
-
--- Set configuration for specific filetype.
-cmp.setup.filetype('gitcommit', {
-    sources = cmp.config.sources({
-        {name = 'cmp_git'} -- You can specify the `cmp_git` source if you were installed it.
-    }, {{name = 'buffer'}})
-})
-
--- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline({'/', '?'}, {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = {{name = 'buffer'}}
-})
-
--- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline(':', {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = cmp.config.sources({{name = 'path'}}, {{name = 'cmdline'}})
-})
-
 -- Setup Commenter
 require('comment').setup()
 
@@ -204,12 +197,8 @@ require("nvim-tree").setup({filters = {dotfiles = true}})
 
 -- Setup nvim-treesitter
 require'nvim-treesitter.configs'.setup {
-    autotag = {
-        enable = true
-    },
-    endwise = {
-        enable = true
-    },
+    autotag = {enable = true},
+    endwise = {enable = true},
     -- A list of parser names, or "all"
     ensure_installed = {
         "css", "comment", "dockerfile", "elixir", "gitattributes", "gitignore",
