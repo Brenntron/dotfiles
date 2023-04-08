@@ -236,7 +236,6 @@ export CFLAGS="-O2 -g -fno-stack-check"
 export KERL_CONFIGURE_OPTIONS="--disable-hipe --with-ssl=$(brew --prefix openssl)"
 
 . ~/.asdf/plugins/java/set-java-home.zsh
-. /usr/local/opt/asdf/libexec/asdf.sh
 
 if [ -x "$(command -v exa)" ]; then
     alias ls="exa"
