@@ -246,6 +246,7 @@ export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
 
 export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
 export PATH="/usr/local/opt/openssl@3/bin:$PATH"
+export PATH="${HOME}/.local/bin:$PATH"
 
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 export RUBY_CONFIGURE_OPTS="--enable-shared --with-openssl-dir=$(brew --prefix openssl@1.1) --with-libyaml-dir=$(brew --prefix libyaml)"
