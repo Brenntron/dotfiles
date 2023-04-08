@@ -163,24 +163,25 @@ ZSH_HIGHLIGHT_STYLES[arg0]='fg=#F8F8F2'
 ZSH_HIGHLIGHT_STYLES[default]='fg=#F8F8F2'
 ZSH_HIGHLIGHT_STYLES[cursor]='standout'
 
-
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
+  aliases
   asdf
   brew
   bundler
-  docker-compose
   docker
+  docker-compose
   fzf
+  gh
   git
+  rails
   ruby
   thefuck
   yarn
-  zsh-syntax-highlighting
 )
 
 ssh-add --apple-use-keychain
@@ -253,3 +254,5 @@ export RUBY_EXTRA_CONFIGURE_OPTIONS="--enable-shared"
 export PATH="/usr/local/sbin:$PATH"
 export XDG_CONFIG_HOME="${HOME}/.config"
 export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
+
+source "${HOME}/zsh-syntax-highlighting/zsh-syntax-highlighting.sh"
