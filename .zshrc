@@ -255,4 +255,4 @@ export PATH="/usr/local/sbin:$PATH"
 export XDG_CONFIG_HOME="${HOME}/.config"
 export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
 
-source "${HOME}/zsh-syntax-highlighting/zsh-syntax-highlighting.sh"
+source "$(brew --prefix zsh-syntax-highlighting)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
