@@ -11,7 +11,12 @@ an executable
 -- general
 lvim.log.level = "warn"
 lvim.format_on_save.enabled = false
-lvim.colorscheme = "tokyonight-moon"
+-- lvim.colorscheme = "tokyonight"
+
+-- Change theme settings
+lvim.builtin.theme.tokyonight.options.dim_inactive = true
+lvim.builtin.theme.tokyonight.options.style = "moon"
+--
 -- to disable icons and use a minimalist setup, uncomment the following
 -- lvim.use_icons = false
 
@@ -44,21 +49,22 @@ lvim.keys.normal_mode["<C-s>"] = ":w<cr>"
 --   },
 -- }
 
--- Change theme settings
--- lvim.builtin.theme.options.dim_inactive = true
--- lvim.builtin.theme.options.style = "storm"
-
 -- Use which-key to add extra bindings with the leader-key prefix
 -- lvim.builtin.which_key.mappings["P"] = { "<cmd>Telescope projects<CR>", "Projects" }
--- lvim.builtin.which_key.mappings["t"] = {
---   name = "+Trouble",
---   r = { "<cmd>Trouble lsp_references<cr>", "References" },
---   f = { "<cmd>Trouble lsp_definitions<cr>", "Definitions" },
---   d = { "<cmd>Trouble document_diagnostics<cr>", "Diagnostics" },
---   q = { "<cmd>Trouble quickfix<cr>", "QuickFix" },
---   l = { "<cmd>Trouble loclist<cr>", "LocationList" },
---   w = { "<cmd>Trouble workspace_diagnostics<cr>", "Workspace Diagnostics" },
--- }
+lvim.builtin.which_key.mappings["t"] = {
+  name = "+Trouble",
+  r = { "<cmd>Trouble lsp_references<cr>", "References" },
+  f = { "<cmd>Trouble lsp_definitions<cr>", "Definitions" },
+  d = { "<cmd>Trouble document_diagnostics<cr>", "Diagnostics" },
+  q = { "<cmd>Trouble quickfix<cr>", "QuickFix" },
+  l = { "<cmd>Trouble loclist<cr>", "LocationList" },
+  w = { "<cmd>Trouble workspace_diagnostics<cr>", "Workspace Diagnostics" },
+}
+
+-- Spectre keybinds
+lvim.builtin.which_key.mappings['S'] = {'<cmd>lua require("spectre").open()<CR>', "Open Spectre"}
+lvim.builtin.which_key.mappings['sw'] = {'<cmd>lua require("spectre").open_visual({select_word=true})<CR>', "Search current word"}
+lvim.builtin.which_key.mappings['sp'] = {'<cmd>lua require("spectre").open_file_search({select_word=true})<CR>', "Search on current file"}
 
 -- Additional Plugins
 lvim.plugins = {
@@ -69,7 +75,6 @@ lvim.plugins = {
         require("lsp-rooter").setup()
       end,
     },
-    {'folke/tokyonight.nvim'},
     {
       "folke/trouble.nvim",
       cmd = "TroubleToggle",
@@ -172,6 +177,13 @@ lvim.plugins = {
       }
     },
     {
+      "windwp/nvim-spectre",
+      event = "BufRead",
+      config = function()
+        require("spectre").setup()
+      end,
+    },
+    {
       "windwp/nvim-ts-autotag",
       config = function()
         require("nvim-ts-autotag").setup()
@@ -242,7 +254,7 @@ lvim.builtin.telescope.on_config_done = function(telescope)
 end
 
 -- Custom linter and formatter for null-ls
-local formatters = require "lvim.lsp.null-ls.formatters"
+-- local formatters = require "lvim.lsp.null-ls.formatters"
 local linters = require "lvim.lsp.null-ls.linters"
 
 linters.setup {
@@ -265,13 +277,13 @@ vim.filetype.add {
 
 -- generic LSP settings
 
--- -- make sure server will always be installed even if the server is in skipped_servers list
+-- make sure server will always be installed even if the server is in skipped_servers list
 lvim.lsp.installer.setup.ensure_installed = {
     "sumneko_lua",
     "jsonls",
 }
--- -- change UI setting of `LspInstallInfo`
--- -- see <https://github.com/williamboman/nvim-lsp-installer#default-configuration>
+-- change UI setting of `LspInstallInfo`
+-- see <https://github.com/williamboman/nvim-lsp-installer#default-configuration>
 lvim.lsp.installer.setup.ui.check_outdated_servers_on_open = false
 lvim.lsp.installer.setup.ui.border = "rounded"
 lvim.lsp.installer.setup.ui.keymaps = {
@@ -279,7 +291,7 @@ lvim.lsp.installer.setup.ui.keymaps = {
     toggle_server_expand = "o",
 }
 
--- ---@usage disable automatic installation of servers
+---@usage disable automatic installation of servers
 lvim.lsp.installer.setup.automatic_installation = false
 
 -- ---configure a server manually. !!Requires `:LvimCacheReset` to take effect!!
