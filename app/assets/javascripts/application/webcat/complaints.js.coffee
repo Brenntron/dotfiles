@@ -113,6 +113,10 @@ window.build_imports_table = () ->
             html += '<button class="inline-retry-button retry-button tooltipped tooltipstered" title="Retry"></button>'
 
           return html
+      },
+      {
+        data: 'status'
+        visible: false
       }
     ]
   )
