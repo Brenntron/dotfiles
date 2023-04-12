@@ -1,6 +1,6 @@
-.row.complaints-metrics-banner
+.complaints-metrics-banner
   // middle column
-  .main-metrics.hidden
+  .main-metrics
     .metrics-col
       %span.metric-header#allTalosTickets
         %a{href: '?f=ALL%20TALOS'} TALOS:
@@ -60,7 +60,7 @@
     %tr
       %td Total Attempted
       %td
-        #wbnp-report-attempted
+        #wbnp-report-attempted=@wbnp_new_count
     %tr
       %td Number Succeeded
       %td
@@ -76,7 +76,7 @@
 
 
 -# below gets shown on webcat/reports page
-.row.webcat-reports-only.hidden
+.row.hidden.webcat-reports-only
   .col-xs-3.col-sm-3.col-md-2
     %table.tickets-totals-table.table-condensed
       %tr

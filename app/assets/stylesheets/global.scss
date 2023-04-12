@@ -706,7 +706,9 @@ button {
   margin-left: 7px;
   position: absolute;
 }
-
+.webcat-reports-toolbar{
+  margin-bottom: -35px;
+}
 .toolbar-button-animated.active {
   background-color: $bug-accent-color;
   color: $content-bg-color;
@@ -1899,15 +1901,6 @@ form select#bug_priority {
   font-weight: 600;
   float: right;
   margin-top: 10px;
-  font-size: 8pt;
-}
-
-.required:before {
-  content: '*';
-  color: $user-section-color;
-  font-weight: 600;
-  left: -10px;
-  position: absolute;
   font-size: 8pt;
 }
 
@@ -7037,13 +7030,17 @@ table.dispute_tool_current tr:last-of-type td {
     h1{color: $content-bg-color!important;}
     .top-info-icon{ padding-right: 55px;}
   }
-  .complaint-mgt-top-area{
-    color: $type-base-color;
-    background-color: $content-bg-color;;
-    padding: 15px;
-    border-radius: 0 4px 0 0;
-    margin-right: -15px ;
-  }
+}
+.complaints-metrics-banner{
+  background-color: $sidebar-nav-base;
+  color: $content-bg-color;
+}
+.complaint-mgt-top-area{
+  //color: $content-bg-color;
+  background-color: $content-bg-color;
+  padding: 15px;
+  border-radius: 0 4px 0 0;
+  margin-right: -15px ;
 }
 
 .dashboard-header-area {
@@ -13624,7 +13621,6 @@ table > tbody > tr > td.no-padding {
 .ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
 }
-
 .webcat-reports-only {
   .table-condensed > tbody > tr > td {
     padding: 3px 4px !important; // need override

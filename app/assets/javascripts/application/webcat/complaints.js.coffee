@@ -14,6 +14,7 @@ webcat_loader_timeout = ''
 
 $(document).ready ->
   if window.location.pathname == '/escalations/webcat/reports'
+    $('.webcat-reports-only').removeClass('hidden')
     std_msg_ajax(
       method: 'GET'
       url: "/escalations/api/v1/escalations/jira_import_tasks"
@@ -204,8 +205,6 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
     data: data
     success: (response) ->
       # Turn off loader indicator
-      $('.wbnp-loading-spinner').hide()
-
       if full_report == true
         # Clear old data
         $('.wbnp-status').empty();
@@ -218,6 +217,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
         currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
 
         # Add current report info to top bar report area
+        console.log curr_report
         $('.wbnp-report-status').text(curr_report.status)
         $('#wbnp-report-attempted').text(curr_report.total_new_cases)
         $('#wbnp-report-succeeded').text(curr_report.cases_imported)
