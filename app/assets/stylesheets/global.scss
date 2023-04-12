@@ -7041,8 +7041,10 @@ table.dispute_tool_current tr:last-of-type td {
   }
 }
 .complaints-metrics-banner{
-  background-color: $sidebar-nav-base;
+  background-color: $content-tab-color;
   color: $content-bg-color;
+  margin: -30px -15px -30px -30px;
+  border-radius: 4px 4px 0 0;
 }
 .complaint-mgt-top-area{
   //color: $content-bg-color;
