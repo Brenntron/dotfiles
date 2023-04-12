@@ -165,9 +165,8 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/wbnp_report_status"
     data: data
     success: (response) ->
-      # Turn off loader indicator
       $('.wbnp-loading-spinner').hide()
-
+      # Turn off loader indicator
       if full_report == true
         # Clear old data
         $('.wbnp-status').empty();
@@ -180,6 +179,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
         currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
 
         # Add current report info to top bar report area
+
         $('.wbnp-report-status').text(curr_report.status)
         $('#wbnp-report-attempted').text(curr_report.total_new_cases)
         $('#wbnp-report-succeeded').text(curr_report.cases_imported)
@@ -231,7 +231,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 
 
       else
-        curr_report = response.data
+        curr_report = response.data[0]
         currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
         # Add current report info to top bar report area
         $('.wbnp-report-status').text(curr_report.status)
@@ -311,9 +311,8 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
-        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.queryWhoIs(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Lookup</button>')
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.whoIsLookups(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Whois</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
-        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
     error: (response) ->
       std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
 
@@ -926,7 +925,7 @@ window.take_selected = ()->
 
 
 
-$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+$(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
   rows = $('#complaints-index').DataTable().rows('.selected').data()
   reopened = false
   invalid_unchanged = false
@@ -1186,7 +1185,7 @@ window.retrieve_history = (position) ->
   for url_position in [1..5]
     $("#url_#{url_position}").css("border-width", "")
     $("#url_#{url_position}").css("border-color", "")
-  
+
   url = $("#url_" + position).val()
 
   if url.length > 0
@@ -1585,9 +1584,8 @@ format = (complaint_entry_row) ->
       '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="lookup-' + entry_id+ '" data-fqdn="' + lookup_val + '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + lookup_val+ '\')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + entry_id + '" onclick="history_dialog(' + entry_id  + ',\'' + url + '\')">History</button><br/>' +
-      '<button class="secondary" id="domain-' + entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+      '<button class="secondary" id="domain-' + entry_id + '" onclick="WebCat.RepLookup.whoIsLookups(\'' + whois_lookup + '\')">Whois</domain>' +
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-4 nested-complaint-editable-data">' +
       '<div class="row">' +
@@ -1760,8 +1758,8 @@ window.get_xbrs_history = (url, tab) ->
       if response.data.length < 1
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
-        
-        
+
+
         $(xbrs_table).append(document.createElement('thead'))
         $(xbrs_table).append(document.createElement('tbody'))
         thead = $(xbrs_table).find('thead')
@@ -1772,7 +1770,7 @@ window.get_xbrs_history = (url, tab) ->
         thead_row = ''
 
         table_headers.forEach (header)->
-          thead_row += "<th> #{header}</th>"       
+          thead_row += "<th> #{header}</th>"
         thead.append(thead_row)
 
         response.data.forEach (row)->
@@ -1782,7 +1780,7 @@ window.get_xbrs_history = (url, tab) ->
             data_row += "<td>#{value || '-'}</td>"
 
           tbody.append("<tr>#{data_row}</tr>")
-          
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -2450,15 +2448,20 @@ $ ->
                 $(button).hide()
 
 
-  $('#complaints_check_box').click ->
-    if $('#complaints_check_box').prop('checked')
+  $('#complaints_check_box, #complaints_select_all').click ->
+    checked = $(this).prop('checked')
+
+    if checked
       $('#complaints-index').DataTable().rows( { page: 'current' } ).select()
     else
       $('#complaints-index').DataTable().rows().deselect()
+
+    $("#complaints_check_box").prop('checked', checked)
+    $("#complaints_select_all").prop('checked', checked)
     return
 
   $(document).ready ->
-    if (window.location.pathname != '/escalations/webcat/complaints' && window.location.pathname != '/escalations/webcat/research')
+    if !window.location.pathname.includes('/escalations/webcat')
       $('#filter-complaints-nav').hide()
       $('#fetch').hide()
       $('#complaints-nav-search-wrapper').hide()
@@ -2504,7 +2507,7 @@ $ ->
 
 # Convert webcat to webrep
 # Enable / disable button to attempt based on if anything is selected
-$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+$(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
   if $('tr.selected').length == 1
     $('#convert-ticket-button').removeAttr('disabled')
   else

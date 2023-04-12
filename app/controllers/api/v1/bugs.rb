@@ -607,7 +607,7 @@ module API
 
                         if note.present?
                           comment = "bugzilla comment is blank" if comment.blank?
-                          note.update_attributes(author: c['author'],
+                          note.update(author: c['author'],
                                                  comment: comment,
                                                  bug_id: bug_id,
                                                  note_type: note_type,
