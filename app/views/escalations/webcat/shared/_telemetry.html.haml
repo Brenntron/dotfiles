@@ -102,7 +102,7 @@
 
   %table.tickets-totals-table.table-condensed.col-with-divider
     %tr
-      %th
+      %th{colspan: '2'}
         %span.data-report-label Complaints
     %tbody
       - @complaints_reports.each do |type, val|
@@ -112,8 +112,9 @@
 
   %table.tickets-totals-table.table-condensed.col-with-divider
     %tr
-      %th{colspan: '2'}
+      %th
         %span.data-report-label WBNP Reports
+      %th.content-td.wbnp-report-status
     %tbody
       %tr
         %td.header-td Total Attempted

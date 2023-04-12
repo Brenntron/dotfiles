@@ -7040,7 +7040,6 @@ table.dispute_tool_current tr:last-of-type td {
   .header-content{
     padding-top: 15px;
     display: flex;
-    flex-direction: column;
     h1{color: $content-bg-color!important;}
     .top-info-icon{
       padding-right: 40px;
@@ -13676,19 +13675,6 @@ table > tbody > tr > td.no-padding {
 .ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
 }
-.icon-div{
-  display: flex;
-}
-.metric-div{
-  color: $type-lightest;
-  padding: 10px 0 0 10px;
-  .metric-label{
-    font-size: 7pt;
-  }
-  .wbnp-report-status{
-    font-size: 12pt;
-  }
-}
 
 .webcat-reports-only {
   display: flex;
@@ -13702,6 +13688,9 @@ table > tbody > tr > td.no-padding {
     width: 110px;
     color: $table-dark-body;
     white-space: nowrap;
+  }
+  .content-td{
+    font-weight: 400!important;
   }
   .tickets-totals-table{
     margin-left: 10px;
