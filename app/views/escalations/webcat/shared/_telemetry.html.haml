@@ -78,7 +78,7 @@
 -# below gets shown on webcat/reports page
 .row.hidden.webcat-reports-only
   .col-xs-3.col-sm-3.col-md-2
-    %table.tickets-totals-table.table-condensed
+    %table.tickets-totals-table.table-condensed.col-with-divider
       %tr
         %th{colspan: '2'}
           %span.ticket-type-label Submitter Type
@@ -89,7 +89,7 @@
             %td=val
 
   .col-xs-3.col-sm-2.col-md-2
-    %table.tickets-totals-table.table-condensed
+    %table.tickets-totals-table.table-condensed.col-with-divider
       %tr
         %th{colspan: '2'}
           %span.ticket-type-label Entries
@@ -100,7 +100,7 @@
 
 
   .col-xs-3.col-sm-2.col-md-2
-    %table.tickets-totals-table.table-condensed
+    %table.tickets-totals-table.table-condensed.col-with-divider
       %tr
         %th
           %span.ticket-type-label Complaints
@@ -109,7 +109,7 @@
           %td=type
           %td=val
   .col-xs-3.col-sm-3.col-md-2
-    %table.tickets-totals-table.table-condensed
+    %table.tickets-totals-table.table-condensed.col-with-divider
       %tr
         %th{colspan: '2'}
           %span.ticket-type-label WBNP Reports
@@ -130,7 +130,7 @@
         %td#wbnp-full-report-skipped
 
   .col-xs-3.col-sm-2.col-md-2
-    %table.tickets-totals-table.table-condensed
+    %table.tickets-totals-table.table-condensed.col-with-divider
       %tr
         %th{colspan: '2'}
           %span.ticket-type-label Jira Imports

@@ -7031,7 +7031,7 @@ table.dispute_tool_current tr:last-of-type td {
 .webcat-reports-top-content{
   background-color: $content-tab-color;
   margin: -15px;
-  border-radius: 4px 4px 0 0;
+  border-radius: 4px;
   .header-content{
     padding-top: 15px;
     display: flex;
@@ -7047,7 +7047,7 @@ table.dispute_tool_current tr:last-of-type td {
   //color: $content-bg-color;
   background-color: $content-bg-color;
   padding: 15px;
-  border-radius: 0 4px 0 0;
+  border-radius: 0 4px 4px 0;
   margin-right: -15px ;
 }
 
@@ -7121,7 +7121,9 @@ table.dispute_tool_current tr:last-of-type td {
   font-weight: 300;
   font-size: 10pt;
 }
-
+.active-view{
+  background-color:#E0F1F7;
+}
 .ticket-type-label {
   font-weight: 700;
   font-size: 9pt;
