@@ -153,6 +153,7 @@ $ ->
     catch e
       webcat_search_conditions = {}
 
+    localStorage.webcat_search_type = 'advanced'
     webcat_search_conditions.tags = tag
 
     localStorage.webcat_search_conditions = JSON.stringify webcat_search_conditions
