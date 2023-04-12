@@ -238,7 +238,7 @@
               Written by
               %span.author-username
                 =comment.user.cvs_username
-              = distance_of_time_in_words(Time.now, comment.created_at) + " ago."
+              = distance_of_time_in_words(Time.now, comment.created_at, false, highest_measure_only: true) + " ago."
             %br.hidden-break
             .note-info-item.time-stamp
               = format_timestamp(comment.created_at)
@@ -246,7 +246,8 @@
               %button.hidden.note-save-button.update-note{class: "note-save-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
-              %button.note-delete-button{comment_id: "#{comment.id}"}
+              - if comment.user.cvs_username == current_user.cvs_username
+                %button.note-delete-button{comment_id: "#{comment.id}"}
 
         .row
           .col-xs-12

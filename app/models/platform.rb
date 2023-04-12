@@ -43,7 +43,7 @@ class Platform < ApplicationRecord
       platform = Platform.new(payload)
       platform.save
     else
-      platform.update_attributes(payload)
+      platform.update(payload)
     end
 
   end

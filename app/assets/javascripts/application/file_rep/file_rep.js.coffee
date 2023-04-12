@@ -1,4 +1,7 @@
 $(document).on 'ready',->
+  $('#advanced-search-button').click ->
+    $('#advanced-search-dropdown').show()
+
   if $('#auto-resolve-dialog').length > 0
     $('#auto-resolve-dialog').dialog({
       autoOpen : false
@@ -214,6 +217,11 @@ $ ->
   sorting_request = false
   time_submitted = ''
   last_updated = ''
+  if localStorage.search_conditions?
+    search_conditions = JSON.parse(localStorage.search_conditions)
+    time_submitted = search_conditions['created_at'] || ''
+    last_updated = search_conditions['updated_at'] || ''
+
   sandbox_score = ''
   threatgrid_score = ''
 
@@ -375,9 +383,9 @@ $ ->
 
     if $('#tg-score-input').closest('.form-group').hasClass('.hidden')
       threatgrid_score = {}
-    if $('#sandbox_score-input').closest('.form-group').hasClass('.hidden')
+    if $('#sandbox-score-input').closest('.form-group').hasClass('.hidden')
       sandbox_score = {}
-    if $('time_submitted-input').closest('.form-group').hasClass('.hidden')
+    if $('time-submitted-input').closest('.form-group').hasClass('.hidden')
       last_updated = {}
     if $('last-updated-input').closest('.form-group').hasClass('.hidden')
       time_submitted = {}
@@ -402,6 +410,7 @@ $ ->
       sha256_hash: form.find('input[id="sha256-input"]').val()
       sample_type: form.find('input[id="sample-type-input"]').val()
       disposition: form.find('input[id="amp-disposition-input"]').val()
+      detection_last_set: form.find('input[id="amp-detection-created-input"]').val()
       disposition_suggested: form.find('input[id="suggested-disposition-input"]').val()
       sandbox_score: sandbox_score
       threatgrid_score: threatgrid_score
@@ -413,8 +422,7 @@ $ ->
       customer_name: form.find('input[id="customer-name-input"]').val()
       customer_email: form.find('input[id="customer-email-input"]').val()
       customer_company_name: form.find('input[id="customer-company-input"]').val()
-      platform_ids: form.find('input[id="platform-input"]').val()
-      platforms: platform_display.join(', ')
+      platforms: platform_display.join(',')
     )
 
     refresh_url()
@@ -969,16 +977,16 @@ $ ->
 
   $(document).on 'focus', '#time-submitted-input', (e) ->
     if time_submitted != ''
-      placeholder = time_submitted.to + ' - ' + time_submitted.from
+      placeholder = time_submitted.from + ' - ' + time_submitted.to
     else
-      placeholder = 'MM-DD-YYYY'
+      placeholder = AC.FileRep.daterangepickerFormat
     $('#time-submitted-input').attr('placeholder', placeholder)
 
-    $('#time-submitted-input').daterangepicker( {},
+    $('#time-submitted-input').daterangepicker( { locale: { format: AC.FileRep.daterangepickerFormat } },
       (start, end) ->
         time_submitted = {
-          from : start.format('YYYY-MM-DD')
-          to : end.format('YYYY-MM-DD')
+          from : start.format(AC.FileRep.daterangepickerFormat)
+          to : end.format(AC.FileRep.daterangepickerFormat)
         }
         $('#advanced-search-dropdown').show()
         $('#advanced-search-dropdown').css('display', 'block')
@@ -986,16 +994,16 @@ $ ->
 
   $(document).on 'focus', '#last-updated-input', () ->
     if last_updated != ''
-      placeholder = last_updated.to + ' - ' + last_updated.from
+      placeholder = last_updated.from + ' - ' + last_updated.to
     else
-      placeholder = 'MM-DD-YYYY'
+      placeholder = AC.FileRep.daterangepickerFormat
     $('#last-updated-input').attr('placeholder', placeholder)
 
-    $('#last-updated-input').daterangepicker( {},
+    $('#last-updated-input').daterangepicker( { locale: { format: AC.FileRep.daterangepickerFormat } },
       (start, end) ->
         last_updated = {
-          from : start.format('YYYY-MM-DD')
-          to : end.format('YYYY-MM-DD')
+          from : start.format(AC.FileRep.daterangepickerFormat)
+          to : end.format(AC.FileRep.daterangepickerFormat)
         }
     )
   $('#sandbox-score-input').slider(
@@ -1509,3 +1517,37 @@ $ ->
       $('#queue').attr('href', link)
 
   set_file_rep_link()
+
+  assignee_input = $('#assignee-input').selectize {
+    persist: true
+    create: false
+    valueField: 'name',
+    labelField: 'display_name',
+    searchField: ['name', 'display_name'],
+    options: AC.FileRep.createAssigneeOptions()
+    render:
+      option: (item, escape) ->
+        name = item.display_name
+        cvs_name = item.name
+        '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(cvs_name) + ')' + '</span></div>'
+    onFocus: () ->
+      window.toggle_selectize_layer(this, 'true')
+    onBlur: () ->
+      window.toggle_selectize_layer(this, 'false')
+  }
+
+  platforms_input = $('#platform-input').selectize {
+    persist: true
+    create: false
+    valueField: 'public_name',
+    labelField: 'public_name',
+    searchField: 'public_name',
+    options: AC.FileRep.createAssigneeOptions()
+    render:
+      option: (item, escape) ->
+       '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'
+    onFocus: () ->
+      window.toggle_selectize_layer(this, 'true')
+    onBlur: () ->
+      window.toggle_selectize_layer(this, 'false')
+  }

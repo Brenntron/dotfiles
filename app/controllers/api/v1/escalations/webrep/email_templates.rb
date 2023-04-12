@@ -29,7 +29,7 @@ module API
               authorize!(:update, EmailTemplate)
               template = EmailTemplate.find(permitted_params[:id])
               authorize!(:update, template)
-              template.update_attributes(permitted_params)
+              template.update(permitted_params)
             end
 
             desc "create an email template"

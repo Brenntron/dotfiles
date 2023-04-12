@@ -1,6 +1,6 @@
-.row.complaints-metrics-banner
+.complaints-metrics-banner
   // middle column
-  .main-metrics.hidden
+  .main-metrics
     .metrics-col
       %span.metric-header#allTalosTickets
         %a{href: '?f=ALL%20TALOS'} TALOS:
@@ -60,7 +60,7 @@
     %tr
       %td Total Attempted
       %td
-        #wbnp-report-attempted
+        #wbnp-report-attempted=@wbnp_new_count
     %tr
       %td Number Succeeded
       %td
@@ -76,61 +76,68 @@
 
 
 -# below gets shown on webcat/reports page
-.row.webcat-reports-only.hidden
-  .col-xs-3.col-sm-3.col-md-2
-    %table.tickets-totals-table.table-condensed
-      %tr
-        %th{colspan: '2'}
-          %span.ticket-type-label Submitter Type
-      %tbody
-        - @submitter_reports.each do |type, val|
-          %tr
-            %td=type
-            %td=val
+.row.hidden.webcat-reports-only
+  %table.tickets-totals-table.table-condensed
+    %tr
+      %th{colspan: '2'}
+        %span.ticket-type-label Submitter Type
+    %tbody.col-with-divider
+      - @submitter_reports.each do |type, val|
+        %tr
+          %td.header-td=type
+          %td.content-td=val
 
-  .col-xs-3.col-sm-2.col-md-2
-    %table.tickets-totals-table.table-condensed
-      %tr
-        %th{colspan: '2'}
-          %span.ticket-type-label Entries
+
+  %table.tickets-totals-table.table-condensed
+    %tr
+      %th{colspan: '2'}
+        %span.ticket-type-label Entries
+    %tbody.col-with-divider
       - @entries_reports.each do |type, val|
         %tr
-          %td=type
-          %td=val
+          %td.header-td=type
+          %td.content-td=val
 
 
-  .col-xs-3.col-sm-2.col-md-2
-    %table.tickets-totals-table.table-condensed
-      %tr
-        %th
-          %span.ticket-type-label Complaints
+
+  %table.tickets-totals-table.table-condensed
+    %tr
+      %th
+        %span.ticket-type-label Complaints
+    %tbody.col-with-divider
       - @complaints_reports.each do |type, val|
         %tr
-          %td=type
-          %td=val
-  .col-xs-3.col-sm-3.col-md-2
-    %table.tickets-totals-table.table-condensed
-      %tr
-        %th{colspan: '2'}
-          %span.ticket-type-label WBNP Reports
-      %tr
-        %td Status
-        %td.wbnp-report-status
-      %tr
-        %td Total Attempted
-        %td#wbnp-report-attempted
-      %tr
-        %td Number Succeeded
-        %td#wbnp-report-succeeded
-      %tr
-        %td Number Rejected
-        %td#wbnp-report-rejected
-      %tr
-        %td Number Skipped
-        %td#wbnp-full-report-skipped
+          %td.header-td=type
+          %td.content-td=val
 
-  .col-xs-3.col-sm-2.col-md-2
-    %table.tickets-totals-table.table-condensed
+  %table.tickets-totals-table.table-condensed
+    %tbody.col-with-divider
+    %tr
+      %th{colspan: '2'}
+        %span.ticket-type-label WBNP Reports
+    %tbody.col-with-divider
       %tr
-        %th{colspan: '2'}
-          %span.ticket-type-label Jira Imports
+        %td.header-td Status
+        %td.content-td.wbnp-report-status
+      %tr
+        %td.header-td Total Attempted
+        %td.content-td#wbnp-report-attempted
+      %tr
+        %td.header-td Number Succeeded
+        %td.content-td#wbnp-report-succeeded
+      %tr
+        %td.header-td Number Rejected
+        %td.content-td#wbnp-report-rejected
+      %tr
+        %td.header-td Number Skipped
+        %td.content-td#wbnp-full-report-skipped
+
+  %table.tickets-totals-table.table-condensed
+    %tr
+      %th{colspan: '2'}
+        %span.ticket-type-label Jira Imports
+    %tbody.col-with-divider
+      - @jira_reports.each do |type, val|
+        %tr
+          %td.header-td=type
+          %td.content-td=val
