@@ -207,6 +207,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/wbnp_report_status"
     data: data
     success: (response) ->
+      $('.wbnp-loading-spinner').hide()
       # Turn off loader indicator
       if full_report == true
         # Clear old data

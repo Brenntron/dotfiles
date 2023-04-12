@@ -31,10 +31,10 @@ class Escalations::WebcatController < ApplicationController
         overdue:  Complaint.overdue_count
     }
     @jira_reports ={
-        complete:Complaint.active_count,
-        failure:Complaint.completed_count,
-        skipped: Complaint.new_count,
-        "overall tries":  Complaint.overdue_count
+        complete:JiraImportTask.completed_count,
+        failure:JiraImportTask.failed_count,
+        pending: JiraImportTask.pending_count,
+        "overall tries":  JiraImportTask.total_count
     }
 
     @ti_new_count = ComplaintEntry.where(complaint_id: Complaint.from_ti).where(status:"NEW").count

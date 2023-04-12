@@ -7040,14 +7040,7 @@ table.dispute_tool_current tr:last-of-type td {
     .top-info-icon{ padding-right: 40px;}
   }
 }
-.complaints-metrics-banner{
-  background-color: $content-tab-color;
-  color: $content-bg-color;
-  margin: -30px -15px -30px -30px;
-  border-radius: 4px 4px 0 0;
-}
 .complaint-mgt-top-area{
-  //color: $content-bg-color;
   background-color: $content-bg-color;
   padding: 15px;
   border-radius: 0 4px 4px 0;
@@ -13401,6 +13394,12 @@ table > tbody > tr > td.no-padding {
 .complaints-metrics-banner {
   display: flex;  // handle vertical centering
   align-items: center;
+  background-color: $content-tab-color;
+  color: $content-bg-color;
+  margin: -30px -15px -30px -30px;
+  border-radius: 4px 4px 0 0;
+  padding: 15px 5px;
+
   h1 {
     margin-bottom: 2px;
     margin-right: 10px;
@@ -13426,7 +13425,7 @@ table > tbody > tr > td.no-padding {
     padding-right: 0;
   }
   .metrics-col {
-    padding: 4px 4px 4px 22px;
+    padding-right: 21px;
     max-width: 400px;
     display: inline-block;
     vertical-align: middle;
@@ -13477,7 +13476,6 @@ table > tbody > tr > td.no-padding {
     text-align: right;
     padding-left: 0;
     padding-right: 1vw;
-    padding-top: 2px;
     max-width: 300px;  // accommodate the loading spinner
     display: inline-block;
     .wbnp-report-status {
