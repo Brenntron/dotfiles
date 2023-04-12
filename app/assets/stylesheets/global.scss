@@ -7033,11 +7033,18 @@ table.dispute_tool_current tr:last-of-type td {
   background-color: $content-tab-color;
   margin: -15px;
   border-radius: 4px;
+  .metric-header{
+    text-transform: uppercase;
+    font-weight: 700;
+  }
   .header-content{
     padding-top: 15px;
     display: flex;
+    flex-direction: column;
     h1{color: $content-bg-color!important;}
-    .top-info-icon{ padding-right: 40px;}
+    .top-info-icon{
+      padding-right: 40px;
+      margin-left: 5px;}
   }
 }
 .complaint-mgt-top-area{
@@ -13668,15 +13675,6 @@ table > tbody > tr > td.no-padding {
   white-space: nowrap;
 }
 
-.ticket-type-label {
-  font-weight: 700;
-  font-size: 12px;
-  text-transform: uppercase;
-  padding-right: 4px;
-  color: $type-lighter-color;
-  padding-bottom: 5px;
-}
-
 .webcat-reports-only {
   display: flex;
   flex-wrap: wrap;
@@ -13686,6 +13684,7 @@ table > tbody > tr > td.no-padding {
   .header-td{
     text-transform: capitalize;
     font-weight: 600;
+    width: 110px;
     color: $table-dark-body;
     white-space: nowrap;
   }
