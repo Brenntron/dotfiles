@@ -13689,6 +13689,9 @@ table > tbody > tr > td.no-padding {
     color: $table-dark-body;
     white-space: nowrap;
   }
+  .wbnp-table .header-td{
+    width: 140px;
+  }
   .content-td{
     font-weight: 400!important;
   }
