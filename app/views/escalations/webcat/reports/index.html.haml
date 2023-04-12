@@ -1,11 +1,14 @@
 .content-wrapper
   .row.webcat-reports-top-content
     .col-xs-2.header-content
-      %span.icon-reports-white.top-info-icon
-      %h1 Reports
+      .icon-div
+        %span.icon-reports-white.top-info-icon
+        %h1 Reports
 
-      .metric-header WBNP Report Status:
-      .content-td.wbnp-report-status
+      .metric-div
+        .metric-label WBNP Status:
+        .wbnp-report-status
+
     .col-xs-10
       .complaint-mgt-top-area
         = render "escalations/webcat/shared/telemetry"

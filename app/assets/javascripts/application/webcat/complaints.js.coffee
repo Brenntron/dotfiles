@@ -22,8 +22,6 @@ $(document).ready ->
       data:''
       success:(response)->
         build_imports_table(response)
-
-
         console.log response
       error:(response)->
         console.log response
@@ -2503,7 +2501,7 @@ $ ->
     return
 
   $(document).ready ->
-    if (window.location.pathname != '/escalations/webcat/complaints' && window.location.pathname != '/escalations/webcat/research')
+    if !window.location.pathname.includes('/escalations/webcat')
       $('#filter-complaints-nav').hide()
       $('#fetch').hide()
       $('#complaints-nav-search-wrapper').hide()

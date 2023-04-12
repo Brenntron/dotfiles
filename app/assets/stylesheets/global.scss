@@ -9307,6 +9307,8 @@ td.text-center span {
 .cluster-mgt-top-area {
   background-color: $content-tab-color;
   padding-bottom: 20px;
+  border-radius: 4px 4px 0 0;
+  margin: -15px;
 }
 #wsa_statuses, #clusters-index_filter, #cluster_comment_field{
   &:empty{
@@ -13673,6 +13675,19 @@ table > tbody > tr > td.no-padding {
 // ensure text doesn't break/wrap in data table
 .ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
+}
+.icon-div{
+  display: flex;
+}
+.metric-div{
+  color: $type-lightest;
+  padding: 10px 0 0 10px;
+  .metric-label{
+    font-size: 7pt;
+  }
+  .wbnp-report-status{
+    font-size: 12pt;
+  }
 }
 
 .webcat-reports-only {
