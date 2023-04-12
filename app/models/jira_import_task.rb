@@ -47,6 +47,12 @@ class JiraImportTask < ApplicationRecord
   end
   handle_asynchronously :process_import, :queue => "process_jira_import", :priority => 1
 
+  def retry
+    return unless status == STATUS_FAILURE
+    update(status: nil, result: nil, imported_at: nil)
+    process_import
+  end
+
   def to_hash
     {
         issue_key: issue_key,
