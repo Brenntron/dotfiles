@@ -3,6 +3,11 @@ class JiraImportTask < ApplicationRecord
 
   validates :issue_key, presence: true, uniqueness: true
 
+  scope :total_count, -> { all.count }
+  scope :completed_count, -> { where(status: STATUS_COMPLETE).count }
+  scope :failed_count, -> { where(status: STATUS_FAILURE).count }
+  scope :pending_count, -> { where(status: STATUS_PENDING).count }
+
   STATUS_COMPLETE = "Complete"
   STATUS_FAILURE = "Failure"
   STATUS_PENDING = "Pending"
