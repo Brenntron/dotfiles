@@ -302,7 +302,7 @@ metz.move_to_child_of(nigel)
 
 
 User.all.each do |u|
-  u.update_attributes(class_level: 0)
+  u.update(class_level: 0)
 end
 
 # Reference.create(reference_data:"12345",reference_type: ref2)

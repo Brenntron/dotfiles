@@ -28,7 +28,7 @@ module API
 
             get "" do
 
-              customers = Customer.all.includes(:company).map{ |customer| "#{customer.name}"}
+              customers = Customer.all.pluck(:name)
               {:data => customers}
 
             end
@@ -70,7 +70,7 @@ module API
 
             get "" do
 
-              customers = Customer.all.includes(:company).map{ |customer| "#{customer.email}"}
+              customers = Customer.all.pluck(:email)
               {:data => customers}
 
             end

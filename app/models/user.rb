@@ -17,7 +17,7 @@ class User < ApplicationRecord
   has_many :webcat_credits
   has_many :sender_domain_reputation_dispute_comments
 
-  validates :cvs_username, presence: true, uniqueness: true
+  validates :cvs_username, presence: true, uniqueness: { case_sensitive: true }
 
   scope :has_cec, -> { where.not(cec_username: nil) }
   scope :not_user, ->(user_id) { where.not(id: user_id) }
