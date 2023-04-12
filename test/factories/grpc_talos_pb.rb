@@ -1,5 +1,6 @@
 require 'service-ipd_services_pb'
 require 'service-urs_services_pb'
+require 'enrich_pb'
 
 FactoryBot.define do
   factory :grpc_reputation_rule, class: Talos::ReputationRule do
@@ -45,7 +46,7 @@ FactoryBot.define do
     taxonomy_entry_id {1}
   end
 
-  factory :query_reply, class: Talos::ENRICH::QueryReply do
+  factory :query_reply, class: ::Talos::ENRICH::QueryReply do
     taxonomy_map_version {1}
     context_tags {Google::Protobuf::RepeatedField.new(:message, Talos::ContextTag, [build(:context_tag)])}
   end

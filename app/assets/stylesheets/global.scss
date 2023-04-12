@@ -873,13 +873,12 @@ button {
   background-image: url(image_path('icon_submit_arrow.svg'));
   background-color: $warning-accent-color;
 }
-.resolution-submit-button {background-image: url(image_path('icon_submit_arrow_grey.svg'));}
-.open .resolution-submit-button {background-image: url(image_path('icon_submit_arrow.svg'));}
-.resolution-submit-button:disabled, .master-submit-button:disabled {background-image: url(image_path('icon_submit_arrow_grey_disabled.svg'));}
+.master-submit-button:disabled {background-image: url(image_path('icon_submit_arrow_grey_disabled.svg'));}
+.resolution-submit-button {background-image: url(image_path('icon_bulk_resolve_white.svg'));}
 .open-viewable {background-image: url(image_path('icon_open_viewable.svg'));}
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
-.open-all {background-image: url(image_path('icon_open_all.svg'));}
+.open-all {background-image: url(image_path('icon_open_viewable.svg'));}
 .take-ticket-toolbar-button {background-image: url(image_path('icon_take.svg'));}
 .return-ticket-toolbar-button {background-image: url(image_path('icon_return.svg'));}
 .convert-ticket-button{background-image: url(image_path('icon_convert_ticket_grey.svg'));}
@@ -890,6 +889,7 @@ button {
 .url-cat-button {background-image: url(image_path('icon_categorize.svg'));}
 .add-user-button {background-image: url(image_path('icon_add_user_grey.svg'));}
 .export-button-white {background-image: url(image_path('icon_export_white.svg'));}
+.webcat-manage-templates-button {background-image: url(image_path('icon_email_read.svg'));}
 .ping-button {
   background-image: url(image_path('icon_ping_grey.svg'));
   float: right;
@@ -1801,7 +1801,10 @@ fieldset.tight {
           );
 }
 #index-change-assign-dropdown{
+  left: initial;
   padding: 20px 0 12px 0!important;
+  top: 80%;
+
   #internal_comment ,#customer_facing_comment{
     font-size: inherit;
     height: 30px;
@@ -2274,7 +2277,6 @@ a.static-nav-item {
 .icon-user-white {background-image: url(image_path('icon_user_white.svg'));}
 .icon-custom-user-white {background-image: url(image_path('icon_custom_user_white.svg'));}
 .icon-opened-selected {background-image: url(image_path('icon_open_selected.svg'));}
-.icon-open-all {background-image: url(image_path('icon_open_all.svg'));}
 .icon-copycat {background-image: url(image_path('icon_copycat.svg'));}
 .icon-telemetry {background-image: url(image_path('icon-telemetry.svg'));}
 .icon-search{background-image: url(image_path('icon_search_white.svg'));}
@@ -2283,7 +2285,6 @@ a.static-nav-item {
 .icon-submit{background-image: url(image_path('icon_submit_arrow.svg'));}
 .icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 .icon-guest-user {background-image: url(image_path('icon_guest_grey.svg'));}
-.icon-talos-sandbox {background-image: url(image_path('icon_sandbox2.svg'));}
 .icon-threat-grid {background-image: url(image_path('icon_grid.svg'));}
 .icon-reversing-labs {background-image: url(image_path('icon_reverse.svg'));}
 .icon-reversing-labs-light {background-image: url(image_path('icon_reverse_light.svg'));}
@@ -5163,7 +5164,7 @@ table > tbody > tr > td.dispute_rep_tools {
 #reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
   width: 400px;
 }
-[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"],[aria-describedby="whois_content"]  {
+[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"],[aria-describedby="whoisContent"]  {
   z-index: 999;
 }
 
@@ -5227,7 +5228,7 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: $bug-section-color;
   color: $content-bg-color;
 }
-
+.dispute-inline-buttons.edit-button{background-image: url(image_path('icon_edit_white.svg'));}
 .dispute-inline-buttons.adjust-wlbl-button, .toolbar .dropdown.open .adjust-wlbl-button  { background-image: url(image_path('icon_wlbl_white.svg')); }
 .dispute-inline-buttons.adjust-reptool-button, .toolbar .dropdown.open .adjust-reptool-button { background-image: url(image_path('icon_blacklist_white.svg')); }
 
@@ -6345,26 +6346,33 @@ table > tbody > tr > td.research-table-row-wrapper {
 }
 
 .wbrs-details-table { background-color: $bug-section-color;}
-.sbrs-details-table { background-color: $success-color;}
+.sbrs-details-table, .auto-resolve-details-table { background-color: $success-color;}
 .xbrs-details-table { background-color: $communication-accent-color;}
 .crosslisted-details-table { background-color: $warning-accent-color;}
 .virustotal-details-table { background-color: $rule-accent-color;}
 .reptool-details-table {background-color: $fifth-section-color;}
-.enrich-details-table {background-color: $escalations-section-color;}
-.prevalence-details-table {background-color: $escalations-section-color;}
-
-.entry-details-table table {
-  background-color: $table-dark-body;
-  color: $content-bg-color;
+.enrich-details-table, .prevalence-details-table  {background-color: $escalations-section-color;}
+.auto-resolve-details-table {
+  background-color: $content-label-color;
+  div{
+    font-size: 8pt;
+    padding: 6px 8px 10px 8px;
+  }
 }
-
+.entry-details-table {
+    table, div {
+    background-color: $table-dark-body;
+    color: $content-bg-color;
+  }
+}
 .entry-details-table table > thead > tr > th {
   border-bottom: 1px solid $table-dark-header;
   font-weight: 600;
   padding: 8px;
 }
 
-.entry-details-table table > tbody > tr > td {
+
+.entry-details-table table > tbody > tr > td{
   border-bottom: none;
   font-size: 8pt;
   font-weight: 300;
@@ -7944,7 +7952,7 @@ table.dispute-entry-table tbody tr.selected {
 
   .selectize-input.items.not-full.has-options.focus.input-active.dropdown-active,
   .selectize-control.form-control.selectize.multi, .selectize-dropdown.multi.form-control.selectize {
-    max-width: 409px !important;
+    max-width: 431px !important;
   }
   .selectize-dropdown.multi.form-control.selectize {
     position: absolute;
@@ -8236,7 +8244,7 @@ table.dispute-entry-table tbody tr.selected {
 .tab-pane:not(.active){
   display: none
 }
-.cat-history-dialog .tab-pane{
+.dialog-content-wrapper .tab-pane{
   border: 1px solid #d9d9d9;
   padding: 15px;
 }
@@ -8315,14 +8323,7 @@ table.dispute-entry-table tbody tr.selected {
   max-height: 42px!important;
   overflow-y: scroll;
 }
-.history-table {
-  font-size: 8pt;
-}
 
-.history-table td {
-  padding: 4px 8px;
-  line-height: 1.25em;
-}
 .uneditable_urls{
   font-size: 8pt;
   padding: 0!important;
@@ -9742,6 +9743,28 @@ td.text-center span {
     }
 }
 
+.webcat-whois-dialog {
+  border: none !important;
+  z-index: 999;
+
+  .tab-pane {
+    min-height: 200px;
+  }
+
+  .ui-dialog-titlebar {
+    background-color: $primary-section-color;
+
+    .ui-dialog-title {
+      background-image: url(image_path('icon_whois_white.svg'));
+      background-position: left -2px;
+      background-repeat: no-repeat;
+      background-size: 22px 22px;
+      line-height: 1rem;
+      padding-left: 25px;
+    }
+  }
+}
+
 .ticket-age-over3hr {
   color: $warning-accent-color;
   font-weight: bold;
@@ -10074,19 +10097,6 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 #edit-dispute-button {
   background-color: $faint-neutral-color;
-}
-
-#whois_content {
-  margin: 17px auto;
-  display: flex;
-  white-space: pre-wrap;
-  justify-content: center;
-  align-items: center;
-  .dialog-content-wrapper{
-    max-height: 500px!important;
-    width: 90%;
-    overflow-y: scroll;
-  }
 }
 
 .dropdown-tool-text-divider {
@@ -10556,26 +10566,28 @@ hr.thin.form-divider {
   padding: 10px 15px;
   box-shadow: none;
   background-color: darken($content-label-color, 10%);
+  border-bottom: none;
 }
 
 .nav-tabs.dialog-tabs > li.active > a {
   background-color: $content-bg-color;
   border: 1px solid darken($faint-neutral-color, 10%);
+  border-bottom: 1px solid $ac-nav-bg-color;
+  box-shadow: 0 1px 0 0 $ac-nav-bg-color;
 }
 
 .nav-tabs.dialog-tabs > li.active::before {
   content: '';
   border-left: 1px solid darken($faint-neutral-color, 10%);
-  border-right: 1px solid darken($faint-neutral-color, 10%);
   background-color: $content-bg-color;
   width: 100%;
-  height: 1px;
+  height: 2px;
   display: block;
   position: absolute;
   left: 0;
   padding: 0;
   z-index: 55;
-  margin-top: 39px;
+  margin-top: 40px;
   margin-left: -1px;
 }
 
@@ -10583,19 +10595,38 @@ hr.thin.form-divider {
   display: none;
 }
 
-.dialog-tab-content {
+.dialog-tab-content, .dialog-content-wrapper {
   border: 1px solid darken($faint-neutral-color, 10%);
   padding: 15px;
+
+  p {
+    font-size: 12px !important;
+  }
+  table {
+    background-color: $content-bg-color;
+    font-size: 8pt !important;
+    margin-bottom: 20px;
+    tbody > tr > td {
+      padding: 4px 8px !important;
+      line-height: 1.25em !important;
+      font-size: 12px;
+    }
+    th {
+      padding: 4px 8px !important;
+      border-bottom: 1px solid $faint-neutral-color;
+      height: 24px;
+      line-height: 1.25em !important;
+    }
+  }
+  hr.thin {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
 }
 
 #xbrs-history-tab {
   overflow: scroll;
 }
-
-.history-table {
-  background-color: $content-bg-color;
-}
-
 
 // dbinebri: the new ticket file rep container needs to be wide and slightly positioned to the right
 .escalations--file_rep--disputes-controller .nav-tools-dropdown {
@@ -10931,11 +10962,6 @@ input.assignee.form-control{
   padding-left: 32px;
   background-size: 24px 24px;
   background-position: left -2px;
-}
-
-.sandbox-header {
-  border-bottom-color: $warning-accent-color;
-  background-image: url(image_path('icon_sandbox2.svg'));
 }
 
 .threatgrid-header {
@@ -11319,24 +11345,6 @@ button.secondary.view-report-external-button {
   width: 100%;
 }
 
-// Specific styles for sandbox report
-.vertical-data-report-table {
-  margin: 10px 0 15px 0;
-  tr td, tr th {
-    border-bottom: none;
-    padding: 4px;
-    font-size: 8pt;
-  }
-  .code-wrap-col {
-    padding-top: 2px;
-    padding-bottom: 2px;
-  }
-  .code-snippet {
-    font-size: 8pt;
-  }
-}
-
-
 // dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
 @media screen and (min-width: 1600px) {
   #research-tab-toolbar .toolbar-button-label .toolbar-button-text, .toolbar-button-label
@@ -11633,7 +11641,6 @@ div[aria-describedby='create-detection-dialog'] {
     tr td:first-of-type {
       background-repeat: no-repeat;
       background-size: 20px 20px;
-      background-image: url(image_path('icon_sortable.svg'));
       background-position: -4px 10px;
     }
     tr td {
@@ -11893,13 +11900,6 @@ table.rl-content {
 // this is the triangle, make color match the top row of rl hover table
 .tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover.tooltipster-bottom .tooltipster-arrow-border {
   border-bottom-color: darken($table-dark-body, 5%);
-}
-
-// dbinebri: ensuring create new report button gets icon
-.create-new-run-button {
-  background-image: url(image_path('icon_sandbox_report.svg'));
-  background-position: 6px center;
-  padding-left: 15px;
 }
 
 // Datatables special display to get rid of sorting by placeholder 'Na' or 'Missing' etc. values
@@ -12306,23 +12306,86 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
-.toolbar#webcat-index-toolbar{
-  margin: 2px 0 -35px 0;
-  z-index: 1;
-  float: left;
-  width: 100%;
+.toolbar#webcat-index-toolbar {
   background: $content-bg-color;
-  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
-  position: relative;
   bottom: 18px;
-  padding: 4px 20px;
+  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
+  flex-direction: row;
+  float: left;
+  margin: 2px 0 -35px 0;
+  padding: 0 0 0 20px;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+
   .toolbar-checkbox-wrapper {
     padding-top: 0;
     padding-left: 5px;
     font-weight: normal;
   }
+
   label {
     display: none;
+  }
+
+  div {
+    margin: 4px 3px 0 0;
+  }
+
+  .btn-group.toolbar-btn-group {
+    margin: 0;
+    vertical-align: baseline;
+  }
+
+  .webcat-toolbar-select-all-wrapper, .webcat-toolbar-tall-wrapper {
+    background-color: $faint-neutral-color;
+    display: block;
+    height: 27px;
+    line-height: 25px;
+    float: none;
+    margin: 0;
+    padding: 0 8px;
+
+    input {
+      margin: 6px 0 0;
+      vertical-align: top;
+    }
+
+    label {
+      display: inline-block;
+      font-weight: 400;
+      height: 27px;
+      margin-left: 2px;
+    }
+  }
+
+  .webcat-toolbar-bulk-res {
+    background-color: #255c7d !important;
+    color: $type-lightest !important;
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+
+  .webcat-toolbar-tall-wrapper {
+    height: 45px;
+    line-height: 45px;
+    margin: 0 0 0 3px;
+    padding: 0 15px;
+
+    input {
+      margin: 16px 0 0;
+    }
+  }
+
+  .webcat-manage-templates-button {
+    background-color: $faint-neutral-color;
+    padding-left: 24px;
+  }
+
+  .webcat-toolbar-push {
+    margin-left: auto;
   }
 }
 
@@ -13001,14 +13064,6 @@ table > tbody > tr > td.no-padding {
   .rep-tools-cell button {
     margin-right: 0;
   }
-}
-
-.enrich-webrep-table-data-missing {
-  display: none;
-}
-
-.prevalence-webrep-table-data-missing {
-  display: none;
 }
 
 .enrich-cell-external-references {
