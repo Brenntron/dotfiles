@@ -14223,6 +14223,13 @@ input.wl-bl-list-inline {
   }
 }
 
+//overridding the webrep toolbar div style for convert ticket dropdown
+#convert-ticket-dropdown  {
+  div {
+    margin-right: 0 !important;
+  }
+}
+
 .align-top {
   vertical-align: top;
 }
