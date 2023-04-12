@@ -5,24 +5,36 @@ class Escalations::WebcatController < ApplicationController
 
   def dashboard_metrics
     @entries_reports = {
-        Assigned: ComplaintEntry.assigned_count,
-        Pending: ComplaintEntry.pending_count,
-        New: ComplaintEntry.new_count,
-        Overdue: ComplaintEntry.overdue_count
+        assigned: ComplaintEntry.assigned_count,
+        pending: ComplaintEntry.pending_count,
+        new: ComplaintEntry.new_count,
+        overdue: ComplaintEntry.overdue_count
     }
 
     @submitter_reports = {
-        Customer: ComplaintEntry.where(complaint_id: Complaint.from_ti.by_guest.open_comps).count,
-        Guest: ComplaintEntry.where(complaint_id: Complaint.from_ti.by_guest.open_comps).count,
-        Internal: ComplaintEntry.where(complaint_id: Complaint.from_int.open_comps).count,
-        WBNP: ComplaintEntry.where(complaint_id: Complaint.from_wbnp.open_comps).count
+        customer: ComplaintEntry.where(complaint_id: Complaint.from_ti.by_guest.open_comps).count,
+        guest: ComplaintEntry.where(complaint_id: Complaint.from_ti.by_guest.open_comps).count,
+        internal: ComplaintEntry.where(complaint_id: Complaint.from_int.open_comps).count,
+        wBNP: ComplaintEntry.where(complaint_id: Complaint.from_wbnp.open_comps).count
     }
 
     @complaints_reports ={
-        Active:Complaint.active_count,
-        Completed:Complaint.completed_count,
-        New: Complaint.new_count,
-        Overdue:  Complaint.overdue_count
+        active:Complaint.active_count,
+        completed:Complaint.completed_count,
+        new: Complaint.new_count,
+        overdue:  Complaint.overdue_count
+    }
+    @complaints_reports ={
+        active:Complaint.active_count,
+        completed:Complaint.completed_count,
+        new: Complaint.new_count,
+        overdue:  Complaint.overdue_count
+    }
+    @jira_reports ={
+        complete:Complaint.active_count,
+        failure:Complaint.completed_count,
+        skipped: Complaint.new_count,
+        "overall tries":  Complaint.overdue_count
     }
 
     @ti_new_count = ComplaintEntry.where(complaint_id: Complaint.from_ti).where(status:"NEW").count

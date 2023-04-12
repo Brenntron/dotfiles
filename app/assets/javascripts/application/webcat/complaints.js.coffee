@@ -22,6 +22,9 @@ $(document).ready ->
       data:''
       success:(response)->
         build_imports_table(response)
+
+
+        console.log response
       error:(response)->
         console.log response
     )
@@ -217,7 +220,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
         currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
 
         # Add current report info to top bar report area
-        console.log curr_report
+
         $('.wbnp-report-status').text(curr_report.status)
         $('#wbnp-report-attempted').text(curr_report.total_new_cases)
         $('#wbnp-report-succeeded').text(curr_report.cases_imported)
@@ -269,7 +272,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 
 
       else
-        curr_report = response.data
+        curr_report = response.data[0]
         currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
         # Add current report info to top bar report area
         $('.wbnp-report-status').text(curr_report.status)

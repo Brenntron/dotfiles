@@ -708,6 +708,7 @@ button {
 }
 .webcat-reports-toolbar{
   margin-bottom: -35px;
+  z-index: 10;
 }
 .toolbar-button-animated.active {
   background-color: $bug-accent-color;
@@ -7036,7 +7037,7 @@ table.dispute_tool_current tr:last-of-type td {
     padding-top: 15px;
     display: flex;
     h1{color: $content-bg-color!important;}
-    .top-info-icon{ padding-right: 55px;}
+    .top-info-icon{ padding-right: 40px;}
   }
 }
 .complaints-metrics-banner{
@@ -7116,21 +7117,9 @@ table.dispute_tool_current tr:last-of-type td {
 .team-icon {  background-image: url(image_path('icon_team.svg'));}
 .team-icon-grey {background-image: url(image_path('icon_team_grey.svg'));}
 
-.tickets-totals-table td {
-  border-bottom: none;
-  font-weight: 300;
-  font-size: 10pt;
-}
 .active-view{
   background-color:#E0F1F7;
 }
-.ticket-type-label {
-  font-weight: 700;
-  font-size: 9pt;
-  text-transform: uppercase;
-  padding-right: 4px;
-}
-
 td.ticket-total, td.entries-total {
   text-align: center;
   font-size: 11pt;
@@ -13678,7 +13667,36 @@ table > tbody > tr > td.no-padding {
 .ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
 }
+
+.ticket-type-label {
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding-right: 4px;
+  color: $type-lighter-color;
+  padding-bottom: 5px;
+}
+
 .webcat-reports-only {
+  display: flex;
+  flex-wrap: wrap;
+  &>* {
+    flex: 1 1 220px;
+  }
+  .header-td{
+    text-transform: capitalize;
+    font-weight: 600;
+    color: $table-dark-body;
+    white-space: nowrap;
+  }
+  .tickets-totals-table{
+    margin-left: 10px;
+    max-width: 210px;
+    td{
+      border-bottom: none;
+      font-size: 8pt;
+    }
+  }
   .table-condensed > tbody > tr > td {
     padding: 3px 4px !important; // need override
   }
