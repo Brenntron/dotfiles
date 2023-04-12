@@ -12299,12 +12299,16 @@ input[type="radio"].resolution_radio_button {
     font-weight: normal;
   }
 
-  label {
-    display: none;
-  }
-
   div {
     margin: 4px 3px 0 0;
+  }
+
+  .toolbar-dropdown {
+    margin-top: 0 !important;
+  }
+
+  .primary-text-divider {
+    margin-top: 0 !important;
   }
 
   .btn-group.toolbar-btn-group {
@@ -14224,6 +14228,13 @@ input.wl-bl-list-inline {
   }
   .align-top {
     padding-top: 3px !important;
+  }
+}
+
+//overridding the webrep toolbar div style for convert ticket dropdown
+#convert-ticket-dropdown  {
+  div {
+    margin-right: 0 !important;
   }
 }
 
