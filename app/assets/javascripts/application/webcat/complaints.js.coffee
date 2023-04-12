@@ -11,7 +11,22 @@ $(document).on 'change','.nested-table-input','.selectize-input', ->
 
 #### WBNP Reporting ####
 webcat_loader_timeout = ''
+
 $(document).ready ->
+  if window.location.pathname == '/escalations/webcat/reports'
+    $('.webcat-reports-only').removeClass('hidden')
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/jira_import_tasks"
+      dataType: 'json'
+      data:''
+      success:(response)->
+        build_imports_table(response)
+        console.log response
+      error:(response)->
+        console.log response
+    )
+
   sessionStorage.removeItem("touchedForm")
   loader = $('#inline-webcat')
   $(this).bind(
@@ -27,7 +42,124 @@ $(document).ready ->
      $('body').hasClass('index-action')
     window.check_wbnp_status()
 
+fake_data = [
+    {
+      "issue_key": "SD-44",
+      "status": "Failure",
+      "result": "No URLs to import",
+      "submitter": "timoport",
+      "bast_task": null,
+      "imported_at": "2023-04-05T17:24:33.000Z",
+      "created_at": "2023-04-05T17:24:33.000Z",
+      "updated_at": "2023-04-05T17:24:33.000Z",
+      "total_urls": 0,
+      "unimported_urls": 0,
+      "imported_urls": 0
+    },
+    {
+      "issue_key": "SD-45",
+      "status": "Pending",
+      "result": "",
+      "submitter": "timoport",
+      "bast_task": 3284,
+      "imported_at": "2023-04-05T17:24:33.000Z",
+      "created_at": "2023-04-05T17:24:33.000Z",
+      "updated_at": "2023-04-05T17:24:33.000Z",
+      "total_urls": 0,
+      "unimported_urls": 0,
+      "imported_urls": 0
+    },
+    {
+      "issue_key": "SD-46",
+      "status": "Pending",
+      "result": null,
+      "submitter": "timoport",
+      "bast_task": 3286,
+      "imported_at": "2023-04-05T17:24:33.000Z",
+      "created_at": "2023-04-05T17:24:33.000Z",
+      "updated_at": "2023-04-05T17:24:33.000Z",
+      "total_urls": 0,
+      "unimported_urls": 0,
+      "imported_urls": 0
+    }
+  ]
+$(document).on 'click', '#show-failed, #show-complete',->
+  table = $('#webcat-imports-index').DataTable()
+  show_failed = $('#show-failed').prop('checked')
+  show_complete = $('#show-complete').prop('checked')
 
+  table.rows().every( ()->
+    status = this.data().status
+    switch status
+      when'Failure'
+        if show_failed
+          $('.failed').show()
+        else
+          $('.failed').hide()
+      else
+        if show_complete
+          $('.complete-pending').show()
+        else
+          $('.complete-pending').hide()
+  )
+
+
+
+window.build_imports_table = (data) ->
+  $('#webcat-imports-index').DataTable(
+    data: fake_data
+    order:[]
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    language: {
+      search: "_INPUT_"
+      searchPlaceholder: "Search within table"
+    }
+    initComplete: (data,type,full,meta) ->
+      $('#webcat-imports-index_filter input').addClass('table-search-input');
+    columnDefs: [
+      {
+        targets: [ 0 ]
+        orderable: false
+        searchable: false
+      }
+      {
+        targets: [ 0,1,2,3,4,5 ]
+        defaultContent:'-'
+      }
+    ]
+    createdRow:(row, data, dataIndex) ->
+      {status} = data
+      if status != 'Complete' && status != 'Pending'
+        $(row).addClass('failed')
+      else
+        $(row).addClass('complete-pending')
+    columns:[
+      {
+        data:'issue_key',
+        render: (data,type,full,meta) ->
+          return "<input type='checkbox' name='cbox' class='imports_check_box' id='cbox#{data}' value=#{data} />"
+      },
+      {data: 'issue_key'},
+      {data: 'submitter'},
+      {data: 'imported_at'},
+      {
+        data: 'total_urls'
+        render: (data,type,full,meta) ->
+          {unimported_urls, total_urls, imported_urls}=full
+          return "<span class='total-imports'>#{total_urls} total</span> (#{imported_urls}|#{unimported_urls})"
+      },
+      {
+        data: 'result'
+        render: (data,type,full,meta) ->
+          {status, result}=full
+
+          html = "<span>#{result}</span>"
+          if status != 'Complete' && status != 'Pending'
+            html += '<button class="inline-retry-button retry-button tooltipped tooltipstered" title="Retry"></button>'
+
+      }
+    ]
+  )
 # WBNP - Get report id
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
@@ -73,9 +205,8 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/wbnp_report_status"
     data: data
     success: (response) ->
-      # Turn off loader indicator
       $('.wbnp-loading-spinner').hide()
-
+      # Turn off loader indicator
       if full_report == true
         # Clear old data
         $('.wbnp-status').empty();
@@ -88,6 +219,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
         currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
 
         # Add current report info to top bar report area
+
         $('.wbnp-report-status').text(curr_report.status)
         $('#wbnp-report-attempted').text(curr_report.total_new_cases)
         $('#wbnp-report-succeeded').text(curr_report.cases_imported)
@@ -139,7 +271,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 
 
       else
-        curr_report = response.data
+        curr_report = response.data[0]
         currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
         # Add current report info to top bar report area
         $('.wbnp-report-status').text(curr_report.status)
@@ -2369,7 +2501,7 @@ $ ->
     return
 
   $(document).ready ->
-    if (window.location.pathname != '/escalations/webcat/complaints' && window.location.pathname != '/escalations/webcat/research')
+    if !window.location.pathname.includes('/escalations/webcat')
       $('#filter-complaints-nav').hide()
       $('#fetch').hide()
       $('#complaints-nav-search-wrapper').hide()
@@ -2580,3 +2712,4 @@ $ ->
 
   $('#wbnp-report-button').click ->
     $('#wbnp-full-report').dialog('open')
+

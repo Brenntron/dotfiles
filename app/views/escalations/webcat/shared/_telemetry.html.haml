@@ -1,64 +1,58 @@
-.row.complaints-metrics-banner
-  // left column
-  .header-area
-    %h1= content_for :webcat_page
-    %span.top-info-icon{class: "#{content_for :webcat_icon}"}
-
+.complaints-metrics-banner
   // middle column
   .main-metrics
-    .row
-      .metrics-col
-        %span.metric-header#allTalosTickets
-          %a{href: '?f=ALL%20TALOS'} TALOS:
-        .number-container
-          %a#ti-new-count.metric-number.metric-new{href: '?f=NEW%20TALOS'}
-            = "#{@ti_new_count} New"
-          %a.metric-overdue{href: '?f=TALOS%20OVERDUE'}
-            %span#ti-overdue-count.metric-number
-              = "(#{@ti_overdue_count} Overdue)"
-          %a#ti-assigned-count.metric-number.metric-assigned{href: '?f=TALOS%20ASSIGNED'}
-            = "#{@ti_assigned_count} Assigned"
+    .metrics-col
+      %span.metric-header#allTalosTickets
+        %a{href: '?f=ALL%20TALOS'} TALOS:
+      .number-container
+        %a#ti-new-count.metric-number.metric-new{href: '?f=NEW%20TALOS'}
+          = "#{@ti_new_count} New"
+        %a.metric-overdue{href: '?f=TALOS%20OVERDUE'}
+          %span#ti-overdue-count.metric-number
+            = "(#{@ti_overdue_count} Overdue)"
+        %a#ti-assigned-count.metric-number.metric-assigned{href: '?f=TALOS%20ASSIGNED'}
+          = "#{@ti_assigned_count} Assigned"
 
-      .metrics-col
-        %span.metric-header#allWbnpTickets
-          %a{href: '?f=ALL%20WBNP'} WBNP:
-        .number-container
-          %a#wbnp-new-count.metric-number.metric-new{href: '?f=NEW%20WBNP'}
-            = "#{@wbnp_new_count} New"
-          %a#wbnp-overdue-count.metric-overdue{href: '?f=WBNP%20OVERDUE'}
-            %span.metric-number
-              = "(#{@wbnp_overdue_count} Overdue)"
-          %a#wbnp-assigned-count.metric-number.metric-assigned{href: '?f=WBNP%20ASSIGNED'}
-            = "#{@wbnp_assigned_count} Assigned"
+    .metrics-col
+      %span.metric-header#allWbnpTickets
+        %a{href: '?f=ALL%20WBNP'} WBNP:
+      .number-container
+        %a#wbnp-new-count.metric-number.metric-new{href: '?f=NEW%20WBNP'}
+          = "#{@wbnp_new_count} New"
+        %a#wbnp-overdue-count.metric-overdue{href: '?f=WBNP%20OVERDUE'}
+          %span.metric-number
+            = "(#{@wbnp_overdue_count} Overdue)"
+        %a#wbnp-assigned-count.metric-number.metric-assigned{href: '?f=WBNP%20ASSIGNED'}
+          = "#{@wbnp_assigned_count} Assigned"
 
-      .metrics-col
-        %span.metric-header#allIntTickets
-          %a{href: '?f=ALL%20INTERNAL'}INTERNAL:
-        .number-container
-          %a#int-new-count.metric-number.metric-new{href: '?f=NEW%20INTERNAL'}
-            = "#{@int_new_count} New"
-          %a.metric-overdue{href: '?f=INTERNAL%20OVERDUE'}
-            %span#int-overdue-count.metric-number
-              = "(#{@int_overdue_count} Overdue)"
-          %a#int-assigned-count.metric-assigned.metric-number{href: '?f=INTERNAL%20ASSIGNED'}
-            = "#{@int_assigned_count} Assigned"
+    .metrics-col
+      %span.metric-header#allIntTickets
+        %a{href: '?f=ALL%20INTERNAL'}INTERNAL:
+      .number-container
+        %a#int-new-count.metric-number.metric-new{href: '?f=NEW%20INTERNAL'}
+          = "#{@int_new_count} New"
+        %a.metric-overdue{href: '?f=INTERNAL%20OVERDUE'}
+          %span#int-overdue-count.metric-number
+            = "(#{@int_overdue_count} Overdue)"
+        %a#int-assigned-count.metric-assigned.metric-number{href: '?f=INTERNAL%20ASSIGNED'}
+          = "#{@int_assigned_count} Assigned"
 
-      .metrics-col
-        %a.metric-header#allPendingTickets{href: '?f=ALL%20PENDING'} PENDING:
-        %a#pending-new-count.metric-number{href: '?f=ALL%20PENDING'}= @pending_new_count
-        %a.metric-overdue{href: '?f=PENDING%20OVERDUE'}
-          %span#pending-overdue-count.metric-number
-            = "(#{@pending_overdue_count} Overdue)"
+    .metrics-col
+      %a.metric-header#allPendingTickets{href: '?f=ALL%20PENDING'} PENDING:
+      %a#pending-new-count.metric-number{href: '?f=ALL%20PENDING'}= @pending_new_count
+      %a.metric-overdue{href: '?f=PENDING%20OVERDUE'}
+        %span#pending-overdue-count.metric-number
+          = "(#{@pending_overdue_count} Overdue)"
 
-      // right column
-      .metrics-col.wbnp-area
-        .metric-header
-          %span.wbnp-loading-spinner.sync-button-white.sync_rotate
-          WBNP Report Status:
-        %a#wbnp-report-status-link.esc-tooltipped-webcat-toolbar{'data-tooltip-content':'#tooltip-wbnp-content'}
-          .wbnp-report-status Checking...
-        - if current_user.is_webcat_manager?
-          %button#wbnp-report-button.wbnp-full-report.icon-reports-white
+    // right column
+    .metrics-col.wbnp-area
+      .metric-header
+        %span.wbnp-loading-spinner.sync-button-white.sync_rotate
+        WBNP Report Status:
+      %a#wbnp-report-status-link.esc-tooltipped-webcat-toolbar{'data-tooltip-content':'#tooltip-wbnp-content'}
+        .wbnp-report-status Checking...
+      - if current_user.is_webcat_manager?
+        %button#wbnp-report-button.wbnp-full-report.icon-reports-white
 
 
 #tooltip-wbnp
@@ -66,7 +60,7 @@
     %tr
       %td Total Attempted
       %td
-        #wbnp-report-attempted
+        #wbnp-report-attempted=@wbnp_new_count
     %tr
       %td Number Succeeded
       %td
@@ -81,82 +75,66 @@
         #wbnp-quick-report-skipped
 
 
-
-
 -# below gets shown on webcat/reports page
-.row.webcat-reports-only.hidden
-  .col-xs-2.header-area
-    %h1= content_for :webcat_page
-    %span.top-info-icon{class: "#{content_for :webcat_icon}"}
-  .col-xs-2
-    %table.tickets-totals-table.table-condensed
-      %tr
-        %th{colspan: '2'}
-          %span.ticket-type-label Submitter Type
-      %tr
-        %td Customer
-        %td=@ti_comp_cust
-      %tr
-        %td Guest
-        %td=@ti_comp_guest
-      %tr
-        %td Internal
-        %td=@int_comp_entries
-      %tr
-        %td WBNP
-        %td=@wbnp
-  .col-xs-2
-    %table.tickets-totals-table.table-condensed
-      %tr
-        %th{colspan: '2'}
-          %span.ticket-type-label Entries
-      %tr
-        %td Assigned
-        %td=@assigned
-      %tr
-        %td Pending
-        %td=@pending
-      %tr
-        %td#report-new-count New
-        %td=@new
-      %tr
-        %td Overdue
-        %td=@overdue
-  .col-xs-2
-    %table.tickets-totals-table.table-condensed
-      %tr
-        %th
-          %span.ticket-type-label Complaints
-      %tr
-        %td New
-        %td=@new_comp
-      %tr
-        %td Active
-        %td=@active_comp
-      %tr
-        %td Overdue
-        %td=@overdue_comp
+.row.hidden.webcat-reports-only
+  %table.tickets-totals-table.table-condensed.col-with-divider
+    %tr
+      %th{colspan: '2'}
+        %span.data-report-label Submitter Type
+    %tbody
+      - @submitter_reports.each do |type, val|
+        %tr
+          %td.header-td=type
+          %td.content-td=val
 
+
+  %table.tickets-totals-table.table-condensed.col-with-divider
+    %tr
+      %th{colspan: '2'}
+        %span.data-report-label Entries
+    %tbody.col-with-divider
+      - @entries_reports.each do |type, val|
+        %tr
+          %td.header-td=type
+          %td.content-td=val
+
+
+
+  %table.tickets-totals-table.table-condensed.col-with-divider
+    %tr
+      %th{colspan: '2'}
+        %span.data-report-label Complaints
+    %tbody
+      - @complaints_reports.each do |type, val|
+        %tr
+          %td.header-td=type
+          %td.content-td=val
+
+  %table.tickets-totals-table.wbnp-table.table-condensed.col-with-divider
+    %tr
+      %th
+        %span.data-report-label WBNP Reports
+      %th.content-td.wbnp-report-status
+    %tbody
       %tr
-        %td Completed
-        %td=@completed_comp
-  .col-xs-2
-    %table.tickets-totals-table.table-condensed
+        %td.header-td Attempted
+        %td.content-td#wbnp-report-attempted
       %tr
-        %th{colspan: '2'}
-          %span.ticket-type-label WBNP Reports
+        %td.header-td Succeeded
+        %td.content-td#wbnp-report-succeeded
       %tr
-        %td Status
-        %td.wbnp-report-status
+        %td.header-td Rejected
+        %td.content-td#wbnp-report-rejected
       %tr
-        %td Total Attempted
-        %td#wbnp-report-attempted
-      %tr
-        %td Number Succeeded
-        %td#wbnp-report-succeeded
-      %tr
-        %td Number Rejected
-        %td#wbnp-report-rejected
-      %tr
-        %td Number Skipped
-        %td#wbnp-full-report-skipped
+        %td.header-td Skipped
+        %td.content-td#wbnp-full-report-skipped
+
+  %table.tickets-totals-table.table-condensed.col-with-divider
+    %tr
+      %th{colspan: '2'}
+        %span.data-report-label Jira Imports
+    %tbody
+      - @jira_reports.each do |type, val|
+        %tr
+          %td.header-td=type
+          %td.content-td=val
