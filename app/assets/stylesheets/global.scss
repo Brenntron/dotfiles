@@ -11025,7 +11025,6 @@ button.secondary.view-report-external-button {
 }
 
 .toolbar-select-wrapper {
-  .toolbar-button-text{padding-left: 22px;}
   .toolbar-button-text{padding-left: 8px;}
   .toolbar-button-text, .toolbar-button-select {
     padding-right: 6px;
@@ -13683,14 +13682,15 @@ table > tbody > tr > td.no-padding {
     flex: 1 1 220px;
   }
   .header-td{
-    text-transform: capitalize;
-    font-weight: 600;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 8pt;
     width: 110px;
     color: $table-dark-body;
     white-space: nowrap;
   }
   .wbnp-table .header-td{
-    width: 140px;
+    width: 130px;
   }
   .content-td{
     font-weight: 400!important;
