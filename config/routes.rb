@@ -61,6 +61,9 @@ Rails.application.routes.draw do
           get :export_complaint_entry
         end
       end
+
+      resources :jira_import_tasks, only: [:index]
+
     end
 
     namespace :webrep do
@@ -94,7 +97,9 @@ Rails.application.routes.draw do
 
     namespace :sdr do
       root 'root#index'
-      resources :disputes, only: [:index, :show]
+      resources :disputes, only: [:index, :show] do
+        get :all_attachments
+      end
     end
 
     namespace :file_rep do
@@ -104,14 +109,6 @@ Rails.application.routes.draw do
       get 'naming_guide', to: 'disputes#naming_guide'
       get 'sandbox-html-report', to: 'disputes#sandbox_html_report'
     end
-
-    namespace :sdr do
-      root 'root#index'
-      resources :disputes, only: [:index, :show] do
-        get :all_attachments
-      end
-    end
-
 
     resources :users, controller: '/users', only: [:index, :show, :update] do
       resource :bugzilla_api_key, controller: '/bugzilla_api_keys', only: [:edit, :update]

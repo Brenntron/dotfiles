@@ -3,6 +3,7 @@
     .col-xs-2.header-content
       %span.icon-reports-white.top-info-icon
       %h1 Reports
+
     .col-xs-10
       .complaint-mgt-top-area
         = render "escalations/webcat/shared/telemetry"
@@ -18,6 +19,6 @@
 
 .tab-content.content-wrapper#report-tab-content
   .tab-pane#generate_reports_tab{role: 'tabpanel'}
-    = render 'escalations/webcat/shared/generate_reports'
+    = render 'escalations/webcat/reports/generate_reports'
   .tab-pane#imports_tab{role: 'tabpanel'}
-    = render 'escalations/webcat/shared/jira_imports'
+    = render 'escalations/webcat/reports/jira_imports'

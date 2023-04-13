@@ -4,7 +4,7 @@
   %div.view-container.toolbar-container
     %label.toolbar-section-label
       View
-    %button.toolbar-button.list-button.toolbar-button-spacer.active.tooltipped{title: 'List All Jira Imports'}
+    %button.toolbar-button.list-button.toolbar-button-spacer.active-view.tooltipped{title: 'List All Jira Imports'}
       %span.toolbar-button-text List
     %button.toolbar-button.view-rules.view-button.tooltipped{title: 'Detailed Import View'}
       %span.toolbar-button-text View
@@ -13,14 +13,12 @@
     %label.toolbar-section-label.show-rule-sets-label
       Show Tickets
     %span.toolbar-select-wrapper.show-tickets
-      %span
-        %label.show-failed.toolbar-button-label.tooltipped{for: 'show-failed', title: 'Show All Failed'}
-          %input#show-failed.toolbar-checkbox{type: 'checkbox',  name: 'show-failed', checked: true}
-          %span.toolbar-button-select All Failed
-      %span
-        %label.show-complete.toolbar-button-label.tooltipped{for: 'show-complete', title: 'Show All Complete and Pending'}
-          %input#show-complete.toolbar-checkbox{type: 'checkbox',  name: 'show-complete', checked: true}
-          %span.toolbar-button-select Complete/Pending
+      %label.show-failed.toolbar-button-label.tooltipped{for: 'show-failed', title: 'Show All Failed'}
+        %input#show-failed.toolbar-checkbox{type: 'checkbox',  name: 'show-failed', checked: true}
+        %span.toolbar-button-select All Failed
+      %label.show-complete.toolbar-button-label.tooltipped{for: 'show-complete', title: 'Show All Complete and Pending'}
+        %input#show-complete.toolbar-checkbox{type: 'checkbox',  name: 'show-complete', checked: true}
+        %span.toolbar-button-select Complete/Pending
 
   %div.actions-container.toolbar-container
     %label.toolbar-section-label Actions
