@@ -50,7 +50,22 @@ $(document).on 'click', '#show-failed, #show-complete',->
         else
           $('.complete-pending').hide()
   )
+$(document).on 'click', '.imports_check_box', ->
+  checked = $('.imports_check_box:checked')
+  can_retry = checked.length > 0
 
+  if can_retry
+    $('.retry-button').removeAttr('disabled')
+  else
+    $('.retry-button').attr('disabled', true)
+
+window.retry_imports = (type, id)->
+  switch type
+    when 'bulk'
+      table = $('#webcat-imports-index').DataTable()
+      rows = $('.imports_check_box:checked').closest('tr')
+      row_data = table.rows(rows).data()
+      console.log row_data
 
 window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
