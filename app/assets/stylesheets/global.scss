@@ -94,10 +94,12 @@ body {
 }
 
 #page-wrapper {
-  min-height: 100%;
   align-content: center;
   display: block;
   margin-left: $sidebar-width;
+  min-height: 100%;
+  position: absolute;
+  top: -15px;
 }
 
 #page-content-wrapper {
@@ -8121,6 +8123,10 @@ table.dispute-entry-table tbody tr.selected {
   display: inline-block;
   margin: 4px 2px 0 2px;
   padding: 2px 4px;
+
+  &:hover {
+    background-color: darken($bug-section-color, 25%); 
+  }
 }
 
 .nested-complaint-data-wrapper a {
