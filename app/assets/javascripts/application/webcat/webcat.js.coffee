@@ -25,6 +25,14 @@ $ ->
   if $('body').hasClass("escalations--webcat--complaints-controller")
     $('#nav-banner').addClass('fixed-nav')
 
+    #pin webcat toolbar under navigation bar, add padding
+    toolbar = $('#webcat-index-toolbar')
+    $('#nav-banner').append(toolbar)
+    $('#page-content-wrapper').css('padding-top','60px')
+
+    #align tooltips under toolbar
+    $('body').addClass('pinned-toolbar-true')
+
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
     { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
@@ -56,6 +64,8 @@ $ ->
     entry_ids = if $('#entryid-input')[0].selectize? then $('#entryid-input')[0].selectize.items else []
     complaint_ids = if $('#complaintid-input')[0].selectize? then $('#complaintid-input')[0].selectize.items else []
     platform_ids = if $('#platform-input')[0].selectize? then $('#platform-input')[0].selectize.items else []
+    submitter_types = if $('#submitter-type-input')[0].selectize? then $('#submitter-type-input')[0].selectize.items else []
+
 
     if tags.length
       form['tags'] = tags.join(', ')
@@ -80,6 +90,8 @@ $ ->
       form['complaint_id'] = complaint_ids.join(', ')
     if user_id.length
       form['user_id'] = user_id.join(', ')
+    if submitter_types.length
+      form['submitter_type'] = submitter_types.join(', ')
 
     form['platform_display'] = []
     if platform_ids.length
@@ -117,6 +129,7 @@ $ ->
       submitted_older: form.date_submitted_older
       tags: form.tags
       user_id: form.user_id
+      submitter_type: form.submitter_type
     )
     refresh_url()
 
@@ -736,7 +749,7 @@ $ ->
         return options
 
     assignee_input = $('#assignee-input').selectize {
-      persist: false
+      persist: true
       create: false
       valueField: 'name',
       labelField: 'display_name',
@@ -874,6 +887,19 @@ $ ->
           value: input
           text: input
         }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
+
+    $('#submitter-type-input').selectize {
+      delimiter: ',',
+      persist: false,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
+      options: [{name: "Customer"}, {name: "Guest"}]
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
@@ -1044,6 +1070,23 @@ window.find_saved_search_by_name = (name) ->
   )
   return saved_search
 $ ->
+
+#  Webcat toolbar and wbnp status report tooltips need slight adjustment
+  $('.esc-tooltipped-webcat-toolbar').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+      'tooltipster-borderless-comment'
+    ]
+    debug: false
+    maxWidth: 500
+    position: 'bottom'
+    distance: [-8, 0]
+
+  $('.esc-tooltipped-webcat-toolbar:disabled').tooltipster
+    disable: true
+    debug: false
+
   # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
   $('#complaints-index').on 'draw.dt', ->
     $('#complaints-index .tooltipstered').tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr

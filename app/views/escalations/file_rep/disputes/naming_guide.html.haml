@@ -1,9 +1,9 @@
 .content-wrapper
   .row
     .col-xs-6.button-row-left.amp-edit-buttons
-      %h1 AMP Naming Conventions Details
+      %h1 Secure Endpoint Naming Conventions Details
       -if can? :update, AmpNamingConvention
-        %button.primary.edit-button#amp-edit-button{onclick: 'edit_amp_naming_conventions();'} Edit AMP Naming Conventions
+        %button.primary.edit-button#amp-edit-button{onclick: 'edit_amp_naming_conventions();'} Edit Secure Endpoint Naming Conventions
         .active-editing-buttons
           %button.primary.save-button#amp-save-button{onclick: 'save_amp_naming_conventions();'} Save Changes
           %button.secondary.cancel-button#amp-cancel-button{onclick: 'cancel_amp_naming_conventions();'} Cancel
@@ -19,16 +19,16 @@
       %table.table.responsive#amp-naming-details-table
         %thead
           %tr
-            %th Pattern
-            %th Example
-            %th Engine Description
+            %th{style: 'color:red'} Pattern
+            %th{style: 'color:red'} Example
+            %th{style: 'color:red'} Engine Description
             %th{style: 'color:red'} Private Engine Description
             %th Point of Contact
             %th Notes
             %th Public Facing Notes
         %tbody
           - @conventions.each do |convention|
-            %tr.amp-naming-row{'data-sort-sequence': "#{convention.table_sequence}", 'data-id': "#{convention.id}"}
+            %tr.amp-naming-row{'data-id': "#{convention.id}"}
               %td.amp-pattern
                 %span.table-content
                   %span.table-code= convention.pattern
@@ -50,7 +50,7 @@
                 %span.table-content
                   = convention.private_engine_description
                 %span.table-form-content
-                  %textarea.description-textarea
+                  %textarea.private-description-textarea
                     = convention.private_engine_description
               %td.amp-contact
                 %span.table-content{data: "#{convention.contact}"}

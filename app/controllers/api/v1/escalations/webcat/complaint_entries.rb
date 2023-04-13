@@ -213,6 +213,39 @@ module API
             end
 
 
+            desc "Remove assignee from a group of complaint entry IDs (revert to vrtincoming)"
+            params do
+              requires :complaint_entry_ids, type: Array[Integer], desc: "analyst-console database id"
+            end
+            post "unassign_all" do
+              results = []
+              params[:complaint_entry_ids].each do |id|
+                entry = ComplaintEntry.find(id)
+                result = entry.unassign
+                results << {id: id, result: result}
+              end
+
+              {:status => "success", :data => results}.to_json
+            end
+
+
+            desc "Reassign complaint entry to another user"
+            params do
+              requires :complaint_entry_ids, type: Array[Integer], desc: "analyst-console database id"
+              requires :user_id, type: Integer, desc: "analyst-console database id"
+            end
+            post "change_assignee" do
+              results = []
+              user = User.find(params[:user_id])
+              params[:complaint_entry_ids].each do |id|
+                entry = ComplaintEntry.find(id)
+                result = entry.reassign(user)
+                results << {id: id, result: result}
+              end
+
+              {:status => "success", :data => results}.to_json
+            end
+
 
             desc 'Get the history'
             params do
@@ -545,12 +578,12 @@ module API
 
               pre_raw_records = []
 
-              prefix_records = Wbrs::Prefix.where({:urls => [URI.escape(SimpleIDN.to_ascii(params[:domain]))]})
+              prefix_records = Wbrs::Prefix.where({:urls => [Addressable::URI.escape(SimpleIDN.to_ascii(params[:domain]))]})
               prefix_records.each do |prefix_record|
                 history_records = Wbrs::HistoryRecord.where({:prefix_id => prefix_record.prefix_id})
                 pre_raw_records += history_records
               end
-              clean_domain = URI.escape(SimpleIDN.to_ascii(params[:domain]))
+              clean_domain = Addressable::URI.escape(SimpleIDN.to_ascii(params[:domain]))
 
               rule_lib_records = Wbrs::Prefix.get_certainty_sources_for_urls([clean_domain], 0)[clean_domain]
               if rule_lib_records.blank?

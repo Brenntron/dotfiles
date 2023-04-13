@@ -17,20 +17,22 @@ module API
                 optional :notes, type: String
                 optional :public_notes, type: String
                 optional :contact, type: String
-                optional :table_sequence, type: Integer
               end
             end
             post "" do
-              
+
               std_api_v2 do
                 ::AmpNamingConvention.transaction do
-                  timestamp = Time.now
                   Rails.logger.debug("\n\n*** POST #{params['patterns']}\n\n")
                   ::AmpNamingConvention.create_from_params(params['patterns'])
-                  ::AmpNamingConvention.send_all_to_ti(timestamp: timestamp)
+                  if params['send_to_ti'] == true
+                    timestamp = Time.now
+                    ::AmpNamingConvention.send_all_to_ti(timestamp: timestamp)
+                  end
                 end
 
-                render json: {status: 'Success'}
+                created_patterns = ::AmpNamingConvention.last(params['patterns'].length)
+                render json: {status: 'Success', new_records: created_patterns}
               end
             end
 
@@ -44,16 +46,17 @@ module API
                 optional :notes, type: String
                 optional :public_notes, type: String
                 optional :contact, type: String
-                optional :table_sequence, type: Integer
               end
             end
             patch "" do
               std_api_v2 do
                 ::AmpNamingConvention.transaction do
-                  timestamp = Time.now
                   Rails.logger.debug("\n\n*** PATCH #{params['patterns']}\n\n")
                   ::AmpNamingConvention.save_from_params(params['patterns'])
-                  ::AmpNamingConvention.send_all_to_ti(timestamp: timestamp)
+                  if params['send_to_ti'] == true
+                    timestamp = Time.now
+                    ::AmpNamingConvention.send_all_to_ti(timestamp: timestamp)
+                  end
                 end
 
                 render json: {status: 'Success'}

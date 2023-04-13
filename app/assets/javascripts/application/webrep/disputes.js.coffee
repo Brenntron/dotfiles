@@ -14,14 +14,6 @@ $(document).ready ->
           text = text.join(', ').replace(/, ([^,]*)$/, ', and $1')
         text = text.replace(/(, and| and |, )/g, '<span class="unset-text">$1</span>')
         return $('.searched-for-url').html(text)
-  # Hide loader cogs when page is done loading
-  loader = $('#inline-webrep')
-  $(this).bind(
-    ajaxStart: () ->
-      loader.removeClass('hidden')
-    ajaxStop: () ->
-      loader.addClass('hidden')
-  )
 
   if window.location.pathname == '/escalations/webrep/disputes'
     std_msg_ajax(
@@ -98,15 +90,7 @@ window.select_or_deselect_all = (dispute_id)->
 
 
 window.advanced_webrep_index_table = () ->
-
   form = $('#disputes-advanced-search-form')
-  submission_types = []
-  if form.find('input[name="advanced_search[submission_type]"][value="w"]').is(':checked')
-    submission_types.push('w')
-  if form.find('input[name="advanced_search[submission_type]"][value="e"]').is(':checked')
-    submission_types.push('e')
-  if form.find('input[name="advanced_search[submission_type]"][value="ew"]').is(':checked')
-    submission_types.push('ew')
   dispute_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   data = {
     search : {
@@ -130,16 +114,27 @@ window.advanced_webrep_index_table = () ->
     status: form.find('input[id="status-input"]').val()
     priority: form.find('input[id="priority-input"]').val()
     resolution: form.find('input[id="resolution-input"]').val()
-    submission_type: submission_types
     submitter_type: form.find('input[id="submitter-input"]').val()
-    platform_ids: form.find('input[id="platform-input"]').val()
+    platform_names: form.find('input[id="platform-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
     submitted_newer: form.find('input[id="submitted-newer-input"]').val()
     age_older: form.find('input[id="age-older-input"]').val()
     age_newer: form.find('input[id="age-newer-input"]').val()
     modified_older: form.find('input[id="modified-older-input"]').val()
     modified_newer: form.find('input[id="modified-newer-input"]').val()
+    case_origin: form.find('input[id="case-origin-input"]').val()
   }
+  unless form.find('#submission-type').parent().hasClass('hidden')
+    submission_types = []
+    if form.find('input#submission-type-w-cb').is(':checked')
+      submission_types.push('w')
+    if form.find('input#submission-type-e-cb').is(':checked')
+      submission_types.push('e')
+    if form.find('input#submission-type-ew-cb').is(':checked')
+      submission_types.push('ew')
+    data['submission_type'] = submission_types
+
+
   if dispute_save_search_format.test(data.search_name) == true
     std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
   else
@@ -822,6 +817,15 @@ window.webrep_reset_search = () ->
   for i in inputs
     i.value = ""
 
+  #clear selectize fields
+  $("#platform-input")[0].selectize.clear()
+  $("#status-input")[0].selectize.clear()
+  $("#priority-input")[0].selectize.clear()
+  $("#resolution-input")[0].selectize.clear()
+
+window.clearSelectize = (input) ->
+  $("##{input}")[0].selectize.clear()
+
 $ ->
 
 #  Opens ticket status resolution back up after modal close
@@ -943,7 +947,9 @@ $ ->
       return false
 
   # Create index table
-  window.dispute_table = $('#disputes-index').DataTable(
+  window.dispute_table = $('#disputes-index').on(
+    'preXhr.dt': ->
+      $('#inline-webrep').removeClass('hidden')).DataTable(
     pagingType: 'full_numbers'
     processing: true
     serverSide: true
@@ -952,6 +958,8 @@ $ ->
       method: 'GET'
       headers: {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       data: build_webrep_data()
+      complete: () ->
+        $('#inline-webrep').addClass('hidden')
     order: [ [
       9
       'desc'
@@ -1050,24 +1058,22 @@ $ ->
               dispute_latency = data
             if dispute_duration.includes('hour')
               hours = parseInt(dispute_duration.replace(/[^0-9]/g, ''))
-              if hours <= 3
+              if hours <= 18
                 dispute_latency = data
               else
-                dispute_latency = '<span class="ticket-age-over3hr">' + data + '</span>'
-              if hours > 12
-                dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+                dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             else
-              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             if dispute_duration.includes('day')
               day = parseInt(data.replace(/[^0-9]/g, ''))
               if day >= 1
-                dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+                dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             if dispute_duration.includes('months')
               month = parseInt(data.replace(/[^0-9]/g, ''))
-              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             if dispute_duration.includes('year')
               year = parseInt(data.replace(/[^0-9]/g, ''))
-              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             dispute_latency
           else
             data
@@ -1360,56 +1366,174 @@ $ ->
       success: (response) ->
     )
 
-  $('#advanced-search-button').click ->
-    std_msg_ajax(
-      method: 'GET'
-      url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
-      success: (response) ->
+  $('#webrep-advanced-search-button').click ->
+    # if we have already loaded the advanced search, with all options no need to load it again
+    if $('#company-list').find('option').size() == 0
 
-        $('#user-list').empty()
-        $('#status-list').empty()
-        $('#submittertype-list').empty()
-        $('#contactname-list').empty()
-        $('#contactemail-list').empty()
-        $('#company-list').empty()
-        $('#resolution-list').empty()
+      if localStorage.getItem('webRepFilters') != null
+        filter_data_found = false
+        #populate any non-selectize fields with current filters
+        #note: any selectize filters need to be populated after the selectize options are created
+        filters = JSON.parse(localStorage.webRepFilters)
 
-        $('#platform-input').selectize {
-          persist: false
-          create: false
-          valueField: 'id',
-          labelField: 'public_name',
-          options: response.json.platforms
-          onFocus: () ->
-            window.toggle_selectize_layer(this, 'true')
-          onBlur: () ->
-            window.toggle_selectize_layer(this, 'false')
-        }
+        #Need to check if this a saved or basic search, since those don't load in the data to the local storage
+        if filters.search_type != 'named' && filters.search_type != 'contains' && $('#dispute-advaced-search-selected-filters').html() != ''
+          filter_data_found = true
 
-        for user in response.json.case_owners
-          $('#user-list').append '<option value=\'' + user.cvs_username + '\'></option>'
+          #Case ID field
+          $('#caseid-input').val filters.case_id
+          #Dispute (URL/IP/Domain)
+          $('#dispute-input').val filters.dispute_entries.ip_or_uri
+          #Assignee
+          $('#owner-input').val filters.case_owner_username
+          #Suggested Disposition
+          $('#disposition-input').val filters.dispute_entries.suggested_disposition
+          #Submitter Type
+          $('#submitter-input').val filters.submitter_type
+          #Contact Name
+          $('#name-input').val filters.customer.name
+          #Contact Email
+          $('#email-input').val filters.customer.email
+          #Submitter Org
+          $('#company-input').val filters.customer.company_name
+          #Submitter Domain
+          $('#domain-input').val filters.org_domain
+          #Date Submitted (Newer)
+          $('#submitted-newer-input').val filters.submitted_newer
+          #Date Submitted (Older)
+          $('#submitted-older-input').val filters.submitted_older
+          #Case Origin
+          $('#case-origin-input').val filters.case_origin
+          #Case Age (Newer) ex: 30d 12h
+          $('#age-newer-input').val filters.age_newer
+          #Case Age (Older) ex: 7d 12h
+          $('#age-older-input').val filters.age_older
+          #Last Modified (Newer)
+          $('#modified-newer-input').val filters.modified_newer
+          #Last Modified (Older)
+          $('#modified-older-input').val filters.modified_older
 
-        for status in response.json.statuses
-          $('#status-list').append '<option value=\'' + status + '\'></option>'
+          #check for submission types parameter - if field is hidden there is no .submission_type attached
+          if filters.submission_type?
+            #uncheck any Submission Types that are not included in filters
+            if filters.submission_type.includes('w') == false
+              $('#submission-type-w-cb').prop('checked', false)
 
-        for type in response.json.submitter_types
-          $('#submittertype-list').append '<option value=\'' + type + '\'></option>'
+            if filters.submission_type.includes('ew') == false
+              $('#submission-type-ew-cb').prop('checked', false)
 
-        for contact in response.json.contacts
-          $('#contactname-list').append '<option value=\'' + contact.name + '\'></option>'
+            if filters.submission_type.includes('e') == false
+              $('#submission-type-e-cb').prop('checked', false)
 
-        for contact in response.json.contacts
-          $('#contactemail-list').append '<option value=\'' + contact.email + '\'></option>'
+      std_msg_ajax(
+        method: 'GET'
+        url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
+        success: (response) ->
+          $('#user-list').empty()
+          $('#status-list').empty()
+          $('#submittertype-list').empty()
+          $('#contactname-list').empty()
+          $('#contactemail-list').empty()
+          $('#company-list').empty()
+          $('#resolution-list').empty()
+          $('#case-origin-list').empty()
 
-        for company in response.json.companies
-          $('#company-list').append '<option value=\'' + company.name + '\'></option>'
+          $('#platform-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.platforms
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
 
-        for resolution in response.json.resolutions
-          $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
-    )
+          $('#resolution-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.resolutions
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
+
+          $('#status-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.statuses
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
+
+          $('#priority-input').selectize {
+            persist: false
+            create: false
+            valueField: 'id',
+            labelField: 'public_name',
+            options: response.json.priorities
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
+
+          #populate selectize fields if correct localstorage is found
+          if filter_data_found == true
+
+            #populate platform
+            if filters.platform_names != ''
+              platform_input = $('#platform-input').selectize()
+              platform_names = filters.platform_names.split(',')
+              platform_input[0].selectize.setValue(platform_names)
+
+            #populate resolution
+            if filters.resolution != ''
+              resolution_input = $('#resolution-input').selectize()
+              resolutions = filters.resolution.split(',')
+              resolution_input[0].selectize.setValue(resolutions)
+
+            #populate status
+            if filters.status != ''
+              status_input = $('#status-input').selectize()
+              statuses = filters.status.split(',')
+              status_input[0].selectize.setValue(statuses)
+
+            #populate priority
+            if filters.priority != ''
+              priority_input = $('#priority-input').selectize()
+              priorities = filters.priority.split(',')
+              priority_input[0].selectize.setValue(priorities)
+
+          for user in response.json.case_owners
+            $('#user-list').append '<option value=\'' + user + '\'></option>'
+
+          for type in response.json.submitter_types
+            $('#submittertype-list').append '<option value=\'' + type + '\'></option>'
+
+          for contact in response.json.contacts
+            $('#contactname-list').append '<option value=\'' + contact.name + '\'></option>'
+
+          for contact in response.json.contacts
+            $('#contactemail-list').append '<option value=\'' + contact.email + '\'></option>'
+
+          for company in response.json.companies
+            $('#company-list').append '<option value=\'' + company + '\'></option>'
+
+          for source in response.json.sources
+            $('#case-origin-list').append '<option value=\'' + source + '\'></option>'
+
+      )
 
 
-   
 
     if window.location.pathname.includes('/escalations/file_rep') ||  window.location.pathname.includes('/escalations/webrep')
       $('#filter-cases').show()
@@ -1658,7 +1782,7 @@ window.get_threat_levels = (uri) ->
   )
 
 $ ->
-  $('#advanced-search-button').click ->
+  $('#webrep-advanced-search-button').click ->
     $('#advanced-search-dropdown').show()
 
   $('#submit-advanced-search').click ->
@@ -1679,11 +1803,12 @@ $ ->
     debug: false
 
   $(document).on 'click', (e)->
-    if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
-      $("#advanced-search-dropdown").hide()
-    else   # ensure webrep dash datepicker not open
-      unless $('.ltr.show-calendar').css('display') == 'block'
-        $("#advanced-search-dropdown").show()
+    if $('#webrep-advanced-search-button').size() > 0    
+      if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
+        $("#advanced-search-dropdown").hide()
+      else   # ensure webrep dash datepicker not open
+        unless $('.ltr.show-calendar').css('display') == 'block'
+          $("#advanced-search-dropdown").show()
 
   window.averageTimeToCloseLabel = (hourAmount) ->
     totalSecond = hourAmount * 60 * 60
@@ -2632,34 +2757,35 @@ window.convert_dispute_to_webcat = () ->
 
 window.build_webrep_data = () ->
   $('#inline-webrep').removeClass('hidden')
-  data = {
-    search_type: '',
-    search_name: '',
-    selected_cases: []
-  }
   if location.search != ''
     urlParams = new URLSearchParams(location.search);
 #      if the location.search has value, it is a standard search
     data =  {
       search_type : 'standard'
       search_name : urlParams.get('f')
-      selected_cases: []
     }
-  
+
   else if localStorage.webRepFilters
     data = JSON.parse(localStorage.webRepFilters)
-   
+
+
+
   format_webrep_header(data)
+
   data
 
 window.format_webrep_header = (data) ->
   return if window.location.pathname != '/escalations/webrep/disputes'
 
   if data != undefined
-    reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="reset_webrep_page()"></span>'
+    if data.search_name == 'unassigned'
+      reset_icon = ''
+    else
+      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="reset_webrep_page()"></span>'
+
     { search_type, search_name } = data
-    if search_type == 'standart'
-      search_text = 
+    if search_type == 'standard'
+      search_text =
         if search_name == 'my_disputes'
           'My Tickets'
         else if search_name == 'team_disputes'
@@ -2675,10 +2801,59 @@ window.format_webrep_header = (data) ->
       else
         new_header = 'All Tickets'
     else if search_type == 'advanced'
+      search_conditions = JSON.parse(localStorage.webRepFilters)
       new_header =
         '<div>Results for Advanced Search ' +
         reset_icon +
         '</div>'
+      selectedFilters = []
+      condition_types = {
+        age_newer: 'Age more than'
+        age_older: 'Age less than'
+        case_id: 'Case IDs'
+        case_owner_username: 'Assignee'
+        modified_newer: 'Updated after'
+        modified_older: 'Updated before'
+        org_domain: 'Submitter domain'
+        platform_names: 'Platform'
+        priority: 'Priority'
+        resolution: 'Resolution'
+        status: 'Status'
+        submitted_newer: 'Submitted after'
+        submitted_older: 'Submitted before'
+        submitter_type: 'Submitter Type'
+        case_origin: 'Case Origin'
+      }
+      for conditionName, condition of search_conditions
+        if condition == '' || ['search', 'search_name', 'search_type'].includes(conditionName)
+          continue
+
+        if conditionName == 'customer'
+          for customer_type, customer_value of search_conditions[conditionName]
+            if customer_value == ''
+             continue
+            if customer_type == 'name'
+              selectedFilters.push({name: 'Contact Name', value: customer_value})
+            if customer_type == 'email'
+              selectedFilters.push({name: 'Contact Email', value: customer_value})
+            if customer_type == 'company_name'
+              selectedFilters.push({name: 'Submitter Org', value: customer_value})
+        else if conditionName == 'dispute_entries'
+          for key, value of search_conditions[conditionName]
+            if value  == ''
+             continue
+            if key == 'ip_or_uri'
+              selectedFilters.push({name: 'Dispute (URL/IP/Domain)', value: value})
+            if key == 'suggested_disposition'
+              selectedFilters.push({name: 'Suggested Disposition', value: value})
+        else if conditionName == 'submission_type'
+          selectedFilters.push({name: 'Submission Type', value: search_conditions[conditionName].map((e) => e.toUpperCase()).join(', ')})
+        else if condition_types[conditionName]
+          selectedFilters.push({name: condition_types[conditionName], value: search_conditions[conditionName]})
+        container = $('#dispute-advaced-search-selected-filters')
+      for item in selectedFilters
+        html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value.split(',').join(', ') + '</span>'
+        $('#dispute-advaced-search-selected-filters').append(html)
     else if search_type == 'named'
       new_header =
         '<div>Results for "' + search_name + '" Saved Search' +
@@ -2696,4 +2871,4 @@ window.format_webrep_header = (data) ->
 
 window.reset_webrep_page = () ->
   localStorage.removeItem('webRepFilters')
-  refresh_webrep_url()
+  refresh_webrep_url('?f=unassigned')

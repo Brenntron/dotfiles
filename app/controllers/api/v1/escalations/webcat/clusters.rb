@@ -32,6 +32,7 @@ module API
               optional :f, type: String, desc: 'filter'
               optional :platform, type: String, desc: 'platform filter(WSA/NGFW/Umbrella)'
               optional :cluster_type, type: String, desc: 'cluster type filter(ip/domain)'
+              optional :save_regex, type: Boolean, desc: 'Save regex'
             end
 
             # Uses class Beaker::Verdicts in old Beaker namespace.
@@ -42,9 +43,14 @@ module API
                 platform: params[:platform],
                 cluster_type: params[:cluster_type]
               }
-              clusters = ::Clusters::Fetcher.new(filter, params[:regex], current_user).fetch
+              clusters = ::Clusters::Fetcher.new(filter, params[:regex], params[:save_regex], current_user).fetch
+              named_search = current_user.named_searches.where(name: params[:regex]).first
 
-              {:status => "success", :data => clusters}.to_json
+              if params[:save_regex]
+                named_search = NamedSearch.create!(user: current_user, name: params[:regex], project_type: 'webcat_clusters_regex') unless named_search
+              end
+
+              {:status => "success", :data => clusters, :named_search => named_search}.to_json
             end
 
             #returns an array of hashes about urls associated with a cluster_id
@@ -66,7 +72,6 @@ module API
               cluster_id = params[:id]
               cluster_info = Wbrs::Cluster.retrieve(cluster_id)
               sorted_limited_cluster_info = cluster_info.sort { |x,y| y['glob_volume'] <=> x['glob_volume'] }.first(300)
-
 
               { status: 'success', data: sorted_limited_cluster_info }.to_json
             end
@@ -173,6 +178,17 @@ module API
                   status: 'failed',
                   error: e.message
               }.to_json
+            end
+
+            desc "Delete saved regex searches for webcat clusters"
+            params do
+              requires :search_name, type: String, desc: 'filter'
+            end
+            delete "searches" do
+              # TODO determine access control policy for named searches
+              search = NamedSearch.where(name: params['search_name'], user: current_user, project_type: 'webcat_clusters_regex')
+              search.destroy_all
+              true
             end
           end
         end

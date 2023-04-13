@@ -186,6 +186,7 @@ window.initialize_sdr_disputes_datatable = () ->
       data: build_sdr_data()
     pagingType: 'full_numbers'
     order: [[ 5, 'desc' ]]  # that's tmp default sorting column
+    stateSave: true
     columnDefs: [
       {
         # remove sorting from age column
@@ -248,7 +249,11 @@ window.initialize_sdr_disputes_datatable = () ->
       }
       { data: 'source' }
       { data: 'platform' }
-      { data: 'dispute' }
+      {
+        data: 'dispute'
+        render: (data) ->
+          return "<div class='text-wrap'>#{data}</div>"
+      }
       #current_rep
       { data: null, visible: false, render: ( data )-> '' }
       #rules
@@ -549,11 +554,6 @@ window.sdr_toggle_selectize_layer = (input, focus) ->
     $(select_parent).css('z-index', '2')
 
 window.build_sdr_data = () ->
-  data = {
-    search_type: ''
-    search_name: ''
-  }
-
   if location.search != ''
     urlParams = new URLSearchParams(location.search);
     # if the location.search has value, it is a standard search
@@ -588,6 +588,13 @@ window.build_sdr_data = () ->
         search_conditions: search_conditions
       }
 
+  else
+    data = {
+      search_type: 'standard'
+      search_name: 'unassigned'
+    }
+
+
   format_sdr_header(data)
   return data
 
@@ -618,7 +625,8 @@ window.format_sdr_header = (data) ->
   if data != undefined && container.length > 0
     reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="sdr_search_refresh()"></span>'
     { search_type, search_name } = data
-
+    if search_name == 'unassigned' && location.search == ''
+      reset_icon = ''
     if search_type == 'standard'
       if search_name == 'all'
         reset_icon = ''

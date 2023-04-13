@@ -57,6 +57,11 @@
     %label.content-label-sm Resolution
     %input.form-control.selectize#resolution-input{name: 'resolution', multiple: 'multiple', tabindex:'-1'}
     %button#remove-criteria-resolution.remove-input{onclick:'clearSelectize("resolution-input")'}
+  
+  .form-group.search-item.hidden
+    %label.content-label-sm Submitter Type
+    %input.form-control.selectize#submitter-type-input{name: 'submitter-type', multiple: 'multiple', tabindex: '-1', data: 'webcat'}
+    %button#remove-criteria-submitter-type.remove-input{onclick: 'clearSelectize("submitter-type-input")'}
 
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Name
@@ -141,6 +146,10 @@
             %label.search-criteria-label
               %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria', value: 'Resolution', for: 'resolution-input'}
               Resolution
+          %li
+            %label.search-criteria-label
+              %input.search-checkbox#submitter-type-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Type', for: 'submitter-type-input'}
+              Submitter Type
           %li
             %label.search-criteria-label
               %input.search-checkbox#name-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Name', for: 'name-input'}

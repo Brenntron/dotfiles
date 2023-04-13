@@ -28,7 +28,7 @@ module API
             put ":id", root: "email_template" do
               authorize!(:update, SenderDomainReputationEmailTemplate)
               template = SenderDomainReputationEmailTemplate.find(permitted_params[:id])
-              template.update_attributes(permitted_params)
+              template.update(permitted_params)
             end
 
             desc "create an email template"

@@ -4,7 +4,7 @@ class Customer < ApplicationRecord
   has_many :disputes
   has_many :file_reputation_disputes
 
-  validates :email, presence: true, uniqueness: true
+  validates :email, presence: true, uniqueness: { case_sensitive: true }
 
   delegate :name, to: :company, allow_nil: true, prefix: true
 

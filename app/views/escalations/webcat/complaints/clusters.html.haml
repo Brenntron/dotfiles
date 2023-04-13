@@ -17,9 +17,9 @@
         %span.top-info-icon{class: "#{content_for :webcat_icon}"}
       .col-xl-9.col-lg-8.col-md-7.col-sm-6.col-xs-12
         .row
-          .col-xs-9
+          .col-xs-8
             %input#cluster_comment_field.text_field{placeholder: 'Reason for category (optional, not public-facing)'}
-          .col-xs-3.no_pad
+          .col-xs-4.no_pad
             %button.toolbar-button.icon-submit.cluster-button#submit-clusters{'onclick': 'categorize_clusters()'} Submit Changes
 
   .row
@@ -38,7 +38,7 @@
           %label.toolbar-section-label View
           .btn-group.toolbar-btn-group
             %button.btn.toolbar-button.icon-opened-selected.esc-tooltipped{title: 'Open Selected in New Tab', onclick: 'open_selected_clusters()'}
-            %button.btn.toolbar-button.icon-open-all.esc-tooltipped{title: 'Open All', onclick: 'open_all_clusters()'}
+            %button.btn.toolbar-button.open-all.esc-tooltipped{title: 'Open All', onclick: 'open_all_clusters()'}
               %span.toolbar-button-text Open in New Tab
         %div
           %label.toolbar-section-label Assign

@@ -891,18 +891,27 @@ module API
 
             desc 'Autopopulate fields on Advanced Search'
             get 'autopopulate_advanced_search' do
-              case_owners = User.joins(:disputes).where.not(cvs_username: nil).order(cvs_username: :asc).uniq
-              statuses = [Dispute::STATUS_RESEARCHING,Dispute::STATUS_ESCALATED,Dispute::STATUS_CUSTOMER_PENDING,
-                          Dispute::STATUS_ON_HOLD,Dispute::STATUS_RESOLVED,Dispute::STATUS_REOPENED]
-              submitter_types = ['Customer', 'Non-Customer']
-              contacts = Customer.all.order(name: :asc)
-              companies = Company.all.order(name: :asc)
-              resolutions = [Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN, Dispute::STATUS_RESOLVED_UNCHANGED,
-                             Dispute::STATUS_RESOLVED_INVALID, Dispute::STATUS_RESOLVED_TEST, Dispute::STATUS_RESOLVED_OTHER]
-              platforms = Platform.all.order(public_name: :asc).map {|m| {id: m.id, public_name: m.public_name}}
+              case_owners = Rails.cache.fetch('user_svs_names_list') do
+                 User.where.not(cvs_username: nil).order(cvs_username: :asc).uniq.pluck(:cvs_username)
+              end
+              statuses = [Dispute::NEW, Dispute::STATUS_RESEARCHING,Dispute::STATUS_ESCALATED,Dispute::STATUS_CUSTOMER_PENDING, Dispute::ASSIGNED,
+                          Dispute::STATUS_ON_HOLD,Dispute::STATUS_RESOLVED,Dispute::STATUS_REOPENED].map {|item| {id: item, public_name: item }}
+              submitter_types = ['Customer', 'Non-Customer', 'Internal']
+              contacts =  Rails.cache.fetch('all_contacts_list') do
+                Customer.all.order(name: :asc).map {|customer| { name: customer.name, email: customer.email }}
+              end
+              companies = Rails.cache.fetch('all_companies_list') do
+                Company.order(name: :asc).pluck(:name)
+              end
+              resolutions = Dispute::RESOLUTIONS.map {|item| {id: item, public_name: item }}
+              priorities = Dispute::PRIORITIES.map {|item| {id: item, public_name: item }}
+              sources = Dispute::SOURCES
+              platforms =  Rails.cache.fetch('platforms_list') do
+                Platform.all.order(public_name: :asc).map {|m| {id: m.public_name, public_name: m.public_name}}
+              end
               render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
                             contacts: contacts, companies: companies, resolutions: resolutions,
-                            platforms: platforms}
+                            platforms: platforms, priorities: priorities, sources: sources}
             end
 
             desc 'Auto-populate fields on New Dispute'
@@ -1079,8 +1088,6 @@ module API
                 return {:status => "success", :messages => results[:messages]}
               end
             end
-
-
           end
         end
       end

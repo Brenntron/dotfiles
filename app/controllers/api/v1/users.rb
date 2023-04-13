@@ -34,7 +34,7 @@ module API
         end
         put ":id", root: "user" do
           authorize! :update_preferences, User
-          current_user.update_attributes(metrics_timeframe: permitted_params[:metrics_timeframe])
+          current_user.update(metrics_timeframe: permitted_params[:metrics_timeframe])
         end
       end
     end
