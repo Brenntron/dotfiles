@@ -4019,15 +4019,13 @@ fieldset.top-content {
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
 .nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
 
-.email-msg-body pre {
+.email-msg-content {
   background-color: $content-bg-color;
   color: $type-lighter-color;
   line-height: 1.4em;
   margin-top: 12px;
   margin-bottom: 40px;
   font-size: 9pt;
-  white-space: pre-wrap;
-  word-wrap: break-word;
 }
 
 .table-toolbar {
@@ -4440,6 +4438,8 @@ input.communication-subject {
   font-size: 8pt;
   border-radius: 0;
   border: 1px solid darken($faint-neutral-color, 5%);
+  width: 100%;
+  max-width: 475px;
 }
 
 #communication h1 {
@@ -12275,12 +12275,16 @@ input[type="radio"].resolution_radio_button {
     font-weight: normal;
   }
 
-  label {
-    display: none;
-  }
-
   div {
     margin: 4px 3px 0 0;
+  }
+
+  .toolbar-dropdown {
+    margin-top: 0 !important;
+  }
+
+  .primary-text-divider {
+    margin-top: 0 !important;
   }
 
   .btn-group.toolbar-btn-group {
@@ -14192,6 +14196,13 @@ input.wl-bl-list-inline {
   }
   .align-top {
     padding-top: 3px !important;
+  }
+}
+
+//overridding the webrep toolbar div style for convert ticket dropdown
+#convert-ticket-dropdown  {
+  div {
+    margin-right: 0 !important;
   }
 }
 
