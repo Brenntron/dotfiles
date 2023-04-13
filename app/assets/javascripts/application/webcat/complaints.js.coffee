@@ -31,6 +31,87 @@ $(document).ready ->
      $('body').hasClass('index-action')
     window.check_wbnp_status()
 
+window.change_ticket_view = (type,button) ->
+
+  checked = $('.imports_check_box:checked')
+
+  if $(button).hasClass('active-view')
+    #if view is already active, do nothing
+    return
+
+  switch type
+    when 'ticket'
+      if checked.length == 0
+        #if ticket view selected without any checked, show error and do nothing
+        std_msg_error("Select at least one ticket to view.", [], reload: false)
+        return
+      else
+        #else build (or show previously built) tickets
+        build_ticket_view(checked)
+        $('.mothra-header').text('Import Results')
+    when 'list'
+      $('.mothra-header').text('Jira Imports')
+      $('.ticket-rows').addClass('hidden') #ticket rows must be individually hidden
+
+  # show/hide appropriate elements
+  $('#webcat-imports-index_wrapper, .webcat-ticket-view').toggleClass('hidden')
+  $('.list-button, .view-tickets').toggleClass('active-view')
+
+
+window.build_ticket_view = (checked) ->
+  table =  $('#webcat-imports-index').DataTable()
+
+  for check in checked
+    row = $(check).closest('tr')
+    id = $(check).val()
+
+    if $("##{id}").length
+      # if we have already built this ticket view, show it
+      $("##{id}").removeClass('hidden')
+    else
+      # if we haven't built this ticket view, build it
+      rd = table.row( row ).data()
+      urls = [] #TODO get bast urls here
+      row_data ={
+        'Jira Ticket': rd.issue_key,
+        'Submitter': rd.submitter,
+        'Imported On': rd.imported_at,
+        'Result': rd.result
+      }
+
+      ticket_html = "<div class='col-xs-8 ticket-rows' id='#{id}'>"
+
+      #build upper data
+      for title, content of row_data
+        ticket_html += "<div class='col-xs-6'>
+                          <label class='data-report-label'>#{title}</label>
+                          <span class='data-report-content'>#{content}</span>
+                        </div>"
+
+      #build table data
+      table_html = "<table>
+                        <thead><tr>
+                          <th>Original</th>
+                          <th>Sanitized</th>
+                          <th>Entry ID</th>
+                          <th>Bast Response</th>
+                        </tr></thead>
+                        <tbody>"
+      for url in urls
+        #this will need to be changed 5sure
+        table_html += "<tr>"
+        for k, v of url
+          table_html += "<td>#{v}</td>"
+        table_html += "</tr>"
+
+      if urls.length == 0
+        table_html +="<tr><td colspan=4 ><span class='missing-data'> No URLs Available</span></td></tr>"
+      table_html += "</tbody></table></div>"
+
+      ticket_html += table_html
+      $('.webcat-ticket-view').append(ticket_html)
+
+
 $(document).on 'click', '#show-failed, #show-complete',->
   table = $('#webcat-imports-index').DataTable()
   show_failed = $('#show-failed').prop('checked')
@@ -88,7 +169,7 @@ window.build_imports_table = () ->
       {
         data:'issue_key',
         render: (data,type,full,meta) ->
-          return "<input type='checkbox' name='cbox' class='imports_check_box' id='cbox#{data}' value=#{data} />"
+          return "<input type='checkbox' name='cbox' class='imports_check_box' id='cbox#{data}' data=#{JSON.stringify(full)} value=#{data} />"
       },
       {data: 'issue_key'},
       {data: 'submitter'},

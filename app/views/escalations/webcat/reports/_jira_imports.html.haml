@@ -1,12 +1,12 @@
-%h1 JIRA Imports
+%h1.mothra-header JIRA Imports
 
 .toolbar.webcat-reports-toolbar
   %div.view-container.toolbar-container
     %label.toolbar-section-label
       View
-    %button.toolbar-button.list-button.toolbar-button-spacer.active-view.tooltipped{title: 'List All Jira Imports'}
+    %button.toolbar-button.list-button.toolbar-button-spacer.active-view.tooltipped{title: 'List All Jira Imports', onclick:'change_ticket_view("list")'}
       %span.toolbar-button-text List
-    %button.toolbar-button.view-rules.view-button.tooltipped{title: 'Detailed Import View'}
+    %button.toolbar-button.view-tickets.view-button.tooltipped{title: 'Detailed Import View', onclick:'change_ticket_view("ticket", this)'}
       %span.toolbar-button-text View
 
   %div.toolbar-container
@@ -29,7 +29,10 @@
 
 .row
   .col-xs-12
-    %table.table.responsive.dataTable.no-footer#webcat-imports-index{role:'datatable'}
+
+    .webcat-ticket-view.hidden
+
+    %table.table.responsive.dataTable.no-footer.webcat-list-view#webcat-imports-index{role:'datatable'}
       %thead
         %tr
           %th.sorting_disabled
