@@ -17,6 +17,16 @@ module API
             end
           end
         end
+
+        resource "escalations/jira_import_tasks/:id/bast_data" do
+          desc "get BastApi data for corresponding jira import task"
+          get "", root: :jira_import_tasks do
+            std_api_v2 do
+              task_id = JiraImportTask.find(params[:id]).bast_task
+              Bast::Base.get_task_result(task_id)
+            end
+          end
+        end
       end
     end
   end
