@@ -93,14 +93,6 @@ Rails.application.routes.draw do
       get :export_selected_dispute_entry_rows, to: 'disputes#export_selected_dispute_entry_rows'
     end
 
-    namespace :sdr do
-      root 'root#index'
-
-      resources :disputes, only: [:index, :show] do
-        get :all_attachments
-      end
-
-    end
 
     namespace :file_rep do
       root 'disputes#index'
