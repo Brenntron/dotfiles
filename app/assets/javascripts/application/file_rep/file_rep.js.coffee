@@ -1537,18 +1537,18 @@ $ ->
         window.toggle_selectize_layer(this, 'false')
     }
 
-    platforms_input = $('#platform-input').selectize {
-      persist: true
-      create: false
-      valueField: 'public_name',
-      labelField: 'public_name',
-      searchField: 'public_name',
-      options: AC.FileRep.createAssigneeOptions()
-      render:
-        option: (item, escape) ->
-         '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'
-      onFocus: () ->
-        window.toggle_selectize_layer(this, 'true')
-      onBlur: () ->
-        window.toggle_selectize_layer(this, 'false')
-    }
+  platforms_input = $('#platform-input').selectize {
+    persist: true
+    create: false
+    valueField: 'public_name',
+    labelField: 'public_name',
+    searchField: 'public_name',
+    options: AC.FileRep.createAssigneeOptions()
+    render:
+      option: (item, escape) ->
+       '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'
+    onFocus: () ->
+      window.toggle_selectize_layer(this, 'true')
+    onBlur: () ->
+      window.toggle_selectize_layer(this, 'false')
+  }
