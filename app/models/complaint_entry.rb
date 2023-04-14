@@ -54,7 +54,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def self.current_category_data_for_uri(uri)
-    prefix = Wbrs::Prefix.where({:urls => [URI.escape(uri)]})&.first
+    prefix = Wbrs::Prefix.where({:urls => [Addressable::URI.escape(uri)]})&.first
     return {} unless prefix
 
     current_categories = prefix.categories
@@ -126,6 +126,48 @@ class ComplaintEntry < ApplicationRecord
     return("Complaint returned")
   end
 
+  def unassign
+    if self.user == User.vrtincoming
+      return("Complaint is already assigned to Vrt Incoming")
+    else
+      if !self.is_important
+        if status!="COMPLETED"
+          self.update(user: User.vrtincoming, status:"NEW")
+          complaint.set_status("NEW")
+        else
+          return("Already completed")
+        end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: User.vrtincoming, status:"NEW")
+        complaint.set_status("NEW")
+      else
+        return("Status is pending")
+      end
+    end
+    return("Complaint unassigned")
+  end
+
+  def reassign(user)
+    if self.user == user
+      return("Complaint is already assigned to #{user.cvs_username}")
+    else
+      if !self.is_important
+        if status!="COMPLETED"
+          self.update(user: user, status:"ASSIGNED", case_assigned_at: Time.now)
+          complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
+        else
+          return("Already completed")
+        end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: user, status:"ASSIGNED", case_assigned_at: Time.now)
+        complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
+      else
+        return("Status is pending")
+      end
+    end
+    return("Complaint assigned to #{user.cvs_username}")
+  end
+
   def is_pending?
     "PENDING" == status
   end
@@ -141,7 +183,7 @@ class ComplaintEntry < ApplicationRecord
   # @return [Array[Wbrs::Prefix]] the object for the Prefix remote stub.
   def remote_prefixes(prefix_given: self.hostlookup, reload: false)
     @remote_prefixes = nil if reload
-    @remote_prefixes ||= Wbrs::Prefix.where({:urls => [URI.escape(prefix_given)]})
+    @remote_prefixes ||= Wbrs::Prefix.where({:urls => [Addressable::URI.escape(prefix_given)]})
   end
 
   # Returns the Wbrs::Prefix object called on domain_of_with_path
@@ -440,7 +482,7 @@ class ComplaintEntry < ApplicationRecord
 
     begin
       Rails.logger.error "#{logger_token} getting sbrs data for uri: #{ip_url}\n"
-      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
+      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => Addressable::URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
     rescue
@@ -541,7 +583,7 @@ class ComplaintEntry < ApplicationRecord
   def self.create_complaint_entry(complaint, ip_url, platform, user = nil, status = NEW, categories = nil)
     new_complaint_entry = ComplaintEntry.new
     begin
-      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
+      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => Addressable::URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
     rescue Exception => e
@@ -711,6 +753,34 @@ class ComplaintEntry < ApplicationRecord
         closed.where(user_id: user.id)
       when "MANAGER QUEUE"
         joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
+      when "ALL TALOS"
+        where(complaint_id: Complaint.from_ti)
+      when "NEW TALOS"
+        where(status: 'NEW', complaint_id: Complaint.from_ti)
+      when "TALOS OVERDUE"
+        where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "TALOS ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_ti)
+      when "ALL WBNP"
+        where(complaint_id: Complaint.from_wbnp)
+      when "NEW WBNP"
+        where(status: 'NEW', complaint_id: Complaint.from_wbnp)
+      when "WBNP OVERDUE"
+        where(complaint_id: Complaint.from_wbnp).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "WBNP ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_wbnp)
+      when "ALL INTERNAL"
+        where(complaint_id: Complaint.from_int)
+      when "NEW INTERNAL"
+        where(status: 'NEW', complaint_id: Complaint.from_int)
+      when "INTERNAL OVERDUE"
+        where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "INTERNAL ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_int)
+      when "ALL PENDING"
+        where(status: 'PENDING')
+      when "PENDING OVERDUE"
+        where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
       when "ALL"
         all
       else
@@ -902,7 +972,7 @@ class ComplaintEntry < ApplicationRecord
 
     if complaint_fields.present?
       relation = relation.includes(:complaint).where(complaints: complaint_fields)
-    end 
+    end
     # Save this search as a named search
     if present_params.present? && search_name.present?
       Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')
@@ -950,7 +1020,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def set_current_category
-    set_current_category_from_prefix(Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]}))
+    set_current_category_from_prefix(Wbrs::Prefix.where({:urls => [Addressable::URI.escape(self.hostlookup)]}))
   end
 
   def self.get_category_data(uri)
@@ -1077,7 +1147,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def self.current_category_data_for_uri(uri)
-    prefix = Wbrs::Prefix.where({:urls => [URI.escape(uri)]})&.first
+    prefix = Wbrs::Prefix.where({:urls => [Addressable::URI.escape(uri)]})&.first
     return {} unless prefix
 
     current_categories = prefix.categories
@@ -1130,7 +1200,7 @@ class ComplaintEntry < ApplicationRecord
   def history_category_data_with_preload_save
 
     prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
+    prefix_results = Wbrs::Prefix.where({:urls => [Addressable::URI.escape(self.hostlookup)]})
 
     complaint_entry_preload = ComplaintEntryPreload.where(complaint_entry_id: self.id).first
 
@@ -1293,7 +1363,7 @@ class ComplaintEntry < ApplicationRecord
     end
     cat_ids_string = cat_ids_array.join(",")
 
-    current_cats = Wbrs::Prefix.where({:urls => [URI.escape(self.uri_as_categorized)]}).map {|result| result.category_id}
+    current_cats = Wbrs::Prefix.where({:urls => [Addressable::URI.escape(self.uri_as_categorized)]}).map {|result| result.category_id}
 
     if current_cats.sort == cat_ids_array.sort
       log_messages << "#{self.id} : #{self.hostlookup} current cat ids appear to match cat ids in ruleAPI, aborting resubmit"
@@ -1308,7 +1378,7 @@ class ComplaintEntry < ApplicationRecord
       final_prefix = self.hostlookup
     end
     #setup for call to ruleAPI
-    existing_prefixes = Wbrs::Prefix.where({:urls => [URI.escape(self.uri_as_categorized)]})
+    existing_prefixes = Wbrs::Prefix.where({:urls => [Addressable::URI.escape(self.uri_as_categorized)]})
     prefix = self.uri_as_categorized
     final_cat_string = cat_ids_string
     comment = self.internal_comment + " -- automated re-attempt at categorization"

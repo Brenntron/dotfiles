@@ -840,6 +840,7 @@ button {
   left: 7px;}
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 .sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
+.remove-assignee-toolbar-button {background-image: url(image_path('icon_unassign_grey.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -847,13 +848,12 @@ button {
   background-image: url(image_path('icon_submit_arrow.svg'));
   background-color: $warning-accent-color;
 }
-.resolution-submit-button {background-image: url(image_path('icon_submit_arrow_grey.svg'));}
-.open .resolution-submit-button {background-image: url(image_path('icon_submit_arrow.svg'));}
-.resolution-submit-button:disabled, .master-submit-button:disabled {background-image: url(image_path('icon_submit_arrow_grey_disabled.svg'));}
+.master-submit-button:disabled {background-image: url(image_path('icon_submit_arrow_grey_disabled.svg'));}
+.resolution-submit-button {background-image: url(image_path('icon_bulk_resolve_white.svg'));}
 .open-viewable {background-image: url(image_path('icon_open_viewable.svg'));}
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
-.open-all {background-image: url(image_path('icon_open_all.svg'));}
+.open-all {background-image: url(image_path('icon_open_viewable.svg'));}
 .take-ticket-toolbar-button {background-image: url(image_path('icon_take.svg'));}
 .return-ticket-toolbar-button {background-image: url(image_path('icon_return.svg'));}
 .convert-ticket-button{background-image: url(image_path('icon_convert_ticket_grey.svg'));}
@@ -864,6 +864,7 @@ button {
 .url-cat-button {background-image: url(image_path('icon_categorize.svg'));}
 .add-user-button {background-image: url(image_path('icon_add_user_grey.svg'));}
 .export-button-white {background-image: url(image_path('icon_export_white.svg'));}
+.webcat-manage-templates-button {background-image: url(image_path('icon_email_read.svg'));}
 .ping-button {
   background-image: url(image_path('icon_ping_grey.svg'));
   float: right;
@@ -1037,9 +1038,9 @@ button {
 .open-all:hover,
 .take-ticket-button:hover,
 .return-ticket-toolbar-button:hover,
+.remove-assignee-toolbar-button:hover,
 .collapse-all:hover,
 .sync-button:hover,
-.pin-to-top-button:hover,
 .expand-all:hover,
 .approve-all-button:hover,
 .reject-all-button:hover {
@@ -1056,6 +1057,7 @@ button {
 .adjust-wlbl-button:focus,
 .export-button:focus,
 .take-ticket-toolbar-button:focus,
+.remove-assignee-toolbar-button:focus,
 .take-ticket-button:focus,
 .open-viewable:focus,
 .open-nonviewable:focus,
@@ -1065,7 +1067,6 @@ button {
 .return-ticket-toolbar-button:focus,
 .collapse-all:focus,
 .sync-button:focus,
-.pin-to-top-button:focus,
 .expand-all:focus,
 .approve-all-button:focus,
 .reject-all-button:focus {
@@ -1776,7 +1777,10 @@ fieldset.tight {
           );
 }
 #index-change-assign-dropdown{
+  left: initial;
   padding: 20px 0 12px 0!important;
+  top: 80%;
+
   #internal_comment ,#customer_facing_comment{
     font-size: inherit;
     height: 30px;
@@ -2258,7 +2262,6 @@ a.static-nav-item {
 .icon-user-white {background-image: url(image_path('icon_user_white.svg'));}
 .icon-custom-user-white {background-image: url(image_path('icon_custom_user_white.svg'));}
 .icon-opened-selected {background-image: url(image_path('icon_open_selected.svg'));}
-.icon-open-all {background-image: url(image_path('icon_open_all.svg'));}
 .icon-copycat {background-image: url(image_path('icon_copycat.svg'));}
 .icon-telemetry {background-image: url(image_path('icon-telemetry.svg'));}
 .icon-search{background-image: url(image_path('icon_search_white.svg'));}
@@ -2273,6 +2276,9 @@ a.static-nav-item {
 .icon-reversing-labs-light {background-image: url(image_path('icon_reverse_light.svg'));}
 .icon-show-as-columns {background-image: url(image_path('icon_vertical.svg'));}
 .icon-show-as-stacked {background-image: url(image_path('icon_horizontal.svg'));}
+.icon-talos-white {background-image: url(image_path('icon_talos_white.svg'));}
+.icon-web-white {background-image: url(image_path('icon_web_white.svg'));}
+.icon-company-white {background-image: url(image_path('icon_company_white.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -2364,6 +2370,10 @@ a.static-nav-item {
   border-bottom-left-radius: 0;
   min-height: 388px;
   padding-top: 10px;
+}
+
+#saved-searches-wrapper.webcat-named-search-list {
+  min-height: 495px;
 }
 
 .search-wrapper {
@@ -5140,7 +5150,7 @@ table > tbody > tr > td.dispute_rep_tools {
 #reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
   width: 400px;
 }
-[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"],[aria-describedby="whois_content"]  {
+[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"],[aria-describedby="whoisContent"]  {
   z-index: 999;
 }
 
@@ -6326,6 +6336,7 @@ table > tbody > tr > td.research-table-row-wrapper {
 .virustotal-details-table { background-color: $rule-accent-color;}
 .reptool-details-table {background-color: $fifth-section-color;}
 .enrich-details-table {background-color: $escalations-section-color;}
+.prevalence-details-table {background-color: $escalations-section-color;}
 
 .entry-details-table table {
   background-color: $table-dark-body;
@@ -7449,7 +7460,7 @@ table.dispute-entry-table tbody tr.selected {
   margin-left: 10px;
 }
 
-.dispute-owner-buttons-wrapper .dropdown.open {
+.dispute-owner-buttons-wrapper .dropdown.open, .webrep-change-assignee-wrapper .dropdown.open{
   background-color: transparent !important;
 }
 
@@ -7898,7 +7909,7 @@ table.dispute-entry-table tbody tr.selected {
 
   .selectize-input.items.not-full.has-options.focus.input-active.dropdown-active,
   .selectize-control.form-control.selectize.multi, .selectize-dropdown.multi.form-control.selectize {
-    max-width: 409px !important;
+    max-width: 431px !important;
   }
   .selectize-dropdown.multi.form-control.selectize {
     position: absolute;
@@ -8190,7 +8201,7 @@ table.dispute-entry-table tbody tr.selected {
 .tab-pane:not(.active){
   display: none
 }
-.cat-history-dialog .tab-pane{
+.dialog-content-wrapper .tab-pane{
   border: 1px solid #d9d9d9;
   padding: 15px;
 }
@@ -8269,14 +8280,7 @@ table.dispute-entry-table tbody tr.selected {
   max-height: 42px!important;
   overflow-y: scroll;
 }
-.history-table {
-  font-size: 8pt;
-}
 
-.history-table td {
-  padding: 4px 8px;
-  line-height: 1.25em;
-}
 .uneditable_urls{
   font-size: 8pt;
   padding: 0!important;
@@ -9467,7 +9471,6 @@ td.text-center span {
     min-width: 110px;
     background-size: 17px;
   }
-
 }
 
 .copycat-tool-footer .cluster-button{
@@ -9481,6 +9484,42 @@ td.text-center span {
     width: unset;
     &:hover {
       background-color: darken($nav-toolbar-color, 10%)!important;
+    }
+  }
+}
+
+#clusters-nav-regex-wrapper {
+  .input-group.search-group {
+    display: inline-block;
+    margin-right: 0;
+    top: -4px;
+    width: 60%;
+
+    @media (min-width: 1000px) {
+      width: 70%;
+    }
+
+    @media (min-width: 1400px) {
+      width: 80%;
+    }
+  }
+
+  .clusters-nav-regex-container {
+    display: inline-block;
+    height: 15px;
+    margin: 15px 0 0 0;
+    width: 80px;
+
+    input {
+      float: right;
+      margin: 0;
+    }
+
+    label {
+      float: left;
+      font-size: 11px;
+      font-weight: 400;
+      margin: 0 5px 0 0;
     }
   }
 }
@@ -9659,6 +9698,28 @@ td.text-center span {
       width: 90px;
       margin-top: 6px;
     }
+}
+
+.webcat-whois-dialog {
+  border: none !important;
+  z-index: 999;
+
+  .tab-pane {
+    min-height: 200px;
+  }
+
+  .ui-dialog-titlebar {
+    background-color: $primary-section-color;
+
+    .ui-dialog-title {
+      background-image: url(image_path('icon_whois_white.svg'));
+      background-position: left -2px;
+      background-repeat: no-repeat;
+      background-size: 22px 22px;
+      line-height: 1rem;
+      padding-left: 25px;
+    }
+  }
 }
 
 .ticket-age-over3hr {
@@ -9993,19 +10054,6 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 #edit-dispute-button {
   background-color: $faint-neutral-color;
-}
-
-#whois_content {
-  margin: 17px auto;
-  display: flex;
-  white-space: pre-wrap;
-  justify-content: center;
-  align-items: center;
-  .dialog-content-wrapper{
-    max-height: 500px!important;
-    width: 90%;
-    overflow-y: scroll;
-  }
 }
 
 .dropdown-tool-text-divider {
@@ -10475,26 +10523,28 @@ hr.thin.form-divider {
   padding: 10px 15px;
   box-shadow: none;
   background-color: darken($content-label-color, 10%);
+  border-bottom: none;
 }
 
 .nav-tabs.dialog-tabs > li.active > a {
   background-color: $content-bg-color;
   border: 1px solid darken($faint-neutral-color, 10%);
+  border-bottom: 1px solid $ac-nav-bg-color;
+  box-shadow: 0 1px 0 0 $ac-nav-bg-color;
 }
 
 .nav-tabs.dialog-tabs > li.active::before {
   content: '';
   border-left: 1px solid darken($faint-neutral-color, 10%);
-  border-right: 1px solid darken($faint-neutral-color, 10%);
   background-color: $content-bg-color;
   width: 100%;
-  height: 1px;
+  height: 2px;
   display: block;
   position: absolute;
   left: 0;
   padding: 0;
   z-index: 55;
-  margin-top: 39px;
+  margin-top: 40px;
   margin-left: -1px;
 }
 
@@ -10502,19 +10552,38 @@ hr.thin.form-divider {
   display: none;
 }
 
-.dialog-tab-content {
+.dialog-tab-content, .dialog-content-wrapper {
   border: 1px solid darken($faint-neutral-color, 10%);
   padding: 15px;
+
+  p {
+    font-size: 12px !important;
+  }
+  table {
+    background-color: $content-bg-color;
+    font-size: 8pt !important;
+    margin-bottom: 20px;
+    tbody > tr > td {
+      padding: 4px 8px !important;
+      line-height: 1.25em !important;
+      font-size: 12px;
+    }
+    th {
+      padding: 4px 8px !important;
+      border-bottom: 1px solid $faint-neutral-color;
+      height: 24px;
+      line-height: 1.25em !important;
+    }
+  }
+  hr.thin {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
 }
 
 #xbrs-history-tab {
   overflow: scroll;
 }
-
-.history-table {
-  background-color: $content-bg-color;
-}
-
 
 // dbinebri: the new ticket file rep container needs to be wide and slightly positioned to the right
 .escalations--file_rep--disputes-controller .nav-tools-dropdown {
@@ -10872,6 +10941,11 @@ input.assignee.form-control{
   background-image: url(image_path('icon_cat.svg'));
 }
 
+.prevalence-filerep-header{
+  border-bottom-color: $second-section-color;
+  background-image: url(image_path('icon_cat.svg'));
+}
+
 .sample-present-true, .sample-present-false {
   width: 30px;
   height: 40px;
@@ -11148,6 +11222,7 @@ button.secondary.view-report-external-button {
 .sb-report-run,
 .sdr-research-data-present,
 .sdr-research-data-missing,
+.prevalence-filerep-data-missing,
 .enrich-filerep-data-missing{
   display: none;
 }
@@ -11156,6 +11231,7 @@ button.secondary.view-report-external-button {
 .sb-data-missing,
 .rl-data-missing,
 .enrich-filerep-data-missing,
+.prevalence-filerep-data-missing,
 .sb-report-run,
 .tg-report-run,
 .rl-report-run {
@@ -11533,7 +11609,6 @@ div[aria-describedby='create-detection-dialog'] {
     tr td:first-of-type {
       background-repeat: no-repeat;
       background-size: 20px 20px;
-      background-image: url(image_path('icon_sortable.svg'));
       background-position: -4px 10px;
     }
     tr td {
@@ -12206,20 +12281,106 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
-.toolbar#webcat-index-toolbar{
-  margin: 25px 0 -35px 0;
-  z-index: 1;
+.toolbar#webcat-index-toolbar {
+  background: $content-bg-color;
+  bottom: 18px;
+  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
+  flex-direction: row;
   float: left;
-  width: auto;
+  margin: 2px 0 -35px 0;
+  padding: 0 0 0 20px;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+
+  .toolbar-checkbox-wrapper {
+    padding-top: 0;
+    padding-left: 5px;
+    font-weight: normal;
+  }
+
+  div {
+    margin: 4px 3px 0 0;
+  }
+
+  .toolbar-dropdown {
+    margin-top: 0 !important;
+  }
+
+  .primary-text-divider {
+    margin-top: 0 !important;
+  }
+
+  .btn-group.toolbar-btn-group {
+    margin: 0;
+    vertical-align: baseline;
+  }
+
+  .webcat-toolbar-select-all-wrapper, .webcat-toolbar-tall-wrapper {
+    background-color: $faint-neutral-color;
+    display: block;
+    height: 27px;
+    line-height: 25px;
+    float: none;
+    margin: 0;
+    padding: 0 8px;
+
+    input {
+      margin: 6px 0 0;
+      vertical-align: top;
+    }
+
+    label {
+      display: inline-block;
+      font-weight: 400;
+      height: 27px;
+      margin-left: 2px;
+    }
+  }
+
+  .webcat-toolbar-bulk-res {
+    background-color: #255c7d !important;
+    color: $type-lightest !important;
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+
+  .webcat-toolbar-tall-wrapper {
+    height: 45px;
+    line-height: 45px;
+    margin: 0 0 0 3px;
+    padding: 0 15px;
+
+    input {
+      margin: 16px 0 0;
+    }
+  }
+
+  .webcat-manage-templates-button {
+    background-color: $faint-neutral-color;
+    padding-left: 24px;
+  }
+
+  .webcat-toolbar-push {
+    margin-left: auto;
+  }
 }
 
-.toolbar#webcat-index-toolbar.pinned-toolbar {
-  margin-top: 2px;
-  width: 100%;
+//sticky toolbar needs extra top spacing on small screens
+@media (max-width: 999px) {
+  .toolbar#webcat-index-toolbar {
+    margin-top: 18px;
+  }
 }
 
 #complaints-index_wrapper .datatable-top-tools {
   margin-bottom: 10px !important;
+}
+
+#webcat-index-toolbar .dropdown.open {
+  background-color: transparent !important;
 }
 
 
@@ -12736,45 +12897,71 @@ table > tbody > tr > td.no-padding {
   z-index: 999;
 }
 
-.pin-to-top-button {
-  background-image: url(image_path('icon_pin1.svg'));
-  background-size: 22px 22px;
-  background-position: 3px 3px;
-  padding-left: 18px;
-}
-
-.pinned-toolbar {
-  background: $content-bg-color;
-  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
-  position: relative;
-  bottom: 18px;
-  padding: 4px 20px;
-  .toolbar-checkbox-wrapper {
-    padding-top: 0;
-    padding-left: 5px;
-    font-weight: normal;
-  }
-  label {
-    display: none;
-  }
-}
-
-#webcat-index-title {
-  padding-top: 10px;
-}
-
-#webcat-index-toolbar {
-  margin: 15px 0 10px;
-}
-
-.pinned-toolbar-true #webcat-index-title {
-  padding-top: 25px;
-  line-height: 12px;
-}
-
 #webcat_searchref_container {
   margin-top: -3px;
   padding: 0 0 6px 0;
+}
+
+//For combo style toolbar buttons that are joined together
+.toolbar-concise-button-area {
+  //need to overwrite 'toolbar span' styles currently
+  padding-left: 0 !important;
+  float: left !important;
+}
+
+.toolbar-concise-button-area .concise-button {
+  border-radius: 0;
+}
+
+.toolbar-concise-button-area .concise-button-first {
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.toolbar-concise-button-area .concise-button-last {
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+//fixes for widescreen issues with concise button area
+@media screen and (min-width: 1951px) {
+  .toolbar-concise-button-area {
+    height: 27px;
+  }
+}
+
+.webrep-change-assignee-wrapper .dropdown-menu {
+  border-radius: 0 4px 4px 4px;
+  border: none;
+  background-color: #6dbcdb;
+  min-width: 200px;
+  top: 29px;
+  left: -2px;
+}
+
+.webrep-change-assignee-wrapper .toolbar label {
+  display: block !important;
+}
+
+.webrep-change-assignee-wrapper .dropdown-menu h3 {
+  color: $content-bg-color;
+  padding: 0 10px;
+  font-weight: 400;
+  font-size: 9pt;
+  margin: 8px 0 8px 0;
+}
+
+.webrep-change-assignee-wrapper .inline-tool-content-wrapper {
+  padding: 4px 10px 20px 4px;
+}
+
+.darkened-button {
+  background-color: #c7c7c7;
+}
+
+//for buttons in concise groups that do not have label text on large screens
+.concise-button-no-text {
+  min-width: 24px;
 }
 
 // tooltipster adjustments for pinned toolbar tooltips
@@ -12782,17 +12969,8 @@ table > tbody > tr > td.no-padding {
   padding: 4px 6px;
 }
 
-// one-off override
-.pinned-toolbar-true .tooltipster-sidetip {
-  top: 85px !important;
-}
-
-.webcat-search-container {
-  height: 15px;
-}
-
 // correction to reduce extraneous vertical space
-.pinned-toolbar-true .webcat-search-container {
+.webcat-search-container {
   height: 0;
 }
 
@@ -12868,6 +13046,10 @@ table > tbody > tr > td.no-padding {
 }
 
 .enrich-webrep-table-data-missing {
+  display: none;
+}
+
+.prevalence-webrep-table-data-missing {
   display: none;
 }
 
@@ -13239,7 +13421,7 @@ table > tbody > tr > td.no-padding {
   }
   .metrics-col {
     padding: 4px 4px 4px 22px;
-    max-width: 380px;
+    max-width: 400px;
     display: inline-block;
     vertical-align: middle;
   }
@@ -13258,12 +13440,8 @@ table > tbody > tr > td.no-padding {
   .metrics-col > .metric-number:last-of-type {
     padding-right: 20px;
   }
-  .metric-label {
-    padding-left: 2px;
-    padding-right: 4px;
-  }
   .metric-overdue {
-    padding-left: 0;
+    padding-left: 4px;
     color: $warning-accent-color;
     border-right: solid 1px lighten($bug-accent-color, 20%);
     margin-right: 8px;
@@ -13280,9 +13458,13 @@ table > tbody > tr > td.no-padding {
       padding-right: 2px;
     }
   }
-  .metric-overdue:last-of-type {
+  .metric-overdue:last-child {
     border-right: none;
     margin-left: 3px;
+  }
+  a {
+      color: #fff;
+      text-decoration: underline;
   }
   .wbnp-area {
     float: right;
@@ -13456,10 +13638,6 @@ table > tbody > tr > td.no-padding {
   }
 }
 
-#webcat-index-title {
-  margin-top: 15px;
-}
-
 .reports-border-left {
   border-left: solid 1px lighten($content-tab-color, 40%);;
 }
@@ -13475,16 +13653,10 @@ table > tbody > tr > td.no-padding {
   }
 }
 
-.webcat-search-container {
-  height: 10px;
-}
-
-#webcat-index-toolbar {
-  margin: 20px 0 5px;
-}
-
 #webcat-index-title {
-  margin-top: 8px;
+  padding-top: 25px;
+  line-height: 12px;
+  margin: 8px 0 10px 0;
 }
 
 // ensure text doesn't break/wrap in data table
@@ -13665,6 +13837,9 @@ table > tbody > tr > td.no-padding {
   }
 }
 
+.escalations--webcat--complaints-controller .tooltipster-box {
+  margin-top: 7px !important;
+}
 
 .inline-edit-ip-button {
   background-image: url(image_path('icon_edit_white.svg'));
@@ -14053,6 +14228,13 @@ input.wl-bl-list-inline {
   }
   .align-top {
     padding-top: 3px !important;
+  }
+}
+
+//overridding the webrep toolbar div style for convert ticket dropdown
+#convert-ticket-dropdown  {
+  div {
+    margin-right: 0 !important;
   }
 }
 

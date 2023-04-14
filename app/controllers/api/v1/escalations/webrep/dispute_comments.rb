@@ -33,7 +33,7 @@ module API
               @dispute_comment = DisputeComment.find(permitted_params[:id])
               authorize!(:update, @dispute_comment)
               if @dispute_comment.user.id == permitted_params[:current_user_id]
-                @dispute_comment.update_attributes(comment: permitted_params[:comment])
+                @dispute_comment.update(comment: permitted_params[:comment])
               else
                 raise 'Unable to edit a note written by another user.'
               end

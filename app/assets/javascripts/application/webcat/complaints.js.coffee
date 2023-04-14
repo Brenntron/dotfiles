@@ -219,9 +219,8 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
-        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.queryWhoIs(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Lookup</button>')
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.whoIsLookups(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Whois</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
-        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
     error: (response) ->
       std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
 
@@ -834,7 +833,7 @@ window.take_selected = ()->
 
 
 
-$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+$(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
   rows = $('#complaints-index').DataTable().rows('.selected').data()
   reopened = false
   invalid_unchanged = false
@@ -920,6 +919,67 @@ window.return_selected = ()->
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+
+window.webcat_remove_assignee = () ->
+  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  if selected_rows[0].length > 0
+    entry_ids = []
+    for row, i in selected_rows[0]
+      entry_ids.push(selected_rows.data()[i].entry_id)
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/unassign_all'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': entry_ids
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          std_msg_error('Error Removing Assignees', json.error)
+        else
+          #reload table data
+          $('#complaints-index').DataTable().draw()
+
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+    , this)
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+
+window.webcat_change_assignee = () ->
+  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  if selected_rows[0].length > 0
+    entry_ids = []
+    for row, i in selected_rows[0]
+      entry_ids.push(selected_rows.data()[i].entry_id)
+
+    user_id = $('#index_target_assignee option:selected').val()
+
+    data = {
+      'complaint_entry_ids': entry_ids,
+      'user_id': user_id
+    }
+
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/change_assignee'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          std_msg_error('Error Assigning Entries', json.error)
+        else
+          #reload table data
+          $('#complaints-index').DataTable().draw()
+
+    )
   else
     std_msg_error('no rows selected', ['Please select at least one row.'])
 
@@ -1033,7 +1093,7 @@ window.retrieve_history = (position) ->
   for url_position in [1..5]
     $("#url_#{url_position}").css("border-width", "")
     $("#url_#{url_position}").css("border-color", "")
-  
+
   url = $("#url_" + position).val()
 
   if url.length > 0
@@ -1432,9 +1492,8 @@ format = (complaint_entry_row) ->
       '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="lookup-' + entry_id+ '" data-fqdn="' + lookup_val + '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + lookup_val+ '\')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + entry_id + '" onclick="history_dialog(' + entry_id  + ',\'' + url + '\')">History</button><br/>' +
-      '<button class="secondary" id="domain-' + entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+      '<button class="secondary" id="domain-' + entry_id + '" onclick="WebCat.RepLookup.whoIsLookups(\'' + whois_lookup + '\')">Whois</domain>' +
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-4 nested-complaint-editable-data">' +
       '<div class="row">' +
@@ -1607,8 +1666,8 @@ window.get_xbrs_history = (url, tab) ->
       if response.data.length < 1
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
-        
-        
+
+
         $(xbrs_table).append(document.createElement('thead'))
         $(xbrs_table).append(document.createElement('tbody'))
         thead = $(xbrs_table).find('thead')
@@ -1619,7 +1678,7 @@ window.get_xbrs_history = (url, tab) ->
         thead_row = ''
 
         table_headers.forEach (header)->
-          thead_row += "<th> #{header}</th>"       
+          thead_row += "<th> #{header}</th>"
         thead.append(thead_row)
 
         response.data.forEach (row)->
@@ -1629,7 +1688,7 @@ window.get_xbrs_history = (url, tab) ->
             data_row += "<td>#{value || '-'}</td>"
 
           tbody.append("<tr>#{data_row}</tr>")
-          
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -1898,27 +1957,6 @@ toggle_selected = (selectedRows, expand)->
         $(row).find('.expand-row-button-inline').click()
         $(row).addClass('selected')
   $(selectState).addClass('selected')
-
-# webcat: pin/unpin toolbar to top on webcat
-window.pin_to_top = () ->
-  if !$('#pin-to-top').hasClass('pinned')
-    toolbar = $('#webcat-index-toolbar').detach()  # detach every time
-    $(toolbar).addClass('pinned-toolbar')
-    $('#nav-banner').append(toolbar)
-
-    $('#pin-to-top span').text('Unpin Toolbar from Top')
-    $('#page-content-wrapper').css('padding-top','60px')
-    $('#pin-to-top').addClass('pinned')
-    $('body').addClass('pinned-toolbar-true')
-  else  # already pinned to top?
-    toolbar = $('#webcat-index-toolbar').detach()
-    $(toolbar).removeClass('pinned-toolbar')
-    $('.webcat-main-area').prepend(toolbar)
-
-    $('#pin-to-top span').text('Pin Toolbar to Top')
-    $('#page-content-wrapper').css('padding-top','15px')
-    $('#pin-to-top').removeClass('pinned')
-    $('body').removeClass('pinned-toolbar-true')
 
 window.collapse_selected =()->
   selectedRows = $('.selected')
@@ -2266,11 +2304,6 @@ $ ->
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
 
-  # webcat: hot key/shortcut to pin toolbar (shift + 6)
-  $(document).keypress (e) ->
-    if e.key == '^'
-      pin_to_top()
-
   $(document).on 'change', '.resolution_radio_button', ->
     id = this.name.split("resolution")[1]
     domain = $("#complaint_prefix_"+id)[0].dataset.domain
@@ -2323,11 +2356,16 @@ $ ->
                 $(button).hide()
 
 
-  $('#complaints_check_box').click ->
-    if $('#complaints_check_box').prop('checked')
+  $('#complaints_check_box, #complaints_select_all').click ->
+    checked = $(this).prop('checked')
+
+    if checked
       $('#complaints-index').DataTable().rows( { page: 'current' } ).select()
     else
       $('#complaints-index').DataTable().rows().deselect()
+
+    $("#complaints_check_box").prop('checked', checked)
+    $("#complaints_select_all").prop('checked', checked)
     return
 
   $(document).ready ->
@@ -2336,21 +2374,11 @@ $ ->
       $('#fetch').hide()
       $('#complaints-nav-search-wrapper').hide()
       $('#new-complaint-nav-wrapper').hide()
-      $('#filter-clusters-nav').hide()
-      $('#clusters-nav-regex-wrapper').hide()
     else
       $('#filter-complaints').show()
       $('#fetch').show()
       $('#complaints-nav-search-wrapper').show()
       $('#new-complaint-nav-wrapper').show()
-      $('#filter-clusters-nav').hide()
-      $('#clusters-nav-regex-wrapper').hide()
-
-    if window.location.pathname == '/escalations/webcat/clusters'
-      $('#filter-complaints-nav').hide()
-      $('#filter-clusters-nav').show()
-      $('#clusters-nav-regex-wrapper').show()
-
 
   # If a stupidly long email address is returned it will wrap
   # rather than pushing the column into the column beside it
@@ -2387,7 +2415,7 @@ $ ->
 
 # Convert webcat to webrep
 # Enable / disable button to attempt based on if anything is selected
-$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+$(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
   if $('tr.selected').length == 1
     $('#convert-ticket-button').removeAttr('disabled')
   else

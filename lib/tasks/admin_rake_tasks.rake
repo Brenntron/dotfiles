@@ -52,7 +52,7 @@ namespace :escalations do
       puts tag.name
       tag.complaints.each do |complaint|
         puts "processing #{complaint.complaint_entries.count} entries for complaint id #{complaint.id}"
-        complaint.update_attributes(platform_id: ngfw_platform.id)
+        complaint.update(platform_id: ngfw_platform.id)
         complaint.complaint_entries.update_all(platform_id: ngfw_platform.id)
       end
     end

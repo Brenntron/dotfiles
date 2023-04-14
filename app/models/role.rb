@@ -2,7 +2,7 @@ class Role < ApplicationRecord
   has_and_belongs_to_many :users
   belongs_to :org_subset
 
-  validates :role, presence: true, uniqueness: true
+  validates :role, presence: true, uniqueness: { case_sensitive: true }
 
   after_create { |role| role.record 'create' if Rails.configuration.websockets_enabled == 'true' }
   after_update { |role| role.record 'update' if Rails.configuration.websockets_enabled == 'true' }

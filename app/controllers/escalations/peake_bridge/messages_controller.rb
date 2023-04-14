@@ -1,5 +1,5 @@
 class Escalations::PeakeBridge::MessagesController < ApplicationController
-  skip_before_action :require_login
+  skip_before_action :require_login, :verify_authenticity_token
 
   def get_messages
     Rails.logger.info("GET get_messages")

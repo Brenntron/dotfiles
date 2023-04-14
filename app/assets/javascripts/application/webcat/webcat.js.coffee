@@ -25,6 +25,14 @@ $ ->
   if $('body').hasClass("escalations--webcat--complaints-controller")
     $('#nav-banner').addClass('fixed-nav')
 
+    #pin webcat toolbar under navigation bar, add padding
+    toolbar = $('#webcat-index-toolbar')
+    $('#nav-banner').append(toolbar)
+    $('#page-content-wrapper').css('padding-top','60px')
+
+    #align tooltips under toolbar
+    $('body').addClass('pinned-toolbar-true')
+
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
     { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
@@ -741,7 +749,7 @@ $ ->
         return options
 
     assignee_input = $('#assignee-input').selectize {
-      persist: false
+      persist: true
       create: false
       valueField: 'name',
       labelField: 'display_name',
@@ -1062,6 +1070,23 @@ window.find_saved_search_by_name = (name) ->
   )
   return saved_search
 $ ->
+
+#  Webcat toolbar and wbnp status report tooltips need slight adjustment
+  $('.esc-tooltipped-webcat-toolbar').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+      'tooltipster-borderless-comment'
+    ]
+    debug: false
+    maxWidth: 500
+    position: 'bottom'
+    distance: [-8, 0]
+
+  $('.esc-tooltipped-webcat-toolbar:disabled').tooltipster
+    disable: true
+    debug: false
+
   # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
   $('#complaints-index').on 'draw.dt', ->
     $('#complaints-index .tooltipstered').tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr

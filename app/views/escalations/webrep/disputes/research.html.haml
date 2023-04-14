@@ -1165,6 +1165,21 @@
                                   %tr
                                     %td.missing-data No enrichment services data.
 
+                            .entry-details-table.prevalence-details-table{'data-entry-id': "#{entry.id}"}
+                              %h5.entry-details-table-header Prevalence
+                              %table.prevalence-webrep-table-data-present
+                                %thead
+                                  %tr
+                                    %th Dataset
+                                    %th Count
+                                    %th First Seen
+                                    %th Last Seen
+                                %tbody
+                              %table.prevalence-webrep-table-data-missing
+                                %tbody
+                                  %tr
+                                    %td.missing-data No Prevalence Data
+
 = render 'escalations/webrep/disputes/new_email_dialog'
 %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
 %input{:name => "xml_token", :type => "hidden", :value => "#{xml_token}"}
