@@ -795,7 +795,12 @@ button {
 .rmt-delete-button    {background-image: url(image_path('icon_delete.svg'));}
 .list-button      {background-image: url(image_path('icon_list.svg'));}
 .view-button      {background-image: url(image_path('icon_view.svg'));}
-.retry-button      {background-image: url(image_path('icon_retry_grey.svg'));}
+.retry-button      {
+  background-image: url(image_path('icon_retry_grey.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }
+}
 .splitview-button {background-image: url(image_path('icon_splitview.svg'));}
 .duplicate-button {background-image: url(image_path('icon_duplicate.svg'));}
 .smtp-button      {background-image: url(image_path('icon_smtp.svg'));}

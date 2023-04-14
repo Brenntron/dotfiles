@@ -50,22 +50,49 @@ $(document).on 'click', '#show-failed, #show-complete',->
         else
           $('.complete-pending').hide()
   )
+
+window.checked_row_data = ()->
+  table = $('#webcat-imports-index').DataTable()
+  rows = $('.imports_check_box:checked').closest('tr')
+  data = table.rows(rows).data()
+  return data
+
 $(document).on 'click', '.imports_check_box', ->
-  checked = $('.imports_check_box:checked')
-  can_retry = checked.length > 0
+  retry_button = $('.toolbar-button.retry-button')
+
+  can_retry = false
+  checked_data = checked_row_data() || [];
+
+  for row in checked_data
+    if row.status == 'Failure'
+      can_retry = true
+      break
 
   if can_retry
-    $('.retry-button').removeAttr('disabled')
+    retry_button.removeAttr('disabled')
   else
-    $('.retry-button').attr('disabled', true)
+    retry_button.attr('disabled', true)
 
-window.retry_imports = (type, id)->
-  switch type
-    when 'bulk'
-      table = $('#webcat-imports-index').DataTable()
-      rows = $('.imports_check_box:checked').closest('tr')
-      row_data = table.rows(rows).data()
-      console.log row_data
+window.retry_imports = (id)->
+  if id
+    ids = [id]
+  else
+    ids = []
+    checked_row_data().map( (r) -> ids.push(parseInt(r.id)) )
+  console.log
+  std_msg_ajax(
+    method: 'GET'
+    url: '/escalations/api/v1/escalations/jira_import_tasks/retry_import'
+    data: {
+        task_ids:ids
+      }
+    success: (response) ->
+      console.log response
+
+    error: (response) ->
+      std_api_error(response, 'Error retrying import.', reload: false)
+  )
+
 
 window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
@@ -117,15 +144,15 @@ window.build_imports_table = () ->
       {
         data: 'result'
         render: (data,type,full,meta) ->
-          {status, result}=full
+          {status, result, id}=full
 
-          if result
+          if result && result != status
             html = "<span>#{status} - #{result}</span>"
           else
             html = "<span>#{status}</span>"
 
           if status == 'Failure'
-            html += '<button class="inline-retry-button retry-button tooltipped tooltipstered" title="Retry"></button>'
+            html += "<button class='inline-retry-button retry-button tooltipped tooltipstered' title='Retry' onclick='retry_imports(#{id})'></button>"
 
           return html
       },
