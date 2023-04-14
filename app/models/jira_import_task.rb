@@ -7,10 +7,12 @@ class JiraImportTask < ApplicationRecord
   scope :completed_count, -> { where(status: STATUS_COMPLETE).count }
   scope :failed_count, -> { where(status: STATUS_FAILURE).count }
   scope :pending_count, -> { where(status: STATUS_PENDING).count }
+  scope :awaiting_bast_verdict_count, -> { where(status: STATUS_AWAITING_BAST_VERDICT).count }
 
   STATUS_COMPLETE = "Complete"
   STATUS_FAILURE = "Failure"
   STATUS_PENDING = "Pending"
+  STATUS_AWAITING_BAST_VERDICT = "Awaiting Bast Verdict"
 
   VALID_FILE_TYPE = "text/csv"
 
@@ -40,11 +42,10 @@ class JiraImportTask < ApplicationRecord
 
       begin
         response = Bast::Base.create_task(urls)
+        update(status: STATUS_AWAITING_BAST_VERDICT, bast_task: response["task_id"])
       rescue ApiRequester::ApiRequester::ApiRequesterError => e
         update(status: STATUS_FAILURE, result: e.message)
       end
-
-      update(status: STATUS_PENDING, bast_task: response["task_id"])
 
     else
       update(status: STATUS_FAILURE, result: "Invalid file type: #{attachment_to_process[:type]}")
@@ -54,7 +55,7 @@ class JiraImportTask < ApplicationRecord
 
   def retry
     return unless status == STATUS_FAILURE
-    update(status: nil, result: nil, imported_at: nil)
+    update(status: STATUS_PENDING, result: nil, imported_at: nil)
     process_import
   end
 
