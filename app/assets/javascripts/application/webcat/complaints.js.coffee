@@ -47,7 +47,7 @@ window.change_ticket_view = (type,button) ->
         return
       else
         #else build (or show previously built) tickets
-        build_ticket_view(checked)
+        build_ticket_view(checked,"bulk")
         $('.mothra-header').text('Import Results')
     when 'list'
       $('.mothra-header').text('Jira Imports')
@@ -58,27 +58,29 @@ window.change_ticket_view = (type,button) ->
   $('.list-button, .view-tickets').toggleClass('active-view')
 
 
-window.build_ticket_view = (checked) ->
+window.build_ticket_view = (checked, view) ->
   table =  $('#webcat-imports-index').DataTable()
+
+  if view == 'single'
+    checked = [checked]
 
   for check in checked
     row = $(check).closest('tr')
-    id = $(check).val()
-
+    id = $(check).attr('value')
     if $("##{id}").length
+      console.log 'ininin', $("##{id}")
       # if we have already built this ticket view, show it
       $("##{id}").removeClass('hidden')
     else
       # if we haven't built this ticket view, build it
       rd = table.row( row ).data()
       urls = [] #TODO get bast urls here
-      row_data ={
+      row_data = {
         'Jira Ticket': rd.issue_key,
         'Submitter': rd.submitter,
         'Imported On': rd.imported_at,
         'Result': rd.result
       }
-
       ticket_html = "<div class='col-xs-8 ticket-rows' id='#{id}'>"
 
       #build upper data
@@ -109,8 +111,25 @@ window.build_ticket_view = (checked) ->
       table_html += "</tbody></table></div>"
 
       ticket_html += table_html
+
       $('.webcat-ticket-view').append(ticket_html)
 
+    if view == 'single'
+      $('.mothra-header').text('Import Results')
+      $('#webcat-imports-index_wrapper, .webcat-ticket-view').toggleClass('hidden')
+      $('.list-button, .view-tickets').toggleClass('active-view')
+
+$(document).on 'click', '#bulk-ticket-select',->
+  checked = $(this).prop('checked')
+  $('.imports_check_box').prop('checked', checked)
+
+$(document).on 'click', '.imports_check_box',->
+  num_checked = $('.imports_check_box:checked').length
+
+  if num_checked == $('.imports_check_box').length
+    $('.imports_check_box').prop('checked', true)
+  if num_checked == 0
+    $('.imports_check_box').prop('checked', false)
 
 $(document).on 'click', '#show-failed, #show-complete',->
   table = $('#webcat-imports-index').DataTable()
@@ -171,7 +190,12 @@ window.build_imports_table = () ->
         render: (data,type,full,meta) ->
           return "<input type='checkbox' name='cbox' class='imports_check_box' id='cbox#{data}' data=#{JSON.stringify(full)} value=#{data} />"
       },
-      {data: 'issue_key'},
+      {
+        data: 'issue_key',
+        render:(data,type,full,meta)->
+          html = "<span onclick='build_ticket_view(this, \"single\")' value='#{data}'>#{data}</span>"
+          return html
+      },
       {data: 'submitter'},
       {data: 'imported_at'},
       {
