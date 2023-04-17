@@ -226,6 +226,18 @@ window.build_imports_table = () ->
     ]
   )
 # WBNP - Get report id
+
+window.get_bast_data = (id) ->
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/jira_import_tasks/#{id}/bast_data"
+    data: {}
+    success: (response) ->
+      console.log(response.body)
+    error: (response) ->
+      std_api_error(response, 'Error fetching bast data', reload: false)
+  )
+
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
   $('#fetch_wbnp').addClass('esc-tooltipped')
