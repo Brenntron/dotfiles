@@ -74,6 +74,8 @@ window.build_ticket_view = (checked, view) ->
     else
       # if we haven't built this ticket view, build it
       rd = table.row( row ).data()
+
+      get_bast_data(rd.id)
       urls = [] #TODO get bast urls here
       row_data = {
         'Jira Ticket': rd.issue_key,
