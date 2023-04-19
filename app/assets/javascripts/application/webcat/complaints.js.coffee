@@ -121,6 +121,23 @@ window.build_imports_table = () ->
     ]
   )
 # WBNP - Get report id
+
+window.export_all_jira_tasks = ()->
+  form = $('#jira-tasks-disputes-export-form')
+
+  $('#jira-tasks-filter-input').val([])
+  form.submit()
+
+window.export_selected_jira_tasks = ()->
+  form = $('#jira-tasks-disputes-export-form')
+
+  selected_tasks = $('.imports_check_box:checked').map((i, el) => el.value).get()
+  if selected_tasks.length <= 0
+    std_msg_error('Error: Nothing selected.',"", reload: false)
+  else      
+    $('#jira-tasks-filter-input').val(selected_tasks)
+    form.submit()
+
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
   $('#fetch_wbnp').addClass('esc-tooltipped')
