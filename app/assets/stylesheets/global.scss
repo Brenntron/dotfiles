@@ -13694,11 +13694,18 @@ table > tbody > tr > td.no-padding {
     display: inline-block;
     margin-bottom: 10px;
   }
-  .vis-ticket:not(:first-of-type){
-      margin-top: 40px;
-      padding-top: 30px;
-      border-top: 1px solid #eeeeee;
+  .vis-ticket {
+    &:not(:last-of-type){
+      margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid #eeeeee;
     }
+    &:only-of-type{
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: unset;
+    }
+  }
 
   .ticket-rows{
     max-width: 800px;
