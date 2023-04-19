@@ -21,7 +21,14 @@ class JiraImportTask < ApplicationRecord
     update(imported_at: Time.now)
 
     issue = JiraRest::Issue.new(issue_key)
-    attachments = issue.attachments_data
+
+    begin
+      attachments = issue.attachments_data
+    rescue => e
+      update(status: STATUS_FAILURE, result: "Error reading attachment data: #{e.message}")
+      return
+    end
+
     if attachments.empty?
       update(status: STATUS_FAILURE, result: "No CSV attachment found")
       return
@@ -53,6 +60,43 @@ class JiraImportTask < ApplicationRecord
   end
   handle_asynchronously :process_import, :queue => "process_jira_import", :priority => 1
 
+  def create_tickets
+    return unless status == STATUS_AWAITING_BAST_VERDICT
+
+    task_status = Bast::Base.get_task_status(bast_task)
+    return unless task_status["status"] == "Completed"
+
+    task_results = Bast::Base.get_task_result(bast_task)
+
+    task_results.each do |k,v|
+      ticketable_urls = []
+
+      ticketable_urls << import_urls.where(submitted_url: k).first
+      if v["urls"].present?
+        v["urls"].each do |url|
+          ticketable_urls << import_urls.where(submitted_url: url).first
+        end
+      end
+
+      ticketable_urls = ticketable_urls.reject {|r| r.nil?}
+
+      description = "Created from Jira Issue #{issue_key}"
+
+      ticketable_urls.each do |ticketable_url|
+        ticketable_url.update(bast_verdict: v["import"])
+        if v["import"] == true
+          response = Complaint.create_action(BugzillaRest::Session.default_session, ticketable_url.submitted_url, description, nil, nil, nil)
+          ticketable_url.update(complaint_id: response[:complaint_id])
+        else
+          ticketable_url.update(verdict_reason: v["reason"])
+        end
+      end
+    end
+
+    update(status: STATUS_COMPLETE)
+  end
+  handle_asynchronously :create_tickets, :queue => "create_complaint_tickets", :priority => 1
+
   def retry
     return unless status == STATUS_FAILURE
     update(status: STATUS_PENDING, result: nil, imported_at: nil)
@@ -70,16 +114,16 @@ class JiraImportTask < ApplicationRecord
         created_at: created_at,
         updated_at: updated_at,
         total_urls: import_urls.count,
-        unimported_urls: unimported_urls.count,  # TODO: bast statuses are unknown at the moment, these are placeholders
-        imported_urls: imported_urls.count       #
+        unimported_urls: unimported_urls.count,
+        imported_urls: imported_urls.count
     }
   end
 
   def unimported_urls
-    import_urls.where(bast_status: nil)
+    import_urls.where("bast_verdict = false or bast_verdict = NULL")
   end
 
   def imported_urls
-    import_urls.where.not(bast_status: nil)
+    import_urls.where(bast_verdict: true)
   end
 end
