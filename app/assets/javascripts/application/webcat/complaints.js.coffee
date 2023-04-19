@@ -52,7 +52,7 @@ window.change_ticket_view = (type,button) ->
     when 'list'
       $('.mothra-header').text('Jira Imports')
       $('.ticket-rows').addClass('hidden') #ticket rows must be individually hidden
-
+      $('.ticket-rows').removeClass('vis-ticket')
   # show/hide appropriate elements
   $('#webcat-imports-index_wrapper, .webcat-ticket-view').toggleClass('hidden')
   $('.list-button, .view-tickets').toggleClass('active-view')
@@ -67,55 +67,68 @@ window.build_ticket_view = (checked, view) ->
   for check in checked
     row = $(check).closest('tr')
     id = $(check).attr('value')
-    if $("##{id}").length
-      console.log 'ininin', $("##{id}")
+    el = $("##{id}")
+    if el.length
       # if we have already built this ticket view, show it
-      $("##{id}").removeClass('hidden')
+      el.removeClass('hidden')
+      if checked.length > 1
+        el.addClass('vis-ticket')
     else
       # if we haven't built this ticket view, build it
       rd = table.row( row ).data()
+      get_bast_data(rd.id).then( (urls)=>
+        row_data = {
+          'Jira Ticket': "<span class='jira-ticket-id'>#{rd.issue_key}</span>",
+          'Submitter': rd.submitter,
+          'Imported On': rd.imported_at,
+          'Result': rd.result
+        }
+        ticket_html = "<div class='col-xs-12 col-sm-10 ticket-rows vis-ticket' id='#{id}'>"
 
-      get_bast_data(rd.id)
-      urls = [] #TODO get bast urls here
-      row_data = {
-        'Jira Ticket': rd.issue_key,
-        'Submitter': rd.submitter,
-        'Imported On': rd.imported_at,
-        'Result': rd.result
-      }
-      ticket_html = "<div class='col-xs-8 ticket-rows' id='#{id}'>"
+        #build upper data
+        for title, content of row_data
 
-      #build upper data
-      for title, content of row_data
-        ticket_html += "<div class='col-xs-6'>
-                          <label class='data-report-label'>#{title}</label>
-                          <span class='data-report-content'>#{content}</span>
-                        </div>"
+          if !content then content = "<span class='missing-data'>Not available</span>"
 
-      #build table data
-      table_html = "<table>
-                        <thead><tr>
-                          <th>Original</th>
-                          <th>Sanitized</th>
-                          <th>Entry ID</th>
-                          <th>Bast Response</th>
-                        </tr></thead>
+          ticket_html += "<div class='col-xs-6 no-padding-left'>
+                            <label class='data-report-label'>#{title}</label>
+                            <span class='data-report-content'>#{content}</span>
+                          </div>"
+
+        #build table data
+        table_html = "<table>
+                          <thead>
+                            <tr>
+                              <th>Original</th>
+                              <th>Sanitized</th>
+                              <th>Entry ID</th>
+                              <th>Bast Response</th>
+                          </tr>
+                          </thead>
                         <tbody>"
-      for url in urls
-        #this will need to be changed 5sure
-        table_html += "<tr>"
-        for k, v of url
-          table_html += "<td>#{v}</td>"
-        table_html += "</tr>"
 
-      if urls.length == 0
-        table_html +="<tr><td colspan=4 ><span class='missing-data'> No URLs Available</span></td></tr>"
-      table_html += "</tbody></table></div>"
+        if $.isEmptyObject(urls)
+          table_html +="<tr><td colspan=4 ><span class='missing-data'> No URLs Available</span></td></tr>"
+        else
+          for key, val of urls
+            if !val["import"]
+              imported = "Not Imported"
+            else
+              imported = "Imported"
 
-      ticket_html += table_html
+            #this will need to be changed 5sure
+            table_html += "<tr>
+                          <td>#{key}</td>
+                          <td>#{key}</td>
+                          <td>-</td>
+                          <td>#{imported}</td>
+                        </tr>"
 
-      $('.webcat-ticket-view').append(ticket_html)
+        table_html += "</tbody></table></div>"
+        ticket_html += table_html
 
+        $('.webcat-ticket-view').append(ticket_html)
+      )
     if view == 'single'
       $('.mothra-header').text('Import Results')
       $('#webcat-imports-index_wrapper, .webcat-ticket-view').toggleClass('hidden')
@@ -195,7 +208,7 @@ window.build_imports_table = () ->
       {
         data: 'issue_key',
         render:(data,type,full,meta)->
-          html = "<span onclick='build_ticket_view(this, \"single\")' value='#{data}'>#{data}</span>"
+          html = "<span class='jira-ticket-id' onclick='build_ticket_view(this, \"single\")' value='#{data}'>#{data}</span>"
           return html
       },
       {data: 'submitter'},
@@ -235,7 +248,7 @@ window.get_bast_data = (id) ->
     url: "/escalations/api/v1/escalations/jira_import_tasks/#{id}/bast_data"
     data: {}
     success: (response) ->
-      console.log(response.body)
+      return response
     error: (response) ->
       std_api_error(response, 'Error fetching bast data', reload: false)
   )

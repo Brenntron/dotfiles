@@ -12835,7 +12835,9 @@ span.threat-cat-no-data {
 .no-padding-right {
   padding-right: 0 !important;
 }
-
+.no-padding-left {
+  padding-left: 0 !important;
+}
 .uri-plus-ip-rule-indicator {
   background-image: url(image_path('icon_plus_ip_blue.svg'));
   background-repeat: no-repeat;
@@ -13674,9 +13676,36 @@ table > tbody > tr > td.no-padding {
 .ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
 }
+.jira-ticket-id{
+  font-weight: bold;
+}
+#webcat-imports-index_wrapper .jira-ticket-id:hover{
+  cursor:pointer;
+  border-bottom: 1px solid #666
+}
 .webcat-ticket-view{
   margin-top: 50px;
   display: inline-block;
+  .data-report-content{
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .data-report-content{
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .vis-ticket:not(:first-of-type){
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 1px solid #eeeeee;
+    }
+
+  .ticket-rows{
+    max-width: 800px;
+    td, th{
+      padding-left:0
+    }
+  }
 }
 .webcat-reports-only {
   display: flex;
