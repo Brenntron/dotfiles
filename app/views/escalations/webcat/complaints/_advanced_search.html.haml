@@ -29,7 +29,7 @@
   .form-group.search-item
     %label.content-label-sm{for: 'tags'} Tags
     %select.form-control.selectize#tags-input{name: 'tags', multiple: 'multiple', tabindex:'-1'}
-    %input.hidden#search_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(','), name: 'tags'}
+    %input.hidden#search_tag_list{value: ComplaintTag.all.sort_by(&:name).map { |tag| tag.name }.join(','), name: 'tags'}
     %button#remove-criteria-tags.remove-input{onclick:'clearSelectize("tags-input")'}
 
   -# Additional search criteria
