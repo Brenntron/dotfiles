@@ -43,5 +43,4 @@ class JiraImportTaskDatatable < AjaxDatatablesRails::ActiveRecord
   def get_raw_records
     JiraImportTask.all
   end
-
 end

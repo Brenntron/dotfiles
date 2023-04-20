@@ -24,9 +24,14 @@
     %label.toolbar-section-label Actions
     %button.toolbar-button.retry-button.toolbar-button-spacer.tooltipped{title: 'Retry', onclick:'retry_imports()', disabled:true}
       %span.toolbar-button-text Retry
-    %button.toolbar-button.export-button.tooltipped{title: 'Export CSV'}
-      %span.toolbar-button-text Export CSV
-
+    %form#jira-tasks-disputes-export-form{action: escalations_webcat_jira_import_tasks_path(format: :xlsx), method: :get}
+      = hidden_field_tag('issue_keys', '[]', id: 'jira-tasks-filter-input')
+      %button.toolbar-button.toolbar-button-spacer.export-button.esc-tooltipped{type: 'button', onclick: 'export_all_jira_tasks();', title: 'Export All to CSV'}
+        %span.toolbar-button-text
+          Export All
+    %button.toolbar-button.export-button.esc-tooltipped{type: 'button', onclick: 'export_selected_jira_tasks();', title: 'Export Selected to CSV'}
+      %span.toolbar-button-text
+        Export Selected
 .row
   .col-xs-12
     %table.table.responsive.dataTable.no-footer#webcat-imports-index{role:'datatable'}
