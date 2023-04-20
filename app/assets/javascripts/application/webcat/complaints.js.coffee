@@ -58,13 +58,13 @@ window.change_ticket_view = (type,button) ->
   $('.list-button, .view-tickets').toggleClass('active-view')
 
 window.build_single_row = (rd, urls) ->
-  { id, issue_key, submitter, result, imported_at } = rd
+  { issue_key, submitter, result, imported_at } = rd
 
   row_data = {
     'Jira Ticket': "<span class='jira-ticket-id'>#{issue_key}</span>",
     'Submitter': submitter,
     'Imported On': imported_at,
-    'Result': result
+    'Result': result.toUpperCase()
   }
 
   ticket_html = "<div class='col-xs-12 col-sm-10 ticket-rows vis-ticket' id='#{issue_key}'>"
@@ -77,37 +77,46 @@ window.build_single_row = (rd, urls) ->
                             <label class='data-report-label'>#{title}</label>
                             <span class='data-report-content'>#{content}</span>
                           </div>"
-
+  ticket_html += "<div class='col-xs-12 no-padding-left urls-container'>
+                  <label class='data-report-label'>Urls<label></div>"
   #build table data
   table_html = "<table>
-                          <thead>
-                            <tr>
-                              <th>Original</th>
-                              <th>Sanitized</th>
-                              <th>Entry ID</th>
-                              <th>Bast Response</th>
-                          </tr>
-                          </thead>
-                        <tbody>"
+                    <thead>
+                      <tr>
+                        <th>Original</th>
+                        <th>Sanitized</th>
+                        <th>Entry ID</th>
+                        <th>Bast Response</th>
+                    </tr>
+                    </thead>
+                  <tbody>"
 
-  if $.isEmptyObject(urls)
+  if !urls.length
     table_html +="<tr><td colspan=4 ><span class='missing-data'> No URLs Available</span></td></tr>"
   else
-    for key, val of urls
-      if !val["import"]
-        imported = "Not Imported"
-      else
-        imported = "Imported"
+    for url in urls
+      {domain, url, complaint_id, imported, verdict_reason}= url
+      unsanitized = '-'
+      entry = '-'
+
+      if verdict_reason
+        imported += " - #{verdict_reason}"
+
+      if complaint_id
+        entry = "<span class='ticket-id'>#{complaint_id}</span>"
+
+      if domain
+        unsanitized = url + domain
 
       #this will need to be changed 5sure
       table_html += "<tr>
-                          <td>#{key}</td>
-                          <td>#{key}</td>
-                          <td>-</td>
+                          <td>#{url}</td>
+                          <td>#{unsanitized}</td>
+                          <td>#{entry}</td>
                           <td>#{imported}</td>
                         </tr>"
 
-  table_html += "</tbody></table></div>"
+  table_html += "</tbody></table></div></div>"
   ticket_html += table_html
 
   $('.webcat-ticket-view').append(ticket_html)
@@ -291,10 +300,11 @@ window.build_imports_table = () ->
 window.get_bast_data = (id) ->
   std_msg_ajax(
     method: 'GET'
-    url: "/escalations/api/v1/escalations/jira_import_tasks/#{id}/bast_data"
+    url: "/escalations/api/v1/escalations/jira_import_tasks/#{id}/submitted_urls"
     data: {}
     success: (response) ->
-      return response
+      console.log response.urls
+      return response.urls
     error: (response) ->
       std_api_error(response, 'Error fetching bast data', reload: false)
   )
