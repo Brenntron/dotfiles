@@ -3,6 +3,7 @@ class Complaint < ApplicationRecord
   has_many :complaint_entries, dependent: :restrict_with_exception
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
   belongs_to :platform, optional: true
+  has_one :import_url
   has_paper_trail on: [:update], ignore: [:updated_at]
 
   delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
@@ -913,6 +914,8 @@ For future web and email reputation requests, please open a web and email reputa
                                        platform_id: platform_record&.id,
                                        status: status,
                                        channel: INT_CHANNEL)
+
+      response[:complaint_id] = new_complaint.id
 
 
       handle_tags(new_complaint, tags) if tags

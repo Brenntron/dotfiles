@@ -16,6 +16,20 @@ module API
               {data: task_array, total_pages: tasks.total_pages}
             end
           end
+
+          desc "retry import"
+          params do
+            requires :task_ids, type: Array[Integer], desc: "ids of the tasks to retry"
+          end
+          get '/retry_import' do
+            std_api_v2 do
+              params[:task_ids].each do |id|
+                task = JiraImportTask.find(id)
+                task.retry
+              end
+              {status: "Success"}
+            end
+          end
         end
 
         resource "escalations/jira_import_tasks/:id/bast_data" do
