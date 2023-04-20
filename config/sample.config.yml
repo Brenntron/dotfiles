@@ -135,15 +135,15 @@ development:
       access_key_id: "redacted"
       secret_access_key: "redacted"
   jira:
-    host: "fmd-drgjr-01tst.vrt.sourcefire.com"
+    host: "https://fmd-drgjr-01tst.vrt.sourcefire.com:443/"
     username: "TBD.gen"
     password: "redacted"
     verify_mode: "verify-none"
-    auth_type: "basic" #basic or cookie
+    auth_type: "cookie" #basic or cookie
     project_key: "SD"
   bast:
     host: "prod-webcat-app3.sv4.ironport.com"
-    port: 500
+    port: 5000
     api_key: "redacted"
     tls: "verify-none"  
 
