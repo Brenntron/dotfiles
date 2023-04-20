@@ -648,6 +648,11 @@ window.save_dispute_entries = () ->
         if new_value != old_value
           changes_made = true
           if new_value == "RESOLVED_CLOSED"
+            resolution_status = {
+              id: id
+              field: "status"
+              new: new_value
+            }
             resolution_data = {
               id: id
               field: "resolution"
@@ -658,6 +663,7 @@ window.save_dispute_entries = () ->
               field: "resolution_comment"
               new: $(this).find("textarea[name='resolution-comment']")[0].value
             }
+            data[id].push(resolution_status)
             data[id].push(resolution_data)
             data[id].push(resolution_comment)
 
