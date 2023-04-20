@@ -54,7 +54,8 @@ class JiraImportTask < ApplicationRecord
       end
 
       urls.each do |url|
-        import_urls.find_or_create_by(submitted_url: url)
+        parsed_url = Complaint.parse_url(url)
+        import_urls.find_or_create_by(submitted_url: url, domain: parsed_url[:domain])
       end
 
       begin

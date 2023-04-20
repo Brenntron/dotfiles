@@ -17,6 +17,14 @@ module API
             end
           end
 
+          desc "get summary of urls for a task"
+          get ":id/submitted_urls", root: :jira_import_tasks do
+            std_api_v2 do
+              task_id = JiraImportTask.find(params[:id])
+              {urls: task_id.import_urls.map {|m| m.to_hash}}
+            end
+          end
+
           desc "retry import"
           params do
             requires :task_ids, type: Array[Integer], desc: "ids of the tasks to retry"
