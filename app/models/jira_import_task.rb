@@ -15,6 +15,16 @@ class JiraImportTask < ApplicationRecord
   STATUS_AWAITING_BAST_VERDICT = "Awaiting Bast Verdict"
 
   VALID_FILE_TYPE = "text/csv"
+  
+  EXPORT_FIELD_NAMES = [
+    'SUBMITTED_URL',
+    'DOMAIN',
+    'ISSUE_KEY',
+    'STATUS',
+    'ISSUE_SUBMITTER',
+    'BAST_TASK_ID',
+    'IMPORTED_AT'
+  ]
 
   #Read CSV from Jira and send URLs to Bast
   def process_import
@@ -125,5 +135,48 @@ class JiraImportTask < ApplicationRecord
 
   def imported_urls
     import_urls.where(bast_verdict: true)
+  end
+
+  def self.export_xlsx(issue_keys='')
+    issue_keys = issue_keys.split(',')
+
+    tasks = issue_keys.empty? ? JiraImportTask.all : JiraImportTask.where(issue_key: issue_keys)
+    tasks = tasks.includes(:import_urls)
+    workbook = RubyXL::Workbook.new
+    worksheet = workbook[0]
+
+    # generate table headers
+    EXPORT_FIELD_NAMES.each_with_index  do |field_name, col_index|
+      worksheet.add_cell(0, col_index, field_name)
+      worksheet.sheet_data[0][col_index].change_font_bold(true)
+    end
+
+    row_index = 0
+    tasks.each do |task|
+      task.import_urls.each do |import_url|
+        row_index += 1
+        EXPORT_FIELD_NAMES.each_with_index do |field_name, col_index|
+          cell_data =
+            case field_name
+            when 'SUBMITTED_URL'
+              import_url.submitted_url
+            when 'DOMAIN'
+              import_url.domain
+            when 'ISSUE_KEY'
+              task.issue_key
+            when 'STATUS'
+              task.status
+            when 'ISSUE_SUBMITTER'
+              task.submitter
+            when 'BAST_TASK_ID'
+              task.bast_task
+            when 'IMPORTED_AT'
+              task.imported_at.utc.iso8601
+            end
+          worksheet.add_cell(row_index, col_index, cell_data)
+        end
+      end
+    end
+    workbook
   end
 end
