@@ -105,22 +105,22 @@ window.build_single_row = (rd, data) ->
   else
     for url in urls
       {domain, url, complaint_id, imported, verdict_reason}= url
-      unsanitized = '-'
+      sanitized = '-'
       entry = '-'
 
       if verdict_reason
         imported += " - #{verdict_reason}"
 
       if complaint_id
-        entry = "<span class='ticket-id'>#{complaint_id}</span>"
+        entry = "<span class='ticket-id'><a target='_blank' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a></span>"
 
-      if domain !=  url
-        unsanitized = domain
+      if domain && domain !=  url
+        sanitized = domain
 
       #this will need to be changed 5sure
       table_html += "<tr>
                           <td>#{url}</td>
-                          <td>#{unsanitized}</td>
+                          <td>#{sanitized}</td>
                           <td>#{entry}</td>
                           <td>#{imported}</td>
                         </tr>"
@@ -276,7 +276,6 @@ window.build_imports_table = () ->
         data: 'total_urls'
         render: (data,type,full,meta) ->
           {unimported_urls, total_urls, imported_urls}=full
-          console.log full
           return "<span class='total-imports'>#{total_urls} total</span> (#{imported_urls}|#{unimported_urls})"
       },
       {
