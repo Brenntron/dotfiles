@@ -53,8 +53,8 @@ class Escalations::Sdr::DisputesController < ApplicationController
         # Previously, the return value of ActionDispatch::Response#content_type did NOT contain the charset part.
         # This behavior has changed to include the previously omitted charset part as well.
         # If you want just the MIME type, please use ActionDispatch::Response#media_type instead.
-        enconding = bug_attachment.media_type.eql?("application/pdf") ? 'wb' : 'w'
-        File.open("#{zip_directory}/#{temp_file_name}", enconding) { |f| f.write bug_attachment.file_contents }
+        enconding = 'wb' #bug_attachment.media_type.eql?("application/pdf") ? 'wb' : 'w'
+        File.open("#{zip_directory}/#{temp_file_name}", enconding) { |f| f.write open(bug_attachment.direct_upload_url).read }
 
         file_attachments << temp_file_name
         offset += 1
