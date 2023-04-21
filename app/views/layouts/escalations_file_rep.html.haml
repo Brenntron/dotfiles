@@ -96,8 +96,9 @@
           = render 'escalations/file_rep/disputes/advanced_search'
 
 
-  - if current_user
-    #login-div.nav-tool-block.col-sm-2.col-md-2.col-lg-2.nav-username
+
+  #login-div.nav-tool-block.col-sm-2.col-md-2.col-lg-2.nav-username
+    - if current_user
       %a.nav-username{href: "/escalations/users/#{current_user[:id]}"}
         = current_user[:display_name]
 
