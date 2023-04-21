@@ -61,8 +61,13 @@ window.build_single_row = (rd, data) ->
   { urls } = data
   { issue_key, submitter, status, result, imported_at } = rd
 
-  if result && status != result
-    status = "#{status.toUpperCase()} - #{result}"
+
+  if status == 'Awaiting Bast Verdict'
+    status = '<span>PENDING <span class="import-note">| Awaiting Bast Verdict<span></span>'
+  else
+    status = status.toUpperCase()
+    if result && status != result.toUpperCase()
+      status = "#{status} | #{result}"
 
   row_data = {
     'Jira Ticket': "<span class='jira-ticket-id'>#{issue_key}</span>",
@@ -285,7 +290,7 @@ window.build_imports_table = () ->
 
           if status == 'Awaiting Bast Verdict'
             html = '<span>Pending <span class="import-note">| Awaiting Bast Verdict<span></span>'
-            
+
           if status == 'Failure'
             html += "<button class='inline-retry-button retry-button tooltipped tooltipstered' title='Retry' onclick='retry_imports(#{id})'></button>"
 
