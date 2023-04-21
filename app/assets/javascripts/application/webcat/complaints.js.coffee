@@ -276,6 +276,7 @@ window.build_imports_table = () ->
         data: 'total_urls'
         render: (data,type,full,meta) ->
           {unimported_urls, total_urls, imported_urls}=full
+          console.log full
           return "<span class='total-imports'>#{total_urls} total</span> (#{imported_urls}|#{unimported_urls})"
       },
       {

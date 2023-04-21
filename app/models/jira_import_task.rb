@@ -131,7 +131,7 @@ class JiraImportTask < ApplicationRecord
   end
 
   def unimported_urls
-    import_urls.where("bast_verdict = false or bast_verdict = NULL")
+    import_urls.where("bast_verdict = false or bast_verdict is NULL")
   end
 
   def imported_urls
