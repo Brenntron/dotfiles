@@ -207,7 +207,6 @@ window.retry_imports = (id)->
   else
     ids = []
     checked_row_data().map( (r) -> ids.push(parseInt(r.id)) )
-  console.log
   std_msg_ajax(
     method: 'GET'
     url: '/escalations/api/v1/escalations/jira_import_tasks/retry_import'
@@ -215,8 +214,7 @@ window.retry_imports = (id)->
         task_ids:ids
       }
     success: (response) ->
-      console.log response
-
+      $('#webcat-imports-index').DataTable().ajax.reload()
     error: (response) ->
       std_api_error(response, 'Error retrying import.', reload: false)
   )
@@ -303,7 +301,6 @@ window.get_bast_data = (id) ->
     url: "/escalations/api/v1/escalations/jira_import_tasks/#{id}/submitted_urls"
     data: {}
     success: (response) ->
-      console.log response.urls
       return response.urls
     error: (response) ->
       std_api_error(response, 'Error fetching bast data', reload: false)
@@ -2829,7 +2826,6 @@ convert_complaint_to_webrep = () ->
       console.log response
       std_msg_success('Success',["Complaint converted to Reputation Dispute."], reload: true)
     error: (response) ->
-      console.log response
       std_msg_error('Error converting ticket', ['Complaint unable to be converted to Reputation Dispute.'], reload: false)
   )
 
