@@ -366,7 +366,10 @@ table.dataTable.no-footer {
     padding-left: 28px;
   }
 }
-.total-imports{
+.import-note{
+  font-size: 8pt;
+}
+.total-imports, .import-note{
   font-weight: 600;
 }
 .restricted-table-search-input {

@@ -57,7 +57,8 @@ window.change_ticket_view = (type,button) ->
   $('#webcat-imports-index_wrapper, .webcat-ticket-view').toggleClass('hidden')
   $('.list-button, .view-tickets').toggleClass('active-view')
 
-window.build_single_row = (rd, urls) ->
+window.build_single_row = (rd, data) ->
+  { urls } = data
   { issue_key, submitter, status, result, imported_at } = rd
 
   if result && status != result
@@ -93,7 +94,7 @@ window.build_single_row = (rd, urls) ->
                     </tr>
                     </thead>
                   <tbody>"
-
+  console.log urls
   if !urls.length
     table_html +="<tr><td colspan=4 ><span class='missing-data'> No URLs Available</span></td></tr>"
   else
@@ -108,8 +109,8 @@ window.build_single_row = (rd, urls) ->
       if complaint_id
         entry = "<span class='ticket-id'>#{complaint_id}</span>"
 
-      if domain
-        unsanitized = url + domain
+      if domain !=  url
+        unsanitized = domain
 
       #this will need to be changed 5sure
       table_html += "<tr>
@@ -226,10 +227,7 @@ window.retry_imports = (id)->
 window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
     serverSide: true
-    processing: true
-    ajax: {
-      url: "/escalations/webcat/jira_import_tasks.json"
-    }
+    ajax: "/escalations/webcat/jira_import_tasks.json"
     order:[]
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     language: {
@@ -285,6 +283,9 @@ window.build_imports_table = () ->
           else
             html = "<span>#{status}</span>"
 
+          if status == 'Awaiting Bast Verdict'
+            html = '<span>Pending <span class="import-note">| Awaiting Bast Verdict<span></span>'
+            
           if status == 'Failure'
             html += "<button class='inline-retry-button retry-button tooltipped tooltipstered' title='Retry' onclick='retry_imports(#{id})'></button>"
 
@@ -324,7 +325,7 @@ window.export_selected_jira_tasks = ()->
   else      
     $('#jira-tasks-filter-input').val(selected_tasks)
     form.submit()
-\
+
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
   $('#fetch_wbnp').addClass('esc-tooltipped')
