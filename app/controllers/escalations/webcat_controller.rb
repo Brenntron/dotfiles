@@ -33,7 +33,7 @@ class Escalations::WebcatController < ApplicationController
     @jira_reports ={
         complete:JiraImportTask.completed_count,
         failure:JiraImportTask.failed_count,
-        pending: JiraImportTask.pending_count,
+        pending: JiraImportTask.pending_count + JiraImportTask.awaiting_bast_verdict_count,
         "overall tries":  JiraImportTask.total_count
     }
 

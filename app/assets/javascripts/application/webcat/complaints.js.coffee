@@ -58,13 +58,16 @@ window.change_ticket_view = (type,button) ->
   $('.list-button, .view-tickets').toggleClass('active-view')
 
 window.build_single_row = (rd, urls) ->
-  { issue_key, submitter, result, imported_at } = rd
+  { issue_key, submitter, status, result, imported_at } = rd
+
+  if result && status != result
+    status = "#{status.toUpperCase()} - #{result}"
 
   row_data = {
     'Jira Ticket': "<span class='jira-ticket-id'>#{issue_key}</span>",
     'Submitter': submitter,
     'Imported On': imported_at,
-    'Result': result.toUpperCase()
+    'Status': status
   }
 
   ticket_html = "<div class='col-xs-12 col-sm-10 ticket-rows vis-ticket' id='#{issue_key}'>"

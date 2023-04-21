@@ -811,7 +811,12 @@ button {
 .revert-button    {background-image: url(image_path('icon_revert.svg'));}
 .commit-button, .committer-label, .commit-logs-label, .commit-label  {background-image: url(image_path('icon_committer.svg'));}
 .research-label   {background-image: url(image_path('icon_researcher.svg'));}
-.export-button    {background-image: url(image_path('icon_export.svg'));}
+.export-button    {
+  background-image: url(image_path('icon_export.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }
+}
 .clear-button    {background-image: url(image_path('icon_clear.svg'));}
 .clear-action-button {
     background-image: url(image_path('icon_delete_grey.svg'));
@@ -13689,9 +13694,7 @@ table > tbody > tr > td.no-padding {
   font-weight: bold;
 }
 .urls-container {
-  border-top: 1px solid #eeeeee;
   padding-top: 30px;
-  margin-top: 20px;
 }
 #webcat-imports-index_wrapper .jira-ticket-id:hover{
   cursor:pointer;
