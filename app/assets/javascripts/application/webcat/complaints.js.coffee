@@ -94,7 +94,7 @@ window.build_single_row = (rd, data) ->
                       <tr>
                         <th>Original</th>
                         <th>Sanitized</th>
-                        <th>Entry ID</th>
+                        <th>Case ID</th>
                         <th>Bast Response</th>
                     </tr>
                     </thead>
