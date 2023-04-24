@@ -1,3 +1,4 @@
+require 'open-uri'
 class SenderDomainReputationDisputeAttachment < ApplicationRecord
 
   belongs_to :sender_domain_reputation_dispute
@@ -64,7 +65,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   end
 
   def parse_email_content
-    file_data = open(self.direct_upload_url).read
+    file_data = File.open(self.direct_upload_url).read
 
     if file_data.present? && FILE_EXTENTIONS_TO_PROCESS.include?(File.extname(self.file_name))
 
@@ -100,7 +101,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   def send_to_corpus(corpus_submission_category, base_subject, tag, bugzilla_session=nil)
     #bug_proxy = bugzilla_session.build_bug(id: self.sender_domain_reputation_dispute.id)
     #bug_attachments = bug_proxy.attachments
-    file = open(self.direct_upload_url)
+    file = File.open(self.direct_upload_url)
     #bug_attachments.each do |bug_attachment|
     #  if bug_attachment.id == self.id
     #    file = bug_attachment

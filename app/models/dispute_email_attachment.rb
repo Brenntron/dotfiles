@@ -1,3 +1,4 @@
+require 'open-uri'
 class DisputeEmailAttachment < ApplicationRecord
   belongs_to :dispute_email
 

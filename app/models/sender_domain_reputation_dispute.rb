@@ -622,7 +622,7 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     sender_domain_reputation_dispute_attachments.each do |sdr_attachment|
       if sdr_attachment.present?
-        sdr_attachment.parse_email_content(sdr_attachment)
+        sdr_attachment.parse_email_content
       end
     end
   end

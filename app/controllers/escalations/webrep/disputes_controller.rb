@@ -27,7 +27,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
     dispute_file_name = dispute_email_attachment.file_name
 
-    file_data = open(dispute_email_attachment.direct_upload_url).read
+    file_data = File.open(dispute_email_attachment.direct_upload_url).read
 
     send_data file_data, filename: dispute_file_name, disposition: 'attachment'
   end

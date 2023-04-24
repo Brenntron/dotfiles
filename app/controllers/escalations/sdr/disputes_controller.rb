@@ -21,7 +21,7 @@ class Escalations::Sdr::DisputesController < ApplicationController
 
     dispute_file_name = sender_domain_reputation_dispute_attachment.file_name
 
-    file_data = open(sender_domain_reputation_dispute_attachment.direct_upload_url).read
+    file_data = File.open(sender_domain_reputation_dispute_attachment.direct_upload_url).read
 
     send_data file_data, filename: dispute_file_name, disposition: 'attachment'
   end
@@ -54,7 +54,7 @@ class Escalations::Sdr::DisputesController < ApplicationController
         # This behavior has changed to include the previously omitted charset part as well.
         # If you want just the MIME type, please use ActionDispatch::Response#media_type instead.
         enconding = 'wb' #bug_attachment.media_type.eql?("application/pdf") ? 'wb' : 'w'
-        File.open("#{zip_directory}/#{temp_file_name}", enconding) { |f| f.write open(bug_attachment.direct_upload_url).read }
+        File.open("#{zip_directory}/#{temp_file_name}", enconding) { |f| f.write File.open(bug_attachment.direct_upload_url).read }
 
         file_attachments << temp_file_name
         offset += 1
