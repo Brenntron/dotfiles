@@ -13693,16 +13693,18 @@ table > tbody > tr > td.no-padding {
 .ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
 }
-.jira-ticket-id, .ticket-id{
+.jira-ticket-id {
   font-weight: bold;
   color: $type-base-color!important;
-  a{text-decoration: none!important;
-    color: $type-base-color!important;}
+}
+.ticket-id{
+  text-decoration: underline;
+  color:#23527c;
 }
 .urls-container {
   padding-top: 30px;
 }
-#webcat-imports-index_wrapper .jira-ticket-id:hover, .ticket-id a:hover{
+#webcat-imports-index_wrapper .jira-ticket-id:hover {
   cursor:pointer;
   border-bottom: 1px solid #666;
 }

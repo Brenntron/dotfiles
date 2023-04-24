@@ -94,25 +94,28 @@ window.build_single_row = (rd, data) ->
                       <tr>
                         <th>Original</th>
                         <th>Sanitized</th>
+                        <th>Entry ID</th>
                         <th>Case ID</th>
                         <th>Bast Response</th>
                     </tr>
                     </thead>
                   <tbody>"
-  console.log urls
+  
   if !urls.length
     table_html +="<tr><td colspan=4 ><span class='missing-data'> No URLs Available</span></td></tr>"
   else
     for url in urls
-      {domain, url, complaint_id, imported, verdict_reason}= url
+      {domain, url, complaint_id, entry_id, imported, verdict_reason}= url
       sanitized = '-'
-      entry = '-'
+      complaint = '-'
 
       if verdict_reason
         imported += " - #{verdict_reason}"
 
+      if !entry_id then entry_id = '-'
+
       if complaint_id
-        entry = "<span class='ticket-id'><a target='_blank' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a></span>"
+        complaint = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
 
       if domain && domain !=  url
         sanitized = domain
@@ -121,7 +124,8 @@ window.build_single_row = (rd, data) ->
       table_html += "<tr>
                           <td>#{url}</td>
                           <td>#{sanitized}</td>
-                          <td>#{entry}</td>
+                          <td>#{entry_id}</td>
+                          <td>#{complaint}</td>
                           <td>#{imported}</td>
                         </tr>"
 
