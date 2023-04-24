@@ -76,7 +76,7 @@ window.build_single_row = (rd, data) ->
     'Status': status
   }
 
-  ticket_html = "<div class='col-xs-12 col-sm-10 ticket-rows vis-ticket' id='#{issue_key}'>"
+  ticket_html = "<div class='row ticket-rows vis-ticket' id='#{issue_key}'>"
   #build upper data
   for title, content of row_data
 
