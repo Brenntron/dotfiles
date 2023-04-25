@@ -3,7 +3,7 @@ class Complaint < ApplicationRecord
   has_many :complaint_entries, dependent: :restrict_with_exception
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
   belongs_to :platform, optional: true
-  has_one :import_url
+  has_many :import_urls
   has_paper_trail on: [:update], ignore: [:updated_at]
 
   delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
