@@ -74,32 +74,37 @@ class JiraImportTask < ApplicationRecord
   def create_tickets
     return unless status == STATUS_AWAITING_BAST_VERDICT
 
+    import_urls.where(domain: nil).each do |url|
+      url_parts = Complaint.parse_url(url.submitted_url)
+      url.update(domain: url_parts[:domain])
+    end
+
     task_status = Bast::Base.get_task_status(bast_task)
     return unless task_status["status"] == "Completed"
 
     task_results = Bast::Base.get_task_result(bast_task)
 
+    description = "Created from Jira Issue #{issue_key}"
+
     task_results.each do |k,v|
-      ticketable_urls = []
 
-      ticketable_urls << import_urls.where(submitted_url: k).first
-      if v["urls"].present?
-        v["urls"].each do |url|
-          ticketable_urls << import_urls.where(submitted_url: url).first
-        end
-      end
+      ticketable_urls = import_urls.where(domain: k)
 
-      ticketable_urls = ticketable_urls.reject {|r| r.nil?}
-
-      description = "Created from Jira Issue #{issue_key}"
-
-      ticketable_urls.each do |ticketable_url|
-        ticketable_url.update(bast_verdict: v["import"])
-        if v["import"] == true
-          response = Complaint.create_action(BugzillaRest::Session.default_session, ticketable_url.submitted_url, description, nil, nil, nil)
-          ticketable_url.update(complaint_id: response[:complaint_id])
+      if v["import"] == true
+        existing_entry = ComplaintEntry.open.where(domain: k).first
+        if existing_entry.present?
+          ticketable_urls.each do |ticketable_url|
+            ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
+          end
         else
-          ticketable_url.update(verdict_reason: v["reason"])
+          response = Complaint.create_action(BugzillaRest::Session.default_session, ticketable_urls.first.submitted_url, description, nil, nil, nil)
+          ticketable_urls.each do |ticketable_url|
+            ticketable_url.update(bast_verdict: v["import"], complaint_id: response[:complaint_id])
+          end
+        end
+      else
+        ticketable_urls.each do |ticketable_url|
+          ticketable_url.update(bast_verdict: v["import"], verdict_reason: v["reason"])
         end
       end
     end
