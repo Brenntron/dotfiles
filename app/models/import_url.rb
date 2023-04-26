@@ -3,7 +3,7 @@ class ImportUrl < ApplicationRecord
   belongs_to :complaint, optional: true
 
   def to_hash
-    entry_id = ComplaintEntry.where(complaint_id:complaint_id).first.id if complaint_id.present?
+    entry_id = ComplaintEntry.where(complaint_id:complaint_id).first&.id if complaint_id.present?
     {
         url: submitted_url,
         domain: domain,
