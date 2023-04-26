@@ -89,17 +89,17 @@ window.build_single_row = (rd, data) ->
                   <label class='data-report-label'>Urls<label></div>"
   #build table data
 
-  ticket_html +="<table class='table responsive dataTable no-footer' id='#{issue_key}-datatable' role='datatable'>
+  ticket_html +="<table class='table responsive dataTable no-footer url-datatable' id='#{issue_key}-datatable' role='datatable'>
                   <thead>
                   <tr>
-                    <th>
-                      <input type='checkbox' name='cbox' class='imports-url-checkbox-bulk' id='cbox-#{issue_key}-urls' value='#{issue_key}'/>
-                    </th>
+                    <th><input type='checkbox' name='cbox' class='imports-url-checkbox-bulk' id='cbox-#{issue_key}-urls' value='#{issue_key}'/></th>
                     <th>Original</th>
                     <th>Sanitized</th>
                     <th>Entry ID</th>
                     <th>Case ID</th>
+                    <th>Status</th>
                     <th>Resolution</th>
+                    <th>Resolution Time</th>
                     <th>Category</th>
                     <th>Assignee</th>
                     <th>Age</th>
@@ -109,9 +109,26 @@ window.build_single_row = (rd, data) ->
                 </table>
             </div></div>"
   $('.webcat-ticket-view').append(ticket_html)
-  console.log urls
+
+  # dynamic datatable for each selected jira import report
+  # handled differently than
   $("##{issue_key}-datatable").DataTable(
-    data:{urls}
+      data:urls
+      searching: false
+      order: [[2,'asc',]]
+      lengthMenu: [25, 50, 100]
+      dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+      columnDefs:
+          [{
+            targets: [ 0 ]
+            orderable: false
+            searchable: false
+          }]
+
+      createdRow: (row, data, index) ->
+        entry_id = data[4]
+        checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
+        $('td', row).eq(0).append(checkbox)
   )
 
 
@@ -122,19 +139,22 @@ window.build_ticket_view = (checked, view) ->
     checked = [checked]
 
   for check, index in checked
-    row = $(check).closest('tr')
-    id = $(check).attr('value')
-    el = $("##{id}")
-
-    if el.length > 0
-      # if we have already built this ticket view, show it
-      el.removeClass('hidden')
-      if checked.length > 1
-        el.addClass('vis-ticket')
+    if index == 10
+      break
     else
-      # if we haven't built this ticket view, build it
-      rd = table.row( row ).data()
-      get_bast_data(rd.id).then( build_single_row.bind(null, rd) )
+      row = $(check).closest('tr')
+      id = $(check).attr('value')
+      el = $("##{id}")
+
+      if el.length > 0
+        # if we have already built this ticket view, show it
+        el.removeClass('hidden')
+        if checked.length > 1
+          el.addClass('vis-ticket')
+      else
+        # if we haven't built this ticket view, build it
+        rd = table.row( row ).data()
+        get_bast_data(rd.id).then( build_single_row.bind(null, rd) )
 
   if view == 'single'
     $('.mothra-header').text('Import Results')
