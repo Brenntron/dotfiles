@@ -50,7 +50,8 @@ class Escalations::WebcatController < ApplicationController
     @int_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_int).where(status:"ASSIGNED").count
 
     @jira_new_count = ComplaintEntry.where(complaint_id: Complaint.from_jira).where(status:"NEW").count
-    @jira_overdue_count = ComplaintEntry.where(complaint_id: Complaint.from_jira).where.not(status:["RESOLVED","COMPLETED"]).where("created_at < ?",Time.now - 12.hours).count
+    @jira_overdue_count = ComplaintEntry.where(complaint_id: Complaint.from_jira).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours).count
+
     @jira_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_jira).where(status:"ASSIGNED").count
 
     @pending_new_count = ComplaintEntry.where(status:"PENDING").count
