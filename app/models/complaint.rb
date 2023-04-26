@@ -50,6 +50,7 @@ class Complaint < ApplicationRecord
   TI_CHANNEL = 'talosintel'
   INT_CHANNEL = 'internal'
   WBNP_CHANNEL = 'wbnp'
+  JIRA_CHANNEL = 'jira'
 
   SOURCE_RULEUI = "RuleUI"
 
@@ -72,6 +73,7 @@ For future web and email reputation requests, please open a web and email reputa
   scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
+  scope :from_jira, -> { includes(:complaint_entries).where(channel: JIRA_CHANNEL) }
 
   validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
 
