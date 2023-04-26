@@ -108,6 +108,7 @@ window.build_single_row = (rd, data) ->
                 </thead>
                 </table>
             </div></div>"
+
   $('.webcat-ticket-view').append(ticket_html)
 
   # dynamic datatable for each selected jira import report
@@ -126,9 +127,15 @@ window.build_single_row = (rd, data) ->
           }]
 
       createdRow: (row, data, index) ->
-        entry_id = data[4]
+        entry_id = data[3]
         checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
         $('td', row).eq(0).append(checkbox)
+
+        complaint_id = data[4]
+        if complaint_id
+          complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
+          $('td', row).eq(4).html(complaint_link)
+
   )
 
 
