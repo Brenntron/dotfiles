@@ -54,8 +54,8 @@ class JiraImportTask < ApplicationRecord
       end
 
       urls.each do |url|
-        url_parts = Complaint.parse_url(url)
-        import_urls.find_or_create_by(submitted_url: url, domain: url_parts[:domain])
+        parsed_url = Complaint.parse_url(url)
+        import_urls.find_or_create_by(submitted_url: url, domain: parsed_url[:domain])
       end
 
       begin
@@ -136,7 +136,7 @@ class JiraImportTask < ApplicationRecord
   end
 
   def unimported_urls
-    import_urls.where("bast_verdict = false or bast_verdict = NULL")
+    import_urls.where("bast_verdict = false or bast_verdict is NULL")
   end
 
   def imported_urls

@@ -31,6 +31,147 @@ $(document).ready ->
      $('body').hasClass('index-action')
     window.check_wbnp_status()
 
+window.change_ticket_view = (type,button) ->
+
+  checked = $('.imports_check_box:checked')
+
+  if $(button).hasClass('active-view')
+    #if view is already active, do nothing
+    return
+
+  switch type
+    when 'ticket'
+      if checked.length == 0
+        #if ticket view selected without any checked, show error and do nothing
+        std_msg_error("Select at least one ticket to view.", [], reload: false)
+        return
+      else
+        #else build (or show previously built) tickets
+        build_ticket_view(checked,"bulk")
+        $('.mothra-header').text('Import Results')
+    when 'list'
+      $('.mothra-header').text('Jira Imports')
+      $('.ticket-rows').addClass('hidden') #ticket rows must be individually hidden
+      $('.ticket-rows').removeClass('vis-ticket')
+  # show/hide appropriate elements
+  $('#webcat-imports-index_wrapper, .webcat-ticket-view').toggleClass('hidden')
+  $('.list-button, .view-tickets').toggleClass('active-view')
+
+window.build_single_row = (rd, data) ->
+  { urls } = data
+  { issue_key, submitter, status, result, imported_at } = rd
+
+
+  if status == 'Awaiting Bast Verdict'
+    status = '<span>PENDING <span class="import-note">| Awaiting Bast Verdict<span></span>'
+  else
+    status = status.toUpperCase()
+    if result && status != result.toUpperCase()
+      status = "#{status} | #{result}"
+
+  row_data = {
+    'Jira Ticket': "<span class='jira-ticket-id'>#{issue_key}</span>",
+    'Submitter': submitter,
+    'Imported On': imported_at,
+    'Status': status
+  }
+
+  ticket_html = "<div class='row ticket-rows vis-ticket' id='#{issue_key}'>"
+  #build upper data
+  for title, content of row_data
+
+    if !content then content = "<span class='missing-data'>Not available</span>"
+
+    ticket_html += "<div class='col-xs-6 no-padding-left'>
+                            <label class='data-report-label'>#{title}</label>
+                            <span class='data-report-content'>#{content}</span>
+                          </div>"
+  ticket_html += "<div class='col-xs-12 no-padding-left urls-container'>
+                  <label class='data-report-label'>Urls<label></div>"
+  #build table data
+  table_html = "<table>
+                    <thead>
+                      <tr>
+                        <th>Original</th>
+                        <th>Sanitized</th>
+                        <th>Entry ID</th>
+                        <th>Case ID</th>
+                        <th>Bast Response</th>
+                    </tr>
+                    </thead>
+                  <tbody>"
+  
+  if !urls.length
+    table_html +="<tr><td colspan=4 ><span class='missing-data'> No URLs Available</span></td></tr>"
+  else
+    for url in urls
+      {domain, url, complaint_id, entry_id, imported, verdict_reason}= url
+      sanitized = '-'
+      complaint = '-'
+
+      if verdict_reason
+        imported += " - #{verdict_reason}"
+
+      if !entry_id then entry_id = '-'
+
+      if complaint_id
+        complaint = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
+
+      if domain && domain !=  url
+        sanitized = domain
+
+      #this will need to be changed 5sure
+      table_html += "<tr>
+                          <td>#{url}</td>
+                          <td>#{sanitized}</td>
+                          <td>#{entry_id}</td>
+                          <td>#{complaint}</td>
+                          <td>#{imported}</td>
+                        </tr>"
+
+  table_html += "</tbody></table></div></div>"
+  ticket_html += table_html
+
+  $('.webcat-ticket-view').append(ticket_html)
+
+window.build_ticket_view = (checked, view) ->
+  table =  $('#webcat-imports-index').DataTable()
+
+  if view == 'single'
+    checked = [checked]
+
+  for check, index in checked
+    row = $(check).closest('tr')
+    id = $(check).attr('value')
+    el = $("##{id}")
+
+    if el.length > 0
+      # if we have already built this ticket view, show it
+      el.removeClass('hidden')
+      if checked.length > 1
+        el.addClass('vis-ticket')
+    else
+      # if we haven't built this ticket view, build it
+      rd = table.row( row ).data()
+      get_bast_data(rd.id).then( build_single_row.bind(null, rd) )
+
+  if view == 'single'
+    $('.mothra-header').text('Import Results')
+    $('#webcat-imports-index_wrapper, .webcat-ticket-view').toggleClass('hidden')
+    $('.list-button, .view-tickets').toggleClass('active-view')
+
+$(document).on 'click', '#bulk-ticket-select',->
+  checked = $(this).prop('checked')
+  $('.imports_check_box').prop('checked', checked)
+
+$(document).on 'click', '.imports_check_box',->
+  num_checked = $('.imports_check_box:checked').length
+
+  if num_checked == $('.imports_check_box').length
+    $('.imports_check_box').prop('checked', true)
+  if num_checked == 0
+    $('.imports_check_box').prop('checked', false)
+
 $(document).on 'click', '#show-failed, #show-complete',->
   table = $('#webcat-imports-index').DataTable()
   show_failed = $('#show-failed').prop('checked')
@@ -79,7 +220,6 @@ window.retry_imports = (id)->
   else
     ids = []
     checked_row_data().map( (r) -> ids.push(parseInt(r.id)) )
-  console.log
   std_msg_ajax(
     method: 'GET'
     url: '/escalations/api/v1/escalations/jira_import_tasks/retry_import'
@@ -87,8 +227,7 @@ window.retry_imports = (id)->
         task_ids:ids
       }
     success: (response) ->
-      console.log response
-
+      $('#webcat-imports-index').DataTable().ajax.reload()
     error: (response) ->
       std_api_error(response, 'Error retrying import.', reload: false)
   )
@@ -97,10 +236,7 @@ window.retry_imports = (id)->
 window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
     serverSide: true
-    processing: true
-    ajax: {
-      url: "/escalations/webcat/jira_import_tasks.json"
-    }
+    ajax: "/escalations/webcat/jira_import_tasks.json"
     order:[]
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     language: {
@@ -130,9 +266,14 @@ window.build_imports_table = () ->
       {
         data:'issue_key',
         render: (data,type,full,meta) ->
-          return "<input type='checkbox' name='cbox' class='imports_check_box' id='cbox#{data}' value=#{data} />"
+          return "<input type='checkbox' name='cbox' class='imports_check_box' id='cbox#{data}' data=#{JSON.stringify(full)} value=#{data} />"
       },
-      {data: 'issue_key'},
+      {
+        data: 'issue_key',
+        render:(data,type,full,meta)->
+          html = "<span class='jira-ticket-id' onclick='build_ticket_view(this, \"single\")' value='#{data}'>#{data}</span>"
+          return html
+      },
       {data: 'submitter'},
       {data: 'imported_at'},
       {
@@ -151,6 +292,9 @@ window.build_imports_table = () ->
           else
             html = "<span>#{status}</span>"
 
+          if status == 'Awaiting Bast Verdict'
+            html = '<span>Pending <span class="import-note">| Awaiting Bast Verdict<span></span>'
+
           if status == 'Failure'
             html += "<button class='inline-retry-button retry-button tooltipped tooltipstered' title='Retry' onclick='retry_imports(#{id})'></button>"
 
@@ -163,6 +307,17 @@ window.build_imports_table = () ->
     ]
   )
 # WBNP - Get report id
+
+window.get_bast_data = (id) ->
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/jira_import_tasks/#{id}/submitted_urls"
+    data: {}
+    success: (response) ->
+      return response.urls
+    error: (response) ->
+      std_api_error(response, 'Error fetching bast data', reload: false)
+  )
 
 window.export_all_jira_tasks = ()->
   form = $('#jira-tasks-disputes-export-form')
@@ -2684,7 +2839,6 @@ convert_complaint_to_webrep = () ->
       console.log response
       std_msg_success('Success',["Complaint converted to Reputation Dispute."], reload: true)
     error: (response) ->
-      console.log response
       std_msg_error('Error converting ticket', ['Complaint unable to be converted to Reputation Dispute.'], reload: false)
   )
 

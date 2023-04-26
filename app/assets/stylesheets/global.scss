@@ -366,6 +366,9 @@ table.dataTable.no-footer {
     padding-left: 28px;
   }
 }
+.import-note{
+  font-size: 8pt;
+}
 .total-imports{
   font-weight: 600;
 }
@@ -811,7 +814,12 @@ button {
 .revert-button    {background-image: url(image_path('icon_revert.svg'));}
 .commit-button, .committer-label, .commit-logs-label, .commit-label  {background-image: url(image_path('icon_committer.svg'));}
 .research-label   {background-image: url(image_path('icon_researcher.svg'));}
-.export-button    {background-image: url(image_path('icon_export.svg'));}
+.export-button    {
+  background-image: url(image_path('icon_export.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }
+}
 .clear-button    {background-image: url(image_path('icon_clear.svg'));}
 .clear-action-button {
     background-image: url(image_path('icon_delete_grey.svg'));
@@ -12844,7 +12852,9 @@ span.threat-cat-no-data {
 .no-padding-right {
   padding-right: 0 !important;
 }
-
+.no-padding-left {
+  padding-left: 0 !important;
+}
 .uri-plus-ip-rule-indicator {
   background-image: url(image_path('icon_plus_ip_blue.svg'));
   background-repeat: no-repeat;
@@ -13683,7 +13693,53 @@ table > tbody > tr > td.no-padding {
 .ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
 }
+.jira-ticket-id {
+  font-weight: bold;
+  color: $type-base-color!important;
+}
+.ticket-id{
+  text-decoration: underline;
+  color:#23527c;
+}
+.urls-container {
+  padding-top: 30px;
+}
+#webcat-imports-index_wrapper .jira-ticket-id:hover {
+  cursor:pointer;
+  border-bottom: 1px solid #666;
+}
+.webcat-ticket-view{
+  margin-top: 50px;
+  display: inline-block;
+  .data-report-content{
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .data-report-content{
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .vis-ticket {
+    &:not(:last-of-type){
+      margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid #eeeeee;
+    }
+    &:only-of-type{
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: unset;
+    }
+  }
 
+  .ticket-rows{
+    max-width: 800px;
+    margin-left: 7px;
+    td, th{
+      padding-left:0
+    }
+  }
+}
 .webcat-reports-only {
   display: flex;
   flex-wrap: wrap;

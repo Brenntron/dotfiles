@@ -29,7 +29,7 @@ class Bast::Base
 
 
   # usage:
-  # Bast::Base.get_task_status(293)
+  # Bast::Base.get_task_result(293)
   # response example:
     # {"cisco.com"=>{"import"=>true, "category"=>"comp", "umbrella_rank"=>434, "wbnp_rank"=>62, "alexa_rank"=>1570}, "pravda.com.ua"=>{"import"=>true, "category"=>"news", "umbrella_rank"=>65475, "wbnp_rank"=>41868, "alexa_rank"=>2783}}
   def self.get_task_result(task_id)
