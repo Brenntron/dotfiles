@@ -128,7 +128,7 @@ window.build_single_row = (rd, data) ->
 
       createdRow: (row, data, index) ->
         entry_id = data[3]
-        checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
+        checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
         $('td', row).eq(0).append(checkbox)
 
         complaint_id = data[4]
@@ -175,7 +175,6 @@ $(document).on 'click', '#bulk-ticket-select',->
 $(document).on 'click', '.imports-url-checkbox-bulk',->
   checked = $(this).prop('checked')
   issue_key = $(this).val()
-
   $(".imports-url-checkbox-#{issue_key}").prop('checked', checked)
 
 $(document).on 'click', '.imports_check_box',->
@@ -321,6 +320,29 @@ window.build_imports_table = () ->
     ]
   )
 # WBNP - Get report id
+
+window.jira_assignee_hub = (type) ->
+  # handle all assigning for jira import entries
+  selected_rows = $('.imports-url-checkbox:checked')
+  entry_ids = selected_rows.map( () ->
+                                  val = $(this).val()
+                                  if val && val != 'null' then return val).get()
+
+  if entry_ids.length > 0
+    data = {'complaint_entry_ids': entry_ids}
+    url = "/escalations/api/v1/escalations/webcat/complaint_entries/#{type}"
+    if type == 'change_assignee'
+      data['user_id'] = $('#index_target_assignee option:selected').val()
+
+    std_msg_ajax(
+      method: 'POST'
+      url: url
+      data: data
+      success: (response) ->
+        console.log response
+      error: (response) ->
+        std_api_error(response, 'Error assigning', reload: false)
+    )
 
 window.get_bast_data = (id) ->
   std_msg_ajax(

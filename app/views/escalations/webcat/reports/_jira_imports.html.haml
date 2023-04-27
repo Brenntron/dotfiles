@@ -32,6 +32,32 @@
     %button.toolbar-button.export-button.esc-tooltipped{type: 'button', onclick: 'export_selected_jira_tasks();', title: 'Export Selected to CSV'}
       %span.toolbar-button-text
         Export Selected
+  %div
+    %label.toolbar-section-label
+      Edit
+    %span.toolbar-concise-button-area
+      %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first{onclick: 'jira_assignee_hub("take_entry")', type: 'button', title: 'Take (alt + t)'}
+        %span.toolbar-button-text Take
+      %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{onclick: 'jira_assignee_hub("return_entry")', type: 'button', title: 'Return (alt + r)'}
+        %span.toolbar-button-text Return
+    %span.toolbar-concise-button-area.webrep-change-assignee-wrapper
+      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text{onclick: 'jira_assignee_hub("unassign_all")', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span.dropdown
+        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text
+            Change Assignee
+        .dropdown-menu.toolbar-dropdown{'aria-labelledby': 'index_change_assign'}
+          %h3 Change Assignee
+          .inline-tool-content-wrapper
+            .toolbar
+              %div
+                %label.toolbar-section-label Assignee
+                %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
+                  - User.joins(roles: :org_subset).where(org_subsets: { name: 'webcat' }).distinct.order(:cvs_username).each do |u|
+                    %option{id: u.id, value: u.id, label: u.cvs_username}
+                      = u.cvs_username
+              %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'jira_assignee_hub("change_assignee")'}
+                Assign
 .row
   .col-xs-12
     .webcat-ticket-view.hidden
