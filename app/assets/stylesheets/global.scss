@@ -861,7 +861,10 @@ button {
 .ticket-status-button {background-image: url(image_path('icon_status.svg'));}
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .mark-related-button {background-image: url(image_path('icon_related.svg'));}
-.ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
+.ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
 .auto-resolve-button {background-image: url(image_path('icon_reports_white.svg'));}
@@ -879,7 +882,11 @@ button {
   left: 7px;}
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 .sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
-.remove-assignee-toolbar-button {background-image: url(image_path('icon_unassign_grey.svg'));}
+.remove-assignee-toolbar-button {
+  background-image: url(image_path('icon_unassign_grey.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -893,8 +900,16 @@ button {
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
 .open-all {background-image: url(image_path('icon_open_viewable.svg'));}
-.take-ticket-toolbar-button {background-image: url(image_path('icon_take.svg'));}
-.return-ticket-toolbar-button {background-image: url(image_path('icon_return.svg'));}
+.take-ticket-toolbar-button {
+  background-image: url(image_path('icon_take.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }}
+.return-ticket-toolbar-button {
+  background-image: url(image_path('icon_return.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }}
 .convert-ticket-button{background-image: url(image_path('icon_convert_ticket_grey.svg'));}
 .open .convert-ticket-button {background-image: url(image_path('icon_convert_ticket.svg'))};
 .collapse-all {background-image: url(image_path('icon_collapse_all.svg'));}

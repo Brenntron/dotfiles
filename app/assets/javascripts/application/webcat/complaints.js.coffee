@@ -53,6 +53,8 @@ window.change_ticket_view = (type,button) ->
       $('.mothra-header').text('Jira Imports')
       $('.ticket-rows').addClass('hidden') #ticket rows must be individually hidden
       $('.ticket-rows').removeClass('vis-ticket')
+      $('.reports-toolbar .toolbar-button').attr('disabled', true)
+      $('.imports-url-checkbox').prop('checked', false)
   # show/hide appropriate elements
   $('#webcat-imports-index_wrapper, .webcat-ticket-view').toggleClass('hidden')
   $('.list-button, .view-tickets').toggleClass('active-view')
@@ -176,6 +178,14 @@ $(document).on 'click', '.imports-url-checkbox-bulk',->
   checked = $(this).prop('checked')
   issue_key = $(this).val()
   $(".imports-url-checkbox-#{issue_key}").prop('checked', checked)
+  $(".imports-url-checkbox-#{issue_key}").trigger("change")
+
+$(document).on 'change', '.imports-url-checkbox',->
+  checked = $(".imports-url-checkbox:checked").length > 0
+  if checked
+    $(".reports-toolbar .toolbar-button").removeAttr('disabled')
+  else
+    $(".reports-toolbar .toolbar-button").attr('disabled', true)
 
 $(document).on 'click', '.imports_check_box',->
   num_checked = $('.imports_check_box:checked').length

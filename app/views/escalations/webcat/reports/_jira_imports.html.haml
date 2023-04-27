@@ -32,18 +32,18 @@
     %button.toolbar-button.export-button.esc-tooltipped{type: 'button', onclick: 'export_selected_jira_tasks();', title: 'Export Selected to CSV'}
       %span.toolbar-button-text
         Export Selected
-  %div
+  %div.reports-toolbar
     %label.toolbar-section-label
       Edit
     %span.toolbar-concise-button-area
-      %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first{onclick: 'jira_assignee_hub("take_entry")', type: 'button', title: 'Take (alt + t)'}
+      %button.toolbar-button.take-ticket-toolbar-button.concise-button.concise-button-first{onclick: 'jira_assignee_hub("take_entry")', type: 'button', title: 'Take', disabled: 'disabled'}
         %span.toolbar-button-text Take
-      %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{onclick: 'jira_assignee_hub("return_entry")', type: 'button', title: 'Return (alt + r)'}
+      %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.concise-button.concise-button-last.darkened-button{onclick: 'jira_assignee_hub("return_entry")', type: 'button', title: 'Return', disabled: 'disabled'}
         %span.toolbar-button-text Return
     %span.toolbar-concise-button-area.webrep-change-assignee-wrapper
-      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text{onclick: 'jira_assignee_hub("unassign_all")', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.concise-button.concise-button-first.concise-button-no-text{onclick: 'jira_assignee_hub("unassign_all")', title: 'Remove Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled'}
       %span.dropdown
-        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.concise-button.concise-button-last.darkened-button{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled'}
           %span.toolbar-button-text
             Change Assignee
         .dropdown-menu.toolbar-dropdown{'aria-labelledby': 'index_change_assign'}
