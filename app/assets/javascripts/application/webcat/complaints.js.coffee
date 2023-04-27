@@ -59,8 +59,7 @@ window.change_ticket_view = (type,button) ->
 
 window.build_single_row = (rd, data) ->
   { urls } = data
-  { issue_key, submitter, status, result, imported_at } = rd
-
+  { issue_key, submitter, status, result, imported_at, age, resolution, resolution_time, assignee,category} = rd
 
   if status == 'Awaiting Bast Verdict'
     status = '<span>PENDING <span class="import-note">| Awaiting Bast Verdict<span></span>'
@@ -89,50 +88,56 @@ window.build_single_row = (rd, data) ->
   ticket_html += "<div class='col-xs-12 no-padding-left urls-container'>
                   <label class='data-report-label'>Urls<label></div>"
   #build table data
-  table_html = "<table>
-                    <thead>
-                      <tr>
-                        <th>Original</th>
-                        <th>Sanitized</th>
-                        <th>Entry ID</th>
-                        <th>Case ID</th>
-                        <th>Bast Response</th>
-                    </tr>
-                    </thead>
-                  <tbody>"
-  
-  if !urls.length
-    table_html +="<tr><td colspan=4 ><span class='missing-data'> No URLs Available</span></td></tr>"
-  else
-    for url in urls
-      {domain, url, complaint_id, entry_id, imported, verdict_reason}= url
-      sanitized = '-'
-      complaint = '-'
 
-      if verdict_reason
-        imported += " - #{verdict_reason}"
-
-      if !entry_id then entry_id = '-'
-
-      if complaint_id
-        complaint = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
-
-      if domain && domain !=  url
-        sanitized = domain
-
-      #this will need to be changed 5sure
-      table_html += "<tr>
-                          <td>#{url}</td>
-                          <td>#{sanitized}</td>
-                          <td>#{entry_id}</td>
-                          <td>#{complaint}</td>
-                          <td>#{imported}</td>
-                        </tr>"
-
-  table_html += "</tbody></table></div></div>"
-  ticket_html += table_html
+  ticket_html +="<table class='table responsive dataTable no-footer url-datatable' id='#{issue_key}-datatable' role='datatable'>
+                  <thead>
+                  <tr>
+                    <th><input type='checkbox' name='cbox' class='imports-url-checkbox-bulk' id='cbox-#{issue_key}-urls' value='#{issue_key}'/></th>
+                    <th>Original</th>
+                    <th>Sanitized</th>
+                    <th>Entry ID</th>
+                    <th>Case ID</th>
+                    <th>Status</th>
+                    <th>Resolution</th>
+                    <th>Resolution Time</th>
+                    <th>Category</th>
+                    <th>Assignee</th>
+                    <th>Age</th>
+                    <th>Bast Response</th>
+                  </tr>
+                </thead>
+                </table>
+            </div></div>"
 
   $('.webcat-ticket-view').append(ticket_html)
+
+  # dynamic datatable for each selected jira import report
+  # handled differently than
+  $("##{issue_key}-datatable").DataTable(
+      data:urls
+      searching: false
+      order: [[2,'asc',]]
+      lengthMenu: [25, 50, 100]
+      dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+      columnDefs:
+          [{
+            targets: [ 0 ]
+            orderable: false
+            searchable: false
+          }]
+
+      createdRow: (row, data, index) ->
+        entry_id = data[3]
+        checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
+        $('td', row).eq(0).append(checkbox)
+
+        complaint_id = data[4]
+        if complaint_id
+          complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
+          $('td', row).eq(4).html(complaint_link)
+
+  )
+
 
 window.build_ticket_view = (checked, view) ->
   table =  $('#webcat-imports-index').DataTable()
@@ -141,19 +146,22 @@ window.build_ticket_view = (checked, view) ->
     checked = [checked]
 
   for check, index in checked
-    row = $(check).closest('tr')
-    id = $(check).attr('value')
-    el = $("##{id}")
-
-    if el.length > 0
-      # if we have already built this ticket view, show it
-      el.removeClass('hidden')
-      if checked.length > 1
-        el.addClass('vis-ticket')
+    if index == 10
+      break
     else
-      # if we haven't built this ticket view, build it
-      rd = table.row( row ).data()
-      get_bast_data(rd.id).then( build_single_row.bind(null, rd) )
+      row = $(check).closest('tr')
+      id = $(check).attr('value')
+      el = $("##{id}")
+
+      if el.length > 0
+        # if we have already built this ticket view, show it
+        el.removeClass('hidden')
+        if checked.length > 1
+          el.addClass('vis-ticket')
+      else
+        # if we haven't built this ticket view, build it
+        rd = table.row( row ).data()
+        get_bast_data(rd.id).then( build_single_row.bind(null, rd) )
 
   if view == 'single'
     $('.mothra-header').text('Import Results')
@@ -163,6 +171,12 @@ window.build_ticket_view = (checked, view) ->
 $(document).on 'click', '#bulk-ticket-select',->
   checked = $(this).prop('checked')
   $('.imports_check_box').prop('checked', checked)
+
+$(document).on 'click', '.imports-url-checkbox-bulk',->
+  checked = $(this).prop('checked')
+  issue_key = $(this).val()
+
+  $(".imports-url-checkbox-#{issue_key}").prop('checked', checked)
 
 $(document).on 'click', '.imports_check_box',->
   num_checked = $('.imports_check_box:checked').length

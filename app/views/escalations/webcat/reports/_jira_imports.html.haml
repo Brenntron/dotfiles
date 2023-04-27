@@ -6,7 +6,7 @@
       View
     %button.toolbar-button.list-button.toolbar-button-spacer.active-view.tooltipped{title: 'List All Jira Imports', onclick:'change_ticket_view("list")'}
       %span.toolbar-button-text List
-    %button.toolbar-button.view-tickets.view-button.tooltipped{title: 'Detailed Import View', onclick:'change_ticket_view("ticket", this)'}
+    %button.toolbar-button.view-tickets.view-button.tooltipped{title: 'Detailed Import View | Only 10 reports may be viewed at a time', onclick:'change_ticket_view("ticket", this)'}
       %span.toolbar-button-text View
 
   %div.toolbar-container
@@ -34,9 +34,7 @@
         Export Selected
 .row
   .col-xs-12
-
     .webcat-ticket-view.hidden
-
     %table.table.responsive.dataTable.no-footer.webcat-list-view#webcat-imports-index{role:'datatable'}
       %thead
         %tr
