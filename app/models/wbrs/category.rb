@@ -25,7 +25,7 @@ class Wbrs::Category < Wbrs::Base
   # Get all the categories.
   # @return [Array<Wbrs::Category>] Array of the results.
   def self.all(reload: false)
-    unless @all || reload
+    unless @all.present? || reload
       response = call_json_request(:get, '/v1/cat/categories', body: '')
 
       response_body = JSON.parse(response.body)
