@@ -56,7 +56,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
     directory_to_create = Pathname(full_file_path)
     directory_to_create.dirname.mkpath
 
-    File.open(full_file_path, "w") { |f| f.write file_content }
+    File.open(full_file_path, "wb") { |f| f.write file_content }
 
     new_local_attachment.direct_upload_url = full_file_path
     new_local_attachment.save
@@ -67,7 +67,7 @@ class SenderDomainReputationDisputeAttachment < ApplicationRecord
   def parse_email_content
     file_data = File.open(self.direct_upload_url).read
 
-    if file_data.present? && FILE_EXTENTIONS_TO_PROCESS.include?(File.extname(self.file_name))
+    if !file_data.empty? && FILE_EXTENTIONS_TO_PROCESS.include?(File.extname(self.file_name))
 
       header_json = SenderDomainReputationDisputeAttachment.parse_headers_to_array(file_data)
 

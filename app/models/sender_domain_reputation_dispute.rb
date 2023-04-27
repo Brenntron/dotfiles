@@ -295,9 +295,11 @@ class SenderDomainReputationDispute < ApplicationRecord
 
   def retrieve_attachments_beaker_data
     self.sender_domain_reputation_dispute_attachments.each do |attachment|
-      attachment.retrieve_beaker_data_and_save
-      if attachment.beaker_info.blank?
+      if attachment.email_header_data.present?
         attachment.retrieve_beaker_data_and_save
+        if attachment.beaker_info.blank?
+          attachment.retrieve_beaker_data_and_save
+        end
       end
     end
   end

@@ -41,7 +41,7 @@ class DisputeEmailAttachment < ApplicationRecord
     directory_to_create = Pathname(full_file_path)
     directory_to_create.dirname.mkpath
 
-    File.open(full_file_path, "w") { |f| f.write file_content }
+    File.open(full_file_path, "wb") { |f| f.write file_content }
 
     new_local_attachment.direct_upload_url = full_file_path
     new_local_attachment.save
