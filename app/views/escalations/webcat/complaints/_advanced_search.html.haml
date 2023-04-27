@@ -54,6 +54,11 @@
     %button#remove-criteria-complaintid.remove-input{onclick:'clearSelectize("complaintid-input")'}
 
   .form-group.search-item.hidden
+    %label.content-label-sm Jira ID(s) (comma separate multiples)
+    %input.form-control.selectize#jiraid-input{name: 'jira_id', multiple: 'multiple', tabindex:'-1'}
+    %button#remove-criteria-jiraid.remove-input{onclick:'clearSelectize("jiraid-input")'}
+
+  .form-group.search-item.hidden
     %label.content-label-sm Resolution
     %input.form-control.selectize#resolution-input{name: 'resolution', multiple: 'multiple', tabindex:'-1'}
     %button#remove-criteria-resolution.remove-input{onclick:'clearSelectize("resolution-input")'}
@@ -142,6 +147,10 @@
             %label.search-criteria-label
               %input.search-checkbox#complaint-id-cb{type: 'checkbox', name: 'search-criteria', value: 'Complaint ID', for: 'complaintid-input'}
               Complaint ID
+          %li
+            %label.search-criteria-label
+              %input.search-checkbox#jira-id-cb{type: 'checkbox', name: 'search-criteria', value: 'Jira ID', for: 'jiraid-input'}
+              Jira ID
           %li
             %label.search-criteria-label
               %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria', value: 'Resolution', for: 'resolution-input'}
