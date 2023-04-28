@@ -403,8 +403,38 @@ $ ->
 
   ## Manage Resolution Message Templates
 
+  $('#resolution-message-templates-table').DataTable(
+    order: [[ 1, "asc" ]]
+    paging: false
+    info: false
+    searching: false
+    autoWidth: false
+    columnDefs: [
+      { targets: [0], orderable: false }
+      { targets: [8], orderable: false }
+    ]
+    language:
+      emptyTable: "<p class='empty-table-message'>No resolution templates have been created.</p>"
+  )
+
+  $('#createResolutionMessageTemplatesDialog').dialog
+    autoOpen: false
+    minWidth: 450
+    maxWidth: 1000
+    position: { my: "left center", at: "left center", of: window }
+
+  $('#editResolutionMessageTemplatesDialog').dialog
+    autoOpen: false
+    minWidth: 450
+    maxWidth: 1000
+    position: { my: "left center", at: "left center", of: window }
+
   window.manage_resolution_message_templates = () ->
-    $('#manageResolutionMessageTemplatesDialog').dialog 'open'
+    $('#createResolutionMessageTemplatesDialog').dialog 'open'
+
+  window.close_resolution_template_dialog = () ->
+    $('#createResolutionMessageTemplatesDialog').dialog 'close'
+    $('#editResolutionMessageTemplatesDialog').dialog 'close'
 
   state = true
 

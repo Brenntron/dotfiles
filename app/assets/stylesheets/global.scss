@@ -5077,19 +5077,20 @@ input.file_attachment {
   border: 1px solid $faint-neutral-color;
 }
 
-#new-resolution-message-template-form-wrapper {
-  display: none;
-  height: 0;
-  margin: 12px;
-  border: 1px solid $faint-neutral-color;
-}
+//TODO: scrape out all the old manager code when finished with new page
+//#new-resolution-message-template-form-wrapper {
+//  display: none;
+//  height: 0;
+//  margin: 12px;
+//  border: 1px solid $faint-neutral-color;
+//}
 
-#edit-template-form-wrapper {
-  display: none;
-  height: 0;
-  margin: 12px;
-  border: 1px solid $faint-neutral-color;
-}
+//#edit-template-form-wrapper {
+//  display: none;
+//  height: 0;
+//  margin: 12px;
+//  border: 1px solid $faint-neutral-color;
+//}
 
 #edit-resolution-message-template-form-wrapper,  #edit-resolved-resolution-message-template-form-wrapper{
   display: none;
@@ -14361,4 +14362,96 @@ input.wl-bl-list-inline {
 .text-wrap {
   max-width: 300px;
   word-wrap: break-word;
+}
+
+//Manage Resolution Message Templates
+
+#resolved-resolution-message-dialogue-form-information {
+  padding: 0 20px;
+}
+
+.resolved-resolution-message-template-input {
+  width: 100%;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  font-size: 8pt;
+}
+
+#resolution-message-templates {
+  .index-table-header {
+    float: none;
+  }
+  .toolbar-container {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+}
+
+#resolution-message-templates-table {
+  margin-top: 10px;
+}
+
+.resolution-template-description {
+  font-size: 12px;
+}
+
+.new-resolution-button-text{
+  text-transform: capitalize;
+  display: inline-block;
+  padding-left: 8px;
+  float: right;
+  font-size: 9pt;
+}
+
+.add-message-template {
+  background-image: url(image_path('icon_add_black.svg'));
+}
+
+.resolution-modal-label {
+  padding: 0 !important;
+  margin-top: 14px;
+}
+
+.resolution-modal-button-wrapper {
+  padding: 20px 0 30px 0;
+}
+
+.resolution-modal-textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 38px;
+  max-width: 100%;
+  min-width: 100%;
+  padding: 5px;
+}
+
+.ticket-resolution-description {
+  min-height: 14px;
+  font-size: 8pt;
+}
+
+#resolution-message-templates-table {
+  margin-top: 10px;
+}
+
+.resolution-template-description {
+  font-size: 12px;
+}
+
+.white-bg {
+  background-color: #fff;
+}
+
+#create-resolution-template-submit:disabled {
+  background-color:#6dbcdb !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resolution_message_templates-action .ui-dialog-title {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.edit-resolution-message-template {
+  cursor: pointer;
 }

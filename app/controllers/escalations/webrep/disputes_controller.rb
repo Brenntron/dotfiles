@@ -63,6 +63,14 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def update
   end
 
+
+  def resolution_message_templates
+    @templates = ResolutionMessageTemplate.for_disputes
+    @platforms = Platform.all.pluck(:public_name)
+    @companies = Company.all.order(name: :asc)
+
+  end
+
   # TODO We should not have a 400 line method in a controller.
   # TODO avoid defining methods in the body of other methods.
   def dashboard
