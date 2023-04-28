@@ -85,7 +85,6 @@ class JiraImportTask < ApplicationRecord
     task_results = Bast::Base.get_task_result(bast_task)
 
     description = "Created from Jira Issue #{issue_key}"
-
     task_results.each do |k,v|
 
       ticketable_urls = import_urls.where(domain: k)
@@ -97,7 +96,19 @@ class JiraImportTask < ApplicationRecord
             ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
           end
         else
-          response = Complaint.create_action(BugzillaRest::Session.default_session, ticketable_urls.first.submitted_url, description, nil, nil, nil)
+          complaint_options = [
+            BugzillaRest::Session.default_session,
+            ticketable_urls.first.submitted_url,
+            description,
+            Customer::JIRA_GENERATED,
+            nil,                     # tags
+            nil,                     # platform
+            nil,                     # status(default to NEW)
+            nil,                     # categories
+            nil,                     # user email
+            Complaint::JIRA_CHANNEL  # channel
+          ]
+          response = Complaint.create_action(*complaint_options)
           ticketable_urls.each do |ticketable_url|
             ticketable_url.update(bast_verdict: v["import"], complaint_id: response[:complaint_id])
           end

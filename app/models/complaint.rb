@@ -51,6 +51,7 @@ class Complaint < ApplicationRecord
   TI_CHANNEL = 'talosintel'
   INT_CHANNEL = 'internal'
   WBNP_CHANNEL = 'wbnp'
+  JIRA_CHANNEL  = 'jira'
 
   SOURCE_RULEUI = "RuleUI"
 
@@ -73,6 +74,7 @@ For future web and email reputation requests, please open a web and email reputa
   scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
+  scope :from_jira, -> { includes(:complaint_entries).where(channel: JIRA_CHANNEL) }
 
   validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
 
@@ -877,7 +879,7 @@ For future web and email reputation requests, please open a web and email reputa
     wbnp_report.save
   end
 
-  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, platform, status=NEW, categories = nil, user_email = nil)
+  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, platform, status=NEW, categories = nil, user_email = nil, channel = INT_CHANNEL)
 
     response = {}
     response[:status] = "success"
@@ -914,7 +916,7 @@ For future web and email reputation requests, please open a web and email reputa
                                        customer_id: cust&.id,
                                        platform_id: platform_record&.id,
                                        status: status,
-                                       channel: INT_CHANNEL)
+                                       channel: channel)
 
       response[:complaint_id] = new_complaint.id
 
