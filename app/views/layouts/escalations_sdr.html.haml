@@ -7,6 +7,9 @@
     %a#queue.nav-page-button{href: escalations_sdr_disputes_path, class: ("active" if current_page?('/escalations/sdr/disputes'))}
       %span.nav-toolbar-icon-large.icon-queue
 
+    %a#queue.nav-page-button{href: '/escalations/sdr/resolution_message_templates', class: ("active" if current_page?('/escalations/sdr/resolution_message_templates'))}
+      %span.nav-toolbar-icon-large.icon-queue.icon-resolution-manager-page
+
   .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'new-sdr-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-new-white'}
