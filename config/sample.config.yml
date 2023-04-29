@@ -284,10 +284,11 @@ test:
       access_key_id: "redacted"
       secret_access_key: "redacted"
   jira:
-    host: "fmd-drgjr-01tst.vrt.sourcefire.com"
-    username: "TBD.gen"
-    password: "redacted"
+    host: "https://fmd-drgjr-01tst.vrt.sourcefire.com:443/"
+    token: "redacted"
     verify_mode: "verify-none"
+    auth_type: "basic"
+    project_key: "SD"
 staging:
   amp_poke:
     host: "localhost"
@@ -586,7 +587,7 @@ production:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
- jira:
+  jira:
     host: "fmd-drgjr-01tst.vrt.sourcefire.com"
     username: "TBD.gen"
     password: "redacted"
