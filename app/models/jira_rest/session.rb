@@ -10,12 +10,10 @@ module JiraRest
 
     def login_options
       {
-        username:     Rails.configuration.jira.username,
-        password:     Rails.configuration.jira.password,
+        default_headers: {authorization: "Bearer #{Rails.configuration.jira.token}"},
         site:         Rails.configuration.jira.host,
         context_path: '',
         auth_type:    Rails.configuration.jira.auth_type,
-        use_cookies:  Rails.configuration.jira.use_cookies
       }
     end
   end
