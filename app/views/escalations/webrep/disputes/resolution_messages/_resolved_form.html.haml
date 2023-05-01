@@ -1,5 +1,5 @@
 #resolution-message-template-form-wrapper
-  %form.resolution-message-template-form{class: local_assigns[:action]}
+  %form.resolution-message-template-form{class: local_assigns[:action], 'data-ticket-type':'Dispute'}
     #resolved-resolution-message-dialogue-form-information{class: local_assigns[:action]}
       %label.content-label-sm.resolution-modal-label Resolution
       - if current_user.has_role?('webrep manager') || current_user.has_role?('manager')

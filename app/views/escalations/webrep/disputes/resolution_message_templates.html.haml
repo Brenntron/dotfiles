@@ -29,7 +29,7 @@
           %tr
             %td
               %span
-                %i.glyphicon.glyphicon-pencil.edit-resolution-message-template{title: 'Edit', data: {resolution_message_template_id: template.id}}
+                %i.glyphicon.glyphicon-pencil.resolved.edit-resolution-message-template{title: 'Edit', data: {resolution_message_template_id: template.id}}
             %td.se-resolution-table-name=template.name
             %td=template.resolution_type
             %td=template.description
@@ -43,8 +43,8 @@
             -#%td=template.editor&.display_name
 
             %td
-              - if current_user.has_role?('ips escalator manager') || current_user.has_role?('manager')
-                .remove-button.se-delete-icon{title: 'Delete', data: {resolution_message_template_id: template.id}}
+              - if current_user.has_role?('webrep manager') || current_user.has_role?('manager')
+                .remove-button.manage-response-delete-icon{title: 'Delete', data: {resolution_message_template_id: template.id}}
 
 #createResolutionMessageTemplatesDialog{ title: 'Create Resolution Template' }
   = render 'escalations/webrep/disputes/resolution_messages/resolved_form', { action: :create }

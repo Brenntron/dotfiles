@@ -436,151 +436,69 @@ $ ->
     $('#createResolutionMessageTemplatesDialog').dialog 'close'
     $('#editResolutionMessageTemplatesDialog').dialog 'close'
 
-  state = true
+  window.get_resolution_template_data = (action)->
+    name: $(".#{action} input[name=name]").val()
+    resolution_type:  $(".#{action} select[name=resolution_type]").val();
+    description: $(".#{action} textarea[name=description]").val();
+    body: $(".#{action} textarea[name=body]").val();
+    ticket_type: $(".resolution-message-template-form").attr('data-ticket-type');
 
-  window.create_new_resolution_message_template = () ->
-    if state
-      $('#new-resolution-message-template-form-wrapper').show()
-      $('#new-resolution-message-template-form-wrapper').contents().show()
-      $('#create-resolution-message-template').text('Cancel')
-      $('#save-resolution-message-template').removeClass('hidden')
-      $('#new-resolution-message-template-form-wrapper').animate {
-        minHeight: 256
-        borderWidth: '1px'
-        marginBottom: 20
-      }, 300
-
-    else
-      $('#new-resolution-message-template-form-wrapper').css('display', 'none')
-      $('#create-resolution-message-template').text('Create New Template')
-      $('#save-resolution-message-template').addClass('hidden')
-      $('#new-resolution-message-template-form-wrapper').animate {
-        minHeight: 0
-        borderWidth: 0
-        marginBottom: 0
-      }, 300
-
-    state = !state
-    return
-
-  window.save_resolution_message_template = () ->
-    name = $('#new-resolution-message-template-name')[0].value
-    description = $('#new-resolution-message-template-desc')[0].value
-    body = $('#new-resolution-message-template-body')[0].value
-
+  # Create new resolution message template
+  window.create_resolution_message_template = () ->
+    data = get_resolution_template_data('create')
     std_msg_ajax(
       method: 'POST'
       url: "/escalations/api/v1/escalations/webrep/resolution_message_templates"
-      data: {name: name, description: description, body: body, ticket_type: 'Dispute'}
+      data: get_resolution_template_data('create')
       success_reload: false
       success: (response) ->
         std_msg_success('Resolution Message template Created.', [], reload: true)
       error: (response) ->
         std_api_error(response, "There was an error creating the resolution message template.", reload: false)
     )
+
+  get_and_populate_resolved_message = (template_id)->
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
+      success_reload: false
+      success: (response) ->
+        $(".update select[name=resolution_type]").val(response.resolution_type)
+        $(".update .resolution-template-resolution-type").text(response.resolution_type)
+        $(".update input[name=name]").val(response.name);
+        $(".update .resolution-template-name").text(response.name);
+        $(".update .resolution-template-description").html(response.description);
+        $(".update .resolution-template-message").html(response.body);
+        $('#editResolutionMessageTemplatesDialog').dialog 'open'
+      error: (response) ->
+        std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
+    )
+
+  # Edit a resolution message template (fetch existing data and populate form)
   $('.edit-resolution-message-template').on 'click', (event)->
-    resolved =  event.target.classList.contains('resolved')
+    $('#createResolutionMessageTemplatesDialog').dialog 'close'
+    template_id = $(this).attr('data-resolution-message-template-id')
+    $('.update input[name=template-id]').val(template_id)
+    get_and_populate_resolved_message(template_id)
 
-    if $('#new-resolution-message-template-form-wrapper').css('display') == "none"
-      resolution_message_template_id = $(this).attr('resolution_message_template_id')
-      if resolved
-        populate_resolved_resolution_message_template_details()
-        getAndPopulateResolvedMessage(resolution_message_template_id)
-      else
-        populate_resolution_message_template_details()
-        getAndPopulateInProgressMessage(resolution_message_template_id)
-
-    else
-      std_msg_error('Error Editing Template', ['Cannot edit a template while in the middle of creating a new one. To discard changes and edit a template, hit Cancel first.'], reload:false)
-  
-  getAndPopulateInProgressMessage = (messageId)->
-    std_msg_ajax(
-      method: 'GET'
-      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{messageId}"
-      success_reload: false
-      success: (response) ->
-        $('#edit-resolution-message-template-name').val(response.name)
-        $('#edit-resolution-message-template-desc').val(response.description)
-        $('#edit-resolution-message-template-body').val(response.body)
-        $('#resolution-message-template-id').val(response.id)
-
-      error: (response) ->
-        std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
-    )
-
-  getAndPopulateResolvedMessage = (messageId)->
-    std_msg_ajax(
-      method: 'GET'
-      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{messageId}"
-      success_reload: false
-      success: (response) ->
-        $('#edit-resolved-resolution-message-template-name').val(response.name)
-        $('#edit-resolved-resolution-message-template-desc').val(response.description)
-        $('#edit-resolved-resolution-message-template-body').val(response.body)
-        $('#resolved-resolution-message-template-id').val(response.id)
-      error: (response) ->
-        std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
-    )
+  # Update resolution message template
   window.update_resolved_resolution_message_template = () ->
-    template_id = $('#resolved-resolution-message-template-id').val()
-    body = $('#edit-resolved-resolution-message-template-body').val()
-
+    template_id = $('.update input[name=template-id]').val();
     std_msg_ajax(
       method: 'PUT'
       url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
-      data: {body: body}
+      data: get_resolution_template_data('update')
       success_reload: true
       success: (response) ->
         std_msg_success('Resolution Message Template Updated.', [], reload: true)
+        $('#editResolutionMessageTemplatesDialog').dialog 'close'
       error: (response) ->
         std_api_error(response, "There was an error updating the resolution message template.", reload: false)
     )
 
-  populate_resolution_message_template_details = () ->
-    $('#edit-resolution-message-template-form-wrapper').show()
-    $('#edit-resolution-message-template-form-wrapper').contents().show()
-    $('#create-resolution-message-template').hide()
-    $('#edit-resolution-message-template').removeClass('hidden')
-    $('#cancel-edit-resolution-message-template').removeClass('hidden')
-    $('#edit-resolution-message-template-form-wrapper').animate {
-      minHeight: 256
-      borderWidth: '1px'
-      marginBottom: 20
-    }, 300
-  
-  populate_resolved_resolution_message_template_details = () ->
-    $('#edit-resolved-resolution-message-template-form-wrapper').show()
-    $('#edit-resolved-resolution-message-template-form-wrapper').contents().show()
-    $('#edit-resolved-resolution-message-template').removeClass('hidden')
-    $('#cancel-edit-resolved-resolution-message-template').removeClass('hidden')
-    $('#edit-resolved-resolution-message-template-form-wrapper').animate {
-      minHeight: 256
-      borderWidth: '1px'
-      marginBottom: 20
-    }, 300
-
-
-
-  window.update_resolution_message_template = () ->
-    template_id = $('#resolution-message-template-id').val()
-    name = $('#edit-resolution-message-template-name').val()
-    description = $('#edit-resolution-message-template-desc').val()
-    body = $('#edit-resolution-message-template-body').val()
-
-    std_msg_ajax(
-      method: 'PUT'
-      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
-      data: {name: name, description: description, body: body}
-      success_reload: true
-      success: (response) ->
-        std_msg_success('Resolution Message Template Updated.', [], reload: true)
-      error: (response) ->
-        std_api_error(response, "There was an error updating the resolution message template.", reload: false)
-    )
-
-  $('.delete-resolution-message-template').on 'click', ->
-    template_id = $(this).attr('resolution_message_template_id')
-
+  # Delete resolution message template
+  $('.manage-response-delete-icon').on 'click', ->
+    template_id = $(this).attr('data-resolution-message-template-id')
     std_msg_confirm(
       'Are you sure you want to delete this template?',
       [],
@@ -597,6 +515,51 @@ $ ->
               std_api_error(response, "Resolution message template could not be deleted.", reload: false)
           )
       })
+
+  # Submit button disable/enable for new resolution template form
+  $('.resolution-message-template-form').on 'keyup', ->
+    name_input = $(".create input[name=name]").val();
+    message_input = $(".create textarea[name=body]").val();
+    if name_input && message_input != ''
+      $('#create-resolution-template-submit').attr('disabled', false)
+    else
+      $('#create-resolution-template-submit').attr('disabled', true)
+
+  # Tooltips for Manage Resolution Templates table
+  tooltip_delay = 400
+  manage_resolution_templates_table = $('#resolution-message-templates-table')
+
+  manage_resolution_templates_table.delegate '.edit-resolution-message-template:not(.tooltipstered)', 'mouseenter', (e) ->
+    target = $(this)
+    target.tooltipster
+      debug: false
+      interactive: true
+      content: $(this).prop('title')
+      trigger: 'hover'
+      theme: ['tooltipster-default', 'tooltipster-default-customized']
+
+    #set interval so that each new tooltip is only displayed after half a second of hovering
+    setInterval ->
+      if target.is(':hover')
+        target.tooltipster('open')
+    , tooltip_delay
+
+  manage_resolution_templates_table.delegate '.manage-response-delete-icon:not(.tooltipstered)', 'mouseenter', (e) ->
+    target = $(this)
+    target.tooltipster
+      debug: false
+      interactive: true
+      content: $(this).prop('title')
+      trigger: 'hover'
+      theme: ['tooltipster-default', 'tooltipster-default-customized']
+
+    #set interval so that each new tooltip is only displayed after half a second of hovering
+    setInterval ->
+      if target.is(':hover')
+        target.tooltipster('open')
+    , tooltip_delay
+
+  ## Resolution Picker Dropdown
 
   $('#select-new-resolution-message-template-status').on 'change', ->
     template_id = this.value
@@ -623,28 +586,8 @@ $ ->
         std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
     )
 
-  window.cancel_edit_resolution_message_template = () ->
-    $('#edit-resolution-message-template-form-wrapper').contents().hide()
-    $('#create-resolution-message-template').hide()
-    $('#save-resolution-message-template').addClass('hidden')
-    $('#create-resolution-message-template').show()
-    $('#cancel-edit-resolution-message-template').addClass('hidden')
-    $('#edit-resolution-message-template').addClass('hidden')
-    $('#edit-resolution-message-template-form-wrapper').animate {
-      minHeight: 0
-      borderWidth: 0
-      marginBottom: 0
-    }, 300
 
-  window.cancel_edit_resolved_resolution_message_template = () ->
-    $('#edit-resolved-resolution-message-template-form-wrapper').contents().hide()
-    $('#cancel-edit-resolved-resolution-message-template').addClass('hidden')
-    $('#edit-resolved-resolution-message-template').addClass('hidden')
-    $('#edit-resolved-resolution-message-template-form-wrapper').animate {
-      minHeight: 0
-      borderWidth: 0
-      marginBottom: 0
-    }, 300
+
   ## Manage Email Templates
 
   $('.edit-template').on 'click', ->
