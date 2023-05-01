@@ -21,7 +21,7 @@ module API
           get ":id/submitted_urls", root: :jira_import_tasks do
             std_api_v2 do
               task_id = JiraImportTask.find(params[:id])
-              {urls: task_id.import_urls.map {|m| m.to_hash}}
+              {urls: task_id.import_urls.map {|m| m.url_dt_format}}
             end
           end
 
