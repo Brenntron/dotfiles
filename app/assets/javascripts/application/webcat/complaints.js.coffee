@@ -53,6 +53,8 @@ window.change_ticket_view = (type,button) ->
       $('.mothra-header').text('Jira Imports')
       $('.ticket-rows').addClass('hidden') #ticket rows must be individually hidden
       $('.ticket-rows').removeClass('vis-ticket')
+      $('.reports-toolbar .toolbar-button').attr('disabled', true)
+      $('.imports-url-checkbox').prop('checked', false)
   # show/hide appropriate elements
   $('#webcat-imports-index_wrapper, .webcat-ticket-view').toggleClass('hidden')
   $('.list-button, .view-tickets').toggleClass('active-view')
@@ -120,15 +122,18 @@ window.build_single_row = (rd, data) ->
       lengthMenu: [25, 50, 100]
       dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
       columnDefs:
-          [{
-            targets: [ 0 ]
-            orderable: false
-            searchable: false
-          }]
-
+        [{
+          targets: [ 0 ]
+          orderable: false
+          searchable: false
+        },
+        {
+          targets: [ 9 ]
+          className:'entry-assignee'
+        }]
       createdRow: (row, data, index) ->
         entry_id = data[3]
-        checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
+        checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
         $('td', row).eq(0).append(checkbox)
 
         complaint_id = data[4]
@@ -175,8 +180,15 @@ $(document).on 'click', '#bulk-ticket-select',->
 $(document).on 'click', '.imports-url-checkbox-bulk',->
   checked = $(this).prop('checked')
   issue_key = $(this).val()
-
   $(".imports-url-checkbox-#{issue_key}").prop('checked', checked)
+  $(".imports-url-checkbox-#{issue_key}").trigger("change")
+
+$(document).on 'change', '.imports-url-checkbox',->
+  checked = $(".imports-url-checkbox:checked").length > 0
+  if checked
+    $(".reports-toolbar .toolbar-button").removeAttr('disabled')
+  else
+    $(".reports-toolbar .toolbar-button").attr('disabled', true)
 
 $(document).on 'click', '.imports_check_box',->
   num_checked = $('.imports_check_box:checked').length
@@ -321,6 +333,57 @@ window.build_imports_table = () ->
     ]
   )
 # WBNP - Get report id
+
+window.jira_assignee_hub = (type) ->
+  # handle all assigning for jira import entries
+  selected = $('.imports-url-checkbox:checked')
+  entry_ids = []
+  selected_rows = []
+  for entry in selected
+    val = $(entry).val()
+    if val && val != 'null'
+      entry_ids.push(val)
+      selected_rows.push( $(entry).closest('tr') )
+
+  if entry_ids.length > 0
+    data = {'complaint_entry_ids': entry_ids}
+    url = "/escalations/api/v1/escalations/webcat/complaint_entries/#{type}"
+    switch type
+      when 'change_assignee'
+        data['user_id'] = $('#index_target_assignee option:selected').val()
+        err_msg = "Error Assigning Entries:"
+      when "take_entry"
+        err_msg = "Error Taking Entries:"
+      when "return_entry"
+        err_msg = "Error Returning Entries:"
+        assignee = 'vrtincom'
+      when "unassign_all"
+        err_msg = "Error Returning Entries:"
+        assignee = 'vrtincom'
+      else
+        err_msg = "Something Went Wrong:"
+
+    std_msg_ajax(
+      method: 'POST'
+      url: url
+      data: data
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          std_msg_error(err_msg, json.error)
+        else
+          std_msg_success('Successfully updated entries', [])
+
+          if json.cvs_username
+            assignee = json.cvs_username
+
+          if assignee
+            $(selected_rows).each ->
+              $(this).find('.entry-assignee').text(assignee)
+
+      error: (response) ->
+        std_api_error(response, 'Error assigning', reload: false)
+    )
 
 window.get_bast_data = (id) ->
   std_msg_ajax(
