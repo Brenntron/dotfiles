@@ -13,6 +13,7 @@ class Complaint < ApplicationRecord
     { label: 'New Tickets', param: 'NEW', icon: 'icon-new-tickets' },
     { label: 'New Talos Tickets', param: 'NEW TALOS', icon: 'icon-talos-white' },
     { label: 'New WBNP Tickets', param: 'NEW WBNP', icon: 'icon-web-white' },
+    { label: 'New Jira Tickets', param: 'NEW JIRA', icon: 'icon-mothra-white' },
     { label: 'New Internal Tickets', param: 'NEW INTERNAL', icon: 'icon-company-white' },
     { label: 'Manager Queue', param: 'MANAGER QUEUE', icon: 'icon-manager-queue' },
     { label: 'Waiting for Review', param: 'REVIEW', icon: 'icon-pending-bugs' },
@@ -72,7 +73,7 @@ For future web and email reputation requests, please open a web and email reputa
 
   scope :from_ti,   -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
-  scope :from_int,  -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
+  scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
   scope :from_jira, -> { includes(:complaint_entries).where(channel: JIRA_CHANNEL) }
 
   validates_length_of :resolution_comment, maximum: 2000, allow_blank: true

@@ -1,7 +1,5 @@
 class Customer < ApplicationRecord
-  JIRA_GENERATED = 'ace-jira.gen@cisco.com'.freeze
-
-  belongs_to :company, optional: true
+  belongs_to :company, optional:true
   has_many :complaints
   has_many :disputes
   has_many :file_reputation_disputes
@@ -19,6 +17,8 @@ class Customer < ApplicationRecord
       Rails.logger.error e
       raise "Failed to create new Customer with the following attributes: '#{attributes}'"
     end
+
+
   end
 
   def self.customer_from_ruleui(data)

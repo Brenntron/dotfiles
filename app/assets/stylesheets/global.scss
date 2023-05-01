@@ -712,6 +712,7 @@ button {
 .webcat-reports-toolbar{
   margin-bottom: -35px;
   z-index: 10;
+  width: calc(100% - 320px);
 }
 .toolbar-button-animated.active {
   background-color: $bug-accent-color;
@@ -2307,7 +2308,7 @@ a.static-nav-item {
 .icon-talos-white {background-image: url(image_path('icon_talos_white.svg'));}
 .icon-web-white {background-image: url(image_path('icon_web_white.svg'));}
 .icon-company-white {background-image: url(image_path('icon_company_white.svg'));}
-
+.icon-mothra-white {background-image: url(image_path('icon_mothra_white.svg'));}
 .saved-search {
   text-transform: none !important;
   font-weight: 400;
@@ -2401,7 +2402,7 @@ a.static-nav-item {
 }
 
 #saved-searches-wrapper.webcat-named-search-list {
-  min-height: 495px;
+  min-height: 530px;
 }
 
 .search-wrapper {
