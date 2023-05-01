@@ -175,7 +175,13 @@ window.build_ticket_view = (checked, view) ->
 
 $(document).on 'click', '#bulk-ticket-select',->
   checked = $(this).prop('checked')
+  all_rows = $("#webcat-imports-index tbody tr")
   $('.imports_check_box').prop('checked', checked)
+
+  if checked
+    all_rows.addClass('selected')
+  else
+    all_rows.removeClass('selected')
 
 $(document).on 'click', '.imports-url-checkbox-bulk',->
   checked = $(this).prop('checked')
@@ -191,32 +197,41 @@ $(document).on 'change', '.imports-url-checkbox',->
     $(".reports-toolbar .toolbar-button").attr('disabled', true)
 
 $(document).on 'click', '.imports_check_box',->
+  row = $(this).closest('tr')
+  check = $('.imports_check_box')
+
+  if check.prop('checked')
+    row.addClass('selected')
+  else
+    row.removeClass('selected')
+
   num_checked = $('.imports_check_box:checked').length
 
-  if num_checked == $('.imports_check_box').length
-    $('.imports_check_box').prop('checked', true)
-  if num_checked == 0
-    $('.imports_check_box').prop('checked', false)
+  if num_checked == check.length
+    check.prop('checked', true)
 
-$(document).on 'click', '#show-failed, #show-complete',->
-  table = $('#webcat-imports-index').DataTable()
+  if num_checked == 0
+    check.prop('checked', false)
+
+$(document).on 'click', '#show-failed, #show-complete, #show-pending',->
   show_failed = $('#show-failed').prop('checked')
   show_complete = $('#show-complete').prop('checked')
+  show_pending = $('#show-pending').prop('checked')
 
-  table.rows().every( ()->
-    status = this.data().status
-    switch status
-      when'Failure'
-        if show_failed
-          $('.failed').show()
-        else
-          $('.failed').hide()
-      else
-        if show_complete
-          $('.complete-pending').show()
-        else
-          $('.complete-pending').hide()
-  )
+  if show_pending
+    $('.pending').show()
+  else
+    $('.pending').hide()
+
+  if show_complete
+    $('.complete').show()
+  else
+    $('.complete').hide()
+
+  if show_failed
+    $('.failure').show()
+  else
+    $('.failure').hide()
 
 window.checked_row_data = ()->
   table = $('#webcat-imports-index').DataTable()
@@ -284,10 +299,8 @@ window.build_imports_table = () ->
     ]
     createdRow:(row, data, dataIndex) ->
       {status} = data
-      if status == 'Failure'
-        $(row).addClass('failed')
-      else
-        $(row).addClass('complete-pending')
+      $(row).addClass(status.toLowerCase())
+
     columns:[
       {
         data:'issue_key',
@@ -384,6 +397,8 @@ window.jira_assignee_hub = (type) ->
       error: (response) ->
         std_api_error(response, 'Error assigning', reload: false)
     )
+  else
+    std_msg_error('Please select at least one ticket with an associated entry', [])
 
 window.get_bast_data = (id) ->
   std_msg_ajax(
