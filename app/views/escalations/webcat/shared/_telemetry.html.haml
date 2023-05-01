@@ -44,6 +44,18 @@
         %span#pending-overdue-count.metric-number
           = "(#{@pending_overdue_count} Overdue)"
 
+    .metrics-col
+      %span.metric-header#allJiraTickets
+        %a{href: '?f=ALL%20JIRA'}JIRA:
+      .number-container
+        %a#jira-new-count.metric-number.metric-new{href: '?f=NEW%20JIRA'}
+          = "#{@jira_new_count} New"
+        %a.metric-overdue{href: '?f=JIRA%20OVERDUE'}
+          %span#jira-overdue-count.metric-number
+            = "(#{@jira_overdue_count} Overdue)"
+        %a#jira-assigned-count.metric-assigned.metric-number{href: '?f=JIRA%20ASSIGNED'}
+          = "#{@jira_assigned_count} Assigned"
+
     // right column
     .metrics-col.wbnp-area
       .metric-header
