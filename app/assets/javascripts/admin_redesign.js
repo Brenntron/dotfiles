@@ -34,6 +34,7 @@
 //= require application/helpers
 //= require clipboard
 //= require moment
+//= require resolution_message_templates
 
 //= require application/chart.pieceLabel.min
 //= require application/chartjs-plugin-annotation.min
