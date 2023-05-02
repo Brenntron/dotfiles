@@ -1,10 +1,10 @@
 %h1.mothra-header JIRA Imports
-
+%input{type: 'hidden', name: 'current_user_name', value: "#{current_user.cvs_username}"}
 .toolbar.webcat-reports-toolbar
   %div.view-container.toolbar-container
     %label.toolbar-section-label
       View
-    %button.toolbar-button.list-button.toolbar-button-spacer.active-view.tooltipped{title: 'List All Jira Imports', onclick:'change_ticket_view("list")'}
+    %button.toolbar-button.list-button.toolbar-button-spacer.active-view.tooltipped{title: 'List All Jira Imports', onclick:'change_ticket_view("list", this)'}
       %span.toolbar-button-text List
     %button.toolbar-button.view-tickets.view-button.tooltipped{title: 'Detailed Import View | Only 10 reports may be viewed at a time', onclick:'change_ticket_view("ticket", this)'}
       %span.toolbar-button-text View
@@ -29,12 +29,12 @@
       %span.toolbar-button-text Retry
     %form#jira-tasks-disputes-export-form{action: escalations_webcat_jira_import_tasks_path(format: :xlsx), method: :get}
       = hidden_field_tag('issue_keys', '[]', id: 'jira-tasks-filter-input')
-    %button.toolbar-button.export-button.esc-tooltipped{type: 'button', onclick: 'export_selected_jira_tasks();', title: 'Export Selected to CSV'}
+    %button.toolbar-button.export-button.esc-tooltipped{type: 'button', onclick: 'export_selected_jira_tasks();', title: 'Export to CSV'}
       %span.toolbar-button-text
-        Export Selected
+        Export
   %div.reports-toolbar
     %label.toolbar-section-label
-      Edit
+      Assign
     %span.toolbar-concise-button-area
       %button.toolbar-button.take-ticket-toolbar-button.concise-button.concise-button-first{onclick: 'jira_assignee_hub("take_entry")', type: 'button', title: 'Take', disabled: 'disabled'}
         %span.toolbar-button-text Take
@@ -72,4 +72,4 @@
           %th
             Entries
             %span.entries-th (Imported | Unimported)
-          %th Status
+          %th Import Status

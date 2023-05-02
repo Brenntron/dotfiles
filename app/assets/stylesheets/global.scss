@@ -2330,7 +2330,7 @@ a.static-nav-item {
 .icon-company-white {background-image: url(image_path('icon_company_white.svg'));}
 .icon-mothra-white {background-image: url(image_path('icon_mothra_white.svg'));}
 .icon-pending-import {background-image: url(image_path('icon_pending_grey.svg'));}
-.icon-complete-import {background-image: url(image_path('icon_fixedbugs_grey.svg'));}
+.icon-complete-import {background-image: url(image_path('icon_my_closed_tickets_grey.svg'));}
 .icon-failed-import {background-image: url(image_path('icon_cancel.svg'));}
 
 .checkbox-icon{
@@ -13722,6 +13722,8 @@ table > tbody > tr > td.no-padding {
 }
 .urls-container {
   padding-top: 30px;
+  width: 80%;
+  margin-bottom: -20px;
 }
 #webcat-imports-index_wrapper .jira-ticket-id:hover {
   cursor:pointer;
@@ -13758,11 +13760,12 @@ table > tbody > tr > td.no-padding {
     }
   }
 }
-
+.url-datatable{
+  th{white-space: nowrap}
+}
 .webcat-reports-only {
   display: flex;
   flex-wrap: wrap;
-
   .header-td{
     text-transform: uppercase;
     font-weight: 700;
