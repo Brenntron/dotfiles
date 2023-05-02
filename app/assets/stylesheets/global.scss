@@ -3992,10 +3992,6 @@ fieldset.top-content {
   max-width: 100%;
 }
 
-#manageResolutionMessageTemplatesDialog .template-content {
-  max-height: 145px;
-}
-
 .email-response-button-wrapper {
   float: right;
   border-left: solid 1px darken($faint-neutral-color, 10%);
@@ -4168,34 +4164,6 @@ input.communication-subject {
   margin-left: 20px;
   font-weight: 300;
   font-size: 9pt;
-}
-
-.mng-resolution-message-templates-button {
-  background-image: url(image_path('icon_comment_template_white.svg'));
-  background-color: darken($nav-toolbar-color, 10%);
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 14px 15px;
-  border-radius: 2px;
-  height: 20px;
-  width: 22px;
-  display: inline-block;
-  float: right;
-  border: none;
-  padding-right: 0;
-  margin-top: 1px;
-  margin-left: 12px;
-  font-weight: 300;
-  font-size: 9pt;
-  &:hover {
-    background-color: $primary-section-color !important;
-  }
-}
-
-//bump up button when next to duplicate status
-.duplicate-status-notice + .mng-resolution-message-templates-button {
-  position: relative;
-  bottom: 5px;
 }
 
 .select-a-template{
@@ -5071,28 +5039,6 @@ input.file_attachment {
 }
 
 #new-template-form-wrapper {
-  display: none;
-  height: 0;
-  margin: 12px;
-  border: 1px solid $faint-neutral-color;
-}
-
-//TODO: scrape out all the old manager code when finished with new page
-//#new-resolution-message-template-form-wrapper {
-//  display: none;
-//  height: 0;
-//  margin: 12px;
-//  border: 1px solid $faint-neutral-color;
-//}
-
-//#edit-template-form-wrapper {
-//  display: none;
-//  height: 0;
-//  margin: 12px;
-//  border: 1px solid $faint-neutral-color;
-//}
-
-#edit-resolution-message-template-form-wrapper,  #edit-resolved-resolution-message-template-form-wrapper{
   display: none;
   height: 0;
   margin: 12px;

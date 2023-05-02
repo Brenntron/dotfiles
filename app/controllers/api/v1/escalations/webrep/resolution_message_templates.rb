@@ -44,15 +44,14 @@ module API
 
             post "", root: "resolution_message_template" do
               authorize!(:create, ResolutionMessageTemplate)
-              # template_data = { status: :resolved, creator: current_user, editor: current_user } # TODO get these working
-              template_data = { status: :resolved}
+              template_data = { status: :resolved, creator: current_user, editor: current_user }
               template = ResolutionMessageTemplate.create(permitted_params.merge(template_data))
               if !template.save
                 raise template.errors.full_messages.to_sentence
               end
             end
 
-            desc "delete an resolution message template"
+            desc "delete a resolution message template"
             params do
               requires :id, type: Integer, desc: "The resolution message template's id in the database."
             end

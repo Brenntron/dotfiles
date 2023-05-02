@@ -47,6 +47,6 @@
                 .remove-button.manage-response-delete-icon{title: 'Delete', data: {resolution_message_template_id: template.id}}
 
 #createResolutionMessageTemplatesDialog{ title: 'Create Resolution Template' }
-  = render 'escalations/webrep/disputes/resolution_messages/resolved_form', { action: :create }
+  = render 'escalations/webrep/disputes/resolution_message_templates_form', { action: :create }
 #editResolutionMessageTemplatesDialog{ title: 'Manage Resolution Message Templates' }
-  = render 'escalations/webrep/disputes/resolution_messages/resolved_form', { action: :update }
+  = render 'escalations/webrep/disputes/resolution_message_templates_form', { action: :update }

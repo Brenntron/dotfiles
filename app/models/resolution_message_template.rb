@@ -10,17 +10,14 @@ class ResolutionMessageTemplate < ApplicationRecord
 
   enum status: { in_progress: 0, resolved: 1 }
 
+  belongs_to :creator, class_name: 'User', foreign_key: :creator_id, optional: true
+  belongs_to :editor, class_name: 'User', foreign_key: :editor_id, optional: true
+
   validates_presence_of :name, :ticket_type
   validates :body, presence: true, if: :in_progress?
-  validate :resolved_message?
 
   scope :for_disputes, -> { where(ticket_type: 'Dispute')}
-  private
+  scope :by_resolution, ->(resolution) { for_snort_escalations.where(resolution_type: resolution)}
 
-  def resolved_message?
-    if resolved? && (name_changed? || description_changed?) && !new_record?
-      errors.add(:base, "You can't change name or description for 'Resolved / Closed' messages")
-    end
-  end
  end
  
