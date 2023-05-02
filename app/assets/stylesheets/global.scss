@@ -13572,12 +13572,23 @@ table > tbody > tr > td.no-padding {
     .header-area {
       display: none;
     }
+    .wbnp-area{
+      margin-top: 15px
+    }
     .wbnp-report-status {
       padding-top: 2px;
     }
   }
 }
 
+@media screen and (max-width: 1550px) {
+  .complaints-metrics-banner {
+    .main-metrics {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+}
 // shorter widths, minor tweaks
 @media screen and (max-width: 1550px) {
   .complaint-mgt-top-area {

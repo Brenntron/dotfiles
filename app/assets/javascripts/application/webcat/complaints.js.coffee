@@ -175,8 +175,8 @@ window.build_ticket_view = (checked, view) ->
 
 $(document).on 'click', '#bulk-ticket-select',->
   checked = $(this).prop('checked')
-  all_rows = $("#webcat-imports-index tbody tr")
-  $('.imports_check_box').prop('checked', checked)
+  all_rows = $("#webcat-imports-index tbody tr").filter(':visible')
+  $('.imports_check_box:visible').prop('checked', checked)
 
   if checked
     all_rows.addClass('selected')
