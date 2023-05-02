@@ -17,7 +17,8 @@ class ResolutionMessageTemplate < ApplicationRecord
   validates :body, presence: true, if: :in_progress?
 
   scope :for_disputes, -> { where(ticket_type: 'Dispute')}
-  scope :by_resolution, ->(resolution) { for_snort_escalations.where(resolution_type: resolution)}
+  scope :for_file_reputation_disputes, -> { where(ticket_type: 'FileReputationDispute')}
+  scope :by_resolution, ->(resolution) { for_disputes.where(resolution_type: resolution)}
 
- end
+end
  

@@ -1,0 +1,46 @@
+#resolution-message-template-form-wrapper
+  %form.resolution-message-template-form{class: local_assigns[:action], 'data-ticket-type':'FileReputationDispute'}
+    #resolved-resolution-message-dialogue-form-information{class: local_assigns[:action]}
+      %label.content-label-sm.resolution-modal-label Resolution
+      - if current_user.has_role?('filerep manager') || current_user.has_role?('manager')
+        - if local_assigns[:action] == :create
+          = select 'create-form', 'resolution_type', options_for_select(['Completed', 'Fixed', 'Invalid', 'Later']),{}, {class: 'inline-select-dropdown resolved-resolution-message-template-input', name:'resolution_type'}
+        - else
+          = select 'update-form', 'resolution_type', options_for_select(['Completed', 'Fixed', 'Invalid', 'Later']),{}, {class: 'inline-select-dropdown resolved-resolution-message-template-input', name:'resolution_type'}
+      -else
+        %p.resolution-template-resolution-type.resolution-template-lesser-permission-text
+
+      %label.content-label-sm.resolution-modal-label Template Name
+      - if current_user.has_role?('filerep manager') || current_user.has_role?('manager')
+        %input.resolved-resolution-message-template-input.form-control.white-bg{type: 'text', name: 'name', required: true}
+      -else
+        %p.resolution-template-name.resolution-template-lesser-permission-text
+
+      %label.content-label-sm.resolution-modal-label Description (When should this be used?)
+      - if current_user.has_role?('filerep manager') || current_user.has_role?('manager')
+        %textarea.form-control.resolution-template-description.resolution-modal-textarea.white-bg{name: 'description', rows: 2}
+      -else
+        %p.resolution-template-description.resolution-template-lesser-permission-text
+
+      %input.hidden{type: 'hidden', name: 'template-id'}
+      %label.content-label-sm.resolution-modal-label Message to Customer
+      - if current_user.has_role?('filerep manager') || current_user.has_role?('manager')
+        %textarea.resolution-template-message.form-control.resolution-modal-textarea.white-bg{name: 'body', required: true, placeholder: 'Your Snort Rule Ticket...', rows: 9}
+      - else
+        %p.resolution-template-message.resolution-template-lesser-permission-text
+
+  .col-xs-12.text-center.resolution-modal-button-wrapper
+    - if current_user.has_role?('filerep manager') || current_user.has_role?('manager')
+      - if local_assigns[:action] == :create
+        %button#create-resolution-template-submit.primary{onclick: "create_resolution_message_template()", disabled: true}
+          Create Template
+      - else
+        %button.primary{onclick: "update_resolved_resolution_message_template()"}
+          Update Template
+
+    - if current_user.has_role?('filerep manager') || current_user.has_role?('manager')
+      %button.secondary{onclick: 'close_resolution_template_dialog()'}
+        Cancel
+    - else
+      %button.secondary{onclick: 'close_resolution_template_dialog()'}
+        Close

@@ -57,6 +57,7 @@ class Escalations::FileRep::DisputesController < ApplicationController
   # Manage Resolution Templates page throws error if it doesn't have conventions data for some reason
   def resolution_message_templates
     @conventions = AmpNamingConvention.all
+    @templates = ResolutionMessageTemplate.for_file_reputation_disputes
   end
 
   private
