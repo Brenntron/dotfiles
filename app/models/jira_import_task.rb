@@ -103,7 +103,7 @@ class JiraImportTask < ApplicationRecord
             Customer::JIRA_GENERATED,
             nil,                     # tags
             nil,                     # platform
-            nil,                     # status(default to NEW)
+            Complaint::NEW,          # status
             nil,                     # categories
             nil,                     # user email
             Complaint::JIRA_CHANNEL  # channel
