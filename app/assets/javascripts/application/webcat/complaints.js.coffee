@@ -73,7 +73,7 @@ window.build_single_row = (rd, data) ->
     'Jira Ticket': "<span class='jira-ticket-id'>#{issue_key}</span>",
     'Submitter': submitter,
     'Imported On': imported_at,
-    'Status': status
+    'Import Status': status
   }
 
   ticket_html = "<div class='row ticket-rows vis-ticket' id='#{issue_key}'>"
@@ -100,7 +100,7 @@ window.build_single_row = (rd, data) ->
                       <th>Sanitized Domain</th>
                       <th>Entry ID</th>
                       <th>Case ID</th>
-                      <th>Import Status</th>
+                      <th>Status</th>
                       <th>Resolution</th>
                       <th>Resolution Time</th>
                       <th>Category</th>
