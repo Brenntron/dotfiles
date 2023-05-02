@@ -76,7 +76,7 @@ window.build_single_row = (rd, data) ->
     'Import Status': status
   }
 
-  ticket_html = "<div class='row ticket-rows vis-ticket' id='#{issue_key}'>"
+  ticket_html = "<div class='row ticket-rows vis-ticket' id='#{issue_key}'><div class='col-xs-5 no-padding-left'>"
   #build upper data
   for title, content of row_data
 
@@ -86,7 +86,7 @@ window.build_single_row = (rd, data) ->
                             <label class='data-report-label'>#{title}</label>
                             <span class='data-report-content'>#{content}</span>
                           </div>"
-
+  ticket_html += "</div>"
   if urls.length
     ticket_html += "<div class='col-xs-12 no-padding-left urls-container'>
                     <label class='data-report-label'>Urls<label></div>"

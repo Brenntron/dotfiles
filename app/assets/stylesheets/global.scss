@@ -13722,7 +13722,6 @@ table > tbody > tr > td.no-padding {
 }
 .urls-container {
   padding-top: 30px;
-  width: 80%;
   margin-bottom: -20px;
 }
 #webcat-imports-index_wrapper .jira-ticket-id:hover {
@@ -13731,7 +13730,6 @@ table > tbody > tr > td.no-padding {
 }
 .webcat-ticket-view{
   margin-top: 50px;
-  display: inline-block;
   .data-report-content{
     display: inline-block;
     margin-bottom: 10px;
@@ -13754,13 +13752,14 @@ table > tbody > tr > td.no-padding {
   }
 
   .ticket-rows{
-    margin-left: 7px;
+    margin: 7px;
     .dataTables_wrapper{
       top: -10px;
     }
   }
 }
 .url-datatable{
+  background-color: #fff;
   th{white-space: nowrap}
 }
 .webcat-reports-only {
