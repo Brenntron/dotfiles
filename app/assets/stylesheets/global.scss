@@ -709,10 +709,15 @@ button {
   margin-left: 7px;
   position: absolute;
 }
+
 .webcat-reports-toolbar{
   margin-bottom: -35px;
   z-index: 10;
   width: calc(100% - 320px);
+  .toolbar-button-select.toolbar-button-text{
+    padding-left: 25px;
+  }
+
 }
 .toolbar-button-animated.active {
   background-color: $bug-accent-color;
@@ -2324,6 +2329,15 @@ a.static-nav-item {
 .icon-web-white {background-image: url(image_path('icon_web_white.svg'));}
 .icon-company-white {background-image: url(image_path('icon_company_white.svg'));}
 .icon-mothra-white {background-image: url(image_path('icon_mothra_white.svg'));}
+.icon-pending-import {background-image: url(image_path('icon_pending_grey.svg'));}
+.icon-complete-import {background-image: url(image_path('icon_fixedbugs_grey.svg'));}
+.icon-failed-import {background-image: url(image_path('icon_cancel.svg'));}
+
+.checkbox-icon{
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  background-position: 4px center;
+}
 .saved-search {
   text-transform: none !important;
   font-weight: 400;
@@ -13770,9 +13784,7 @@ table > tbody > tr > td.no-padding {
 .webcat-reports-only {
   display: flex;
   flex-wrap: wrap;
-  &>* {
-    flex: 1 1 220px;
-  }
+
   .header-td{
     text-transform: uppercase;
     font-weight: 700;
@@ -13789,12 +13801,26 @@ table > tbody > tr > td.no-padding {
   }
   .tickets-totals-table{
     margin-left: 10px;
-    max-width: 210px;
+    max-width: 220px;
     td{
       border-bottom: none;
       font-size: 8pt;
     }
   }
+  &>* { flex: 1 1 220px; }
+  @media (max-width: 1485px) {
+    .tickets-totals-table{
+      max-width: 180px;
+    }
+  }
+  @media (max-width: 1220px) {
+    &>* {flex: 1 1 170px;}
+    .tickets-totals-table{
+      max-width: 180px;
+      margin-bottom: 20px;
+    }
+  }
+
   .table-condensed > tbody > tr > td {
     padding: 3px 4px !important; // need override
   }
