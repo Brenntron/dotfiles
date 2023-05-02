@@ -198,6 +198,7 @@ $(document).on 'change', '.imports-url-checkbox',->
   can_take = false
   can_return = false
   can_assign = false
+
   for row in checked_rows
     user = $(row).find('.entry-assignee').text()
 
@@ -216,9 +217,15 @@ $(document).on 'change', '.imports-url-checkbox',->
     $('.return-ticket-toolbar-button').attr('disabled', true)
 
   if can_assign
-    $(".remove-assignee-toolbar-button, .ticket-owner-button").removeAttr('disabled')
+    $(".ticket-owner-button").removeAttr('disabled')
   else
-    $(".remove-assignee-toolbar-button, .ticket-owner-button").attr('disabled', true)
+    $(".ticket-owner-button").attr('disabled', true)
+
+
+  if can_assign && can_take
+    $(".remove-assignee-toolbar-button").removeAttr('disabled')
+  else
+    $(".remove-assignee-toolbar-button").attr('disabled', true)
 
 $(document).on 'click', '.imports_check_box',->
   row = $(this).closest('tr')
