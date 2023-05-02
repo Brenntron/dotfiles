@@ -13039,9 +13039,7 @@ table > tbody > tr > td.no-padding {
 
 // handling the top-right username width issues
 @media screen and (max-width: 1200px) {
-  #nav-banner a.nav-username {
-    display: none;
-  }
+  #nav-banner a.nav-username {display: none;}
 }
 
 
@@ -13484,7 +13482,7 @@ table > tbody > tr > td.no-padding {
     padding-right: 21px;
     max-width: 400px;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
   }
   .metric-header {
     display: inline-block;
@@ -13531,7 +13529,6 @@ table > tbody > tr > td.no-padding {
     float: right;
     text-align: right;
     padding-left: 0;
-    padding-right: 1vw;
     max-width: 300px;  // accommodate the loading spinner
     display: inline-block;
     .wbnp-report-status {
@@ -13586,15 +13583,13 @@ table > tbody > tr > td.no-padding {
     .header-area {
       display: none;
     }
-    .wbnp-area{
-      margin-top: 15px
-    }
     .wbnp-report-status {
       padding-top: 2px;
     }
   }
 }
 
+// shorter widths, minor tweaks
 @media screen and (max-width: 1550px) {
   .complaints-metrics-banner {
     .main-metrics {
@@ -13602,9 +13597,15 @@ table > tbody > tr > td.no-padding {
       flex-wrap: wrap;
     }
   }
+  .wbnp-area .metric-header {
+    display: inline-block;
+    vertical-align: middle;
+  }
 }
-// shorter widths, minor tweaks
-@media screen and (max-width: 1550px) {
+@media screen and (max-width: 1513px) {
+  .wbnp-area{padding-top: 30px;}
+}
+@media screen and (max-width: 2080px) {
   .complaint-mgt-top-area {
     padding: 6px 15px;
   }
@@ -13621,13 +13622,6 @@ table > tbody > tr > td.no-padding {
       padding: 6px 5px 0 0;
       display: block;
     }
-    .wbnp-area {
-      padding: 0.8vw 1vw;
-    }
-    .wbnp-area .metric-header {
-      display: inline-block;
-      vertical-align: middle;
-    }
     .metric-header {
       padding-top: 0;
       vertical-align: top;
@@ -13639,32 +13633,17 @@ table > tbody > tr > td.no-padding {
 }
 
 // 1350px and smaller
-@media screen and (max-width: 1350px) {
-  #nav-banner a.nav-username {
-    display: none;
-  }
-  .complaints-metrics-banner {
-    .wbnp-area {
-      padding: 8px 15px 8px 10px;
-    }
-    .wbnp-area .metric-header {
-      width: 110px;
-    }
-  }
-}
 
 // 1255px and smaller
 @media screen and (max-width: 1255px) {
-  #nav-banner a.nav-username {
-    display: none;
-  }
   .complaints-metrics-banner {
     .metrics-col {
       max-width: 200px;
+      padding-right: unset;
+      }
     }
-    .wbnp-area {
-      padding: 15px;
-    }
+  .wbnp-area{
+    max-width: unset!important;
   }
 }
 
@@ -13687,8 +13666,7 @@ table > tbody > tr > td.no-padding {
       max-width: 160px;
     }
     .wbnp-area {
-      padding: 15px;
-      max-width: 200px;
+      max-width: unset;
     }
   }
 }
