@@ -32,35 +32,35 @@ $(document).ready ->
     window.check_wbnp_status()
 
 window.change_ticket_view = (type,button) ->
-
-  checked = $('.imports_check_box:checked')
-
   if $(button).hasClass('active-view')
     #if view is already active, do nothing
     return
+  else
 
-  switch type
-    when 'ticket'
-      if checked.length == 0
-        #if ticket view selected without any checked, show error and do nothing
-        std_msg_error("Select at least one ticket to view.", [], reload: false)
-        return
-      else
-        #else build (or show previously built) tickets
-        build_ticket_view(checked,"bulk")
-        $('.mothra-header').text('Import Results')
-    when 'list'
-      $('.mothra-header').text('Jira Imports')
-      $('.ticket-rows').addClass('hidden') #ticket rows must be individually hidden
-      $('.ticket-rows').removeClass('vis-ticket')
-  # show/hide appropriate elements
-  $('#webcat-imports-index_wrapper, .webcat-ticket-view').toggleClass('hidden')
-  $('.list-button, .view-tickets').toggleClass('active-view')
+    checked = $('.imports_check_box:checked')
+    switch type
+      when 'ticket'
+        if checked.length == 0
+          #if ticket view selected without any checked, show error and do nothing
+          std_msg_error("Select at least one ticket to view.", [], reload: false)
+          return
+        else
+          #else build (or show previously built) tickets
+          build_ticket_view(checked,"bulk")
+          $('.mothra-header').text('Import Results')
+      when 'list'
+        $('.mothra-header').text('Jira Imports')
+        $('.ticket-rows').addClass('hidden') #ticket rows must be individually hidden
+        $('.ticket-rows').removeClass('vis-ticket')
+        $('.reports-toolbar .toolbar-button').attr('disabled', true)
+        $('.imports-url-checkbox').prop('checked', false)
+    # show/hide appropriate elements
+    $('#webcat-imports-index_wrapper, .webcat-ticket-view').toggleClass('hidden')
+    $('.list-button, .view-tickets').toggleClass('active-view')
 
 window.build_single_row = (rd, data) ->
   { urls } = data
-  { issue_key, submitter, status, result, imported_at } = rd
-
+  { issue_key, submitter, status, result, imported_at} = rd
 
   if status == 'Awaiting Bast Verdict'
     status = '<span>PENDING <span class="import-note">| Awaiting Bast Verdict<span></span>'
@@ -73,10 +73,10 @@ window.build_single_row = (rd, data) ->
     'Jira Ticket': "<span class='jira-ticket-id'>#{issue_key}</span>",
     'Submitter': submitter,
     'Imported On': imported_at,
-    'Status': status
+    'Import Status': status
   }
 
-  ticket_html = "<div class='row ticket-rows vis-ticket' id='#{issue_key}'>"
+  ticket_html = "<div class='row ticket-rows vis-ticket' id='#{issue_key}'><div class='col-xs-5 no-padding-left'>"
   #build upper data
   for title, content of row_data
 
@@ -86,53 +86,66 @@ window.build_single_row = (rd, data) ->
                             <label class='data-report-label'>#{title}</label>
                             <span class='data-report-content'>#{content}</span>
                           </div>"
-  ticket_html += "<div class='col-xs-12 no-padding-left urls-container'>
-                  <label class='data-report-label'>Urls<label></div>"
-  #build table data
-  table_html = "<table>
+  ticket_html += "</div>"
+  if urls.length
+    ticket_html += "<div class='col-xs-12 no-padding-left urls-container'>
+                    <label class='data-report-label'>Urls<label></div>"
+    #build table data
+
+    ticket_html +="<table class='table responsive dataTable no-footer url-datatable' id='#{issue_key}-datatable' role='datatable'>
                     <thead>
-                      <tr>
-                        <th>Original</th>
-                        <th>Sanitized</th>
-                        <th>Entry ID</th>
-                        <th>Case ID</th>
-                        <th>Bast Response</th>
+                    <tr>
+                      <th><input type='checkbox' name='cbox' class='imports-url-checkbox-bulk' id='cbox-#{issue_key}-urls' value='#{issue_key}'/></th>
+                      <th>Original</th>
+                      <th>Sanitized Domain</th>
+                      <th>Entry ID</th>
+                      <th>Case ID</th>
+                      <th>Status</th>
+                      <th>Resolution</th>
+                      <th>Resolution Time</th>
+                      <th>Category</th>
+                      <th>Assignee</th>
+                      <th>Age</th>
+                      <th>Bast Response</th>
                     </tr>
-                    </thead>
-                  <tbody>"
-  
-  if !urls.length
-    table_html +="<tr><td colspan=4 ><span class='missing-data'> No URLs Available</span></td></tr>"
+                  </thead>
+                  </table>
+              </div>"
+
+    $('.webcat-ticket-view').append(ticket_html)
+
+    # dynamic datatable for each selected jira import report
+    # handled differently than
+    $("##{issue_key}-datatable").DataTable(
+        data:urls
+        searching: false
+        order: [[2,'asc',]]
+        lengthMenu: [25, 50, 100]
+        dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+        columnDefs:
+          [{
+            targets: [ 0 ]
+            orderable: false
+            searchable: false
+          },
+          {
+            targets: [ 9 ]
+            className:'entry-assignee'
+          }]
+        createdRow: (row, data, index) ->
+          entry_id = data[3]
+          checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
+          $('td', row).eq(0).append(checkbox)
+
+          complaint_id = data[4]
+          if complaint_id
+            complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
+            $('td', row).eq(4).html(complaint_link)
+
+    )
   else
-    for url in urls
-      {domain, url, complaint_id, entry_id, imported, verdict_reason}= url
-      sanitized = '-'
-      complaint = '-'
-
-      if verdict_reason
-        imported += " - #{verdict_reason}"
-
-      if !entry_id then entry_id = '-'
-
-      if complaint_id
-        complaint = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
-
-      if domain && domain !=  url
-        sanitized = domain
-
-      #this will need to be changed 5sure
-      table_html += "<tr>
-                          <td>#{url}</td>
-                          <td>#{sanitized}</td>
-                          <td>#{entry_id}</td>
-                          <td>#{complaint}</td>
-                          <td>#{imported}</td>
-                        </tr>"
-
-  table_html += "</tbody></table></div></div>"
-  ticket_html += table_html
-
-  $('.webcat-ticket-view').append(ticket_html)
+    ticket_html += "</div>"
+    $('.webcat-ticket-view').append(ticket_html)
 
 window.build_ticket_view = (checked, view) ->
   table =  $('#webcat-imports-index').DataTable()
@@ -141,19 +154,22 @@ window.build_ticket_view = (checked, view) ->
     checked = [checked]
 
   for check, index in checked
-    row = $(check).closest('tr')
-    id = $(check).attr('value')
-    el = $("##{id}")
-
-    if el.length > 0
-      # if we have already built this ticket view, show it
-      el.removeClass('hidden')
-      if checked.length > 1
-        el.addClass('vis-ticket')
+    if index == 10
+      break
     else
-      # if we haven't built this ticket view, build it
-      rd = table.row( row ).data()
-      get_bast_data(rd.id).then( build_single_row.bind(null, rd) )
+      row = $(check).closest('tr')
+      id = $(check).attr('value')
+      el = $("##{id}")
+
+      if el.length > 0
+        # if we have already built this ticket view, show it
+        el.removeClass('hidden')
+        if checked.length > 1
+          el.addClass('vis-ticket')
+      else
+        # if we haven't built this ticket view, build it
+        rd = table.row( row ).data()
+        get_bast_data(rd.id).then( build_single_row.bind(null, rd) )
 
   if view == 'single'
     $('.mothra-header').text('Import Results')
@@ -162,35 +178,92 @@ window.build_ticket_view = (checked, view) ->
 
 $(document).on 'click', '#bulk-ticket-select',->
   checked = $(this).prop('checked')
-  $('.imports_check_box').prop('checked', checked)
+  all_rows = $("#webcat-imports-index tbody tr").filter(':visible')
+  $('.imports_check_box:visible').prop('checked', checked)
+
+  if checked
+    all_rows.addClass('selected')
+  else
+    all_rows.removeClass('selected')
+
+$(document).on 'click', '.imports-url-checkbox-bulk',->
+  checked = $(this).prop('checked')
+  issue_key = $(this).val()
+  $(".imports-url-checkbox-#{issue_key}").prop('checked', checked)
+  $(".imports-url-checkbox-#{issue_key}").trigger("change")
+
+$(document).on 'change', '.imports-url-checkbox',->
+  checked_rows = $(".imports-url-checkbox:checked").closest('tr')
+  current_username = $('input[name="current_user_name"]').val()
+  can_take =     false
+  can_return =   false
+  can_assign =   false
+  can_unassign = false
+
+  for row in checked_rows
+    user = $(row).find('.entry-assignee').text()
+
+    if user != ''                       then can_assign = true
+    if user == current_username         then can_return = true
+    if user == 'vrtincom'               then can_take = true
+    if user != '' && user != 'vrtincom' then can_unassign = true
+
+  if can_take
+    $('.take-ticket-toolbar-button').removeAttr('disabled')
+  else
+    $('.take-ticket-toolbar-button').attr('disabled', true)
+
+  if can_return
+    $('.return-ticket-toolbar-button').removeAttr('disabled')
+  else
+    $('.return-ticket-toolbar-button').attr('disabled', true)
+
+  if can_assign
+    $(".ticket-owner-button").removeAttr('disabled')
+  else
+    $(".ticket-owner-button").attr('disabled', true)
+
+  if can_unassign
+    $(".remove-assignee-toolbar-button").removeAttr('disabled')
+  else
+    $(".remove-assignee-toolbar-button").attr('disabled', true)
 
 $(document).on 'click', '.imports_check_box',->
+  row = $(this).closest('tr')
+  check = $('.imports_check_box')
+
+  if check.prop('checked')
+    row.addClass('selected')
+  else
+    row.removeClass('selected')
+
   num_checked = $('.imports_check_box:checked').length
 
-  if num_checked == $('.imports_check_box').length
-    $('.imports_check_box').prop('checked', true)
-  if num_checked == 0
-    $('.imports_check_box').prop('checked', false)
+  if num_checked == check.length
+    check.prop('checked', true)
 
-$(document).on 'click', '#show-failed, #show-complete',->
-  table = $('#webcat-imports-index').DataTable()
+  if num_checked == 0
+    check.prop('checked', false)
+
+$(document).on 'click', '#show-failed, #show-complete, #show-pending',->
   show_failed = $('#show-failed').prop('checked')
   show_complete = $('#show-complete').prop('checked')
+  show_pending = $('#show-pending').prop('checked')
 
-  table.rows().every( ()->
-    status = this.data().status
-    switch status
-      when'Failure'
-        if show_failed
-          $('.failed').show()
-        else
-          $('.failed').hide()
-      else
-        if show_complete
-          $('.complete-pending').show()
-        else
-          $('.complete-pending').hide()
-  )
+  if show_pending
+    $('.pending').show()
+  else
+    $('.pending').hide()
+
+  if show_complete
+    $('.complete').show()
+  else
+    $('.complete').hide()
+
+  if show_failed
+    $('.failure').show()
+  else
+    $('.failure').hide()
 
 window.checked_row_data = ()->
   table = $('#webcat-imports-index').DataTable()
@@ -258,10 +331,8 @@ window.build_imports_table = () ->
     ]
     createdRow:(row, data, dataIndex) ->
       {status} = data
-      if status == 'Failure'
-        $(row).addClass('failed')
-      else
-        $(row).addClass('complete-pending')
+      $(row).addClass(status.toLowerCase())
+
     columns:[
       {
         data:'issue_key',
@@ -308,6 +379,62 @@ window.build_imports_table = () ->
   )
 # WBNP - Get report id
 
+window.jira_assignee_hub = (type) ->
+  # handle all assigning for jira import entries
+  selected = $('.imports-url-checkbox:checked')
+  entry_ids = []
+  selected_rows = []
+  for entry in selected
+    val = $(entry).val()
+    if val && val != 'null'
+      entry_ids.push(val)
+      selected_rows.push( $(entry).closest('tr') )
+
+  if entry_ids.length > 0
+    data = {'complaint_entry_ids': entry_ids}
+    url = "/escalations/api/v1/escalations/webcat/complaint_entries/#{type}"
+    err_msg = "Something Went Wrong:"
+    succ_msg = "Entries successfully assigned"
+
+    switch type
+      when 'change_assignee'
+        data['user_id'] = $('#index_target_assignee option:selected').val()
+        err_msg = "Error Assigning Entries:"
+      when "take_entry"
+        err_msg = "Error Taking Entries:"
+      when "return_entry"
+        err_msg = "Error Returning Entries:"
+        succ_msg = "Entries successfully returned"
+        assignee = 'vrtincom'
+      when "unassign_all"
+        err_msg = "Error Returning Entries:"
+        succ_msg = "Entries successfully unassigned"
+        assignee = 'vrtincom'
+
+    std_msg_ajax(
+      method: 'POST'
+      url: url
+      data: data
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          std_msg_error(err_msg, json.error)
+        else
+          std_msg_success(succ_msg, [])
+
+          if json.cvs_username
+            assignee = json.cvs_username
+
+          if assignee
+            $(selected_rows).each ->
+              $(this).find('.entry-assignee').text(assignee)
+
+      error: (response) ->
+        std_api_error(response, 'Error assigning', reload: false)
+    )
+  else
+    std_msg_error('Please select at least one ticket with an associated entry', [])
+
 window.get_bast_data = (id) ->
   std_msg_ajax(
     method: 'GET'
@@ -319,21 +446,14 @@ window.get_bast_data = (id) ->
       std_api_error(response, 'Error fetching bast data', reload: false)
   )
 
-window.export_all_jira_tasks = ()->
-  form = $('#jira-tasks-disputes-export-form')
-
-  $('#jira-tasks-filter-input').val([])
-  form.submit()
-
 window.export_selected_jira_tasks = ()->
   form = $('#jira-tasks-disputes-export-form')
-
   selected_tasks = $('.imports_check_box:checked').map((i, el) => el.value).get()
-  if selected_tasks.length <= 0
-    std_msg_error('Error: Nothing selected.',"", reload: false)
+  if !selected_tasks.length
+    $('#jira-tasks-filter-input').val([])
   else      
     $('#jira-tasks-filter-input').val(selected_tasks)
-    form.submit()
+  form.submit()
 
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)

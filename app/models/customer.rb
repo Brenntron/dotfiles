@@ -19,6 +19,8 @@ class Customer < ApplicationRecord
       Rails.logger.error e
       raise "Failed to create new Customer with the following attributes: '#{attributes}'"
     end
+
+
   end
 
   def self.customer_from_ruleui(data)

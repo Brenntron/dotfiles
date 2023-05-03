@@ -709,9 +709,15 @@ button {
   margin-left: 7px;
   position: absolute;
 }
+
 .webcat-reports-toolbar{
   margin-bottom: -35px;
   z-index: 10;
+  width: calc(100% - 320px);
+  .toolbar-button-select.toolbar-button-text{
+    padding-left: 25px;
+  }
+
 }
 .toolbar-button-animated.active {
   background-color: $bug-accent-color;
@@ -861,7 +867,10 @@ button {
 .ticket-status-button {background-image: url(image_path('icon_status.svg'));}
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .mark-related-button {background-image: url(image_path('icon_related.svg'));}
-.ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
+.ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
 .auto-resolve-button {background-image: url(image_path('icon_reports_white.svg'));}
@@ -879,7 +888,11 @@ button {
   left: 7px;}
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 .sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
-.remove-assignee-toolbar-button {background-image: url(image_path('icon_unassign_grey.svg'));}
+.remove-assignee-toolbar-button {
+  background-image: url(image_path('icon_unassign_grey.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -893,8 +906,16 @@ button {
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
 .open-all {background-image: url(image_path('icon_open_viewable.svg'));}
-.take-ticket-toolbar-button {background-image: url(image_path('icon_take.svg'));}
-.return-ticket-toolbar-button {background-image: url(image_path('icon_return.svg'));}
+.take-ticket-toolbar-button {
+  background-image: url(image_path('icon_take.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }}
+.return-ticket-toolbar-button {
+  background-image: url(image_path('icon_return.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }}
 .convert-ticket-button{background-image: url(image_path('icon_convert_ticket_grey.svg'));}
 .open .convert-ticket-button {background-image: url(image_path('icon_convert_ticket.svg'))};
 .collapse-all {background-image: url(image_path('icon_collapse_all.svg'));}
@@ -2307,7 +2328,16 @@ a.static-nav-item {
 .icon-talos-white {background-image: url(image_path('icon_talos_white.svg'));}
 .icon-web-white {background-image: url(image_path('icon_web_white.svg'));}
 .icon-company-white {background-image: url(image_path('icon_company_white.svg'));}
+.icon-mothra-white {background-image: url(image_path('icon_mothra_white.svg'));}
+.icon-pending-import {background-image: url(image_path('icon_pending_grey.svg'));}
+.icon-complete-import {background-image: url(image_path('icon_my_closed_tickets_grey.svg'));}
+.icon-failed-import {background-image: url(image_path('icon_cancel.svg'));}
 
+.checkbox-icon{
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  background-position: 4px center;
+}
 .saved-search {
   text-transform: none !important;
   font-weight: 400;
@@ -2401,7 +2431,7 @@ a.static-nav-item {
 }
 
 #saved-searches-wrapper.webcat-named-search-list {
-  min-height: 495px;
+  min-height: 530px;
 }
 
 .search-wrapper {
@@ -13009,9 +13039,7 @@ table > tbody > tr > td.no-padding {
 
 // handling the top-right username width issues
 @media screen and (max-width: 1200px) {
-  #nav-banner a.nav-username {
-    display: none;
-  }
+  #nav-banner a.nav-username {display: none;}
 }
 
 
@@ -13454,7 +13482,7 @@ table > tbody > tr > td.no-padding {
     padding-right: 21px;
     max-width: 400px;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
   }
   .metric-header {
     display: inline-block;
@@ -13501,7 +13529,6 @@ table > tbody > tr > td.no-padding {
     float: right;
     text-align: right;
     padding-left: 0;
-    padding-right: 1vw;
     max-width: 300px;  // accommodate the loading spinner
     display: inline-block;
     .wbnp-report-status {
@@ -13564,6 +13591,21 @@ table > tbody > tr > td.no-padding {
 
 // shorter widths, minor tweaks
 @media screen and (max-width: 1550px) {
+  .complaints-metrics-banner {
+    .main-metrics {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+  .wbnp-area .metric-header {
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+@media screen and (max-width: 1513px) {
+  .wbnp-area{padding-top: 30px;}
+}
+@media screen and (max-width: 2080px) {
   .complaint-mgt-top-area {
     padding: 6px 15px;
   }
@@ -13580,13 +13622,6 @@ table > tbody > tr > td.no-padding {
       padding: 6px 5px 0 0;
       display: block;
     }
-    .wbnp-area {
-      padding: 0.8vw 1vw;
-    }
-    .wbnp-area .metric-header {
-      display: inline-block;
-      vertical-align: middle;
-    }
     .metric-header {
       padding-top: 0;
       vertical-align: top;
@@ -13598,32 +13633,17 @@ table > tbody > tr > td.no-padding {
 }
 
 // 1350px and smaller
-@media screen and (max-width: 1350px) {
-  #nav-banner a.nav-username {
-    display: none;
-  }
-  .complaints-metrics-banner {
-    .wbnp-area {
-      padding: 8px 15px 8px 10px;
-    }
-    .wbnp-area .metric-header {
-      width: 110px;
-    }
-  }
-}
 
 // 1255px and smaller
 @media screen and (max-width: 1255px) {
-  #nav-banner a.nav-username {
-    display: none;
-  }
   .complaints-metrics-banner {
     .metrics-col {
       max-width: 200px;
+      padding-right: unset;
+      }
     }
-    .wbnp-area {
-      padding: 15px;
-    }
+  .wbnp-area{
+    max-width: unset!important;
   }
 }
 
@@ -13646,8 +13666,7 @@ table > tbody > tr > td.no-padding {
       max-width: 160px;
     }
     .wbnp-area {
-      padding: 15px;
-      max-width: 200px;
+      max-width: unset;
     }
   }
 }
@@ -13703,6 +13722,7 @@ table > tbody > tr > td.no-padding {
 }
 .urls-container {
   padding-top: 30px;
+  margin-bottom: -20px;
 }
 #webcat-imports-index_wrapper .jira-ticket-id:hover {
   cursor:pointer;
@@ -13710,7 +13730,6 @@ table > tbody > tr > td.no-padding {
 }
 .webcat-ticket-view{
   margin-top: 50px;
-  display: inline-block;
   .data-report-content{
     display: inline-block;
     margin-bottom: 10px;
@@ -13733,19 +13752,19 @@ table > tbody > tr > td.no-padding {
   }
 
   .ticket-rows{
-    max-width: 800px;
-    margin-left: 7px;
-    td, th{
-      padding-left:0
+    margin: 7px;
+    .dataTables_wrapper{
+      top: -10px;
     }
   }
+}
+.url-datatable{
+  background-color: #fff;
+  th{white-space: nowrap}
 }
 .webcat-reports-only {
   display: flex;
   flex-wrap: wrap;
-  &>* {
-    flex: 1 1 220px;
-  }
   .header-td{
     text-transform: uppercase;
     font-weight: 700;
@@ -13762,12 +13781,26 @@ table > tbody > tr > td.no-padding {
   }
   .tickets-totals-table{
     margin-left: 10px;
-    max-width: 210px;
+    max-width: 220px;
     td{
       border-bottom: none;
       font-size: 8pt;
     }
   }
+  &>* { flex: 1 1 220px; }
+  @media (max-width: 1485px) {
+    .tickets-totals-table{
+      max-width: 180px;
+    }
+  }
+  @media (max-width: 1220px) {
+    &>* {flex: 1 1 170px;}
+    .tickets-totals-table{
+      max-width: 180px;
+      margin-bottom: 20px;
+    }
+  }
+
   .table-condensed > tbody > tr > td {
     padding: 3px 4px !important; // need override
   }
