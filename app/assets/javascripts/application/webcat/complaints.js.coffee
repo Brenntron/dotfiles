@@ -195,16 +195,18 @@ $(document).on 'click', '.imports-url-checkbox-bulk',->
 $(document).on 'change', '.imports-url-checkbox',->
   checked_rows = $(".imports-url-checkbox:checked").closest('tr')
   current_username = $('input[name="current_user_name"]').val()
-  can_take = false
-  can_return = false
-  can_assign = false
+  can_take =     false
+  can_return =   false
+  can_assign =   false
+  can_unassign = false
 
   for row in checked_rows
     user = $(row).find('.entry-assignee').text()
 
-    if user != ''               then can_assign = true
-    if user == current_username then can_return = true
-    if user == 'vrtincom'       then can_take = true
+    if user != ''                       then can_assign = true
+    if user == current_username         then can_return = true
+    if user == 'vrtincom'               then can_take = true
+    if user != '' && user != 'vrtincom' then can_unassign = true
 
   if can_take
     $('.take-ticket-toolbar-button').removeAttr('disabled')
@@ -221,8 +223,7 @@ $(document).on 'change', '.imports-url-checkbox',->
   else
     $(".ticket-owner-button").attr('disabled', true)
 
-
-  if can_assign && can_take
+  if can_unassign
     $(".remove-assignee-toolbar-button").removeAttr('disabled')
   else
     $(".remove-assignee-toolbar-button").attr('disabled', true)
@@ -392,6 +393,9 @@ window.jira_assignee_hub = (type) ->
   if entry_ids.length > 0
     data = {'complaint_entry_ids': entry_ids}
     url = "/escalations/api/v1/escalations/webcat/complaint_entries/#{type}"
+    err_msg = "Something Went Wrong:"
+    succ_msg = "Entries successfully assigned"
+
     switch type
       when 'change_assignee'
         data['user_id'] = $('#index_target_assignee option:selected').val()
@@ -400,12 +404,12 @@ window.jira_assignee_hub = (type) ->
         err_msg = "Error Taking Entries:"
       when "return_entry"
         err_msg = "Error Returning Entries:"
+        succ_msg = "Entries successfully returned"
         assignee = 'vrtincom'
       when "unassign_all"
         err_msg = "Error Returning Entries:"
+        succ_msg = "Entries successfully unassigned"
         assignee = 'vrtincom'
-      else
-        err_msg = "Something Went Wrong:"
 
     std_msg_ajax(
       method: 'POST'
@@ -416,7 +420,7 @@ window.jira_assignee_hub = (type) ->
         if json.error
           std_msg_error(err_msg, json.error)
         else
-          std_msg_success('Entries successfully assigned', [])
+          std_msg_success(succ_msg, [])
 
           if json.cvs_username
             assignee = json.cvs_username
