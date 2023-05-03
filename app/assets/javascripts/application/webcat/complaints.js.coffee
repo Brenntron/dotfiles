@@ -2478,8 +2478,8 @@ window.prep_complaint_to_convert = () ->
 
               entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
                 '<td class="text-center entry-disposition">' +
-                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio" title="Customer says the web site is safe and should be allowed.">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
-                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio" title="Customer says the web site is malicious and should be blocked">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio" title="Customer says the website is safe and should be allowed.">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio" title="Customer says the website is malicious and should be blocked">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
                 '</td></tr>'
 
               $(entries_table).append(entry_row)
