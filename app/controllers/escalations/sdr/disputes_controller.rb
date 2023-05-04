@@ -80,6 +80,11 @@ class Escalations::Sdr::DisputesController < ApplicationController
     end
   end
 
+  def resolution_message_templates
+    @templates = ResolutionMessageTemplate.for_sdr_disputes
+
+  end
+
   private
 
     def datatables_search_params
