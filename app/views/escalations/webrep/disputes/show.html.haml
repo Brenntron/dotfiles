@@ -102,6 +102,13 @@
                           = render 'escalations/shared/resolved_resolution_options',  { dispute_resolution_name: 'dispute-resolution' }
                         .col-xs-6.submenu-right-wrapper
                           .resolution-comment-wrapper
+                            -if @dispute.submission_type == 'w' && @dispute.submitter_type != 'INTERNAl'
+                              %label.content-label-sm
+                                Template
+                              %select#webrep-resolution-message-template-select.resolution-message-template-select
+                              %label.content-label-sm
+                                Description
+                              %p.ticket-resolution-description
                             %label.content-label-sm
                               Comment
                             %textarea.ticket-resolution-comment

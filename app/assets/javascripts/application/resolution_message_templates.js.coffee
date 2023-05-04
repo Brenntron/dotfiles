@@ -167,7 +167,7 @@ $ ->
         target.tooltipster('open')
     , tooltip_delay
 
-  ## Resolution Picker Dropdown
+  ## Resolution Picker Dropdown ##
 
   $('#select-new-resolution-message-template-status').on 'change', ->
     template_id = this.value
@@ -181,6 +181,7 @@ $ ->
       error: (response) ->
         std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
     )
+
   $('#select-new-resolution-message-template-resolution').on 'change', ->
     template_id = this.value
 
@@ -193,4 +194,26 @@ $ ->
       error: (response) ->
         std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
     )
+
+  #Fetch resolutions by resolution, for use in template selects
+  window.get_resolution_templates_by_resolution = (route, resolution) ->
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/#{route}/resolution_message_templates"
+      data: {resolution: resolution}
+      dataType: 'json'
+      success_reload: false
+      success: (response) ->
+        response
+      error: (response) ->
+        std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
+    )
+
+  # Change resolution template select
+  $('.resolution-message-template-select').on 'change', (i, e) ->
+    comment = $('.resolution-message-template-select option:selected').attr('data-body')
+    $('.ticket-resolution-comment').val comment
+    description = $('.resolution-message-template-select option:selected').attr('data-description')
+    $('.ticket-resolution-description').text description
+
 

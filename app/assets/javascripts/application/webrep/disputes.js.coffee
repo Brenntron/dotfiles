@@ -1607,8 +1607,25 @@ $ ->
 
       $(".ticket-resolution-comment").html('')
       messageId = $(event.target).data('id')
-      resolution_comment = get_resolution_comment(@value, is_customer, messageId)
-      $(".ticket-resolution-comment").html(resolution_comment)
+      resolution_data = get_resolution_comment(@value, is_customer, messageId)
+
+      get_resolution_templates_by_resolution('webrep', resolution_data.resolution_type).then (response) ->
+        resolution_select = $('#webrep-resolution-message-template-select.resolution-message-template-select')
+        resolution_select.empty()
+        templates = JSON.parse response
+
+        $(templates).each (index, template) ->
+          template_option = $("<option class='webrep-resolution-template-option'></option>")
+          $(template_option).val template.name
+          $(template_option).text template.name
+          $(template_option).attr('data-body', template.body )
+          $(template_option).attr('data-description', template.description )
+          resolution_select.append template_option
+
+          #show first option as body and description
+          if index == 0
+            $('.ticket-resolution-comment').val template.body
+            $('.ticket-resolution-description').text template.description
 
 
   $('#webrep-entry-resolution-selector input[type=radio][name=entry-resolution]').change (event)->
@@ -1687,8 +1704,8 @@ $ ->
 window.get_resolution_comment = (value, is_customer, messageId) ->
   resolutionMessage = getResolutionMessageTemplate(messageId)
   if resolutionMessage.description == 'UNCHANGED'
-    return resolutionMessage.body + " Please open a TAC case and provide additional details if you need further assistance."
-  return resolutionMessage.body
+    resolutionMessage.body = resolutionMessage.body + " Please open a TAC case and provide additional details if you need further assistance."
+  return resolutionMessage
 
 window.getResolutionMessageTemplate = (messageId)->
   message = null

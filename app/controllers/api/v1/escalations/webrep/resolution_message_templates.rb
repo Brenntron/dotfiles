@@ -6,6 +6,15 @@ module API
           include API::V1::Defaults
           resource "escalations/webrep/resolution_message_templates" do
 
+            desc "get a filtered resolution message templates by resolution"
+            params do
+              requires :resolution, type: String, desc: "Resolution of the resolution message template"
+            end
+
+            get  "", root: "resolution_message_template" do
+              ResolutionMessageTemplate.by_resolution_disputes(params[:resolution]).to_json
+            end
+
             desc "get a resolution message template"
             params do
               requires :id, type: String, desc: "ID of the resolution message template"
@@ -58,7 +67,7 @@ module API
 
             delete ":id", root: "resolution_message_template" do
               authorize!(:delete, ResolutionMessageTemplate)
-              template = ResolutionMessageTemplate.find(permitted_params[:id])
+              template = ResolutionMessageTemplate..find(permitted_params[:id])
               authorize!(:delete, template)
               template.destroy
             end

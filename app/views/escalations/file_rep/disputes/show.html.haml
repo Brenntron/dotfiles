@@ -73,6 +73,12 @@
                         .col-xs-8.submenu-right-wrapper
                           .resolution-comment-wrapper
                             %label.content-label-sm
+                              Template
+                            %select#se-resolution-message-template-select.resolution-message-template-select
+                            %label.content-label-sm
+                              Description
+                            %p.ticket-resolution-description
+                            %label.content-label-sm
                               Comment
                             %textarea.resolution-status-comment
                             %button.primary{onClick: 'update_file_rep_status_on_show()'}

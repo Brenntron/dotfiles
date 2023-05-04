@@ -20,7 +20,9 @@ class ResolutionMessageTemplate < ApplicationRecord
   scope :for_file_reputation_disputes, -> { where(ticket_type: 'FileReputationDispute')}
   scope :for_sdr_disputes, -> { where(ticket_type: 'SenderDomainReputationDispute')}
 
-  scope :by_resolution, ->(resolution) { for_disputes.where(resolution_type: resolution)}
+  scope :by_resolution_disputes, ->(resolution) { for_disputes.where(resolution_type: resolution)}
+  scope :by_resolution_file_reputation_disputes, ->(resolution) { for_file_reputation_disputes.where(resolution_type: resolution)}
+  scope :by_sdr_reputation_disputes, ->(resolution) { for_sdr_disputes.where(resolution_type: resolution)}
 
 end
  
