@@ -4,7 +4,7 @@ module API
       module FileRep
         class ResolutionMessageTemplates < Grape::API
           include API::V1::Defaults
-          resource "escalations/filerep/resolution_message_templates" do
+          resource "escalations/file_rep/resolution_message_templates" do
 
             desc "get a resolution message template"
             params do
