@@ -67,7 +67,7 @@ module API
 
             delete ":id", root: "resolution_message_template" do
               authorize!(:delete, ResolutionMessageTemplate)
-              template = ResolutionMessageTemplate..find(permitted_params[:id])
+              template = ResolutionMessageTemplate.find(permitted_params[:id])
               authorize!(:delete, template)
               template.destroy
             end
