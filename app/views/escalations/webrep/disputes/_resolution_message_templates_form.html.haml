@@ -32,10 +32,10 @@
   .col-xs-12.text-center.resolution-modal-button-wrapper
     - if current_user.has_role?('webrep manager') || current_user.has_role?('manager')
       - if local_assigns[:action] == :create
-        %button#create-resolution-template-submit.primary{onclick: "create_resolution_message_template()", disabled: true}
+        %button#create-resolution-template-submit.primary{onclick: "create_resolution_message_template('webrep')", disabled: true}
           Create Template
       - else
-        %button.primary{onclick: "update_resolved_resolution_message_template()"}
+        %button.primary{onclick: "update_resolved_resolution_message_template('webrep')"}
           Update Template
 
     - if current_user.has_role?('webrep manager') || current_user.has_role?('manager')
