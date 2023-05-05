@@ -1,4 +1,4 @@
-class JiraImportTask < ApplicationRecord
+class JiraImportTask < ApplicationRecord  
   has_many :import_urls
 
   validates :issue_key, presence: true, uniqueness: true
@@ -29,47 +29,51 @@ class JiraImportTask < ApplicationRecord
   #Read CSV from Jira and send URLs to Bast
   def process_import
     update(imported_at: Time.now)
-
+    custom_fields = JiraRest::Project.new('SDOCS').custom_fields
     issue = JiraRest::Issue.new(issue_key)
 
+    # fetch data from 'URL(s)' ticket field
     begin
-      attachments = issue.attachments_data
-    rescue => e
-      update(status: STATUS_FAILURE, result: "Error reading attachment data: #{e.message}")
-      return
+      urls = issue.issue.fields[custom_fields[:urls]].to_s.split(/[\n,\s]+/).reject(&:blank?)
+    rescue
+      urls = []
     end
 
-    if attachments.empty?
-      update(status: STATUS_FAILURE, result: "No CSV attachment found")
-      return
-    end
-    attachment_to_process = attachments.first
-    if attachment_to_process[:type] == VALID_FILE_TYPE
-      csv_data = attachment_to_process[:content]
-      urls = csv_data.map {|m| m[0]&.strip}.reject {|r| r.blank?}
-      
+    # fetch data from ticket attachment
+
+    begin
+      attachment_to_process = issue.attachments_data.first
+    rescue
       if urls.empty?
-        update(status: STATUS_FAILURE, result: "No URLs to import")
+        update(status: STATUS_FAILURE, result: "Error reading attachment data: #{e.message}")
         return
       end
+      attachment_to_process = {}
+    end
 
-      urls.each do |url|
-        parsed_url = Complaint.parse_url(url)
-        import_urls.find_or_create_by(submitted_url: url, domain: parsed_url[:domain])
-      end
+    if attachment_to_process&.dig(:type) == VALID_FILE_TYPE
+      csv_data = attachment_to_process[:content]
+      urls += csv_data.map { |m| m[0]&.strip }.reject(&:blank?)
+    end
 
-      begin
-        response = Bast::Base.create_task(urls)
-        update(status: STATUS_AWAITING_BAST_VERDICT, bast_task: response["task_id"])
-      rescue ApiRequester::ApiRequester::ApiRequesterError => e
-        update(status: STATUS_FAILURE, result: e.message)
-      end
+    if urls.empty?
+      update(status: STATUS_FAILURE, result: 'No URLs to import')
+      return
+    end
 
-    else
-      update(status: STATUS_FAILURE, result: "Invalid file type: #{attachment_to_process[:type]}")
+    urls.each do |url|
+      url_parts = Complaint.parse_url(url)
+      import_urls.find_or_create_by(submitted_url: url, domain: url_parts[:domain])
+    end
+
+    begin
+      response = Bast::Base.create_task(urls)
+      update(status: STATUS_AWAITING_BAST_VERDICT, bast_task: response['task_id'])
+    rescue ApiRequester::ApiRequester::ApiRequesterError => e
+      update(status: STATUS_FAILURE, result: e.message)
     end
   end
-  handle_asynchronously :process_import, :queue => "process_jira_import", :priority => 1
+  # handle_asynchronously :process_import, :queue => "process_jira_import", :priority => 1
 
   def create_tickets
     return unless status == STATUS_AWAITING_BAST_VERDICT
