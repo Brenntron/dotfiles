@@ -320,12 +320,12 @@ window.build_imports_table = () ->
       $('#webcat-imports-index_filter input').addClass('table-search-input');
     columnDefs: [
       {
-        targets: [ 0 ]
+        targets: [ 0,4,6 ]
         orderable: false
         searchable: false
       }
       {
-        targets: [ 0,1,2,3,4,5 ]
+        targets: [ 0,1,2,3,4,5,6 ]
         defaultContent:'-'
       }
     ]
@@ -371,6 +371,7 @@ window.build_imports_table = () ->
 
           return html
       },
+      {data: 'issue_status'},
       {
         data: 'status'
         visible: false

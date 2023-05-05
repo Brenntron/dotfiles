@@ -26,11 +26,15 @@ class JiraImportTask < ApplicationRecord
     'IMPORTED_AT'
   ]
 
+  CACHE_LIFESPAN = 30
+
+  def issue
+    @issue ||= JiraRest::Issue.new(issue_key)
+  end
+
   #Read CSV from Jira and send URLs to Bast
   def process_import
     update(imported_at: Time.now)
-
-    issue = JiraRest::Issue.new(issue_key)
 
     begin
       attachments = issue.attachments_data
@@ -195,5 +199,17 @@ class JiraImportTask < ApplicationRecord
       end
     end
     workbook
+  end
+
+  def issue_status
+    issue_data = JSON.parse(Rails.cache.read("#{issue_key}") || "{}")
+
+    if issue_data.blank? || issue_data['last_queried'] < CACHE_LIFESPAN.minutes.ago
+      issue_status = issue.issue.status.name
+      Rails.cache.write("#{issue_key}", {'status' => issue_status, 'last_queried' => Time.now}.to_json)
+    else
+      issue_status = issue_data['status']
+    end
+    issue_status
   end
 end
