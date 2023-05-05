@@ -69,32 +69,53 @@ window.build_single_row = (rd, data) ->
     if result && status != result.toUpperCase()
       status = "#{status} | #{result}"
 
-  row_data = {
-    'Jira Ticket': "<span class='jira-ticket-id'>#{issue_key}</span>",
-    'Jira Summary': issue_summary,
-    'Jira Status': issue_status,
-    'Jira Description': issue_description,
-    'Jira Platform': issue_platform,
-    'Submitter': submitter,
-    'Imported On': imported_at,
-    'Import Status': status,
-  }
-  ticket_html = "<div class='row ticket-rows vis-ticket' id='#{issue_key}'><div class='col-xs-5 no-padding-left'>"
-  #build upper data
-  for title, content of row_data
+  # build upper data
+  # breaking out layout html for more granular control over display
+  ticket_html = "<div class='row ticket-rows vis-ticket' id='#{issue_key}'>" +
+                  "<div class='col-xs-12'>" +
+                    "<h4 class='ticket-report-header'>Jira Ticket Information</h4>" +
+                    "<div class='row'>" +
+                      "<div class='col-md-6 col-sm-8 col-xs-12'>" +
+                        "<div class='row'>" +
+                          "<div class='col-xs-3'>" +
+                            "<label class='content-label-sm'>Ticket ID</label>" +
+                            "<div class='jira-ticket-id top-info-data'>#{issue_key}</div>" +
+                          "</div>" +
+                          "<div class='col-xs-9'>" +
+                            "<label class='content-label-sm'>Summary</label>" +
+                            "<div class='data-report-content top-info-data'>#{issue_summary}</div>" +
+                          "</div>" +
+                        "</div>" +
+                        "<div class='row'>" +
+                          "<div class='col-xs-12'>" +
+                            "<label class='content-label-sm'>Description</label>" +
+                            "<div class='data-report-content top-info-data'>#{issue_description}</div>" +
+                          "</div>" +
+                        "</div>" +
+                      "</div>" +
+                      "<div class='col-md-6 col-sm-4 col-xs-12'>" +
+                        "<div class='row'>" +
+                          "<div class='col-xs-6'>" +
+                            "<label class='content-label-sm'>Imported On</label>" +
+                            "<div class='data-report-content top-info-data'>#{imported_at}</div>" +
+                            "<label class='content-label-sm'>Import Status</label>" +
+                            "<div class='data-report-content top-info-data'>#{status}</div>" +
+                          "</div>" +
+                          "<div class='col-xs-6'>" +
+                            "<label class='content-label-sm'>Ticket Status</label>" +
+                            "<div class='data-report-content top-info-data'>#{issue_status}</div>" +
+                            "<label class='content-label-sm'>Submitter</label>" +
+                            "<div class='data-report-content top-info-data'>#{submitter}</div>" +
+                          "</div>" +
+                        "</div>" +
+                      "</div>" +
+                    "</div>"
 
-    if !content then content = "<span class='missing-data'>Not available</span>"
-
-    ticket_html += "<div class='col-xs-6 no-padding-left'>
-                            <label class='data-report-label'>#{title}</label>
-                            <span class='data-report-content'>#{content}</span>
-                          </div>"
-  ticket_html += "</div>"
   if urls.length
-    ticket_html += "<div class='col-xs-12 no-padding-left urls-container'>
-                    <label class='data-report-label'>Urls<label></div>"
-    #build table data
+    ticket_html += "<div class='row'><div class='col-xs-12 urls-container'>
+                    <label class='data-report-label'>Urls Imported from Ticket</label>"
 
+    #build table data
     ticket_html +="<table class='table responsive dataTable no-footer url-datatable' id='#{issue_key}-datatable' role='datatable'>
                     <thead>
                     <tr>
@@ -113,7 +134,12 @@ window.build_single_row = (rd, data) ->
                     </tr>
                   </thead>
                   </table>
-              </div>"
+                  </div>
+                  </div>
+                  <hr/>
+                  </div>
+                  </div>"
+
 
     $('.webcat-ticket-view').append(ticket_html)
 
@@ -138,7 +164,7 @@ window.build_single_row = (rd, data) ->
         createdRow: (row, data, index) ->
           entry_id = data[3]
           checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
-          $('td', row).eq(0).append(checkbox)
+          $('td', row).eq(0).append(checkbox).addClass('checkbox-cell')
 
           complaint_id = data[4]
           if complaint_id
@@ -339,6 +365,7 @@ window.build_imports_table = () ->
     columns:[
       {
         data:'issue_key',
+        className: 'checkbox-cell',
         render: (data,type,full,meta) ->
           return "<input type='checkbox' name='cbox' class='imports_check_box' id='cbox#{data}' data=#{JSON.stringify(full)} value=#{data} />"
       },

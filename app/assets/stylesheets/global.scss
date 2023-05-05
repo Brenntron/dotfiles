@@ -713,7 +713,6 @@ button {
 .webcat-reports-toolbar{
   margin-bottom: -35px;
   z-index: 10;
-  width: calc(100% - 320px);
   .toolbar-button-select.toolbar-button-text{
     padding-left: 25px;
   }
@@ -10811,7 +10810,7 @@ hr.thin.form-divider {
   }
 }
 
-.top-case-info h4 {
+.top-case-info h4, h4.ticket-report-header {
   text-transform: uppercase;
   font-weight: 700 !important;
   color: $type-lighter-color;
@@ -13713,6 +13712,7 @@ table > tbody > tr > td.no-padding {
   white-space: nowrap;
 }
 .jira-ticket-id {
+  font-size: 13px;
   font-weight: bold;
   color: $type-base-color!important;
 }
@@ -13723,6 +13723,10 @@ table > tbody > tr > td.no-padding {
 .urls-container {
   padding-top: 30px;
   margin-bottom: -20px;
+  .data-report-label {
+    width: auto;
+    position: absolute;
+  }
 }
 #webcat-imports-index_wrapper .jira-ticket-id:hover {
   cursor:pointer;
@@ -13739,24 +13743,35 @@ table > tbody > tr > td.no-padding {
     margin-bottom: 10px;
   }
   .vis-ticket {
-    &:not(:last-of-type){
-      margin-bottom: 40px;
-      padding-bottom: 40px;
-      border-bottom: 1px solid #eeeeee;
-    }
+    padding: 4px;
     &:only-of-type{
       margin-bottom: 0;
       padding-bottom: 0;
       border-bottom: unset;
     }
+    .data-report-content {
+      font-size: 13px;
+    }
+    .content-label-sm {
+      display: block;
+      margin-bottom: 0;
+    }
+    hr {
+      margin-top: 40px;
+      margin-bottom: 50px;
+    }
   }
 
   .ticket-rows{
-    margin: 7px;
+    //margin: 7px;
     .dataTables_wrapper{
       top: -10px;
     }
   }
+}
+.checkbox-cell {
+  padding-bottom: 0 !important;
+  padding-top: 6px !important;
 }
 .url-datatable{
   background-color: #fff;
