@@ -1983,6 +1983,10 @@ button.close {
   position: absolute;
   z-index: 100;
   @include box-shadow($dropshadow);
+
+  .st0 {
+    fill: $type-base-color;
+  }
 }
 
 #sidenav-icons-div .sidenav-icons {
@@ -2031,6 +2035,10 @@ button.close {
 #sidenav-menu-div .sub-nav li a, .sidenav-icons .sub-nav li a {
   color: $type-base-color;
   font-size: 8pt;
+}
+
+#sidenav-menu-div .sub-nav li a, .sidenav-icons ul li a, .nav-container ul li a {
+  color: $type-base-color;
 }
 
 .sub-nav.collapse.in {
@@ -5979,7 +5987,7 @@ input.table-entry-input:focus {
   }
 
   .domain-name-normal {
-    color: #333;
+    color: $type-base-color;
   }
 
   .domain-name {
@@ -8551,7 +8559,7 @@ h2 {
   text-transform: uppercase;
   margin-top: 24px;
   margin-bottom: 6px;
-  color: #333;
+  color: $type-base-color;
 }
 
 .dashboard-header-area {
@@ -12039,7 +12047,7 @@ table.rl-content {
   white-space: pre!important;
 }
 .amp-url{
-  color: #333;
+  color: $type-base-color;
 }
 // ensure AMP disposition on File Rep > Show is capitalized in all 3 instances
 #create-detection-dialog .top-info-data,
