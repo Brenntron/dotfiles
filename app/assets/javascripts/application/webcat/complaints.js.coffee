@@ -60,7 +60,7 @@ window.change_ticket_view = (type,button) ->
 
 window.build_single_row = (rd, data) ->
   { urls } = data
-  { issue_key, submitter, status, result, imported_at} = rd
+  { issue_key, submitter, status, result, imported_at, issue_status, issue_platform, issue_description, issue_summary} = rd
 
   if status == 'Awaiting Bast Verdict'
     status = '<span>PENDING <span class="import-note">| Awaiting Bast Verdict<span></span>'
@@ -71,11 +71,14 @@ window.build_single_row = (rd, data) ->
 
   row_data = {
     'Jira Ticket': "<span class='jira-ticket-id'>#{issue_key}</span>",
+    'Jira Summary': issue_summary,
+    'Jira Status': issue_status,
+    'Jira Description': issue_description,
+    'Jira Platform': issue_platform,
     'Submitter': submitter,
     'Imported On': imported_at,
-    'Import Status': status
+    'Import Status': status,
   }
-
   ticket_html = "<div class='row ticket-rows vis-ticket' id='#{issue_key}'><div class='col-xs-5 no-padding-left'>"
   #build upper data
   for title, content of row_data

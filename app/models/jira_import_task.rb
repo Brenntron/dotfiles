@@ -1,5 +1,5 @@
-class JiraImportTask < ApplicationRecord  
-  has_many :import_urls
+class JiraImportTask < ApplicationRecord
+  has_many :import_urls, dependent: :destroy
 
   validates :issue_key, presence: true, uniqueness: true
 
@@ -23,7 +23,11 @@ class JiraImportTask < ApplicationRecord
     'STATUS',
     'ISSUE_SUBMITTER',
     'BAST_TASK_ID',
-    'IMPORTED_AT'
+    'IMPORTED_AT',
+    'ISSUE_SUMMARY',
+    'ISSUE_DESCRIPTION',
+    'ISSUE_STATUS',
+    'ISSUE_PLATFORM'
   ]
 
   #Read CSV from Jira and send URLs to Bast
@@ -40,7 +44,6 @@ class JiraImportTask < ApplicationRecord
     end
 
     # fetch data from ticket attachment
-
     begin
       attachment_to_process = issue.attachments_data.first
     rescue
@@ -73,7 +76,7 @@ class JiraImportTask < ApplicationRecord
       update(status: STATUS_FAILURE, result: e.message)
     end
   end
-  # handle_asynchronously :process_import, :queue => "process_jira_import", :priority => 1
+  handle_asynchronously :process_import, :queue => "process_jira_import", :priority => 1
 
   def create_tickets
     return unless status == STATUS_AWAITING_BAST_VERDICT
@@ -193,6 +196,14 @@ class JiraImportTask < ApplicationRecord
               task.bast_task
             when 'IMPORTED_AT'
               task.imported_at.utc.iso8601
+            when 'ISSUE_STATUS'
+              task.issue_status
+            when 'ISSUE_DESCRIPTION'
+              task.issue_description
+            when 'ISSUE_PLATFORM'
+              task.issue_platform
+            when 'ISSUE_SUMMARY'
+              task.issue_summary
             end
           worksheet.add_cell(row_index, col_index, cell_data)
         end
