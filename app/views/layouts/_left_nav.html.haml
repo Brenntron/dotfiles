@@ -13,7 +13,7 @@
         %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav-icons'}
           - if is_rule_user?
             %li{class: 'ips-link'}
-              %a{href: '/bugs'}= inline_svg 'icon_snort.svg'
+              %a{href: '/bugs'}= inline_svg 'icon_snort.svg', class: 'sidenav-svg'
 
     - if is_rule_user? || can?(:index, any: [FileReputationDispute, Dispute, Complaint])
       %li{class: 'nav-escalations'}
@@ -23,26 +23,26 @@
           - if is_rule_user?
             %li{class: 'ips-link'}
               %a{href: '/escalation_bugs'}
-                =inline_svg 'icon_snort.svg'
+                =inline_svg 'icon_snort.svg', class: 'sidenav-svg'
           - if can?(:read, Admin)
             %li{class: 'clam-link disabled-link'}
-              %a.disabled-link= inline_svg 'icon_clam.svg'
+              %a.disabled-link= inline_svg 'icon_clam.svg', class: 'sidenav-svg'
           - if can?(:index, FileReputationDispute)
             %li{class: 'amp-link'}
               %a{href: escalations_file_rep_disputes_path + "?f=open", id: 'amp-icon-link'}
-                = inline_svg 'icon_filerep_tix_grey.svg'
+                = inline_svg 'icon_filerep_tix_grey.svg', class: 'sidenav-svg'
           - if can?(:index, Dispute)
             %li{class: 'rep-link'}
               %a{href: escalations_webrep_disputes_path + "?f=unassigned", id: 'rep-icon-link'}
-                =inline_svg 'icon_webrep_tix_grey.svg'
+                =inline_svg 'icon_webrep_tix_grey.svg', class: 'sidenav-svg'
           - if can?(:index, SenderDomainReputationDispute)
             %li{class: 'sdr-link'}
               %a{href: escalations_sdr_disputes_path + "?f=unassigned", id: 'sdr-icon-link'}
-                =inline_svg 'icon_sender_rep.svg'
+                =inline_svg 'icon_sender_rep.svg', class: 'sidenav-svg'
           - if can?(:index, Complaint)
             %li{class: 'cat-link'}
               %a{href: escalations_webcat_complaints_path, id: 'cat-icon-link'}
-                =inline_svg 'icon_cat.svg'
+                =inline_svg 'icon_cat.svg', class: 'sidenav-svg'
     %li{class: 'nav-item nav-users'}
       %a{href: escalations_users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
 
@@ -53,10 +53,10 @@
         %ul#admin-subnav-icons.sub-nav.collapse.admin-subnav
           %li.acr-admin-link
             %a{href: '/admin'}
-              =inline_svg 'icon_bug_grey.svg'
+              =inline_svg 'icon_bug_grey.svg', class: 'sidenav-svg'
           %li.ace-admin-link
             %a{href: '/escalations/admin'}
-              =inline_svg 'icon_escalations_grey.svg'
+              =inline_svg 'icon_escalations_grey.svg', class: 'sidenav-svg'
 
     %li{class: 'nav-docs'}
       %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
@@ -64,14 +64,14 @@
       %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav-icons'}
         %li{class: 'wiki-link'}
           %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'}
-            =inline_svg 'confluence-brands.svg'
+            =inline_svg 'confluence-brands.svg', class: 'sidenav-svg'
         %li{class: 'release-link'}
           - if !@version.nil?
             %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"}
-              =inline_svg 'confluence-brands.svg'
+              =inline_svg 'confluence-brands.svg', class: 'sidenav-svg'
           - else
             %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349"}
-              =inline_svg 'confluence-brands.svg'
+              =inline_svg 'confluence-brands.svg', class: 'sidenav-svg'
 
   #sidenav-menu-div
     %ul{class: 'nav-container'}

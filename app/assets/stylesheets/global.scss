@@ -1984,7 +1984,7 @@ button.close {
   z-index: 100;
   @include box-shadow($dropshadow);
 
-  .st0 {
+  .sidenav-svg {
     fill: $type-base-color;
   }
 }
