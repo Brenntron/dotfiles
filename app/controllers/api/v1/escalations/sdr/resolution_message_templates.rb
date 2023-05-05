@@ -6,6 +6,15 @@ module API
           include API::V1::Defaults
           resource "escalations/sdr/resolution_message_templates" do
 
+            desc "get a filtered resolution message templates by resolution"
+            params do
+              requires :resolution, type: String, desc: "Resolution of the resolution message template"
+            end
+
+            get  "", root: "resolution_message_template" do
+              ResolutionMessageTemplate.by_sdr_reputation_disputes(params[:resolution]).to_json
+            end
+
             desc "get a resolution message template"
             params do
               requires :id, type: String, desc: "ID of the resolution message template"

@@ -259,26 +259,30 @@ $ ->
       $(res_comment[0]).val('')
 
 
-  $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change ->
+  $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change (e) ->
     if $('input[name=filerep-dispute-customer-company-name]').val() != 'Guest'
       is_customer = true
 
-    $(".resolution-status-comment").html('')
-    resolution_comment = ''
-    switch @value
-      when 'FIXED_FP'
-        resolution_comment += "Talos has concluded that the file is safe to access at this time; the file has been marked unknown/clean. This update will be publicly visible in the next 24 hours."
-        if is_customer
-          resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
-      when 'FIXED_FN'
-        resolution_comment += "Talos has concluded that the file is unsafe due to malicious activity; the file has been marked malicious. This update will be publicly visible in the next 24 hours."
-        if is_customer
-          resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
-      when 'UNCHANGED'
-        resolution_comment += "Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file's disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file's disposition, if they understand the risks in doing so."
-        if is_customer
-          resolution_comment += " Please open a TAC case and provide additional details if you need further assistance."
-    $(".resolution-status-comment").html(resolution_comment)
+    resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+
+    get_resolution_templates_by_resolution('file_rep', resolution_type).then (response) ->
+      resolution_select = $('#filerep-resolution-message-template-select.resolution-message-template-select')
+      resolution_select.empty()
+      templates = JSON.parse response
+
+      $(templates).each (index, template) ->
+        template_option = $("<option class='filerep-resolution-template-option'></option>")
+        $(template_option).val template.name
+        $(template_option).text template.name
+        $(template_option).attr('data-body', template.body )
+        $(template_option).attr('data-description', template.description )
+        resolution_select.append template_option
+
+        #show first option as body and description
+        if index == 0
+
+          $('.ticket-resolution-description').text template.description
+          $('.resolution-status-comment').text template.body
 
   # note: this function below affects the global space, can be accessed everywhere
   # these window-level funcs should probably be moved into a "global JS" file when time available
