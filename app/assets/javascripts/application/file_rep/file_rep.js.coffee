@@ -237,6 +237,12 @@ $ ->
       stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
       $('#ticket-non-res-submit').hide()
       $(stat_comment).val('')
+
+      #check first resolution checkbox if none selected
+      if !($("input.ticket-resolution-radio").is(':checked'))
+        $('input#FIXED_FP').prop('checked', true)
+        populate_resolved_filerep_templates('Fixed - FP')
+
     else
       $('#ticket-non-res-submit').show()
       res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
@@ -258,17 +264,17 @@ $ ->
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
 
-
-  $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change () ->
-    if $('input[name=filerep-dispute-customer-company-name]').val() != 'Guest'
-      is_customer = true
-
-    resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+  window.populate_resolved_filerep_templates = (resolution_type) ->
 
     get_resolution_templates_by_resolution('file_rep', resolution_type).then (response) ->
       resolution_select = $('#filerep-resolution-message-template-select.resolution-message-template-select')
       resolution_select.empty()
       templates = JSON.parse response
+
+      if templates.length == 0
+        resolution_select.val ''
+        $('.ticket-resolution-description').text ''
+        $('.ticket-resolution-comment').val ''
 
       $(templates).each (index, template) ->
         template_option = $("<option class='filerep-resolution-template-option'></option>")
@@ -282,6 +288,13 @@ $ ->
         if index == 0
           $('.ticket-resolution-description').text template.description
           $('.resolution-status-comment').text template.body
+
+  $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change () ->
+    if $('input[name=filerep-dispute-customer-company-name]').val() != 'Guest'
+      is_customer = true
+
+    resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+    populate_resolved_filerep_templates(resolution_type)
 
   # note: this function below affects the global space, can be accessed everywhere
   # these window-level funcs should probably be moved into a "global JS" file when time available

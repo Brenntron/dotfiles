@@ -858,6 +858,12 @@ $ ->
       stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
       $('#ticket-non-res-submit').hide()
       $(stat_comment).val('')
+
+      #check first resolution checkbox if none selected
+      if !($("input.ticket-resolution-radio").is(':checked'))
+        $('input#FIXED_FP').prop('checked', true)
+        populate_resolved_webrep_templates('Fixed - FP')
+
     else
       $('#ticket-non-res-submit').show()
       res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
@@ -1597,6 +1603,32 @@ $ ->
       alert('No disputes selected')
 
 
+  window.populate_resolved_webrep_templates = (resolution_type) ->
+
+    get_resolution_templates_by_resolution('webrep', resolution_type).then (response) ->
+      resolution_select = $('#webrep-resolution-message-template-select.resolution-message-template-select')
+      resolution_select.empty()
+      templates = JSON.parse response
+
+      if templates.length == 0
+        resolution_select.val ''
+        $('.ticket-resolution-description').text ''
+        $('.ticket-resolution-comment').val ''
+
+      $(templates).each (index, template) ->
+        template_option = $("<option class='webrep-resolution-template-option'></option>")
+        $(template_option).val template.name
+        $(template_option).text template.name
+        $(template_option).attr('data-body', template.body )
+        $(template_option).attr('data-description', template.description )
+        resolution_select.append template_option
+
+        #show first option as body and description
+        if index == 0
+          $('.ticket-resolution-comment').val template.body
+          $('.ticket-resolution-description').text template.description
+
+
   $('#webrep-resolution-selector input[type=radio][name=dispute-resolution]').change (event)->
     submission_type = $('input[name=webrep-dispute-submission-type').val()
     submitter_type = $('input[name=webrep-dispute-submitter-type]').val()
@@ -1608,24 +1640,7 @@ $ ->
       $(".ticket-resolution-comment").html('')
       messageId = $(event.target).data('id')
       resolution_data = get_resolution_comment(@value, is_customer, messageId)
-
-      get_resolution_templates_by_resolution('webrep', resolution_data.resolution_type).then (response) ->
-        resolution_select = $('#webrep-resolution-message-template-select.resolution-message-template-select')
-        resolution_select.empty()
-        templates = JSON.parse response
-
-        $(templates).each (index, template) ->
-          template_option = $("<option class='webrep-resolution-template-option'></option>")
-          $(template_option).val template.name
-          $(template_option).text template.name
-          $(template_option).attr('data-body', template.body )
-          $(template_option).attr('data-description', template.description )
-          resolution_select.append template_option
-
-          #show first option as body and description
-          if index == 0
-            $('.ticket-resolution-comment').val template.body
-            $('.ticket-resolution-description').text template.description
+      populate_resolved_webrep_templates(resolution_data.resolution_type)
 
 
   $('#webrep-entry-resolution-selector input[type=radio][name=entry-resolution]').change (event)->

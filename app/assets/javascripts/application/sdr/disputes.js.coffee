@@ -93,6 +93,12 @@ $ ->
       stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
       $('#ticket-non-res-submit').hide()
       $(stat_comment).val('')
+      # check first resolution checkbox (and Fixed-FP parent) if none checked after opening
+      if !($("input.ticket-resolution-radio").is(':checked'))
+        $('input#FIXED_FP').prop('checked', true)
+        $('#FIXED_FP_SUDDEN_SPIKE').prop('checked', true)
+        populate_resolved_sdr_templates('Fixed - FP: Sudden Spike')
+
     else
       $('#ticket-non-res-submit').show()
       res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
@@ -152,16 +158,7 @@ $ ->
         $('#advanced-search-dropdown').show()
     )
 
-  $('#sdr-resolution-selector input.sdr-ticket-resolution-radio').click (event)->
-    fixed_fp_message_types = ['Fixed - FP: Sudden Spike', 'Fixed - FP: Domain Age', 'Fixed - FP: Negative Webrep']
-
-    resolution_type = $(event.target.closest('input')).attr('data-saved-resolution-type')
-    #uncheck Fixed - FP choices if clicking outside Fixed - FP
-    if resolution_type in fixed_fp_message_types
-      $("input[name='dispute-resolution']").prop('checked', false)
-      $('input#FIXED_FP').prop('checked', true)
-    else
-      $("input[name='dispute-preset-resolution']").prop('checked', false)
+  window.populate_resolved_sdr_templates = (resolution_type) ->
 
     get_resolution_templates_by_resolution('sdr', resolution_type).then (response) ->
       resolution_select = $('#sdr-resolution-message-template-select.resolution-message-template-select')
@@ -185,6 +182,19 @@ $ ->
         if index == 0
           $('.ticket-resolution-description').text template.description
           $('.ticket-resolution-comment').text template.body
+
+  $('#sdr-resolution-selector input.sdr-ticket-resolution-radio').click (event)->
+    fixed_fp_message_types = ['Fixed - FP: Sudden Spike', 'Fixed - FP: Domain Age', 'Fixed - FP: Negative Webrep']
+
+    resolution_type = $(event.target.closest('input')).attr('data-saved-resolution-type')
+    #uncheck Fixed - FP choices if clicking outside Fixed - FP
+    if resolution_type in fixed_fp_message_types
+      $("input[name='dispute-resolution']").prop('checked', false)
+      $('input#FIXED_FP').prop('checked', true)
+    else
+      $("input[name='dispute-preset-resolution']").prop('checked', false)
+
+    populate_resolved_sdr_templates(resolution_type)
 
 window.initialize_sdr_disputes_datatable = () ->
   $('#sdr-disputes-index').DataTable(
