@@ -259,7 +259,7 @@ $ ->
       $(res_comment[0]).val('')
 
 
-  $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change (e) ->
+  $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change () ->
     if $('input[name=filerep-dispute-customer-company-name]').val() != 'Guest'
       is_customer = true
 
@@ -280,7 +280,6 @@ $ ->
 
         #show first option as body and description
         if index == 0
-
           $('.ticket-resolution-description').text template.description
           $('.resolution-status-comment').text template.body
 

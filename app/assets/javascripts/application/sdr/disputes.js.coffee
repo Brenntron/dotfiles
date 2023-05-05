@@ -153,24 +153,38 @@ $ ->
     )
 
   $('#sdr-resolution-selector input.sdr-ticket-resolution-radio').click (event)->
-    fixed_fp_message_types = ['FIXED_FP_SUDDEN_SPIKE', 'FIXED_FP_DOMAIN_AGE', 'FIXED_FP_NEGATIVE_WEBREP']
+    fixed_fp_message_types = ['Fixed - FP: Sudden Spike', 'Fixed - FP: Domain Age', 'Fixed - FP: Negative Webrep']
 
-    resolution_comments =
-      'FIXED_FP_SUDDEN_SPIKE': 'The domain was impacted due to Talos sensors observing suspicious behavior typically indicative of spamming. This behavior is no longer observed and the reputation has been adjusted accordingly.'
-      'FIXED_FP_DOMAIN_AGE': 'The domains were penalized by SDR due to a combination of domain registration and sending attributes prevalent in spam sending domains. The issue has been rectified and the domain reputation has been adjusted accordingly.'
-      'FIXED_FP_NEGATIVE_WEBREP': 'This domain was penalized by SDR as it used to have a Untrusted Web Reputation score due to malicious or suspicious behavior. The issue has been rectified and the domain reputation has been adjusted accordingly.'
-      'FIXED_FN': "Talos has concluded that the submission has been associated with recent spam campaigns; the submission's reputation has been decreased. This update will be publicly visible in the next 24 hours."
-      'UNCHANGED': "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission's reputation because it can negatively affect our customers."
-    value = $(event.target.closest('input')).val()
-    comment = resolution_comments[value] || ''
-    if  value in fixed_fp_message_types
+    resolution_type = $(event.target.closest('input')).attr('data-saved-resolution-type')
+    #uncheck Fixed - FP choices if clicking outside Fixed - FP
+    if resolution_type in fixed_fp_message_types
       $("input[name='dispute-resolution']").prop('checked', false)
       $('input#FIXED_FP').prop('checked', true)
     else
       $("input[name='dispute-preset-resolution']").prop('checked', false)
 
-    $(".ticket-resolution-comment").html(comment)
+    get_resolution_templates_by_resolution('sdr', resolution_type).then (response) ->
+      resolution_select = $('#sdr-resolution-message-template-select.resolution-message-template-select')
+      resolution_select.empty()
+      templates = JSON.parse response
 
+      if templates.length == 0
+        resolution_select.val ''
+        $('.ticket-resolution-description').text ''
+        $('.ticket-resolution-comment').text ''
+
+      $(templates).each (index, template) ->
+        template_option = $("<option class='sdr-resolution-template-option'></option>")
+        $(template_option).val template.name
+        $(template_option).text template.name
+        $(template_option).attr('data-body', template.body )
+        $(template_option).attr('data-description', template.description )
+        resolution_select.append template_option
+
+        #show first option as body and description
+        if index == 0
+          $('.ticket-resolution-description').text template.description
+          $('.ticket-resolution-comment').text template.body
 
 window.initialize_sdr_disputes_datatable = () ->
   $('#sdr-disputes-index').DataTable(

@@ -35,7 +35,10 @@ $ ->
     $('#editResolutionMessageTemplatesDialog').dialog 'close'
 
   window.get_resolution_template_data = (action)->
+
+
     name: $(".#{action} input[name=name]").val()
+
     resolution_type:  $(".#{action} select[name=resolution_type]").val();
     description: $(".#{action} textarea[name=description]").val();
     body: $(".#{action} textarea[name=body]").val();
@@ -43,7 +46,6 @@ $ ->
 
   # Create new resolution message template
   window.create_resolution_message_template = (type) ->
-    data = get_resolution_template_data('create')
     std_msg_ajax(
       method: 'POST'
       url: "/escalations/api/v1/escalations/#{type}/resolution_message_templates"
