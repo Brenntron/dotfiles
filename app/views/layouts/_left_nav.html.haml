@@ -65,7 +65,7 @@
         %li{class: 'wiki-link'}
           %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'}
             =inline_svg 'confluence-brands.svg'
-        %li{class: 'github-link'}
+        %li{class: 'release-link'}
           - if !@version.nil?
             %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"}
               =inline_svg 'confluence-brands.svg'
@@ -144,7 +144,7 @@
         %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav'}
           %li{class: 'wiki-link'}
             %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'} Doc
-          %li{class: 'github-link'}
+          %li{class: 'release-link'}
             - if !@version.nil?
               %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"} V #{@version}
             - else
