@@ -43,6 +43,7 @@ class Dispute < ApplicationRecord
   PRIORITY_5 = 'P5'
 
   PRIORITIES = [PRIORITY_1, PRIORITY_2, PRIORITY_3, PRIORITY_4, PRIORITY_5]
+  SIMPLE_DATE_FORMAT = '%Y-%m-%d'
 
   # It's possible that some of this is duplicates of the above but I'm too scared to try and consolidate
   # them. These strings apply specifically to the "Status" dropdown on **Disputes**. To edit these strings

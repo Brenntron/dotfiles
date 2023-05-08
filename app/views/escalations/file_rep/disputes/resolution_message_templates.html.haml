@@ -33,14 +33,10 @@
             %td.se-resolution-table-name=template.name
             %td=template.resolution_type
             %td=template.description
-            %td=template.created_at
-            %td
-            %td
-            %td
-            -#%td=template.created_at.strftime(Bug::DATE_FORMAT)
-            -#%td=template.creator&.display_name
-            -#%td=template.updated_at.strftime(Bug::DATE_FORMAT)
-            -#%td=template.editor&.display_name
+            %td=template.created_at.strftime(Dispute::SIMPLE_DATE_FORMAT)
+            %td=template.creator&.display_name
+            %td=template.updated_at.strftime(Dispute::SIMPLE_DATE_FORMAT)
+            %td=template.editor&.display_name
 
             %td
               - if current_user.has_role?('filerep manager') || current_user.has_role?('manager')
