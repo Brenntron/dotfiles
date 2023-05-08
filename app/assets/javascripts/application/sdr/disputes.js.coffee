@@ -168,7 +168,7 @@ $ ->
       if templates.length == 0
         resolution_select.val ''
         $('.ticket-resolution-description').text ''
-        $('.ticket-resolution-comment').text ''
+        $('.ticket-resolution-comment').val ''
 
       $(templates).each (index, template) ->
         template_option = $("<option class='sdr-resolution-template-option'></option>")
@@ -181,7 +181,7 @@ $ ->
         #show first option as body and description
         if index == 0
           $('.ticket-resolution-description').text template.description
-          $('.ticket-resolution-comment').text template.body
+          $('.ticket-resolution-comment').val template.body
 
   $('#sdr-resolution-selector input.sdr-ticket-resolution-radio').click (event)->
     fixed_fp_message_types = ['Fixed - FP: Sudden Spike', 'Fixed - FP: Domain Age', 'Fixed - FP: Negative Webrep']
