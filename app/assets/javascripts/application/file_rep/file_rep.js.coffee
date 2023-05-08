@@ -250,6 +250,13 @@ $ ->
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
 
+  # Filerep index page trigger resolution select
+  $('.fr-ticket-status-radio-label-index').click ->
+    radio_button = $(this).prev('.ticket-status-radio')
+    $(radio_button[0]).trigger('click')
+    if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+      populate_resolved_filerep_templates('Fixed - FP')
+
   # Displays comment/resolution modal depending for FileRep Status radio buttons
   $('.fr-ticket-status-radio').click ->
     if $(this)[0].id == 'file-status-closed'
@@ -274,7 +281,7 @@ $ ->
       if templates.length == 0
         resolution_select.val ''
         $('.ticket-resolution-description').text ''
-        $('.ticket-resolution-comment').val ''
+        $('.resolution-status-comment').val ''
 
       $(templates).each (index, template) ->
         template_option = $("<option class='filerep-resolution-template-option'></option>")
@@ -287,12 +294,15 @@ $ ->
         #show first option as body and description
         if index == 0
           $('.ticket-resolution-description').text template.description
-          $('.resolution-status-comment').text template.body
+          $('.resolution-status-comment').val template.body
 
+  # Filerep show page resolution select
   $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change () ->
-    if $('input[name=filerep-dispute-customer-company-name]').val() != 'Guest'
-      is_customer = true
+    resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+    populate_resolved_filerep_templates(resolution_type)
 
+  # Filerep index page resolution select
+  $('#filerep-resolution-selector input[type=radio][name=ticket-resolution]').change () ->
     resolution_type = $(this).siblings('.ticket-res-radio-label').text()
     populate_resolved_filerep_templates(resolution_type)
 

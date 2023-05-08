@@ -7228,6 +7228,16 @@ td.ticket-total::before {
   margin-top: -56px;
 }
 
+#index-ticket-resolution-submenu {
+  width: 475px;
+  .resolution-status-comment{
+    min-height: 186px;
+    height: 105px;
+    font-size: 12px;
+    line-height: 1.4em;
+  }
+}
+
 .non-resolution-submit-wrapper {
   display: none;
 }
