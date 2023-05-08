@@ -4174,19 +4174,6 @@ input.communication-subject {
   font-weight: 700;
 }
 
-.select-resolution-message-templates-button {
-  background-image: url(image_path('icon_comment_template_dk_grey.svg'));
-  background-repeat: no-repeat;
-  background-position: 0 0px;
-  background-size: 18px 18px;
-  height: 24px;
-  display: inline-block;
-  background-color: transparent;
-  border: none;
-  font-weight: 300;
-  font-size: 9pt;
-}
-
 .note-info-item {
   display: inline-block;
 }
@@ -6620,10 +6607,6 @@ textarea.ticket-resolution-comment {
   min-height: 40px;
 }
 
-.non-resolution-submit-wrapper .content-label-sm {
-  margin-top: 12px;
-}
-
 .sdr-non-resolution-submit-wrapper .content-label-sm {
   margin-top: 0;
   padding-top: 0;
@@ -7189,7 +7172,6 @@ td.ticket-total::before {
   min-width: 200px;
   top: 0;
   left: 100%;
-  height: 100%;
 }
 
 .sdr-non-resolution-submit-wrapper {

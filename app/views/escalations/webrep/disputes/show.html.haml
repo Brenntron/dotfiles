@@ -119,14 +119,6 @@
                       %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
 
                   %li.non-resolution-submit-wrapper#ticket-non-res-submit
-                    %center{class: 'select-resolution-message-templates-button'}
-                      %p{class:'select-a-template'} Select A Template
-                    %select.dropdown.resolution-message-template-select#select-new-resolution-message-template-status
-                      -if ResolutionMessageTemplate.for_disputes.in_progress.empty?
-                        %option.hidden{value:'', disabled: true, selected: true} No Templates Created
-                      -else
-                        %option{value:'', disabled: true, selected: true} No Template Selected
-                        =options_for_select(ResolutionMessageTemplate.for_disputes.in_progress.pluck(:name, :id))
                     %label.content-label-sm
                       Comment
                     %textarea.ticket-status-comment
