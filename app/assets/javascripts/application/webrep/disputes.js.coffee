@@ -862,7 +862,7 @@ $ ->
       #check first resolution checkbox if none selected
       if !($("input.ticket-resolution-radio").is(':checked'))
         $('input#FIXED_FP').prop('checked', true)
-        populate_resolved_webrep_templates('Fixed - FP')
+        populate_resolved_webrep_templates('Fixed - FP', 'ticket')
 
     else
       $('#ticket-non-res-submit').show()
@@ -884,6 +884,12 @@ $ ->
           stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
           $('#ticket-non-res-submit').hide()
           $(stat_comment).val('')
+
+          #check first resolution checkbox if none selected
+          if !($("input.ticket-resolution-radio").is(':checked'))
+            $('input#FIXED_FP').prop('checked', true)
+            populate_resolved_webrep_templates('Fixed - FP', 'entry')
+
         else
           $('#ticket-non-res-submit').show()
           res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
@@ -1602,18 +1608,16 @@ $ ->
     else
       alert('No disputes selected')
 
-
-  window.populate_resolved_webrep_templates = (resolution_type) ->
-
+  window.populate_resolved_webrep_templates = (resolution_type, ticket_or_entry) ->
     get_resolution_templates_by_resolution('webrep', resolution_type).then (response) ->
-      resolution_select = $('#webrep-resolution-message-template-select.resolution-message-template-select')
+      resolution_select = $("#webrep-#{ticket_or_entry}-resolution-message-template-select.resolution-message-template-select")
       resolution_select.empty()
       templates = JSON.parse response
 
       if templates.length == 0
         resolution_select.val ''
-        $('.ticket-resolution-description').text ''
-        $('.ticket-resolution-comment').val ''
+        $(".#{ticket_or_entry}-resolution-description").text ''
+        $(".#{ticket_or_entry}-status-comment").val ''
 
       $(templates).each (index, template) ->
         template_option = $("<option class='webrep-resolution-template-option'></option>")
@@ -1625,24 +1629,20 @@ $ ->
 
         #show first option as body and description
         if index == 0
-          $('.ticket-resolution-comment').val template.body
-          $('.ticket-resolution-description').text template.description
+          $(".#{ticket_or_entry}-status-comment").val template.body
+          $(".#{ticket_or_entry}-resolution-description").text template.description
 
-
+  #show page ticket resolution select
   $('#webrep-resolution-selector input[type=radio][name=dispute-resolution]').change (event)->
     submission_type = $('input[name=webrep-dispute-submission-type').val()
     submitter_type = $('input[name=webrep-dispute-submitter-type]').val()
-    #Only fill comment if web type submission
     if submission_type == 'w' && submitter_type != "INTERNAl"
       if submitter_type == 'CUSTOMER'
         is_customer = true
+      resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+      populate_resolved_webrep_templates(resolution_type.trim(), 'ticket')
 
-      $(".ticket-resolution-comment").html('')
-      messageId = $(event.target).data('id')
-      resolution_data = get_resolution_comment(@value, is_customer, messageId)
-      populate_resolved_webrep_templates(resolution_data.resolution_type)
-
-
+  #single entry in show page resolution select
   $('#webrep-entry-resolution-selector input[type=radio][name=entry-resolution]').change (event)->
     submission_type = $('input[name=webrep-dispute-submission-type').val()
     submitter_type = $('input[name=webrep-dispute-submitter-type]').val()
@@ -1650,12 +1650,10 @@ $ ->
     if submission_type == 'w' && submitter_type != "INTERNAl"
       if submitter_type == 'CUSTOMER'
         is_customer = true
-      $('#webrep-entry-resolution-comment').html('')
-      messageId = $(event.target).data('id')
-      resolution_comment = get_resolution_comment(@value, is_customer, messageId)
-      $("#webrep-entry-resolution-comment").html(resolution_comment)
+      resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+      populate_resolved_webrep_templates(resolution_type.trim(), 'ticket')
 
-
+  #resolution select for ticket(s) on index table
   $('#index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change (event)->
     $(".ticket-status-comment").html('')
     submission_types = []
@@ -1681,12 +1679,12 @@ $ ->
       if submission_type == 'w' && submitter_type != 'INTERNAl'
         if submitter_type == 'CUSTOMER'
           is_customer = true
-        messageId = $(event.target).data('id')
-        resolution_comment = get_resolution_comment(@value, is_customer, messageId)
-        $(".ticket-status-comment").html(resolution_comment)
 
+        resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+        populate_resolved_webrep_templates(resolution_type.trim(), 'ticket')
+
+  #resolution select for entries on index table
   $('#index-entry-resolution-submenu input[type=radio][name=entry-resolution]').change (event)->
-    $("#entry-status-comment").html('')
     checkboxes = $('#disputes-index').find('.dispute-entry-checkbox')
     submission_types = []
     submitter_types = []
@@ -1709,55 +1707,12 @@ $ ->
       submission_type = submission_types[0]
       submitter_type = submitter_types[0]
 
-      if submission_type == 'w' && submitter_type != 'INTERNAl'
+      if submission_type == 'w'
         if submitter_type == 'CUSTOMER'
           is_customer = true
-        messageId = $(event.target).data('id')
-        resolution_comment = get_resolution_comment(@value, is_customer, messageId)
-        $("#entry-status-comment").html(resolution_comment)
 
-window.get_resolution_comment = (value, is_customer, messageId) ->
-  resolutionMessage = getResolutionMessageTemplate(messageId)
-  if resolutionMessage.description == 'UNCHANGED'
-    resolutionMessage.body = resolutionMessage.body + " Please open a TAC case and provide additional details if you need further assistance."
-  return resolutionMessage
-
-window.getResolutionMessageTemplate = (messageId)->
-  message = null
-  std_msg_ajax(
-      method: 'GET'
-      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{messageId}"
-      success_reload: false
-      async: false
-      success: (response) ->
-        message = response
-  )
-  message
-window.populate_entry_status_dropdown = (dispute_id) ->
-  std_msg_ajax(
-    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_id}"
-    method: 'GET'
-    data: {}
-    dataType: 'json'
-    success: (response) ->
-      response = JSON.parse(response)
-      status = response.status
-
-      $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true)
-  )
-
-window.populate_resolution_dropdown = (dispute_id) ->
-  std_msg_ajax(
-    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_resolution/#{dispute_id}"
-    method: 'GET'
-    data: {}
-    dataType: 'json'
-    success: (response) ->
-      response = JSON.parse(response)
-      status = response.status
-
-      $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true)
-  )
+        resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+        populate_resolved_webrep_templates(resolution_type, 'entry')
 
 window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))

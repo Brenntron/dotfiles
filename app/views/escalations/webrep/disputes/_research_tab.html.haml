@@ -386,7 +386,8 @@
                               .col-xs-6.submenu-left-wrapper#webrep-entry-resolution-selector
                                 .submenu-header
                                   Ticket Resolution
-                                = render 'escalations/shared/resolved_resolution_options', { dispute_resolution_name: 'entry-resolution' }
+
+                                = render 'escalations/webrep/disputes/resolved_resolution_options', { dispute_resolution_name: 'entry-resolution' }
                               .col-xs-6.submenu-right-wrapper
                                 .resolution-comment-wrapper
                                   %label.content-label-sm

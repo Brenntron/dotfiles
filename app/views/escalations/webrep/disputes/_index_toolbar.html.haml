@@ -137,12 +137,19 @@
               .col-xs-6.submenu-left-wrapper
                 .submenu-header
                   Ticket Resolution
-                = render 'escalations/shared/resolved_resolution_options', { dispute_resolution_name: 'ticket-resolution' }
+                = render 'escalations/webrep/disputes/resolved_resolution_options',  { dispute_resolution_name: 'ticket-resolution' }
+
               .col-xs-6.submenu-right-wrapper
                 .resolution-comment-wrapper
+                  %label.content-label-sm
+                    Template
+                  %select#webrep-ticket-resolution-message-template-select.resolution-message-template-select
+                  %label.content-label-sm
+                    Description
+                  %p.ticket-resolution-description
                   %label.content-label-sm.customer-facing-comment
                     Customer Facing Comment
-                  %textarea.ticket-status-comment
+                  %textarea.ticket-status-comment.ticket-resolution-comment
                   .button-row-center
                     %button.primary.change_ticket_status_button{type:'button', id:'webrep_resolve_ticket', onclick:'change_ticket_status();'}
                       Submit
@@ -153,7 +160,7 @@
           %li.non-resolution-submit-wrapper#ticket-non-res-submit
             %label.content-label-sm
               Comment
-            %textarea.ticket-status-comment
+            %textarea.ticket-status-comment.ticket-resolution-comment
             .button-row-center
               %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'change_ticket_status();'}
                 Submit
@@ -232,14 +239,20 @@
             %input.entry-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'ENTRY_RESOLVED_CLOSED', value: 'RESOLVED_CLOSED'}
             %label.entry-status-radio-label.radio-label{for: 'ENTRY_RESOLVED_CLOSED'} Resolved / Closed
             .dropdown-menu#index-entry-resolution-submenu
-              .col-xs-6.submenu-left-wrapper
+              .col-xs-66.submenu-left-wrapper
                 .submenu-header
                   Entry Resolution
-                = render 'escalations/shared/resolved_resolution_options',  { dispute_resolution_name: 'entry-resolution' }
+                = render 'escalations/webrep/disputes/resolved_resolution_options',  { dispute_resolution_name: 'entry-resolution' }
               .col-xs-6.submenu-right-wrapper
                 .resolution-comment-wrapper
-                  %label.content-label-sm.customer-facing-comment
-                    Customer Facing Comment
+                  %label.content-label-sm
+                    Template
+                  %select#webrep-entry-resolution-message-template-select.resolution-message-template-select
+                  %label.content-label-sm
+                    Description
+                  %p.entry-resolution-description
+                  %label.content-label-sm
+                    Comment
                   %textarea.entry-status-comment#entry-status-comment
                   .button-row-center
                     %button.primary{onclick: "toolbar_index_edit_status()"}
