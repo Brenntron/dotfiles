@@ -38,7 +38,7 @@
           - if can?(:index, SenderDomainReputationDispute)
             %li{class: 'sdr-link'}
               %a{href: escalations_sdr_disputes_path + "?f=unassigned", id: 'sdr-icon-link'}
-                =inline_svg 'icon_sender_rep.svg', class: 'sidenav-svg'
+                =inline_svg 'icon_sender_domain_tix.svg', class: 'sidenav-svg'
           - if can?(:index, Complaint)
             %li{class: 'cat-link'}
               %a{href: escalations_webcat_complaints_path, id: 'cat-icon-link'}
@@ -67,10 +67,10 @@
             =inline_svg 'confluence-brands.svg', class: 'sidenav-svg'
         %li{class: 'release-link'}
           - if !@version.nil?
-            %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"}
+            %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}", target: '_blank'}
               =inline_svg 'confluence-brands.svg', class: 'sidenav-svg'
           - else
-            %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349"}
+            %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349", target: '_blank'}
               =inline_svg 'confluence-brands.svg', class: 'sidenav-svg'
 
   #sidenav-menu-div
@@ -81,12 +81,12 @@
       - if is_rule_user?
         %li{class: 'nav-bugs'}
           %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
-            Bugs
+            Snort Research Bugs
 
           %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav'}
             - if is_rule_user?
               %li{class: 'ips-link'}
-                %a{href: '/bugs'} IPS
+                %a{href: '/bugs'} Snort Research Bugs
             - if can?(:read, Admin)
               %li{class: 'clam-link disabled-link'}
                 %a.disabled-link Clam
@@ -103,11 +103,11 @@
       - if is_rule_user? || can?(:index, any: [ FileReputationDispute, Dispute, Complaint ])
         %li{class: 'nav-escalations'}
           %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
-            Escalations
+            Snort Escalations
           %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav'}
             - if is_rule_user?
               %li{class: 'ips-link'}
-                %a{href: '/escalation_bugs'} IPS
+                %a{href: '/escalation_bugs'} Snort Escalations
             - if can?(:read, Admin)
               %li{class: 'clam-link disabled-link'}
                 %a.disabled-link Clam
@@ -143,12 +143,12 @@
           Docs
         %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav'}
           %li{class: 'wiki-link'}
-            %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'} Doc
+            %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'} User Docs
           %li{class: 'release-link'}
             - if !@version.nil?
-              %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"} V #{@version}
+              %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}", target: '_blank'} V #{@version}
             - else
-              %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349"} Release Notes
+              %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349", target: '_blank'} Release Notes
 
 
   .copyright-area

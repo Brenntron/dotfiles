@@ -1985,7 +1985,9 @@ button.close {
   @include box-shadow($dropshadow);
 
   .sidenav-svg {
-    fill: $type-base-color;
+    .st0, path {
+      fill: $type-base-color;
+    }
   }
 }
 
@@ -1995,24 +1997,24 @@ button.close {
 
 #sidenav-menu-div {
   background-color: $sidebar-nav-base;
-  display: block;
-  position: absolute;
-  color: $content-bg-color;
-  text-transform: uppercase;
-  font-weight: 700;
-  line-height: $sidebar-width;
-  z-index: -1;
-  width: 200px;
-  height: 100%;
-  top: 0;
   bottom: 0;
+  color: $content-bg-color;
+  display: block;
+  font-weight: 700;
+  height: 100%;
   left: 0;
-  -webkit-transform: translateX(-100%);
+  line-height: $sidebar-width;
+  position: absolute;
+  text-transform: uppercase;
+  top: 0;
   transform: translateX(-100%);
+  -webkit-transform: translateX(-100%);
   -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
   transition: -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
-  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
   transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  width: 210px;
+  z-index: -1;
 }
 
 #sidenav-menu-div a {
