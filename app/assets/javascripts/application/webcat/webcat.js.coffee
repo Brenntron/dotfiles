@@ -422,308 +422,628 @@ $ ->
     else
       $('#webcat-index-title')[0].innerHTML = 'All Tickets'
 
+
+
+  #### New complaints setup
   build_complaints_table = () ->
-        complaint_table = $('#complaints-index').DataTable(
-          initComplete: ->
-            input = $('.dataTables_filter input').unbind()
-            self = @api()
+    complaint_table = $('#complaints-index').DataTable(
+      initComplete: ->
+        input = $('.dataTables_filter input').unbind()
+        self = @api()
 
-            $searchButton = $('<button class="dt-button dt-search-button esc-tooltipped" title="Search">').click(->
-              self.search(input.val()).draw()
-              return
-            )
-            $clearButton = $('<button class="dt-button dt-search-clear-button esc-tooltipped" title="Clear">').click(->
-              input.val ''
-              $searchButton.click()
-              return
-            )
-            $('.dataTables_filter').append $clearButton, $searchButton
+        $searchButton = $('<button class="dt-button dt-search-button esc-tooltipped" title="Search">').click(->
+          self.search(input.val()).draw()
+          return
+        )
+        $clearButton = $('<button class="dt-button dt-search-clear-button esc-tooltipped" title="Clear">').click(->
+          input.val ''
+          $searchButton.click()
+          return
+        )
+        $('.dataTables_filter').append $clearButton, $searchButton
 
-            # properly init these search/clear icons
-            $('.dt-button').tooltipster
-              theme: [
-                'tooltipster-borderless'
-                'tooltipster-borderless-customized'
-                'tooltipster-borderless-comment'
-              ]
-
-            return
-          lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
-          processing: true
-          serverSide: true
-          stateSave: true
-          select: true
-          ajax:
-            url: url
-            data: build_data()
-            error: () ->
-              ###
-                If there is an error with the build_data call, the localstorage and url will be blown away
-                This will reset the search and filters
-              ###
-              refresh_localStorage()
-              refresh_url()
-            complete: ->
-              use_user_preference_filter()
-          drawCallback: ( settings ) ->
-            if localStorage.webcat_reset_page
-              localStorage.removeItem('webcat_reset_page')
-
-              setTimeout () ->
-                $('#complaints-index').DataTable().page(0).draw( true )
-              , 100
-
-            if localStorage.webcat_search_name
-              { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
-              ### check variables below
-                  text_check makes sure that the table doesn't have the named search with the same name being saved now
-                  search_name_check makes sure that the search is being saved as a named search
-                  Not super complicated, but that if statement was looking gross and confusing
-              ###
-              text_check = !window.find_saved_search_by_name(webcat_search_name)
-              search_name_check = webcat_search_name != ''
-              if webcat_search_type == 'advanced' && search_name_check && text_check
-                window.add_tmp_tr_to_named_search_list(webcat_search_name)
-                window.sort_named_search_list()
-
-          pagingType: 'full_numbers'
-          order: [ [
-            3
-            'desc'
-          ] ]
-          dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
-          language: {
-            search: "_INPUT_"
-            searchPlaceholder: "Search within table"
-          }
-          rowCallback: (row, data) ->
-            cell = @api().row(row).nodes().to$()
-            { is_important, was_dismissed } = data
-            if is_important
-              cell.addClass 'highlight-second-review'
-            if was_dismissed
-              cell.addClass 'highlight-was-dismissed'
-          columnDefs: [
-            {
-              targets: [ 0 ]
-              className: 'expandable-row-column'
-              searchable: false
-              orderable: false
-            }
-            {
-              targets: [1]
-              className: 'important-flag-col'
-              searchable: false
-              orderable: false
-            }
-            {
-              targets: [ 2 ]
-              className: 'entry-id-col'
-            }
-            {
-              targets: [ 3 ]
-              orderData: 18 #This is ordered by the age int column. Anytime the columns are changed this needs to be updated.
-            }
-            {
-              targets: [ 14 ]
-              className: 'submitter-col'
-            }
+        # properly init these search/clear icons
+        $('.dt-button').tooltipster
+          theme: [
+            'tooltipster-borderless'
+            'tooltipster-borderless-customized'
+            'tooltipster-borderless-comment'
           ]
-          columns: [
-              {
-                data: null
-                width: '14px'
-                orderable: false
-                searchable: false
-                sortable: false
-                render: ( data ) ->
-                  { entry_id } = data
-                  return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
-              }
-              {
-                data: null
-                orderable: false
-                searchable: false
-                sortable: false
-                defaultContent: '<span></span>'
-                width: '10px'
-                render: ( data )->
-                  { is_important, was_dismissed } = data
-                  if is_important == "true" && was_dismissed == "true"
-                      return '<div class="container-important-tags ">' +
-                        '<div class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></div>' +
-                        '<div class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></div>' +
-                        '</div>'
-                  else if is_important == "true" && was_dismissed == "false"
-                    return '<span class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
-                  else if is_important == "false" && was_dismissed == "true"
-                    return '<span class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></span>'
-              }
-              {
-                data: 'entry_id'
-                width: '50px'
-              }
-              {
-#               age column
-                width: '40px'
-                render: (data, type, full, meta) ->
-                  { age, status } = full
-                  unless status == 'COMPLETED' || status == 'RESOLVED'
-                    if age.indexOf('h') != -1 && age.indexOf('h') >= 3
-                      hour = parseInt( age.split("h")[0] )
-                      if hour>= 3 && hour < 12
-                        age_class = 'ticket-age-over3hr'
-                      else if hour >= 12
-                        age_class = 'ticket-age-over12hr'
-                    else if age.indexOf('mo') != -1
-                      age_class = 'ticket-age-over12hr'
-                    else if (age.indexOf('m') != -1) || (age.indexOf('s') != -1)
-                      age_class = ''
-                    else
-                      age_class = 'ticket-age-over12hr'
-                    return "<span class='#{age_class}'>#{age}</span>"
-                  # if status is "completed" or "resolved", no css class (orange/red) needed
-                  else
-                    return "<span>#{age}</span>"
-              }
-              {
-                data: 'status'
-                className: 'state-col'
-              }
-              {
-                data: 'tags'
-                render: ( data )->
 
-                  tag_items = '<span class="missing-data">No tags</span>'
+        return
+      lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
+      processing: true
+      serverSide: true
+      stateSave: true
+      select: true
+      ajax:
+        url: url
+        data: build_data()
+        error: () ->
+          ###
+            If there is an error with the build_data call, the localstorage and url will be blown away
+            This will reset the search and filters
+          ###
+#          refresh_localStorage()
+#          refresh_url()
+        complete: ->
+#          use_user_preference_filter()
+#      drawCallback: ( settings ) ->
+#        if localStorage.webcat_reset_page
+#          localStorage.removeItem('webcat_reset_page')
+#
+#          setTimeout () ->
+#            $('#complaints-index').DataTable().page(0).draw( true )
+#          , 100
+#
+#        if localStorage.webcat_search_name
+#          { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+#          ### check variables below
+#              text_check makes sure that the table doesn't have the named search with the same name being saved now
+#              search_name_check makes sure that the search is being saved as a named search
+#              Not super complicated, but that if statement was looking gross and confusing
+#          ###
+#          text_check = !window.find_saved_search_by_name(webcat_search_name)
+#          search_name_check = webcat_search_name != ''
+#          if webcat_search_type == 'advanced' && search_name_check && text_check
+#            window.add_tmp_tr_to_named_search_list(webcat_search_name)
+#            window.sort_named_search_list()
 
-                  if data && typeof data == 'string'
-                    tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
-                    tag_list = tags.split(',').map ( tag ) -> return tag.trim();
+      pagingType: 'full_numbers'
+      order: [ [
+        0
+        'desc'
+      ] ]
+      dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+      language: {
+        search: "_INPUT_"
+        searchPlaceholder: "Search within table"
+      }
+#      rowCallback: (row, data) ->
+#        cell = @api().row(row).nodes().to$()
+#        { is_important, was_dismissed } = data
+#        if is_important
+#          cell.addClass 'highlight-second-review'
+#        if was_dismissed
+#          cell.addClass 'highlight-was-dismissed'
+      columnDefs: [
+        {
+          targets: [0,1,2,3,4,5,6,7,8,9]
+          orderable: false
+        }
+      ]
+      columns: [
+        {
+          data: 'age'
+          className: 'ticket-col'
+          orderable: false
+          render: (data, type, full, meta) ->
 
-                    if tag_list.length >= 1
-                      tag_items = ''
-                      tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
-                      for tag in tag_list
-                        item = "<span class='tag-capsule' onclick='search_for_tag(\"#{tag}\")'>" + tag + "</span>"
-                        tag_items += item
+            console.log full.category
+            # refactor to use age_int
 
-                  tag_items
-              }
-              {
-#                subdomain column
-                data: 'subdomain'
-                render:(data,type,full,meta)->
-                  {subdomain, entry_id} = full
+            age_class = ''
+            unless full.status == 'COMPLETED' || full.status == 'RESOLVED'
+              if data.indexOf('h') != -1 && data.indexOf('h') >= 3
+                hour = parseInt( data.split("h")[0] )
+                if hour>= 3 && hour < 12
+                  age_class = 'ticket-age-over3hr'
+                else if hour >= 12
+                  age_class = 'ticket-age-over12hr'
+              else if data.indexOf('mo') != -1
+                age_class = 'ticket-age-over12hr'
+              else if (data.indexOf('m') != -1) || (data.indexOf('s') != -1)
+                age_class = ''
+              else
+                age_class = 'ticket-age-over12hr'
 
-                  if subdomain
-                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + subdomain + '</span>'
-                  else
-                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + '</span>'
-                width: '50px'
-              }
-              {
-                data: 'domain'
-                render:( data, type, full, meta )->
-                  { domain, ip_address, entry_id, subdomain, path } = full
-                  data_full = ''
-                  if subdomain != ''
-                    subdomain += '.'
-                    data_full = subdomain
-                  if domain != ''
-                    data_full += domain
-                  if path != ''
-                    data_full += path
-                  if ip_address != ''
-                    data_full = ip_address
-                  if data_full != ''
-                    data_full = "data-full=" + data_full
-                  title = "title=" + domain
-                  if domain
-                    "<p class='input-truncate esc-tooltipped webcat-domain-holder' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
-                  else
-                    "<a id='domain_#{entry_id}' #{data_full} href='http://#{ip_address}' target='blank'>#{ip_address}</a>"
-              }
-              {
-                data: 'path'
-                render: ( data, type, full, meta ) ->
-                  { path , entry_id } = full
-                  if type == 'display'
-                    path = td_truncate(data, 20)
-                  return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + path + '">' + path + '</span>'
-              }
-              {
-                data: 'uri'
-                className: 'uri-col'
-              }
-              {
-                data: 'category'
-                render: ( data, type, full, meta ) ->
-                  categories = ''
-                  category = ''
-                  plus = ''
-                  { category , entry_id } = full
-                  if category
-                    categories = category.split(',')
-                    category = categories[0]
-                    if category == "Not in our list"
-                      category = ""
-                  '<span id="category_' + entry_id + '">' + category + '</span>'
-              }
-              {
-                data: 'suggested_disposition'
-                render: ( data, type, full, meta ) ->
-                  return data.replace(',', ', ')
-              }
-              {
-                data: 'wbrs_score'
-                width: '55px'
-                render: ( data, type, full, meta ) ->
-                  { wbrs_score, entry_id } = full
-                  rep = wbrs_display(wbrs_score)
-                  wbrs_score = parseFloat(wbrs_score).toFixed(1)
-                  if rep == undefined then rep = 'unknown'
-                  if rep == 'unknown' then wbrs_score = '--'
-                  tooltip_rep = rep.toUpperCase()
-                  icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
-                  return "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
-              }
-              {
-                data: 'platform'
-                class: 'platform-col'
-                render: (data, type, full, meta) ->
-                  if data?
-                    platform = data
-                  else
-                    platform = ""
-                  if platform == "N/A" || platform == "Unknown" || platform == "Missing" || platform == ""
-                    platform = '<span class="missing-data platform"></span>'
-                  return platform
-              }
-              {
-                data: 'submitter_type'
-                render: (data) ->
-                  if data == 'CUSTOMER'
-                    '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
-                  else
-                    '<button class="complaint-submitter-type icon-guest-user esc-tooltipped" title="Guest"></button>'
-              }
-              {
-                data: 'company_name'
-              }
-              {
-                data: 'customer_email'
-              }
-              {
-                data: 'assigned_to'
-                className: 'assignee-col'
-              }
-              {
-                data: 'age_int'
-                visible: false
-              }
-            ]
-        select: 'style': 'os'
-        responsive: true)
+            source = ''
+            if full.complaint_source?
+              if full.complaint_source == 'talos-intelligence'
+                complaint_source = 'TI Webform'
+              else if full.complaint_source == 'talos-intelligence-api'
+                complaint_source = 'TI API'
+              else if full.complaint_source == ''
+                complaint_source = '<span class="missing-data">Source unknown</span>'
+              else
+                complaint_source = full.complaint_source
+            else
+              complaint_source = '<span class="missing-data">Source unknown</span>'
+
+            is_important_flag = ''
+            if full.is_important == "true" && full.was_dismissed == "true"
+              is_important_flag = '<div class="container-important-tags ">' +
+                '<div class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></div>' +
+                '<div class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></div>' +
+                '</div>'
+            else if full.is_important == "true" && full.was_dismissed == "false"
+              is_important_flag = '<span class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
+            else if full.is_important == "false" && full.was_dismissed == "true"
+              is_important_flag = '<span class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></span>'
+
+            ticket_col =
+              '<table class="nested-col-table">' +
+                '<tbody>' +
+                '<tr><td class="entry-id-col">' + full.entry_id + '</td></tr>' +
+                '<tr><td class="age-col ' + age_class + '">' + data + '</td></tr>' +
+                '<tr><td class="state-col">' + full.status + '</td></tr>' +
+                '<tr><td class="source-col">' + complaint_source + '</td></tr>' +
+                '<tr><td class="important-col">' + is_important_flag + '</td></tr>' +
+                '</tbody>' +
+              '</table>'
+
+            return ticket_col
+        }
+        {
+          data: 'customer_name'
+          className: 'submitter-col'
+          render: (data, type, full, meta) ->
+            if full.platform?
+              platform = full.platform
+            else
+              platform = ""
+            if platform == "N/A" || platform == "Unknown" || platform == "Missing" || platform == ""
+              platform = '<span class="missing-data platform"></span>'
+
+            submitter_col =
+              '<table class="nested-col-table">' +
+                '<tbody>' +
+                '<tr><td class="company-col">' + full.company_name + '</td></tr>' +
+                '<tr><td class="submitter-name-col">' + full.customer_name + '</td></tr>' +
+                '<tr><td class="submitter-email-col">' + full.customer_email + '</td></tr>' +
+                '<tr><td class="platform-col">' + platform + '</td></tr>' +
+                '</tbody>' +
+              '</table>'
+
+            return submitter_col
+        }
+        {
+          data: 'tags'
+          className: 'tag-col'
+          render: (data)->
+            tag_items = '<span class="missing-data">No tags</span>'
+
+            if data && typeof data == 'string'
+              tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
+              tag_list = tags.split(',').map ( tag ) -> return tag.trim();
+
+              if tag_list.length >= 1
+                tag_items = ''
+                tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
+                for tag in tag_list
+                  item = "<span class='tag-capsule' onclick='search_for_tag(\"#{tag}\")'>" + tag + "</span>"
+                  tag_items += item
+
+            return tag_items
+        }
+        {
+          data: 'assigned_to'
+          className: 'users-col'
+          render: (data, type, full, meta) ->
+            users_col =
+              '<table class="nested-col-table">' +
+                '<tbody>' +
+                '<tr><td class="assignee-col">' + data + '</td></tr>' +
+  #                  '<tr><td class="reviewer-col">' + data.customer_name + '</td></tr>' +
+  #                  '<tr><td class="second-reviewer-col">' + data.customer_email + '</td></tr>' +
+                '</tbody>' +
+              '</table>'
+
+            return users_col
+        }
+        {
+          data: 'description'
+          className: 'description-col'
+        }
+        {
+          data: 'suggested_disposition'
+          render: (data) ->
+            return data.replace(',', ', ')
+        }
+        {
+          data: 'uri'
+          className: 'uri-col'
+          render: (data, type, full, meta) ->
+
+            rep = wbrs_display(full.wbrs_score)
+            wbrs_score = parseFloat(full.wbrs_score).toFixed(1)
+            if rep == undefined then rep = 'unknown'
+            if rep == 'unknown' then wbrs_score = '--'
+            tooltip_rep = rep.toUpperCase()
+            icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
+            score = "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{full.entry_id}'/>#{wbrs_score}</span></div>"
+
+            entry = data || full.ip_address
+            domain = full.domain || full.ip_address
+
+            domain_col =
+              '<table class="nested-col-table">' +
+                '<tbody>' +
+                '<tr><td class="uri-ip-col">' + score + '<div class="original-entry">' + entry + '</div></td></tr>' +
+                '<tr><td class="edit-uri-col">' +
+                '<input class="complaint-uri-input" type="text">' + domain + '</input>' +
+#                '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' +
+#                  full.entry_id + '" type="text" data-domain="' + entry + '" data-qual_subdomain="' + full.subdomain + '" value="' + edit_input +
+#      '"' + entry_status + '>'' + domain + ' +
+                '</td></tr>' +
+                '</tbody>' +
+              '</table>'
+
+            return domain_col
+        }
+        {
+          data: null
+          render: (data) ->
+            return 'Tools'
+        }
+        {
+          data: 'category'
+          render: (data) ->
+            cat_string = data.replace(',', ', ')
+            return cat_string
+        }
+        {
+          data: null
+          render: (data) ->
+            return 'Resolution'
+        }
+
+
+  #          {
+  ##                subdomain column
+  #            data: 'subdomain'
+  #            render:(data,type,full,meta)->
+  #              {subdomain, entry_id} = full
+  #
+  #              if subdomain
+  #                '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + subdomain + '</span>'
+  #              else
+  #                '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + '</span>'
+  #            width: '50px'
+  #          }
+  #          {
+  #            data: 'domain'
+  #            render:( data, type, full, meta )->
+  #              { domain, ip_address, entry_id, subdomain, path } = full
+  #              data_full = ''
+  #              if subdomain != ''
+  #                subdomain += '.'
+  #                data_full = subdomain
+  #              if domain != ''
+  #                data_full += domain
+  #              if path != ''
+  #                data_full += path
+  #              if ip_address != ''
+  #                data_full = ip_address
+  #              if data_full != ''
+  #                data_full = "data-full=" + data_full
+  #              title = "title=" + domain
+  #              if domain
+  #                "<p class='input-truncate esc-tooltipped webcat-domain-holder' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
+  #              else
+  #                "<a id='domain_#{entry_id}' #{data_full} href='http://#{ip_address}' target='blank'>#{ip_address}</a>"
+  #          }
+  #          {
+  #            data: 'path'
+  #            render: ( data, type, full, meta ) ->
+  #              { path , entry_id } = full
+  #              if type == 'display'
+  #                path = td_truncate(data, 20)
+  #              return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + path + '">' + path + '</span>'
+  #          }
+  #
+  #          {
+  #
+  #          }
+
+      ]
+      responsive: true)
+
+
+
+
+#  build_complaints_table = () ->
+#        complaint_table = $('#complaints-index').DataTable(
+#          initComplete: ->
+#            input = $('.dataTables_filter input').unbind()
+#            self = @api()
+#
+#            $searchButton = $('<button class="dt-button dt-search-button esc-tooltipped" title="Search">').click(->
+#              self.search(input.val()).draw()
+#              return
+#            )
+#            $clearButton = $('<button class="dt-button dt-search-clear-button esc-tooltipped" title="Clear">').click(->
+#              input.val ''
+#              $searchButton.click()
+#              return
+#            )
+#            $('.dataTables_filter').append $clearButton, $searchButton
+#
+#            # properly init these search/clear icons
+#            $('.dt-button').tooltipster
+#              theme: [
+#                'tooltipster-borderless'
+#                'tooltipster-borderless-customized'
+#                'tooltipster-borderless-comment'
+#              ]
+#
+#            return
+#          lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
+#          processing: true
+#          serverSide: true
+#          stateSave: true
+#          select: true
+#          ajax:
+#            url: url
+#            data: build_data()
+#            error: () ->
+#              ###
+#                If there is an error with the build_data call, the localstorage and url will be blown away
+#                This will reset the search and filters
+#              ###
+#              refresh_localStorage()
+#              refresh_url()
+#            complete: ->
+#              use_user_preference_filter()
+#          drawCallback: ( settings ) ->
+#            if localStorage.webcat_reset_page
+#              localStorage.removeItem('webcat_reset_page')
+#
+#              setTimeout () ->
+#                $('#complaints-index').DataTable().page(0).draw( true )
+#              , 100
+#
+#            if localStorage.webcat_search_name
+#              { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+#              ### check variables below
+#                  text_check makes sure that the table doesn't have the named search with the same name being saved now
+#                  search_name_check makes sure that the search is being saved as a named search
+#                  Not super complicated, but that if statement was looking gross and confusing
+#              ###
+#              text_check = !window.find_saved_search_by_name(webcat_search_name)
+#              search_name_check = webcat_search_name != ''
+#              if webcat_search_type == 'advanced' && search_name_check && text_check
+#                window.add_tmp_tr_to_named_search_list(webcat_search_name)
+#                window.sort_named_search_list()
+#
+#          pagingType: 'full_numbers'
+#          order: [ [
+#            3
+#            'desc'
+#          ] ]
+#          dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+#          language: {
+#            search: "_INPUT_"
+#            searchPlaceholder: "Search within table"
+#          }
+#          rowCallback: (row, data) ->
+#            cell = @api().row(row).nodes().to$()
+#            { is_important, was_dismissed } = data
+#            if is_important
+#              cell.addClass 'highlight-second-review'
+#            if was_dismissed
+#              cell.addClass 'highlight-was-dismissed'
+#          columnDefs: [
+#            {
+#              targets: [ 0 ]
+#              className: 'expandable-row-column'
+#              searchable: false
+#              orderable: false
+#            }
+#            {
+#              targets: [1]
+#              className: 'important-flag-col'
+#              searchable: false
+#              orderable: false
+#            }
+#            {
+#              targets: [ 2 ]
+#              className: 'entry-id-col'
+#            }
+#            {
+#              targets: [ 3 ]
+#              orderData: 18 #This is ordered by the age int column. Anytime the columns are changed this needs to be updated.
+#            }
+#            {
+#              targets: [ 14 ]
+#              className: 'submitter-col'
+#            }
+#          ]
+#          columns: [
+#              {
+#                data: null
+#                width: '14px'
+#                orderable: false
+#                searchable: false
+#                sortable: false
+#                render: ( data ) ->
+#                  { entry_id } = data
+#                  return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
+#              }
+#              {
+#                data: null
+#                orderable: false
+#                searchable: false
+#                sortable: false
+#                defaultContent: '<span></span>'
+#                width: '10px'
+#                render: ( data )->
+#                  { is_important, was_dismissed } = data
+#                  if is_important == "true" && was_dismissed == "true"
+#                      return '<div class="container-important-tags ">' +
+#                        '<div class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></div>' +
+#                        '<div class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></div>' +
+#                        '</div>'
+#                  else if is_important == "true" && was_dismissed == "false"
+#                    return '<span class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
+#                  else if is_important == "false" && was_dismissed == "true"
+#                    return '<span class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></span>'
+#              }
+#              {
+#                data: 'entry_id'
+#                width: '50px'
+#              }
+#              {
+##               age column
+#                width: '40px'
+#                render: (data, type, full, meta) ->
+#                  { age, status } = full
+#                  unless status == 'COMPLETED' || status == 'RESOLVED'
+#                    if age.indexOf('h') != -1 && age.indexOf('h') >= 3
+#                      hour = parseInt( age.split("h")[0] )
+#                      if hour>= 3 && hour < 12
+#                        age_class = 'ticket-age-over3hr'
+#                      else if hour >= 12
+#                        age_class = 'ticket-age-over12hr'
+#                    else if age.indexOf('mo') != -1
+#                      age_class = 'ticket-age-over12hr'
+#                    else if (age.indexOf('m') != -1) || (age.indexOf('s') != -1)
+#                      age_class = ''
+#                    else
+#                      age_class = 'ticket-age-over12hr'
+#                    return "<span class='#{age_class}'>#{age}</span>"
+#                  # if status is "completed" or "resolved", no css class (orange/red) needed
+#                  else
+#                    return "<span>#{age}</span>"
+#              }
+#              {
+#                data: 'status'
+#                className: 'state-col'
+#              }
+#              {
+#                data: 'tags'
+#                render: ( data )->
+#
+#                  tag_items = '<span class="missing-data">No tags</span>'
+#
+#                  if data && typeof data == 'string'
+#                    tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
+#                    tag_list = tags.split(',').map ( tag ) -> return tag.trim();
+#
+#                    if tag_list.length >= 1
+#                      tag_items = ''
+#                      tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
+#                      for tag in tag_list
+#                        item = "<span class='tag-capsule' onclick='search_for_tag(\"#{tag}\")'>" + tag + "</span>"
+#                        tag_items += item
+#
+#                  tag_items
+#              }
+#              {
+##                subdomain column
+#                data: 'subdomain'
+#                render:(data,type,full,meta)->
+#                  {subdomain, entry_id} = full
+#
+#                  if subdomain
+#                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + subdomain + '</span>'
+#                  else
+#                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + '</span>'
+#                width: '50px'
+#              }
+#              {
+#                data: 'domain'
+#                render:( data, type, full, meta )->
+#                  { domain, ip_address, entry_id, subdomain, path } = full
+#                  data_full = ''
+#                  if subdomain != ''
+#                    subdomain += '.'
+#                    data_full = subdomain
+#                  if domain != ''
+#                    data_full += domain
+#                  if path != ''
+#                    data_full += path
+#                  if ip_address != ''
+#                    data_full = ip_address
+#                  if data_full != ''
+#                    data_full = "data-full=" + data_full
+#                  title = "title=" + domain
+#                  if domain
+#                    "<p class='input-truncate esc-tooltipped webcat-domain-holder' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
+#                  else
+#                    "<a id='domain_#{entry_id}' #{data_full} href='http://#{ip_address}' target='blank'>#{ip_address}</a>"
+#              }
+#              {
+#                data: 'path'
+#                render: ( data, type, full, meta ) ->
+#                  { path , entry_id } = full
+#                  if type == 'display'
+#                    path = td_truncate(data, 20)
+#                  return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + path + '">' + path + '</span>'
+#              }
+#              {
+#                data: 'uri'
+#                className: 'uri-col'
+#              }
+#              {
+#                data: 'category'
+#                render: ( data, type, full, meta ) ->
+#                  categories = ''
+#                  category = ''
+#                  plus = ''
+#                  { category , entry_id } = full
+#                  if category
+#                    categories = category.split(',')
+#                    category = categories[0]
+#                    if category == "Not in our list"
+#                      category = ""
+#                  '<span id="category_' + entry_id + '">' + category + '</span>'
+#              }
+#              {
+#                data: 'suggested_disposition'
+#                render: ( data, type, full, meta ) ->
+#                  return data.replace(',', ', ')
+#              }
+#              {
+#                data: 'wbrs_score'
+#                width: '55px'
+#                render: ( data, type, full, meta ) ->
+#                  { wbrs_score, entry_id } = full
+#                  rep = wbrs_display(wbrs_score)
+#                  wbrs_score = parseFloat(wbrs_score).toFixed(1)
+#                  if rep == undefined then rep = 'unknown'
+#                  if rep == 'unknown' then wbrs_score = '--'
+#                  tooltip_rep = rep.toUpperCase()
+#                  icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
+#                  return "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
+#              }
+#              {
+#                data: 'platform'
+#                class: 'platform-col'
+#                render: (data, type, full, meta) ->
+#                  if data?
+#                    platform = data
+#                  else
+#                    platform = ""
+#                  if platform == "N/A" || platform == "Unknown" || platform == "Missing" || platform == ""
+#                    platform = '<span class="missing-data platform"></span>'
+#                  return platform
+#              }
+#              {
+#                data: 'submitter_type'
+#                render: (data) ->
+#                  if data == 'CUSTOMER'
+#                    '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
+#                  else
+#                    '<button class="complaint-submitter-type icon-guest-user esc-tooltipped" title="Guest"></button>'
+#              }
+#              {
+#                data: 'company_name'
+#              }
+#              {
+#                data: 'customer_email'
+#              }
+#              {
+#                data: 'assigned_to'
+#                className: 'assignee-col'
+#              }
+#              {
+#                data: 'age_int'
+#                visible: false
+#              }
+#            ]
+#        select: 'style': 'os'
+#        responsive: true)
 
 
   if $('#complaints-index').length
