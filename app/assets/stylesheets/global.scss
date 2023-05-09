@@ -2175,6 +2175,33 @@ a.static-nav-item {
   margin-top: -1px;
 }
 
+.temp-links {
+  margin-top: 20px;
+  padding-left: 2px;
+
+  li {
+    border-bottom: none !important;
+    font-size: 8pt;
+    font-weight: normal;
+  }
+
+  .icon-link svg {
+    bottom: 2px;
+    height: 42px;
+    left: 12px;
+    position: relative;
+    width: 15px;
+  }
+
+  .temp-link-full {
+    background: $sidebar-nav-base;
+    bottom: 4px;
+    padding-left: 12px;
+    position: relative;
+    right: 20px;
+  }
+}
+
 /***** End of Side Nav *****/
 
 

@@ -72,6 +72,16 @@
           - else
             %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349", target: '_blank'}
               =inline_svg 'confluence-brands.svg', class: 'sidenav-svg'
+    %ul{class:'temp-links'}
+      %li{class: 'regex-link'}
+        %a{class:'icon-link', href: 'https://wwwint.vrt.sourcefire.com/offlineRegex101/', title:'Offline Regex 101', target:'_blank'}
+          =inline_svg 'icon_link.svg'
+      %li{class: 'chef-link'}
+        %a{class:'icon-link', href: 'https://wwwint.vrt.sourcefire.com/cyberchef/', title:'Cyber Chef', target:'_blank'}
+          =inline_svg 'icon_link.svg'
+      %li{class: 'ava-link'}
+        %a{class:'icon-link', href: 'https://avabuffers.vrt.sourcefire.com', title:'Avabuffers', target:'_blank'}
+          =inline_svg 'icon_link.svg'
 
   #sidenav-menu-div
     %ul{class: 'nav-container'}
@@ -142,6 +152,10 @@
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
           Docs
         %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav'}
+          - if is_rule_user?
+            %li{class: 'ruledocs-link'}
+              %a{href: '/rule_documents'}
+                Snort Rule Docs
           %li{class: 'wiki-link'}
             %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'} User Docs
           %li{class: 'release-link'}
@@ -149,7 +163,16 @@
               %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}", target: '_blank'} V #{@version}
             - else
               %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349", target: '_blank'} Release Notes
-
+      %ul{class:'temp-links'}
+        %li{class: 'regex-link'}
+          %a{class:'temp-link-full', href: 'https://wwwint.vrt.sourcefire.com/offlineRegex101/', target: '_blank'}
+            Offline Regex 101
+        %li{class: 'chef-link'}
+          %a{class:'temp-link-full', href: 'https://wwwint.vrt.sourcefire.com/cyberchef/', target: '_blank'}
+            Cyber Chef
+        %li{class: 'ava-link'}
+          %a{class:'temp-link-full', href: 'https://avabuffers.vrt.sourcefire.com', target: '_blank'}
+            Avabuffers
 
   .copyright-area
     = image_tag('logo_talos_white.svg', class: 'talos-logo', alt: 'Talos Logo')
