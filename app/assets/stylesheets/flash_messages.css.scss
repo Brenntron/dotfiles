@@ -9,10 +9,10 @@
   border: none;
   display: block;
   font-size: 9pt;
-  height: 32px;
   line-height: 14pt;
   margin: 0 auto;
-  max-height: 80px;
+  max-height: 200px;
+  min-height: 32px;
   min-width: 300px;
   overflow: hidden;
   overflow-y: auto;  // some errors get huge, keep them handled
@@ -52,7 +52,6 @@
   }
 
   &.alert-streamlined {
-    bottom: 0;
     left: 0;
     position: absolute;
   }
