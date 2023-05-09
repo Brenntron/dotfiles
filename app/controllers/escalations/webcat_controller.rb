@@ -13,7 +13,7 @@ class Escalations::WebcatController < ApplicationController
 
     @submitter_reports = {
         customer: ComplaintEntry.where(complaint_id: Complaint.from_ti.by_guest.open_comps).count,
-        guest: ComplaintEntry.where(complaint_id: Complaint.from_ti.by_guest.open_comps).count,
+        guest: ComplaintEntry.where(complaint_id: Complaint.from_ti.by_cust.open_comps).count,
         internal: ComplaintEntry.where(complaint_id: Complaint.from_int.open_comps).count,
         wBNP: ComplaintEntry.where(complaint_id: Complaint.from_wbnp.open_comps).count
     }

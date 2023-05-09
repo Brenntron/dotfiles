@@ -47,6 +47,7 @@ $disabled-txt: #A0A0A0;
 $communication-accent-color: #C14B92;
 $grey-section-color: #e2e2e2;
 $yellow-graph-bar:#f9cf81;
+$yet-another-pale-grey: #e8e8e8;
 
 /* Content Label Color */
 $content-label-color: #999;     /* Light Grey     */
@@ -712,6 +713,7 @@ button {
 
 .webcat-reports-toolbar{
   margin-bottom: -35px;
+  margin-top: 37px;
   z-index: 10;
   .toolbar-button-select.toolbar-button-text{
     padding-left: 25px;
@@ -13732,6 +13734,34 @@ table > tbody > tr > td.no-padding {
   cursor:pointer;
   border-bottom: 1px solid #666;
 }
+
+.jira-ticket-type-wrapper {
+  float: right;
+  max-width: 350px;
+  padding: 5px 14px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.25em;
+  border: 1px solid $yet-another-pale-grey;
+  background-color: $content-bg-color;
+  &::before {
+    content: '*';
+    color: $second-section-color;
+    position: absolute;
+    display: block;
+    margin-left: -7px;
+  }
+}
+.bold-note{
+  font-weight: bold;
+}
+// ff one-off fix for the red asterisk
+@-moz-document url-prefix() {
+  .jira-ticket-type-wrapper::before {
+    margin-top: -14px;
+  }
+}
+
 .webcat-ticket-view{
   margin-top: 50px;
   .data-report-content{
@@ -13763,7 +13793,6 @@ table > tbody > tr > td.no-padding {
   }
 
   .ticket-rows{
-    //margin: 7px;
     .dataTables_wrapper{
       top: -10px;
     }
