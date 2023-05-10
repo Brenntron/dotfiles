@@ -1,0 +1,24 @@
+/// STYLES FOR CARD STYLE INDEX
+
+table.dataTable tbody tr td table.nested-col-table td {
+  padding: 1px 0;
+  border: none;
+  min-height: 20px;
+}
+
+#complaints-index .nested-table-input {
+  border: 1px solid #E5E5E5;
+  background-color: #EEF7FB;
+  border-radius: 1px;
+  padding: 2px 4px;
+  width: 100%;
+  margin-top: 1px;
+  min-height: 26px;
+  &::placeholder {
+    font-style: italic;
+  }
+  .current-cat-col {
+    padding-bottom: 4px;
+  }
+}
+

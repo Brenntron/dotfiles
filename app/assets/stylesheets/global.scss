@@ -12109,11 +12109,6 @@ input[type="radio"].resolution_radio_button {
   margin: 12px 0 6px 0;
 }
 
-// more width so this aligns with the comment fields and for long URIs
-.complaint-uri-input {
-  width: 65%;
-}
-
 // ensure the XBRS history headers are accurate and stay put while scrolling
 .entry-details-table.xbrs-details-table .dataTables_wrapper .dataTables_scrollBody {
   table > thead > tr > th {
@@ -12729,8 +12724,10 @@ span.threat-cat-no-data {
 }
 .reputation-icon-container{
   display: inline-flex;
+  float: left;
   .reputation-icon{
-    top: -1px
+    top: -1px;
+    margin-left: -6px;
   }
 }
 // webrep dispute index > ensure the dispute count is to the right of the domain entry

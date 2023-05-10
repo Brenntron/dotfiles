@@ -582,15 +582,40 @@ $ ->
               platform = full.platform
             else
               platform = ""
+
             if platform == "N/A" || platform == "Unknown" || platform == "Missing" || platform == ""
               platform = '<span class="missing-data platform"></span>'
+
+            if full.company_name?
+              if full.company_name != ''
+                submitter = full.company_name
+              else
+                submitter = 'Guest'
+            else
+              submitter = 'Guest'
+
+            if full.customer_name?
+              if full.customer_name != ''
+                name_row = '<tr><td class="submitter-name-col">' + full.customer_name + '</td></tr>'
+              else
+                name_row = ''
+            else
+              name_row = ''
+
+            if full.customer_email?
+              if full.customer_email != ''
+                email_row = '<tr><td class="submitter-email-col">' + full.customer_email + '</td></tr>'
+              else
+                email_row = ''
+            else
+              email_row = ''
 
             submitter_col =
               '<table class="nested-col-table">' +
                 '<tbody>' +
-                '<tr><td class="company-col">' + full.company_name + '</td></tr>' +
-                '<tr><td class="submitter-name-col">' + full.customer_name + '</td></tr>' +
-                '<tr><td class="submitter-email-col">' + full.customer_email + '</td></tr>' +
+                '<tr><td class="company-col">' + submitter + '</td></tr>' +
+                name_row +
+                email_row +
                 '<tr><td class="platform-col">' + platform + '</td></tr>' +
                 '</tbody>' +
               '</table>'
@@ -649,9 +674,8 @@ $ ->
             wbrs_score = parseFloat(full.wbrs_score).toFixed(1)
             if rep == undefined then rep = 'unknown'
             if rep == 'unknown' then wbrs_score = '--'
-            tooltip_rep = rep.toUpperCase()
-            icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
-            score = "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{full.entry_id}'/>#{wbrs_score}</span></div>"
+            tooltip_rep = wbrs_score + ' | ' + rep
+            icon = "<div class='reputation-icon-container'><span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span></div>"
 
             entry = data || full.ip_address
             domain = full.domain || full.ip_address
@@ -659,12 +683,11 @@ $ ->
             domain_col =
               '<table class="nested-col-table">' +
                 '<tbody>' +
-                '<tr><td class="uri-ip-col">' + score + '<div class="original-entry">' + entry + '</div></td></tr>' +
+                '<tr><td class="uri-ip-col">' + icon + '<div class="original-entry">' + entry + '</div></td></tr>' +
                 '<tr><td class="edit-uri-col">' +
-                '<input class="complaint-uri-input" type="text">' + domain + '</input>' +
-#                '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' +
-#                  full.entry_id + '" type="text" data-domain="' + entry + '" data-qual_subdomain="' + full.subdomain + '" value="' + edit_input +
-#      '"' + entry_status + '>'' + domain + ' +
+                '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' +
+                full.entry_id + '" type="text" data-domain="' + entry + '" data-qual_subdomain="' +
+                full.subdomain + '"value="' + domain + '"/>' +
                 '</td></tr>' +
                 '</tbody>' +
               '</table>'
@@ -678,64 +701,37 @@ $ ->
         }
         {
           data: 'category'
-          render: (data) ->
+          render: (data, type, full, meta) ->
             cat_string = data.replace(',', ', ')
-            return cat_string
+            cat_table =
+              '<table class="nested-col-table">' +
+                '<tbody>' +
+                '<tr><td class="current-cat-col">' + cat_string + '</td></tr>' +
+                '<tr><td class="edit-cat-col">' +
+                '<input class="nested-table-input" placeholder="Enter categories / confidence order">' +
+                '</td></tr>' +
+                '</tbody>' +
+              '</table>'
+
+            return cat_table
         }
         {
           data: null
-          render: (data) ->
-            return 'Resolution'
+          render: (data, type, full, meta) ->
+            submit_res_wrapper =
+              '<div class="submit-res-wrapper">' +
+                '<div class="res-radio-row">' +
+                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" id="unchanged' + full.entry_id + '" name="resolution' + full.entry_id + '" value="UNCHANGED"><label>Unchanged</label></div>' +
+                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" id="fixed' + full.entry_id + '" name="resolution' + full.entry_id + '" value="FIXED"><label>Fixed</label></div>' +
+                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" id="invalid' + full.entry_id + '" name="resolution' + full.entry_id + '" value="INVALID"><label>Invalid</label></div>' +
+                '</div>' +
+                '<div class="submit-row">' +
+                  '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '">Submit Changes</button>' +
+                '</div>' +
+              '</div>'
+            
+            return submit_res_wrapper
         }
-
-
-  #          {
-  ##                subdomain column
-  #            data: 'subdomain'
-  #            render:(data,type,full,meta)->
-  #              {subdomain, entry_id} = full
-  #
-  #              if subdomain
-  #                '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + subdomain + '</span>'
-  #              else
-  #                '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + '</span>'
-  #            width: '50px'
-  #          }
-  #          {
-  #            data: 'domain'
-  #            render:( data, type, full, meta )->
-  #              { domain, ip_address, entry_id, subdomain, path } = full
-  #              data_full = ''
-  #              if subdomain != ''
-  #                subdomain += '.'
-  #                data_full = subdomain
-  #              if domain != ''
-  #                data_full += domain
-  #              if path != ''
-  #                data_full += path
-  #              if ip_address != ''
-  #                data_full = ip_address
-  #              if data_full != ''
-  #                data_full = "data-full=" + data_full
-  #              title = "title=" + domain
-  #              if domain
-  #                "<p class='input-truncate esc-tooltipped webcat-domain-holder' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
-  #              else
-  #                "<a id='domain_#{entry_id}' #{data_full} href='http://#{ip_address}' target='blank'>#{ip_address}</a>"
-  #          }
-  #          {
-  #            data: 'path'
-  #            render: ( data, type, full, meta ) ->
-  #              { path , entry_id } = full
-  #              if type == 'display'
-  #                path = td_truncate(data, 20)
-  #              return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + path + '">' + path + '</span>'
-  #          }
-  #
-  #          {
-  #
-  #          }
-
       ]
       responsive: true)
 
