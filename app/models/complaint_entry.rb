@@ -857,6 +857,10 @@ class ComplaintEntry < ApplicationRecord
       present_params['user_id'] = present_params['user_id'].split(',').map {|item| item.strip }
     end
 
+    if present_params['jira_id'].present?
+      present_params['jira_id'] = present_params['jira_id'].split(',').map {|item| item.strip}
+    end
+
     simple_params = present_params.slice(*%w{id complaint_id resolution status})
 
     relation = where(simple_params)
@@ -865,6 +869,10 @@ class ComplaintEntry < ApplicationRecord
 
       relation =
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
+    end
+    
+    if params['jira_id'].present?
+      relation = relation.joins(complaint: {import_urls: :jira_import_task}).where(jira_import_tasks: {issue_key: present_params['jira_id']})
     end
 
     if params['platform_ids'].present?
