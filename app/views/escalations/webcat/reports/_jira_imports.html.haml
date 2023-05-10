@@ -1,24 +1,27 @@
-%h1 JIRA Imports
-
+%h1.mothra-header JIRA Imports
+%input{type: 'hidden', name: 'current_user_name', value: "#{current_user.cvs_username}"}
 .toolbar.webcat-reports-toolbar
   %div.view-container.toolbar-container
     %label.toolbar-section-label
       View
-    %button.toolbar-button.list-button.toolbar-button-spacer.active-view.tooltipped{title: 'List All Jira Imports'}
+    %button.toolbar-button.list-button.toolbar-button-spacer.active-view.tooltipped{title: 'List All Jira Imports', onclick:'change_ticket_view("list", this)'}
       %span.toolbar-button-text List
-    %button.toolbar-button.view-rules.view-button.tooltipped{title: 'Detailed Import View'}
+    %button.toolbar-button.view-tickets.view-button.tooltipped{title: 'Detailed Import View | Only 10 reports may be viewed at a time', onclick:'change_ticket_view("ticket", this)'}
       %span.toolbar-button-text View
 
   %div.toolbar-container
     %label.toolbar-section-label.show-rule-sets-label
-      Show Tickets
+      Reports by Import Status
     %span.toolbar-select-wrapper.show-tickets
-      %label.show-failed.toolbar-button-label.tooltipped{for: 'show-failed', title: 'Show All Failed'}
+      %label.show-failed.toolbar-button-label.icon-failed-import.tooltipped{for: 'show-failed', title: 'Show All Failed'}
         %input#show-failed.toolbar-checkbox{type: 'checkbox',  name: 'show-failed', checked: true}
-        %span.toolbar-button-select All Failed
-      %label.show-complete.toolbar-button-label.tooltipped{for: 'show-complete', title: 'Show All Complete and Pending'}
+        %span.toolbar-button-select.toolbar-button-text Failed
+      %label.show-complete.toolbar-button-label.icon-complete-import.tooltipped{for: 'show-complete', title: 'Show All Complete'}
         %input#show-complete.toolbar-checkbox{type: 'checkbox',  name: 'show-complete', checked: true}
-        %span.toolbar-button-select Complete/Pending
+        %span.toolbar-button-select.toolbar-button-text Complete
+      %label.show-pending.toolbar-button-label.icon-pending-import.tooltipped{for: 'show-pending', title: 'Show All Pending'}
+        %input#show-pending.toolbar-checkbox{type: 'checkbox',  name: 'show-pending', checked: true}
+        %span.toolbar-button-select.toolbar-button-text Pending
 
   %div.actions-container.toolbar-container
     %label.toolbar-section-label Actions
@@ -26,23 +29,47 @@
       %span.toolbar-button-text Retry
     %form#jira-tasks-disputes-export-form{action: escalations_webcat_jira_import_tasks_path(format: :xlsx), method: :get}
       = hidden_field_tag('issue_keys', '[]', id: 'jira-tasks-filter-input')
-      %button.toolbar-button.toolbar-button-spacer.export-button.esc-tooltipped{type: 'button', onclick: 'export_all_jira_tasks();', title: 'Export All to CSV'}
-        %span.toolbar-button-text
-          Export All
-    %button.toolbar-button.export-button.esc-tooltipped{type: 'button', onclick: 'export_selected_jira_tasks();', title: 'Export Selected to CSV'}
+    %button.toolbar-button.export-button.esc-tooltipped{type: 'button', onclick: 'export_selected_jira_tasks();', title: 'Export to CSV'}
       %span.toolbar-button-text
-        Export Selected
+        Export
+  %div.reports-toolbar
+    %label.toolbar-section-label
+      Assign
+    %span.toolbar-concise-button-area
+      %button.toolbar-button.take-ticket-toolbar-button.concise-button.concise-button-first{onclick: 'jira_assignee_hub("take_entry")', type: 'button', title: 'Take', disabled: 'disabled'}
+        %span.toolbar-button-text Take
+      %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.concise-button.concise-button-last.darkened-button{onclick: 'jira_assignee_hub("return_entry")', type: 'button', title: 'Return', disabled: 'disabled'}
+        %span.toolbar-button-text Return
+    %span.toolbar-concise-button-area.webrep-change-assignee-wrapper
+      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.concise-button.concise-button-first.concise-button-no-text{onclick: 'jira_assignee_hub("unassign_all")', title: 'Remove Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled'}
+      %span.dropdown
+        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.concise-button.concise-button-last.darkened-button{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled'}
+          %span.toolbar-button-text
+            Change Assignee
+        .dropdown-menu.toolbar-dropdown{'aria-labelledby': 'index_change_assign'}
+          %h3 Change Assignee
+          .inline-tool-content-wrapper
+            .toolbar
+              %div
+                %label.toolbar-section-label Assignee
+                %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
+                  - User.joins(roles: :org_subset).where(org_subsets: { name: 'webcat' }).distinct.order(:cvs_username).each do |u|
+                    %option{id: u.id, value: u.id, label: u.cvs_username}
+                      = u.cvs_username
+              %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'jira_assignee_hub("change_assignee")'}
+                Assign
 .row
   .col-xs-12
-    %table.table.responsive.dataTable.no-footer#webcat-imports-index{role:'datatable'}
+    .webcat-ticket-view.hidden
+    %table.table.responsive.dataTable.no-footer.webcat-list-view#webcat-imports-index{role:'datatable'}
       %thead
         %tr
           %th.sorting_disabled
-            %input{type: 'checkbox'}
-          %th Jira Ticket
+            %input{type: 'checkbox', id:'bulk-ticket-select'}
+          %th Jira Ticket ID
           %th Submitter
           %th Imported On
           %th
             Entries
             %span.entries-th (Imported | Unimported)
-          %th Result
+          %th Import Status

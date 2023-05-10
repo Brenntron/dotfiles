@@ -17,6 +17,14 @@ module API
             end
           end
 
+          desc "get summary of urls for a task"
+          get ":id/submitted_urls", root: :jira_import_tasks do
+            std_api_v2 do
+              task_id = JiraImportTask.find(params[:id])
+              {urls: task_id.import_urls.map {|m| m.url_dt_format}}
+            end
+          end
+
           desc "retry import"
           params do
             requires :task_ids, type: Array[Integer], desc: "ids of the tasks to retry"
@@ -28,6 +36,16 @@ module API
                 task.retry
               end
               {status: "Success"}
+            end
+          end
+        end
+
+        resource "escalations/jira_import_tasks/:id/bast_data" do
+          desc "get BastApi data for corresponding jira import task"
+          get "", root: :jira_import_tasks do
+            std_api_v2 do
+              task_id = JiraImportTask.find(params[:id]).bast_task
+              Bast::Base.get_task_result(task_id)
             end
           end
         end

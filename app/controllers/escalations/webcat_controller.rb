@@ -33,7 +33,7 @@ class Escalations::WebcatController < ApplicationController
     @jira_reports ={
         complete:JiraImportTask.completed_count,
         failure:JiraImportTask.failed_count,
-        pending: JiraImportTask.pending_count,
+        pending: JiraImportTask.pending_count + JiraImportTask.awaiting_bast_verdict_count,
         "overall tries":  JiraImportTask.total_count
     }
 
@@ -48,6 +48,11 @@ class Escalations::WebcatController < ApplicationController
     @int_new_count = ComplaintEntry.where(complaint_id: Complaint.from_int).where(status:"NEW").count
     @int_overdue_count = ComplaintEntry.where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED","COMPLETED"]).where("created_at < ?",Time.now - 12.hours).count
     @int_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_int).where(status:"ASSIGNED").count
+
+    @jira_new_count = ComplaintEntry.where(complaint_id: Complaint.from_jira).where(status:"NEW").count
+    @jira_overdue_count = ComplaintEntry.where(complaint_id: Complaint.from_jira).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours).count
+
+    @jira_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_jira).where(status:"ASSIGNED").count
 
     @pending_new_count = ComplaintEntry.where(status:"PENDING").count
     @pending_overdue_count = ComplaintEntry.where(status:"PENDING").where("created_at < ?",Time.now - 12.hours).count
