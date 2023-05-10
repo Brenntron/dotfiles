@@ -13,7 +13,7 @@
         %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav-icons'}
           - if is_rule_user?
             %li{class: 'ips-link'}
-              %a{href: '/bugs'}= inline_svg 'icon_snort.svg', class: 'sidenav-svg'
+              %a{href: '/bugs'}= inline_svg 'icon_snort.svg'
 
     - if is_rule_user? || can?(:index, any: [FileReputationDispute, Dispute, Complaint])
       %li{class: 'nav-escalations'}
@@ -23,26 +23,26 @@
           - if is_rule_user?
             %li{class: 'ips-link'}
               %a{href: '/escalation_bugs'}
-                =inline_svg 'icon_snort.svg', class: 'sidenav-svg'
+                =inline_svg 'icon_snort.svg'
           - if can?(:read, Admin)
             %li{class: 'clam-link disabled-link'}
-              %a.disabled-link= inline_svg 'icon_clam.svg', class: 'sidenav-svg'
+              %a.disabled-link= inline_svg 'icon_clam.svg'
           - if can?(:index, FileReputationDispute)
             %li{class: 'amp-link'}
               %a{href: escalations_file_rep_disputes_path + "?f=open", id: 'amp-icon-link'}
-                = inline_svg 'icon_filerep_tix_grey.svg', class: 'sidenav-svg'
+                = inline_svg 'icon_filerep_tix_grey.svg'
           - if can?(:index, Dispute)
             %li{class: 'rep-link'}
               %a{href: escalations_webrep_disputes_path + "?f=unassigned", id: 'rep-icon-link'}
-                =inline_svg 'icon_webrep_tix_grey.svg', class: 'sidenav-svg'
+                =inline_svg 'icon_webrep_tix_grey.svg'
           - if can?(:index, SenderDomainReputationDispute)
             %li{class: 'sdr-link'}
               %a{href: escalations_sdr_disputes_path + "?f=unassigned", id: 'sdr-icon-link'}
-                =inline_svg 'icon_sender_domain_tix.svg', class: 'sidenav-svg'
+                =inline_svg 'icon_sender_domain_tix.svg'
           - if can?(:index, Complaint)
             %li{class: 'cat-link'}
               %a{href: escalations_webcat_complaints_path, id: 'cat-icon-link'}
-                =inline_svg 'icon_cat.svg', class: 'sidenav-svg'
+                =inline_svg 'icon_cat_grey.svg'
     %li{class: 'nav-item nav-users'}
       %a{href: escalations_users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
 
@@ -53,10 +53,10 @@
         %ul#admin-subnav-icons.sub-nav.collapse.admin-subnav
           %li.acr-admin-link
             %a{href: '/admin'}
-              =inline_svg 'icon_bug_grey.svg', class: 'sidenav-svg'
+              =inline_svg 'icon_bug_grey.svg'
           %li.ace-admin-link
             %a{href: '/escalations/admin'}
-              =inline_svg 'icon_escalations_grey.svg', class: 'sidenav-svg'
+              =inline_svg 'icon_escalations_grey.svg'
 
     %li{class: 'nav-docs'}
       %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
@@ -65,17 +65,17 @@
         - if is_rule_user?
           %li{class: 'doc-link'}
             %a{href: '/rule_documents'}
-              =inline_svg 'icon_snort.svg', class: 'sidenav-svg'
+              =inline_svg 'icon_snort.svg'
         %li{class: 'wiki-link'}
           %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'}
-            =inline_svg 'confluence-brands.svg', class: 'sidenav-svg'
+            =inline_svg 'confluence-brands.svg'
         %li{class: 'release-link'}
           - if !@version.nil?
             %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}", target: '_blank'}
-              =inline_svg 'confluence-brands.svg', class: 'sidenav-svg'
+              =inline_svg 'confluence-brands.svg'
           - else
             %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349", target: '_blank'}
-              =inline_svg 'confluence-brands.svg', class: 'sidenav-svg'
+              =inline_svg 'confluence-brands.svg'
     %ul{class:'temp-links'}
       %li{class: 'regex-link'}
         %a{class:'icon-link', href: 'https://wwwint.vrt.sourcefire.com/offlineRegex101/', title:'Offline Regex 101', target:'_blank'}
