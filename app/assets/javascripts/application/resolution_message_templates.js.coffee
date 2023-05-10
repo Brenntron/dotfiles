@@ -9,7 +9,7 @@ $ ->
     autoWidth: false
     columnDefs: [
       { targets: [0], orderable: false }
-      { targets: [8], orderable: false }
+      { targets: [-1], orderable: false }
     ]
     language:
       emptyTable: "<p class='empty-table-message'>No resolution templates have been created.</p>"
@@ -35,10 +35,7 @@ $ ->
     $('#editResolutionMessageTemplatesDialog').dialog 'close'
 
   window.get_resolution_template_data = (action)->
-
-
     name: $(".#{action} input[name=name]").val()
-
     resolution_type:  $(".#{action} select[name=resolution_type]").val();
     description: $(".#{action} textarea[name=description]").val();
     body: $(".#{action} textarea[name=body]").val();
@@ -198,11 +195,17 @@ $ ->
     )
 
   #Fetch resolutions by resolution, for use in template selects
-  window.get_resolution_templates_by_resolution = (route, resolution) ->
+  window.get_resolution_templates_by_resolution = (route, resolution, ticket_type) ->
+
+    if route == 'webrep' #show if web or email ticket for webrep
+      data = {resolution: resolution, ticket_type: ticket_type}
+    else
+      data = {resolution: resolution}
+
     std_msg_ajax(
       method: 'GET'
       url: "/escalations/api/v1/escalations/#{route}/resolution_message_templates"
-      data: {resolution: resolution}
+      data: data
       dataType: 'json'
       success_reload: false
       success: (response) ->
@@ -218,4 +221,9 @@ $ ->
     description = $('.resolution-message-template-select option:selected').attr('data-description')
     $('.ticket-resolution-description').text description
 
-
+  # Switch webrep form type
+  $('#resolved-resolution-message-dialogue-form-information input[type=radio][name=dispute-type]').change (event)->
+    if $(this).val() == 'email'
+      $('.resolution-message-template-form.create').attr('data-ticket-type', 'EmailDispute')
+    else
+      $('.resolution-message-template-form.create').attr('data-ticket-type', 'WebDispute')

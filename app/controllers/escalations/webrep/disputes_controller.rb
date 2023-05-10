@@ -65,7 +65,9 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
 
   def resolution_message_templates
-    @templates = ResolutionMessageTemplate.for_disputes
+    @web_templates = ResolutionMessageTemplate.for_web_disputes
+    @email_templates = ResolutionMessageTemplate.for_email_disputes
+    @templates = @web_templates + @email_templates
   end
 
   # TODO We should not have a 400 line method in a controller.

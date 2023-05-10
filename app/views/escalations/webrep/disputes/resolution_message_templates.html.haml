@@ -23,6 +23,7 @@
         %th.text-uppercase Created By
         %th.text-uppercase Last Edited On
         %th.text-uppercase Updated By
+        %th.text-uppercase Dispute Type
         %th
       %tbody
         - @templates.each do |template|
@@ -37,6 +38,7 @@
             %td=template.creator&.display_name
             %td=template.updated_at.strftime(Dispute::SIMPLE_DATE_FORMAT)
             %td=template.editor&.display_name
+            %td=template.ticket_type.gsub('Dispute', '')
 
             %td
               - if current_user.has_role?('webrep manager') || current_user.has_role?('manager')

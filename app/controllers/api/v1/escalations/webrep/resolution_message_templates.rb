@@ -9,10 +9,15 @@ module API
             desc "get a filtered resolution message templates by resolution"
             params do
               requires :resolution, type: String, desc: "Resolution of the resolution message template"
+              requires :ticket_type, type: String, desc: "The type of ticket (web or email)"
             end
 
             get  "", root: "resolution_message_template" do
-              ResolutionMessageTemplate.by_resolution_disputes(params[:resolution]).to_json
+              if params[:ticket_type] == 'EmailDispute'
+                ResolutionMessageTemplate.by_email_resolution_disputes(params[:resolution]).to_json
+              else
+                ResolutionMessageTemplate.by_web_resolution_disputes(params[:resolution]).to_json
+              end
             end
 
             desc "get a resolution message template"

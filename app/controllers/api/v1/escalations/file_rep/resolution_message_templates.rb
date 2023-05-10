@@ -12,7 +12,7 @@ module API
             end
 
             get  "", root: "resolution_message_template" do
-              ResolutionMessageTemplate.by_resolution_file_reputation_disputes(params[:resolution]).to_json
+              ResolutionMessageTemplate.by_file_reputation_resolution_disputes(params[:resolution]).to_json
             end
 
             desc "get a resolution message template"

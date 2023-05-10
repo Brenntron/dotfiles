@@ -1,6 +1,19 @@
 #resolution-message-template-form-wrapper
-  %form.resolution-message-template-form{class: local_assigns[:action], 'data-ticket-type':'Dispute'}
+  %form.resolution-message-template-form{class: local_assigns[:action], 'data-ticket-type':'WebDispute'}
     #resolved-resolution-message-dialogue-form-information{class: local_assigns[:action]}
+
+      - if local_assigns[:action] == :create
+        %label.content-label-sm.resolution-modal-label Dispute Type
+        - if current_user.has_role?('webrep manager') || current_user.has_role?('manager')
+          %li.dispute-type-radio-wrapper
+            %input.ticket-status-radio.form-check-input{type: 'radio', name: 'dispute-type', id: 'dispute-type-web', value:'web', checked: 'checked' }
+            %label.ticket-status-radio-label.radio-label.form-check-label{for: 'dispute-type-web'} Web
+          %li.dispute-type-radio-wrapper
+            %input.ticket-status-radio{type: 'radio', name: 'dispute-type', id: 'dispute-type-email', value: 'email'}
+            %label.ticket-status-radio-label.radio-label{for: 'dispute-type-email'} Email
+        -else
+          %p.resolution-template-dispute-type.resolution-template-lesser-permission-text
+
       %label.content-label-sm.resolution-modal-label Resolution
       - if current_user.has_role?('webrep manager') || current_user.has_role?('manager')
         - if local_assigns[:action] == :create
