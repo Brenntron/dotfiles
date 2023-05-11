@@ -7,7 +7,6 @@ module JiraRest
       @issue = @session.client.Issue.find(issue_key)
     end
 
-
     def status
       issue.status
     end
@@ -26,7 +25,7 @@ module JiraRest
     def change_status(status)
       transition = @issue.transitions.build
       transition_id = available_transitions[status]
-      transition.save!("transition" => {"id" => transition_id})
+      transition.save!('transition' => { 'id' => transition_id })
     end
 
     def create_comment(body)
@@ -40,17 +39,17 @@ module JiraRest
           content: get_attachment_content(attachment),
           type: attachment.mimeType
         }
-      end      
+      end
     end
 
     private
-    
+
     def get_attachment_content(attachment)
       case attachment.mimeType
-      when "text/csv"
+      when 'text/csv'
         CSV.parse(@session.client.get(attachment.content).body)
       else
-        @session.client.get(attachment.content).body.split("\n")
+        @session.client.get(attachment.content).body.split('\n')
       end
     end
   end

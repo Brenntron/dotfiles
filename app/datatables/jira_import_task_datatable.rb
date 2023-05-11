@@ -17,7 +17,10 @@ class JiraImportTaskDatatable < AjaxDatatablesRails::ActiveRecord
         total_urls:                  { source: "JiraImportTask.total_urls", data: :total_urls, searchable: false, orderable: false },
         unimported_urls:             { source: "JiraImportTask.unimported_urls", data: :unimported_urls, searchable: false, orderable: false},
         imported_urls:               { source: "JiraImportTask.imported_urls", data: :imported_urls, searchable: false, orderable: false},
-        issue_status:                { source: "JiraImportTask.issue_status", data: :issue_status, searchable: false, orderable: false}
+        issue_status:                { source: "JiraImportTask.issue_status", data: :issue_status, searchable: false, orderable: false},
+        issue_summary:               { source: "JiraImportTask.issue_summary", data: :issue_summary, searchable: false},
+        issue_description:           { source: "JiraImportTask.issue_description", data: :issue_description, searchable: false},
+        issue_platform:              { source: "JiraImportTask.issue_platform", data: :issue_platform, searchable: false}
     }
   end
 
@@ -37,6 +40,9 @@ class JiraImportTaskDatatable < AjaxDatatablesRails::ActiveRecord
           unimported_urls: record.unimported_urls.count,
           imported_urls: record.imported_urls.count,
           issue_status: record.issue_status,
+          issue_summary: record.issue_summary,
+          issue_description: record.issue_description,
+          issue_platform: record.issue_platform,
           DT_RowId: record.id
       }
     end

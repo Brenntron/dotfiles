@@ -139,7 +139,7 @@ development:
     token: "redacted"
     verify_mode: "verify-none"
     auth_type: "basic"
-    project_key: "SD"
+    project_key: "SDOCS"
   bast:
     host: "prod-webcat-app3.sv4.ironport.com"
     port: 5000

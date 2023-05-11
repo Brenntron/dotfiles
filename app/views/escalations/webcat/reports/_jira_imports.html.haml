@@ -1,3 +1,8 @@
+- if @question_type_tickets > 0
+  .jira-ticket-type-wrapper
+    Open Question/Assistance tickets:
+    %span.font-weight-bold=@question_type_tickets
+
 %h1.mothra-header JIRA Imports
 %input{type: 'hidden', name: 'current_user_name', value: "#{current_user.cvs_username}"}
 .toolbar.webcat-reports-toolbar
