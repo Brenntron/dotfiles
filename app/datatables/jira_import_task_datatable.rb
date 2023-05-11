@@ -14,12 +14,12 @@ class JiraImportTaskDatatable < AjaxDatatablesRails::ActiveRecord
         imported_at:                 { source: "JiraImportTask.imported_at", data: :imported_at, searchable: false },
         created_at:                  { source: "JiraImportTask.created_at", data: :created_at, searchable: false },
         updated_at:                  { source: "JiraImportTask.updated_at", data: :updated_at, searchable: false },
-        total_urls:                  { source: "JiraImportTask.total_urls", data: :total_urls, searchable: false },
-        unimported_urls:             { source: "JiraImportTask.unimported_urls", data: :unimported_urls, searchable: false},
-        imported_urls:               { source: "JiraImportTask.imported_urls", data: :imported_urls, searchable: false},
+        total_urls:                  { source: "JiraImportTask.total_urls", data: :total_urls, searchable: false, orderable: false },
+        unimported_urls:             { source: "JiraImportTask.unimported_urls", data: :unimported_urls, searchable: false, orderable: false},
+        imported_urls:               { source: "JiraImportTask.imported_urls", data: :imported_urls, searchable: false, orderable: false},
+        issue_status:                { source: "JiraImportTask.issue_status", data: :issue_status, searchable: false, orderable: false},
         issue_summary:               { source: "JiraImportTask.issue_summary", data: :issue_summary, searchable: false},
         issue_description:           { source: "JiraImportTask.issue_description", data: :issue_description, searchable: false},
-        issue_status:                { source: "JiraImportTask.issue_status", data: :issue_status, searchable: false},
         issue_platform:              { source: "JiraImportTask.issue_platform", data: :issue_platform, searchable: false}
     }
   end
@@ -39,11 +39,11 @@ class JiraImportTaskDatatable < AjaxDatatablesRails::ActiveRecord
           total_urls: record.import_urls.count,
           unimported_urls: record.unimported_urls.count,
           imported_urls: record.imported_urls.count,
-          DT_RowId: record.id,
+          issue_status: record.issue_status,
           issue_summary: record.issue_summary,
           issue_description: record.issue_description,
-          issue_status: record.issue_status,
-          issue_platform: record.issue_platform
+          issue_platform: record.issue_platform,
+          DT_RowId: record.id
       }
     end
   end
