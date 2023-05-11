@@ -428,6 +428,13 @@ $ ->
   build_complaints_table = () ->
     complaint_table = $('#complaints-index').DataTable(
       initComplete: ->
+        rows = $('#complaints-index').find('.cat-index-main-row')
+        # Initialize category selectizes
+        $(rows).each ->
+          entry_id = $(this).attr('id')
+          entry_cats = $(this).attr('data-categories')
+          load_selectize_cats(entry_id, entry_cats)
+
         input = $('.dataTables_filter input').unbind()
         self = @api()
 
@@ -464,11 +471,16 @@ $ ->
             If there is an error with the build_data call, the localstorage and url will be blown away
             This will reset the search and filters
           ###
-#          refresh_localStorage()
-#          refresh_url()
+          refresh_localStorage()
+          refresh_url()
         complete: ->
 #          use_user_preference_filter()
-#      drawCallback: ( settings ) ->
+      createdRow: (row, data) ->
+        $(row).addClass('cat-index-main-row')
+        $(row).attr('data-categories', data.category)
+#      drawCallback: () ->
+
+
 #        if localStorage.webcat_reset_page
 #          localStorage.removeItem('webcat_reset_page')
 #
@@ -518,8 +530,6 @@ $ ->
           className: 'ticket-col'
           orderable: false
           render: (data, type, full, meta) ->
-
-            console.log full.category
             # refactor to use age_int
 
             age_class = ''
@@ -576,7 +586,7 @@ $ ->
         }
         {
           data: 'customer_name'
-          className: 'submitter-col'
+          className: 'submitter-col alt-col'
           render: (data, type, full, meta) ->
             if full.platform?
               platform = full.platform
@@ -662,6 +672,7 @@ $ ->
         }
         {
           data: 'suggested_disposition'
+          className: 'suggested-col alt-col'
           render: (data) ->
             return data.replace(',', ', ')
         }
@@ -696,19 +707,25 @@ $ ->
         }
         {
           data: null
+          className: 'tools-col'
           render: (data) ->
             return 'Tools'
         }
         {
           data: 'category'
+          className: 'categories-col alt-col'
           render: (data, type, full, meta) ->
+            domain = full.domain || full.ip_address
             cat_string = data.replace(',', ', ')
             cat_table =
               '<table class="nested-col-table">' +
                 '<tbody>' +
                 '<tr><td class="current-cat-col">' + cat_string + '</td></tr>' +
                 '<tr><td class="edit-cat-col">' +
-                '<input class="nested-table-input" placeholder="Enter categories / confidence order">' +
+                '<select id="input_cat_' + full.entry_id + '" name="input_cat_' +
+                full.entry_id + '" class="nested-table-input" placeholder="Enter categories / confidence order" ' +
+                'onchange="touchedFormChange(\'' + domain + '\')">' +
+                '</select>' +
                 '</td></tr>' +
                 '</tbody>' +
               '</table>'
@@ -717,6 +734,7 @@ $ ->
         }
         {
           data: null
+          className: 'resolution-col'
           render: (data, type, full, meta) ->
             submit_res_wrapper =
               '<div class="submit-res-wrapper">' +
@@ -729,14 +747,38 @@ $ ->
                   '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '">Submit Changes</button>' +
                 '</div>' +
               '</div>'
-            
+
             return submit_res_wrapper
         }
       ]
       responsive: true)
 
+  load_selectize_cats = (entry_id, categories) ->
+    cleaned_cats = []
+    if categories
+      cleaned_cats = categories.split(',')
+      #splice together 'Conventions, Conferences and Trade Shows' due to extra comma
+      if categories.includes('Conferences and Trade Shows')
+        $(cleaned_cats).each (i, category) ->
+          if category == 'Conventions'
+            cleaned_cats.splice(i, 1)
+          else if category == ' Conferences and Trade Shows'
+            i2 = i - 1
+            cleaned_cats.splice(i2, 1, 'Conventions, Conferences and Trade Shows')
 
-
+    cat_selectize = $('#input_cat_'+ entry_id).selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      closeAfterSelect: true,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: AC.WebCat.createSelectOptions('#input_cat_' + entry_id),
+      items: cleaned_cats
+#      onLoad: (_) ->
+#        cat_selectize.setValue cleaned_cats
+    }
 
 #  build_complaints_table = () ->
 #        complaint_table = $('#complaints-index').DataTable(

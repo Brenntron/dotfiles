@@ -22,3 +22,14 @@ table.dataTable tbody tr td table.nested-col-table td {
   }
 }
 
+#complaints-index {
+  .selectize-control {
+    .selectize-input {
+      background-color: transparent;
+      input::placeholder {
+        font-style: italic;
+        font-size: 11px;
+      }
+    }
+  }
+}
