@@ -809,6 +809,7 @@ button {
     opacity: 0.5;
   }
 }
+.close-ticket-button{background-image: url(image_path('icon_my_closed_tickets_grey.svg'));}
 .splitview-button {background-image: url(image_path('icon_splitview.svg'));}
 .duplicate-button {background-image: url(image_path('icon_duplicate.svg'));}
 .smtp-button      {background-image: url(image_path('icon_smtp.svg'));}

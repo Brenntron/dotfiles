@@ -1,6 +1,11 @@
 module JiraRest
   class Session 
+    include Singleton
     attr_accessor :client
+
+    def self.connection
+      instance.client
+    end
        
     def initialize
       @client = JIRA::Client.new(login_options)

@@ -25,6 +25,9 @@
 
   %div.actions-container.toolbar-container
     %label.toolbar-section-label Actions
+    %button.toolbar-button.close-ticket-button.toolbar-button-spacer.tooltipped{title: 'Close Related Jira Tickets', onclick:'close_related_issues()'}
+      %span.toolbar-button-text Close Related Tickets
+
     %button.toolbar-button.retry-button.toolbar-button-spacer.tooltipped{title: 'Retry', onclick:'retry_imports()', disabled:true}
       %span.toolbar-button-text Retry
     %form#jira-tasks-disputes-export-form{action: escalations_webcat_jira_import_tasks_path(format: :xlsx), method: :get}
