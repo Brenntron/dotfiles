@@ -27,27 +27,12 @@ $ ->
     maxWidth: 1000
     position: { my: "left center", at: "left center", of: window }
 
-  $('#editWebResolutionMessageTemplatesDialog').dialog
-    autoOpen: false
-    minWidth: 450
-    maxWidth: 1000
-    position: { my: "left center", at: "left center", of: window }
-
-  $('#editEmailResolutionMessageTemplatesDialog').dialog
-    autoOpen: false
-    minWidth: 450
-    maxWidth: 1000
-    position: { my: "left center", at: "left center", of: window }
-
-
   window.manage_resolution_message_templates = () ->
     $('#createResolutionMessageTemplatesDialog').dialog 'open'
 
   window.close_resolution_template_dialog = () ->
     $('#createResolutionMessageTemplatesDialog').dialog 'close'
     $('#editResolutionMessageTemplatesDialog').dialog 'close'
-    $('#editWebResolutionMessageTemplatesDialog').dialog 'close'
-    $('#editEmailResolutionMessageTemplatesDialog').dialog 'close'
 
   window.get_resolution_template_data = (action)->
     name: $(".#{action} input[name=name]").val()
@@ -86,25 +71,6 @@ $ ->
         std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
     )
 
-  get_and_populate_webrep_resolved_message = (template_id, template_type)->
-    std_msg_ajax(
-      method: 'GET'
-      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
-      success_reload: false
-      success: (response) ->
-        $(".update select[name=resolution_type]").val(response.resolution_type)
-        $(".update .resolution-template-resolution-type").text(response.resolution_type)
-        $(".update input[name=name]").val(response.name);
-        $(".update .resolution-template-name").text(response.name);
-        $(".update .resolution-template-description").html(response.description);
-        $(".update .resolution-template-message").html(response.body);
-        if template_type == 'EmailDispute'
-          $('#editEmailResolutionMessageTemplatesDialog').dialog 'open'
-        else
-          $('#editWebResolutionMessageTemplatesDialog').dialog 'open'
-      error: (response) ->
-        std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
-    )
 
   # Edit a resolution message template (fetch existing data and populate form)
   $('.edit-resolution-message-template').on 'click', (event)->
@@ -113,13 +79,6 @@ $ ->
     $('.update input[name=template-id]').val(template_id)
     get_and_populate_resolved_message(template_id)
 
-  # Edit a webrep resolution message template (fetch existing data and populate form) - different function to check if web or email
-  $('.edit-webrep-resolution-message-template').on 'click', (event)->
-    $('#createResolutionMessageTemplatesDialog').dialog 'close'
-    template_id = $(this).attr('data-resolution-message-template-id')
-    $('.update input[name=template-id]').val(template_id)
-    template_type = $(this).attr('data-ticket-type')
-    get_and_populate_webrep_resolved_message(template_id, template_type)
 
   # Update resolution message template
   window.update_resolved_resolution_message_template = (type) ->
@@ -132,8 +91,6 @@ $ ->
       success: (response) ->
         std_msg_success('Resolution Message Template Updated.', [], reload: true)
         $('#editResolutionMessageTemplatesDialog').dialog 'close'
-        $('#editWebResolutionMessageTemplatesDialog').dialog 'close'
-        $('#editEmailResolutionMessageTemplatesDialog').dialog 'close'
       error: (response) ->
         std_api_error(response, "There was an error updating the resolution message template.", reload: false)
     )
@@ -266,9 +223,118 @@ $ ->
     description = $('.resolution-message-template-select option:selected').attr('data-description')
     $('.ticket-resolution-description').text description
 
+
+  ## Webrep specific ##
+
+  window.create_webrep_resolution_message_template = (route) ->
+    if $("input[name='dispute-type']:checked").val() == 'web'
+      ticket_type = 'WebDispute'
+      resolution_type = $(".create select[name=resolution_type_web]").val();
+    else
+      ticket_type = 'EmailDispute'
+      resolution_type = $(".create select[name=resolution_type_email]").val();
+
+    data = {
+      name: $(".create input[name=name]").val()
+      resolution_type: resolution_type
+      description: $(".create textarea[name=description]").val()
+      body: $(".create textarea[name=body]").val()
+      ticket_type: ticket_type
+    }
+
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/#{route}/resolution_message_templates"
+      data: data
+      success_reload: false
+      success: (response) ->
+        std_msg_success('Resolution Message template Created.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "There was an error creating the resolution message template.", reload: false)
+    )
+
+  window.get_webrep_resolution_template_data = (action, is_footer) ->
+    if is_footer == true
+      resolution_type = 'Customer Footer'
+    else
+      resolution_type = $(".#{action} select[name=resolution_type]").val()
+
+    data = {
+      name: $(".#{action} input[name=name]").val()
+      resolution_type: resolution_type
+      description: $(".#{action} textarea[name=description]").val()
+      body: $(".#{action} textarea[name=body]").val()
+      ticket_type: $(".resolution-message-template-form").attr('data-ticket-type')
+    }
+    return data
+
+  window.update_webrep_resolved_resolution_message_template = (type) ->
+    template_id = $('.update input[name=template-id]').val();
+    is_footer = false
+    #check if footer is being updated
+    if !$(".resolution-template-footer-text").hasClass('hide')
+      is_footer = true
+    std_msg_ajax(
+      method: 'PUT'
+      url: "/escalations/api/v1/escalations/#{type}/resolution_message_templates/#{template_id}"
+      data: get_webrep_resolution_template_data('update', is_footer)
+      success_reload: true
+      success: (response) ->
+        std_msg_success('Resolution Message Template Updated.', [], reload: true)
+        $('#editResolutionMessageTemplatesDialog').dialog 'close'
+      error: (response) ->
+        std_api_error(response, "There was an error updating the resolution message template.", reload: false)
+    )
+
+  get_and_populate_webrep_resolved_message = (template_id, template_type, is_footer)->
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
+      success_reload: false
+      success: (response) ->
+        $(".update select[name=resolution_type]").val(response.resolution_type)
+        $(".update .resolution-template-resolution-type").text(response.resolution_type)
+        $(".update input[name=name]").val(response.name);
+        $(".update .resolution-template-name").text(response.name);
+        $(".update .resolution-template-description").html(response.description);
+        $(".update .resolution-template-message").html(response.body);
+
+        #set current edit modal to current data-ticket-type (WebDispute or EmailDispute)
+        $('#editResolutionMessageTemplatesDialog .resolution-message-template-form.update').attr('data-ticket-type', template_type)
+
+        if is_footer?
+          $('#editResolutionMessageTemplatesDialog select').addClass('hide-temporarily')
+          $('#editResolutionMessageTemplatesDialog .resolution-template-footer-text').removeClass('hide')
+        else
+          $('#editResolutionMessageTemplatesDialog select').removeClass('hide-temporarily')
+          $('#editResolutionMessageTemplatesDialog .resolution-template-footer-text').addClass('hide')
+
+        $('#editResolutionMessageTemplatesDialog').dialog 'open'
+      error: (response) ->
+        std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
+    )
+
+  # Edit a webrep resolution message template (fetch existing data and populate form) - different function to check if web or email
+  $('.edit-webrep-resolution-message-template').on 'click', (event)->
+    $('#createResolutionMessageTemplatesDialog').dialog 'close'
+    template_id = $(this).attr('data-resolution-message-template-id')
+    $('.update input[name=template-id]').val(template_id)
+    template_type = $(this).attr('data-ticket-type')
+    is_footer = $(this).attr('data-is-footer')
+
+    get_and_populate_webrep_resolved_message(template_id, template_type, is_footer)
+
   # Switch webrep form type
   $('#resolved-resolution-message-dialogue-form-information input[type=radio][name=dispute-type]').change (event)->
     if $(this).val() == 'email'
       $('.resolution-message-template-form.create').attr('data-ticket-type', 'EmailDispute')
     else
       $('.resolution-message-template-form.create').attr('data-ticket-type', 'WebDispute')
+
+  $('#resolved-resolution-message-dialogue-form-information input[type=radio][name=dispute-type]').change (event)->
+    if $(this).attr('id') == 'dispute-type-email'
+      $('#create-form_resolution_type_web').addClass('hide')
+      $('#create-form_resolution_type_email').removeClass('hide')
+    else
+      $('#create-form_resolution_type_web').removeClass('hide')
+      $('#create-form_resolution_type_email').addClass('hide')
