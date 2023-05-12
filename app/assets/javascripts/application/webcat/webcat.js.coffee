@@ -428,12 +428,22 @@ $ ->
   build_complaints_table = () ->
     complaint_table = $('#complaints-index').DataTable(
       initComplete: ->
-        rows = $('#complaints-index').find('.cat-index-main-row')
-        # Initialize category selectizes
-        $(rows).each ->
-          entry_id = $(this).attr('id')
-          entry_cats = $(this).attr('data-categories')
-          load_selectize_cats(entry_id, entry_cats)
+        # Grab up-to-date list of categories ONE time for all entries
+        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+        $.ajax(
+          url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
+          method: 'GET'
+          headers: headers
+          success: (response) ->
+            all_categories = response
+
+            # Initialize category selectizes
+            rows = $('#complaints-index').find('.cat-index-main-row')
+            $(rows).each ->
+              entry_id = $(this).attr('id')
+              entry_cats = $(this).attr('data-categories')
+              load_selectize_cats(entry_id, entry_cats, all_categories)
+        )
 
         input = $('.dataTables_filter input').unbind()
         self = @api()
@@ -457,7 +467,6 @@ $ ->
             'tooltipster-borderless-comment'
           ]
 
-        return
       lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
       processing: true
       serverSide: true
@@ -733,9 +742,8 @@ $ ->
         }
         {
           data: 'status'
-          className: 'resolution-col'
           render: (data, type, full, meta) ->
-
+            console.log full
             if data == 'PENDING'
               submit_res_wrapper =
                 '<div class="submit-res-wrapper pending-ticket-res-wrapper">' +
@@ -795,12 +803,13 @@ $ ->
       ]
       responsive: true)
 
-  load_selectize_cats = (entry_id, categories) ->
+  load_selectize_cats = (entry_id, entry_categories, all_categories) ->
+
     cleaned_cats = []
-    if categories
-      cleaned_cats = categories.split(',')
+    if entry_categories
+      cleaned_cats = entry_categories.split(',')
       #splice together 'Conventions, Conferences and Trade Shows' due to extra comma
-      if categories.includes('Conferences and Trade Shows')
+      if entry_categories.includes('Conferences and Trade Shows')
         $(cleaned_cats).each (i, category) ->
           if category == 'Conventions'
             cleaned_cats.splice(i, 1)
@@ -808,8 +817,21 @@ $ ->
             i2 = i - 1
             cleaned_cats.splice(i2, 1, 'Conventions, Conferences and Trade Shows')
 
-    # preselected items are not working - TODO investigate
-    cat_selectize = $('#input_cat_'+ entry_id).selectize {
+    cat_options = []
+    for key, value of all_categories
+      cat_code = key.split(' - ')[1]
+      value_name = key.split(' - ')[0]
+      cat_options.push({category_id: value, category_name: value_name, category_code: cat_code})
+
+    # find the category ids that match the current cats on the entry
+    category_ids = []
+    for name in cleaned_cats
+      for x, y of all_categories
+        value_name = x.split(' - ')[0]
+        if name.trim() == value_name
+          category_ids.push(y)
+
+    $('#input_cat_'+ entry_id).selectize {
       persist: false,
       create: false,
       maxItems: 5,
@@ -817,10 +839,8 @@ $ ->
       valueField: 'category_id',
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions('#input_cat_' + entry_id),
-      items: cleaned_cats
-#      onLoad: (_) ->
-#        cat_selectize.setValue cleaned_cats
+      options: cat_options,
+      items: category_ids
     }
 
 #  build_complaints_table = () ->

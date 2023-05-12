@@ -26,9 +26,14 @@ table.dataTable tbody tr td table.nested-col-table td {
   .selectize-control {
     .selectize-input {
       background-color: transparent;
+      margin-bottom: -7px !important;
       input::placeholder {
         font-style: italic;
         font-size: 11px;
+      }
+      .item {
+        padding: 2px 6px;
+        font-size: 8pt;
       }
     }
   }
