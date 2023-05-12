@@ -32,4 +32,14 @@ table.dataTable tbody tr td table.nested-col-table td {
       }
     }
   }
+  .resolution-col {
+    padding: 0 0 8px 0;
+    .res-radio-row {
+      padding: 4px;
+      background-color: #EEF7FB;
+    }
+  }
+  .submit_changes {
+    padding: 6px 30px;
+  }
 }

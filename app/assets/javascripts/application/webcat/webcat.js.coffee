@@ -502,10 +502,10 @@ $ ->
 #            window.sort_named_search_list()
 
       pagingType: 'full_numbers'
-      order: [ [
-        0
-        'desc'
-      ] ]
+#      order: [ [
+#        10
+#        'desc'
+#      ] ]
       dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
       language: {
         search: "_INPUT_"
@@ -528,7 +528,6 @@ $ ->
         {
           data: 'age'
           className: 'ticket-col'
-          orderable: false
           render: (data, type, full, meta) ->
             # refactor to use age_int
 
@@ -733,23 +732,66 @@ $ ->
             return cat_table
         }
         {
-          data: null
+          data: 'status'
           className: 'resolution-col'
           render: (data, type, full, meta) ->
-            submit_res_wrapper =
-              '<div class="submit-res-wrapper">' +
-                '<div class="res-radio-row">' +
-                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" id="unchanged' + full.entry_id + '" name="resolution' + full.entry_id + '" value="UNCHANGED"><label>Unchanged</label></div>' +
-                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" id="fixed' + full.entry_id + '" name="resolution' + full.entry_id + '" value="FIXED"><label>Fixed</label></div>' +
-                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" id="invalid' + full.entry_id + '" name="resolution' + full.entry_id + '" value="INVALID"><label>Invalid</label></div>' +
-                '</div>' +
-                '<div class="submit-row">' +
-                  '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '">Submit Changes</button>' +
-                '</div>' +
-              '</div>'
+
+            if data == 'PENDING'
+              submit_res_wrapper =
+                '<div class="submit-res-wrapper pending-ticket-res-wrapper">' +
+                  '<div class="res-radio-row">' +
+                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="commit"><label>Commit</label></div>' +
+                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="decline" checked="checked"><label>Decline</label></div>' +
+                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="ignore"><label>Ignore (Bulk change only)</label></div>' +
+                  '</div>' +
+                  '<div class="submit-row">' +
+                  '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="updatePending(' + full.entry_id + ')">Submit</button>' +
+                  '</div>' +
+                '</div>'
+            else
+              if data == 'COMPLETED'
+
+                fixed_check = ''
+                unchanged_check = ''
+                invalid_check = ''
+                if full.resolution == 'FIXED'
+                  fixed_check = 'checked="checked"'
+                if full.resolution == 'UNCHANGED'
+                  unchanged_check = 'checked="checked"'
+                if full.resolution == 'INVALID'
+                  invalid_check = 'checked="checked"'
+
+                submit_res_wrapper =
+                  '<div class="submit-res-wrapper completed-ticket-res-wrapper">' +
+                    '<div class="res-radio-row">' +
+                    '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="UNCHANGED" disabled="true" ' + unchanged_check + '><label>Unchanged</label></div>' +
+                    '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="FIXED" disabled="true" ' + fixed_check + '><label>Fixed</label></div>' +
+                    '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="INVALID" disabled="true" ' + invalid_check + '><label>Invalid</label></div>' +
+                    '</div>' +
+                    '<div class="submit-row">' +
+                    '<button class="tertiary submit_changes" id="reopen_' + full.entry_id + '" onclick="reopenComplaint(' + full.entry_id + ')">Reopen</button>' +
+                    '</div>' +
+                  '</div>'
+
+              else
+                submit_res_wrapper =
+                  '<div class="submit-res-wrapper open-ticket-res-wrapper">' +
+                    '<div class="res-radio-row">' +
+                      '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="UNCHANGED"><label>Unchanged</label></div>' +
+                      '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="FIXED" checked="checked"><label>Fixed</label></div>' +
+                      '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="INVALID"><label>Invalid</label></div>' +
+                    '</div>' +
+                    '<div class="submit-row">' +
+                      '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="updateEntryColumns(' + full.entry_id + ')">Submit</button>' +
+                    '</div>' +
+                  '</div>'
 
             return submit_res_wrapper
         }
+#        {
+#          data: 'age_int'
+#          visible: false
+#        }
       ]
       responsive: true)
 
@@ -766,6 +808,7 @@ $ ->
             i2 = i - 1
             cleaned_cats.splice(i2, 1, 'Conventions, Conferences and Trade Shows')
 
+    # preselected items are not working - TODO investigate
     cat_selectize = $('#input_cat_'+ entry_id).selectize {
       persist: false,
       create: false,
