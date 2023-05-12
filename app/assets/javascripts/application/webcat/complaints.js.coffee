@@ -1977,25 +1977,25 @@ toggle_selected = (selectedRows, expand)->
         $(row).addClass('selected')
   $(selectState).addClass('selected')
 
-window.collapse_selected =()->
-  selectedRows = $('.selected')
-  expand = false;
-  toggle_selected(selectedRows, expand)
-
-window.collapse_all =()->
-  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
-  expand = false;
-  toggle_selected(selectedRows, expand)
-
-window.expand_selected =()->
-  selectedRows = $('.selected')
-  expand = true;
-  toggle_selected(selectedRows, expand)
-
-window.expand_all =()->
-  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
-  expand = true;
-  toggle_selected(selectedRows, expand)
+#window.collapse_selected =()->
+#  selectedRows = $('.selected')
+#  expand = false;
+#  toggle_selected(selectedRows, expand)
+#
+#window.collapse_all =()->
+#  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
+#  expand = false;
+#  toggle_selected(selectedRows, expand)
+#
+#window.expand_selected =()->
+#  selectedRows = $('.selected')
+#  expand = true;
+#  toggle_selected(selectedRows, expand)
+#
+#window.expand_all =()->
+#  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
+#  expand = true;
+#  toggle_selected(selectedRows, expand)
 
 window.mark_for_commit = () ->
   entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
@@ -2329,50 +2329,50 @@ $ ->
     touchedFormChange(domain)
     $('#master-submit').prop('disabled', false)
 
-  $('.expand-all').click ->
-    complaint_table = $('#complaints-index').DataTable()
-    td = $('#complaints-index').find('td.expandable-row-column')
+#  $('.expand-all').click ->
+#    complaint_table = $('#complaints-index').DataTable()
+#    td = $('#complaints-index').find('td.expandable-row-column')
 
-    td.each ->
-      tr = $(this).closest('tr')
-      row = complaint_table.row(tr)
+#    td.each ->
+#      tr = $(this).closest('tr')
+#      row = complaint_table.row(tr)
+#
+#      unless row.child.isShown()
+#
+#        row.child(format(row)).show()
+#        nested_tooltip()
+#
+#        tr.addClass 'shown'
+#
+#        td = $(tr).next('tr').find('td:first')
+#        $(td).addClass 'nested-complaint-data-wrapper'
+#        unless $(td).hasClass 'nested-complaint-data-wrapper'
+#          tr.find('td:first').addClass 'nested-complaint-data-wrapper'
+#
+#        cat_select = '#input_cat_'+ row.data().entry_id
+#        $(cat_select).selectize {
+#          persist: false,
+#          create: false,
+#          maxItems: 5,
+#          closeAfterSelect: true,
+#          valueField: 'category_id',
+#          labelField: 'category_name',
+#          searchField: ['category_name', 'category_code'],
+#          options: AC.WebCat.createSelectOptions('#input_cat_'+ row.data().entry_id)
+#          items: AC.WebCat.getCategoryIds(selected_options(row.data().category), cat_select)
+#        }
 
-      unless row.child.isShown()
-
-        row.child(format(row)).show()
-        nested_tooltip()
-
-        tr.addClass 'shown'
-
-        td = $(tr).next('tr').find('td:first')
-        $(td).addClass 'nested-complaint-data-wrapper'
-        unless $(td).hasClass 'nested-complaint-data-wrapper'
-          tr.find('td:first').addClass 'nested-complaint-data-wrapper'
-
-        cat_select = '#input_cat_'+ row.data().entry_id
-        $(cat_select).selectize {
-          persist: false,
-          create: false,
-          maxItems: 5,
-          closeAfterSelect: true,
-          valueField: 'category_id',
-          labelField: 'category_name',
-          searchField: ['category_name', 'category_code'],
-          options: AC.WebCat.createSelectOptions('#input_cat_'+ row.data().entry_id)
-          items: AC.WebCat.getCategoryIds(selected_options(row.data().category), cat_select)
-        }
-
-        $('.toggle-vis-nested').each ->
-          checkbox_trigger = $(button).attr('data-column')
-          checkbox = $(this).find('input')
-          if $(checkbox).prop('checked')
-            $('.complaint-entry-table td, .complaint-entry-table th').each ->
-              if $(button).hasClass(checkbox_trigger)
-                $(button).show()
-          else if $(checkbox).prop('checked') == false
-            $('.complaint-entry-table td, .complaint-entry-table th').each ->
-              if $(button).hasClass(checkbox_trigger)
-                $(button).hide()
+#        $('.toggle-vis-nested').each ->
+#          checkbox_trigger = $(button).attr('data-column')
+#          checkbox = $(this).find('input')
+#          if $(checkbox).prop('checked')
+#            $('.complaint-entry-table td, .complaint-entry-table th').each ->
+#              if $(button).hasClass(checkbox_trigger)
+#                $(button).show()
+#          else if $(checkbox).prop('checked') == false
+#            $('.complaint-entry-table td, .complaint-entry-table th').each ->
+#              if $(button).hasClass(checkbox_trigger)
+#                $(button).hide()
 
 
   $('#complaints_check_box, #complaints_select_all').click ->

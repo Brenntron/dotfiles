@@ -428,6 +428,8 @@ $ ->
   build_complaints_table = () ->
     complaint_table = $('#complaints-index').DataTable(
       initComplete: ->
+        rows = $('#complaints-index').find('.cat-index-main-row')
+
         # Grab up-to-date list of categories ONE time for all entries
         headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
         $.ajax(
@@ -436,14 +438,18 @@ $ ->
           headers: headers
           success: (response) ->
             all_categories = response
-
             # Initialize category selectizes
-            rows = $('#complaints-index').find('.cat-index-main-row')
             $(rows).each ->
               entry_id = $(this).attr('id')
               entry_cats = $(this).attr('data-categories')
-              load_selectize_cats(entry_id, entry_cats, all_categories)
+              entry_status = $(this).attr('data-status')
+              load_selectize_cats(entry_id, entry_cats, all_categories, entry_status)
         )
+
+        # Fetch external categories
+        $(rows).each ->
+          entry_id = $(this).attr('id')
+          fetch_external_categories(entry_id)
 
         input = $('.dataTables_filter input').unbind()
         self = @api()
@@ -487,6 +493,9 @@ $ ->
       createdRow: (row, data) ->
         $(row).addClass('cat-index-main-row')
         $(row).attr('data-categories', data.category)
+        $(row).attr('data-status', data.status)
+
+
 #      drawCallback: () ->
 
 
@@ -681,8 +690,18 @@ $ ->
         {
           data: 'suggested_disposition'
           className: 'suggested-col alt-col'
-          render: (data) ->
-            return data.replace(',', ', ')
+          render: (data, type, full, meta) ->
+            if data?
+              cleaned_cats = []
+              sugg_cats = data.split(',')
+              $(sugg_cats).each ->
+                cat = this
+                # weird hack below, feel free to change
+                unless JSON.stringify(cat) == JSON.stringify('Not in our list')
+                  cleaned_cats.push(cat)
+
+            fin_cats = cleaned_cats.join(', ')
+            return fin_cats
         }
         {
           data: 'uri'
@@ -724,11 +743,11 @@ $ ->
           className: 'categories-col alt-col'
           render: (data, type, full, meta) ->
             domain = full.domain || full.ip_address
-            cat_string = data.replace(',', ', ')
+
             cat_table =
               '<table class="nested-col-table">' +
                 '<tbody>' +
-                '<tr><td class="current-cat-col">' + cat_string + '</td></tr>' +
+                '<tr><td id="current_cat_' + full.entry_id + '" class="current-cat-col"></td></tr>' +
                 '<tr><td class="edit-cat-col">' +
                 '<select id="input_cat_' + full.entry_id + '" name="input_cat_' +
                 full.entry_id + '" class="nested-table-input" placeholder="Enter categories / confidence order" ' +
@@ -743,7 +762,6 @@ $ ->
         {
           data: 'status'
           render: (data, type, full, meta) ->
-            console.log full
             if data == 'PENDING'
               submit_res_wrapper =
                 '<div class="submit-res-wrapper pending-ticket-res-wrapper">' +
@@ -803,7 +821,10 @@ $ ->
       ]
       responsive: true)
 
-  load_selectize_cats = (entry_id, entry_categories, all_categories) ->
+
+  # Compares the categories of an entry in AC to the full list of
+  # AUP categories and initializes & populates that entry's selectize box
+  load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status) ->
 
     cleaned_cats = []
     if entry_categories
@@ -831,17 +852,123 @@ $ ->
         if name.trim() == value_name
           category_ids.push(y)
 
-    $('#input_cat_'+ entry_id).selectize {
-      persist: false,
-      create: false,
-      maxItems: 5,
-      closeAfterSelect: true,
-      valueField: 'category_id',
-      labelField: 'category_name',
-      searchField: ['category_name', 'category_code'],
-      options: cat_options,
-      items: category_ids
+    if entry_status == 'COMPLETED'
+      # need to initialize the selectize function but disable it here if entry is completed
+      $completed_selectize = $('#input_cat_'+ entry_id).selectize {
+        persist: true,
+        create: false,
+        maxItems: 5,
+        closeAfterSelect: true,
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
+        options: cat_options,
+        items: category_ids,
+      }
+      select_complete = $completed_selectize[0].selectize
+      select_complete.disable()
+    else
+      $('#input_cat_'+ entry_id).selectize {
+        persist: false,
+        create: false,
+        maxItems: 5,
+        closeAfterSelect: true,
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
+        options: cat_options,
+        items: category_ids,
+        score: (input) ->
+          #  Adding some customization for autofill
+          #  restricting on certain cats to avoid accidental categorization
+          #  (replaces selectize's built-in `getScoreFunction()` with our own)
+          (item) ->
+            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+              item.category_code == input ? 1 : 0
+            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+              1
+            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+              0.9
+            else
+              0
     }
+
+
+
+  fetch_external_categories = (entry_id) ->
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
+      data: {'id': entry_id}
+      success: (response) ->
+
+        row_id = JSON.parse(this.data).id
+        { current_category_data : current_categories, master_categories, sds_category, sds_domain_category} = JSON.parse(response)
+
+        # If there are any current categories (WBRS)
+        # Put the top one in the list
+        # All other cat details will be in a tooltip
+        primary_cat = '<span class="missing-data">No current external categories</span>'
+        tooltip_table = '<div class="current-external-cat-info"><div class="row"><div class="col-xs-12">'
+
+        if current_categories
+          tooltip_table +=
+            '<label class="tooltip-table-label">WBRS</label>' +
+            '<table><thead><tr>' +
+            '<th>Conf</th><th>WBRS Categories</th><th>Certainty</th><th colspan="3">Feeds</th>' +
+            '</tr></thead><tbody>'
+
+          $.each current_categories, (key, value) ->
+            active =  $(this).attr("is_active")
+            if active == true
+              { confidence, mnem: mnemonic, descr: name, category_id: cat_id, top_certainty, certainties } = this
+              if certainties
+                rowspan = certainties.length
+              else
+                rowspan=''
+
+              tooltip_table +=
+                '<tr><td rowspan="' + rowspan + '">' + value.confidence + '</td>' +
+                  '<td rowspan="' + rowspan + '">' + value.mnem + ' - ' + value.descr + '</td>' +
+                  '<td rowspan="' + rowspan + '">' + value.top_certainty + '</td>'
+              if certainties
+                $(certainties).each (i) ->
+                  { certainty:source_certainty, source_description, source_mnemonic: source_name } = this
+                  unless i == 0
+                    tooltip_table += '<tr>'
+
+                  tooltip_table +=
+                    '<td class="alt-col">' + this.certainty + '</td>' +
+                    '<td class="alt-col">' + this.source_mnemonic + '</td>' +
+                    '<td class="alt-col">' + this.source_description + '</td></tr>'
+
+              else
+                tooltip_table += '</tr>'
+              tooltip_table =+ '</tbody></table>'
+
+              if key == '1.0'
+                primary_cat = '<a class="esc-tooltipped tooltip-underline">' + value.mnem + ' - ' + value.descr + ' <span class="ex-category-source">WBRS</span></a>'
+
+        else if sds_category
+          primary_cat = '<a class="esc-tooltipped tooltip-underline">' + sds_category + ' <span class="ex-category-source">SDS URI</span></a>'
+
+        else if sds_domain_category
+          primary_cat = '<a class="esc-tooltipped tooltip-underline">' + sds_domain_category + ' <span class="ex-category-source">SDS Domain</span></a>'
+
+        console.log tooltip_table
+
+
+
+
+
+        $('#current_cat_' + entry_id).html(primary_cat)
+
+
+      error: (response) ->
+        current_categories = ''
+    )
+
+
 
 #  build_complaints_table = () ->
 #        complaint_table = $('#complaints-index').DataTable(
