@@ -39,12 +39,15 @@ $ ->
     maxWidth: 1000
     position: { my: "left center", at: "left center", of: window }
 
+
   window.manage_resolution_message_templates = () ->
     $('#createResolutionMessageTemplatesDialog').dialog 'open'
 
   window.close_resolution_template_dialog = () ->
     $('#createResolutionMessageTemplatesDialog').dialog 'close'
     $('#editResolutionMessageTemplatesDialog').dialog 'close'
+    $('#editWebResolutionMessageTemplatesDialog').dialog 'close'
+    $('#editEmailResolutionMessageTemplatesDialog').dialog 'close'
 
   window.get_resolution_template_data = (action)->
     name: $(".#{action} input[name=name]").val()
@@ -129,6 +132,8 @@ $ ->
       success: (response) ->
         std_msg_success('Resolution Message Template Updated.', [], reload: true)
         $('#editResolutionMessageTemplatesDialog').dialog 'close'
+        $('#editWebResolutionMessageTemplatesDialog').dialog 'close'
+        $('#editEmailResolutionMessageTemplatesDialog').dialog 'close'
       error: (response) ->
         std_api_error(response, "There was an error updating the resolution message template.", reload: false)
     )
