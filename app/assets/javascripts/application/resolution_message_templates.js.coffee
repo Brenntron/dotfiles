@@ -27,6 +27,18 @@ $ ->
     maxWidth: 1000
     position: { my: "left center", at: "left center", of: window }
 
+  $('#editWebResolutionMessageTemplatesDialog').dialog
+    autoOpen: false
+    minWidth: 450
+    maxWidth: 1000
+    position: { my: "left center", at: "left center", of: window }
+
+  $('#editEmailResolutionMessageTemplatesDialog').dialog
+    autoOpen: false
+    minWidth: 450
+    maxWidth: 1000
+    position: { my: "left center", at: "left center", of: window }
+
   window.manage_resolution_message_templates = () ->
     $('#createResolutionMessageTemplatesDialog').dialog 'open'
 
@@ -71,12 +83,40 @@ $ ->
         std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
     )
 
+  get_and_populate_webrep_resolved_message = (template_id, template_type)->
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
+      success_reload: false
+      success: (response) ->
+        $(".update select[name=resolution_type]").val(response.resolution_type)
+        $(".update .resolution-template-resolution-type").text(response.resolution_type)
+        $(".update input[name=name]").val(response.name);
+        $(".update .resolution-template-name").text(response.name);
+        $(".update .resolution-template-description").html(response.description);
+        $(".update .resolution-template-message").html(response.body);
+        if template_type == 'EmailDispute'
+          $('#editEmailResolutionMessageTemplatesDialog').dialog 'open'
+        else
+          $('#editWebResolutionMessageTemplatesDialog').dialog 'open'
+      error: (response) ->
+        std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
+    )
+
   # Edit a resolution message template (fetch existing data and populate form)
   $('.edit-resolution-message-template').on 'click', (event)->
     $('#createResolutionMessageTemplatesDialog').dialog 'close'
     template_id = $(this).attr('data-resolution-message-template-id')
     $('.update input[name=template-id]').val(template_id)
     get_and_populate_resolved_message(template_id)
+
+  # Edit a webrep resolution message template (fetch existing data and populate form) - different function to check if web or email
+  $('.edit-webrep-resolution-message-template').on 'click', (event)->
+    $('#createResolutionMessageTemplatesDialog').dialog 'close'
+    template_id = $(this).attr('data-resolution-message-template-id')
+    $('.update input[name=template-id]').val(template_id)
+    template_type = $(this).attr('data-ticket-type')
+    get_and_populate_webrep_resolved_message(template_id, template_type)
 
   # Update resolution message template
   window.update_resolved_resolution_message_template = (type) ->

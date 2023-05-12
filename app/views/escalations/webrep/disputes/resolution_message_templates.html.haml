@@ -30,7 +30,7 @@
           %tr
             %td
               %span
-                %i.glyphicon.glyphicon-pencil.resolved.edit-resolution-message-template{title: 'Edit', data: {resolution_message_template_id: template.id}}
+                %i.glyphicon.glyphicon-pencil.resolved.edit-webrep-resolution-message-template{title: 'Edit', data: {resolution_message_template_id: template.id, ticket_type: template.ticket_type}}
             %td.se-resolution-table-name=template.name
             %td=template.resolution_type
             %td=template.description
@@ -45,6 +45,8 @@
                 .remove-button.manage-response-delete-icon{title: 'Delete', data: {resolution_message_template_id: template.id}}
 
 #createResolutionMessageTemplatesDialog{ title: 'Create Resolution Template' }
-  = render 'escalations/webrep/disputes/resolution_message_templates_form', { action: :create }
-#editResolutionMessageTemplatesDialog{ title: 'Manage Resolution Message Templates' }
-  = render 'escalations/webrep/disputes/resolution_message_templates_form', { action: :update }
+  = render 'escalations/webrep/disputes/resolution_message_templates_form', { action: :create, form_type: 'WebDispute' }
+#editWebResolutionMessageTemplatesDialog{ title: 'Manage Resolution Message Templates' }
+  = render 'escalations/webrep/disputes/resolution_message_templates_form', { action: :update, form_type: 'WebDispute' }
+#editEmailResolutionMessageTemplatesDialog{ title: 'Manage Resolution Message Templates' }
+  = render 'escalations/webrep/disputes/resolution_message_templates_form', { action: :update , form_type: 'EmailDispute'}
