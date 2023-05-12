@@ -160,7 +160,7 @@
           %li.non-resolution-submit-wrapper#ticket-non-res-submit
             %label.content-label-sm
               Comment
-            %textarea.ticket-status-comment.ticket-resolution-comment
+            %textarea.ticket-status-comment
             .button-row-center
               %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'change_ticket_status();'}
                 Submit
@@ -253,7 +253,7 @@
                   %p.entry-resolution-description
                   %label.content-label-sm
                     Comment
-                  %textarea.entry-status-comment#entry-status-comment
+                  %textarea.entry-status-comment.entry-resolution-comment#entry-status-comment
                   .button-row-center
                     %button.primary{onclick: "toolbar_index_edit_status()"}
                       Submit

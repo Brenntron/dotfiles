@@ -860,10 +860,10 @@ $ ->
       $(stat_comment).val('')
 
       #check first resolution checkbox if none selected
-      if !($("input.ticket-resolution-radio").is(':checked'))
+      if !($("#index-edit-ticket-status-dropdown input.ticket-resolution-radio").is(':checked'))
         #populate resolution dropdown with first email or web template
         submission_type = $('input[name=webrep-dispute-submission-type').val()
-        $('input#FIXED_FP').prop('checked', true)
+        $('#index-edit-ticket-status-dropdown input#FIXED_FP').prop('checked', true)
         if submission_type == 'e'
           populate_resolved_webrep_templates('Fixed - FP', 'ticket', 'EmailDispute')
         else
@@ -891,8 +891,8 @@ $ ->
           $(stat_comment).val('')
 
           #check first resolution checkbox if none selected
-          if !($("input.ticket-resolution-radio").is(':checked'))
-            $('input#FIXED_FP').prop('checked', true)
+          if !($("#index-edit-ticket-status-dropdown input.ticket-resolution-radio").is(':checked'))
+            $('#index-edit-ticket-status-dropdown input#FIXED_FP').prop('checked', true)
             populate_resolved_webrep_templates('Fixed - FP', 'entry')
 
         else
@@ -935,6 +935,12 @@ $ ->
           stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
           $('#entry-non-res-submit').hide()
           $(stat_comment).val('')
+          $('#index-edit-entry-status-dropdown #FIXED_FP').prop('checked', true)
+          submission_type = $('input[name=webrep-dispute-submission-type').val()
+          if submission_type == 'e'
+            populate_resolved_webrep_templates('Fixed - FP', 'entry', 'EmailDispute')
+          else
+            populate_resolved_webrep_templates('Fixed - FP', 'entry', 'WebDispute')
         else
           $('#entry-non-res-submit').show()
           res_comment = $('#index-entry-resolution-submenu').find('.entry-status-comment')
@@ -1622,7 +1628,7 @@ $ ->
       if templates.length == 0
         resolution_select.val ''
         $(".#{ticket_or_entry}-resolution-description").text ''
-        $(".#{ticket_or_entry}-status-comment").val ''
+        $(".#{ticket_or_entry}-resolution-comment").val ''
 
       $(templates).each (index, template) ->
         template_option = $("<option class='webrep-resolution-template-option'></option>")
@@ -1634,7 +1640,7 @@ $ ->
 
         #show first option as body and description
         if index == 0
-          $(".#{ticket_or_entry}-status-comment").val template.body
+          $(".#{ticket_or_entry}-resolution-comment").val template.body
           $(".#{ticket_or_entry}-resolution-description").text template.description
 
   #show page ticket resolution select
