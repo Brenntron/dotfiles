@@ -714,7 +714,8 @@ button {
 .webcat-reports-toolbar{
   margin-bottom: -35px;
   margin-top: 37px;
-  z-index: 10;
+  z-index: 1;
+  width: fit-content;
   .toolbar-button-select.toolbar-button-text{
     padding-left: 25px;
   }
