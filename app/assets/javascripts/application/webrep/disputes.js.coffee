@@ -846,7 +846,9 @@ $ ->
     else
       $(box).closest('tr').removeClass('selected')
 
-  $('.ticket-status-radio').click ->
+  # Show page status select
+  $('.escalations--webrep--disputes-controller.show-action .ticket-status-radio').click ->
+
     all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
     if $(this).is(':checked')
       wrapper = $(this).parent()
@@ -893,18 +895,42 @@ $ ->
           $('#ticket-non-res-submit').hide()
           $(stat_comment).val('')
 
-          #check first resolution checkbox if none selected
+          #check first resolution checkbox if none selected, check if web or email ticket
           if !($("#index-edit-ticket-status-dropdown input.ticket-resolution-radio").is(':checked'))
             $('#index-edit-ticket-status-dropdown input#FIXED_FP').prop('checked', true)
-            submission_type = $('input[name=webrep-dispute-submission-type').val()
 
-            if submission_type == 'e'
-              ticket_type = 'EmailDispute'
-            else
-              ticket_type = 'WebDispute'
-#            TODO: fix up entry default selection
+            is_customer = false
+            submission_types = []
+            submitter_types = []
+            checkboxes = $('#disputes-index').find('.dispute_check_box')
 
-            populate_resolved_webrep_templates('Fixed - FP', 'entry', ticket_type, true)
+            $(checkboxes).each ->
+              if $(this).is(':checked')
+                tr = $(this).closest('tr')
+                row = window.dispute_table.row(tr)
+                submission_types.push(row.data().submission_type)
+                submitter_types.push(row.data().submitter_type)
+
+            submission_types.sort()
+            submitter_types.sort()
+
+            common_submission = (submission_types[0] == submission_types[submission_types.length - 1])
+            common_submitter = (submitter_types[0] == submitter_types[submitter_types.length - 1])
+
+            if common_submission && common_submitter
+              submission_type = submission_types[0]
+              submitter_type = submitter_types[0]
+
+              if submitter_type != 'INTERNAl'
+                if submitter_type == 'CUSTOMER'
+                  is_customer = true
+
+                if submission_type == 'e'
+                  ticket_type = 'EmailDispute'
+                else
+                  ticket_type = 'WebDispute'
+
+                populate_resolved_webrep_templates('Fixed - FP', 'ticket', ticket_type, is_customer)
 
         else
           $('#ticket-non-res-submit').show()
@@ -946,13 +972,43 @@ $ ->
           stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
           $('#entry-non-res-submit').hide()
           $(stat_comment).val('')
-          $('#index-edit-entry-status-dropdown #FIXED_FP').prop('checked', true)
-          submission_type = $('input[name=webrep-dispute-submission-type').val()
-          if submission_type == 'e'
-            ticket_type = 'EmailDispute'
-          else
-            ticket_type = 'WebDispute'
-          populate_resolved_webrep_templates('Fixed - FP', 'entry', ticket_type, true)
+
+          #check first resolution checkbox if none selected, check if web or email ticket
+          if !($("#index-edit-entry-status-dropdown input.ticket-resolution-radio").is(':checked'))
+            $('#index-edit-entry-status-dropdown input#FIXED_FP').prop('checked', true)
+
+            is_customer = false
+            submission_types = []
+            submitter_types = []
+            checkboxes = $('#disputes-index').find('.dispute_check_box')
+
+            $(checkboxes).each ->
+              if $(this).is(':checked')
+                tr = $(this).closest('tr')
+                row = window.dispute_table.row(tr)
+                submission_types.push(row.data().submission_type)
+                submitter_types.push(row.data().submitter_type)
+
+            submission_types.sort()
+            submitter_types.sort()
+
+            common_submission = (submission_types[0] == submission_types[submission_types.length - 1])
+            common_submitter = (submitter_types[0] == submitter_types[submitter_types.length - 1])
+
+            if common_submission && common_submitter
+              submission_type = submission_types[0]
+              submitter_type = submitter_types[0]
+
+              if submitter_type != 'INTERNAl'
+                if submitter_type == 'CUSTOMER'
+                  is_customer = true
+
+                if submission_type == 'e'
+                  ticket_type = 'EmailDispute'
+                else
+                  ticket_type = 'WebDispute'
+
+                populate_resolved_webrep_templates('Fixed - FP', 'entry', ticket_type, is_customer)
 
         else
           $('#entry-non-res-submit').show()
@@ -1634,8 +1690,6 @@ $ ->
 
   window.assemble_webrep_response_templates = (templates, ticket_or_entry, customer_footer) ->
 
-    console.log 'customer_footer'
-    console.log customer_footer
     resolution_select = $("#webrep-#{ticket_or_entry}-resolution-message-template-select.resolution-message-template-select")
     resolution_select.empty()
 
