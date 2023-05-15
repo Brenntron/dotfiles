@@ -334,6 +334,26 @@ window.retry_imports = (id)->
       std_api_error(response, 'Error retrying import.', reload: false)
   )
 
+window.close_related_issues = () ->
+  ids = $('.imports_check_box:checked').map (i, el) -> $(el).val()
+  if ids.length > 0
+    $('.close-ticket-button').attr('disabled', true)
+
+    data =  { issue_keys: ids.toArray() } 
+    std_msg_ajax(
+      method: 'put'
+      url: '/escalations/api/v1/escalations/jira_import_tasks/close_related_issues'
+      data: data
+      error: (response) ->
+        std_api_error(response, 'Error closing related issues.', reload: false)
+      complete: (response) ->
+        $('#webcat-imports-index').DataTable().ajax.reload()
+
+        $('.close-ticket-button').removeAttr('disabled')
+    )
+  else
+    std_msg_error('Error',['Please select at least one row before close related issues.'])
+
 
 window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
