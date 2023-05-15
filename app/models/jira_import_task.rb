@@ -30,10 +30,17 @@ class JiraImportTask < ApplicationRecord
     'ISSUE_PLATFORM'
   ]
 
+  CACHE_LIFESPAN = 30
+
+  def issue
+    @issue ||= JiraRest::Issue.new(issue_key)
+  end
+
   #Read CSV from Jira and send URLs to Bast
   def process_import
     update(imported_at: Time.now)
-    custom_fields = JiraRest::Project.new('SDOCS').custom_fields
+
+    custom_fields = JiraRest::Project.new(Rails.configuration.jira.project_key).custom_fields
     issue = JiraRest::Issue.new(issue_key)
 
     # fetch data from 'URL(s)' ticket field
@@ -161,6 +168,22 @@ class JiraImportTask < ApplicationRecord
     import_urls.where(bast_verdict: true)
   end
 
+  def self.question_type_ticket_count
+    filters = ['status != Resolved', "issuetype = 'Question / Assistance'"]
+    project_key = Rails.configuration.jira.project_key
+
+    stored_count = JSON.parse(Rails.cache.read("question_type_count") || "{}")
+    if stored_count.blank? || stored_count['last_queried'] < 15.minutes.ago
+      project = JiraRest::Project.new(project_key)
+      issues = project.issues(filters)
+      count = issues.count
+      Rails.cache.write("question_type_count", {'count' => count, 'last_queried' => Time.now}.to_json)
+    else
+      count = stored_count['count']
+    end
+    count
+  end
+
   def self.export_xlsx(issue_keys='')
     issue_keys = issue_keys.split(',')
 
@@ -210,5 +233,17 @@ class JiraImportTask < ApplicationRecord
       end
     end
     workbook
+  end
+
+  def issue_status
+    issue_data = JSON.parse(Rails.cache.read("#{issue_key}") || "{}")
+
+    if issue_data.blank? || issue_data['last_queried'] < CACHE_LIFESPAN.minutes.ago
+      issue_status = issue.issue.status.name
+      Rails.cache.write("#{issue_key}", {'status' => issue_status, 'last_queried' => Time.now}.to_json)
+    else
+      issue_status = issue_data['status']
+    end
+    issue_status
   end
 end

@@ -3,8 +3,7 @@ require 'rake'
 namespace :jira do
   desc 'Import issues from Jira'
   task :import => :environment do
-    filters = ['statusCategory != Done', 'createdDate > -30d']
-
+    filters = ['status != Resolved', "issuetype != 'Question / Assistance'", 'createdDate > -30d']
     project_key = Rails.configuration.jira.project_key
     project = JiraRest::Project.new(project_key)
     platform_field_id = project.custom_fields[:platform]

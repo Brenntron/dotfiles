@@ -209,7 +209,7 @@ $(document).on 'click', '#bulk-ticket-select',->
   checked = $(this).prop('checked')
   all_rows = $("#webcat-imports-index tbody tr").filter(':visible')
   $('.imports_check_box:visible').prop('checked', checked)
-
+  $('.imports_check_box:visible').trigger('change')
   if checked
     all_rows.addClass('selected')
   else
@@ -222,6 +222,7 @@ $(document).on 'click', '.imports-url-checkbox-bulk',->
   $(".imports-url-checkbox-#{issue_key}").trigger("change")
 
 $(document).on 'change', '.imports-url-checkbox',->
+
   checked_rows = $(".imports-url-checkbox:checked").closest('tr')
   current_username = $('input[name="current_user_name"]').val()
   can_take =     false
@@ -267,12 +268,29 @@ $(document).on 'click', '.imports_check_box',->
     row.removeClass('selected')
 
   num_checked = $('.imports_check_box:checked').length
-
   if num_checked == check.length
     check.prop('checked', true)
-
   if num_checked == 0
     check.prop('checked', false)
+
+$(document).on 'change', '.imports_check_box', ->
+  retry_button = $('.toolbar-button.retry-button')
+  can_retry = false
+  checked_data = checked_row_data() || [];
+  if checked_data.length > 0
+    $('.close-ticket-button').attr('disabled', true)
+  else
+    $('.close-ticket-button').removeAttr('disabled')
+
+  for row in checked_data
+    if row.status == 'Failure'
+      can_retry = true
+      break
+
+  if can_retry
+    retry_button.removeAttr('disabled')
+  else
+    retry_button.attr('disabled', true)
 
 $(document).on 'click', '#show-failed, #show-complete, #show-pending',->
   show_failed = $('#show-failed').prop('checked')
@@ -300,22 +318,6 @@ window.checked_row_data = ()->
   data = table.rows(rows).data()
   return data
 
-$(document).on 'click', '.imports_check_box', ->
-  retry_button = $('.toolbar-button.retry-button')
-
-  can_retry = false
-  checked_data = checked_row_data() || [];
-
-  for row in checked_data
-    if row.status == 'Failure'
-      can_retry = true
-      break
-
-  if can_retry
-    retry_button.removeAttr('disabled')
-  else
-    retry_button.attr('disabled', true)
-
 window.retry_imports = (id)->
   if id
     ids = [id]
@@ -334,6 +336,25 @@ window.retry_imports = (id)->
       std_api_error(response, 'Error retrying import.', reload: false)
   )
 
+window.close_related_issues = () ->
+  ids = $('.imports_check_box:checked').map (i, el) -> $(el).val()
+  if ids.length > 0
+    $('.close-ticket-button').attr('disabled', true)
+
+    data =  { issue_keys: ids.toArray() } 
+    std_msg_ajax(
+      method: 'put'
+      url: '/escalations/api/v1/escalations/jira_import_tasks/close_related_issues'
+      data: data
+      error: (response) ->
+        std_api_error(response, 'Error closing related issues.', reload: false)
+      complete: (response) ->
+        $('#webcat-imports-index').DataTable().ajax.reload()
+        $('.close-ticket-button').removeAttr('disabled')
+    )
+  else
+    std_msg_error('Error',['Please select at least one row before close related issues.'])
+
 
 window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
@@ -349,12 +370,12 @@ window.build_imports_table = () ->
       $('#webcat-imports-index_filter input').addClass('table-search-input');
     columnDefs: [
       {
-        targets: [ 0 ]
+        targets: [ 0,4,6 ]
         orderable: false
         searchable: false
       }
       {
-        targets: [ 0,1,2,3,4,5 ]
+        targets: [ 0,1,2,3,4,5,6 ]
         defaultContent:'-'
       }
     ]
@@ -401,7 +422,14 @@ window.build_imports_table = () ->
 
           return html
       },
-      {data: 'issue_status'}
+      {
+        data: 'issue_status'
+        orderable: true
+      },
+      {
+        data: 'status'
+        visible: false
+      }
     ]
   )
 # WBNP - Get report id
@@ -2364,10 +2392,14 @@ window.fetch_complaints = () ->
 
 
 open_selected = (selected_rows, toggle) ->
-  for selected_row in selected_rows.data()
-    { viewable, subdomain, domain, path, ip_address } = selected_row
-    if viewable == toggle
+  low_rep_entries = []
+  error_message = ''
 
+  for selected_row in selected_rows.data()
+    { viewable, subdomain, domain, path, ip_address, wbrs_score } = selected_row
+    if parseInt(wbrs_score) <= -6
+      low_rep_entries.push selected_row
+    else if viewable == toggle
       new_subdomain = ""
       new_domain = ""
       new_path = ""
@@ -2380,6 +2412,21 @@ open_selected = (selected_rows, toggle) ->
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
         window.open("http://"+selected_row.ip_address)
+
+  if low_rep_entries.length >= 10
+    error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores."
+  else if low_rep_entries.length > 0
+    domains_and_ips = []
+
+    for lre in low_rep_entries
+      if lre.domain
+        domains_and_ips.push "<li>#{lre.domain}</li>"
+      else
+        domains_and_ips.push "<li>#{lre.ip_address}</li>"
+
+    error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores. <ul>#{domains_and_ips.join('')}</ul>"
+
+  show_message('error', "#{error_message}", false, '#alertMessage')
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
@@ -2931,13 +2978,18 @@ window.prep_complaint_to_convert = () ->
 
               entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
                 '<td class="text-center entry-disposition">' +
-                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
-                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio" title="Customer says the website is safe and should be allowed.">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio" title="Customer says the website is malicious and should be blocked">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
                 '</td></tr>'
 
               $(entries_table).append(entry_row)
 
             $('#convert-ticket-summary').append(summary)
+            $('.entry-disposition > .inline-radio-wrapper > label').tooltipster
+              theme: [
+                'tooltipster-borderless'
+                'tooltipster-borderless-customized'
+              ]
 
           else
             std_msg_error('Ticket cannot be converted', ['Selected entry\'s parent ticket is not in a convertible (open) status.'])

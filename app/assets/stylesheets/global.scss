@@ -47,6 +47,7 @@ $disabled-txt: #A0A0A0;
 $communication-accent-color: #C14B92;
 $grey-section-color: #e2e2e2;
 $yellow-graph-bar:#f9cf81;
+$yet-another-pale-grey: #e8e8e8;
 
 /* Content Label Color */
 $content-label-color: #999;     /* Light Grey     */
@@ -94,10 +95,10 @@ body {
 }
 
 #page-wrapper {
-  min-height: 100%;
   align-content: center;
   display: block;
   margin-left: $sidebar-width;
+  min-height: 100%;
 }
 
 #page-content-wrapper {
@@ -712,6 +713,7 @@ button {
 
 .webcat-reports-toolbar{
   margin-bottom: -35px;
+  margin-top: 37px;
   z-index: 10;
   .toolbar-button-select.toolbar-button-text{
     padding-left: 25px;
@@ -809,7 +811,13 @@ button {
     opacity: 0.5;
   }
 }
-.splitview-button {background-image: url(image_path('icon_splitview.svg'));}
+.close-ticket-button{
+  background-image: url(image_path('icon_my_closed_tickets_grey.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }}
+.splitview-button {background-image: url(image_path('icon_splitview.svg'));
+}
 .duplicate-button {background-image: url(image_path('icon_duplicate.svg'));}
 .smtp-button      {background-image: url(image_path('icon_smtp.svg'));}
 .copydoc-button   {background-image: url(image_path('icon_copydoc.svg'));}
@@ -4077,15 +4085,13 @@ fieldset.top-content {
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
 .nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
 
-.email-msg-body pre {
+.email-msg-content {
   background-color: $content-bg-color;
   color: $type-lighter-color;
   line-height: 1.4em;
   margin-top: 12px;
   margin-bottom: 40px;
   font-size: 9pt;
-  white-space: pre-wrap;
-  word-wrap: break-word;
 }
 
 .table-toolbar {
@@ -4498,6 +4504,8 @@ input.communication-subject {
   font-size: 8pt;
   border-radius: 0;
   border: 1px solid darken($faint-neutral-color, 5%);
+  width: 100%;
+  max-width: 475px;
 }
 
 #communication h1 {
@@ -8185,12 +8193,17 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 .tag-capsule {
-  padding: 2px 4px;
-  margin: 4px 2px 0 2px;
   background-color: $bug-section-color;
   border-radius: 2px;
   color: $content-bg-color;
+  cursor: pointer;
   display: inline-block;
+  margin: 4px 2px 0 2px;
+  padding: 2px 4px;
+
+  &:hover {
+    background-color: darken($bug-section-color, 7%); 
+  }
 }
 
 .nested-complaint-data-wrapper a {
@@ -12363,12 +12376,16 @@ input[type="radio"].resolution_radio_button {
     font-weight: normal;
   }
 
-  label {
-    display: none;
-  }
-
   div {
     margin: 4px 3px 0 0;
+  }
+
+  .toolbar-dropdown {
+    margin-top: 0 !important;
+  }
+
+  .primary-text-divider {
+    margin-top: 0 !important;
   }
 
   .btn-group.toolbar-btn-group {
@@ -13732,6 +13749,34 @@ table > tbody > tr > td.no-padding {
   cursor:pointer;
   border-bottom: 1px solid #666;
 }
+
+.jira-ticket-type-wrapper {
+  float: right;
+  max-width: 350px;
+  padding: 5px 14px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.25em;
+  border: 1px solid $yet-another-pale-grey;
+  background-color: $content-bg-color;
+  &::before {
+    content: '*';
+    color: $second-section-color;
+    position: absolute;
+    display: block;
+    margin-left: -7px;
+  }
+}
+.bold-note{
+  font-weight: bold;
+}
+// ff one-off fix for the red asterisk
+@-moz-document url-prefix() {
+  .jira-ticket-type-wrapper::before {
+    margin-top: -14px;
+  }
+}
+
 .webcat-ticket-view{
   margin-top: 50px;
   .data-report-content{
@@ -13763,7 +13808,6 @@ table > tbody > tr > td.no-padding {
   }
 
   .ticket-rows{
-    //margin: 7px;
     .dataTables_wrapper{
       top: -10px;
     }
@@ -14379,6 +14423,13 @@ input.wl-bl-list-inline {
   }
   .align-top {
     padding-top: 3px !important;
+  }
+}
+
+//overridding the webrep toolbar div style for convert ticket dropdown
+#convert-ticket-dropdown  {
+  div {
+    margin-right: 0 !important;
   }
 }
 

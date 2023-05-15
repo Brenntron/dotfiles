@@ -54,13 +54,12 @@ gem 'net-ssh', '5.0.2'
 gem "net-http"
 gem "net-smtp"
 gem "net-imap"
-gem "uri", "0.10.0"
+gem "uri", "0.12.0"
 gem 'httparty', '~> 0.15.3'
-# gem 'peake-bridge-client', '0.1.0.0'
-# gem 'peake-bridge-client', '0.1.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
-gem 'peake-bridge-client', '0.2.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
-# gem 'peake-bridge-client', '0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
-# gem 'peake-bridge-client', '0.1.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
+
+# gem 'peake-bridge-client', '0.2.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
+gem 'peake-bridge-client', '0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
+
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'
 gem 'aws-sdk', '3.1.0'
@@ -107,8 +106,8 @@ gem 'pry-remote', '~> 0.1.8'
 
 
 
-gem 'whois', '4.0.7'
-gem 'whois-parser', '1.1.0'
+gem 'whois', '4.1.0'
+gem 'whois-parser', '2.0'
 
 
 gem 'clipboard-rails', '1.7.1'
