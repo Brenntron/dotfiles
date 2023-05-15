@@ -173,7 +173,7 @@ window.build_single_row = (rd, data) ->
           if complaint_id
             complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
             $('td', row).eq(4).html(complaint_link)
-          console.log age
+
           if age
             unless status == 'COMPLETED' || status == 'RESOLVED'
               if age.indexOf('h') != -1 && age.indexOf('h') >= 3
@@ -211,8 +211,7 @@ window.build_ticket_view = (checked, view) ->
       if el.length > 0
         # if we have already built this ticket view, show it
         el.removeClass('hidden')
-        if checked.length > 1
-          el.addClass('vis-ticket')
+        el.addClass('vis-ticket')
       else
         # if we haven't built this ticket view, build it
         rd = table.row( row ).data()
