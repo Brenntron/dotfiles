@@ -326,7 +326,7 @@ module API
 
                   if status[:status] != 'ip'
                     current_categories = complaint_entry.current_category_data
-                    wbrs_response = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(complaint_entry.domain)})
+                    wbrs_response = Sbrs::ManualSbrs.get_wbrs_data({:url => Addressable::URI.escape(complaint_entry.domain)})
                     wbrs_score = wbrs_response["wbrs"]["score"]
 
                     complaint_entry.wbrs_score = wbrs_score

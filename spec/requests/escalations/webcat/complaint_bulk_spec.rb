@@ -49,7 +49,7 @@ RSpec.describe "complaint bulk submit", type: :request do
     expect(json_body["data"]["created"].size).to eql(1)
     expect(json_body["data"]["completed"].size).to eql(1)
 
-    current_cats = Wbrs::Prefix.where({:urls => [URI.escape('test-one.com')]})
+    current_cats = Wbrs::Prefix.where({:urls => [Addressable::URI.escape('test-one.com')]})
     expect(current_cats.size).to eql(1)
     expect(current_cats.first.category_id).to eql(10)
 
@@ -76,12 +76,12 @@ RSpec.describe "complaint bulk submit", type: :request do
     expect(json_body["data"]["created"].size).to eql(2)
     expect(json_body["data"]["completed"].size).to eql(2)
 
-    current_cats = Wbrs::Prefix.where({:urls => [URI.escape('test-six.com')]})
+    current_cats = Wbrs::Prefix.where({:urls => [Addressable::URI.escape('test-six.com')]})
     expect(current_cats.size).to eql(2)
     expect(current_cats.first.category_id).to eql(15)
     expect(current_cats.last.category_id).to eql(16)
 
-    current_cats = Wbrs::Prefix.where({:urls => [URI.escape('test-seven.com')]})
+    current_cats = Wbrs::Prefix.where({:urls => [Addressable::URI.escape('test-seven.com')]})
     expect(current_cats.size).to eql(2)
     expect(current_cats.first.category_id).to eql(15)
     expect(current_cats.last.category_id).to eql(16)

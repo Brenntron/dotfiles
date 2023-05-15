@@ -95,10 +95,10 @@ body {
 }
 
 #page-wrapper {
-  min-height: 100%;
   align-content: center;
   display: block;
   margin-left: $sidebar-width;
+  min-height: 100%;
 }
 
 #page-content-wrapper {
@@ -4080,15 +4080,13 @@ fieldset.top-content {
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
 .nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
 
-.email-msg-body pre {
+.email-msg-content {
   background-color: $content-bg-color;
   color: $type-lighter-color;
   line-height: 1.4em;
   margin-top: 12px;
   margin-bottom: 40px;
   font-size: 9pt;
-  white-space: pre-wrap;
-  word-wrap: break-word;
 }
 
 .table-toolbar {
@@ -4501,6 +4499,8 @@ input.communication-subject {
   font-size: 8pt;
   border-radius: 0;
   border: 1px solid darken($faint-neutral-color, 5%);
+  width: 100%;
+  max-width: 475px;
 }
 
 #communication h1 {
@@ -8188,12 +8188,17 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 .tag-capsule {
-  padding: 2px 4px;
-  margin: 4px 2px 0 2px;
   background-color: $bug-section-color;
   border-radius: 2px;
   color: $content-bg-color;
+  cursor: pointer;
   display: inline-block;
+  margin: 4px 2px 0 2px;
+  padding: 2px 4px;
+
+  &:hover {
+    background-color: darken($bug-section-color, 7%); 
+  }
 }
 
 .nested-complaint-data-wrapper a {
@@ -12366,12 +12371,16 @@ input[type="radio"].resolution_radio_button {
     font-weight: normal;
   }
 
-  label {
-    display: none;
-  }
-
   div {
     margin: 4px 3px 0 0;
+  }
+
+  .toolbar-dropdown {
+    margin-top: 0 !important;
+  }
+
+  .primary-text-divider {
+    margin-top: 0 !important;
   }
 
   .btn-group.toolbar-btn-group {
@@ -14409,6 +14418,13 @@ input.wl-bl-list-inline {
   }
   .align-top {
     padding-top: 3px !important;
+  }
+}
+
+//overridding the webrep toolbar div style for convert ticket dropdown
+#convert-ticket-dropdown  {
+  div {
+    margin-right: 0 !important;
   }
 }
 
