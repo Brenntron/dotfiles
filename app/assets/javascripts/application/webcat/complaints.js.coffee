@@ -173,7 +173,7 @@ window.build_single_row = (rd, data) ->
 
     )
   else
-    ticket_html += "</div>"
+    ticket_html += "<hr/></div>"
     $('.webcat-ticket-view').append(ticket_html)
 
 window.build_ticket_view = (checked, view) ->
@@ -401,10 +401,7 @@ window.build_imports_table = () ->
 
           return html
       },
-      {
-        data: 'status'
-        visible: false
-      }
+      {data: 'issue_status'}
     ]
   )
 # WBNP - Get report id
