@@ -163,14 +163,32 @@ window.build_single_row = (rd, data) ->
           }]
         createdRow: (row, data, index) ->
           entry_id = data[3]
+          complaint_id = data[4]
+          age = data[10]
+          status = data[5]
+
           checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
           $('td', row).eq(0).append(checkbox).addClass('checkbox-cell')
 
-          complaint_id = data[4]
           if complaint_id
             complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
             $('td', row).eq(4).html(complaint_link)
-
+          console.log age
+          if age
+            unless status == 'COMPLETED' || status == 'RESOLVED'
+              if age.indexOf('h') != -1 && age.indexOf('h') >= 3
+                hour = parseInt( age.split("h")[0] )
+                if hour>= 3 && hour < 12
+                  age_class = 'ticket-age-over3hr'
+                else if hour >= 12
+                  age_class = 'ticket-age-over12hr'
+              else if age.indexOf('mo') != -1
+                age_class = 'ticket-age-over12hr'
+              else if (age.indexOf('m') != -1) || (age.indexOf('s') != -1)
+                age_class = ''
+              else
+                age_class = 'ticket-age-over12hr'
+              $('td', row).eq(10).html("<span class='#{age_class}'>#{age}</span>")
     )
   else
     ticket_html += "<hr/></div>"
@@ -277,10 +295,11 @@ $(document).on 'change', '.imports_check_box', ->
   retry_button = $('.toolbar-button.retry-button')
   can_retry = false
   checked_data = checked_row_data() || [];
+
   if checked_data.length > 0
-    $('.close-ticket-button').attr('disabled', true)
-  else
     $('.close-ticket-button').removeAttr('disabled')
+  else
+    $('.close-ticket-button').attr('disabled', true)
 
   for row in checked_data
     if row.status == 'Failure'
