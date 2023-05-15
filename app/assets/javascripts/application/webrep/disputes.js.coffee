@@ -207,9 +207,19 @@ window.dispute_status_drop_down = (dispute_id) ->
       status = response.status
       comment = response.comment
 
+      #deselect any current status
+      $('.status-radio-wrapper').removeClass 'selected'
+      if status != 'FIXED_FP'
+        $('.ticket-resolution-radio').prop("checked", false)
+
+      #add comment if found
       $('.ticket-status-radio' + '#' + status).prop("checked", true)
       if comment?
         $('.ticket-status-comment').text(comment)
+
+      #close comment dropdowns
+      $('#show-ticket-resolution-submenu').hide()
+      $('#ticket-non-res-submit').hide()
   )
 
 window.dispute_resolution_drop_down = (dispute_id) ->
