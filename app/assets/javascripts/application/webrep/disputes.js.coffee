@@ -863,11 +863,14 @@ $ ->
       if !($("#index-edit-ticket-status-dropdown input.ticket-resolution-radio").is(':checked'))
         #populate resolution dropdown with first email or web template
         submission_type = $('input[name=webrep-dispute-submission-type').val()
-        $('#index-edit-ticket-status-dropdown input#FIXED_FP').prop('checked', true)
+        $('#show-ticket-resolution-submenu input#FIXED_FP').prop('checked', true)
+
         if submission_type == 'e'
-          populate_resolved_webrep_templates('Fixed - FP', 'ticket', 'EmailDispute')
+          ticket_type = 'EmailDispute'
         else
-          populate_resolved_webrep_templates('Fixed - FP', 'ticket', 'WebDispute')
+          ticket_type = 'WebDispute'
+
+        populate_resolved_webrep_templates('Fixed - FP', 'ticket', ticket_type, true)
 
     else
       $('#ticket-non-res-submit').show()
@@ -893,7 +896,15 @@ $ ->
           #check first resolution checkbox if none selected
           if !($("#index-edit-ticket-status-dropdown input.ticket-resolution-radio").is(':checked'))
             $('#index-edit-ticket-status-dropdown input#FIXED_FP').prop('checked', true)
-            populate_resolved_webrep_templates('Fixed - FP', 'entry')
+            submission_type = $('input[name=webrep-dispute-submission-type').val()
+
+            if submission_type == 'e'
+              ticket_type = 'EmailDispute'
+            else
+              ticket_type = 'WebDispute'
+#            TODO: fix up entry default selection
+
+            populate_resolved_webrep_templates('Fixed - FP', 'entry', ticket_type, true)
 
         else
           $('#ticket-non-res-submit').show()
@@ -938,9 +949,11 @@ $ ->
           $('#index-edit-entry-status-dropdown #FIXED_FP').prop('checked', true)
           submission_type = $('input[name=webrep-dispute-submission-type').val()
           if submission_type == 'e'
-            populate_resolved_webrep_templates('Fixed - FP', 'entry', 'EmailDispute')
+            ticket_type = 'EmailDispute'
           else
-            populate_resolved_webrep_templates('Fixed - FP', 'entry', 'WebDispute')
+            ticket_type = 'WebDispute'
+          populate_resolved_webrep_templates('Fixed - FP', 'entry', ticket_type, true)
+
         else
           $('#entry-non-res-submit').show()
           res_comment = $('#index-entry-resolution-submenu').find('.entry-status-comment')
@@ -1619,29 +1632,56 @@ $ ->
     else
       alert('No disputes selected')
 
+  window.assemble_webrep_response_templates = (templates, ticket_or_entry, customer_footer) ->
+
+    console.log 'customer_footer'
+    console.log customer_footer
+    resolution_select = $("#webrep-#{ticket_or_entry}-resolution-message-template-select.resolution-message-template-select")
+    resolution_select.empty()
+
+    if templates.length == 0
+      resolution_select.val ''
+      $(".#{ticket_or_entry}-resolution-description").text ''
+      $(".#{ticket_or_entry}-resolution-comment").val ''
+
+    $(templates).each (index, template) ->
+
+      #append customer footer to preset message
+      if customer_footer != ''
+        customer_message = template.body + ' ' + customer_footer
+      else customer_message = template.body
+
+      template_option = $("<option class='webrep-resolution-template-option'></option>")
+      $(template_option).val template.name
+      $(template_option).text template.name
+      $(template_option).attr('data-body', customer_message )
+      $(template_option).attr('data-description', template.description )
+      resolution_select.append template_option
+
+      #show first option as body and description
+      if index == 0
+        $(".#{ticket_or_entry}-resolution-comment").val customer_message
+        $(".#{ticket_or_entry}-resolution-description").text template.description
+
+
   window.populate_resolved_webrep_templates = (resolution_type, ticket_or_entry, ticket_type, is_customer) ->
+
+    #fetch main template data
     get_resolution_templates_by_resolution('webrep', resolution_type, ticket_type).then (response) ->
-      resolution_select = $("#webrep-#{ticket_or_entry}-resolution-message-template-select.resolution-message-template-select")
-      resolution_select.empty()
       templates = JSON.parse response
+      customer_footer = ''
 
-      if templates.length == 0
-        resolution_select.val ''
-        $(".#{ticket_or_entry}-resolution-description").text ''
-        $(".#{ticket_or_entry}-resolution-comment").val ''
+      if is_customer == true
+        #fetch customer footer to append to message if customer ticket
+        get_resolution_templates_by_resolution('webrep', 'Customer Footer', ticket_type).then (customer_footer_response) ->
+          if customer_footer_response.length > 0
+            customer_footer = JSON.parse customer_footer_response
+            customer_footer = customer_footer[0].body
 
-      $(templates).each (index, template) ->
-        template_option = $("<option class='webrep-resolution-template-option'></option>")
-        $(template_option).val template.name
-        $(template_option).text template.name
-        $(template_option).attr('data-body', template.body )
-        $(template_option).attr('data-description', template.description )
-        resolution_select.append template_option
+            assemble_webrep_response_templates(templates, ticket_or_entry, customer_footer)
 
-        #show first option as body and description
-        if index == 0
-          $(".#{ticket_or_entry}-resolution-comment").val template.body
-          $(".#{ticket_or_entry}-resolution-description").text template.description
+      else
+        assemble_webrep_response_templates(templates, ticket_or_entry, customer_footer)
 
   #show page ticket resolution select
   $('#webrep-resolution-selector input[type=radio][name=dispute-resolution]').change (event)->
@@ -1654,9 +1694,11 @@ $ ->
       resolution_type = $(this).siblings('.ticket-res-radio-label').text()
 
       if submission_type == 'e'
-        populate_resolved_webrep_templates(resolution_type.trim(), 'ticket', 'EmailDispute', is_customer)
+        ticket_type = 'EmailDispute'
       else
-        populate_resolved_webrep_templates(resolution_type.trim(), 'ticket', 'WebDispute', is_customer)
+        ticket_type = 'WebDispute'
+
+      populate_resolved_webrep_templates(resolution_type.trim(), 'ticket', ticket_type, is_customer)
 
 
   #single entry in show page resolution select
@@ -1670,12 +1712,15 @@ $ ->
         is_customer = true
 
       if submission_type == 'e'
-        populate_resolved_webrep_templates(resolution_type.trim(), 'entry', 'EmailDispute', is_customer)
+        ticket_type = 'EmailDispute'
       else
-        populate_resolved_webrep_templates(resolution_type.trim(), 'entry', 'WebDispute', is_customer)
+        ticket_type = 'WebDispute'
+
+      populate_resolved_webrep_templates(resolution_type.trim(), 'entry', ticket_type, is_customer)
 
   #resolution select for ticket(s) on index table
   $('#index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change (event)->
+    is_customer = false
     $(".ticket-status-comment").html('')
     submission_types = []
     submitter_types = []
@@ -1702,10 +1747,13 @@ $ ->
           is_customer = true
 
         resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+
         if submission_type == 'e'
-          populate_resolved_webrep_templates(resolution_type.trim(), 'ticket', 'EmailDispute', is_customer)
+          ticket_type = 'EmailDispute'
         else
-          populate_resolved_webrep_templates(resolution_type.trim(), 'ticket', 'WebDispute', is_customer)
+          ticket_type = 'WebDispute'
+
+        populate_resolved_webrep_templates(resolution_type.trim(), 'ticket', ticket_type, is_customer)
 
   #resolution select for entries on index table
   $('#index-entry-resolution-submenu input[type=radio][name=entry-resolution]').change (event)->
@@ -1736,9 +1784,11 @@ $ ->
 
       resolution_type = $(this).siblings('.ticket-res-radio-label').text()
       if submission_type == 'e'
-        populate_resolved_webrep_templates(resolution_type.trim(), 'entry', 'EmailDispute', is_customer)
+        ticket_type = 'EmailDispute'
       else
-        populate_resolved_webrep_templates(resolution_type.trim(), 'entry', 'WebDispute', is_customer)
+        ticket_type = 'WebDispute'
+
+      populate_resolved_webrep_templates(resolution_type.trim(), 'entry', ticket_type, is_customer)
 
 window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
