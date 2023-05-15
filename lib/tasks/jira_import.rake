@@ -10,23 +10,21 @@ namespace :jira do
     platform_field_id = project.custom_fields[:platform]
     issues = project.issues(filters)
     issues.each do |issue|
-
       import_task = JiraImportTask.find_by(issue_key: issue.key)
-      if import_task.present?
-        next
-      else
-        task_attributes = {
-          issue_key: issue.key,
-          submitter: issue.reporter.name,
-          status: JiraImportTask::STATUS_PENDING,
-          issue_summary: issue.summary,
-          issue_status: issue.status.name,
-          issue_description: issue.description,
-          issue_platform: issue.fields.dig(platform_field_id, 'value')
-        }
-        import_task = JiraImportTask.create!(task_attributes)
-        import_task.process_import
-      end
+      next if import_task.present?
+      
+      task_attributes = {
+        issue_key: issue.key,
+        submitter: issue.reporter.name,
+        status: JiraImportTask::STATUS_PENDING,
+        issue_summary: issue.summary,
+        issue_status: issue.status.name,
+        issue_description: issue.description,
+        issue_platform: issue.fields.dig(platform_field_id, 'value'),
+        issue_type: issue.issuetype.name
+      }
+      import_task = JiraImportTask.create!(task_attributes)
+      import_task.process_import
     end
   end
 

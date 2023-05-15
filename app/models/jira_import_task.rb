@@ -18,16 +18,20 @@ class JiraImportTask < ApplicationRecord
   
   EXPORT_FIELD_NAMES = [
     'SUBMITTED_URL',
-    'DOMAIN',
     'ISSUE_KEY',
     'STATUS',
     'ISSUE_SUBMITTER',
-    'BAST_TASK_ID',
     'IMPORTED_AT',
     'ISSUE_SUMMARY',
     'ISSUE_DESCRIPTION',
     'ISSUE_STATUS',
-    'ISSUE_PLATFORM'
+    'ISSUE_PLATFORM',
+    'ISSUE_TYPE',
+    'COMPLAINT_ID',
+    'COMPLAINT_ENTRY_STATUS',
+
+    'COMPLAINT_ENTRY_RESOLUTION',
+    'BAST_COMMENT'
   ]
 
   #Read CSV from Jira and send URLs to Bast
@@ -184,16 +188,12 @@ class JiraImportTask < ApplicationRecord
             case field_name
             when 'SUBMITTED_URL'
               import_url.submitted_url
-            when 'DOMAIN'
-              import_url.domain
             when 'ISSUE_KEY'
               task.issue_key
             when 'STATUS'
               task.status
             when 'ISSUE_SUBMITTER'
               task.submitter
-            when 'BAST_TASK_ID'
-              task.bast_task
             when 'IMPORTED_AT'
               task.imported_at.utc.iso8601
             when 'ISSUE_STATUS'
@@ -204,6 +204,16 @@ class JiraImportTask < ApplicationRecord
               task.issue_platform
             when 'ISSUE_SUMMARY'
               task.issue_summary
+            when 'ISSUE_TYPE'
+              task.issue_type
+            when 'COMPLAINT_ID'
+              import_url.complaint_id
+            when 'COMPLAINT_ENTRY_STATUS'
+              import_url.complaint&.status
+            when 'COMPLAINT_ENTRY_RESOLUTION'
+              import_url.complaint&.resolution
+            when 'BAST_COMMENT'
+              import_url.verdict_reason || 'Inactive'
             end
           worksheet.add_cell(row_index, col_index, cell_data)
         end

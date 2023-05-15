@@ -4,6 +4,11 @@ FactoryBot.define do
     status { 'pending' }
     sequence(:result) { |n| "result-#{n}" }
     submitter { Faker::Name.name }
+    issue_summary { 'These are URLS, pls add categories'}
+    issue_description { 'URLs was imported by DOC team' }
+    issue_status { 'Open' }
+    issue_platform { 'Secure Platform' }
+    issue_type { "Small Requests ≤ 50 URL" }
     sequence(:bast_task) { |n| n }
     imported_at { Time.now }
 
