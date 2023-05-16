@@ -62,12 +62,10 @@ window.build_single_row = (rd, data) ->
   { urls } = data
   { issue_key, submitter, status, result, imported_at, issue_status, issue_platform, issue_description, issue_summary} = rd
 
-  if status == 'Awaiting Bast Verdict'
-    status = '<span>PENDING <span class="import-note">| Awaiting Bast Verdict<span></span>'
-  else
-    status = status.toUpperCase()
-    if result && status != result.toUpperCase()
-      status = "#{status} | #{result}"
+
+  status = status.toUpperCase()
+  if result && status != result.toUpperCase()
+    status = "#{status} | #{result}"
 
   # build upper data
   # breaking out layout html for more granular control over display
