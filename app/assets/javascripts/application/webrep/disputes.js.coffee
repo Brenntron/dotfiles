@@ -1741,7 +1741,8 @@ $ ->
         get_resolution_templates_by_resolution('webrep', 'Customer Footer', ticket_type).then (customer_footer_response) ->
           if customer_footer_response.length > 0
             customer_footer = JSON.parse customer_footer_response
-            customer_footer = customer_footer[0].body
+            if customer_footer[0]?
+              customer_footer = customer_footer[0].body
 
             assemble_webrep_response_templates(templates, ticket_or_entry, customer_footer)
 
