@@ -54,6 +54,22 @@ class JiraImportTaskDatatable < AjaxDatatablesRails::ActiveRecord
 
   def sort_records(records)
     case datatable.orders.first.column.sort_query
+    when 'jira_import_tasks.result'
+      records.order("status #{datatable.orders.first.direction}")
+    when 'jira_import_tasks.issue_key'
+      if datatable.orders.first.direction == 'ASC'
+        record_ids = records.sort_by { |record| record.issue_key.split("-").last.to_i }.map(&:id)
+      else
+        record_ids = records.sort_by { |record| record.issue_key.split("-").last.to_i }.reverse.map(&:id)
+      end
+
+      order_clause = "CASE id "
+      record_ids.each_with_index do |value, index|
+        order_clause << "WHEN #{value} THEN #{index} "
+      end
+      order_clause << "END"
+
+      JiraImportTask.where(id: records.map(&:id)).order(Arel.sql(order_clause))
     when 'jira_import_tasks.issue_status'
       if datatable.orders.first.direction == 'ASC'
         record_ids = records.sort_by {|record| record.issue_status}.map(&:id)
