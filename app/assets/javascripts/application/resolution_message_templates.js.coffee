@@ -228,13 +228,19 @@ $ ->
         std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
     )
 
-  # Change resolution template select
+  # Change resolution template select - Tickets
   $('.resolution-message-template-select').on 'change', (i, e) ->
     comment = $('.resolution-message-template-select option:selected').attr('data-body')
     $('.ticket-resolution-comment').val comment
     description = $('.resolution-message-template-select option:selected').attr('data-description')
     $('.ticket-resolution-description').text description
 
+  # Change resolution template select - Entries
+  $('.entry-resolution-message-template-select').on 'change', (i, e) ->
+    comment = $('.entry-resolution-message-template-select option:selected').attr('data-body')
+    $('.entry-status-comment').val comment
+    description = $('.entry-resolution-message-template-select option:selected').attr('data-description')
+    $('.entry-resolution-description').text description
 
   ## Webrep specific ##
 

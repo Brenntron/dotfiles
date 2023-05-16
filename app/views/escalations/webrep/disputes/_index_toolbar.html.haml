@@ -113,7 +113,7 @@
       Edit Ticket
 
     %span.dropdown
-      %button#index_ticket_status.toolbar-button.ticket-status-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_ticket_status.webrep-status-select-button.toolbar-button.ticket-status-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Edit Ticket Status
       .dropdown-menu.toolbar-dropdown#index-edit-ticket-status-dropdown{'aria-labelledby': 'index_ticket_status'}
@@ -247,7 +247,7 @@
                 .resolution-comment-wrapper
                   %label.content-label-sm
                     Template
-                  %select#webrep-entry-resolution-message-template-select.resolution-message-template-select
+                  %select#webrep-entry-resolution-message-template-select.resolution-message-template-select.entry-resolution-message-template-select
                   %label.content-label-sm
                     Description
                   %p.entry-resolution-description

@@ -892,10 +892,11 @@ $ ->
       $(res_comment[0]).val('')
 
   # Edit Ticket: Edit Ticket Status
-  $('#index_ticket_status').click ->
+  $('.escalations--webrep--disputes-controller #index_ticket_status').click ->
     dropdown = $('#index-edit-ticket-status-dropdown').parent()
     if ($('.dispute_check_box:checked').length > 0)
-# Select Status
+
+      # Select Status
       $('.ticket-status-radio-label').click ->
         radio_button = $(this).prev('.ticket-status-radio')
         $(radio_button[0]).trigger('click')
@@ -1783,7 +1784,7 @@ $ ->
       populate_resolved_webrep_templates(resolution_type.trim(), 'entry', ticket_type, is_customer)
 
   #resolution select for ticket(s) on index table
-  $('#index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change (event)->
+  $('#webrep-index-toolbar #index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change (event)->
     is_customer = false
     $(".ticket-status-comment").html('')
     submission_types = []
