@@ -432,9 +432,6 @@ window.build_imports_table = () ->
           else
             html = "<span>#{status}</span>"
 
-          if status == 'Awaiting Bast Verdict'
-            html = '<span>Pending <span class="import-note">| Awaiting Bast Verdict<span></span>'
-
           if status == 'Failure'
             html += "<button class='inline-retry-button retry-button tooltipped tooltipstered' title='Retry' onclick='retry_imports(#{id})'></button>"
 
