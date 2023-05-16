@@ -714,7 +714,8 @@ button {
 .webcat-reports-toolbar{
   margin-bottom: -35px;
   margin-top: 37px;
-  z-index: 10;
+  z-index: 1;
+  width: fit-content;
   .toolbar-button-select.toolbar-button-text{
     padding-left: 25px;
   }
@@ -811,8 +812,13 @@ button {
     opacity: 0.5;
   }
 }
-.close-ticket-button{background-image: url(image_path('icon_my_closed_tickets_grey.svg'));}
-.splitview-button {background-image: url(image_path('icon_splitview.svg'));}
+.close-ticket-button{
+  background-image: url(image_path('icon_my_closed_tickets_grey.svg'));
+  &:disabled {
+    opacity: 0.5;
+  }}
+.splitview-button {background-image: url(image_path('icon_splitview.svg'));
+}
 .duplicate-button {background-image: url(image_path('icon_duplicate.svg'));}
 .smtp-button      {background-image: url(image_path('icon_smtp.svg'));}
 .copydoc-button   {background-image: url(image_path('icon_copydoc.svg'));}

@@ -17,7 +17,7 @@ class JiraImportTaskDatatable < AjaxDatatablesRails::ActiveRecord
         total_urls:                  { source: "JiraImportTask.total_urls", data: :total_urls, searchable: false, orderable: false },
         unimported_urls:             { source: "JiraImportTask.unimported_urls", data: :unimported_urls, searchable: false, orderable: false},
         imported_urls:               { source: "JiraImportTask.imported_urls", data: :imported_urls, searchable: false, orderable: false},
-        issue_status:                { source: "JiraImportTask.issue_status", data: :issue_status, searchable: false, orderable: false},
+        issue_status:                { source: "JiraImportTask.issue_status", data: :issue_status, searchable: false},
         issue_summary:               { source: "JiraImportTask.issue_summary", data: :issue_summary, searchable: false},
         issue_description:           { source: "JiraImportTask.issue_description", data: :issue_description, searchable: false},
         issue_platform:              { source: "JiraImportTask.issue_platform", data: :issue_platform, searchable: false}
@@ -50,5 +50,42 @@ class JiraImportTaskDatatable < AjaxDatatablesRails::ActiveRecord
 
   def get_raw_records
     JiraImportTask.all
+  end
+
+  def sort_records(records)
+    case datatable.orders.first.column.sort_query
+    when 'jira_import_tasks.result'
+      records.order("status #{datatable.orders.first.direction}")
+    when 'jira_import_tasks.issue_key'
+      if datatable.orders.first.direction == 'ASC'
+        record_ids = records.sort_by { |record| record.issue_key.split("-").last.to_i }.map(&:id)
+      else
+        record_ids = records.sort_by { |record| record.issue_key.split("-").last.to_i }.reverse.map(&:id)
+      end
+
+      order_clause = "CASE id "
+      record_ids.each_with_index do |value, index|
+        order_clause << "WHEN #{value} THEN #{index} "
+      end
+      order_clause << "END"
+
+      JiraImportTask.where(id: records.map(&:id)).order(Arel.sql(order_clause))
+    when 'jira_import_tasks.issue_status'
+      if datatable.orders.first.direction == 'ASC'
+        record_ids = records.sort_by {|record| record.issue_status}.map(&:id)
+      else
+        record_ids = records.sort_by {|record| record.issue_status}.reverse.map(&:id)
+      end
+
+      order_clause = "CASE id "
+      record_ids.each_with_index do |value, index|
+        order_clause << "WHEN #{value} THEN #{index} "
+      end
+      order_clause << "END"
+
+      JiraImportTask.where(id: records.map(&:id)).order(Arel.sql(order_clause))
+    else
+      super
+    end
   end
 end

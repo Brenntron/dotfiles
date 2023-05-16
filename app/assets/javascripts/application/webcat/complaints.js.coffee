@@ -62,12 +62,10 @@ window.build_single_row = (rd, data) ->
   { urls } = data
   { issue_key, submitter, status, result, imported_at, issue_status, issue_platform, issue_description, issue_summary} = rd
 
-  if status == 'Awaiting Bast Verdict'
-    status = '<span>PENDING <span class="import-note">| Awaiting Bast Verdict<span></span>'
-  else
-    status = status.toUpperCase()
-    if result && status != result.toUpperCase()
-      status = "#{status} | #{result}"
+
+  status = status.toUpperCase()
+  if result && status != result.toUpperCase()
+    status = "#{status} | #{result}"
 
   # build upper data
   # breaking out layout html for more granular control over display
@@ -163,17 +161,35 @@ window.build_single_row = (rd, data) ->
           }]
         createdRow: (row, data, index) ->
           entry_id = data[3]
+          complaint_id = data[4]
+          age = data[10]
+          status = data[5]
+
           checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
           $('td', row).eq(0).append(checkbox).addClass('checkbox-cell')
 
-          complaint_id = data[4]
           if complaint_id
             complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
             $('td', row).eq(4).html(complaint_link)
 
+          if age
+            unless status == 'COMPLETED' || status == 'RESOLVED'
+              if age.indexOf('h') != -1 && age.indexOf('h') >= 3
+                hour = parseInt( age.split("h")[0] )
+                if hour>= 3 && hour < 12
+                  age_class = 'ticket-age-over3hr'
+                else if hour >= 12
+                  age_class = 'ticket-age-over12hr'
+              else if age.indexOf('mo') != -1
+                age_class = 'ticket-age-over12hr'
+              else if (age.indexOf('m') != -1) || (age.indexOf('s') != -1)
+                age_class = ''
+              else
+                age_class = 'ticket-age-over12hr'
+              $('td', row).eq(10).html("<span class='#{age_class}'>#{age}</span>")
     )
   else
-    ticket_html += "</div>"
+    ticket_html += "<hr/></div>"
     $('.webcat-ticket-view').append(ticket_html)
 
 window.build_ticket_view = (checked, view) ->
@@ -193,8 +209,7 @@ window.build_ticket_view = (checked, view) ->
       if el.length > 0
         # if we have already built this ticket view, show it
         el.removeClass('hidden')
-        if checked.length > 1
-          el.addClass('vis-ticket')
+        el.addClass('vis-ticket')
       else
         # if we haven't built this ticket view, build it
         rd = table.row( row ).data()
@@ -209,7 +224,7 @@ $(document).on 'click', '#bulk-ticket-select',->
   checked = $(this).prop('checked')
   all_rows = $("#webcat-imports-index tbody tr").filter(':visible')
   $('.imports_check_box:visible').prop('checked', checked)
-
+  $('.imports_check_box:visible').trigger('change')
   if checked
     all_rows.addClass('selected')
   else
@@ -222,6 +237,7 @@ $(document).on 'click', '.imports-url-checkbox-bulk',->
   $(".imports-url-checkbox-#{issue_key}").trigger("change")
 
 $(document).on 'change', '.imports-url-checkbox',->
+
   checked_rows = $(".imports-url-checkbox:checked").closest('tr')
   current_username = $('input[name="current_user_name"]').val()
   can_take =     false
@@ -267,12 +283,30 @@ $(document).on 'click', '.imports_check_box',->
     row.removeClass('selected')
 
   num_checked = $('.imports_check_box:checked').length
-
   if num_checked == check.length
     check.prop('checked', true)
-
   if num_checked == 0
     check.prop('checked', false)
+
+$(document).on 'change', '.imports_check_box', ->
+  retry_button = $('.toolbar-button.retry-button')
+  can_retry = false
+  checked_data = checked_row_data() || [];
+
+  if checked_data.length > 0
+    $('.close-ticket-button').removeAttr('disabled')
+  else
+    $('.close-ticket-button').attr('disabled', true)
+
+  for row in checked_data
+    if row.status == 'Failure'
+      can_retry = true
+      break
+
+  if can_retry
+    retry_button.removeAttr('disabled')
+  else
+    retry_button.attr('disabled', true)
 
 $(document).on 'click', '#show-failed, #show-complete, #show-pending',->
   show_failed = $('#show-failed').prop('checked')
@@ -299,22 +333,6 @@ window.checked_row_data = ()->
   rows = $('.imports_check_box:checked').closest('tr')
   data = table.rows(rows).data()
   return data
-
-$(document).on 'click', '.imports_check_box', ->
-  retry_button = $('.toolbar-button.retry-button')
-
-  can_retry = false
-  checked_data = checked_row_data() || [];
-
-  for row in checked_data
-    if row.status == 'Failure'
-      can_retry = true
-      break
-
-  if can_retry
-    retry_button.removeAttr('disabled')
-  else
-    retry_button.attr('disabled', true)
 
 window.retry_imports = (id)->
   if id
@@ -348,7 +366,6 @@ window.close_related_issues = () ->
         std_api_error(response, 'Error closing related issues.', reload: false)
       complete: (response) ->
         $('#webcat-imports-index').DataTable().ajax.reload()
-
         $('.close-ticket-button').removeAttr('disabled')
     )
   else
@@ -369,7 +386,7 @@ window.build_imports_table = () ->
       $('#webcat-imports-index_filter input').addClass('table-search-input');
     columnDefs: [
       {
-        targets: [ 0,4,6 ]
+        targets: [ 0,4 ]
         orderable: false
         searchable: false
       }
@@ -413,15 +430,15 @@ window.build_imports_table = () ->
           else
             html = "<span>#{status}</span>"
 
-          if status == 'Awaiting Bast Verdict'
-            html = '<span>Pending <span class="import-note">| Awaiting Bast Verdict<span></span>'
-
           if status == 'Failure'
             html += "<button class='inline-retry-button retry-button tooltipped tooltipstered' title='Retry' onclick='retry_imports(#{id})'></button>"
 
           return html
       },
-      {data: 'issue_status'},
+      {
+        data: 'issue_status'
+        orderable: true
+      },
       {
         data: 'status'
         visible: false
