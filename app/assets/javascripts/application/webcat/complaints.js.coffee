@@ -388,7 +388,7 @@ window.build_imports_table = () ->
       $('#webcat-imports-index_filter input').addClass('table-search-input');
     columnDefs: [
       {
-        targets: [ 0,4,6 ]
+        targets: [ 0,4 ]
         orderable: false
         searchable: false
       }
