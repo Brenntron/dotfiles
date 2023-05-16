@@ -271,40 +271,75 @@ $ ->
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
 
-  window.populate_resolved_filerep_templates = (resolution_type) ->
+  window.assemble_filerep_response_templates = (templates, customer_footer) ->
+
+    resolution_select = $('#filerep-resolution-message-template-select.resolution-message-template-select')
+    resolution_select.empty()
+
+    if templates.length == 0
+      resolution_select.val ''
+      $('.ticket-resolution-description').text ''
+      $('.resolution-status-comment').val ''
+
+    $(templates).each (index, template) ->
+      #append customer footer to preset message
+      if customer_footer != ''
+        customer_message = template.body + ' ' + customer_footer
+      else customer_message = template.body
+
+      template_option = $("<option class='filerep-resolution-template-option'></option>")
+      $(template_option).val template.name
+      $(template_option).text template.name
+      $(template_option).attr('data-body', customer_message )
+      $(template_option).attr('data-description', template.description )
+      resolution_select.append template_option
+
+      #show first option as body and description
+      if index == 0
+        $('.ticket-resolution-description').text template.description
+        $('.resolution-status-comment').val customer_message
+
+  window.populate_resolved_filerep_templates = (resolution_type, is_customer) ->
 
     get_resolution_templates_by_resolution('file_rep', resolution_type).then (response) ->
-      resolution_select = $('#filerep-resolution-message-template-select.resolution-message-template-select')
-      resolution_select.empty()
       templates = JSON.parse response
+      customer_footer = ''
 
-      if templates.length == 0
-        resolution_select.val ''
-        $('.ticket-resolution-description').text ''
-        $('.resolution-status-comment').val ''
-
-      $(templates).each (index, template) ->
-        template_option = $("<option class='filerep-resolution-template-option'></option>")
-        $(template_option).val template.name
-        $(template_option).text template.name
-        $(template_option).attr('data-body', template.body )
-        $(template_option).attr('data-description', template.description )
-        resolution_select.append template_option
-
-        #show first option as body and description
-        if index == 0
-          $('.ticket-resolution-description').text template.description
-          $('.resolution-status-comment').val template.body
+      if is_customer == true
+        #fetch customer footer to append to message if customer ticket
+        get_resolution_templates_by_resolution('file_rep', 'Customer Footer').then (customer_footer_response) ->
+          if customer_footer_response.length > 0
+            customer_footer = JSON.parse customer_footer_response
+            customer_footer = customer_footer[0].body
+            assemble_filerep_response_templates(templates, customer_footer)
+      else
+        assemble_filerep_response_templates(templates, customer_footer)
 
   # Filerep show page resolution select
   $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change () ->
     resolution_type = $(this).siblings('.ticket-res-radio-label').text()
-    populate_resolved_filerep_templates(resolution_type)
+    submitter_type = $('#filerep-dispute-customer-submitter-type').val().toLowerCase()
+    if submitter_type == 'customer' then is_customer = true else is_customer = false
+    populate_resolved_filerep_templates(resolution_type, is_customer)
 
   # Filerep index page resolution select
   $('#filerep-resolution-selector input[type=radio][name=ticket-resolution]').change () ->
     resolution_type = $(this).siblings('.ticket-res-radio-label').text()
-    populate_resolved_filerep_templates(resolution_type)
+    checkboxes = $('#file-rep-datatable').find('.dispute_check_box:checked')
+    submitter_types = []
+    table = $('#file-rep-datatable').DataTable()
+
+    is_customer = false
+    #show customer message if any checked rows are for customers
+    $(checkboxes).each ->
+      if $(this).is(':checked')
+        tr = $(this).closest('tr')
+        row = table.row(tr)
+        console.log row.data()
+        if row.data().submitter_type.toLowerCase() == 'customer'
+          is_customer = true
+
+    populate_resolved_filerep_templates(resolution_type, is_customer)
 
   # note: this function below affects the global space, can be accessed everywhere
   # these window-level funcs should probably be moved into a "global JS" file when time available

@@ -58,6 +58,7 @@ class Escalations::FileRep::DisputesController < ApplicationController
   def resolution_message_templates
     @conventions = AmpNamingConvention.all
     @templates = ResolutionMessageTemplate.for_file_reputation_disputes
+    @check_for_footer_filerep = ResolutionMessageTemplate.by_file_reputation_resolution_disputes('Customer Footer').exists?
   end
 
   private

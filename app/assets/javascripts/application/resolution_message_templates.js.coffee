@@ -54,7 +54,7 @@ $ ->
         std_api_error(response, "There was an error creating the resolution message template.", reload: false)
     )
 
-  get_and_populate_resolved_message = (template_id)->
+  get_and_populate_resolved_message = (template_id, is_footer)->
     std_msg_ajax(
       method: 'GET'
       url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
@@ -66,7 +66,17 @@ $ ->
         $(".update .resolution-template-name").text(response.name);
         $(".update .resolution-template-description").html(response.description);
         $(".update .resolution-template-message").html(response.body);
+
+        #do not show resolution type select when editing footer
+        if is_footer?
+          $('#editResolutionMessageTemplatesDialog select').addClass('hide-temporarily')
+          $('#editResolutionMessageTemplatesDialog .resolution-template-footer-text').removeClass('hide')
+        else
+          $('#editResolutionMessageTemplatesDialog select').removeClass('hide-temporarily')
+          $('#editResolutionMessageTemplatesDialog .resolution-template-footer-text').addClass('hide')
+
         $('#editResolutionMessageTemplatesDialog').dialog 'open'
+
       error: (response) ->
         std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
     )
@@ -77,7 +87,9 @@ $ ->
     $('#createResolutionMessageTemplatesDialog').dialog 'close'
     template_id = $(this).attr('data-resolution-message-template-id')
     $('.update input[name=template-id]').val(template_id)
-    get_and_populate_resolved_message(template_id)
+
+    is_footer = $(this).attr('data-is-footer')
+    get_and_populate_resolved_message(template_id, is_footer)
 
 
   # Update resolution message template

@@ -1,6 +1,7 @@
 -#view single record
 - unless @file_rep_dispute.customer.nil? || @file_rep_dispute.customer.company.nil?
   %input{type:'hidden', name: 'filerep-dispute-customer-company-name', value: "#{@file_rep_dispute.customer.company.name}"}
+  %input{type:'hidden', id: 'filerep-dispute-customer-submitter-type', name: 'filerep-dispute-customer-submitter-type', value: "#{@file_rep_dispute.submitter_type}"}
 
 .row
   .col-xs-12.col-sm-6
