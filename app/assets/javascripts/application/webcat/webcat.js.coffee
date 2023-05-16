@@ -909,12 +909,16 @@ $ ->
         # Put the top one in the list
         # All other cat details will be in a tooltip
         primary_cat = '<span class="missing-data">No current external categories</span>'
-        tooltip_table = '<div class="current-external-cat-info"><div class="row"><div class="col-xs-12">'
+
+        if current_categories || sds_category || sds_domain_category
+          tooltip_table = '<div class="current-external-cat-info">'
+        else
+          tooltip_table = ''
 
         if current_categories
           tooltip_table +=
             '<label class="tooltip-table-label">WBRS</label>' +
-            '<table><thead><tr>' +
+            '<table class="category-tooltip-table"><thead><tr>' +
             '<th>Conf</th><th>WBRS Categories</th><th>Certainty</th><th colspan="3">Feeds</th>' +
             '</tr></thead><tbody>'
 
@@ -941,10 +945,10 @@ $ ->
                     '<td class="alt-col">' + this.certainty + '</td>' +
                     '<td class="alt-col">' + this.source_mnemonic + '</td>' +
                     '<td class="alt-col">' + this.source_description + '</td></tr>'
-
               else
-                tooltip_table += '</tr>'
-              tooltip_table =+ '</tbody></table>'
+                tooltip_table += '<tr><td colspan="3"></td></tr>'
+
+              tooltip_table += '</tbody></table>'
 
               if key == '1.0'
                 primary_cat = '<a class="esc-tooltipped tooltip-underline">' + value.mnem + ' - ' + value.descr + ' <span class="ex-category-source">WBRS</span></a>'
@@ -955,14 +959,40 @@ $ ->
         else if sds_domain_category
           primary_cat = '<a class="esc-tooltipped tooltip-underline">' + sds_domain_category + ' <span class="ex-category-source">SDS Domain</span></a>'
 
-        console.log tooltip_table
+        # build the rest of the tooltip if there is stuff from SDS
+        if sds_category || sds_domain_category
+          tooltip_table +=
+            '<label class="tooltip-table-label">SDS</label>' +
+              '<table class="category-tooltip-table"><thead><tr>' +
+              '<th>SDS URI Category</th><th>SDS Domain Category</th>' +
+              '</tr></thead>' +
+              '<tbody><tr>'
 
+          if sds_category
+            tooltip_table += '<td>' + sds_category + '</td>'
+          else
+            tooltip_table += '<td></td>'
+          if sds_domain_category
+            tooltip_table += '<td>' + sds_domain_category + '</td>'
+          else
+            tooltip_table += '<td></td>'
 
+          tooltip_table +=
+            '</tr></tbody></table>'
 
-
+        tooltip_table += '</div>'
 
         $('#current_cat_' + entry_id).html(primary_cat)
-
+        if tooltip_table != '</div>'
+          $('#current_cat_' + entry_id + ' a.esc-tooltipped').tooltipster
+            content: $(tooltip_table),
+          # TODO remove trigger when done testing
+#            trigger: 'click',
+            theme: [
+              'tooltipster-borderless'
+              'tooltipster-borderless-customized'
+            ],
+            minWidth: '820'
 
       error: (response) ->
         current_categories = ''

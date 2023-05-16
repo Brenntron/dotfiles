@@ -70,3 +70,31 @@ table.dataTable tbody tr td table.nested-col-table td {
     padding: 6px 30px;
   }
 }
+
+.current-external-cat-info {
+  margin: -8px;
+  table {
+    font-size: 11px;
+    text-align: left;
+    margin-top: 6px;
+    margin-bottom: 15px;
+    td, th {
+      border-color: #707070;
+      padding: 4px;
+      line-height: 1.25em;
+    }
+    td.alt-col {
+      background-color: #707070 !important;
+      border-color: #4E4E4E;
+    }
+  }
+
+  .tooltip-table-label {
+    width: 100%;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    background-color: #393737;
+    padding: 4px 12px;
+  }
+}
