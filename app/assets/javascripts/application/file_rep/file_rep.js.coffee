@@ -250,12 +250,65 @@ $ ->
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
 
-  # Filerep index page trigger resolution select
-  $('.fr-ticket-status-radio-label-index').click ->
-    radio_button = $(this).prev('.ticket-status-radio')
-    $(radio_button[0]).trigger('click')
-    if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
-      populate_resolved_filerep_templates('Fixed - FP')
+  # Edit Ticket: Edit Ticket Status on page index
+  $('.escalations--file_rep--disputes-controller #index_ticket_status').click ->
+    dropdown = $('#index-edit-ticket-status-dropdown').parent()
+    if ($('.dispute_check_box:checked').length > 0)
+
+      # Select Status
+      $('.ticket-status-radio-label').click ->
+        radio_button = $(this).prev('.ticket-status-radio')
+        $(radio_button[0]).trigger('click')
+        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+
+          #check first resolution checkbox if none selected, check if web or email ticket
+          if !($("#index-edit-ticket-status-dropdown input.ticket-resolution-radio").is(':checked'))
+            $('#index-edit-ticket-status-dropdown input#FIXED_FP').prop('checked', true)
+
+            is_customer = false
+            checkboxes = $('#file-rep-datatable').find('.dispute_check_box')
+            table = $('#file-rep-datatable').DataTable()
+
+            #show customer message if any checked rows are for customers
+            $(checkboxes).each ->
+              if $(this).is(':checked')
+                tr = $(this).closest('tr')
+                row = table.row(tr)
+                if row.data().submitter_type.toLowerCase() == 'customer'
+                  is_customer = true
+
+            populate_resolved_filerep_templates('Fixed - FP', is_customer)
+
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#index-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
+
+      $('.ticket-status-radio').click ->
+        all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+        if $(this).is(':checked')
+          wrapper = $(this).parent()
+          $(all_stat_radios).removeClass('selected')
+          $(wrapper).addClass('selected')
+        if $(this).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#index-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
+    else
+      std_msg_error('No rows selected', ['Please select at least one row.'])
 
   # Displays comment/resolution modal depending for FileRep Status radio buttons
   $('.fr-ticket-status-radio').click ->
@@ -335,7 +388,6 @@ $ ->
       if $(this).is(':checked')
         tr = $(this).closest('tr')
         row = table.row(tr)
-        console.log row.data()
         if row.data().submitter_type.toLowerCase() == 'customer'
           is_customer = true
 
