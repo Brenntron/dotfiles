@@ -134,12 +134,12 @@
             %input.ticket-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'ticket-status', id: 'RESOLVED_CLOSED', value: 'RESOLVED_CLOSED'}
             %label.ticket-status-radio-label.radio-label{for: 'RESOLVED_CLOSED'} Resolved / Closed
             .dropdown-menu#index-ticket-resolution-submenu
-              .col-xs-6.submenu-left-wrapper
+              .col-xs-4.submenu-left-wrapper
                 .submenu-header
                   Ticket Resolution
                 = render 'escalations/webrep/disputes/resolved_resolution_options',  { dispute_resolution_name: 'ticket-resolution' }
 
-              .col-xs-6.submenu-right-wrapper
+              .col-xs-8.submenu-right-wrapper
                 .resolution-comment-wrapper
                   %label.content-label-sm
                     Template
@@ -147,8 +147,8 @@
                   %label.content-label-sm
                     Description
                   %p.ticket-resolution-description
-                  %label.content-label-sm.customer-facing-comment
-                    Customer Facing Comment
+                  %label.content-label-sm
+                    Customer
                   %textarea.ticket-status-comment.ticket-resolution-comment
                   .button-row-center
                     %button.primary.change_ticket_status_button{type:'button', id:'webrep_resolve_ticket', onclick:'change_ticket_status();'}
@@ -239,11 +239,11 @@
             %input.entry-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'ENTRY_RESOLVED_CLOSED', value: 'RESOLVED_CLOSED'}
             %label.entry-status-radio-label.radio-label{for: 'ENTRY_RESOLVED_CLOSED'} Resolved / Closed
             .dropdown-menu#index-entry-resolution-submenu
-              .col-xs-6.submenu-left-wrapper
+              .col-xs-4.submenu-left-wrapper
                 .submenu-header
                   Entry Resolution
                 = render 'escalations/webrep/disputes/resolved_resolution_options',  { dispute_resolution_name: 'entry-resolution' }
-              .col-xs-6.submenu-right-wrapper
+              .col-xs-8.submenu-right-wrapper
                 .resolution-comment-wrapper
                   %label.content-label-sm
                     Template

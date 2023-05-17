@@ -6593,13 +6593,18 @@ input[type="radio"].ticket-status-radio {
 }
 
 .resolution-comment-wrapper {
-  display: inline-block;
   background-color: $content-bg-color;
   padding: 4px 12px !important;;
 }
 
 textarea.ticket-resolution-comment {
-  display: inline-block;
+  font-size: 8pt;
+}
+
+.ticket-resolution-comment, .entry-resolution-comment {
+  min-height: 180px;
+  resize: vertical;
+  line-height: 12px;
 }
 
 .resolution-comment-wrapper input[type='text'] {
@@ -7184,7 +7189,14 @@ td.ticket-total::before {
   border: 1px solid darken($faint-neutral-color, 5%);
   font-size: 8pt;
   padding: 6px;
+}
+
+.non-resolution-submit-wrapper textarea {
   min-height: 50px;
+}
+
+.resolution-comment-wrapper textarea {
+  min-height: 180px;
 }
 
 #sdr-index-dispute-resolution-submenu .resolution-comment-wrapper, #show-ticket-resolution-submenu .resolution-comment-wrapper {
@@ -7228,13 +7240,13 @@ td.ticket-total::before {
   margin-top: -56px;
 }
 
-#index-ticket-resolution-submenu {
-  width: 475px;
-  .resolution-status-comment{
+#index-ticket-resolution-submenu, #index-entry-resolution-submenu {
+  min-width: 475px;
+  .resolution-status-comment, .entry-status-comment{
     min-height: 186px;
     height: 105px;
-    font-size: 12px;
-    line-height: 1.4em;
+    font-size: 8pt;
+    line-height: 12px;
   }
 }
 
@@ -7620,11 +7632,6 @@ table.dispute-entry-table tbody tr.selected {
   width: 475px;
   margin-top: -55px;
   padding: 0;
-  .resolution-status-comment{
-    height: 105px;
-    font-size: 12px;
-    line-height: 1.4em;
-  }
   button.primary{
     margin: 2% 0px 0px 33%
   }
@@ -8301,29 +8308,6 @@ hr.condensed {
 .top-case-info a {
   color: $content-bg-color;
   text-decoration: underline;
-}
-
-#disputes-research-table label.customer-facing-comment {
-  font-weight: 600;
-  padding-right: 0;
-}
-
-.customer-facing-comment {
-  color: $warning-accent-color !important;
-  font-weight: 600;
-  text-transform: none !important;
-}
-
-.customer-facing-comment::before {
-  content: '';
-  background-image: url(image_path('icon_warning_orange.svg'));
-  background-repeat: no-repeat;
-  width: 14px;
-  height: 14px;
-  display: inline-block;
-  float: left;
-  margin-top: -2px;
-  margin-right: 2px;
 }
 
 th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc {
