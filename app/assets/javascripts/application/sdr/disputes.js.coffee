@@ -83,7 +83,8 @@ $ ->
       error: () ->
     )
 
-  $('.sdr-ticket-status-radio').click ->
+  # Show page resolution select
+  $('.show-action .sdr-ticket-status-radio').click ->
     if $(this).is(':checked')
       wrapper = $(this).parent()
       $(wrapper).addClass('selected')
@@ -97,7 +98,8 @@ $ ->
       if !($("input.ticket-resolution-radio").is(':checked'))
         $('input#FIXED_FP').prop('checked', true)
         $('#FIXED_FP_SUDDEN_SPIKE').prop('checked', true)
-        populate_resolved_sdr_templates('Fixed - FP: Sudden Spike')
+        is_customer = check_for_customer_show_page_sdr()
+        populate_resolved_sdr_templates('Fixed - FP: Sudden Spike', is_customer)
 
     else
       $('#ticket-non-res-submit').show()
@@ -158,32 +160,52 @@ $ ->
         $('#advanced-search-dropdown').show()
     )
 
-  window.populate_resolved_sdr_templates = (resolution_type) ->
+  assemble_sdr_response_templates = (templates, customer_footer) ->
+    resolution_select = $('#sdr-resolution-message-template-select.resolution-message-template-select')
+    resolution_select.empty()
+
+    if templates.length == 0
+      resolution_select.val ''
+      $('.ticket-resolution-description').text ''
+      $('.ticket-resolution-comment').val ''
+
+    $(templates).each (index, template) ->
+      #append customer footer to saved message
+      if customer_footer != ''
+        customer_message = template.body + ' ' + customer_footer
+      else customer_message = template.body
+
+      template_option = $("<option class='sdr-resolution-template-option'></option>")
+      $(template_option).val template.name
+      $(template_option).text template.name
+      $(template_option).attr('data-body', customer_message )
+      $(template_option).attr('data-description', template.description )
+      resolution_select.append template_option
+
+      #show first option as body and description
+      if index == 0
+        $('.ticket-resolution-description').text template.description
+        $('.ticket-resolution-comment').val customer_message
+
+  window.populate_resolved_sdr_templates = (resolution_type, is_customer) ->
 
     get_resolution_templates_by_resolution('sdr', resolution_type).then (response) ->
-      resolution_select = $('#sdr-resolution-message-template-select.resolution-message-template-select')
-      resolution_select.empty()
       templates = JSON.parse response
+      customer_footer = ''
 
-      if templates.length == 0
-        resolution_select.val ''
-        $('.ticket-resolution-description').text ''
-        $('.ticket-resolution-comment').val ''
+      if is_customer == true
+        #fetch customer footer to append to message if customer ticket
+        get_resolution_templates_by_resolution('sdr', 'Customer Footer').then (customer_footer_response) ->
+          if customer_footer_response.length > 0
+            customer_footer = JSON.parse customer_footer_response
+            if customer_footer[0]?
+              customer_footer = customer_footer[0].body
+            assemble_sdr_response_templates(templates, customer_footer)
+      else
+        assemble_sdr_response_templates(templates, customer_footer)
 
-      $(templates).each (index, template) ->
-        template_option = $("<option class='sdr-resolution-template-option'></option>")
-        $(template_option).val template.name
-        $(template_option).text template.name
-        $(template_option).attr('data-body', template.body )
-        $(template_option).attr('data-description', template.description )
-        resolution_select.append template_option
-
-        #show first option as body and description
-        if index == 0
-          $('.ticket-resolution-description').text template.description
-          $('.ticket-resolution-comment').val template.body
-
-  $('#sdr-resolution-selector input.sdr-ticket-resolution-radio').click (event)->
+  # Resolution status change - Index and Show page
+  $('#sdr-resolution-selector .sdr-ticket-resolution-radio').change (event)->
     fixed_fp_message_types = ['Fixed - FP: Sudden Spike', 'Fixed - FP: Domain Age', 'Fixed - FP: Negative Webrep']
 
     resolution_type = $(event.target.closest('input')).attr('data-saved-resolution-type')
@@ -194,7 +216,33 @@ $ ->
     else
       $("input[name='dispute-preset-resolution']").prop('checked', false)
 
-    populate_resolved_sdr_templates(resolution_type)
+    #check if on index table or show page, then check if customer
+    if $('.escalations--sdr--disputes-controller.show-action').length > 0
+      is_customer = check_for_customer_show_page_sdr()
+    else
+      is_customer = check_for_customer_checkbox_sdr()
+    populate_resolved_sdr_templates(resolution_type, is_customer)
+
+
+window.check_for_customer_show_page_sdr = () ->
+  submitter_type = $(".submitter-type-wrapper p").text().toLowerCase()
+  if submitter_type == 'customer'
+    is_customer = true
+  else
+    is_customer = false
+  is_customer
+
+window.check_for_customer_checkbox_sdr = () ->
+  #show customer message if any checked rows are for customers
+  checkboxes = $('#sdr-disputes-index').find('.sdr_dispute_check_box:checked')
+  table = $('#sdr-disputes-index').DataTable()
+  is_customer = false
+  $(checkboxes).each ->
+    tr = $(this).closest('tr')
+    row = table.row(tr)
+    if row.data().submitter_type.toLowerCase() == 'customer'
+      is_customer = true
+  is_customer
 
 window.initialize_sdr_disputes_datatable = () ->
   $('#sdr-disputes-index').DataTable(
@@ -753,19 +801,27 @@ window.export_sdr_selected = () ->
   $('#index-export-data-input').val(data_json)
   document.getElementById("sdr-disputes-export-form").onsubmit = ""
 
+# index edit status button press
 window.sdr_index_edit_ticket_status = () ->
     dropdown = $('#sdr-index-edit-ticket-status-dropdown').parent()
 
     if ($('.sdr_dispute_check_box:checked').length > 0)
-# Select Status
+      # Select Status
       $('.sdr-ticket-status-radio-label').click ->
         radio_button = $(this).prev('.sdr-ticket-status-radio')
-        $(radio_button[0]).trigger('click')
+#        $(radio_button[0]).trigger('click')
         if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
           $('#sdr-index-dispute-resolution-submenu').show()
           stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
           $('#ticket-non-res-submit').hide()
           $(stat_comment).val('')
+          $('input#FIXED_FP').prop('checked', true)
+          $('#FIXED_FP_SUDDEN_SPIKE').prop('checked', true)
+
+          #show customer message if any checked rows are for customers
+          is_customer = check_for_customer_checkbox_sdr()
+          populate_resolved_sdr_templates('Fixed - FP: Sudden Spike', is_customer)
+
         else
           $('#ticket-non-res-submit').show()
           res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')

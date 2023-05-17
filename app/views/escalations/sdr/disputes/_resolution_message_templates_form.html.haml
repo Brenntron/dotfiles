@@ -3,12 +3,13 @@
     #resolved-resolution-message-dialogue-form-information{class: local_assigns[:action]}
       %label.content-label-sm.resolution-modal-label Resolution
       - if current_user.has_role?('sdr manager') || current_user.has_role?('manager')
-        - if local_assigns[:action] == :create
-          = select 'create-form', 'resolution_type', options_for_select(['Fixed - FP', 'Fixed - FP: Sudden Spike', 'Fixed - FP: Domain Age', 'Fixed - FP: Negative Webrep', 'Fixed - FN', 'Unchanged', 'Invalid / Junk Mail', 'Test / Training', 'Other']),{}, {class: 'inline-select-dropdown resolved-resolution-message-template-input', name:'resolution_type'}
-        - else
-          = select 'update-form', 'resolution_type', options_for_select(['Fixed - FP', 'Fixed - FP: Sudden Spike', 'Fixed - FP: Domain Age', 'Fixed - FP: Negative Webrep', 'Fixed - FN', 'Unchanged', 'Invalid / Junk Mail', 'Test / Training', 'Other']),{}, {class: 'inline-select-dropdown resolved-resolution-message-template-input', name:'resolution_type'}
+        - if @customer_footer_exists == true
+          = select "#{local_assigns[:action]}-form", 'resolution_type', options_for_select(['Fixed - FP', 'Fixed - FP: Sudden Spike', 'Fixed - FP: Domain Age', 'Fixed - FP: Negative Webrep', 'Fixed - FN', 'Unchanged', 'Invalid / Junk Mail', 'Test / Training', 'Other']),{}, {class: 'inline-select-dropdown resolved-resolution-message-template-input', name:'resolution_type'}
+        -else
+          = select "#{local_assigns[:action]}-form", 'resolution_type', options_for_select(['Fixed - FP', 'Fixed - FP: Sudden Spike', 'Fixed - FP: Domain Age', 'Fixed - FP: Negative Webrep', 'Fixed - FN', 'Unchanged', 'Invalid / Junk Mail', 'Test / Training', 'Other', 'Customer Footer']),{}, {class: 'inline-select-dropdown resolved-resolution-message-template-input', name:'resolution_type'}
       -else
         %p.resolution-template-resolution-type.resolution-template-lesser-permission-text
+      %p.resolution-template-footer-text.hide Customer Footer
 
       %label.content-label-sm.resolution-modal-label Template Name
       - if current_user.has_role?('sdr manager') || current_user.has_role?('manager')
