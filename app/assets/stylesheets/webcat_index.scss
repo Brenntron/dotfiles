@@ -80,16 +80,20 @@ table.dataTable tbody tr td table.nested-col-table td {
   .edit-uri-col {
     vertical-align: top;
   }
-  .edit-button {
-    background-image: url(image_path('icon_edit_dd_grey.svg'));
+  button {
     background-color: #D7DADB;
     background-repeat: no-repeat;
     background-position: center;
+    border: none;
+    border-radius: 2px;
+    min-height: 23px;
+    min-width: 23px;
+  }
+  .edit-button {
+    background-image: url(image_path('icon_edit_dd_grey.svg'));
     background-size: 25px;
     height: 26px;
     width: 30px;
-    border: none;
-    border-radius: 2px;
     &:disabled {
       opacity: .5;
       background-color: #D7DADB !important;
@@ -100,6 +104,18 @@ table.dataTable tbody tr td table.nested-col-table td {
       background-color: #6DBCDB;
       background-image: url(image_path('icon_edit_dd_white.svg'));
     }
+  }
+  .history-button {
+    background-image: url(image_path('icon_history.svg'));
+    background-size: 19px;
+    background-position: 2px;
+  }
+  .whois-button {
+    background-image: url(image_path('icon_whois_grey.svg'));
+    background-size: 20px;
+  }
+  .lookup-button {
+    background-image: url(image_path('icon_google_grey.svg'));
   }
   .quick-edit-uri-dropdown {
     margin-top: -4px;

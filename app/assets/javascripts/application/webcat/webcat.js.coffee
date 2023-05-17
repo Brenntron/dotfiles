@@ -773,11 +773,27 @@ $ ->
         {
           data: null
           className: 'tools-col'
-          render: (data) ->
-            return 'Tools'
+          render: (data, type, full, meta) ->
+            history_url = full.uri || full.ip_address
+            history_button =
+              '<button class="history-button" id="history-' + full.entry_id + '" ' +
+              'onclick="history_dialog(\'' + full.entry_id + '\', \'' + history_url + '\')"></button>'
+
+            whois_url = full.domain || full.ip_address
+            whois_button =
+              '<button class="whois-button" id="domain-' + full.entry_id + '" ' +
+              'onclick="WebCat.RepLookup.whoIsLookups(\'' + whois_url + '\')"></button>'
+
+            lookup_url = full.subdomain + '.' + full.domain || full.ip_address
+            lookup_button =
+              '<a class="button-wrapper-link" href="https://www.google.com/search?q=site%3A' + lookup_url + '" target="_blank"><button class="lookup-button"></button></a>'
+
+            # TODO - Add open in new tab button *IF score is above certain threshold
+
+            return history_button + whois_button + lookup_button
         }
         {
-          data: 'category'
+          data: null
           className: 'categories-col alt-col'
           render: (data, type, full, meta) ->
             domain = full.domain || full.ip_address
@@ -1024,8 +1040,6 @@ $ ->
         if tooltip_table != '</div>'
           $('#current_cat_' + entry_id + ' a.esc-tooltipped').tooltipster
             content: $(tooltip_table),
-          # TODO remove trigger when done testing
-#            trigger: 'click',
             theme: [
               'tooltipster-borderless'
               'tooltipster-borderless-customized'
