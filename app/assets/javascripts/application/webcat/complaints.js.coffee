@@ -1227,10 +1227,10 @@ window.drop_current_categories = () ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
-window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
-  event.preventDefault();
-  $('#' + input_id)[0].value = qual_subdomain
-  return false;
+#window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
+#  event.preventDefault();
+#  $('#' + input_id)[0].value = qual_subdomain
+#  return false;
 
 
 format = (complaint_entry_row) ->

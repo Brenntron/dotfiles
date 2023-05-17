@@ -538,7 +538,7 @@ $ ->
 #          cell.addClass 'highlight-was-dismissed'
       columnDefs: [
         {
-          targets: [0,1,2,3,4,5,6,7,8,9]
+          targets: [0,1,2,3,5,6,7,8,9]
           orderable: false
         }
       ]
@@ -712,20 +712,58 @@ $ ->
             wbrs_score = parseFloat(full.wbrs_score).toFixed(1)
             if rep == undefined then rep = 'unknown'
             if rep == 'unknown' then wbrs_score = '--'
-            tooltip_rep = wbrs_score + ' | ' + rep
-            icon = "<div class='reputation-icon-container'><span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span></div>"
+            icon = "<div class='reputation-icon-container'><span class='reputation-icon icon-#{rep}'></span>" + wbrs_score + "</div>"
 
             entry = data || full.ip_address
             domain = full.domain || full.ip_address
 
+            # disabling domain status since it is the default
+            domain_status = 'disabled'
+            console.log full
+
+            if full.subdomain == '' && full.path == ''
+              edit_button_status = 'disabled="disabled"'
+            else
+              edit_button_status = ''
+            if full.subdomain == ''
+              sub_status = 'disabled'
+              sub_function = ''
+              sub_val = ''
+            else
+              sub_status = ''
+              sub_val = full.subdomain + '.' + domain
+              sub_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + full.subdomain + '.' + domain + '\', \'subdomain\');"'
+            if full.path == ''
+              path_status = 'disabled'
+              path_function = ''
+              path_val = ''
+            else
+              path_status = ''
+              path_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + full.uri + '\', \'uri\');"'
+              path_val = full.uri
+
             domain_col =
               '<table class="nested-col-table">' +
                 '<tbody>' +
-                '<tr><td class="uri-ip-col">' + icon + '<div class="original-entry">' + entry + '</div></td></tr>' +
-                '<tr><td class="edit-uri-col">' +
-                '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' +
-                full.entry_id + '" type="text" data-domain="' + entry + '" data-qual_subdomain="' +
-                full.subdomain + '"value="' + domain + '"/>' +
+                '<tr>' +
+                '<td class="wbrs-score-col icon-' + rep + '">' + wbrs_score + '</td>' +
+                '<td class="uri-ip-col">' + entry + '</td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td class="quick-edit-uri-tool-col">' +
+                '<span class="dropdown">' +
+                '<button class="edit-button" id="quick_edit_uri_' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"' + edit_button_status + '></button>' +
+                '<div id="quick_edit_dropdown_' + full.entry_id + '" class="dropdown-menu quick-edit-uri-dropdown" aria-labelledby="quick_edit_uri_' + full.entry_id + '">' +
+                '<ul>' +
+                '<li class="quick-domain ' + domain_status + '" data-val="' + domain + '">domain</li>' +
+                '<li class="quick-subdomain ' + sub_status + '" data-val="' + sub_val + '" ' + sub_function + '>subdomain</li>' +
+                '<li class="quick-uri ' + path_status + '" data-val="' + path_val + '" ' + path_function + '>original uri</li>' +
+                '</ul>' +
+                '</div>' +
+                '</td>' +
+                '<td class="edit-uri-col">' +
+                '<input class="nested-table-input complaint-uri-input" id="edit_uri_input_' +
+                full.entry_id + '" type="text" data-domain="' + domain + ' "value="' + domain + '"/>' +
                 '</td></tr>' +
                 '</tbody>' +
               '</table>'
@@ -997,6 +1035,9 @@ $ ->
       error: (response) ->
         current_categories = ''
     )
+
+
+
 
 
 
@@ -1507,6 +1548,53 @@ $('#exampleModal').on 'shown.bs.modal', ->
 
 
 $ ->
+  ### New for card style rows ###
+  window.update_editURI = (entry_id, value, value_type) ->
+    # update input
+    input = '#edit_uri_input_' + entry_id
+    $(input).val(value)
+    $(input).attr('value', value)
+
+    # adjust the quickie dropdown
+    dropdown = '#quick_edit_dropdown_' + entry_id
+    domain_link = $(dropdown).find('.quick-domain')
+    dom_val = $(domain_link[0]).attr('data-val')
+    sub_link = $(dropdown).find('.quick-subdomain')
+    sub_val = $(sub_link[0]).attr('data-val')
+    uri_link = $(dropdown).find('.quick-uri')
+    uri_val = $(uri_link[0]).attr('data-val')
+
+    if value_type == 'uri' || value_type == 'subdomain'
+      $(domain_link).removeClass('disabled')
+      $(domain_link).attr('onclick', 'update_editURI(\'' + entry_id + '\', \'' + dom_val + '\', \'domain\')')
+
+      if value_type == 'subdomain'
+        $(sub_link).addClass('disabled')
+        $(sub_link).removeAttr('onclick')
+        unless uri_val == ''
+          $(uri_link).removeClass('disabled')
+          $(uri_link).attr('onclick', 'update_editURI(\'' + entry_id + '\', \'' + uri_val + '\', \'uri\')')
+
+      else if value_type == 'uri'
+        $(uri_link).addClass('disabled')
+        $(uri_link).removeAttr('onclick')
+        unless sub_val == ''
+          $(sub_link).removeClass('disabled')
+          $(sub_link).attr('onclick', 'update_editURI(\'' + entry_id + '\', \'' + sub_val + '\', \'subdomain\')')
+
+    else if value_type == 'domain'
+      $(domain_link).addClass('disabled')
+      $(domain_link).removeAttr('onclick')
+      unless sub_val == ''
+        $(sub_link).removeClass('disabled')
+        $(sub_link).attr('onclick', 'update_editURI(\'' + entry_id + '\', \'' + sub_val + '\', \'subdomain\')')
+      unless uri_val == ''
+        $(uri_link).removeClass('disabled')
+        $(uri_link).attr('onclick', 'update_editURI(\'' + entry_id + '\', \'' + uri_val + '\', \'uri\')')
+
+
+
+
 
   $('.toggle-vis-webcat').each ->
     table = $('#complaints-index').DataTable()

@@ -69,6 +69,61 @@ table.dataTable tbody tr td table.nested-col-table td {
   .submit_changes {
     padding: 6px 30px;
   }
+  .wbrs-score-col {
+    background-repeat: no-repeat;
+    background-position: -5px center;
+    padding-left: 13px;
+  }
+  .quick-edit-uri-tool-col {
+    padding-top: 2px;
+  }
+  .edit-uri-col {
+    vertical-align: top;
+  }
+  .edit-button {
+    background-image: url(image_path('icon_edit_dd_grey.svg'));
+    background-color: #D7DADB;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 25px;
+    height: 26px;
+    width: 30px;
+    border: none;
+    border-radius: 2px;
+    &:disabled {
+      opacity: .5;
+      background-color: #D7DADB !important;
+    }
+  }
+  .dropdown.open {
+    .edit-button {
+      background-color: #6DBCDB;
+      background-image: url(image_path('icon_edit_dd_white.svg'));
+    }
+  }
+  .quick-edit-uri-dropdown {
+    margin-top: -4px;
+    border-radius: 0 4px 4px 4px;
+    min-width: 80px;
+    width: auto;
+    font-size: 11px;
+    border: none;
+    padding: 0;
+    li {
+      padding: 3px 8px;
+      display: block;
+      cursor: pointer;
+      &:hover {
+        text-decoration: none;
+        background-color: #F2F2F2;
+        color: #333;
+      }
+      &.disabled {
+        opacity: .5;
+        cursor: not-allowed;
+      }
+    }
+  }
 }
 
 .current-external-cat-info {
