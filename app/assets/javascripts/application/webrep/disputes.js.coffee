@@ -1733,6 +1733,17 @@ $ ->
 
   #resolution select for ticket(s) on index table
   $('#webrep-index-toolbar #index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change (event)->
+
+    # Temp workaround due to shared IDs causing ticket input to get checked when entry input label is clicked
+    if $('#index-ticket-resolution-submenu').is(':hidden')
+      ticket_or_entry = 'entry'
+      entry_id = $(this)[0].id
+      #manually check radio in entry dropdown
+      $("#index-entry-resolution-submenu .ticket-resolution-radio##{entry_id}").prop('checked', true)
+    else
+      ticket_or_entry = 'ticket'
+      $('#index-ticket-resolution-submenu').prop('checked', true)
+
     is_customer = false
     $(".ticket-status-comment").html('')
     submission_types = []
@@ -1761,7 +1772,7 @@ $ ->
 
         resolution_type = $(this).siblings('.ticket-res-radio-label').text()
         ticket_type = get_webrep_ticket_type(submission_type)
-        populate_resolved_webrep_templates(resolution_type.trim(), 'ticket', ticket_type, is_customer)
+        populate_resolved_webrep_templates(resolution_type.trim(), ticket_or_entry, ticket_type, is_customer)
 
   #resolution select for entries on index table
   $('#index-entry-resolution-submenu input[type=radio][name=entry-resolution]').change (event)->
