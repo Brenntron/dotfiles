@@ -1,6 +1,7 @@
 class ImportUrl < ApplicationRecord
   belongs_to :jira_import_task
   belongs_to :complaint, optional: true
+  has_many :complaint_entries, through: :complaint
 
   def url_dt_format
     entry = ComplaintEntry.where(complaint_id:complaint_id).first if complaint_id.present?
@@ -19,12 +20,11 @@ class ImportUrl < ApplicationRecord
       complaint_id,                                                #complaint_id
       entry&.status,                                               #status
       entry&.resolution,                                           #resolution
-      entry&.case_resolved_at,                                   #resolution_time
+      entry&.case_resolved_at,                                     #resolution_time
       entry&.category,                                             #category
       assignee,                                                    #assignee
       age,                                                         #age
-      imported,                                                    #verdict_reason
+      imported                                                     #verdict_reason
     ]
-    end
   end
-
+end
