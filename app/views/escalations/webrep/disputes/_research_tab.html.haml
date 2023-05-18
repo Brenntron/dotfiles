@@ -368,21 +368,21 @@
                       .dropdown-menu.inline-dropdown-menu{id: "entry_status_button_#{entry.id}", 'aria-labelledby':"entry_status_button_#{entry.id}"}
                         %ul
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RESEARCHING_#{entry.id}", id: "RESEARCHING", onclick: 'populate_status_selection();'}
-                            %label.radio-label{for: "#{DisputeEntry::STATUS_RESEARCHING}"} Researching
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RESEARCHING_#{entry.id}", id: "RESEARCHING", onclick: "populate_status_selection(#{entry.id});"}
+                            %label.radio-label{for: "#{DisputeEntry::STATUS_RESEARCHING}", onclick: "populate_status_selection(#{entry.id});"} Researching
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ESCALATED_#{entry.id}", id: "ESCALATED", onclick: 'populate_status_selection();'}
-                            %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} Escalated
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ESCALATED_#{entry.id}", id: "ESCALATED", onclick: "populate_status_selection(#{entry.id});"}
+                            %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}", onclick: "populate_status_selection(#{entry.id});"} Escalated
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "CUSTOMER_PENDING_#{entry.id}", id: "CUSTOMER_PENDING", onclick: 'populate_status_selection();'}
-                            %label.radio-label{for: "#{DisputeEntry::STATUS_CUSTOMER_PENDING}"} Customer Pending
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "CUSTOMER_PENDING_#{entry.id}", id: "CUSTOMER_PENDING", onclick: "populate_status_selection(#{entry.id});"}
+                            %label.radio-label{for: "#{DisputeEntry::STATUS_CUSTOMER_PENDING}", onclick: "populate_status_selection(#{entry.id});"} Customer Pending
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ON_HOLD_#{entry.id}", id: "ON_HOLD", onclick: 'populate_status_selection();'}
-                            %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}"} On Hold
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "ON_HOLD_#{entry.id}", id: "ON_HOLD", onclick: "populate_status_selection(#{entry.id});"}
+                            %label.radio-label{for: "#{DisputeEntry::STATUS_ESCALATED}", onclick: "populate_status_selection(#{entry.id});"} On Hold
                           %li.status-radio-wrapper
-                            %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', class: "RESOLVED_CLOSED_#{entry.id}", id: "RESOLVED_CLOSED", onclick: 'populate_resolved_status_selection();'}
-                            %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED}"} Resolved / Closed
-                            .dropdown-menu.ticket-resolution-submenu
+                            %input.entry-status-radio.resolution-drodown-menu{type: 'radio', name: 'entry-status', class: "RESOLVED_CLOSED_#{entry.id}", id: "RESOLVED_CLOSED", onclick: "populate_resolved_status_selection(#{entry.id});"}
+                            %label.radio-label{for: "#{DisputeEntry::STATUS_RESOLVED}", onclick: "populate_resolved_status_selection(#{entry.id});"} Resolved / Closed
+                            .dropdown-menu.ticket-resolution-submenu{id: "entry-resolution-submenu-wrapper-id-#{entry.id}"}
                               .col-xs-6.submenu-left-wrapper#webrep-entry-resolution-selector
                                 .submenu-header
                                   Ticket Resolution
@@ -391,12 +391,23 @@
                               .col-xs-6.submenu-right-wrapper
                                 .resolution-comment-wrapper
                                   %label.content-label-sm
+                                    Template
+                                  %select#webrep-entry-resolution-message-template-select.resolution-message-template-select.entry-resolution-message-template-select
+                                  %label.content-label-sm
+                                    Description
+                                  %p.entry-resolution-description
+                                  %label.content-label-sm
                                     Comment
-                                  %textarea#webrep-entry-resolution-comment{name: 'resolution-comment'}
+                                  %textarea#webrep-entry-resolution-comment.entry-resolution-comment{name: 'resolution-comment'}
 
                           %li.status-radio-wrapper
-                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RE-OPENED_#{entry.id}", id: "RE-OPENED", onclick: 'populate_status_selection();'}
+                            %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RE-OPENED_#{entry.id}", id: "RE-OPENED", onclick: "populate_status_selection(#{entry.id});"}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_REOPENED}"} Re-Opened
+                          %li.non-resolution-submit-wrapper{id: "entry-non-resolution-submit-wrapper-id-#{entry.id}"}
+                            %label.content-label-sm
+                              Comment
+                            %textarea.entry-status-comment#entry-status-non-res-comment
+
                   %td.resolution-cell
                     - if entry.resolution.nil?
                       %label Resolution

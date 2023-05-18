@@ -222,62 +222,6 @@ window.dispute_status_drop_down = (dispute_id) ->
       $('#ticket-non-res-submit').hide()
   )
 
-window.dispute_resolution_drop_down = (dispute_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
-  $.ajax(
-    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_resolution/#{dispute_id}"
-    method: 'GET'
-    headers: headers
-    data: {}
-    dataType: 'json'
-    success: (response) ->
-      response = JSON.parse(response)
-      resolution = response.resolution
-      resolution_comment = response.resolution_comment
-
-      # Fill in resolution radio button and comment
-      $('.dispute-resolution-' + dispute_id + '#' + resolution).prop("checked", true)
-      $('.ticket-resolution-comment').text(resolution_comment)
-  )
-
-window.entry_status_drop_down = (dispute_entry_id) ->
-
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
-  $.ajax(
-    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_entry_id}"
-    method: 'GET'
-    headers: headers
-    data: {}
-    dataType: 'json'
-    success: (response) ->
-      response = JSON.parse(response)
-      status = response.status
-
-      $('.radio-dispute-' + dispute_entry_id + '#' + status).prop("checked", true);
-  )
-
-window.entry_resolution_drop_down = (dispute_entry_id) ->
-
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
-  $.ajax(
-    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_resolution/#{dispute_entry_id}"
-    method: 'GET'
-    headers: headers
-    data: {}
-    dataType: 'json'
-    success: (response) ->
-      response = JSON.parse(response)
-      resolution = response.resolution
-      resolution_comment = response.resolution_comment
-
-      $('.resolution-dispute-' + dispute_entry_id + '#' + resolution).prop("checked", true)
-      $('#resolution-comment-' + dispute_entry_id).text(resolution_comment)
-  )
-
-
 window.popup_response_error =(response, prefix) ->
   if response.responseJSON == undefined
     response_lines = response.responseText.split("\n")
@@ -809,14 +753,26 @@ window.set_duplicate_dispute = (form_tag) ->
     error_prefix: 'Error marking duplicate relationship.'
   )
 
+window.get_webrep_ticket_type = (submission_type) ->
+  if submission_type == 'e'
+    ticket_type = 'EmailDispute'
+  else
+    ticket_type = 'WebDispute'
 
+window.populate_status_selection = (data_id) ->
+  #show the closest non-resolved entry form
+  $("#entry-non-resolution-submit-wrapper-id-#{data_id}").show()
+  $("#entry-resolution-submenu-wrapper-id-#{data_id}").hide()
 
-window.populate_status_selection = () ->
-  nearest_selection = $(document).find("input[name='entry-status']:checked").attr('id')
-  $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
-
-window.populate_resolved_status_selection = () ->
-  $('.ticket-resolution-submenu').show()
+window.populate_resolved_status_selection = (data_id) ->
+  #show the closest resolved entry form
+  $("#entry-resolution-submenu-wrapper-id-#{data_id}").show()
+  $("#entry-non-resolution-submit-wrapper-id-#{data_id}").hide()
+  submission_type = $('input[name=webrep-dispute-submission-type').val()
+  #check Fixed - FP checkbox and get template data
+  $("#entry-resolution-submenu-wrapper-id-#{data_id} input#FIXED_FP").prop('checked', true)
+  ticket_type = get_webrep_ticket_type(submission_type)
+  populate_resolved_webrep_templates('Fixed - FP', 'entry', ticket_type, true)
 
   nearest_selection = $(document).find("input[name='entry-status']:checked").attr('id')
   $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
@@ -856,42 +812,41 @@ $ ->
     else
       $(box).closest('tr').removeClass('selected')
 
-  # Show page status select
-  $('.escalations--webrep--disputes-controller.show-action .ticket-status-radio').click ->
+#  # Show page status select
+  $('.escalations--webrep--disputes-controller.show-action #show-edit-ticket-status-dropdown .ticket-status-radio').click ->
 
-    all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
-    if $(this).is(':checked')
-      wrapper = $(this).parent()
-      $(all_stat_radios).removeClass('selected')
-      $(wrapper).addClass('selected')
+    ## The top status select on the webrep show page currently shares a bunch of IDs with the entry status selects, which can cause bugs
+    ## This is a temporary workaround
+    if !($('.escalations--webrep--disputes-controller.show-action #show-edit-ticket-status-dropdown').is(':hidden'))
 
-    if $(this).attr('id') == 'RESOLVED_CLOSED'
-      $('#show-ticket-resolution-submenu').show()
-      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-      $('#ticket-non-res-submit').hide()
-      $(stat_comment).val('')
+      all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+      if $(this).is(':checked')
+        wrapper = $(this).parent()
+        $(all_stat_radios).removeClass('selected')
+        $(wrapper).addClass('selected')
 
-      #check first resolution checkbox if none selected
-      if !($("#index-edit-ticket-status-dropdown input.ticket-resolution-radio").is(':checked'))
-        #populate resolution dropdown with first email or web template
-        submission_type = $('input[name=webrep-dispute-submission-type').val()
-        $('#show-ticket-resolution-submenu input#FIXED_FP').prop('checked', true)
+      if $(this).attr('id') == 'RESOLVED_CLOSED'
+        $('#show-ticket-resolution-submenu').show()
+        stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+        $('#ticket-non-res-submit').hide()
+        $(stat_comment).val('')
 
-        if submission_type == 'e'
-          ticket_type = 'EmailDispute'
-        else
-          ticket_type = 'WebDispute'
+        #check first resolution checkbox if none selected
+        if !($("#index-edit-ticket-status-dropdown input.ticket-resolution-radio").is(':checked'))
+          #populate resolution dropdown with first email or web template
+          submission_type = $('input[name=webrep-dispute-submission-type').val()
+          $('#show-ticket-resolution-submenu input#FIXED_FP').prop('checked', true)
+          ticket_type = get_webrep_ticket_type(submission_type)
+          populate_resolved_webrep_templates('Fixed - FP', 'ticket', ticket_type, true)
 
-        populate_resolved_webrep_templates('Fixed - FP', 'ticket', ticket_type, true)
+      else
+        $('#ticket-non-res-submit').show()
+        res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+        $('.ticket-resolution-radio').prop('checked', false)
+        $('#show-ticket-resolution-submenu').hide()
+        $(res_comment[0]).val('')
 
-    else
-      $('#ticket-non-res-submit').show()
-      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-      $('.ticket-resolution-radio').prop('checked', false)
-      $('#show-ticket-resolution-submenu').hide()
-      $(res_comment[0]).val('')
-
-  # Edit Ticket: Edit Ticket Status
+  # Index - Edit Ticket Status
   $('.escalations--webrep--disputes-controller #index_ticket_status').click ->
     dropdown = $('#index-edit-ticket-status-dropdown').parent()
     if ($('.dispute_check_box:checked').length > 0)
@@ -936,11 +891,7 @@ $ ->
                 if submitter_type == 'CUSTOMER'
                   is_customer = true
 
-                if submission_type == 'e'
-                  ticket_type = 'EmailDispute'
-                else
-                  ticket_type = 'WebDispute'
-
+                ticket_type = get_webrep_ticket_type(submission_type)
                 populate_resolved_webrep_templates('Fixed - FP', 'ticket', ticket_type, is_customer)
 
         else
@@ -970,7 +921,7 @@ $ ->
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
-  # Edit Entry: Edit Entry Status
+  # Index - Edit Entry Status
   $('#index-entry-status-button').click ->
     dropdown = $('#index-edit-entry-status-dropdown').parent()
     if ($('.dispute-entry-checkbox:checked').length > 0)
@@ -1014,11 +965,7 @@ $ ->
                 if submitter_type == 'CUSTOMER'
                   is_customer = true
 
-                if submission_type == 'e'
-                  ticket_type = 'EmailDispute'
-                else
-                  ticket_type = 'WebDispute'
-
+                ticket_type = get_webrep_ticket_type(submission_type)
                 populate_resolved_webrep_templates('Fixed - FP', 'entry', ticket_type, is_customer)
 
         else
@@ -1749,23 +1696,6 @@ $ ->
       else
         assemble_webrep_response_templates(templates, ticket_or_entry, customer_footer)
 
-  #show page ticket resolution select
-  $('#webrep-resolution-selector input[type=radio][name=dispute-resolution]').change (event)->
-    submission_type = $('input[name=webrep-dispute-submission-type').val()
-    submitter_type = $('input[name=webrep-dispute-submitter-type]').val()
-    if submitter_type == 'CUSTOMER'
-      is_customer = true
-
-    if submitter_type != "INTERNAl"
-      resolution_type = $(this).siblings('.ticket-res-radio-label').text()
-
-      if submission_type == 'e'
-        ticket_type = 'EmailDispute'
-      else
-        ticket_type = 'WebDispute'
-
-      populate_resolved_webrep_templates(resolution_type.trim(), 'ticket', ticket_type, is_customer)
-
 
   #single entry in show page resolution select
   $('#webrep-entry-resolution-selector input[type=radio][name=entry-resolution]').change (event)->
@@ -1777,12 +1707,29 @@ $ ->
       if submitter_type == 'CUSTOMER'
         is_customer = true
 
-      if submission_type == 'e'
-        ticket_type = 'EmailDispute'
-      else
-        ticket_type = 'WebDispute'
-
+      ticket_type = get_webrep_ticket_type(submission_type)
       populate_resolved_webrep_templates(resolution_type.trim(), 'entry', ticket_type, is_customer)
+
+  #show page ticket resolution select
+  $('#webrep-resolution-selector input[type=radio][name=dispute-resolution]').change (event)->
+
+    #workaround for bug where entry select clicks ticket status select due to shared IDs
+    if $('.escalations--webrep--disputes-controller.show-action #show-edit-ticket-status-dropdown').is(':hidden')
+      ticket_or_entry = 'entry'
+    else
+      ticket_or_entry = 'ticket'
+
+    submission_type = $('input[name=webrep-dispute-submission-type').val()
+    submitter_type = $('input[name=webrep-dispute-submitter-type]').val()
+    if submitter_type == 'CUSTOMER'
+      is_customer = true
+
+    if submitter_type != "INTERNAl"
+      resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+
+      ticket_type = get_webrep_ticket_type(submission_type)
+      populate_resolved_webrep_templates(resolution_type.trim(), ticket_or_entry, ticket_type, is_customer)
+
 
   #resolution select for ticket(s) on index table
   $('#webrep-index-toolbar #index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change (event)->
@@ -1813,12 +1760,7 @@ $ ->
           is_customer = true
 
         resolution_type = $(this).siblings('.ticket-res-radio-label').text()
-
-        if submission_type == 'e'
-          ticket_type = 'EmailDispute'
-        else
-          ticket_type = 'WebDispute'
-
+        ticket_type = get_webrep_ticket_type(submission_type)
         populate_resolved_webrep_templates(resolution_type.trim(), 'ticket', ticket_type, is_customer)
 
   #resolution select for entries on index table
@@ -1849,11 +1791,7 @@ $ ->
         is_customer = true
 
       resolution_type = $(this).siblings('.ticket-res-radio-label').text()
-      if submission_type == 'e'
-        ticket_type = 'EmailDispute'
-      else
-        ticket_type = 'WebDispute'
-
+      ticket_type = get_webrep_ticket_type(submission_type)
       populate_resolved_webrep_templates(resolution_type.trim(), 'entry', ticket_type, is_customer)
 
 window.disputes_select_all_check_box = () ->
