@@ -16,23 +16,21 @@ class JiraImportTask < ApplicationRecord
 
   VALID_FILE_TYPE = "text/csv"
   
-  EXPORT_FIELD_NAMES = [
-    'SUBMITTED_URL',
-    'ISSUE_KEY',
-    'STATUS',
-    'ISSUE_SUBMITTER',
-    'IMPORTED_AT',
-    'ISSUE_SUMMARY',
-    'ISSUE_DESCRIPTION',
-    'ISSUE_STATUS',
-    'ISSUE_PLATFORM',
-    'ISSUE_TYPE',
-    'COMPLAINT_ID',
-    'COMPLAINT_ENTRY_STATUS',
-
-    'COMPLAINT_ENTRY_RESOLUTION',
-    'BAST_COMMENT'
-  ]
+  EXPORT_FIELD_NAMES = {
+    'ISSUE_KEY' => 'Jira Ticket ID',
+    'SUBMITTED_URL' => 'Submitted URL',
+    'COMPLAINT_ENTRY_ID' => 'Complaint Entry ID',
+    'COMPLAINT_ENTRY_STATUS' => 'Complaint Entry Status',
+    'COMPLAINT_ENTRY_RESOLUTION' => 'Complaint Entry Resolution',
+    'ISSUE_STATUS' => 'Jira Ticket Status',
+    'ISSUE_TYPE' => 'Jira Ticket Type',
+    'ISSUE_SUMMARY' => 'Summary',
+    'ISSUE_SUBMITTER' => 'Submitter',
+    'ISSUE_PLATFORM' => 'Platform',
+    'STATUS' => 'Ticket Import Status',
+    'IMPORTED_AT' => 'Imported At',
+    'BAST_COMMENT' => 'BAST comment'
+  }
 
   #Read CSV from Jira and send URLs to Bast
   def process_import
@@ -174,7 +172,7 @@ class JiraImportTask < ApplicationRecord
     worksheet = workbook[0]
 
     # generate table headers
-    EXPORT_FIELD_NAMES.each_with_index  do |field_name, col_index|
+    EXPORT_FIELD_NAMES.values.each_with_index  do |field_name, col_index|
       worksheet.add_cell(0, col_index, field_name)
       worksheet.sheet_data[0][col_index].change_font_bold(true)
     end
@@ -183,7 +181,7 @@ class JiraImportTask < ApplicationRecord
     tasks.each do |task|
       task.import_urls.each do |import_url|
         row_index += 1
-        EXPORT_FIELD_NAMES.each_with_index do |field_name, col_index|
+        EXPORT_FIELD_NAMES.keys.each_with_index do |field_name, col_index|
           cell_data =
             case field_name
             when 'SUBMITTED_URL'
@@ -198,20 +196,18 @@ class JiraImportTask < ApplicationRecord
               task.imported_at.utc.iso8601
             when 'ISSUE_STATUS'
               task.issue_status
-            when 'ISSUE_DESCRIPTION'
-              task.issue_description
             when 'ISSUE_PLATFORM'
               task.issue_platform
             when 'ISSUE_SUMMARY'
               task.issue_summary
             when 'ISSUE_TYPE'
               task.issue_type
-            when 'COMPLAINT_ID'
-              import_url.complaint_id
+            when 'COMPLAINT_ENTRY_ID'
+              import_url.complaint_entries.first&.id
             when 'COMPLAINT_ENTRY_STATUS'
-              import_url.complaint&.status
+              import_url.complaint_entries.first&.status
             when 'COMPLAINT_ENTRY_RESOLUTION'
-              import_url.complaint&.resolution
+              import_url.complaint_entries.first&.resolution
             when 'BAST_COMMENT'
               import_url.verdict_reason || 'Inactive'
             end
