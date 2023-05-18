@@ -759,12 +759,13 @@ window.get_webrep_ticket_type = (submission_type) ->
   else
     ticket_type = 'WebDispute'
 
-window.populate_status_selection = (data_id) ->
+window.populate_status_selection = (data_id, text) ->
   #show the closest non-resolved entry form
   $("#entry-non-resolution-submit-wrapper-id-#{data_id}").show()
   $("#entry-resolution-submenu-wrapper-id-#{data_id}").hide()
+  $("#entry-non-resolution-submit-wrapper-id-#{data_id}").closest(".inline-dropdown-menu").prev().html(text)
 
-window.populate_resolved_status_selection = (data_id) ->
+window.populate_resolved_status_selection = (data_id, text) ->
   #show the closest resolved entry form
   $("#entry-resolution-submenu-wrapper-id-#{data_id}").show()
   $("#entry-non-resolution-submit-wrapper-id-#{data_id}").hide()
@@ -773,9 +774,7 @@ window.populate_resolved_status_selection = (data_id) ->
   $("#entry-resolution-submenu-wrapper-id-#{data_id} input#FIXED_FP").prop('checked', true)
   ticket_type = get_webrep_ticket_type(submission_type)
   populate_resolved_webrep_templates('Fixed - FP', 'entry', ticket_type, true)
-
-  nearest_selection = $(document).find("input[name='entry-status']:checked").attr('id')
-  $(document).find("input[name='entry-status']:checked").closest(".inline-dropdown-menu").prev().html(nearest_selection)
+  $("#entry-resolution-submenu-wrapper-id-#{data_id}").closest(".inline-dropdown-menu").prev().html(text)
 
 window.webrep_reset_search = () ->
   inputs = document.getElementsByClassName('form-control')
