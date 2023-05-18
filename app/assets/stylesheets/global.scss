@@ -6410,10 +6410,20 @@ h5.entry-details-table-header {
 }
 
 .ticket-resolution-submenu {
-  left: -219%;
+  left: -298%;
   margin-top: -56px;
   margin-left: 1px;
-  width: 350px;
+  width: 475px;
+}
+
+//Research tab entries get a little extra padding since they are missing submit button
+#disputes-research-table {
+  .ticket-resolution-submenu {
+    padding-bottom: 8px;
+  }
+  .non-resolution-submit-wrapper {
+    padding-bottom: 8px;
+  }
 }
 
 .ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label, #index-entry-resolution-submenu
