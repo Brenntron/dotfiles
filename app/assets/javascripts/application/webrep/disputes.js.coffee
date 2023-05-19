@@ -1731,7 +1731,7 @@ $ ->
 
 
   #resolution select for ticket(s) on index table
-  $('#webrep-index-toolbar #index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change (event)->
+  $('#webrep-index-toolbar #index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').click (event)->
 
     # Temp workaround due to shared IDs causing ticket input to get checked when entry input label is clicked
     if $('#index-ticket-resolution-submenu').is(':hidden')
