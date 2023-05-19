@@ -228,8 +228,12 @@ $ ->
   $(document).on 'click', '.sorting[aria-controls="file-rep-datatable"]', () ->
     sorting_request = true
 
-  # Displays comment/resolution modal for FileRep Status radio labels
+  # Show page status picker radio buttons
   $('.fr-ticket-status-radio-label').click ->
+    wrapper = $(this).parent()
+    $('.show-action .status-radio-wrapper').removeClass('selected')
+    $(wrapper).addClass('selected')
+
     radio_button = $(this).prev('.fr-ticket-status-radio')
     $(radio_button[0]).trigger('click')
     if $(radio_button).attr('id') == 'file-status-closed'
@@ -309,20 +313,6 @@ $ ->
           $(res_comment[0]).val('')
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
-
-  # Displays comment/resolution modal depending for FileRep Status radio buttons
-  $('.fr-ticket-status-radio').click ->
-    if $(this)[0].id == 'file-status-closed'
-      $('#show-ticket-resolution-submenu').show()
-      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-      $('#ticket-non-res-submit').hide()
-      $(stat_comment).val('')
-    else
-      $('#ticket-non-res-submit').show()
-      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-      $('.ticket-resolution-radio').prop('checked', false)
-      $('#show-ticket-resolution-submenu').hide()
-      $(res_comment[0]).val('')
 
   window.assemble_filerep_response_templates = (templates, customer_footer) ->
 

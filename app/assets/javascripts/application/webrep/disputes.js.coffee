@@ -818,10 +818,9 @@ $ ->
     ## This is a temporary workaround
     if !($('.escalations--webrep--disputes-controller.show-action #show-edit-ticket-status-dropdown').is(':hidden'))
 
-      all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
       if $(this).is(':checked')
         wrapper = $(this).parent()
-        $(all_stat_radios).removeClass('selected')
+        $('.top-case-info .status-radio-wrapper').removeClass('selected')
         $(wrapper).addClass('selected')
 
       if $(this).attr('id') == 'RESOLVED_CLOSED'

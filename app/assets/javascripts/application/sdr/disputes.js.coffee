@@ -87,6 +87,7 @@ $ ->
   $('.show-action .sdr-ticket-status-radio').click ->
     if $(this).is(':checked')
       wrapper = $(this).parent()
+      $('.show-action .status-radio-wrapper').removeClass('selected')
       $(wrapper).addClass('selected')
 
     if $(this).attr('id') == 'RESOLVED_CLOSED'
