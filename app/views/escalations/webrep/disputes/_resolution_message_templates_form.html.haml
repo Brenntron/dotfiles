@@ -5,7 +5,7 @@
       - if local_assigns[:action] == :create
         %label.content-label-sm.resolution-modal-label Dispute Type
         - if current_user.has_role?('webrep manager') || current_user.has_role?('manager')
-          %li.dispute-type-radio-wrapper
+          %li.dispute-type-radio-wrapper#dispute-type-web-wrapper
             %input.ticket-status-radio.form-check-input.webrep-resolution-template-type{type: 'radio', name: 'dispute-type', id: 'dispute-type-web', value:'web', checked: 'checked' }
             %label.ticket-status-radio-label.radio-label.form-check-label{for: 'dispute-type-web'} Web
           %li.dispute-type-radio-wrapper

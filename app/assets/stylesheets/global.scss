@@ -6602,6 +6602,22 @@ input[type="radio"].ticket-status-radio {
   margin-top: 4px;
 }
 
+.dispute-type-radio-wrapper {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  input, label {
+    cursor: pointer;
+  }
+}
+
+.webrep-resolution-template-type {
+  margin-right: 6px !important;
+}
+
+#dispute-type-web-wrapper {
+  margin-bottom: 5px;
+}
 .resolution-comment-wrapper {
   background-color: $content-bg-color;
   padding: 4px 12px !important;;
