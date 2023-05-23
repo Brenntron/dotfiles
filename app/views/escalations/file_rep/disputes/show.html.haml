@@ -21,8 +21,8 @@
               %label.content-label-sm
                 Status
               -#  Add ruby code for status here
-              %span.dropdown.top-info-data
-                %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title:'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false',  }
+              %span.dropdown.top-info-data#filerep-show-page-status-dropdown
+                %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title:'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'file_dispute_status_drop_down()' }
                   - if @file_rep_dispute.status.nil?
                     NEW
                   - else
@@ -31,22 +31,22 @@
                 .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
                   %ul
                     %li.status-radio-wrapper
-                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-new', value: 'NEW'}
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-new', 'data-status': 'NEW', value: 'NEW'}
                       %label.radio-label.fr-ticket-status-radio-label{for:'file-status-new'} New
                     %li.status-radio-wrapper
-                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-researching', value: 'RESEARCHING'}
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-researching', 'data-status': 'RESEARCHING', value: 'RESEARCHING'}
                       %label.radio-label.fr-ticket-status-radio-label{for:'file-status-researching'} Researching
                     %li.status-radio-wrapper
-                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-escalated', value: 'ESCALATED'}
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-escalated', 'data-status': 'ESCALATED', value: 'ESCALATED'}
                       %label.radio-label.fr-ticket-status-radio-label{for:'file-status-escalated'} Escalated
                     %li.status-radio-wrapper
-                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-pending', value: 'PENDING'}
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-pending', 'data-status': 'PENDING', value: 'PENDING'}
                       %label.radio-label.fr-ticket-status-radio-label{for:'file-status-pending'} Customer Pending
                     %li.status-radio-wrapper
-                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-onhold', value: 'ON_HOLD'}
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-onhold', 'data-status': 'ON_HOLD', value: 'ON_HOLD'}
                       %label.radio-label.fr-ticket-status-radio-label{for:'file-status-onhold'} On Hold
                     %li.status-radio-wrapper
-                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-closed', value: 'RESOLVED_CLOSED'}
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-closed','data-status': 'RESOLVED_CLOSED',  value: 'RESOLVED_CLOSED'}
                       %label.radio-label.fr-ticket-status-radio-label{for:'file-status-closed'} Resolved / Closed
                       .dropdown-menu#show-ticket-resolution-submenu
                         .col-xs-4.submenu-left-wrapper#filerep-resolution-selector

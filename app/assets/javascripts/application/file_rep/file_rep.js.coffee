@@ -254,6 +254,17 @@ $ ->
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
 
+  # Reset status picker dropdown after clicking off of it
+  window.file_dispute_status_drop_down = () ->
+    $('.status-radio-wrapper').removeClass 'selected'
+    status = $('#show-edit-ticket-status-button').text().trim()
+    radio = $(".fr-ticket-status-radio[data-status='#{status}'] ")
+    radio.prop("checked", true)
+    wrapper = radio.parent()
+    wrapper.addClass('selected')
+    $('.non-resolution-submit-wrapper').hide()
+    $('#ticket-non-res-submit').hide()
+
   # Edit Ticket: Edit Ticket Status on page index
   $('.escalations--file_rep--disputes-controller #index_ticket_status').click ->
     dropdown = $('#index-edit-ticket-status-dropdown').parent()
