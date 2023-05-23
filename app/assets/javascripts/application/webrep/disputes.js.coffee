@@ -193,34 +193,21 @@ window.delete_disputes_named_search = (close_button, search_name) ->
       this.tr_tag.remove();
   )
 
-window.dispute_status_drop_down = (dispute_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+window.dispute_status_drop_down = () ->
+  #deselect any current status
+  $('.status-radio-wrapper').removeClass 'selected'
+  $('.ticket-status-radio').prop("checked", false)
 
-  $.ajax(
-    url: "/escalations/api/v1/escalations/webrep/disputes/dispute_status/#{dispute_id}"
-    method: 'GET'
-    headers: headers
-    data: {}
-    dataType: 'json'
-    success: (response) ->
-      response = JSON.parse(response)
-      status = response.status
-      comment = response.comment
+  #close comment dropdowns
+  $('#show-ticket-resolution-submenu').hide()
+  $('#ticket-non-res-submit').hide()
 
-      #deselect any current status
-      $('.status-radio-wrapper').removeClass 'selected'
-      if status != 'FIXED_FP'
-        $('.ticket-resolution-radio').prop("checked", false)
-
-      #add comment if found
-      $('.ticket-status-radio' + '#' + status).prop("checked", true)
-      if comment?
-        $('.ticket-status-comment').text(comment)
-
-      #close comment dropdowns
-      $('#show-ticket-resolution-submenu').hide()
-      $('#ticket-non-res-submit').hide()
-  )
+  #select current status in dropdown
+  status = $('#show-edit-ticket-status-button').text().trim()
+  radio = $(".ticket-status-radio[data-status='#{status}'] ")
+  radio.prop("checked", true)
+  wrapper = radio.parent()
+  wrapper.addClass('selected')
 
 window.popup_response_error =(response, prefix) ->
   if response.responseJSON == undefined
