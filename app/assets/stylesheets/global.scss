@@ -6611,6 +6611,15 @@ input[type="radio"].ticket-status-radio {
   }
 }
 
+#resolution-message-template-form-wrapper select {
+  min-height: 22px;
+  padding-left: 3px;
+  //overwrite firefox and safari default select styles
+  appearance: none;
+  background-color: #fff;
+}
+
+
 .webrep-resolution-template-type {
   margin-right: 6px !important;
 }
