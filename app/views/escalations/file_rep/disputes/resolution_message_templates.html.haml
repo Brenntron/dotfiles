@@ -30,9 +30,9 @@
             %td
               %span
                 - if template.resolution_type == 'Customer Footer'
-                  %i.glyphicon.glyphicon-pencil.resolved.edit-resolution-message-template{title: 'Edit', data: {resolution_message_template_id: template.id}, is_footer: true}
+                  %i.glyphicon.glyphicon-pencil.resolved.edit-resolution-message-template{title: 'Edit', data: {resolution_message_template_id: template.id, is_footer: true}}
                 - else
-                  %i.glyphicon.glyphicon-pencil.resolved.edit-resolution-message-template{title: 'Edit', data: {resolution_message_template_id: template.id}, is_footer: false}
+                  %i.glyphicon.glyphicon-pencil.resolved.edit-resolution-message-template{title: 'Edit', data: {resolution_message_template_id: template.id, is_footer: false}}
             %td.se-resolution-table-name=template.name
             %td=template.resolution_type
             %td=template.description
