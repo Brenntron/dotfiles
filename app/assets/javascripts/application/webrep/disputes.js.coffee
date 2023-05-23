@@ -194,7 +194,7 @@ window.delete_disputes_named_search = (close_button, search_name) ->
   )
 
 window.dispute_status_drop_down = () ->
-  #deselect any current status
+  #deselect all statuses
   $('.status-radio-wrapper').removeClass 'selected'
   $('.ticket-status-radio').prop("checked", false)
 

@@ -449,24 +449,21 @@ window.hide_loading_gears = () ->
       loader.addClass('hidden')
   )
 
-window.sdr_dispute_status_drop_down = (dispute_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+window.sdr_dispute_status_drop_down = () ->
+  #deselect all statuses
+  $('.status-radio-wrapper').removeClass 'selected'
+  $('.sdr-ticket-status-radio').prop("checked", false)
 
-  $.ajax(
-    url: "/escalations/api/v1/escalations/sdr/disputes/dispute_status/#{dispute_id}"
-    method: 'GET'
-    headers: headers
-    data: {}
-    dataType: 'json'
-    success: (response) ->
-      response = JSON.parse(response)
-      status = response.status
-      comment = response.comment
+  #close comment dropdowns
+  $('.sdr-non-resolution-submit-wrapper').hide()
+  $('#show-ticket-resolution-submenu').hide()
 
-      $("#{status}").prop("checked", true)
-      if comment?
-        $('.ticket-status-comment').text(comment)
-  )
+  #select current status in dropdown (NEW is not an option so that won't select anything)
+  status = $('#show-edit-ticket-status-button').text().trim()
+  radio = $(".sdr-ticket-status-radio[data-status='#{status}'] ")
+  radio.prop("checked", true)
+  wrapper = radio.parent()
+  wrapper.addClass('selected')
 
 window.sdr_show_page_edit_status = (dispute_id) ->
   statusName = $('input[name=dispute-status]:checked').val()
