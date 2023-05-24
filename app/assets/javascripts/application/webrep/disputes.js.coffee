@@ -852,7 +852,8 @@ $ ->
     resolution_select = $("#webrep-#{ticket_or_entry}-resolution-message-template-select.resolution-message-template-select")
     resolution_select.empty()
     resolution_select.val ''
-    $(".#{ticket_or_entry}-resolution-description").text 'All checked tickets must be of the same type to load resolution templates.'
+    if ticket_or_entry == 'entry' then type = 'entries' else type = 'tickets'
+    $(".#{ticket_or_entry}-resolution-description").text "All checked #{type} must be of the same type to load resolution templates."
     $(".#{ticket_or_entry}-resolution-comment").val ''
 
   window.webrep_index_get_checked_rows_data = () ->
@@ -954,7 +955,7 @@ $ ->
 
     # Clear template data and tell customer to select one or the other
     else
-      webrep_message_must_select_web_or_email()
+      webrep_message_must_select_web_or_email('ticket')
 
   $('.escalations--webrep--disputes-controller #index_ticket_status').click ->
     if ($('.dispute_check_box:checked').length > 0)
@@ -1004,7 +1005,7 @@ $ ->
 
     # Clear template data and tell customer to select one or the other
     else
-      webrep_message_must_select_web_or_email()
+      webrep_message_must_select_web_or_email('entry')
 
   $('#index-entry-status-button').click ->
     if ($('.dispute-entry-checkbox:checked').length > 0)
