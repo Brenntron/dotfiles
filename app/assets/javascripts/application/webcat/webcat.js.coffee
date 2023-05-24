@@ -595,7 +595,7 @@ $ ->
                 '<tr><td class="age-col ' + age_class + '">' + data + '</td></tr>' +
                 '<tr><td class="state-col">' + full.status + '</td></tr>' +
                 '<tr><td class="source-col">' + complaint_source + '</td></tr>' +
-                '<tr><td class="important-col">' + is_important_flag + '</td></tr>' +
+                '<tr><td class="important-flag-col">' + is_important_flag + '</td></tr>' +
                 '</tbody>' +
               '</table>'
 
@@ -815,6 +815,7 @@ $ ->
         }
         {
           data: 'status'
+          className: 'resolution-col'
           render: (data, type, full, meta) ->
             if data == 'PENDING'
               submit_res_wrapper =
@@ -873,7 +874,7 @@ $ ->
 #          visible: false
 #        }
       ]
-      responsive: true)
+    )
 
 
   # Compares the categories of an entry in AC to the full list of
@@ -1136,43 +1137,9 @@ $ ->
 #              cell.addClass 'highlight-second-review'
 #            if was_dismissed
 #              cell.addClass 'highlight-was-dismissed'
-#          columnDefs: [
-#            {
-#              targets: [ 0 ]
-#              className: 'expandable-row-column'
-#              searchable: false
-#              orderable: false
-#            }
-#            {
-#              targets: [1]
-#              className: 'important-flag-col'
-#              searchable: false
-#              orderable: false
-#            }
-#            {
-#              targets: [ 2 ]
-#              className: 'entry-id-col'
-#            }
-#            {
-#              targets: [ 3 ]
-#              orderData: 18 #This is ordered by the age int column. Anytime the columns are changed this needs to be updated.
-#            }
-#            {
-#              targets: [ 14 ]
-#              className: 'submitter-col'
-#            }
-#          ]
+
 #          columns: [
-#              {
-#                data: null
-#                width: '14px'
-#                orderable: false
-#                searchable: false
-#                sortable: false
-#                render: ( data ) ->
-#                  { entry_id } = data
-#                  return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
-#              }
+
 #              {
 #                data: null
 #                orderable: false
@@ -1413,6 +1380,7 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
+
     tag_input = $('#tags-input').selectize {
       persist: false
       valueField: 'name',
@@ -1563,6 +1531,7 @@ $('#exampleModal').on 'shown.bs.modal', ->
 
 $ ->
   ### New for card style rows ###
+  # Changes which value is in the entry's uri input
   window.update_editURI = (entry_id, value, value_type) ->
     # update input
     input = '#edit_uri_input_' + entry_id
@@ -1605,6 +1574,12 @@ $ ->
       unless uri_val == ''
         $(uri_link).removeClass('disabled')
         $(uri_link).attr('onclick', 'update_editURI(\'' + entry_id + '\', \'' + uri_val + '\', \'uri\')')
+
+
+  # New submit function that does not reload the page
+  window.submit_changes = () ->
+    debugger
+
 
 
 

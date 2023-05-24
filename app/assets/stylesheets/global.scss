@@ -817,6 +817,7 @@ button {
 .email-button {background-image: url(image_path('icon_message.svg'));}
 .manage-button {background-image: url(image_path('icon_manage_team.svg'));}
 .show-col-button  {background-image: url(image_path('icon_columns.svg'));  }
+.open .show-col-button  {background-image: url(image_path('icon_columns_white.svg'));  }
 .collapse-button  {background-image: url(image_path('icon_collapse.svg'));}
 .select-all-button  {background-image: url(image_path('icon_check_grey.svg'));}
 .ticket-status-button {background-image: url(image_path('icon_status.svg'));}
@@ -7348,13 +7349,15 @@ td.ticket-total::before {
 .tc_data {
     display: inline-block;
 }
-.entry-important-flag::before, .highlight-second-review .important-flag-col .is-important {
+.entry-important-flag::before,
+.highlight-second-review .important-flag-col .is-important,
+.important-flag-col .highlight-second-review.is-important {
   background-image: url(image_path('icon_important.svg'));
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
 }
-.highlight-second-review .important-flag-col{
+.highlight-second-review .important-flag-col,{
   max-width: 50px!important;
 }
 td.in_zoo{
@@ -7363,7 +7366,8 @@ td.in_zoo{
 .container-important-tags{
   display: inline-flex;
 }
-.highlight-second-review .important-flag-col span {
+.highlight-second-review .important-flag-col span,
+.important-flag-col .highlight-second-review {
   display: block;
 }
 .font-weight-bold{
@@ -8391,7 +8395,8 @@ table#duplicates a {
   overflow-y: scroll !important;
 }
 
-.highlight-was-dismissed .important-flag-col .was-reviewed::after {
+.highlight-was-dismissed .important-flag-col .was-reviewed::after,
+.important-flag-col .highlight-second-review.was-reviewed::after{
   display: block;
   background-image: url(image_path('icon_reviewed_check.svg'));
   width: 20px;
@@ -12210,118 +12215,7 @@ input[type="radio"].resolution_radio_button {
     top: -55px;
   }
 }
-// webcat - 1950px below is our current "widest" breakpoint
-@media (min-width: 1950px) {
 
-  #webcat-index-toolbar {
-    .toolbar-button {
-      background-position: 4px 6px;
-      padding-left: 13px;
-      padding-right: 7px;
-      min-height: 25px;
-      background-size: 14px 14px; // icon size
-      transition: background-color 0.2s;
-    }
-  }
-}
-@media (max-width: 1951px)  {
-  #webcat-index-toolbar .toolbar-button-text {
-    display: none !important;
-  }
-}
-@media screen and (max-width: 1800px) and (min-width: 1705px){
-  #webcat-index-toolbar .toolbar-button-text {
-    .toolbar-button {
-      background-position: 4px 6px;
-    }
-  }
-}
-.toolbar#webcat-index-toolbar {
-  background: $content-bg-color;
-  bottom: 18px;
-  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
-  flex-direction: row;
-  float: left;
-  margin: 2px 0 -35px 0;
-  padding: 0 0 0 20px;
-  position: relative;
-  width: 100%;
-  z-index: 1;
-
-  .toolbar-checkbox-wrapper {
-    padding-top: 0;
-    padding-left: 5px;
-    font-weight: normal;
-  }
-
-  div {
-    margin: 4px 3px 0 0;
-  }
-
-  .toolbar-dropdown {
-    margin-top: 0 !important;
-  }
-
-  .primary-text-divider {
-    margin-top: 0 !important;
-  }
-
-  .btn-group.toolbar-btn-group {
-    margin: 0;
-    vertical-align: baseline;
-  }
-
-  .webcat-toolbar-select-all-wrapper, .webcat-toolbar-tall-wrapper {
-    background-color: $faint-neutral-color;
-    display: block;
-    height: 27px;
-    line-height: 25px;
-    float: none;
-    margin: 0;
-    padding: 0 8px;
-
-    input {
-      margin: 6px 0 0;
-      vertical-align: top;
-    }
-
-    label {
-      display: inline-block;
-      font-weight: 400;
-      height: 27px;
-      margin-left: 2px;
-    }
-  }
-
-  .webcat-toolbar-bulk-res {
-    background-color: #255c7d !important;
-    color: $type-lightest !important;
-
-    &:disabled {
-      opacity: 0.5;
-    }
-  }
-
-  .webcat-toolbar-tall-wrapper {
-    height: 45px;
-    line-height: 45px;
-    margin: 0 0 0 3px;
-    padding: 0 15px;
-
-    input {
-      margin: 16px 0 0;
-    }
-  }
-
-  .webcat-manage-templates-button {
-    background-color: $faint-neutral-color;
-    padding-left: 24px;
-  }
-
-  .webcat-toolbar-push {
-    margin-left: auto;
-  }
-}
 
 //sticky toolbar needs extra top spacing on small screens
 @media (max-width: 999px) {
@@ -13919,27 +13813,6 @@ table > tbody > tr > td.no-padding {
 // webcat > button text "All" in toolbar
 .text-button-all {
   min-width: 30px;
-}
-
-
-
-// webcat index DT, adhering to existing naming conventions
-#webcat-index-table-show-columns-dropdown {
-  width: 320px;
-  ul {
-    display: inline-block;
-    padding: 10px;
-    width: 49%;
-    vertical-align: text-top;
-    li {
-      font-size: 9pt;
-      padding: 4px 12px;
-      cursor: default;
-      input {
-        margin-right: 8px;
-      }
-    }
-  }
 }
 
 #webcat-index-toolbar .collapse-all {
