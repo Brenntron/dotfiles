@@ -137,7 +137,7 @@
               .col-xs-4.submenu-left-wrapper
                 .submenu-header
                   Ticket Resolution
-                = render 'escalations/webrep/disputes/resolved_resolution_options',  { dispute_resolution_name: 'ticket-resolution' }
+                = render 'escalations/webrep/disputes/resolved_resolution_options',  { dispute_resolution_name: 'ticket-resolution', id_prefix: '' }
 
               .col-xs-8.submenu-right-wrapper
                 .resolution-comment-wrapper
@@ -242,7 +242,8 @@
               .col-xs-4.submenu-left-wrapper
                 .submenu-header
                   Entry Resolution
-                = render 'escalations/webrep/disputes/resolved_resolution_options',  { dispute_resolution_name: 'entry-resolution' }
+                = render 'escalations/webrep/disputes/resolved_resolution_options',  { dispute_resolution_name: 'entry-resolution', id_prefix: 'ENTRY_' }
+
               .col-xs-8.submenu-right-wrapper
                 .resolution-comment-wrapper
                   %label.content-label-sm
