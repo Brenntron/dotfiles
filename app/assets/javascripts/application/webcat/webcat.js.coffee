@@ -719,7 +719,6 @@ $ ->
 
             # disabling domain status since it is the default
             domain_status = 'disabled'
-            console.log full
 
             if full.subdomain == '' && full.path == ''
               edit_button_status = 'disabled="disabled"'
@@ -826,6 +825,12 @@ $ ->
                   '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="ignore"><label>Ignore (Bulk change only)</label></div>' +
                   '</div>' +
                   '<div class="submit-row">' +
+                  '<span class="dropdown internal-comment-wrapper">' +
+                  '<button class="comment-button" id="internal_comment_button' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>' +
+                  '<div id="internal_comment_dropdown_' + full.entry_id + '" class="dropdown-menu dropdown-menu-right internal-comment-dropdown" aria-labelledby="internal_comment_button' + full.entry_id + '">' +
+                  '<div class="dropdown-reverse-header">Internal Comment</div>' +
+                  '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories">' + full.internal_comment + '</textarea>' +
+                  '</div></span>' +
                   '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="updatePending(' + full.entry_id + ')">Submit</button>' +
                   '</div>' +
                 '</div>'
@@ -850,6 +855,12 @@ $ ->
                     '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="INVALID" disabled="true" ' + invalid_check + '><label>Invalid</label></div>' +
                     '</div>' +
                     '<div class="submit-row">' +
+                    '<span class="dropdown internal-comment-wrapper">' +
+                    '<button class="comment-button" id="internal_comment_button' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>' +
+                    '<div id="internal_comment_dropdown_' + full.entry_id + '" class="dropdown-menu dropdown-menu-right internal-comment-dropdown" aria-labelledby="internal_comment_button' + full.entry_id + '">' +
+                    '<div class="dropdown-reverse-header">Internal Comment</div>' +
+                    '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories" disabled="disabled">' + full.internal_comment + '</textarea>' +
+                    '</div></span>' +
                     '<button class="tertiary submit_changes" id="reopen_' + full.entry_id + '" onclick="reopenComplaint(' + full.entry_id + ')">Reopen</button>' +
                     '</div>' +
                   '</div>'
@@ -863,7 +874,13 @@ $ ->
                       '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="INVALID"><label>Invalid</label></div>' +
                     '</div>' +
                     '<div class="submit-row">' +
-                      '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="updateEntryColumns(' + full.entry_id + ')">Submit</button>' +
+                    '<span class="dropdown internal-comment-wrapper">' +
+                    '<button class="comment-button" id="internal_comment_button' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>' +
+                    '<div id="internal_comment_dropdown_' + full.entry_id + '" class="dropdown-menu dropdown-menu-right internal-comment-dropdown" aria-labelledby="internal_comment_button' + full.entry_id + '">' +
+                    '<div class="dropdown-reverse-header">Internal Comment</div>' +
+                    '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories">' + full.internal_comment + '</textarea>' +
+                    '</div></span>' +
+                    '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="updateEntryColumns(' + full.entry_id + ')">Submit</button>' +
                     '</div>' +
                   '</div>'
 
@@ -1159,10 +1176,7 @@ $ ->
 #                  else if is_important == "false" && was_dismissed == "true"
 #                    return '<span class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></span>'
 #              }
-#              {
-#                data: 'entry_id'
-#                width: '50px'
-#              }
+
 #              {
 ##               age column
 #                width: '40px'
@@ -1186,10 +1200,7 @@ $ ->
 #                  else
 #                    return "<span>#{age}</span>"
 #              }
-#              {
-#                data: 'status'
-#                className: 'state-col'
-#              }
+
 #              {
 #                data: 'tags'
 #                render: ( data )->
@@ -1209,114 +1220,7 @@ $ ->
 #
 #                  tag_items
 #              }
-#              {
-##                subdomain column
-#                data: 'subdomain'
-#                render:(data,type,full,meta)->
-#                  {subdomain, entry_id} = full
-#
-#                  if subdomain
-#                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + subdomain + '</span>'
-#                  else
-#                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + '</span>'
-#                width: '50px'
-#              }
-#              {
-#                data: 'domain'
-#                render:( data, type, full, meta )->
-#                  { domain, ip_address, entry_id, subdomain, path } = full
-#                  data_full = ''
-#                  if subdomain != ''
-#                    subdomain += '.'
-#                    data_full = subdomain
-#                  if domain != ''
-#                    data_full += domain
-#                  if path != ''
-#                    data_full += path
-#                  if ip_address != ''
-#                    data_full = ip_address
-#                  if data_full != ''
-#                    data_full = "data-full=" + data_full
-#                  title = "title=" + domain
-#                  if domain
-#                    "<p class='input-truncate esc-tooltipped webcat-domain-holder' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
-#                  else
-#                    "<a id='domain_#{entry_id}' #{data_full} href='http://#{ip_address}' target='blank'>#{ip_address}</a>"
-#              }
-#              {
-#                data: 'path'
-#                render: ( data, type, full, meta ) ->
-#                  { path , entry_id } = full
-#                  if type == 'display'
-#                    path = td_truncate(data, 20)
-#                  return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + path + '">' + path + '</span>'
-#              }
-#              {
-#                data: 'uri'
-#                className: 'uri-col'
-#              }
-#              {
-#                data: 'category'
-#                render: ( data, type, full, meta ) ->
-#                  categories = ''
-#                  category = ''
-#                  plus = ''
-#                  { category , entry_id } = full
-#                  if category
-#                    categories = category.split(',')
-#                    category = categories[0]
-#                    if category == "Not in our list"
-#                      category = ""
-#                  '<span id="category_' + entry_id + '">' + category + '</span>'
-#              }
-#              {
-#                data: 'suggested_disposition'
-#                render: ( data, type, full, meta ) ->
-#                  return data.replace(',', ', ')
-#              }
-#              {
-#                data: 'wbrs_score'
-#                width: '55px'
-#                render: ( data, type, full, meta ) ->
-#                  { wbrs_score, entry_id } = full
-#                  rep = wbrs_display(wbrs_score)
-#                  wbrs_score = parseFloat(wbrs_score).toFixed(1)
-#                  if rep == undefined then rep = 'unknown'
-#                  if rep == 'unknown' then wbrs_score = '--'
-#                  tooltip_rep = rep.toUpperCase()
-#                  icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
-#                  return "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
-#              }
-#              {
-#                data: 'platform'
-#                class: 'platform-col'
-#                render: (data, type, full, meta) ->
-#                  if data?
-#                    platform = data
-#                  else
-#                    platform = ""
-#                  if platform == "N/A" || platform == "Unknown" || platform == "Missing" || platform == ""
-#                    platform = '<span class="missing-data platform"></span>'
-#                  return platform
-#              }
-#              {
-#                data: 'submitter_type'
-#                render: (data) ->
-#                  if data == 'CUSTOMER'
-#                    '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
-#                  else
-#                    '<button class="complaint-submitter-type icon-guest-user esc-tooltipped" title="Guest"></button>'
-#              }
-#              {
-#                data: 'company_name'
-#              }
-#              {
-#                data: 'customer_email'
-#              }
-#              {
-#                data: 'assigned_to'
-#                className: 'assignee-col'
-#              }
+
 #              {
 #                data: 'age_int'
 #                visible: false
