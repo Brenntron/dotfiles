@@ -622,7 +622,11 @@ window.updatePending = (id,row_id) ->
   else
     processSubmitPending(id,row_id)
 
+
 processSubmitEntry = (entry_id,row_id) ->
+  debugger
+
+
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   if $('#input_cat_'+entry_id).val() != null
     categories = $('#input_cat_'+entry_id).val().toString()

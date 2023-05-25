@@ -720,8 +720,12 @@ $ ->
             # disabling domain status since it is the default
             domain_status = 'disabled'
 
-            if full.subdomain == '' && full.path == ''
+            if (full.status == 'COMPLETED') || (full.subdomain == '' && full.path == '')
               edit_button_status = 'disabled="disabled"'
+              if full.status == 'COMPLETED'
+                input_status = 'disabled="disabled"'
+              else
+                input_status = ''
             else
               edit_button_status = ''
             if full.subdomain == ''
@@ -762,7 +766,7 @@ $ ->
                 '</td>' +
                 '<td class="edit-uri-col">' +
                 '<input class="nested-table-input complaint-uri-input" id="edit_uri_input_' +
-                full.entry_id + '" type="text" data-domain="' + domain + ' "value="' + domain + '"/>' +
+                full.entry_id + '" type="text" data-domain="' + domain + ' "value="' + domain + '"' + input_status + '/>' +
                 '</td></tr>' +
                 '</tbody>' +
               '</table>'
@@ -880,7 +884,7 @@ $ ->
                     '<div class="dropdown-reverse-header">Internal Comment</div>' +
                     '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories">' + full.internal_comment + '</textarea>' +
                     '</div></span>' +
-                    '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="updateEntryColumns(' + full.entry_id + ')">Submit</button>' +
+                    '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="submit_changes(' + full.entry_id + ')">Submit</button>' +
                     '</div>' +
                   '</div>'
 
@@ -1480,12 +1484,25 @@ $ ->
         $(uri_link).attr('onclick', 'update_editURI(\'' + entry_id + '\', \'' + uri_val + '\', \'uri\')')
 
 
-  # New submit function that does not reload the page
-  window.submit_changes = () ->
+  # New submit function that maintains current layout and spacing
+  # by adding a screen overtop the submitted row, does not reload the page
+  # Single submissions only
+  window.submit_changes = (entry_id) ->
+    row = $('#' + entry_id)
+    res = $('input[name=resolution' + entry_id + ']:checked').val()
+    comment = $('#internal_comment_' + entry_id).val()
+    uri = $('#edit_uri_input_' + entry_id).val()
+
+    $(row).addClass('submitting-entry')
+
     debugger
+    # Create a screen that covers the row, but maintains its position
+    # Should have a message saying its submitted
+    # submit for real
+    # do not reload page
 
 
-  # This does not touch user prefs yet
+  # This does not touch user prefs yet - TODO
   # also needs to disable subdata checkboxes if the col is hidden
   $('.webcat-view-data-cb').click ->
     # check if col or data toggle
