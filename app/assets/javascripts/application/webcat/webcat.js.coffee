@@ -591,11 +591,11 @@ $ ->
             ticket_col =
               '<table class="nested-col-table">' +
                 '<tbody>' +
-                '<tr><td class="entry-id-col">' + full.entry_id + '</td></tr>' +
-                '<tr><td class="age-col ' + age_class + '">' + data + '</td></tr>' +
-                '<tr><td class="state-col">' + full.status + '</td></tr>' +
-                '<tr><td class="source-col">' + complaint_source + '</td></tr>' +
-                '<tr><td class="important-flag-col">' + is_important_flag + '</td></tr>' +
+                '<tr class="entry-id-row"><td>' + full.entry_id + '</td></tr>' +
+                '<tr class="age-row"><td class="' + age_class + '">' + data + '</td></tr>' +
+                '<tr class="state-row"><td>' + full.status + '</td></tr>' +
+                '<tr class="source-row"><td>' + complaint_source + '</td></tr>' +
+                '<tr class="important-flag-row"><td>' + is_important_flag + '</td></tr>' +
                 '</tbody>' +
               '</table>'
 
@@ -623,7 +623,7 @@ $ ->
 
             if full.customer_name?
               if full.customer_name != ''
-                name_row = '<tr><td class="submitter-name-col">' + full.customer_name + '</td></tr>'
+                name_row = '<tr class="submitter-name-row"><td>' + full.customer_name + '</td></tr>'
               else
                 name_row = ''
             else
@@ -631,7 +631,7 @@ $ ->
 
             if full.customer_email?
               if full.customer_email != ''
-                email_row = '<tr><td class="submitter-email-col">' + full.customer_email + '</td></tr>'
+                email_row = '<tr class="submitter-email-row"><td>' + full.customer_email + '</td></tr>'
               else
                 email_row = ''
             else
@@ -640,10 +640,10 @@ $ ->
             submitter_col =
               '<table class="nested-col-table">' +
                 '<tbody>' +
-                '<tr><td class="company-col">' + submitter + '</td></tr>' +
+                '<tr class="company-row"><td>' + submitter + '</td></tr>' +
                 name_row +
                 email_row +
-                '<tr><td class="platform-col">' + platform + '</td></tr>' +
+                '<tr class="platform-row"><td>' + platform + '</td></tr>' +
                 '</tbody>' +
               '</table>'
 
@@ -675,9 +675,9 @@ $ ->
             users_col =
               '<table class="nested-col-table">' +
                 '<tbody>' +
-                '<tr><td class="assignee-col">' + data + '</td></tr>' +
-  #                  '<tr><td class="reviewer-col">' + data.customer_name + '</td></tr>' +
-  #                  '<tr><td class="second-reviewer-col">' + data.customer_email + '</td></tr>' +
+                '<tr class="assignee-row"><td>' + data + '</td></tr>' +
+  #                  '<tr class="reviewer-row"><td>' + data.customer_name + '</td></tr>' +
+  #                  '<tr class="second-reviewer-row"><td>' + data.customer_email + '</td></tr>' +
                 '</tbody>' +
               '</table>'
 
@@ -1581,76 +1581,79 @@ $ ->
     debugger
 
 
-
-
-
-
-  $('.toggle-vis-webcat').each ->
-    table = $('#complaints-index').DataTable()
-    column = table.column($(this).attr('data-column'))
-    checkbox = $(this).find('input')
-
-    if $(checkbox).prop('checked')
-      column.visible(true)
+  # This does not touch user prefs yet
+  # also needs to disable subdata checkboxes if the col is hidden
+  $('.webcat-view-data-cb').click ->
+    # check if col or data toggle
+    checkbox = this
+    if $(checkbox).hasClass('webcat-view-col-cb')
+      # this is a column toggle
+      table = $('#complaints-index').DataTable()
+      column = table.column($(checkbox).attr('data-column'))
+      if $(checkbox).prop('checked')
+        column.visible(true)
+      else
+        column.visible(false)
     else
-      column.visible(false)
+      # this is a data toggle
+      data_class = $(checkbox).attr('data-class')
+      if $(checkbox).prop('checked')
+        $('.' + data_class).show()
+      else
+        $('.' + data_class).hide()
 
-    $(this).click (e) ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
-      column.visible(!column.visible())
 
-    $(checkbox).click (e) ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
+
 
 
   # webcat > get the show/hide state for these checkboxes
-  if window.location.pathname == '/escalations/webcat/complaints'
-    std_msg_ajax(
-      method: 'POST'
-      url: "/escalations/api/v1/escalations/user_preferences/"
-      data: {name: 'WebCatColumns'}
-      success: (response) ->
-        response = JSON.parse(response)
-
-        $.each response, (column, state) ->
-          if state == true
-            $("##{column}-checkbox").prop('checked', true)
-            $('#complaints-index').DataTable().column("##{column}").visible true
-          else
-            $("##{column}-checkbox").prop('checked', false)
-            $('#complaints-index').DataTable().column("##{column}").visible false
-
-    )
+#  if window.location.pathname == '/escalations/webcat/complaints'
+#    std_msg_ajax(
+#      method: 'POST'
+#      url: "/escalations/api/v1/escalations/user_preferences/"
+#      data: {name: 'WebCatColumns'}
+#      success: (response) ->
+#        response = JSON.parse(response)
+#
+#        $.each response, (column, state) ->
+#          if state == true
+#            $("##{column}-checkbox").prop('checked', true)
+#            $('#complaints-index').DataTable().column("##{column}").visible true
+#          else
+#            $("##{column}-checkbox").prop('checked', false)
+#            $('#complaints-index').DataTable().column("##{column}").visible false
+#
+#    )
 
   # webcat > on click any show/hide column, update user prefs table
-  $('.toggle-vis-webcat').on "click", ->
-    data = {}
-    ## retain commented line below
-    # data['important'] = $("#important-checkbox").is(':checked')
-    data['age'] = $("#age-checkbox").is(':checked')
-    data['status'] = $("#status-checkbox").is(':checked')
-    data['tags'] = $("#tags-checkbox").is(':checked')
-    data['subdomain'] = $("#subdomain-checkbox").is(':checked')
-    data['domain'] = $("#domain-checkbox").is(':checked')
-    data['path'] = $("#path-checkbox").is(':checked')
-    data['uri'] = $("#path-checkbox").is(':checked')
-    data['primary'] = $("#primary-checkbox").is(':checked')
-    data['suggested'] = $("#suggested-checkbox").is(':checked')
-    data['wbrs'] = $("#wbrs-checkbox").is(':checked')
-    data['platform'] = $("#platform-checkbox").is(':checked')
-    data['submittertype'] = $("#submittertype-checkbox").is(':checked')
-    data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
-    data['submitteremail'] = $("#submitteremail-checkbox").is(':checked')
-    data['assignee'] = $("#assignee-checkbox").is(':checked')
-
-    std_msg_ajax(
-      url: "/escalations/api/v1/escalations/user_preferences/update"
-      method: 'POST'
-      data: {data, name: 'WebCatColumns'}
-      dataType: 'json'
-      success: (response) ->
-        console.log 'Webcat column show/hide preferences are updated in user_prefs table.'
-    )
+#  $('.toggle-vis-webcat').on "click", ->
+#    data = {}
+#    ## retain commented line below
+#    # data['important'] = $("#important-checkbox").is(':checked')
+#    data['age'] = $("#age-checkbox").is(':checked')
+#    data['status'] = $("#status-checkbox").is(':checked')
+#    data['tags'] = $("#tags-checkbox").is(':checked')
+#    data['subdomain'] = $("#subdomain-checkbox").is(':checked')
+#    data['domain'] = $("#domain-checkbox").is(':checked')
+#    data['path'] = $("#path-checkbox").is(':checked')
+#    data['uri'] = $("#path-checkbox").is(':checked')
+#    data['primary'] = $("#primary-checkbox").is(':checked')
+#    data['suggested'] = $("#suggested-checkbox").is(':checked')
+#    data['wbrs'] = $("#wbrs-checkbox").is(':checked')
+#    data['platform'] = $("#platform-checkbox").is(':checked')
+#    data['submittertype'] = $("#submittertype-checkbox").is(':checked')
+#    data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
+#    data['submitteremail'] = $("#submitteremail-checkbox").is(':checked')
+#    data['assignee'] = $("#assignee-checkbox").is(':checked')
+#
+#    std_msg_ajax(
+#      url: "/escalations/api/v1/escalations/user_preferences/update"
+#      method: 'POST'
+#      data: {data, name: 'WebCatColumns'}
+#      dataType: 'json'
+#      success: (response) ->
+#        console.log 'Webcat column show/hide preferences are updated in user_prefs table.'
+#    )
 
   # webcat > complaints show page, disable two Submit toolbar buttons on page load
   if $('body').hasClass('escalations--webcat--complaints-controller')
