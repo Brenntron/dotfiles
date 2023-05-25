@@ -12,6 +12,16 @@ class ServiceStatus < ApplicationRecord
   # RULEAPI:RULEHIT
   # RULEAPI:COMPLAINT_RECORD
 
+  # VIRUSTOTAL:SCAN
+
+  # REPTOOL
+
+  # UMBRELLA:DOMAIN_INFO
+  # UMBRELLA:DOMAIN_VOLUME
+  # UMBRELLA:SCAN
+  # UMBRELLA:SECURITY_INFO
+  # UMBRELLA:WHOIS
+
   def report_outage
     if self.exception_count < 0
       self.exception_count = 0

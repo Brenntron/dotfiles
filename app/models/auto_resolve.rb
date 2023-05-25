@@ -259,9 +259,17 @@ class AutoResolve
       results[:action] = :do_not_resolve
 
     rescue Exception => e
-      Rails.logger.error(e.message)
-      results[:action] = :do_not_resolve
-      results[:log] << "there was an error in conviction requirements, halting auto conviction process"
+
+      morsel_output = "AUTO RESOLVE EXCEPTION FOR DISPUTE #{new_dispute.id.to_s}:\n\n"
+      morsel_output += e.message + "\n"
+      morsel_output += e.backtrace.join("\n")
+
+      morsel = Morsel.create(:output => morsel_output)
+
+      Rails.logger.error morsel_output
+
+      results[:action] = :do_not_resolve_error
+      results[:log] << "there was an error in conviction requirements, check morsel id: #{morsel.id.to_s}"
 
     end
 
@@ -335,9 +343,18 @@ class AutoResolve
       ##################
       return results
     rescue Exception => e
-      Rails.logger.error(e.message)
-      results[:action] = :do_not_resolve
-      results[:log] << "there was an error in baseline requirements, halting auto conviction process"
+
+      morsel_output = "AUTO RESOLVE EXCEPTION FOR DISPUTE #{new_dispute.id.to_s}:\n\n"
+      morsel_output += e.message + "\n"
+      morsel_output += e.backtrace.join("\n")
+
+      morsel = Morsel.create(:output => morsel_output)
+
+      Rails.logger.error morsel_output
+
+      results[:action] = :do_not_resolve_error
+      results[:log] << "there was an error in baseline requirements, check morsel id: #{morsel.id.to_s}"
+
       return results
     end
 
@@ -360,9 +377,18 @@ class AutoResolve
       malicious_domain_count = 0 if malicious_domain_count.blank?
       total_domain_count = 0 if total_domain_count.blank?
     rescue Exception => e
-      Rails.logger.error(e.message)
-      results[:action] = :do_not_resolve
-      results[:log] << "there was an error in conviction requirements, halting auto conviction process"
+
+      morsel_output = "AUTO RESOLVE EXCEPTION FOR DISPUTE #{new_dispute.id.to_s}:\n\n"
+      morsel_output += e.message + "\n"
+      morsel_output += e.backtrace.join("\n")
+
+      morsel = Morsel.create(:output => morsel_output)
+
+      Rails.logger.error morsel_output
+
+      results[:action] = :do_not_resolve_error
+      results[:log] << "there was an error in conviction requirements, check morsel id: #{morsel.id.to_s}"
+
       return results
     end
 
@@ -431,10 +457,20 @@ class AutoResolve
 
 
       rescue Exception => e
-        Rails.logger.error(e.message)
-        results[:action] = :do_not_resolve
-        results[:log] << "there was an error in conviction requirements, halting auto conviction process"
+
+        morsel_output = "AUTO RESOLVE EXCEPTION FOR DISPUTE #{new_dispute.id.to_s}:\n\n"
+        morsel_output += e.message + "\n"
+        morsel_output += e.backtrace.join("\n")
+
+        morsel = Morsel.create(:output => morsel_output)
+
+        Rails.logger.error morsel_output
+
+        results[:action] = :do_not_resolve_error
+        results[:log] << "there was an error in conviction requirements, check morsel id: #{morsel.id.to_s}"
+
         return results
+
       end
 
       #20% malicious ratio
@@ -471,6 +507,15 @@ class AutoResolve
         dispute_entry.status = DisputeEntry::NEW
       end
 
+    elsif action == :do_not_resolve_error
+      dispute_entry.retries += 1
+      dispute_entry.save
+
+      if dispute_entry.retries <= 3
+        dispute_entry.satus = DisputeEntry::PROCESSING
+      else
+        dispute_entry.status = DisputeEntry::NEW
+      end
     else
       resolved_at = Time.now
       reptool_result = commit_to_reptool(action, dispute_entry)
@@ -497,11 +542,18 @@ class AutoResolve
         dispute_entry.case_closed_at = resolved_at
         dispute_entry.case_resolved_at = resolved_at
       else
-        dispute_entry.status = DisputeEntry::NEW
-        result[:log] << "Error attempting to commit to reptool, setting status to NEW for manual review."
-        if add_additional_blocklist == true
-          result[:log] << "Error in Reptool caused halt to adding blh rulehit to RuleAPI."
+        dispute_entry.retries += 1
+        dispute_entry.save
+        if dispute_entry.retries <= 3
+          dispute_entry.status = DisputeEntry::NEW
+          result[:log] << "Error attempting to commit to reptool, setting status to NEW for manual review."
+          if add_additional_blocklist == true
+            result[:log] << "Error in Reptool caused halt to adding blh rulehit to RuleAPI."
+          end
+        else
+          dispute_entry.status = DisputeEntry::PROCESSING
         end
+
       end
 
     end
@@ -796,7 +848,15 @@ class AutoResolve
 
     rescue Exception => e
 
-      Rails.logger.error(e.message)
+
+      morsel_output = "AUTO RESOLVE EXCEPTION FOR DISPUTE ENTRY #{dispute_entry.id.to_s}:\n\n"
+      morsel_output += e.message + "\n"
+      morsel_output += e.backtrace.join("\n")
+
+      morsel = Morsel.create(:output => morsel_output)
+
+      Rails.logger.error morsel_output
+
       result[:success] = false
     end
 

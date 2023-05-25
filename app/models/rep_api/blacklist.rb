@@ -9,6 +9,8 @@ class RepApi::Blacklist < RepApi::Base
 
   validates :entry, :classifications, presence: true
 
+  SERVICE_STATUS_NAME = "REPTOOL:BLOCKLIST"
+
   def initialize(attributes = {})
     if attributes.keys.present?
       attributes.keys.each do |attr|
@@ -19,6 +21,10 @@ class RepApi::Blacklist < RepApi::Base
     end
     @new_record = attributes.has_key?(:new_record) ? attributes.delete(:new_record) : true
     super
+  end
+
+  def self.service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
   def new_record?
@@ -194,7 +200,31 @@ class RepApi::Blacklist < RepApi::Base
 
     #response = call_json_request(:post, '/escalations/add', body: build_request_body(input))
 
-    response = call_json_request(:post, base_url, body: conditions)
+
+    retries = 0
+    service_status_data = {}
+    begin
+      response = call_json_request(:post, base_url, body: conditions)
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    rescue Exception => e
+      Rails.logger.error(e.message)
+
+      if retries < 3
+        retries += 1
+        sleep(5)
+        retry
+      end
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/api/v3/blocklist/add not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+      raise e.message
+    end
+
+
+
 
     blocklist_objects = []
 

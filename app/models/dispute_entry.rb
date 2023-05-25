@@ -15,6 +15,8 @@ class DisputeEntry < ApplicationRecord
   NEW = "NEW"
   ASSIGNED = "ASSIGNED"
   CLOSED = "CLOSED"
+  PROCESSING = "PROCESSING"
+
 
   STATUS_RESEARCHING = "RESEARCHING"
   STATUS_ESCALATED = "ESCALATED"
@@ -563,6 +565,11 @@ class DisputeEntry < ApplicationRecord
   def new_payload_item
 
     case
+    when PROCESSING == status
+      payload = {
+          status: Dispute::TI_NEW,
+          resolution_message: '',
+      }
     when NEW == status
       payload = {
           status: Dispute::TI_NEW,
