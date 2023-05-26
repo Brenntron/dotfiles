@@ -1492,12 +1492,36 @@ $ ->
     res = $('input[name=resolution' + entry_id + ']:checked').val()
     comment = $('#internal_comment_' + entry_id).val()
     uri = $('#edit_uri_input_' + entry_id).val()
+    if $('#input_cat_'+entry_id).val() != null
+      cat_ids = $('#input_cat_'+entry_id).val().toString()
+    else
+      cat_ids = null
+    category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
+    category_names = []
+    category_name.each ->
+      category_names.push($(this).text())
+    category_names = category_names.toString()
 
+    # need number of cols for replacement temp col
+    # not sure if this is the best way to do this
+    # ::before did not work well and cant adjust styles directly
+    # (no inline styles on psuedo elements)
+    # might be able to use some kind of dt function
+    visible_cols = $('#complaints-index thead th').length
+
+
+    # gets submission row height, then assigns it so it won't change
+    row_height = $(row).height()
+    $(row).css('height', row_height + 'px')
+    $(row).empty()
     $(row).addClass('submitting-entry')
 
+    temp_msg = '<h3 class="temp-msg">Submitting entry...</h3>'
+    fin_msg = '<h3 class="temp-msg submitted-entry">Submitted entry. Refresh page to see results</h3>'
+    $(row).append('<td colspan="' + visible_cols + '">' + temp_msg + '</td>')
+
     debugger
-    # Create a screen that covers the row, but maintains its position
-    # Should have a message saying its submitted
+    
     # submit for real
     # do not reload page
 
