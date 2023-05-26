@@ -112,7 +112,7 @@ $ ->
     for attachment in attachments
       $('#incoming-attachment').removeClass('hidden')
       attachment_div = $('.email-attachments')
-      attachment_link = ("<a class=email-attachment-name, href=#{attachment.direct_upload_url}>#{attachment.file_name} </a>")
+      attachment_link = ("<a class=email-attachment-name, href='/escalations/webrep/disputes/download_email_attachment_file/#{attachment.id}''>#{attachment.file_name} </a>")
       attachment_div.append(attachment_link)
 
 

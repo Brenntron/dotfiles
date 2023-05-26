@@ -8,8 +8,13 @@ module API::BugzillaRestSession
   included do
     helpers do
       def bugzilla_rest_session
-        token = env['rack.session']['bugzilla_rest_api_token']
-        BugzillaRest::Session.new(api_key: current_user.bugzilla_api_key, token: token)
+        #token = env['rack.session']['bugzilla_rest_api_token']
+        #BugzillaRest::Session.new(api_key: current_user.bugzilla_api_key, token: token)
+        ### this is a drop and go replacement of bugzilla rest session functionality since bugzilla is going away
+        # all we need is a local "proxy" to "act" like bugzilla so that functionality can continue on as if nothing happened
+        # EscalationTicket acts as that proxy, pretending to be bugzilla,
+        # for the sake of continuity it will "behave" like bugzilla
+        EscalationTicket
       end
     end
   end
