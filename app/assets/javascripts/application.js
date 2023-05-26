@@ -14,6 +14,5 @@
 //= require Chart.bundle
 //= require chartkick
 //= require bootstrap-multiselect
-//= require application/tree-table
 //= require application/util
 //= require_directory ./application
