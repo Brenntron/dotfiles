@@ -36,6 +36,9 @@ development:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     username: ""
     password: ""
+  file_mgmt:
+    base_host_path: "/tmp/"
+    base_file_path: "analyst_console/escalations/"
   file_reputation_sandbox:
     host: "intel.api.sourcefire.com"
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
@@ -184,6 +187,9 @@ test:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     username: ""
     password: ""
+  file_mgmt:
+    base_host_path: "/tmp/"
+    base_file_path: "analyst_console/escalations/"
   file_reputation_sandbox:
     host: "intel.api.sourcefire.com"
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
@@ -333,6 +339,9 @@ staging:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     username: "redacted"
     password: "redacted"
+  file_mgmt:
+    base_host_path: "/nfs/fmd_bugz_s3c/"
+    base_file_path: "analyst_console/escalations/"
   file_reputation_sandbox:
     host: "intel.api.sourcefire.com"
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
@@ -484,6 +493,9 @@ production:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     username: "redacted"
     password: "redacted"
+  file_mgmt:
+    base_host_path: "/nfs/fmd_bugz_s3c/"
+    base_file_path: "analyst_console/escalations/"
   file_reputation_sandbox:
     host: "intel.api.sourcefire.com"
     port: 443

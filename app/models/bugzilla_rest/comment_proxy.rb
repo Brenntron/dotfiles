@@ -1,4 +1,6 @@
+#marked for removal but may need for file download migration first
 class BugzillaRest::CommentProxy < BugzillaRest::Base
+
 
   FIELDS = %i{id time comment text bug_id count attachment_id is_private is_markdown tags creator creation_time}
 
@@ -34,4 +36,5 @@ class BugzillaRest::CommentProxy < BugzillaRest::Base
     bug_proxy.save!
     bug_proxy
   end
+
 end
