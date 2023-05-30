@@ -80,6 +80,7 @@ Rails.application.routes.draw do
           get :export_per_customer_report
           get :resolution_age_report
           get :export_resolution_age_report
+          get 'download_email_attachment_file/:id', to: 'disputes#download_email_attachment_file'
         end
         member do
           get :export
@@ -95,12 +96,6 @@ Rails.application.routes.draw do
       get :export_selected_dispute_entry_rows, to: 'disputes#export_selected_dispute_entry_rows'
     end
 
-    namespace :sdr do
-      root 'root#index'
-      resources :disputes, only: [:index, :show] do
-        get :all_attachments
-      end
-    end
 
     namespace :file_rep do
       root 'disputes#index'
@@ -110,8 +105,17 @@ Rails.application.routes.draw do
       get 'sandbox-html-report', to: 'disputes#sandbox_html_report'
     end
 
+    namespace :sdr do
+      root 'root#index'
+      resources :disputes, only: [:index, :show] do
+        collection do
+          get 'download_sdr_attachment_file/:id', to: 'disputes#download_sdr_attachment_file'
+        end
+        get :all_attachments
+      end
+    end
+
     resources :users, controller: '/users', only: [:index, :show, :update] do
-      resource :bugzilla_api_key, controller: '/bugzilla_api_keys', only: [:edit, :update]
 
       collection do
         get :all

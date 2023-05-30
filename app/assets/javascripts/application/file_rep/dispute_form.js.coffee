@@ -37,8 +37,7 @@ $ ->
         i++
 
     else
-      if !document.getElementById('bugzilla-login-notice')
-        document.getElementById('file_rep_submit').disabled = false
+      document.getElementById('file_rep_submit').disabled = false
 
   $('#new-file-rep-form').on 'submit', (e) ->
     e.preventDefault()

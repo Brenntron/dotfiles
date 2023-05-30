@@ -22,6 +22,7 @@ module Escalations::Sdr::DisputesHelper
   end
 
   def humanize_beaker_info(beaker_info)
+    return "" if beaker_info.blank?
     beaker_data = JSON.parse(beaker_info).with_indifferent_access
     return beaker_data.to_json if beaker_data['status'] == 'failed' || beaker_data.dig('response', 'data').empty?
 

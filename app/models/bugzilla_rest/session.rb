@@ -9,7 +9,10 @@
 #
 # Other stubs for remote bugzilla resources, particularly the BugProxy, can be constructed from this object.
 #
+
+#MARKED FOR REMOVAL, BUT NEED IT INITIALLY TO PULL EXISTING FILE DATA FROM BUGZILLA
 class BugzillaRest::Session < BugzillaRest::Base
+
 
   # @return [String] bugzilla token
   def login(username, password)
@@ -91,5 +94,6 @@ class BugzillaRest::Session < BugzillaRest::Base
   def logged_in?
     self.api_key.present? || self.token.present?
   end
+
 end
 

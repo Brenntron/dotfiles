@@ -2,6 +2,8 @@
 #
 # Stores fields of object in an attributes hash.
 # Uses method_missing to alias the name of the attribute as getter and setter methods.
+
+#MARKED FOR REMOVAL BUT NEED FOR PULLING FILE DATA FIRST
 class BugzillaRest::Base
   include ActiveModel::Model
 
@@ -152,4 +154,5 @@ class BugzillaRest::Base
       super
     end
   end
+
 end

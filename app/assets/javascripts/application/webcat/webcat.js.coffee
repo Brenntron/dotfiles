@@ -28,7 +28,7 @@ $ ->
     #pin webcat toolbar under navigation bar, add padding
     toolbar = $('#webcat-index-toolbar')
     $('#nav-banner').append(toolbar)
-    $('#page-content-wrapper').css('padding-top','60px')
+    $('.escalations--webcat--complaints-controller.index-action #page-content-wrapper').css('padding-top','60px')
 
     #align tooltips under toolbar
     $('body').addClass('pinned-toolbar-true')
