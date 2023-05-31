@@ -465,3 +465,11 @@ table.dataTable tbody tr.submitting-entry {
   padding-left: 20px;
 
 }
+
+.sort-button {
+  background-image: url(image_path('icon_sort_grey.svg'));
+}
+
+.open .sort-button {
+  background-image: url(image_path('icon_sort_white.svg'));
+}

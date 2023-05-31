@@ -5,7 +5,7 @@
       %label{for: 'complaints_select_all'} Select All
   %div
     %span.dropdown
-      %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.dropdown-button-margin-right{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Show/Hide Data
       .dropdown-menu.toolbar-dropdown#webcat-index-table-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
@@ -75,41 +75,24 @@
                 %input#view-tools-col-cb.webcat-view-data-cb.webcat-view-col-cb{type: 'checkbox', checked: true, 'data-column': '7'}
                 %label{for: 'view-tools-col-cb'} Tools
 
-        -#%ul
-        -#  %li.toggle-vis-webcat.hidden{'data-column':'1'}
-        -#    %input.important-checkbox{type: 'checkbox', checked: true, id: 'important-checkbox'} Important
-        -#  %li.toggle-vis-webcat{'data-column':'3'}
-        -#    %input.age-checkbox{type: 'checkbox', checked: true, id: 'age-checkbox'} Age
-        -#  %li.toggle-vis-webcat{'data-column':'4'}
-        -#    %input.status-checkbox{type: 'checkbox', checked: true, id: 'status-checkbox'} Status
-        -#  %li.toggle-vis-webcat{'data-column':'5'}
-        -#    %input.tags-checkbox{type: 'checkbox', checked: true, id: 'tags-checkbox'} Tags
-        -#  %li.toggle-vis-webcat{'data-column':'6'}
-        -#    %input.subdomain-checkbox{type: 'checkbox', checked: true, id: 'subdomain-checkbox'} Subdomain
-        -#  %li.toggle-vis-webcat{'data-column':'7'}
-        -#    %input.domain-checkbox{type: 'checkbox', checked: true, id: 'domain-checkbox'} Domain / IP
-        -#  %li.toggle-vis-webcat{'data-column':'8'}
-        -#    %input.path-checkbox{type: 'checkbox', checked: true, id: 'path-checkbox'} Path
-        -#  %li.toggle-vis-webcat{'data-column':'9'}
-        -#    %input.uri-checkbox{type: 'checkbox', checked: true, id: 'uri-checkbox'} URI
-        -#
-        -#%ul
-        -#  %li.toggle-vis-webcat{'data-column':'10'}
-        -#    %input.primary-checkbox{type: 'checkbox', checked: true, id: 'primary-checkbox'} Primary Cat
-        -#  %li.toggle-vis-webcat{'data-column':'11'}
-        -#    %input.suggested-checkbox{type: 'checkbox', checked: true, id: 'suggested-checkbox' } Suggested Cat
-        -#  %li.toggle-vis-webcat{'data-column':'12'}
-        -#    %input.wbrs-checkbox{type: 'checkbox', checked: true, id: 'wbrs-checkbox'} WBRS
-        -#  %li.toggle-vis-webcat{'data-column':'13'}
-        -#    %input.platform-checkbox{type: 'checkbox', checked: true, id: 'platform-checkbox'} Platform
-        -#  %li.toggle-vis-webcat{'data-column':'14'}
-        -#    %input.submittertype-checkbox{type: 'checkbox', checked: true, id: 'submittertype-checkbox'} Submitter Type
-        -#  %li.toggle-vis-webcat{'data-column':'15'}
-        -#    %input.submitterorg-checkbox{type: 'checkbox', checked: true, id: 'submitterorg-checkbox'} Submitter Org
-        -#  %li.toggle-vis-webcat{'data-column':'16'}
-        -#    %input.submitterorg-checkbox{type: 'checkbox', checked: true, id: 'submitteremail-checkbox'} Submitter Email
-        -#  %li.toggle-vis-webcat{'data-column':'17'}
-        -#    %input.assignee-checkbox{type: 'checkbox', checked: true, id: 'assignee-checkbox'} Assignee
+    %span.dropdown
+      %button#webcat-index-table-sort-button.toolbar-button.sort-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Sort data', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Sort Data
+      .dropdown-menu.toolbar-dropdown#webcat-index-table-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
+        %label.dropdown-label Sort Data
+        .row
+          %select#webcat-index-sort-select
+            %option{value: '10'} Age
+            %option{value: '11'} Entry ID
+            %option{value: '12'} Status
+            %option IP/URI
+            %option{value: '14'} WBRS Score
+            %option{value: '13'} Resolution
+            %option{value: '15'} Submitter Org
+            %option{value:'16'} Assignee
+          %button.primary{onclick: 'sort_webcat_index(this);'}
+            Apply Sort
 
   %div
     %div.btn-group.toolbar-btn-group

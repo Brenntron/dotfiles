@@ -480,6 +480,7 @@ $ ->
       serverSide: true
       stateSave: true
       select: true
+      ordering: false
       ajax:
         url: url
         data: build_data()
@@ -500,7 +501,7 @@ $ ->
 
 #      drawCallback: () ->
 
-
+# we should be figuring out local storage prior to building the table
 #        if localStorage.webcat_reset_page
 #          localStorage.removeItem('webcat_reset_page')
 #
@@ -522,10 +523,6 @@ $ ->
 #            window.sort_named_search_list()
 
       pagingType: 'full_numbers'
-#      order: [ [
-#        10
-#        'desc'
-#      ] ]
       dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
       language: {
         search: "_INPUT_"
@@ -540,8 +537,8 @@ $ ->
 #          cell.addClass 'highlight-was-dismissed'
       columnDefs: [
         {
-          targets: [0,1,2,3,5,6,7,8,9]
-          orderable: false
+          targets: [10,11,12,13,14,15,16]
+          visible: false
         }
       ]
       columns: [
@@ -674,10 +671,15 @@ $ ->
           data: 'assigned_to'
           className: 'users-col'
           render: (data, type, full, meta) ->
+            if data == ''
+              user = '<span class="missing-data">No assignee</span>'
+            else
+              user = data
+
             users_col =
               '<table class="nested-col-table">' +
                 '<tbody>' +
-                '<tr class="assignee-row"><td>' + data + '</td></tr>' +
+                '<tr class="assignee-row"><td>' + user + '</td></tr>' +
   #                  '<tr class="reviewer-row"><td>' + data.customer_name + '</td></tr>' +
   #                  '<tr class="second-reviewer-row"><td>' + data.customer_email + '</td></tr>' +
                 '</tbody>' +
@@ -837,6 +839,7 @@ $ ->
                   '<div class="dropdown-reverse-header">Internal Comment</div>' +
                   '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories">' + full.internal_comment + '</textarea>' +
                   '</div></span>' +
+
                   '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="updatePending(' + full.entry_id + ')">Submit</button>' +
                   '</div>' +
                 '</div>'
@@ -865,7 +868,7 @@ $ ->
                     '<button class="comment-button" id="internal_comment_button' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>' +
                     '<div id="internal_comment_dropdown_' + full.entry_id + '" class="dropdown-menu dropdown-menu-right internal-comment-dropdown" aria-labelledby="internal_comment_button' + full.entry_id + '">' +
                     '<div class="dropdown-reverse-header">Internal Comment</div>' +
-                    '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories" disabled="disabled">' + full.internal_comment + '</textarea>' +
+                    '<div id="internal_comment_' + full.entry_id + '">' + full.internal_comment + '</div>' +
                     '</div></span>' +
                     '<button class="tertiary submit_changes" id="reopen_' + full.entry_id + '" onclick="reopenComplaint(' + full.entry_id + ')">Reopen</button>' +
                     '</div>' +
@@ -876,7 +879,7 @@ $ ->
                   '<div class="submit-res-wrapper open-ticket-res-wrapper">' +
                     '<div class="res-radio-row">' +
                       '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="UNCHANGED"><label>Unchanged</label></div>' +
-                      '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="FIXED" checked="checked"><label>Fixed</label></div>' +
+                      '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="FIXED" checked><label>Fixed</label></div>' +
                       '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="INVALID"><label>Invalid</label></div>' +
                     '</div>' +
                     '<div class="submit-row">' +
@@ -892,12 +895,35 @@ $ ->
 
             return submit_res_wrapper
         }
-#        {
-#          data: 'age_int'
-#          visible: false
-#        }
+        # The below columns are for sorting only and should never be visible
+        {
+          data: 'age_int'
+        }
+        {
+          data: 'entry_id'
+        }
+        {
+          data: 'status'
+        }
+        {
+          data: 'resolution'
+        }
+        {
+          data: 'wbrs_score'
+        }
+        {
+          data: 'company_name'
+        }
+        {
+          data: 'assigned_to'
+        }
+
       ]
     )
+
+# how to sort by ip OR uri at once
+#    %option IP/URI
+
 
 
   # Compares the categories of an entry in AC to the full list of
@@ -1073,8 +1099,6 @@ $ ->
       error: (response) ->
         current_categories = ''
     )
-
-
 
 
 
@@ -1471,7 +1495,7 @@ get_display_prefs = () ->
       $.each response, (data, state) ->
         # HTML5 uses 'checked' presense rather than 'checked=true'
         checkbox = $("##{data}")
-        if state == true
+        if state == 'true'
           $(checkbox).prop('checked')
         else
           $(checkbox).removeAttr('checked')
@@ -1504,7 +1528,10 @@ save_display_prefs = () ->
   $('.webcat-view-data-cb').each ->
     data_id = $(this).attr('id')
     state = $(this).is(':checked')
-    data[data_id] = state
+    if state == true
+      data[data_id] = 'true'
+    else
+      data[data_id] = 'false'
 
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/user_preferences/update"
@@ -1616,6 +1643,14 @@ $ ->
     save_display_prefs()
 
 
+  # Sort
+  window.sort_webcat_index = () ->
+    debugger
+    sort_by = $('#webcat-index-sort-select').val()
+    complaint_table = $('#complaints-index').DataTable()
+    complaint_table
+      .order( [ sort_by, 'asc' ] )
+      .draw();
 
   # webcat > complaints show page, disable two Submit toolbar buttons on page load
   if $('body').hasClass('escalations--webcat--complaints-controller')
