@@ -428,6 +428,8 @@ $ ->
   build_complaints_table = () ->
     complaint_table = $('#complaints-index').DataTable(
       initComplete: ->
+        # Get display prefs
+        get_display_prefs()
         rows = $('#complaints-index').find('.cat-index-main-row')
 
         # Grab up-to-date list of categories ONE time for all entries
@@ -1235,6 +1237,7 @@ $ ->
 
 
   if $('#complaints-index').length
+    # Create index table
     build_complaints_table()
 
     # Make the search prettier
@@ -1457,6 +1460,62 @@ process_entry = (entry_data) ->
     , this)
 
 
+
+get_display_prefs = () ->
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/user_preferences/"
+    data: {name: 'WebCatVisible'}
+    success: (response) ->
+      response = JSON.parse(response)
+      $.each response, (data, state) ->
+        # HTML5 uses 'checked' presense rather than 'checked=true'
+        checkbox = $("##{data}")
+        if state == true
+          $(checkbox).prop('checked')
+        else
+          $(checkbox).removeAttr('checked')
+        toggle_display_data(checkbox)
+
+  )
+
+
+toggle_display_data = (checkbox) ->
+  # check if col or data toggle
+  if $(checkbox).hasClass('webcat-view-col-cb')
+    # this is a column toggle
+    table = $('#complaints-index').DataTable()
+    column = table.column($(checkbox).attr('data-column'))
+    if $(checkbox).prop('checked')
+      column.visible(true)
+    else
+      column.visible(false)
+  else
+    # this is a data toggle
+    data_class = $(checkbox).attr('data-class')
+    if $(checkbox).prop('checked')
+      $('.' + data_class).show()
+    else
+      $('.' + data_class).hide()
+
+
+save_display_prefs = () ->
+  data = {}
+  $('.webcat-view-data-cb').each ->
+    data_id = $(this).attr('id')
+    state = $(this).is(':checked')
+    data[data_id] = state
+
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/user_preferences/update"
+    method: 'POST'
+    data: {data: data, name: 'WebCatVisible'}
+    dataType: 'json'
+    success: (response) ->
+      console.log 'Webcat show/hide preferences are updated in user_prefs table.'
+  )
+
+
 $ ->
   ### New for card style rows ###
   # Changes which value is in the entry's uri input
@@ -1551,80 +1610,12 @@ $ ->
 
 
 
-
-  # This does not touch user prefs yet - TODO
-  # also needs to disable subdata checkboxes if the col is hidden
+  # Hide / Show data and columns on index table
   $('.webcat-view-data-cb').click ->
-    # check if col or data toggle
-    checkbox = this
-    if $(checkbox).hasClass('webcat-view-col-cb')
-      # this is a column toggle
-      table = $('#complaints-index').DataTable()
-      column = table.column($(checkbox).attr('data-column'))
-      if $(checkbox).prop('checked')
-        column.visible(true)
-      else
-        column.visible(false)
-    else
-      # this is a data toggle
-      data_class = $(checkbox).attr('data-class')
-      if $(checkbox).prop('checked')
-        $('.' + data_class).show()
-      else
-        $('.' + data_class).hide()
+    toggle_display_data(this)
+    save_display_prefs()
 
 
-
-
-
-  # webcat > get the show/hide state for these checkboxes
-#  if window.location.pathname == '/escalations/webcat/complaints'
-#    std_msg_ajax(
-#      method: 'POST'
-#      url: "/escalations/api/v1/escalations/user_preferences/"
-#      data: {name: 'WebCatColumns'}
-#      success: (response) ->
-#        response = JSON.parse(response)
-#
-#        $.each response, (column, state) ->
-#          if state == true
-#            $("##{column}-checkbox").prop('checked', true)
-#            $('#complaints-index').DataTable().column("##{column}").visible true
-#          else
-#            $("##{column}-checkbox").prop('checked', false)
-#            $('#complaints-index').DataTable().column("##{column}").visible false
-#
-#    )
-
-  # webcat > on click any show/hide column, update user prefs table
-#  $('.toggle-vis-webcat').on "click", ->
-#    data = {}
-#    ## retain commented line below
-#    # data['important'] = $("#important-checkbox").is(':checked')
-#    data['age'] = $("#age-checkbox").is(':checked')
-#    data['status'] = $("#status-checkbox").is(':checked')
-#    data['tags'] = $("#tags-checkbox").is(':checked')
-#    data['subdomain'] = $("#subdomain-checkbox").is(':checked')
-#    data['domain'] = $("#domain-checkbox").is(':checked')
-#    data['path'] = $("#path-checkbox").is(':checked')
-#    data['uri'] = $("#path-checkbox").is(':checked')
-#    data['primary'] = $("#primary-checkbox").is(':checked')
-#    data['suggested'] = $("#suggested-checkbox").is(':checked')
-#    data['wbrs'] = $("#wbrs-checkbox").is(':checked')
-#    data['platform'] = $("#platform-checkbox").is(':checked')
-#    data['submittertype'] = $("#submittertype-checkbox").is(':checked')
-#    data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
-#    data['submitteremail'] = $("#submitteremail-checkbox").is(':checked')
-#    data['assignee'] = $("#assignee-checkbox").is(':checked')
-#
-#    std_msg_ajax(
-#      url: "/escalations/api/v1/escalations/user_preferences/update"
-#      method: 'POST'
-#      data: {data, name: 'WebCatColumns'}
-#      dataType: 'json'
-#      success: (response) ->
-#        console.log 'Webcat column show/hide preferences are updated in user_prefs table.'
-#    )
 
   # webcat > complaints show page, disable two Submit toolbar buttons on page load
   if $('body').hasClass('escalations--webcat--complaints-controller')
