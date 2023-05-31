@@ -47,8 +47,7 @@ module API
               rescue Exception => e
                   return {error:e.message}.to_json
               end
-              {display_name: current_user.display_name, status: entry.status, entry_resolution: permitted_params['status'],
-               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path, categories: params[:categories]}.to_json
+              {entry_id: entry.id}.to_json
               end
             end
 

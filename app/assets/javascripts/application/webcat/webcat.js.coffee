@@ -1258,9 +1258,6 @@ $ ->
         ), 2000
 
 
-    $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
-      click_table_buttons complaint_table, this
-
     createSelectOptions = ->
       tags = $('#search_tag_list')[0]
       if tags
@@ -1437,6 +1434,29 @@ $('#exampleModal').on 'shown.bs.modal', ->
   $('button.toolbar-button.cat-btn').addClass('active')
 
 
+process_entry = (entry_data) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  # If resolution is set to fixed, make sure it has categories applied
+  if entry_data.categories == null && entry_data.status == "FIXED"
+    std_msg_error("Must include at least one category.","", reload: false)
+  else
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
+      method: 'POST'
+      headers: headers
+      data: entry_data
+      success: (response) ->
+        data = $.parseJSON(response)
+        msg = $('#' + data.entry_id + ' .temp-msg')
+        $(msg).text('Submitted. Refresh to see new results.')
+        $(msg).addClass('submitted-row')
+
+      error: (response) ->
+        std_msg_error(response,"", reload: false)
+    , this)
+
+
 $ ->
   ### New for card style rows ###
   # Changes which value is in the entry's uri input
@@ -1503,12 +1523,7 @@ $ ->
     category_names = category_names.toString()
 
     # need number of cols for replacement temp col
-    # not sure if this is the best way to do this
-    # ::before did not work well and cant adjust styles directly
-    # (no inline styles on psuedo elements)
-    # might be able to use some kind of dt function
     visible_cols = $('#complaints-index thead th').length
-
 
     # gets submission row height, then assigns it so it won't change
     row_height = $(row).height()
@@ -1520,10 +1535,21 @@ $ ->
     fin_msg = '<h3 class="temp-msg submitted-entry">Submitted entry. Refresh page to see results</h3>'
     $(row).append('<td colspan="' + visible_cols + '">' + temp_msg + '</td>')
 
-    debugger
-    
+    entry_data = {
+      'id': entry_id,
+      'prefix': uri,
+      'categories': cat_ids,
+      'category_names': category_names,
+      'status': res,
+      'comment': comment,
+      'resolution_comment': '',
+      'uri_as_categorized': uri
+    }
+
+    process_entry(entry_data)
     # submit for real
-    # do not reload page
+
+
 
 
   # This does not touch user prefs yet - TODO

@@ -447,7 +447,7 @@ table.dataTable tbody tr.submitting-entry {
     margin: 0;
     text-align: center;
     vertical-align: middle;
-    background-color: #4e4e4e1a;
+    background-color: #4e4e4e05;
   }
   .temp-msg {
     text-align: center;
@@ -456,4 +456,12 @@ table.dataTable tbody tr.submitting-entry {
     font-style: italic;
     font-size: 14px;
   }
+}
+
+.submitted-row {
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_check_grey.svg'));
+  background-position: calc(50% - 117px) 50%;
+  padding-left: 20px;
+
 }
