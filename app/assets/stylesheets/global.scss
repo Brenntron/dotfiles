@@ -11022,9 +11022,6 @@ button.secondary.view-report-external-button {
 
   // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
   @media screen and (min-width: 1200px) {
-    .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
-      width: 12%;
-    }
     // below ensures the navbar widths adds up correctly
     .col-lg-2.nav-username {
       width: 17%;
@@ -11035,10 +11032,7 @@ button.secondary.view-report-external-button {
   }
 
   // 1430px specific
-  @media screen and (min-width: 1201px) and (max-width: 1500px) {
-    .nav-page-button-wrapper {
-      width: 120px;
-    }
+  @media screen and (min-width: 1401px) and (max-width: 1500px) {
     .col-lg-2.nav-username {
       display: none;
     }
