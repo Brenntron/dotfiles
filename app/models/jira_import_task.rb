@@ -74,8 +74,12 @@ class JiraImportTask < ApplicationRecord
     end
 
     urls.each do |url|
-      url_parts = Complaint.parse_url(url)
-      import_urls.find_or_create_by(submitted_url: url, domain: url_parts[:domain])
+      begin
+        url_parts = Complaint.parse_url(url)
+        import_urls.find_or_create_by(submitted_url: url, domain: url_parts[:domain])
+      rescue PublicSuffix::DomainNotAllowed
+        urls.delete(url)
+      end
     end
 
     begin
