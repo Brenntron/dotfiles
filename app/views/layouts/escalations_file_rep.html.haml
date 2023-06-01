@@ -2,7 +2,8 @@
   Escalations - File Reputation - Analyst Console
 
 - content_for(:nav_banner) do
-  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-2.col-md-3.col-lg-2
+
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-4.col-sm-3.col-md-.col-lg-2
     %a#queue.nav-page-button{href: '/escalations/file_rep/disputes', class: ("active" if current_page?('/escalations/file_rep/disputes'))}
       %span.nav-toolbar-icon-large.icon-queue
 
@@ -17,10 +18,10 @@
       %span.nav-toolbar-icon-large.icon-research
 
 
-  .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-new-ticket
+  .nav-tool-blocks.col-xs-1.col-sm-1.col-md-2.col-lg-1.dropdown.nav-new-ticket
     %a{href: '#', class: 'dropdown-toggle', id: 'new-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-new-white'}
-      New Ticket
+      New
     .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-dispute'}
       %h3.nav-tool-dropdown-header.inverse
         New File Reputation Ticket
@@ -85,7 +86,8 @@
 
 
 
-  .nav-tool-blocks.col-xs-3.col-sm-3.col-md-2.col-lg-5.search-wrapper
+
+  .nav-tool-blocks.col-xs-4.col-sm-4.col-md-3.col-lg-4.search-wrapper
     .input-group.search-group#file-rep-search
       = form_tag('/tickets', method: :get, onsubmit: 'build_contains_search();return false;') do
         = text_field_tag 'case[id]', "#{}", class: 'search-box'
