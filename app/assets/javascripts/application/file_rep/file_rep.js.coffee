@@ -229,13 +229,12 @@ $ ->
     sorting_request = true
 
   # Show page status picker radio buttons
-  $('.fr-ticket-status-radio-label').click ->
+  $(".fr-ticket-status-radio[name='file-dispute-status']").change ->
     wrapper = $(this).parent()
     $('.show-action .status-radio-wrapper').removeClass('selected')
     $(wrapper).addClass('selected')
 
-    radio_button = $(this).prev('.fr-ticket-status-radio')
-    $(radio_button[0]).trigger('click')
+    radio_button = $(this)
     if $(radio_button).attr('id') == 'file-status-closed'
       $('#show-ticket-resolution-submenu').show()
       stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
@@ -264,16 +263,23 @@ $ ->
     wrapper.addClass('selected')
     $('.non-resolution-submit-wrapper').hide()
     $('#ticket-non-res-submit').hide()
+    $('#show-ticket-resolution-submenu').hide()
+    $('.ticket-resolution-radio').prop('checked', false)
 
-  # Edit Ticket: Edit Ticket Status on page index
+  # Edit Ticket Status on index page
   $('.escalations--file_rep--disputes-controller #index_ticket_status').click ->
     dropdown = $('#index-edit-ticket-status-dropdown').parent()
     if ($('.dispute_check_box:checked').length > 0)
 
       # Select Status
-      $('.ticket-status-radio-label').click ->
-        radio_button = $(this).prev('.ticket-status-radio')
-        $(radio_button[0]).trigger('click')
+      $('.ticket-status-radio').change ->
+        radio_button = $(this)
+
+        all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+        $(all_stat_radios).removeClass('selected')
+        wrapper = radio_button.parent()
+        $(wrapper).addClass('selected')
+
         if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
           $('#index-ticket-resolution-submenu').show()
           stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
@@ -305,23 +311,6 @@ $ ->
           $('#index-ticket-resolution-submenu').hide()
           $(res_comment[0]).val('')
 
-      $('.ticket-status-radio').click ->
-        all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
-        if $(this).is(':checked')
-          wrapper = $(this).parent()
-          $(all_stat_radios).removeClass('selected')
-          $(wrapper).addClass('selected')
-        if $(this).attr('id') == 'RESOLVED_CLOSED'
-          $('#index-ticket-resolution-submenu').show()
-          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-          $('#ticket-non-res-submit').hide()
-          $(stat_comment).val('')
-        else
-          $('#ticket-non-res-submit').show()
-          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-          $('.ticket-resolution-radio').prop('checked', false)
-          $('#index-ticket-resolution-submenu').hide()
-          $(res_comment[0]).val('')
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
