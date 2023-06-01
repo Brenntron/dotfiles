@@ -22,7 +22,7 @@ window.wbrs_display = (score) ->
 $ ->
 
   # webcat: have top navigation bar scroll with page per user request
-  if $('body').hasClass("escalations--webcat--complaints-controller")
+  if $('body').hasClass("escalations--webcat--complaints-controller") && $('body').hasClass("index-action")
     $('#nav-banner').addClass('fixed-nav')
 
     #pin webcat toolbar under navigation bar, add padding
@@ -1537,6 +1537,26 @@ $ ->
     complaint_table
       .order( [ sort_by, 'asc' ] )
       .draw();
+
+
+  window.toggle_direct_sort = (col, field, button) ->
+    order = $(button).attr('data-sort')
+    if order == 'asc'
+      $(button).attr('data-sort', 'desc')
+      $(button).removeClass('sort-asc').addClass('sort-desc')
+      title = 'Sort by ' + field + ': descending'
+      $(button).attr('title', title)
+    else
+      $(button).attr('data-sort', 'asc')
+      $(button).removeClass('sort-desc').addClass('sort-asc')
+      title = 'Sort by ' + field + ': ascending'
+      $(button).attr('title', title)
+
+    complaint_table = $('#complaints-index').DataTable()
+    complaint_table
+      .order( [ col, order] )
+      .draw();
+
 
   # webcat > complaints show page, disable two Submit toolbar buttons on page load
   if $('body').hasClass('escalations--webcat--complaints-controller')

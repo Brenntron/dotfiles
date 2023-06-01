@@ -508,3 +508,21 @@ table.dataTable tbody tr.submitting-entry {
   }
 }
 
+#sort-btn-group {
+  float: left;
+  .direct-sorter {
+    padding-bottom: 0;
+    font-weight: 600;
+    font-size: 12px;
+    color: #4d4e4e;
+    background-position: 0;
+    padding-top: 0;
+    padding-left: 18px;
+  }
+  .sort-desc {
+    background-image: url(image_path('icon_sort_dec_grey.svg'));
+  }
+  .sort-asc {
+    background-image: url(image_path('icon_sort_asc_grey.svg'));
+  }
+}

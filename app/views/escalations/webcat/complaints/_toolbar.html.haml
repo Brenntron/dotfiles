@@ -5,7 +5,7 @@
       %label{for: 'complaints_select_all'} Select All
   %div
     %span.dropdown
-      %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.dropdown-button-margin-right{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Show/Hide Data
       .dropdown-menu.toolbar-dropdown#webcat-index-table-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
@@ -74,6 +74,10 @@
               %li
                 %input#view-tools-col-cb.webcat-view-data-cb.webcat-view-col-cb{type: 'checkbox', checked: true, 'data-column': '7'}
                 %label{for: 'view-tools-col-cb'} Tools
+  %div
+    %div#sort-btn-group.btn-group.toolbar-btn-group
+      %button#webcat-index-table-sort-age.btn.toolbar-button.esc-tooltipped-webcat-toolbar.darkened-button.direct-sorter.sort-asc.concise-button.concise-button-first{title: 'Sort by age: ascending', onclick: 'toggle_direct_sort("10", "age", this);', 'data-sort': 'asc'} Age
+      %button#webcat-index-table-sort-uri.btn.toolbar-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.direct-sorter.sort-asc.concise-button.concise-button-last{title: 'Sort by IP/URI: ascending', onclick: 'toggle_direct_sort("12", "IP/URI", this);', 'data-sort': 'asc'} IP/URI
 
     %span.dropdown
       %button#webcat-index-table-sort-button.toolbar-button.sort-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Sort data', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -102,14 +106,14 @@
         %span.toolbar-button-text.text-button-all All
   %div
     %span.toolbar-concise-button-area
-      %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)'}
+      %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.darkened-button{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)'}
         %span.toolbar-button-text Take
-      %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
+      %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
         %span.toolbar-button-text Return
     %span.toolbar-concise-button-area.webrep-change-assignee-wrapper
-      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text.darkened-button{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span.dropdown
-        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text
             Change Assignee
         .dropdown-menu.toolbar-dropdown{'aria-labelledby': 'index_change_assign'}
@@ -173,16 +177,6 @@
             %button#convert-to-webrep.primary.dropdown-submit-button{type: 'button', disabled: 'disabled'}
               Convert Ticket
 
-  %div
-    %button.toolbar-button.collapse-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'collapse_selected()', type: 'button', title: 'Collapse Selected (alt + f)'}
-      %span.toolbar-button-text Selected
-    %button.toolbar-button.collapse-all.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'collapse_all()', type: 'button', title: 'Collapse All (alt + h)'}
-      %span.toolbar-button-text.text-button-all All
-  %div
-    %button.toolbar-button.expand-row-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected (alt + d)'}
-      %span.toolbar-button-text Selected
-    %button.toolbar-button.expand-all.esc-tooltipped-webcat-toolbar{type: 'button', title: 'Expand All (alt + g)'}
-      %span.toolbar-button-text.text-button-all All
   %div
     %button.toolbar-button.sync-button#fetch.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
       %span.toolbar-button-text Complaints
