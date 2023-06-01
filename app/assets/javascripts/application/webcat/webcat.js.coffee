@@ -435,7 +435,6 @@ $ ->
         rows = $('#complaints-index').find('.cat-index-main-row')
         get_current_cats(rows)
 
-        # unsure what this part does
         input = $('.dataTables_filter input').unbind()
         self = @api()
 
@@ -463,7 +462,6 @@ $ ->
       serverSide: true
       stateSave: true
       select: true
-#      ordering: false
       ajax:
         url: url
         data: build_data()
@@ -521,14 +519,7 @@ $ ->
         searchPlaceholder: "Search within table"
       }
       # default ordering - keep on hidden age column
-      order: [ 10, 'asc' ]
-#      rowCallback: (row, data) ->
-#        cell = @api().row(row).nodes().to$()
-#        { is_important, was_dismissed } = data
-#        if is_important
-#          cell.addClass 'highlight-second-review'
-#        if was_dismissed
-#          cell.addClass 'highlight-was-dismissed'
+      order: [ 10, 'dec' ]
       columnDefs: [
         {
           targets: [10,11,12,13,14,15,16,17]
@@ -564,25 +555,20 @@ $ ->
             else
               complaint_source = '<span class="missing-data">Source unknown</span>'
 
-            is_important_flag = ''
-            if full.is_important == "true" && full.was_dismissed == "true"
-              is_important_flag = '<div class="container-important-tags ">' +
-                '<div class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></div>' +
-                '<div class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></div>' +
-                '</div>'
-            else if full.is_important == "true" && full.was_dismissed == "false"
-              is_important_flag = '<span class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
-            else if full.is_important == "false" && full.was_dismissed == "true"
-              is_important_flag = '<span class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></span>'
+            is_important_flags = ''
+            if full.is_important == "true"
+              is_important_flags += '<span class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
+            if full.was_dismissed == "true"
+              is_important_flags += '<span class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></span>'
 
             ticket_col =
               '<table class="nested-col-table">' +
                 '<tbody>' +
-                '<tr class="entry-id-row"><td>' + full.entry_id + '</td></tr>' +
+                '<tr class="entry-id-row"><td><a href="complaints/' + full.complaint_id + '" >' + full.entry_id + '</a></td></tr>' +
                 '<tr class="age-row"><td class="' + age_class + '">' + data + '</td></tr>' +
                 '<tr class="state-row"><td>' + full.status + '</td></tr>' +
                 '<tr class="source-row"><td>' + complaint_source + '</td></tr>' +
-                '<tr class="important-flag-row"><td>' + is_important_flag + '</td></tr>' +
+                '<tr class="important-flag-row"><td>' + is_important_flags + '</td></tr>' +
                 '</tbody>' +
               '</table>'
 
@@ -934,45 +920,9 @@ $ ->
 
 #  build_complaints_table = () ->
 #        complaint_table = $('#complaints-index').DataTable(
-#          initComplete: ->
-#            input = $('.dataTables_filter input').unbind()
-#            self = @api()
 #
-#            $searchButton = $('<button class="dt-button dt-search-button esc-tooltipped" title="Search">').click(->
-#              self.search(input.val()).draw()
-#              return
-#            )
-#            $clearButton = $('<button class="dt-button dt-search-clear-button esc-tooltipped" title="Clear">').click(->
-#              input.val ''
-#              $searchButton.click()
-#              return
-#            )
-#            $('.dataTables_filter').append $clearButton, $searchButton
-#
-#            # properly init these search/clear icons
-#            $('.dt-button').tooltipster
-#              theme: [
-#                'tooltipster-borderless'
-#                'tooltipster-borderless-customized'
-#                'tooltipster-borderless-comment'
-#              ]
-#
-#            return
-#          lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
-#          processing: true
-#          serverSide: true
-#          stateSave: true
-#          select: true
+
 #          ajax:
-#            url: url
-#            data: build_data()
-#            error: () ->
-#              ###
-#                If there is an error with the build_data call, the localstorage and url will be blown away
-#                This will reset the search and filters
-#              ###
-#              refresh_localStorage()
-#              refresh_url()
 #            complete: ->
 #              use_user_preference_filter()
 #          drawCallback: ( settings ) ->
@@ -996,14 +946,6 @@ $ ->
 #                window.add_tmp_tr_to_named_search_list(webcat_search_name)
 #                window.sort_named_search_list()
 #
-
-#          rowCallback: (row, data) ->
-#            cell = @api().row(row).nodes().to$()
-#            { is_important, was_dismissed } = data
-#            if is_important
-#              cell.addClass 'highlight-second-review'
-#            if was_dismissed
-#              cell.addClass 'highlight-was-dismissed'
 
 #            ]
 #        select: 'style': 'os'

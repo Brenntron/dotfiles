@@ -483,3 +483,28 @@ table.dataTable tbody tr.submitting-entry {
 .open .sort-button {
   background-image: url(image_path('icon_sort_white.svg'));
 }
+
+#webcat-index-title {
+  line-height: 12px;
+  margin: 8px 0 10px 0;
+}
+
+.entry-id-row a {
+  text-decoration: underline;
+}
+
+.important-flag-row {
+  .is-important, .was-reviewed {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-repeat: no-repeat;
+  }
+  .is-important {
+    background-image: url(image_path('icon_important.svg'));
+  }
+  .was-reviewed {
+    background-image: url(image_path('icon_reviewed_check.svg'));
+  }
+}
+
