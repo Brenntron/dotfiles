@@ -169,6 +169,16 @@
   .lookup-button {
     background-image: url(image_path('icon_google_grey.svg'));
   }
+  .open-all {
+    background-size: 18px;
+    &[disabled] {
+      opacity: .5;
+      background-color: #D7DADB !important;
+    }
+    &:hover {
+      background-color: darken(#D7DADB, 10%);
+    }
+  }
   .quick-edit-uri-dropdown {
     margin-top: -4px;
     border-radius: 0 4px 4px 4px;

@@ -783,9 +783,15 @@ $ ->
             lookup_button =
               '<a class="button-wrapper-link" href="https://www.google.com/search?q=site%3A' + lookup_url + '" target="_blank"><button class="lookup-button"></button></a>'
 
-            # TODO - Add open in new tab button *IF score is above certain threshold
+            visit_url = history_url
+            if full.wbrs_score <= -6
+              visit_button =
+                '<button class="open-all" disabled></button>'
+            else
+              visit_button =
+                '<a class="button-wrapper-link" href="http://' + visit_url + '" target="_blank"><button class="open-all"></button></a>'
 
-            return history_button + whois_button + lookup_button
+            return history_button + whois_button + lookup_button + visit_button
         }
         {
           data: null
@@ -1206,7 +1212,7 @@ $('#exampleModal').on 'shown.bs.modal', ->
 
 
 get_current_cats = (rows) ->
-# Grab up-to-date list of categories ONE time for all entries
+  # Grab up-to-date list of categories ONE time for all entries
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
@@ -1223,76 +1229,76 @@ get_current_cats = (rows) ->
         fetch_external_categories(entry_id)
   )
 
-  # Compares the categories of an entry in AC to the full list of
-  # AUP categories and initializes & populates that entry's selectize box
-  load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status) ->
+# Compares the categories of an entry in AC to the full list of
+# AUP categories and initializes & populates that entry's selectize box
+load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status) ->
 
-    cleaned_cats = []
-    if entry_categories
-      cleaned_cats = entry_categories.split(',')
-      #splice together 'Conventions, Conferences and Trade Shows' due to extra comma
-      if entry_categories.includes('Conferences and Trade Shows')
-        $(cleaned_cats).each (i, category) ->
-          if category == 'Conventions'
-            cleaned_cats.splice(i, 1)
-          else if category == ' Conferences and Trade Shows'
-            i2 = i - 1
-            cleaned_cats.splice(i2, 1, 'Conventions, Conferences and Trade Shows')
+  cleaned_cats = []
+  if entry_categories
+    cleaned_cats = entry_categories.split(',')
+    #splice together 'Conventions, Conferences and Trade Shows' due to extra comma
+    if entry_categories.includes('Conferences and Trade Shows')
+      $(cleaned_cats).each (i, category) ->
+        if category == 'Conventions'
+          cleaned_cats.splice(i, 1)
+        else if category == ' Conferences and Trade Shows'
+          i2 = i - 1
+          cleaned_cats.splice(i2, 1, 'Conventions, Conferences and Trade Shows')
 
-    cat_options = []
-    for key, value of all_categories
-      cat_code = key.split(' - ')[1]
-      value_name = key.split(' - ')[0]
-      cat_options.push({category_id: value, category_name: value_name, category_code: cat_code})
+  cat_options = []
+  for key, value of all_categories
+    cat_code = key.split(' - ')[1]
+    value_name = key.split(' - ')[0]
+    cat_options.push({category_id: value, category_name: value_name, category_code: cat_code})
 
-    # find the category ids that match the current cats on the entry
-    category_ids = []
-    for name in cleaned_cats
-      for x, y of all_categories
-        value_name = x.split(' - ')[0]
-        if name.trim() == value_name
-          category_ids.push(y)
+  # find the category ids that match the current cats on the entry
+  category_ids = []
+  for name in cleaned_cats
+    for x, y of all_categories
+      value_name = x.split(' - ')[0]
+      if name.trim() == value_name
+        category_ids.push(y)
 
-    if entry_status == 'COMPLETED'
-      # need to initialize the selectize function but disable it here if entry is completed
-      $completed_selectize = $('#input_cat_'+ entry_id).selectize {
-        persist: true,
-        create: false,
-        maxItems: 5,
-        closeAfterSelect: true,
-        valueField: 'category_id',
-        labelField: 'category_name',
-        searchField: ['category_name', 'category_code'],
-        options: cat_options,
-        items: category_ids,
-      }
-      select_complete = $completed_selectize[0].selectize
-      select_complete.disable()
-    else
-      $('#input_cat_'+ entry_id).selectize {
-        persist: false,
-        create: false,
-        maxItems: 5,
-        closeAfterSelect: true,
-        valueField: 'category_id',
-        labelField: 'category_name',
-        searchField: ['category_name', 'category_code'],
-        options: cat_options,
-        items: category_ids,
-        score: (input) ->
-          #  Adding some customization for autofill
-          #  restricting on certain cats to avoid accidental categorization
-          #  (replaces selectize's built-in `getScoreFunction()` with our own)
-          (item) ->
-            if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
-              item.category_code == input ? 1 : 0
-            else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
-              1
-            else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
-              0.9
-            else
-              0
-      }
+  if entry_status == 'COMPLETED'
+    # need to initialize the selectize function but disable it here if entry is completed
+    $completed_selectize = $('#input_cat_'+ entry_id).selectize {
+      persist: true,
+      create: false,
+      maxItems: 5,
+      closeAfterSelect: true,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: cat_options,
+      items: category_ids,
+    }
+    select_complete = $completed_selectize[0].selectize
+    select_complete.disable()
+  else
+    $('#input_cat_'+ entry_id).selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      closeAfterSelect: true,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: cat_options,
+      items: category_ids,
+      score: (input) ->
+        #  Adding some customization for autofill
+        #  restricting on certain cats to avoid accidental categorization
+        #  (replaces selectize's built-in `getScoreFunction()` with our own)
+        (item) ->
+          if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+            item.category_code == input ? 1 : 0
+          else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+            1
+          else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+            0.9
+          else
+            0
+    }
 
 
 

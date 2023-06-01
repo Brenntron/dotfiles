@@ -1158,68 +1158,7 @@ format = (complaint_entry_row) ->
     reopen_class = ""
     submit_class = "hidden"
     status_class = "completed"
-  wbrs_score = ''
-  if complaint_entry.wbrs_score
-    wbrs_score = complaint_entry.wbrs_score
-  else
-    wbrs_score = missing_data
-  confidence = ''
-  if complaint_entry.confidence
-    confidence = complaint_entry.confidence
-  else
-    confidence = missing_data
 
-  customer_name = ''
-  if complaint_entry.customer_name
-    customer_name = complaint_entry.customer_name
-  else
-    customer_name = missing_data
-
-  customer_description = ''
-  if complaint_entry.description
-    customer_description = complaint_entry.description
-  else
-    customer_description = missing_data
-
-  screen_shot_error = ''
-  if complaint_entry.screen_shot_error
-    screen_shot_error = complaint_entry.screen_shot_error
-
-  certainty = ''
-  if complaint_entry.certainty
-    certainty = complaint_entry.certainty
-  else
-    certainty = missing_data
-  category = ''
-  if complaint_entry.category
-    category = complaint_entry.category
-  else
-    category = ''
-  internal_comment=''
-  if complaint_entry.internal_comment
-    internal_comment = complaint_entry.internal_comment
-  resolution_comment=''
-  if complaint_entry.resolution_comment
-    resolution_comment = complaint_entry.resolution_comment
-  disposition = ''
-  if complaint_entry.suggested_disposition
-    disposition = complaint_entry.suggested_disposition
-  else
-    disposition = missing_data
-  unchanged_radio = ""
-  fixed_radio = ""
-  invalid_radio = ""
-
-  if complaint_entry.resolution
-    switch (complaint_entry.resolution)
-      when "UNCHANGED"
-        unchanged_radio = "checked='checked'"
-      when "FIXED"
-        fixed_radio = "checked='checked'"
-      when "INVALID"
-        invalid_radio = "checked='checked'"
-  else
-    fixed_radio = "checked='checked'"
 
   category_row = ''
   tooltip_table = ''
@@ -1231,52 +1170,6 @@ format = (complaint_entry_row) ->
   tooltip_wrapper_end = '</span></div>'
 
 
-  std_msg_ajax(
-    method: 'POST'
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
-    data: {'id': complaint_entry.entry_id}
-    success: (response) ->
-      row_id = JSON.parse(this.data).id
-      { current_category_data : current_categories, master_categories, sds_category, sds_domain_category} = JSON.parse(response)
-
-      sds_category == '' unless sds_category != null
-
-      master_categories_list = '#main-domain-categories_' + complaint_entry.entry_id
-
-      if master_categories && master_categories.length > 0
-        $(master_categories_list).closest('.domain-categories').show()
-        for cat in master_categories
-          new_cat = '<li>' + cat + '</li>'
-          $(master_categories_list).append(new_cat)
-
-      $(".simple-nested-table#entry-table-#{complaint_entry.entry_id} tbody > tr").remove()
-      $.each current_categories, (key, value) ->
-        active =  $(this).attr("is_active")
-        if active == true
-          { confidence, mnem: mnemonic, descr: name, category_id: cat_id, top_certainty, certainties } = this
-
-          $(certainties).each ->
-            { certainty:source_certainty, source_description, source_mnemonic: source_name } = this
-            certainty_row = '<tr><td>' + source_certainty + '</td><td>' + source_name + '</td><td>' + source_description + '</td></tr>'
-            tooltip_table_guts = tooltip_table_guts + certainty_row
-
-          tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
-          tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + tooltip_table + tooltip_wrapper_end
-
-          if key == '1.0'
-            category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td><td class=sds_category>' + sds_category + '</td><td class=sds_category>' + sds_domain_category + '</td></tr>'
-            $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
-          else
-            category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
-            $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
-
-      if jQuery.isEmptyObject(current_categories) == true && sds_category
-        category_row = '<tr><td><td></td><td></td><td class=sds_category>' + sds_category + '</td></tr>'
-        $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
-
-    error: (response) ->
-      current_categories = ''
-  )
 
   if complaint_entry.entry_history?
     if complaint_entry.entry_history.complaint_history.length >= 1
@@ -1300,69 +1193,20 @@ format = (complaint_entry_row) ->
       domain = complaint_entry.uri_as_categorized
     # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
 
-    complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
-    complaint_submission_html =
-        '<input type="radio" name="resolution_review_' + entry_id + '" value="commit" > Commit <br/>' +
-        '<input type="radio" name="resolution_review_' + entry_id + '" value="decline" checked="checked"> Decline <br />' +
-        '<input type="radio" name="resolution_review_' + entry_id + '" value="ignore"> Ignore (Bulk change only)' +
-        '<br/>' +
-        '<button class="tertiary" onclick="updatePending(' + entry_id + ',' + row_id + ')"> Submit </button>' +
-        '</div>'
-  else
-    complaint_table_row_html = '<table class="active_table"><tr class="active_master_submit" type="submit_changes" entry_id="' + entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row">'
-    complaint_submission_html =
-        '<input type="radio" class="resolution_radio_button" id="unchanged' + entry_id + '" name="resolution' + entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
-        '<input type="radio" class="resolution_radio_button" id="fixed' + entry_id + '" name="resolution' + entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
-        '<input type="radio" class="resolution_radio_button" id="invalid' + entry_id + '" name="resolution' + entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
-        '<br/>' +
-        '<button class="tertiary submit_changes ' + submit_class + '" id="submit_changes_' + entry_id + '" onclick="updateEntryColumns(' + entry_id + ',' + row_id + ')">Submit Changes</button>' +
-        '<button class="tertiary ' + reopen_class + '" id="reopen_' + entry_id + '" onclick="reopenComplaint(' + entry_id + ', this)">Reopen Complaint</button>' +
-        '</div>'
-
-  retake_in_progress = false
-  if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
-    retake_in_progress = true
-
   edit_input = if domain != "" then domain else host #if the domain is empty, then display host for ips in edit input
 
-  if complaint_entry.complaint_source?
-    if complaint_entry.complaint_source == 'talos-intelligence'
-      complaint_source = 'TI Webform'
-    else if complaint_entry.complaint_source == 'talos-intelligence-api'
-      complaint_source = 'TI API'
-    else if complaint_entry.complaint_source == ''
-      complaint_source = '<span class="missing-data">Source unknown</span>'
-    else
-      complaint_source = complaint_entry.complaint_source
-  else
-    complaint_source = '<span class="missing-data">Source unknown</span>'
 
   form_change_item = domain || complaint_entry.ip_address
 
   complaint_entry_html =
       complaint_table_row_html +
-      "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
-      "<div class='row'>" +
-      "<div class='col-xs-3 col-with-divider'>" +
-      "<div class='screenshot-thumb-wrapper'>" +
-      "<img id='screenshot_id_#{entry_id}' class='screenshot-thumb-img' title='#{screen_shot_error}' data-toggle='popover' onclick='enlarge_image('#{entry_id} , complaint_entries/serve_image?complaint_entry_id='#{entry_id} , #{retake_in_progress}')' src='complaint_entries/serve_image?complaint_entry_id=#{entry_id}'/>" +
-      "</div>" +
+
       "<div class='complaint-entry-info'>" +
-      "<label class='content-label-sm'>Case ID</label>"+
       "<span class='nested-complaint-data case-id'><a href='complaints/#{complaint_id}'>#{complaint_id}</a></span>" +
       "<label class='content-label-sm'>Entry URI</label>" +
       "<span class='nested-complaint-data input-truncate esc-tooltipped' id='entry-uri-#{entry_id}' title='#{url}'><a href='http://#{url}' target='_blank'>#{url}</a></span>" +
       "<label class='content-label-sm' id='site-search'>Site Search</label>" +
       "<span class='nested-complaint-data input-truncate esc-tooltipped' id='site-search-#{entry_id}' title='#{url}'>#{search_uri}</span>" +
-      "<label class='content-label-sm'>Customer Name</label>" +
-      "<span class='nested-complaint-data'>#{customer_name}</span>" +
-      "<label class='content-label-sm'>Customer Description</label>" +
-      "<span class='nested-complaint-data'>#{customer_description}</span>" +
-      "<label class='content-label-sm'>Complaint Source</label>" +
-      "<span class='nested-complaint-data'>#{complaint_source}</span>" +
-      "</div></div><div class='col-xs-7 col-with-divider'>" +
-      '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-3">WBRS Categories</th><th class="col-sm-2">WBRS Certainty</th><th class="col-sm-3">SDS URI Category</th><th class="col-sm-3">SDS Domain Category</th></tr></thead>' +
-      '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="history-' + entry_id + '" onclick="history_dialog(' + entry_id  + ',\'' + url + '\')">History</button><br/>' +
@@ -1823,9 +1667,7 @@ open_selected = (selected_rows, toggle) ->
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, "true")
-window.open_nonviewable = () ->
-  selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, "false")
+
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length == 0
@@ -1838,37 +1680,6 @@ window.open_all = () ->
     selected_rows = $('#complaints-index').DataTable().rows()
     open_selected(selected_rows, "true")
 
-toggle_selected = (selectedRows, expand)->
-  selectState = $('.selected')
-  for row in selectedRows
-    if expand
-      if !$(row).hasClass('shown')
-        $(row).find('.expand-row-button-inline').click()
-    else
-      if $(row).hasClass('shown')
-        $(row).find('.expand-row-button-inline').click()
-        $(row).addClass('selected')
-  $(selectState).addClass('selected')
-
-#window.collapse_selected =()->
-#  selectedRows = $('.selected')
-#  expand = false;
-#  toggle_selected(selectedRows, expand)
-#
-#window.collapse_all =()->
-#  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
-#  expand = false;
-#  toggle_selected(selectedRows, expand)
-#
-#window.expand_selected =()->
-#  selectedRows = $('.selected')
-#  expand = true;
-#  toggle_selected(selectedRows, expand)
-#
-#window.expand_all =()->
-#  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
-#  expand = true;
-#  toggle_selected(selectedRows, expand)
 
 window.mark_for_commit = () ->
   entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
@@ -1901,20 +1712,6 @@ window.commit_marked = () ->
     dataType: 'json'
     error: (response) ->
       popup_response_error(response, 'Error committing marked entries.')
-  )
-
-window.load_screenshot = (img_tag, complaint_entry_id) ->
-  std_msg_ajax(
-    method: 'GET'
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/' + complaint_entry_id + '/screenshot'
-    data: {}
-    img_tag: img_tag
-    error_prefix: 'Error downloading screenshot.'
-    success: (response) ->
-      JSON.parse(response).image_data
-      image_data = JSON.parse(response).image_data
-      src = 'data:image/png;base64,' + image_data
-      this.img_tag.src = src
   )
 
 window.triggerTooltips = (item) ->
@@ -2202,50 +1999,6 @@ $ ->
     touchedFormChange(domain)
     $('#master-submit').prop('disabled', false)
 
-#  $('.expand-all').click ->
-#    complaint_table = $('#complaints-index').DataTable()
-#    td = $('#complaints-index').find('td.expandable-row-column')
-
-#    td.each ->
-#      tr = $(this).closest('tr')
-#      row = complaint_table.row(tr)
-#
-#      unless row.child.isShown()
-#
-#        row.child(format(row)).show()
-#        nested_tooltip()
-#
-#        tr.addClass 'shown'
-#
-#        td = $(tr).next('tr').find('td:first')
-#        $(td).addClass 'nested-complaint-data-wrapper'
-#        unless $(td).hasClass 'nested-complaint-data-wrapper'
-#          tr.find('td:first').addClass 'nested-complaint-data-wrapper'
-#
-#        cat_select = '#input_cat_'+ row.data().entry_id
-#        $(cat_select).selectize {
-#          persist: false,
-#          create: false,
-#          maxItems: 5,
-#          closeAfterSelect: true,
-#          valueField: 'category_id',
-#          labelField: 'category_name',
-#          searchField: ['category_name', 'category_code'],
-#          options: AC.WebCat.createSelectOptions('#input_cat_'+ row.data().entry_id)
-#          items: AC.WebCat.getCategoryIds(selected_options(row.data().category), cat_select)
-#        }
-
-#        $('.toggle-vis-nested').each ->
-#          checkbox_trigger = $(button).attr('data-column')
-#          checkbox = $(this).find('input')
-#          if $(checkbox).prop('checked')
-#            $('.complaint-entry-table td, .complaint-entry-table th').each ->
-#              if $(button).hasClass(checkbox_trigger)
-#                $(button).show()
-#          else if $(checkbox).prop('checked') == false
-#            $('.complaint-entry-table td, .complaint-entry-table th').each ->
-#              if $(button).hasClass(checkbox_trigger)
-#                $(button).hide()
 
 
   $('#complaints_check_box, #complaints_select_all').click ->
