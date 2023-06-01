@@ -94,10 +94,10 @@ body {
 }
 
 #page-wrapper {
-  min-height: 100%;
   align-content: center;
   display: block;
   margin-left: $sidebar-width;
+  min-height: 100%;
 }
 
 #page-content-wrapper {
@@ -8096,12 +8096,17 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 .tag-capsule {
-  padding: 2px 4px;
-  margin: 4px 2px 0 2px;
   background-color: $bug-section-color;
   border-radius: 2px;
   color: $content-bg-color;
+  cursor: pointer;
   display: inline-block;
+  margin: 4px 2px 0 2px;
+  padding: 2px 4px;
+
+  &:hover {
+    background-color: darken($bug-section-color, 7%); 
+  }
 }
 
 .nested-complaint-data-wrapper a {
@@ -12212,7 +12217,7 @@ input[type="radio"].resolution_radio_button {
 }
 .toolbar#webcat-index-toolbar {
   background: $content-bg-color;
-  bottom: 18px;
+  bottom: 2px;
   box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
   flex-direction: row;
   float: left;

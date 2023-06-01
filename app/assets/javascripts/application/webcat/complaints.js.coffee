@@ -281,7 +281,7 @@ processSubmitNewURL = () ->
         )
       error: (response) ->
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
-          std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
+          std_api_error(response, "Please make sure you have the appropriate permissions. Unable to categorize url.", reload: false)
         else
           std_api_error(response, "Unable to categorize url.", reload: false)
     )
@@ -1911,10 +1911,14 @@ window.fetch_complaints = () ->
 
 
 open_selected = (selected_rows, toggle) ->
-  for selected_row in selected_rows.data()
-    { viewable, subdomain, domain, path, ip_address } = selected_row
-    if viewable == toggle
+  low_rep_entries = []
+  error_message = ''
 
+  for selected_row in selected_rows.data()
+    { viewable, subdomain, domain, path, ip_address, wbrs_score } = selected_row
+    if parseInt(wbrs_score) <= -6
+      low_rep_entries.push selected_row
+    else if viewable == toggle
       new_subdomain = ""
       new_domain = ""
       new_path = ""
@@ -1927,6 +1931,21 @@ open_selected = (selected_rows, toggle) ->
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
         window.open("http://"+selected_row.ip_address)
+
+  if low_rep_entries.length >= 10
+    error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores."
+  else if low_rep_entries.length > 0
+    domains_and_ips = []
+
+    for lre in low_rep_entries
+      if lre.domain
+        domains_and_ips.push "<li>#{lre.domain}</li>"
+      else
+        domains_and_ips.push "<li>#{lre.ip_address}</li>"
+
+    error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores. <ul>#{domains_and_ips.join('')}</ul>"
+
+  show_message('error', "#{error_message}", false, '#alertMessage')
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
@@ -2478,13 +2497,18 @@ window.prep_complaint_to_convert = () ->
 
               entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
                 '<td class="text-center entry-disposition">' +
-                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
-                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio" title="Customer says the website is safe and should be allowed.">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio" title="Customer says the website is malicious and should be blocked">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
                 '</td></tr>'
 
               $(entries_table).append(entry_row)
 
             $('#convert-ticket-summary').append(summary)
+            $('.entry-disposition > .inline-radio-wrapper > label').tooltipster
+              theme: [
+                'tooltipster-borderless'
+                'tooltipster-borderless-customized'
+              ]
 
           else
             std_msg_error('Ticket cannot be converted', ['Selected entry\'s parent ticket is not in a convertible (open) status.'])

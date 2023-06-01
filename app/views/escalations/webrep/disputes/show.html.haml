@@ -62,7 +62,6 @@
           %label.content-label-sm
             Status
           %br
-          -##bugzilla_popover_state
           - if (@dispute.resolution != Dispute::DUPLICATE)
             %span.dropdown
               %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "dispute_status_drop_down()"}

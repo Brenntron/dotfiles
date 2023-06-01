@@ -8,7 +8,6 @@
 //= require jquery-ui
 //= require datatables
 //= require util
-//= require tree-table
 //= require selectize
 //= require tooltipster.bundle.min
 //= require tooltipster-custom
@@ -19,7 +18,6 @@
 //= require bootstrap-table.min
 //= require bootstrap_tabs
 //= require admin/bs-dropdown-select
-//= require admin/bs-admin-tabs
 //= require admin/std_api
 //= require admin/std_msg
 //= require application/custom

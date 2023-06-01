@@ -589,6 +589,11 @@ window.save_dispute_entries = () ->
         if new_value != old_value
           changes_made = true
           if new_value == "RESOLVED_CLOSED"
+            resolution_status = {
+              id: id
+              field: "status"
+              new: new_value
+            }
             resolution_data = {
               id: id
               field: "resolution"
@@ -599,6 +604,7 @@ window.save_dispute_entries = () ->
               field: "resolution_comment"
               new: $(this).find("textarea[name='resolution-comment']")[0].value
             }
+            data[id].push(resolution_status)
             data[id].push(resolution_data)
             data[id].push(resolution_comment)
 
@@ -1138,31 +1144,16 @@ $ ->
       {
         data: 'case_age'
         'render': (data,type,full,meta) ->
-          if data != "<1 hr"
-            dispute_duration = moment(full.case_opened_at).fromNow()
-            if dispute_duration.includes('minute')
+          if data == "<1 hr"
+            data
+          else if data.includes('h') && !data.includes('d')
+            hours = parseInt(data.split('h')[0])
+            if hours < 18
               dispute_latency = data
-            if dispute_duration.includes('hour')
-              hours = parseInt(dispute_duration.replace(/[^0-9]/g, ''))
-              if hours <= 18
-                dispute_latency = data
-              else
-                dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             else
               dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            if dispute_duration.includes('day')
-              day = parseInt(data.replace(/[^0-9]/g, ''))
-              if day >= 1
-                dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            if dispute_duration.includes('months')
-              month = parseInt(data.replace(/[^0-9]/g, ''))
-              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            if dispute_duration.includes('year')
-              year = parseInt(data.replace(/[^0-9]/g, ''))
-              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            dispute_latency
           else
-            data
+            dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
       }
       { data: 'source' }
       {

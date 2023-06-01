@@ -1,6 +1,5 @@
-GIT
-  remote: https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git
-  revision: d8c7fa0c0fa507b9cd6cb790ee51032ce0e79d7f
+PATH
+  remote: vendor/gems/peake-bridge-client
   specs:
     peake-bridge-client (0.2.0.0)
       curb (~> 0.9)

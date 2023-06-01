@@ -1,8 +1,0 @@
-<form id="change_metrics_timeframe_form" style="display:none;" class="form-inline top-space">
-  <div class="form-group row">
-    <div class="col-xs-12 col-lg-10">
-      <%=select_tag :metrics_timeframe, options_for_select([['7 days', 7], ['30 days', 30], ['90 days', 90], ['6 months', 180], ['1 year', 365]], selected: current_user.metrics_timeframe.to_s), id: 'user_metrics_timeframe', class: 'form-control input-sm'%>
-      <button class="btn btn-xs btn-default" value="submit" type="submit">done</button>
-    </div>
-  </div>
-</form>
