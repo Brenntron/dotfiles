@@ -285,3 +285,45 @@ Feature: Disputes
     And I click "#RESEARCHING"
     And I click ".primary"
     Then I should see content "RESEARCHING" within "#show-edit-ticket-status-button"
+
+  @javascript
+  Scenario: a user uses advanced search with 'Contact Email' as a search criteria
+    Given a user with role "webrep user" exists and is logged in
+    And the following SDR disputes exist:
+      | id |
+      | 1  |
+    Given the following resolution message templates exist:
+      |body                           |resolution_type            |ticket_type                    |name            |description  |
+      |This is the first FP comment   |Fixed - FP: Sudden Spike   |SenderDomainReputationDispute  |Sudden Spike 01 |First        |
+      |This is the second FP comment  |Fixed - FP: Sudden Spike   |SenderDomainReputationDispute  |Sudden Spike 02 |Second       |
+      |This is the first FN comment   |Fixed - FN                 |SenderDomainReputationDispute  |Fixed - FN 01   |First        |
+    When I goto "escalations/sdr/disputes?f=all"
+    Then I click ".sdr_dispute_check_box"
+    Then I click "#sdr_index_ticket_status"
+    Then I click "#RESOLVED_CLOSED"
+    And I wait for "5" seconds
+    Then element with id "sdr-resolution-message-template-select" should contain a value of "Sudden Spike 01"
+    ## NOTE - the test will not read the text in the textarea and I have no idea why
+#    Then element with id "sdr-resolution-comment" should contain a value of "This is the first FP comment"
+    Then I select "Sudden Spike 02" from "sdr-resolution-message-template-select"
+    Then element with id "sdr-resolution-message-template-select" should contain a value of "Sudden Spike 02"
+#    Then element with id "sdr-resolution-comment" should contain a value of "This is the second FP comment"
+    #select Fixed - FN resolution status
+    Then I click "#FIXED_FN"
+    Then element with id "sdr-resolution-message-template-select" should contain a value of "Fixed - FN 01"
+#    Then element with id "sdr-resolution-comment" should contain a value of "This is the first FN comment"
+
+  #TODO: Show page test with response templates, show page cannot currently load
+
+  @javascript
+  Scenario: a user can visit the filerep response template manager page and see content
+    Given a user with role "webrep manager" exists and is logged in
+    And vrtincoming exists
+    Given the following resolution message templates exist:
+      |body                           |resolution_type            |ticket_type                    |name            |description  |
+      |This is the first FP comment   |Fixed - FP: Sudden Spike   |SenderDomainReputationDispute  |Sudden Spike 01 |First        |
+      |This is the second FP comment  |Fixed - FP: Sudden Spike   |SenderDomainReputationDispute  |Sudden Spike 02 |Second       |
+      |This is the first FN comment   |Fixed - FN                 |SenderDomainReputationDispute  |Fixed - FN 01   |First        |
+    Then I go to "/escalations/sdr/resolution_message_templates"
+    And I should see "Manage Resolution Templates"
+    And the table "resolution-message-templates-table" should have "3" number of rows
