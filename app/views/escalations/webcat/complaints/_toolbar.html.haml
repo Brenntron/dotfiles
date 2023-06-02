@@ -76,27 +76,30 @@
                 %label{for: 'view-tools-col-cb'} Tools
   %div
     %div#sort-btn-group.btn-group.toolbar-btn-group
-      %button#webcat-index-table-sort-age.btn.toolbar-button.esc-tooltipped-webcat-toolbar.darkened-button.direct-sorter.sort-asc.concise-button.concise-button-first{title: 'Sort by age: ascending', onclick: 'toggle_direct_sort("10", "age", this);', 'data-sort': 'asc'} Age
-      %button#webcat-index-table-sort-uri.btn.toolbar-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.direct-sorter.sort-asc.concise-button.concise-button-last{title: 'Sort by IP/URI: ascending', onclick: 'toggle_direct_sort("12", "IP/URI", this);', 'data-sort': 'asc'} IP/URI
+      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.darkened-button.direct-sorter.sort-asc.concise-button.concise-button-first{title: 'Sort by age: ascending', onclick: 'toggle_direct_sort("10", "age", this);', 'data-sort': 'asc'} Age
+      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.direct-sorter.sort-asc.concise-button.concise-button-last{title: 'Sort by IP/URI: ascending', onclick: 'toggle_direct_sort("12", "IP/URI", this);', 'data-sort': 'asc'} IP/URI
 
     %span.dropdown
       %button#webcat-index-table-sort-button.toolbar-button.sort-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Sort data', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Sort Data
-      .dropdown-menu.toolbar-dropdown#webcat-index-table-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
-        %label.dropdown-label Sort Data
+      .dropdown-menu.toolbar-dropdown#webcat-index-table-sort-dropdown{'aria-labelledby': 'webcat-index-table-sort-button'}
+        %label.dropdown-label Sort results by
         .row
-          %select#webcat-index-sort-select
-            %option{value: '10'} Age
-            %option{value: '11'} Entry ID
-            %option{value: '13'} Status
-            %option{value: '12'} IP/URI
-            %option{value: '15'} WBRS Score
-            %option{value: '14'} Resolution
-            %option{value: '16'} Submitter Org
-            %option{value:'17'} Assignee
-          %button.primary{onclick: 'sort_webcat_index(this);'}
-            Apply Sort
+          .col-xs-12
+            %select#webcat-index-sort-select
+              %option{value: '17'} Assignee
+              %option{value: '11'} Entry ID
+              %option{value: '14'} Resolution
+              %option{value: '13'} Status
+              %option{value: '16'} Submitter Org
+              %option{value: '15'} WBRS Score
+            %button#webcat-index-sort-order.direct-sorter.sort-asc.toolbar-button{'data-sort': 'asc', onclick: 'toggle_select_order(this);'}
+            %label Ascending
+        .row
+          .col-xs-12.text-center
+            %button.primary.apply-button{onclick: 'sort_webcat_index(this);'}
+              Apply Sort
 
   %div
     %div.btn-group.toolbar-btn-group

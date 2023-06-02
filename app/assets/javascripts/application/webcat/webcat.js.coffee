@@ -1529,15 +1529,14 @@ $ ->
     save_display_prefs()
 
 
-  # Sort
+  # Sorting functions
   window.sort_webcat_index = () ->
-    debugger
+    order = $('#webcat-index-sort-order').attr('data-sort')
     sort_by = $('#webcat-index-sort-select').val()
     complaint_table = $('#complaints-index').DataTable()
     complaint_table
-      .order( [ sort_by, 'asc' ] )
+      .order( [ sort_by, order ] )
       .draw();
-
 
   window.toggle_direct_sort = (col, field, button) ->
     order = $(button).attr('data-sort')
@@ -1556,6 +1555,17 @@ $ ->
     complaint_table
       .order( [ col, order] )
       .draw();
+
+  window.toggle_select_order = (button) ->
+    order = $(button).attr('data-sort')
+    if order == 'asc'
+      $(button).attr('data-sort', 'desc')
+      $(button).removeClass('sort-asc').addClass('sort-desc')
+      $(button).next().text('Descending')
+    else
+      $(button).attr('data-sort', 'asc')
+      $(button).removeClass('sort-desc').addClass('sort-asc')
+      $(button).next().text('Ascending')
 
 
   # webcat > complaints show page, disable two Submit toolbar buttons on page load
