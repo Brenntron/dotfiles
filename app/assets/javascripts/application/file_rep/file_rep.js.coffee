@@ -362,7 +362,9 @@ $ ->
   # Filerep show page resolution select
   $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change () ->
     resolution_type = $(this).siblings('.ticket-res-radio-label').text()
-    submitter_type = $('#filerep-dispute-customer-submitter-type').val().toLowerCase()
+    submitter_type = ''
+    if $('#filerep-dispute-customer-submitter-type').val()? #workaround for a cucumber test that hates hidden fields
+      submitter_type = $('#filerep-dispute-customer-submitter-type').val().toLowerCase()
     if submitter_type == 'customer' then is_customer = true else is_customer = false
     populate_resolved_filerep_templates(resolution_type, is_customer)
 

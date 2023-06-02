@@ -709,3 +709,68 @@ Feature: Disputes
     Then I should see "000001"
     And I should not see "000002"
 
+  @javascript
+  Scenario: a user checks a row in the index table and can load resolution templates
+    Given a user with role "filerep user" exists and is logged in
+    Given the following resolution message templates exist:
+      |body                        |resolution_type     |ticket_type            |name          |description  |
+      |This is the first FP comment   |Fixed - FP          |FileReputationDispute  |Fixed - FP 01 |First        |
+      |This is the second FP comment  |Fixed - FP          |FileReputationDispute  |Fixed - FP 02 |Second       |
+      |This is the first FN comment   |Fixed - FN          |FileReputationDispute  |Fixed - FN 01 |First        |
+    And A FileRep Dispute with trait "assigned" exists
+    And A FileRep Dispute with trait "assigned_resolved" exists
+    When I go to "/escalations/file_rep/disputes?f=my_open"
+    Then I click ".dispute_check_box"
+    Then I click "#index_ticket_status"
+    Then I click "#RESOLVED_CLOSED"
+    Then element with id "filerep-resolution-message-template-select" should contain a value of "Fixed - FP 01"
+    Then element with id "filerep-resolution-comment" should contain a value of "This is the first FP comment"
+    #select different Fixed - FP resolution template
+    Then I select "Fixed - FP 02" from "filerep-resolution-message-template-select"
+    Then element with id "filerep-resolution-message-template-select" should contain a value of "Fixed - FP 02"
+    Then element with id "filerep-resolution-comment" should contain a value of "This is the second FP comment"
+    #select Fixed - FN resolution status
+    Then I click "#FIXED_FN"
+    Then element with id "filerep-resolution-message-template-select" should contain a value of "Fixed - FN 01"
+    Then element with id "filerep-resolution-comment" should contain a value of "This is the first FN comment"
+
+  @javascript
+  Scenario: a user loads the resolution templates on a filerep dispute show page
+    Given a user with role "filerep manager" exists and is logged in
+    And vrtincoming exists
+    And A FileRep Dispute with trait "default" exists
+    Given the following resolution message templates exist:
+      |body                           |resolution_type     |ticket_type            |name          |description  |
+      |This is the first FP comment   |Fixed - FP          |FileReputationDispute  |Fixed - FP 01 |First        |
+      |This is the second FP comment  |Fixed - FP          |FileReputationDispute  |Fixed - FP 02 |Second       |
+      |This is the first FN comment   |Fixed - FN          |FileReputationDispute  |Fixed - FN 01 |First        |
+    When I go to "/escalations/file_rep/disputes/1"
+    #Commented out below is a workaround if there is an error popup locally, it should not happen on staging
+#    And I wait for "5" seconds
+#    Then I click ".close"
+    Then I click "#show-edit-ticket-status-button"
+    Then I click "#file-status-closed"
+    Then element with id "filerep-resolution-message-template-select" should contain a value of "Fixed - FP 01"
+    Then element with id "filerep-resolution-comment" should contain a value of "This is the first FP comment"
+    #select different Fixed - FP resolution template
+    Then I select "Fixed - FP 02" from "filerep-resolution-message-template-select"
+    Then element with id "filerep-resolution-message-template-select" should contain a value of "Fixed - FP 02"
+    Then element with id "filerep-resolution-comment" should contain a value of "This is the second FP comment"
+    #select Fixed - FN resolution status
+    Then I click "#FIXED_FN"
+    Then element with id "filerep-resolution-message-template-select" should contain a value of "Fixed - FN 01"
+    Then element with id "filerep-resolution-comment" should contain a value of "This is the first FN comment"
+
+  @javascript
+  Scenario: a user can visit the filerep response template manager page and see content
+    Given a user with role "filerep manager" exists and is logged in
+    And vrtincoming exists
+    And A FileRep Dispute with trait "default" exists
+    Given the following resolution message templates exist:
+      |body                           |resolution_type     |ticket_type            |name          |description  |
+      |This is the first FP comment   |Fixed - FP          |FileReputationDispute  |Fixed - FP 01 |First        |
+      |This is the second FP comment  |Fixed - FP          |FileReputationDispute  |Fixed - FP 02 |Second       |
+      |This is the first FN comment   |Fixed - FN          |FileReputationDispute  |Fixed - FN 01 |First        |
+    Then I go to "/escalations/file_rep/resolution_message_templates"
+    And I should see "Manage Resolution Templates"
+    And the table "resolution-message-templates-table" should have "3" number of rows
