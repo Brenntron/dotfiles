@@ -556,31 +556,14 @@ table.dataTable tbody tr.submitting-entry {
 }
 
 
-#webcat-index-toolbar {
-  .toolbar-button {
-    background-position: 4px 6px;
-    padding-left: 13px;
-    padding-right: 7px;
-    min-height: 25px;
-    background-size: 14px 14px; // icon size
-    transition: background-color 0.2s;
-  }
-}
-
 @media (max-width: 1951px)  {
   #webcat-index-toolbar .toolbar-button-text {
     display: none !important;
   }
 }
-@media screen and (max-width: 1800px) and (min-width: 1705px){
-  #webcat-index-toolbar .toolbar-button-text {
-    .toolbar-button {
-      background-position: 4px 6px;
-    }
-  }
-}
+
 .toolbar#webcat-index-toolbar {
-  background: $content-bg-color;
+  background: white;
   bottom: 2px;
   box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
   flex-direction: row;
@@ -615,7 +598,7 @@ table.dataTable tbody tr.submitting-entry {
   }
 
   .webcat-toolbar-select-all-wrapper, .webcat-toolbar-tall-wrapper {
-    background-color: $faint-neutral-color;
+    background-color: #f2f2f2;
     display: block;
     height: 27px;
     line-height: 25px;
@@ -638,7 +621,7 @@ table.dataTable tbody tr.submitting-entry {
 
   .webcat-toolbar-bulk-res {
     background-color: #255c7d !important;
-    color: $type-lightest !important;
+    color: #fff !important;
 
     &:disabled {
       opacity: 0.5;
@@ -657,7 +640,7 @@ table.dataTable tbody tr.submitting-entry {
   }
 
   .webcat-manage-templates-button {
-    background-color: $faint-neutral-color;
+    background-color: #f2f2f2;
     padding-left: 24px;
   }
 

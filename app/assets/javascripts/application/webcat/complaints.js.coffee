@@ -924,6 +924,7 @@ window.enlarge_image = (id,image,retake_in_progress)->
     template: '<div class="popover webcat-screenshot"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
     content: image_content).popover 'show'
 
+  # What is this for exactly?
 window.lookup_prefix = () ->
 
   $('.lookup-drop-loader').removeClass('hidden')
@@ -1109,13 +1110,7 @@ window.drop_current_categories = () ->
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
-  missing_data = '<span class="missing-data">No Data</span>'
-  uri = ''
-  host = ''
-  qual_subdomain = ''
-  lookup_val = ''
-  url = ''
-  search_uri = ''
+
   if complaint_entry.uri
     host = complaint_entry.uri
     url = host
@@ -1152,23 +1147,6 @@ format = (complaint_entry_row) ->
   reopen_class = "hidden"
   submit_class = ""
   status_class = ""
-  # Disabling all interactive elements if entry is 'Completed'
-  if complaint_entry.status == "COMPLETED"
-    entry_status = "disabled='true'"
-    reopen_class = ""
-    submit_class = "hidden"
-    status_class = "completed"
-
-
-  category_row = ''
-  tooltip_table = ''
-  tooltip_all = ''
-  tooltip_wrapper_start = '<div class="tooltip_templates"><span id="'
-  tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Certainty</th><th>Source</th><th>Description</th></tr></thead><tbody>'
-  tooltip_table_guts = ''
-  tooltip_table_end = '</tbody></table>'
-  tooltip_wrapper_end = '</span></div>'
-
 
 
   if complaint_entry.entry_history?
@@ -1201,20 +1179,11 @@ format = (complaint_entry_row) ->
   complaint_entry_html =
       complaint_table_row_html +
 
-      "<div class='complaint-entry-info'>" +
-      "<span class='nested-complaint-data case-id'><a href='complaints/#{complaint_id}'>#{complaint_id}</a></span>" +
       "<label class='content-label-sm'>Entry URI</label>" +
       "<span class='nested-complaint-data input-truncate esc-tooltipped' id='entry-uri-#{entry_id}' title='#{url}'><a href='http://#{url}' target='_blank'>#{url}</a></span>" +
       "<label class='content-label-sm' id='site-search'>Site Search</label>" +
       "<span class='nested-complaint-data input-truncate esc-tooltipped' id='site-search-#{entry_id}' title='#{url}'>#{search_uri}</span>" +
-      '</br>' +
-      '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="history-' + entry_id + '" onclick="history_dialog(' + entry_id  + ',\'' + url + '\')">History</button><br/>' +
-      '<button class="secondary" id="domain-' + entry_id + '" onclick="WebCat.RepLookup.whoIsLookups(\'' + whois_lookup + '\')">Whois</domain>' +
-      '</div></div>' +
-      '</div><div class="col-xs-12 col-sm-4 nested-complaint-editable-data">' +
-      '<div class="row">' +
-      '<div class="col-xs-12">' +
+
       '<div><label class="content-label-sm">Original</label></div> ' +
       '<div>' + host  + '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
@@ -1223,26 +1192,14 @@ format = (complaint_entry_row) ->
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
       '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
-      '<div class="complaint-selectize-col-wrapper">' +
-      '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
-      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + form_change_item + '\')"></select>' +
-      '</div>' +
-      '<div class="domain-categories" >' +
+
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
       '<ul id="main-domain-categories_' + entry_id + '"></ul>'+
       '<button class="secondary inline-button" onclick="inheritCategories(' + entry_id + ')">Inherit</button><br/>' +
       '</div>' +'</div><div class="col-xs-8">' +
-      '<label class="content-label-sm">Internal Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + entry_id + '" type="text" data-domain="' + domain + '" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
-      '</div>' +
-      '<div class="col-xs-4">' +
-      '<label class="content-label-sm">Resolution</label><br/>' +
-      complaint_submission_html +
-      '</div></div></div></div></td></tr></table>'
 
-  complaint_entry_html
 
 
 ## Complaint history dialog box. Includes tabs for domain history, complaint entry history, and xbrs history of the url.
@@ -1383,8 +1340,6 @@ window.get_xbrs_history = (url, tab) ->
       if response.data.length < 1
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
-
-
         $(xbrs_table).append(document.createElement('thead'))
         $(xbrs_table).append(document.createElement('tbody'))
         thead = $(xbrs_table).find('thead')
@@ -1466,118 +1421,6 @@ window.lookup_dialog  = (id) ->
       std_msg_error("<p>Something went wrong: #{response.responseText}","")
   , this)
 
-## This is for expanding and collapsing the nested rows ##
-window.click_table_buttons = (complaint_table, button)->
-  tr = $(button).closest('tr')
-  row = complaint_table.row(tr)
-
-  if row.child.isShown()       # This row is already open - close it
-    row.child.hide()
-    tr.removeClass 'shown'
-    tr.addClass 'not-shown'
-
-    if verifyMasterSubmit() == false
-      $('#master-submit').prop('disabled', true)
-
-  else
-    # Open this row
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
-      method: 'GET'
-      headers: headers
-      success: (response) ->
-        data = row.data()
-        cat_select = '#input_cat_'+ data.entry_id
-
-        webcat_options = []
-        for key, value of response
-          cat_code = key.split(' - ')[1]
-          value_name = key.split(' - ')[0]
-          webcat_options.push({category_id: value, category_name: value_name, category_code: cat_code})
-
-        category_ids = []
-        for name in selected_options(data.category)
-          for x, y of response
-            value_name = x.split(' - ')[0]
-            if name.trim() == value_name
-              category_ids.push(y)
-
-        row.child(format(row)).show()
-        nested_tooltip()
-
-        tr.removeClass 'not-shown'
-        tr.addClass 'shown'
-        td = $(tr).next('tr').find('td:first')
-        unless $(td).hasClass 'nested-complaint-data-wrapper'
-          $(td).addClass 'nested-complaint-data-wrapper'
-        if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
-          $( cat_select ).selectize {
-            persist: true,
-            create: false,
-            maxItems: 5,
-            closeAfterSelect: true,
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: webcat_options,
-            items: category_ids,
-            onItemAdd: ->
-              if verifyMasterSubmit() == true
-                $('#master-submit').prop('disabled', false)
-            onItemRemove: ->
-              if verifyMasterSubmit() == true
-                $('#master-submit').prop('disabled', false)
-              else
-                $('#master-submit').prop('disabled', true)
-            score: (input) ->
-              #  Adding some customization for autofill
-              #  restricting on certain cats to avoid accidental categorization
-              #  (replaces selectize's built-in `getScoreFunction()` with our own)
-              (item) ->
-                if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
-                  item.category_code == input ? 1 : 0
-                else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
-                  1
-                else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
-                  0.9
-                else
-                  0
-          }
-        else
-          # need to initialize the selectize function but disable it here if entry is completed
-          $completed_selectize = $( cat_select ).selectize {
-            persist: true,
-            create: false,
-            maxItems: 5,
-            closeAfterSelect: true,
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: webcat_options,
-            items: category_ids,
-          }
-          select_complete = $completed_selectize[0].selectize
-          select_complete.disable()
-
-        # Check to see which columns should be displayed
-        $('.toggle-vis-nested').each ->
-          checkbox_trigger = $(button).attr('data-column')
-          checkbox = $(this).find('input')
-          if $(checkbox).prop('checked')
-            $('.complaint-entry-table td, .complaint-entry-table th').each ->
-              if $(button).hasClass(checkbox_trigger)
-                $(button).show()
-          else if $(checkbox).prop('checked') == false
-            $('.complaint-entry-table td, .complaint-entry-table th').each ->
-              if $(button).hasClass(checkbox_trigger)
-                $(button).hide()
-
-        if verifyMasterSubmit() == true
-          $('#master-submit').prop('disabled', false)
-      error: (response) ->
-        std_msg_error("<p>Something went wrong</p>","")
-    , this)
 
 window.display_preview_window = (entry) ->
   {domain, category, id} = entry

@@ -482,35 +482,35 @@ $ ->
           rows = $('#complaints-index').find('.cat-index-main-row')
           get_current_cats(rows)
 
-#          use_user_preference_filter()
+          # confirm this function is in the right locatino
+          use_user_preference_filter()
       createdRow: (row, data) ->
         $(row).addClass('cat-index-main-row')
         $(row).attr('data-categories', data.category)
         $(row).attr('data-status', data.status)
 
 
-#      drawCallback: () ->
+      drawCallback: () ->
 
-# we should be figuring out local storage prior to building the table
-#        if localStorage.webcat_reset_page
-#          localStorage.removeItem('webcat_reset_page')
-#
+        if localStorage.webcat_reset_page
+          localStorage.removeItem('webcat_reset_page')
+#         trying to figure out why we are redrawing the table here
 #          setTimeout () ->
 #            $('#complaints-index').DataTable().page(0).draw( true )
 #          , 100
 #
-#        if localStorage.webcat_search_name
-#          { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
-#          ### check variables below
-#              text_check makes sure that the table doesn't have the named search with the same name being saved now
-#              search_name_check makes sure that the search is being saved as a named search
-#              Not super complicated, but that if statement was looking gross and confusing
-#          ###
-#          text_check = !window.find_saved_search_by_name(webcat_search_name)
-#          search_name_check = webcat_search_name != ''
-#          if webcat_search_type == 'advanced' && search_name_check && text_check
-#            window.add_tmp_tr_to_named_search_list(webcat_search_name)
-#            window.sort_named_search_list()
+        if localStorage.webcat_search_name
+          { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+          ### check variables below
+              text_check makes sure that the table doesn't have the named search with the same name being saved now
+              search_name_check makes sure that the search is being saved as a named search
+              Not super complicated, but that if statement was looking gross and confusing
+          ###
+          text_check = !window.find_saved_search_by_name(webcat_search_name)
+          search_name_check = webcat_search_name != ''
+          if webcat_search_type == 'advanced' && search_name_check && text_check
+            window.add_tmp_tr_to_named_search_list(webcat_search_name)
+            window.sort_named_search_list()
 
       pagingType: 'full_numbers'
       dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
@@ -909,49 +909,6 @@ $ ->
 
 
 
-
-
-
-
-
-
-
-
-
-#  build_complaints_table = () ->
-#        complaint_table = $('#complaints-index').DataTable(
-#
-
-#          ajax:
-#            complete: ->
-#              use_user_preference_filter()
-#          drawCallback: ( settings ) ->
-#            if localStorage.webcat_reset_page
-#              localStorage.removeItem('webcat_reset_page')
-#
-#              setTimeout () ->
-#                $('#complaints-index').DataTable().page(0).draw( true )
-#              , 100
-#
-#            if localStorage.webcat_search_name
-#              { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
-#              ### check variables below
-#                  text_check makes sure that the table doesn't have the named search with the same name being saved now
-#                  search_name_check makes sure that the search is being saved as a named search
-#                  Not super complicated, but that if statement was looking gross and confusing
-#              ###
-#              text_check = !window.find_saved_search_by_name(webcat_search_name)
-#              search_name_check = webcat_search_name != ''
-#              if webcat_search_type == 'advanced' && search_name_check && text_check
-#                window.add_tmp_tr_to_named_search_list(webcat_search_name)
-#                window.sort_named_search_list()
-#
-
-#            ]
-#        select: 'style': 'os'
-#        responsive: true)
-
-
   if $('#complaints-index').length
     # Create index table
     build_complaints_table()
@@ -1293,11 +1250,11 @@ fetch_external_categories = (entry_id) ->
                 tooltip_table +=
                   '<td class="alt-col">' + this.certainty + '</td>' +
                     '<td class="alt-col">' + this.source_mnemonic + '</td>' +
-                    '<td class="alt-col">' + this.source_description + '</td></tr>'
+                    '<td class="alt-col">' + this.source_description + '</td>'
             else
-              tooltip_table += '<tr><td colspan="3"></td></tr>'
+              tooltip_table += '<td colspan="3"></td>'
 
-            tooltip_table += '</tbody></table>'
+            tooltip_table += '</tr></tbody></table>'
 
             if key == '1.0'
               primary_cat = '<a class="esc-tooltipped tooltip-underline">' + value.mnem + ' - ' + value.descr + ' <span class="ex-category-source">WBRS</span></a>'
