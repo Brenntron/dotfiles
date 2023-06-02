@@ -805,9 +805,13 @@ window.sdr_index_edit_ticket_status = () ->
 
     if ($('.sdr_dispute_check_box:checked').length > 0)
       # Select Status
-      $('.sdr-ticket-status-radio-label').click ->
-        radio_button = $(this).prev('.sdr-ticket-status-radio')
-#        $(radio_button[0]).trigger('click')
+      $('.sdr-ticket-status-radio').change ->
+        radio_button = $(this)
+        all_stat_radios = $('#sdr-index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+        wrapper = $(this).parent()
+        $(all_stat_radios).removeClass('selected')
+        $(wrapper).addClass('selected')
+
         if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
           $('#sdr-index-dispute-resolution-submenu').show()
           stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
@@ -827,23 +831,6 @@ window.sdr_index_edit_ticket_status = () ->
           $('#sdr-index-dispute-resolution-submenu').hide()
           $(res_comment[0]).val('')
 
-      $('.sdr-ticket-status-radio').click ->
-        all_stat_radios = $('#sdr-index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
-        if $(this).is(':checked')
-          wrapper = $(this).parent()
-          $(all_stat_radios).removeClass('selected')
-          $(wrapper).addClass('selected')
-        if $(this).attr('id') == 'RESOLVED_CLOSED'
-          $('#sdr-index-dispute-resolution-submenu').show()
-          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-          $('#ticket-non-res-submit').hide()
-          $(stat_comment).val('')
-        else
-          $('#ticket-non-res-submit').show()
-          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-          $('.ticket-resolution-radio').prop('checked', false)
-          $('#sdr-index-dispute-resolution-submenu').hide()
-          $(res_comment[0]).val('')
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
