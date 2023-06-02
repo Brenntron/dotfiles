@@ -1,8 +1,10 @@
 # Stub class for remote Bugzilla bug objects using the REST API.
 # Begs naming convention of bug_proxy as such an object.
+
+#MARKED FOR REMOVAL BUT NEED FOR PULLING FILE DATA FIRST
 class BugzillaRest::BugProxy < BugzillaRest::Base
 
-  FIELDS = %i{id product component summary version description opsys platform priority severity
+FIELDS = %i{id product component summary version description opsys platform priority severity
               creator classification assigned_to groups status
               resolution whiteboard creation_time last_change_time qa_contact depends_on}
 

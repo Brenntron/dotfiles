@@ -12219,19 +12219,6 @@ input[type="radio"].resolution_radio_button {
   }
 }
 
-
-//sticky toolbar needs extra top spacing on small screens
-@media (max-width: 999px) {
-  .toolbar#webcat-index-toolbar {
-    margin-top: 18px;
-  }
-}
-
-#webcat-index-toolbar .dropdown.open {
-  background-color: transparent !important;
-}
-
-
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
 @media screen and (max-width: 1600px) and (min-width: 1401px) {
   #research-tab-toolbar {

@@ -554,3 +554,125 @@ table.dataTable tbody tr.submitting-entry {
   margin-right: 6px;
   margin-left: 4px;
 }
+
+
+#webcat-index-toolbar {
+  .toolbar-button {
+    background-position: 4px 6px;
+    padding-left: 13px;
+    padding-right: 7px;
+    min-height: 25px;
+    background-size: 14px 14px; // icon size
+    transition: background-color 0.2s;
+  }
+}
+
+@media (max-width: 1951px)  {
+  #webcat-index-toolbar .toolbar-button-text {
+    display: none !important;
+  }
+}
+@media screen and (max-width: 1800px) and (min-width: 1705px){
+  #webcat-index-toolbar .toolbar-button-text {
+    .toolbar-button {
+      background-position: 4px 6px;
+    }
+  }
+}
+.toolbar#webcat-index-toolbar {
+  background: $content-bg-color;
+  bottom: 2px;
+  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
+  flex-direction: row;
+  float: left;
+  margin: 2px 0 -35px 0;
+  padding: 0 0 0 20px;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+
+  .toolbar-checkbox-wrapper {
+    padding-top: 0;
+    padding-left: 5px;
+    font-weight: normal;
+  }
+
+  div {
+    margin: 4px 3px 0 0;
+  }
+
+  .toolbar-dropdown {
+    margin-top: 0 !important;
+  }
+
+  .primary-text-divider {
+    margin-top: 0 !important;
+  }
+
+  .btn-group.toolbar-btn-group {
+    margin: 0;
+    vertical-align: baseline;
+  }
+
+  .webcat-toolbar-select-all-wrapper, .webcat-toolbar-tall-wrapper {
+    background-color: $faint-neutral-color;
+    display: block;
+    height: 27px;
+    line-height: 25px;
+    float: none;
+    margin: 0;
+    padding: 0 8px;
+
+    input {
+      margin: 6px 0 0;
+      vertical-align: top;
+    }
+
+    label {
+      display: inline-block;
+      font-weight: 400;
+      height: 27px;
+      margin-left: 2px;
+    }
+  }
+
+  .webcat-toolbar-bulk-res {
+    background-color: #255c7d !important;
+    color: $type-lightest !important;
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+
+  .webcat-toolbar-tall-wrapper {
+    height: 45px;
+    line-height: 45px;
+    margin: 0 0 0 3px;
+    padding: 0 15px;
+
+    input {
+      margin: 16px 0 0;
+    }
+  }
+
+  .webcat-manage-templates-button {
+    background-color: $faint-neutral-color;
+    padding-left: 24px;
+  }
+
+  .webcat-toolbar-push {
+    margin-left: auto;
+  }
+}
+
+//sticky toolbar needs extra top spacing on small screens
+@media (max-width: 999px) {
+  .toolbar#webcat-index-toolbar {
+    margin-top: 18px;
+  }
+}
+
+#webcat-index-toolbar .dropdown.open {
+  background-color: transparent !important;
+}

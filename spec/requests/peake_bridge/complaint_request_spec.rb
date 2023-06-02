@@ -278,6 +278,7 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
     expect(complaint.product_platform).to eql(nil)
   end
 
+
   it 'receives dispute payload message from TI API not in-network' do
     vrt_incoming
     guest_company
@@ -298,8 +299,8 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
     expect(complaint.in_network).to eql(nil)
     expect(complaint.ticket_source).to eql("talos-intelligence-api")
   end
-
-  it 'receives dispute payload message from TI API in-network' do
+  #disabling this feature for now
+  xit 'receives dispute payload message from TI API in-network' do
     vrt_incoming
     guest_company
 

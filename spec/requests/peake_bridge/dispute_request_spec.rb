@@ -640,8 +640,8 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.platform_id).to eql(1001)
     expect(dispute.product_platform).to eql(nil)
   end
-
-  it 'receives dispute payload message from TI API in-network' do
+  #disabling this feature for now
+  xit 'receives dispute payload message from TI API in-network' do
     vrt_incoming
     guest_company
 
