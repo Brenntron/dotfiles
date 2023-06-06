@@ -1543,7 +1543,7 @@ $ ->
     valueField: 'public_name',
     labelField: 'public_name',
     searchField: 'public_name',
-    options: AC.FileRep.createAssigneeOptions()
+    options: AC.FileRep.createPlatformOptions()
     render:
       option: (item, escape) ->
        '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'
