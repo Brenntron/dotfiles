@@ -1046,8 +1046,8 @@
                                       %td= cross_listed.username
                                       %td= cross_listed.mtime
                                       %td= cross_listed.ctime
-                                      %td= cross_listed.mtime.to_datetime.to_i
-                                      %td= cross_listed.ctime.to_datetime.to_i
+                                      %td= cross_listed.mtime&.to_datetime&.to_i
+                                      %td= cross_listed.ctime&.to_datetime&.to_i
 
                           .entry-details-table.reptool-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header RepTool Details
