@@ -805,7 +805,7 @@ $ ->
       $(box).closest('tr').removeClass('selected')
 
 #  # Show page status select
-  $('.escalations--webrep--disputes-controller.show-action #show-edit-ticket-status-dropdown .ticket-status-radio').click ->
+  $('.escalations--webrep--disputes-controller.show-action #show-edit-ticket-status-dropdown .ticket-status-radio').change ->
 
     ## The top status select on the webrep show page currently shares a bunch of IDs with the entry status selects, which can cause bugs
     ## This is a temporary workaround
