@@ -862,7 +862,7 @@ $ ->
     $(".#{ticket_or_entry}-resolution-description").text "All checked #{type} must be of the same type to load resolution templates."
     $(".#{ticket_or_entry}-resolution-comment").val ''
 
-  window.webrep_index_get_checked_rows_data = () ->
+  window.webrep_index_get_checked_ticket_rows_data = () ->
     is_customer = false
     submission_types = []
 
@@ -912,7 +912,7 @@ $ ->
   window.webrep_check_current_checkbox_types = (ticket_or_entry) ->
 
     if ticket_or_entry == 'ticket'
-      checkbox_data = webrep_index_get_checked_rows_data()
+      checkbox_data = webrep_index_get_checked_ticket_rows_data()
     else
       checkbox_data = webrep_index_get_checked_entry_rows_data()
 
@@ -924,18 +924,31 @@ $ ->
     dropdown_ticket_type = $("#index-#{ticket_or_entry}-resolution-submenu .#{ticket_or_entry}-resolution-comment").attr('data-ticket-type')
     submission_type_full = get_webrep_ticket_type(submission_type)
 
+    #get footer data to check if it needs to be updated
+    has_footer = $("#webrep-#{ticket_or_entry}-resolution-message-template-select").attr('data-has-footer')
+    if has_footer?
+      if has_footer == 'true' && is_customer == true || has_footer == 'false' && is_customer == false
+        is_footer_consistent = true
+      else
+        is_footer_consistent = false
+        $("#webrep-ticket-resolution-message-template-select").attr('data-has-footer', is_customer)
+    else
+      is_footer_consistent = true #pass as true if select hasn't been populated yet, there's no need to update
+
     # Reset template data if both Email and Web tickets are selected
     if common_submission == false
       webrep_message_must_select_web_or_email(ticket_or_entry)
 
     # Get fresh data if current dropdown ticket type does not match checkbox ticket types
-    else if submission_type_full != dropdown_ticket_type
+    else if submission_type_full != dropdown_ticket_type || is_footer_consistent == false
       radio_button = $("#index-#{ticket_or_entry}-resolution-submenu .ticket-resolution-radio:checked")
 
       if ticket_or_entry == 'ticket'
         webrep_index_show_ticket_resolution_dropdown(radio_button)
       else
         webrep_index_show_entry_resolution_dropdown(radio_button)
+      #update attr used to check if footer is present or not
+      $("#webrep-ticket-resolution-message-template-select").attr('data-has-footer', is_customer)
 
   # Index - Edit Ticket Status
   window.webrep_index_show_ticket_resolution_dropdown = (radio_button) ->
@@ -949,7 +962,7 @@ $ ->
     if !($("#index-edit-ticket-status-dropdown input.ticket-resolution-radio").is(':checked'))
       $('#index-edit-ticket-status-dropdown input#FIXED_FP').prop('checked', true)
 
-    checkbox_data = webrep_index_get_checked_rows_data()
+    checkbox_data = webrep_index_get_checked_ticket_rows_data()
     common_submission = checkbox_data[0]
     submission_type = checkbox_data[1]
     is_customer = checkbox_data[2]
@@ -1673,8 +1686,9 @@ $ ->
 
   window.assemble_webrep_response_templates = (templates, ticket_or_entry, customer_footer, ticket_type) ->
 
-    resolution_select = $("#webrep-#{ticket_or_entry}-resolution-message-template-select.resolution-message-template-select")
+    resolution_select = $("#webrep-#{ticket_or_entry}-resolution-message-template-select")
     resolution_select.empty()
+    is_customer = false
 
     if templates.length == 0
       resolution_select.val ''
@@ -1686,7 +1700,9 @@ $ ->
       #append customer footer to preset message
       if customer_footer != ''
         customer_message = template.body + ' ' + customer_footer
-      else customer_message = template.body
+        is_customer = true
+      else
+        customer_message = template.body
 
       template_option = $("<option class='webrep-resolution-template-option'></option>")
       $(template_option).val template.name
@@ -1695,11 +1711,12 @@ $ ->
       $(template_option).attr('data-description', template.description )
       resolution_select.append template_option
 
-      #show first option as body and description
+      #show first option as body and description, note if footer is present
       if index == 0
         $(".#{ticket_or_entry}-resolution-comment").val customer_message
         $(".#{ticket_or_entry}-resolution-comment").attr('data-ticket-type', ticket_type)
         $(".#{ticket_or_entry}-resolution-description").text template.description
+        resolution_select.attr('data-has-footer', is_customer)
 
 
   window.populate_resolved_webrep_templates = (resolution_type, ticket_or_entry, ticket_type, is_customer) ->
@@ -1759,7 +1776,7 @@ $ ->
 
   #resolution select for ticket(s) on index table
   $('#webrep-index-toolbar #index-ticket-resolution-submenu input[type=radio][name=ticket-resolution]').change (event)->
-    checkbox_data = webrep_index_get_checked_rows_data()
+    checkbox_data = webrep_index_get_checked_ticket_rows_data()
     common_submission = checkbox_data[0]
     submission_type = checkbox_data[1]
     is_customer = checkbox_data[2]
@@ -1770,7 +1787,7 @@ $ ->
 
   #resolution select for entries on index table
   $('#index-entry-resolution-submenu input[type=radio][name=entry-resolution]').change (event)->
-    checkbox_data = webrep_index_get_checked_rows_data()
+    checkbox_data = webrep_index_get_checked_entry_rows_data()
     common_submission = checkbox_data[0]
     submission_type = checkbox_data[1]
     is_customer = checkbox_data[2]
