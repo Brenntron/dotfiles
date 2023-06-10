@@ -274,6 +274,8 @@
     .col-xs-12.text-center
       %button#top_bar_toggle{onClick: '$( "#top_bar_extended_info" ).slideToggle( ); $("#top_bar_toggle").toggleClass("top-info-open");'}
 
+
+-# tabs navigation UI
 %ul.nav.nav-tabs#research-tab{role: 'tablist'}
   %li.nav-item{role:'presentation'}
     %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
@@ -284,6 +286,10 @@
   %li.nav-item{role:'presentation'}
     %a.nav-link#related-tab-link{href: '#related_tab', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
       Duplicate Cases
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#tags-tab-link{href: '#tags_tab', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
+      Context Tags
+
 
 .tab-content.content-wrapper#bug-tab-content
   .tab-pane#communication_tab{role: 'tabpanel'}
@@ -310,3 +316,5 @@
                       %tr
                         %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
                         %td= dispute_dup.case_opened_at.strftime('%F %T')
+  .tab-pane.tab-tags#tags_tab{role: 'tabpanel'}
+    = render 'escalations/webrep/disputes/tags_tab'

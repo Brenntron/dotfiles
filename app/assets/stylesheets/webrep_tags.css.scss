@@ -1,0 +1,42 @@
+// context tags tab for webrep
+.tab-tags {
+  h2 {
+    font-size: 10pt;
+    font-weight: 700;
+    padding: 0 3px 6px;
+  }
+  table {
+    margin-bottom: 50px;
+    border: solid 1px #eee;
+    td {
+      border-right: solid 1px #eee;
+    }
+  }
+}
+
+// toolbar styles
+.tags-toolbar {
+  .toolbar-button {
+    background-repeat: no-repeat;
+    margin-right: 2px;
+  }
+  .suppressed-tags-toggle {
+    background-color: #eee;
+  }
+  .unsuppressed-tags-toggle {
+    background-color: #eee;
+  }
+  .add-tag-button {
+    background-image: url(image_path('icon_add_grey.svg'));
+  }
+  .suppress-tag-button {
+    background-image: url(image_path('icon_hide.svg'));
+  }
+  .unsuppress-tag-button {
+    background-image: url(image_path('icon_view.svg'));
+  }
+  .remove-tag-button {
+    background-image: url(image_path('icon_delete.svg'));
+  }
+}
+
