@@ -17,20 +17,40 @@
 // toolbar styles
 .tags-toolbar {
   .toolbar-button {
-    background-repeat: no-repeat;
-    margin-right: 2px;
+    margin-right: 3px;
+    padding-left: 22px;
+    background-position-x: 5px;
   }
-  .suppressed-tags-toggle {
-    background-color: #eee;
+  input {
+    margin: 2px;
+    vertical-align: text-top;
   }
-  .unsuppressed-tags-toggle {
-    background-color: #eee;
+  span {
+    float: none;
+  }
+  .tags-toggle, .toggle-label {
+    display: inline-block;
+  }
+  .tags-toggle {
+    padding: 5px;
+    background-color: #f6f6f6;
+  }
+  .tags-toggle:first-of-type {
+    margin-right: -3px;
+  }
+  .toggle-label {
+    padding: 0 3px;
+  }
+  .show-col-tags-button  {
+    background-image: url(image_path('icon_columns.svg'));
+    background-size: 18px 18px;
   }
   .add-tag-button {
     background-image: url(image_path('icon_add_grey.svg'));
   }
   .suppress-tag-button {
     background-image: url(image_path('icon_hide.svg'));
+    background-position-y: 3px;
   }
   .unsuppress-tag-button {
     background-image: url(image_path('icon_view.svg'));

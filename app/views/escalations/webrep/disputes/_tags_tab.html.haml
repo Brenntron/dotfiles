@@ -7,15 +7,17 @@
     .toolbar.tags-toolbar
       %div
         %label.toolbar-section-label Show
-        %button.toolbar-button.show-col-button
+        %button.toolbar-button.show-col-tags-button
           %span.toolbar-button-text Show/Hide Columns
 
       %div
         %label.toolbar-section-label View
-        %button.toolbar-button.suppressed-tags-toggle
-          %span.toolbar-button-text Suppressed Tags
-        %button.toolbar-button.unsuppressed-tags-toggle
-          %span.toolbar-button-text Unsuppressed Tags
+        %span.tags-toggle.suppressed-tags-toggle
+          %input.cb-suppressed-tags{type:'checkbox', checked: true}
+          %span.toggle-label Suppressed Tags
+        %span.tags-toggle.unsuppressed-tags-toggle
+          %input.cb-suppressed-tags{type:'checkbox', checked: true}
+          %span.toggle-label Unsuppressed Tags
 
       %div
         %label.toolbar-section-label Actions
@@ -55,7 +57,7 @@
         %td data
 
 
-    -# LEGACY ENRICHMENT, KEEP FOR REFERENCE
+    -# LEGACY ENRICHMENT, KEEP FOR REFERENCE. DELETE WHEN SAFE.
     -#.entry-details-table.enrich-details-table{'data-entry-id': ""}
     -#  %h5.entry-details-table-header Enrichment
     -#  %table.hidden.enrich-webrep-table-data-present
@@ -68,14 +70,12 @@
     -#        %th.enrich-webrep-external-ref-header External References
     -#    %tbody
     -#      %tr
-    -#
     -#  %table.enrich-webrep-table-data-missing
     -#    %tbody
     -#      %tr
     -#        %td.missing-data No enrichment services data
 
-
-    -# LEGACY PREVALENCE, KEEP FOR REFERENCE
+    -# LEGACY PREVALENCE, KEEP FOR REFERENCE. DELETE WHEN SAFE.
     -#.entry-details-table.prevalence-details-table{'data-entry-id': ""}
     -#  %h5.entry-details-table-header Prevalence
     -#  %table.prevalence-webrep-table-data-present.hidden
@@ -86,7 +86,6 @@
     -#        %th First Seen
     -#        %th Last Seen
     -#    %tbody
-    -#
     -#  %table.prevalence-webrep-table-data-missing
     -#    %tbody
     -#      %tr
