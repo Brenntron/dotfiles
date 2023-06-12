@@ -302,6 +302,14 @@ $ ->
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
+      #reset the resolution dropdown if it is already populated
+      if $('.ticket-status-radio').prop('checked', true)
+        $('.ticket-resolution-radio').prop('checked', false)
+        $('.ticket-status-radio').prop('checked', false)
+        $('#index-ticket-resolution-submenu').hide()
+        $('#ticket-non-res-submit').hide()
+        $('.status-radio-wrapper').removeClass 'selected'
+
   window.assemble_filerep_response_templates = (templates, customer_footer) ->
 
     resolution_select = $('#filerep-resolution-message-template-select.resolution-message-template-select')

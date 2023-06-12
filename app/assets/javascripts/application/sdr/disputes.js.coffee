@@ -834,6 +834,14 @@ window.sdr_index_edit_ticket_status = () ->
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
+      #reset the resolution dropdown if it is already populated
+      if  $('.sdr-ticket-status-radio').prop('checked', true)
+        $('.sdr-ticket-resolution-radio').prop('checked', false)
+        $('.sdr-ticket-status-radio').prop('checked', false)
+        $('#sdr-index-dispute-resolution-submenu').hide()
+        $('#ticket-non-res-submit').hide()
+        $('.status-radio-wrapper').removeClass 'selected'
+
 window.sdr_index_change_ticket_status = () ->
   checkboxes = $('#sdr-disputes-index').find('.sdr_dispute_check_box')
   checked_dispute_ids = []

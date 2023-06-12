@@ -998,6 +998,14 @@ $ ->
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
+      #reset the resolution dropdown if it is already populated
+      if $('.ticket-status-radio').prop('checked', true)
+        $('.ticket-resolution-radio').prop('checked', false)
+        $('.ticket-status-radio').prop('checked', false)
+        $('#index-ticket-resolution-submenu').hide()
+        $('#ticket-non-res-submit').hide()
+        $('.status-radio-wrapper').removeClass 'selected'
+
   # Index - Edit Entry Status
   window.webrep_index_show_entry_resolution_dropdown = (radio_button) ->
 
