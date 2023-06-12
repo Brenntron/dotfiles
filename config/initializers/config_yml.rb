@@ -224,3 +224,11 @@ file_mgmt_config = env_config.fetch('file_mgmt', nil)
 raise 'config.yml missing file_mgmt section' unless file_mgmt_config
 Rails.configuration.base_host_path = file_mgmt_config['base_host_path']
 Rails.configuration.base_file_path = file_mgmt_config['base_file_path']
+
+tmi_config = env_config.fetch('tmi', nil)
+raise 'config.yml missing tmi section' unless tmi_config
+Rails.configuration.tmi           =  OpenStruct.new
+Rails.configuration.tmi.hostport  =  tmi_config['hostport']
+Rails.configuration.tmi.ca_file   =  tmi_config['ca_file']
+Rails.configuration.tmi.cert_file =  tmi_config['cert_file']
+Rails.configuration.tmi.key_file  =  tmi_config['key_file']
