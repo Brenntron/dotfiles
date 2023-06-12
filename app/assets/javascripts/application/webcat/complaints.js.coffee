@@ -2058,6 +2058,9 @@ processSubmitMaster = () ->
   selectedEntryDomains = (sessionStorage.getItem("touchedForm")|| "" )
   return if selectedEntryDomains.length == 0
 
+  # disable the master submit button while processing
+  $('#master-submit').prop('disabled', true)
+
   # remove empty values
   selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
   selectedEntries = []
@@ -2176,8 +2179,10 @@ processSubmitMaster = () ->
         if td.className == ''
           td.classList.add('nested-complaint-data-wrapper')
 
+      $('#master-submit').prop('disabled', false)
     error: (response) ->
       std_msg_error("Unable to submit changes for selected entries.","", reload: false)
+      $('#master-submit').prop('disabled', false)
 
   , this)
 
