@@ -242,7 +242,9 @@ $ ->
     description = $('.entry-resolution-message-template-select option:selected').attr('data-description')
     $('.entry-resolution-description').text description
 
-  ## Webrep specific ##
+  ##
+  # Webrep specific functions - different due to loading two ticket types
+  ##
 
   window.create_webrep_resolution_message_template = (route) ->
     if $("input[name='dispute-type']:checked").val() == 'web'
