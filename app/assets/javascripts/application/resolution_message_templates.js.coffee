@@ -321,6 +321,8 @@ $ ->
 
         #set current edit modal to current data-ticket-type (WebDispute or EmailDispute)
         $('#editResolutionMessageTemplatesDialog .resolution-message-template-form.update').attr('data-ticket-type', template_type)
+        template_type_name = template_type.replace('Dispute', '')
+        $('#resolution-template-dispute-type-text').text(template_type_name)
 
         if is_footer?
           $('#editResolutionMessageTemplatesDialog select').addClass('hide-temporarily')

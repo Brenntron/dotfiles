@@ -30,6 +30,10 @@
         -else
 
       - if local_assigns[:action] == :update
+
+        %label.content-label-sm.resolution-modal-label Dispute Type
+        %p#resolution-template-dispute-type-text.resolution-template-lesser-permission-text
+
         %label.content-label-sm.resolution-modal-label Resolution
         - if current_user.has_role?('webrep manager') || current_user.has_role?('manager')
           = select "#{local_assigns[:action]}-form", 'resolution_type', options_for_select(['Fixed - FP', 'Fixed - FN', 'Unchanged', 'Invalid / Junk Mail', 'Test / Training', 'Other']),{}, {class: 'inline-select-dropdown resolved-resolution-message-template-input', name:'resolution_type'}
