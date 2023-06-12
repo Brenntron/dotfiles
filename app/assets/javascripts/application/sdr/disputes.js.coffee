@@ -164,6 +164,7 @@ $ ->
   assemble_sdr_response_templates = (templates, customer_footer) ->
     resolution_select = $('#sdr-resolution-message-template-select.resolution-message-template-select')
     resolution_select.empty()
+    is_customer = false
 
     if templates.length == 0
       resolution_select.val ''
@@ -174,6 +175,7 @@ $ ->
       #append customer footer to saved message
       if customer_footer != ''
         customer_message = template.body + ' ' + customer_footer
+        is_customer = true
       else customer_message = template.body
 
       template_option = $("<option class='sdr-resolution-template-option'></option>")
@@ -187,6 +189,7 @@ $ ->
       if index == 0
         $('.ticket-resolution-description').text template.description
         $('.ticket-resolution-comment').val customer_message
+        resolution_select.attr('data-has-footer', is_customer)
 
   window.populate_resolved_sdr_templates = (resolution_type, is_customer) ->
 
@@ -804,6 +807,18 @@ window.sdr_index_edit_ticket_status = () ->
     dropdown = $('#sdr-index-edit-ticket-status-dropdown').parent()
 
     if ($('.sdr_dispute_check_box:checked').length > 0)
+
+      # If menu is being re-opened, check if customer status has changed for checked rows and reload dropdown if it has
+      if $('#sdr-index-dispute-resolution-submenu .sdr-ticket-resolution-radio:checked').length > 0
+        is_customer = check_for_customer_checkbox_sdr()
+        current_resolution = $('#sdr-index-dispute-resolution-submenu .sdr-ticket-resolution-radio:checked').siblings('.ticket-res-radio-label').text()
+        current_resolution = current_resolution.replace('Fixed - FP', 'Fixed - FP: ') #need to format the top three options in a specific way
+        customer_loaded_in_form = $('#sdr-resolution-message-template-select').attr('data-has-footer')
+        if is_customer == true && customer_loaded_in_form == 'false' || is_customer == false && customer_loaded_in_form == 'true'
+          #reload form data to add/remove customer footer
+          populate_resolved_sdr_templates(current_resolution, is_customer)
+          $('#sdr-resolution-message-template-select').attr('data-has-footer', is_customer)
+
       # Select Status
       $('.sdr-ticket-status-radio').change ->
         radio_button = $(this)
@@ -835,7 +850,7 @@ window.sdr_index_edit_ticket_status = () ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
       #reset the resolution dropdown if it is already populated
-      if  $('.sdr-ticket-status-radio').prop('checked', true)
+      if $('.sdr-ticket-status-radio').prop('checked', true)
         $('.sdr-ticket-resolution-radio').prop('checked', false)
         $('.sdr-ticket-status-radio').prop('checked', false)
         $('#sdr-index-dispute-resolution-submenu').hide()

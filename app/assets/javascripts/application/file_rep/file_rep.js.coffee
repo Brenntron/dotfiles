@@ -271,6 +271,16 @@ $ ->
     dropdown = $('#index-edit-ticket-status-dropdown').parent()
     if ($('.dispute_check_box:checked').length > 0)
 
+      # If menu is being re-opened, check if customer status has changed for checked rows and reload dropdown if it has
+      if $('#index-ticket-resolution-submenu .ticket-resolution-radio:checked').length > 0
+        is_customer = filerep_check_for_customer()
+        current_resolution = $('#index-ticket-resolution-submenu .ticket-resolution-radio:checked').siblings('.ticket-res-radio-label').text()
+        customer_loaded_in_form = $('#filerep-resolution-message-template-select').attr('data-has-footer')
+        if is_customer == true && customer_loaded_in_form == 'false' || is_customer == false && customer_loaded_in_form == 'true'
+          #reload form data to add/remove customer footer
+          populate_resolved_filerep_templates(current_resolution, is_customer)
+          $('#filerep-resolution-message-template-select').attr('data-has-footer', is_customer)
+
       # Select Status
       $('.ticket-status-radio').change ->
         radio_button = $(this)
@@ -314,6 +324,7 @@ $ ->
 
     resolution_select = $('#filerep-resolution-message-template-select.resolution-message-template-select')
     resolution_select.empty()
+    is_customer = false
 
     if templates.length == 0
       resolution_select.val ''
@@ -324,6 +335,7 @@ $ ->
       #append customer footer to preset message
       if customer_footer != ''
         customer_message = template.body + ' ' + customer_footer
+        is_customer = true
       else customer_message = template.body
 
       template_option = $("<option class='filerep-resolution-template-option'></option>")
@@ -337,6 +349,7 @@ $ ->
       if index == 0
         $('.ticket-resolution-description').text template.description
         $('.resolution-status-comment').val customer_message
+        resolution_select.attr('data-has-footer', is_customer)
 
   window.populate_resolved_filerep_templates = (resolution_type, is_customer) ->
 
