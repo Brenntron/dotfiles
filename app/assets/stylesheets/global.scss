@@ -2065,12 +2065,12 @@ button.close {
 }
 
 #admin-subnav, #admin-subnav-icons {
-  background-color: lighten($admin-section-color, 30%);
+  background-color: lighten($admin-section-color, 33%);
 }
 
 .sub-nav svg {
   width: 20px;
-  height: auto;
+  height: 20px;
   margin-left: 12px;
   margin-top: 5px;
 }
@@ -8154,7 +8154,7 @@ table.dispute-entry-table tbody tr.selected {
   padding: 2px 4px;
 
   &:hover {
-    background-color: darken($bug-section-color, 7%); 
+    background-color: darken($bug-section-color, 7%);
   }
 }
 
