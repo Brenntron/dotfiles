@@ -866,14 +866,13 @@ $ ->
     is_customer = false
     submission_types = []
 
-    checkboxes = $('#disputes-index').find('.dispute_check_box')
+    checkboxes = $('#disputes-index').find('.dispute_check_box:checked')
     $(checkboxes).each ->
-      if $(this).is(':checked')
-        tr = $(this).closest('tr')
-        row = window.dispute_table.row(tr)
-        submission_types.push(row.data().submission_type)
-        if row.data().submitter_type == 'CUSTOMER'
-          is_customer = true
+      tr = $(this).closest('tr')
+      row = window.dispute_table.row(tr)
+      submission_types.push(row.data().submission_type)
+      if row.data().submitter_type == 'CUSTOMER'
+        is_customer = true
 
     submission_types.sort()
     submission_types_all_same = (submission_types[0] == submission_types[submission_types.length - 1])
