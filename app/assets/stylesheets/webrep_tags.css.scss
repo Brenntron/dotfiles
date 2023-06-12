@@ -1,15 +1,54 @@
-// context tags tab for webrep
+// context tags (tmi) tab for webrep & filerep
 .tab-tags {
   h2 {
-    font-size: 10pt;
+    font-size: 11pt;
     font-weight: 700;
-    padding: 0 3px 6px;
+    padding: 3px 3px 10px;
   }
   table {
     margin-bottom: 50px;
-    border: solid 1px #eee;
+    border-bottom: none !important;
+    .cb-tmi {
+      margin: 0;
+      position: relative;
+      top: 2px;
+      display: inline-block;
+    }
+    thead th {
+      border-bottom: solid 1px #f6f6f6;
+      padding: 8px 10px;
+      vertical-align: middle;
+    }
     td {
-      border-right: solid 1px #eee;
+      line-height: 12pt;
+    }
+  }
+  input.cb-tmi-select-all {
+    display: inline-block;
+    position: absolute;
+    top: 2px;
+  }
+  .tmi-cell-suppressed {
+    font-weight: 600;
+  }
+  .tmi-red-cell {
+    background-color: #f8bbbb;
+  }
+  .tmi-gray-cell {
+    background-color: #f6f6f6;
+  }
+}
+
+.tmi-columns-dropdown {
+  width: 400px;
+  margin: 0;
+  ul {
+    display: inline-block;
+    vertical-align: top;
+    width: 190px;
+    padding: 10px 5px;
+    input[type='checkbox'] {
+      margin-right: 8px;
     }
   }
 }
@@ -20,6 +59,9 @@
     margin-right: 3px;
     padding-left: 22px;
     background-position-x: 5px;
+  }
+  .toolbar-button:last-of-type {
+    margin-right: 0;
   }
   input {
     margin: 2px;
@@ -60,3 +102,12 @@
   }
 }
 
+.dropdown.open .show-col-tags-button {
+  background-image: url(image_path('icon_columns_white.svg'));
+}
+
+// target dt wrapper
+#datatable-prevalence_wrapper {
+  width: 50%;
+  min-width: 800px;
+}

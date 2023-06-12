@@ -1,0 +1,189 @@
+-# context tags tab exists on both webrep and filerep
+.row
+  .col-sm-12
+    %h1 Context Tags
+    %h2 Tag Management Interface
+
+    .toolbar.tags-toolbar
+      %div
+        %label.toolbar-section-label
+          Show
+        %span.dropdown
+          %button#tmi-columns-button.toolbar-button.show-col-tags-button.dropdown-toggle{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %span.toolbar-button-text
+              Show/Hide Columns
+
+          .dropdown-menu.toolbar-dropdown.tmi-columns-dropdown{'aria-labelledby': 'tmi-columns-button'}
+            %ul
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Observable
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Tag Name
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Mneumonic
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Tag Type
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Taxonomy
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Source
+            %ul
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Processor
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Creation Date
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Suppressed?
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Suppression Source
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Suppression Platform
+              %li.toggle-vis
+                %input{type: 'checkbox', checked: true} Suppression Date
+
+      %div
+        %label.toolbar-section-label View
+        %span.tags-toggle.suppressed-tags-toggle
+          %input.cb-suppressed-tags{type:'checkbox', checked: true}
+          %span.toggle-label Suppressed Tags
+        %span.tags-toggle.unsuppressed-tags-toggle
+          %input.cb-suppressed-tags{type:'checkbox', checked: true}
+          %span.toggle-label Unsuppressed Tags
+
+      %div
+        %label.toolbar-section-label Actions
+        %button.toolbar-button.add-tag-button
+          %span.toolbar-button-text Add Tag
+        %button.toolbar-button.suppress-tag-button
+          %span.toolbar-button-text Suppress Tag
+        %button.toolbar-button.unsuppress-tag-button
+          %span.toolbar-button-text Unsuppress Tag
+        %button.toolbar-button.remove-tag-button
+          %span.toolbar-button-text Remove Tag
+
+    -# tag management interface datatable
+    %table#datatable-tmi.datatable-tmi
+      %thead
+        %tr
+          %th
+            %input.cb-tmi-select-all{type:'checkbox'}
+          %th Observable
+          %th Tag Name
+          %th Mneumonic
+          %th Tag Type
+          %th Taxonomy
+          %th Source
+          %th Processor
+          %th Creation Date
+          %th Suppressed?
+          %th Suppression Source
+          %th Suppression Platform
+          %th Suppression Date
+
+      -# PLACEHOLDER DATA BELOW. WILL BE UPDATED.
+      -# PLACEHOLDER DATA BELOW. WILL BE UPDATED.
+      %tbody
+        %tr
+          %td.tmi-cell-cb
+            %input.cb-tmi{type:'checkbox'}
+          %td.tmi-cell-observable mail.google.com
+          %td.tmi-cell-tag-name Internet Accessible Device
+          %td.tmi-cell-mneumonic Test
+          %td.tmi-cell-tag-type Techniques
+          %td.tmi-cell-taxonomy MITRE ATT&CK
+          %td.tmi-cell-source rmarchuk
+          %td.tmi-cell-processor Sherlock
+          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
+          %td.tmi-cell-suppressed.tmi-red-cell NO
+          %td.tmi-cell-suppression-source.tmi-gray-cell
+          %td.tmi-cell-suppression-platform.tmi-gray-cell
+          %td.tmi-cell-suppression-date.tmi-gray-cell
+        %tr
+          %td.tmi-cell-cb
+            %input.cb-tmi{type:'checkbox'}
+          %td.tmi-cell-observable mail.google.com
+          %td.tmi-cell-tag-name Questionable
+          %td.tmi-cell-mneumonic Test
+          %td.tmi-cell-tag-type Techniques
+          %td.tmi-cell-taxonomy MITRE ATT&CK
+          %td.tmi-cell-source rmarchuk
+          %td.tmi-cell-processor Sherlock
+          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
+          %td.tmi-cell-suppressed YES
+          %td.tmi-cell-suppression-source rmarchuk
+          %td.tmi-cell-suppression-platform Sherlock
+          %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
+
+    -# enrichment datatable for dispute (moved from research tab to here)
+    %h2 Enrichment Service
+    %table#datatable-enrichment.datatable-enrichment
+      %thead
+        %tr
+          %th Observable
+          %th Context
+          %th Tag Name
+          %th Mneumonic
+          %th Taxonomy
+          %th Description
+          %th External References
+      %tbody
+        %tr
+          %td.enrichment-cell-observable mail.google.com
+          %td.enrichment-cell-context Email
+          %td.enrichment-cell-tag-name Internet Accessible Device
+          %td.enrichment-cell-mneumonic Test
+          %td.enrichment-cell-taxonomy MITRE ATT&CK
+          %td.enrichment-cell-description Adversaries may gain access to a system through a web site over the normal course of browsing.
+          %td.enrichment-cell-external-references https://attack.mitre.org/techniques/T1189/
+
+    -# prevalence datatable for dispute (moved from research tab to here)
+    %h2 Prevalence
+    %table#datatable-prevalence.datatable-prevalence
+      %thead
+        %tr
+          %th Dataset
+          %th Count
+          %th First Seen
+          %th Last Seen
+      %tbody
+        %tr
+          %td.prevalence-cell-dataset Total
+          %td.prevalence-cell-count Email
+          %td.prevalence-cell-first-seen 2020-06-15 19:00:00
+          %td.prevalence-cell-last-seen 2020-06-15 19:00:00
+
+
+
+    -# LEGACY ENRICHMENT, KEEP FOR REFERENCE. DELETE WHEN SAFE.
+    -#.entry-details-table.enrich-details-table{'data-entry-id': ""}
+    -#  %h5.entry-details-table-header Enrichment
+    -#  %table.hidden.enrich-webrep-table-data-present
+    -#    %thead
+    -#      %tr
+    -#        %th Context
+    -#        %th Taxonomy
+    -#        %th Name
+    -#        %th Description
+    -#        %th.enrich-webrep-external-ref-header External References
+    -#    %tbody
+    -#      %tr
+    -#  %table.enrich-webrep-table-data-missing
+    -#    %tbody
+    -#      %tr
+    -#        %td.missing-data No enrichment services data
+
+    -# LEGACY PREVALENCE, KEEP FOR REFERENCE. DELETE WHEN SAFE.
+    -#.entry-details-table.prevalence-details-table{'data-entry-id': ""}
+    -#  %h5.entry-details-table-header Prevalence
+    -#  %table.prevalence-webrep-table-data-present.hidden
+    -#    %thead
+    -#      %tr
+    -#        %th Dataset
+    -#        %th Count
+    -#        %th First Seen
+    -#        %th Last Seen
+    -#    %tbody
+    -#  %table.prevalence-webrep-table-data-missing
+    -#    %tbody
+    -#      %tr
+    -#        %td.missing-data No prevalence data

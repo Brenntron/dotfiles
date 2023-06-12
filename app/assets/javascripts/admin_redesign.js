@@ -65,4 +65,5 @@
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
 //= require application/webrep/enrich
+//= require application/context-tags
 //= require admin/admin-tools

@@ -284,11 +284,11 @@
     %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
       Research
   %li.nav-item{role:'presentation'}
-    %a.nav-link#related-tab-link{href: '#related_tab', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
-      Duplicate Cases
-  %li.nav-item{role:'presentation'}
     %a.nav-link#tags-tab-link{href: '#tags_tab', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
       Context Tags
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#related-tab-link{href: '#related_tab', 'aria-controls': 'related', role: 'tab', 'data-toggle': 'tab'}
+      Duplicate Cases
 
 
 .tab-content.content-wrapper#bug-tab-content
@@ -317,4 +317,5 @@
                         %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
                         %td= dispute_dup.case_opened_at.strftime('%F %T')
   .tab-pane.tab-tags#tags_tab{role: 'tabpanel'}
-    = render 'escalations/webrep/disputes/tags_tab'
+
+    = render 'shared/tags_tab'
