@@ -286,22 +286,10 @@ $ ->
           $('#ticket-non-res-submit').hide()
           $(stat_comment).val('')
 
-          #check first resolution checkbox if none selected, check if web or email ticket
+          #check first resolution checkbox if none selected
           if !($("#index-edit-ticket-status-dropdown input.ticket-resolution-radio").is(':checked'))
             $('#index-edit-ticket-status-dropdown input#FIXED_FP').prop('checked', true)
-
-            is_customer = false
-            checkboxes = $('#file-rep-datatable').find('.dispute_check_box')
-            table = $('#file-rep-datatable').DataTable()
-
-            #show customer message if any checked rows are for customers
-            $(checkboxes).each ->
-              if $(this).is(':checked')
-                tr = $(this).closest('tr')
-                row = table.row(tr)
-                if row.data().submitter_type.toLowerCase() == 'customer'
-                  is_customer = true
-
+            is_customer = filerep_check_for_customer()
             populate_resolved_filerep_templates('Fixed - FP', is_customer)
 
         else
@@ -368,13 +356,9 @@ $ ->
     if submitter_type == 'customer' then is_customer = true else is_customer = false
     populate_resolved_filerep_templates(resolution_type, is_customer)
 
-  # Filerep index page resolution select
-  $('#filerep-resolution-selector input[type=radio][name=ticket-resolution]').change () ->
-    resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+  filerep_check_for_customer = () ->
     checkboxes = $('#file-rep-datatable').find('.dispute_check_box:checked')
-    submitter_types = []
     table = $('#file-rep-datatable').DataTable()
-
     is_customer = false
     #show customer message if any checked rows are for customers
     $(checkboxes).each ->
@@ -383,7 +367,12 @@ $ ->
         row = table.row(tr)
         if row.data().submitter_type.toLowerCase() == 'customer'
           is_customer = true
+    return is_customer
 
+  # Filerep index page resolution select
+  $('#filerep-resolution-selector input[type=radio][name=ticket-resolution]').change () ->
+    resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+    is_customer = filerep_check_for_customer()
     populate_resolved_filerep_templates(resolution_type, is_customer)
 
   # note: this function below affects the global space, can be accessed everywhere
