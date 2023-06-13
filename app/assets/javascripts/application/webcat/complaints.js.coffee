@@ -154,19 +154,25 @@ window.build_single_row = (rd, data) ->
             targets: [ 0 ]
             orderable: false
             searchable: false
-          },
+          }
           {
             targets: [ 9 ]
             className:'entry-assignee'
           }]
         createdRow: (row, data, index) ->
-          entry_id = data[3]
+          url =          data[1]
+          entry_id =     data[3]
           complaint_id = data[4]
-          age = data[10]
-          status = data[5]
+          status =       data[5]
+          age =          data[10]
+
 
           checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
           $('td', row).eq(0).append(checkbox).addClass('checkbox-cell')
+
+          if url
+            updated_url = "<span class='jira-url esc-tooltipped' title='#{url}'>#{url}</span>"
+            $('td', row).eq(1).html(updated_url)
 
           if complaint_id
             complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
@@ -187,6 +193,12 @@ window.build_single_row = (rd, data) ->
               else
                 age_class = 'ticket-age-over12hr'
               $('td', row).eq(10).html("<span class='#{age_class}'>#{age}</span>")
+        initComplete: () ->
+          $('.esc-tooltipped:not(.tooltipstered)').tooltipster
+            theme: [
+              'tooltipster-borderless'
+              'tooltipster-borderless-customized'
+            ]
     )
   else
     ticket_html += "<hr/></div>"
