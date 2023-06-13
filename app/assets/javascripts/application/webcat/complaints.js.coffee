@@ -802,29 +802,10 @@ window.webcat_reset_search = ()->
   for i in inputs
     i.value = ""
 
-  tag_input = $('#tags-input')[0].selectize
-  assignee_input = $('#assignee-input')[0].selectize
-  category_input = $('#category-input')[0].selectize
-  company_input = $('#company-input')[0].selectize
-  status_input = $('#status-input')[0].selectize
-  resolution_input = $('#resolution-input')[0].selectize
-  customer_input = $('#name-input')[0].selectize
-  complaint_input = $('#complaint-input')[0].selectize
-  channel_input = $('#channel-input')[0].selectize
-  entry_input = $('#entryid-input')[0].selectize
-  complaint_id_input = $('#complaintid-input')[0].selectize
-
-  tag_input.clear()
-  assignee_input.clear()
-  category_input.clear()
-  company_input.clear()
-  status_input.clear()
-  resolution_input.clear()
-  customer_input.clear()
-  complaint_input.clear()
-  channel_input.clear()
-  entry_input.clear()
-  complaint_id_input.clear()
+  els = ['tags','assignee','category','company','status','resolution','name','complaint','channel', 'entryid','complaintid','jiraid','submitter-type']
+  for el in els
+    selectize_el = $("##{el}-input")[0].selectize
+    selectize_el.clear()
 
 window.multiple_url_categorization = () ->
   loader = $('.lookup-drop-loader')
@@ -2600,8 +2581,9 @@ processSubmitMaster = () ->
 
       json = JSON.parse(response)
 
-      table = $('#complaints-index').DataTable()
-
+      table = $('#complaints-index').DataTable(
+        initComplete: -> $('#inline-webcat').addClass('hidden')
+      )
       for entry in json
         if entry.error == true && entry.reason == 'nil_categories'
           nil_categories_errors.push(entry.entry_id)
@@ -2701,15 +2683,6 @@ window.verifyMasterSubmit = () ->
 
 window.updateResolutionDialog = (confirm) ->
 
-
-
-#   { status } = row
-#  if status == 'COMPLETED'
-#    reopened = true
-#    disabled = false
-#  if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
-#    invalid_unchanged = true
-#    disabled = false
   $('#complaint_entries_to_update').empty()
   resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected')
@@ -2733,7 +2706,6 @@ window.updateResolutionDialog = (confirm) ->
       if push_row
         $(row).addClass('filtered-row')
         complaint_entries.push(id)
-        full_domain = ''
         domain = $(row).find("#domain_#{id}").attr('data-full')
         $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
   $('#resolution_dialog').modal("show")

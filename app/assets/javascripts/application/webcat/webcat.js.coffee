@@ -52,13 +52,14 @@ $ ->
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
+    { items, options } = category_input[0].selectize
+
     user_id = if assignee_input[0].selectize? then assignee_input[0].selectize.items else []
     tags = if tag_input[0].selectize? then tag_input[0].selectize.items else []
     company = if $('#company-input')[0].selectize? then $('#company-input')[0].selectize.items else []
     status = if $('#status-input')[0].selectize? then $('#status-input')[0].selectize.items else []
     resolution = if $('#resolution-input')[0].selectize? then $('#resolution-input')[0].selectize.items else []
     customer_name = if $('#name-input')[0].selectize? then $('#name-input')[0].selectize.items else []
-    { items, options } = category_input[0].selectize
     complaints = if $('#complaint-input')[0].selectize? then $('#complaint-input')[0].selectize.items else []
     channels = if $('#channel-input')[0].selectize? then $('#channel-input')[0].selectize.items else []
     entry_ids = if $('#entryid-input')[0].selectize? then $('#entryid-input')[0].selectize.items else []
@@ -487,7 +488,7 @@ $ ->
               text_check = !window.find_saved_search_by_name(webcat_search_name)
               search_name_check = webcat_search_name != ''
               if webcat_search_type == 'advanced' && search_name_check && text_check
-                window.add_tmp_tr_to_named_search_list(webcat_search_name)
+                window.temporary_search_link(webcat_search_name)
                 window.sort_named_search_list()
 
           pagingType: 'full_numbers'
@@ -784,6 +785,8 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
+
+
     tag_input = $('#tags-input').selectize {
       persist: false
       valueField: 'name',
@@ -811,7 +814,8 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-    company_input = $('#company-input').selectize {
+#    company_input
+    $('#company-input').selectize {
       persist: false,
       create: false,
       valueField: 'company_name',
@@ -822,7 +826,9 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-    status_input = $('#status-input').selectize {
+
+#    status_input
+    $('#status-input').selectize {
       persist: false,
       create: false,
       maxItems: 6,
@@ -836,7 +842,8 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-    resolution_input = $('#resolution-input').selectize {
+#    resolution-input
+    $('#resolution-input').selectize {
       persist: false,
       create: false,
       maxItems: 3,
@@ -849,7 +856,8 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-    customer_input = $('#name-input').selectize {
+#    customer_input
+    $('#name-input').selectize {
       persist: false,
       create: false,
       valueField: 'name',
@@ -860,7 +868,8 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-    complaint_input = $('#complaint-input').selectize {
+#    complaint_input
+    $('#complaint-input').selectize {
       persist: false,
       create: (input) ->
         {
@@ -872,7 +881,8 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-    channel_input = $('#channel-input').selectize {
+#    channel_input
+    $('#channel-input').selectize {
       persist: false,
       create: false,
       maxItems: 2,
@@ -885,7 +895,9 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-    entry_ids = $('#entryid-input').selectize {
+
+#      entry_ids
+    $('#entryid-input').selectize {
       delimiter: ',',
       persist: false,
       create: (input) ->
@@ -898,7 +910,8 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-    complaint_ids = $('#complaintid-input').selectize {
+#    complaint_ids
+    $('#complaintid-input').selectize {
       delimiter: ',',
       persist: false,
       create: (input) ->
@@ -911,7 +924,8 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-    jira_ids = $('#jiraid-input').selectize {
+#    jira_ids
+    $('#jiraid-input').selectize {
       delimiter: ',',
       persist: false,
       create: (input) ->
@@ -924,6 +938,7 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
+#    submitter type
     $('#submitter-type-input').selectize {
       delimiter: ',',
       persist: false,
@@ -1055,7 +1070,7 @@ window.copyToClipboard = (text) ->
   document.execCommand 'copy'
   document.body.removeChild dummy
 
-window.add_tmp_tr_to_named_search_list = (webcat_search_name) ->
+window.temporary_search_link = (webcat_search_name) ->
   new_tr = document.createElement('tr')
   new_td = document.createElement('td')
   new_link =  document.createElement('a')
@@ -1084,12 +1099,6 @@ window.add_tmp_tr_to_named_search_list = (webcat_search_name) ->
   $(new_delete).append(new_delete_image)
   $(new_td).append(new_fav_icon)
   $('.webcat-named-search-list tbody').append(new_tr)
-
-window.sort_named_search_list = ->
-  tbody = $('.webcat-named-search-list tbody')
-  tbody.find('tr').sort((a, b) ->
-    return $('td:first a:first', b).text().localeCompare($('td:first a:first', a).text())
-  ).appendTo(tbody)
 
 window.find_saved_search_by_name = (name) ->
   saved_search = null
