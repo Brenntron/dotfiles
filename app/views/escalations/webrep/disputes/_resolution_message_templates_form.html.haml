@@ -56,7 +56,7 @@
       %input.hidden{type: 'hidden', name: 'template-id'}
       %label.content-label-sm.resolution-modal-label Message to Customer
       - if current_user.has_role?('webrep manager') || current_user.has_role?('manager')
-        %textarea.resolution-template-message.form-control.resolution-modal-textarea.white-bg{name: 'body', required: true, placeholder: 'Your Snort Rule Ticket...', rows: 9}
+        %textarea.resolution-template-message.form-control.resolution-modal-textarea.white-bg{name: 'body', required: true, placeholder: 'Your Reputation Ticket...', rows: 9}
       - else
         %p.resolution-template-message.resolution-template-lesser-permission-text
 
