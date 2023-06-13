@@ -17,7 +17,7 @@ $(document).ready ->
     build_imports_table()
 
   sessionStorage.removeItem("touchedForm")
-  loader = $('#inline-webcat')
+  loader = $('#inline-webcat').removeClass('hidden')
   $(this).bind(
     ajaxStart: () ->
       webcat_loader_timeout = setTimeout ->

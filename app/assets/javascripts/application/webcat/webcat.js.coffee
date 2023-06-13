@@ -143,12 +143,18 @@ $ ->
     refresh_url()
 
   window.build_webcat_named_search = (search_name) ->
-    link_el = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
+    console.log search_name
     localStorage.webcat_search_type = 'named'
-    localStorage.webcat_search_name = search_name
-    localStorage.webcat_search_conditions = '#' + link_el
+    localStorage.webcat_search_name  = search_name
+    localStorage.removeItem('search_conditions')
 
     refresh_url()
+#    link_el = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
+#    localStorage.webcat_search_type = 'named'
+#    localStorage.webcat_search_name = search_name
+#    localStorage.webcat_search_conditions = '#' + link_el
+
+#    refresh_url()
 
   window.search_for_tag = (tag) ->
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
@@ -489,7 +495,6 @@ $ ->
               search_name_check = webcat_search_name != ''
               if webcat_search_type == 'advanced' && search_name_check && text_check
                 window.temporary_search_link(webcat_search_name)
-                window.sort_named_search_list()
 
           pagingType: 'full_numbers'
           order: [ [
@@ -1086,7 +1091,9 @@ window.temporary_search_link = (webcat_search_name) ->
   $(new_delete_image).addClass('delete-search-image')
   $(new_fav_icon).addClass('nav-dropdown-icon favorite-search-icon')
 
+
   $(new_link).on 'click', () ->
+    console.log webcat_search_name
     window.build_webcat_named_search(webcat_search_name)
 
   $(new_delete).on 'click', () ->
