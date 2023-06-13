@@ -16,8 +16,8 @@ window.get_enrichment_service = (query_item, query_type) ->
       $('.prevalence-webrep-table-data-missing').removeClass('hidden')
       $('.enrich-webrep-table-data-present').addClass('hidden')
       $('.enrich-webrep-table-data-missing').removeClass('hidden')
-      # RESTORE THIS ERROR LINE BELOW WHEN TMI IS DONE.
-      # RESTORE THIS ERROR LINE BELOW WHEN TMI IS DONE.
+
+      # RESTORE BELOW LINE WHEN TMI IS DONE. COMMENTING OUT DUE TO ERRORS ON LOCALHOST.
 #      std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
     complete: (response) ->
       console.log 'RESPONSE FOR ENRICHMENT:'
