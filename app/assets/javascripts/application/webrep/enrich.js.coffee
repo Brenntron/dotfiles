@@ -17,8 +17,8 @@ window.get_enrichment_service = (query_item, query_type) ->
       $('.enrich-webrep-table-data-present').addClass('hidden')
       $('.enrich-webrep-table-data-missing').removeClass('hidden')
 
-      # RESTORE BELOW LINE WHEN TMI IS DONE. COMMENTING OUT DUE TO ERRORS ON LOCALHOST.
-#      std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
+      # COMMENT/UNCOMMENT BELOW LINE WHILE TMI IS BEING WORKED, REMOVE THIS COMMENT WHEN TMI IS DONE.
+      std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
     complete: (response) ->
       console.log 'RESPONSE FOR ENRICHMENT:'
       console.log response
