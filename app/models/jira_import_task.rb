@@ -113,33 +113,35 @@ class JiraImportTask < ApplicationRecord
 
       ticketable_urls = import_urls.where(domain: k)
 
-      if v["import"] == true
-        existing_entry = ComplaintEntry.open.where(domain: k).first
-        if existing_entry.present?
-          ticketable_urls.each do |ticketable_url|
-            ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
+      unless ticketable_urls.empty?
+        if v["import"] == true
+          existing_entry = ComplaintEntry.open.where(domain: k).first
+          if existing_entry.present?
+            ticketable_urls.each do |ticketable_url|
+              ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
+            end
+          else
+            complaint_options = [
+              BugzillaRest::Session.default_session,
+              ticketable_urls.first.submitted_url,
+              description,
+              Customer::JIRA_GENERATED,
+              nil,                     # tags
+              nil,                     # platform
+              Complaint::NEW,          # status
+              nil,                     # categories
+              nil,                     # user email
+              Complaint::JIRA_CHANNEL  # channel
+            ]
+            response = Complaint.create_action(*complaint_options)
+            ticketable_urls.each do |ticketable_url|
+              ticketable_url.update(bast_verdict: v["import"], complaint_id: response[:complaint_id])
+            end
           end
         else
-          complaint_options = [
-            BugzillaRest::Session.default_session,
-            ticketable_urls.first.submitted_url,
-            description,
-            Customer::JIRA_GENERATED,
-            nil,                     # tags
-            nil,                     # platform
-            Complaint::NEW,          # status
-            nil,                     # categories
-            nil,                     # user email
-            Complaint::JIRA_CHANNEL  # channel
-          ]
-          response = Complaint.create_action(*complaint_options)
           ticketable_urls.each do |ticketable_url|
-            ticketable_url.update(bast_verdict: v["import"], complaint_id: response[:complaint_id])
+            ticketable_url.update(bast_verdict: v["import"], verdict_reason: v["reason"])
           end
-        end
-      else
-        ticketable_urls.each do |ticketable_url|
-          ticketable_url.update(bast_verdict: v["import"], verdict_reason: v["reason"])
         end
       end
     end
