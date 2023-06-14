@@ -111,8 +111,9 @@
                             %label.content-label-sm
                               Comment
                             %textarea#webrep-show-ticket-resolution-comment.ticket-resolution-comment.ticket-status-comment
-                            %button.primary{onClick: 'show_page_edit_status()'}
-                              Submit
+                            .ticket-resolution-submit-wrapper
+                              %button.primary{onClick: 'show_page_edit_status()'}
+                                Submit
                     %li.status-radio-wrapper
                       %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", 'data-status': "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
                       %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened

@@ -82,8 +82,9 @@
                             %label.content-label-sm
                               Comment
                             %textarea#filerep-resolution-comment.resolution-status-comment.ticket-resolution-comment
-                            %button.primary{onClick: 'update_file_rep_status_on_show()'}
-                              Submit
+                            .ticket-resolution-submit-wrapper
+                              %button.primary{onClick: 'update_file_rep_status_on_show()'}
+                                Submit
                     %li.status-radio-wrapper
                       %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-reopened', value: 'RE-OPENED'}
                       %label.radio-label.fr-ticket-status-radio-label{for:'file-status-reopened'} Re-Opened

@@ -6375,7 +6375,7 @@ h5.entry-details-table-header {
   padding: 0 8px !important;
 }
 
-.inline-select-dropdown {
+.inline-select-dropdown{
   padding-right: 20px;
   background-image: url(image_path('icon_dropdown_grey.svg'));
   background-repeat: no-repeat;
@@ -6414,13 +6414,11 @@ h5.entry-details-table-header {
   margin-top: -56px;
   margin-left: 1px;
   width: 475px;
+  background-color: $bug-section-color;
 }
 
 //Research tab entries get a little extra padding since they are missing submit button
 #disputes-research-table {
-  .ticket-resolution-submenu {
-    padding-bottom: 8px;
-  }
   .non-resolution-submit-wrapper {
     padding-bottom: 8px;
   }
@@ -6549,6 +6547,11 @@ h5.entry-details-table-header {
   margin-right: 0  !important;
 }
 
+.submenu-right-wrapper {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
 .submenu-header {
   color: $content-bg-color;
   width: 100%;
@@ -6642,6 +6645,11 @@ textarea.ticket-resolution-comment {
   line-height: 12px;
 }
 
+//extra padding for werbrep show entry resolution menu
+.entry-resolution-comment-wrapper-research-tab {
+  padding-bottom: 10px !important;
+}
+
 .resolution-comment-wrapper input[type='text'] {
   width: 100%;
   min-height: 40px;
@@ -6657,6 +6665,13 @@ textarea.ticket-resolution-comment {
   border-radius: 0;
   border: 1px solid darken($faint-neutral-color, 5%);
   width: 100%;
+  background-color: #fff; //firefox specific fix to get rid of default color
+  background-image: url(image_path('icon_dropdown_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+  background-size: 14px;
+  -webkit-appearance: none;
+  padding: 3px 0 3px 3px;
 }
 
 #wlbl_adjust_entries, #wlbl_adjust_entries_index {
@@ -7214,10 +7229,6 @@ td.ticket-total::before {
   left: 100%;
 }
 
-.sdr-non-resolution-submit-wrapper {
-  padding-top: 6px !important;
-}
-
 .non-resolution-submit-wrapper textarea, .resolution-comment-wrapper textarea {
   width: 100%;
   margin: auto;
@@ -7273,6 +7284,7 @@ td.ticket-total::before {
   left: 100%;
   padding: 0;
   margin-top: -56px;
+  background-color: $bug-section-color;
 }
 
 #index-ticket-resolution-submenu, #index-entry-resolution-submenu {
@@ -7667,6 +7679,7 @@ table.dispute-entry-table tbody tr.selected {
   width: 475px;
   margin-top: -55px;
   padding: 0;
+  background-color: $bug-section-color;
   button.primary{
     margin: 2% 0px 0px 33%
   }
@@ -7683,6 +7696,10 @@ table.dispute-entry-table tbody tr.selected {
 
 .show-toolbar-wrapper {
   margin-top: 40px;
+}
+
+.ticket-resolution-submit-wrapper {
+  padding: 12px 6px 6px 6px !important;
 }
 
 .preview-website-col {
