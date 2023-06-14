@@ -713,11 +713,6 @@
                             = entry.virustotals_negatives_count
                             \/
                             = entry.virustotals.count
-                        %td.input-col.enrich-input-wrapper
-                          %input.research-row-checkbox.enrich-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                        %td.enrich-label-cell
-                          %label Enrichment
-                        %td.text-center.enrich-cell
                         %td.left-bordered.wlbl-tc-label-cell
                           %label WL/BL
                         %td.entry-data-wlbl.wlbl-tc-cell
@@ -794,8 +789,7 @@
                           %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                         %td
                           %label RepTool Class
-                        -#strech Reptool cell to balance out the new Enrichment section
-                        %td.entry-reptool-data.reptool-class-cell{colspan: '4'}
+                        %td.entry-reptool-data.reptool-class-cell
                           - if entry.classifications.first.nil?
                             %span.missing-data.entry-reptool-class Not on RepTool
                           - else
