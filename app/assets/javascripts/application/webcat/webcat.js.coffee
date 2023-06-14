@@ -143,18 +143,11 @@ $ ->
     refresh_url()
 
   window.build_webcat_named_search = (search_name) ->
-    console.log search_name
     localStorage.webcat_search_type = 'named'
     localStorage.webcat_search_name  = search_name
-    localStorage.removeItem('search_conditions')
+#    localStorage.removeItem('webcat_search_conditions')
 
     refresh_url()
-#    link_el = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
-#    localStorage.webcat_search_type = 'named'
-#    localStorage.webcat_search_name = search_name
-#    localStorage.webcat_search_conditions = '#' + link_el
-
-#    refresh_url()
 
   window.search_for_tag = (tag) ->
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
@@ -417,6 +410,7 @@ $ ->
             reset_icon +
             '</div>'
         el = localStorage.webcat_search_conditions
+        console.log localStorage.webcat_search_conditions
         if el
           if !el.includes('temp_row')
             subheader = $(el + ' .saved-search')[0].dataset.search_conditions

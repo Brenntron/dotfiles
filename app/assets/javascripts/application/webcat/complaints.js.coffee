@@ -22,7 +22,7 @@ $(document).ready ->
     ajaxStart: () ->
       webcat_loader_timeout = setTimeout ->
         loader.removeClass('hidden')
-      , 500
+      , 100
     ajaxStop: () ->
       clearTimeout(webcat_loader_timeout)
       loader.addClass('hidden')
