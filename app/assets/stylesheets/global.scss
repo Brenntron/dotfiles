@@ -9753,7 +9753,9 @@ td.text-center span {
 .webcat-loader-wrapper, .webrep-loader-wrapper, .sdr-loader-wrapper {
   margin: 0 37%;
 }
-
+.webcat-loader-wrapper{
+  margin-top: 25px;
+}
 .sdr-loader-wrapper {
   top: 5px;
 }

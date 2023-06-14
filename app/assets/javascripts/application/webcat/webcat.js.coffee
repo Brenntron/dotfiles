@@ -417,11 +417,12 @@ $ ->
             reset_icon +
             '</div>'
         el = localStorage.webcat_search_conditions
-        if !el.includes('temp_row')
-          subheader = $(el + ' .saved-search')[0].dataset.search_conditions
-        else
-          subheader = $('#saved-search-tbody').last('tr').find('.saved-search').attr('data-search_conditions')
-        build_subheader(subheader)
+        if el
+          if !el.includes('temp_row')
+            subheader = $(el + ' .saved-search')[0].dataset.search_conditions
+          else
+            subheader = $('#saved-search-tbody').last('tr').find('.saved-search').attr('data-search_conditions')
+          build_subheader(subheader)
       else if search_type == 'contains'
         new_header =
           '<div>Results for "' + webcat_search_conditions.value + '" '+
