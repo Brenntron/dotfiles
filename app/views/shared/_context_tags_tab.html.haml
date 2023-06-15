@@ -4,12 +4,12 @@
     %h1 Context Tags
     %h2 Tag Management Interface
 
-    .toolbar.tags-toolbar
+    .toolbar.context-tags-toolbar
       %div
         %label.toolbar-section-label
           Show
         %span.dropdown
-          %button#tmi-columns-button.toolbar-button.show-col-tags-button.dropdown-toggle{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %button#tmi-columns-button.toolbar-button.show-col-context-tags.dropdown-toggle{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
             %span.toolbar-button-text
               Show/Hide Columns
 
@@ -43,22 +43,22 @@
 
       %div
         %label.toolbar-section-label View
-        %span.tags-toggle.suppressed-tags-toggle
+        %span.context-tags-toggle.suppressed-context-tags-toggle
           %input.cb-suppressed-tags{type:'checkbox', checked: true}
           %span.toggle-label Suppressed Tags
-        %span.tags-toggle.unsuppressed-tags-toggle
+        %span.context-tags-toggle.unsuppressed-context-tags-toggle
           %input.cb-suppressed-tags{type:'checkbox', checked: true}
           %span.toggle-label Unsuppressed Tags
 
       %div
         %label.toolbar-section-label Actions
-        %button.toolbar-button.add-tag-button
+        %button.toolbar-button.add-context-tag-button
           %span.toolbar-button-text Add Tag
-        %button.toolbar-button.suppress-tag-button
+        %button.toolbar-button.suppress-context-tag-button
           %span.toolbar-button-text Suppress Tag
-        %button.toolbar-button.unsuppress-tag-button
+        %button.toolbar-button.unsuppress-context-tag-button
           %span.toolbar-button-text Unsuppress Tag
-        %button.toolbar-button.remove-tag-button
+        %button.toolbar-button.remove-context-tag-button
           %span.toolbar-button-text Remove Tag
 
     -# tag management interface datatable

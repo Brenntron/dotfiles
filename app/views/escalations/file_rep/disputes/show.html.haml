@@ -250,7 +250,7 @@
     %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
       Communication
   %li.nav-item{role:'presentation'}
-    %a.nav-link#tags-tab-link{href: '#tags_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+    %a.nav-link#context-tags-tab-link{href: '#context_tags_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
       Context Tags
 
 
@@ -259,8 +259,8 @@
     = render 'escalations/file_rep/disputes/research_tab'
   .tab-pane#communication_tab{role: 'tabpanel'}
     = render 'escalations/file_rep/disputes/communication_tab'
-  .tab-pane#tags_tab.tab-tags{role: 'tabpanel'}
-    = render 'shared/tags_tab'
+  .tab-pane#context_tags_tab.tab-context-tags{role: 'tabpanel'}
+    = render 'shared/context_tags_tab'
 
 
 = render 'escalations/file_rep/disputes/create_detection_dialog'
