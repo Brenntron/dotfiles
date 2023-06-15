@@ -6605,6 +6605,19 @@ input[type="radio"].ticket-status-radio {
   margin-top: 0;
 }
 
+//tweak to get webrep radio buttons to align better
+#index-edit-ticket-status-dropdown {
+  input[type="radio"].ticket-status-radio {
+    margin-top: 4px;
+  }
+}
+
+.escalations--webrep--disputes-controller {
+  input[type="radio"].ticket-status-radio {
+    margin-top: 3px;
+  }
+}
+
 .radio-label {
   text-transform: none !important;
   font-weight: 400 !important;
