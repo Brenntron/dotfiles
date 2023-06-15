@@ -175,7 +175,7 @@ $ ->
         data = {
           search_type: webcat_search_type
           search_name : webcat_search_name
-          search_conditions: webcat_search_conditions
+          search_conditions: JSON.parse webcat_search_conditions
         }
       when 'contains'
         data = {
