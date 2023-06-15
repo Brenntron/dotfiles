@@ -35,7 +35,6 @@ $ ->
 
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
-    { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
     if keyCode == 13
       webcat_search_string = $('#web-cat-search .search-box').val().trim()
       if webcat_search_string == ''
@@ -145,17 +144,14 @@ $ ->
   window.build_webcat_named_search = (search_name) ->
     localStorage.webcat_search_type = 'named'
     localStorage.webcat_search_name  = search_name
-#    localStorage.removeItem('webcat_search_conditions')
+    localStorage.webcat_search_conditions = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
 
     refresh_url()
 
   window.search_for_tag = (tag) ->
-    { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+    { webcat_search_conditions } = localStorage
 
-    try
-      webcat_search_conditions = JSON.parse webcat_search_conditions
-    catch e
-      webcat_search_conditions = {}
+#    if webcat_search_conditions then webcat_search_conditions = JSON.parse webcat_search_conditions
 
     localStorage.webcat_search_type = 'advanced'
     webcat_search_conditions.tags = tag
@@ -173,10 +169,7 @@ $ ->
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
     { search } = location
 
-    try
-      webcat_search_conditions = JSON.parse webcat_search_conditions
-    catch e
-      webcat_search_conditions = {}
+#    if webcat_search_conditions then webcat_search_conditions = JSON.parse webcat_search_conditions
 
     if search != ''
       webcat_search_type = 'standard'
@@ -209,7 +202,6 @@ $ ->
     return data
 
   refresh_url = (href) ->
-    { webcat_search_type, webcat_search_name } = localStorage
     url_check = current_url.split('/escalations/webcat/complaints/')[0]
     new_url = '/escalations/webcat/complaints'
     if href != undefined
@@ -376,57 +368,34 @@ $ ->
     # If the search_type is 'named' or 'advanced', a subheader with search definitions will be made with the build_subheader function
     ###
     container = $('#webcat_searchref_container')
+    header = 'All Tickets'
+
     if data != undefined && container.length > 0
       reset_icon = "<span #{if current_page_is_favourite() then 'hidden style="display: none"' else ''} id='refresh-filter-button' class='reset-filter esc-tooltipped' title='Clear Search Results' onclick='webcat_refresh()'></span>"
       {search_type, search_name} = data
 
-      try
-        webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
-      catch e
-        webcat_search_conditions = {}
+      if localStorage.webcat_search_conditions then {webcat_search_conditions} = localStorage
 
-      if search_type == 'standard'
+      subheader = ''
+      switch search_type
+        when 'standard'
+          search_name = search_name.toLowerCase().replace('complaints', 'tickets').replace(/_|%20/g, " ")
+          if !search_name.endsWith('tickets') then search_name += ' tickets'
+          header  = "<div class='text-capitalize'>#{search_name} #{reset_icon} </div>"
+        when 'advanced'
+          header = "<div>Results for Advanced Search#{reset_icon}</div>"
+          subheader = webcat_search_conditions
+        when 'named'
+          header = "<div>Results for #{search_name} Saved Search #{reset_icon} </div>"
+          if webcat_search_conditions
+            subheader = $("##{webcat_search_conditions} .saved-search").data('search_conditions')
+        when 'contains'
+          header = "<div>Results for #{webcat_search_conditions.value} #{reset_icon} </div>"
 
-        search_name = search_name.toLowerCase().replace('complaints', 'tickets')
+      if subheader != '' then build_subheader(subheader)
+        
+    $('#webcat-index-title')[0].innerHTML = header
 
-        if !search_name.endsWith('tickets')
-          search_name += ' tickets'
-
-        new_header =
-          '<div>' +
-            '<span class="text-capitalize">' + search_name.replace(/_|%20/g, " ") + ' </span>' +
-            reset_icon +
-            '</div>'
-
-      else if search_type == 'advanced'
-        new_header =
-          '<div>Results for Advanced Search ' +
-            reset_icon +
-            '</div>'
-        build_subheader(webcat_search_conditions)
-      else if search_type == 'named'
-        new_header =
-          '<div>Results for "' + search_name + '" Saved Search' +
-            reset_icon +
-            '</div>'
-        el = localStorage.webcat_search_conditions
-        console.log localStorage.webcat_search_conditions
-        if el
-          if !el.includes('temp_row')
-            subheader = $(el + ' .saved-search')[0].dataset.search_conditions
-          else
-            subheader = $('#saved-search-tbody').last('tr').find('.saved-search').attr('data-search_conditions')
-          build_subheader(subheader)
-      else if search_type == 'contains'
-        new_header =
-          '<div>Results for "' + webcat_search_conditions.value + '" '+
-            reset_icon +
-          '</div>'
-      else
-        new_header = 'All Tickets'
-      $('#webcat-index-title')[0].innerHTML = new_header
-    else
-      $('#webcat-index-title')[0].innerHTML = 'All Tickets'
 
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
@@ -489,7 +458,7 @@ $ ->
               text_check = !window.find_saved_search_by_name(webcat_search_name)
               search_name_check = webcat_search_name != ''
               if webcat_search_type == 'advanced' && search_name_check && text_check
-                window.temporary_search_link(webcat_search_name)
+                window.temporary_search_link(webcat_search_name, webcat_search_conditions)
 
           pagingType: 'full_numbers'
           order: [ [
@@ -1070,7 +1039,7 @@ window.copyToClipboard = (text) ->
   document.execCommand 'copy'
   document.body.removeChild dummy
 
-window.temporary_search_link = (webcat_search_name) ->
+window.temporary_search_link = (webcat_search_name, webcat_search_conditions) ->
   new_tr = document.createElement('tr')
   new_td = document.createElement('td')
   new_link =  document.createElement('a')
@@ -1081,6 +1050,7 @@ window.temporary_search_link = (webcat_search_name) ->
   $(new_tr).attr('id','temp_row')
   $(new_link).addClass('input-truncate saved-search esc-tooltipped')
     .attr('title', webcat_search_name)
+    .attr('data-search_conditions', webcat_search_conditions)
     .text(webcat_search_name)
   $(new_delete).addClass("delete-search")
   $(new_delete_image).addClass('delete-search-image')
@@ -1088,7 +1058,6 @@ window.temporary_search_link = (webcat_search_name) ->
 
 
   $(new_link).on 'click', () ->
-    console.log webcat_search_name
     window.build_webcat_named_search(webcat_search_name)
 
   $(new_delete).on 'click', () ->
