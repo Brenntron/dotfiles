@@ -48,7 +48,7 @@ class JiraImportTask < ApplicationRecord
     # fetch data from 'URL(s)' ticket field
     begin
       url_field = issue.issue.fields[custom_fields[:urls]].to_s
-      url_field.gsub("URLs ONLY - ONE PER LINE - MAXIMUM OF 50", "")
+      url_field = url_field.gsub("URLs ONLY - ONE PER LINE - MAXIMUM OF 50", "")
       urls = url_field.split(/[\n,\s]+/).reject(&:blank?)
     rescue
       urls = []
@@ -71,7 +71,7 @@ class JiraImportTask < ApplicationRecord
     end
 
     if urls.empty?
-      update(status: STATUS_FAILURE, result: 'No URLs to import')
+      update(status: STATUS_FAILURE, result: 'No URLs found on ticket')
       return
     end
 
@@ -84,6 +84,11 @@ class JiraImportTask < ApplicationRecord
       rescue PublicSuffix::DomainNotAllowed
         next
       end
+    end
+
+    if urls_to_submit.empty?
+      update(status: STATUS_FAILURE, result: 'No valid URLs to import')
+      return
     end
 
     begin
