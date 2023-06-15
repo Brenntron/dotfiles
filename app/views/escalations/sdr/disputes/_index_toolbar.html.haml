@@ -97,7 +97,7 @@
               %input.sdr-ticket-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: 'RESOLVED_CLOSED', value: 'RESOLVED_CLOSED'}
               %label.sdr-ticket-status-radio-label.radio-label{for: 'RESOLVED_CLOSED'} Resolved / Closed
               .dropdown-menu#sdr-index-dispute-resolution-submenu
-                .col-xs-5.submenu-left-wrapper{id: 'sdr-resolution-selector'}
+                .submenu-left-wrapper{id: 'sdr-resolution-selector'}
                   .submenu-header
                     Ticket Resolution
                   %ul
@@ -129,7 +129,7 @@
                     %li
                       %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}", 'data-saved-resolution-type': 'Other'}
                       %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
-                .col-xs-7.submenu-right-wrapper
+                .submenu-right-wrapper
                   .resolution-comment-wrapper
                     %label.content-label-sm
                       Template

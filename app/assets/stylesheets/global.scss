@@ -6541,6 +6541,28 @@ h5.entry-details-table-header {
   background-color: darken($bug-section-color, 5%);
 }
 
+.selected #show-ticket-resolution-submenu,
+.selected #sdr-index-dispute-resolution-submenu,
+.selected #index-ticket-resolution-submenu,
+.selected #index-entry-resolution-submenu {
+  display: flex;
+}
+
+.submenu-left-wrapper {
+  max-width: fit-content;
+  ul li {
+    padding-right: 4px !important;
+  }
+  .radio-label {
+    padding-right: 10px !important;
+  }
+}
+
+//workaround for webrep single entries - delete after we remove this section
+.research-table-row.editing-row .submenu-left-wrapper {
+  max-width: 100%;
+}
+
 .submenu-left-wrapper, .submenu-right-wrapper {
   padding-left: 0  !important;
   padding-right: 0 !important;
@@ -6550,6 +6572,7 @@ h5.entry-details-table-header {
 .submenu-right-wrapper {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+  flex-grow: 1; //stretch right submenu to fill rest of width
 }
 
 .submenu-header {

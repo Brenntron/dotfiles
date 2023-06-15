@@ -134,12 +134,12 @@
             %input.ticket-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'ticket-status', id: 'RESOLVED_CLOSED', value: 'RESOLVED_CLOSED'}
             %label.ticket-status-radio-label.radio-label{for: 'RESOLVED_CLOSED'} Resolved / Closed
             .dropdown-menu#index-ticket-resolution-submenu
-              .col-xs-4.submenu-left-wrapper
+              .submenu-left-wrapper
                 .submenu-header
                   Ticket Resolution
                 = render 'escalations/webrep/disputes/resolved_resolution_options',  { dispute_resolution_name: 'ticket-resolution', id_prefix: '' }
 
-              .col-xs-8.submenu-right-wrapper
+              .submenu-right-wrapper
                 .resolution-comment-wrapper
                   %label.content-label-sm
                     Template
@@ -239,12 +239,12 @@
             %input.entry-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'entry-status', id: 'ENTRY_RESOLVED_CLOSED', value: 'RESOLVED_CLOSED'}
             %label.entry-status-radio-label.radio-label{for: 'ENTRY_RESOLVED_CLOSED'} Resolved / Closed
             .dropdown-menu#index-entry-resolution-submenu
-              .col-xs-4.submenu-left-wrapper
+              .submenu-left-wrapper
                 .submenu-header
                   Entry Resolution
                 = render 'escalations/webrep/disputes/resolved_resolution_options',  { dispute_resolution_name: 'entry-resolution', id_prefix: 'ENTRY_' }
 
-              .col-xs-8.submenu-right-wrapper
+              .submenu-right-wrapper
                 .resolution-comment-wrapper
                   %label.content-label-sm
                     Template
