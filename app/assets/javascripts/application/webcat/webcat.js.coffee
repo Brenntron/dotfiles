@@ -378,21 +378,18 @@ $ ->
           search_name = search_name.toLowerCase().replace('complaints', 'tickets')
           search_name = search_name.replace(/_|%20/g, " ")
           if !search_name.endsWith('tickets') then search_name += ' tickets'
-
           header  = "<div class='text-capitalize'>#{search_name} #{reset_icon} </div>"
         when 'advanced'
           header = "<div>Results for Advanced Search#{reset_icon}</div>"
           subheader = webcat_search_conditions
         when 'named'
           header = "<div>Results for #{search_name} Saved Search #{reset_icon} </div>"
-
           if webcat_search_conditions
             subheader = $("##{webcat_search_conditions} .saved-search").data('search_conditions')
         when 'contains'
           header = "<div>Results for #{webcat_search_conditions.value} #{reset_icon} </div>"
 
       if subheader != '' then build_subheader(subheader)
-
     $('#webcat-index-title')[0].innerHTML = header
 
 
@@ -906,6 +903,21 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
+    $('#platform-input').selectize {
+        persist: false
+        create: false
+        valueField: 'id',
+        labelField: 'public_name',
+        create: (input) ->
+          {
+            value: input
+            text: input
+          }
+        onFocus: () ->
+          window.toggle_selectize_layer(this, 'true')
+        onBlur: () ->
+          window.toggle_selectize_layer(this, 'false')
+      }
 #    submitter type
     $('#submitter-type-input').selectize {
       delimiter: ',',
