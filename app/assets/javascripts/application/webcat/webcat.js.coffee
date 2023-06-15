@@ -151,8 +151,6 @@ $ ->
   window.search_for_tag = (tag) ->
     { webcat_search_conditions } = localStorage
 
-#    if webcat_search_conditions then webcat_search_conditions = JSON.parse webcat_search_conditions
-
     localStorage.webcat_search_type = 'advanced'
     webcat_search_conditions.tags = tag
 
@@ -168,8 +166,6 @@ $ ->
     ###
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
     { search } = location
-
-#    if webcat_search_conditions then webcat_search_conditions = JSON.parse webcat_search_conditions
 
     if search != ''
       webcat_search_type = 'standard'
@@ -393,7 +389,7 @@ $ ->
           header = "<div>Results for #{webcat_search_conditions.value} #{reset_icon} </div>"
 
       if subheader != '' then build_subheader(subheader)
-        
+
     $('#webcat-index-title')[0].innerHTML = header
 
 
