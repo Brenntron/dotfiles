@@ -126,7 +126,7 @@ development:
     gssnegotiate: false
     auth_token: "redacted"
   k2:
-    host: "k2-api.sv4.ironport.com"
+    host: "k2-api-int.sv4.ironport.com"
     port: 443
     token: "redacted"
   enrichment_service:
@@ -272,7 +272,7 @@ test:
     verify_mode: "no-tls"
     gssnegotiate: false
   k2:
-    host: "k2-api.sv4.ironport.com"
+    host: "k2-api-int.sv4.ironport.com"
     port: 443
     token: "redacted"
   umbrella_data_fetcher:
@@ -422,7 +422,7 @@ staging:
     verify_mode: "no-tls"
     gssnegotiate: false
   k2:
-    host: "k2-api.sv4.ironport.com"
+    host: "k2-api-int.sv4.ironport.com"
     port: 443
     token: "redacted"
   umbrella_data_fetcher:
