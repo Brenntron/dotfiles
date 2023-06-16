@@ -965,9 +965,9 @@ $ ->
       headers: {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       data: build_webrep_data()
       complete: () ->
-        $('#inline-webrep').addClass('hidden')
         #cache current filters for export_all form
         $('#disputes-index-export-data-input').val(JSON.stringify(build_webrep_data()))
+        $('#inline-webrep').addClass('hidden')
     order: [ [
       9
       'desc'
@@ -2760,8 +2760,6 @@ window.build_webrep_data = () ->
 
   else if localStorage.webRepFilters
     data = JSON.parse(localStorage.webRepFilters)
-
-
 
   format_webrep_header(data)
 
