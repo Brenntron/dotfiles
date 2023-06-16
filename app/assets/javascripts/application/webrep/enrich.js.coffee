@@ -3,6 +3,8 @@
 ################################################################################
 #data is loaded separately and fed into the Research Data, similar to wbrs
 
+
+# method below populates enrich data and prevalence data into context tags tab
 window.get_enrichment_service = (query_item, query_type) ->
   data = {'query_item': query_item, 'query_type', query_type}
   std_msg_ajax(

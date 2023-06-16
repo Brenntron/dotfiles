@@ -16,6 +16,7 @@
     }
     td {
       line-height: 12pt;
+      min-height: 30px;
     }
     .cb-tmi {
       margin: 0;
@@ -106,13 +107,19 @@
   }
 }
 
-// prevalence table wrapper div needs less width
-#datatable-prevalence_wrapper {
+// prevalence table wrapper div needs less width, must use id
+#datatable-prevalence_wrapper, .datatable-prevalence, .prevalence-webrep-table-data-present {
   width: 50%;
   min-width: 800px;
 }
 
-// overflow on y axis, allow bg color
+// overflow on y axis? allow bg color
 .datatable-tmi, .datatable-enrichment {
   background-color: #fff;
+}
+
+.tab-context-tags .loading-message {
+  padding: 10px;
+  font-style: italic;
+  color: #bbb;
 }

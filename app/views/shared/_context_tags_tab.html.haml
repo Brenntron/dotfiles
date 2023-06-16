@@ -79,9 +79,6 @@
           %th Suppression Source
           %th Suppression Platform
           %th Suppression Date
-
-      -# PLACEHOLDER DATA BELOW. WILL BE UPDATED.
-      -# PLACEHOLDER DATA BELOW. WILL BE UPDATED.
       %tbody
         %tr
           %td.tmi-cell-cb
@@ -114,78 +111,12 @@
           %td.tmi-cell-suppression-platform Example
           %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
 
-    -# enrichment datatable for dispute (moved from research tab to here)
-    -# PLACEHOLDER DATA
+
+    -# BELOW IS WIP HTML, WILL BE CHANGED LATER ON INTO SUBTABS.
     %h2 Enrichment Service
-    %table#datatable-enrichment.datatable-enrichment
-      %thead
-        %tr
-          %th Observable
-          %th Context
-          %th Tag Name
-          %th Mneumonic
-          %th Taxonomy
-          %th Description
-          %th External References
-      %tbody
-        %tr
-          %td.enrichment-cell-observable example.com
-          %td.enrichment-cell-context Email
-          %td.enrichment-cell-tag-name Internet Accessible Device
-          %td.enrichment-cell-mneumonic Example
-          %td.enrichment-cell-taxonomy MITRE ATT&CK
-          %td.enrichment-cell-description This is some test text and it is just placeholder.
-          %td.enrichment-cell-external-references https://attack.mitre.org/techniques/T1189/
+    .area-for-enrichment
+      %p.loading-message Loading...
 
-    -# prevalence datatable for dispute (moved from research tab to here)
-    -# PLACEHOLDER DATA
     %h2 Prevalence
-    %table#datatable-prevalence.datatable-prevalence
-      %thead
-        %tr
-          %th Dataset
-          %th Count
-          %th First Seen
-          %th Last Seen
-      %tbody
-        %tr
-          %td.prevalence-cell-dataset Total
-          %td.prevalence-cell-count Email
-          %td.prevalence-cell-first-seen 2020-06-15 19:00:00
-          %td.prevalence-cell-last-seen 2020-06-15 19:00:00
-
-
-
-    -# LEGACY ENRICHMENT, KEEP FOR REFERENCE. DELETE WHEN SAFE.
-    -#.entry-details-table.enrich-details-table{'data-entry-id': ""}
-    -#  %h5.entry-details-table-header Enrichment
-    -#  %table.hidden.enrich-webrep-table-data-present
-    -#    %thead
-    -#      %tr
-    -#        %th Context
-    -#        %th Taxonomy
-    -#        %th Name
-    -#        %th Description
-    -#        %th.enrich-webrep-external-ref-header External References
-    -#    %tbody
-    -#      %tr
-    -#  %table.enrich-webrep-table-data-missing
-    -#    %tbody
-    -#      %tr
-    -#        %td.missing-data No enrichment services data
-
-    -# LEGACY PREVALENCE, KEEP FOR REFERENCE. DELETE WHEN SAFE.
-    -#.entry-details-table.prevalence-details-table{'data-entry-id': ""}
-    -#  %h5.entry-details-table-header Prevalence
-    -#  %table.prevalence-webrep-table-data-present.hidden
-    -#    %thead
-    -#      %tr
-    -#        %th Dataset
-    -#        %th Count
-    -#        %th First Seen
-    -#        %th Last Seen
-    -#    %tbody
-    -#  %table.prevalence-webrep-table-data-missing
-    -#    %tbody
-    -#      %tr
-    -#        %td.missing-data No prevalence data
+    .area-for-prevalence
+      %p.loading-message Loading...

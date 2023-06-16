@@ -13,14 +13,25 @@ $ ->
       }
     ]
 
-  # below dt init will be enhanced later on, placeholder for now
-  $('#datatable-enrichment').DataTable
-    paging: false
-    searching: false
-    info: false
+  # enrich.js.coffee will set up the enrich data in the context tags tab
+  # REFACTOR OUT THE SETTIMEOUT INTO A PROMISE OR DIFF SOLUTION. FIND BETTER SOLUTION RATHER THAN CLONING WHEN TIME AVAIL.
+  setTimeout ->
+    enrich_table = $('#research_tab .enrich-details-table table').clone()
+    $('.area-for-enrichment').html(enrich_table)
 
-  # below dt init will be enhanced later on, placeholder for now
-  $('#datatable-prevalence').DataTable
-    paging: false
-    searching: false
-    info: false
+    prevalence_table = $('#research_tab .prevalence-details-table table').clone()
+    $('.area-for-prevalence').html(prevalence_table)
+
+    # SET UP THE DT INITS ON THESE TABLES LATER ON IN TMI DEVELOPMENT, NORMAL TABLES ARE OK FOR TIME-BEING.
+    # LEAVE COMMENTED BELOW FOR NOW.
+#    $('.tab-context-tags .enrich-webrep-table-data-present').DataTable
+#      paging: false
+#      searching: false
+#      info: false
+#    $('.tab-context-tags .prevalence-webrep-table-data-present').DataTable
+#      paging: false
+#      searching: false
+#      info: false
+  , 4000
+
+
