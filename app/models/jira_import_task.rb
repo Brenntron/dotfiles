@@ -47,7 +47,9 @@ class JiraImportTask < ApplicationRecord
 
     # fetch data from 'URL(s)' ticket field
     begin
-      urls = issue.issue.fields[custom_fields[:urls]].to_s.split(/[\n,\s]+/).reject(&:blank?)
+      url_field = issue.issue.fields[custom_fields[:urls]].to_s
+      url_field = url_field.gsub("URLs ONLY - ONE PER LINE - MAXIMUM OF 50", "")
+      urls = url_field.split(/[\n,\s]+/).reject(&:blank?)
     rescue
       urls = []
     end
@@ -69,21 +71,28 @@ class JiraImportTask < ApplicationRecord
     end
 
     if urls.empty?
-      update(status: STATUS_FAILURE, result: 'No URLs to import')
+      update(status: STATUS_FAILURE, result: 'No URLs found on ticket')
       return
     end
 
+    urls_to_submit = []
     urls.each do |url|
       begin
         url_parts = Complaint.parse_url(url)
         import_urls.find_or_create_by(submitted_url: url, domain: url_parts[:domain])
+        urls_to_submit << url
       rescue PublicSuffix::DomainNotAllowed
-        urls.delete(url)
+        next
       end
     end
 
+    if urls_to_submit.empty?
+      update(status: STATUS_FAILURE, result: 'No valid URLs to import')
+      return
+    end
+
     begin
-      response = Bast::Base.create_task(urls)
+      response = Bast::Base.create_task(urls_to_submit)
       update(status: STATUS_AWAITING_BAST_VERDICT, bast_task: response['task_id'])
     rescue ApiRequester::ApiRequester::ApiRequesterError => e
       update(status: STATUS_FAILURE, result: e.message)
@@ -109,33 +118,35 @@ class JiraImportTask < ApplicationRecord
 
       ticketable_urls = import_urls.where(domain: k)
 
-      if v["import"] == true
-        existing_entry = ComplaintEntry.open.where(domain: k).first
-        if existing_entry.present?
-          ticketable_urls.each do |ticketable_url|
-            ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
+      unless ticketable_urls.empty?
+        if v["import"] == true
+          existing_entry = ComplaintEntry.open.where(domain: k).first
+          if existing_entry.present?
+            ticketable_urls.each do |ticketable_url|
+              ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
+            end
+          else
+            complaint_options = [
+              BugzillaRest::Session.default_session,
+              ticketable_urls.first.submitted_url,
+              description,
+              Customer::JIRA_GENERATED,
+              nil,                     # tags
+              nil,                     # platform
+              Complaint::NEW,          # status
+              nil,                     # categories
+              nil,                     # user email
+              Complaint::JIRA_CHANNEL  # channel
+            ]
+            response = Complaint.create_action(*complaint_options)
+            ticketable_urls.each do |ticketable_url|
+              ticketable_url.update(bast_verdict: v["import"], complaint_id: response[:complaint_id])
+            end
           end
         else
-          complaint_options = [
-            BugzillaRest::Session.default_session,
-            ticketable_urls.first.submitted_url,
-            description,
-            Customer::JIRA_GENERATED,
-            nil,                     # tags
-            nil,                     # platform
-            Complaint::NEW,          # status
-            nil,                     # categories
-            nil,                     # user email
-            Complaint::JIRA_CHANNEL  # channel
-          ]
-          response = Complaint.create_action(*complaint_options)
           ticketable_urls.each do |ticketable_url|
-            ticketable_url.update(bast_verdict: v["import"], complaint_id: response[:complaint_id])
+            ticketable_url.update(bast_verdict: v["import"], verdict_reason: v["reason"])
           end
-        end
-      else
-        ticketable_urls.each do |ticketable_url|
-          ticketable_url.update(bast_verdict: v["import"], verdict_reason: v["reason"])
         end
       end
     end

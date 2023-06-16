@@ -10,7 +10,13 @@ namespace :jira do
     issues = project.issues(filters)
     issues.each do |issue|
       import_task = JiraImportTask.find_by(issue_key: issue.key)
-      next if import_task.present?
+
+      if import_task.present?
+        if import_task.status == JiraImportTask::STATUS_PENDING && import_task.updated_at < 6.hours.ago
+          import_task.process_import
+        end
+        next
+      end
       
       task_attributes = {
         issue_key: issue.key,
