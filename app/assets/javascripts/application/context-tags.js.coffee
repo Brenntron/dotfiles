@@ -1,6 +1,6 @@
 # context tags dt logic for webrep and filerep - this tab exists in both places
 $ ->
-  $('#datatable-tmi').DataTable
+  $('#tmi-datatable').DataTable
     paging: false
     searching: false
     info: false
@@ -13,25 +13,29 @@ $ ->
       }
     ]
 
-  # enrich.js.coffee will set up the enrich data in the context tags tab
-  # REFACTOR OUT THE SETTIMEOUT INTO A PROMISE OR DIFF SOLUTION. FIND BETTER SOLUTION RATHER THAN CLONING WHEN TIME AVAIL.
-  setTimeout ->
-    enrich_table = $('#research_tab .enrich-details-table table').clone()
-    $('.area-for-enrichment').html(enrich_table)
+# refactor how this works when time avail
+window.context_tab_move_data = () ->
+  # get the enrich table and data, move it here, init the table as a dt
+  # refactor below as loop
+  enrich_table = $('#research_tab .enrich-details-table table').detach()
+  $('.area-for-enrichment').html(enrich_table)
 
-    prevalence_table = $('#research_tab .prevalence-details-table table').clone()
-    $('.area-for-prevalence').html(prevalence_table)
+  if $('.area-for-enrichment tbody tr:first').html() == ""
+    $('.area-for-enrichment tbody tr:first').remove()  # clean out first row for dt init
 
-    # SET UP THE DT INITS ON THESE TABLES LATER ON IN TMI DEVELOPMENT, NORMAL TABLES ARE OK FOR TIME-BEING.
-    # LEAVE COMMENTED BELOW FOR NOW.
-#    $('.tab-context-tags .enrich-webrep-table-data-present').DataTable
-#      paging: false
-#      searching: false
-#      info: false
-#    $('.tab-context-tags .prevalence-webrep-table-data-present').DataTable
-#      paging: false
-#      searching: false
-#      info: false
-  , 4000
+  $('#enrichment-datatable').DataTable
+    paging: false
+    searching: false
+    info: false
 
+  # get the prev table and data, move it here, init the table as a dt
+  prevalence_table = $('#research_tab .prevalence-details-table table').detach()
+  $('.area-for-prevalence').html(prevalence_table)
 
+  if $('.area-for-prevalence tbody tr:first').html() == ""
+    $('.area-for-prevalence tbody tr:first').remove()
+
+  $('#prevalence-datatable').DataTable
+    paging: false
+    searching: false
+    info: false

@@ -14,17 +14,14 @@ window.get_enrichment_service = (query_item, query_type) ->
     success: (response) ->
       return response
     error: (response) ->
-      $('.prevalence-webrep-table-data-present').addClass('hidden')
-      $('.prevalence-webrep-table-data-missing').removeClass('hidden')
-      $('.enrich-webrep-table-data-present').addClass('hidden')
-      $('.enrich-webrep-table-data-missing').removeClass('hidden')
       std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
+      $('.area-for-enrichment').text('Error gathering enrichment data')
+    # remove below console logging when tmi is done.
     complete: (response) ->
       console.log 'RESPONSE FOR ENRICHMENT:'
       console.log response
   )
 
-##create each enrichment section under webrep research tab
 create_webrep_enrichment_section = (tags, context, enrich_toolbar_cell, table, create_index) ->
   $(tags).each (index, tag) ->
     name = ''
@@ -152,7 +149,6 @@ create_webrep_prevalence_section = (prevalence_data, table) ->
       $(table).append(new_row)
 
 
-
 window.setup_enrichment_section = () ->
   if $('#research-tab').length || $('.reputation-research-search-wrapper').length
     $('.research-table-row').each ->
@@ -169,7 +165,6 @@ window.setup_enrichment_section = () ->
           resolve enrich_json
 
       enrich_promise.then (response) ->
-
         email_context_tags = []
         web_context_tags = []
         enrichment_context_tags = []
@@ -200,12 +195,12 @@ window.setup_enrichment_section = () ->
             create_index++
             create_webrep_enrichment_section(enrichment_context_tags, 'Enrichment',  enrich_toolbar_cell, table, create_index)
 
-        else
-          $('.enrich-webrep-table-data-present').addClass('hidden')
-          $('.enrich-webrep-table-data-missing').removeClass('hidden')
-
         if response?.data?.prevalence?.responses?
           create_webrep_prevalence_section(response.data.prevalence.responses, prevalence_table)
+
+        # move enrich and prevalence data to context tags tab
+        context_tab_move_data()
+
 
 $(document).ready( ()->
   setup_enrichment_section()

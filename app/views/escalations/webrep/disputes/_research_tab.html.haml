@@ -1091,13 +1091,9 @@
                                     %td= entry.blacklist.last_seen
 
 
-
-                          -# HIDDEN TABLES FOR ENRICH AND PREV FOR NOW, REMOVE WHEN TMI IS DEV-DONE.
-                          -# HIDDEN TABLES FOR ENRICH AND PREV FOR NOW, REMOVE WHEN TMI IS DEV-DONE.
-                          .hidden.entry-details-table.enrich-details-table{class: "enrich-details-table-#{entry.id}", 'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header Enrichment
-
-                            %table.enrich-webrep-table-data-present
+                          -# tables are built here for the controller, then moved to ct tab with js
+                          .hidden.entry-details-table.enrich-details-table{'data-entry-id': "#{entry.id}"}
+                            %table.enrich-webrep-table-data-present#enrichment-datatable
                               %thead
                                 %tr
                                   %th Context
@@ -1108,14 +1104,8 @@
                               %tbody
                                 %tr
 
-                            -#%table.enrich-webrep-table-data-missing
-                            -#  %tbody
-                            -#    %tr
-                            -#      %td.missing-data No enrichment services data
-
                           .hidden.entry-details-table.prevalence-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header Prevalence
-                            %table.prevalence-webrep-table-data-present
+                            %table.prevalence-webrep-table-data-present#prevalence-datatable
                               %thead
                                 %tr
                                   %th Dataset
@@ -1124,8 +1114,3 @@
                                   %th Last Seen
                               %tbody
                                 %tr
-
-                            -#%table.prevalence-webrep-table-data-missing
-                            -#  %tbody
-                            -#    %tr
-                            -#      %td.missing-data No prevalence data
