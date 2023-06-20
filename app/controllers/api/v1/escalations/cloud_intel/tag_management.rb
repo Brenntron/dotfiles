@@ -5,12 +5,12 @@ module API
         class TagManagement < Grape::API
           include API::V1::Defaults
 
-          resource "escalations/cloud_intel/enrichment_service" do
+          resource "escalations/cloud_intel/tag_management" do
 
             desc "Read tag information"
             params do
               requires :query_item, type: String
-              optional :query_type, type: String
+              requires :query_type, type: String
             end
             get "read_observable" do
               std_api_v2 do
@@ -27,7 +27,15 @@ module API
                 else
                   raise Tmi::TmiError, "Invalid query type: #{query_type}"
                 end
-                { data: results.to_hash }
+                { data: results.to_h }
+              end
+            end
+
+            desc "Return the taxonomy map"
+            get "taxonomy_map" do
+              std_api_v2 do
+                map = ::EnrichmentService::TaxonomyMap.load_condensed_map
+                JSON.parse(map)
               end
             end
           end
