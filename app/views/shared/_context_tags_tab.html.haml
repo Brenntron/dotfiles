@@ -62,7 +62,7 @@
           %span.toolbar-button-text Remove Tag
 
     -# tag management interface datatable
-    %table#tmi-datatable
+    %table#webrep-tmi-dt
       %thead
         %tr
           %th
@@ -112,11 +112,34 @@
           %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
 
 
-    -# BELOW IS WIP HTML, WILL BE CHANGED LATER ON INTO SUBTABS.
     %h2 Enrichment Service
-    .area-for-enrichment
-      %p.loading-message Loading...
+    .webrep-context-enrichment
+      %table.enrich-webrep-table-data#webrep-enrichment-dt
+        %thead
+          %tr
+            %th Context
+            %th Taxonomy
+            %th Name
+            %th Description
+            %th.enrich-webrep-external-ref-header External References
+        %tbody
+          %tr.loader-context-enrichment
+            %td
+              %p.loading-message
+                Loading...
+
 
     %h2 Prevalence
-    .area-for-prevalence
-      %p.loading-message Loading...
+    .webrep-tab-prevalence
+      %table.prevalence-webrep-table-data#webrep-prevalence-dt
+        %thead
+          %tr
+            %th Dataset
+            %th Count
+            %th First Seen
+            %th Last Seen
+        %tbody
+          %tr.loader-context-prevalence
+            %td
+              %p.loading-message
+                Loading...

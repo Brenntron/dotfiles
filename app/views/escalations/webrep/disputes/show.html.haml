@@ -291,11 +291,14 @@
       Duplicate Cases
 
 
+-# tabs content rendered here
 .tab-content.content-wrapper#bug-tab-content
   .tab-pane#communication_tab{role: 'tabpanel'}
     = render 'escalations/webrep/disputes/communication_tab'
+
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/webrep/disputes/research_tab'
+
   .tab-pane#related_tab{role: 'tabpanel'}
     %h1 Duplicate Cases
     .row
@@ -316,5 +319,6 @@
                       %tr
                         %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
                         %td= dispute_dup.case_opened_at.strftime('%F %T')
+
   .tab-pane.tab-context-tags#context_tags_tab{role: 'tabpanel'}
     = render 'shared/context_tags_tab'

@@ -1090,27 +1090,3 @@
                                     %td= entry.blacklist.first_seen
                                     %td= entry.blacklist.last_seen
 
-
-                          -# tables are built here for the controller, then moved to ct tab with js
-                          .hidden.entry-details-table.enrich-details-table{'data-entry-id': "#{entry.id}"}
-                            %table.enrich-webrep-table-data-present#enrichment-datatable
-                              %thead
-                                %tr
-                                  %th Context
-                                  %th Taxonomy
-                                  %th Name
-                                  %th Description
-                                  %th.enrich-webrep-external-ref-header External References
-                              %tbody
-                                %tr
-
-                          .hidden.entry-details-table.prevalence-details-table{'data-entry-id': "#{entry.id}"}
-                            %table.prevalence-webrep-table-data-present#prevalence-datatable
-                              %thead
-                                %tr
-                                  %th Dataset
-                                  %th Count
-                                  %th First Seen
-                                  %th Last Seen
-                              %tbody
-                                %tr
