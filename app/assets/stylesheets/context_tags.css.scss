@@ -1,0 +1,139 @@
+// context tags (tmi) tab for webrep & filerep
+.tab-context-tags {
+  h2 {
+    font-size: 11pt;
+    font-weight: 700;
+    padding: 3px 3px 10px;
+  }
+  .context-tags-table {
+    margin-bottom: 50px;
+    border-bottom: none !important;
+    thead th {
+      border-bottom: solid 1px #f6f6f6;
+      padding: 8px 10px;
+      vertical-align: middle;
+      background-position-y: center !important;  // override dt defaults
+    }
+    tbody td {
+      padding: 8px 10px;
+      line-height: 12pt;
+    }
+    .cb-tmi {
+      margin: 0;
+      position: relative;
+      top: 2px;
+      display: inline-block;
+    }
+  }
+  .tmi-cell-suppressed {
+    font-weight: 600;
+  }
+  .tmi-red-cell {
+    background-color: #f8bbbb;
+  }
+  .tmi-gray-cell {
+    background-color: #f6f6f6;
+  }
+  .enrichment-missing, .enrichment-error,
+  .prevalence-missing, .prevalence-error {
+    font-size: 9pt;
+    padding: 6px 4px 15px;
+  }
+  .data-report-table {
+    font-size: 9pt;
+    line-height: 12pt;
+    margin-top: 10px;
+  }
+  .filerep-prevalence-table-disposition-td {
+    text-transform: capitalize;  // data comes back all lowercase
+  }
+}
+
+// toolbar styles
+.context-tags-toolbar {
+  input {
+    margin: 2px;
+    vertical-align: text-top;
+  }
+  span {
+    float: none;
+  }
+  .toggle-label {
+    padding: 0 3px;
+  }
+  .toolbar-button {
+    margin-right: 3px;
+    padding-left: 22px;
+    background-position-x: 5px;
+  }
+  .toolbar-button-text {
+    margin-left: 0;
+  }
+  .toolbar-button:last-of-type {
+    margin-right: 0;
+  }
+  .context-tags-toggle, .toggle-label {
+    display: inline-block;
+  }
+  .context-tags-toggle {
+    padding: 5px;
+    background-color: #f6f6f6;
+  }
+  .context-tags-toggle:first-of-type {
+    margin-right: -3px;
+  }
+  .show-col-context-tags  {
+    background-image: url(image_path('icon_columns.svg'));
+    background-size: 18px 18px;
+  }
+  .add-context-tag-button {
+    background-image: url(image_path('icon_add_grey.svg'));
+  }
+  .suppress-context-tag-button {
+    background-image: url(image_path('icon_hide.svg'));
+    background-position-y: 3px;
+  }
+  .unsuppress-context-tag-button {
+    background-image: url(image_path('icon_view.svg'));
+  }
+  .remove-context-tag-button {
+    background-image: url(image_path('icon_delete.svg'));
+  }
+}
+
+.dropdown.open .show-col-context-tags {
+  background-image: url(image_path('icon_columns_white.svg'));
+}
+
+// show/hide columns
+.tmi-columns-dropdown {
+  width: 400px;
+  margin: 0;
+  ul {
+    display: inline-block;
+    vertical-align: top;
+    width: 190px;
+    padding: 10px 5px;
+    input[type='checkbox'] {
+      margin-right: 8px;
+    }
+  }
+}
+
+// prevalence table wrapper div needs much less width
+.prevalence-area {
+  width: 50%;
+  min-width: 800px;
+}
+
+// ensure bg color if table width extends off page
+.datatable-tmi, .datatable-enrichment {
+  background-color: #fff;
+}
+
+.tab-context-tags .loading-message {
+  padding: 8px 6px 12px;
+  font-size: 9pt;
+  font-style: italic;
+  color: #999;
+}
