@@ -44,7 +44,6 @@ class JiraImportTask < ApplicationRecord
 
     custom_fields = JiraRest::Project.new(Rails.configuration.jira.project_key).custom_fields
     issue = JiraRest::Issue.new(issue_key)
-
     # fetch data from 'URL(s)' ticket field
     begin
       url_field = issue.issue.fields[custom_fields[:urls]].to_s
@@ -81,7 +80,7 @@ class JiraImportTask < ApplicationRecord
         url_parts = Complaint.parse_url(url)
         import_urls.find_or_create_by(submitted_url: url, domain: url_parts[:domain])
         urls_to_submit << url
-      rescue PublicSuffix::DomainNotAllowed
+      rescue PublicSuffix::DomainNotAllowed, PublicSuffix::DomainInvalid, Addressable::URI::InvalidURIError
         next
       end
     end
