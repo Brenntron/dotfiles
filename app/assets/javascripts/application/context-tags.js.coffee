@@ -378,23 +378,23 @@ window.create_filerep_prevalence_section = (prevalence_data) ->
       for d_key in disposition_keys
         dataset_row = $("<tr></tr>")
 
-        dataset_td = $("<td></td>")
+        dataset_td = $("<td class='filerep-prevalence-table-dataset-td'></td>")
         $(dataset_td).text(key)
         $(dataset_row).append(dataset_td)
 
-        dataset_disposition_td = $("<td></td>")
+        dataset_disposition_td = $("<td class='filerep-prevalence-table-disposition-td'></td>")
         $(dataset_disposition_td).text(d_key)
         $(dataset_row).append(dataset_disposition_td)
 
-        dataset_count_td = $("<td></td>")
+        dataset_count_td = $("<td class='filerep-prevalence-table-count-td'></td>")
         $(dataset_count_td).text(dispositions[d_key].count)
         $(dataset_row).append(dataset_count_td)
 
-        dataset_first_seen_td = $("<td></td>")
+        dataset_first_seen_td = $("<td class='filerep-prevalence-table-first-td'></td>")
         $(dataset_first_seen_td).text(dispositions[d_key].first_seen)
         $(dataset_row).append(dataset_first_seen_td)
 
-        dataset_last_seen_td = $("<td></td>")
+        dataset_last_seen_td = $("<td class='filerep-prevalence-table-last-td'></td>")
         $(dataset_last_seen_td).text(dispositions[d_key].last_seen)
         $(dataset_row).append(dataset_last_seen_td)
 
@@ -421,8 +421,8 @@ window.group_by_tag_filerep = (array, key) ->
 
 
 
-# FINAL ACTIONS, DT INITS
-# FINAL ACTIONS, DT INITS
+# CONTEXT TAGS - final actions and housekeeping can go below
+# CONTEXT TAGS - final actions and housekeeping can go below
 $ ->
   $('#tmi-dt').DataTable
     paging: false

@@ -44,6 +44,9 @@
     line-height: 12pt;
     margin-top: 10px;
   }
+  .filerep-prevalence-table-disposition-td {
+    text-transform: capitalize;  // data comes back all lowercase
+  }
 }
 
 // toolbar styles
