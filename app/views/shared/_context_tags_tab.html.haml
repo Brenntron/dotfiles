@@ -61,7 +61,7 @@
         %button.toolbar-button.remove-context-tag-button
           %span.toolbar-button-text Remove Tag
 
-    -# tag management interface datatable (used on both webrep and filerep)
+    -# tag management interface datatable used on both webrep and filerep
     %table.context-tags-table#tmi-dt
       %thead
         %tr
@@ -112,13 +112,15 @@
           %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
 
 
-    -# enrich and prevalence areas below are dynamically used by webrep and filerep
+    -# enrich and prevalence areas below are used by webrep and filerep context tags tab
     %h2 Enrichment Service
     .enrichment-area
       %p.enrichment-loader.loading-message
         Loading...
       %p.enrichment-missing.missing-data.hidden
         No enrichment data found.
+      %p.enrichment-error.missing-data.hidden
+        Error gathering enrichment data.
 
       %table#enrichment-webrep-dt.enrich-webrep-table.context-tags-table.hidden
         %thead
@@ -136,9 +138,8 @@
         Loading...
       %p.prevalence-missing.missing-data.hidden
         No prevalence data found.
-
-      -# REMOVE BELOW
-      -#%table.context-tags-table.prevalence-webrep-table-data.prevalence-filerep-table-data#prevalence-dt
+      %p.prevalence-error.missing-data.hidden
+        Error gathering prevalence data.
 
       %table#prevalence-webrep-dt.prevalence-webrep-table.context-tags-table.hidden
         %thead

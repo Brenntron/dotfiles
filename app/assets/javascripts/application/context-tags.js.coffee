@@ -12,7 +12,7 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
       return response
     error: (response) ->
       std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
-      $('.enrichment-area').html('Error with enrichment service.')
+      $('.enrichment-area .enrichment-error').removeClass('hidden')
     complete: (response) ->
       # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
       # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
@@ -136,7 +136,7 @@ window.create_webrep_enrichment_section = (tags, context) ->
 
 
 $ ->
-  # start the enrich table
+  # start the enrich table build
   setup_enrichment_section_webrep()
 
 
@@ -252,8 +252,8 @@ window.create_filerep_enrich_section = (tags, context) ->
     $(section_wrapper).append taxonomy_header
     #create table wrapper
     table_wrapper = $("<table class='filerep-enrich-taxonomy-table data-report-table'></table>")
-    #loop through each tag in group
 
+    #loop through each tag in group
     $(tag_group).each (index, tag) ->
       name = ''
       description = ''
@@ -442,20 +442,25 @@ window.enrichment_prevalence_actions = () ->
   $('.enrichment-loader, .prevalence-loader').remove()  # remove loaders
 
   # refactor below into dry code when tmi is near-final
-  if $('.tab-context-tags .enrichment-area table:not(.hidden)').length == 0
-    $('.tab-context-tags .enrichment-missing').removeClass('hidden')
+  if $('.enrichment-area table:not(.hidden) tbody td').length == 0
+    $('.enrichment-missing').removeClass('hidden')
+    $('.enrichment-webrep-table').addClass('hidden')
 
-  # init the webrep dts
-  $('#enrichment-webrep-dt').DataTable
-    paging: false
-    searching: false
-    info: false
+  # init the webrep enrich dt
+  else
+    $('#enrichment-webrep-dt').DataTable
+      paging: false
+      searching: false
+      info: false
 
-  if $('.tab-context-tags .prevalence-area table:not(.hidden)').length == 0
-    $('.tab-context-tags .prevalence-missing').removeClass('hidden')
+  # refactor below into dry code when tmi is near-final
+  if $('.prevalence-area table:not(.hidden) tbody td').length == 0
+    $('.prevalence-missing').removeClass('hidden')
+    $('.prevalence-webrep-table').addClass('hidden')
 
-  $('#prevalence-webrep-dt').DataTable
-    paging: false
-    searching: false
-    info: false
+  else
+    $('#prevalence-webrep-dt').DataTable
+      paging: false
+      searching: false
+      info: false
 
