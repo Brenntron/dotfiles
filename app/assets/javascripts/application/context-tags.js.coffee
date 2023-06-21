@@ -14,6 +14,7 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
       std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
       $('.enrichment-area .enrichment-error').removeClass('hidden')
     complete: (response) ->
+      $('.enrichment-loader').addClass('hidden')
       # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
       # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
       console.clear()
