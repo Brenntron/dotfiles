@@ -5,7 +5,7 @@
     font-weight: 700;
     padding: 3px 3px 10px;
   }
-  table {
+  .context-tags-table {
     margin-bottom: 50px;
     border-bottom: none !important;
     thead th {
@@ -14,9 +14,9 @@
       vertical-align: middle;
       background-position-y: center !important;  // override dt defaults
     }
-    td {
+    tbody td {
+      padding: 8px 10px;
       line-height: 12pt;
-      min-height: 30px;
     }
     .cb-tmi {
       margin: 0;
@@ -33,6 +33,15 @@
   }
   .tmi-gray-cell {
     background-color: #f6f6f6;
+  }
+  .enrichment-missing, .prevalence-missing {
+    font-size: 9pt;
+    padding: 6px 4px 15px;
+  }
+  .data-report-table {
+    font-size: 9pt;
+    line-height: 12pt;
+    margin-top: 10px;
   }
 }
 
@@ -108,7 +117,7 @@
 }
 
 // prevalence table wrapper div needs less width, must use id
-#prevalence_wrapper_datatable {
+.prevalence-area {
   width: 50%;
   min-width: 800px;
 }

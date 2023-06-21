@@ -1,4 +1,5 @@
 # WEBREP ENRICHMENT
+# WEBREP ENRICHMENT
 
 # part 1 of enrichment
 window.get_enrichment_service_webrep = (query_item, query_type) ->
@@ -11,23 +12,21 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
       return response
     error: (response) ->
       std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
-      $('.webrep-context-enrichment').html('<p>Error gathering enrichment data</p>')
-    # remove below console logging when tmi is done.
+      $('.enrichment-area').html('Error with enrichment service.')
     complete: (response) ->
+      # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
+      # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
+      console.clear()
       console.log 'response for enrichment:'
       console.log response
 
 
 # part 2 of enrichment
 window.setup_enrichment_section_webrep = () ->
-# research table row is a parent row on show page
-# handle multiple entries per case id, below will only handle one right now. future ticket will fix this.
+  # research table row is a parent row on show page
+  # handle multiple entries per case id, below will only handle one right now. future ticket will fix this.
   $('.research-table-row').each ->
-    create_index = 0 #track if first entry in table
     ip_uri = $(this).find('.entry-data-content').text().trim()
-
-    enrichment_table = $('.tab-context-tags .enrich-webrep-table-data tbody')  # target the ct tab, not research tab anymore
-    prevalence_table = $('.tab-context-tags .prevalence-webrep-table-data tbody')
 
     # enrichment services uses a separate api call - needs to be handled w/ a js promise (2-3 sec lag)
     enrich_promise = new Promise (resolve, reject) ->
@@ -45,31 +44,31 @@ window.setup_enrichment_section_webrep = () ->
       if response?.data?.web_context_tags.length > 0 then web_context_tags = response.data.web_context_tags
       if response?.data?.context_tags.length > 0 then enrichment_context_tags = response.data.context_tags
 
-      # add-to-dom is done within the create function for each
+      # create functions below do the add-to-dom
       if email_context_tags.length > 0 || web_context_tags.length > 0 || enrichment_context_tags.length > 0
         if email_context_tags.length > 0
-          create_index++
-          create_webrep_enrichment_section(email_context_tags, 'Email', enrichment_table, create_index)
+          create_webrep_enrichment_section(email_context_tags, 'Email')
 
         if web_context_tags.length > 0
-          create_index++
-          create_webrep_enrichment_section(web_context_tags, 'Web', enrichment_table, create_index)
+          create_webrep_enrichment_section(web_context_tags, 'Web')
 
         #need to pass the tags, context, enrich_toolbar_cell and table to function
         if enrichment_context_tags.length > 0
-          create_index++
-          create_webrep_enrichment_section(enrichment_context_tags, 'Enrichment', enrichment_table, create_index)
+          create_webrep_enrichment_section(enrichment_context_tags, 'Enrichment')
 
-      # prevalence section built here (prev data comes bundled with enrich data)
+      # prevalence data comes bundled with enrich data, may as well pass it from on here
       if response?.data?.prevalence?.responses?
-        create_webrep_prevalence_section(response.data.prevalence.responses, prevalence_table)
+        create_webrep_prevalence_section(response.data.prevalence.responses)
 
       # init the dts on ct tab now
-      webrep_context_dts_init()
+      enrichment_prevalence_actions()
 
 
 # part 3 of enrichment
-window.create_webrep_enrichment_section = (tags, context, enrichment_table, create_index) ->
+window.create_webrep_enrichment_section = (tags, context) ->
+  enrich_tbody = $('.tab-context-tags .enrich-webrep-table tbody')
+  $('.tab-context-tags .enrich-webrep-table').removeClass('hidden')
+
   $(tags).each (index, tag) ->
     name = ''
     description = ''
@@ -87,23 +86,23 @@ window.create_webrep_enrichment_section = (tags, context, enrichment_table, crea
           combined_external_refs = combined_external_refs.concat external_ref
 
     #create new table row
-    wrapper = $("<tr></tr>")
-    context_wrapper = $("<td class='enrich-cell-context'>#{context}</td>")
-    taxonomy_wrapper = $("<td class='enrich-cell-taxonomy'></td>")
-    $(taxonomy_wrapper).text(taxonomy)
+    curr_row = $("<tr></tr>")
+    context_cell = $("<td class='enrich-cell-context'>#{context}</td>")
+    taxonomy_cell = $("<td class='enrich-cell-taxonomy'></td>")
+    $(taxonomy_cell).text(taxonomy)
 
-    name_wrapper = $("<td class='enrich-cell-name'></td>")
-    $(name_wrapper).text(name)
+    name_cell = $("<td class='enrich-cell-name'></td>")
+    $(name_cell).text(name)
 
-    description_wrapper = $("<td class='enrich-cell-description'></td>")
-    $(description_wrapper).text(description)
+    description_cell = $("<td class='enrich-cell-description'></td>")
+    $(description_cell).text(description)
 
-    external_ref_wrapper = $("<td class='enrich-cell-external-references'></td>")
+    external_ref_cell = $("<td class='enrich-cell-external-references'></td>")
 
     #if any external references are returned show column and append data
     if combined_external_refs.length > 0
       $(combined_external_refs).each (index, external_ref) ->
-        individual_wrapper = $("<span class='enrich-external-ref' id='enrich-external-ref-#{index}'></span>")
+        individual_span = $("<span class='enrich-external-ref' id='enrich-external-ref-#{index}'></span>")
         link_wrapper = ''
         source = ''
         url = ''
@@ -114,26 +113,27 @@ window.create_webrep_enrichment_section = (tags, context, enrichment_table, crea
         if external_ref.external_id? then external_id = external_ref.external_id
 
         if source != '' && url != ''
-          link_wrapper = $("<a href=#{url} class='enrich-external-reference-link' target='blank'></a>")
+          link_tag = $("<a href=#{url} class='enrich-external-reference-link' target='blank'></a>")
 
           #use ID as link text if that is available
           if external_id != ''
-            $(link_wrapper).text(external_id)
+            $(link_tag).text(external_id)
           else
-            $(link_wrapper).text(source)
+            $(link_tag).text(source)
 
-        $(individual_wrapper).append(link_wrapper)
-        $(external_ref_wrapper).append(individual_wrapper)
+        $(individual_span).append(link_tag)
+        $(external_ref_cell).append(individual_span)
 
     #Create new row in Enrichment table
-    $(wrapper).append(context_wrapper)
-    $(wrapper).append(taxonomy_wrapper)
-    $(wrapper).append(name_wrapper)
-    $(wrapper).append(description_wrapper)
-    $(wrapper).append(external_ref_wrapper)
+    $(curr_row).append(context_cell)
+    $(curr_row).append(taxonomy_cell)
+    $(curr_row).append(name_cell)
+    $(curr_row).append(description_cell)
+    $(curr_row).append(external_ref_cell)
 
-    # add to dom
-    $(enrichment_table).append(wrapper)
+    # append a table row
+    $(enrich_tbody).append(curr_row)  # add to dom
+
 
 $ ->
   # start the enrich table
@@ -141,11 +141,14 @@ $ ->
 
 
 
-
 # WEBREP PREVALENCE
+# WEBREP PREVALENCE
+window.create_webrep_prevalence_section = (prevalence_data) ->
+  prevalence_tbody = $('.tab-context-tags .prevalence-webrep-table tbody')
+  $('.tab-context-tags .prevalence-webrep-table').removeClass('hidden')
 
-window.create_webrep_prevalence_section = (prevalence_data, table) ->
   response_key = Object.keys(prevalence_data)[0]
+
   data = prevalence_data[response_key]
   if data.count != 0
     total_row = $("<tr></tr>")
@@ -163,9 +166,10 @@ window.create_webrep_prevalence_section = (prevalence_data, table) ->
     $(total_last_seen).text(data.last_seen)
     $(total_row).append(total_last_seen)
 
-    $(table).append(total_row)
+    $(prevalence_tbody).append(total_row)
 
     dataset_keys = Object.keys(data.datasets)
+
     for key in dataset_keys
       new_row = $("<tr></tr>")
 
@@ -185,50 +189,13 @@ window.create_webrep_prevalence_section = (prevalence_data, table) ->
       $(last_seen).text(data.datasets[key].last_seen)
       $(new_row).append(last_seen)
 
-      $(table).append(new_row)
-
-
-
-
-# WEBREP MISC
-
-$ ->
-  $('#webrep-tmi-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-    order: [[ 1, 'asc']]
-    columnDefs: [
-      {
-        targets: [ 0 ]
-        orderable: false
-        sortable: false
-      }
-    ]
-
-# init these dts, keep in sep function for when promise resolves elsewhere (api call is delayed).
-window.webrep_context_dts_init = () ->
-  $('.loader-context-enrichment').remove()  # remove loader first before dt init
-
-  $('#webrep-enrichment-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-
-  $('.loader-context-prevalence').remove()
-
-  $('#webrep-prevalence-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-
-
+      $(prevalence_tbody).append(new_row)
 
 
 
 
 # FILEREP ENHANCEMENT
-
+# FILEREP ENHANCEMENT
 # part 1
 window.get_enrichment_service_filerep = (sha256_hash) ->
   std_msg_ajax(
@@ -237,9 +204,6 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
     url: '/escalations/api/v1/escalations/cloud_intel/enrichment_service/query/'
     success_reload: false
     success: (response) ->
-      $('#enrich-loader').hide()
-      $('#prevalence-loader').hide()
-
       email_context_tags = []
       web_context_tags = []
       enrichment_context_tags = []
@@ -250,31 +214,16 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
 
       #check if any data returned and show section
       if email_context_tags.length > 0 || web_context_tags.length > 0 || enrichment_context_tags.length > 0
-        $('.enrich-filerep-data-present').show()
-
-        ## Enrichment Section - Email Section
-        if email_context_tags.length > 0
-          create_filerep_enrich_section(email_context_tags, 'Email')
-
-        ## Enrichment Section - Web Section
-        if web_context_tags.length > 0
-          create_filerep_enrich_section(web_context_tags, 'Web')
-
-        ## Enrichment Section - Enrichment (Other) Section
-        if enrichment_context_tags.length > 0
-          create_filerep_enrich_section(enrichment_context_tags, 'Enrichment')
-
-#show empty message if no tags returned
-      else
-        $('.enrich-filerep-data-missing').show()
+        if email_context_tags.length > 0 then create_filerep_enrich_section(email_context_tags, 'Email')
+        if web_context_tags.length > 0 then create_filerep_enrich_section(web_context_tags, 'Web')
+        if enrichment_context_tags.length > 0 then create_filerep_enrich_section(enrichment_context_tags, 'Enrichment')
 
       if response?.data?.prevalence?
         create_filerep_prevalence_section(response.data.prevalence.responses)
-      else
-        $('.prevalence-filerep-data-missing').show()
 
     error: (response) ->
       std_msg_error('Error with Enrichment Service', ['There was an error.'])
+      $('.enrichment-area').html('Error with enrichment service.')
   )
 
 # part 2
@@ -367,17 +316,19 @@ window.create_filerep_enrich_section = (tags, context) ->
             else
               $(link_wrapper).text(source)
 
-          $(individual_wrapper).append link_wrapper
-          $(external_ref_wrapper).append individual_wrapper
+          $(individual_wrapper).append(link_wrapper)
+          $(external_ref_wrapper).append(individual_wrapper)
 
-      $(table_wrapper).append row_wrapper
+      $(table_wrapper).append(row_wrapper)
 
-    $(section_wrapper).append table_wrapper
+    $(section_wrapper).append(table_wrapper)
 
-    # add to dom
-    $('.enrich-filerep-data-present').append section_wrapper
+    $('.tab-context-tags .enrich-filerep-table-data').append(section_wrapper)
 
-# part 3
+
+
+# FILEREP PREVALENCE
+# FILEREP PREVALENCE
 window.create_filerep_prevalence_section = (prevalence_data) ->
   response_key = Object.keys(prevalence_data)[0]
   data = prevalence_data[response_key]
@@ -407,7 +358,8 @@ window.create_filerep_prevalence_section = (prevalence_data) ->
     $(table_body).append(total_row)
     $(table_wrapper).append(table_body)
     $(total_section_wrapper).append(table_wrapper)
-    $('.prevalence-filerep-data-present').append(total_section_wrapper)
+
+    $('.prevalence-area').append(total_section_wrapper)
 
     dataset_section_wrapper = $("<div class='enrich-filerep-section-wrapper'></div>")
     dataset_section_header = "<h4 class='enrich-filerep-section-header data-report-label'>Datasets</h4>"
@@ -450,8 +402,11 @@ window.create_filerep_prevalence_section = (prevalence_data) ->
 
     $(dataset_table_wrapper).append(dataset_table_body)
     $(dataset_section_wrapper).append(dataset_table_wrapper)
-    $('.prevalence-filerep-data-present').append(dataset_section_wrapper)
 
+    $('.prevalence-area').append(dataset_section_wrapper)  # add to dom
+
+    # init the enrich and prev tables now that both exist
+    enrichment_prevalence_actions()
 
 
 # group taxonomies by id for enrichment section on filerep
@@ -466,29 +421,41 @@ window.group_by_tag_filerep = (array, key) ->
 
 
 
-# FILEREP MISC
+# FINAL ACTIONS, DT INITS
+# FINAL ACTIONS, DT INITS
+$ ->
+  $('#tmi-dt').DataTable
+    paging: false
+    searching: false
+    info: false
+    order: [[ 1, 'asc']]
+    columnDefs: [
+      {
+        targets: [ 0 ]
+        orderable: false
+        sortable: false
+      }
+    ]
 
-#$ ->
-#  $('#filerep-tmi-dt').DataTable
-#    paging: false
-#    searching: false
-#    info: false
-#    order: [[ 1, 'asc']]
-#    columnDefs: [
-#      {
-#        targets: [ 0 ]
-#        orderable: false
-#        sortable: false
-#      }
-#    ]
-#
-#  $('#filerep-enrichment-dt').DataTable
-#    paging: false
-#    searching: false
-#    info: false
-#
-#  $('#filerep-prevalence-dt').DataTable
-#    paging: false
-#    searching: false
-#    info: false
-#
+# init these dts, keep in sep function for when promise resolves elsewhere (api call is delayed).
+window.enrichment_prevalence_actions = () ->
+  $('.enrichment-loader, .prevalence-loader').remove()  # remove loaders
+
+  # refactor below into dry code when tmi is near-final
+  if $('.tab-context-tags .enrichment-area table:not(.hidden)').length == 0
+    $('.tab-context-tags .enrichment-missing').removeClass('hidden')
+
+  # init the webrep dts
+  $('#enrichment-webrep-dt').DataTable
+    paging: false
+    searching: false
+    info: false
+
+  if $('.tab-context-tags .prevalence-area table:not(.hidden)').length == 0
+    $('.tab-context-tags .prevalence-missing').removeClass('hidden')
+
+  $('#prevalence-webrep-dt').DataTable
+    paging: false
+    searching: false
+    info: false
+

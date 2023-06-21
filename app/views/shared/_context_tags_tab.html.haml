@@ -20,7 +20,7 @@
               %li.toggle-vis
                 %input{type: 'checkbox', checked: true} Tag Name
               %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Mneumonic
+                %input{type: 'checkbox', checked: true} Mnemonic
               %li.toggle-vis
                 %input{type: 'checkbox', checked: true} Tag Type
               %li.toggle-vis
@@ -61,15 +61,15 @@
         %button.toolbar-button.remove-context-tag-button
           %span.toolbar-button-text Remove Tag
 
-    -# tag management interface datatable
-    %table#webrep-tmi-dt
+    -# tag management interface datatable (used on both webrep and filerep)
+    %table.context-tags-table#tmi-dt
       %thead
         %tr
           %th
             %input.cb-tmi-select-all{type:'checkbox'}
           %th Observable
           %th Tag Name
-          %th Mneumonic
+          %th Mnemonic
           %th Tag Type
           %th Taxonomy
           %th Source
@@ -85,7 +85,7 @@
             %input.cb-tmi{type:'checkbox'}
           %td.tmi-cell-observable example.com
           %td.tmi-cell-tag-name Internet Accessible Device
-          %td.tmi-cell-mneumonic Testing
+          %td.tmi-cell-mnemonic Testing
           %td.tmi-cell-tag-type Techniques
           %td.tmi-cell-taxonomy MITRE ATT&CK
           %td.tmi-cell-source test_name
@@ -100,7 +100,7 @@
             %input.cb-tmi{type:'checkbox'}
           %td.tmi-cell-observable example.com
           %td.tmi-cell-tag-name Questionable
-          %td.tmi-cell-mneumonic Example
+          %td.tmi-cell-mnemonic Example
           %td.tmi-cell-tag-type Techniques
           %td.tmi-cell-taxonomy MITRE ATT&CK
           %td.tmi-cell-source test_name
@@ -112,34 +112,38 @@
           %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
 
 
+    -# enrich and prevalence areas below are dynamically used by webrep and filerep
     %h2 Enrichment Service
-    .webrep-context-enrichment
-      %table.enrich-webrep-table-data#webrep-enrichment-dt
+    .enrichment-area
+      %p.enrichment-loader.loading-message
+        Loading...
+      %p.enrichment-missing.missing-data.hidden
+        No enrichment data found.
+
+      %table#enrichment-webrep-dt.enrich-webrep-table.context-tags-table.hidden
         %thead
-          %tr
-            %th Context
-            %th Taxonomy
-            %th Name
-            %th Description
-            %th.enrich-webrep-external-ref-header External References
+          %th Context
+          %th Taxonomy
+          %th Name
+          %th Description
+          %th External References
         %tbody
-          %tr.loader-context-enrichment
-            %td
-              %p.loading-message
-                Loading...
 
 
     %h2 Prevalence
-    .webrep-tab-prevalence
-      %table.prevalence-webrep-table-data#webrep-prevalence-dt
+    .prevalence-area
+      %p.prevalence-loader.loading-message
+        Loading...
+      %p.prevalence-missing.missing-data.hidden
+        No prevalence data found.
+
+      -# REMOVE BELOW
+      -#%table.context-tags-table.prevalence-webrep-table-data.prevalence-filerep-table-data#prevalence-dt
+
+      %table#prevalence-webrep-dt.prevalence-webrep-table.context-tags-table.hidden
         %thead
-          %tr
-            %th Dataset
-            %th Count
-            %th First Seen
-            %th Last Seen
+          %th Dataset
+          %th Count
+          %th First Seen
+          %th Last Seen
         %tbody
-          %tr.loader-context-prevalence
-            %td
-              %p.loading-message
-                Loading...
