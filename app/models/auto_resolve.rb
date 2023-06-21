@@ -492,7 +492,11 @@ class AutoResolve
         end
         dispute_entry.status = DisputeEntry::STATUS_RESOLVED
         dispute_entry.resolution = DisputeEntry::STATUS_AUTO_RESOLVED_FN
-        dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+        if dispute_entry.dispute.submitter_type == "NON-CUSTOMER"
+          dispute_entry.resolution_comment = generate_dynamic_fn_message(dispute_entry.hostlookup, false)
+        else
+          dispute_entry.resolution_comment = generate_dynamic_fn_message(dispute_entry.hostlookup, true)
+        end
         dispute_entry.auto_resolve_category = result[:resolve_category]
         dispute_entry.case_closed_at = resolved_at
         dispute_entry.case_resolved_at = resolved_at
@@ -511,6 +515,57 @@ class AutoResolve
     dispute_entry.save
 
     dispute_entry
+  end
+
+  def self.generate_generic_non_blocking_message(hostlookup, raw_score, is_customer = false)
+
+    threat_level = DisputeEntry.verdict_from_score(raw_score)
+
+    threat_level_comment = ""
+
+    case threat_level.downcase
+
+    when 'questionable'
+      threat_level_comment = "A Questionable Threat Level means that Talos has negative threat intelligence on a site, but it is low confidence. This information is not sufficient to warrant a block by itself, but it may indicate a risk or could be undesirable."
+    when 'neutral'
+      threat_level_comment = "A Neutral Threat Level means that Talos has no positive or negative threat intelligence on a site, but it has been evaluated."
+    when 'favorable'
+      threat_level_comment = "A Favorable Threat Level means that Talos has positive threat intelligence on a site, and this indicates a level of safety."
+    when 'trusted'
+      threat_level_comment = "A Trusted Threat Level means that Talos has high confidence positive threat intelligence on a site, and this indicates exceptional safety."
+    end
+
+    defanged_hostlookup = hostlookup.gsub(".", "[.]")
+
+    message = "Thank you for your submission! Your dispute was resolved automatically because #{defanged_hostlookup} currently has a #{threat_level} Threat Level and is not globally blocked on Cisco devices. #{threat_level_comment} Talos does NOT recommend that our customers block sites with a #{threat_level} Threat Level– customers who choose to block #{threat_level} sites should be prepared to locally allow-list sites frequently. "
+    if is_customer == true
+      message += "If you need further assistance with this dispute, please open a TAC case."
+    end
+
+    message
+  end
+
+  def self.generate_generic_blocking_message(hostlookup, is_customer = false)
+    defanged_hostlookup = hostlookup.gsub(".", "[.]")
+
+    message = "Thank you for your submission! Your dispute was resolved automatically because #{defanged_hostlookup} has an Untrusted Threat Level and is globally blocked on Cisco devices. An Untrusted Threat Level is applied when Talos has negative threat intelligence on a site and that information is sufficient to warrant a block; having an Untrusted Threat Level indicates the site is exceptionally bad, malicious, or undesirable"
+    if is_customer == true
+      message += "If you need further assistance with this dispute, please open a TAC case."
+    end
+    message
+  end
+
+  def self.generate_dynamic_fn_message(hostlookup, is_customer = false)
+    #OLD MESSAGE
+    # "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+    defanged_hostlookup = hostlookup.gsub(".", "[.]")
+
+    message = "Thank you for your submission! Your submission triggered a dynamic reassessment of #{defanged_hostlookup}. Sufficient negative threat intelligence exists to warrant an Untrusted Threat Level for #{defanged_hostlookup}. This change will be reflected on Cisco Secure devices within 24 hours."
+    if is_customer == true
+      message += "If you need further assistance with this dispute, please open a TAC case."
+    end
+    message
+
   end
 
   def self.number_of_virustotal_trusted_hits(hits)
