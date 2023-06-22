@@ -4,7 +4,7 @@
     %h1 Context Tags
     %h2 Tag Management Interface
 
-    .toolbar.context-tags-toolbar
+    .toolbar.tmi-toolbar
       %div
         %label.toolbar-section-label
           Show
@@ -15,31 +15,31 @@
 
           .dropdown-menu.toolbar-dropdown.tmi-columns-dropdown{'aria-labelledby': 'tmi-columns-button'}
             %ul
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Observable
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Tag Name
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Mnemonic
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Tag Type
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Taxonomy
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Source
+              %li.toggle-col-tmi{'data-column':'1'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-observable-checkbox'} Observable
+              %li.toggle-col-tmi{'data-column':'2'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-tag-name-checkbox'} Tag Name
+              %li.toggle-col-tmi{'data-column':'3'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-mnemonic-checkbox'} Mnemonic
+              %li.toggle-col-tmi{'data-column':'4'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-tag-type-checkbox'} Tag Type
+              %li.toggle-col-tmi{'data-column':'5'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-taxonomy-checkbox'} Taxonomy
+              %li.toggle-col-tmi{'data-column':'6'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-source-checkbox'} Source
             %ul
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Processor
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Creation Date
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Suppressed?
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Suppression Source
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Suppression Platform
-              %li.toggle-vis
-                %input{type: 'checkbox', checked: true} Suppression Date
+              %li.toggle-col-tmi{'data-column':'7'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-processor-checkbox'} Processor
+              %li.toggle-col-tmi{'data-column':'8'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-creation-date-checkbox'} Creation Date
+              %li.toggle-col-tmi{'data-column':'9'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-suppressed-checkbox'} Suppressed?
+              %li.toggle-col-tmi{'data-column':'10'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-suppression-source-checkbox'} Suppression Source
+              %li.toggle-col-tmi{'data-column':'11'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-suppression-platform-checkbox'} Suppression Platform
+              %li.toggle-col-tmi{'data-column':'12'}
+                %input{type: 'checkbox', checked: true, id: 'tmi-suppression-date-checkbox'} Suppression Date
 
       %div
         %label.toolbar-section-label View
@@ -95,6 +95,66 @@
           %td.tmi-cell-suppression-source.tmi-gray-cell
           %td.tmi-cell-suppression-platform.tmi-gray-cell
           %td.tmi-cell-suppression-date.tmi-gray-cell
+        %tr
+          %td.tmi-cell-cb
+            %input.cb-tmi{type:'checkbox'}
+          %td.tmi-cell-observable example.com
+          %td.tmi-cell-tag-name Questionable
+          %td.tmi-cell-mnemonic Example
+          %td.tmi-cell-tag-type Techniques
+          %td.tmi-cell-taxonomy MITRE ATT&CK
+          %td.tmi-cell-source test_name
+          %td.tmi-cell-processor Example
+          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
+          %td.tmi-cell-suppressed YES
+          %td.tmi-cell-suppression-source Example
+          %td.tmi-cell-suppression-platform Example
+          %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
+        %tr
+          %td.tmi-cell-cb
+            %input.cb-tmi{type:'checkbox'}
+          %td.tmi-cell-observable example.com
+          %td.tmi-cell-tag-name Questionable
+          %td.tmi-cell-mnemonic Example
+          %td.tmi-cell-tag-type Techniques
+          %td.tmi-cell-taxonomy MITRE ATT&CK
+          %td.tmi-cell-source test_name
+          %td.tmi-cell-processor Example
+          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
+          %td.tmi-cell-suppressed YES
+          %td.tmi-cell-suppression-source Example
+          %td.tmi-cell-suppression-platform Example
+          %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
+        %tr
+          %td.tmi-cell-cb
+            %input.cb-tmi{type:'checkbox'}
+          %td.tmi-cell-observable example.com
+          %td.tmi-cell-tag-name Questionable
+          %td.tmi-cell-mnemonic Example
+          %td.tmi-cell-tag-type Techniques
+          %td.tmi-cell-taxonomy MITRE ATT&CK
+          %td.tmi-cell-source test_name
+          %td.tmi-cell-processor Example
+          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
+          %td.tmi-cell-suppressed YES
+          %td.tmi-cell-suppression-source Example
+          %td.tmi-cell-suppression-platform Example
+          %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
+        %tr
+          %td.tmi-cell-cb
+            %input.cb-tmi{type:'checkbox'}
+          %td.tmi-cell-observable example.com
+          %td.tmi-cell-tag-name Questionable
+          %td.tmi-cell-mnemonic Example
+          %td.tmi-cell-tag-type Techniques
+          %td.tmi-cell-taxonomy MITRE ATT&CK
+          %td.tmi-cell-source test_name
+          %td.tmi-cell-processor Example
+          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
+          %td.tmi-cell-suppressed YES
+          %td.tmi-cell-suppression-source Example
+          %td.tmi-cell-suppression-platform Example
+          %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
         %tr
           %td.tmi-cell-cb
             %input.cb-tmi{type:'checkbox'}

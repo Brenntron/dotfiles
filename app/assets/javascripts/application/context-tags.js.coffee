@@ -12,7 +12,8 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
       return response
     error: (response) ->
       std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
-      $('.enrichment-area .enrichment-error').removeClass('hidden')
+      $('.enrichment-error, .prevalence-error').removeClass('hidden')
+      $('.enrichment-loader, .prevalence-loader').addClass('hidden')
     complete: (response) ->
       $('.enrichment-loader').addClass('hidden')
       # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
@@ -224,7 +225,14 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
 
     error: (response) ->
       std_msg_error('Error with Enrichment Service', ['There was an error.'])
-      $('.enrichment-area').html('Error with enrichment service.')
+      $('.enrichment-area .enrichment-error').removeClass('hidden')
+    complete: () ->
+      $('.enrichment-loader').addClass('hidden')
+      # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
+      # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
+      console.clear()
+      console.log 'response for enrichment:'
+      console.log response
   )
 
 # part 2
@@ -425,7 +433,7 @@ window.group_by_tag_filerep = (array, key) ->
 # CONTEXT TAGS - final actions and housekeeping can go below
 # CONTEXT TAGS - final actions and housekeeping can go below
 $ ->
-  $('#tmi-dt').DataTable
+  tmi_table = $('#tmi-dt').DataTable
     paging: false
     searching: false
     info: false
@@ -437,6 +445,27 @@ $ ->
         sortable: false
       }
     ]
+
+
+  # show or hide columns in tmi table
+  $('.toggle-col-tmi').each ->
+    checkbox = $(this).find('input')
+    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
+
+    if $(checkbox).prop('checked') then column.visible(true)
+    else column.visible(false)
+
+    # click anywhere in the li to toggle
+    $(this).click ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+      column.visible(!column.visible())
+
+    # or click the cb specifically to toggle
+    $(checkbox).click ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+
+
+
 
 # init these dts, keep in sep function for when promise resolves elsewhere (api call is delayed).
 window.enrichment_prevalence_actions = () ->

@@ -50,7 +50,7 @@
 }
 
 // toolbar styles
-.context-tags-toolbar {
+.tmi-toolbar {
   input {
     margin: 2px;
     vertical-align: text-top;
@@ -99,7 +99,11 @@
   .remove-context-tag-button {
     background-image: url(image_path('icon_delete.svg'));
   }
+  .toggle-col-tmi {
+    cursor: default;
+  }
 }
+
 
 .dropdown.open .show-col-context-tags {
   background-image: url(image_path('icon_columns_white.svg'));
