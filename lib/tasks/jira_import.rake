@@ -9,6 +9,8 @@ namespace :jira do
     platform_field_id = project.custom_fields[:platform]
     issues = project.issues(filters)
     issues.each do |issue|
+      next if issue.fields.dig(platform_field_id, 'value') == "OpenDNS"
+
       import_task = JiraImportTask.find_by(issue_key: issue.key)
 
       if import_task.present?
