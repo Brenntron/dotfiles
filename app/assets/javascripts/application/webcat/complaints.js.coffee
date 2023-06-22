@@ -390,10 +390,9 @@ window.close_related_issues = () ->
       success: (response) ->
         std_msg_success('Successfully closed related tickets',[], reload: false)
         $('.toolbar-button.close-ticket-button').attr('disabled', true)
+        $('#webcat-imports-index').DataTable().ajax.reload()
       error: (response) ->
         std_api_error(response, 'Error closing related issues.', reload: false)
-      complete: (response) ->
-        $('#webcat-imports-index').DataTable().ajax.reload()
   else
     std_api_error(response, 'Select at least one unresolved issue.', reload: false)
 
