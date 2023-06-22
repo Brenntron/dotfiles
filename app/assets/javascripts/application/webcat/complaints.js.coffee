@@ -366,8 +366,11 @@ window.retry_imports = (id)->
 
 window.run_imports = () ->
   std_msg_ajax(
-    method: 'put'
+    method: 'get'
     url: '/escalations/api/v1/escalations/jira_import_tasks/queue_imports'
+    success: (response) ->
+      std_msg_success('Success',["Import successful"], reload: false)
+      $('#webcat-imports-index').DataTable().ajax.reload()
     error: (response) ->
       std_api_error(response, 'Error running manual import.', reload: false)
   )
