@@ -3,6 +3,7 @@ require 'rake'
 namespace :jira do
   desc 'Import issues from Jira'
   task :import => :environment do
+
     JiraImportTask.queue_imports
   end
 
