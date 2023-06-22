@@ -16,6 +16,16 @@ class Escalations::Sdr::DisputesController < ApplicationController
     end
   end
 
+  def download_sdr_attachment_file
+    sender_domain_reputation_dispute_attachment = SenderDomainReputationDisputeAttachment.find(params[:id])
+
+    dispute_file_name = sender_domain_reputation_dispute_attachment.file_name
+
+    file_data = File.open(sender_domain_reputation_dispute_attachment.direct_upload_url).read
+
+    send_data file_data, filename: dispute_file_name, disposition: 'attachment'
+  end
+
   def show
     @dispute = SenderDomainReputationDispute.where(id: params[:id]).first
     @beaker_info = @dispute.beaker_info
@@ -26,20 +36,26 @@ class Escalations::Sdr::DisputesController < ApplicationController
     dispute = SenderDomainReputationDispute.find(params[:dispute_id])
     if dispute.sender_domain_reputation_dispute_attachments.any?
       zip_directory = Dir.mktmpdir
-      bug_proxy = bugzilla_rest_session.build_bug(id: dispute.id)
-      bug_attachments = bug_proxy.attachments
+      #bug_proxy = bugzilla_rest_session.build_bug(id: dispute.id)
+      #bug_attachments = bug_proxy.attachments
 
       zip_filename = "sdr_export-#{Time.now.utc.iso8601}.zip"
       temp_file = Tempfile.new(zip_filename)
 
       offset = 0
       file_attachments = []
-      bug_attachments.each do |bug_attachment|
-        sdr_attach = SenderDomainReputationDisputeAttachment.find(bug_attachment.id)
-        split_file_name = sdr_attach.file_name.split('.')
+      dispute.sender_domain_reputation_dispute_attachments.each do |bug_attachment|
+        #sdr_attach = SenderDomainReputationDisputeAttachment.find(bug_attachment.id)
+        split_file_name = bug_attachment.file_name.split('.')
         temp_file_name = "#{split_file_name.first}_#{(Time.now.to_i + offset).to_s}.#{split_file_name.last}"
-        enconding = bug_attachment.content_type.eql?("application/pdf") ? 'wb' : 'w'
-        File.open("#{zip_directory}/#{temp_file_name}", enconding) { |f| f.write bug_attachment.file_contents }
+
+        # [Upgrading rails from 5.2 to 6.0.1]
+        # Previously, the return value of ActionDispatch::Response#content_type did NOT contain the charset part.
+        # This behavior has changed to include the previously omitted charset part as well.
+        # If you want just the MIME type, please use ActionDispatch::Response#media_type instead.
+        enconding = 'wb' #bug_attachment.media_type.eql?("application/pdf") ? 'wb' : 'w'
+        File.open("#{zip_directory}/#{temp_file_name}", enconding) { |f| f.write File.open(bug_attachment.direct_upload_url).read }
+
         file_attachments << temp_file_name
         offset += 1
       end

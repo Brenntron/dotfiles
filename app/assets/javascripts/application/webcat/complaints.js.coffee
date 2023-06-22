@@ -219,9 +219,8 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
-        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.queryWhoIs(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Lookup</button>')
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.whoIsLookups(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Whois</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
-        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
     error: (response) ->
       std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
 
@@ -282,7 +281,7 @@ processSubmitNewURL = () ->
         )
       error: (response) ->
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
-          std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
+          std_api_error(response, "Please make sure you have the appropriate permissions. Unable to categorize url.", reload: false)
         else
           std_api_error(response, "Unable to categorize url.", reload: false)
     )
@@ -834,7 +833,7 @@ window.take_selected = ()->
 
 
 
-$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+$(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
   rows = $('#complaints-index').DataTable().rows('.selected').data()
   reopened = false
   invalid_unchanged = false
@@ -1094,7 +1093,7 @@ window.retrieve_history = (position) ->
   for url_position in [1..5]
     $("#url_#{url_position}").css("border-width", "")
     $("#url_#{url_position}").css("border-color", "")
-  
+
   url = $("#url_" + position).val()
 
   if url.length > 0
@@ -1493,9 +1492,8 @@ format = (complaint_entry_row) ->
       '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="lookup-' + entry_id+ '" data-fqdn="' + lookup_val + '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + lookup_val+ '\')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + entry_id + '" onclick="history_dialog(' + entry_id  + ',\'' + url + '\')">History</button><br/>' +
-      '<button class="secondary" id="domain-' + entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+      '<button class="secondary" id="domain-' + entry_id + '" onclick="WebCat.RepLookup.whoIsLookups(\'' + whois_lookup + '\')">Whois</domain>' +
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-4 nested-complaint-editable-data">' +
       '<div class="row">' +
@@ -1668,8 +1666,8 @@ window.get_xbrs_history = (url, tab) ->
       if response.data.length < 1
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
-        
-        
+
+
         $(xbrs_table).append(document.createElement('thead'))
         $(xbrs_table).append(document.createElement('tbody'))
         thead = $(xbrs_table).find('thead')
@@ -1680,7 +1678,7 @@ window.get_xbrs_history = (url, tab) ->
         thead_row = ''
 
         table_headers.forEach (header)->
-          thead_row += "<th> #{header}</th>"       
+          thead_row += "<th> #{header}</th>"
         thead.append(thead_row)
 
         response.data.forEach (row)->
@@ -1690,7 +1688,7 @@ window.get_xbrs_history = (url, tab) ->
             data_row += "<td>#{value || '-'}</td>"
 
           tbody.append("<tr>#{data_row}</tr>")
-          
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -1913,10 +1911,14 @@ window.fetch_complaints = () ->
 
 
 open_selected = (selected_rows, toggle) ->
-  for selected_row in selected_rows.data()
-    { viewable, subdomain, domain, path, ip_address } = selected_row
-    if viewable == toggle
+  low_rep_entries = []
+  error_message = ''
 
+  for selected_row in selected_rows.data()
+    { viewable, subdomain, domain, path, ip_address, wbrs_score } = selected_row
+    if parseInt(wbrs_score) <= -6
+      low_rep_entries.push selected_row
+    else if viewable == toggle
       new_subdomain = ""
       new_domain = ""
       new_path = ""
@@ -1929,6 +1931,21 @@ open_selected = (selected_rows, toggle) ->
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
         window.open("http://"+selected_row.ip_address)
+
+  if low_rep_entries.length >= 10
+    error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores."
+  else if low_rep_entries.length > 0
+    domains_and_ips = []
+
+    for lre in low_rep_entries
+      if lre.domain
+        domains_and_ips.push "<li>#{lre.domain}</li>"
+      else
+        domains_and_ips.push "<li>#{lre.ip_address}</li>"
+
+    error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores. <ul>#{domains_and_ips.join('')}</ul>"
+
+  show_message('error', "#{error_message}", false, '#alertMessage')
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
@@ -2358,11 +2375,16 @@ $ ->
                 $(button).hide()
 
 
-  $('#complaints_check_box').click ->
-    if $('#complaints_check_box').prop('checked')
+  $('#complaints_check_box, #complaints_select_all').click ->
+    checked = $(this).prop('checked')
+
+    if checked
       $('#complaints-index').DataTable().rows( { page: 'current' } ).select()
     else
       $('#complaints-index').DataTable().rows().deselect()
+
+    $("#complaints_check_box").prop('checked', checked)
+    $("#complaints_select_all").prop('checked', checked)
     return
 
   $(document).ready ->
@@ -2412,7 +2434,7 @@ $ ->
 
 # Convert webcat to webrep
 # Enable / disable button to attempt based on if anything is selected
-$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+$(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
   if $('tr.selected').length == 1
     $('#convert-ticket-button').removeAttr('disabled')
   else
@@ -2475,13 +2497,18 @@ window.prep_complaint_to_convert = () ->
 
               entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
                 '<td class="text-center entry-disposition">' +
-                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
-                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio" title="Customer says the website is safe and should be allowed.">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
+                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio" title="Customer says the website is malicious and should be blocked">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
                 '</td></tr>'
 
               $(entries_table).append(entry_row)
 
             $('#convert-ticket-summary').append(summary)
+            $('.entry-disposition > .inline-radio-wrapper > label').tooltipster
+              theme: [
+                'tooltipster-borderless'
+                'tooltipster-borderless-customized'
+              ]
 
           else
             std_msg_error('Ticket cannot be converted', ['Selected entry\'s parent ticket is not in a convertible (open) status.'])

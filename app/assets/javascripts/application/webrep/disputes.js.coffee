@@ -114,7 +114,6 @@ window.advanced_webrep_index_table = () ->
     status: form.find('input[id="status-input"]').val()
     priority: form.find('input[id="priority-input"]').val()
     resolution: form.find('input[id="resolution-input"]').val()
-    submission_type: submission_types
     submitter_type: form.find('input[id="submitter-input"]').val()
     platform_names: form.find('input[id="platform-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
@@ -649,6 +648,11 @@ window.save_dispute_entries = () ->
         if new_value != old_value
           changes_made = true
           if new_value == "RESOLVED_CLOSED"
+            resolution_status = {
+              id: id
+              field: "status"
+              new: new_value
+            }
             resolution_data = {
               id: id
               field: "resolution"
@@ -659,6 +663,7 @@ window.save_dispute_entries = () ->
               field: "resolution_comment"
               new: $(this).find("textarea[name='resolution-comment']")[0].value
             }
+            data[id].push(resolution_status)
             data[id].push(resolution_data)
             data[id].push(resolution_comment)
 
@@ -818,6 +823,15 @@ window.webrep_reset_search = () ->
   for i in inputs
     i.value = ""
 
+  #clear selectize fields
+  $("#platform-input")[0].selectize.clear()
+  $("#status-input")[0].selectize.clear()
+  $("#priority-input")[0].selectize.clear()
+  $("#resolution-input")[0].selectize.clear()
+
+window.clearSelectize = (input) ->
+  $("##{input}")[0].selectize.clear()
+
 $ ->
 
 #  Opens ticket status resolution back up after modal close
@@ -951,6 +965,8 @@ $ ->
       headers: {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       data: build_webrep_data()
       complete: () ->
+        #cache current filters for export_all form
+        $('#disputes-index-export-data-input').val(JSON.stringify(build_webrep_data()))
         $('#inline-webrep').addClass('hidden')
     order: [ [
       9
@@ -1044,31 +1060,16 @@ $ ->
       {
         data: 'case_age'
         'render': (data,type,full,meta) ->
-          if data != "<1 hr"
-            dispute_duration = moment(full.case_opened_at).fromNow()
-            if dispute_duration.includes('minute')
+          if data == "<1 hr"
+            data
+          else if data.includes('h') && !data.includes('d')
+            hours = parseInt(data.split('h')[0])
+            if hours < 18
               dispute_latency = data
-            if dispute_duration.includes('hour')
-              hours = parseInt(dispute_duration.replace(/[^0-9]/g, ''))
-              if hours <= 18
-                dispute_latency = data
-              else
-                dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
             else
               dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            if dispute_duration.includes('day')
-              day = parseInt(data.replace(/[^0-9]/g, ''))
-              if day >= 1
-                dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            if dispute_duration.includes('months')
-              month = parseInt(data.replace(/[^0-9]/g, ''))
-              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            if dispute_duration.includes('year')
-              year = parseInt(data.replace(/[^0-9]/g, ''))
-              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            dispute_latency
           else
-            data
+            dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
       }
       { data: 'source' }
       {
@@ -1361,6 +1362,62 @@ $ ->
   $('#webrep-advanced-search-button').click ->
     # if we have already loaded the advanced search, with all options no need to load it again
     if $('#company-list').find('option').size() == 0
+
+      if localStorage.getItem('webRepFilters') != null
+        filter_data_found = false
+        #populate any non-selectize fields with current filters
+        #note: any selectize filters need to be populated after the selectize options are created
+        filters = JSON.parse(localStorage.webRepFilters)
+
+        #Need to check if this a saved or basic search, since those don't load in the data to the local storage
+        if filters.search_type != 'named' && filters.search_type != 'contains' && $('#dispute-advaced-search-selected-filters').html() != ''
+          filter_data_found = true
+
+          #Case ID field
+          $('#caseid-input').val filters.case_id
+          #Dispute (URL/IP/Domain)
+          $('#dispute-input').val filters.dispute_entries.ip_or_uri
+          #Assignee
+          $('#owner-input').val filters.case_owner_username
+          #Suggested Disposition
+          $('#disposition-input').val filters.dispute_entries.suggested_disposition
+          #Submitter Type
+          $('#submitter-input').val filters.submitter_type
+          #Contact Name
+          $('#name-input').val filters.customer.name
+          #Contact Email
+          $('#email-input').val filters.customer.email
+          #Submitter Org
+          $('#company-input').val filters.customer.company_name
+          #Submitter Domain
+          $('#domain-input').val filters.org_domain
+          #Date Submitted (Newer)
+          $('#submitted-newer-input').val filters.submitted_newer
+          #Date Submitted (Older)
+          $('#submitted-older-input').val filters.submitted_older
+          #Case Origin
+          $('#case-origin-input').val filters.case_origin
+          #Case Age (Newer) ex: 30d 12h
+          $('#age-newer-input').val filters.age_newer
+          #Case Age (Older) ex: 7d 12h
+          $('#age-older-input').val filters.age_older
+          #Last Modified (Newer)
+          $('#modified-newer-input').val filters.modified_newer
+          #Last Modified (Older)
+          $('#modified-older-input').val filters.modified_older
+
+          #check for submission types parameter - if field is hidden there is no .submission_type attached
+          if filters.submission_type?
+            #uncheck any Submission Types that are not included in filters
+            if filters.submission_type.includes('w') == false
+              $('#submission-type-w-cb').prop('checked', false)
+
+            if filters.submission_type.includes('ew') == false
+              $('#submission-type-ew-cb').prop('checked', false)
+
+            if filters.submission_type.includes('e') == false
+              $('#submission-type-e-cb').prop('checked', false)
+
       std_msg_ajax(
         method: 'GET'
         url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
@@ -1373,7 +1430,6 @@ $ ->
           $('#company-list').empty()
           $('#resolution-list').empty()
           $('#case-origin-list').empty()
-
 
           $('#platform-input').selectize {
             persist: false
@@ -1422,6 +1478,33 @@ $ ->
             onBlur: () ->
               window.toggle_selectize_layer(this, 'false')
           }
+
+          #populate selectize fields if correct localstorage is found
+          if filter_data_found == true
+
+            #populate platform
+            if filters.platform_names != ''
+              platform_input = $('#platform-input').selectize()
+              platform_names = filters.platform_names.split(',')
+              platform_input[0].selectize.setValue(platform_names)
+
+            #populate resolution
+            if filters.resolution != ''
+              resolution_input = $('#resolution-input').selectize()
+              resolutions = filters.resolution.split(',')
+              resolution_input[0].selectize.setValue(resolutions)
+
+            #populate status
+            if filters.status != ''
+              status_input = $('#status-input').selectize()
+              statuses = filters.status.split(',')
+              status_input[0].selectize.setValue(statuses)
+
+            #populate priority
+            if filters.priority != ''
+              priority_input = $('#priority-input').selectize()
+              priorities = filters.priority.split(',')
+              priority_input[0].selectize.setValue(priorities)
 
           for user in response.json.case_owners
             $('#user-list').append '<option value=\'' + user + '\'></option>'
@@ -1713,11 +1796,12 @@ $ ->
     debug: false
 
   $(document).on 'click', (e)->
-    if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
-      $("#advanced-search-dropdown").hide()
-    else   # ensure webrep dash datepicker not open
-      unless $('.ltr.show-calendar').css('display') == 'block'
-        $("#advanced-search-dropdown").show()
+    if $('#webrep-advanced-search-button').size() > 0    
+      if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
+        $("#advanced-search-dropdown").hide()
+      else   # ensure webrep dash datepicker not open
+        unless $('.ltr.show-calendar').css('display') == 'block'
+          $("#advanced-search-dropdown").show()
 
   window.averageTimeToCloseLabel = (hourAmount) ->
     totalSecond = hourAmount * 60 * 60
@@ -2676,8 +2760,6 @@ window.build_webrep_data = () ->
 
   else if localStorage.webRepFilters
     data = JSON.parse(localStorage.webRepFilters)
-
-
 
   format_webrep_header(data)
 

@@ -97,7 +97,7 @@
           %span.email-datetime
     .row
       .col-xs-12.email-msg-body
-        %pre.email-msg-content
+        .email-msg-content
 
     = render 'escalations/sdr/disputes/new_email_dialog'
 
@@ -223,7 +223,7 @@
               Written by
               %span.author-username
                 =comment.user.cvs_username
-              = distance_of_time_in_words(Time.now, comment.created_at) + " ago."
+              = distance_of_time_in_words(Time.now, comment.created_at, false, highest_measure_only: true) + " ago."
             %br.hidden-break
             .note-info-item.time-stamp
               = format_timestamp(comment.created_at)
@@ -231,7 +231,8 @@
               %button.hidden.note-save-button{class: "note-save-button#{comment.id}", onclick: "updateSdrNote(#{comment.id})"}
               %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
-              %button.sdr-note-delete-button{onclick: "deleteSdrNote(#{comment.id})"}
+              - if comment.user.cvs_username == current_user.cvs_username
+                %button.sdr-note-delete-button{onclick: "deleteSdrNote(#{comment.id})"}
 
         .row
           .col-xs-12

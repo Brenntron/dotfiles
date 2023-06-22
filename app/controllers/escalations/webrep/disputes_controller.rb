@@ -1,5 +1,5 @@
 class Escalations::Webrep::DisputesController < ApplicationController
-  load_and_authorize_resource class: 'Dispute'
+  load_and_authorize_resource class: 'Dispute', :except => :download_email_attachment_file
 
   before_action :require_login
 
@@ -7,7 +7,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
     respond_to do |format|
       format.html
       format.xlsx do
-        index_params = JSON.parse(params['data_json'])
+        index_params = params['data_json'].empty? ? {} : JSON.parse(params['data_json'])
         search_type = index_params['search_type']
         search_name = 'advanced' == search_type ? nil : index_params['search_name']
         @disputes = Dispute.robust_search(search_type,
@@ -20,6 +20,16 @@ class Escalations::Webrep::DisputesController < ApplicationController
         send_data export.to_s, filename: "disputes_search_#{Time.now.utc.iso8601}.xlsx", disposition: 'attachment'
       end
     end
+  end
+
+  def download_email_attachment_file
+    dispute_email_attachment = DisputeEmailAttachment.find(params[:id])
+
+    dispute_file_name = dispute_email_attachment.file_name
+
+    file_data = File.open(dispute_email_attachment.direct_upload_url).read
+
+    send_data file_data, filename: dispute_file_name, disposition: 'attachment'
   end
 
   def show

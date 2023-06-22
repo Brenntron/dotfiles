@@ -70,7 +70,7 @@ class Clusters::Ngfw::Processor < Clusters::Templates::Processor
 
   def process_2nd_person_review(cluster)
     db_cluster = ngfw_cluster(cluster)
-    db_cluster.update_attributes(category_ids: cluster[:categories].map(&:to_i).to_json) # mysql can't store arrays =(
+    db_cluster.update(category_ids: cluster[:categories].map(&:to_i).to_json) # mysql can't store arrays =(
     db_cluster.pending!
   end
 
@@ -78,7 +78,7 @@ class Clusters::Ngfw::Processor < Clusters::Templates::Processor
     db_cluster = ngfw_cluster(cluster)
     unless db_cluster.pending?
       # update cluster data from user input
-      db_cluster.update_attributes(category_ids: cluster[:categories].to_json, comment: cluster[:comment])
+      db_cluster.update(category_ids: cluster[:categories].to_json, comment: cluster[:comment])
     end
 
     # process in the same way as complaint entries

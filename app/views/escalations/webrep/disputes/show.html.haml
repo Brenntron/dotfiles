@@ -62,7 +62,6 @@
           %label.content-label-sm
             Status
           %br
-          -##bugzilla_popover_state
           - if (@dispute.resolution != Dispute::DUPLICATE)
             %span.dropdown
               %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "dispute_status_drop_down(#{@dispute.id})"}
@@ -311,8 +310,3 @@
                       %tr
                         %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
                         %td= dispute_dup.case_opened_at.strftime('%F %T')
-
-:javascript
-  $(document).ready(function(){
-    setup_enrichment_section()
-  })

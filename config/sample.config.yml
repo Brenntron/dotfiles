@@ -36,6 +36,9 @@ development:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     username: ""
     password: ""
+  file_mgmt:
+    base_host_path: "/tmp/"
+    base_file_path: "analyst_console/escalations/"
   file_reputation_sandbox:
     host: "intel.api.sourcefire.com"
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
@@ -123,7 +126,7 @@ development:
     gssnegotiate: false
     auth_token: "redacted"
   k2:
-    host: "k2-api.sv4.ironport.com"
+    host: "k2-api-int.sv4.ironport.com"
     port: 443
     token: "redacted"
   enrichment_service:
@@ -174,6 +177,9 @@ test:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     username: ""
     password: ""
+  file_mgmt:
+    base_host_path: "/tmp/"
+    base_file_path: "analyst_console/escalations/"
   file_reputation_sandbox:
     host: "intel.api.sourcefire.com"
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
@@ -265,18 +271,15 @@ test:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-<<<<<<< HEAD
   k2:
-    host: "k2-api.sv4.ironport.com"
+    host: "k2-api-int.sv4.ironport.com"
     port: 443
     token: "redacted"
-=======
   umbrella_data_fetcher:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
 
->>>>>>> development
 staging:
   amp_poke:
     host: "localhost"
@@ -321,6 +324,9 @@ staging:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     username: "redacted"
     password: "redacted"
+  file_mgmt:
+    base_host_path: "/nfs/fmd_bugz_s3c/"
+    base_file_path: "analyst_console/escalations/"
   file_reputation_sandbox:
     host: "intel.api.sourcefire.com"
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
@@ -415,18 +421,15 @@ staging:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-<<<<<<< HEAD
   k2:
-    host: "k2-api.sv4.ironport.com"
+    host: "k2-api-int.sv4.ironport.com"
     port: 443
     token: "redacted"
-=======
   umbrella_data_fetcher:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
 
->>>>>>> development
 production:
   amp_poke: 
     host: "poke.vrt.sourcefire.com"
@@ -471,6 +474,9 @@ production:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     username: "redacted"
     password: "redacted"
+  file_mgmt:
+    base_host_path: "/nfs/fmd_bugz_s3c/"
+    base_file_path: "analyst_console/escalations/"
   file_reputation_sandbox:
     host: "intel.api.sourcefire.com"
     port: 443
@@ -566,15 +572,12 @@ production:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-<<<<<<< HEAD
   k2:
     host: "k2-api.sv4.ironport.com"
     port: 443
     token: "redacted"
-=======
   umbrella_data_fetcher:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
->>>>>>> development
 

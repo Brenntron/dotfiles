@@ -723,12 +723,18 @@ describe Dispute do
   end
 
   it 'should close as matching disposition for a wide net when false positive (one)' do
+    @dispute = Dispute.new
+    @dispute.submission_type = "w"
+    @dispute.submitter_type = "CUSTOMER"
+    @dispute.save(:validate => false)
+
     @dispute_entry = DisputeEntry.new
     @dispute_entry.id = 1
     @dispute_entry.uri = "www.bing.com"
     @dispute_entry.entry_type = "URI/DOMAIN"
     @dispute_entry.status = "NEW"
     @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.dispute_id = @dispute.id
     @dispute_entry.save
 
     response = {"wbrs" => {"score" => -3.5}}
@@ -737,7 +743,9 @@ describe Dispute do
 
     expect(@dispute_entry.is_disposition_matching?("false positive")).to eql(true)
     expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
-    expect(@dispute_entry.resolution).to eql("UNCHANGED")
+    expect(@dispute_entry.resolution).to eql("AP - Match")
+
+    expect(@dispute_entry.resolution_comment).to eql("Thank you for your submission! Your dispute was resolved automatically because www[.]bing[.]com currently has a Questionable Threat Level and is not globally blocked on Cisco devices. A Questionable Threat Level means that Talos has negative threat intelligence on a site, but it is low confidence. This information is not sufficient to warrant a block by itself, but it may indicate a risk or could be undesirable. Talos does NOT recommend that our customers block sites with a Questionable Threat Level– customers who choose to block Questionable sites should be prepared to locally allow-list sites frequently. If you need further assistance with this dispute, please open a TAC case.")
 
 
   end
@@ -806,6 +814,12 @@ describe Dispute do
 
 
   it 'should close as matching disposition for a wide net when false negative' do
+
+    @dispute = Dispute.new
+    @dispute.submission_type = "w"
+    @dispute.submitter_type = "CUSTOMER"
+    @dispute.save(:validate => false)
+
     @dispute_entry = DisputeEntry.new
     @dispute_entry.id = 1
     @dispute_entry.uri = "www.bing.com"
@@ -813,6 +827,7 @@ describe Dispute do
     @dispute_entry.entry_type = "URI/DOMAIN"
     @dispute_entry.suggested_disposition = "Untrusted"
     @dispute_entry.auto_resolve_log = ""
+    @dispute_entry.dispute_id = @dispute.id
     @dispute_entry.save
 
     response = {"wbrs" => {"score" => -6.1}}
@@ -821,8 +836,9 @@ describe Dispute do
 
     expect(@dispute_entry.is_disposition_matching?("false negative")).to eql(true)
     expect(@dispute_entry.status).to eql("RESOLVED_CLOSED")
-    expect(@dispute_entry.resolution).to eql("UNCHANGED")
-
+    expect(@dispute_entry.resolution).to eql("AP - Match")
+    
+    expect(@dispute_entry.resolution_comment).to eql("Thank you for your submission! Your dispute was resolved automatically because www[.]bing[.]com has an Untrusted Threat Level and is globally blocked on Cisco devices. An Untrusted Threat Level is applied when Talos has negative threat intelligence on a site and that information is sufficient to warrant a block; having an Untrusted Threat Level indicates the site is exceptionally bad, malicious, or undesirableIf you need further assistance with this dispute, please open a TAC case.")
 
   end
 

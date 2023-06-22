@@ -337,15 +337,28 @@ class FileReputationDispute < ApplicationRecord
   def self.advanced_search(params, search_name:, user:)
     search_hash = non_blank_fields(params)
     sha256_hash = search_hash.delete('sha256_hash')
+    assignee_cvs_usernames = search_hash.delete('assigned')&.split(',')
+    detection_last_set = search_hash.delete('detection_last_set')
     file_name = search_hash.delete('file_name')
-    platform_ids = search_hash.delete('platform_ids')
+    platform_names = search_hash.delete('platforms')
     threatgrid_range = search_hash.delete('threatgrid_score') || {}
     sandbox_range = search_hash.delete('sandbox_score') || {}
     created_at_range = search_hash.delete('created_at') || {}
     updated_at_range = search_hash.delete('updated_at') || {}
     dispute_fields = matching_field(search_hash)
 
+
+    if assignee_cvs_usernames.present?
+      user_ids = User.where(cvs_username: assignee_cvs_usernames).pluck(:id)
+      dispute_fields['user_id'] = user_ids if user_ids.present?
+    end
+
     relation = where(dispute_fields)
+
+    if detection_last_set.present?
+      date = Date.parse(detection_last_set)
+      relation = relation.where(detection_last_set: date.beginning_of_day..date.end_of_day)
+    end
 
     if sha256_hash.present?
       relation = relation.where('sha256_hash like :sha256_hash', sha256_hash: "%#{sanitize_sql_like(sha256_hash)}%")
@@ -355,8 +368,8 @@ class FileReputationDispute < ApplicationRecord
       relation = relation.where('file_name like :file_name', file_name: "%#{sanitize_sql_like(file_name)}%")
     end
 
-    if platform_ids.present?
-      ids = platform_ids.split(',').map {|m| m.to_i}
+    if platform_names.present?
+      ids = Platform.where(public_name: platform_names.split(',')).pluck(:id)
       relation = relation.where(platform_id: ids)
     end
 
@@ -377,21 +390,21 @@ class FileReputationDispute < ApplicationRecord
     end
 
     if created_at_range['from'].present?
-      relation = relation.where('created_at >= :created_at_from', created_at_from: created_at_range['from'])
+      relation = relation.where('file_reputation_disputes.created_at >= :created_at_from', created_at_from: created_at_range['from'])
     end
 
     if created_at_range['to'].present?
       created_at_to = created_at_range['to']
-      relation = relation.where('created_at <= ADDDATE(:created_at_to, INTERVAL 1 DAY)', created_at_to: created_at_to)
+      relation = relation.where('file_reputation_disputes.created_at <= ADDDATE(:created_at_to, INTERVAL 1 DAY)', created_at_to: created_at_to)
     end
 
     if updated_at_range['from'].present?
-      relation = relation.where('updated_at >= :updated_at_from', updated_at_from: updated_at_range['from'])
+      relation = relation.where('file_reputation_disputes.updated_at >= :updated_at_from', updated_at_from: updated_at_range['from'])
     end
 
     if updated_at_range['to'].present?
       updated_at_to = updated_at_range['to']
-      relation = relation.where('updated_at <= ADDDATE(:updated_at_to, INTERVAL 1 DAY)', updated_at_to: updated_at_to)
+      relation = relation.where('file_reputation_disputes.updated_at <= ADDDATE(:updated_at_to, INTERVAL 1 DAY)', updated_at_to: updated_at_to)
     end
 
     if %w{customer_name customer_email company_name}.any? {|key_name| search_hash[key_name].present? }
@@ -636,7 +649,7 @@ class FileReputationDispute < ApplicationRecord
     customer = Customer.file_rep_process_and_get_customer(customer_payload)
 
     bugzilla_rest_session = message_payload[:bugzilla_rest_session]
-
+    message_payload.delete(:bugzilla_rest_session)
     summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     full_description = <<~HEREDOC
@@ -703,15 +716,17 @@ class FileReputationDispute < ApplicationRecord
       new_dispute.update_amp_detection
     end
 
-    if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
-      ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
-      linked_dispute_comment = FileRepComment.new
-      linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
-      linked_dispute_comment.user_id = user.id
-      linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
-      linked_dispute_comment.save(:validate => false)
+    # commenting this functionality out until bugzilla snort bugs have been successfully moved to JIRA, then
+    # this functionality will need to be rebuilt, if it's even necessary (since this feature isn't even being used)
+    #if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
+    #  ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
+    #  linked_dispute_comment = FileRepComment.new
+    #  linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
+    #  linked_dispute_comment.user_id = user.id
+    #  linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+    #  linked_dispute_comment.save(:validate => false)
 
-    end
+    #end
 
     if is_duplicate == true
       return new_dispute
@@ -1292,29 +1307,30 @@ class FileReputationDispute < ApplicationRecord
       Rails.logger.error("Error saving updated detection information -- #{$!.message}")
     end
   end
+  #this is part of a feature that isn't being used, and will need to be rebuilt at some point if it intends to be used
+  # after switching from BZ to JIRA
+  #def self.build_ips_bug(bugzilla_rest_session, filename, sha256, problem, original_bug_id)
+  #  summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-  def self.build_ips_bug(bugzilla_rest_session, filename, sha256, problem, original_bug_id)
-    summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+  #  full_description = <<~HEREDOC
+  #        File name: #{filename}
+  #        File Rep Sha: #{sha256}
 
-    full_description = <<~HEREDOC
-          File name: #{filename}
-          File Rep Sha: #{sha256}
+  #        Summary: #{problem}
+  #  HEREDOC
 
-          Summary: #{problem}
-    HEREDOC
+  #  bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
+  #  logger.debug "Creating bugzilla bug"
 
-    bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
-    logger.debug "Creating bugzilla bug"
+  #  research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-    research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+  #  linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
+  #  linked_bug_proxy.save!
 
-    linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
-    linked_bug_proxy.save!
+  #  new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
 
-    new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
-
-    research_bug_proxy
-  end
+  #  research_bug_proxy
+  #end
 
 
   def get_email_meta_data
