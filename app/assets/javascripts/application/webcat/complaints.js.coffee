@@ -302,7 +302,9 @@ $(document).on 'click', '.imports_check_box',->
 
 $(document).on 'change', '.imports_check_box', ->
   retry_button = $('.toolbar-button.retry-button')
+  resolve_button = $('.toolbar-button.close-ticket-button')
   can_retry = false
+  can_resolve = false
   checked_data = checked_row_data() || [];
 
   if checked_data.length > 0
@@ -315,10 +317,19 @@ $(document).on 'change', '.imports_check_box', ->
       can_retry = true
       break
 
+    if row.status != 'Resolved'
+      can_resolve = true
+      break
+
   if can_retry
     retry_button.removeAttr('disabled')
   else
     retry_button.attr('disabled', true)
+
+  if can_resolve
+    resolve_button.removeAttr('disabled')
+  else
+    resolve_button.attr('disabled', true)
 
 $(document).on 'click', '#show-failed, #show-complete, #show-pending',->
   show_failed = $('#show-failed').prop('checked')
@@ -365,24 +376,26 @@ window.retry_imports = (id)->
   )
 
 window.close_related_issues = () ->
-  ids = $('.imports_check_box:checked').map (i, el) -> $(el).val()
-  if ids.length > 0
-    $('.close-ticket-button').attr('disabled', true)
-
-    data =  { issue_keys: ids.toArray() } 
-    std_msg_ajax(
+  ids = []
+  checked_row_data().map( (r) ->
+    # only run ids if the row is not resolved
+    if r.status != "Resolved"
+      ids.push(parseInt(r.id))
+  )
+  if ids.length
+    std_msg_ajax
       method: 'put'
       url: '/escalations/api/v1/escalations/jira_import_tasks/close_related_issues'
-      data: data
+      data: issue_keys: ids
+      success: (response) ->
+        std_msg_success('Successfully closed related tickets',[], reload: false)
+        $('.toolbar-button.close-ticket-button').attr('disabled', true)
       error: (response) ->
         std_api_error(response, 'Error closing related issues.', reload: false)
       complete: (response) ->
         $('#webcat-imports-index').DataTable().ajax.reload()
-        $('.close-ticket-button').removeAttr('disabled')
-    )
   else
-    std_msg_error('Error',['Please select at least one row before close related issues.'])
-
+    std_api_error(response, 'Select at least one unresolved issue.', reload: false)
 
 window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
