@@ -37,6 +37,8 @@
       %span.toolbar-button-text Retry
     %form#jira-tasks-disputes-export-form{action: escalations_webcat_jira_import_tasks_path(format: :xlsx), method: :get}
       = hidden_field_tag('issue_keys', '[]', id: 'jira-tasks-filter-input')
+    %button.toolbar-button.import-ticket-button.toolbar-button-spacer.tooltipped{title: 'Run Imports Manually', onclick:'run_imports()'}
+      %span.toolbar-button-text Run Imports
     %button.toolbar-button.export-button.esc-tooltipped{type: 'button', onclick: 'export_selected_jira_tasks();', title: 'Export to CSV'}
       %span.toolbar-button-text
         Export
