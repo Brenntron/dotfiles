@@ -760,6 +760,8 @@ class ComplaintEntry < ApplicationRecord
         where(complaint_id: Complaint.from_jira).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
       when "JIRA ASSIGNED"
         where(status: 'ASSIGNED', complaint_id: Complaint.from_jira)
+      when "ALL JIRA"
+        where(complaint_id: Complaint.from_jira)
       when "ALL TALOS"
         where(complaint_id: Complaint.from_ti)
       when "NEW TALOS"
