@@ -255,10 +255,10 @@ class JiraImportTask < ApplicationRecord
     workbook
   end
 
-  def issue_status
+  def issue_status(reload: false)
     issue_data = JSON.parse(Rails.cache.read("#{issue_key}") || "{}")
 
-    if issue_data.blank? || issue_data['last_queried'] < CACHE_LIFESPAN.minutes.ago
+    if issue_data.blank? || (issue_data['last_queried'] < CACHE_LIFESPAN.minutes.ago || reload)
       issue_status = issue.issue.status.name
       Rails.cache.write("#{issue_key}", {'status' => issue_status, 'last_queried' => Time.now}.to_json)
     else

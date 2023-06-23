@@ -386,7 +386,7 @@ window.close_related_issues = () ->
     std_msg_ajax
       method: 'put'
       url: '/escalations/api/v1/escalations/jira_import_tasks/close_related_issues'
-      data: issue_keys: ids
+      data: task_ids: ids
       success: (response) ->
         std_msg_success('Successfully closed related tickets',[], reload: false)
         $('.toolbar-button.close-ticket-button').attr('disabled', true)
