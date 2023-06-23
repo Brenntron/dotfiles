@@ -39,6 +39,14 @@ module API
             end
           end
 
+          desc "Manually queue imports"
+          get '/queue_imports' do
+            std_api_v2 do
+              JiraImportTask.queue_imports(force_retry_pending: true)
+              {status: "Success"}
+            end
+          end
+
           desc 'close Jira Issue'
 
           params do
