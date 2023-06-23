@@ -317,7 +317,7 @@ $(document).on 'change', '.imports_check_box', ->
       can_retry = true
       break
 
-    if row.status != 'Resolved'
+    if row.issue_status != 'Resolved'
       can_resolve = true
       break
 
@@ -393,7 +393,7 @@ window.close_related_issues = () ->
         setTimeout ->
           # on success, wait a moment then reload data to reflect any status changes
           $('#webcat-imports-index').DataTable().ajax.reload()
-        , 700
+        , 500
       error: (response) ->
         std_api_error(response, 'Error closing related issues.', reload: false)
   else
