@@ -1,7 +1,7 @@
 # WEBREP ENRICHMENT
 # WEBREP ENRICHMENT
 
-# part 1 of enrichment
+# part 1 of enrichment (enrich and prev data come from same place)
 window.get_enrichment_service_webrep = (query_item, query_type) ->
   data = {'query_item': query_item, 'query_type', query_type}
   std_msg_ajax
@@ -11,16 +11,20 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
     success: (response) ->
       return response
     error: (response) ->
-      std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
-      $('.enrichment-error, .prevalence-error').removeClass('hidden')
       $('.enrichment-loader, .prevalence-loader').addClass('hidden')
+      $('.enrichment-error').removeClass('hidden')
+      $('.prevalence-error').removeClass('hidden')
+      # RESTORE BELOW WHEN TMI IS DONE
+      # RESTORE BELOW WHEN TMI IS DONE
+#      std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
     complete: (response) ->
-      $('.enrichment-loader').addClass('hidden')
-      # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
-      # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
+      # REMOVE BELOW WHEN TMI IS DONE.
+      # REMOVE BELOW WHEN TMI IS DONE.
       console.clear()
       console.log 'response for enrichment:'
       console.log response
+      $('.error-msg .close').click()  # REMOVE THIS TOO
+      $('.fade').remove()  # REMOVE THIS TOO
 
 
 # part 2 of enrichment
@@ -227,7 +231,7 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
       std_msg_error('Error with Enrichment Service', ['There was an error.'])
       $('.enrichment-area .enrichment-error').removeClass('hidden')
     complete: () ->
-      $('.enrichment-loader').addClass('hidden')
+#      $('.enrichment-loader').addClass('hidden')
       # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
       # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
       console.clear()
@@ -469,28 +473,41 @@ $ ->
 
 # init these dts, keep in sep function for when promise resolves elsewhere (api call is delayed).
 window.enrichment_prevalence_actions = () ->
-  $('.enrichment-loader, .prevalence-loader').remove()  # remove loaders
+  $('.enrichment-loader, .prevalence-loader').addClass('hidden')  # remove loaders
+#  $('.enrichment-error, .prevalence-error').addClass('hidden')
 
   # refactor below into dry code when tmi is near-final
   if $('.enrichment-area table:not(.hidden) tbody td').length == 0
     $('.enrichment-missing').removeClass('hidden')
     $('.enrichment-webrep-table').addClass('hidden')
 
-  # init the webrep enrich dt
+  # init the webrep enrich dt, unless its already been inited
   else
-    $('#enrichment-webrep-dt').DataTable
-      paging: false
-      searching: false
-      info: false
+    $('.enrichment-error').addClass('hidden')
+
+    # FIX THIS
+#
+#    unless enrichment_webrep_dt
+#      enrichment_webrep_dt = $('#enrichment-webrep-dt').DataTable
+#        paging: false
+#        searching: false
+#        info: false
+#
 
   # refactor below into dry code when tmi is near-final
   if $('.prevalence-area table:not(.hidden) tbody td').length == 0
     $('.prevalence-missing').removeClass('hidden')
     $('.prevalence-webrep-table').addClass('hidden')
 
-  else
-    $('#prevalence-webrep-dt').DataTable
-      paging: false
-      searching: false
-      info: false
+# FIX THIS
+#
+#  else
+#    $('.prevalence-error').addClass('hidden')
+#
+#    unless prevalence_webrep_dt
+#      prevalence_webrep_dt = $('#prevalence-webrep-dt').DataTable
+#        paging: false
+#        searching: false
+#        info: false
+
 
