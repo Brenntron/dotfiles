@@ -1634,23 +1634,24 @@ $ ->
 
   set_file_rep_link()
 
-  assignee_input = $('#assignee-input').selectize {
-    persist: true
-    create: false
-    valueField: 'name',
-    labelField: 'display_name',
-    searchField: ['name', 'display_name'],
-    options: AC.FileRep.createAssigneeOptions()
-    render:
-      option: (item, escape) ->
-        name = item.display_name
-        cvs_name = item.name
-        '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(cvs_name) + ')' + '</span></div>'
-    onFocus: () ->
-      window.toggle_selectize_layer(this, 'true')
-    onBlur: () ->
-      window.toggle_selectize_layer(this, 'false')
-  }
+  if $('#assignee-input').length > 0
+    assignee_input = $('#assignee-input').selectize {
+      persist: true
+      create: false
+      valueField: 'name',
+      labelField: 'display_name',
+      searchField: ['name', 'display_name'],
+      options: AC.FileRep.createAssigneeOptions()
+      render:
+        option: (item, escape) ->
+          name = item.display_name
+          cvs_name = item.name
+          '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(cvs_name) + ')' + '</span></div>'
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
 
   platforms_input = $('#platform-input').selectize {
     persist: true
@@ -1658,7 +1659,7 @@ $ ->
     valueField: 'public_name',
     labelField: 'public_name',
     searchField: 'public_name',
-    options: AC.FileRep.createAssigneeOptions()
+    options: AC.FileRep.createPlatformOptions()
     render:
       option: (item, escape) ->
        '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'

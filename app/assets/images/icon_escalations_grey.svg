@@ -3,14 +3,14 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 14 14" style="enable-background:new 0 0 14 14;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#717273;}
+	.icon-escalations{fill:#333333;}
 </style>
 <g>
-	<rect x="1" y="9.5" class="st0" width="3.5" height="3.5"/>
-	<rect x="5.3" y="9.5" class="st0" width="3.5" height="3.5"/>
-	<rect x="9.5" y="9.5" class="st0" width="3.5" height="3.5"/>
-	<rect x="5.3" y="5.3" class="st0" width="3.5" height="3.5"/>
-	<rect x="9.5" y="5.3" class="st0" width="3.5" height="3.5"/>
-	<rect x="9.5" y="1" class="st0" width="3.5" height="3.5"/>
+	<rect x="1" y="9.5" class="icon-escalations" width="3.5" height="3.5"/>
+	<rect x="5.3" y="9.5" class="icon-escalations" width="3.5" height="3.5"/>
+	<rect x="9.5" y="9.5" class="icon-escalations" width="3.5" height="3.5"/>
+	<rect x="5.3" y="5.3" class="icon-escalations" width="3.5" height="3.5"/>
+	<rect x="9.5" y="5.3" class="icon-escalations" width="3.5" height="3.5"/>
+	<rect x="9.5" y="1" class="icon-escalations" width="3.5" height="3.5"/>
 </g>
 </svg>
