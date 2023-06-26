@@ -383,6 +383,7 @@ window.close_related_issues = () ->
       ids.push(parseInt(r.id))
   )
   if ids.length
+    console.log ids
     std_msg_ajax
       method: 'put'
       url: '/escalations/api/v1/escalations/jira_import_tasks/close_related_issues'
@@ -397,7 +398,7 @@ window.close_related_issues = () ->
       error: (response) ->
         std_api_error(response, 'Error closing related issues.', reload: false)
   else
-    std_api_error('Select at least one unresolved issue.')
+    std_msg_error('Select at least one unresolved issue.')
 
 window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
