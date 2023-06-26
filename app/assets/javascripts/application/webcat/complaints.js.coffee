@@ -379,7 +379,7 @@ window.close_related_issues = () ->
   ids = []
   checked_row_data().map( (r) ->
     # only run ids if the row is not resolved
-    if r.status != "Resolved"
+    if r.issue_status != "Resolved"
       ids.push(parseInt(r.id))
   )
   if ids.length
@@ -397,7 +397,7 @@ window.close_related_issues = () ->
       error: (response) ->
         std_api_error(response, 'Error closing related issues.', reload: false)
   else
-    std_api_error(response, 'Select at least one unresolved issue.', reload: false)
+    std_api_error('Select at least one unresolved issue.')
 
 window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
