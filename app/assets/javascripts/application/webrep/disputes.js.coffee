@@ -1060,7 +1060,7 @@ $ ->
       {
         data: 'case_age'
         'render': (data,type,full,meta) ->
-          if data == "<1 hr"
+          if data == "<1 hr" || data == '&lt;1 hr'
             data
           else if data.includes('h') && !data.includes('d')
             hours = parseInt(data.split('h')[0])
