@@ -312,14 +312,11 @@ $(document).on 'change', '.imports_check_box', ->
   else
     $('.close-ticket-button').attr('disabled', true)
 
-  for row in checked_data
-    if row.status == 'Failure'
+  checked_data.each ->
+    if this.status == 'Failure'
       can_retry = true
-      break
-
-    if row.issue_status != 'Resolved'
+    if this.issue_status != 'Resolved'
       can_resolve = true
-      break
 
   if can_retry
     retry_button.removeAttr('disabled')
@@ -389,16 +386,17 @@ window.close_related_issues = () ->
       url: '/escalations/api/v1/escalations/jira_import_tasks/close_related_issues'
       data: task_ids: ids
       success: (response) ->
-        std_msg_success('Successfully closed related tickets',[], reload: false)
+        std_msg_success('Successfully closed Jira issues',[], reload: false)
         $('.toolbar-button.close-ticket-button').attr('disabled', true)
         setTimeout ->
           # on success, wait a moment then reload data to reflect any status changes
           $('#webcat-imports-index').DataTable().ajax.reload()
         , 500
       error: (response) ->
-        std_api_error(response, 'Error closing related issues.', reload: false)
+        console.log response
+        std_api_error(response, 'Error closing Jira issues', reload: false)
   else
-    std_msg_error('Select at least one unresolved issue.')
+    std_msg_error('Select at least one unresolved Jira issue.')
 
 window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
