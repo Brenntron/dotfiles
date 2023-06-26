@@ -79,11 +79,16 @@ describe AutoResolve do
       }.to_json
     }
     before(:each) do
+      @dispute = Dispute.new
+      @dispute.submitter_type = "CUSTOMER"
+      @dispute.save(:validate => false)
+
       @dispute_entry = DisputeEntry.new
       @dispute_entry.id = 1
       @dispute_entry.uri = target_address
       @dispute_entry.entry_type = "URI/DOMAIN"
       @dispute_entry.auto_resolve_log = ""
+      @dispute_entry.dispute_id = @dispute.id
       @dispute_entry.save
     end
     it 'should not auto resolve if there is an error' do
@@ -162,7 +167,7 @@ describe AutoResolve do
 
       response = AutoResolve.process_conviction_requirements(@dispute_entry.hostlookup, response)
 
-      expect(response).to eql({:action=>:commit_malware, :log=>["Umbrella popularity rating: 38.0: result of pass: false", "no sds rulehits detected against allow list", "no entry with reptool whitelist, continuing.", "vt results: Kaspersky,Avira,Forcepoint ThreatSeeker,Fortinet\n", "trusted vt hits: 2\n"]})
+      expect(response).to eql({:action=>:commit_malware, :log=>["Umbrella popularity rating: 38.0: result of pass: false", "no sds rulehits detected against allow list", "no entry with reptool whitelist, continuing.", "vt results: Kaspersky,Avira,Forcepoint ThreatSeeker,Fortinet\n", "trusted vt hits: 2\n"], :resolve_category=>"1 or more trusted VT hits"})
 
       #integration test
       dispute_entry = AutoResolve.attempt_ai_conviction(['plcbo'], @dispute_entry)
@@ -170,6 +175,8 @@ describe AutoResolve do
       expect(dispute_entry.status).to eql(DisputeEntry::STATUS_RESOLVED)
       expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_AUTO_RESOLVED_FN)
       expect(dispute_entry.auto_resolve_log).to eql("Umbrella popularity rating: 38.0: result of pass: false<br><br>no sds rulehits detected against allow list<br><br>no entry with reptool whitelist, continuing.<br><br>vt results: Kaspersky,Avira,Forcepoint ThreatSeeker,Fortinet\n<br><br>trusted vt hits: 2\n")
+
+      expect(dispute_entry.resolution_comment).to eql("Thank you for your submission! Your submission triggered a dynamic reassessment of testing[.]com. Sufficient negative threat intelligence exists to warrant an Untrusted Threat Level for testing[.]com. This change will be reflected on Cisco Secure devices within 24 hours.If you need further assistance with this dispute, please open a TAC case.")
     end
 
 
