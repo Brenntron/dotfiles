@@ -33,33 +33,9 @@ class Tmi::TmiGrpc < Tmi::TmiBase
         )
       end
 
-      context_groups = []
-      item[:groups].each do |group|
-        group_context_tags = []
-        group[:tags].each do |tag|
-          group_context_tags << ::Talos::Internal::TMI::ContextTag.new(
-              tag_type_id: tag[:tag_type_id],
-              taxonomy_id: tag[:taxonomy_id],
-              taxonomy_entry_id: tag[:taxonomy_entry_id],
-              tag_val_uint32: tag[:tag_val_uint32],
-              tag_val_uint64: tag[:tag_val_uint64],
-              tag_val_string: tag[:tag_val_string],
-              tag_val_bytes: tag[:tag_val_bytes],
-              tag_key_string: tag[:tag_key_string],
-              external_id: tag[:external_id]
-          )
-        end
-        context_groups << ::Talos::Internal::TMI::ContextGroup.new(
-            taxonomy_id: group[:taxonomy_id],
-            taxonomy_entry_id: group[:taxonomy_entry_id],
-            context_tags: group_context_tags
-        )
-      end
-
       update_items << ::Talos::Internal::TMI::UpdateItem.new(observation: observable,
                                                              action: action,
                                                              tags: context_tags,
-                                                             groups: context_groups,
                                                              suppress_target: get_data_source)
     end
 
@@ -74,18 +50,13 @@ class Tmi::TmiGrpc < Tmi::TmiBase
                               ip: nil,
                               sha: nil,
                               action: nil,
-                              tag_mnemonics: [],
-                              group_mnemonic: nil,
-                              group_tag_mnemonics: [])
+                              tag_mnemonics: [])
 
     observable = get_observable(domain: domain, url: url, ip: ip, sha: sha)
-
-    mnemonic_group = ::Talos::Internal::TMI::MnemonicGroup.new(group_mnemonic: group_mnemonic, tag_mnemonics: group_tag_mnemonics)
 
     mnemonic_update_item = ::Talos::Internal::TMI::MnemonicUpdateItem.new(observation: observable,
                                                                           action: get_action(action),
                                                                           tag_mnemonics: tag_mnemonics,
-                                                                          group_mnemonics: mnemonic_group,
                                                                           suppress_target: get_data_source)
 
     mnemonic_update_request = ::Talos::Internal::TMI::MnemonicUpdateRequest.new(mnemonic_update_item: mnemonic_update_item)
