@@ -30,13 +30,15 @@
 
   %div.actions-container.toolbar-container
     %label.toolbar-section-label Actions
-    %button.toolbar-button.close-ticket-button.toolbar-button-spacer.tooltipped{title: 'Close Related Jira Tickets', onclick:'close_related_issues()', disabled:true}
-      %span.toolbar-button-text Close Related Tickets
+    %button.toolbar-button.close-ticket-button.toolbar-button-spacer.tooltipped{title: 'Close Selected Jira Tickets', onclick:'close_related_issues()', disabled:true}
+      %span.toolbar-button-text Close Selected Jira Tickets
 
-    %button.toolbar-button.retry-button.toolbar-button-spacer.tooltipped{title: 'Retry', onclick:'retry_imports()', disabled:true}
-      %span.toolbar-button-text Retry
+    %button.toolbar-button.retry-button.toolbar-button-spacer.tooltipped{title: 'Retry Import', onclick:'retry_imports()', disabled:true}
+      %span.toolbar-button-text Retry Import
     %form#jira-tasks-disputes-export-form{action: escalations_webcat_jira_import_tasks_path(format: :xlsx), method: :get}
       = hidden_field_tag('issue_keys', '[]', id: 'jira-tasks-filter-input')
+    %button.toolbar-button.import-ticket-button.toolbar-button-spacer.tooltipped{title: 'Run Imports Manually', onclick:'run_imports()'}
+      %span.toolbar-button-text Run Imports
     %button.toolbar-button.export-button.esc-tooltipped{type: 'button', onclick: 'export_selected_jira_tasks();', title: 'Export to CSV'}
       %span.toolbar-button-text
         Export

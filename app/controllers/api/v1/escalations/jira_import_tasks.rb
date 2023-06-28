@@ -39,22 +39,30 @@ module API
             end
           end
 
+          desc "Manually queue imports"
+          get '/queue_imports' do
+            std_api_v2 do
+              JiraImportTask.queue_imports(force_retry_pending: true)
+              {status: "Success"}
+            end
+          end
+
           desc 'close Jira Issue'
 
           params do
-            requires :issue_keys, type: Array[String], desc: "Jira issue keys to close"
+            requires :task_ids, type: Array[Integer], desc: "Task ids"
           end
 
           put '/close_related_issues' do
             response = { closed: [], failed: []}
-            JiraImportTask.where(issue_key: params[:issue_keys]).each do |task|
+            JiraImportTask.where(id: params[:task_ids]).each do |task|
               issue = JiraRest::Issue.new(task.issue_key)
               close_status = issue.close_issue
               if close_status == true
-                task.update(issue_status: 'Resolved')
+                task.update(issue_status: task.issue_status(reload: true))
                 response[:closed] << task.issue_key
               else
-                reponse[:failed] << task.issue_key
+                response[:failed] << task.issue_key
               end
             end
             response
