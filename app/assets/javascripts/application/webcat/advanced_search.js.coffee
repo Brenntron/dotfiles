@@ -78,28 +78,31 @@ namespace 'AC.WebCat', (exports) ->
     for label, search_value of searchConditions
       continue if search_value == ''
 
-      selectize_elements = ['entryid','complaintid','jiraid', 'complaint']
+      console.log 'ininin'
+      selectize_elements = ['tags','assignee','category','company','status','resolution','name','complaint','channel','entryid','complaintid','jiraid','submitter-type']
 
       if label == 'id'             then label = 'entryid'
+      if label == 'user_id'        then label = 'assignee'
       if label == 'platform_ids'   then label = 'platform'
       if label == 'ip_or_uri'      then label = 'complaint'
       if label == 'customer_email' then label = 'email'
-
+      if label == 'company_name'    then label = 'company'
+      
       #make sure that labels match the corresponding adv search input
       search_label = label.replace('_',  '').replace('ids',  '')
       input_element = $("##{search_label}-input")
-
       if selectize_elements.includes(search_label)
         #set values of known selectize inputs
         values = search_value.split(', ')
         for val in values
           input_element[0].selectize.addOption({ value: val, text: val })
+          input_element[0].selectize.setValue(values)
       else if input_element[0] && input_element[0].selectize
         #catchall for inputs that fall through the cracks
-        input_element[0].selectize.setValue(searchCriteria)
+        input_element[0].selectize.setValue(search_value)
       else
         #set values of non selectize inputs
-        input_element.val(searchCriteria)
+        input_element.val(search_value)
 
       # if the value has been searched, make sure that the input isn't hidden
       input_element.removeClass('hidden')
