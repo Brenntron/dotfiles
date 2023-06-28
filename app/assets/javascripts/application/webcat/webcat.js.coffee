@@ -688,6 +688,10 @@ $ ->
                 className: 'assignee-col'
               }
               {
+                data: 'channel'
+                className: 'channel-col'
+              }
+              {
                 data: 'age_int'
                 visible: false
               }

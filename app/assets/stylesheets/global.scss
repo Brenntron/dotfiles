@@ -11821,6 +11821,9 @@ div[aria-describedby='create-detection-dialog'] {
 .table > tbody > tr > td.assignee-col, table > tbody > tr > td.assignee-col {
   min-width: 90px !important;
 }
+td.channel-col{
+  text-transform: capitalize;
+}
 
  // dbinebri: adding a specific on-click sha tooltip
 .copied-sha-tooltip {
