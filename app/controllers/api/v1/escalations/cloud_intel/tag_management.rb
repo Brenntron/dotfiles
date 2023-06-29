@@ -33,111 +33,25 @@ module API
               end
             end
 
-            desc "Add a tag"
+            desc "Update an observable"
             params do
-              optional :domain, type: String
-              optional :ip, type: String
-              optional :url, type: String
-              optional :sha, type: String
-              requires :taxonomy_id, type: Integer
-              requires :taxonomy_entry_id, type: Integer
-            end
-            post "add_tag" do
-              std_api_v2 do
-                item = {
-                    domain: params[:domain],
-                    ip: params[:ip],
-                    url: params[:url],
-                    sha: params[:sha],
-                    action: "add",
-                    tags: [{
-                               tag_type_id: 1,
-                               taxonomy_id: params[:taxonomy_id],
-                               taxonomy_entry_id: params[:taxonomy_entry_id]
-                           }]
-                }
-                Tmi::TmiGrpc.update_by_context(items: [item])
+              group :items, type: Array do
+                optional :domain, type: String
+                optional :ip, type: String
+                optional :url, type: String
+                optional :sha, type: String
+                optional :action, type: String
+                group :tags, type: Array do
+                  optional :tag_type_id, type: Integer, default: 1
+                  optional :taxonomy_id, type: Integer
+                  optional :taxonomy_entry_id, type: Integer
+                end
               end
             end
-
-            desc "Remove a tag"
-            params do
-              optional :domain, type: String
-              optional :ip, type: String
-              optional :url, type: String
-              optional :sha, type: String
-              requires :taxonomy_id, type: Integer
-              requires :taxonomy_entry_id, type: Integer
-            end
-            post "remove_tag" do
+            post "update_by_context" do
               std_api_v2 do
-                item = {
-                    domain: params[:domain],
-                    ip: params[:ip],
-                    url: params[:url],
-                    sha: params[:sha],
-                    action: "delete",
-                    tags: [{
-                               tag_type_id: 1,
-                               taxonomy_id: params[:taxonomy_id],
-                               taxonomy_entry_id: params[:taxonomy_entry_id]
-                           }]
-                }
-                Tmi::TmiGrpc.update_by_context(items: [item])
-              end
-            end
-
-            desc "Suppress a tag"
-            params do
-              optional :domain, type: String
-              optional :ip, type: String
-              optional :url, type: String
-              optional :sha, type: String
-              requires :taxonomy_id, type: Integer
-              requires :taxonomy_entry_id, type: Integer
-            end
-            post "suppress_tag" do
-              std_api_v2 do
-                item = {
-                    domain: params[:domain],
-                    ip: params[:ip],
-                    url: params[:url],
-                    sha: params[:sha],
-                    action: "suppress",
-                    tags: [{
-                               tag_type_id: 1,
-                               taxonomy_id: params[:taxonomy_id],
-                               taxonomy_entry_id: params[:taxonomy_entry_id]
-                           }]
-                }
-                Tmi::TmiGrpc.update_by_context(items: [item])
-              end
-            end
-
-            desc "Unsuppress a tag"
-            params do
-              optional :domain, type: String
-              optional :ip, type: String
-              optional :url, type: String
-              optional :sha, type: String
-              requires :taxonomy_id, type: Integer
-              requires :taxonomy_entry_id, type: Integer
-            end
-            post "unsuppress_tag" do
-              std_api_v2 do
-                item = {
-                    domain: params[:domain],
-                    ip: params[:ip],
-                    url: params[:url],
-                    sha: params[:sha],
-                    action: "unsuppress",
-                    tags: [{
-                               tag_type_id: 1,
-                               taxonomy_id: params[:taxonomy_id],
-                               taxonomy_entry_id: params[:taxonomy_entry_id]
-                           }]
-                }
-                Tmi::TmiGrpc.update_by_context(items: [item])
+                response = ::Tmi::TmiGrpc.update_by_context(items: params[:items], source: current_user.cvs_username)
+                response.to_h
               end
             end
           end
