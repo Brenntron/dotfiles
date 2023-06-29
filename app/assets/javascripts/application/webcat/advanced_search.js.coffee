@@ -18,16 +18,9 @@ namespace 'AC.WebCat', (exports) ->
       url: "/escalations/api/v1/escalations/webcat/customers_names_selectize"
       success_reload: false
       success: (response) ->
-        element = $('#name-input')[0].selectize
-
         json = JSON.parse(response)
         for customer_name in json
-          element.addOption(customer_name)
-        {webcat_search_conditions, webcat_search_type} = localStorage
-        if webcat_search_conditions
-          if webcat_search_type == 'advanced'
-            search = JSON.parse webcat_search_conditions
-
+          $('#name-input')[0].selectize.addOption(customer_name)
     )
 
   exports.createAssigneeOptions = ->
@@ -47,30 +40,32 @@ namespace 'AC.WebCat', (exports) ->
     searchConditions = JSON.parse localStorage.webcat_search_conditions
     company_val = []
     name_val = []
+    
     for label, search_value of searchConditions
       continue if search_value == ''
       selectize_elements = ['tags','assignee','category','company','status','resolution','name','complaint','channel','entryid','complaintid','jiraid','submitter-type']
 
+      #make sure that labels match the corresponding adv search input
       label = label.replace('_',  '')
                    .replace('modified',  'modified-')
                    .replace('submitted',  'submitted-')
                    .replace('ids',  '')
-
+      #make sure that labels match the corresponding adv search input
       if label == 'id'             then label = 'entryid'
       if label == 'user_id'        then label = 'assignee'
       if label == 'platform_ids'   then label = 'platform'
       if label == 'ip_or_uri'      then label = 'complaint'
-      if label == 'customer_email' then label = 'email'
-      if label == 'company_name'   then label = 'company'
-      if label == 'submittertype' then label = 'submitter-type'
-      if label == 'customername' then label = 'name'
-      #make sure that labels match the corresponding adv search input
+      if label == 'customeremail' then label = 'email'
+      if label == 'companyname'    then label = 'company'
+      if label == 'submittertype'  then label = 'submitter-type'
+      if label == 'customername'   then label = 'name'
 
       input_element = $("##{label}-input")
+
       if selectize_elements.includes(label)
         #set values of known selectize inputs
         values = search_value.split(', ')
-        selectize_el = input_element[0].selectize
+
         if label == 'company'
           # the company selectize requires a timeout to avoid timing issues
           company_val = values
@@ -78,20 +73,16 @@ namespace 'AC.WebCat', (exports) ->
             $("#company-input")[0].selectize.setValue(company_val)
           ,500
         else if label == 'name'
-          # the customer name selectize requires a timeout to avoid timing issues
+          # the company names electize requires a timeout to avoid timing issues
           name_val = values
           setTimeout ->
-            $("#name-input")[0].selectize
-#            for val in name_val
-#              $("#name-input")[0].selectize.addOption({ value: val, text: val})
             $("#name-input")[0].selectize.setValue(name_val)
-            console.log name_val
-          ,1100
+          ,2500
         else
           for val in values
-            selectize_el.addOption({ value: val.trim(), text: val.trim() })
-          selectize_el.setValue(values)
+            input_element[0].selectize.addOption({ value: val.trim(), text: val.trim() })
 
+        input_element[0].selectize.setValue(values)
       else
         if input_element[0] && input_element[0].selectize
           #catchall for selectize inputs that fall through the cracks
