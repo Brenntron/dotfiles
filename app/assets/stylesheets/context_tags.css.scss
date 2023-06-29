@@ -12,7 +12,7 @@
     white-space: nowrap;
     overflow: hidden;
   }
-  .ctt-entry-selector {
+  .ctt-choose-an-entry {
     position: absolute;
     left: 160px;
     top: 10px;
@@ -181,8 +181,8 @@
   min-width: 800px;
 }
 
-// ensure bg color if table width extends off page
-.datatable-tmi, .datatable-enrichment {
+// ensure bg color if table width extends off page on context tags tab
+.ctt-table {
   background-color: #fff;
 }
 
