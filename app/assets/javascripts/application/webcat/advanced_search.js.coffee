@@ -21,7 +21,7 @@ namespace 'AC.WebCat', (exports) ->
             { company_name } = JSON.parse localStorage.webcat_search_conditions
 
             if company_name
-              element[0].selectize.setValue(company_name)
+              element[0].selectize.setValue(company_name.split(', '))
     )
 
   exports.createCustomerNameOptions = ->
@@ -45,7 +45,7 @@ namespace 'AC.WebCat', (exports) ->
             { customer_name } = JSON.parse localStorage.webcat_search_conditions
 
             if customer_name
-              element[0].selectize.setValue(customer_name)
+              element[0].selectize.setValue(customer_name.split(', '))
     )
 
   exports.createAssigneeOptions = ->
@@ -63,21 +63,24 @@ namespace 'AC.WebCat', (exports) ->
           selectize.addOption(assignee)
 
         { webcat_search_conditions, webcat_search_type } = localStorage
-
         if webcat_search_type?
           if webcat_search_type == 'advanced'
             { user_id } = JSON.parse localStorage.webcat_search_conditions
-
             if user_id
-              element[0].selectize.setValue(user_id)
+              element[0].selectize.setValue(user_id.split(', '))
     )
 
   exports.populateSearchCriteria = ->
     return unless localStorage.webcat_search_conditions
     searchConditions = JSON.parse localStorage.webcat_search_conditions
     for searchLabel, searchCriteria of searchConditions
-      continue if searchCriteria == ''
-
+      continue if searchCriteria == '' 
+     
+      # company_name, user_id, customer_name we populate by 
+      # calling the createCompanyOptions, createCustomerNameOptions, createAssigneeOptions functions
+      # so no need to do it here
+      continue if ['company_name', 'user_id', 'customer_name'].includes(searchLabel)
+     
       if searchLabel == 'platform_ids'
         $searchLabel = $('#platform-input')
       else if searchLabel == 'ip_or_uri'
@@ -93,6 +96,13 @@ namespace 'AC.WebCat', (exports) ->
           $searchLabel[0].selectize.addOption({ value: entryid, text: entryid })
       else if searchLabel == 'customer_email'
         $searchLabel = $('#email-input')
+      else if searchLabel == 'jira_id'
+        $searchLabel = $('#jiraid-input')
+        ticketIds = searchCriteria.split(', ')
+        for ticketId in ticketIds
+          $searchLabel[0].selectize.addOption({ value: ticketId, text: ticketId })
+      else if searchLabel == 'platforms'
+        $searchLabel = $('#platform-input')
       else if searchLabel == 'complaint_id'
         $searchLabel = $('#complaintid-input')
         complaintIds = searchCriteria.split(', ')
@@ -102,13 +112,13 @@ namespace 'AC.WebCat', (exports) ->
         searchLabelTransformed = searchLabel.replace /_ids/, ''
         searchLabelTransformed = searchLabelTransformed.replace /_/, '-'
         $searchLabel = $("##{searchLabelTransformed}-input")
+      multipleFields = ['id', 'ip_or_uri', 'complaint_id', 'tags', 'status', 'channel', 'jira_id', 'resolution', 'platforms', 'submitter_type']
 
-      if searchLabel == 'id' || searchLabel == 'ip_or_uri' || searchLabel == 'complaint_id'
+      if multipleFields.includes(searchLabel)
         splitSearchCriteria = searchCriteria.split(', ')
         $searchLabel[0].selectize.setValue(splitSearchCriteria)
       else if $searchLabel[0] && $searchLabel[0].selectize
         $searchLabel[0].selectize.setValue(searchCriteria)
       else
         $searchLabel.val(searchCriteria)
-
       $("##{searchLabel}-input").removeClass('hidden')
