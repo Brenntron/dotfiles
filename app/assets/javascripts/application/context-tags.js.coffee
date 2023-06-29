@@ -35,10 +35,14 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
 
 # part 2 of enrichment, set up enrichment based on url passed in
 window.setup_enrichment_section_webrep = (param) ->
+  if $('body').hasClass('dt-inited')
+    $('#webrep-tmi-dt').DataTable().destroy()
+    $('#webrep-enrichment-dt').DataTable().destroy()
+    $('#webrep-prevalence-dt').DataTable().destroy()
 
+  $('.webrep-tmi-table tbody tr:not(.placeholder-row)').remove()
   $('.webrep-enrichment-table tbody').empty()
   $('.webrep-prevalence-table tbody').empty()
-
 
   # update curr view to selected entry
   if param == 'update'
@@ -95,11 +99,8 @@ window.setup_enrichment_section_webrep = (param) ->
 
 # part 3 of enrichment
 window.create_webrep_enrichment_section = (tags, context) ->
-
-
   enrich_tbody = $('.webrep-enrichment-table tbody')
   $('.webrep-enrichment-table').removeClass('hidden')
-
 
   $(tags).each (index, tag) ->
     name = ''
@@ -457,91 +458,58 @@ window.group_by_tag_filerep = (array, key) ->
 
 
 
-
 # init these dts, keep in sep function for when promise resolves elsewhere (api call is delayed).
 window.enrich_prev_dt_inits = () ->
-  console.log 'hi there'
   # do some housekeeping before init the dts
   $('.enrichment-loader, .prevalence-loader').addClass('hidden')  # remove loaders
 
-#
-#  unless $('#webrep-tmi-dt').hasClass('inited')
-#
-#
-#    # verify we dont reinit all 3 dts, make sure its clearly inited in the dom
-#    $('#webrep-tmi-dt').addClass('inited')
-#
-#
-#
-#    # dt init the tmi dt (and save to a variable for column hiding)
-#    tmi_table = $('#webrep-tmi-dt').DataTable
-#      paging: false
-#      searching: false
-#      info: false
-#      order: [[ 1, 'asc']]
-#      columnDefs: [
-#        {
-#          targets: [ 0 ]
-#          orderable: false
-#          sortable: false
-#        }
-#      ]
-#
-#    # show or hide columns in tmi table
-#    $('.toggle-col-tmi').each ->
-#      checkbox = $(this).find('input')
-#      column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
-#
-#      if $(checkbox).prop('checked') then column.visible(true)
-#      else column.visible(false)
-#
-#      # click anywhere in the li to toggle
-#      $(this).click ->
-#        $(checkbox).prop('checked', !checkbox.prop('checked'))
-#        column.visible(!column.visible())
-#
-#      # or click the cb specifically to toggle
-#      $(checkbox).click ->
-#        $(checkbox).prop('checked', !checkbox.prop('checked'))
-#
-#
-#    # dt init the enrich dt
-#    $('#webrep-enrichment-dt').DataTable
-#        paging: false
-#        searching: false
-#        info: false
-#
-#    # dt init the prev dt
-#    $('#webrep-prevalence-dt').DataTable
-#        paging: false
-#        searching: false
-#        info: false
+  # dt init the enrich dt
+  $('#webrep-enrichment-dt').DataTable
+    paging: false
+    searching: false
+    info: false
+
+  # dt init the prev dt
+  $('#webrep-prevalence-dt').DataTable
+      paging: false
+      searching: false
+      info: false
+
+  # dt init the tmi dt (and save to a variable for column hiding)
+  tmi_table = $('#webrep-tmi-dt').DataTable
+    paging: false
+    searching: false
+    info: false
+    order: [[ 1, 'asc']]
+    columnDefs: [
+      {
+        targets: [ 0 ]
+        orderable: false
+        sortable: false
+      }
+    ]
+
+  # show or hide columns in tmi table
+  $('.toggle-col-tmi').each ->
+    checkbox = $(this).find('input')
+    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
+
+    if $(checkbox).prop('checked') then column.visible(true)
+    else column.visible(false)
+
+    # click anywhere in the li to toggle
+    $(this).click ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+      column.visible(!column.visible())
+
+    # or click the cb specifically to toggle
+    $(checkbox).click ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
 
 
-#  # refactor below into dry code when tmi is near-final
-#  if $('.enrichment-area table:not(.hidden) tbody td').length == 0
-#    $('.enrichment-missing').removeClass('hidden')
-#    $('.enrichment-webrep-table').addClass('hidden')
-#
-#  # init the webrep enrich dt, unless its already been inited
-#  else
-#    $('.enrichment-error').addClass('hidden')
-#
-##    $('#enrichment-webrep-dt').DataTable
-##        paging: false
-##        searching: false
-##        info: false
-#
-#  # refactor below into dry code when tmi is near-final
-#  if $('.prevalence-area table:not(.hidden) tbody td').length == 0
-#    $('.prevalence-missing').removeClass('hidden')
-#    $('.prevalence-webrep-table').addClass('hidden')
-
-#    $('#prevalence-webrep-dt').DataTable
-#      paging: false
-#      searching: false
-#      info: false
-
+  # set a flag that dts have been inited, so we can re-init properly on change entry
+  if $('body').hasClass('dt-inited') == false
+    $('body').addClass('dt-inited')
 
 
 $ ->
