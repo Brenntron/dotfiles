@@ -1,6 +1,8 @@
 # WEBREP ENRICHMENT
 # WEBREP ENRICHMENT
 
+# REMOVE BELOW WHEN TMI IS DONE.
+
 # part 1 of enrichment (enrich and prev data come from same place)
 window.get_enrichment_service_webrep = (query_item, query_type) ->
   data = {'query_item': query_item, 'query_type', query_type}
@@ -10,9 +12,12 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
     data: data
     success: (response) ->
       return response
+      # on success, build out everything into the same div with latest data
     error: (response) ->
-      $('.enrichment-loader, .prevalence-loader').addClass('hidden')
+      $('.enrichment-loader').addClass('hidden')
       $('.enrichment-error').removeClass('hidden')
+
+      $('.prevalence-loader').addClass('hidden')
       $('.prevalence-error').removeClass('hidden')
       # RESTORE BELOW WHEN TMI IS DONE
       # RESTORE BELOW WHEN TMI IS DONE
@@ -23,51 +28,81 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
       console.clear()
       console.log 'response for enrichment:'
       console.log response
-      $('.error-msg .close').click()  # REMOVE THIS TOO
-      $('.fade').remove()  # REMOVE THIS TOO
+      $('.error-msg .close').click()  # REMOVE THIS WHEN TMI IS DONE.
+      $('.fade').remove()  # REMOVE THIS WHEN TMI IS DONE.
 
 
-# part 2 of enrichment
-window.setup_enrichment_section_webrep = () ->
-  # research table row is a parent row on show page
-  # handle multiple entries per case id, below will only handle one right now. future ticket will fix this.
+
+# part 2 of enrichment, set up enrichment based on url passed in
+window.setup_enrichment_section_webrep = (param) ->
+  # reset the select first
+
+  # FIX THIS LINE, CAUSING ALL THE ISSUES
+  # FIX THIS LINE, CAUSING ALL THE ISSUES
+  # FIX THIS LINE, CAUSING ALL THE ISSUES
+#  $('.ctt-entry-select').empty()
+
+  # build the select options from research tab
   $('.research-table-row').each ->
-    ip_uri = $(this).find('.entry-data-content').text().trim()
+    curr_url = $(this).find('.entry-data-content').text().trim()
+    curr_option = "<option class='mult-entry-option' data-url='#{curr_url}' value='#{curr_url}'>#{curr_url}</option>"
+    $(".ctt-entry-select").append(curr_option)
 
-    # enrichment services uses a separate api call - needs to be handled w/ a js promise (2-3 sec lag)
-    enrich_promise = new Promise (resolve, reject) ->
-      enrich_json = get_enrichment_service_webrep(ip_uri)  # this is the actual api call
-      if enrich_json
-        resolve enrich_json
+  # update curr view to selected entry
+  if param == 'update'
+    # clear out the tbodys first
+    $('.enrich-webrep-table tbody tr').remove()
+    $('.prevalence-webrep-table tbody tr').remove()
 
-    enrich_promise.then (response) ->
-      email_context_tags = []
-      web_context_tags = []
-      enrichment_context_tags = []
+    # keep these lines non-dry
+    $('.enrichment-table, .enrichment-error').addClass('hidden')
+    $('.prevalence-table, .prevalence-error').addClass('hidden')
+    $('.enrichment-loader, .prevalence-loader').removeClass('hidden')
 
-      #look for data in context_tags, email_context_tags and web_context_tags, multiple entries are possible in each so loop through to grab them all
-      if response?.data?.email_context_tags.length > 0 then email_context_tags = response.data.email_context_tags
-      if response?.data?.web_context_tags.length > 0 then web_context_tags = response.data.web_context_tags
-      if response?.data?.context_tags.length > 0 then enrichment_context_tags = response.data.context_tags
+    ip_uri = $('.ctt-entry-select option:selected').attr('data-url')
 
-      # create functions below do the add-to-dom
-      if email_context_tags.length > 0 || web_context_tags.length > 0 || enrichment_context_tags.length > 0
-        if email_context_tags.length > 0
-          create_webrep_enrichment_section(email_context_tags, 'Email')
+    console.log 'THIS IS THE URL YOU JUST SELECTED:'
+    console.log ip_uri
 
-        if web_context_tags.length > 0
-          create_webrep_enrichment_section(web_context_tags, 'Web')
+  # if no uri is passed in, use the first research row from research tab
+  else
+    ip_uri = $(".research-table-row:eq(0)").find(".entry-data-content").text().trim()
 
-        #need to pass the tags, context, enrich_toolbar_cell and table to function
-        if enrichment_context_tags.length > 0
-          create_webrep_enrichment_section(enrichment_context_tags, 'Enrichment')
 
-      # prevalence data comes bundled with enrich data, may as well pass it from on here
-      if response?.data?.prevalence?.responses?
-        create_webrep_prevalence_section(response.data.prevalence.responses)
+  # enrichment services uses a separate api call - needs to be handled w/ a js promise (2-3 sec lag)
+  enrich_promise = new Promise (resolve, reject) ->
+    enrich_json = get_enrichment_service_webrep(ip_uri)  # this is the actual api call
+    if enrich_json
+      resolve enrich_json
 
-      # init the dts on ct tab now
-      enrichment_prevalence_actions()
+  enrich_promise.then (response) ->
+    email_context_tags = []
+    web_context_tags = []
+    enrichment_context_tags = []
+
+    #look for data in context_tags, email_context_tags and web_context_tags, multiple entries are possible in each so loop through to grab them all
+    if response?.data?.email_context_tags.length > 0 then email_context_tags = response.data.email_context_tags
+    if response?.data?.web_context_tags.length > 0 then web_context_tags = response.data.web_context_tags
+    if response?.data?.context_tags.length > 0 then enrichment_context_tags = response.data.context_tags
+
+    # create functions below do the add-to-dom
+    if email_context_tags.length > 0 || web_context_tags.length > 0 || enrichment_context_tags.length > 0
+      if email_context_tags.length > 0
+        create_webrep_enrichment_section(email_context_tags, 'Email')
+
+      if web_context_tags.length > 0
+        create_webrep_enrichment_section(web_context_tags, 'Web')
+
+      #need to pass the tags, context, enrich_toolbar_cell and table to function
+      if enrichment_context_tags.length > 0
+        create_webrep_enrichment_section(enrichment_context_tags, 'Enrichment')
+
+    # prevalence data comes bundled with enrich data, may as well pass it from on here
+    if response?.data?.prevalence?.responses?
+      create_webrep_prevalence_section(response.data.prevalence.responses)
+
+    # init the dts on ct tab now
+    enrichment_prevalence_actions()
 
 
 # part 3 of enrichment
@@ -138,11 +173,11 @@ window.create_webrep_enrichment_section = (tags, context) ->
     $(curr_row).append(external_ref_cell)
 
     # append a table row
-    $(enrich_tbody).append(curr_row)  # add to dom
+    $(enrich_tbody).append(curr_row)  # ADD TO DOM
 
 
 $ ->
-  # start the enrich table build
+  # enrichment functions are defined, build it out on initial page load
   setup_enrichment_section_webrep()
 
 
@@ -436,37 +471,36 @@ window.group_by_tag_filerep = (array, key) ->
 
 # CONTEXT TAGS - final actions and housekeeping can go below
 # CONTEXT TAGS - final actions and housekeeping can go below
-$ ->
-  tmi_table = $('#tmi-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-    order: [[ 1, 'asc']]
-    columnDefs: [
-      {
-        targets: [ 0 ]
-        orderable: false
-        sortable: false
-      }
-    ]
-
-
-  # show or hide columns in tmi table
-  $('.toggle-col-tmi').each ->
-    checkbox = $(this).find('input')
-    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
-
-    if $(checkbox).prop('checked') then column.visible(true)
-    else column.visible(false)
-
-    # click anywhere in the li to toggle
-    $(this).click ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
-      column.visible(!column.visible())
-
-    # or click the cb specifically to toggle
-    $(checkbox).click ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
+#$ ->
+#  tmi_table = $('#tmi-dt').DataTable
+#    paging: false
+#    searching: false
+#    info: false
+#    order: [[ 1, 'asc']]
+#    columnDefs: [
+#      {
+#        targets: [ 0 ]
+#        orderable: false
+#        sortable: false
+#      }
+#    ]
+#
+#  # show or hide columns in tmi table
+#  $('.toggle-col-tmi').each ->
+#    checkbox = $(this).find('input')
+#    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
+#
+#    if $(checkbox).prop('checked') then column.visible(true)
+#    else column.visible(false)
+#
+#    # click anywhere in the li to toggle
+#    $(this).click ->
+#      $(checkbox).prop('checked', !checkbox.prop('checked'))
+#      column.visible(!column.visible())
+#
+#    # or click the cb specifically to toggle
+#    $(checkbox).click ->
+#      $(checkbox).prop('checked', !checkbox.prop('checked'))
 
 
 
@@ -485,29 +519,25 @@ window.enrichment_prevalence_actions = () ->
   else
     $('.enrichment-error').addClass('hidden')
 
-    # FIX THIS
-#
-#    unless enrichment_webrep_dt
-#      enrichment_webrep_dt = $('#enrichment-webrep-dt').DataTable
+#    $('#enrichment-webrep-dt').DataTable
 #        paging: false
 #        searching: false
 #        info: false
-#
 
   # refactor below into dry code when tmi is near-final
   if $('.prevalence-area table:not(.hidden) tbody td').length == 0
     $('.prevalence-missing').removeClass('hidden')
     $('.prevalence-webrep-table').addClass('hidden')
 
-# FIX THIS
-#
-#  else
-#    $('.prevalence-error').addClass('hidden')
-#
-#    unless prevalence_webrep_dt
-#      prevalence_webrep_dt = $('#prevalence-webrep-dt').DataTable
-#        paging: false
-#        searching: false
-#        info: false
+#    $('#prevalence-webrep-dt').DataTable
+#      paging: false
+#      searching: false
+#      info: false
 
 
+
+# choose an entry if multiple entries exist
+$ ->
+  unless !$('.top-case-info .dispute-entry-count')
+    if parseInt($('.top-case-info .dispute-entry-count').text().trim()) > 1
+      $('.ctt-entry-select').removeClass('hidden')

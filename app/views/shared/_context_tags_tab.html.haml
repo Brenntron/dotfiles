@@ -1,9 +1,18 @@
--# context tags tab exists on both webrep and filerep
+-# context tags tab (ctt) exists on both webrep and filerep
 .row
   .col-sm-12
     %h1 Context Tags
-    %h2 Tag Management Interface
 
+    -# choose an entry if multiple entries exist
+    .ctt-entry-selector.hidden
+      %span.ctt-entry-label
+        Entry:
+
+      -# options will be generated separately below
+      %select.ctt-entry-select{onchange: "setup_enrichment_section_webrep('update')"}
+
+
+    %h2 Tag Management Interface
     .toolbar.tmi-toolbar
       %div
         %label.toolbar-section-label
@@ -62,7 +71,7 @@
           %span.toolbar-button-text Remove Tag
 
     -# tag management interface datatable used on both webrep and filerep
-    %table.context-tags-table#tmi-dt
+    %table.ctt-table#tmi-dt
       %thead
         %tr
           %th
@@ -83,7 +92,9 @@
         %tr
           %td.tmi-cell-cb
             %input.cb-tmi{type:'checkbox'}
-          %td.tmi-cell-observable example.com
+          %td.tmi-cell-observable
+            %span.observable-container.esc-tooltipped{title: "example.com"}
+              example.com
           %td.tmi-cell-tag-name Internet Accessible Device
           %td.tmi-cell-mnemonic Testing
           %td.tmi-cell-tag-type Techniques
@@ -98,67 +109,9 @@
         %tr
           %td.tmi-cell-cb
             %input.cb-tmi{type:'checkbox'}
-          %td.tmi-cell-observable example.com
-          %td.tmi-cell-tag-name Questionable
-          %td.tmi-cell-mnemonic Example
-          %td.tmi-cell-tag-type Techniques
-          %td.tmi-cell-taxonomy MITRE ATT&CK
-          %td.tmi-cell-source test_name
-          %td.tmi-cell-processor Example
-          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
-          %td.tmi-cell-suppressed YES
-          %td.tmi-cell-suppression-source Example
-          %td.tmi-cell-suppression-platform Example
-          %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
-        %tr
-          %td.tmi-cell-cb
-            %input.cb-tmi{type:'checkbox'}
-          %td.tmi-cell-observable example.com
-          %td.tmi-cell-tag-name Questionable
-          %td.tmi-cell-mnemonic Example
-          %td.tmi-cell-tag-type Techniques
-          %td.tmi-cell-taxonomy MITRE ATT&CK
-          %td.tmi-cell-source test_name
-          %td.tmi-cell-processor Example
-          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
-          %td.tmi-cell-suppressed YES
-          %td.tmi-cell-suppression-source Example
-          %td.tmi-cell-suppression-platform Example
-          %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
-        %tr
-          %td.tmi-cell-cb
-            %input.cb-tmi{type:'checkbox'}
-          %td.tmi-cell-observable example.com
-          %td.tmi-cell-tag-name Questionable
-          %td.tmi-cell-mnemonic Example
-          %td.tmi-cell-tag-type Techniques
-          %td.tmi-cell-taxonomy MITRE ATT&CK
-          %td.tmi-cell-source test_name
-          %td.tmi-cell-processor Example
-          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
-          %td.tmi-cell-suppressed YES
-          %td.tmi-cell-suppression-source Example
-          %td.tmi-cell-suppression-platform Example
-          %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
-        %tr
-          %td.tmi-cell-cb
-            %input.cb-tmi{type:'checkbox'}
-          %td.tmi-cell-observable example.com
-          %td.tmi-cell-tag-name Questionable
-          %td.tmi-cell-mnemonic Example
-          %td.tmi-cell-tag-type Techniques
-          %td.tmi-cell-taxonomy MITRE ATT&CK
-          %td.tmi-cell-source test_name
-          %td.tmi-cell-processor Example
-          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
-          %td.tmi-cell-suppressed YES
-          %td.tmi-cell-suppression-source Example
-          %td.tmi-cell-suppression-platform Example
-          %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
-        %tr
-          %td.tmi-cell-cb
-            %input.cb-tmi{type:'checkbox'}
-          %td.tmi-cell-observable example.com
+          %td.tmi-cell-observable
+            %span.observable-container.esc-tooltipped{title: "example.com/example/asdfjlaksdfllaskdfalsdkfjalsdkfjasdf/asdfljasdlfjklasjdklfjlsdaflj-asldkfjasdkljfasdf"}
+              example.com/example/asdfjlaksdfllaskdfalsdkfjalsdkfjasdf/asdfljasdlfjklasjdklfjlsdaflj-asldkfjasdkljfasdf
           %td.tmi-cell-tag-name Questionable
           %td.tmi-cell-mnemonic Example
           %td.tmi-cell-tag-type Techniques
@@ -175,14 +128,8 @@
     -# enrich and prevalence areas below are used by webrep and filerep context tags tab
     %h2 Enrichment Service
     .enrichment-area
-      %p.enrichment-loader.loading-message
-        Loading...
-      %p.enrichment-missing.missing-data.hidden
-        No enrichment data found.
-      %p.enrichment-error.missing-data.hidden
-        Error gathering enrichment data.
 
-      %table#enrichment-webrep-dt.enrich-webrep-table.context-tags-table.hidden
+      %table#enrichment-webrep-dt.enrich-webrep-table.ctt-table.enrichment-table.hidden
         %thead
           %tr
             %th Context
@@ -192,20 +139,31 @@
             %th External References
         %tbody
 
+      %p.enrichment-loader.ctt-loader
+        = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
+        %span.loader-msg Loading...
+
+      %p.enrichment-missing.missing-data.hidden
+        No enrichment data found.
+      %p.enrichment-error.missing-data.hidden
+        Error gathering enrichment data.
 
     %h2 Prevalence
     .prevalence-area
-      %p.prevalence-loader.loading-message
-        Loading...
-      %p.prevalence-missing.missing-data.hidden
-        No prevalence data found.
-      %p.prevalence-error.missing-data.hidden
-        Error gathering prevalence data.
 
-      %table#prevalence-webrep-dt.prevalence-webrep-table.context-tags-table.hidden
+      %table#prevalence-webrep-dt.prevalence-webrep-table.ctt-table.prevalence-table.hidden
         %thead
           %th Dataset
           %th Count
           %th First Seen
           %th Last Seen
         %tbody
+
+      %p.prevalence-loader.ctt-loader
+        = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
+        %span.loader-msg Loading...
+
+      %p.prevalence-missing.missing-data.hidden
+        No prevalence data found.
+      %p.prevalence-error.missing-data.hidden
+        Error gathering prevalence data.
