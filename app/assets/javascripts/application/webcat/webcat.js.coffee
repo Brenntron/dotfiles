@@ -827,11 +827,12 @@ $ ->
     }
 #    customer_input
     $('#name-input').selectize {
-      persist: false,
+      persist: true,
       create: false,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
+      options: AC.WebCat.createCustomerNameOptions()
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
@@ -908,15 +909,15 @@ $ ->
         window.toggle_selectize_layer(this, 'false')
     }
     $('#platform-input').selectize {
-        persist: false
-        create: false
-        valueField: 'id',
+        persist: true,
+        create: false,
+        valueField: 'public_name',
         labelField: 'public_name',
-        create: (input) ->
-          {
-            value: input
-            text: input
-          }
+        searchField: 'public_name',
+        options: AC.WebCat.createPlatformOptions()
+        render:
+          option: (item, escape) ->
+            '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'
         onFocus: () ->
           window.toggle_selectize_layer(this, 'true')
         onBlur: () ->

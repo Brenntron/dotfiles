@@ -6,10 +6,22 @@ namespace 'AC.WebCat', (exports) ->
       url: "/escalations/api/v1/escalations/webcat/companies"
       success_reload: false
       success: (response) ->
-        element = $('#company-input')[0].selectize
-        json = JSON.parse(response)
-        for company in json
-          element.addOption(company)
+        for company in JSON.parse(response)
+          $('#company-input')[0].selectize.addOption(company)
+      error : (response) ->
+        console.log response
+    )
+
+  exports.createPlatformOptions = ->
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/webcat/platforms_names'
+      success_reload: false
+      success: (response) ->
+        for platform in response.data
+          $('#platform-input')[0].selectize.addOption({ public_name: platform })
+      error : (response) ->
+        console.log response
     )
 
   exports.createCustomerNameOptions = ->
@@ -18,9 +30,11 @@ namespace 'AC.WebCat', (exports) ->
       url: "/escalations/api/v1/escalations/webcat/customers_names_selectize"
       success_reload: false
       success: (response) ->
-        json = JSON.parse(response)
-        for customer_name in json
+        for customer_name in JSON.parse(response)
           $('#name-input')[0].selectize.addOption(customer_name)
+
+      error : (response) ->
+        console.log response
     )
 
   exports.createAssigneeOptions = ->
@@ -29,10 +43,10 @@ namespace 'AC.WebCat', (exports) ->
       url: "/escalations/api/v1/users/json"
       success_reload: false
       success: (response) ->
-        element = $('#assignee-input')[0].selectize
-        json = JSON.parse(response)
-        for assignee in json
-          element.addOption(assignee)
+        for assignee in JSON.parse(response)
+          $('#assignee-input')[0].selectize.addOption(assignee)
+      error : (response) ->
+        console.log response
     )
 
   exports.populateSearchCriteria = ->
@@ -40,10 +54,10 @@ namespace 'AC.WebCat', (exports) ->
     searchConditions = JSON.parse localStorage.webcat_search_conditions
     company_val = []
     name_val = []
-    
+
     for label, search_value of searchConditions
       continue if search_value == ''
-      selectize_elements = ['tags','assignee','category','company','status','resolution','name','complaint','channel','entryid','complaintid','jiraid','submitter-type']
+      selectize_elements = ['tags','assignee','category','company','status','resolution','name','complaint','channel','entryid','complaintid','jiraid','submitter-type','platform']
 
       #make sure that labels match the corresponding adv search input
       label = label.replace('_',  '')
@@ -54,42 +68,45 @@ namespace 'AC.WebCat', (exports) ->
       if label == 'id'             then label = 'entryid'
       if label == 'user_id'        then label = 'assignee'
       if label == 'platform_ids'   then label = 'platform'
-      if label == 'ip_or_uri'      then label = 'complaint'
-      if label == 'customeremail' then label = 'email'
+      if label == 'ipor_uri'      then label = 'complaint'
+      if label == 'customeremail'  then label = 'email'
       if label == 'companyname'    then label = 'company'
       if label == 'submittertype'  then label = 'submitter-type'
       if label == 'customername'   then label = 'name'
 
       input_element = $("##{label}-input")
 
+
       if selectize_elements.includes(label)
         #set values of known selectize inputs
-        values = search_value.split(', ')
+        values = search_value.split(',').map( (val) => return val.trim())
 
         if label == 'company'
           # the company selectize requires a timeout to avoid timing issues
           company_val = values
+          for val in company_val
+            $("#company-input")[0].selectize.addOption(val)
           setTimeout ->
             $("#company-input")[0].selectize.setValue(company_val)
           ,500
         else if label == 'name'
-          # the company names electize requires a timeout to avoid timing issues
+          # the company names selectize requires a timeout to avoid timing issues
           name_val = values
           setTimeout ->
+            for val in name_val
+              $("#name-input")[0].selectize.addOption(val)
             $("#name-input")[0].selectize.setValue(name_val)
-          ,2500
+          ,5500
         else
           for val in values
-            input_element[0].selectize.addOption({ value: val.trim(), text: val.trim() })
+            input_element[0].selectize.addOption(val.trim())
 
         input_element[0].selectize.setValue(values)
       else
-        if input_element[0] && input_element[0].selectize
-          #catchall for selectize inputs that fall through the cracks
+        if input_element[0] && input_element[0].selectize #catchall for selectize inputs that fall through the cracks
           input_element[0].selectize.setValue(search_value)
-        else
-          #set values of non selectize inputs
+        else #set values of non selectize inputs
           input_element.val(search_value)
 
-#       if the value has been searched, make sure that the input isn't hidden
+      # if the value has been searched, make sure that the input isn't hidden
       input_element.removeClass('hidden')
