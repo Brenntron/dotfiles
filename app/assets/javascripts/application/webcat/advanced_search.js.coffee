@@ -108,11 +108,13 @@ namespace 'AC.WebCat', (exports) ->
         complaintIds = searchCriteria.split(', ')
         for complaintId in complaintIds
           $searchLabel[0].selectize.addOption({ value: complaintId, text: complaintId })
+      else if searchLabel == 'category_ids'
+        $searchLabel = $('#category-input')
       else
         searchLabelTransformed = searchLabel.replace /_ids/, ''
         searchLabelTransformed = searchLabelTransformed.replace /_/, '-'
         $searchLabel = $("##{searchLabelTransformed}-input")
-      multipleFields = ['id', 'ip_or_uri', 'complaint_id', 'tags', 'status', 'channel', 'jira_id', 'resolution', 'platforms', 'submitter_type']
+      multipleFields = ['id', 'ip_or_uri', 'complaint_id', 'tags', 'status', 'channel', 'jira_id', 'resolution', 'platforms', 'submitter_type', 'category_ids']
 
       if multipleFields.includes(searchLabel)
         splitSearchCriteria = searchCriteria.split(', ')
