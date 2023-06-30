@@ -2049,24 +2049,24 @@ button.close {
 
 #sidenav-menu-div {
   background-color: $sidebar-nav-base;
-  display: block;
-  position: absolute;
-  color: $content-bg-color;
-  text-transform: uppercase;
-  font-weight: 700;
-  line-height: $sidebar-width;
-  z-index: -1;
-  width: 200px;
-  height: 100%;
-  top: 0;
   bottom: 0;
+  color: $content-bg-color;
+  display: block;
+  font-weight: 700;
+  height: 100%;
   left: 0;
-  -webkit-transform: translateX(-100%);
+  line-height: $sidebar-width;
+  position: absolute;
+  text-transform: uppercase;
+  top: 0;
   transform: translateX(-100%);
+  -webkit-transform: translateX(-100%);
   -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
   transition: -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
-  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
   transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  width: 200px;
+  z-index: -1;
 }
 
 #sidenav-menu-div a {
@@ -2089,6 +2089,10 @@ button.close {
 #sidenav-menu-div .sub-nav li a, .sidenav-icons .sub-nav li a {
   color: $type-base-color;
   font-size: 8pt;
+}
+
+#sidenav-menu-div .sub-nav li a, .sidenav-icons ul li a, .nav-container ul li a {
+  color: $type-base-color;
 }
 
 .sub-nav.collapse.in {
@@ -2119,12 +2123,12 @@ button.close {
 }
 
 #admin-subnav, #admin-subnav-icons {
-  background-color: lighten($admin-section-color, 30%);
+  background-color: lighten($admin-section-color, 33%);
 }
 
 .sub-nav svg {
   width: 20px;
-  height: auto;
+  height: 20px;
   margin-left: 12px;
   margin-top: 5px;
 }
@@ -2221,6 +2225,33 @@ a.static-nav-item {
   height: $sidebar-width;
   width: auto;
   margin-top: -1px;
+}
+
+.temp-links {
+  margin-top: 20px;
+  padding-left: 2px;
+
+  li {
+    border-bottom: none !important;
+    font-size: 8pt;
+    font-weight: normal;
+  }
+
+  .icon-link svg {
+    bottom: 2px;
+    height: 42px;
+    left: 12px;
+    position: relative;
+    width: 15px;
+  }
+
+  .temp-link-full {
+    background: $sidebar-nav-base;
+    bottom: 4px;
+    padding-left: 12px;
+    position: relative;
+    right: 20px;
+  }
 }
 
 /***** End of Side Nav *****/
@@ -6046,7 +6077,7 @@ input.table-entry-input:focus {
   }
 
   .domain-name-normal {
-    color: #333;
+    color: $type-base-color;
   }
 
   .domain-name {
@@ -8203,7 +8234,7 @@ table.dispute-entry-table tbody tr.selected {
   padding: 2px 4px;
 
   &:hover {
-    background-color: darken($bug-section-color, 7%); 
+    background-color: darken($bug-section-color, 7%);
   }
 }
 
@@ -8636,7 +8667,7 @@ h2 {
   text-transform: uppercase;
   margin-top: 24px;
   margin-bottom: 6px;
-  color: #333;
+  color: $type-base-color;
 }
 
 .dashboard-header-area {
@@ -12146,7 +12177,7 @@ table.rl-content {
   white-space: pre!important;
 }
 .amp-url{
-  color: #333;
+  color: $type-base-color;
 }
 // ensure AMP disposition on File Rep > Show is capitalized in all 3 instances
 #create-detection-dialog .top-info-data,

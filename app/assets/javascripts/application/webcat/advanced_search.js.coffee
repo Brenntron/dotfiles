@@ -50,7 +50,11 @@ namespace 'AC.WebCat', (exports) ->
     )
 
   exports.populateSearchCriteria = ->
-    return unless localStorage.webcat_search_conditions
+
+    {webcat_search_conditions, webcat_search_type} = localStorage
+    return unless webcat_search_conditions && webcat_search_type == 'advanced'
+    # if there is no advance search or search conditions then break
+
     searchConditions = JSON.parse localStorage.webcat_search_conditions
     company_val = []
     name_val = []
@@ -66,16 +70,15 @@ namespace 'AC.WebCat', (exports) ->
                    .replace('ids',  '')
       #make sure that labels match the corresponding adv search input
       if label == 'id'             then label = 'entryid'
-      if label == 'user_id'        then label = 'assignee'
+      if label == 'userid'         then label = 'assignee'
       if label == 'platform_ids'   then label = 'platform'
-      if label == 'ipor_uri'      then label = 'complaint'
+      if label == 'ipor_uri'       then label = 'complaint'
       if label == 'customeremail'  then label = 'email'
       if label == 'companyname'    then label = 'company'
       if label == 'submittertype'  then label = 'submitter-type'
       if label == 'customername'   then label = 'name'
 
       input_element = $("##{label}-input")
-
 
       if selectize_elements.includes(label)
         #set values of known selectize inputs
@@ -99,7 +102,7 @@ namespace 'AC.WebCat', (exports) ->
           ,5500
         else
           for val in values
-            input_element[0].selectize.addOption(val.trim())
+            input_element[0].selectize.addOption({value: val, text: val })
 
         input_element[0].selectize.setValue(values)
       else

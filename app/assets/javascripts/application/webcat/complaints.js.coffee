@@ -802,7 +802,7 @@ window.webcat_reset_search = ()->
   for i in inputs
     i.value = ""
 
-  els = ['tags','assignee','category','company','status','resolution','name','complaint','channel', 'entryid','complaintid','jiraid','submitter-type']
+  els = ['tags','assignee','category','company','status','resolution','name','complaint','channel','entryid','complaintid','jiraid','submitter-type','platform']
   for el in els
     selectize_el = $("##{el}-input")[0].selectize
     selectize_el.clear()
