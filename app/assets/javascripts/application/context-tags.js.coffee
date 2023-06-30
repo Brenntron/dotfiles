@@ -1,8 +1,6 @@
 # WEBREP ENRICHMENT
 # WEBREP ENRICHMENT
 
-# REMOVE BELOW WHEN TMI IS DONE.
-
 # part 1 of enrichment (enrich and prev data come from same place)
 window.get_enrichment_service_webrep = (query_item, query_type) ->
   data = {'query_item': query_item, 'query_type', query_type}
@@ -15,10 +13,11 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
       # on success, build out everything into the same div with latest data
     error: (response) ->
       # dry out below
-      $('.enrichment-loader').addClass('hidden')
-      $('.enrichment-error').removeClass('hidden')
-      $('.prevalence-loader').addClass('hidden')
-      $('.prevalence-error').removeClass('hidden')
+      $('.tab-webrep-ctt .enrichment-loader').addClass('hidden')
+      $('.tab-webrep-ctt .enrichment-error').removeClass('hidden')
+      $('.tab-webrep-ctt .prevalence-loader').addClass('hidden')
+      $('.tab-webrep-ctt .prevalence-error').removeClass('hidden')
+
       # RESTORE BELOW WHEN TMI IS DONE
       # RESTORE BELOW WHEN TMI IS DONE
 #      std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
@@ -35,11 +34,13 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
 
 # part 2 of enrichment, set up enrichment based on url passed in
 window.setup_enrichment_section_webrep = (param) ->
-  if $('body').hasClass('dt-inited')
+  # reset the dts if already inited
+  if $('.tab-context-tags').hasClass('dt-inited')
     $('#webrep-tmi-dt').DataTable().destroy()
     $('#webrep-enrichment-dt').DataTable().destroy()
     $('#webrep-prevalence-dt').DataTable().destroy()
 
+  # reset the tables
   $('.webrep-tmi-table tbody tr:not(.placeholder-row)').remove()
   $('.webrep-enrichment-table tbody').empty()
   $('.webrep-prevalence-table tbody').empty()
@@ -50,7 +51,6 @@ window.setup_enrichment_section_webrep = (param) ->
     $('.enrich-webrep-table tbody tr').remove()
     $('.prevalence-webrep-table tbody tr').remove()
 
-    # keep these lines non-dry
     $('.enrichment-table, .enrichment-error').addClass('hidden')
     $('.prevalence-table, .prevalence-error').addClass('hidden')
     $('.enrichment-loader, .prevalence-loader').removeClass('hidden')
@@ -250,7 +250,7 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
 
     error: (response) ->
       std_msg_error('Error with Enrichment Service', ['There was an error.'])
-      $('.enrichment-area .enrichment-error').removeClass('hidden')
+      $('.tab-filerep-ctt .enrichment-area .enrichment-error').removeClass('hidden')
 
     complete: () ->
       # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
@@ -357,10 +357,7 @@ window.create_filerep_enrich_section = (tags, context) ->
 
     $(section_wrapper).append(table_wrapper)
 
-    # FIX THIS
-    # FIX THIS
-    # FIX THIS
-    $('.tab-context-tags .enrich-filerep-table-data').append(section_wrapper)
+    $('.enrichment-area').append(section_wrapper)
 
 
 
@@ -508,12 +505,12 @@ window.enrich_prev_dt_inits = () ->
 
 
   # set a flag that dts have been inited, so we can re-init properly on change entry
-  if $('body').hasClass('dt-inited') == false
-    $('body').addClass('dt-inited')
+  if $('.tab-context-tags').hasClass('dt-inited') == false
+    $('.tab-context-tags').addClass('dt-inited')
 
 
 $ ->
-  # show the choose-an-entry if multiple entries exist
+  # show the choose-an-entry if multiple entries exist on webrep
   num_of_disputes = parseInt($('.top-case-info .dispute-entry-count').text().trim())
   if num_of_disputes > 1
     $('.ctt-choose-an-entry').removeClass('hidden')
@@ -525,6 +522,4 @@ $ ->
 
   # enrichment functions are defined, build it out on initial page load
   setup_enrichment_section_webrep()
-
-
 
