@@ -27,8 +27,8 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
       console.clear()
       console.log 'response for enrichment:'
       console.log response
-      $('.error-msg .close').click()  # REMOVE THIS WHEN TMI IS DONE.
-      $('.fade').remove()  # REMOVE THIS WHEN TMI IS DONE.
+#      $('.error-msg .close').click()  # REMOVE THIS WHEN TMI IS DONE.
+#      $('.fade').remove()  # REMOVE THIS WHEN TMI IS DONE.
 
 
 
@@ -252,12 +252,12 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
       std_msg_error('Error with Enrichment Service', ['There was an error.'])
       $('.tab-filerep-ctt .enrichment-area .enrichment-error').removeClass('hidden')
 
-    complete: () ->
+#    complete: () ->
       # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
       # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
-      console.clear()
-      console.log 'response for enrichment:'
-      console.log response
+#      console.clear()
+#      console.log 'response for enrichment:'
+#      console.log response
   )
 
 # part 2
