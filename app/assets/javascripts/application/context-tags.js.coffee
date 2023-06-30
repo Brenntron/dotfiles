@@ -10,51 +10,42 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
     data: data
     success: (response) ->
       return response
-      # on success, build out everything into the same div with latest data
     error: (response) ->
-      # dry out below
-      $('.tab-webrep-ctt .enrichment-loader').addClass('hidden')
-      $('.tab-webrep-ctt .enrichment-error').removeClass('hidden')
-      $('.tab-webrep-ctt .prevalence-loader').addClass('hidden')
-      $('.tab-webrep-ctt .prevalence-error').removeClass('hidden')
-
-      # RESTORE BELOW WHEN TMI IS DONE
-      # RESTORE BELOW WHEN TMI IS DONE
+      $('.tab-webrep-ctt .enrichment-loader, .tab-webrep-ctt .prevalence-loader').addClass('hidden')
+      $('.tab-webrep-ctt .enrichment-error, .tab-webrep-ctt .prevalence-error').removeClass('hidden')
+      # RESTORE BELOW WHEN TMI IS DONE OR NOT NEEDED
 #      std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
     complete: (response) ->
-      # REMOVE BELOW WHEN TMI IS DONE.
-      # REMOVE BELOW WHEN TMI IS DONE.
+      # REMOVE BELOW WHEN TMI IS DONE OR NOT NEEDED
       console.clear()
       console.log 'response for enrichment:'
       console.log response
-#      $('.error-msg .close').click()  # REMOVE THIS WHEN TMI IS DONE.
-#      $('.fade').remove()  # REMOVE THIS WHEN TMI IS DONE.
+      # REMOVE BELOW WHEN TMI IS DONE OR NOT NEEDED
+#      $('.error-msg .close').click()
+#      $('.fade').remove()
 
 
 
 # part 2 of enrichment, set up enrichment based on url passed in
-window.setup_enrichment_section_webrep = (param) ->
-  # reset the dts if already inited
+window.setup_enrichment_section_webrep = (action) ->
+  # clear inited datatables to cleanly reinit on data refresh
   if $('.tab-context-tags').hasClass('dt-inited')
     $('#webrep-tmi-dt').DataTable().destroy()
     $('#webrep-enrichment-dt').DataTable().destroy()
     $('#webrep-prevalence-dt').DataTable().destroy()
 
-  # reset the tables
-  $('.webrep-tmi-table tbody tr:not(.placeholder-row)').remove()
-  $('.webrep-enrichment-table tbody').empty()
-  $('.webrep-prevalence-table tbody').empty()
+  # reset the table states
+  $('.webrep-tmi-table tbody tr:not(.placeholder-row)').remove()  # UPDATE THIS LINE PRE-FINAL
+  $('.webrep-enrichment-table tbody, .webrep-prevalence-table tbody').empty()
 
   # update curr view to selected entry
-  if param == 'update'
-    # clear out the tbodys first
-    $('.enrich-webrep-table tbody tr').remove()
-    $('.prevalence-webrep-table tbody tr').remove()
-
-    $('.enrichment-table, .enrichment-error').addClass('hidden')
-    $('.prevalence-table, .prevalence-error').addClass('hidden')
+  if action == 'update'
+    # clean up the page first when doing a data update
+    $('.enrich-webrep-table tbody tr, .prevalence-webrep-table tbody tr').remove()
+    $('.enrichment-table, .enrichment-error, .prevalence-table, .prevalence-error').addClass('hidden')
     $('.enrichment-loader, .prevalence-loader').removeClass('hidden')
 
+    # use this url or ip
     ip_uri = $('.ctt-entry-select option:selected').attr('data-url')
 
   # if no uri is passed in, use the first research row from research tab
@@ -99,8 +90,8 @@ window.setup_enrichment_section_webrep = (param) ->
 
 # part 3 of enrichment
 window.create_webrep_enrichment_section = (tags, context) ->
-  enrich_tbody = $('.webrep-enrichment-table tbody')
   $('.webrep-enrichment-table').removeClass('hidden')
+  enrich_tbody = $('.webrep-enrichment-table tbody')
 
   $(tags).each (index, tag) ->
     name = ''
@@ -171,8 +162,8 @@ window.create_webrep_enrichment_section = (tags, context) ->
 # WEBREP PREVALENCE
 # WEBREP PREVALENCE
 window.create_webrep_prevalence_section = (prevalence_data) ->
-  prevalence_tbody = $('.webrep-prevalence-table tbody')
   $('.webrep-prevalence-table').removeClass('hidden')
+  prevalence_tbody = $('.webrep-prevalence-table tbody')
 
   response_key = Object.keys(prevalence_data)[0]
 
@@ -252,9 +243,8 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
       std_msg_error('Error with Enrichment Service', ['There was an error.'])
       $('.tab-filerep-ctt .enrichment-area .enrichment-error').removeClass('hidden')
 
+# REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE OR NOT NEEDED
 #    complete: () ->
-      # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
-      # REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE.
 #      console.clear()
 #      console.log 'response for enrichment:'
 #      console.log response
@@ -468,11 +458,11 @@ window.enrich_prev_dt_inits = () ->
 
   # dt init the prev dt
   $('#webrep-prevalence-dt').DataTable
-      paging: false
-      searching: false
-      info: false
+    paging: false
+    searching: false
+    info: false
 
-  # dt init the tmi dt (and save to a variable for column hiding)
+  # dt init the tmi dt (and save to a var for col toggling)
   tmi_table = $('#webrep-tmi-dt').DataTable
     paging: false
     searching: false
@@ -515,6 +505,7 @@ $ ->
   if num_of_disputes > 1
     $('.ctt-choose-an-entry').removeClass('hidden')
 
+    # build select for choose-an-entry
     $('.research-table-row').each ->
       curr_url = $(this).find('.entry-data-content').text().trim()
       curr_option = "<option class='mult-entry-option' data-url='#{curr_url}' value='#{curr_url}'>#{curr_url}</option>"
