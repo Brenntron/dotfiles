@@ -299,6 +299,31 @@ table.dataTable thead .sorting_desc {
   background-image: url(image_path('layout/icon_sort_dec.svg'));
 }
 
+.entry-details-table {
+  /* scrollY misaligns datatable headers with the column bodies if
+    the page isn't show on page load. This overflow and max-height
+    gets the table scrollable while keeping the heads and body inline. */
+  .dataTables_wrapper.no-footer {
+      max-height: 200px;
+      overflow: auto;
+  }
+  .dataTable.no-footer {
+    overflow: auto;
+
+    th {
+      background-position-x: 95% !important;
+    }
+  }
+
+  .dataTables_wrapper.no-footer, .dataTable.no-footer {
+    border-bottom: 1px solid $table-dark-header;
+
+    .dataTable.no-footer {
+      border: 0;
+    }
+  }
+}
+
 .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
   height: 100%;
   display: inline-block;
