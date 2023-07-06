@@ -9,24 +9,18 @@ module API
 
             desc "Read tag information"
             params do
-              requires :query_item, type: String
-              requires :query_type, type: String
+              optional :domain, type: String
+              optional :ip, type: String
+              optional :url, type: String
+              optional :sha, type: String
             end
             get "read_observable" do
               std_api_v2 do
-                query_type = params[:query_type]&.downcase
-                case query_type
-                when "domain"
-                  results = ::Tmi::TmiGrpc.read(domain: params[:query_item])
-                when "ip"
-                  results = ::Tmi::TmiGrpc.read(ip: params[:query_item])
-                when "url"
-                  results = ::Tmi::TmiGrpc.read(url: params[:query_item])
-                when "sha"
-                  results = ::Tmi::TmiGrpc.read(sha: params[:query_item])
-                else
-                  raise Tmi::TmiError, "Invalid query type: #{query_type}"
-                end
+                results = ::Tmi::TmiGrpc.read(domain: params[:domain],
+                                              ip: params[:ip],
+                                              url: params[:url],
+                                              sha: params[:sha])
+
                 { data: results.to_h }
               end
             end
@@ -36,6 +30,28 @@ module API
               std_api_v2 do
                 map = ::EnrichmentService::TaxonomyMap.load_condensed_map
                 JSON.parse(map)
+              end
+            end
+
+            desc "Update an observable"
+            params do
+              group :items, type: Array do
+                optional :domain, type: String
+                optional :ip, type: String
+                optional :url, type: String
+                optional :sha, type: String
+                optional :action, type: String
+                group :tags, type: Array do
+                  optional :tag_type_id, type: Integer, default: 1
+                  optional :taxonomy_id, type: Integer
+                  optional :taxonomy_entry_id, type: Integer
+                end
+              end
+            end
+            post "update_by_context" do
+              std_api_v2 do
+                response = ::Tmi::TmiGrpc.update_by_context(items: params[:items], source: current_user.cvs_username)
+                response.to_h
               end
             end
           end
