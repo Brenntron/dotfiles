@@ -172,50 +172,48 @@ window.build_single_row = (rd, data) ->
             targets: [ 10 ]
             className:'entry-assignee'
           }]
-      drawCallback:()->
-        init_tooltip()  #initialize tooltip after table is drawn and html exists (this is just for important tags at the moment)
+        drawCallback:()->
+          init_tooltip()  #initialize tooltip after table is drawn and html exists (this is just for important tags at the moment)
 
-      createdRow: (row, data, index) ->
-        url =          data[2]
-        entry_id =     data[4]
-        complaint_id = data[5]
-        status =       data[6]
-        age =          data[11]
-        is_important = data[1]
-        console.log 'inininininin'
-        console.log checkbox, $('td', row).eq(0)
-#          checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
-        checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-1'  id='cbox-1-#{index}-urls' value='1'/>"
-        $('td', row).eq(0).html(checkbox)
-        console.log checkbox, $('td', row).eq(0)
-        if url
-          updated_url = "<span class='jira-url esc-tooltipped' title='#{url}'>#{url}</span>"
-          $('td', row).eq(2).html(updated_url)
+        createdRow: (row, data, index) ->
+            url =          data[2]
+            entry_id =     data[4]
+            complaint_id = data[5]
+            status =       data[6]
+            age =          data[11]
+            is_important = data[1]
 
-        if complaint_id
-          complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
-          $('td', row).eq(5).html(complaint_link)
+            checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
+            $('td', row).eq(0).html(checkbox)
 
-        if age
-          unless status == 'COMPLETED' || status == 'RESOLVED'
-            if age.indexOf('h') != -1 && age.indexOf('h') >= 3
-              hour = parseInt( age.split("h")[0] )
-              if hour>= 3 && hour < 12
-                age_class = 'ticket-age-over3hr'
-              else if hour >= 12
-                age_class = 'ticket-age-over12hr'
-            else if age.indexOf('mo') != -1
-              age_class = 'ticket-age-over12hr'
-            else if (age.indexOf('m') != -1) || (age.indexOf('s') != -1)
-              age_class = ''
-            else
-              age_class = 'ticket-age-over12hr'
-            $('td', row).eq(11).html("<span class='#{age_class}'>#{age}</span>")
+            if is_important
+              $('td', row).eq(1).html('<span class="entry-important-flag esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>')
 
-        if is_important
-          $('td', row).eq(1).html('<span class="entry-important-flag esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>')
+            if url
+              updated_url = "<span class='jira-url esc-tooltipped' title='#{url}'>#{url}</span>"
+              $('td', row).eq(2).html(updated_url)
 
-    )
+            if complaint_id
+              complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
+              $('td', row).eq(5).html(complaint_link)
+
+            if age
+              unless status == 'COMPLETED' || status == 'RESOLVED'
+                if age.indexOf('h') != -1 && age.indexOf('h') >= 3
+                  hour = parseInt( age.split("h")[0] )
+                  if hour>= 3 && hour < 12
+                    age_class = 'ticket-age-over3hr'
+                  else if hour >= 12
+                    age_class = 'ticket-age-over12hr'
+                else if age.indexOf('mo') != -1
+                  age_class = 'ticket-age-over12hr'
+                else if (age.indexOf('m') != -1) || (age.indexOf('s') != -1)
+                  age_class = ''
+                else
+                  age_class = 'ticket-age-over12hr'
+                $('td', row).eq(11).html("<span class='#{age_class}'>#{age}</span>")
+
+        )
   else
     ticket_html += "<hr/></div>"
     $('.webcat-ticket-view').append(ticket_html)
@@ -406,7 +404,6 @@ window.close_related_issues = () ->
       ids.push(parseInt(r.id))
   )
   if ids.length
-    console.log ids
     std_msg_ajax
       method: 'put'
       url: '/escalations/api/v1/escalations/jira_import_tasks/close_related_issues'
