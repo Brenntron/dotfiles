@@ -74,6 +74,9 @@ gem 'grpc-tools', '1.45.0'
 gem 'xmlrpc'
 gem 'bugzilla', require: 'bugzilla'
 
+# Jira
+gem 'jira-ruby', '2.3.0'
+
 # Formatting and Presentation
 gem 'nokogiri' ,'1.13.9'
 gem 'diffy', '3.2.1'

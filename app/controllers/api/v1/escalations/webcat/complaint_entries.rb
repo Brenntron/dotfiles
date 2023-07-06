@@ -166,7 +166,7 @@ module API
                 error = "#{e.message}"
                 return {:error => error}.to_json
               end
-              {name:current_user.display_name}.to_json
+              {name:current_user.display_name, cvs_username: current_user.cvs_username}.to_json
             end
 
 
@@ -243,7 +243,7 @@ module API
                 results << {id: id, result: result}
               end
 
-              {:status => "success", :data => results}.to_json
+              {:status => "success", :data => results, :cvs_username => user.cvs_username}.to_json
             end
 
 

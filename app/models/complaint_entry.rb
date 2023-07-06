@@ -16,6 +16,7 @@ class ComplaintEntry < ApplicationRecord
 
   scope :open, -> { where.not(status: [STATUS_COMPLETED, RESOLVED]) }
   scope :closed, -> { where(status: [STATUS_COMPLETED, RESOLVED]) }
+  scope :new_entries, -> { where(status: [NEW]) }
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
   scope :pending_count , -> {where(status:"PENDING").count}
   scope :new_count , -> {where(status:"NEW").count}
@@ -740,7 +741,7 @@ class ComplaintEntry < ApplicationRecord
   def self.standard_search(search_name, user:)
     case search_name
       when "NEW"
-        where(status:"NEW")
+        new_entries
       when "COMPLETED"
         closed
       when "ACTIVE"
@@ -755,6 +756,14 @@ class ComplaintEntry < ApplicationRecord
         closed.where(user_id: user.id)
       when "MANAGER QUEUE"
         joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
+      when "NEW JIRA"
+          where(status: 'NEW', complaint_id: Complaint.from_jira)
+      when "JIRA OVERDUE"
+        where(complaint_id: Complaint.from_jira).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "JIRA ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_jira)
+      when "ALL JIRA"
+        where(complaint_id: Complaint.from_jira)
       when "ALL TALOS"
         where(complaint_id: Complaint.from_ti)
       when "NEW TALOS"
@@ -852,6 +861,10 @@ class ComplaintEntry < ApplicationRecord
       present_params['user_id'] = present_params['user_id'].split(',').map {|item| item.strip }
     end
 
+    if present_params['jira_id'].present?
+      present_params['jira_id'] = present_params['jira_id'].split(',').map {|item| item.strip}
+    end
+
     simple_params = present_params.slice(*%w{id complaint_id resolution status})
 
     relation = where(simple_params)
@@ -860,6 +873,10 @@ class ComplaintEntry < ApplicationRecord
 
       relation =
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
+    end
+    
+    if params['jira_id'].present?
+      relation = relation.joins(complaint: {import_urls: :jira_import_task}).where(jira_import_tasks: {issue_key: present_params['jira_id']})
     end
 
     if params['platform_ids'].present?

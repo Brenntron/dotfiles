@@ -206,7 +206,6 @@ $ ->
     $(nested_row).toggle()
     $(expand_button).toggleClass('shown')
 
-
   ## WL/BL Form manipulation
   $('.wl-bl-list-inline').click ->
     page = ''
@@ -320,16 +319,69 @@ $ ->
     else
       $(table).hide()
 
-  # Scrollable tables in the expanded rows
-  $('.table-scrollable').DataTable({
-    scrollY: 200,
-#    scrollCollapse: true,
+  # Tables in the expanded rows
+
+  $('.virustotal-table').DataTable({
+    info: false,
+    ordering: true,
     paging: false,
-    searching: false,
-    ordering: false,
-    info: false
+    searching: false
   })
 
+  $('.sbrs-table').DataTable({
+    info: false,
+    ordering: true,
+    paging: false,
+    searching: false
+  })
+
+  $('.shared-xbrs-timeline-table').DataTable({
+    columnDefs: [
+      {
+        orderData: [6],
+        targets: [0]
+      },
+      {
+        visible: false,
+        targets: [6]
+      }
+    ]
+    info: false,
+    ordering: true,
+    paging: false,
+    searching: false,
+  })
+
+  $('.wbrs-table').DataTable({
+    columnDefs: [{
+      targets: [0],
+      orderable: false
+    }]
+    info: false,
+    order: [[1, 'asc']],
+    paging: false,
+    searching: false
+  })
+
+  $('.crosslisted-table').DataTable({
+    columnDefs: [
+      {
+        orderData: [7],
+        targets: [5],
+      },
+      {
+        orderData: [8],
+        targets: [6],
+      },
+      {
+        visible: false,
+        targets: [7, 8]
+      }
+    ]
+    info: false,
+    paging: false,
+    searching: false
+  })
 
   #  Rule escalations email
   $('.wbrs-rule-trigger').click ->
@@ -434,7 +486,6 @@ $ ->
       error: (response) ->
         std_api_error(response, "Error recovering dispute entry content", reload: false)
     )
-
 
 $(document).ready ->
 

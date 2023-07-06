@@ -909,7 +909,7 @@
                                       %span.missing-data
                                         No rule hits.
                             - else
-                              %table
+                              %table.wbrs-table
                                 %thead
                                   %tr
                                     %th
@@ -970,7 +970,7 @@
                                       %span.missing-data
                                         No rule hits.
                             - else
-                              %table
+                              %table.sbrs-table
                                 %thead
                                   %tr
                                     %th Rule
@@ -1001,7 +1001,7 @@
                                       %span.missing-data
                                         No Virustotal data available.
                             - else
-                              %table.table-scrollable
+                              %table.virustotal-table
                                 %thead
                                   %tr
                                     %th AV Vendor
@@ -1035,29 +1035,8 @@
                                     %th
                                       %span.missing-data
                                         No cross-listed urls
-                            - elsif entry.wbrs_xlist.count < 8
-                              %table
-                                %thead
-                                  %tr
-                                    %th ID
-                                    %th URL
-                                    %th List Type
-                                    %th.text-center Current Score
-                                    %th Username
-                                    %th Last Update
-                                    %th Created
-                                %tbody
-                                  - entry.wbrs_xlist.each do |cross_listed|
-                                    %tr
-                                      %td= cross_listed.id
-                                      %td= cross_listed.url
-                                      %td= cross_listed.list_type
-                                      %td -
-                                      %td= cross_listed.username
-                                      %td= cross_listed.mtime
-                                      %td= cross_listed.ctime
                             - else
-                              %table.table-scrollable
+                              %table.crosslisted-table
                                 %thead
                                   %tr
                                     %th ID
@@ -1067,6 +1046,8 @@
                                     %th Username
                                     %th Last Update
                                     %th Created
+                                    %th
+                                    %th
                                 %tbody
                                   - entry.wbrs_xlist.each do |cross_listed|
                                     %tr
@@ -1077,6 +1058,8 @@
                                       %td= cross_listed.username
                                       %td= cross_listed.mtime
                                       %td= cross_listed.ctime
+                                      %td= cross_listed.mtime&.to_datetime&.to_i
+                                      %td= cross_listed.ctime&.to_datetime&.to_i
 
                           .entry-details-table.reptool-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header RepTool Details
@@ -1088,7 +1071,7 @@
                                       %span.missing-data
                                         No blacklist data
                             - else
-                              %table
+                              %table.reptool-table
                                 %thead
                                   %tr
                                     %th RepTool Class
@@ -1119,7 +1102,6 @@
                                   %th Description
                                   %th.enrich-webrep-external-ref-header External References
                               %tbody
-                                %tr
 
                             %table.enrich-webrep-table-data-missing
                               %tbody
