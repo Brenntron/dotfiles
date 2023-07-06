@@ -16,12 +16,10 @@ module API
             end
             get "read_observable" do
               std_api_v2 do
-                results = ::Tmi::TmiGrpc.read(domain: params[:domain],
-                                              ip: params[:ip],
-                                              url: params[:url],
-                                              sha: params[:sha])
-
-                { data: results.to_h }
+                ::CloudIntel::TagManagementInterface.read(domain: params[:domain],
+                                                          ip: params[:ip],
+                                                          url: params[:url],
+                                                          sha: params[:sha])
               end
             end
 

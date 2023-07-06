@@ -24,8 +24,12 @@ class EnrichmentService::TaxonomyMap
     taxonomy_map_json
   end
 
-  def self.get_taxonomy(id, entry_id = nil)
-    taxonomy_map = JSON.parse(load_map)
+  def self.get_taxonomy(id, entry_id = nil, condensed = false)
+    if condensed
+      taxonomy_map = JSON.parse(load_condensed_map)
+    else
+      taxonomy_map = JSON.parse(load_map)
+    end
     raise EnrichmentService::EnrichmentServiceError, "Missing Taxonomy Map" if taxonomy_map.blank?
     taxonomy_map["taxonomies"].each do |taxonomy|
       if id.to_i == taxonomy["taxonomy_id"].to_i
@@ -44,7 +48,7 @@ class EnrichmentService::TaxonomyMap
   end
 
   def self.condense_map(map)
-    condensed_map = {map: []}
+    condensed_map = {taxonomies: []}
     map.taxonomies.each_with_index do |tax, i|
       next if i == 0
       taxonomy = {taxonomy_id: tax.taxonomy_id,
@@ -62,7 +66,7 @@ class EnrichmentService::TaxonomyMap
             mnemonic: entry.mnemonic
         }
       end
-      condensed_map[:map] << taxonomy
+      condensed_map[:taxonomies] << taxonomy
     end
     Rails.cache.write("condensed_taxonomy_map", condensed_map.to_json)
   end
