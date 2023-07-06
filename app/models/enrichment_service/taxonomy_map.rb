@@ -9,8 +9,15 @@ class EnrichmentService::TaxonomyMap
     map
   end
 
+  def self.load_condensed_map
+    map = Rails.cache.read("condensed_taxonomy_map") || "{}"
+    cache_map if JSON.parse(map).blank?
+    Rails.cache.read("condensed_taxonomy_map") || "{}"
+  end
+
   def self.cache_map
     taxonomy_map = EnrichmentService::Tts.query_taxonomy_map
+    condense_map(taxonomy_map)
     taxonomy_map_json = taxonomy_map.to_h.to_json
     Rails.cache.write("taxonomy_map_version", taxonomy_map.version)
     Rails.cache.write("taxonomy_map", taxonomy_map_json)
@@ -34,6 +41,30 @@ class EnrichmentService::TaxonomyMap
       end
     end
     {"error" => "Could not find taxonomy with id: #{id}#{entry_id.present? ? ", entry_id: #{entry_id}" : ""}"}
+  end
+
+  def self.condense_map(map)
+    condensed_map = {map: []}
+    map.taxonomies.each_with_index do |tax, i|
+      next if i == 0
+      taxonomy = {taxonomy_id: tax.taxonomy_id,
+                  name: tax.name,
+                  description: tax.description,
+                  mnemonic: tax.mnemonic,
+                  entries: [],
+      }
+
+      tax.entries.each do |entry|
+        taxonomy[:entries] << {
+            entry_id: entry.entry_id,
+            name: entry.name[0]&.text,
+            description: entry.description[0]&.text,
+            mnemonic: entry.mnemonic
+        }
+      end
+      condensed_map[:map] << taxonomy
+    end
+    Rails.cache.write("condensed_taxonomy_map", condensed_map.to_json)
   end
 
   def self.check_version(new_version)
