@@ -6,7 +6,16 @@ class CloudIntel::TagManagementInterface
 
     result_hash['items'].each do |item|
       item['tags'].each do |tag|
-        tag['taxonomy'] = EnrichmentService::TaxonomyMap.get_taxonomy(tag['tag']['taxonomy_id'], tag['tag']['taxonomy_entry_id'], true)
+        tag['tag_type'] = EnrichmentService::TaxonomyMap.get_tag_type(tag['tag']['tag_type_id'])
+        if tag['tag']['tag_type_id'] == 1
+          taxonomy = EnrichmentService::TaxonomyMap.get_taxonomy(tag['tag']['taxonomy_id'], nil, true)
+          tag['taxonomy'] = {
+              "name" => taxonomy['name'],
+              "description" => taxonomy['description'],
+              "mnemonic" => taxonomy['mnemonic']
+          }
+          tag['taxonomy_entry'] = EnrichmentService::TaxonomyMap.get_taxonomy(tag['tag']['taxonomy_id'], tag['tag']['taxonomy_entry_id'], true)
+        end
       end
     end
 

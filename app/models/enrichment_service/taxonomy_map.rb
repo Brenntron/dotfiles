@@ -24,6 +24,10 @@ class EnrichmentService::TaxonomyMap
     taxonomy_map_json
   end
 
+  def self.get_tag_type(id)
+    get_taxonomy(1, id)["name"][0]["text"]
+  end
+
   def self.get_taxonomy(id, entry_id = nil, condensed = false)
     if condensed
       taxonomy_map = JSON.parse(load_condensed_map)
