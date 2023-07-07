@@ -21,32 +21,43 @@ class EnrichmentService::TaxonomyMap
     taxonomy_map_json = taxonomy_map.to_h.to_json
     Rails.cache.write("taxonomy_map_version", taxonomy_map.version)
     Rails.cache.write("taxonomy_map", taxonomy_map_json)
+    build_lookups
     taxonomy_map_json
+  end
+
+  def self.build_lookups
+    taxonomy_map = JSON.parse(load_map)
+    taxonomy_map["taxonomies"].each do |taxonomy|
+      taxonomy_lookup = taxonomy["entries"].inject({}) { |lookup, entry|
+        lookup[entry["entry_id"]] = entry
+        lookup
+      }
+
+      Rails.cache.write("taxonomy_#{taxonomy["taxonomy_id"]}", taxonomy.to_json)
+      Rails.cache.write("taxonomy_lookup_#{taxonomy["taxonomy_id"]}", taxonomy_lookup.to_json)
+    end
   end
 
   def self.get_tag_type(id)
     get_taxonomy(1, id)["name"][0]["text"]
   end
 
-  def self.get_taxonomy(id, entry_id = nil, condensed = false)
-    if condensed
-      taxonomy_map = JSON.parse(load_condensed_map)
-    else
-      taxonomy_map = JSON.parse(load_map)
-    end
-    raise EnrichmentService::EnrichmentServiceError, "Missing Taxonomy Map" if taxonomy_map.blank?
-    taxonomy_map["taxonomies"].each do |taxonomy|
-      if id.to_i == taxonomy["taxonomy_id"].to_i
-        if entry_id.present?
-          taxonomy["entries"].each do |entry|
-            if entry_id.to_i == entry["entry_id"].to_i
-              return entry
-            end
-          end
-        else
-          return taxonomy
-        end
+  def self.get_taxonomy(id, entry_id = nil)
+    if entry_id.present?
+      lookup = JSON.parse(Rails.cache.read("taxonomy_lookup_#{id}") || "{}")
+      if lookup.blank?
+        build_lookups
+        lookup = JSON.parse(Rails.cache.read("taxonomy_lookup_#{id}") || "{}")
       end
+      entry = lookup[entry_id.to_s]
+      return entry if entry.present?
+    else
+      taxonomy = JSON.parse(Rails.cache.read("taxonomy_#{id}") || "{}")
+      if taxonomy.blank?
+        build_lookups
+        taxonomy = JSON.parse(Rails.cache.read("taxonomy_#{id}") || "{}")
+      end
+      return taxonomy if taxonomy.present?
     end
     {"error" => "Could not find taxonomy with id: #{id}#{entry_id.present? ? ", entry_id: #{entry_id}" : ""}"}
   end

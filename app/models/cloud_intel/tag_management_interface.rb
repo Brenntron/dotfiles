@@ -6,15 +6,22 @@ class CloudIntel::TagManagementInterface
 
     result_hash['items'].each do |item|
       item['tags'].each do |tag|
-        tag['tag_type'] = EnrichmentService::TaxonomyMap.get_tag_type(tag['tag']['tag_type_id'])
+        tag_type = EnrichmentService::TaxonomyMap.get_taxonomy(1, tag['tag']['tag_type_id'])
+        tag['tag_type'] = tag_type.dig("name", 0, "text")
         if tag['tag']['tag_type_id'] == 1
-          taxonomy = EnrichmentService::TaxonomyMap.get_taxonomy(tag['tag']['taxonomy_id'], nil, true)
+          taxonomy = EnrichmentService::TaxonomyMap.get_taxonomy(tag['tag']['taxonomy_id'], nil)
           tag['taxonomy'] = {
               "name" => taxonomy['name'],
               "description" => taxonomy['description'],
               "mnemonic" => taxonomy['mnemonic']
           }
-          tag['taxonomy_entry'] = EnrichmentService::TaxonomyMap.get_taxonomy(tag['tag']['taxonomy_id'], tag['tag']['taxonomy_entry_id'], true)
+          entry = EnrichmentService::TaxonomyMap.get_taxonomy(tag['tag']['taxonomy_id'], tag['tag']['taxonomy_entry_id'])
+          tag['taxonomy_entry'] = {
+              "entry_id" => entry["entry_id"],
+              "name" => entry.dig("name", 0, "text"),
+              "description" => entry.dig("name", 0, "text"),
+              "mnemonic" => entry["mnemonic"]
+          }
         end
       end
     end
