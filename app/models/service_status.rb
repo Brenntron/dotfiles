@@ -1,6 +1,8 @@
 class ServiceStatus < ApplicationRecord
   has_many :service_status_logs
 
+  validates :name, uniqueness: true
+
   #SERVICE STATUS NAMES
   # RULEAPI:CATEGORY
   # RULEAPI:WEB_REPUTATION
@@ -12,7 +14,7 @@ class ServiceStatus < ApplicationRecord
   # RULEAPI:RULEHIT
   # RULEAPI:COMPLAINT_RECORD
 
-  # VIRUSTOTAL:SCAN
+  # VIRUSTOTAL
 
   # REPTOOL
 
@@ -21,6 +23,7 @@ class ServiceStatus < ApplicationRecord
   # UMBRELLA:SCAN
   # UMBRELLA:SECURITY_INFO
   # UMBRELLA:WHOIS
+  # UMBRELLA:TIMELINE
 
   def report_outage
     if self.exception_count < 0

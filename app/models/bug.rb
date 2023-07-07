@@ -47,4 +47,8 @@ class Bug < ApplicationRecord
 
     new_bug
   end
+
+  def self.call_thing(one, two, three:, four:)
+    puts 'here'
+  end
 end

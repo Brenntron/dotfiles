@@ -6,6 +6,11 @@ class Umbrella::DomainInfo
 
   UMBRELLA_BASE_URL = "https://investigate.api.umbrella.com/"
 
+  SERVICE_STATUS_NAME = "UMBRELLA:WHOIS"
+  def self.service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
 
   def self.domain_whois(domain: nil, as_hash: false)
 
@@ -14,7 +19,28 @@ class Umbrella::DomainInfo
 
     request = new_request(url)
 
-    response = HTTPI.get(request)
+    service_status_data = {}
+
+    response = nil
+
+    (0..2).each do
+      response = HTTPI.get(request)
+      if response.code.to_i < 300
+        break
+      end
+      sleep(2)
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/whois not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
 
     if as_hash == true
       response = JSON.parse(response.body)
@@ -47,8 +73,33 @@ class Umbrella::DomainInfo
 
     request.headers['Content-Type'] = 'application/json'
 
-    HTTPI.get(request).body
+    service_status_data = {}
 
+    response = nil
+
+    (0..2).each do
+      response = HTTPI.get(request)
+      if response.code.to_i < 300
+        break
+      end
+      sleep(2)
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/bgp/routes/ip/ not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
+
+
+
+    response.body
   end
 
 

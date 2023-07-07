@@ -14,7 +14,34 @@ class Umbrella::Scan
 
   def self.scan_result(address:)
     request = new_request(address)
-    HTTPI.post(request)
+
+
+
+    service_status_data = {}
+
+    response = nil
+
+    (0..2).each do
+      response = HTTPI.post(request)
+      if response.code.to_i < 300
+        break
+      end
+      sleep(2)
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "#{Rails.configuration.umbrella.url} not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
+
+    response
   end
 
   def self.health_check

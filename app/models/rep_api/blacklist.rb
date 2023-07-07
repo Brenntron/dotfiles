@@ -9,8 +9,6 @@ class RepApi::Blacklist < RepApi::Base
 
   validates :entry, :classifications, presence: true
 
-  SERVICE_STATUS_NAME = "REPTOOL:BLOCKLIST"
-
   def initialize(attributes = {})
     if attributes.keys.present?
       attributes.keys.each do |attr|
