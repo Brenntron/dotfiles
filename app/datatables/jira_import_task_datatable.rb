@@ -49,7 +49,7 @@ class JiraImportTaskDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   def get_raw_records
-    JiraImportTask.all
+    JiraImportTask.all.order("created_at DESC")
   end
 
   def sort_records(records)
