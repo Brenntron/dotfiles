@@ -1325,9 +1325,9 @@ class DisputeEntry < ApplicationRecord
 
             results = RepApi::Blacklist.where(entries: [ self.hostlookup ]) rescue nil
             if results.kind_of?(Array)
-              is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
+              is_blacklisted = results.any?{|result| result.status.upcase == "ACTIVE"} rescue true
             else
-              is_blacklisted = results.status == "ACTIVE" rescue true
+              is_blacklisted = results.status.upcase == "ACTIVE" rescue true
             end
 
             #WEB-10157
