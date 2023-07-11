@@ -2,51 +2,60 @@
 # WEBREP TMI
 
 $ ->
-  setTimeout ->
-    console.clear()
-    get_tmi_data_webrep('google.com')
-#    show_tag_tree()
-  , 5000
+  # MOVE THIS CODE TO BETTER PLACE
+  top_url = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
+  get_tmi_data_webrep(top_url)  # example is 'aol.com' or 'hydropneumaticsengg.in/wng0mn/kzlx_51984960'
 
 
 # part 1 of tmi
 window.get_tmi_data_webrep = (query_item) ->
-  # domain, url, ip, or sha
+  query_type = determine_string_type(query_item)
 
-  # add logic to this
-  data = {
-    domain: query_item
-  }
+#  console.clear()
+
+  switch query_type
+    when 'ip'
+      data = { ip: query_item }
+    when 'domain'
+      data = { domain: query_item }
+    when 'sha'
+      data = { sha: query_item }
+    else
+      data = { url: query_item }
+
+#  console.log 'THIS IS THE DATA OBJ'
+#  console.log data
 
   std_msg_ajax
     url: '/escalations/api/v1/escalations/cloud_intel/tag_management/read_observable'
     method: 'GET'
     data: data
     success: (response) ->
-      # remove placeholder html and below line when tmi is done
-      $('.tmi-tbody .placeholder-row').remove()
-
       # REMOVE BELOW WHEN TMI IS DONE.
-      console.clear()
-      console.log 'TMI LOOKUP RESPONSE FOR QUERY:'
-      console.log response
+#      console.clear()
+#      console.log 'TMI LOOKUP RESPONSE FOR QUERY:'
+#      console.log response
 
-      observable = tag_name = mnemonic = tag_type = taxonomy = source = processor = creation_date = suppressed = suppression_source = suppression_platform = suppression_date = ''
-
-      # start a new row
-      report_tr = ""
+      observable = tag_name = mnemonic = taxonomy = source = processor = report_date = suppressed = suppression_source = suppression_platform = suppression_date = ''
 
       # list of observables
       { items } = response
+
+      # if no items exist, show the no data message
+      if items.length == 0
+        $('.tmi-missing').removeClass('hidden')
+        $('.tmi-main-content').addClass('hidden')
+      else
+        $('.tmi-main-content').removeClass('hidden')
 
       $(items).each (i, val) ->
         { tags } = this
 
         # tags array
         $(tags).each (i, val) ->
-          { reports, tag_type, taxonomy, taxonomy_entry, suppressed_by } = this
+          { reports, taxonomy, taxonomy_entry, suppressed_by } = this
 
-          # issue with trying to find .name at last index but that last index doesnt exist
+          # issue with indexing, below works to show full set
           unless i > $(tags).length - 1
             if !taxonomy_entry
               tag_name = ""
@@ -88,38 +97,45 @@ window.get_tmi_data_webrep = (query_item) ->
               if !suppressed_by.suppressed_ts
                 suppression_date = ""
               else
-                suppression_date = moment.unix(suppressed_by.suppressed_ts).format('MMMM Do YYYY, h:mm:ss a')  # convert unix timecode
+                # convert unix timecode to utc date/time
+                suppression_date = moment.unix(suppressed_by.suppressed_ts).format('YYYY-MM-DD hh:mm:ss')
 
+          # start a new row
+          report_tr = ""
 
           # each report generates a tmi table row
           $(reports).each ->
             { raw_observable, source, created_ts } = this
             { source, processor } = source
 
-            # convert unix timecode to human-readable
-            creation_date = moment.unix(created_ts).format('MMMM Do YYYY, h:mm:ss a')
+            # convert unix timecode to utc date/time, created means when report was created
+            report_date = moment.unix(created_ts).format('YYYY-MM-DD hh:mm:ss')
 
+            # one table row for each report
             report_tr =
-              "<tr class='tmi-tr-#{created_ts}'>
+              "<tr class='tmi-tr'>
                  <td class='tmi-cb-cell'>
                    <input type='checkbox' class='tmi-cb'></input></td>
-                 <td class='tmi-observable'>#{raw_observable}</td>
+                 <td class='tmi-observable'>
+                   <span class='observable-container esc-tooltipped' title='raw_observable'>#{raw_observable}</span></td>
                  <td class='tmi-tag-name'>#{tag_name}</td>
                  <td class='tmi-mnemonic'>#{tag_mnemonic}</td>
-                 <td class='tmi-tag-type'>#{tag_type}</td>
                  <td class='tmi-taxonomy'>#{taxonomy_name}</td>
                  <td class='tmi-source'>#{source}</td>
                  <td class='tmi-processor'>#{processor}</td>
-                 <td class='tmi-creation-date'>#{creation_date}</td>
-                 <td class='tmi-suppressed'>#{suppressed}</td>
-                 <td class='tmi-suppression-source'>#{suppression_source}</td>
-                 <td class='tmi-suppression-platform'>#{suppression_platform}</td>
-                 <td class='tmi-suppression-date'>#{suppression_date}</td></tr>"
+                 <td class='tmi-report-date'>#{report_date}</td>
+                 <td class='tmi-suppressed tmi-red'>#{suppressed}</td>
+                 <td class='tmi-suppression-source tmi-gray'>#{suppression_source}</td>
+                 <td class='tmi-suppression-platform tmi-gray'>#{suppression_platform}</td>
+                 <td class='tmi-suppression-date tmi-gray'>#{suppression_date}</td></tr>"
+
+            # default is no with red cell and gray cells to the right
+            if suppressed == 'yes'
+              report_tr = report_tr.replace(/tmi-red/g,'')
+              report_tr = report_tr.replace(/tmi-gray/g,'')
 
             # created ts is unique enough for now, fix this though to something even more unique
-            unless $(".tmi-tr-#{created_ts}").length > 0
-              $('.tmi-tbody').append(report_tr)
-
+            $('.tmi-tbody').append(report_tr)
 
 
     error: (response) ->
@@ -127,14 +143,10 @@ window.get_tmi_data_webrep = (query_item) ->
       console.log 'ERROR ON TMI LOOKUP'
       console.log response
 
+      $('.tmi-error').removeClass('hidden')
 
-window.show_tag_tree = () ->
-  std_msg_ajax
-    url: '/escalations/api/v1/escalations/cloud_intel/tag_management/taxonomy_map'
-    method: 'GET'
-    success: (response) ->
-      console.log 'TAG TREE DATA BELOW'
-      console.log response
+    complete: () ->
+      $('.tmi-loader').addClass('hidden')
 
 
 
@@ -144,7 +156,8 @@ window.show_tag_tree = () ->
 
 # part 1 of enrichment (enrich and prev data come from same place)
 window.get_enrichment_service_webrep = (query_item, query_type) ->
-  data = {'query_item': query_item, 'query_type', query_type}
+#  data = {'query_item': query_item, 'query_type', query_type}
+  data = {'query_item': query_item, 'query_type': query_type}
   std_msg_ajax
     url: '/escalations/api/v1/escalations/cloud_intel/enrichment_service/query/'
     method: 'GET'
@@ -152,23 +165,12 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
     success: (response) ->
       return response
     error: (response) ->
-      $('.tab-webrep-ctt .enrichment-loader, .tab-webrep-ctt .prevalence-loader').addClass('hidden')
-      $('.tab-webrep-ctt .enrichment-error, .tab-webrep-ctt .prevalence-error').removeClass('hidden')
-      # RESTORE BELOW WHEN TMI IS DONE OR NOT NEEDED
-#      std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
-#    complete: (response) ->
-      # REMOVE BELOW WHEN TMI IS DONE OR NOT NEEDED
-#      console.clear()
-#      console.log 'response for enrichment:'
-#      console.log response
-      # REMOVE BELOW WHEN TMI IS DONE OR NOT NEEDED
-#      $('.error-msg .close').click()
-#      $('.fade').remove()
-
+      $('.enrichment-loader, .prevalence-loader').addClass('hidden')
+      $('.enrichment-error, .prevalence-error').removeClass('hidden')
 
 
 # part 2 of enrichment, set up enrichment based on url passed in
-window.setup_ctt_webrep = (action) ->
+window.setup_context_tables_webrep = (action) ->
   # clear inited datatables to cleanly reinit on data refresh
   if $('.tab-context-tags').hasClass('dt-inited')
     $('#webrep-tmi-dt').DataTable().destroy()
@@ -176,28 +178,27 @@ window.setup_ctt_webrep = (action) ->
     $('#webrep-prevalence-dt').DataTable().destroy()
 
   # reset the table states
-  $('.webrep-enrichment-table tbody, .webrep-prevalence-table tbody').empty()
-  #  $('.webrep-tmi-table tbody tr').remove()
+  $('.webrep-tmi-table tbody, .webrep-enrichment-table tbody, .webrep-prevalence-table tbody').empty()
 
-  # update curr view to selected entry
+  # are we updating existing stuff?
   if action == 'update'
     # clean up the page first when doing a data update
-    $('.enrich-webrep-table tbody tr, .prevalence-webrep-table tbody tr').remove()
-    $('.enrichment-table, .enrichment-error, .prevalence-table, .prevalence-error').addClass('hidden')
-    $('.enrichment-loader, .prevalence-loader').removeClass('hidden')
+#    $('.tmi-table tbody tr, .enrich-webrep-table tbody tr, .prevalence-webrep-table tbody tr').remove()
+
+#    $('.tmi-table, .enrichment-table, .prevalence-table').addClass('hidden')
+    $('.tmi-error, .enrichment-error, .prevalence-error').addClass('hidden')
+    $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
 
     # use this url or ip
-    ip_uri = $('.ctt-entry-select option:selected').attr('data-url')
+    entry = $('.ctt-entry-select option:selected').attr('data-entry')
 
-  # if no uri is passed in, use the first research row from research tab
+  # if not an update action, its a first action
   else
-    ip_uri = $(".research-table-row:eq(0)").find(".entry-data-content").text().trim()
-
-
+    entry = $(".research-table-row:first").find(".entry-data-content").text().trim()
 
   # enrichment services uses a separate api call - needs to be handled w/ a js promise (2-3 sec lag)
   enrich_promise = new Promise (resolve, reject) ->
-    enrich_json = get_enrichment_service_webrep(ip_uri)  # this is the actual api call
+    enrich_json = get_enrichment_service_webrep(entry)  # this is the actual api call
     if enrich_json
       resolve enrich_json
 
@@ -592,24 +593,21 @@ window.group_by_tag_filerep = (array, key) ->
 window.enrich_prev_dt_inits = () ->
 # do some housekeeping before init the dts
   $('.enrichment-loader, .prevalence-loader').addClass('hidden')  # remove loaders
-
-  # dt init the enrich dt
-  $('#webrep-enrichment-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-
-  # dt init the prev dt
-  $('#webrep-prevalence-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-
-
-  # COMMENTING OUT BELOW WHILE TMI TABLE IS BUILT, RESTORE BELOW WHEN TMI TABLE IS DONE
-  # COMMENTING OUT BELOW WHILE TMI TABLE IS BUILT, RESTORE BELOW WHEN TMI TABLE IS DONE
-  # COMMENTING OUT BELOW WHILE TMI TABLE IS BUILT, RESTORE BELOW WHEN TMI TABLE IS DONE
-  # dt init the tmi dt (and save to a var for col toggling)
+#
+#  # dt init the enrich dt
+#  $('#webrep-enrichment-dt').DataTable
+#    paging: false
+#    searching: false
+#    info: false
+#
+#  # dt init the prev dt
+#  $('#webrep-prevalence-dt').DataTable
+#    paging: false
+#    searching: false
+#    info: false
+#
+#
+#  # dt init the tmi dt (and save to a var for col toggling)
 #  tmi_table = $('#webrep-tmi-dt').DataTable
 #    paging: false
 #    searching: false
@@ -639,25 +637,75 @@ window.enrich_prev_dt_inits = () ->
 #    # or click the cb specifically to toggle
 #    $(checkbox).click ->
 #      $(checkbox).prop('checked', !checkbox.prop('checked'))
+#
+#
+#  # set a flag that dts have been inited, so we can re-init properly on change entry
+#  if $('.tab-context-tags').hasClass('dt-inited') == false
+#    $('.tab-context-tags').addClass('dt-inited')
 
 
-  # set a flag that dts have been inited, so we can re-init properly on change entry
-  if $('.tab-context-tags').hasClass('dt-inited') == false
-    $('.tab-context-tags').addClass('dt-inited')
+# determine if a string is an ip/url/domain/sha, return the type
+window.determine_string_type = (curr_string) ->
+  console.log 'DO YOU SEE THIS'
+  console.log curr_string
+
+  ip_regex = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi
+  sha_regex = /^[a-f0-9]{64}$/gi
+
+  # add ip v6 handling later on when needed
+  if ip_regex.test(curr_string) == true
+    return 'ip'
+  else if sha_regex.test(curr_string) == true
+    return 'sha'
+  else if curr_string.includes('.') && !curr_string.includes('/')
+    return 'domain'   # at least one dot and no slash indicates domain
+  else
+    return 'url'
 
 
+
+# HOUSEKEEPING STUFF, MOVE THIS INTO A FUNCTION BELOW
 $ ->
-  # show the choose-an-entry if multiple entries exist on webrep
+  # show the choose-an-entry if multiple entries exist on webrep dispute case
   num_of_disputes = parseInt($('.top-case-info .dispute-entry-count').text().trim())
+
   if num_of_disputes > 1
     $('.ctt-choose-an-entry').removeClass('hidden')
 
     # build select for choose-an-entry
     $('.research-table-row').each ->
-      curr_url = $(this).find('.entry-data-content').text().trim()
-      curr_option = "<option class='mult-entry-option' data-url='#{curr_url}' value='#{curr_url}'>#{curr_url}</option>"
+      curr_entry = $(this).find('.entry-data-content').text().trim()  # entry can be url/ip/domain
+      curr_option = "<option class='mult-entry-option' data-entry='#{curr_entry}'>#{curr_entry}</option>"
       $(".ctt-entry-select").append(curr_option)
 
   # enrichment functions are defined, build it out on initial page load
-  setup_ctt_webrep()
+  setup_context_tables_webrep()
 
+
+
+
+$ ->
+  $('.ctt-entry-select').change ->
+    curr_url = $(this).find('option:selected').attr('data-entry')
+
+    get_tmi_data_webrep(curr_url)  # do tmi stuff
+    setup_context_tables_webrep('update')  # do enrich and prev stuff
+
+    console.log 'NOW LOADING DATA FOR:'
+    console.log curr_url
+
+
+
+# WIP FUNCTION
+window.show_tag_tree = () ->
+  std_msg_ajax
+    url: '/escalations/api/v1/escalations/cloud_intel/tag_management/taxonomy_map'
+    method: 'GET'
+    success: (response) ->
+      console.log 'TAG TREE DATA BELOW'
+      console.log response
+
+
+# WIP FUNCTION
+#$ ->
+#  show_tag_tree()
