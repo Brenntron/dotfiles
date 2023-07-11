@@ -699,6 +699,56 @@ window.set_related_dispute = (form_tag) ->
     error_prefix: 'Error marking relationship.'
   )
 
+
+window.auto_resolve_tickets = (current_user) ->
+
+  checkboxes = $('#disputes-index').find('.dispute_check_box')
+  checked_disputes = []
+  successfully_closed_disputes = []
+  ajax_count = 0
+  error_disputes = ''
+  success_disputes = ''
+  $(checkboxes).each ->
+    if $(this).is(':checked')
+      dispute_id = $(this).val()
+      checked_disputes.push(dispute_id)
+
+  for dispute_id in checked_disputes
+    data = {
+      user_id: current_user
+      dispute_id: dispute_id
+    }
+
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webrep/disputes/manual_autoresolve'
+      data: data
+      success: (response)=> console.log response
+      error: (response)=> console.log response
+    ).then((response)=>
+      {dispute_id} = response
+      if response.status == 'success'
+        success_disputes += " #{dispute_id}"
+      else
+        error_disputes +=  " #{dispute_id}"
+      ajax_count++
+    )
+
+
+  ajax_interval = setInterval ()->
+    if ajax_count == checked_disputes.length
+      clearInterval(ajax_interval)
+      response = {success:toString(success_disputes.trim()), error:toString(error_disputes.trim())}
+      auto_resolve_msg(response)
+  , 3000
+
+window.auto_resolve_msg = (msg) ->
+  { success, error } = msg
+
+  if success =! ''
+    console.log typeof success
+
+
 window.change_ticket_status = (event) ->
 #  event.preventDefault()
   status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
