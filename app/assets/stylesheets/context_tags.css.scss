@@ -66,7 +66,7 @@
       line-height: 12pt;
       vertical-align: middle;
     }
-    .cb-tmi {
+    .tmi-cb {
       margin: 0;
       position: relative;
       top: 2px;
@@ -76,13 +76,17 @@
   .tmi-table {
     margin-bottom: 20px;
   }
-  .tmi-cell-suppressed {
+  .tmi-suppressed {
     font-weight: 600;
+    text-transform: uppercase;
   }
-  .tmi-red-cell {
+  .tmi-suppression-platform, .tmi-tag-type, .tmi-processor {
+    text-transform: capitalize;
+  }
+  .tmi-red {
     background-color: #f8bbbb;
   }
-  .tmi-gray-cell {
+  .tmi-gray {
     background-color: #f6f6f6;
   }
   .enrichment-missing, .enrichment-error,

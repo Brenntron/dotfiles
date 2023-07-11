@@ -1,3 +1,144 @@
+# WEBREP TMI
+# WEBREP TMI
+
+$ ->
+  setTimeout ->
+    console.clear()
+    get_tmi_data_webrep('google.com')
+#    show_tag_tree()
+  , 5000
+
+
+# part 1 of tmi
+window.get_tmi_data_webrep = (query_item) ->
+  # domain, url, ip, or sha
+
+  # add logic to this
+  data = {
+    domain: query_item
+  }
+
+  std_msg_ajax
+    url: '/escalations/api/v1/escalations/cloud_intel/tag_management/read_observable'
+    method: 'GET'
+    data: data
+    success: (response) ->
+      # remove placeholder html and below line when tmi is done
+      $('.tmi-tbody .placeholder-row').remove()
+
+      # REMOVE BELOW WHEN TMI IS DONE.
+      console.clear()
+      console.log 'TMI LOOKUP RESPONSE FOR QUERY:'
+      console.log response
+
+      observable = tag_name = mnemonic = tag_type = taxonomy = source = processor = creation_date = suppressed = suppression_source = suppression_platform = suppression_date = ''
+
+      # start a new row
+      report_tr = ""
+
+      # list of observables
+      { items } = response
+
+      $(items).each (i, val) ->
+        { tags } = this
+
+        # tags array
+        $(tags).each (i, val) ->
+          { reports, tag_type, taxonomy, taxonomy_entry, suppressed_by } = this
+
+          # issue with trying to find .name at last index but that last index doesnt exist
+          unless i > $(tags).length - 1
+            if !taxonomy_entry
+              tag_name = ""
+              tag_mnemonic = ""
+            else
+              if !taxonomy_entry.name
+                tag_name = ""
+              else
+                tag_name = taxonomy_entry.name
+              if !taxonomy_entry.mnemonic
+                tag_mnemonic = ""
+              else
+                tag_mnemonic = taxonomy_entry.mnemonic
+
+            if !taxonomy
+              taxonomy_name = ""
+            else
+              taxonomy_name = taxonomy.name
+
+            # suppressed_by itself could be null, empty strings for source/platform/date
+            if !suppressed_by
+              suppressed = 'no'
+              suppression_source = ''
+              suppression_platform = ''
+              suppression_date = ''
+            else
+              suppressed = 'yes'  # if suppressed timestamp exists, then yes it was suppressed
+
+              if !suppressed_by.source.source
+                suppression_source = ""
+              else
+                suppression_source = suppressed_by.source.source
+
+              if !suppressed_by.source.processor
+                suppression_platform = ""
+              else
+                suppression_platform = suppressed_by.source.processor
+
+              if !suppressed_by.suppressed_ts
+                suppression_date = ""
+              else
+                suppression_date = moment.unix(suppressed_by.suppressed_ts).format('MMMM Do YYYY, h:mm:ss a')  # convert unix timecode
+
+
+          # each report generates a tmi table row
+          $(reports).each ->
+            { raw_observable, source, created_ts } = this
+            { source, processor } = source
+
+            # convert unix timecode to human-readable
+            creation_date = moment.unix(created_ts).format('MMMM Do YYYY, h:mm:ss a')
+
+            report_tr =
+              "<tr class='tmi-tr-#{created_ts}'>
+                 <td class='tmi-cb-cell'>
+                   <input type='checkbox' class='tmi-cb'></input></td>
+                 <td class='tmi-observable'>#{raw_observable}</td>
+                 <td class='tmi-tag-name'>#{tag_name}</td>
+                 <td class='tmi-mnemonic'>#{tag_mnemonic}</td>
+                 <td class='tmi-tag-type'>#{tag_type}</td>
+                 <td class='tmi-taxonomy'>#{taxonomy_name}</td>
+                 <td class='tmi-source'>#{source}</td>
+                 <td class='tmi-processor'>#{processor}</td>
+                 <td class='tmi-creation-date'>#{creation_date}</td>
+                 <td class='tmi-suppressed'>#{suppressed}</td>
+                 <td class='tmi-suppression-source'>#{suppression_source}</td>
+                 <td class='tmi-suppression-platform'>#{suppression_platform}</td>
+                 <td class='tmi-suppression-date'>#{suppression_date}</td></tr>"
+
+            # created ts is unique enough for now, fix this though to something even more unique
+            unless $(".tmi-tr-#{created_ts}").length > 0
+              $('.tmi-tbody').append(report_tr)
+
+
+
+    error: (response) ->
+      console.clear()
+      console.log 'ERROR ON TMI LOOKUP'
+      console.log response
+
+
+window.show_tag_tree = () ->
+  std_msg_ajax
+    url: '/escalations/api/v1/escalations/cloud_intel/tag_management/taxonomy_map'
+    method: 'GET'
+    success: (response) ->
+      console.log 'TAG TREE DATA BELOW'
+      console.log response
+
+
+
+
 # WEBREP ENRICHMENT
 # WEBREP ENRICHMENT
 
@@ -15,11 +156,11 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
       $('.tab-webrep-ctt .enrichment-error, .tab-webrep-ctt .prevalence-error').removeClass('hidden')
       # RESTORE BELOW WHEN TMI IS DONE OR NOT NEEDED
 #      std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
-    complete: (response) ->
+#    complete: (response) ->
       # REMOVE BELOW WHEN TMI IS DONE OR NOT NEEDED
-      console.clear()
-      console.log 'response for enrichment:'
-      console.log response
+#      console.clear()
+#      console.log 'response for enrichment:'
+#      console.log response
       # REMOVE BELOW WHEN TMI IS DONE OR NOT NEEDED
 #      $('.error-msg .close').click()
 #      $('.fade').remove()
@@ -27,7 +168,7 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
 
 
 # part 2 of enrichment, set up enrichment based on url passed in
-window.setup_enrichment_section_webrep = (action) ->
+window.setup_ctt_webrep = (action) ->
   # clear inited datatables to cleanly reinit on data refresh
   if $('.tab-context-tags').hasClass('dt-inited')
     $('#webrep-tmi-dt').DataTable().destroy()
@@ -35,8 +176,8 @@ window.setup_enrichment_section_webrep = (action) ->
     $('#webrep-prevalence-dt').DataTable().destroy()
 
   # reset the table states
-  $('.webrep-tmi-table tbody tr:not(.placeholder-row)').remove()  # UPDATE THIS LINE PRE-FINAL
   $('.webrep-enrichment-table tbody, .webrep-prevalence-table tbody').empty()
+  #  $('.webrep-tmi-table tbody tr').remove()
 
   # update curr view to selected entry
   if action == 'update'
@@ -51,6 +192,8 @@ window.setup_enrichment_section_webrep = (action) ->
   # if no uri is passed in, use the first research row from research tab
   else
     ip_uri = $(".research-table-row:eq(0)").find(".entry-data-content").text().trim()
+
+
 
   # enrichment services uses a separate api call - needs to be handled w/ a js promise (2-3 sec lag)
   enrich_promise = new Promise (resolve, reject) ->
@@ -252,7 +395,7 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
 
 # part 2
 window.create_filerep_enrich_section = (tags, context) ->
-  #organize tags by taxonomy_id if there are multiple
+#organize tags by taxonomy_id if there are multiple
   if tags.length > 1
     taxonomy_object = group_by_tag_filerep(tags, 'taxonomy_id')
     taxonomy_array = Object.entries(taxonomy_object)
@@ -261,7 +404,7 @@ window.create_filerep_enrich_section = (tags, context) ->
   #loop through each group of tags and put each in their own section
   $(taxonomy_array).each (i, group) ->
 
-    #single objects have different structure than multiple entries
+#single objects have different structure than multiple entries
     if group.length > 1
       tag_group = $(group)[1]
     else tag_group = group
@@ -447,7 +590,7 @@ window.group_by_tag_filerep = (array, key) ->
 
 # init these dts, keep in sep function for when promise resolves elsewhere (api call is delayed).
 window.enrich_prev_dt_inits = () ->
-  # do some housekeeping before init the dts
+# do some housekeeping before init the dts
   $('.enrichment-loader, .prevalence-loader').addClass('hidden')  # remove loaders
 
   # dt init the enrich dt
@@ -462,36 +605,40 @@ window.enrich_prev_dt_inits = () ->
     searching: false
     info: false
 
+
+  # COMMENTING OUT BELOW WHILE TMI TABLE IS BUILT, RESTORE BELOW WHEN TMI TABLE IS DONE
+  # COMMENTING OUT BELOW WHILE TMI TABLE IS BUILT, RESTORE BELOW WHEN TMI TABLE IS DONE
+  # COMMENTING OUT BELOW WHILE TMI TABLE IS BUILT, RESTORE BELOW WHEN TMI TABLE IS DONE
   # dt init the tmi dt (and save to a var for col toggling)
-  tmi_table = $('#webrep-tmi-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-    order: [[ 1, 'asc']]
-    columnDefs: [
-      {
-        targets: [ 0 ]
-        orderable: false
-        sortable: false
-      }
-    ]
-
-  # show or hide columns in tmi table
-  $('.toggle-col-tmi').each ->
-    checkbox = $(this).find('input')
-    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
-
-    if $(checkbox).prop('checked') then column.visible(true)
-    else column.visible(false)
-
-    # click anywhere in the li to toggle
-    $(this).click ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
-      column.visible(!column.visible())
-
-    # or click the cb specifically to toggle
-    $(checkbox).click ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
+#  tmi_table = $('#webrep-tmi-dt').DataTable
+#    paging: false
+#    searching: false
+#    info: false
+#    order: [[ 1, 'asc']]
+#    columnDefs: [
+#      {
+#        targets: [ 0 ]
+#        orderable: false
+#        sortable: false
+#      }
+#    ]
+#
+#  # show or hide columns in tmi table
+#  $('.toggle-col-tmi').each ->
+#    checkbox = $(this).find('input')
+#    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
+#
+#    if $(checkbox).prop('checked') then column.visible(true)
+#    else column.visible(false)
+#
+#    # click anywhere in the li to toggle
+#    $(this).click ->
+#      $(checkbox).prop('checked', !checkbox.prop('checked'))
+#      column.visible(!column.visible())
+#
+#    # or click the cb specifically to toggle
+#    $(checkbox).click ->
+#      $(checkbox).prop('checked', !checkbox.prop('checked'))
 
 
   # set a flag that dts have been inited, so we can re-init properly on change entry
@@ -512,5 +659,5 @@ $ ->
       $(".ctt-entry-select").append(curr_option)
 
   # enrichment functions are defined, build it out on initial page load
-  setup_enrichment_section_webrep()
+  setup_ctt_webrep()
 

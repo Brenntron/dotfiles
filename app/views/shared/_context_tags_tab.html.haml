@@ -7,8 +7,14 @@
     .ctt-choose-an-entry.hidden
       %span.ctt-entry-label
         Entry:
+
+
+
       -# options will be generated from js into select below
-      %select.ctt-entry-select{onchange: "setup_enrichment_section_webrep('update');"}
+      %select.ctt-entry-select{onchange: "setup_ctt_webrep('update');"}
+
+
+
 
     %h2 Tag Management Interface
     .toolbar.tmi-toolbar
@@ -75,7 +81,7 @@
       %thead
         %tr
           %th
-            %input.cb-tmi-select-all{type:'checkbox'}
+            %input.tmi-cb-select-all{type:'checkbox'}
           %th Observable
           %th Tag Name
           %th Mnemonic
@@ -88,84 +94,72 @@
           %th Suppression Source
           %th Suppression Platform
           %th Suppression Date
-      %tbody
+      %tbody.tmi-tbody
         %tr.placeholder-row
-          %td.tmi-cell-cb
-            %input.cb-tmi{type:'checkbox'}
-          %td.tmi-cell-observable
-            %span.observable-container.esc-tooltipped{title: "example.com"}
-              example.com
-          %td.tmi-cell-tag-name Internet Accessible Device
-          %td.tmi-cell-mnemonic Testing
-          %td.tmi-cell-tag-type Techniques
-          %td.tmi-cell-taxonomy MITRE ATT&CK
-          %td.tmi-cell-source test_name
-          %td.tmi-cell-processor Testing
-          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
-          %td.tmi-cell-suppressed.tmi-red-cell NO
-          %td.tmi-cell-suppression-source.tmi-gray-cell
-          %td.tmi-cell-suppression-platform.tmi-gray-cell
-          %td.tmi-cell-suppression-date.tmi-gray-cell
-        %tr.placeholder-row
-          %td.tmi-cell-cb
-            %input.cb-tmi{type:'checkbox'}
-          %td.tmi-cell-observable
-            %span.observable-container.esc-tooltipped{title: "example.com/example/asdfjlakaslkdfalksdjf/asdflkjasdklf"}
-              example.com/example/asdfjlaksdfllaskdfalsdkfjalsdkfjasdf/asdfljasdlfjklasjdklfjlsdaflj-asldkfjasdkljfasdf
-          %td.tmi-cell-tag-name Questionable
-          %td.tmi-cell-mnemonic Example
-          %td.tmi-cell-tag-type Techniques
-          %td.tmi-cell-taxonomy MITRE ATT&CK
-          %td.tmi-cell-source test_name
-          %td.tmi-cell-processor Example
-          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
-          %td.tmi-cell-suppressed YES
-          %td.tmi-cell-suppression-source Example
-          %td.tmi-cell-suppression-platform Example
-          %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
+          %td.tmi-cb-cell
+            %input.tmi-cb{type:'checkbox'}
+          %td.tmi-observable Loading...
+          %td.tmi-tag-name
+          %td.tmi-mnemonic
+          %td.tmi-tag-type
+          %td.tmi-taxonomy
+          %td.tmi-source
+          %td.tmi-processor
+          %td.tmi-creation-date
+          %td.tmi-suppressed
+          %td.tmi-suppression-source
+          %td.tmi-suppression-platform
+          %td.tmi-suppression-date
+          -#%td.tmi-cell-observable
+          -#  %span.observable-container.esc-tooltipped{title: "example.com"}
+          -#    example.com
 
 
     -# enrichment data for webrep and filerep
-    %h2 Enrichment Service
-    .enrichment-area
 
-      %table#webrep-enrichment-dt.ctt-table.enrichment-table.webrep-enrichment-table.hidden
-        %thead
-          %tr
-            %th Context
-            %th Taxonomy
-            %th Name
-            %th Description
-            %th External References
-        %tbody
+    -# REMOVE THIS HIDE DIV
+    -# REMOVE THIS HIDE DIV
+    .hide-this-div.hidden
+      %h2 Enrichment Service
+      .enrichment-area
 
-      %p.enrichment-loader.ctt-loader
-        = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
-        %span.loader-msg Loading...
+        %table#webrep-enrichment-dt.ctt-table.enrichment-table.webrep-enrichment-table.hidden
+          %thead
+            %tr
+              %th Context
+              %th Taxonomy
+              %th Name
+              %th Description
+              %th External References
+          %tbody
 
-      %p.enrichment-missing.missing-data.hidden
-        No enrichment data found.
-      %p.enrichment-error.missing-data.hidden
-        Error gathering data.
+        %p.enrichment-loader.ctt-loader
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
+          %span.loader-msg Loading...
+
+        %p.enrichment-missing.missing-data.hidden
+          No enrichment data found.
+        %p.enrichment-error.missing-data.hidden
+          Error gathering data.
 
 
-    -# prevalence data for webrep and filerep
-    %h2 Prevalence
-    .prevalence-area
+      -# prevalence data for webrep and filerep
+      %h2 Prevalence
+      .prevalence-area
 
-      %table#webrep-prevalence-dt.ctt-table.prevalence-table.webrep-prevalence-table.hidden
-        %thead
-          %th Dataset
-          %th Count
-          %th First Seen
-          %th Last Seen
-        %tbody
+        %table#webrep-prevalence-dt.ctt-table.prevalence-table.webrep-prevalence-table.hidden
+          %thead
+            %th Dataset
+            %th Count
+            %th First Seen
+            %th Last Seen
+          %tbody
 
-      %p.prevalence-loader.ctt-loader
-        = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
-        %span.loader-msg Loading...
+        %p.prevalence-loader.ctt-loader
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
+          %span.loader-msg Loading...
 
-      %p.prevalence-missing.missing-data.hidden
-        No prevalence data found.
-      %p.prevalence-error.missing-data.hidden
-        Error gathering data.
+        %p.prevalence-missing.missing-data.hidden
+          No prevalence data found.
+        %p.prevalence-error.missing-data.hidden
+          Error gathering data.
