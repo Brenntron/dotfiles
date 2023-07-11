@@ -19,7 +19,7 @@ class CloudIntel::TagManagementInterface
           tag['taxonomy_entry'] = {
               "entry_id" => entry["entry_id"],
               "name" => entry.dig("name", 0, "text"),
-              "description" => entry.dig("name", 0, "text"),
+              "description" => entry.dig("description", 0, "text"),
               "mnemonic" => entry["mnemonic"]
           }
         end
