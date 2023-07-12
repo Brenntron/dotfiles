@@ -6,12 +6,10 @@ window.tmi_ajax_webrep = (query_item) ->
   query_type = determine_string_type(query_item)
 
   switch query_type
-    when 'ip'
-      data = { ip: query_item }
-    when 'domain'
-      data = { domain: query_item }
-    when 'sha'
-      data = { sha: query_item }
+    when 'ip' then data = { ip: query_item }
+    when 'domain' then data = { domain: query_item }
+    when 'sha' then data = { sha: query_item }
+    when 'url' then data = { url: query_item }
     else
       data = { url: query_item }
 
@@ -21,8 +19,8 @@ window.tmi_ajax_webrep = (query_item) ->
     data: data
     success: (response) ->
       # REMOVE BELOW WHEN TMI IS DONE.
-      console.clear()
-      console.log response
+#      console.clear()
+#      console.log response
 
       observable = tag_name = mnemonic = taxonomy = source = processor = report_date = suppressed = suppression_source = suppression_platform = suppression_date = ''
 
@@ -30,7 +28,7 @@ window.tmi_ajax_webrep = (query_item) ->
       { items } = response
 
       # if no items exist, show the no-data message
-      if items.length == 0
+      if !items
         $('.tmi-main-content').addClass('hidden')
       else
         $('.tmi-main-content').removeClass('hidden')
@@ -101,10 +99,6 @@ window.tmi_ajax_webrep = (query_item) ->
 
             # convert unix timecode to utc date/time, created means when report was created
             report_date = moment.unix(created_ts).utc().format('YYYY-MM-DD hh:mm:ss')
-
-            # ensure datetimes are known as utc
-            if report_date then report_date += ' UTC'
-            if suppression_date then suppression_date += ' UTC'
 
             # one table row for each report
             report_tr =
@@ -587,9 +581,13 @@ window.tmi_enrich_prev_dt_inits = () ->
   # tmi dt inited, ensure tmi loader hid
   $('.tmi-loader').addClass('hidden')
 
+
+
   # extraneous dt tmi error may appear at this point, remove that if exists
   if $('.tmi-tbody .tmi-tr').length > 0
     $('.tmi-tbody .dataTables_empty').remove()
+
+
 
   # show or hide columns in tmi table
   $('.toggle-col-tmi').each ->
