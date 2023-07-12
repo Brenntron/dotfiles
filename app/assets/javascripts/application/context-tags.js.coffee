@@ -1,17 +1,9 @@
 # WEBREP TMI
 # WEBREP TMI
 
-$ ->
-  # MOVE THIS CODE TO BETTER PLACE
-  top_url = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
-  get_tmi_data_webrep(top_url)  # example is 'aol.com' or 'hydropneumaticsengg.in/wng0mn/kzlx_51984960'
-
-
 # part 1 of tmi
 window.get_tmi_data_webrep = (query_item) ->
   query_type = determine_string_type(query_item)
-
-#  console.clear()
 
   switch query_type
     when 'ip'
@@ -23,8 +15,6 @@ window.get_tmi_data_webrep = (query_item) ->
     else
       data = { url: query_item }
 
-#  console.log 'THIS IS THE DATA OBJ'
-#  console.log data
 
   std_msg_ajax
     url: '/escalations/api/v1/escalations/cloud_intel/tag_management/read_observable'
@@ -41,7 +31,7 @@ window.get_tmi_data_webrep = (query_item) ->
       # list of observables
       { items } = response
 
-      # if no items exist, show the no data message
+      # if no items exist, show the no-data message
       if items.length == 0
         $('.tmi-missing').removeClass('hidden')
         $('.tmi-main-content').addClass('hidden')
@@ -77,12 +67,12 @@ window.get_tmi_data_webrep = (query_item) ->
 
             # suppressed_by itself could be null, empty strings for source/platform/date
             if !suppressed_by
-              suppressed = 'no'
-              suppression_source = ''
-              suppression_platform = ''
-              suppression_date = ''
+              suppressed = "no"
+              suppression_source = ""
+              suppression_platform = ""
+              suppression_date = ""
             else
-              suppressed = 'yes'  # if suppressed timestamp exists, then yes it was suppressed
+              suppressed = "yes"  # if suppressed timestamp exists, then yes it was suppressed
 
               if !suppressed_by.source.source
                 suppression_source = ""
@@ -98,7 +88,7 @@ window.get_tmi_data_webrep = (query_item) ->
                 suppression_date = ""
               else
                 # convert unix timecode to utc date/time
-                suppression_date = moment.unix(suppressed_by.suppressed_ts).format('YYYY-MM-DD hh:mm:ss')
+                suppression_date = moment.unix(suppressed_by.suppressed_ts).utc().format('YYYY-MM-DD hh:mm:ss')
 
           # start a new row
           report_tr = ""
@@ -109,7 +99,7 @@ window.get_tmi_data_webrep = (query_item) ->
             { source, processor } = source
 
             # convert unix timecode to utc date/time, created means when report was created
-            report_date = moment.unix(created_ts).format('YYYY-MM-DD hh:mm:ss')
+            report_date = moment.unix(created_ts).utc().format('YYYY-MM-DD hh:mm:ss')
 
             # one table row for each report
             report_tr =
@@ -117,17 +107,17 @@ window.get_tmi_data_webrep = (query_item) ->
                  <td class='tmi-cb-cell'>
                    <input type='checkbox' class='tmi-cb'></input></td>
                  <td class='tmi-observable'>
-                   <span class='observable-container esc-tooltipped' title='raw_observable'>#{raw_observable}</span></td>
+                   <span class='observable-container esc-tooltipped' title='#{raw_observable}'>#{raw_observable}</span></td>
                  <td class='tmi-tag-name'>#{tag_name}</td>
                  <td class='tmi-mnemonic'>#{tag_mnemonic}</td>
                  <td class='tmi-taxonomy'>#{taxonomy_name}</td>
                  <td class='tmi-source'>#{source}</td>
                  <td class='tmi-processor'>#{processor}</td>
-                 <td class='tmi-report-date'>#{report_date}</td>
+                 <td class='tmi-report-date'>#{report_date} UTC</td>
                  <td class='tmi-suppressed tmi-red'>#{suppressed}</td>
                  <td class='tmi-suppression-source tmi-gray'>#{suppression_source}</td>
                  <td class='tmi-suppression-platform tmi-gray'>#{suppression_platform}</td>
-                 <td class='tmi-suppression-date tmi-gray'>#{suppression_date}</td></tr>"
+                 <td class='tmi-suppression-date tmi-gray'>#{suppression_date} UTC</td></tr>"
 
             # default is no with red cell and gray cells to the right
             if suppressed == 'yes'
@@ -177,17 +167,15 @@ window.setup_context_tables_webrep = (action) ->
     $('#webrep-enrichment-dt').DataTable().destroy()
     $('#webrep-prevalence-dt').DataTable().destroy()
 
-  # reset the table states
-  $('.webrep-tmi-table tbody, .webrep-enrichment-table tbody, .webrep-prevalence-table tbody').empty()
-
   # are we updating existing stuff?
   if action == 'update'
-    # clean up the page first when doing a data update
-#    $('.tmi-table tbody tr, .enrich-webrep-table tbody tr, .prevalence-webrep-table tbody tr').remove()
-
-#    $('.tmi-table, .enrichment-table, .prevalence-table').addClass('hidden')
+    # hide the tables in general
+    $('.tmi-main-content, .enrichment-table, .prevalence-table').addClass('hidden')
     $('.tmi-error, .enrichment-error, .prevalence-error').addClass('hidden')
     $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
+
+    # reset the tables
+    $('.tmi-table tbody, .enrichment-table tbody, .prevalence-table tbody').empty()
 
     # use this url or ip
     entry = $('.ctt-entry-select option:selected').attr('data-entry')
@@ -202,7 +190,10 @@ window.setup_context_tables_webrep = (action) ->
     if enrich_json
       resolve enrich_json
 
+  # when promised response comes back, continue with data
   enrich_promise.then (response) ->
+    $('.tmi-main-content, .enrichment-table, .prevalence-table').removeClass('hidden')
+
     email_context_tags = []
     web_context_tags = []
     enrichment_context_tags = []
@@ -262,8 +253,8 @@ window.create_webrep_enrichment_section = (tags, context) ->
     name_cell = $("<td class='enrich-cell-name'></td>")
     $(name_cell).text(name)
 
-    description_cell = $("<td class='enrich-cell-description'></td>")
-    $(description_cell).text(description)
+    description_cell = $("<td class='enrich-cell-description'><p></p></td>")
+    $(description_cell).find('p').text(description)
 
     external_ref_cell = $("<td class='enrich-cell-external-references'></td>")
 
@@ -593,62 +584,59 @@ window.group_by_tag_filerep = (array, key) ->
 window.enrich_prev_dt_inits = () ->
 # do some housekeeping before init the dts
   $('.enrichment-loader, .prevalence-loader').addClass('hidden')  # remove loaders
-#
-#  # dt init the enrich dt
-#  $('#webrep-enrichment-dt').DataTable
-#    paging: false
-#    searching: false
-#    info: false
-#
-#  # dt init the prev dt
-#  $('#webrep-prevalence-dt').DataTable
-#    paging: false
-#    searching: false
-#    info: false
-#
-#
-#  # dt init the tmi dt (and save to a var for col toggling)
-#  tmi_table = $('#webrep-tmi-dt').DataTable
-#    paging: false
-#    searching: false
-#    info: false
-#    order: [[ 1, 'asc']]
-#    columnDefs: [
-#      {
-#        targets: [ 0 ]
-#        orderable: false
-#        sortable: false
-#      }
-#    ]
-#
-#  # show or hide columns in tmi table
-#  $('.toggle-col-tmi').each ->
-#    checkbox = $(this).find('input')
-#    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
-#
-#    if $(checkbox).prop('checked') then column.visible(true)
-#    else column.visible(false)
-#
-#    # click anywhere in the li to toggle
-#    $(this).click ->
-#      $(checkbox).prop('checked', !checkbox.prop('checked'))
-#      column.visible(!column.visible())
-#
-#    # or click the cb specifically to toggle
-#    $(checkbox).click ->
-#      $(checkbox).prop('checked', !checkbox.prop('checked'))
-#
-#
-#  # set a flag that dts have been inited, so we can re-init properly on change entry
-#  if $('.tab-context-tags').hasClass('dt-inited') == false
-#    $('.tab-context-tags').addClass('dt-inited')
+
+  # dt init the enrich dt
+  $('#webrep-enrichment-dt').DataTable
+    paging: false
+    searching: false
+    info: false
+
+  # dt init the prev dt
+  $('#webrep-prevalence-dt').DataTable
+    paging: false
+    searching: false
+    info: false
+
+
+  # dt init the tmi dt (and save to a var for col toggling)
+  tmi_table = $('#webrep-tmi-dt').DataTable
+    paging: false
+    searching: false
+    info: false
+    order: [[ 1, 'asc']]
+    columnDefs: [
+      {
+        targets: [ 0 ]
+        orderable: false
+        sortable: false
+      }
+    ]
+
+  # show or hide columns in tmi table
+  $('.toggle-col-tmi').each ->
+    checkbox = $(this).find('input')
+    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
+
+    if $(checkbox).prop('checked') then column.visible(true)
+    else column.visible(false)
+
+    # click anywhere in the li to toggle
+    $(this).click ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+      column.visible(!column.visible())
+
+    # or click the cb specifically to toggle
+    $(checkbox).click ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+
+
+  # set a flag that dts have been inited, so we can re-init properly on change entry
+  if $('.tab-context-tags').hasClass('dt-inited') == false
+    $('.tab-context-tags').addClass('dt-inited')
 
 
 # determine if a string is an ip/url/domain/sha, return the type
 window.determine_string_type = (curr_string) ->
-  console.log 'DO YOU SEE THIS'
-  console.log curr_string
-
   ip_regex = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi
   sha_regex = /^[a-f0-9]{64}$/gi
 
@@ -685,6 +673,12 @@ $ ->
 
 
 $ ->
+  # MOVE BELOW CODE TO BETTER PLACE
+  if $('.top-case-info .dispute-entry-ip-uri').length > 0
+    top_url = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
+    get_tmi_data_webrep(top_url)  # example is 'aol.com' or 'hydropneumaticsengg.in/wng0mn/kzlx_51984960'
+
+
   $('.ctt-entry-select').change ->
     curr_url = $(this).find('option:selected').attr('data-entry')
 
@@ -693,7 +687,6 @@ $ ->
 
     console.log 'NOW LOADING DATA FOR:'
     console.log curr_url
-
 
 
 # WIP FUNCTION

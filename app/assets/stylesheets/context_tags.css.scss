@@ -53,6 +53,7 @@
       padding: 8px 10px;
       vertical-align: middle;
       background-position-y: center !important;  // override dt defaults
+      white-space: nowrap;
     }
     tbody td {
       padding: 8px 10px;
@@ -67,11 +68,11 @@
     }
   }
   .tmi-table {
-    margin-bottom: 20px;
+    margin-bottom: 40px;
   }
-  .tmi-observable {
-    width: 15%;
-  }
+  //.tmi-observable {
+    //width: 15%;
+  //}
   .tmi-suppressed {
     font-weight: 600;
     text-transform: uppercase;
@@ -88,9 +89,24 @@
   .tmi-gray {
     background-color: #f6f6f6;
   }
+  .enrich-cell-context, .enrich-cell-taxonomy, .enrich-cell-name, .enrich-cell-external-references {
+    width: 12%;
+  }
+  .enrich-cell-description {
+    width: 52%;
+  }
+  .enrich-cell-taxonomy, .enrich-cell-name {
+    white-space: nowrap;
+  }
+  .enrich-cell-description p {
+    max-height: 220px;  // desc can get huge, use overflow scroll if so
+    overflow-y: auto;
+    white-space: pre-wrap;  // retain formatting from source
+    padding-right: 20px;
+  }
   .observable-container {
     display: inline-block;
-    //width: 150px;  # need this for ellipsis trick to work
+    width: 160px;  // need this for ellipsis trick to work
     text-overflow: ellipsis;  // ellipsis trick long urls
     white-space: nowrap;
     overflow: hidden;
