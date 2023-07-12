@@ -564,14 +564,11 @@ window.group_by_tag_filerep = (array, key) ->
 
 # init these dts, keep in sep function for when promise resolves elsewhere (api call is delayed).
 window.tmi_enrich_prev_dt_inits = () ->
-
-  # tmi dt inited, ensure tmi loader hid
-  $('.tmi-loader').addClass('hidden')
-
+  $('.tmi-loader, .enrichment-loader, .prevalence-loader').addClass('hidden')  # remove loaders
 
   # FIX THIS, SETTIMEOUT IS HACKY
   # FIX THIS, SETTIMEOUT IS HACKY
-  # tiny delay to ensure tmi data exists
+  # tiny delay to ensure tmi data exists before dt init
   setTimeout ->
     # dt init the tmi dt (and save to a var for col toggling)
     tmi_table = $('#webrep-tmi-dt').DataTable
@@ -603,7 +600,7 @@ window.tmi_enrich_prev_dt_inits = () ->
       # or click the cb specifically to toggle
       $(checkbox).click ->
         $(checkbox).prop('checked', !checkbox.prop('checked'))
-  , 1000
+  , 2000
 
 
   # FIX THIS
@@ -611,14 +608,6 @@ window.tmi_enrich_prev_dt_inits = () ->
   #  if $('.tmi-tbody .tmi-tr').length > 0
   #    $('.tmi-tbody .dataTables_empty').remove()
   #  $('.tmi-tbody .dataTables_empty').remove()
-
-
-  # set a flag that dts have been inited, so we can re-init properly on change entry
-  if $('.tab-context-tags').hasClass('dt-inited') == false
-    $('.tab-context-tags').addClass('dt-inited')
-
-  # tmi stuff is dealt with, now on to enrich and prev tables
-  $('.enrichment-loader, .prevalence-loader').addClass('hidden')  # remove loaders
 
   # dt init the enrich dt
   $('#webrep-enrichment-dt').DataTable
@@ -631,6 +620,10 @@ window.tmi_enrich_prev_dt_inits = () ->
     paging: false
     searching: false
     info: false
+
+  # set a dom flag that dts have been inited, so we can re-init properly on change entry
+  if $('.tab-context-tags').hasClass('dt-inited') == false
+    $('.tab-context-tags').addClass('dt-inited')
 
 
 
@@ -653,7 +646,7 @@ window.determine_string_type = (curr_string) ->
 
 # HOUSEKEEPING STUFF, MOVE THIS INTO A FUNCTION BELOW
 $ ->
-  # webrep - kick things off on webrep, we need the first ip/domain/url entry on this case
+  # webrep - tmi kick things off on webrep, we need the first ip/domain/url entry on this case
   if $('.tab-ctt-webrep').length > 0
     if $('.top-case-info .dispute-entry-ip-uri').length > 0
       top_url = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
@@ -682,7 +675,7 @@ $ ->
     setup_context_tables_webrep()
 
 
-  # filerep - kick things off on filerep, we need the sha
+  # filerep - tmi kick things off on filerep, we need the sha
   else if $('.tab-ctt-filerep').length > 0
     curr_sha = $('#sha256_hash').text().trim()  # get url or ip
     tmi_ajax_webrep(curr_sha)
@@ -699,5 +692,5 @@ window.show_tag_tree = () ->
 
 
 # WIP FUNCTION
-#$ ->
-#  show_tag_tree()
+$ ->
+  show_tag_tree()
