@@ -564,48 +564,54 @@ window.group_by_tag_filerep = (array, key) ->
 
 # init these dts, keep in sep function for when promise resolves elsewhere (api call is delayed).
 window.tmi_enrich_prev_dt_inits = () ->
-  # dt init the tmi dt (and save to a var for col toggling)
-  tmi_table = $('#webrep-tmi-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-    order: [[ 1, 'asc']]
-    columnDefs: [
-      {
-        targets: [ 0 ]
-        orderable: false
-        sortable: false
-      }
-    ]
 
   # tmi dt inited, ensure tmi loader hid
   $('.tmi-loader').addClass('hidden')
 
 
+  # FIX THIS, SETTIMEOUT IS HACKY
+  # FIX THIS, SETTIMEOUT IS HACKY
+  # tiny delay to ensure tmi data exists
+  setTimeout ->
+    # dt init the tmi dt (and save to a var for col toggling)
+    tmi_table = $('#webrep-tmi-dt').DataTable
+      paging: false
+      searching: false
+      info: false
+      order: [[ 1, 'asc']]
+      columnDefs: [
+        {
+          targets: [ 0 ]
+          orderable: false
+          sortable: false
+        }
+      ]
+
+    # show or hide columns in tmi table
+    $('.toggle-col-tmi').each ->
+      checkbox = $(this).find('input')
+      column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
+
+      if $(checkbox).prop('checked') then column.visible(true)
+      else column.visible(false)
+
+      # click anywhere in the li to toggle
+      $(this).click ->
+        $(checkbox).prop('checked', !checkbox.prop('checked'))
+        column.visible(!column.visible())
+
+      # or click the cb specifically to toggle
+      $(checkbox).click ->
+        $(checkbox).prop('checked', !checkbox.prop('checked'))
+  , 1000
+
+
   # FIX THIS
   # extraneous dt tmi error may appear at this point, remove that if exists
-#  if $('.tmi-tbody .tmi-tr').length > 0
-#    $('.tmi-tbody .dataTables_empty').remove()
-#  $('.tmi-tbody .dataTables_empty').remove()
+  #  if $('.tmi-tbody .tmi-tr').length > 0
+  #    $('.tmi-tbody .dataTables_empty').remove()
+  #  $('.tmi-tbody .dataTables_empty').remove()
 
-
-
-  # show or hide columns in tmi table
-  $('.toggle-col-tmi').each ->
-    checkbox = $(this).find('input')
-    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
-
-    if $(checkbox).prop('checked') then column.visible(true)
-    else column.visible(false)
-
-    # click anywhere in the li to toggle
-    $(this).click ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
-      column.visible(!column.visible())
-
-    # or click the cb specifically to toggle
-    $(checkbox).click ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
 
   # set a flag that dts have been inited, so we can re-init properly on change entry
   if $('.tab-context-tags').hasClass('dt-inited') == false
