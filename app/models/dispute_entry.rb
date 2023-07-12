@@ -677,7 +677,7 @@ class DisputeEntry < ApplicationRecord
 
 
     if extra_wbrs_stuff.present?
-      self.score = extra_wbrs_stuff["wbrs"]&["score"]
+      self.score = extra_wbrs_stuff.dig("wbrs", "score")
 
       threat_cats = extra_wbrs_stuff["threat_cats"]
 
@@ -1325,9 +1325,9 @@ class DisputeEntry < ApplicationRecord
 
             results = RepApi::Blacklist.where(entries: [ self.hostlookup ]) rescue nil
             if results.kind_of?(Array)
-              is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
+              is_blacklisted = results.any?{|result| result.status.upcase == "ACTIVE"} rescue true
             else
-              is_blacklisted = results.status == "ACTIVE" rescue true
+              is_blacklisted = results.status.upcase == "ACTIVE" rescue true
             end
 
             #WEB-10157
