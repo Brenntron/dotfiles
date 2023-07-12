@@ -90,21 +90,18 @@
   .tmi-gray {
     background-color: #f6f6f6;
   }
-
   .enrich-cell-context, .enrich-cell-taxonomy, .enrich-cell-name, .enrich-cell-external-references {
     width: 12%;
   }
   .enrich-cell-description {
     width: 52%;
   }
-
   .filerep-enrich-cell-name {
     width: 20%;
   }
   .filerep-enrich-cell-description {
     width: 70%;
   }
-
   .enrich-cell-taxonomy, .enrich-cell-name {
     white-space: nowrap;
   }
@@ -190,7 +187,6 @@
   }
 }
 
-
 .dropdown.open .show-col-context-tags {
   background-image: url(image_path('icon_columns_white.svg'));
 }
@@ -210,7 +206,7 @@
   }
 }
 
-// prevalence table wrapper div needs much less width, commenting out for now
+// leave commented out until tmi is done: prev table wrapper div needs less width
 //.prevalence-area {
 //  width: 50%;
 //  min-width: 800px;

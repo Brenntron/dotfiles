@@ -320,5 +320,5 @@
                         %td= link_to(dispute_dup.case_id_str, escalations_webrep_dispute_path(dispute_dup.id), target: "_blank")
                         %td= dispute_dup.case_opened_at.strftime('%F %T')
 
-  .tab-pane.tab-context-tags#context_tags_tab.tab-webrep-ctt{role: 'tabpanel'}
+  .tab-pane.tab-context-tags#context_tags_tab.tab-ctt-webrep{role: 'tabpanel'}
     = render 'shared/context_tags_tab'

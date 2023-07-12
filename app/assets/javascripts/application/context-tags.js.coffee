@@ -582,10 +582,11 @@ window.tmi_enrich_prev_dt_inits = () ->
   $('.tmi-loader').addClass('hidden')
 
 
-
+  # FIX THIS
   # extraneous dt tmi error may appear at this point, remove that if exists
-  if $('.tmi-tbody .tmi-tr').length > 0
-    $('.tmi-tbody .dataTables_empty').remove()
+#  if $('.tmi-tbody .tmi-tr').length > 0
+#    $('.tmi-tbody .dataTables_empty').remove()
+#  $('.tmi-tbody .dataTables_empty').remove()
 
 
 
@@ -606,11 +607,9 @@ window.tmi_enrich_prev_dt_inits = () ->
     $(checkbox).click ->
       $(checkbox).prop('checked', !checkbox.prop('checked'))
 
-
   # set a flag that dts have been inited, so we can re-init properly on change entry
   if $('.tab-context-tags').hasClass('dt-inited') == false
     $('.tab-context-tags').addClass('dt-inited')
-
 
   # tmi stuff is dealt with, now on to enrich and prev tables
   $('.enrichment-loader, .prevalence-loader').addClass('hidden')  # remove loaders
@@ -649,13 +648,13 @@ window.determine_string_type = (curr_string) ->
 # HOUSEKEEPING STUFF, MOVE THIS INTO A FUNCTION BELOW
 $ ->
   # webrep - kick things off on webrep, we need the first ip/domain/url entry on this case
-  if location.href.includes('escalations/webrep')
+  if $('.tab-ctt-webrep').length > 0
     if $('.top-case-info .dispute-entry-ip-uri').length > 0
       top_url = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
       tmi_ajax_webrep(top_url)  # example is 'aol.com'
 
     # on webrep, if user clicks the 'select an entry' element
-    $('.tab-webrep-ctt .ctt-entry-select').change ->
+    $('.tab-ctt-webrep .ctt-entry-select').change ->
       curr_url = $(this).find('option:selected').attr('data-entry')
 
       tmi_ajax_webrep(curr_url)  # do tmi stuff
@@ -677,8 +676,8 @@ $ ->
     setup_context_tables_webrep()
 
 
-  # filrep - kick things off on filerep, we need the sha
-  else if location.href.includes('escalations/file_rep')
+  # filerep - kick things off on filerep, we need the sha
+  else if $('.tab-ctt-filerep').length > 0
     curr_sha = $('#sha256_hash').text().trim()  # get url or ip
     tmi_ajax_webrep(curr_sha)
 
