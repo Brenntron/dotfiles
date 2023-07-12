@@ -1,4 +1,4 @@
-// context tags (tmi) tab for webrep & filerep
+// context tags tab for webrep & filerep
 .tab-context-tags {
   h2 {
     font-size: 11pt;
@@ -41,6 +41,7 @@
       left: 0;
       bottom: 7px;
       font-size: 9pt;
+      color: #777;
     }
   }
 
@@ -53,7 +54,7 @@
       padding: 8px 10px;
       vertical-align: middle;
       background-position-y: center !important;  // override dt defaults
-      //white-space: nowrap;
+      line-height: 10pt;
     }
     tbody td {
       padding: 8px 10px;
@@ -70,9 +71,6 @@
   .tmi-table {
     margin-bottom: 40px;
   }
-  //.tmi-observable {
-    //width: 15%;
-  //}
   .tmi-suppressed {
     font-weight: 600;
     text-transform: uppercase;
@@ -121,7 +119,7 @@
   }
   .observable-container {
     display: inline-block;
-    width: 160px;  // need this for ellipsis trick to work
+    //width: 160px;
     text-overflow: ellipsis;  // ellipsis trick long urls
     white-space: nowrap;
     overflow: hidden;
@@ -212,11 +210,11 @@
   }
 }
 
-// prevalence table wrapper div needs much less width
-.prevalence-area {
-  width: 50%;
-  min-width: 800px;
-}
+// prevalence table wrapper div needs much less width, commenting out for now
+//.prevalence-area {
+//  width: 50%;
+//  min-width: 800px;
+//}
 
 // ensure bg color if table width extends off page on context tags tab
 .ctt-table {

@@ -103,7 +103,7 @@ window.research_data = (sha256_hash) ->
   window.get_threatgrid_data(sha256_hash)
   window.get_reversinglabs_data(sha256_hash)
   window.get_zoo_status(sha256_hash)
-  window.get_enrichment_service_filerep(sha256_hash)
+  window.enrich_ajax_filerep(sha256_hash)  # enrichment moved to context tags tab
 
 
 ########### SAMPLE ZOO STATUS ############
