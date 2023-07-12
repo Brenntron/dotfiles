@@ -687,10 +687,13 @@ window.show_tag_tree = () ->
     url: '/escalations/api/v1/escalations/cloud_intel/tag_management/taxonomy_map'
     method: 'GET'
     success: (response) ->
+      console.clear()
       console.log 'TAG TREE DATA BELOW'
       console.log response
 
 
 # WIP FUNCTION
 $ ->
-  show_tag_tree()
+  setTimeout ->
+    show_tag_tree()
+  , 3000
