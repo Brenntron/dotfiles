@@ -53,7 +53,7 @@
       padding: 8px 10px;
       vertical-align: middle;
       background-position-y: center !important;  // override dt defaults
-      white-space: nowrap;
+      //white-space: nowrap;
     }
     tbody td {
       padding: 8px 10px;
@@ -77,6 +77,9 @@
     font-weight: 600;
     text-transform: uppercase;
   }
+  .tmi-suppressed, .tmi-suppression-source, .tmi-suppression-platform, .tmi-suppression-date {
+    width: 6%;
+  }
   .tmi-suppression-platform, .tmi-tag-type {
     text-transform: capitalize;
   }
@@ -89,20 +92,32 @@
   .tmi-gray {
     background-color: #f6f6f6;
   }
+
   .enrich-cell-context, .enrich-cell-taxonomy, .enrich-cell-name, .enrich-cell-external-references {
     width: 12%;
   }
   .enrich-cell-description {
     width: 52%;
   }
+
+  .filerep-enrich-cell-name {
+    width: 20%;
+  }
+  .filerep-enrich-cell-description {
+    width: 70%;
+  }
+
   .enrich-cell-taxonomy, .enrich-cell-name {
     white-space: nowrap;
   }
-  .enrich-cell-description p {
+  .enrich-cell-description p, .filerep-enrich-cell-description p {
     max-height: 220px;  // desc can get huge, use overflow scroll if so
     overflow-y: auto;
     white-space: pre-wrap;  // retain formatting from source
     padding-right: 20px;
+  }
+  .filerep-enrich-cell-description p {
+    margin-right: 40px;
   }
   .observable-container {
     display: inline-block;
@@ -111,12 +126,6 @@
     white-space: nowrap;
     overflow: hidden;
     vertical-align: middle;
-  }
-  .tmi-missing, .tmi-error,
-  .enrichment-missing, .enrichment-error,
-  .prevalence-missing, .prevalence-error {
-    font-size: 9pt;
-    padding: 5px 3px 10px;
   }
   .data-report-table {
     font-size: 9pt;

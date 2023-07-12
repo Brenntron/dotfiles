@@ -15,7 +15,6 @@ window.get_tmi_data_webrep = (query_item) ->
     else
       data = { url: query_item }
 
-
   std_msg_ajax
     url: '/escalations/api/v1/escalations/cloud_intel/tag_management/read_observable'
     method: 'GET'
@@ -27,6 +26,10 @@ window.get_tmi_data_webrep = (query_item) ->
 #      console.log response
 
       observable = tag_name = mnemonic = taxonomy = source = processor = report_date = suppressed = suppression_source = suppression_platform = suppression_date = ''
+
+      # sha will be the observable
+#      if query_item == 'sha'
+#        observable = sha
 
       # list of observables
       { items } = response
@@ -98,6 +101,10 @@ window.get_tmi_data_webrep = (query_item) ->
             { raw_observable, source, created_ts } = this
             { source, processor } = source
 
+            # shas wont have raw_observable value, use the sha itself
+            if !raw_observable && query_type == 'sha'
+              raw_observable = query_item
+
             # convert unix timecode to utc date/time, created means when report was created
             report_date = moment.unix(created_ts).utc().format('YYYY-MM-DD hh:mm:ss')
 
@@ -154,9 +161,8 @@ window.get_enrichment_service_webrep = (query_item, query_type) ->
     data: data
     success: (response) ->
       return response
-    error: (response) ->
+    complete: () ->
       $('.enrichment-loader, .prevalence-loader').addClass('hidden')
-      $('.enrichment-error, .prevalence-error').removeClass('hidden')
 
 
 # part 2 of enrichment, set up enrichment based on url passed in
@@ -171,7 +177,6 @@ window.setup_context_tables_webrep = (action) ->
   if action == 'update'
     # hide the tables in general
     $('.tmi-main-content, .enrichment-table, .prevalence-table').addClass('hidden')
-    $('.tmi-error, .enrichment-error, .prevalence-error').addClass('hidden')
     $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
 
     # reset the tables
@@ -220,7 +225,7 @@ window.setup_context_tables_webrep = (action) ->
       create_webrep_prevalence_section(response.data.prevalence.responses)
 
     # init the dts on ct tab now
-    enrich_prev_dt_inits()
+    ctt_dt_inits()
 
 
 # part 3 of enrichment
@@ -376,18 +381,12 @@ window.get_enrichment_service_filerep = (sha256_hash) ->
 
     error: (response) ->
       std_msg_error('Error with Enrichment Service', ['There was an error.'])
-      $('.tab-filerep-ctt .enrichment-area .enrichment-error').removeClass('hidden')
 
-# REMOVE BELOW CONSOLE LOGGING WHEN TMI IS DONE OR NOT NEEDED
-#    complete: () ->
-#      console.clear()
-#      console.log 'response for enrichment:'
-#      console.log response
   )
 
 # part 2
 window.create_filerep_enrich_section = (tags, context) ->
-#organize tags by taxonomy_id if there are multiple
+  #organize tags by taxonomy_id if there are multiple
   if tags.length > 1
     taxonomy_object = group_by_tag_filerep(tags, 'taxonomy_id')
     taxonomy_array = Object.entries(taxonomy_object)
@@ -432,13 +431,13 @@ window.create_filerep_enrich_section = (tags, context) ->
 
       #create table header if first result
       if index == 0
-        table_header = "<tr class='filerep-enrich-table-header-row'><th class='filerep-enrich-table-name-th'>Name</th><th class='filerep-enrich-table-description-th'>Description</th><th class='text-right'>External Ref</th></tr>"
+        table_header = "<tr class='filerep-enrich-table-header-row'><th class='filerep-enrich-table-name-th'>Name</th><th class='filerep-enrich-table-description-th'>Description</th><th class='filerep-enrich-table-external-ref-th'>External Ref</th></tr>"
         $(table_wrapper).append table_header
 
       name_wrapper = $("<td class='filerep-enrich-cell-name'></td>")
-      $(name_wrapper).text(name) #escaping to prevent xss attacks
-      description_wrapper = $("<td class='filerep-enrich-cell-description'></td>")
-      $(description_wrapper).text(description) #escaping to prevent xss attacks
+      $(name_wrapper).text(name)
+      description_wrapper = $("<td class='filerep-enrich-cell-description'><p></p></td>")
+      $(description_wrapper).find('p').text(description)
       external_ref_wrapper = $("<td class='filerep-enrich-cell-external-references'></td>")
 
       row_wrapper = $("<tr class='filerep-enrich-table-body-row'></tr>")
@@ -482,7 +481,7 @@ window.create_filerep_enrich_section = (tags, context) ->
 
     $(section_wrapper).append(table_wrapper)
 
-    $('.enrichment-area').append(section_wrapper)
+    $('.enrichment-area').append(section_wrapper)  # add to dom
 
 
 
@@ -565,7 +564,7 @@ window.create_filerep_prevalence_section = (prevalence_data) ->
     $('.prevalence-area').append(dataset_section_wrapper)  # add to dom
 
     # init the enrich and prev tables now that both exist
-    enrich_prev_dt_inits()
+    ctt_dt_inits()
 
 
 # group taxonomies by id for enrichment section on filerep
@@ -581,58 +580,73 @@ window.group_by_tag_filerep = (array, key) ->
 
 
 # init these dts, keep in sep function for when promise resolves elsewhere (api call is delayed).
-window.enrich_prev_dt_inits = () ->
-# do some housekeeping before init the dts
-  $('.enrichment-loader, .prevalence-loader').addClass('hidden')  # remove loaders
+window.ctt_dt_inits = () ->
+  console.log 'ctt_dt_inits() was called'
 
-  # dt init the enrich dt
-  $('#webrep-enrichment-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-
-  # dt init the prev dt
-  $('#webrep-prevalence-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-
+  # make sure this is done last
 
   # dt init the tmi dt (and save to a var for col toggling)
-  tmi_table = $('#webrep-tmi-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-    order: [[ 1, 'asc']]
-    columnDefs: [
-      {
-        targets: [ 0 ]
-        orderable: false
-        sortable: false
-      }
-    ]
+
+
+  # DO BELOW TO ENSURE NO 'no data available' errors in dt
+#  setTimeout ->
+#    tmi_table = $('#webrep-tmi-dt').DataTable
+#      paging: false
+#      searching: false
+#      info: false
+#      order: [[ 1, 'asc']]
+#      columnDefs: [
+#        {
+#          targets: [ 0 ]
+#          orderable: false
+#          sortable: false
+#        }
+#      ]
+#  , 5000
+#
+
+
+    # if tmi dt rows exist, remove any extraneous
+#    $('.tmi-table .dataTables_empty').remove()
+
 
   # show or hide columns in tmi table
-  $('.toggle-col-tmi').each ->
-    checkbox = $(this).find('input')
-    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
-
-    if $(checkbox).prop('checked') then column.visible(true)
-    else column.visible(false)
-
-    # click anywhere in the li to toggle
-    $(this).click ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
-      column.visible(!column.visible())
-
-    # or click the cb specifically to toggle
-    $(checkbox).click ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
-
+#  $('.toggle-col-tmi').each ->
+#    checkbox = $(this).find('input')
+#    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
+#
+#    if $(checkbox).prop('checked') then column.visible(true)
+#    else column.visible(false)
+#
+#    # click anywhere in the li to toggle
+#    $(this).click ->
+#      $(checkbox).prop('checked', !checkbox.prop('checked'))
+#      column.visible(!column.visible())
+#
+#    # or click the cb specifically to toggle
+#    $(checkbox).click ->
+#      $(checkbox).prop('checked', !checkbox.prop('checked'))
 
   # set a flag that dts have been inited, so we can re-init properly on change entry
-  if $('.tab-context-tags').hasClass('dt-inited') == false
-    $('.tab-context-tags').addClass('dt-inited')
+#  if $('.tab-context-tags').hasClass('dt-inited') == false
+#    $('.tab-context-tags').addClass('dt-inited')
+
+
+  # tmi stuff is dealt with, now on to enrich and prev tables
+  $('.enrichment-loader, .prevalence-loader').addClass('hidden')  # remove loaders
+
+#  # dt init the enrich dt
+#  $('#webrep-enrichment-dt').DataTable
+#    paging: false
+#    searching: false
+#    info: false
+#
+#  # dt init the prev dt
+#  $('#webrep-prevalence-dt').DataTable
+#    paging: false
+#    searching: false
+#    info: false
+#
 
 
 # determine if a string is an ip/url/domain/sha, return the type
@@ -674,12 +688,22 @@ $ ->
 
 $ ->
   # MOVE BELOW CODE TO BETTER PLACE
-  if $('.top-case-info .dispute-entry-ip-uri').length > 0
-    top_url = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
-    get_tmi_data_webrep(top_url)  # example is 'aol.com' or 'hydropneumaticsengg.in/wng0mn/kzlx_51984960'
+  # MOVE BELOW CODE TO BETTER PLACE
+
+  # kick things off on webrep, we need the first ip/domain/url entry on this case
+  if location.href.includes('escalations/webrep')
+    if $('.top-case-info .dispute-entry-ip-uri').length > 0
+      top_url = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
+      get_tmi_data_webrep(top_url)  # example is 'aol.com' or 'hydropneumaticsengg.in/wng0mn/kzlx_51984960'
+
+  # kick things off on filerep, we need the sha
+  else if location.href.includes('escalations/file_rep')
+    curr_sha = $('#sha256_hash').text().trim()  # get url or ip
+    get_tmi_data_webrep(curr_sha)  # example is 'aol.com' or 'hydropneumaticsengg.in/wng0mn/kzlx_51984960'
 
 
-  $('.ctt-entry-select').change ->
+  # on webrep, if user clicks the 'select an entry' element
+  $('.tab-webrep-ctt .ctt-entry-select').change ->
     curr_url = $(this).find('option:selected').attr('data-entry')
 
     get_tmi_data_webrep(curr_url)  # do tmi stuff

@@ -88,16 +88,9 @@
               %th Suppression Date
           %tbody.tmi-tbody
 
-
       %p.tmi-loader.ctt-loader
         = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
         %span.loader-msg Loading...
-      %p.tmi-missing.missing-data.hidden
-        No tag data found.
-      %p.tmi-error.missing-data.hidden
-        Error with tag data.
-
-
 
 
     -# enrichment data for webrep and filerep
@@ -117,10 +110,6 @@
       %p.enrichment-loader.ctt-loader
         = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
         %span.loader-msg Loading...
-      %p.enrichment-missing.missing-data.hidden
-        No enrichment data found.
-      %p.enrichment-error.missing-data.hidden
-        Error gathering data.
 
 
     -# prevalence data for webrep and filerep
@@ -138,7 +127,3 @@
       %p.prevalence-loader.ctt-loader
         = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
         %span.loader-msg Loading...
-      %p.prevalence-missing.missing-data.hidden
-        No prevalence data found.
-      %p.prevalence-error.missing-data.hidden
-        Error gathering data.
