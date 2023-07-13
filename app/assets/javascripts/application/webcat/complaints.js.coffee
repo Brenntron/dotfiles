@@ -33,10 +33,9 @@ $(document).ready ->
 
 window.change_ticket_view = (type,button) ->
   if $(button).hasClass('active-view')
-#if view is already active, do nothing
+  #if view is already active, do nothing
     return
   else
-
     checked = $('.imports_check_box:checked')
     switch type
       when 'ticket'
@@ -890,7 +889,7 @@ window.inheritCategories = (complaint_entry_id) ->
   )
 
 name_servers =(server_list)->
-  if undefined == server_list
+  if server_list ==  undefined
     ''
   else
     text = ""
