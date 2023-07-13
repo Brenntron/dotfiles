@@ -300,6 +300,31 @@ table.dataTable thead .sorting_desc {
   background-image: url(image_path('layout/icon_sort_dec.svg'));
 }
 
+.entry-details-table {
+  /* scrollY misaligns datatable headers with the column bodies if
+    the page isn't show on page load. This overflow and max-height
+    gets the table scrollable while keeping the heads and body inline. */
+  .dataTables_wrapper.no-footer {
+      max-height: 200px;
+      overflow: auto;
+  }
+  .dataTable.no-footer {
+    overflow: auto;
+
+    th {
+      background-position-x: 95% !important;
+    }
+  }
+
+  .dataTables_wrapper.no-footer, .dataTable.no-footer {
+    border-bottom: 1px solid $table-dark-header;
+
+    .dataTable.no-footer {
+      border: 0;
+    }
+  }
+}
+
 .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
   height: 100%;
   display: inline-block;
@@ -806,17 +831,8 @@ button {
 .rmt-delete-button    {background-image: url(image_path('icon_delete.svg'));}
 .list-button      {background-image: url(image_path('icon_list.svg'));}
 .view-button      {background-image: url(image_path('icon_view.svg'));}
-.retry-button      {
-  background-image: url(image_path('icon_retry_grey.svg'));
-  &:disabled {
-    opacity: 0.5;
-  }
-}
-.close-ticket-button{
-  background-image: url(image_path('icon_my_closed_tickets_grey.svg'));
-  &:disabled {
-    opacity: 0.5;
-  }}
+.retry-button      {background-image: url(image_path('icon_retry_grey.svg'));}
+.close-ticket-button{background-image: url(image_path('icon_my_closed_tickets_grey.svg'));}
 .splitview-button {background-image: url(image_path('icon_splitview.svg'));
 }
 .duplicate-button {background-image: url(image_path('icon_duplicate.svg'));}
@@ -828,12 +844,8 @@ button {
 .revert-button    {background-image: url(image_path('icon_revert.svg'));}
 .commit-button, .committer-label, .commit-logs-label, .commit-label  {background-image: url(image_path('icon_committer.svg'));}
 .research-label   {background-image: url(image_path('icon_researcher.svg'));}
-.export-button    {
-  background-image: url(image_path('icon_export.svg'));
-  &:disabled {
-    opacity: 0.5;
-  }
-}
+.export-button    {background-image: url(image_path('icon_export.svg'));}
+.close-ticket-button{background-image: url(image_path('icon_my_closed_tickets_grey.svg'));}
 .clear-button    {background-image: url(image_path('icon_clear.svg'));}
 .clear-action-button {
     background-image: url(image_path('icon_delete_grey.svg'));
@@ -875,10 +887,8 @@ button {
 .ticket-status-button {background-image: url(image_path('icon_status.svg'));}
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .mark-related-button {background-image: url(image_path('icon_related.svg'));}
-.ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));
-  &:disabled {
-    opacity: 0.5;
-  }}
+.ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
+.import-ticket-button {background-image: url(image_path('icon_import_dark_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
 .auto-resolve-button {background-image: url(image_path('icon_reports_white.svg'));}
@@ -897,10 +907,7 @@ button {
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 .sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
 .remove-assignee-toolbar-button {
-  background-image: url(image_path('icon_unassign_grey.svg'));
-  &:disabled {
-    opacity: 0.5;
-  }}
+  background-image: url(image_path('icon_unassign_grey.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -915,15 +922,9 @@ button {
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
 .open-all {background-image: url(image_path('icon_open_viewable.svg'));}
 .take-ticket-toolbar-button {
-  background-image: url(image_path('icon_take.svg'));
-  &:disabled {
-    opacity: 0.5;
-  }}
+  background-image: url(image_path('icon_take.svg'));}
 .return-ticket-toolbar-button {
-  background-image: url(image_path('icon_return.svg'));
-  &:disabled {
-    opacity: 0.5;
-  }}
+  background-image: url(image_path('icon_return.svg'));}
 .convert-ticket-button{background-image: url(image_path('icon_convert_ticket_grey.svg'));}
 .open .convert-ticket-button {background-image: url(image_path('icon_convert_ticket.svg'))};
 .collapse-all {background-image: url(image_path('icon_collapse_all.svg'));}
@@ -938,6 +939,14 @@ button {
   float: right;
   margin-left: 3px;
 }
+
+.close-ticket-button, .export-button, .ticket-owner-button, .import-ticket-button,.return-ticket-toolbar-button,.take-ticket-toolbar-button,.remove-assignee-toolbar-button,.retry-button,.convert-ticket-button{
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
 .delete-search {
   display: inline-block;
   float: right;
@@ -947,11 +956,6 @@ button {
   right: 40px;
   height: 20px !important;
   position: absolute;
-}
-
-.convert-ticket-button:disabled {
-  opacity: .5;
-  cursor: not-allowed;
 }
 
 #research-tab-toolbar {
@@ -13781,6 +13785,13 @@ table > tbody > tr > td.no-padding {
     width: auto;
     position: absolute;
   }
+}
+.jira-url{
+  max-width: 300px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 #webcat-imports-index_wrapper .jira-ticket-id:hover {
   cursor:pointer;

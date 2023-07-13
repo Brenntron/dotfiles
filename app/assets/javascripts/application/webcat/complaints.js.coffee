@@ -154,19 +154,25 @@ window.build_single_row = (rd, data) ->
             targets: [ 0 ]
             orderable: false
             searchable: false
-          },
+          }
           {
             targets: [ 9 ]
             className:'entry-assignee'
           }]
         createdRow: (row, data, index) ->
-          entry_id = data[3]
+          url =          data[1]
+          entry_id =     data[3]
           complaint_id = data[4]
-          age = data[10]
-          status = data[5]
+          status =       data[5]
+          age =          data[10]
+
 
           checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
           $('td', row).eq(0).append(checkbox).addClass('checkbox-cell')
+
+          if url
+            updated_url = "<span class='jira-url esc-tooltipped' title='#{url}'>#{url}</span>"
+            $('td', row).eq(1).html(updated_url)
 
           if complaint_id
             complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
@@ -187,6 +193,12 @@ window.build_single_row = (rd, data) ->
               else
                 age_class = 'ticket-age-over12hr'
               $('td', row).eq(10).html("<span class='#{age_class}'>#{age}</span>")
+        initComplete: () ->
+          $('.esc-tooltipped:not(.tooltipstered)').tooltipster
+            theme: [
+              'tooltipster-borderless'
+              'tooltipster-borderless-customized'
+            ]
     )
   else
     ticket_html += "<hr/></div>"
@@ -290,7 +302,9 @@ $(document).on 'click', '.imports_check_box',->
 
 $(document).on 'change', '.imports_check_box', ->
   retry_button = $('.toolbar-button.retry-button')
+  resolve_button = $('.toolbar-button.close-ticket-button')
   can_retry = false
+  can_resolve = false
   checked_data = checked_row_data() || [];
 
   if checked_data.length > 0
@@ -298,15 +312,21 @@ $(document).on 'change', '.imports_check_box', ->
   else
     $('.close-ticket-button').attr('disabled', true)
 
-  for row in checked_data
-    if row.status == 'Failure'
+  checked_data.each ->
+    if this.status == 'Failure'
       can_retry = true
-      break
+    if this.issue_status != 'Resolved'
+      can_resolve = true
 
   if can_retry
     retry_button.removeAttr('disabled')
   else
     retry_button.attr('disabled', true)
+
+  if can_resolve
+    resolve_button.removeAttr('disabled')
+  else
+    resolve_button.attr('disabled', true)
 
 $(document).on 'click', '#show-failed, #show-complete, #show-pending',->
   show_failed = $('#show-failed').prop('checked')
@@ -352,25 +372,41 @@ window.retry_imports = (id)->
       std_api_error(response, 'Error retrying import.', reload: false)
   )
 
+window.run_imports = () ->
+  std_msg_ajax(
+    method: 'get'
+    url: '/escalations/api/v1/escalations/jira_import_tasks/queue_imports'
+    success: (response) ->
+      std_msg_success('Import Successful', [], reload: false)
+      $('#webcat-imports-index').DataTable().ajax.reload()
+    error: (response) ->
+      std_api_error(response, 'Error running manual import.', reload: false)
+  )
 window.close_related_issues = () ->
-  ids = $('.imports_check_box:checked').map (i, el) -> $(el).val()
-  if ids.length > 0
-    $('.close-ticket-button').attr('disabled', true)
-
-    data =  { issue_keys: ids.toArray() } 
-    std_msg_ajax(
+  ids = []
+  checked_row_data().map( (r) ->
+    # only run ids if the row is not resolved
+    if r.issue_status != "Resolved"
+      ids.push(parseInt(r.id))
+  )
+  if ids.length
+    console.log ids
+    std_msg_ajax
       method: 'put'
       url: '/escalations/api/v1/escalations/jira_import_tasks/close_related_issues'
-      data: data
+      data: task_ids: ids
+      success: (response) ->
+        std_msg_success('Successfully closed Jira issues',[], reload: false)
+        $('.toolbar-button.close-ticket-button').attr('disabled', true)
+        setTimeout ->
+          # on success, wait a moment then reload data to reflect any status changes
+          $('#webcat-imports-index').DataTable().ajax.reload()
+        , 500
       error: (response) ->
-        std_api_error(response, 'Error closing related issues.', reload: false)
-      complete: (response) ->
-        $('#webcat-imports-index').DataTable().ajax.reload()
-        $('.close-ticket-button').removeAttr('disabled')
-    )
+        console.log response
+        std_api_error(response, 'Error closing Jira issues', reload: false)
   else
-    std_msg_error('Error',['Please select at least one row before close related issues.'])
-
+    std_msg_error('Select at least one unresolved Jira issue.')
 
 window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
@@ -2533,6 +2569,9 @@ processSubmitMaster = () ->
   selectedEntryDomains = (sessionStorage.getItem("touchedForm")|| "" )
   return if selectedEntryDomains.length == 0
 
+  # disable the master submit button while processing
+  $('#master-submit').prop('disabled', true)
+
   # remove empty values
   selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
   selectedEntries = []
@@ -2652,8 +2691,10 @@ processSubmitMaster = () ->
         if td.className == ''
           td.classList.add('nested-complaint-data-wrapper')
 
+      $('#master-submit').prop('disabled', false)
     error: (response) ->
       std_msg_error("Unable to submit changes for selected entries.","", reload: false)
+      $('#master-submit').prop('disabled', false)
 
   , this)
 

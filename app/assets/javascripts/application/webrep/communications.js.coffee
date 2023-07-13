@@ -441,7 +441,7 @@ $ ->
     std_msg_ajax(
       method: 'POST'
       url: "/escalations/api/v1/escalations/webrep/resolution_message_templates"
-      data: {name: name, description: description, body: body}
+      data: {name: name, description: description, body: body, ticket_type: 'Dispute'}
       success_reload: false
       success: (response) ->
         std_msg_success('Resolution Message template Created.', [], reload: true)

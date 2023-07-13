@@ -9,6 +9,8 @@ class JiraImportTask < ApplicationRecord
   scope :pending_count, -> { where(status: STATUS_PENDING).count }
   scope :awaiting_bast_verdict_count, -> { where(status: STATUS_AWAITING_BAST_VERDICT).count }
 
+  JIRA_FILTERS = ['status != Resolved', "issuetype != 'Question / Assistance'", 'createdDate > -30d']
+
   STATUS_COMPLETE = "Complete"
   STATUS_FAILURE = "Failure"
   STATUS_PENDING = "Pending"
@@ -38,17 +40,48 @@ class JiraImportTask < ApplicationRecord
     @issue ||= JiraRest::Issue.new(issue_key)
   end
 
+  def self.queue_imports(force_retry_pending: false)
+    project_key = Rails.configuration.jira.project_key
+    project = JiraRest::Project.new(project_key)
+    platform_field_id = project.custom_fields[:platform]
+    issues = project.issues(JIRA_FILTERS)
+    issues.each do |issue|
+      next if issue.fields.dig(platform_field_id, 'value') == "OpenDNS"
+      import_task = JiraImportTask.find_by(issue_key: issue.key)
+
+      if import_task.present?
+        if import_task.status == JiraImportTask::STATUS_PENDING && (import_task.updated_at < 6.hours.ago || force_retry_pending)
+          import_task.process_import
+        end
+        next
+      end
+
+      task_attributes = {
+          issue_key: issue.key,
+          submitter: issue.reporter.name,
+          status: JiraImportTask::STATUS_PENDING,
+          issue_summary: issue.summary,
+          issue_status: issue.status.name,
+          issue_description: issue.description,
+          issue_platform: issue.fields.dig(platform_field_id, 'value'),
+          issue_type: issue.issuetype.name
+      }
+
+      import_task = JiraImportTask.create!(task_attributes)
+      import_task.process_import
+    end
+  end
+
   #Read CSV from Jira and send URLs to Bast
   def process_import
     update(imported_at: Time.now)
 
     custom_fields = JiraRest::Project.new(Rails.configuration.jira.project_key).custom_fields
     issue = JiraRest::Issue.new(issue_key)
-
     # fetch data from 'URL(s)' ticket field
     begin
       url_field = issue.issue.fields[custom_fields[:urls]].to_s
-      url_field.gsub("URLs ONLY - ONE PER LINE - MAXIMUM OF 50", "")
+      url_field = url_field.gsub("URLs ONLY - ONE PER LINE - MAXIMUM OF 50", "")
       urls = url_field.split(/[\n,\s]+/).reject(&:blank?)
     rescue
       urls = []
@@ -71,7 +104,7 @@ class JiraImportTask < ApplicationRecord
     end
 
     if urls.empty?
-      update(status: STATUS_FAILURE, result: 'No URLs to import')
+      update(status: STATUS_FAILURE, result: 'No URLs found on ticket')
       return
     end
 
@@ -81,9 +114,14 @@ class JiraImportTask < ApplicationRecord
         url_parts = Complaint.parse_url(url)
         import_urls.find_or_create_by(submitted_url: url, domain: url_parts[:domain])
         urls_to_submit << url
-      rescue PublicSuffix::DomainNotAllowed
+      rescue PublicSuffix::DomainNotAllowed, PublicSuffix::DomainInvalid, Addressable::URI::InvalidURIError
         next
       end
+    end
+
+    if urls_to_submit.empty?
+      update(status: STATUS_FAILURE, result: 'No valid URLs to import')
+      return
     end
 
     begin
@@ -113,33 +151,35 @@ class JiraImportTask < ApplicationRecord
 
       ticketable_urls = import_urls.where(domain: k)
 
-      if v["import"] == true
-        existing_entry = ComplaintEntry.open.where(domain: k).first
-        if existing_entry.present?
-          ticketable_urls.each do |ticketable_url|
-            ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
+      unless ticketable_urls.empty?
+        if v["import"] == true
+          existing_entry = ComplaintEntry.open.where(domain: k).first
+          if existing_entry.present?
+            ticketable_urls.each do |ticketable_url|
+              ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
+            end
+          else
+            complaint_options = [
+              BugzillaRest::Session.default_session,
+              ticketable_urls.first.submitted_url,
+              description,
+              Customer::JIRA_GENERATED,
+              nil,                     # tags
+              nil,                     # platform
+              Complaint::NEW,          # status
+              nil,                     # categories
+              nil,                     # user email
+              Complaint::JIRA_CHANNEL  # channel
+            ]
+            response = Complaint.create_action(*complaint_options)
+            ticketable_urls.each do |ticketable_url|
+              ticketable_url.update(bast_verdict: v["import"], complaint_id: response[:complaint_id])
+            end
           end
         else
-          complaint_options = [
-            BugzillaRest::Session.default_session,
-            ticketable_urls.first.submitted_url,
-            description,
-            Customer::JIRA_GENERATED,
-            nil,                     # tags
-            nil,                     # platform
-            Complaint::NEW,          # status
-            nil,                     # categories
-            nil,                     # user email
-            Complaint::JIRA_CHANNEL  # channel
-          ]
-          response = Complaint.create_action(*complaint_options)
           ticketable_urls.each do |ticketable_url|
-            ticketable_url.update(bast_verdict: v["import"], complaint_id: response[:complaint_id])
+            ticketable_url.update(bast_verdict: v["import"], verdict_reason: v["reason"])
           end
-        end
-      else
-        ticketable_urls.each do |ticketable_url|
-          ticketable_url.update(bast_verdict: v["import"], verdict_reason: v["reason"])
         end
       end
     end
@@ -249,10 +289,10 @@ class JiraImportTask < ApplicationRecord
     workbook
   end
 
-  def issue_status
+  def issue_status(reload: false)
     issue_data = JSON.parse(Rails.cache.read("#{issue_key}") || "{}")
 
-    if issue_data.blank? || issue_data['last_queried'] < CACHE_LIFESPAN.minutes.ago
+    if issue_data.blank? || (issue_data['last_queried'] < CACHE_LIFESPAN.minutes.ago || reload)
       issue_status = issue.issue.status.name
       Rails.cache.write("#{issue_key}", {'status' => issue_status, 'last_queried' => Time.now}.to_json)
     else
