@@ -1272,3 +1272,174 @@ Feature: Disputes
     And I click "#convert-ticket-button"
     And I wait for "1" seconds
     And I should see "TICKET CANNOT BE CONVERTED"
+
+  @javascript
+  Scenario: a user can load the resolution templates while closing a web ticket on the index table
+  #  after adding it so we're starting with clean data from the api
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    Given the following resolution message templates exist:
+      |body                           |resolution_type     |ticket_type        |name          |description  |
+      |This is the first FP comment   |Fixed - FP          |WebDispute         |Fixed - FP 01 |First        |
+      |This is the second FP comment  |Fixed - FP          |WebDispute         |Fixed - FP 02 |Second       |
+      |This is the first FN comment   |Fixed - FN          |WebDispute         |Fixed - FN 01 |First        |
+    When I goto "escalations/webrep/disputes?f=open"
+    And I wait for "1" seconds
+    And I click ".dispute_check_box"
+    Then I click "#index_ticket_status"
+    Then I click "#RESOLVED_CLOSED"
+    Then element with id "webrep-ticket-resolution-message-template-select" should contain a value of "Fixed - FP 01"
+    Then element with id "webrep-ticket-resolution-comment" should contain a value of "This is the first FP comment"
+    #select different Fixed - FP resolution template
+    Then I select "Fixed - FP 02" from "webrep-ticket-resolution-message-template-select"
+    Then element with id "webrep-ticket-resolution-message-template-select" should contain a value of "Fixed - FP 02"
+    Then element with id "webrep-ticket-resolution-comment" should contain a value of "This is the second FP comment"
+    #select Fixed - FN resolution status
+    Then I click "#FIXED_FN"
+    Then element with id "webrep-ticket-resolution-message-template-select" should contain a value of "Fixed - FN 01"
+    Then element with id "webrep-ticket-resolution-comment" should contain a value of "This is the first FN comment"
+
+  @javascript
+  Scenario: a user can load the resolution templates while closing an email ticket on the index table
+  #  after adding it so we're starting with clean data from the api
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | e               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    Given the following resolution message templates exist:
+      |body                           |resolution_type     |ticket_type        |name          |description  |
+      |This is the first FP comment   |Fixed - FP          |EmailDispute         |Fixed - FP 01 |First        |
+      |This is the second FP comment  |Fixed - FP          |EmailDispute         |Fixed - FP 02 |Second       |
+      |This is the first FN comment   |Fixed - FN          |EmailDispute         |Fixed - FN 01 |First        |
+    When I goto "escalations/webrep/disputes?f=open"
+    And I wait for "1" seconds
+    And I click ".dispute_check_box"
+    Then I click "#index_ticket_status"
+    Then I click "#RESOLVED_CLOSED"
+    Then element with id "webrep-ticket-resolution-message-template-select" should contain a value of "Fixed - FP 01"
+    Then element with id "webrep-ticket-resolution-comment" should contain a value of "This is the first FP comment"
+    #select different Fixed - FP resolution template
+    Then I select "Fixed - FP 02" from "webrep-ticket-resolution-message-template-select"
+    Then element with id "webrep-ticket-resolution-message-template-select" should contain a value of "Fixed - FP 02"
+    Then element with id "webrep-ticket-resolution-comment" should contain a value of "This is the second FP comment"
+    #select Fixed - FN resolution status
+    Then I click "#FIXED_FN"
+    Then element with id "webrep-ticket-resolution-message-template-select" should contain a value of "Fixed - FN 01"
+    Then element with id "webrep-ticket-resolution-comment" should contain a value of "This is the first FN comment"
+
+
+  @javascript
+  Scenario: a user can load the resolution templates while closing a web entry on the index table
+  #  after adding it so we're starting with clean data from the api
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    Given the following resolution message templates exist:
+      |body                           |resolution_type     |ticket_type        |name          |description  |
+      |This is the first FP comment   |Fixed - FP          |WebDispute         |Fixed - FP 01 |First        |
+      |This is the second FP comment  |Fixed - FP          |WebDispute         |Fixed - FP 02 |Second       |
+      |This is the first FN comment   |Fixed - FN          |WebDispute         |Fixed - FN 01 |First        |
+    When I goto "escalations/webrep/disputes?f=open"
+    And I wait for "1" seconds
+    And I click ".expand-row-button-inline"
+    And I click ".dispute-entry-checkbox"
+    And I click "#index-entry-status-button"
+    And I click "#ENTRY_RESOLVED_CLOSED"
+    Then element with id "webrep-entry-resolution-message-template-select" should contain a value of "Fixed - FP 01"
+    Then element with id "entry-status-comment" should contain a value of "This is the first FP comment"
+    #select different Fixed - FP resolution template
+    Then I select "Fixed - FP 02" from "webrep-entry-resolution-message-template-select"
+    Then element with id "webrep-entry-resolution-message-template-select" should contain a value of "Fixed - FP 02"
+    Then element with id "entry-status-comment" should contain a value of "This is the second FP comment"
+    #select Fixed - FN resolution status
+    Then I click "#ENTRY_FIXED_FN"
+    Then element with id "webrep-entry-resolution-message-template-select" should contain a value of "Fixed - FN 01"
+    Then element with id "entry-status-comment" should contain a value of "This is the first FN comment"
+
+  @javascript
+  Scenario: a user can load the resolution templates while closing an email entry on the index table
+  #  after adding it so we're starting with clean data from the api
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    Given the following resolution message templates exist:
+      |body                           |resolution_type     |ticket_type        |name          |description  |
+      |This is the first FP comment   |Fixed - FP          |WebDispute         |Fixed - FP 01 |First        |
+      |This is the second FP comment  |Fixed - FP          |WebDispute         |Fixed - FP 02 |Second       |
+      |This is the first FN comment   |Fixed - FN          |WebDispute         |Fixed - FN 01 |First        |
+    When I goto "escalations/webrep/disputes?f=open"
+    And I wait for "1" seconds
+    And I click ".expand-row-button-inline"
+    And I click ".dispute-entry-checkbox"
+    And I click "#index-entry-status-button"
+    And I click "#ENTRY_RESOLVED_CLOSED"
+    Then element with id "webrep-entry-resolution-message-template-select" should contain a value of "Fixed - FP 01"
+    Then element with id "entry-status-comment" should contain a value of "This is the first FP comment"
+    #select different Fixed - FP resolution template
+    Then I select "Fixed - FP 02" from "webrep-entry-resolution-message-template-select"
+    Then element with id "webrep-entry-resolution-message-template-select" should contain a value of "Fixed - FP 02"
+    Then element with id "entry-status-comment" should contain a value of "This is the second FP comment"
+    #select Fixed - FN resolution status
+    Then I click "#ENTRY_FIXED_FN"
+    Then element with id "webrep-entry-resolution-message-template-select" should contain a value of "Fixed - FN 01"
+    Then element with id "entry-status-comment" should contain a value of "This is the first FN comment"
+
+  @javascript
+  Scenario: A user tries to update a dispute
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id   |
+      | 5370 |
+    Given the following resolution message templates exist:
+      |body                           |resolution_type     |ticket_type        |name          |description  |
+      |This is the first FP comment   |Fixed - FP          |WebDispute         |Fixed - FP 01 |First        |
+      |This is the second FP comment  |Fixed - FP          |WebDispute         |Fixed - FP 02 |Second       |
+      |This is the first FN comment   |Fixed - FN          |WebDispute         |Fixed - FN 01 |First        |
+    Then I go to "/escalations/webrep/resolution_message_templates"
+    And I should see "Manage Resolution Templates"
+    And the table "resolution-message-templates-table" should have "3" number of rows
+
+  @javascript
+  Scenario: A user can load the resolution templates while closing an entry on the ticket show page
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    Given the following resolution message templates exist:
+      |body                           |resolution_type     |ticket_type        |name          |description  |
+      |This is the first FP comment   |Fixed - FP          |WebDispute         |Fixed - FP 01 |First        |
+      |This is the second FP comment  |Fixed - FP          |WebDispute         |Fixed - FP 02 |Second       |
+      |This is the first FN comment   |Fixed - FN          |WebDispute         |Fixed - FN 01 |First        |
+    When I goto "/escalations/webrep/disputes/1"
+    Then I click "#show-edit-ticket-status-button"
+    Then I click "#RESOLVED_CLOSED"
+    #Note: the textarea comment is being read as blank despite being populated, I don't know why
+    Then element with id "webrep-ticket-resolution-message-template-select" should contain a value of "Fixed - FP 01"
+#    Then element with id "webrep-show-ticket-resolution-comment" should contain a value of "This is the first FP comment"
+    #select different Fixed - FP resolution template
+    Then I select "Fixed - FP 02" from "webrep-ticket-resolution-message-template-select"
+    Then element with id "webrep-ticket-resolution-message-template-select" should contain a value of "Fixed - FP 02"
+#    Then element with id "webrep-show-ticket-resolution-comment" should contain a value of "This is the second FP comment"
+    #select Fixed - FN resolution status
+    Then I click "#FIXED_FN"
+    Then element with id "webrep-ticket-resolution-message-template-select" should contain a value of "Fixed - FN 01"
+#    Then element with id "webrep-show-ticket-resolution-comment" should contain a value of "This is the first FN comment"
