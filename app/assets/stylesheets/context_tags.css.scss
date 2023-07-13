@@ -217,3 +217,79 @@
   background-color: #fff;
 }
 
+
+
+
+
+
+// add tags dialog
+.add-context-tags-dialog {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 500;
+  font-size: 10pt;
+  .dialog-content-wrapper {
+    border: none;
+  }
+  &.ui-dialog .ui-dialog-titlebar {
+    font-weight: 700;
+    background-color: #3e5a72;
+    padding-left: 35px;
+    background-image: url(image_path('icon_add_white.svg'));
+    background-repeat: no-repeat;
+    background-position: 8px center;
+    background-size: 20px 20px;
+  }
+  input {
+    color: #bbb;
+    width: 100%;
+    font-size: 8pt;
+    font-family: 'Open Sans', sans-serif;
+    border: solid 1px #ddd;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding: 5px 30px 5px 5px;
+    background-image: url(image_path('icon_search_dark.svg'));
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: 25px 18px;
+  }
+  button {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+  }
+  .top-tree-row {
+    background-color: #eee;
+  }
+  .tree-row {
+    padding: 0;
+    font-size: 8.5pt;
+    font-weight: 600;
+    min-height: 25px;
+    label {
+      display: inline-block;
+      width: 13px;
+      height: 13px;
+      background-image: url(image_path('icon_tree_plus_grey.svg'));
+      background-repeat: no-repeat;
+      cursor: pointer;
+      margin-right: 4px;
+    }
+    input {
+      display: inline-block;
+      margin: 0 5px 0 2px;
+      width: 20px;
+    }
+    span {
+      vertical-align: middle;
+      cursor: default;
+      position: relative;
+      bottom: 2px;
+    }
+  }
+  .save-button-row {
+    margin: 0 auto;
+    width: 100%;
+    border-top: solid 1px #eee;
+    padding: 10px;
+  }
+}

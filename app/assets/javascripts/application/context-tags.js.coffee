@@ -583,8 +583,7 @@ window.tmi_enrich_prev_dt_inits = () ->
           sortable: false
         }
       ]
-
-    # show or hide columns in tmi table
+    # tmi_table from above is used below, show or hide columns in tmi table
     $('.toggle-col-tmi').each ->
       checkbox = $(this).find('input')
       column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
@@ -681,19 +680,191 @@ $ ->
     tmi_ajax_webrep(curr_sha)
 
 
-# WIP FUNCTION
-window.show_tag_tree = () ->
+
+
+
+
+
+
+
+
+# add tags dialog stuff goes here
+$ ->
+  # this just inits the dialog html, the props are used when dialog() is called later
+  $('#add-context-tags-dialog').dialog(
+    autoOpen: false
+    dialogClass: 'add-context-tags-dialog'
+    width: 600
+    height: 600
+    minWidth: 600
+    minHeight: 400
+  )
+
+
+
+# initialize and open the tags dialog!!
+window.add_context_tags_dialog = () ->
+  console.log 'add tags dialog is executed, lets build the ui tag tree'
+
+  # open the dialog
+  $('#add-context-tags-dialog').dialog('open')
+
+  # ajax call to get list of taxonomies
   std_msg_ajax
     url: '/escalations/api/v1/escalations/cloud_intel/tag_management/taxonomy_map'
     method: 'GET'
     success: (response) ->
-      console.clear()
       console.log 'TAG TREE DATA BELOW'
       console.log response
 
+      # taxonomies is an array of top-level nodes
+      { taxonomies } = response
 
-# WIP FUNCTION
-$ ->
-  setTimeout ->
-    show_tag_tree()
-  , 3000
+      # for each taxonomy, add to ul
+      $(taxonomies).each (i, val) ->
+        { name } = this
+        curr_node =
+          "<li class='tree-row'>
+             <label class='tree-toggle-label'></label>
+             <input class='node-select' type='checkbox'>
+             <span class='tree-text'>#{name}</span>
+           </li>"
+
+        $('#context-tags-tree').append(curr_node)
+
+
+
+
+
+
+
+
+
+# FOR REFERENCE BELOW ONLY! DELETE ALL OF THIS WHEN TMI IS NEAR-FINAL
+# FOR REFERENCE BELOW ONLY! DELETE ALL OF THIS WHEN TMI IS NEAR-FINAL
+# FOR REFERENCE BELOW ONLY! DELETE ALL OF THIS WHEN TMI IS NEAR-FINAL
+window.rulegroups_dialog = (button) ->
+  $(button).addClass('active')
+
+  $('#edit-rulegroups-dialog').dialog('open')
+
+  # Only need to fetch if we haven't already done that
+  unless $('#rulegroups-tree').length > 0
+    fetch_rulegroups_tree()
+
+#  turn_off_button = (button) ->
+#    debugger
+#    $(button).removeClass('active')
+
+  fetch_rulegroups_tree = () ->
+    $.atlas_ajax
+      url: '/api/v2/research/rule_groups'
+      method: 'GET'
+      success: (response) ->
+        root_id = response.root
+        root_data = response.lookup[root_id]
+        tree_nodes_raw = response.lookup
+
+        # grab initial 'children' (top parents) to start creating useful tree structure
+        grab_children(tree_nodes_raw, root_data)
+        data_tree = root_data.children
+
+        # this will pull in all decendents & their data into the parent.children array
+        find_kids(data_tree, tree_nodes_raw)
+
+        # loop through data to construct UI Tree
+        tree = build_tree(data_tree)
+
+        # turn off loader
+        $('#rule-group-tree .inline-loader-wrapper').hide()
+        $('#rule-group-tree').append(tree)
+
+
+  # Make sure there are children to grab
+  find_kids = (array, tree_nodes_raw) ->
+    for node in array
+      if node.type == 'branch'
+        grab_children(tree_nodes_raw, node)
+        find_kids(node.children, tree_nodes_raw)
+
+  # Get the van ready
+  grab_children = (tree, parent) ->
+    children_arry = []
+    for child in parent.children
+# use this to grab children from the tree \o/
+      child_data = tree[child]
+      children_arry.push(child_data)
+
+    # replace array of children keys with array of children data
+    Object.assign(parent.children, children_arry)
+    return parent
+
+  ## Build the UI Tree!
+  build_tree = (data_tree) ->
+    tree = '<ul id="rulegroups-tree">'
+    for node in data_tree
+      branch = build_a_branch(node)
+      if node.type == 'branch'
+        nested_branches = build_nested_branches(node.children)
+        branch += nested_branches
+      branch += '</li>'
+      tree += branch
+    tree += '</ul>'
+    return tree
+
+  build_nested_branches = (children) ->
+    nested_branches = '<ul class="nested-tree-list collapsed">'
+    branches = []
+    for child in children
+      branch = build_a_branch(child)
+
+      #need to check if this has children
+      if child.type == 'branch'
+        sub_branches = build_nested_branches(child.children)
+        branch += sub_branches
+      branch += '</li>'
+      branches.push(branch)
+
+    # put branches in alphabetical order
+    sorted_branches = branches.sort()
+    nested_branches += sorted_branches.join('')
+    nested_branches += '</ul>'
+    return nested_branches
+
+  build_a_branch = (node) ->
+    if node.type == 'branch'
+      branch = '<li data-name="' + node.name + '" data-id="' + node.groupid + '">'
+      branch += '<input hidden="hidden" type="checkbox" class="tree-toggle" id="tree-toggle-' + node.groupid + '" onclick="toggle_branch(this)"/>'
+      branch += '<label class="tree-toggle-label" for="tree-toggle-' + node.groupid + '" />'
+    else
+      branch = '<li data-name="' + node.name + '" class="leaf-node-spacer" data-id="' + node.groupid + '">'
+
+    branch +=
+      '<input type="checkbox" class="node-select" id="node-select-' + node.groupid + '" data-fqn="' + node.fqn + '" onclick="select_nodes(this)"/>' +
+        '<span class="tree-text tooltipped" title="' + node.description + '">' + node.name + '</span>'
+    # close branch elsewhere in case there are nested branches
+    return branch
+
+
+# Hide / show branches
+window.toggle_branch = (button) ->
+  ul = $(button).siblings('.nested-tree-list')
+  if $(button).hasClass('tree-toggle-open')
+    $(button).removeClass('tree-toggle-open')
+    $(ul).addClass('collapsed')
+  else
+    $(button).addClass('tree-toggle-open')
+    $(ul).removeClass('collapsed')
+
+# Selecting checkboxes (should toggle all sub branches)
+window.select_nodes = (checkbox) ->
+  ul = $(checkbox).siblings('.nested-tree-list')
+  checkboxes = $(ul).find('.node-select')
+  if $(checkbox).prop('checked') == true
+    $(checkboxes).prop('checked', true)
+    $($(checkbox).parent('li')).addClass('selected')
+    $($(checkboxes).parent('li')).addClass('selected')
+  else
+    $(checkboxes).prop('checked', false)
+    $($(checkbox).parent('li')).removeClass('selected')
+    $($(checkboxes).parent('li')).removeClass('selected')

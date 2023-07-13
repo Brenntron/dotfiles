@@ -1,4 +1,4 @@
--# context tags tab (ctt) exists on both webrep and filerep
+-# context tags tab (ctt) exists on both webrep and filerep, this file used in both places
 .row
   .col-sm-12
     %h1 Context Tags
@@ -60,7 +60,7 @@
               %span.toggle-label Unsuppressed Tags
           %div
             %label.toolbar-section-label Actions
-            %button.toolbar-button.add-context-tag-button
+            %button.toolbar-button.add-context-tag-button.dialog-button{onclick: 'add_context_tags_dialog();'}
               %span.toolbar-button-text Add Tag
             %button.toolbar-button.suppress-context-tag-button
               %span.toolbar-button-text Suppress Tag
@@ -127,3 +127,30 @@
       %p.prevalence-loader.ctt-loader
         = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
         %span.loader-msg Loading...
+
+
+
+
+
+
+
+
+-# ADD TAGS DIALOG BELOW, DONT PUT IN SEPARATE FILE, CODE IS SIMPLE ENOUGH TO LEAVE HERE
+-# ADD TAGS DIALOG BELOW, DONT PUT IN SEPARATE FILE, CODE IS SIMPLE ENOUGH TO LEAVE HERE
+#add-context-tags-dialog{title: 'Add Tags to Observable'}
+  .dialog-content-wrapper
+    .row
+      .col-xs-12
+        %label.content-label-sm
+          Select tags to add to observable
+        %input.context-tags-search{placeholder: 'Search Context Tag Tree'}
+
+    .row
+      .col-xs-12
+        -# li's will all be generated below
+        %ul#context-tags-tree
+
+    .row.save-button-row
+      .col-xs-12.text-center
+        %button.secondary Cancel
+        %button.primary Save
