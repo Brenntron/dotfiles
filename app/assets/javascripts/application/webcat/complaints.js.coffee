@@ -2620,9 +2620,8 @@ processSubmitMaster = () ->
 
       json = JSON.parse(response)
 
-      table = $('#complaints-index').DataTable(
-        initComplete: -> $('#inline-webcat').addClass('hidden')
-      )
+      table = $('#complaints-index').DataTable()
+
       for entry in json
         if entry.error == true && entry.reason == 'nil_categories'
           nil_categories_errors.push(entry.entry_id)
