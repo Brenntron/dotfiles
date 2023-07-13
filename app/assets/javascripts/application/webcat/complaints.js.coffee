@@ -425,7 +425,7 @@ window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
     serverSide: true
     ajax: "/escalations/webcat/jira_import_tasks.json"
-    order:[[3, 'desc']]
+    order:[[1, 'desc']]
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     language: {
       search: "_INPUT_"
@@ -435,12 +435,12 @@ window.build_imports_table = () ->
       $('#webcat-imports-index_filter input').addClass('table-search-input');
     columnDefs: [
       {
-        targets: [ 0,5 ]
+        targets: [ 0,4 ]
         orderable: false
         searchable: false
       }
       {
-        targets: [ 0,1,2,3,4,5,6,7 ]
+        targets: [ 0,1,2,3,4,5,6 ]
         defaultContent:'-'
       }
     ]
@@ -462,7 +462,6 @@ window.build_imports_table = () ->
           return html
       },
       {data: 'submitter'},
-      {data: 'created_at'},
       {data: 'imported_at'},
       {
         data: 'total_urls'
