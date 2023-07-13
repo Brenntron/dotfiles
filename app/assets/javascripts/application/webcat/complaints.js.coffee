@@ -26,14 +26,14 @@ $(document).ready ->
     ajaxStop: () ->
       clearTimeout(webcat_loader_timeout)
       loader.addClass('hidden')
-  )
+    )
   if ($('body').hasClass('escalations--webcat--complaints-controller') || $('body').hasClass('escalations--webcat--reports-controller')) &&
-    $('body').hasClass('index-action')
+     $('body').hasClass('index-action')
     window.check_wbnp_status()
 
 window.change_ticket_view = (type,button) ->
   if $(button).hasClass('active-view')
-#if view is already active, do nothing
+    #if view is already active, do nothing
     return
   else
 
@@ -41,11 +41,11 @@ window.change_ticket_view = (type,button) ->
     switch type
       when 'ticket'
         if checked.length == 0
-#if ticket view selected without any checked, show error and do nothing
+          #if ticket view selected without any checked, show error and do nothing
           std_msg_error("Select at least one ticket to view.", [], reload: false)
           return
         else
-#else build (or show previously built) tickets
+          #else build (or show previously built) tickets
           build_ticket_view(checked,"bulk")
           $('.mothra-header').text('Import Results')
       when 'list'
@@ -70,44 +70,44 @@ window.build_single_row = (rd, data) ->
   # build upper data
   # breaking out layout html for more granular control over display
   ticket_html = "<div class='row ticket-rows vis-ticket' id='#{issue_key}'>" +
-    "<div class='col-xs-12'>" +
-    "<h4 class='ticket-report-header'>Jira Ticket Information</h4>" +
-    "<div class='row'>" +
-    "<div class='col-md-6 col-sm-8 col-xs-12'>" +
-    "<div class='row'>" +
-    "<div class='col-xs-3'>" +
-    "<label class='content-label-sm'>Ticket ID</label>" +
-    "<div class='jira-ticket-id top-info-data'>#{issue_key}</div>" +
-    "</div>" +
-    "<div class='col-xs-9'>" +
-    "<label class='content-label-sm'>Summary</label>" +
-    "<div class='data-report-content top-info-data'>#{issue_summary}</div>" +
-    "</div>" +
-    "</div>" +
-    "<div class='row'>" +
-    "<div class='col-xs-12'>" +
-    "<label class='content-label-sm'>Description</label>" +
-    "<div class='data-report-content top-info-data'>#{issue_description}</div>" +
-    "</div>" +
-    "</div>" +
-    "</div>" +
-    "<div class='col-md-6 col-sm-4 col-xs-12'>" +
-    "<div class='row'>" +
-    "<div class='col-xs-6'>" +
-    "<label class='content-label-sm'>Imported On</label>" +
-    "<div class='data-report-content top-info-data'>#{imported_at}</div>" +
-    "<label class='content-label-sm'>Import Status</label>" +
-    "<div class='data-report-content top-info-data'>#{status}</div>" +
-    "</div>" +
-    "<div class='col-xs-6'>" +
-    "<label class='content-label-sm'>Ticket Status</label>" +
-    "<div class='data-report-content top-info-data'>#{issue_status}</div>" +
-    "<label class='content-label-sm'>Submitter</label>" +
-    "<div class='data-report-content top-info-data'>#{submitter}</div>" +
-    "</div>" +
-    "</div>" +
-    "</div>" +
-    "</div>"
+                  "<div class='col-xs-12'>" +
+                    "<h4 class='ticket-report-header'>Jira Ticket Information</h4>" +
+                    "<div class='row'>" +
+                      "<div class='col-md-6 col-sm-8 col-xs-12'>" +
+                        "<div class='row'>" +
+                          "<div class='col-xs-3'>" +
+                            "<label class='content-label-sm'>Ticket ID</label>" +
+                            "<div class='jira-ticket-id top-info-data'>#{issue_key}</div>" +
+                          "</div>" +
+                          "<div class='col-xs-9'>" +
+                            "<label class='content-label-sm'>Summary</label>" +
+                            "<div class='data-report-content top-info-data'>#{issue_summary}</div>" +
+                          "</div>" +
+                        "</div>" +
+                        "<div class='row'>" +
+                          "<div class='col-xs-12'>" +
+                            "<label class='content-label-sm'>Description</label>" +
+                            "<div class='data-report-content top-info-data'>#{issue_description}</div>" +
+                          "</div>" +
+                        "</div>" +
+                      "</div>" +
+                      "<div class='col-md-6 col-sm-4 col-xs-12'>" +
+                        "<div class='row'>" +
+                          "<div class='col-xs-6'>" +
+                            "<label class='content-label-sm'>Imported On</label>" +
+                            "<div class='data-report-content top-info-data'>#{imported_at}</div>" +
+                            "<label class='content-label-sm'>Import Status</label>" +
+                            "<div class='data-report-content top-info-data'>#{status}</div>" +
+                          "</div>" +
+                          "<div class='col-xs-6'>" +
+                            "<label class='content-label-sm'>Ticket Status</label>" +
+                            "<div class='data-report-content top-info-data'>#{issue_status}</div>" +
+                            "<label class='content-label-sm'>Submitter</label>" +
+                            "<div class='data-report-content top-info-data'>#{submitter}</div>" +
+                          "</div>" +
+                        "</div>" +
+                      "</div>" +
+                    "</div>"
 
   if urls.length
     ticket_html += "<div class='row'><div class='col-xs-12 urls-container'>
@@ -144,71 +144,68 @@ window.build_single_row = (rd, data) ->
     # dynamic datatable for each selected jira import report
     # handled differently than
     $("##{issue_key}-datatable").DataTable(
-      data:urls
-      searching: false
-      order: [[2,'asc',]]
-      lengthMenu: [25, 50, 100]
-      dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
-      columnDefs:
-        [{
-          targets: [ 0 ]
-          orderable: false
-          searchable: false
-        }
+        data:urls
+        searching: false
+        order: [[2,'asc',]]
+        lengthMenu: [25, 50, 100]
+        dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+        columnDefs:
+          [{
+            targets: [ 0 ]
+            orderable: false
+            searchable: false
+          }
           {
             targets: [ 9 ]
             className:'entry-assignee'
           }]
-      createdRow: (row, data, index) ->
-        url =          data[1]
-        entry_id =     data[3]
-        complaint_id = data[4]
-        status =       data[5]
-        age =          data[10]
+        createdRow: (row, data, index) ->
+          url =          data[1]
+          entry_id =     data[3]
+          complaint_id = data[4]
+          status =       data[5]
+          age =          data[10]
 
 
-        checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
-        $('td', row).eq(0).append(checkbox).addClass('checkbox-cell')
+          checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
+          $('td', row).eq(0).append(checkbox).addClass('checkbox-cell')
 
-        if url
-          updated_url = "<span class='jira-url esc-tooltipped' title='#{url}'>#{url}</span>"
-          $('td', row).eq(1).html(updated_url)
+          if url
+            updated_url = "<span class='jira-url esc-tooltipped' title='#{url}'>#{url}</span>"
+            $('td', row).eq(1).html(updated_url)
 
-        if complaint_id
-          complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
-          $('td', row).eq(4).html(complaint_link)
+          if complaint_id
+            complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
+            $('td', row).eq(4).html(complaint_link)
 
-        if age
-          unless status == 'COMPLETED' || status == 'RESOLVED'
-            if age.indexOf('h') != -1 && age.indexOf('h') >= 3
-              hour = parseInt( age.split("h")[0] )
-              if hour>= 3 && hour < 12
-                age_class = 'ticket-age-over3hr'
-              else if hour >= 12
+          if age
+            unless status == 'COMPLETED' || status == 'RESOLVED'
+              if age.indexOf('h') != -1 && age.indexOf('h') >= 3
+                hour = parseInt( age.split("h")[0] )
+                if hour>= 3 && hour < 12
+                  age_class = 'ticket-age-over3hr'
+                else if hour >= 12
+                  age_class = 'ticket-age-over12hr'
+              else if age.indexOf('mo') != -1
                 age_class = 'ticket-age-over12hr'
-            else if age.indexOf('mo') != -1
-              age_class = 'ticket-age-over12hr'
-            else if (age.indexOf('m') != -1) || (age.indexOf('s') != -1)
-              age_class = ''
-            else
-              age_class = 'ticket-age-over12hr'
-            $('td', row).eq(10).html("<span class='#{age_class}'>#{age}</span>")
-      initComplete: () ->
-        $('.esc-tooltipped:not(.tooltipstered)').tooltipster
-          theme: [
-            'tooltipster-borderless'
-            'tooltipster-borderless-customized'
-          ]
+              else if (age.indexOf('m') != -1) || (age.indexOf('s') != -1)
+                age_class = ''
+              else
+                age_class = 'ticket-age-over12hr'
+              $('td', row).eq(10).html("<span class='#{age_class}'>#{age}</span>")
+        initComplete: () ->
+          $('.esc-tooltipped:not(.tooltipstered)').tooltipster
+            theme: [
+              'tooltipster-borderless'
+              'tooltipster-borderless-customized'
+            ]
     )
   else
     ticket_html += "<hr/></div>"
     $('.webcat-ticket-view').append(ticket_html)
 
 window.build_ticket_view = (checked, view) ->
-  table = $('#complaints-index').DataTable(
-    initComplete: -> $('#inline-webcat').addClass('hidden')
-  )
-
+  table =  $('#webcat-imports-index').DataTable()
 
   if view == 'single'
     checked = [checked]
@@ -222,11 +219,11 @@ window.build_ticket_view = (checked, view) ->
       el = $("##{id}")
 
       if el.length > 0
-# if we have already built this ticket view, show it
+        # if we have already built this ticket view, show it
         el.removeClass('hidden')
         el.addClass('vis-ticket')
       else
-# if we haven't built this ticket view, build it
+        # if we haven't built this ticket view, build it
         rd = table.row( row ).data()
         get_bast_data(rd.id).then( build_single_row.bind(null, rd) )
 
@@ -367,8 +364,8 @@ window.retry_imports = (id)->
     method: 'GET'
     url: '/escalations/api/v1/escalations/jira_import_tasks/retry_import'
     data: {
-      task_ids:ids
-    }
+        task_ids:ids
+      }
     success: (response) ->
       $('#webcat-imports-index').DataTable().ajax.reload()
     error: (response) ->
@@ -388,7 +385,7 @@ window.run_imports = () ->
 window.close_related_issues = () ->
   ids = []
   checked_row_data().map( (r) ->
-# only run ids if the row is not resolved
+    # only run ids if the row is not resolved
     if r.issue_status != "Resolved"
       ids.push(parseInt(r.id))
   )
@@ -402,7 +399,7 @@ window.close_related_issues = () ->
         std_msg_success('Successfully closed Jira issues',[], reload: false)
         $('.toolbar-button.close-ticket-button').attr('disabled', true)
         setTimeout ->
-# on success, wait a moment then reload data to reflect any status changes
+          # on success, wait a moment then reload data to reflect any status changes
           $('#webcat-imports-index').DataTable().ajax.reload()
         , 500
       error: (response) ->
@@ -487,7 +484,7 @@ window.build_imports_table = () ->
 # WBNP - Get report id
 
 window.jira_assignee_hub = (type) ->
-# handle all assigning for jira import entries
+  # handle all assigning for jira import entries
   selected = $('.imports-url-checkbox:checked')
   entry_ids = []
   selected_rows = []
@@ -558,7 +555,7 @@ window.export_selected_jira_tasks = ()->
   selected_tasks = $('.imports_check_box:checked').map((i, el) => el.value).get()
   if !selected_tasks.length
     $('#jira-tasks-filter-input').val([])
-  else
+  else      
     $('#jira-tasks-filter-input').val(selected_tasks)
   form.submit()
 
@@ -587,7 +584,7 @@ window.fetch_wbnp_data = () ->
 # WBNP - Check report info
 check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
   if $('#wbnp-full-report').length > 0
-# this is a webcat manager and they get the full WBNP report
+    # this is a webcat manager and they get the full WBNP report
     data = {}
     full_report = true
     # Turn on the checking message if needed
@@ -609,7 +606,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
       $('.wbnp-loading-spinner').hide()
       # Turn off loader indicator
       if full_report == true
-# Clear old data
+        # Clear old data
         $('.wbnp-status').empty();
         $('.wbnp-status-msg').empty();
         $('.wbnp-full-report-table tbody').empty();
@@ -757,7 +754,7 @@ window.updateURI = (event, complaint_entry_id) ->
     error: (response) ->
       std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
 
-  )
+ )
 
 processSubmitNewURL = () ->
   data = {}
@@ -788,9 +785,9 @@ processSubmitNewURL = () ->
             popular_entries.push(val.url)
 
         if popular_entries.length > 0
-          message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+           message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
         else
-          message = "No pending complaint entries have been created"
+           message = "No pending complaint entries have been created"
 
         reload_message = "</br><a href='.'>Refresh the page</a> to see the result"
         std_msg_success(
@@ -798,7 +795,7 @@ processSubmitNewURL = () ->
           [message, "All other entries have been submitted directly to WBRS.", reload_message],
           reload: false,
           complete: (->
-# clear url inputs
+            # clear url inputs
             $('#url_1').val('')
             $('#url_2').val('')
             $('#url_3').val('')
@@ -810,7 +807,7 @@ processSubmitNewURL = () ->
             $('#cat_new_url_3')[0].selectize.clear()
             $('#cat_new_url_4')[0].selectize.clear()
             $('#cat_new_url_5')[0].selectize.clear()
-          )
+            )
         )
       error: (response) ->
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
@@ -842,7 +839,6 @@ window.webcat_reset_search = ()->
     i.value = ""
 
   els = ['tags','assignee','category','company','status','resolution','name','complaint','channel','entryid','complaintid','jiraid','submitter-type','platform']
-
   for el in els
     selectize_el = $("##{el}-input")[0].selectize
     selectize_el.clear()
@@ -887,7 +883,7 @@ window.inheritCategories = (complaint_entry_id) ->
 
     error: (response) ->
       std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
-  )
+    )
 
 name_servers =(server_list)->
   if undefined == server_list
@@ -905,27 +901,27 @@ format_domain_info = (info)->
     '<hr class="thin">' +
     '<h5>Registrant </h5>' +
     '<table class="nested-dialog-table">' +
-    '<tr>' +
-    '<td class="table-side-header">' +
-    'Organization' +
-    '</td>' +
-    '<td>' +
-    info['organisation'] +
-    '</tr><tr>' +
-    '<td class="table-side-header">' +
-    'Country' +
-    '</td>' +
-    '<td>' +
-    info['registrant_country'] +
-    '</td>' +
-    '</tr><tr>' +
-    '<td class="table-side-header">' +
-    'State/Province' +
-    '</td>' +
-    '<td>' +
-    info['registrant_state/province'] +
-    '</td>' +
-    '</tr>' +
+      '<tr>' +
+        '<td class="table-side-header">' +
+           'Organization' +
+        '</td>' +
+        '<td>' +
+          info['organisation'] +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Country' +
+        '</td>' +
+        '<td>' +
+          info['registrant_country'] +
+        '</td>' +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+        'State/Province' +
+        '</td>' +
+        '<td>' +
+          info['registrant_state/province'] +
+        '</td>' +
+      '</tr>' +
     '</table>' +
     '<hr class="thin">' +
     '<h5>Name Servers</h5>'+
@@ -933,28 +929,28 @@ format_domain_info = (info)->
     '<hr class="thin">' +
     '<h5> Dates</h5>'+
     '<table class="nested-dialog-table">' +
-    '<tr>' +
-    '<td class="table-side-header">' +
-    'Created' +
-    '</td>' +
-    '<td>' + info['created'] + '</td>'+
-    '</tr><tr>' +
-    '<td class="table-side-header">' +
-    'Last updated' +
-    '</td>' +
-    '<td>' +
-    info['changed'] +
-    '</td>' +
-    '</tr><tr>' +
-    '<td class="table-side-header">' +
-    'Expiry_date' +
-    '</td>' +
-    '<td>' +
-    info['registry_expiry_date'] +
-    '</td>' +
-    '</tr>' +
+      '<tr>' +
+        '<td class="table-side-header">' +
+          'Created' +
+        '</td>' +
+        '<td>' + info['created'] + '</td>'+
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Last updated' +
+        '</td>' +
+        '<td>' +
+          info['changed'] +
+        '</td>' +
+      '</tr><tr>' +
+        '<td class="table-side-header">' +
+          'Expiry_date' +
+        '</td>' +
+        '<td>' +
+          info['registry_expiry_date'] +
+        '</td>' +
+      '</tr>' +
     '</table>' +
-    '</div>'
+  '</div>'
 
 window.domain_whois = (IP_Domain) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -1226,8 +1222,8 @@ processSubmitEntry = (entry_id,row_id) ->
               items: selected_options(temp_row.data().category_names)
             }
           else
-# For entries that are 'Completed', we need to initialize the selectize function
-# and then disable it
+            # For entries that are 'Completed', we need to initialize the selectize function
+            # and then disable it
             $completed_selectize = $('#input_cat_'+ temp_row.data().entry_id).selectize {
               persist: false,
               create: false,
@@ -1289,7 +1285,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
 window.reopenComplaint = (entry_id, button) ->
 
 # Getting all the fields that need to be interactive if reopened
-# Changing these on the fly so the full page doesn't need to be reloaded
+  # Changing these on the fly so the full page doesn't need to be reloaded
   editable_stuff = $(button).parents('.nested-complaint-editable-data')[0]
   inputs = $(editable_stuff).find('.nested-table-input')
   radios = $(editable_stuff).find('.resolution_radio_button')
@@ -1357,11 +1353,11 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaint
     { status } = row
 
     if status == 'COMPLETED'
-      reopened = true
-      disabled = false
+        reopened = true
+        disabled = false
     if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
-      invalid_unchanged = true
-      disabled = false
+        invalid_unchanged = true
+        disabled = false
 
   if disabled == false
     $('#index_update_resolution').attr('disabled', false)
@@ -1455,7 +1451,7 @@ window.webcat_remove_assignee = () ->
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Removing Assignees', json.error)
         else
-#reload table data
+          #reload table data
           $('#complaints-index').DataTable().draw()
 
       error: (response) ->
@@ -1491,7 +1487,7 @@ window.webcat_change_assignee = () ->
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Assigning Entries', json.error)
         else
-#reload table data
+          #reload table data
           $('#complaints-index').DataTable().draw()
 
     )
@@ -1623,8 +1619,8 @@ window.retrieve_history = (position) ->
           std_msg_error("<p>Something went wrong: #{json.error}","")
         else
           history_dialog_content =
-            "<div class='cat-history-dialog dialog-content-wrapper'>
-             <h4>#{url}</h4>
+              "<div class='cat-history-dialog dialog-content-wrapper'>
+               <h4>#{url}</h4>
                <ul class='nav nav-tabs dialog-tabs' role='tablist'>
                <li class='nav-item active' role='presentation'>
                 <a class='nav-link' role='tab' data-toggle='tab' href='#domain-history-tab' aria-controls='domain-history-tab'>
@@ -1740,7 +1736,7 @@ window.drop_current_categories = () ->
     error: (response) ->
       $('.lookup-drop-loader').addClass('hidden')
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
-  )
+)
 
 window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
   event.preventDefault();
@@ -1933,7 +1929,7 @@ format = (complaint_entry_row) ->
 
   if complaint_entry.status == "PENDING"
     if complaint_entry.uri_as_categorized  == ""
-# if a subdomain string exists, prepend it to the domain
+      # if a subdomain string exists, prepend it to the domain
       if complaint_entry.subdomain.length > 0
         domain = complaint_entry.subdomain + "." + complaint_entry.domain
       else
@@ -1944,7 +1940,7 @@ format = (complaint_entry_row) ->
 
     complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
     complaint_submission_html =
-      '<input type="radio" name="resolution_review_' + entry_id + '" value="commit" > Commit <br/>' +
+        '<input type="radio" name="resolution_review_' + entry_id + '" value="commit" > Commit <br/>' +
         '<input type="radio" name="resolution_review_' + entry_id + '" value="decline" checked="checked"> Decline <br />' +
         '<input type="radio" name="resolution_review_' + entry_id + '" value="ignore"> Ignore (Bulk change only)' +
         '<br/>' +
@@ -1953,7 +1949,7 @@ format = (complaint_entry_row) ->
   else
     complaint_table_row_html = '<table class="active_table"><tr class="active_master_submit" type="submit_changes" entry_id="' + entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row">'
     complaint_submission_html =
-      '<input type="radio" class="resolution_radio_button" id="unchanged' + entry_id + '" name="resolution' + entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
+        '<input type="radio" class="resolution_radio_button" id="unchanged' + entry_id + '" name="resolution' + entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
         '<input type="radio" class="resolution_radio_button" id="fixed' + entry_id + '" name="resolution' + entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
         '<input type="radio" class="resolution_radio_button" id="invalid' + entry_id + '" name="resolution' + entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
         '<br/>' +
@@ -1982,7 +1978,7 @@ format = (complaint_entry_row) ->
   form_change_item = domain || complaint_entry.ip_address
 
   complaint_entry_html =
-    complaint_table_row_html +
+      complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
       "<div class='row'>" +
       "<div class='col-xs-3 col-with-divider'>" +
@@ -2245,7 +2241,7 @@ window.lookup_dialog  = (id) ->
       if json.error
         std_msg_error("<p>Something went wrong: #{json.error}","")
       else
-#parse this json properly
+        #parse this json properly
         lookup_dialog_content = parse_lookup_dialog_content(json)
         if $("#lookup_dialog").length
           lookup_dialog = this
@@ -2278,7 +2274,7 @@ window.click_table_buttons = (complaint_table, button)->
       $('#master-submit').prop('disabled', true)
 
   else
-# Open this row
+    # Open this row
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
@@ -2329,9 +2325,9 @@ window.click_table_buttons = (complaint_table, button)->
               else
                 $('#master-submit').prop('disabled', true)
             score: (input) ->
-#  Adding some customization for autofill
-#  restricting on certain cats to avoid accidental categorization
-#  (replaces selectize's built-in `getScoreFunction()` with our own)
+              #  Adding some customization for autofill
+              #  restricting on certain cats to avoid accidental categorization
+              #  (replaces selectize's built-in `getScoreFunction()` with our own)
               (item) ->
                 if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
                   item.category_code == input ? 1 : 0
@@ -2343,7 +2339,7 @@ window.click_table_buttons = (complaint_table, button)->
                   0
           }
         else
-# need to initialize the selectize function but disable it here if entry is completed
+          # need to initialize the selectize function but disable it here if entry is completed
           $completed_selectize = $( cat_select ).selectize {
             persist: true,
             create: false,
@@ -2398,9 +2394,9 @@ window.display_preview_window = (entry) ->
       url:loc
     }
     success: (response) ->
-#yay you can visit the site
+      #yay you can visit the site
     error: (response) ->
-#that page wont load. lets display someting else
+      #that page wont load. lets display someting else
       switch response["status"]
         when 404
           document.getElementById('preview_window').src = "/unknown_url.html"
@@ -2624,8 +2620,9 @@ processSubmitMaster = () ->
 
       json = JSON.parse(response)
 
-      table = $('#complaints-index').DataTable()
-
+      table = $('#complaints-index').DataTable(
+        initComplete: -> $('#inline-webcat').addClass('hidden')
+      )
       for entry in json
         if entry.error == true && entry.reason == 'nil_categories'
           nil_categories_errors.push(entry.entry_id)
@@ -2727,15 +2724,6 @@ window.verifyMasterSubmit = () ->
 
 window.updateResolutionDialog = (confirm) ->
 
-
-
-#   { status } = row
-#  if status == 'COMPLETED'
-#    reopened = true
-#    disabled = false
-#  if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
-#    invalid_unchanged = true
-#    disabled = false
   $('#complaint_entries_to_update').empty()
   resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected')
@@ -2759,7 +2747,6 @@ window.updateResolutionDialog = (confirm) ->
       if push_row
         $(row).addClass('filtered-row')
         complaint_entries.push(id)
-        full_domain = ''
         domain = $(row).find("#domain_#{id}").attr('data-full')
         $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
   $('#resolution_dialog').modal("show")
@@ -2824,7 +2811,7 @@ window.updateResolution = () ->
           if $('.update-resolution-entries').height() > 300
             $('.update-resolution-entries').addClass('scrollable-list')
         ,200
-# Determine whether to render a success or error modal accordingly
+      # Determine whether to render a success or error modal accordingly
 
   )
 
@@ -2964,10 +2951,10 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaint
 # Prepare ticket for converting
 window.prep_complaint_to_convert = () ->
   if $('tr.selected').length > 1
-# This shouldn't happen, but just in case
+    # This shouldn't happen, but just in case
     std_api_error('Can only convert 1 complaint at a time.')
   else
-# get all data associated with the selected row
+    # get all data associated with the selected row
     complaint_row = $('tr.selected')[0]
     row_data = $('#complaints-index').DataTable().row(complaint_row).data()
 
@@ -2999,7 +2986,7 @@ window.prep_complaint_to_convert = () ->
 
         if complaint_source == 'talos-intelligence' || complaint_source == 'talos-intelligence-api'
           if complaint_status == 'NEW' || complaint_status == 'ACTIVE' || complaint_status == 'REOPENED'
-# populate the dropdown
+            # populate the dropdown
             $('#complaint-id-to-convert').text(complaint_id)
             $('.convert-entry-count').text('(' + entry_count + ')')
 
@@ -3050,7 +3037,7 @@ window.nested_tooltip = () ->
       'tooltipster-borderless-customized'
     ]
 convert_complaint_to_webrep = () ->
-# get the parent ticket info
+  # get the parent ticket info
   complaint_id = parseInt($('#complaint-id-to-convert').text())
   summary = $('#convert-ticket-summary').val()
   submission_type = $('input[name=ticket-type]:checked').val()
@@ -3082,9 +3069,9 @@ convert_complaint_to_webrep = () ->
 
 
 $ ->
-# check prior to enabling submit convert to webrep button
+  # check prior to enabling submit convert to webrep button
   $('#convert-ticket-dropdown').click ->
-# find all the radios
+    # find all the radios
     radios = $(this).find('input:radio')
     # separate into groups by name & then grab only the unique names
     radio_names = []
