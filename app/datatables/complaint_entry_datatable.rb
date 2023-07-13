@@ -14,6 +14,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
         entry_id:           {source: "ComplaintEntry.id", data: :entry_id, cond: :like},
         created_at:         {source: "ComplaintEntry.created_at", data: :created_at, cond: :date_range},
         age_int:            {source: "ComplaintEntry.age_int", data: :age_int, searchable: false, orderable: false},
+        channel:            {source: "ComplaintEntry.channel", data: :channel, searchable: false, orderable: false},
         age:                {source: "ComplaintEntry.age", data: :age, searchable: false, orderable: false},
         status:             {source: "ComplaintEntry.status", data: :status, cond: :string_eq},
         subdomain:          {source: "ComplaintEntry.subdomain", data: :subdomain, cond: :like},
@@ -57,12 +58,14 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
 
     complaint_entries.map do |complaint_entry|
       complaint = complaint_entry.complaint
+
       suggested_dispositions = complaint_entry.suggested_disposition&.split(',')
 
       {
           entry_id:         complaint_entry.id,
           created_at:       complaint_entry.created_at,
           age_int:          (Time.now - complaint_entry.created_at).to_i,
+          channel:          complaint.channel,
           age:              ComplaintEntry.first_two_time_layers(time_ago_in_words(complaint_entry.created_at.to_time, {scope: 'datetime.distance_in_words', include_seconds: false})),
           status:           complaint_entry.status,
           subdomain:        complaint_entry.subdomain,
@@ -138,6 +141,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
       records.left_joins(:user).order("users.display_name #{datatable.orders.first.direction}")
     when 'complaint_tags.name'
       records.left_joins(complaint: :complaint_tags).order("complaint_tags.name #{datatable.orders.first.direction}")
+    when 'complaint_entries.channel'
+      records.left_joins(complaint: :channel).order("complaints.channel #{datatable.orders.first.direction}")
     else
       super
     end

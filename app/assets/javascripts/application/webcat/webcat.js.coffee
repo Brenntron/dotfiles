@@ -35,6 +35,7 @@ $ ->
 
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
+    { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
     if keyCode == 13
       webcat_search_string = $('#web-cat-search .search-box').val().trim()
       if webcat_search_string == ''
@@ -51,14 +52,13 @@ $ ->
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
-    { items, options } = category_input[0].selectize
-
     user_id = if assignee_input[0].selectize? then assignee_input[0].selectize.items else []
     tags = if tag_input[0].selectize? then tag_input[0].selectize.items else []
     company = if $('#company-input')[0].selectize? then $('#company-input')[0].selectize.items else []
     status = if $('#status-input')[0].selectize? then $('#status-input')[0].selectize.items else []
     resolution = if $('#resolution-input')[0].selectize? then $('#resolution-input')[0].selectize.items else []
     customer_name = if $('#name-input')[0].selectize? then $('#name-input')[0].selectize.items else []
+    { items, options } = category_input[0].selectize
     complaints = if $('#complaint-input')[0].selectize? then $('#complaint-input')[0].selectize.items else []
     channels = if $('#channel-input')[0].selectize? then $('#channel-input')[0].selectize.items else []
     entry_ids = if $('#entryid-input')[0].selectize? then $('#entryid-input')[0].selectize.items else []
@@ -150,6 +150,7 @@ $ ->
 
   window.search_for_tag = (tag) ->
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+
     try
       webcat_search_conditions = JSON.parse webcat_search_conditions
     catch e
@@ -170,6 +171,7 @@ $ ->
     ###
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
     { search } = location
+
     try
       webcat_search_conditions = JSON.parse webcat_search_conditions
     catch e
@@ -178,7 +180,6 @@ $ ->
     if search != ''
       webcat_search_type = 'standard'
       urlParams = new URLSearchParams(location.search);
-
     switch(webcat_search_type)
       when 'advanced'
         data = {
@@ -204,7 +205,6 @@ $ ->
           search_name: webcat_search_name
         }
     $.when(pull_user_preference_filter()).done -> build_header(data)
-
     return data
 
   refresh_url = (href) ->
@@ -378,6 +378,7 @@ $ ->
     if data != undefined && container.length > 0
       reset_icon = "<span #{if current_page_is_favourite() then 'hidden style="display: none"' else ''} id='refresh-filter-button' class='reset-filter esc-tooltipped' title='Clear Search Results' onclick='webcat_refresh()'></span>"
       {search_type, search_name} = data
+
       try
         webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
       catch e
@@ -417,13 +418,12 @@ $ ->
         new_header =
           '<div>Results for "' + webcat_search_conditions.value + '" '+
             reset_icon +
-            '</div>'
+          '</div>'
       else
         new_header = 'All Tickets'
       $('#webcat-index-title')[0].innerHTML = new_header
     else
       $('#webcat-index-title')[0].innerHTML = 'All Tickets'
-
 
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
@@ -487,6 +487,7 @@ $ ->
               search_name_check = webcat_search_name != ''
               if webcat_search_type == 'advanced' && search_name_check && text_check
                 window.temporary_search_link(webcat_search_name, webcat_search_conditions)
+                window.sort_named_search_list()
 
           pagingType: 'full_numbers'
           order: [ [
@@ -716,12 +717,12 @@ $ ->
                 data: 'customer_email'
               }
               {
-                data: 'assigned_to'
-                className: 'assignee-col'
-              }
-              {
                 data: 'channel'
                 className: 'channel-col'
+              }
+              {
+                data: 'assigned_to'
+                className: 'assignee-col'
               }
               {
                 data: 'age_int'
@@ -786,8 +787,6 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-
-
     tag_input = $('#tags-input').selectize {
       persist: false
       valueField: 'name',
@@ -815,7 +814,6 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-#    company_input
     $('#company-input').selectize {
       persist: false,
       create: false,
@@ -827,8 +825,6 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-
-#    status_input
     $('#status-input').selectize {
       persist: false,
       create: false,
@@ -843,7 +839,6 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-#    resolution-input
     $('#resolution-input').selectize {
       persist: false,
       create: false,
@@ -857,7 +852,6 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-#    customer_input
     $('#name-input').selectize {
       persist: true,
       create: false,
@@ -870,7 +864,7 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-#    complaint_input
+
     $('#complaint-input').selectize {
       persist: false,
       create: (input) ->
@@ -883,7 +877,6 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-#    channel_input
     $('#channel-input').selectize {
       persist: false,
       create: false,
@@ -898,7 +891,6 @@ $ ->
         window.toggle_selectize_layer(this, 'false')
     }
 
-#      entry_ids
     $('#entryid-input').selectize {
       delimiter: ',',
       persist: false,
@@ -912,7 +904,6 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-#    complaint_ids
     $('#complaintid-input').selectize {
       delimiter: ',',
       persist: false,
@@ -926,7 +917,6 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-#    jira_ids
     $('#jiraid-input').selectize {
       delimiter: ',',
       persist: false,
@@ -940,22 +930,23 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
+
     $('#platform-input').selectize {
-        persist: true,
-        create: false,
-        valueField: 'public_name',
-        labelField: 'public_name',
-        searchField: 'public_name',
-        options: AC.WebCat.createPlatformOptions()
-        render:
-          option: (item, escape) ->
-            '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'
-        onFocus: () ->
-          window.toggle_selectize_layer(this, 'true')
-        onBlur: () ->
-          window.toggle_selectize_layer(this, 'false')
-      }
-#    submitter type
+      persist: true,
+      create: false,
+      valueField: 'public_name',
+      labelField: 'public_name',
+      searchField: 'public_name',
+      options: AC.WebCat.createPlatformOptions()
+      render:
+        option: (item, escape) ->
+          '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
+
     $('#submitter-type-input').selectize {
       delimiter: ',',
       persist: false,
@@ -1035,6 +1026,7 @@ $ ->
     data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
     data['submitteremail'] = $("#submitteremail-checkbox").is(':checked')
     data['assignee'] = $("#assignee-checkbox").is(':checked')
+    data['assignee'] = $("#assignee-checkbox").is(':checked')
 
     std_msg_ajax(
       url: "/escalations/api/v1/escalations/user_preferences/update"
@@ -1104,7 +1096,6 @@ window.temporary_search_link = (webcat_search_name, webcat_search_conditions) ->
   $(new_delete_image).addClass('delete-search-image')
   $(new_fav_icon).addClass('nav-dropdown-icon favorite-search-icon')
 
-
   $(new_link).on 'click', () ->
     window.build_webcat_named_search(webcat_search_name)
 
@@ -1118,6 +1109,12 @@ window.temporary_search_link = (webcat_search_name, webcat_search_conditions) ->
   $(new_delete).append(new_delete_image)
   $(new_td).append(new_fav_icon)
   $('.webcat-named-search-list tbody').append(new_tr)
+
+window.sort_named_search_list = ->
+  tbody = $('.webcat-named-search-list tbody')
+  tbody.find('tr').sort((a, b) ->
+    return $('td:first a:first', b).text().localeCompare($('td:first a:first', a).text())
+  ).appendTo(tbody)
 
 window.find_saved_search_by_name = (name) ->
   saved_search = null

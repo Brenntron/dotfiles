@@ -79,7 +79,7 @@ namespace 'AC.WebCat', (exports) ->
       if label == 'customername'   then label = 'name'
 
       input_element = $("##{label}-input")
-
+      form_el = input_element.closest(".search-item")
       if selectize_elements.includes(label)
         #set values of known selectize inputs
         values = search_value.split(',').map( (val) => return val.trim())
@@ -112,4 +112,4 @@ namespace 'AC.WebCat', (exports) ->
           input_element.val(search_value)
 
       # if the value has been searched, make sure that the input isn't hidden
-      input_element.removeClass('hidden')
+      $(form_el).removeClass('hidden')
