@@ -149,7 +149,11 @@ $ ->
     refresh_url()
 
   window.search_for_tag = (tag) ->
-    { webcat_search_conditions } = localStorage
+    { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+    try
+      webcat_search_conditions = JSON.parse webcat_search_conditions
+    catch e
+      webcat_search_conditions = {}
 
     localStorage.webcat_search_type = 'advanced'
     webcat_search_conditions.tags = tag
@@ -166,16 +170,21 @@ $ ->
     ###
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
     { search } = location
+    try
+      webcat_search_conditions = JSON.parse webcat_search_conditions
+    catch e
+      webcat_search_conditions = {}
 
     if search != ''
       webcat_search_type = 'standard'
       urlParams = new URLSearchParams(location.search);
+
     switch(webcat_search_type)
       when 'advanced'
         data = {
           search_type: webcat_search_type
           search_name : webcat_search_name
-          search_conditions: JSON.parse webcat_search_conditions
+          search_conditions: webcat_search_conditions
         }
       when 'contains'
         data = {
@@ -198,6 +207,7 @@ $ ->
     return data
 
   refresh_url = (href) ->
+    { webcat_search_type, webcat_search_name } = localStorage
     url_check = current_url.split('/escalations/webcat/complaints/')[0]
     new_url = '/escalations/webcat/complaints'
     if href != undefined

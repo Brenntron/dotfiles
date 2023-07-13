@@ -2747,6 +2747,7 @@ window.updateResolutionDialog = (confirm) ->
       if push_row
         $(row).addClass('filtered-row')
         complaint_entries.push(id)
+        full_domain = ''
         domain = $(row).find("#domain_#{id}").attr('data-full')
         $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
   $('#resolution_dialog').modal("show")
