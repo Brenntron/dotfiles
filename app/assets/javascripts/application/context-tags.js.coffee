@@ -704,7 +704,7 @@ $ ->
 
 # initialize and open the tags dialog!!
 window.add_context_tags_dialog = () ->
-  console.log 'add tags dialog is executed, lets build the ui tag tree'
+  console.log 'addtags() is ran, lets build the taxonomy tag tree'
 
   # open the dialog
   $('#add-context-tags-dialog').dialog('open')
@@ -722,18 +722,27 @@ window.add_context_tags_dialog = () ->
 
       # for each taxonomy, add to ul
       $(taxonomies).each (i, val) ->
-        { name } = this
-        curr_node =
-          "<li class='tree-row'>
-             <label class='tree-toggle-label'></label>
-             <input class='node-select' type='checkbox'>
-             <span class='tree-text'>#{name}</span>
-           </li>"
+        { name, entries, taxonomy_id } = this
+        taxonomy_option = "<option class='taxonomy-#{taxonomy_id}'>#{name}</option>"
+        $('.taxonomy-select').append(taxonomy_option)
 
-        $('#context-tags-tree').append(curr_node)
+#        top_node =
+#          "<div class='tree-node top-node top-node-#{taxonomy_id}'>
+#             <input class='node-select' type='checkbox'>
+#             <span class='tree-text'>#{name}</span>
+#           </div>"
 
-
-
+#        $('#context-tags-tree').append(top_node)
+#
+#        $(entries).each ->
+#          { entry_id, name } = this
+#          child_node =
+#            "<div class='tag-#{taxonomy_id}-#{entry_id}'>
+#               <input type='checkbox'>
+#               <span'>#{name}</span>
+#             </div>"
+#
+#          $('#context-tags-tree').append(child_node)
 
 
 
