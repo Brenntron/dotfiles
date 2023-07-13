@@ -21,7 +21,7 @@ window.wbrs_display = (score) ->
     return 'trusted'
 $ ->
 
-  # webcat: have top navigation bar scroll with page per user request
+# webcat: have top navigation bar scroll with page per user request
   if $('body').hasClass("escalations--webcat--complaints-controller")
     $('#nav-banner').addClass('fixed-nav')
 
@@ -39,7 +39,7 @@ $ ->
     if keyCode == 13
       webcat_search_string = $('#web-cat-search .search-box').val().trim()
       if webcat_search_string == ''
-       refresh_localStorage()
+        refresh_localStorage()
       else
         localStorage.webcat_search_type = 'contains'
         localStorage.webcat_search_name = ''
@@ -50,7 +50,7 @@ $ ->
     localStorage.setItem('webcat_reset_page', true)
 
   window.set_webcat_advanced = () ->
-    # creating form object from array made from advanced dropdown form
+# creating form object from array made from advanced dropdown form
     form = {}
     user_id = if assignee_input[0].selectize? then assignee_input[0].selectize.items else []
     tags = if tag_input[0].selectize? then tag_input[0].selectize.items else []
@@ -142,10 +142,9 @@ $ ->
     refresh_url()
 
   window.build_webcat_named_search = (search_name) ->
-    link_el = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
     localStorage.webcat_search_type = 'named'
-    localStorage.webcat_search_name = search_name
-    localStorage.webcat_search_conditions = '#' + link_el
+    localStorage.webcat_search_name  = search_name
+    localStorage.webcat_search_conditions = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
 
     refresh_url()
 
@@ -316,9 +315,9 @@ $ ->
       searchField: ['category_name', 'category_code'],
       options: AC.WebCat.createSelectOptions("##{select.id}")
       score: (input) ->
-        #  Adding some customization for autofill
-        #  restricting on certain cats to avoid accidental categorization
-        #  (replaces selectize's built-in `getScoreFunction()` with our own)
+#  Adding some customization for autofill
+#  restricting on certain cats to avoid accidental categorization
+#  (replaces selectize's built-in `getScoreFunction()` with our own)
         (item) ->
           if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
             item.category_code == input ? 1 : 0
@@ -376,6 +375,7 @@ $ ->
     # If the search_type is 'named' or 'advanced', a subheader with search definitions will be made with the build_subheader function
     ###
     container = $('#webcat_searchref_container')
+
     if data != undefined && container.length > 0
       reset_icon = "<span #{if current_page_is_favourite() then 'hidden style="display: none"' else ''} id='refresh-filter-button' class='reset-filter esc-tooltipped' title='Clear Search Results' onclick='webcat_refresh()'></span>"
       {search_type, search_name} = data
@@ -419,7 +419,7 @@ $ ->
         new_header =
           '<div>Results for "' + webcat_search_conditions.value + '" '+
             reset_icon +
-          '</div>'
+            '</div>'
       else
         new_header = 'All Tickets'
       $('#webcat-index-title')[0].innerHTML = new_header
@@ -487,8 +487,7 @@ $ ->
           text_check = !window.find_saved_search_by_name(webcat_search_name)
           search_name_check = webcat_search_name != ''
           if webcat_search_type == 'advanced' && search_name_check && text_check
-            window.add_tmp_tr_to_named_search_list(webcat_search_name)
-            window.sort_named_search_list()
+            window.temporary_search_link(webcat_search_name,webcat_search_conditions)
 
       pagingType: 'full_numbers'
       order: [ [
@@ -586,7 +585,7 @@ $ ->
               else
                 age_class = 'ticket-age-over12hr'
               return "<span class='#{age_class}'>#{age}</span>"
-            # if status is "completed" or "resolved", no css class (orange/red) needed
+# if status is "completed" or "resolved", no css class (orange/red) needed
             else
               return "<span>#{age}</span>"
         }
@@ -722,6 +721,10 @@ $ ->
           className: 'assignee-col'
         }
         {
+          data: 'channel'
+          className: 'channel-col'
+        }
+        {
           data: 'age_int'
           visible: false
         }
@@ -750,8 +753,8 @@ $ ->
       $(element).after( html )
       $('.copied-container').delay(1000).fadeOut(1000);
       setTimeout (->
-          $(".copied-container").remove()
-        ), 2000
+        $(".copied-container").remove()
+      ), 2000
 
 
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
@@ -830,7 +833,7 @@ $ ->
       labelField: 'name',
       searchField: 'name',
       options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"}, {name: "ACTIVE"},
-               {name: "COMPLETED"}, {name: "PENDING"}, {name: "REOPENED"}]
+        {name: "COMPLETED"}, {name: "PENDING"}, {name: "REOPENED"}]
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
@@ -1055,7 +1058,7 @@ window.copyToClipboard = (text) ->
   document.execCommand 'copy'
   document.body.removeChild dummy
 
-window.add_tmp_tr_to_named_search_list = (webcat_search_name) ->
+window.temporary_search_link = (webcat_search_name, webcat_search_conditions) ->
   new_tr = document.createElement('tr')
   new_td = document.createElement('td')
   new_link =  document.createElement('a')
@@ -1066,6 +1069,7 @@ window.add_tmp_tr_to_named_search_list = (webcat_search_name) ->
   $(new_tr).attr('id','temp_row')
   $(new_link).addClass('input-truncate saved-search esc-tooltipped')
     .attr('title', webcat_search_name)
+    .attr('data-search_conditions', webcat_search_conditions)
     .text(webcat_search_name)
   $(new_delete).addClass("delete-search")
   $(new_delete_image).addClass('delete-search-image')
@@ -1085,16 +1089,10 @@ window.add_tmp_tr_to_named_search_list = (webcat_search_name) ->
   $(new_td).append(new_fav_icon)
   $('.webcat-named-search-list tbody').append(new_tr)
 
-window.sort_named_search_list = ->
-  tbody = $('.webcat-named-search-list tbody')
-  tbody.find('tr').sort((a, b) ->
-    return $('td:first a:first', b).text().localeCompare($('td:first a:first', a).text())
-  ).appendTo(tbody)
-
 window.find_saved_search_by_name = (name) ->
   saved_search = null
   $("#saved-search-tbody a").each((i, elem) ->
-    # trim() is needed for filter_name in case if there is extra space in saved filter
+# trim() is needed for filter_name in case if there is extra space in saved filter
     if elem.text.trim() == name.trim()
       saved_search = $(elem)
       return
