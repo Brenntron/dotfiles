@@ -425,7 +425,7 @@ window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
     serverSide: true
     ajax: "/escalations/webcat/jira_import_tasks.json"
-    order:[]
+    order:[[8, 'desc']]
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     language: {
       search: "_INPUT_"
@@ -500,6 +500,10 @@ window.build_imports_table = () ->
       },
       {
         data: 'status'
+        visible: false
+      },
+      {
+        data: 'created_at'
         visible: false
       }
     ]
