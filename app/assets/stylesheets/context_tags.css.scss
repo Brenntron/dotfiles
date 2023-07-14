@@ -111,6 +111,9 @@
     white-space: pre-wrap;  // retain formatting from source
     padding-right: 20px;
   }
+  .enrich-cell-external-references a {
+    text-decoration: underline;
+  }
   .filerep-enrich-cell-description p {
     margin-right: 40px;
   }
@@ -205,12 +208,6 @@
     }
   }
 }
-
-// leave commented out until tmi is done: prev table wrapper div needs less width
-//.prevalence-area {
-//  width: 50%;
-//  min-width: 800px;
-//}
 
 // ensure bg color if tmi, enrich, or prev table width extends off page on context tags tab
 .ctt-table {
