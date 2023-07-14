@@ -111,6 +111,9 @@
     white-space: pre-wrap;  // retain formatting from source
     padding-right: 20px;
   }
+  .enrich-cell-external-references a {
+    text-decoration: underline;
+  }
   .filerep-enrich-cell-description p {
     margin-right: 40px;
   }

@@ -1,8 +1,7 @@
-# WEBREP TMI
-# WEBREP TMI
+# WEBREP AND FILEREP TMI AJAX
+# WEBREP AND FILEREP TMI AJAX
 
-# part 1 of tmi
-window.tmi_ajax_webrep = (query_item) ->
+window.tmi_ajax = (query_item) ->
   query_type = determine_string_type(query_item)
 
   switch query_type
@@ -17,16 +16,7 @@ window.tmi_ajax_webrep = (query_item) ->
     data: data
     success: (response) ->
 #      console.log response
-#      observable = tag_name = mnemonic = taxonomy = source = processor = report_date = suppressed = suppression_source = suppression_platform = suppression_date = ''
-
-      # list of observables
-      { items } = response
-
-      # if no items exist, show the no-data message
-      if !items
-        $('.tmi-main-content').addClass('hidden')
-      else
-        $('.tmi-main-content').removeClass('hidden')
+      { items } = response  # list of observables
 
       $(items).each (i, val) ->
         { tags } = this
@@ -119,12 +109,11 @@ window.tmi_ajax_webrep = (query_item) ->
               report_tr = report_tr.replace(/tmi-gray/g,'')
 
             # created ts is unique enough for now, fix this though to something even more unique
-            $('.tmi-tbody').append(report_tr)
+            $('.tmi-tbody').append(report_tr)  # add to dom
+
 
 #    error: (response) ->
 #      std_msg_error("Error", [response.responseJSON], reload: false)
-#      console.clear()
-#      console.log 'ERROR ON TMI LOOKUP'
 #      console.log response
 
 
@@ -141,43 +130,36 @@ window.enrich_ajax_webrep = (query_item, query_type) ->
     data: data
     success: (response) ->
       return response
-    complete: () ->
-      $('.enrichment-loader, .prevalence-loader').addClass('hidden')
 
 
 # part 2 of enrichment, set up enrichment based on url passed in
-window.setup_context_tables_webrep = (action) ->
-  # clear inited datatables to cleanly reinit on data refresh
-  if $('.tab-context-tags').hasClass('dt-inited')
-    $('#webrep-tmi-dt').DataTable().destroy()
-    $('#webrep-enrichment-dt').DataTable().destroy()
-    $('#webrep-prevalence-dt').DataTable().destroy()
-
+window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
   # are we updating existing stuff?
   if action == 'update'
-    # hide the tables in general
-    $('.tmi-main-content, .enrichment-table, .prevalence-table').addClass('hidden')
-    $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
+    $('#tmi-dt').DataTable().destroy()
+    $('#enrichment-dt').DataTable().destroy()
+    $('#prevalence-dt').DataTable().destroy()
+    $('.tmi-main-content, .enrichment-table, .prevalence-table').addClass('hidden')  # hide the tables in general
+    $('.tmi-table tbody, .enrichment-table tbody, .prevalence-table tbody').empty()  # reset the table rows
 
-    # reset the tables
-    $('.tmi-table tbody, .enrichment-table tbody, .prevalence-table tbody').empty()
+  # tmi promise for that separate api call (sep from enrich api)
+  tmi_promise = new Promise (resolve, reject) ->
+    tmi_built = tmi_ajax(curr_entry)
+    if tmi_built
+      resolve tmi_built
 
-    # use this url or ip
-    entry = $('.ctt-entry-select option:selected').attr('data-entry')
+  # when promised response comes back, continue with data
+  tmi_promise.then (response) ->
+    tmi_dt_init()  # ensure dt init after api call resolved
 
-  # if not an update action, its a first action
-  else
-    entry = $(".research-table-row:first").find(".entry-data-content").text().trim()
-
-  # enrichment services uses a separate api call - needs to be handled w/ a js promise (2-3 sec lag)
+  # enrichment services uses a separate api call
   enrich_promise = new Promise (resolve, reject) ->
-    enrich_json = enrich_ajax_webrep(entry)  # this is the actual api call
+    enrich_json = enrich_ajax_webrep(curr_entry)
     if enrich_json
       resolve enrich_json
 
-  # when promised response comes back, continue with data
   enrich_promise.then (response) ->
-    $('.tmi-main-content, .enrichment-table, .prevalence-table').removeClass('hidden')
+    $('.enrichment-table, .prevalence-table, .tmi-main-content').removeClass('hidden')
 
     email_context_tags = []
     web_context_tags = []
@@ -205,13 +187,13 @@ window.setup_context_tables_webrep = (action) ->
       create_webrep_prevalence_section(response.data.prevalence.responses)
 
     # init the dts on ct tab now
-    tmi_enrich_prev_dt_inits()
+    enrich_prev_dt_init()
 
 
 # part 3 of enrichment
 window.create_webrep_enrichment_section = (tags, context) ->
-  $('.webrep-enrichment-table').removeClass('hidden')
-  enrich_tbody = $('.webrep-enrichment-table tbody')
+  $('.enrichment-table').removeClass('hidden')
+  enrich_tbody = $('.enrichment-table tbody')
 
   $(tags).each (index, tag) ->
     name = ''
@@ -282,8 +264,8 @@ window.create_webrep_enrichment_section = (tags, context) ->
 # WEBREP PREVALENCE
 # WEBREP PREVALENCE
 window.create_webrep_prevalence_section = (prevalence_data) ->
-  $('.webrep-prevalence-table').removeClass('hidden')
-  prevalence_tbody = $('.webrep-prevalence-table tbody')
+  $('.prevalence-table').removeClass('hidden')
+  prevalence_tbody = $('.prevalence-table tbody')
 
   response_key = Object.keys(prevalence_data)[0]
 
@@ -330,9 +312,8 @@ window.create_webrep_prevalence_section = (prevalence_data) ->
       $(prevalence_tbody).append(new_row)
 
 
-
-# FILEREP ENHANCEMENT
-# FILEREP ENHANCEMENT
+# FILEREP ENRICHMENT
+# FILEREP ENRICHMENT
 window.enrich_ajax_filerep = (sha256_hash) ->
   std_msg_ajax(
     method: 'GET'
@@ -362,7 +343,6 @@ window.enrich_ajax_filerep = (sha256_hash) ->
 
   )
 
-# part 2
 window.create_filerep_enrich_section = (tags, context) ->
   #organize tags by taxonomy_id if there are multiple
   if tags.length > 1
@@ -542,7 +522,7 @@ window.create_filerep_prevalence_section = (prevalence_data) ->
     $('.prevalence-area').append(dataset_section_wrapper)  # add to dom
 
     # init the enrich and prev tables now that both exist
-    tmi_enrich_prev_dt_inits()
+    enrich_prev_dt_init()
 
 
 # group taxonomies by id for enrichment section on filerep
@@ -556,61 +536,51 @@ window.group_by_tag_filerep = (array, key) ->
 
 
 
-# init these dts, keep in sep function for when promise resolves elsewhere (api call is delayed).
-window.tmi_enrich_prev_dt_inits = () ->
-  $('.tmi-loader, .enrichment-loader, .prevalence-loader').addClass('hidden')  # remove loaders
+# init the tmi dt (and save to var for col hiding), applies to webrep and filerep
+window.tmi_dt_init = () ->
+  tmi_table = $('#tmi-dt').DataTable
+    paging: false
+    searching: false
+    info: false
+    order: [[ 7, 'desc']]
+    columnDefs: [
+      {
+        targets: [ 0 ]
+        orderable: false
+        sortable: false
+      }
+    ]
 
-  # FIX THIS, SETTIMEOUT IS HACKY
-  # FIX THIS, SETTIMEOUT IS HACKY
-  # tiny delay to ensure tmi data exists before dt init
-  setTimeout ->
-    # dt init the tmi dt (and save to a var for col toggling)
-    tmi_table = $('#webrep-tmi-dt').DataTable
+  # show or hide columns in tmi table
+  $('.toggle-col-tmi').each ->
+    checkbox = $(this).find('input')
+    column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
+    if $(checkbox).prop('checked') then column.visible(true)
+    else column.visible(false)
+    # click anywhere in the li to toggle
+    $(this).click ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+      column.visible(!column.visible())
+    # or click the cb specifically to toggle
+    $(checkbox).click ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+
+
+# init the enrichment and prevalence dts
+window.enrich_prev_dt_init = () ->
+  $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # remove all loaders
+
+  # dt inits for enrich and prev dts for webrep, and only if not already inited
+  if $('.tab-ctt-webrep').length > 0
+    $('#enrichment-dt').DataTable
       paging: false
       searching: false
       info: false
-      order: [[ 7, 'desc']]
-      columnDefs: [
-        {
-          targets: [ 0 ]
-          orderable: false
-          sortable: false
-        }
-      ]
-    # tmi_table from above is used below, show or hide columns in tmi table
-    $('.toggle-col-tmi').each ->
-      checkbox = $(this).find('input')
-      column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
 
-      if $(checkbox).prop('checked') then column.visible(true)
-      else column.visible(false)
-
-      # click anywhere in the li to toggle
-      $(this).click ->
-        $(checkbox).prop('checked', !checkbox.prop('checked'))
-        column.visible(!column.visible())
-
-      # or click the cb specifically to toggle
-      $(checkbox).click ->
-        $(checkbox).prop('checked', !checkbox.prop('checked'))
-  , 2000
-
-
-  # dt init the enrich dt
-  $('#webrep-enrichment-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-
-  # dt init the prev dt
-  $('#webrep-prevalence-dt').DataTable
-    paging: false
-    searching: false
-    info: false
-
-  # set a dom flag that dts have been inited, so we can re-init properly on change entry
-  if $('.tab-context-tags').hasClass('dt-inited') == false
-    $('.tab-context-tags').addClass('dt-inited')
+    $('#prevalence-dt').DataTable
+      paging: false
+      searching: false
+      info: false
 
 
 
@@ -633,39 +603,36 @@ window.determine_string_type = (curr_string) ->
 
 # HOUSEKEEPING STUFF, MOVE THIS INTO A FUNCTION BELOW
 $ ->
-  # webrep - tmi kick things off on webrep, we need the first ip/domain/url entry on this case
+  # webrep - tmi page load on webrep, we need the first ip/domain/url entry on this case
   if $('.tab-ctt-webrep').length > 0
     if $('.top-case-info .dispute-entry-ip-uri').length > 0
-      top_url = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
-      tmi_ajax_webrep(top_url)  # example is 'aol.com'
+      curr_entry = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
+      tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
 
     # on webrep, if user clicks the 'select an entry' element
     $('.tab-ctt-webrep .ctt-entry-select').change ->
-      curr_url = $(this).find('option:selected').attr('data-entry')
+      $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
+      curr_entry = $(this).find('option:selected').attr('data-entry')
+      tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
 
-      tmi_ajax_webrep(curr_url)  # do tmi stuff
-      setup_context_tables_webrep('update')  # do enrich and prev stuff
 
     # show the choose-an-entry if multiple entries exist on webrep dispute case
-    num_of_disputes = parseInt($('.top-case-info .dispute-entry-count').text().trim())
-
-    if num_of_disputes > 1
+    entries_str = $('.top-case-info .dispute-entry-count').text().trim()
+    entries_num = parseInt(entries_str)
+    if entries_num > 1
       $('.ctt-choose-an-entry').removeClass('hidden')
 
-      # build select for choose-an-entry
+      # select - build options for choose-an-entry
       $('.research-table-row').each ->
         curr_entry = $(this).find('.entry-data-content').text().trim()  # entry can be url/ip/domain
         curr_option = "<option class='mult-entry-option' data-entry='#{curr_entry}'>#{curr_entry}</option>"
         $(".ctt-entry-select").append(curr_option)
 
-    # enrichment functions are defined, build it out on initial page load
-    setup_context_tables_webrep()
-
 
   # filerep - tmi kick things off on filerep, we need the sha
   else if $('.tab-ctt-filerep').length > 0
-    curr_sha = $('#sha256_hash').text().trim()  # get url or ip
-    tmi_ajax_webrep(curr_sha)
+    curr_entry = $('#sha256_hash').text().trim()  # get url or ip
+    tmi_enrich_prev_dt_inits('initial', curr_entry)
 
 
 
