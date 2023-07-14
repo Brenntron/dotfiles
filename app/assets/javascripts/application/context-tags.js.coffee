@@ -690,178 +690,63 @@ $ ->
 
 
 
-# initialize and open the tags dialog!!
+# initialize and open the tags dialog
 window.add_context_tags_dialog = () ->
-  console.log 'addtags() is ran, lets build the taxonomy tag tree'
-
   # open the dialog
   $('#add-context-tags-dialog').dialog('open')
 
-  # ajax call to get list of taxonomies
-  std_msg_ajax
-    url: '/escalations/api/v1/escalations/cloud_intel/tag_management/taxonomy_map'
-    method: 'GET'
-    success: (response) ->
-      console.log 'TAG TREE DATA BELOW'
-      console.log response
-
-      # taxonomies is an array of top-level nodes
-      { taxonomies } = response
-
-      # for each taxonomy, add to ul
-      $(taxonomies).each (i, val) ->
-        { name, entries, taxonomy_id } = this
-        taxonomy_option = "<option class='taxonomy-#{taxonomy_id}'>#{name}</option>"
-        $('.taxonomy-select').append(taxonomy_option)
-
-#        top_node =
-#          "<div class='tree-node top-node top-node-#{taxonomy_id}'>
-#             <input class='node-select' type='checkbox'>
-#             <span class='tree-text'>#{name}</span>
-#           </div>"
-
-#        $('#context-tags-tree').append(top_node)
-#
-#        $(entries).each ->
-#          { entry_id, name } = this
-#          child_node =
-#            "<div class='tag-#{taxonomy_id}-#{entry_id}'>
-#               <input type='checkbox'>
-#               <span'>#{name}</span>
-#             </div>"
-#
-#          $('#context-tags-tree').append(child_node)
-
-
-
-
-
-
-# FOR REFERENCE BELOW ONLY! DELETE ALL OF THIS WHEN TMI IS NEAR-FINAL
-# FOR REFERENCE BELOW ONLY! DELETE ALL OF THIS WHEN TMI IS NEAR-FINAL
-# FOR REFERENCE BELOW ONLY! DELETE ALL OF THIS WHEN TMI IS NEAR-FINAL
-window.rulegroups_dialog = (button) ->
-  $(button).addClass('active')
-
-  $('#edit-rulegroups-dialog').dialog('open')
-
-  # Only need to fetch if we haven't already done that
-  unless $('#rulegroups-tree').length > 0
-    fetch_rulegroups_tree()
-
-#  turn_off_button = (button) ->
-#    debugger
-#    $(button).removeClass('active')
-
-  fetch_rulegroups_tree = () ->
-    $.atlas_ajax
-      url: '/api/v2/research/rule_groups'
+  # no need to re-run ajax if already exists in dom
+  unless $('.tab-context-tags').hasClass('tags-dialog-built')
+    # ajax call to get list of taxonomies
+    std_msg_ajax
+      url: '/escalations/api/v1/escalations/cloud_intel/tag_management/taxonomy_map'
       method: 'GET'
       success: (response) ->
-        root_id = response.root
-        root_data = response.lookup[root_id]
-        tree_nodes_raw = response.lookup
+        console.clear()
+        console.log 'TAG TREE DATA BELOW'
+        console.log response
 
-        # grab initial 'children' (top parents) to start creating useful tree structure
-        grab_children(tree_nodes_raw, root_data)
-        data_tree = root_data.children
+        { taxonomies } = response  # all the top-level nodes or taxonomies
 
-        # this will pull in all decendents & their data into the parent.children array
-        find_kids(data_tree, tree_nodes_raw)
+        # for each taxonomy, add an <option> and a <div> with taxonomy entries
+        $(taxonomies).each (i, val) ->
+          { name, entries, taxonomy_id } = this
 
-        # loop through data to construct UI Tree
-        tree = build_tree(data_tree)
+          # taxonomy select - add an <option> first
+          taxonomy_option = "<option class='taxonomy-#{taxonomy_id}' data-id='#{taxonomy_id}'>#{name}</option>"
+          $('.taxonomy-select').append(taxonomy_option)
 
-        # turn off loader
-        $('#rule-group-tree .inline-loader-wrapper').hide()
-        $('#rule-group-tree').append(tree)
+          # taxonomy div - start it
+          taxonomy_div = "<div class='taxonomy-div taxonomy-div-#{taxonomy_id} hidden'>"
 
+          # taxonomy div - add all the entries for this taxonomy
+          $(entries).each ->
+            { entry_id, name } = this
+            entry_div =
+              "<div class='tag-entry tag-#{taxonomy_id}-#{entry_id}'><input class='tag-entry-cb' type='checkbox'><span class='tag-entry-name'>#{name}</span></div>"
 
-  # Make sure there are children to grab
-  find_kids = (array, tree_nodes_raw) ->
-    for node in array
-      if node.type == 'branch'
-        grab_children(tree_nodes_raw, node)
-        find_kids(node.children, tree_nodes_raw)
+            # add entry div to taxonomy div
+            taxonomy_div += entry_div
 
-  # Get the van ready
-  grab_children = (tree, parent) ->
-    children_arry = []
-    for child in parent.children
-# use this to grab children from the tree \o/
-      child_data = tree[child]
-      children_arry.push(child_data)
+          # entry divs are done, close up the taxonomy div
+          taxonomy_div += "</div>"
 
-    # replace array of children keys with array of children data
-    Object.assign(parent.children, children_arry)
-    return parent
+          # add taxonomy div to dom (will be hidden by default)
+          $('.tag-entries-area').append(taxonomy_div)
 
-  ## Build the UI Tree!
-  build_tree = (data_tree) ->
-    tree = '<ul id="rulegroups-tree">'
-    for node in data_tree
-      branch = build_a_branch(node)
-      if node.type == 'branch'
-        nested_branches = build_nested_branches(node.children)
-        branch += nested_branches
-      branch += '</li>'
-      tree += branch
-    tree += '</ul>'
-    return tree
+        # open the dialog with the default entries showing
+        curr_id = $('.taxonomy-select option:selected').attr('data-id')
+        $(".taxonomy-div-#{curr_id}").removeClass('hidden')
 
-  build_nested_branches = (children) ->
-    nested_branches = '<ul class="nested-tree-list collapsed">'
-    branches = []
-    for child in children
-      branch = build_a_branch(child)
-
-      #need to check if this has children
-      if child.type == 'branch'
-        sub_branches = build_nested_branches(child.children)
-        branch += sub_branches
-      branch += '</li>'
-      branches.push(branch)
-
-    # put branches in alphabetical order
-    sorted_branches = branches.sort()
-    nested_branches += sorted_branches.join('')
-    nested_branches += '</ul>'
-    return nested_branches
-
-  build_a_branch = (node) ->
-    if node.type == 'branch'
-      branch = '<li data-name="' + node.name + '" data-id="' + node.groupid + '">'
-      branch += '<input hidden="hidden" type="checkbox" class="tree-toggle" id="tree-toggle-' + node.groupid + '" onclick="toggle_branch(this)"/>'
-      branch += '<label class="tree-toggle-label" for="tree-toggle-' + node.groupid + '" />'
-    else
-      branch = '<li data-name="' + node.name + '" class="leaf-node-spacer" data-id="' + node.groupid + '">'
-
-    branch +=
-      '<input type="checkbox" class="node-select" id="node-select-' + node.groupid + '" data-fqn="' + node.fqn + '" onclick="select_nodes(this)"/>' +
-        '<span class="tree-text tooltipped" title="' + node.description + '">' + node.name + '</span>'
-    # close branch elsewhere in case there are nested branches
-    return branch
+        # add flag to dom that the dialog is now built
+        $('.tab-context-tags').addClass('tags-dialog-built')
 
 
-# Hide / show branches
-window.toggle_branch = (button) ->
-  ul = $(button).siblings('.nested-tree-list')
-  if $(button).hasClass('tree-toggle-open')
-    $(button).removeClass('tree-toggle-open')
-    $(ul).addClass('collapsed')
-  else
-    $(button).addClass('tree-toggle-open')
-    $(ul).removeClass('collapsed')
 
-# Selecting checkboxes (should toggle all sub branches)
-window.select_nodes = (checkbox) ->
-  ul = $(checkbox).siblings('.nested-tree-list')
-  checkboxes = $(ul).find('.node-select')
-  if $(checkbox).prop('checked') == true
-    $(checkboxes).prop('checked', true)
-    $($(checkbox).parent('li')).addClass('selected')
-    $($(checkboxes).parent('li')).addClass('selected')
-  else
-    $(checkboxes).prop('checked', false)
-    $($(checkbox).parent('li')).removeClass('selected')
-    $($(checkboxes).parent('li')).removeClass('selected')
+
+$ ->
+  $('.taxonomy-select').change ->
+    selected_id = $(this).find('option:selected').attr('data-id')
+    $(".taxonomy-div").addClass('hidden')
+    $(".taxonomy-div-#{selected_id}").removeClass('hidden')
+

@@ -130,30 +130,26 @@
 
 
 
-
-
-
-
--# ADD TAGS DIALOG BELOW, DONT PUT IN SEPARATE FILE, CODE IS SIMPLE ENOUGH TO LEAVE HERE
--# ADD TAGS DIALOG BELOW, DONT PUT IN SEPARATE FILE, CODE IS SIMPLE ENOUGH TO LEAVE HERE
+-# add tags dialog below, dont put in separate file, code is simple enough to leave here
 #add-context-tags-dialog{title: 'Add Tags to Observable'}
   .dialog-content-wrapper
-    .row
+    .row.taxonomy-row
       .col-xs-6
-        %label.content-label-sm
+        %label.tag-label
           Taxonomy
         -# context tags js will generate options below
         %select.taxonomy-select
-
       .col-xs-6
-        %label.content-label-sm
+        %label.tag-label
           Tag Search
         %input.context-tags-search
 
     .row.tags-content-row
       .col-xs-12
-        %label.content-label-sm
+        %label.tag-label
           Results
+        -# all entries generated into below div
+        .tag-entries-area
 
     .row.save-button-row
       .col-xs-12.text-center

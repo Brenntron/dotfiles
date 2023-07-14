@@ -206,12 +206,6 @@
   }
 }
 
-// leave commented out until tmi is done: prev table wrapper div needs less width
-//.prevalence-area {
-//  width: 50%;
-//  min-width: 800px;
-//}
-
 // ensure bg color if tmi, enrich, or prev table width extends off page on context tags tab
 .ctt-table {
   background-color: #fff;
@@ -221,16 +215,34 @@
 
 
 
-
-// add tags dialog
+// ADD TAGS DIALOG
+// ADD TAGS DIALOG
 .add-context-tags-dialog {
   font-family: 'Open Sans', sans-serif;
   font-weight: 500;
-  font-size: 10pt;
+  font-size: 9pt;
+
+  // delete this or clean up this ui stuff
+  &.ui-dialog .ui-dialog-titlebar {
+    font-size: 10pt;
+    font-weight: 600;
+    background-color: #3e5a72;
+    padding-left: 35px;
+    background-image: url(image_path('icon_add_white.svg'));
+    background-repeat: no-repeat;
+    background-position: 8px center;
+    background-size: 20px 20px;
+  }
+  .ui-dialog .ui-dialog-content {
+    position: relative;
+    border: 0;
+    padding: 0;
+    background: none;
+    overflow: auto;
+    box-sizing: content-box;
+  }
 
 
-
-  // GET BOTTOM ROW TO AFFIX TO BOTTOM OF WINDOW
   // GET BOTTOM ROW TO AFFIX TO BOTTOM OF WINDOW
   // GET BOTTOM ROW TO AFFIX TO BOTTOM OF WINDOW
   .dialog-content-wrapper {
@@ -241,42 +253,41 @@
     width: 100%;
     height: 100%;
   }
+  // clean up all this css
+  .taxonomy-row {
+    border-bottom: solid 1px #eee;
+  }
+  .tags-content-row {
+    flex: 1 0 auto;
+    padding-top: 10px;
+  }
   .save-button-row {
     margin: 0 auto;
     width: 100%;
     border-top: solid 1px #eee;
     padding: 15px;
   }
-  .tags-content-row {
-    flex: 1 0 auto;
-  }
-
-  // delete this
-  .ui-dialog .ui-dialog-content {
-    position: relative;
-    border: 0;
-    padding: 0;
-    background: none;
-    overflow: auto;
-    box-sizing: content-box;
-  }
-
-  &.ui-dialog .ui-dialog-titlebar {
+  .tag-label {
+    padding: 8px 2px;
     font-weight: 700;
-    background-color: #3e5a72;
-    padding-left: 35px;
-    background-image: url(image_path('icon_add_white.svg'));
-    background-repeat: no-repeat;
-    background-position: 8px center;
-    background-size: 20px 20px;
   }
-
-
-  input {
-    color: #bbb;
-    width: 100%;
-    font-size: 8pt;
+  .tag-entries-area {
+    height: 350px;
+    max-height: 350px;
+    overflow-y: auto;
+  }
+  .tag-entry {
+    margin-bottom: 4px;
+  }
+  .tag-entry-name {
+    padding: 4px;
+    font-size: 9pt;
+  }
+  .context-tags-search {
     font-family: 'Open Sans', sans-serif;
+    font-size: 9pt;
+    color: #666;
+    width: 100%;
     border: solid 1px #ddd;
     margin-top: 0;
     margin-bottom: 20px;
@@ -286,18 +297,21 @@
     background-position: right center;
     background-size: 25px 18px;
   }
-
-  select {
-    font-family: 'Open Sans', sans-serif;
-    width: 100%;
-    border: solid 1px #eee;
-    padding: 3px;
+  .tag-entry-cb {
+    width: 20px;
+    position: relative;
+    top: 2px;
   }
-
+  .taxonomy-select {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 9pt;
+    width: 100%;
+    border: solid 1px #ddd;
+    padding: 4px;
+  }
   button {
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
+    margin-top: 5px;
   }
-
-
 }
