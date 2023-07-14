@@ -90,7 +90,7 @@ class JiraImportTask < ApplicationRecord
     # fetch data from ticket attachment
     begin
       attachment_to_process = issue.attachments_data.first
-    rescue
+    rescue => e
       if urls.empty?
         update(status: STATUS_FAILURE, result: "Error reading attachment data: #{e.message}")
         return
