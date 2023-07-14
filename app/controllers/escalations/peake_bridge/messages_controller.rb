@@ -1,5 +1,5 @@
 class Escalations::PeakeBridge::MessagesController < ApplicationController
-  skip_before_action :require_login
+  skip_before_action :require_login, :verify_authenticity_token
 
   def get_messages
     Rails.logger.info("GET get_messages")
@@ -24,7 +24,11 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
         if message_payload.respond_to?(:permit!)
           message_payload = message_payload.permit!.to_h
         end
-        message_payload[:bugzilla_rest_session] = bugzilla_rest_session
+        ### this is a drop and go replacement of bugzilla rest session functionality since bugzilla is going away
+        # all we need is a local "proxy" to "act" like bugzilla so that functionality can continue on as if nothing happened
+        # EscalationTicket acts as that proxy, pretending to be bugzilla,
+        # for the sake of continuity it will "behave" like bugzilla
+        message_payload[:bugzilla_rest_session] = EscalationTicket
         message_payload[:current_user] = current_user
 
         # This is so the tests can stub out the `threaded?` method and test synchronously.
@@ -83,9 +87,9 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
     true
   end
 
-  def bugzilla_rest_session
-    BugzillaRest::Session.default_session
-  end
+  #def bugzilla_rest_session
+  #  BugzillaRest::Session.default_session
+  #end
 
   def log_exception(except)
     Rails.logger.error(except.message)

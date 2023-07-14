@@ -4,7 +4,7 @@
 #data is loaded separately and fed into the Research Data, similar to wbrs
 
 window.get_enrichment_service = (query_item, query_type) ->
-  data = {'query_item': query_item, 'query_type', query_type}
+  data = {'query_item': query_item, 'query_type': query_type}
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/cloud_intel/enrichment_service/query/'
     method: 'GET'
@@ -107,6 +107,7 @@ create_webrep_enrichment_section = (tags, context, enrich_toolbar_cell, table, c
 create_webrep_prevalence_section = (prevalence_data, table) ->
   response_key = Object.keys(prevalence_data)[0]
   data = prevalence_data[response_key]
+
   if data.count != 0
     total_row = $("<tr></tr>")
     $(total_row).append($("<td>Total</td>"))
@@ -123,9 +124,18 @@ create_webrep_prevalence_section = (prevalence_data, table) ->
     $(total_last_seen).text(data.last_seen)
     $(total_row).append(total_last_seen)
 
+    total_first_seen_int = $("<td></td>")
+    $(total_first_seen_int).text(new Date(data.first_seen).getTime())
+    $(total_row).append(total_first_seen_int)
+
+    total_last_seen_int = $("<td></td>")
+    $(total_last_seen_int).text(new Date(data.last_seen).getTime())
+    $(total_row).append(total_last_seen_int)
+
     $(table).append(total_row)
 
     dataset_keys = Object.keys(data.datasets)
+
     for key in dataset_keys
       new_row = $("<tr></tr>")
 
@@ -145,6 +155,14 @@ create_webrep_prevalence_section = (prevalence_data, table) ->
       $(last_seen).text(data.datasets[key].last_seen)
       $(new_row).append(last_seen)
 
+      first_seen_int = $("<td></td>")
+      $(first_seen_int).text(new Date(data.datasets[key].first_seen).getTime())
+      $(new_row).append(first_seen_int)
+
+      last_seen_int = $("<td></td>")
+      $(last_seen_int).text(new Date(data.datasets[key].last_seen).getTime())
+      $(new_row).append(last_seen_int)
+
       $(table).append(new_row)
 
 
@@ -154,8 +172,8 @@ window.setup_enrichment_section = () ->
     $('.research-table-row').each ->
       create_index = 0 #track if first entry in table
       ip_uri = $(this).find('.entry-data-content').text().trim()
-      table = $(this).find('.enrich-webrep-table-data-present tbody')
-      prevalence_table = $(this).find('.prevalence-webrep-table-data-present tbody')
+      table_body = $(this).find('.enrich-webrep-table-data-present tbody')
+      prevalence_table_body = $(this).find('.prevalence-webrep-table-data-present tbody')
       enrich_toolbar_cell = $(this).find('.enrich-cell')
 
       # enrichment services uses a separate API call - needs to be handled w/ a js promise (1-2 sec lag)
@@ -165,7 +183,6 @@ window.setup_enrichment_section = () ->
           resolve enrich_json
 
       enrich_promise.then (response) ->
-
         email_context_tags = []
         web_context_tags = []
         enrichment_context_tags = []
@@ -185,23 +202,55 @@ window.setup_enrichment_section = () ->
 
           if email_context_tags.length > 0
             create_index++
-            create_webrep_enrichment_section(email_context_tags, 'Email',  enrich_toolbar_cell, table, create_index)
+            create_webrep_enrichment_section(email_context_tags, 'Email',  enrich_toolbar_cell, table_body, create_index)
 
           if web_context_tags.length > 0
             create_index++
-            create_webrep_enrichment_section(web_context_tags, 'Web',  enrich_toolbar_cell, table, create_index)
+            create_webrep_enrichment_section(web_context_tags, 'Web',  enrich_toolbar_cell, table_body, create_index)
 
           #need to pass the tags, context, enrich_toolbar_cell and table to function
           if enrichment_context_tags.length > 0
             create_index++
-            create_webrep_enrichment_section(enrichment_context_tags, 'Enrichment',  enrich_toolbar_cell, table, create_index)
+            create_webrep_enrichment_section(enrichment_context_tags, 'Enrichment',  enrich_toolbar_cell, table_body, create_index)
 
+          $('.enrich-webrep-table-data-missing').addClass('hidden')
+          $('.enrich-webrep-table-data-present').removeClass('hidden')
+
+          $('.enrich-webrep-table-data-present').DataTable({
+            info: false,
+            ordering: true,
+            paging: false,
+            searching: false
+          })
         else
           $('.enrich-webrep-table-data-present').addClass('hidden')
           $('.enrich-webrep-table-data-missing').removeClass('hidden')
 
         if response?.data?.prevalence?.responses?
-          create_webrep_prevalence_section(response.data.prevalence.responses, prevalence_table)
+          create_webrep_prevalence_section(response.data.prevalence.responses, prevalence_table_body)
+
+          $('.prevalence-webrep-table-data-missing').addClass('hidden')
+          $('.prevalence-webrep-table-data-present').removeClass('hidden')
+
+          $('.prevalence-webrep-table-data-present').DataTable({
+            columnDefs: [
+              {
+                orderData: [4],
+                targets: [2],
+              },
+              {
+                orderData: [5],
+                targets: [3],
+              },
+              {
+                visible: false,
+                targets: [4, 5]
+              }
+            ]
+            info: false,
+            paging: false,
+            searching: false
+          })
 
 $(document).ready( ()->
   setup_enrichment_section()

@@ -1,6 +1,5 @@
-GIT
-  remote: git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git
-  revision: d8c7fa0c0fa507b9cd6cb790ee51032ce0e79d7f
+PATH
+  remote: vendor/gems/peake-bridge-client
   specs:
     peake-bridge-client (0.2.0.0)
       curb (~> 0.9)
@@ -1929,17 +1928,17 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.2)
-    uri (0.10.0)
+    uri (0.12.0)
     warden (1.2.9)
       rack (>= 2.0.9)
     webrick (1.7.0)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    whois (4.0.7)
-    whois-parser (1.1.0)
+    whois (4.1.0)
+    whois-parser (2.0.0)
       activesupport (>= 4)
-      whois (>= 4.0.6)
+      whois (>= 4.1.0)
     will_paginate (3.3.1)
     with_advisory_lock (4.6.0)
       activerecord (>= 4.2)
@@ -2053,9 +2052,9 @@ DEPENDENCIES
   timecop
   turbolinks (= 5.2.0)
   uglifier (= 4.1.20)
-  uri (= 0.10.0)
-  whois (= 4.0.7)
-  whois-parser (= 1.1.0)
+  uri (= 0.12.0)
+  whois (= 4.1.0)
+  whois-parser (= 2.0)
   will_paginate (= 3.3.1)
   with_advisory_lock (~> 4.0)
   xmlrpc

@@ -28,7 +28,7 @@ $ ->
     #pin webcat toolbar under navigation bar, add padding
     toolbar = $('#webcat-index-toolbar')
     $('#nav-banner').append(toolbar)
-    $('#page-content-wrapper').css('padding-top','60px')
+    $('.escalations--webcat--complaints-controller.index-action #page-content-wrapper').css('padding-top','60px')
 
     #align tooltips under toolbar
     $('body').addClass('pinned-toolbar-true')
@@ -63,6 +63,7 @@ $ ->
     channels = if $('#channel-input')[0].selectize? then $('#channel-input')[0].selectize.items else []
     entry_ids = if $('#entryid-input')[0].selectize? then $('#entryid-input')[0].selectize.items else []
     complaint_ids = if $('#complaintid-input')[0].selectize? then $('#complaintid-input')[0].selectize.items else []
+    jira_ids = if $('#jiraid-input')[0].selectize? then $('#jiraid-input')[0].selectize.items else []
     platform_ids = if $('#platform-input')[0].selectize? then $('#platform-input')[0].selectize.items else []
     submitter_types = if $('#submitter-type-input')[0].selectize? then $('#submitter-type-input')[0].selectize.items else []
 
@@ -88,6 +89,8 @@ $ ->
       form['entry_id'] = entry_ids.join(', ')
     if complaint_ids.length
       form['complaint_id'] = complaint_ids.join(', ')
+    if jira_ids.length
+      form['jira_id'] = jira_ids.join(', ')
     if user_id.length
       form['user_id'] = user_id.join(', ')
     if submitter_types.length
@@ -114,6 +117,7 @@ $ ->
       channel: form.channel
       company_name: form.company
       complaint_id: form.complaint_id
+      jira_id: form.jira_id
       customer_email: form.customer_email
       customer_name: form.customer_name
       domain: form.domain
@@ -142,6 +146,21 @@ $ ->
     localStorage.webcat_search_type = 'named'
     localStorage.webcat_search_name = search_name
     localStorage.webcat_search_conditions = '#' + link_el
+
+    refresh_url()
+
+  window.search_for_tag = (tag) ->
+    { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+
+    try
+      webcat_search_conditions = JSON.parse webcat_search_conditions
+    catch e
+      webcat_search_conditions = {}
+
+    localStorage.webcat_search_type = 'advanced'
+    webcat_search_conditions.tags = tag
+
+    localStorage.webcat_search_conditions = JSON.stringify webcat_search_conditions
 
     refresh_url()
 
@@ -589,7 +608,7 @@ $ ->
                       tag_items = ''
                       tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
                       for tag in tag_list
-                        item = '<span class="tag-capsule">' + tag + '</span>'
+                        item = "<span class='tag-capsule' onclick='search_for_tag(\"#{tag}\")'>" + tag + "</span>"
                         tag_items += item
 
                   tag_items
@@ -860,7 +879,7 @@ $ ->
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
-      options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"}]
+      options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"},{name: "Jira"} ]
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
@@ -892,7 +911,19 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-
+    jira_ids = $('#jiraid-input').selectize {
+      delimiter: ',',
+      persist: false,
+      create: (input) ->
+        {
+          value: input
+          text: input
+        }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
     $('#submitter-type-input').selectize {
       delimiter: ',',
       persist: false,
@@ -1069,6 +1100,7 @@ window.find_saved_search_by_name = (name) ->
       return
   )
   return saved_search
+
 $ ->
 
 #  Webcat toolbar and wbnp status report tooltips need slight adjustment

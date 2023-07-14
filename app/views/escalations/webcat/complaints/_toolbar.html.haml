@@ -1,11 +1,9 @@
-.toolbar#webcat-index-toolbar
+#webcat-index-toolbar.toolbar
   %div
     %div.webcat-toolbar-select-all-wrapper
       %input{type: 'checkbox', id:'complaints_select_all'}
       %label{for: 'complaints_select_all'} Select All
   %div
-    %label.toolbar-section-label
-      View
     %span.dropdown
       %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
@@ -48,16 +46,12 @@
             %input.assignee-checkbox{type: 'checkbox', checked: true, id: 'assignee-checkbox'} Assignee
 
   %div
-    %label.toolbar-section-label
-      Open in Tab
     %div.btn-group.toolbar-btn-group
       %button.btn.toolbar-button.open-selected.esc-tooltipped-webcat-toolbar{onclick: 'open_selected()', type: 'button', title: 'Open Selected (alt + o)'}
         %span.toolbar-button-text Selected
       %button.btn.toolbar-button.open-all.esc-tooltipped-webcat-toolbar{onclick: 'open_all()', type: 'button', title: 'Open All (shift + alt + o)'}
         %span.toolbar-button-text.text-button-all All
   %div
-    %label.toolbar-section-label
-      Edit
     %span.toolbar-concise-button-area
       %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)'}
         %span.toolbar-button-text Take
@@ -131,21 +125,16 @@
               Convert Ticket
 
   %div
-    %label.toolbar-section-label
-      Collapse
     %button.toolbar-button.collapse-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'collapse_selected()', type: 'button', title: 'Collapse Selected (alt + f)'}
       %span.toolbar-button-text Selected
     %button.toolbar-button.collapse-all.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'collapse_all()', type: 'button', title: 'Collapse All (alt + h)'}
       %span.toolbar-button-text.text-button-all All
   %div
-    %label.toolbar-section-label
-      Expand
     %button.toolbar-button.expand-row-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected (alt + d)'}
       %span.toolbar-button-text Selected
     %button.toolbar-button.expand-all.esc-tooltipped-webcat-toolbar{type: 'button', title: 'Expand All (alt + g)'}
       %span.toolbar-button-text.text-button-all All
   %div
-    %label.toolbar-section-label Fetch Data
     %button.toolbar-button.sync-button#fetch.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
       %span.toolbar-button-text Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped-webcat-toolbar{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}

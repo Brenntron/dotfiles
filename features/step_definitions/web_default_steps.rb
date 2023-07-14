@@ -609,3 +609,19 @@ end
 Then(/^I click input with id "(.*?)"$/) do |id_name|
   page.find(:xpath, "//input[@id='#{id_name}']").click
 end
+
+Then(/^element with id "(.*?)" should contain a value of "(.*?)"$/) do |id_name, content|
+  elem = find(:xpath, "//*[@id='#{id_name}']")
+  unless elem.value == content
+    raise "Element found, but with different content; expected: '#{content}' but found: '#{elem.text}'"
+  end
+end
+
+Then(/^element with class "(.*?)" should have content "(.*?)"$/) do |class_name, content|
+  elem = find(:xpath, "//*[@class='#{class_name}']")
+  raise "No text was found" unless elem.has_content?(content)
+end
+
+And(/the table "(.*?)" should have "(.*?)" number of rows/) do | table, number_of_rows|
+  page.all("table##{table} tbody tr").count.should == Integer(number_of_rows)
+end

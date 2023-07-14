@@ -7,24 +7,13 @@ class ApplicationController < ActionController::Base
   before_action :set_version
   helper_method :current_user
   helper_method :xml_token
-  helper_method :bugzilla_rest_session
+  #helper_method :bugzilla_rest_session
 
   private
 
   # TODO Unneeded?
   def require_login
     session[:previous_url] = request.url
-  end
-
-  def bugzilla_session()
-    xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-    xmlrpc.token = request.headers['Xmlrpc-Token'] ? request.headers['Xmlrpc-Token'] : xml_token
-    xmlrpc
-  end
-
-  def bugzilla_rest_session
-    token = session['bugzilla_rest_api_token']
-    BugzillaRest::Session.new(api_key: current_user.bugzilla_api_key, token: token)
   end
 
   def current_user

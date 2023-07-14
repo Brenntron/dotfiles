@@ -214,7 +214,6 @@ module ApiRequester::ApiRequester
     end
 
     def new_request(path, query = nil)
-
       request = HTTPI::Request.new(uri(path, query))
       if gssnegotiate?
         request.auth.gssnegotiate
@@ -254,6 +253,13 @@ module ApiRequester::ApiRequester
       request = new_request(path, query)
       request.headers = default_headers.merge(headers)
       request.body = ''
+      request
+    end
+
+    def new_form_data_request(path, body:, headers: {})
+      request = new_request(path)
+      request.headers = default_headers.merge(headers).merge("Content-Type" => "application/x-www-form-urlencoded")
+      request.body = URI.encode_www_form(body).gsub(/&/, '&')
       request
     end
 
@@ -346,6 +352,8 @@ module ApiRequester::ApiRequester
             new_query_string_request(path, query: input, headers: headers)
           when :query_body
             new_query_body_request(path, query: input, headers: headers)
+          when :form_data
+            new_form_data_request(path, body: input, headers: headers)
           else
             raise 'Unknown request type, must be :json, :query_string, or :query_body'
           end

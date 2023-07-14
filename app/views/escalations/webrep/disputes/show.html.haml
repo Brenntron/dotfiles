@@ -62,10 +62,9 @@
           %label.content-label-sm
             Status
           %br
-          -##bugzilla_popover_state
           - if (@dispute.resolution != Dispute::DUPLICATE)
             %span.dropdown
-              %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "dispute_status_drop_down(#{@dispute.id})"}
+              %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "dispute_status_drop_down()"}
                 - if @dispute.status.nil?
                   NEW
                 - else
@@ -75,51 +74,51 @@
                 .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
                   %ul
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_NEW}", value: "#{Dispute::STATUS_NEW}"}
+                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_NEW}", 'data-status': "#{Dispute::STATUS_NEW}", value: "#{Dispute::STATUS_NEW}"}
                       %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_NEW}"} New
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESEARCHING}", value: "#{Dispute::STATUS_RESEARCHING}"}
+                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESEARCHING}", 'data-status': "#{Dispute::STATUS_RESEARCHING}", value: "#{Dispute::STATUS_RESEARCHING}"}
                       %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_RESEARCHING}"} Researching
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ESCALATED}", value: "#{Dispute::STATUS_ESCALATED}"}
+                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ESCALATED}", 'data-status': "#{Dispute::STATUS_ESCALATED}", value: "#{Dispute::STATUS_ESCALATED}"}
                       %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_ESCALATED}"} Escalated
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_CUSTOMER_PENDING}", value: "#{Dispute::STATUS_CUSTOMER_PENDING}"}
+                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_CUSTOMER_PENDING}", 'data-status': "#{Dispute::STATUS_CUSTOMER_PENDING}", value: "#{Dispute::STATUS_CUSTOMER_PENDING}"}
                       %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_CUSTOMER_PENDING}"} Customer Pending
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ON_HOLD}", value: "#{Dispute::STATUS_ON_HOLD}"}
+                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ON_HOLD}", 'data-status': "#{Dispute::STATUS_ON_HOLD}", value: "#{Dispute::STATUS_ON_HOLD}"}
                       %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_ON_HOLD}"} On Hold
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ASSIGNED}", value: "#{Dispute::STATUS_ASSIGNED}"}
+                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ASSIGNED}", 'data-status': "#{Dispute::STATUS_ASSIGNED}", value: "#{Dispute::STATUS_ASSIGNED}"}
                       %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_ASSIGNED}"} Assigned
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio.resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESOLVED}", value: "#{Dispute::STATUS_RESOLVED}"}
+                      %input.ticket-status-radio.resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESOLVED}", 'data-status': "#{Dispute::STATUS_RESOLVED}", value: "#{Dispute::STATUS_RESOLVED}"}
                       %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_RESOLVED}"} Resolved / Closed
                       .dropdown-menu#show-ticket-resolution-submenu
-                        .col-xs-6.submenu-left-wrapper{id: "webrep-resolution-selector"}
+                        .submenu-left-wrapper{id: "webrep-resolution-selector"}
                           .submenu-header
                             Ticket Resolution
-                          = render 'escalations/shared/resolved_resolution_options',  { dispute_resolution_name: 'dispute-resolution' }
-                        .col-xs-6.submenu-right-wrapper
+                          = render 'escalations/webrep/disputes/resolved_resolution_options',  { dispute_resolution_name: 'dispute-resolution', id_prefix: '' }
+
+                        .submenu-right-wrapper
                           .resolution-comment-wrapper
                             %label.content-label-sm
+                              Template
+                            %select#webrep-ticket-resolution-message-template-select.resolution-message-template-select
+                            %label.content-label-sm
+                              Description
+                            %p.ticket-resolution-description
+                            %label.content-label-sm
                               Comment
-                            %textarea.ticket-resolution-comment
-                            %button.primary{onClick: 'show_page_edit_status()'}
-                              Submit
+                            %textarea#webrep-show-ticket-resolution-comment.ticket-resolution-comment.ticket-status-comment
+                            .ticket-resolution-submit-wrapper
+                              %button.primary{onClick: 'show_page_edit_status()'}
+                                Submit
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
+                      %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", 'data-status': "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
                       %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
 
                   %li.non-resolution-submit-wrapper#ticket-non-res-submit
-                    %center{class: 'select-resolution-message-templates-button'}
-                      %p{class:'select-a-template'} Select A Template
-                    %select.dropdown.resolution-message-template-select#select-new-resolution-message-template-status
-                      -if ResolutionMessageTemplate.in_progress.empty?
-                        %option.hidden{value:'', disabled: true, selected: true} No Templates Created
-                      -else
-                        %option{value:'', disabled: true, selected: true} No Template Selected
-                        =options_for_select(ResolutionMessageTemplate.in_progress.pluck(:name, :id))
                     %label.content-label-sm
                       Comment
                     %textarea.ticket-status-comment
@@ -135,7 +134,6 @@
           - else
             .duplicate-status-notice
               =@dispute.resolution
-          %button.mng-resolution-message-templates-button.esc-tooltipped{onClick: 'manage_resolution_message_templates()', title: 'Manage Resolution Message Templates'}
 
     .col-xs-2.col-with-divider
       .disposition-wrapper

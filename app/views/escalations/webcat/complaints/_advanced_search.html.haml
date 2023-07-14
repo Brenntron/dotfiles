@@ -29,7 +29,7 @@
   .form-group.search-item
     %label.content-label-sm{for: 'tags'} Tags
     %select.form-control.selectize#tags-input{name: 'tags', multiple: 'multiple', tabindex:'-1'}
-    %input.hidden#search_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(','), name: 'tags'}
+    %input.hidden#search_tag_list{value: ComplaintTag.all.sort_by(&:name).map { |tag| tag.name }.join(','), name: 'tags'}
     %button#remove-criteria-tags.remove-input{onclick:'clearSelectize("tags-input")'}
 
   -# Additional search criteria
@@ -52,6 +52,11 @@
     %label.content-label-sm Complaint ID(s) (comma separate multiples)
     %input.form-control.selectize#complaintid-input{name: 'complaint_id', multiple: 'multiple', tabindex:'-1'}
     %button#remove-criteria-complaintid.remove-input{onclick:'clearSelectize("complaintid-input")'}
+
+  .form-group.search-item.hidden
+    %label.content-label-sm Jira ID(s) (comma separate multiples)
+    %input.form-control.selectize#jiraid-input{name: 'jira_id', multiple: 'multiple', tabindex:'-1', placeholder: 'ex: SDOCS-123'}
+    %button#remove-criteria-jiraid.remove-input{onclick:'clearSelectize("jiraid-input")'}
 
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
@@ -142,6 +147,10 @@
             %label.search-criteria-label
               %input.search-checkbox#complaint-id-cb{type: 'checkbox', name: 'search-criteria', value: 'Complaint ID', for: 'complaintid-input'}
               Complaint ID
+          %li
+            %label.search-criteria-label
+              %input.search-checkbox#jira-id-cb{type: 'checkbox', name: 'search-criteria', value: 'Jira ID', for: 'jiraid-input'}
+              Jira ID
           %li
             %label.search-criteria-label
               %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria', value: 'Resolution', for: 'resolution-input'}

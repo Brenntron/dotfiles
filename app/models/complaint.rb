@@ -3,6 +3,7 @@ class Complaint < ApplicationRecord
   has_many :complaint_entries, dependent: :restrict_with_exception
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
   belongs_to :platform, optional: true
+  has_many :import_urls
   has_paper_trail on: [:update], ignore: [:updated_at]
 
   delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
@@ -12,6 +13,7 @@ class Complaint < ApplicationRecord
     { label: 'New Tickets', param: 'NEW', icon: 'icon-new-tickets' },
     { label: 'New Talos Tickets', param: 'NEW TALOS', icon: 'icon-talos-white' },
     { label: 'New WBNP Tickets', param: 'NEW WBNP', icon: 'icon-web-white' },
+    { label: 'New Jira Tickets', param: 'NEW JIRA', icon: 'icon-mothra-white' },
     { label: 'New Internal Tickets', param: 'NEW INTERNAL', icon: 'icon-company-white' },
     { label: 'Manager Queue', param: 'MANAGER QUEUE', icon: 'icon-manager-queue' },
     { label: 'Waiting for Review', param: 'REVIEW', icon: 'icon-pending-bugs' },
@@ -49,6 +51,7 @@ class Complaint < ApplicationRecord
   TI_CHANNEL = 'talosintel'
   INT_CHANNEL = 'internal'
   WBNP_CHANNEL = 'wbnp'
+  JIRA_CHANNEL = 'jira'
 
   SOURCE_RULEUI = "RuleUI"
 
@@ -68,9 +71,10 @@ For future web and email reputation requests, please open a web and email reputa
   scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
   scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
 
-  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
+  scope :from_ti,   -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
+  scope :from_jira, -> { includes(:complaint_entries).where(channel: JIRA_CHANNEL) }
 
   validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
 
@@ -329,7 +333,8 @@ For future web and email reputation requests, please open a web and email reputa
       }
 
       bugzilla_rest_session = message_payload[:bugzilla_rest_session]
-      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs, assigned_user: user)
+      message_payload.delete(:bugzilla_rest_session)
+      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
       internal_comment = nil
 
@@ -363,12 +368,14 @@ For future web and email reputation requests, please open a web and email reputa
       if message_payload["payload"]["api_customer"].present? && message_payload["payload"]["api_customer"] == true
         new_complaint.submitter_type = SUBMITTER_TYPE_CUSTOMER
       end
-      if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
-        ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
+      # commenting this functionality out until bugzilla snort bugs have been successfully moved to JIRA, then
+      # this functionality will need to be rebuilt, if it's even necessary (since this feature isn't even being used)
+      #if message_payload["payload"]["network"].present? && message_payload["payload"]["network"] == true
+      #  ips_bug_proxy= build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, message_payload["payload"]["problem"], bug_proxy.id)
 
-        internal_comment = "Complaint is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+      #  internal_comment = "Complaint is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
 
-      end
+      #end
 
       new_complaint.save!
 
@@ -616,7 +623,7 @@ For future web and email reputation requests, please open a web and email reputa
 
         total_entries = all_complaints.size
         entry_num = 1
-        bugzilla_rest_session = BugzillaRest::Session.default_session
+        bugzilla_rest_session = EscalationTicket
 
         all_complaints.each do |new_ui_complaint|
 
@@ -711,14 +718,14 @@ For future web and email reputation requests, please open a web and email reputa
     end
     uri = "#{subdomain}#{parts["domain"]}#{parts["path"]}"
 
-    URI.escape(uri)
+    Addressable::URI.escape(uri)
   end
 
   def self.validate_url(uri, new_ui_complaint)
     begin
       URI.parse(uri.strip)
 
-      first_test_url = URI.escape(uri)
+      first_test_url = Addressable::URI.escape(uri)
       first_test_uri = URI.parse(URI.parse(first_test_url).scheme.nil? ? "http://#{first_test_url}" : first_test_url)
       first_test_domain = PublicSuffix.parse(first_test_uri.host, :ignore_private => true)
       first_test_uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{first_test_domain.domain}$"), '')
@@ -875,7 +882,7 @@ For future web and email reputation requests, please open a web and email reputa
     wbnp_report.save
   end
 
-  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, platform, status=NEW, categories = nil, user_email = nil)
+  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, platform, status=NEW, categories = nil, user_email = nil, channel = INT_CHANNEL)
 
     response = {}
     response[:status] = "success"
@@ -912,7 +919,9 @@ For future web and email reputation requests, please open a web and email reputa
                                        customer_id: cust&.id,
                                        platform_id: platform_record&.id,
                                        status: status,
-                                       channel: INT_CHANNEL)
+                                       channel: channel)
+
+      response[:complaint_id] = new_complaint.id
 
 
       handle_tags(new_complaint, tags) if tags
@@ -1027,29 +1036,30 @@ For future web and email reputation requests, please open a web and email reputa
     return true
 
   end
+  #this is part of a feature that isn't being used, and will need to be rebuilt at some point if it intends to be used
+  # after switching from BZ to JIRA
+  #def self.build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, problem, original_bug_id)
+  #  summary = "New Web Content Categorization Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-  def self.build_ips_bug(bugzilla_rest_session, new_entries_ips, new_entries_urls, problem, original_bug_id)
-    summary = "New Web Content Categorization Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+  #  full_description = <<~HEREDOC
+  #        IPs: #{new_entries_ips.keys}
+  #        URIs: #{new_entries_urls.keys}
+  #        Problem Summary: #{problem}
+  #  HEREDOC
 
-    full_description = <<~HEREDOC
-          IPs: #{new_entries_ips.keys}
-          URIs: #{new_entries_urls.keys}
-          Problem Summary: #{problem}
-    HEREDOC
+  #  bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
+  #  logger.debug "Creating bugzilla bug"
 
-    bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
-    logger.debug "Creating bugzilla bug"
+  #  research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-    research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+  #  linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
+  #  linked_bug_proxy.save!
 
-    linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
-    linked_bug_proxy.save!
+  #  new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
 
-    new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
+  #  research_bug_proxy
 
-    research_bug_proxy
-
-  end
+  #end
 
   def self.assign_wbnp_case(complaint_id)
     max_attempts = 10

@@ -38,11 +38,11 @@
           - if can?(:index, SenderDomainReputationDispute)
             %li{class: 'sdr-link'}
               %a{href: escalations_sdr_disputes_path + "?f=unassigned", id: 'sdr-icon-link'}
-                =inline_svg 'icon_sender_rep.svg'
+                =inline_svg 'icon_sender_domain_tix.svg'
           - if can?(:index, Complaint)
             %li{class: 'cat-link'}
               %a{href: escalations_webcat_complaints_path, id: 'cat-icon-link'}
-                =inline_svg 'icon_cat.svg'
+                =inline_svg 'icon_cat_grey.svg'
     %li{class: 'nav-item nav-users'}
       %a{href: escalations_users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
 
@@ -62,16 +62,30 @@
       %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
         = image_tag('layout/icon_documentation.svg', class: 'sidenav-icon', alt: 'Docs')
       %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav-icons'}
+        - if is_rule_user?
+          %li{class: 'doc-link'}
+            %a{href: '/rule_documents'}
+              =inline_svg 'icon_snort.svg'
         %li{class: 'wiki-link'}
           %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'}
-            =inline_svg 'confluence-brands.svg'
-        %li{class: 'github-link'}
+            =inline_svg 'icon_confluence.svg'
+        %li{class: 'release-link'}
           - if !@version.nil?
-            %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"}
-              =inline_svg 'confluence-brands.svg'
+            %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}", target: '_blank'}
+              =inline_svg 'icon_confluence.svg'
           - else
-            %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349"}
-              =inline_svg 'confluence-brands.svg'
+            %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349", target: '_blank'}
+              =inline_svg 'icon_confluence.svg'
+    %ul{class:'temp-links'}
+      %li{class: 'regex-link'}
+        %a{class:'icon-link', href: 'https://wwwint.vrt.sourcefire.com/offlineRegex101/', title:'Offline Regex 101', target:'_blank'}
+          =inline_svg 'icon_link.svg'
+      %li{class: 'chef-link'}
+        %a{class:'icon-link', href: 'https://wwwint.vrt.sourcefire.com/cyberchef/', title:'Cyber Chef', target:'_blank'}
+          =inline_svg 'icon_link.svg'
+      %li{class: 'ava-link'}
+        %a{class:'icon-link', href: 'https://avabuffers.vrt.sourcefire.com', title:'Avabuffers', target:'_blank'}
+          =inline_svg 'icon_link.svg'
 
   #sidenav-menu-div
     %ul{class: 'nav-container'}
@@ -86,7 +100,7 @@
           %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav'}
             - if is_rule_user?
               %li{class: 'ips-link'}
-                %a{href: '/bugs'} IPS
+                %a{href: '/bugs'} Snort Research Bugs
             - if can?(:read, Admin)
               %li{class: 'clam-link disabled-link'}
                 %a.disabled-link Clam
@@ -107,7 +121,7 @@
           %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav'}
             - if is_rule_user?
               %li{class: 'ips-link'}
-                %a{href: '/escalation_bugs'} IPS
+                %a{href: '/escalation_bugs'} Snort Escalations
             - if can?(:read, Admin)
               %li{class: 'clam-link disabled-link'}
                 %a.disabled-link Clam
@@ -142,14 +156,27 @@
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
           Docs
         %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav'}
+          - if is_rule_user?
+            %li{class: 'ruledocs-link'}
+              %a{href: '/rule_documents'}
+                Snort Rule Docs
           %li{class: 'wiki-link'}
-            %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'} Doc
-          %li{class: 'github-link'}
+            %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'} User Docs
+          %li{class: 'release-link'}
             - if !@version.nil?
-              %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}"} V #{@version}
+              %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}", target: '_blank'} V #{@version}
             - else
-              %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349"} Release Notes
-
+              %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349", target: '_blank'} Release Notes
+      %ul{class:'temp-links'}
+        %li{class: 'regex-link'}
+          %a{class:'temp-link-full', href: 'https://wwwint.vrt.sourcefire.com/offlineRegex101/', target: '_blank'}
+            Offline Regex 101
+        %li{class: 'chef-link'}
+          %a{class:'temp-link-full', href: 'https://wwwint.vrt.sourcefire.com/cyberchef/', target: '_blank'}
+            Cyber Chef
+        %li{class: 'ava-link'}
+          %a{class:'temp-link-full', href: 'https://avabuffers.vrt.sourcefire.com', target: '_blank'}
+            Avabuffers
 
   .copyright-area
     = image_tag('logo_talos_white.svg', class: 'talos-logo', alt: 'Talos Logo')
