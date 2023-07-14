@@ -1026,7 +1026,7 @@ $ ->
     data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
     data['submitteremail'] = $("#submitteremail-checkbox").is(':checked')
     data['assignee'] = $("#assignee-checkbox").is(':checked')
-    data['assignee'] = $("#assignee-checkbox").is(':checked')
+    data['channel'] = $("#channel-checkbox").is(':checked')
 
     std_msg_ajax(
       url: "/escalations/api/v1/escalations/user_preferences/update"
