@@ -77,7 +77,9 @@ class EnrichmentService::TaxonomyMap
         taxonomy[:entries] << {
             entry_id: entry.entry_id,
             name: entry.name[0]&.text,
+            short_name: entry.short_name[0]&.text,
             description: entry.description[0]&.text,
+            short_description: entry.short_description[0]&.text,
             mnemonic: entry.mnemonic
         }
       end
