@@ -1,16 +1,9 @@
-// context tags (tmi) tab for webrep & filerep
+// context tags tab for webrep & filerep
 .tab-context-tags {
   h2 {
     font-size: 11pt;
     font-weight: 700;
     padding: 3px 3px 10px;
-  }
-  .observable-container {
-    display: inline-block;
-    width: 150px;
-    text-overflow: ellipsis;  // ellipsis trick long urls
-    white-space: nowrap;
-    overflow: hidden;
   }
   .ctt-choose-an-entry {
     position: absolute;
@@ -48,6 +41,7 @@
       left: 0;
       bottom: 7px;
       font-size: 9pt;
+      color: #777;
     }
   }
 
@@ -60,13 +54,14 @@
       padding: 8px 10px;
       vertical-align: middle;
       background-position-y: center !important;  // override dt defaults
+      line-height: 10pt;
     }
     tbody td {
       padding: 8px 10px;
       line-height: 12pt;
-      vertical-align: middle;
+      vertical-align: top;
     }
-    .cb-tmi {
+    .tmi-cb {
       margin: 0;
       position: relative;
       top: 2px;
@@ -74,21 +69,61 @@
     }
   }
   .tmi-table {
-    margin-bottom: 20px;
+    margin-bottom: 40px;
   }
-  .tmi-cell-suppressed {
+  .tmi-suppressed {
     font-weight: 600;
+    text-transform: uppercase;
   }
-  .tmi-red-cell {
+  .tmi-suppressed, .tmi-suppression-source, .tmi-suppression-platform, .tmi-suppression-date {
+    width: 6%;
+  }
+  .tmi-suppression-platform, .tmi-tag-type {
+    text-transform: capitalize;
+  }
+  .tmi-taxonomy, .tmi-report-date, .tmi-suppression-date {
+    white-space: nowrap;
+  }
+  .tmi-red {
     background-color: #f8bbbb;
   }
-  .tmi-gray-cell {
+  .tmi-gray {
     background-color: #f6f6f6;
   }
-  .enrichment-missing, .enrichment-error,
-  .prevalence-missing, .prevalence-error {
-    font-size: 9pt;
-    padding: 5px 3px 10px;
+  .enrich-cell-context, .enrich-cell-taxonomy, .enrich-cell-name, .enrich-cell-external-references {
+    width: 12%;
+  }
+  .enrich-cell-description {
+    width: 52%;
+  }
+  .filerep-enrich-cell-name {
+    width: 20%;
+  }
+  .filerep-enrich-cell-description {
+    width: 70%;
+  }
+  .enrich-cell-taxonomy, .enrich-cell-name {
+    white-space: nowrap;
+  }
+  .enrich-cell-description p, .filerep-enrich-cell-description p {
+    max-height: 220px;  // desc can get huge, use overflow scroll if so
+    overflow-y: auto;
+    white-space: pre-wrap;  // retain formatting from source
+    padding-right: 20px;
+  }
+  .enrich-cell-external-references a {
+    text-decoration: underline;
+  }
+  .filerep-enrich-cell-description p {
+    margin-right: 40px;
+  }
+  .observable-container {
+    display: inline-block;
+    //width: 160px;
+    text-overflow: ellipsis;  // ellipsis trick long urls
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: middle;
   }
   .data-report-table {
     font-size: 9pt;
@@ -155,7 +190,6 @@
   }
 }
 
-
 .dropdown.open .show-col-context-tags {
   background-image: url(image_path('icon_columns_white.svg'));
 }
@@ -175,13 +209,7 @@
   }
 }
 
-// prevalence table wrapper div needs much less width
-.prevalence-area {
-  width: 50%;
-  min-width: 800px;
-}
-
-// ensure bg color if table width extends off page on context tags tab
+// ensure bg color if tmi, enrich, or prev table width extends off page on context tags tab
 .ctt-table {
   background-color: #fff;
 }

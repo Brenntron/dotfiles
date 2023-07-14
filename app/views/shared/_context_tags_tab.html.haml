@@ -8,128 +8,96 @@
       %span.ctt-entry-label
         Entry:
       -# options will be generated from js into select below
-      %select.ctt-entry-select{onchange: "setup_enrichment_section_webrep('update');"}
+      %select.ctt-entry-select
 
+
+    -# tmi data for webrep and filerep
     %h2 Tag Management Interface
-    .toolbar.tmi-toolbar
-      %div
-        %label.toolbar-section-label
-          Show
-        %span.dropdown
-          %button#tmi-columns-button.toolbar-button.show-col-context-tags.dropdown-toggle{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-            %span.toolbar-button-text
-              Show/Hide Columns
+    .tmi-area
+      .tmi-main-content.hidden
 
-          .dropdown-menu.toolbar-dropdown.tmi-columns-dropdown{'aria-labelledby': 'tmi-columns-button'}
-            %ul
-              %li.toggle-col-tmi{'data-column':'1'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-observable-checkbox'} Observable
-              %li.toggle-col-tmi{'data-column':'2'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-tag-name-checkbox'} Tag Name
-              %li.toggle-col-tmi{'data-column':'3'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-mnemonic-checkbox'} Mnemonic
-              %li.toggle-col-tmi{'data-column':'4'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-tag-type-checkbox'} Tag Type
-              %li.toggle-col-tmi{'data-column':'5'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-taxonomy-checkbox'} Taxonomy
-              %li.toggle-col-tmi{'data-column':'6'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-source-checkbox'} Source
-            %ul
-              %li.toggle-col-tmi{'data-column':'7'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-processor-checkbox'} Processor
-              %li.toggle-col-tmi{'data-column':'8'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-creation-date-checkbox'} Creation Date
-              %li.toggle-col-tmi{'data-column':'9'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-suppressed-checkbox'} Suppressed?
-              %li.toggle-col-tmi{'data-column':'10'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-suppression-source-checkbox'} Suppression Source
-              %li.toggle-col-tmi{'data-column':'11'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-suppression-platform-checkbox'} Suppression Platform
-              %li.toggle-col-tmi{'data-column':'12'}
-                %input{type: 'checkbox', checked: true, id: 'tmi-suppression-date-checkbox'} Suppression Date
+        .toolbar.tmi-toolbar
+          %div
+            %label.toolbar-section-label
+              Show
+            %span.dropdown
+              %button#tmi-columns-button.toolbar-button.show-col-context-tags.dropdown-toggle{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                %span.toolbar-button-text
+                  Show/Hide Columns
 
-      %div
-        %label.toolbar-section-label View
-        %span.context-tags-toggle.suppressed-context-tags-toggle
-          %input.cb-suppressed-tags{type:'checkbox', checked: true}
-          %span.toggle-label Suppressed Tags
-        %span.context-tags-toggle.unsuppressed-context-tags-toggle
-          %input.cb-suppressed-tags{type:'checkbox', checked: true}
-          %span.toggle-label Unsuppressed Tags
+              .dropdown-menu.toolbar-dropdown.tmi-columns-dropdown{'aria-labelledby': 'tmi-columns-button'}
+                %ul
+                  %li.toggle-col-tmi{'data-column':'1'}
+                    %input{type: 'checkbox', checked: true, id: 'tmi-observable-checkbox'} Observable
+                  %li.toggle-col-tmi{'data-column':'2'}
+                    %input{type: 'checkbox', checked: true, id: 'tmi-tag-name-checkbox'} Tag Name
+                  %li.toggle-col-tmi{'data-column':'3'}
+                    %input{type: 'checkbox', checked: true, id: 'tmi-mnemonic-checkbox'} Mnemonic
+                  %li.toggle-col-tmi{'data-column':'4'}
+                    %input{type: 'checkbox', checked: true, id: 'tmi-taxonomy-checkbox'} Taxonomy
+                  %li.toggle-col-tmi{'data-column':'5'}
+                    %input{type: 'checkbox', checked: true, id: 'tmi-source-checkbox'} Source
+                  %li.toggle-col-tmi{'data-column':'6'}
+                    %input{type: 'checkbox', checked: true, id: 'tmi-processor-checkbox'} Processor
+                %ul
+                  %li.toggle-col-tmi{'data-column':'7'}
+                    %input{type: 'checkbox', checked: true, id: 'tmi-report-date-checkbox'} Report Date
+                  %li.toggle-col-tmi{'data-column':'8'}
+                    %input{type: 'checkbox', checked: true, id: 'tmi-suppressed-checkbox'} Suppressed?
+                  %li.toggle-col-tmi{'data-column':'9'}
+                    %input{type: 'checkbox', checked: true, id: 'tmi-suppression-source-checkbox'} Suppression Source
+                  %li.toggle-col-tmi{'data-column':'10'}
+                    %input{type: 'checkbox', checked: true, id: 'tmi-suppression-platform-checkbox'} Suppression Platform
+                  %li.toggle-col-tmi{'data-column':'11'}
+                    %input{type: 'checkbox', checked: true, id: 'tmi-suppression-date-checkbox'} Suppression Date
+          %div
+            %label.toolbar-section-label View
+            %span.context-tags-toggle.suppressed-context-tags-toggle
+              %input.cb-suppressed-tags{type:'checkbox', checked: true}
+              %span.toggle-label Suppressed Tags
+            %span.context-tags-toggle.unsuppressed-context-tags-toggle
+              %input.cb-suppressed-tags{type:'checkbox', checked: true}
+              %span.toggle-label Unsuppressed Tags
+          %div
+            %label.toolbar-section-label Actions
+            %button.toolbar-button.add-context-tag-button
+              %span.toolbar-button-text Add Tag
+            %button.toolbar-button.suppress-context-tag-button
+              %span.toolbar-button-text Suppress Tag
+            %button.toolbar-button.unsuppress-context-tag-button
+              %span.toolbar-button-text Unsuppress Tag
+            %button.toolbar-button.remove-context-tag-button
+              %span.toolbar-button-text Remove Tag
 
-      %div
-        %label.toolbar-section-label Actions
-        %button.toolbar-button.add-context-tag-button
-          %span.toolbar-button-text Add Tag
-        %button.toolbar-button.suppress-context-tag-button
-          %span.toolbar-button-text Suppress Tag
-        %button.toolbar-button.unsuppress-context-tag-button
-          %span.toolbar-button-text Unsuppress Tag
-        %button.toolbar-button.remove-context-tag-button
-          %span.toolbar-button-text Remove Tag
+        -# tmi dt on both webrep and filerep
+        %table.ctt-table#tmi-dt.tmi-table
+          %thead
+            %tr
+              %th
+                %input.tmi-cb-select-all{type:'checkbox'}
+              %th Observable
+              %th Tag Name
+              %th Mnemonic
+              %th Taxonomy
+              %th Source
+              %th Processor
+              %th Report Date
+              %th Suppressed?
+              %th Suppression Source
+              %th Suppression Platform
+              %th Suppression Date
+          %tbody.tmi-tbody
 
-
-
-    -# tag management interface datatable used on both webrep and filerep
-    %table.ctt-table#webrep-tmi-dt.webrep-tmi-table
-      %thead
-        %tr
-          %th
-            %input.cb-tmi-select-all{type:'checkbox'}
-          %th Observable
-          %th Tag Name
-          %th Mnemonic
-          %th Tag Type
-          %th Taxonomy
-          %th Source
-          %th Processor
-          %th Creation Date
-          %th Suppressed?
-          %th Suppression Source
-          %th Suppression Platform
-          %th Suppression Date
-      %tbody
-        %tr.placeholder-row
-          %td.tmi-cell-cb
-            %input.cb-tmi{type:'checkbox'}
-          %td.tmi-cell-observable
-            %span.observable-container.esc-tooltipped{title: "example.com"}
-              example.com
-          %td.tmi-cell-tag-name Internet Accessible Device
-          %td.tmi-cell-mnemonic Testing
-          %td.tmi-cell-tag-type Techniques
-          %td.tmi-cell-taxonomy MITRE ATT&CK
-          %td.tmi-cell-source test_name
-          %td.tmi-cell-processor Testing
-          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
-          %td.tmi-cell-suppressed.tmi-red-cell NO
-          %td.tmi-cell-suppression-source.tmi-gray-cell
-          %td.tmi-cell-suppression-platform.tmi-gray-cell
-          %td.tmi-cell-suppression-date.tmi-gray-cell
-        %tr.placeholder-row
-          %td.tmi-cell-cb
-            %input.cb-tmi{type:'checkbox'}
-          %td.tmi-cell-observable
-            %span.observable-container.esc-tooltipped{title: "example.com/example/asdfjlakaslkdfalksdjf/asdflkjasdklf"}
-              example.com/example/asdfjlaksdfllaskdfalsdkfjalsdkfjasdf/asdfljasdlfjklasjdklfjlsdaflj-asldkfjasdkljfasdf
-          %td.tmi-cell-tag-name Questionable
-          %td.tmi-cell-mnemonic Example
-          %td.tmi-cell-tag-type Techniques
-          %td.tmi-cell-taxonomy MITRE ATT&CK
-          %td.tmi-cell-source test_name
-          %td.tmi-cell-processor Example
-          %td.tmi-cell-creation-date 2023-03-03 12:39:32 UTC
-          %td.tmi-cell-suppressed YES
-          %td.tmi-cell-suppression-source Example
-          %td.tmi-cell-suppression-platform Example
-          %td.tmi-cell-suppression-date 2023-02-16 18:39:43 UTC
+      %p.tmi-loader.ctt-loader
+        = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
+        %span.loader-msg Loading...
 
 
     -# enrichment data for webrep and filerep
     %h2 Enrichment Service
     .enrichment-area
 
-      %table#webrep-enrichment-dt.ctt-table.enrichment-table.webrep-enrichment-table.hidden
+      %table#enrichment-dt.ctt-table.enrichment-table.hidden
         %thead
           %tr
             %th Context
@@ -143,17 +111,12 @@
         = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
         %span.loader-msg Loading...
 
-      %p.enrichment-missing.missing-data.hidden
-        No enrichment data found.
-      %p.enrichment-error.missing-data.hidden
-        Error gathering data.
-
 
     -# prevalence data for webrep and filerep
     %h2 Prevalence
     .prevalence-area
 
-      %table#webrep-prevalence-dt.ctt-table.prevalence-table.webrep-prevalence-table.hidden
+      %table#prevalence-dt.ctt-table.prevalence-table.hidden
         %thead
           %th Dataset
           %th Count
@@ -164,8 +127,3 @@
       %p.prevalence-loader.ctt-loader
         = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
         %span.loader-msg Loading...
-
-      %p.prevalence-missing.missing-data.hidden
-        No prevalence data found.
-      %p.prevalence-error.missing-data.hidden
-        Error gathering data.
