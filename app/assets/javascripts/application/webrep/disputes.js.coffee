@@ -714,7 +714,7 @@ window.bulk_auto_resolve_tickets = (current_user) ->
     data = { user_id: current_user, dispute_id: dispute_id }
     dispute_promises.push(data)
 
-  # make all autoresolve calls, messaging function only gets called after all promises resolve
+  # make all auto resolve calls, messaging function only gets called after all promises resolve
   Promise.allSettled( dispute_promises.map( (data) -> return autoresolve(data)) ).then( (result)-> auto_resolve_msg(result) )
 
 window.autoresolve = (data) ->
