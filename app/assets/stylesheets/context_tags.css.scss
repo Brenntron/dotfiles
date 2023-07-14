@@ -268,7 +268,7 @@
     padding: 15px;
   }
   .tag-label {
-    padding: 8px 2px;
+    padding: 6px 2px;
     font-weight: 700;
   }
   .tag-entries-area {
@@ -276,12 +276,13 @@
     max-height: 350px;
     overflow-y: auto;
   }
-  .tag-entry {
-    margin-bottom: 4px;
-  }
-  .tag-entry-name {
+  .tag-entry-row {
     padding: 4px;
-    font-size: 9pt;
+    font-size: 8.5pt;
+  }
+  .tag-cb-col {
+    width: 20px;
+    padding: 0 !important;
   }
   .context-tags-search {
     font-family: 'Open Sans', sans-serif;

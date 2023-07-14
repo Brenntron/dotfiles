@@ -717,26 +717,33 @@ window.add_context_tags_dialog = () ->
           $('.taxonomy-select').append(taxonomy_option)
 
           # taxonomy div - start it
-          taxonomy_div = "<div class='taxonomy-div taxonomy-div-#{taxonomy_id} hidden'>"
+          taxonomy_table = "<table class='taxonomy-table taxonomy-table-#{taxonomy_id} hidden'>"
 
           # taxonomy div - add all the entries for this taxonomy
           $(entries).each ->
-            { entry_id, name } = this
-            entry_div =
-              "<div class='tag-entry tag-#{taxonomy_id}-#{entry_id}'><input class='tag-entry-cb' type='checkbox'><span class='tag-entry-name'>#{name}</span></div>"
+            { entry_id, name, description } = this
+
+            if !description then description = ''
+
+            entry_tr =
+              "<tr class='tag-entry-row tag-#{taxonomy_id}-#{entry_id}'>
+                 <td class='tag-cb-col'><input class='tag-entry-cb' type='checkbox'></td>
+                 <td class='tag-name-col'><span class='tag-entry-name'>#{name}</span></td>
+                 <td class='tag-desc-col'><span class='tag-entry-name'>#{description}</span></td>
+               </tr>"
 
             # add entry div to taxonomy div
-            taxonomy_div += entry_div
+            taxonomy_table += entry_tr
 
           # entry divs are done, close up the taxonomy div
-          taxonomy_div += "</div>"
+          taxonomy_table += "</table>"
 
           # add taxonomy div to dom (will be hidden by default)
-          $('.tag-entries-area').append(taxonomy_div)
+          $('.tag-entries-area').append(taxonomy_table)
 
         # open the dialog with the default entries showing
         curr_id = $('.taxonomy-select option:selected').attr('data-id')
-        $(".taxonomy-div-#{curr_id}").removeClass('hidden')
+        $(".taxonomy-table-#{curr_id}").removeClass('hidden')
 
         # add flag to dom that the dialog is now built
         $('.tab-context-tags').addClass('tags-dialog-built')
@@ -745,8 +752,15 @@ window.add_context_tags_dialog = () ->
 
 
 $ ->
+  # taxonomy select change in dialog
   $('.taxonomy-select').change ->
+    $('.tag-entry-cb').prop('checked', false)
     selected_id = $(this).find('option:selected').attr('data-id')
-    $(".taxonomy-div").addClass('hidden')
-    $(".taxonomy-div-#{selected_id}").removeClass('hidden')
+    $(".taxonomy-table").addClass('hidden')
+    $(".taxonomy-table-#{selected_id}").removeClass('hidden')
 
+  # tag search/filter in dialog
+  $('.context-tags-search').on 'keyup', ->
+    search_string = $(this).val().toLowerCase()
+    $('.taxonomy-table tr').filter ->
+      $(this).toggle $(this).text().toLowerCase().indexOf(search_string) > -1
