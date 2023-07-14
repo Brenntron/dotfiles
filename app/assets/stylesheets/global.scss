@@ -11124,6 +11124,9 @@ button.secondary.view-report-external-button {
     line-height: 1.65em;
   }
 }
+
+.hidden-selectize-dropdown .selectize-dropdown{ display: none!important; }
+
 #report-tab-content{
   .toolbar-select-wrapper input[type='checkbox'] {
     margin-top: 3px;

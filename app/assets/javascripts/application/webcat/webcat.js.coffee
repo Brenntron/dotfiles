@@ -867,6 +867,7 @@ $ ->
 
     $('#complaint-input').selectize {
       persist: false,
+      createOnBlur: true,
       create: (input) ->
         {
           value: input
@@ -894,6 +895,7 @@ $ ->
     $('#entryid-input').selectize {
       delimiter: ',',
       persist: false,
+      createOnBlur: true,
       create: (input) ->
         {
           value: input
@@ -907,6 +909,7 @@ $ ->
     $('#complaintid-input').selectize {
       delimiter: ',',
       persist: false,
+      createOnBlur: true,
       create: (input) ->
         {
           value: input
@@ -920,6 +923,7 @@ $ ->
     $('#jiraid-input').selectize {
       delimiter: ',',
       persist: false,
+      createOnBlur: true,
       create: (input) ->
         {
           value: input
@@ -927,7 +931,9 @@ $ ->
         }
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
+        this.close()
       onBlur: () ->
+        this.close()
         window.toggle_selectize_layer(this, 'false')
     }
 
