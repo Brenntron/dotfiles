@@ -550,9 +550,6 @@ window.tmi_dt_init = () ->
         sortable: false
       }
     ]
-  # set a dom flag that dts have been inited, so we can re-init properly on change entry
-  if $('.tab-context-tags').hasClass('tmi-dt-inited') == false
-    $('.tab-context-tags').addClass('tmi-dt-inited')
 
   # show or hide columns in tmi table
   $('.toggle-col-tmi').each ->
@@ -574,7 +571,7 @@ window.enrich_prev_dt_init = () ->
   $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # remove all loaders
 
   # dt inits for enrich and prev dts for webrep, and only if not already inited
-  if $('.tab-ctt-webrep').length > 0 && !$('.tab-context-tags').hasClass('enrich-dt-inited')
+  if $('.tab-ctt-webrep').length > 0
     $('#enrichment-dt').DataTable
       paging: false
       searching: false
@@ -584,9 +581,6 @@ window.enrich_prev_dt_init = () ->
       paging: false
       searching: false
       info: false
-
-    # set a dom flag that dts have been inited, so we can re-init properly on change entry
-    $('.tab-context-tags').addClass('enrich-dt-inited')
 
 
 
