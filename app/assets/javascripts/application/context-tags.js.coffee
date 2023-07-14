@@ -10,19 +10,14 @@ window.tmi_ajax_webrep = (query_item) ->
     when 'domain' then data = { domain: query_item }
     when 'sha' then data = { sha: query_item }
     when 'url' then data = { url: query_item }
-    else
-      data = { url: query_item }
 
   std_msg_ajax
     url: '/escalations/api/v1/escalations/cloud_intel/tag_management/read_observable'
     method: 'GET'
     data: data
     success: (response) ->
-      # REMOVE BELOW WHEN TMI IS DONE.
-#      console.clear()
 #      console.log response
-
-      observable = tag_name = mnemonic = taxonomy = source = processor = report_date = suppressed = suppression_source = suppression_platform = suppression_date = ''
+#      observable = tag_name = mnemonic = taxonomy = source = processor = report_date = suppressed = suppression_source = suppression_platform = suppression_date = ''
 
       # list of observables
       { items } = response
@@ -126,11 +121,11 @@ window.tmi_ajax_webrep = (query_item) ->
             # created ts is unique enough for now, fix this though to something even more unique
             $('.tmi-tbody').append(report_tr)
 
-
-    error: (response) ->
-      console.clear()
-      console.log 'ERROR ON TMI LOOKUP'
-      console.log response
+#    error: (response) ->
+#      std_msg_error("Error", [response.responseJSON], reload: false)
+#      console.clear()
+#      console.log 'ERROR ON TMI LOOKUP'
+#      console.log response
 
 
 
@@ -338,7 +333,6 @@ window.create_webrep_prevalence_section = (prevalence_data) ->
 
 # FILEREP ENHANCEMENT
 # FILEREP ENHANCEMENT
-# part 1
 window.enrich_ajax_filerep = (sha256_hash) ->
   std_msg_ajax(
     method: 'GET'
@@ -575,7 +569,7 @@ window.tmi_enrich_prev_dt_inits = () ->
       paging: false
       searching: false
       info: false
-      order: [[ 1, 'asc']]
+      order: [[ 7, 'desc']]
       columnDefs: [
         {
           targets: [ 0 ]
@@ -601,12 +595,6 @@ window.tmi_enrich_prev_dt_inits = () ->
         $(checkbox).prop('checked', !checkbox.prop('checked'))
   , 2000
 
-
-  # FIX THIS
-  # extraneous dt tmi error may appear at this point, remove that if exists
-  #  if $('.tmi-tbody .tmi-tr').length > 0
-  #    $('.tmi-tbody .dataTables_empty').remove()
-  #  $('.tmi-tbody .dataTables_empty').remove()
 
   # dt init the enrich dt
   $('#webrep-enrichment-dt').DataTable
