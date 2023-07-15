@@ -62,11 +62,11 @@
             %label.toolbar-section-label Actions
             %button.toolbar-button.add-context-tag-button.dialog-button{onclick: 'add_context_tags_dialog();'}
               %span.toolbar-button-text Add Tag
-            %button.toolbar-button.suppress-context-tag-button
+            %button.toolbar-button.suppress-context-tag-button.disabled{disabled:'disabled'}
               %span.toolbar-button-text Suppress Tag
-            %button.toolbar-button.unsuppress-context-tag-button
+            %button.toolbar-button.unsuppress-context-tag-button.disabled{disabled:'disabled'}
               %span.toolbar-button-text Unsuppress Tag
-            %button.toolbar-button.remove-context-tag-button
+            %button.toolbar-button.remove-context-tag-button.disabled{disabled:'disabled'}
               %span.toolbar-button-text Remove Tag
 
         -# tmi dt on both webrep and filerep
@@ -139,19 +139,20 @@
           Taxonomy
         -# context tags js will generate options below
         %select.taxonomy-select
-      .col-xs-6
-        %label.tag-label
-          Tag Search
-        %input.context-tags-search
+      -#.col-xs-6
+        -#%label.tag-label
+        -#  Tag Search
+        -#%input.context-tags-search
 
     .row.tags-content-row
       .col-xs-12
-        %label.tag-label
-          Results
+        -#%label.tag-label
+        -#  Results
+
         -# all entries generated into a table into below div
         .tag-entries-area
 
     .row.save-button-row
       .col-xs-12.text-center
         %button.secondary Cancel
-        %button.primary Save
+        %button.primary Add Tags to Observable

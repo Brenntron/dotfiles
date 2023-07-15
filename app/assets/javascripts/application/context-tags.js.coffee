@@ -637,21 +637,15 @@ $ ->
 
 
 
-
-
-
-
-
-
 # add tags dialog stuff goes here
 $ ->
   # this just inits the dialog html, the props are used when dialog() is called later
   $('#add-context-tags-dialog').dialog(
     autoOpen: false
     dialogClass: 'add-context-tags-dialog'
-    width: 600
+    width: 1000
     height: 600
-    minWidth: 600
+    minWidth: 800
     minHeight: 400
   )
 
@@ -670,7 +664,7 @@ window.add_context_tags_dialog = () ->
       method: 'GET'
       success: (response) ->
         console.clear()
-        console.log 'TAG TREE DATA BELOW'
+        console.log 'TAXONOMY DATA BELOW'
         console.log response
 
         { taxonomies } = response  # all the top-level nodes or taxonomies
@@ -678,32 +672,45 @@ window.add_context_tags_dialog = () ->
         # for each taxonomy, add an <option> and a <div> with taxonomy entries
         $(taxonomies).each (i, val) ->
           { name, entries, taxonomy_id } = this
+          taxonomy_name = name
 
           # taxonomy select - add an <option> first
           taxonomy_option = "<option class='taxonomy-#{taxonomy_id}' data-id='#{taxonomy_id}'>#{name}</option>"
           $('.taxonomy-select').append(taxonomy_option)
 
           # taxonomy div - start it
-          taxonomy_table = "<table class='taxonomy-table taxonomy-table-#{taxonomy_id} hidden'>"
+          taxonomy_table =
+            "<table class='taxonomy-table taxonomy-table-#{taxonomy_id} hidden'>
+               <thead><th></th><th>Tag Name</th><th>Taxonomy</th><th>Description</th></thead><tbody>"
+
 
           # taxonomy div - add all the entries for this taxonomy
           $(entries).each ->
-            { entry_id, name, description } = this
+            { entry_id, name, description, mnemonic, short_description, short_name } = this
 
-            if !description then description = ''
+            # if short desc exists, the regular desc is too wordy, use short. will be fqn for mitre.
+#            if short_description
+#              description = short_description
+
+            if taxonomy_name.includes('MITRE') && short_description
+              description = short_description
+
+            if !description
+              description = ''
 
             entry_tr =
               "<tr class='tag-entry-row tag-#{taxonomy_id}-#{entry_id}'>
                  <td class='tag-cb-col'><input class='tag-entry-cb' type='checkbox'></td>
-                 <td class='tag-name-col'><span class='tag-entry-name'>#{name}</span></td>
-                 <td class='tag-desc-col'><span class='tag-entry-name'>#{description}</span></td>
+                 <td class='tag-name-col'><p class='tag-entry-name'>#{name}</p></td>
+                 <td class='tag-taxonomy-col'><p class='tag-entry-name'>#{taxonomy_name}</p></td>
+                 <td class='tag-desc-col'><p class='tag-entry-description'>#{description}</p></td>
                </tr>"
 
             # add entry div to taxonomy div
             taxonomy_table += entry_tr
 
           # entry divs are done, close up the taxonomy div
-          taxonomy_table += "</table>"
+          taxonomy_table += "</tbody></table>"
 
           # add taxonomy div to dom (will be hidden by default)
           $('.tag-entries-area').append(taxonomy_table)
@@ -712,9 +719,17 @@ window.add_context_tags_dialog = () ->
         curr_id = $('.taxonomy-select option:selected').attr('data-id')
         $(".taxonomy-table-#{curr_id}").removeClass('hidden')
 
+
+        # INIT THE DT - ONE THE FIRST TAXONOMY FOR NOW
+        # INIT THE DT - ONE THE FIRST TAXONOMY FOR NOW
+        # initial-load datatable
+        $('.taxonomy-table-2').DataTable
+          dom: 'lftpir'
+          order: [[1, 'asc'] ]
+          pageLength: 50
+
         # add flag to dom that the dialog is now built
         $('.tab-context-tags').addClass('tags-dialog-built')
-
 
 
 
@@ -725,6 +740,20 @@ $ ->
     selected_id = $(this).find('option:selected').attr('data-id')
     $(".taxonomy-table").addClass('hidden')
     $(".taxonomy-table-#{selected_id}").removeClass('hidden')
+
+    # change the select to reset the dt init
+#    $('.taxonomy-table').DataTable().destroy()
+    $('.taxonomy-table-2').DataTable().destroy()
+    $('.dialog-content-wrapper .dataTables_wrapper').remove()
+
+
+    # FIX THIS
+    # FIX THIS
+    $('.taxonomy-table:visible').DataTable
+      dom: 'lftpir'
+      order: [[1, 'asc'] ]
+      pageLength: 50
+
 
   # tag search/filter in dialog
   $('.context-tags-search').on 'keyup', ->
