@@ -637,20 +637,6 @@ $ ->
 
 
 
-# add tags dialog stuff goes here
-$ ->
-  # this just inits the dialog html, the props are used when dialog() is called later
-  $('#add-context-tags-dialog').dialog(
-    autoOpen: false
-    dialogClass: 'add-context-tags-dialog'
-    width: 1000
-    height: 600
-    minWidth: 800
-    minHeight: 400
-  )
-
-
-
 # initialize and open the tags dialog
 window.add_context_tags_dialog = () ->
   # open the dialog
@@ -681,28 +667,26 @@ window.add_context_tags_dialog = () ->
           # taxonomy div - start it
           taxonomy_table =
             "<table class='taxonomy-table taxonomy-table-#{taxonomy_id} hidden'>
-               <thead><th></th><th>Tag Name</th><th>Taxonomy</th><th>Description</th></thead><tbody>"
-
+               <thead><th></th><th>Tag Name</th><th>Mnemonic</th><th>Taxonomy</th><th>Description</th></thead><tbody>"
 
           # taxonomy div - add all the entries for this taxonomy
           $(entries).each ->
             { entry_id, name, description, mnemonic, short_description, short_name } = this
 
-            # if short desc exists, the regular desc is too wordy, use short. will be fqn for mitre.
-#            if short_description
-#              description = short_description
-
+            # mitre tags need fqn to appear in description, fqn is in short desc
             if taxonomy_name.includes('MITRE') && short_description
-              description = short_description
+              description = short_description + '\n\r' + description
 
-            if !description
-              description = ''
+            if !description then description = ''
 
+            # id for an entry is taxonomy_id and entry_id combined, e.g. tax 3 + entry 127 == id of 3-127
             entry_tr =
               "<tr class='tag-entry-row tag-#{taxonomy_id}-#{entry_id}'>
-                 <td class='tag-cb-col'><input class='tag-entry-cb' type='checkbox'></td>
+                 <td class='tag-cb-col'>
+                   <input class='tag-entry-cb tag-entry-cb-#{taxonomy_id}-#{entry_id}' type='checkbox' data-entry-name='#{name}' data-entry-id='#{entry_id}' data-tax-id='#{taxonomy_id}' data-tax-name='#{taxonomy_name}'></td>
                  <td class='tag-name-col'><p class='tag-entry-name'>#{name}</p></td>
-                 <td class='tag-taxonomy-col'><p class='tag-entry-name'>#{taxonomy_name}</p></td>
+                 <td class='tag-mnemonic-col'><p class='tag-entry-mnemonic'>#{mnemonic}</p></td>
+                 <td class='tag-taxonomy-col'><p class='tag-entry-taxonomy'>#{taxonomy_name}</p></td>
                  <td class='tag-desc-col'><p class='tag-entry-description'>#{description}</p></td>
                </tr>"
 
@@ -713,50 +697,136 @@ window.add_context_tags_dialog = () ->
           taxonomy_table += "</tbody></table>"
 
           # add taxonomy div to dom (will be hidden by default)
-          $('.tag-entries-area').append(taxonomy_table)
+          $('.tag-entries-area').append(taxonomy_table)  # ADD TO DOM
+
+
 
         # open the dialog with the default entries showing
-        curr_id = $('.taxonomy-select option:selected').attr('data-id')
-        $(".taxonomy-table-#{curr_id}").removeClass('hidden')
+        curr_taxonomy_id = $('.taxonomy-select option:selected').attr('data-id')
 
-
-        # INIT THE DT - ONE THE FIRST TAXONOMY FOR NOW
-        # INIT THE DT - ONE THE FIRST TAXONOMY FOR NOW
-        # initial-load datatable
-        $('.taxonomy-table-2').DataTable
+        # DT INITING ALL THE DTS AT ONCE IS ABOUT 5-7 SECONDS, TOO SLOW!!  ONLY DT INIT ONE AT A TIME!!
+        # INITIAL LOAD - DT INIT the first
+        $(".taxonomy-table-#{curr_taxonomy_id}").DataTable
           dom: 'lftpir'
-          order: [[1, 'asc'] ]
-          pageLength: 50
+          columnDefs: [
+            {
+              targets: [0]
+              orderable: false
+              sortable: false
+            }
+          ]
+          order: [[1, 'asc']]
+          pageLength: 10
+          language: {
+            search: "_INPUT_"
+            searchPlaceholder: "Search inside taxonomy"
+          }
+
+        # show table within dt wrapper
+        $(".taxonomy-table-#{curr_taxonomy_id}").removeClass('hidden')
+
+
+        # DONE WITH INITIAL LOAD
+
+
+
 
         # add flag to dom that the dialog is now built
         $('.tab-context-tags').addClass('tags-dialog-built')
 
 
+        # TAG PREVIEW CLICK HANDLERS AND STUFF
+        # TAG PREVIEW CLICK HANDLERS AND STUFF
+        # TAG PREVIEW CLICK HANDLERS AND STUFF
+
+        # click a cb to show the preview area, using document trick for click handler
+        $('.tag-entry-cb').click ->
+          taxonomy_id = $(this).attr('data-tax-id')
+          taxonomy_name = $(this).attr('data-tax-name')
+          tag_name = $(this).attr('data-entry-name')
+          tag_id = $(this).attr('data-entry-id')
+          full_id = "#{taxonomy_id}-#{tag_id}"
+
+          # tag cb is clicked and selected?
+          if $(this).prop('checked') == true
+            $('.preview-tag-area').removeClass('hidden')
+
+            tag_entry = "<div class='preview-tag preview-tag-#{full_id}'><span class='preview-tag-name'><p>#{taxonomy_name}::#{tag_name}</p></span><span class='preview-tag-close' data-full-id='#{full_id}'></span></div>"
+
+            $('.preview-tag-area').append(tag_entry)
+
+
+            # PREVIEW TAG CLOSE BUTTON NOW EXISTS IN DOM, ATTACH HANDLER
+            # on close click, uncheck the id for that cb
+            $('.preview-tag-close').click ->
+              $(this).closest('.preview-tag').remove()  # remove from dom first
+
+              full_id = $(this).attr('data-full-id')  # uncheck the cb after
+              $(".tag-entry-cb-#{full_id}").prop('checked', false)
+
+              if $('.preview-tag-area .preview-tag').length == 0
+                $('.preview-tag-area').addClass('hidden')
+
+
+
+          # tag cb is clicked and not selected?
+          else if $(this).prop('checked') == false
+            $(".preview-tag-#{full_id}").remove()
+
+            if $('.preview-tag-area .preview-tag').length == 0
+              $('.preview-tag-area').addClass('hidden')
+
+
+
 
 $ ->
-  # taxonomy select change in dialog
+  # cancel button for dialog
+  $('.tags-cancel-button').click ->
+    $('#add-context-tags-dialog').dialog('close')
+
+
+
+
+  # SELECT CHANGE
+  # SELECT CHANGE
+  # SELECT CHANGE
   $('.taxonomy-select').change ->
     $('.tag-entry-cb').prop('checked', false)
-    selected_id = $(this).find('option:selected').attr('data-id')
     $(".taxonomy-table").addClass('hidden')
+    $(".tags-dialog .dataTables_wrapper").addClass('hidden')  # hide other dt wrappers inside the dialog
+
+    selected_id = $(this).find('option:selected').attr('data-id')
+
+    # tax table may or may not already be dt-inited, show table + dt wrapper, dt initing all tables at once is too slow
+    $(".taxonomy-table-#{selected_id}").closest('.dataTables_wrapper').removeClass('hidden')
     $(".taxonomy-table-#{selected_id}").removeClass('hidden')
 
-    # change the select to reset the dt init
-#    $('.taxonomy-table').DataTable().destroy()
-    $('.taxonomy-table-2').DataTable().destroy()
-    $('.dialog-content-wrapper .dataTables_wrapper').remove()
+    # selected taxonomy - init the dt for that one unless already dt-ed
+    unless $(".taxonomy-table-#{selected_id}").hasClass('dataTable')
+      $(".taxonomy-table-#{selected_id}").DataTable
+        dom: 'lftpir'
+        columnDefs: [
+          {
+            targets: [0]
+            orderable: false
+            sortable: false
+          }
+        ]
+        order: [[1, 'asc']]
+        pageLength: 10
+        language: {
+          search: "_INPUT_"
+          searchPlaceholder: "Search inside taxonomy"
+        }
 
 
-    # FIX THIS
-    # FIX THIS
-    $('.taxonomy-table:visible').DataTable
-      dom: 'lftpir'
-      order: [[1, 'asc'] ]
-      pageLength: 50
+# add tags dialog stuff jquery init here
+$ ->
+# this just inits the dialog html, the props are used when dialog() is called later
+  $('#add-context-tags-dialog').dialog(
+    autoOpen: false
+    dialogClass: 'add-context-tags-dialog'
+    width: 1200
+    height: 500
+  )
 
-
-  # tag search/filter in dialog
-  $('.context-tags-search').on 'keyup', ->
-    search_string = $(this).val().toLowerCase()
-    $('.taxonomy-table tr').filter ->
-      $(this).toggle $(this).text().toLowerCase().indexOf(search_string) > -1

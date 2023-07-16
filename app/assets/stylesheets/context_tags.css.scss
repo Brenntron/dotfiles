@@ -1,5 +1,6 @@
 // context tags tab for webrep & filerep
 .tab-context-tags {
+  min-height: 400px;
   h2 {
     font-size: 11pt;
     font-weight: 700;
@@ -28,6 +29,8 @@
     }
   }
   .ctt-loader {
+    display: inline-block;
+    margin-bottom: 30px;
     position: relative;
     left: 5px;
     .gears-icon {
@@ -90,7 +93,8 @@
   .tmi-gray {
     background-color: #f6f6f6;
   }
-  .enrich-cell-context, .enrich-cell-taxonomy, .enrich-cell-name, .enrich-cell-external-references {
+  .enrich-cell-context, .enrich-cell-taxonomy, .enrich-cell-name,
+  .enrich-cell-external-references {
     width: 12%;
   }
   .enrich-cell-description {
@@ -219,19 +223,29 @@
 
 
 
-
-
-// ADD TAGS DIALOG
-// ADD TAGS DIALOG
+// add tags dialog on ct tab
 .add-context-tags-dialog {
   font-family: 'Open Sans', sans-serif;
   font-weight: 500;
   font-size: 9pt;
+  background-color: #fff;
+  // jquery builds the id inside the same parent class
+  #add-context-tags-dialog {
+    display: flex;  // auto-fill dialog height tidy resize method
+    flex-flow: column;
 
-  // delete this or clean up this ui stuff
-  &.ui-dialog .ui-dialog-titlebar {
-    font-size: 10pt;
+    height: 93% !important;  // FIX THIS, ITS ODD
+
+    min-width: 800px !important;
+    min-height: 500px !important;
+    //max-height: 500px !important;
+    border: none;
+    padding: 10px 15px;
+  }
+  .ui-dialog-titlebar {
+    font-family: 'Open Sans', sans-serif;
     font-weight: 600;
+    font-size: 10pt;
     background-color: #3e5a72;
     padding-left: 35px;
     background-image: url(image_path('icon_add_white.svg'));
@@ -239,83 +253,102 @@
     background-position: 8px center;
     background-size: 20px 20px;
   }
-  .ui-dialog .ui-dialog-content {
-    position: relative;
-    border: 0;
-    padding: 0;
-    background: none;
-    overflow: auto;
-    box-sizing: content-box;
-  }
-
-
-  // GET BOTTOM ROW TO AFFIX TO BOTTOM OF WINDOW
-  // GET BOTTOM ROW TO AFFIX TO BOTTOM OF WINDOW
-  .dialog-content-wrapper {
+  table.dataTable.taxonomy-table.no-footer {
     border: none;
-    padding: 10px 15px;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
   }
-  // clean up all this css
-  .taxonomy-row {
-    border-bottom: solid 1px #eee;
+  td {
+    padding: 2px 8px 6px !important;
+  }
+
+
+
+
+  .preview-tag-area {
+    border-left: solid 1px #eee;
+    height: 78px;
+    width: 100%;
+    padding: 10px 15px 5px;
+    position: absolute;
+    top: -10px;
+    right: 0;
+    background-color: #d7dadb2b;
+    overflow-y: scroll;
+  }
+  .content-label-sm {
+    display: block;
+  }
+  .preview-tag {
+    display: inline-block;
+    width: 250px;
+    height: 20px;
+    padding: 0;
+    margin: 0 2px 2px 0;
+    background-color: #ddd;
+    font-size: 8pt;
+    .preview-tag-name {
+      display: inline-block;
+      padding: 5px;
+      vertical-align: top;
+      cursor: default;
+    }
+    .preview-tag-name p {
+      text-overflow: ellipsis;
+      white-space: nowrap;  // ellipsis-trick this string
+      overflow-x: hidden;
+      width: 218px;
+      height: 15px;
+    }
+    .preview-tag-close {
+      display: inline-block;
+      width: 22px;
+      height: 20px;
+      padding: 0;
+      border-left: solid 1px #ccc;
+      background-image: url(image_path('icon_close.svg'));
+      background-repeat: no-repeat;
+      background-size: 18px 18px;
+      background-position: 1px 1px;
+      &:hover {
+        background-color: #ccc;
+        cursor: pointer;
+      }
+    }
   }
   .tags-content-row {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
     padding-top: 20px;
   }
   .save-button-row {
-    margin: 0 auto;
-    width: 100%;
-    border-top: solid 1px #eee;
+    flex: 0 1 auto;
     padding: 15px;
+    width: 100%;
+    margin: 0 auto;
+    border-top: solid 1px #eee;
   }
-  .tag-label {
-    padding: 6px 2px;
-    font-weight: 700;
-  }
-  .tag-entries-area {
-    height: 380px;
-    max-height: 380px;
-    overflow-y: auto;
+  .taxonomy-row {
+    border-bottom: solid 1px #eee;
   }
   .tag-entry-row {
-    padding: 4px;
     font-size: 8.5pt;
+    line-height: 12pt;
   }
-
-  .tag-entry-name {
-
-  }
-  .tag-entry-description {
-    //max-height: 100px;
-    //overflow-y: auto;
+  .tag-cb-col {
+    width: 2%;
   }
   .tag-name-col {
     width: 20%;
   }
-  .tag-taxonomy-col {
-    width: 20%;
+  .tag-taxonomy-col, .tag-mnemonic-col {
+    width: 12%;
   }
-
-
-
-  .context-tags-search {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 9pt;
-    color: #666;
-    width: 100%;
-    border: solid 1px #ddd;
-    margin-top: 0;
-    margin-bottom: 20px;
-    padding: 5px 30px 5px 5px;
-    background-image: url(image_path('icon_search_dark.svg'));
-    background-repeat: no-repeat;
-    background-position: right center;
-    background-size: 25px 18px;
+  .tag-entry-description {
+    white-space: pre-line;
+    max-height: 80px;
+    overflow-y: auto;
+  }
+  code {
+    color: #333;  // code tag appears from api in desc randomly
+    background-color: #fff;
   }
   .tag-entry-cb {
     width: 20px;
@@ -324,7 +357,6 @@
   }
   .taxonomy-select {
     font-family: 'Open Sans', sans-serif;
-    font-size: 9pt;
     width: 100%;
     border: solid 1px #ddd;
     padding: 4px;
@@ -338,42 +370,35 @@
 }
 
 
-
-
-
-
-// DATATABLES STUFF - FIX THESE
-// DATATABLES STUFF - FIX THESE
-table.dataTable.taxonomy-table thead th {
-  border-bottom: solid 1px #eee;
-  vertical-align: middle;
-}
-
+// taxonomy table dt style one-offs needed for dt ui elems
 .tag-entries-area {
-  .dataTables_wrapper .dataTables_length,
-  .dataTables_wrapper .dataTables_filter {
-    height: 100%;
-    display: inline-block;
+  .taxonomy-table th {
+    border-bottom: solid 1px #eee;
+    vertical-align: middle;
+    padding-left: 8px;
   }
   .dataTables_filter input {
-    border: solid 1px #eee;
+    width: 200px;
+    border: solid 1px #ddd;
     padding: 5px;
-  }
-  .dataTables_wrapper .dataTables_filter input {
-    border: solid 1px #eee;
-    margin-right: 5px;
-  }
-  .dataTables_length {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
   }
   .dataTables_length label {
     background-color: #eee;
   }
-  .dataTables_wrapper .dataTables_info {
+  .dataTables_length select {
+    border: solid 1px #eee;
+    padding: 2px;
+  }
+  .dataTables_info {
     float: none;
     display: inline-block;
   }
   .dataTables_info, .dataTables_paginate {
-    margin: 0 0 5px;
+    margin: 10px 0;
   }
 }
+
+
+
+

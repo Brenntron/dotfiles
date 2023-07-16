@@ -131,28 +131,27 @@
 
 
 -# add tags dialog below, dont put in separate file, code is simple enough to leave here
-#add-context-tags-dialog{title: 'Add Tags to Observable'}
-  .dialog-content-wrapper
-    .row.taxonomy-row
-      .col-xs-6
-        %label.tag-label
-          Taxonomy
-        -# context tags js will generate options below
-        %select.taxonomy-select
-      -#.col-xs-6
-        -#%label.tag-label
-        -#  Tag Search
-        -#%input.context-tags-search
+#add-context-tags-dialog.tags-dialog{title: 'Add Tags to Observable'}
+  .row.taxonomy-row
+    .col-xs-4
+      %label.content-label-sm
+        Taxonomy
+      -# context tags js will generate options below
+      %select.taxonomy-select
 
-    .row.tags-content-row
-      .col-xs-12
-        -#%label.tag-label
-        -#  Results
+    -# preview area for tags to be added
+    .col-xs-6.col-xs-offset-2
+      .preview-tag-area.hidden
+        %label.content-label-sm
+          Add To Observable
 
-        -# all entries generated into a table into below div
-        .tag-entries-area
 
-    .row.save-button-row
-      .col-xs-12.text-center
-        %button.secondary Cancel
-        %button.primary Add Tags to Observable
+  .row.tags-content-row
+    .col-xs-12
+      -# all entries generated into a table into below div
+      .tag-entries-area
+
+  .row.save-button-row
+    .col-xs-12.text-center
+      %button.secondary.tags-cancel-button Cancel
+      %button.primary.tags-save-button Add Tags to Observable
