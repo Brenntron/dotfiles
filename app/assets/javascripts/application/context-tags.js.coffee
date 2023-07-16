@@ -1,6 +1,6 @@
 # TMI AJAX - WEBREP AND FILEREP
 # TMI AJAX - WEBREP AND FILEREP
-window.tmi_ajax = (query_item) ->
+window.tmi_ajax_get_data = (query_item) ->
   query_type = determine_string_type(query_item)
 
   switch query_type
@@ -140,7 +140,7 @@ window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
 
   # tmi promise for that separate api call (sep from enrich api)
   tmi_promise = new Promise (resolve, reject) ->
-    tmi_built = tmi_ajax(curr_entry)
+    tmi_built = tmi_ajax_get_data(curr_entry)
     if tmi_built
       resolve tmi_built
 
@@ -610,6 +610,11 @@ $ ->
       curr_entry = $(this).find('option:selected').attr('data-entry')
       tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
 
+    # select - build options for choose-an-entry
+    $('.research-table-row').each ->
+      curr_entry = $(this).find('.entry-data-content').text().trim()  # entry can be url/ip/domain
+      curr_option = "<option class='mult-entry-option' data-entry='#{curr_entry}'>#{curr_entry}</option>"
+      $(".ctt-entry-select").append(curr_option)
 
     # show the choose-an-entry if multiple entries exist on webrep dispute case
     entries_str = $('.top-case-info .dispute-entry-count').text().trim()
@@ -617,14 +622,8 @@ $ ->
     if entries_num > 1
       $('.ctt-choose-an-entry').removeClass('hidden')
 
-      # select - build options for choose-an-entry
-      $('.research-table-row').each ->
-        curr_entry = $(this).find('.entry-data-content').text().trim()  # entry can be url/ip/domain
-        curr_option = "<option class='mult-entry-option' data-entry='#{curr_entry}'>#{curr_entry}</option>"
-        $(".ctt-entry-select").append(curr_option)
 
-
-  # filerep - tmi kick things off on filerep, we need the sha
+  # filerep - tmi kick things off on filerep, we need the sha (one sha per dispute)
   else if $('.tab-ctt-filerep').length > 0
     curr_entry = $('#sha256_hash').text().trim()  # get url or ip
     tmi_enrich_prev_dt_inits('initial', curr_entry)
@@ -647,6 +646,9 @@ window.add_context_tags_dialog = () ->
         console.clear()
         console.log 'TAXONOMY DATA BELOW'
         console.log response
+
+        # remove loader
+        $('.loading-tags').remove()
 
         { taxonomies } = response  # all the top-level nodes or taxonomies
 
@@ -710,17 +712,17 @@ window.add_context_tags_dialog = () ->
         $('.tag-entry-cb').click ->
           taxonomy_id = $(this).attr('data-tax-id')
           taxonomy_name = $(this).attr('data-tax-name')
-          tag_name = $(this).attr('data-entry-name')
-          tag_id = $(this).attr('data-entry-id')
-          full_id = "#{taxonomy_id}-#{tag_id}"
+          entry_name = $(this).attr('data-entry-name')  # tag name is entry name
+          entry_id = $(this).attr('data-entry-id')
+          full_id = "#{taxonomy_id}-#{entry_id}"
 
           # tag cb is clicked and selected?
           if $(this).prop('checked') == true
             $('.preview-tag-area').removeClass('hidden')
 
-            tag_entry = "<div class='preview-tag preview-tag-#{full_id}'><span class='preview-tag-name'><p>#{taxonomy_name}::#{tag_name}</p></span><span class='preview-tag-close' data-full-id='#{full_id}'></span></div>"
+            new_entry = "<div class='preview-tag preview-tag-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{entry_id}'><span class='preview-tag-name'><p>#{taxonomy_name}::#{entry_name}</p></span><span class='preview-tag-close' data-full-id='#{full_id}'></span></div>"
 
-            $('.preview-tag-area').append(tag_entry)
+            $('.preview-tag-area').append(new_entry)
 
 
             # PREVIEW TAG CLOSE BUTTON NOW EXISTS IN DOM, ATTACH HANDLER
@@ -766,17 +768,6 @@ window.taxonomy_dt_init = (taxonomy_id) ->
 
 
 
-# tags dialog jquery init here
-$ ->
-  # this just inits the dialog html, the props are used when dialog() is called later
-  $('#add-context-tags-dialog').dialog(
-    autoOpen: false
-    dialogClass: 'add-context-tags-dialog'
-    width: 1200
-    height: 500
-  )
-
-
 # HOUSEKEEPING/MISC BELOW FOR TAGS DIALOG
 $ ->
   # select change for taxonomy
@@ -793,8 +784,91 @@ $ ->
 
     taxonomy_dt_init(selected_id)
 
-    
+
   # cancel button for tags dialog
   $('.tags-cancel-button').click ->
     $('#add-context-tags-dialog').dialog('close')
+
+
+
+
+
+
+
+
+
+
+
+# add the tag of 'dns' in taxonomy of 'intelligence types' to observable of 'cisco.com'
+# actions can be 'add', 'delete', 'suppress_tag', or 'unsuppress_tag', multiple actions allowed at once
+window.add_tags_observable = () ->
+  console.log 'YOU HAVE RUN ADD TAGS OBSERVABLE ()'
+
+  return
+
+
+  # LIKE THIS??? do I need 'items' here or no??
+  # LIKE THIS??? do I need 'items' here or no?? I want to add 2 tags to cisco.com
+  data = {
+    items: [
+      {
+        domain: 'cisco.com'
+        action: 'add'
+        tags: [
+          {
+            taxonomy_id: [ 2 ]
+            taxonomy_entry_id: [ 35 ]
+          }
+        ]
+      },
+      {
+        domain: 'cisco.com'
+        action: 'add'
+        tags: [
+          {
+            taxonomy_id: [ 3 ]
+            taxonomy_entry_id: [ 14 ]
+          }
+        ]
+      }
+    ]
+  }
+
+  # js pop() each data obj into items[] array ABOVE
+
+  # DATA ABOVE - APPEND A NEW OBJ FOR EACH PREVIEW TAG
+  # DATA ABOVE - APPEND A NEW OBJ FOR EACH PREVIEW TAG
+  $('.preview-tag-area .preview-tag').each ->
+    tax_id = $(this).attr('data-tax-id')  # 2 is example
+    entry_id = $(this).attr('data-entry-id')  # 2 is example
+    curr_observable = $('.ctt-entry-select option:selected').text().trim()
+
+  # FIX - THIS ENDPOINT RIGHT?? ASK TIM, not sure if I need /update_by_context or POST or PUT
+  # FIX - THIS ENDPOINT RIGHT?? ASK TIM, not sure if I need /update_by_context or POST or PUT
+
+  std_msg_ajax
+    url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
+    method: 'POST'
+    data: data
+    success: (response) ->
+      $('#add-context-tags-dialog').dialog('close')
+      std_msg_success("Tags added to observable", 'Success. Reloading page.', reload: true)
+
+
+
+
+
+
+
+
+# tags dialog jquery init here
+$ ->
+  $('#add-context-tags-dialog').dialog(
+    autoOpen: false
+    dialogClass: 'add-context-tags-dialog'
+    width: 1200
+    height: 500
+    minWidth: 1000
+    minHeight: 500
+  )
 

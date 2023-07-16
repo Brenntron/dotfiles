@@ -10,6 +10,7 @@
     position: absolute;
     left: 160px;
     top: 10px;
+
     .ctt-entry-label {
       position: relative;
       left: 60px;
@@ -222,26 +223,22 @@
 }
 
 
-
 // add tags dialog on ct tab
 .add-context-tags-dialog {
   font-family: 'Open Sans', sans-serif;
   font-weight: 500;
   font-size: 9pt;
   background-color: #fff;
+
   // jquery builds the id inside the same parent class
   #add-context-tags-dialog {
     display: flex;  // auto-fill dialog height tidy resize method
     flex-flow: column;
-
-    height: 93% !important;  // FIX THIS, ITS ODD
-
-    min-width: 800px !important;
-    min-height: 500px !important;
-    //max-height: 500px !important;
+    height: 100% !important;
     border: none;
     padding: 10px 15px;
   }
+
   .ui-dialog-titlebar {
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
@@ -259,23 +256,20 @@
   td {
     padding: 2px 8px 6px !important;
   }
-
-
-
-
+  .content-label-sm {
+    display: block;
+  }
   .preview-tag-area {
     border-left: solid 1px #eee;
+    border-bottom: solid 1px #eee;
     height: 78px;
     width: 100%;
     padding: 10px 15px 5px;
     position: absolute;
     top: -10px;
     right: 0;
-    background-color: #d7dadb2b;
-    overflow-y: scroll;
-  }
-  .content-label-sm {
-    display: block;
+    background-color: #f8f9f9;
+    overflow-y: auto;
   }
   .preview-tag {
     display: inline-block;
@@ -315,14 +309,18 @@
     }
   }
   .tags-content-row {
+    min-height: 150px;
     flex: 1 1 auto;
     padding-top: 20px;
   }
   .save-button-row {
-    flex: 0 1 auto;
-    padding: 15px;
+    //flex: 0 1 auto;
+    padding: 10px;
     width: 100%;
     margin: 0 auto;
+    height: 80px;
+    //position: relative;
+    //bottom: 30px;
     border-top: solid 1px #eee;
   }
   .taxonomy-row {
@@ -398,7 +396,5 @@
     margin: 10px 0;
   }
 }
-
-
 
 
