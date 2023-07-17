@@ -17,6 +17,9 @@
       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         %div
           %label.toolbar-section-label Edit
+          %button.icon-autoresolved.toolbar-button.esc-tooltipped.toolbar-button-spacer{title: 'Auto Resolve', onclick: "auto_resolve_tickets(#{current_user.id}, #{@dispute.id});"}
+            %span.toolbar-button-text
+              Auto Resolve
           %button.toolbar-button.edit-button#edit-dispute-entry-button.esc-tooltipped{title: 'Edit Dispute Entry'}
             %span.toolbar-button-text Edit Dispute Entry
           %span.dropdown

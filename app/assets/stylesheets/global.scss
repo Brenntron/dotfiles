@@ -12358,7 +12358,7 @@ input[type="radio"].resolution_radio_button {
 
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
-@media screen and (max-width: 1600px) and (min-width: 1401px) {
+@media screen and (max-width: 1600px) and (min-width: 1521px) {
   #research-tab-toolbar {
     .toolbar-button {
       background-position: 6px 6px;
@@ -12371,7 +12371,7 @@ input[type="radio"].resolution_radio_button {
   }
 }
 // fix the collapse breakpoint
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1520px) {
   #research-tab-toolbar .toolbar-button-text, .toolbar-button-text {
     display: none;
     margin-left: 8px;

@@ -700,35 +700,46 @@ window.set_related_dispute = (form_tag) ->
   )
 
 
-window.bulk_auto_resolve_tickets = (current_user) ->
-  checkboxes = $('#disputes-index').find('.dispute_check_box')
-  checked_disputes = []
-  dispute_promises = []
+window.auto_resolve_tickets = (current_user, id) ->
 
-  $(checkboxes).each ->
-    if $(this).is(':checked')
-      dispute_id = $(this).val()
-      checked_disputes.push(dispute_id)
+  if id != undefined
+    #show page single ticket auto resolve
+    data = { user_id: current_user, dispute_id: id }
 
-  for dispute_id in checked_disputes
-    data = { user_id: current_user, dispute_id: dispute_id }
-    dispute_promises.push(data)
+    autoresolve(data).then( (result) ->
+      if result.status = 'success'
+        std_msg_success('All Dispute Entries Auto Resolved', [], reload: false)
+      else
+        std_msg_error('Unable to Auto Resolve Dispute Entries', [], reload: false)
+    )
 
-  # make all auto resolve calls, messaging function only gets called after all promises resolve
-  Promise.allSettled( dispute_promises.map( (data) -> return autoresolve(data)) ).then( (result)-> auto_resolve_msg(result) )
+  else
+    #index page bulk select auto resolve
+    checkboxes = $('#disputes-index').find('.dispute_check_box')
+    checked_disputes = []
+    dispute_promises = []
+    $(checkboxes).each ->
+      if $(this).is(':checked')
+        dispute_id = $(this).val()
+        checked_disputes.push(dispute_id)
+
+    for dispute_id in checked_disputes
+      data = { user_id: current_user, dispute_id: dispute_id }
+      dispute_promises.push(data)
+    # make all auto resolve calls, messaging function only gets called after all promises resolve
+    Promise.allSettled( dispute_promises.map( (data) -> return autoresolve(data)) ).then( (result)-> auto_resolve_msg(result) )
 
 window.autoresolve = (data) ->
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/manual_autoresolve'
     method: 'POST'
     data: data
-    success: (response) ->
-      return response
-    error: (response) ->
-      return response
+    success: (response) -> return response
+    error: (response) -> return response
 )
 
 window.auto_resolve_msg = (result) ->
+  #index page auto resolve success/error messaging
   success_message = 'The following tickets have been Auto Resolved:'
   error_message   = 'Error Auto Resolving the following tickets:'
   success_arr   = []
