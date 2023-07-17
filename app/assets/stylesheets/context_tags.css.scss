@@ -1,6 +1,5 @@
 // context tags tab for webrep & filerep
 .tab-context-tags {
-  min-height: 400px;
   h2 {
     font-size: 11pt;
     font-weight: 700;
@@ -229,12 +228,13 @@
   font-weight: 500;
   font-size: 9pt;
   background-color: #fff;
+  min-height: 500px;
 
   // jquery builds the id inside the same parent class
   #add-context-tags-dialog {
-    display: flex;  // auto-fill dialog height tidy resize method
+    display: flex;
     flex-flow: column;
-    height: 100% !important;
+    height: 92% !important;  // odd one-off but works for resize, wip
     border: none;
     padding: 10px 15px;
   }
@@ -321,8 +321,10 @@
     height: 70px;
     border-top: solid 1px #eee;
     z-index: 9999;
+    background-color: #fff;
     &.dialog-resized {
-      height: 100px;
+      position: relative;
+      top: 10px;
     }
   }
   .taxonomy-row {
