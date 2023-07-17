@@ -720,7 +720,7 @@ window.add_context_tags_dialog = () ->
           if $(this).prop('checked') == true
             $('.preview-tag-area').removeClass('hidden')
 
-            new_entry = "<div class='preview-tag preview-tag-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{entry_id}'><span class='preview-tag-name'><p>#{taxonomy_name}::#{entry_name}</p></span><span class='preview-tag-close' data-full-id='#{full_id}'></span></div>"
+            new_entry = "<div class='preview-tag preview-tag-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{entry_id}'><span class='preview-tag-name'><p>#{taxonomy_name}: #{entry_name}</p></span><span class='preview-tag-close' data-full-id='#{full_id}'></span></div>"
 
             $('.preview-tag-area').append(new_entry)
 
@@ -765,6 +765,10 @@ window.taxonomy_dt_init = (taxonomy_id) ->
         search: "_INPUT_"
         searchPlaceholder: "Search inside taxonomy"
       }
+
+  $(".add-context-tags-dialog").resize ->
+    $('.add-context-tags-dialog .save-button-row').addClass('dialog-resized')
+
 
 
 
@@ -853,8 +857,6 @@ window.add_tags_observable = () ->
     success: (response) ->
       $('#add-context-tags-dialog').dialog('close')
       std_msg_success("Tags added to observable", 'Success. Reloading page.', reload: true)
-
-
 
 
 
