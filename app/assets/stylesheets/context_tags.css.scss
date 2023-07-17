@@ -309,7 +309,7 @@
     }
   }
   .tags-content-row {
-    min-height: 150px;
+    min-height: 300px;
     flex: 1 1 auto;
     padding-top: 20px;
   }
@@ -369,6 +369,10 @@
     font-weight: 600;
     margin-top: 5px;
   }
+  button.secondary:active, button.secondary:focus {
+    background-color: #666;
+    color: #fff;
+  }
 }
 
 
@@ -380,7 +384,7 @@
     padding-left: 8px;
   }
   .dataTables_filter input {
-    width: 200px;
+    width: 300px;
     border: solid 1px #ddd;
     padding: 5px;
     margin-bottom: 15px;

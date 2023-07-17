@@ -722,7 +722,9 @@ window.add_context_tags_dialog = () ->
 
             new_entry = "<div class='preview-tag preview-tag-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{entry_id}'><span class='preview-tag-name'><p>#{taxonomy_name}: #{entry_name}</p></span><span class='preview-tag-close' data-full-id='#{full_id}'></span></div>"
 
-            $('.preview-tag-area').append(new_entry)
+            # ensure no duplicate tags added
+            unless $(".preview-tag-area .preview-tag-#{full_id}").length > 0
+              $('.preview-tag-area').append(new_entry)  # add to dom
 
 
             # PREVIEW TAG CLOSE BUTTON NOW EXISTS IN DOM, ATTACH HANDLER
@@ -842,14 +844,16 @@ window.add_tags_observable = () ->
 
   # DATA ABOVE - APPEND A NEW OBJ FOR EACH PREVIEW TAG
   # DATA ABOVE - APPEND A NEW OBJ FOR EACH PREVIEW TAG
+
+  # add tags need preview tag information
   $('.preview-tag-area .preview-tag').each ->
     tax_id = $(this).attr('data-tax-id')  # 2 is example
     entry_id = $(this).attr('data-entry-id')  # 2 is example
     curr_observable = $('.ctt-entry-select option:selected').text().trim()
 
-  # FIX - THIS ENDPOINT RIGHT?? ASK TIM, not sure if I need /update_by_context or POST or PUT
-  # FIX - THIS ENDPOINT RIGHT?? ASK TIM, not sure if I need /update_by_context or POST or PUT
 
+  # FIX - THIS ENDPOINT RIGHT?? ASK TIM, not sure if I need /update_by_context or POST or PUT
+  # FIX - THIS ENDPOINT RIGHT?? ASK TIM, not sure if I need /update_by_context or POST or PUT
   std_msg_ajax
     url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
     method: 'POST'
