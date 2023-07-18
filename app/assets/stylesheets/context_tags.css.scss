@@ -257,9 +257,9 @@
   table.dataTable.taxonomy-table.no-footer {
     border: none;
   }
-  //td {
-  //  padding: 4px 8px !important;
-  //}
+  td {
+    padding: 2px 8px 4px !important;
+  }
   .content-label-sm {
     display: block;
   }
@@ -430,5 +430,8 @@
   }
   .dataTables_info, .dataTables_paginate {
     margin: 10px 0;
+  }
+  .dataTables_empty {
+    padding: 30px !important;
   }
 }
