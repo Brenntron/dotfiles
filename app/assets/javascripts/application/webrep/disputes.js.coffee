@@ -124,6 +124,7 @@ window.advanced_webrep_index_table = () ->
     modified_newer: form.find('input[id="modified-newer-input"]').val()
     case_origin: form.find('input[id="case-origin-input"]').val()
   }
+
   unless form.find('#submission-type').parent().hasClass('hidden')
     submission_types = []
     if form.find('input#submission-type-w-cb').is(':checked')
@@ -785,6 +786,9 @@ window.clearSelectize = (input) ->
   $("##{input}")[0].selectize.clear()
 
 $ ->
+  # Get the webrep_data for the table and format the search header
+  webrep_data = build_webrep_data()
+  format_webrep_header(webrep_data)
 
 #  Opens ticket status resolution back up after modal close
   $('#msg-modal').on 'hide.bs.modal', (e) ->
@@ -1067,10 +1071,10 @@ $ ->
       url: '/escalations/api/v1/escalations/webrep/disputes'
       method: 'GET'
       headers: {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-      data: build_webrep_data()
+      data: webrep_data
       complete: () ->
         #cache current filters for export_all form
-        $('#disputes-index-export-data-input').val(JSON.stringify(build_webrep_data()))
+        $('#disputes-index-export-data-input').val(JSON.stringify(webrep_data))
         $('#inline-webrep').addClass('hidden')
     order: [ [
       9
@@ -1881,7 +1885,7 @@ $ ->
     debug: false
 
   $(document).on 'click', (e)->
-    if $('#webrep-advanced-search-button').size() > 0    
+    if $('#webrep-advanced-search-button').size() > 0
       if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
         $("#advanced-search-dropdown").hide()
       else   # ensure webrep dash datepicker not open
@@ -2845,8 +2849,6 @@ window.build_webrep_data = () ->
 
   else if localStorage.webRepFilters
     data = JSON.parse(localStorage.webRepFilters)
-
-  format_webrep_header(data)
 
   data
 
