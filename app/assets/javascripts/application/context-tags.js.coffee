@@ -82,7 +82,7 @@ window.tmi_ajax_get_data = (query_item) ->
 
             # one table row for each report
             report_tr =
-              "<tr class='tmi-tr'>
+              "<tr class='tmi-tr tmi-tr-suppressed-#{suppressed}'>
                  <td class='tmi-cb-cell'>
                    <input type='checkbox' class='tmi-cb'></input></td>
                  <td class='tmi-observable'>
@@ -626,12 +626,6 @@ $ ->
     tmi_enrich_prev_dt_inits('initial', curr_entry)
 
 
-#  setTimeout ->
-#    $('.ctt-loader').addClass('hidden')  # ensure these are hidden no matter what
-#  , 5000
-#
-
-
 # initialize and open the tags dialog
 window.add_context_tags_dialog = () ->
   # open the dialog
@@ -644,9 +638,9 @@ window.add_context_tags_dialog = () ->
       url: '/escalations/api/v1/escalations/cloud_intel/tag_management/taxonomy_map'
       method: 'GET'
       success: (response) ->
-#        console.clear()
-#        console.log 'TAXONOMY DATA BELOW'
-#        console.log response
+        console.clear()
+        console.log 'TAXONOMY DATA BELOW'
+        console.log response
 
         $('.loading-tags').remove()
 
@@ -672,6 +666,10 @@ window.add_context_tags_dialog = () ->
 
             # SPEED THIS UP - PRE-DT RENDER TIME IS SLOW
             # SPEED THIS UP - PRE-DT RENDER TIME IS SLOW
+
+            # remove newlines, they mess with line height
+#            description = description.replace(/\n\n/g,'<p class="new-line"></p>')
+
             entry_tr =
               "<tr class='tag-entry-row tag-#{full_id} taxonomy-row taxonomy-row-#{taxonomy_id}'>
                  <td class='tag-cb-col'>
@@ -682,7 +680,7 @@ window.add_context_tags_dialog = () ->
                  <td class='tag-desc-col'>
                    <p class='tag-mitre-fqn hidden'>#{short_description}</p>
                    <p class='tag-entry-description'>#{description}</p>
-                   <button class='read-more-button hidden' onclick='mitre_read_more(\"#{full_id}\");'>Read More</button>
+                   <button class='read-more-button hidden' onclick='mitre_read_more(\"#{full_id}\");'>Read More <span class='down-caret'></span></button>
                  </td>
                </tr>"
 
@@ -691,17 +689,14 @@ window.add_context_tags_dialog = () ->
               entry_tr = entry_tr.replace('tag-mitre-fqn hidden','tag-mitre-fqn')
 
               # show read more button if the description is verbose
-              if description.length > 300
+              if description.length > 200
                 entry_tr = entry_tr.replace('tag-entry-description','tag-entry-description condensed')
                 entry_tr = entry_tr.replace('read-more-button hidden','read-more-button')
 
             # add entry row to tbody
             $('.tag-entries-area .taxonomy-table tbody').append(entry_tr)  # ADD TO DOM
 
-
-        # open the dialog with the default entries showing
-#        curr_taxonomy_text = $('.taxonomy-select option:first').text()
-#        taxonomy_dt_init(curr_taxonomy_text)
+        # open the dialog and dt init with all tags showing
         taxonomy_dt_init()
 
         # add flag to dom that the dialog is now built
@@ -723,9 +718,6 @@ window.add_preview_tag = () ->
     entry_id = $(this).attr('data-entry-id')
     full_id = "#{taxonomy_id}-#{entry_id}"
 
-    # tag cb is clicked and selected?
-#    if $(this).prop('checked') == true
-
     # BUILD PREVIEW TAG
     new_entry = "<div class='preview-tag preview-tag-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{entry_id}'><span class='preview-tag-name'><p>#{taxonomy_name}: #{entry_name}</p></span><span class='preview-tag-close' data-full-id='#{full_id}'></span></div>"
 
@@ -745,17 +737,11 @@ window.add_preview_tag = () ->
       if $('.preview-tag-area .preview-tag').length == 0
         $('.preview-tag-area').addClass('hidden')
 
-    # tag cb is clicked and not selected?
-#    else if $(this).prop('checked') == false
-#      $(".preview-tag-#{full_id}").remove()
-#
-#      if $('.preview-tag-area .preview-tag').length == 0
-#        $('.preview-tag-area').addClass('hidden')
 
 
 # dt init the taxonomy table on initial load or change select
 window.taxonomy_dt_init = () ->
-  # show all 7500 rows by default
+  # show all seven thousand tag rows by default
   unless $(".taxonomy-table").hasClass('dataTable')
     taxonomy_table = $(".taxonomy-table").DataTable
       dom: 'lftpir'
@@ -770,36 +756,19 @@ window.taxonomy_dt_init = () ->
       pageLength: 10
       language: {
         search: "_INPUT_"
-        searchPlaceholder: "Search all tags in all taxonomies"
+        searchPlaceholder: "Search"
       }
-
-    # initial load of dt?  load the first taxonomy
-#    curr_text = $('.taxonomy-select option:first').text()
-#    taxonomy_table.columns(3).search(curr_text).draw()
 
     # select change does a search and draw
     $('.taxonomy-select').change ->
-      alert 'fix save function first then do this one'
-#      curr_id = $(this).find('option:selected').attr('data-id')
-#      console.log curr_id
-#
-#      $(".taxonomy-table .taxonomy-row").addClass('hidden')
-#      $(".taxonomy-table .taxonomy-row-#{curr_id}").removeClass('hidden')
-
-      # do a addClass hidden to all trs
-      # then remove all taxonomy-row-2
-
-#      new_text = $(this).find('option:selected').text()
-#      taxonomy_table.columns(3).search(new_text).draw()
-
-#    $('.tag-entries-area .dataTables_filter input').click ->
-#      taxonomy_table.search('').draw()
+      new_text = $(this).find('option:selected').text()
+      taxonomy_table.columns(3).search(new_text).draw()
 
 
 # read more button for mitre descriptions in dialog
 window.mitre_read_more = (full_id) ->
   $(".tag-#{full_id} .tag-entry-description").toggleClass('condensed')
-  $(".tag-#{full_id} .read-more-button").addClass('hidden')
+  $(".tag-#{full_id} .read-more-button .down-caret").toggleClass('expanded')
 
 
 
@@ -811,59 +780,103 @@ $ ->
 
 
 
-
-
-
-
 # add the tag of 'dns' in taxonomy of 'intelligence types' to observable of 'cisco.com'
 # actions can be 'add', 'delete', 'suppress_tag', or 'unsuppress_tag', multiple actions allowed at once
-window.add_tags_observable = () ->
-  console.log 'SAVE IS CLICKED, HERE WE GO:'
+window.tags_action = (action) ->
+  #  action will be add/suppress/unsuppress/delete
+  console.log 'tag action to do:'
+  console.log action
 
-  data = {}
-  items = []
+  # if preview tags are visible, proceed with everything
+  if $('.preview-tag:visible').length == 0
+    alert 'please select a tag'
 
-  # data - get data to pass to endpoint
-  $('.preview-tag-area .preview-tag').each ->
-    tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
-    entry_id = parseInt($(this).attr('data-entry-id'))
-    curr_observable = $('.ctt-entry-select option:selected').text().trim()  # this works even when hidden
+  # if preview tags are visible, proceed with everything
+  else if $('.preview-tag:visible').length > 0
 
-    # make tags array dynamic
-    observable_type = determine_string_type(curr_observable)  # ip or sha or url or domain
+    switch action
+      when 'add'
+        success_msg = "Tags added to observable"
+      when 'suppress'
+        success_msg = "Tags suppressed"
+      when 'unsuppress'
+        success_msg = "Tags unsuppressed"
+      when 'delete'
+        success_msg = "Tags removed from observable"
 
-    # add new item object to add to array
-    new_item = {
-      "#{observable_type}": curr_observable
-      action: 'add'
-      tags: [
-        {
-          taxonomy_id: tax_id
-          taxonomy_entry_id: entry_id
-        }
-      ]
-    }
+    data = {}
+    items = []
 
-    items.push(new_item)
+    # all of below is set up for ADD tags
+    # logic will need to be adjusted for suppress/remove/etc
+
+    # FIX THIS, we are changing the preview tag stuff
+    # FIX THIS
+    $('.preview-tag-area .preview-tag').each ->
+      tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
+      entry_id = parseInt($(this).attr('data-entry-id'))
+      curr_observable = $('.ctt-entry-select option:selected').text().trim()  # this works even when hidden
+
+      # make tags array dynamic
+      observable_type = determine_string_type(curr_observable)  # ip or sha or url or domain
+
+      # add new item object to add to array, 'add' can change action to suppress or remove
+      new_item = {
+        "#{observable_type}": curr_observable
+        action: action
+        tags: [
+          {
+            taxonomy_id: tax_id
+            taxonomy_entry_id: entry_id
+          }
+        ]
+      }
+
+      items.push(new_item)
+
+    data.items = items
+
+    console.log 'HERE IS YOUR DATA'
+    console.log data
+
+    # data is finished construction, send to endpoint with action specified
+    std_msg_ajax
+      url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
+      method: 'POST'
+      data: data
+      success: (response) ->
+        $('#add-context-tags-dialog').dialog('close')
+        std_msg_success(success_msg, ['Success. Reloading page.'], reload: true)
 
 
-  data.items = items
 
-  console.log 'HERE IS YOUR DATA'
-  console.log data
+# FIX THIS
+# FIX THIS
+# FIX THIS, dry out and add label handler
+$ ->
+  $('.suppressed-context-tags-toggle').click ->
+    if $(this).find('input:checkbox').prop('checked') == true
+      $('.tmi-tr-suppressed-yes').removeClass('hidden')
+    else
+      $('.tmi-tr-suppressed-yes').addClass('hidden')
 
-#  return
+  $('.unsuppressed-context-tags-toggle').click ->
+    if $(this).find('input:checkbox').prop('checked') == true
+      $('.tmi-tr-suppressed-no').removeClass('hidden')
+    else
+      $('.tmi-tr-suppressed-no').addClass('hidden')
 
+# FIX THIS UP below
+#  $('.tab-context-tags .context-tags-toggle').click ->
+#    if $(this).hasClass('suppressed-context-tags-toggle')
+#      curr_class = 'yes'
+#    else if $(this).hasClass('unsuppressed-context-tags-toggle')
+#      curr_class = 'no'
+#    if $(this).find('input:checkbox').prop('checked') == true
+#      $(".tmi-tr-suppressed-#{curr_class}").removeClass('hidden')
+#    else
+#      $(".tmi-tr-suppressed-#{curr_class}").addClass('hidden')
 
-
-  # ONE AT A TIME
-  std_msg_ajax
-    url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
-    method: 'POST'
-    data: data
-    success: (response) ->
-      $('#add-context-tags-dialog').dialog('close')
-      std_msg_success("Tags added to observable", ['Success. Reloading page.'], reload: true)
 
 
 

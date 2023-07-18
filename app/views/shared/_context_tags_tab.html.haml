@@ -60,14 +60,22 @@
               %span.toggle-label Unsuppressed Tags
           %div
             %label.toolbar-section-label Actions
-            %button.toolbar-button.add-context-tag-button.dialog-button{onclick: 'add_context_tags_dialog();'}
+
+            %button.toolbar-button.add-context-tag-button.dialog-button{onclick: "add_context_tags_dialog();"}
               %span.toolbar-button-text Add Tag
-            %button.toolbar-button.suppress-context-tag-button.disabled{disabled:'disabled'}
+
+            -# hook this one up
+            %button.toolbar-button.suppress-context-tag-button
               %span.toolbar-button-text Suppress Tag
-            %button.toolbar-button.unsuppress-context-tag-button.disabled{disabled:'disabled'}
+
+            -# hook this one up
+            %button.toolbar-button.unsuppress-context-tag-button
               %span.toolbar-button-text Unsuppress Tag
-            %button.toolbar-button.remove-context-tag-button.disabled{disabled:'disabled'}
+
+            -# hook this one up
+            %button.toolbar-button.remove-context-tag-button
               %span.toolbar-button-text Remove Tag
+
 
         -# tmi dt on both webrep and filerep
         %table.ctt-table#tmi-dt.tmi-table
@@ -138,12 +146,8 @@
         Taxonomy
       -# context tags js will generate options below
 
-
-      -# REMOVE INLINE STYLE BELOW
-      -# REMOVE INLINE STYLE BELOW
-      -# REMOVE INLINE STYLE BELOW
-      %select.taxonomy-select{style:'opacity: 0.5'}
-
+      %select.taxonomy-select
+        %option Select a taxonomy
 
 
     -# preview area for tags to be added
@@ -182,4 +186,4 @@
   .row.save-button-row
     .col-xs-12.text-center
       %button.secondary.tags-cancel-button Cancel
-      %button.primary.tags-save-button{onclick:'add_tags_observable();'} Add Tags to Observable
+      %button.primary.tags-save-button{onclick:"tags_action('add');"} Add Tags to Observable

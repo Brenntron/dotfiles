@@ -176,6 +176,7 @@
   .context-tags-toggle {
     padding: 5px;
     background-color: #f6f6f6;
+    cursor: default;
   }
   .context-tags-toggle:first-of-type {
     margin-right: -3px;
@@ -353,24 +354,47 @@
   // show 3 lines at top
   .tag-entry-description {
     white-space: pre-line;
-    line-height: 12pt;
+    line-height: 11pt;
+    padding-bottom: 5px;
   }
   .tag-entry-description.condensed {
-    max-height: 50px;
+    max-height: 40px;
     overflow-y: hidden;
   }
   .tag-mitre-fqn {
     display: block;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
   }
   .read-more-button {
+    width: 100%;
+    color: #999;
+    border: none;
     padding: 2px 10px;
-    background-color: #f6f6f6;
-    border: solid 1px #eee;
-    margin: 2px 0;
+    background-color: #fff;
+    height: 20px;
+    margin: 2px 0 0;
+    font-style: italic;
     font-size: 8pt;
     font-weight: 500;
+    box-shadow: 0px -6px 8px 2px #ffffff;
+  }
+  .down-caret {
+    background-image: url(image_path('icon_down_arrow_grey.svg'));
+    background-repeat: no-repeat;
+    background-size: 12px 12px;
+    background-position: 0 3px;
+    opacity: 0.9;
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    &.expanded {
+      transform: scaleY(-1);  // flip arrow up
+      background-position: 0 -2px;
+    }
+  }
+  .new-line {
+    height: 10px;
   }
   code {
     color: #333;  // code tag appears from api in desc randomly
@@ -387,6 +411,9 @@
     border: solid 1px #ddd;
     padding: 4px;
     margin-bottom: 15px;
+    option:first-of-type {
+      color: red;
+    }
   }
   button {
     font-family: 'Open Sans', sans-serif;
