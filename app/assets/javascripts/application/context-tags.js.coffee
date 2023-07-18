@@ -644,7 +644,10 @@ window.add_context_tags_dialog = () ->
 
         $('.loading-tags').remove()
 
-        { taxonomies } = response  # all the top-level nodes or taxonomies
+        # all the top-level taxonomies
+        { taxonomies } = response
+
+        all_tag_rows_html = ''
 
         # for each taxonomy, add an <option> and a <div> with taxonomy entries
         $(taxonomies).each (i, val) ->
@@ -655,6 +658,8 @@ window.add_context_tags_dialog = () ->
           taxonomy_option = "<option class='taxonomy-#{taxonomy_id}' data-id='#{taxonomy_id}'>#{name}</option>"
           $('.taxonomy-select').append(taxonomy_option)
 
+          curr_taxonomy_rows_html = ''
+
           # taxonomy div - add all the entries for this taxonomy
           $(entries).each ->
             { entry_id, name, description, mnemonic, short_description } = this
@@ -663,12 +668,6 @@ window.add_context_tags_dialog = () ->
             full_id = "#{taxonomy_id}-#{entry_id}"
 
             if !description then description = ''
-
-            # SPEED THIS UP - PRE-DT RENDER TIME IS SLOW
-            # SPEED THIS UP - PRE-DT RENDER TIME IS SLOW
-
-            # remove newlines, they mess with line height
-#            description = description.replace(/\n\n/g,'<p class="new-line"></p>')
 
             entry_tr =
               "<tr class='tag-entry-row tag-#{full_id} taxonomy-row taxonomy-row-#{taxonomy_id}'>
@@ -687,14 +686,17 @@ window.add_context_tags_dialog = () ->
             # mitre descriptions are huge, show the mitre fqn (short_desc) and show the read more button
             if taxonomy_name.includes('MITRE') && short_description
               entry_tr = entry_tr.replace('tag-mitre-fqn hidden','tag-mitre-fqn')
-
               # show read more button if the description is verbose
               if description.length > 200
                 entry_tr = entry_tr.replace('tag-entry-description','tag-entry-description condensed')
                 entry_tr = entry_tr.replace('read-more-button hidden','read-more-button')
 
-            # add entry row to tbody
-            $('.tag-entries-area .taxonomy-table tbody').append(entry_tr)  # ADD TO DOM
+            all_tag_rows_html += entry_tr  # build one block of html
+
+
+        
+        # add one big string at once, less interaction with dom == better performance
+        $('.tag-entries-area .taxonomy-table tbody').append(all_tag_rows_html)  # ADD TO DOM
 
         # open the dialog and dt init with all tags showing
         taxonomy_dt_init()
