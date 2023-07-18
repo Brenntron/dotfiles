@@ -952,27 +952,17 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
-    #relation = relation.group(:id)
-
     category = present_params['category']
     if category.present?
       relation = relation.where('category like :category', category: "%#{category}%")
     end
 
     ip_or_uri = present_params['ip_or_uri']
-
-    # Constructs a gigantic, but valid where clause
     if ip_or_uri.present?
-      ip_or_uri_clause = nil
-      ip_or_uri.each_with_index do |single, index|
-        if index == 0
-          ip_or_uri_clause = "ip_address = '#{single}' OR uri like '%#{single}%' OR domain like '%#{single}%'"
-        else
-          ip_or_uri_clause = ip_or_uri_clause + " OR " + "ip_address = '#{single}' OR uri like '%#{single}%' OR domain like '%#{single}%'"
-        end
-      end
-
-      relation = relation.where(ip_or_uri_clause)
+      vals = ip_or_uri.map{ |e| "'#{e}'"}.join(',')
+      relation = relation.where("complaint_entries.domain in (#{vals})")
+                         .or(where("complaint_entries.ip_address in (#{vals})"))
+                         .or(where("complaint_entries.uri in (#{vals})"))
     end
 
     complaint_fields = present_params.to_h.slice(*%w{description channel})
