@@ -53,7 +53,7 @@
     }
   }
   .tmi-table {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
   }
   .tmi-suppressed {
     font-weight: 600;
@@ -64,6 +64,9 @@
   }
   .tmi-suppression-platform, .tmi-tag-type {
     text-transform: capitalize;
+  }
+  .tmi-tag-name {
+    width: 15%;
   }
   .tmi-taxonomy, .tmi-report-date, .tmi-suppression-date {
     white-space: nowrap;
@@ -123,7 +126,7 @@
 // used globally on ctt
 .ctt-loader {
   display: inline-block;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   position: relative;
   left: 5px;
   .gears-icon {
@@ -353,7 +356,7 @@
     line-height: 12pt;
   }
   .tag-entry-description.condensed {
-    max-height: 60px;
+    max-height: 50px;
     overflow-y: hidden;
   }
   .tag-mitre-fqn {
@@ -365,8 +368,7 @@
     padding: 2px 10px;
     background-color: #f6f6f6;
     border: solid 1px #eee;
-    margin: 0;
-    margin-top: 5px;
+    margin: 2px 0;
     font-size: 8pt;
     font-weight: 500;
   }

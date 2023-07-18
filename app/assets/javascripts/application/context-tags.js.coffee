@@ -1,14 +1,10 @@
 # TMI AJAX - WEBREP AND FILEREP
 # TMI AJAX - WEBREP AND FILEREP
 window.tmi_ajax_get_data = (query_item) ->
-  query_type = determine_string_type(query_item)
-
-  switch query_type
-    when 'ip' then data = { ip: query_item }
-    when 'domain' then data = { domain: query_item }
-    when 'sha' then data = { sha: query_item }
-    when 'url' then data = { url: query_item }
-
+  query_type = determine_string_type(query_item)  # will be ip, domain, url, or sha
+  data = {
+    "#{query_type}": query_item
+  }
   std_msg_ajax
     url: '/escalations/api/v1/escalations/cloud_intel/tag_management/read_observable'
     method: 'GET'
@@ -630,6 +626,10 @@ $ ->
     tmi_enrich_prev_dt_inits('initial', curr_entry)
 
 
+#  setTimeout ->
+#    $('.ctt-loader').addClass('hidden')  # ensure these are hidden no matter what
+#  , 5000
+#
 
 
 # initialize and open the tags dialog
@@ -689,9 +689,11 @@ window.add_context_tags_dialog = () ->
             # mitre descriptions are huge, show the mitre fqn (short_desc) and show the read more button
             if taxonomy_name.includes('MITRE') && short_description
               entry_tr = entry_tr.replace('tag-mitre-fqn hidden','tag-mitre-fqn')
-              entry_tr = entry_tr.replace('tag-entry-description','tag-entry-description condensed')
-              entry_tr = entry_tr.replace('read-more-button hidden','read-more-button')
 
+              # show read more button if the description is verbose
+              if description.length > 300
+                entry_tr = entry_tr.replace('tag-entry-description','tag-entry-description condensed')
+                entry_tr = entry_tr.replace('read-more-button hidden','read-more-button')
 
             # add entry row to tbody
             $('.tag-entries-area .taxonomy-table tbody').append(entry_tr)  # ADD TO DOM
@@ -702,7 +704,6 @@ window.add_context_tags_dialog = () ->
 #        taxonomy_dt_init(curr_taxonomy_text)
         taxonomy_dt_init()
 
-
         # add flag to dom that the dialog is now built
         $('.tab-context-tags').addClass('tags-dialog-built')
 
@@ -710,8 +711,6 @@ window.add_context_tags_dialog = () ->
 
 # TAG PREVIEW CLICK HANDLERS AND STUFF
 window.add_preview_tag = () ->
-  console.log 'DO YOU SEE THIS, THIS FUNC GOT FIRED'
-
   # RESET
   $('.preview-tag-area').removeClass('hidden')
 #  $('.preview-tag-area .preview-tag').remove()
@@ -754,10 +753,8 @@ window.add_preview_tag = () ->
 #        $('.preview-tag-area').addClass('hidden')
 
 
-
 # dt init the taxonomy table on initial load or change select
 window.taxonomy_dt_init = () ->
-
   # show all 7500 rows by default
   unless $(".taxonomy-table").hasClass('dataTable')
     taxonomy_table = $(".taxonomy-table").DataTable
@@ -789,13 +786,11 @@ window.taxonomy_dt_init = () ->
 #      $(".taxonomy-table .taxonomy-row").addClass('hidden')
 #      $(".taxonomy-table .taxonomy-row-#{curr_id}").removeClass('hidden')
 
-
       # do a addClass hidden to all trs
       # then remove all taxonomy-row-2
 
 #      new_text = $(this).find('option:selected').text()
 #      taxonomy_table.columns(3).search(new_text).draw()
-
 
 #    $('.tag-entries-area .dataTables_filter input').click ->
 #      taxonomy_table.search('').draw()
@@ -805,7 +800,6 @@ window.taxonomy_dt_init = () ->
 window.mitre_read_more = (full_id) ->
   $(".tag-#{full_id} .tag-entry-description").toggleClass('condensed')
   $(".tag-#{full_id} .read-more-button").addClass('hidden')
-
 
 
 
@@ -824,7 +818,10 @@ $ ->
 # add the tag of 'dns' in taxonomy of 'intelligence types' to observable of 'cisco.com'
 # actions can be 'add', 'delete', 'suppress_tag', or 'unsuppress_tag', multiple actions allowed at once
 window.add_tags_observable = () ->
-  console.log 'SAVE IS RAN, HERE WE GO'
+  console.log 'SAVE IS CLICKED, HERE WE GO:'
+
+  data = {}
+  items = []
 
   # data - get data to pass to endpoint
   $('.preview-tag-area .preview-tag').each ->
@@ -832,94 +829,41 @@ window.add_tags_observable = () ->
     entry_id = parseInt($(this).attr('data-entry-id'))
     curr_observable = $('.ctt-entry-select option:selected').text().trim()  # this works even when hidden
 
-
     # make tags array dynamic
+    observable_type = determine_string_type(curr_observable)  # ip or sha or url or domain
 
-
-    observable_type = determine_string_type(curr_observable)
-
-    console.log observable_type
-
-    switch observable_type
-      when 'ip'
-        data = {
-          items: [
-            {
-              ip: curr_observable
-              action: 'add'
-              tags: [
-                {
-                  taxonomy_id: tax_id
-                  taxonomy_entry_id: entry_id
-                }
-              ]
-            }
-          ]
+    # add new item object to add to array
+    new_item = {
+      "#{observable_type}": curr_observable
+      action: 'add'
+      tags: [
+        {
+          taxonomy_id: tax_id
+          taxonomy_entry_id: entry_id
         }
-      when 'domain'
-        data = {
-          items: [
-            {
-              domain: curr_observable
-              action: 'add'
-              tags: [
-                {
-                  taxonomy_id: tax_id
-                  taxonomy_entry_id: entry_id
-                }
-              ]
-            }
-          ]
-        }
-      when 'sha'
-        data = {
-          items: [
-            {
-              sha: curr_observable
-              action: 'add'
-              tags: [
-                {
-                  taxonomy_id: tax_id
-                  taxonomy_entry_id: entry_id
-                }
-              ]
-            }
-          ]
-        }
-      when 'url'
-        data = {
-          items: [
-            {
-              url: curr_observable
-              action: 'add'
-              tags: [
-                {
-                  taxonomy_id: tax_id
-                  taxonomy_entry_id: entry_id
-                }
-              ]
-            }
-          ]
-        }
+      ]
+    }
+
+    items.push(new_item)
+
+
+  data.items = items
+
+  console.log 'HERE IS YOUR DATA'
+  console.log data
+
+#  return
 
 
 
-    console.log 'HERE IS YOUR DATA'
-    console.log data
-
-#    return
-
-    # js pop() each data obj into items[] array ABOVE
-    # data above - append a new obj for each preview tag
-
-    # ONE AT A TIME FOR NOW UNTIL WE GET IT RIGHT, THEN DO BULK TAGS
-    std_msg_ajax
-      url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
-      method: 'POST'
-      data: data
-      success: (response) ->
-        $('#add-context-tags-dialog').dialog('close')
-        std_msg_success("Tags added to observable", ['Success. Reloading page.'], reload: true)
+  # ONE AT A TIME
+  std_msg_ajax
+    url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
+    method: 'POST'
+    data: data
+    success: (response) ->
+      $('#add-context-tags-dialog').dialog('close')
+      std_msg_success("Tags added to observable", ['Success. Reloading page.'], reload: true)
 
 
 
