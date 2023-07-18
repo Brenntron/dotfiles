@@ -139,18 +139,40 @@
       -# context tags js will generate options below
       %select.taxonomy-select
 
+
+
     -# preview area for tags to be added
-    .col-xs-6.col-xs-offset-2
+    .col-xs-4
       .preview-tag-area.hidden
         %label.content-label-sm
           Add To Observable
 
 
+    -# search will go here
+    .col-xs-4
+
+
+
   .row.tags-content-row
     .col-xs-12
-      %p.loading-tags Loading...
-      -# all entries generated into a table into below div
+
+      %p.ctt-loader.loading-tags
+        = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
+        %span.loader-msg Loading...
+
       .tag-entries-area
+
+        -# all tag entries generated into this table
+        %table.taxonomy-table
+          %thead
+            %th
+            %th Tag Name
+            %th Mnemonic
+            %th Taxonomy
+            %th Description
+          %tbody
+
+
 
   .row.save-button-row
     .col-xs-12.text-center

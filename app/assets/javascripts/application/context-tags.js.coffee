@@ -647,8 +647,8 @@ window.add_context_tags_dialog = () ->
         console.log 'TAXONOMY DATA BELOW'
         console.log response
 
-        # remove loader
         $('.loading-tags').remove()
+#        $('.taxonomy-table .loader-tbody').remove()
 
         { taxonomies } = response  # all the top-level nodes or taxonomies
 
@@ -661,51 +661,61 @@ window.add_context_tags_dialog = () ->
           taxonomy_option = "<option class='taxonomy-#{taxonomy_id}' data-id='#{taxonomy_id}'>#{name}</option>"
           $('.taxonomy-select').append(taxonomy_option)
 
-          # taxonomy div - start it
-          taxonomy_table =
-            "<table class='taxonomy-table taxonomy-table-#{taxonomy_id} hidden'>
-               <thead><th></th><th>Tag Name</th><th>Mnemonic</th><th>Taxonomy</th><th>Description</th></thead><tbody>"
-
           # taxonomy div - add all the entries for this taxonomy
           $(entries).each ->
-            { entry_id, name, description, mnemonic, short_description, short_name } = this
+            { entry_id, name, description, mnemonic, short_description } = this
 
-            # mitre tags need fqn to appear in description, fqn is in short desc
-            if taxonomy_name.includes('MITRE') && short_description
-              description = short_description + '\n\r' + description
+            # full id for an entry is taxonomy_id and entry_id combined, this becomes the unique identifier
+            full_id = "#{taxonomy_id}-#{entry_id}"
 
             if !description then description = ''
 
-            # id for an entry is taxonomy_id and entry_id combined, e.g. tax 3 + entry 127 == id of 3-127
+            # SPEED THIS UP - PRE-DT RENDER TIME IS SLOW
+            # SPEED THIS UP - PRE-DT RENDER TIME IS SLOW
+            # SPEED THIS UP - PRE-DT RENDER TIME IS SLOW
+
+            # ADD HIDDEN TO ROW
+            # ADD HIDDEN TO ROW
+            # ADD HIDDEN TO ROW
             entry_tr =
-              "<tr class='tag-entry-row tag-#{taxonomy_id}-#{entry_id}'>
+              "<tr class='tag-entry-row tag-#{full_id} taxonomy-row taxonomy-row-#{taxonomy_id}'>
                  <td class='tag-cb-col'>
-                   <input class='tag-entry-cb tag-entry-cb-#{taxonomy_id}-#{entry_id}' type='checkbox' data-tax-id='#{taxonomy_id}' data-tax-name='#{taxonomy_name}' data-entry-name='#{name}' data-entry-id='#{entry_id}'></td>
+                   <input class='tag-entry-cb tag-entry-cb-#{full_id}' type='checkbox' data-tax-id='#{taxonomy_id}' data-tax-name='#{taxonomy_name}' data-entry-name='#{name}' data-entry-id='#{entry_id}'></td>
                  <td class='tag-name-col'><p class='tag-entry-name'>#{name}</p></td>
                  <td class='tag-mnemonic-col'><p class='tag-entry-mnemonic'>#{mnemonic}</p></td>
                  <td class='tag-taxonomy-col'><p class='tag-entry-taxonomy'>#{taxonomy_name}</p></td>
-                 <td class='tag-desc-col'><p class='tag-entry-description'>#{description}</p></td>
+                 <td class='tag-desc-col'>
+                   <p class='tag-mitre-fqn hidden'>#{short_description}</p>
+                   <p class='tag-entry-description'>#{description}</p>
+                   <button class='read-more-button hidden' onclick='mitre_read_more(\'#{full_id}\');'>Read More</button>
+                 </td>
                </tr>"
 
-            # add entry div to taxonomy div
-            taxonomy_table += entry_tr
+            # mitre descriptions are huge, show the mitre fqn (short_desc) and show the read more button
+            if taxonomy_name.includes('MITRE') && short_description
+              entry_tr = entry_tr.replace('tag-mitre-fqn hidden','tag-mitre-fqn')
+              entry_tr = entry_tr.replace('tag-entry-description','tag-entry-description condensed')
+              entry_tr = entry_tr.replace('read-more-button hidden','read-more-button')
 
-          # entry divs are done, close up the taxonomy div
-          taxonomy_table += "</tbody></table>"
 
-          # add taxonomy div to dom (will be hidden by default)
-          $('.tag-entries-area').append(taxonomy_table)  # ADD TO DOM
+            # add entry row to tbody
+            $('.tag-entries-area .taxonomy-table tbody').append(entry_tr)  # ADD TO DOM
+
 
         # open the dialog with the default entries showing
-        curr_taxonomy_id = $('.taxonomy-select option:selected').attr('data-id')
+#        curr_taxonomy_text = $('.taxonomy-select option:first').text()
+#        taxonomy_dt_init(curr_taxonomy_text)
+        taxonomy_dt_init()
 
-        taxonomy_dt_init(curr_taxonomy_id)
 
-        # show table within dt wrapper
-        $(".taxonomy-table-#{curr_taxonomy_id}").removeClass('hidden')
+        # BIG LOOP IS DONE, NOW REMOVE ALL HIDDEN CLASSES
+        $('.taxonomy-row').removeClass('hidden')
 
         # add flag to dom that the dialog is now built
         $('.tab-context-tags').addClass('tags-dialog-built')
+
+
+
 
         # TAG PREVIEW CLICK HANDLERS AND STUFF
         # click a cb to show the preview area, using document trick for click handler
@@ -750,9 +760,12 @@ window.add_context_tags_dialog = () ->
 
 
 # dt init the taxonomy table on initial load or change select
-window.taxonomy_dt_init = (taxonomy_id) ->
-  unless $(".taxonomy-table-#{taxonomy_id}").hasClass('dataTable')
-    $(".taxonomy-table-#{taxonomy_id}").DataTable
+window.taxonomy_dt_init = (taxonomy_text) ->
+  # comment out below, maybe useful later
+  # dom: '<"top"iflp<"clear">>rt<"bottom"iflp<"clear">>'
+
+  unless $(".taxonomy-table").hasClass('dataTable')
+    taxonomy_table = $(".taxonomy-table").DataTable
       dom: 'lftpir'
       columnDefs: [
         {
@@ -764,33 +777,35 @@ window.taxonomy_dt_init = (taxonomy_id) ->
       order: [[1, 'asc']]
       pageLength: 10
       language: {
-        search: "_INPUT_"
-        searchPlaceholder: "Search inside taxonomy"
+        searchPlaceholder: "Search all tags"
       }
 
-  $(".add-context-tags-dialog").resize ->
-    $('.add-context-tags-dialog .save-button-row').addClass('dialog-resized')
+    # initial load
+#    taxonomy_table.columns(3).search(taxonomy_text).draw()
+#    taxonomy_table.search(taxonomy_text).draw()
+
+
+
+    # select change does a search and draw
+    $('.taxonomy-select').change ->
+      new_text = $(this).find('option:selected').text()
+      taxonomy_table.columns(3).search(new_text).draw()
+
+
+    # reset cb states
+#    $('.tag-entry-cb').prop('checked', false)
+
+
+
+# read more button for mitre descriptions in dialog
+window.mitre_read_more = (full_id) ->
+  $(".tag-#{full_id} .tag-entry-description").toggleClass('condensed')
+  $(".tag-#{full_id} .read-more-button").addClass('hidden')
 
 
 
 
-# HOUSEKEEPING/MISC BELOW FOR TAGS DIALOG
 $ ->
-  # select change for taxonomy
-  $('.taxonomy-select').change ->
-    $('.tag-entry-cb').prop('checked', false)
-    $(".taxonomy-table").addClass('hidden')
-    $(".tags-dialog .dataTables_wrapper").addClass('hidden')  # hide other dt wrappers inside the dialog
-
-    selected_id = $(this).find('option:selected').attr('data-id')
-
-    # tax table may or may not already be dt-inited, show table + dt wrapper, dt initing all tables at once is too slow
-    $(".taxonomy-table-#{selected_id}").closest('.dataTables_wrapper').removeClass('hidden')
-    $(".taxonomy-table-#{selected_id}").removeClass('hidden')
-
-    taxonomy_dt_init(selected_id)
-
-
   # cancel button for tags dialog
   $('.tags-cancel-button').click ->
     $('#add-context-tags-dialog').dialog('close')
@@ -802,19 +817,17 @@ $ ->
 
 
 
-
-
-
 # add the tag of 'dns' in taxonomy of 'intelligence types' to observable of 'cisco.com'
 # actions can be 'add', 'delete', 'suppress_tag', or 'unsuppress_tag', multiple actions allowed at once
 window.add_tags_observable = () ->
-  console.log 'YOU HAVE RUN ADD TAGS OBSERVABLE ()'
+  console.log 'you have run add tags observable ()'
 
-  return
+  # add tags need preview tag information
+  #  $('.preview-tag-area .preview-tag').each ->
+  #    tax_id = $(this).attr('data-tax-id')  # 2 is example
+  #    entry_id = $(this).attr('data-entry-id')  # 2 is example
+  #    curr_observable = $('.ctt-entry-select option:selected').text().trim()
 
-
-  # LIKE THIS??? do I need 'items' here or no??
-  # LIKE THIS??? do I need 'items' here or no?? I want to add 2 tags to cisco.com
   data = {
     items: [
       {
@@ -822,18 +835,8 @@ window.add_tags_observable = () ->
         action: 'add'
         tags: [
           {
-            taxonomy_id: [ 2 ]
-            taxonomy_entry_id: [ 35 ]
-          }
-        ]
-      },
-      {
-        domain: 'cisco.com'
-        action: 'add'
-        tags: [
-          {
-            taxonomy_id: [ 3 ]
-            taxonomy_entry_id: [ 14 ]
+            taxonomy_id: 2
+            taxonomy_entry_id: 4
           }
         ]
       }
@@ -841,19 +844,8 @@ window.add_tags_observable = () ->
   }
 
   # js pop() each data obj into items[] array ABOVE
+  # data above - append a new obj for each preview tag
 
-  # DATA ABOVE - APPEND A NEW OBJ FOR EACH PREVIEW TAG
-  # DATA ABOVE - APPEND A NEW OBJ FOR EACH PREVIEW TAG
-
-  # add tags need preview tag information
-  $('.preview-tag-area .preview-tag').each ->
-    tax_id = $(this).attr('data-tax-id')  # 2 is example
-    entry_id = $(this).attr('data-entry-id')  # 2 is example
-    curr_observable = $('.ctt-entry-select option:selected').text().trim()
-
-
-  # FIX - THIS ENDPOINT RIGHT?? ASK TIM, not sure if I need /update_by_context or POST or PUT
-  # FIX - THIS ENDPOINT RIGHT?? ASK TIM, not sure if I need /update_by_context or POST or PUT
   std_msg_ajax
     url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
     method: 'POST'
@@ -861,7 +853,6 @@ window.add_tags_observable = () ->
     success: (response) ->
       $('#add-context-tags-dialog').dialog('close')
       std_msg_success("Tags added to observable", 'Success. Reloading page.', reload: true)
-
 
 
 

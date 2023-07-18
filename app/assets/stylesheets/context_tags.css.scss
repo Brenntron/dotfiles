@@ -28,25 +28,6 @@
       border: solid 1px #ddd;
     }
   }
-  .ctt-loader {
-    display: inline-block;
-    margin-bottom: 30px;
-    position: relative;
-    left: 5px;
-    .gears-icon {
-      display: inline-block;
-      width: 26px;
-      height: 26px;
-      margin-right: 4px;
-    }
-    .loader-msg {
-      position: relative;
-      left: 0;
-      bottom: 7px;
-      font-size: 9pt;
-      color: #777;
-    }
-  }
 
   .ctt-table {
     margin-bottom: 30px;
@@ -139,6 +120,27 @@
   }
 }
 
+// used globally on ctt
+.ctt-loader {
+  display: inline-block;
+  margin-bottom: 30px;
+  position: relative;
+  left: 5px;
+  .gears-icon {
+    display: inline-block;
+    width: 26px;
+    height: 26px;
+    margin-right: 4px;
+  }
+  .loader-msg {
+    position: relative;
+    left: 0;
+    bottom: 7px;
+    font-size: 9pt;
+    color: #777;
+  }
+}
+
 // toolbar styles
 .tmi-toolbar {
   input {
@@ -222,6 +224,8 @@
 }
 
 
+// DIALOG STYLES HERE
+// DIALOG STYLES HERE
 // add tags dialog on ct tab
 .add-context-tags-dialog {
   font-family: 'Open Sans', sans-serif;
@@ -234,7 +238,7 @@
   #add-context-tags-dialog {
     display: flex;
     flex-flow: column;
-    height: 92% !important;  // odd one-off but works for resize, wip
+    height: 100% !important;
     border: none;
     padding: 10px 15px;
   }
@@ -253,9 +257,9 @@
   table.dataTable.taxonomy-table.no-footer {
     border: none;
   }
-  td {
-    padding: 2px 8px 6px !important;
-  }
+  //td {
+  //  padding: 4px 8px !important;
+  //}
   .content-label-sm {
     display: block;
   }
@@ -268,7 +272,7 @@
     position: absolute;
     top: -10px;
     right: 0;
-    background-color: #f8f9f9;
+    //background-color: #f8f9f9;
     overflow-y: auto;
   }
   .preview-tag {
@@ -343,10 +347,28 @@
   .tag-taxonomy-col, .tag-mnemonic-col {
     width: 12%;
   }
+  // show 3 lines at top
   .tag-entry-description {
     white-space: pre-line;
-    max-height: 80px;
-    overflow-y: auto;
+    line-height: 12pt;
+  }
+  .tag-entry-description.condensed {
+    max-height: 60px;
+    overflow-y: hidden;
+  }
+  .tag-mitre-fqn {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .read-more-button {
+    padding: 2px 10px;
+    background-color: #f6f6f6;
+    border: solid 1px #eee;
+    margin: 0;
+    margin-top: 5px;
+    font-size: 8pt;
+    font-weight: 500;
   }
   code {
     color: #333;  // code tag appears from api in desc randomly
@@ -384,17 +406,23 @@
     padding-left: 8px;
   }
   .dataTables_filter input {
-    width: 300px;
+    width: 220px;
     border: solid 1px #ddd;
     padding: 5px;
     margin-bottom: 15px;
   }
   .dataTables_length label {
     background-color: #eee;
+    margin-bottom: 10px;
   }
   .dataTables_length select {
     border: solid 1px #eee;
     padding: 2px;
+  }
+  .dataTables_filter {
+    position: absolute;
+    top: -65px;
+    right: 0;
   }
   .dataTables_info {
     float: none;
@@ -404,5 +432,3 @@
     margin: 10px 0;
   }
 }
-
-
