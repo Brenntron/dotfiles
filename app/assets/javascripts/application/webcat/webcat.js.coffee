@@ -487,7 +487,7 @@ $ ->
               search_name_check = webcat_search_name != ''
               if webcat_search_type == 'advanced' && search_name_check && text_check
                 window.temporary_search_link(webcat_search_name, webcat_search_conditions)
-                window.sort_named_search_list()
+
 
           pagingType: 'full_numbers'
           order: [ [
@@ -1087,9 +1087,8 @@ window.copyToClipboard = (text) ->
 
 window.temporary_search_link = (webcat_search_name, webcat_search_conditions) ->
   table = document.getElementById("saved-search")
-  new_tr = table.insertRow(-1)
 
-#  new_tr = document.createElement('tr')
+  new_tr = document.createElement('tr')
   new_td = document.createElement('td')
   new_link =  document.createElement('a')
   new_delete_image = document.createElement('img')
@@ -1117,13 +1116,7 @@ window.temporary_search_link = (webcat_search_name, webcat_search_conditions) ->
   $(new_td).append(new_delete)
   $(new_delete).append(new_delete_image)
   $(new_td).append(new_fav_icon)
-  $('.webcat-named-search-list tbody').appendChild(new_tr)
-
-window.sort_named_search_list = ->
-  tbody = $('.webcat-named-search-list tbody')
-  tbody.find('tr').sort((a, b) ->
-    return $('td:first a:first', b).text().localeCompare($('td:first a:first', a).text())
-  ).appendTo(tbody)
+  $(table).append(new_tr)
 
 window.find_saved_search_by_name = (name) ->
   saved_search = null
