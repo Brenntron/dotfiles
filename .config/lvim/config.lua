@@ -49,34 +49,17 @@ lvim.builtin.telescope.defaults.mappings = {
 
 -- Telescope ignore list
 lvim.builtin.telescope.defaults.file_ignore_patterns = {
-    "vendor/*",
-    "%.lock",
-    "%.sqlite3",
-    "node_modules/*",
-    "%.jpg",
-    "%.jpeg",
-    "%.png",
-    "%.svg",
-    "%.otf",
-    "%.ttf",
-    ".git/",
-    ".github/",
-    ".idea/",
-    ".settings/",
-    "build/",
-    "env/",
-    "node_modules/",
-    "%.cache",
-    "%.ico",
-    "%.pdf",
-    "%.dylib",
-    "%.jar",
-  }
+    "vendor/*", "%.lock", "%.sqlite3", "node_modules/*", "%.jpg", "%.jpeg",
+    "%.png", "%.svg", "%.otf", "%.ttf", ".git/", ".github/", ".idea/",
+    ".settings/", "build/", "env/", "node_modules/", "%.cache", "%.ico",
+    "%.pdf", "%.dylib", "%.jar"
+}
 
 -- Use which-key to add extra bindings with the leader-key prefix
 lvim.builtin.which_key.mappings["P"] = {
     "<cmd>Telescope projects<CR>", "Projects"
 }
+
 lvim.builtin.which_key.mappings["t"] = {
     name = "+Trouble",
     r = {"<cmd>Trouble lsp_references<cr>", "References"},
@@ -100,33 +83,25 @@ lvim.builtin.which_key.mappings['sp'] = {
     "Search on current file"
 }
 
+-- vim-easy-align keybinds
+lvim.keys.normal_mode["ga"] = "<Plug>(EasyAlign)"
+lvim.keys.visual_mode["ga"] = "<Plug>(EasyAlign)"
+
 -- Additional Plugins
 lvim.plugins = {
     {
-        "ahmedkhalf/lsp-rooter.nvim",
+        "cappyzawa/trim.nvim",
         event = "BufRead",
-        config = function() require("lsp-rooter").setup() end
-    }, {'edluffy/hologram.nvim'}, {
+        config = function()
+            require('trim').setup({trim_last_line = false})
+        end
+    }, {'edluffy/hologram.nvim', auto_display = true}, {"fladson/vim-kitty"}, {
         "folke/trouble.nvim",
         cmd = "TroubleToggle",
         requires = "nvim-tree/nvim-web-devicons",
         config = function() require("trouble").setup {} end
-    },
-    -- automatically install all the formatters and linters specified by the following
-    -- config options:
-    -- * linters.setup
-    -- * formatters.setup
-    {
-        "jayp0521/mason-null-ls.nvim",
-        config = function()
-            require("mason-null-ls").setup({
-                automatic_installation = false,
-                automatic_setup = true,
-                ensure_installed = nil
-            })
-            require("mason-null-ls").setup_handlers()
-        end
-    }, {'kchmck/vim-coffee-script'}, {'Mofiqul/dracula.nvim'},
+    }, {'kchmck/vim-coffee-script'}, {'junegunn/vim-easy-align'},
+    {'Mofiqul/dracula.nvim'},
     {
         "nvim-telescope/telescope-fzy-native.nvim",
         run = "make",
@@ -156,31 +131,24 @@ lvim.plugins = {
                 -- vim.cmd("nnoremap gP <cmd>lua require('goto-preview').close_all_win()<CR>")
             }
         end
-    }, {
+    }, {"sindrets/diffview.nvim", event = "BufRead"}, {
         "simrat39/symbols-outline.nvim",
         config = function() require('symbols-outline').setup() end
-    }, {"tpope/vim-bundler", cmd = {"Bundler", "Bopen", "Bsplit", "Btabedit"}},
-    {
-        "tpope/vim-fugitive",
-        cmd = {
-            "G", "Git", "Gdiffsplit", "Gread", "Gwrite", "Ggrep", "GMove",
-            "GDelete", "GBrowse", "GRemove", "GRename", "Glgrep", "Gedit"
-        },
-        ft = {"fugitive"}
-    }, {
-        "tpope/vim-rails",
-        cmd = {
-            "Eview", "Econtroller", "Emodel", "Smodel", "Sview", "Scontroller",
-            "Vmodel", "Vview", "Vcontroller", "Tmodel", "Tview", "Tcontroller",
-            "Rails", "Generate", "Runner", "Extract"
-        }
     }, {
         "windwp/nvim-spectre",
         event = "BufRead",
         config = function() require("spectre").setup() end
     }, {
         "windwp/nvim-ts-autotag",
-        config = function() require("nvim-ts-autotag").setup() end
+        config = function()
+            require("nvim-ts-autotag").setup({
+                autotag = {enable = true},
+                filetypes = {
+                    "html", "embedded_template", "eruby", 'javascript',
+                    'markdown', 'php', 'svelte', 'typescript', 'vue', 'xml'
+                }
+            })
+        end
     }
 }
 
@@ -190,32 +158,39 @@ lvim.builtin.alpha.mode = "dashboard"
 lvim.builtin.terminal.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
 lvim.builtin.nvimtree.setup.renderer.icons.show.git = false
+lvim.builtin.treesitter.autotag.enable = true
+lvim.builtin.treesitter.matchup.enable = true
 
 -- Hologram setup
-require('hologram').setup{
+require('hologram').setup {
     auto_display = true -- WIP automatic markdown image display, may be prone to breaking
 }
 
 -- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
-    "bash", "comment", "css", "dockerfile", "dot", "elixir", "git_rebase",
-    "gitignore", "html", "javascript", "json", "lua", "markdown_inline",
-    "python", "regex", "ruby", "rust", "scss", "sql", "vim", "yaml"
+    "bash", "comment", "css", "dockerfile", "dot", "eex", "elixir",
+    "git_rebase", "gitignore", "html", "javascript", "json", "lua",
+    "markdown_inline", "python", "regex", "ruby", "rust", "scss", "sql", "vim",
+    "yaml"
 }
 
 lvim.builtin.treesitter.ignore_install = {"haskell"}
 lvim.builtin.treesitter.highlight.enable = true
 
+-- Mason setup
+require("mason").setup()
+
 -- Add additional languages
 require("mason-lspconfig").setup({
     ensure_installed = {
-        "bashls", "cssls", "dockerls", "grammarly", "html", "jsonls",
-        "sumneko_lua", "marksman", "pyright", "pylsp", "solargraph", "sqlls",
+        "bashls", "cssls", "cucumber_language_server", "dockerls", "grammarly",
+        "html", "jsonls", "marksman", "pyright", "pylsp", "solargraph", "sqlls",
         "yamlls"
     }
 })
 
-require('lspconfig').coffeesense.setup()
+-- -- Coffeesense Setup
+require'lspconfig'.coffeesense.setup {}
 
 -- Telescope plugin update
 lvim.builtin.telescope.on_config_done = function(telescope)
@@ -228,12 +203,19 @@ local formatters = require "lvim.lsp.null-ls.formatters"
 local linters = require "lvim.lsp.null-ls.linters"
 
 formatters.setup {
-    {name = "lua_format"}, {name = "markdownlint"}, {name = "shfmt"}
+    {name = 'beautysh'}, {name = "erb_lint"}, {name = "lua_format"},
+    {name = "markdownlint"}, {name = 'prettierd'}, {name = "rubocop"},
+    {name = 'stylelint'}
+}
+
+-- Extend format timeout
+lvim.builtin.which_key.mappings["l"]["f"] = {
+    function() require("lvim.lsp.utils").format {timeout_ms = 5000} end,
+    "Format"
 }
 
 linters.setup {
-    {name = "codespell", filetypes = {"coffee", "erb", "html", "markdown"}},
-    {name = "luacheck"}, {name = "markdownlint"}, {name = "rubocop"},
+    {name = "codespell", filetypes = {"erb", "eruby", "html", "markdown"}},
     {command = "shellcheck", extra_args = {"--severity", "warning"}}
 }
 
@@ -248,7 +230,7 @@ vim.filetype.add {extension = {coffee = 'coffee'}, {config = 'conf'}}
 -- generic LSP settings
 
 -- make sure server will always be installed even if the server is in skipped_servers list
-lvim.lsp.installer.setup.ensure_installed = {"sumneko_lua", "jsonls"}
+-- lvim.lsp.installer.setup.ensure_installed = {"sumneko_lua", "jsonls"}
 -- change UI setting of `LspInstallInfo`
 -- see <https://github.com/williamboman/nvim-lsp-installer#default-configuration>
 -- lvim.lsp.installer.setup.ui.check_outdated_servers_on_open = false
@@ -289,10 +271,10 @@ lvim.lsp.installer.setup.ensure_installed = {"sumneko_lua", "jsonls"}
 --   -- enable wrap mode for json files only
 --   command = "setlocal wrap",
 -- })
--- vim.api.nvim_create_autocmd("FileType", {
---   pattern = "zsh",
---   callback = function()
---     -- let treesitter use bash highlight for zsh files as well
---     require("nvim-treesitter.highlight").attach(0, "bash")
---   end,
--- })
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "zsh",
+    callback = function()
+        -- let treesitter use bash highlight for zsh files as well
+        require("nvim-treesitter.highlight").attach(0, "bash")
+    end
+})
