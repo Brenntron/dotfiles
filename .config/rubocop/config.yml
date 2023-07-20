@@ -1,0 +1,8 @@
+inherit_from:
+  - https://relaxed.ruby.style/rubocop.yml
+AllCops:
+  NewCops: enable
+Style/Encoding:
+  Enabled: true
+Style/FrozenStringLiteralComment:
+  Enabled: false
