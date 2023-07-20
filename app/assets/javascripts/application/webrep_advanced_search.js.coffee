@@ -1,5 +1,4 @@
 $(document).ready ->
-
   window.set_advanced_search_pref()
   $('#add-search-items-button').click ->
     $('#search-criteria-options').show()
@@ -124,7 +123,6 @@ window.set_advanced_search_pref = () ->
             $(search_input).addClass('hidden')
             $(search_toggle).removeClass('hidden')
   )
-
 
 window.pageFiltersIdentifier = ()->
   if window.location.href.includes('file_rep')
