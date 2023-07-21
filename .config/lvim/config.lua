@@ -208,15 +208,16 @@ formatters.setup {
     {name = 'stylelint'}
 }
 
+linters.setup {
+    {name = "codespell", filetypes = {"erb", "eruby", "html", "markdown"}},
+    {command = "shellcheck", extra_args = {"--severity", "warning"}},
+    {name = "zsh", filetypes = {"zsh"}}
+}
+
 -- Extend format timeout
 lvim.builtin.which_key.mappings["l"]["f"] = {
     function() require("lvim.lsp.utils").format {timeout_ms = 5000} end,
     "Format"
-}
-
-linters.setup {
-    {name = "codespell", filetypes = {"erb", "eruby", "html", "markdown"}},
-    {command = "shellcheck", extra_args = {"--severity", "warning"}}
 }
 
 -- generic options
@@ -271,10 +272,3 @@ vim.filetype.add {extension = {coffee = 'coffee'}, {config = 'conf'}}
 --   -- enable wrap mode for json files only
 --   command = "setlocal wrap",
 -- })
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "zsh",
-    callback = function()
-        -- let treesitter use bash highlight for zsh files as well
-        require("nvim-treesitter.highlight").attach(0, "bash")
-    end
-})
