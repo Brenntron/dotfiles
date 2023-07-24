@@ -35,7 +35,7 @@
     thead th {
       border-bottom: solid 1px #f6f6f6;
       border-top: solid 1px #f6f6f6;
-      padding: 8px 10px;
+      padding: 8px 14px 8px 10px;  // extra pad for tight widths
       vertical-align: middle;
       background-position-y: center !important;  // override dt defaults
       line-height: 10pt;
@@ -453,6 +453,23 @@
     top: -65px;
     right: 0;
   }
+
+  // FIX THIS
+  // FIX THIS
+  // FIX THIS
+  //.selectize-input {
+  //  border: solid 1px #eee;
+  //  width: 300px;
+  //  text-align: left;
+  //  .item {
+  //    text-align: left !important;
+  //    padding: 2px;
+  //  }
+  //}
+  //
+
+
+
   .dataTables_info {
     float: none;
     display: inline-block;
@@ -463,4 +480,24 @@
   .dataTables_empty {
     padding: 30px !important;
   }
+}
+
+
+
+
+
+
+// two primary divs within the act dialog
+.actd-loader-area, .actd-tags-area {
+  padding: 0;
+  margin: 0;
+}
+.actd-loader-area {
+  display: flex;
+  width: 100%;
+  padding: 30px;
+  justify-content: center;
+  //height: 100%;
+  //align-content: center;
+  //align-items: center;
 }

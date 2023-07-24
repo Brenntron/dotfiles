@@ -140,50 +140,53 @@
 
 -# add tags dialog below
 #add-context-tags-dialog.tags-dialog{title: 'Add Tags to Observable'}
-  .row.taxonomy-row
-    .col-xs-3
-      %label.content-label-sm
-        Taxonomy
-      -# context tags js will generate options below
 
-      %select.taxonomy-select
-        %option Select a taxonomy
+  -# LOADER DIV
+  .actd-loader-area
+    %p.ctt-loader.loading-tags
+      = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
+      %span.loader-msg Loading tag data...
 
+  -# ERROR DIV
+  .actd-error-area.hidden
+    %p Error with tag data.
 
-    -# preview area for tags to be added
-    .col-xs-6
-      .preview-tag-area.hidden
+  -# MAIN DIV
+  .actd-tags-area.hidden
+    .row.taxonomy-row
+      .col-xs-3
         %label.content-label-sm
-          Add To Observable
+          Taxonomy
+        -# context tags js will generate options below
+
+        %select.taxonomy-select
+          %option Select a taxonomy
+
+      -# preview area for tags to be added
+      .col-xs-6
+        .preview-tag-area.hidden
+          %label.content-label-sm
+            Add To Observable
+
+      -# tag search will exist here when dt inits
+      .col-xs-3
+
+    .row.tags-content-row
+      .col-xs-12
+        .tag-entries-area
+
+          -# all tag rows will be generated into this table
+          %table.taxonomy-table
+            %thead
+              %th
+              %th Tag Name
+              %th Mnemonic
+              %th Taxonomy
+              %th Description
+            %tbody
 
 
-    -# search will go here
-    .col-xs-3
-
-
-
-  .row.tags-content-row
-    .col-xs-12
-
-      %p.ctt-loader.loading-tags
-        = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
-        %span.loader-msg Loading tag data...
-
-      .tag-entries-area
-
-        -# all tag entries generated into this table
-        %table.taxonomy-table
-          %thead
-            %th
-            %th Tag Name
-            %th Mnemonic
-            %th Taxonomy
-            %th Description
-          %tbody
-
-
-
-  .row.save-button-row
-    .col-xs-12.text-center
-      %button.secondary.tags-cancel-button Cancel
-      %button.primary.tags-save-button{onclick:"tags_action('add');"} Add Tags to Observable
+    .row.save-button-row
+      .col-xs-12.text-center
+        %button.secondary.tags-cancel-button Cancel
+        %button.primary.tags-save-button{onclick:"tags_action('add');"} Add Tags to Observable

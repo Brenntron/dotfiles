@@ -637,12 +637,18 @@ window.add_context_tags_dialog = () ->
     std_msg_ajax
       url: '/escalations/api/v1/escalations/cloud_intel/tag_management/taxonomy_map'
       method: 'GET'
+      error: (response) ->
+        $('.actd-loader-area').addClass('hidden')
+        $('.actd-error-area').removeClass('hidden')
+
       success: (response) ->
         console.clear()
         console.log 'TAXONOMY DATA BELOW'
         console.log response
 
-        $('.loading-tags').remove()
+        # hide loader, show main content
+        $('.actd-loader-area').addClass('hidden')
+        $('.actd-tags-area').removeClass('hidden')
 
         # all the top-level taxonomies
         { taxonomies } = response
@@ -669,6 +675,10 @@ window.add_context_tags_dialog = () ->
 
             if !description then description = ''
 
+            # ADD A ROW TO DT, ADD A ROW TO SELECTIZE OPTIONS??
+            # ADD A ROW TO DT, ADD A ROW TO SELECTIZE OPTIONS??
+            # ADD A ROW TO DT, ADD A ROW TO SELECTIZE OPTIONS??
+
             entry_tr =
               "<tr class='tag-entry-row tag-#{full_id} taxonomy-row taxonomy-row-#{taxonomy_id}'>
                  <td class='tag-cb-col'>
@@ -682,6 +692,8 @@ window.add_context_tags_dialog = () ->
                    <button class='read-more-button hidden' onclick='mitre_read_more(\"#{full_id}\");'>Read More <span class='down-caret'></span></button>
                  </td>
                </tr>"
+
+
 
             # mitre descriptions are huge, show the mitre fqn (short_desc) and show the read more button
             if taxonomy_name.includes('MITRE') && short_description
@@ -765,6 +777,35 @@ window.taxonomy_dt_init = () ->
     $('.taxonomy-select').change ->
       new_text = $(this).find('option:selected').text()
       taxonomy_table.columns(3).search(new_text).draw()
+
+
+
+
+
+    # SELECTIZE SET UP HERE
+    # SELECTIZE SET UP HERE
+    # SELECTIZE SET UP HERE
+#    $('#DataTables_Table_1_filter input').selectize {
+#      maxItems: 5,
+#      plugins: ["remove_button"],
+#      valueField: 'id',
+#      labelField: 'title',
+#      searchField: 'title',
+#      options: [
+#        {id: 1, title: 'Spam'},
+#        {id: 2, title: 'Phishing'},
+#        {id: 3, title: 'Adult Content'}
+#      ],
+#      create: false
+#    }
+#
+#
+
+
+
+
+
+
 
 
 # read more button for mitre descriptions in dialog
