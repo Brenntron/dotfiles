@@ -1391,7 +1391,7 @@ class FileReputationDispute < ApplicationRecord
       sanitized_disposition = "Unknown"
     end
 
-    comment = "Thank you for your submission! Your dispute was resolved automatically because #{self.sha256_hash} currently has a #{sanitized_disposition} disposition and is not globally blocked on Cisco devices. #{disposition_comment} Talos does NOT recommend that our customers block sites with #{sanitized_disposition} dispositions– customers who choose to block #{sanitized_disposition} files should be prepared to locally allow-list files frequently."
+    comment = "Thank you for your submission! Your dispute was resolved automatically because #{self.sha256_hash} currently has a #{sanitized_disposition} disposition and is not globally blocked on Cisco devices. #{disposition_comment} Talos does NOT recommend that our customers block files with #{sanitized_disposition} dispositions– customers who choose to block #{sanitized_disposition} files should be prepared to locally allow-list files frequently."
     if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
       comment += " If you need further assistance with this dispute, please open a TAC case."
     end
