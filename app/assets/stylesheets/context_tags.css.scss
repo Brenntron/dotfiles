@@ -435,13 +435,23 @@
     vertical-align: middle;
     padding-left: 8px;
   }
-  .dataTables_length label {
-    background-color: #eee;
-    margin-bottom: 10px;
+  .dataTables_info {
+    margin: 0 0 10px;
+    padding-top: 5px;
   }
-  .dataTables_length select {
-    border: solid 1px #eee;
-    padding: 2px;
+  .dataTables_paginate {
+    margin: 10px 0;
+  }
+  .dataTables_length {
+    float: right;
+    label {
+      background-color: #eee;
+      margin-bottom: 10px;
+    }
+    select {
+      border: solid 1px #eee;
+      padding: 2px;
+    }
   }
   .dataTables_filter label {
     position: absolute;
@@ -462,13 +472,6 @@
       margin: 0;
       margin-top: 10px;
     }
-  }
-  .dataTables_info {
-    float: none;
-    display: inline-block;
-  }
-  .dataTables_info, .dataTables_paginate {
-    margin: 10px 0;
   }
   .dataTables_empty {
     padding: 30px !important;

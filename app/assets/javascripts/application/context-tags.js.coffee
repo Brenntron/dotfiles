@@ -757,8 +757,7 @@ window.taxonomy_dt_init = () ->
   # show all seven thousand tag rows by default
   unless $(".taxonomy-table").hasClass('dataTable')
     taxonomy_table = $(".taxonomy-table").DataTable
-#      dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
-      dom: 'lftpir'
+      dom: 'ilftpr'
       columnDefs: [
         {
           targets: [0]
