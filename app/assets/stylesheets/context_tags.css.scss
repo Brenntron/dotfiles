@@ -293,7 +293,7 @@
       white-space: nowrap;  // ellipsis-trick tag name
       overflow-x: hidden;
       padding: 4px 8px;
-      width: 240px;
+      max-width: 240px;
       height: 20px;
       font-size: 8.5pt;
       vertical-align: middle;
@@ -311,6 +311,7 @@
       &:hover {
         opacity: 0.5;
         cursor: pointer;
+        text-decoration: none;
       }
     }
   }
@@ -434,12 +435,6 @@
     vertical-align: middle;
     padding-left: 8px;
   }
-  .dataTables_filter input {
-    width: 270px;
-    border: solid 1px #ddd;
-    padding: 5px;
-    margin-bottom: 15px;
-  }
   .dataTables_length label {
     background-color: #eee;
     margin-bottom: 10px;
@@ -448,24 +443,26 @@
     border: solid 1px #eee;
     padding: 2px;
   }
-  .dataTables_filter {
+  .dataTables_filter label {
     position: absolute;
-    top: -65px;
+    top: -85px;
     right: 0;
+    display: block;
+    font-size: 7pt;
+    color: #999;
+    text-align: left;
+    padding: 2px;
+    input {
+      display: block;
+      width: 270px;
+      font-size: 9pt;
+      color: #333;
+      border: solid 1px #ddd;
+      padding: 5px;
+      margin: 0;
+      margin-top: 10px;
+    }
   }
-
-  // FIX THIS
-  //.selectize-input {
-  //  border: solid 1px #eee;
-  //  width: 300px;
-  //  text-align: left;
-  //  .item {
-  //    text-align: left !important;
-  //    padding: 2px;
-  //  }
-  //}
-  //
-
   .dataTables_info {
     float: none;
     display: inline-block;
