@@ -2841,9 +2841,10 @@ window.format_webrep_header = (data) ->
         else if condition_types[conditionName]
           selectedFilters.push({name: condition_types[conditionName], value: search_conditions[conditionName]})
         container = $('#dispute-advaced-search-selected-filters')
-      for item in selectedFilters
-        html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value.split(',').join(', ') + '</span>'
-        $('#dispute-advaced-search-selected-filters').append(html)
+      if container.html() == ''
+        for item in selectedFilters
+          html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value.split(',').join(', ') + '</span>'
+          $('#dispute-advaced-search-selected-filters').append(html)
     else if search_type == 'named'
       new_header =
         '<div>Results for "' + search_name + '" Saved Search' +
