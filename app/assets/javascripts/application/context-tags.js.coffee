@@ -675,9 +675,7 @@ window.add_context_tags_dialog = () ->
 
             if !description then description = ''
 
-            # ADD A ROW TO DT, ADD A ROW TO SELECTIZE OPTIONS??
-            # ADD A ROW TO DT, ADD A ROW TO SELECTIZE OPTIONS??
-            # ADD A ROW TO DT, ADD A ROW TO SELECTIZE OPTIONS??
+
 
             entry_tr =
               "<tr class='tag-entry-row tag-#{full_id} taxonomy-row taxonomy-row-#{taxonomy_id}'>
@@ -692,7 +690,6 @@ window.add_context_tags_dialog = () ->
                    <button class='read-more-button hidden' onclick='mitre_read_more(\"#{full_id}\");'>Read More <span class='down-caret'></span></button>
                  </td>
                </tr>"
-
 
 
             # mitre descriptions are huge, show the mitre fqn (short_desc) and show the read more button
@@ -720,36 +717,34 @@ window.add_context_tags_dialog = () ->
 
 # TAG PREVIEW CLICK HANDLERS AND STUFF
 window.add_preview_tag = () ->
-  # RESET
-  $('.preview-tag-area').removeClass('hidden')
-#  $('.preview-tag-area .preview-tag').remove()
+  # stop at 5
+  if $('.preview-tag-area .preview-tag').length == 5 && $('.tag-entry-cb:checked').length == 5
+    std_msg_error("Maximum of 5 new tags at once.","")
 
-  # CB EACH
-  $('.tag-entry-cb:checked').each ->
-    taxonomy_id = $(this).attr('data-tax-id')
-    taxonomy_name = $(this).attr('data-tax-name')
-    entry_name = $(this).attr('data-entry-name')  # tag name is entry name
-    entry_id = $(this).attr('data-entry-id')
-    full_id = "#{taxonomy_id}-#{entry_id}"
+  else
+    $('.tag-entry-cb:checked').each ->
+      taxonomy_id = $(this).attr('data-tax-id')
+      taxonomy_name = $(this).attr('data-tax-name')
+      entry_name = $(this).attr('data-entry-name')  # tag name is entry name
+      entry_id = $(this).attr('data-entry-id')
+      full_id = "#{taxonomy_id}-#{entry_id}"
 
-    # BUILD PREVIEW TAG
-    new_entry = "<div class='preview-tag preview-tag-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{entry_id}'><span class='preview-tag-name'><p>#{taxonomy_name}: #{entry_name}</p></span><span class='preview-tag-close' data-full-id='#{full_id}'></span></div>"
+      # BUILD PREVIEW TAG
+      new_entry = "<div class='preview-tag preview-tag-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{entry_id}'><span class='preview-tag-name'>#{taxonomy_name}: #{entry_name}</span> <a href='javascript:void(0);' class='preview-tag-close' data-full-id='#{full_id}' title='Remove'>×</a></div>"
 
-    # ensure no duplicate tags added
-    unless $(".preview-tag-area .preview-tag-#{full_id}").length > 0
-      # ADD PREVIEW TAG
-      $('.preview-tag-area').append(new_entry)  # add to dom
+      # ensure no duplicate tags added
+      unless $(".preview-tag-area .preview-tag-#{full_id}").length > 0
+        # ADD PREVIEW TAG
+        $('.preview-tag-area').append(new_entry)  # add to dom
 
-    # PREVIEW TAG CLOSE BUTTON NOW EXISTS IN DOM, ATTACH HANDLER
-    # on close click, uncheck the id for that cb
-    $('.preview-tag-close').click ->
-      $(this).closest('.preview-tag').remove()  # remove from dom first
+      # PREVIEW TAG CLOSE BUTTON NOW EXISTS IN DOM, ATTACH HANDLER
+      # on close click, uncheck the id for that cb
+      $('.preview-tag-close').click ->
+        $(this).closest('.preview-tag').remove()  # remove from dom first
 
-      full_id = $(this).attr('data-full-id')  # uncheck the cb after
-      $(".tag-entry-cb-#{full_id}").prop('checked', false)
+        full_id = $(this).attr('data-full-id')  # uncheck the cb after
+        $(".tag-entry-cb-#{full_id}").prop('checked', false)
 
-      if $('.preview-tag-area .preview-tag').length == 0
-        $('.preview-tag-area').addClass('hidden')
 
 
 
@@ -758,7 +753,8 @@ window.taxonomy_dt_init = () ->
   # show all seven thousand tag rows by default
   unless $(".taxonomy-table").hasClass('dataTable')
     taxonomy_table = $(".taxonomy-table").DataTable
-      dom: 'lftpir'
+#      dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+      dom: 'l<"my-class"f>tpir'
       columnDefs: [
         {
           targets: [0]
@@ -769,8 +765,9 @@ window.taxonomy_dt_init = () ->
       order: [[1, 'asc']]
       pageLength: 10
       language: {
-        search: "_INPUT_"
+        search: "Tag Search"
         searchPlaceholder: "Search"
+        zeroRecords: "No matching tags found"
       }
 
     # select change does a search and draw
@@ -781,38 +778,10 @@ window.taxonomy_dt_init = () ->
 
 
 
-
-    # SELECTIZE SET UP HERE
-    # SELECTIZE SET UP HERE
-    # SELECTIZE SET UP HERE
-#    $('#DataTables_Table_1_filter input').selectize {
-#      maxItems: 5,
-#      plugins: ["remove_button"],
-#      valueField: 'id',
-#      labelField: 'title',
-#      searchField: 'title',
-#      options: [
-#        {id: 1, title: 'Spam'},
-#        {id: 2, title: 'Phishing'},
-#        {id: 3, title: 'Adult Content'}
-#      ],
-#      create: false
-#    }
-#
-#
-
-
-
-
-
-
-
-
 # read more button for mitre descriptions in dialog
 window.mitre_read_more = (full_id) ->
   $(".tag-#{full_id} .tag-entry-description").toggleClass('condensed')
   $(".tag-#{full_id} .read-more-button .down-caret").toggleClass('expanded')
-
 
 
 $ ->
@@ -832,20 +801,15 @@ window.tags_action = (action) ->
 
   # if preview tags are visible, proceed with everything
   if $('.preview-tag:visible').length == 0
-    alert 'please select a tag'
+    std_msg_error('No tag selected', ['Please select at least one tag.'])
 
   # if preview tags are visible, proceed with everything
   else if $('.preview-tag:visible').length > 0
-
     switch action
-      when 'add'
-        success_msg = "Tags added to observable"
-      when 'suppress'
-        success_msg = "Tags suppressed"
-      when 'unsuppress'
-        success_msg = "Tags unsuppressed"
-      when 'delete'
-        success_msg = "Tags removed from observable"
+      when 'add' then success_msg = "Tags added to observable"
+      when 'suppress' then success_msg = "Tags suppressed"
+      when 'unsuppress' then success_msg = "Tags unsuppressed"
+      when 'delete' then success_msg = "Tags removed from observable"
 
     data = {}
     items = []
@@ -853,8 +817,7 @@ window.tags_action = (action) ->
     # all of below is set up for ADD tags
     # logic will need to be adjusted for suppress/remove/etc
 
-    # FIX THIS, we are changing the preview tag stuff
-    # FIX THIS
+    # every existing tag preview to be added
     $('.preview-tag-area .preview-tag').each ->
       tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
       entry_id = parseInt($(this).attr('data-entry-id'))
@@ -889,12 +852,10 @@ window.tags_action = (action) ->
       data: data
       success: (response) ->
         $('#add-context-tags-dialog').dialog('close')
-        std_msg_success(success_msg, ['Success. Reloading page.'], reload: true)
+        std_msg_success("Success", ["#{success_msg}. Reloading page."], reload: true)
 
 
 
-# FIX THIS
-# FIX THIS
 # FIX THIS, dry out and add label handler
 $ ->
   $('.suppressed-context-tags-toggle').click ->
@@ -908,20 +869,6 @@ $ ->
       $('.tmi-tr-suppressed-no').removeClass('hidden')
     else
       $('.tmi-tr-suppressed-no').addClass('hidden')
-
-# FIX THIS UP below
-#  $('.tab-context-tags .context-tags-toggle').click ->
-#    if $(this).hasClass('suppressed-context-tags-toggle')
-#      curr_class = 'yes'
-#    else if $(this).hasClass('unsuppressed-context-tags-toggle')
-#      curr_class = 'no'
-#    if $(this).find('input:checkbox').prop('checked') == true
-#      $(".tmi-tr-suppressed-#{curr_class}").removeClass('hidden')
-#    else
-#      $(".tmi-tr-suppressed-#{curr_class}").addClass('hidden')
-
-
-
 
 
 

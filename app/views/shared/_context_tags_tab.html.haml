@@ -160,13 +160,14 @@
         -# context tags js will generate options below
 
         %select.taxonomy-select
-          %option Select a taxonomy
+          %option.first-option Select a taxonomy
 
       -# preview area for tags to be added
       .col-xs-6
-        .preview-tag-area.hidden
+        .preview-tag-area
           %label.content-label-sm
             Add To Observable
+
 
       -# tag search will exist here when dt inits
       .col-xs-3

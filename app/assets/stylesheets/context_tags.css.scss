@@ -229,7 +229,6 @@
 
 
 // DIALOG STYLES HERE
-// DIALOG STYLES HERE
 // add tags dialog on ct tab
 .add-context-tags-dialog {
   font-family: 'Open Sans', sans-serif;
@@ -237,7 +236,6 @@
   font-size: 9pt;
   background-color: #fff;
   min-height: 500px;
-
   // jquery builds the id inside the same parent class
   #add-context-tags-dialog {
     display: flex;
@@ -268,54 +266,55 @@
     display: block;
   }
   .preview-tag-area {
-    border-left: solid 1px #eee;
-    border-bottom: solid 1px #eee;
-    height: 78px;
+    border: solid 1px #eee;
+    border-top: none;
+    min-height: 78px;
+    max-height: 130px;
     width: 100%;
     padding: 10px 15px 5px;
     position: absolute;
+    background-color: #fff;
     top: -10px;
     right: 0;
-    //background-color: #f8f9f9;
     overflow-y: auto;
+    z-index: 9999;
   }
   .preview-tag {
     display: inline-block;
-    width: 250px;
-    height: 20px;
-    padding: 0;
+    color: #fff;
+    background-color: #6dbcdb;
+    padding: 0;  // full height for close btn
+    border-radius: 2px;
     margin: 2px 4px 1px 0;
-    background-color: #ddd;
-    font-size: 8pt;
+    cursor: default;
     .preview-tag-name {
       display: inline-block;
-      padding: 5px;
-      vertical-align: top;
-      cursor: default;
-    }
-    .preview-tag-name p {
       text-overflow: ellipsis;
-      white-space: nowrap;  // ellipsis-trick this string
+      white-space: nowrap;  // ellipsis-trick tag name
       overflow-x: hidden;
-      width: 218px;
-      height: 15px;
+      padding: 4px 8px;
+      width: 240px;
+      height: 20px;
+      font-size: 8.5pt;
+      vertical-align: middle;
     }
     .preview-tag-close {
       display: inline-block;
-      width: 22px;
-      height: 20px;
-      padding: 0;
-      border-left: solid 1px #ccc;
-      background-image: url(image_path('icon_close.svg'));
-      background-repeat: no-repeat;
-      background-size: 18px 18px;
-      background-position: 1px 1px;
+      font-size: 12pt;
+      color: #fff;
+      width: 20px;
+      vertical-align: middle;
+      height: 25px;
+      padding: 4px 5px;
+      margin-left: 5px;
+      border-left: solid 1px #8bcfea;
       &:hover {
-        background-color: #ccc;
+        opacity: 0.5;
         cursor: pointer;
       }
     }
   }
+
   .tags-content-row {
     min-height: 300px;
     flex: 1 1 auto;
@@ -410,9 +409,10 @@
     width: 100%;
     border: solid 1px #ddd;
     padding: 4px;
+    //color: #666;
     margin-bottom: 15px;
     option:first-of-type {
-      color: red;
+      color: #eee !important;
     }
   }
   button {
@@ -435,7 +435,7 @@
     padding-left: 8px;
   }
   .dataTables_filter input {
-    width: 220px;
+    width: 270px;
     border: solid 1px #ddd;
     padding: 5px;
     margin-bottom: 15px;
@@ -455,8 +455,6 @@
   }
 
   // FIX THIS
-  // FIX THIS
-  // FIX THIS
   //.selectize-input {
   //  border: solid 1px #eee;
   //  width: 300px;
@@ -467,8 +465,6 @@
   //  }
   //}
   //
-
-
 
   .dataTables_info {
     float: none;
@@ -484,9 +480,6 @@
 
 
 
-
-
-
 // two primary divs within the act dialog
 .actd-loader-area, .actd-tags-area {
   padding: 0;
@@ -497,7 +490,8 @@
   width: 100%;
   padding: 30px;
   justify-content: center;
-  //height: 100%;
-  //align-content: center;
-  //align-items: center;
+}
+
+.taxonomy-select .first-option {
+  color: #ddd;
 }
