@@ -192,7 +192,7 @@ window.create_webrep_enrichment_section = (tags, context) ->
     taxonomy = ''
 
     if tag.mapped_taxonomy?.name[0].text? then name = tag.mapped_taxonomy.name[0].text
-    if tag.mapped_taxonomy?.description[0].text? then description = tag.mapped_taxonomy.description[0].text
+    if tag.mapped_taxonomy?.description[0]?.text? then description = tag.mapped_taxonomy.description[0].text
     if tag.taxonomy_name? then taxonomy = tag.taxonomy_name
 
     #look for any external reference data
@@ -249,7 +249,8 @@ window.create_webrep_enrichment_section = (tags, context) ->
     $(curr_row).append(external_ref_cell)
 
     # append a table row
-    $(enrich_tbody).append(curr_row)  # ADD TO DOM
+    $('.enrichment-table tbody').append(curr_row)  # ADD TO DOM
+
 
 
 # WEBREP PREVALENCE
