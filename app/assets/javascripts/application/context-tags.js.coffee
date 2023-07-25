@@ -680,7 +680,7 @@ window.add_context_tags_dialog = () ->
             entry_tr =
               "<tr class='tag-entry-row tag-#{full_id} taxonomy-row taxonomy-row-#{taxonomy_id}'>
                  <td class='tag-cb-col'>
-                   <input class='tag-entry-cb tag-entry-cb-#{full_id}' type='checkbox' data-tax-id='#{taxonomy_id}' data-tax-name='#{taxonomy_name}' data-entry-name='#{name}' data-entry-id='#{entry_id}' onclick='add_preview_tag();'></td>
+                   <input class='tag-entry-cb tag-entry-cb-#{full_id}' type='checkbox' data-tax-id='#{taxonomy_id}' data-tax-name='#{taxonomy_name}' data-entry-name='#{name}' data-entry-id='#{entry_id}' onclick='add_preview_tag(\"#{full_id}\");'></td>
                  <td class='tag-name-col'><p class='tag-entry-name'>#{name}</p></td>
                  <td class='tag-mnemonic-col'><p class='tag-entry-mnemonic'>#{mnemonic}</p></td>
                  <td class='tag-taxonomy-col'><p class='tag-entry-taxonomy'>#{taxonomy_name}</p></td>
@@ -716,34 +716,38 @@ window.add_context_tags_dialog = () ->
 
 
 # TAG PREVIEW CLICK HANDLERS AND STUFF
-window.add_preview_tag = () ->
-  # stop at 5
-  if $('.preview-tag-area .preview-tag').length == 5 && $('.tag-entry-cb:checked').length == 5
-    std_msg_error("Maximum of 5 new tags at once.","")
-
+window.add_preview_tag = (curr_tag_id) ->
+  # if preview tag already showing and tag cb is clicked, hide that preview tag
+  if $(".tag-entry-cb-#{curr_tag_id}").prop('checked') == false && $(".preview-tag-#{curr_tag_id}").length > 0
+    $(".preview-tag-#{curr_tag_id}").remove()
   else
-    $('.tag-entry-cb:checked').each ->
-      taxonomy_id = $(this).attr('data-tax-id')
-      taxonomy_name = $(this).attr('data-tax-name')
-      entry_name = $(this).attr('data-entry-name')  # tag name is entry name
-      entry_id = $(this).attr('data-entry-id')
-      full_id = "#{taxonomy_id}-#{entry_id}"
+    # stop at 5 tags to be added at once
+    if $('.preview-tag-area .preview-tag').length == 5 && $('.tag-entry-cb:checked').length == 5
+      std_msg_error("Maximum of 5 new tags at once.","")
 
-      # BUILD PREVIEW TAG
-      new_entry = "<div class='preview-tag preview-tag-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{entry_id}'><span class='preview-tag-name'>#{taxonomy_name}: #{entry_name}</span> <a href='javascript:void(0);' class='preview-tag-close' data-full-id='#{full_id}' title='Remove'>×</a></div>"
+    else
+      $('.tag-entry-cb:checked').each ->
+        taxonomy_id = $(this).attr('data-tax-id')
+        taxonomy_name = $(this).attr('data-tax-name')
+        entry_name = $(this).attr('data-entry-name')  # tag name is entry name
+        entry_id = $(this).attr('data-entry-id')
+        full_id = "#{taxonomy_id}-#{entry_id}"
 
-      # ensure no duplicate tags added
-      unless $(".preview-tag-area .preview-tag-#{full_id}").length > 0
-        # ADD PREVIEW TAG
-        $('.preview-tag-area').append(new_entry)  # add to dom
+        # BUILD PREVIEW TAG
+        new_entry = "<div class='preview-tag preview-tag-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{entry_id}'><span class='preview-tag-name'>#{taxonomy_name}: #{entry_name}</span> <a href='javascript:void(0);' class='preview-tag-close' data-full-id='#{full_id}' title='Remove'>×</a></div>"
 
-      # PREVIEW TAG CLOSE BUTTON NOW EXISTS IN DOM, ATTACH HANDLER
-      # on close click, uncheck the id for that cb
-      $('.preview-tag-close').click ->
-        $(this).closest('.preview-tag').remove()  # remove from dom first
+        # ensure no duplicate tags added
+        unless $(".preview-tag-area .preview-tag-#{full_id}").length > 0
+          # ADD PREVIEW TAG
+          $('.preview-tag-area').append(new_entry)  # add to dom
 
-        full_id = $(this).attr('data-full-id')  # uncheck the cb after
-        $(".tag-entry-cb-#{full_id}").prop('checked', false)
+        # PREVIEW TAG CLOSE BUTTON NOW EXISTS IN DOM, ATTACH HANDLER
+        # on close click, uncheck the id for that cb
+        $('.preview-tag-close').click ->
+          $(this).closest('.preview-tag').remove()  # remove from dom first
+
+          full_id = $(this).attr('data-full-id')  # uncheck the cb after
+          $(".tag-entry-cb-#{full_id}").prop('checked', false)
 
 
 
@@ -754,7 +758,7 @@ window.taxonomy_dt_init = () ->
   unless $(".taxonomy-table").hasClass('dataTable')
     taxonomy_table = $(".taxonomy-table").DataTable
 #      dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
-      dom: 'l<"my-class"f>tpir'
+      dom: 'lftpir'
       columnDefs: [
         {
           targets: [0]
