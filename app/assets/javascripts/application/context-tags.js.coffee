@@ -752,9 +752,11 @@ window.add_preview_tag = (curr_tag_id) ->
 
 
 
+
+
 # dt init the taxonomy table on initial load or change select
 window.taxonomy_dt_init = () ->
-  # show all seven thousand tag rows by default
+  # show all 7000+ tag rows by default, dt init all
   unless $(".taxonomy-table").hasClass('dataTable')
     taxonomy_table = $(".taxonomy-table").DataTable
       dom: 'ilftpr'
@@ -773,10 +775,28 @@ window.taxonomy_dt_init = () ->
         zeroRecords: "No matching tags found"
       }
 
+
+    # FIX THIS
+    # FIX THIS
+    # FIX THIS
+
     # select change does a search and draw
     $('.taxonomy-select').change ->
       new_text = $(this).find('option:selected').text()
       taxonomy_table.columns(3).search(new_text).draw()
+
+      # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
+      # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
+      if new_text == "Select a taxonomy"
+        taxonomy_table.columns(3).search('').draw()
+        $('.tag-entries-area .dataTables_filter input').val('')
+
+
+    # change the text in the dt search field, and if 'select a taxonomy' is already selected, reset the dt results
+    $('.tag-entries-area .dataTables_filter input').click ->
+      if $('.taxonomy-select option:selected').text() == "Select a taxonomy" && !$(this).text().length > 0
+        taxonomy_table.columns(3).search('').draw()
+
 
 
 
