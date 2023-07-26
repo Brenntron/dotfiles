@@ -65,15 +65,15 @@
               %span.toolbar-button-text Add Tag
 
             -# hook this one up
-            %button.toolbar-button.suppress-context-tag-button
+            %button.toolbar-button.suppress-context-tag-button{onclick: "other_tag_functions('suppress_tag');"}
               %span.toolbar-button-text Suppress Tag
 
             -# hook this one up
-            %button.toolbar-button.unsuppress-context-tag-button
+            %button.toolbar-button.unsuppress-context-tag-button{onclick: "other_tag_functions('unsuppress_tag');"}
               %span.toolbar-button-text Unsuppress Tag
 
             -# hook this one up
-            %button.toolbar-button.remove-context-tag-button
+            %button.toolbar-button.remove-context-tag-button{onclick: "other_tag_functions('delete');"}
               %span.toolbar-button-text Remove Tag
 
 
@@ -193,4 +193,4 @@
     .row.save-button-row
       .col-xs-12.text-center
         %button.secondary.tags-cancel-button Cancel
-        %button.primary.tags-save-button{onclick:"tags_action('add');"} Add Tags to Observable
+        %button.primary.tags-save-button{onclick: "add_tags_submit();"} Add Tags to Observable

@@ -10,15 +10,21 @@ window.tmi_ajax_get_data = (query_item) ->
     method: 'GET'
     data: data
     success: (response) ->
-#      console.log response
+      console.log 'read observable data here'
+      console.log response
+
       { items } = response  # list of observables
 
       $(items).each (i, val) ->
         { tags } = this
 
+
+
+
         # tags array
         $(tags).each (i, val) ->
-          { reports, taxonomy, taxonomy_entry, suppressed_by } = this
+          { tag, reports, taxonomy, taxonomy_entry, suppressed_by } = this
+          { taxonomy_id, taxonomy_entry_id } = tag
 
           # issue with indexing, below works to show full set
           unless i > $(tags).length - 1
@@ -80,11 +86,14 @@ window.tmi_ajax_get_data = (query_item) ->
             # convert unix timecode to utc date/time, created means when report was created
             report_date = moment.unix(created_ts).utc().format('YYYY-MM-DD hh:mm:ss')
 
+            # fully unique id for a tag is the tax id + entry id
+            full_id = "#{taxonomy_id}-#{taxonomy_entry_id}"
+
             # one table row for each report
             report_tr =
               "<tr class='tmi-tr tmi-tr-suppressed-#{suppressed}'>
                  <td class='tmi-cb-cell'>
-                   <input type='checkbox' class='tmi-cb'></input></td>
+                   <input type='checkbox' class='tmi-cb tmi-cb-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{taxonomy_entry_id}' data-full-id='#{full_id}'></input></td>
                  <td class='tmi-observable'>
                    <span class='observable-container esc-tooltipped' title='#{raw_observable}'>#{raw_observable}</span></td>
                  <td class='tmi-tag-name'>#{tag_name}</td>
@@ -97,6 +106,9 @@ window.tmi_ajax_get_data = (query_item) ->
                  <td class='tmi-suppression-source tmi-gray'>#{suppression_source}</td>
                  <td class='tmi-suppression-platform tmi-gray'>#{suppression_platform}</td>
                  <td class='tmi-suppression-date tmi-gray'>#{suppression_date}</td></tr>"
+
+
+
 
             # default is no with red cell and gray cells to the right
             if suppressed == 'yes'
@@ -828,12 +840,11 @@ $ ->
 
 
 
-# add the tag of 'dns' in taxonomy of 'intelligence types' to observable of 'cisco.com'
-# actions can be 'add', 'delete', 'suppress_tag', or 'unsuppress_tag', multiple actions allowed at once
-window.tags_action = (action) ->
-  #  action will be add/suppress/unsuppress/delete
-  console.log 'tag action to do:'
-  console.log action
+
+
+window.add_tags_submit = () ->
+  data = {}
+  items = []
 
   # if preview tags are visible, proceed with everything
   if $('.preview-tag:visible').length == 0
@@ -841,20 +852,67 @@ window.tags_action = (action) ->
 
   # if preview tags are visible, proceed with everything
   else if $('.preview-tag:visible').length > 0
-    switch action
-      when 'add' then success_msg = "Tags added to observable"
-      when 'suppress' then success_msg = "Tags suppressed"
-      when 'unsuppress' then success_msg = "Tags unsuppressed"
-      when 'delete' then success_msg = "Tags removed from observable"
-
-    data = {}
-    items = []
-
-    # all of below is set up for ADD tags
-    # logic will need to be adjusted for suppress/remove/etc
-
-    # every existing tag preview to be added
     $('.preview-tag-area .preview-tag').each ->
+      tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
+      entry_id = parseInt($(this).attr('data-entry-id'))
+      curr_observable = $('.ctt-entry-select option:selected').text().trim()  # this works even when hidden
+
+      # make tags array dynamic
+      observable_type = determine_string_type(curr_observable)  # ip or sha or url or domain
+
+      # add new item object to add to array, 'add' can change action to suppress or remove
+      new_item = {
+        "#{observable_type}": curr_observable
+        action: 'add'
+        tags: [
+          {
+            taxonomy_id: tax_id
+            taxonomy_entry_id: entry_id
+          }
+        ]
+      }
+      items.push(new_item)
+
+    # items is fully built, add to data object
+    data.items = items
+
+    # data is finished construction, send to endpoint with action specified
+    std_msg_ajax
+      url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
+      method: 'POST'
+      data: data
+      success: (response) ->
+        $('#add-context-tags-dialog').dialog('close')
+        std_msg_success("Success", ["Tags added to observable. Reloading page."], reload: true)
+
+
+
+
+# FIX THIS
+# FIX THIS
+# FIX THIS
+# suppress tags and unsuppress tags and remove tags, all handled here
+window.other_tag_functions = (action) ->
+  data = {}
+  items = []
+
+  switch action
+    when 'suppress_tag'
+      success_msg = "Tags suppressed"
+    when 'unsuppress_tag'
+      success_msg = "Tags unsuppressed"
+    when 'delete'
+      success_msg = "Tags removed from observable"
+
+
+  if $('.tmi-cb:checked').length == 0
+    std_msg_error('No tag selected', ['Please select at least one tag.'])
+
+  else
+    # FIX THIS
+    # FIX THIS
+    # every tag checkbox
+    $('.tmi-cb:checked').each ->
       tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
       entry_id = parseInt($(this).attr('data-entry-id'))
       curr_observable = $('.ctt-entry-select option:selected').text().trim()  # this works even when hidden
@@ -873,13 +931,15 @@ window.tags_action = (action) ->
           }
         ]
       }
-
       items.push(new_item)
 
+    # items is fully built, add to data object
     data.items = items
 
-    console.log 'HERE IS YOUR DATA'
+#    console.clear()
+    console.log 'data for tags to SUPPRESS OR UNSUPPRESS OR REMOVE'
     console.log data
+
 
     # data is finished construction, send to endpoint with action specified
     std_msg_ajax
@@ -887,7 +947,6 @@ window.tags_action = (action) ->
       method: 'POST'
       data: data
       success: (response) ->
-        $('#add-context-tags-dialog').dialog('close')
         std_msg_success("Success", ["#{success_msg}. Reloading page."], reload: true)
 
 
