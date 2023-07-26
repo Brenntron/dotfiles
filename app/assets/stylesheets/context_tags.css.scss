@@ -479,7 +479,6 @@
 }
 
 
-
 // two primary divs within the act dialog
 .actd-loader-area, .actd-tags-area {
   padding: 0;
@@ -491,7 +490,12 @@
   padding: 30px;
   justify-content: center;
 }
+.actd-error-area p {
+  text-align: center;
+  padding: 20px;
+}
 
-.taxonomy-select .first-option {
-  color: #ddd;
+.tmi-error {
+  padding: 10px 5px 5px;
+  font-size: 9pt;
 }

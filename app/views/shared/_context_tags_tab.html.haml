@@ -100,6 +100,9 @@
         = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
         %span.loader-msg Loading...
 
+      %p.tmi-error.missing-data.hidden
+        Error loading data.
+
 
     -# enrichment data for webrep and filerep
     %h2 Enrichment Service
@@ -149,7 +152,7 @@
 
   -# ERROR DIV
   .actd-error-area.hidden
-    %p Error with tag data.
+    %p.missing-info Error loading tag data.
 
   -# MAIN DIV
   .actd-tags-area.hidden

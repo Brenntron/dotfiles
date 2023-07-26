@@ -107,9 +107,11 @@ window.tmi_ajax_get_data = (query_item) ->
             $('.tmi-tbody').append(report_tr)  # add to dom
 
 
-#    error: (response) ->
-#      std_msg_error("Error", [response.responseJSON], reload: false)
-#      console.log response
+    error: (response) ->
+      std_msg_error("Error with loading data", [response.responseText], reload: false)
+      $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # remove all loaders
+      $('.tmi-error').removeClass('hidden')
+
 
 
 
@@ -131,6 +133,7 @@ window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
     $('#tmi-dt').DataTable().destroy()
     $('#enrichment-dt').DataTable().destroy()
     $('#prevalence-dt').DataTable().destroy()
+
     $('.tmi-main-content, .enrichment-table, .prevalence-table').addClass('hidden')  # hide the tables in general
     $('.tmi-table tbody, .enrichment-table tbody, .prevalence-table tbody').empty()  # reset the table rows
 
@@ -676,8 +679,6 @@ window.add_context_tags_dialog = () ->
 
             if !description then description = ''
 
-
-
             entry_tr =
               "<tr class='tag-entry-row tag-#{full_id} taxonomy-row taxonomy-row-#{taxonomy_id}'>
                  <td class='tag-cb-col'>
@@ -760,7 +761,7 @@ window.taxonomy_dt_init = () ->
   # show all 7000+ tag rows by default, dt init all
   unless $(".taxonomy-table").hasClass('dataTable')
     taxonomy_table = $(".taxonomy-table").DataTable
-      dom: 'ilftpr'
+      dom: 'ilftipr'
       columnDefs: [
         {
           targets: [0]
@@ -772,7 +773,7 @@ window.taxonomy_dt_init = () ->
       pageLength: 10
       language: {
         search: "Tag Search"
-        searchPlaceholder: "Search"
+        searchPlaceholder: "Search for tags by keyword"
         zeroRecords: "No matching tags found"
       }
 
