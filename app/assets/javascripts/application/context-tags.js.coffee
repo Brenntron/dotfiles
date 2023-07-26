@@ -772,6 +772,7 @@ window.all_tags_dt_init = () ->
       ]
       order: [[1, 'asc']]
       pageLength: 10
+      pagingType: 'full_numbers'
       language: {
         search: "Tag Search"
         searchPlaceholder: "Search for tags by keyword"

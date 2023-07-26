@@ -398,6 +398,9 @@
   .new-line {
     height: 10px;
   }
+  select {
+    background-color: #fff;
+  }
   code {
     color: #333;  // code tag appears from api in desc randomly
     background-color: #fff;
@@ -443,6 +446,16 @@
   }
   .dataTables_paginate {
     margin: 10px 0;
+    .paginate_button {
+      background-color: #fff;
+      margin-right: 2px;
+      border-color: #ddd !important;
+    }
+    .paginate_button.disabled {
+      border: solid 1px #f6f6f6 !important;  // fix these imps if time avail
+      background-color: #f6f6f6;
+      color: #aaa !important;
+    }
   }
   .dataTables_length {
     float: right;
