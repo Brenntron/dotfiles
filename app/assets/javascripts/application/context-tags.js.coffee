@@ -838,10 +838,7 @@ $ ->
     $('#add-context-tags-dialog').dialog('close')
 
 
-
-
-
-
+# adding tags inside of the dialog
 window.add_tags_submit = () ->
   data = {}
   items = []
@@ -883,71 +880,76 @@ window.add_tags_submit = () ->
       data: data
       success: (response) ->
         $('#add-context-tags-dialog').dialog('close')
-        std_msg_success("Success", ["Tags added to observable. Reloading page."], reload: true)
+        std_msg_success("Success!", ["Tags added to observable. Reloading page."], reload: true)
+      error: (response) ->
+        std_msg_error("Error adding tags", ["#{response.responseText}"], reload: false)
 
 
 
 
-# FIX THIS
-# FIX THIS
-# FIX THIS
 # suppress tags and unsuppress tags and remove tags, all handled here
 window.other_tag_functions = (action) ->
   data = {}
   items = []
 
-  switch action
-    when 'suppress_tag'
-      success_msg = "Tags suppressed"
-    when 'unsuppress_tag'
-      success_msg = "Tags unsuppressed"
-    when 'delete'
-      success_msg = "Tags removed from observable"
+  any_tags_suppressed = false
 
+  # any tags are suppressed? this affects remove tag func
+  $('.tmi-cb:checked').each ->
+    suppressed_status = $(this).closest('tr').find('.tmi-suppressed').text().trim()
+    if suppressed_status == 'yes' then any_tags_suppressed = true
+
+  switch action
+    when 'suppress_tag' then success_msg = "Tags suppressed"
+    when 'unsuppress_tag' then success_msg = "Tags unsuppressed"
+    when 'delete' then success_msg = "Tags removed from observable"
 
   if $('.tmi-cb:checked').length == 0
     std_msg_error('No tag selected', ['Please select at least one tag.'])
 
   else
-    # FIX THIS
-    # FIX THIS
-    # every tag checkbox
-    $('.tmi-cb:checked').each ->
-      tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
-      entry_id = parseInt($(this).attr('data-entry-id'))
-      curr_observable = $('.ctt-entry-select option:selected').text().trim()  # this works even when hidden
+    # remove tags and the tags are suppressed, stop and error out
+    if action == 'delete' && any_tags_suppressed == true
+      std_msg_error('Error', ['One or more tags is suppressed, can not proceed with removing tags.'])
 
-      # make tags array dynamic
-      observable_type = determine_string_type(curr_observable)  # ip or sha or url or domain
+    else
+      $('.tmi-cb:checked').each ->
+        tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
+        entry_id = parseInt($(this).attr('data-entry-id'))
+        curr_observable = $('.ctt-entry-select option:selected').text().trim()  # this works even when hidden
 
-      # add new item object to add to array, 'add' can change action to suppress or remove
-      new_item = {
-        "#{observable_type}": curr_observable
-        action: action
-        tags: [
-          {
-            taxonomy_id: tax_id
-            taxonomy_entry_id: entry_id
-          }
-        ]
-      }
-      items.push(new_item)
+        # make tags array dynamic
+        observable_type = determine_string_type(curr_observable)  # ip or sha or url or domain
 
-    # items is fully built, add to data object
-    data.items = items
+        # add new item object to add to array, 'add' can change action to suppress or remove
+        new_item = {
+          "#{observable_type}": curr_observable
+          action: action
+          tags: [
+            {
+              taxonomy_id: tax_id
+              taxonomy_entry_id: entry_id
+            }
+          ]
+        }
+        items.push(new_item)
 
-#    console.clear()
-    console.log 'data for tags to SUPPRESS OR UNSUPPRESS OR REMOVE'
-    console.log data
+      # items is fully built, add to data object
+      data.items = items
 
+  #    console.clear()
+      console.log 'data for tags to SUPPRESS OR UNSUPPRESS OR REMOVE'
+      console.log data
 
-    # data is finished construction, send to endpoint with action specified
-    std_msg_ajax
-      url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
-      method: 'POST'
-      data: data
-      success: (response) ->
-        std_msg_success("Success", ["#{success_msg}. Reloading page."], reload: true)
+      # data is finished construction, send to endpoint with action specified
+      std_msg_ajax
+        url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
+        method: 'POST'
+        data: data
+        success: (response) ->
+          std_msg_success("Success!", ["#{success_msg}. Reloading page."], reload: true)
+        error: (response) ->
+          std_msg_error("Error with tags", ["#{response.responseText}"], reload: false)
 
 
 
