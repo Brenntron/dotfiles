@@ -82,14 +82,16 @@ module API
               begin
                 params[:data].each do |submitted_complaint|
                   @entry = ComplaintEntry.find(submitted_complaint[:id])
-                  @entry.change_category( submitted_complaint[:prefix],
-                                          submitted_complaint[:categories],
-                                          submitted_complaint[:category_names],
-                                          submitted_complaint[:status],
-                                          submitted_complaint[:comment],
-                                          submitted_complaint[:resolution_comment],
-                                          '',
-                                          current_user, submitted_complaint[:commit])
+                  @entry.change_category(submitted_complaint[:prefix],
+                                         submitted_complaint[:categories],
+                                         submitted_complaint[:category_names],
+                                         submitted_complaint[:status],
+                                         submitted_complaint[:comment],
+                                         submitted_complaint[:resolution_comment],
+                                         '',
+                                         current_user,
+                                         submitted_complaint[:commit],
+                                         submitted_complaint[:self_review])
 
                   if submitted_complaint[:commit] == 'decline'
                     category_data = @entry.current_category_data.to_a
@@ -538,14 +540,16 @@ module API
                     if entry['error'] == false
                       complaint_entry = ComplaintEntry.find(entry['entry_id'])
                       uri_as_categorized = entry['uri_as_categorized'].blank? ? complaint_entry.uri : entry['uri_as_categorized']
-                      complaint_entry.change_category( entry['prefix'],
-                                                       entry['categories'],
-                                                       entry['category_names'],
-                                                       entry['status'],
-                                                       entry['comment'],
-                                                       entry['resolution_comment'],
-                                                       uri_as_categorized,
-                                                       current_user, "")
+                      complaint_entry.change_category(entry['prefix'],
+                                                      entry['categories'],
+                                                      entry['category_names'],
+                                                      entry['status'],
+                                                      entry['comment'],
+                                                      entry['resolution_comment'],
+                                                      uri_as_categorized,
+                                                      current_user,
+                                                      "",
+                                                      entry['self_review'])
 
                       Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry) }
                       if complaint_entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
