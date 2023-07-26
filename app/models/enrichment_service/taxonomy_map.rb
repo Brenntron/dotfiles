@@ -46,7 +46,7 @@ class EnrichmentService::TaxonomyMap
     if entry_id.present?
       lookup = JSON.parse(Rails.cache.read("taxonomy_lookup_#{id}") || "{}")
       if lookup.blank?
-        build_lookups
+        cache_map
         lookup = JSON.parse(Rails.cache.read("taxonomy_lookup_#{id}") || "{}")
       end
       entry = lookup[entry_id.to_s]
@@ -54,7 +54,7 @@ class EnrichmentService::TaxonomyMap
     else
       taxonomy = JSON.parse(Rails.cache.read("taxonomy_#{id}") || "{}")
       if taxonomy.blank?
-        build_lookups
+        cache_map
         taxonomy = JSON.parse(Rails.cache.read("taxonomy_#{id}") || "{}")
       end
       return taxonomy if taxonomy.present?
