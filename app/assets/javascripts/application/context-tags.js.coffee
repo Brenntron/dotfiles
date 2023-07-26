@@ -608,6 +608,7 @@ $ ->
     # on webrep, if user clicks the 'select an entry' element
     $('.tab-ctt-webrep .ctt-entry-select').change ->
       $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
+      $('.tmi-error').addClass('hidden')
       curr_entry = $(this).find('option:selected').attr('data-entry')
       tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
 
@@ -710,7 +711,7 @@ window.add_context_tags_dialog = () ->
         $('.tag-entries-area .taxonomy-table tbody').append(all_tag_rows_html)  # ADD TO DOM
 
         # open the dialog and dt init with all tags showing
-        taxonomy_dt_init()
+        all_tags_dt_init()
 
         # add flag to dom that the dialog is now built
         $('.tab-context-tags').addClass('tags-dialog-built')
@@ -757,10 +758,10 @@ window.add_preview_tag = (curr_tag_id) ->
 
 
 # dt init the taxonomy table on initial load or change select
-window.taxonomy_dt_init = () ->
+window.all_tags_dt_init = () ->
   # show all 7000+ tag rows by default, dt init all
   unless $(".taxonomy-table").hasClass('dataTable')
-    taxonomy_table = $(".taxonomy-table").DataTable
+    tags_table = $(".taxonomy-table").DataTable
       dom: 'ilftipr'
       columnDefs: [
         {
@@ -777,27 +778,31 @@ window.taxonomy_dt_init = () ->
         zeroRecords: "No matching tags found"
       }
 
+    # highlight substrings here (uses dt/jquery plugin)
+    tags_table.on 'draw', ->
+      tags_body = $(tags_table.table().body())
+      tags_body.unhighlight()
+      tags_body.highlight(tags_table.search())
+
 
     # FIX THIS
     # FIX THIS
-    # FIX THIS
-
     # select change does a search and draw
     $('.taxonomy-select').change ->
       new_text = $(this).find('option:selected').text()
-      taxonomy_table.columns(3).search(new_text).draw()
+      tags_table.columns(3).search(new_text).draw()
 
       # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
       # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
       if new_text == "Select a taxonomy"
-        taxonomy_table.columns(3).search('').draw()
+        tags_table.columns(3).search('').draw()
         $('.tag-entries-area .dataTables_filter input').val('')
 
 
     # change the text in the dt search field, and if 'select a taxonomy' is already selected, reset the dt results
     $('.tag-entries-area .dataTables_filter input').click ->
       if $('.taxonomy-select option:selected').text() == "Select a taxonomy" && !$(this).text().length > 0
-        taxonomy_table.columns(3).search('').draw()
+        tags_table.columns(3).search('').draw()
 
 
 

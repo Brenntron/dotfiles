@@ -9,7 +9,7 @@
     position: absolute;
     left: 160px;
     top: 10px;
-
+    white-space: nowrap;  // ensure superlong strings dont break ui
     .ctt-entry-label {
       position: relative;
       left: 60px;
@@ -268,10 +268,10 @@
   .preview-tag-area {
     border: solid 1px #eee;
     border-top: none;
-    min-height: 78px;
+    min-height: 76px;
     max-height: 130px;
     width: 100%;
-    padding: 10px 15px 5px;
+    padding: 10px 15px;
     position: absolute;
     background-color: #fff;
     top: -10px;
@@ -292,7 +292,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;  // ellipsis-trick tag name
       overflow-x: hidden;
-      padding: 4px 8px;
+      padding: 4px 2px 4px 8px;
       max-width: 240px;
       height: 20px;
       font-size: 8.5pt;
@@ -318,11 +318,9 @@
 
   .tags-content-row {
     min-height: 300px;
-    flex: 1 1 auto;
-    padding-top: 20px;
+    //flex: 1 1 auto;
   }
   .save-button-row {
-    //flex: 0 1 auto;
     padding: 10px;
     width: 100%;
     margin: 0 auto;
@@ -356,6 +354,10 @@
     white-space: pre-line;
     line-height: 11pt;
     padding-bottom: 5px;
+  }
+  .highlight {
+    background-color: #fff7cd;
+    font-weight: 600;
   }
   .tag-entry-description.condensed {
     max-height: 40px;
@@ -407,10 +409,11 @@
   }
   .taxonomy-select {
     font-family: 'Open Sans', sans-serif;
+    font-size: 8.5pt;
     width: 100%;
     border: solid 1px #ddd;
     padding: 4px;
-    //color: #666;
+    color: #777;
     margin-bottom: 15px;
     option:first-of-type {
       color: #eee !important;
@@ -436,17 +439,18 @@
     padding-left: 8px;
   }
   .dataTables_info {
-    margin: 0 0 10px;
-    padding-top: 5px;
+    margin: 20px 0;
+    padding: 0;
   }
   .dataTables_paginate {
     margin: 10px 0;
   }
   .dataTables_length {
     float: right;
+    position: relative;
+    top: 20px;
     label {
       background-color: #eee;
-      margin-bottom: 10px;
     }
     select {
       border: solid 1px #eee;
@@ -455,8 +459,8 @@
   }
   .dataTables_filter label {
     position: absolute;
-    top: -85px;
-    right: 0;
+    top: -65px;
+    left: 290px;
     display: block;
     font-size: 7pt;
     color: #999;
@@ -465,12 +469,20 @@
     input {
       display: block;
       width: 270px;
-      font-size: 9pt;
+      font-size: 8.5pt;
+      height: 29px;
+      position: relative;
+      bottom: 1px;
+      font-family: 'Open Sans', sans-serif;
       color: #333;
       border: solid 1px #ddd;
-      padding: 5px;
+      padding: 6px;
       margin: 0;
       margin-top: 10px;
+      background-image: url(image_path('icon_search_dark.svg'));
+      background-repeat: no-repeat;
+      background-position: 99% center;
+      background-size: 15px 15px;
     }
   }
   .dataTables_empty {
