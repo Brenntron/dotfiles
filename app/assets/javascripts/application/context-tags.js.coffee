@@ -761,7 +761,7 @@ window.add_preview_tag = (curr_tag_id) ->
 window.all_tags_dt_init = () ->
   # show all 7000+ tag rows by default, dt init all
   unless $(".taxonomy-table").hasClass('dataTable')
-    tags_table = $(".taxonomy-table").DataTable
+    tags_table_dt = $(".taxonomy-table").DataTable
       dom: 'ilftipr'
       columnDefs: [
         {
@@ -779,10 +779,10 @@ window.all_tags_dt_init = () ->
       }
 
     # highlight substrings here (uses dt/jquery plugin)
-    tags_table.on 'draw', ->
-      tags_body = $(tags_table.table().body())
-      tags_body.unhighlight()
-      tags_body.highlight(tags_table.search())
+    tags_table_dt.on 'draw', ->
+      tags_dt_body = $(tags_table_dt.table().body())
+      tags_dt_body.unhighlight()
+      tags_dt_body.highlight(tags_table_dt.search())
 
 
     # FIX THIS
@@ -790,19 +790,24 @@ window.all_tags_dt_init = () ->
     # select change does a search and draw
     $('.taxonomy-select').change ->
       new_text = $(this).find('option:selected').text()
-      tags_table.columns(3).search(new_text).draw()
+      tags_table_dt.columns(3).search(new_text).draw()
 
       # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
       # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
       if new_text == "Select a taxonomy"
-        tags_table.columns(3).search('').draw()
+        $(this).addClass('no-tax-selected')
+        tags_table_dt.columns(3).search('').draw()
         $('.tag-entries-area .dataTables_filter input').val('')
+      else
+        $(this).removeClass('no-tax-selected')
 
 
+    # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
+    # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
     # change the text in the dt search field, and if 'select a taxonomy' is already selected, reset the dt results
     $('.tag-entries-area .dataTables_filter input').click ->
       if $('.taxonomy-select option:selected').text() == "Select a taxonomy" && !$(this).text().length > 0
-        tags_table.columns(3).search('').draw()
+        tags_table_dt.columns(3).search('').draw()
 
 
 

@@ -413,10 +413,9 @@
     width: 100%;
     border: solid 1px #ddd;
     padding: 4px;
-    color: #777;
     margin-bottom: 15px;
-    option:first-of-type {
-      color: #eee !important;
+    &.no-tax-selected {
+      color: #777;
     }
   }
   button {
@@ -481,7 +480,7 @@
       margin-top: 10px;
       background-image: url(image_path('icon_search_dark.svg'));
       background-repeat: no-repeat;
-      background-position: 99% center;
+      background-position: 98% center;
       background-size: 15px 15px;
     }
   }
