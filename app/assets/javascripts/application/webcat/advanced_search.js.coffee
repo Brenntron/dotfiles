@@ -52,10 +52,15 @@ namespace 'AC.WebCat', (exports) ->
   exports.populateSearchCriteria = ->
 
     {webcat_search_conditions, webcat_search_type} = localStorage
-    return unless webcat_search_conditions && webcat_search_type == 'advanced'
+    advanced = webcat_search_conditions && webcat_search_type == 'advanced'
+    named = webcat_search_type == 'named'
+
+    return unless advanced || named
     # if there is no advance search or search conditions then break
 
-    searchConditions = JSON.parse localStorage.webcat_search_conditions
+    if named
+      searchConditions = JSON.parse $("##{webcat_search_conditions} a").attr('data-search_conditions')
+
     company_val = []
     name_val = []
 
