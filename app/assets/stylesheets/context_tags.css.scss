@@ -28,7 +28,6 @@
       border: solid 1px #ddd;
     }
   }
-
   .ctt-table {
     margin-bottom: 30px;
     border-bottom: none !important;
@@ -109,8 +108,6 @@
   .filerep-enrich-cell-description p {
     margin-right: 40px;
   }
-
-
   .observable-container {
     display: inline-block;
     max-width: 200px;  // revisit when time avail, ok for now
@@ -289,7 +286,7 @@
     background-position: 8px center;
     background-size: 20px 20px;
   }
-  table.dataTable.taxonomy-table.no-footer {
+  table.dataTable.all-tags-table.no-footer {
     border: none;
   }
   td {
@@ -393,7 +390,6 @@
     border: solid 1px #ddd;
     padding: 4px;
     height: 27px;
-    //margin-bottom: 15px;
   }
   button {
     font-family: 'Open Sans', sans-serif;
@@ -445,7 +441,7 @@
 
 // taxonomy table dt style one-offs needed for dt ui elems
 .tag-entries-area {
-  .taxonomy-table th {
+  .all-tags-table th {
     border-bottom: solid 1px #eee;
     vertical-align: middle;
     padding-left: 8px;
@@ -490,7 +486,6 @@
   left: -10px;
   input {
     display: block;
-    //width: 270px;
     width: 100%;
     font-size: 8.5pt;
     height: 27px;

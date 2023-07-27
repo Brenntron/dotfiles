@@ -18,9 +18,6 @@ window.tmi_ajax_get_data = (query_item) ->
       $(items).each (i, val) ->
         { tags } = this
 
-
-
-
         # tags array
         $(tags).each (i, val) ->
           { tag, reports, taxonomy, taxonomy_entry, suppressed_by } = this
@@ -109,15 +106,13 @@ window.tmi_ajax_get_data = (query_item) ->
                  <td class='tmi-suppression-platform tmi-gray'>#{suppression_platform}</td>
                  <td class='tmi-suppression-date tmi-gray'>#{suppression_date}</td></tr>"
 
-
             # default is no with red cell and gray cells to the right
             if suppressed == 'yes'
               report_tr = report_tr.replace(/tmi-red/g,'')
               report_tr = report_tr.replace(/tmi-gray/g,'')
 
-            # created ts is unique enough for now, fix this though to something even more unique
+            # add row to dom
             $('.tmi-tbody').append(report_tr)  # add to dom
-
 
     error: (response) ->
       std_msg_error("Error with loading data", [response.responseJSON.message], reload: false)
@@ -667,9 +662,9 @@ window.add_context_tags_dialog = () ->
         $('.actd-error-area').removeClass('hidden')
 
       success: (response) ->
-        console.clear()
-        console.log 'TAXONOMY DATA BELOW'
-        console.log response
+#        console.clear()
+#        console.log 'TAXONOMY DATA BELOW'
+#        console.log response
 
         # hide loader, show main content
         $('.actd-loader-area').addClass('hidden')
@@ -725,20 +720,14 @@ window.add_context_tags_dialog = () ->
 
             all_tag_rows_html += entry_tr  # build one block of html
 
-
         # add one big string at once, less interaction with dom == better performance
-        $('.tag-entries-area .taxonomy-table tbody').append(all_tag_rows_html)  # ADD TO DOM
+        $('.tag-entries-area .all-tags-table tbody').append(all_tag_rows_html)  # ADD TO DOM
 
         # open the dialog and dt init with all tags showing
         tags_dialog_dt_init()
 
         # add flag to dom that the dialog is now built
         $('.tab-context-tags').addClass('tags-dialog-built')
-
-        # read more btn handler for huge tag descs
-        $('.tags-dialog .read-more-button').click ->
-          $(this).prev().toggleClass('condensed')
-          $(this).find('.down-caret').toggleClass('expanded')
 
 
 # TAG PREVIEW CLICK HANDLERS AND STUFF
@@ -777,13 +766,10 @@ window.add_preview_tag = (curr_tag_id) ->
 
 
 
-
-
 # dt init the taxonomy table on initial load or change select
 window.tags_dialog_dt_init = () ->
-  # show all 7000+ tag rows by default, dt init all
-  unless $(".taxonomy-table").hasClass('dataTable')
-    tags_table_dt = $(".taxonomy-table").DataTable
+  unless $(".all-tags-table").hasClass('dataTable')
+    tags_table_dt = $(".all-tags-table").DataTable
       dom: 'filtipr'
       columnDefs: [
         {
@@ -800,6 +786,11 @@ window.tags_dialog_dt_init = () ->
         searchPlaceholder: "Search for tags by keyword"
         zeroRecords: "No matching tags found"
       }
+      drawCallback: ->
+        $('.tags-dialog .read-more-button').click ->
+          $(this).prev().toggleClass('condensed')  # after a draw or redraw of dt, add click handler
+          $(this).find('.down-caret').toggleClass('expanded')
+
 
     # get the auto-generated dt search and move it into header
     tag_search_html = $('.tags-dialog .dataTables_filter input').detach()
@@ -878,7 +869,6 @@ window.add_tags_submit = () ->
 
 
 
-
 # suppress tags and unsuppress tags and remove tags, all handled here
 window.other_tag_functions = (action) ->
   data = {}
@@ -929,8 +919,8 @@ window.other_tag_functions = (action) ->
       data.items = items
 
   #    console.clear()
-      console.log 'data for tags to SUPPRESS OR UNSUPPRESS OR REMOVE'
-      console.log data
+#      console.log 'data for tags to SUPPRESS OR UNSUPPRESS OR REMOVE'
+#      console.log data
 
       # data is finished construction, send to endpoint with action specified
       std_msg_ajax
@@ -941,7 +931,6 @@ window.other_tag_functions = (action) ->
           std_msg_success("Success!", ["#{success_msg}. Reloading page."], reload: true)
         error: (response) ->
           std_msg_error("Error with tags", ["#{response.responseText}"], reload: false)
-
 
 
 
@@ -957,7 +946,6 @@ $ ->
     minHeight: 600
   )
 
-
   # if this has class suppressed or unsuppressed, do that
   $('.suppressed-label-toggle, .unsuppressed-label-toggle').on "click", (e) ->
     if $(this).hasClass('suppressed-label-toggle')
@@ -971,7 +959,6 @@ $ ->
       else if $(this).find('input').prop('checked') == false
         $(this).find('input').prop('checked', true)
 
-
   # click the select all checkbox in tmi table
   $('.tmi-cb-select-all').click ->
     if $(this).prop('checked') == true
@@ -979,7 +966,6 @@ $ ->
     else
       $('.tmi-cb').prop('checked', false)
 
-    
   # cancel button for tags dialog
   $('.tags-cancel-button').click ->
     $('#add-context-tags-dialog').dialog('close')
