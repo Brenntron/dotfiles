@@ -54,6 +54,13 @@ class Escalations::FileRep::DisputesController < ApplicationController
     @conventions = AmpNamingConvention.all
   end
 
+  # Manage Resolution Templates page throws error if it doesn't have conventions data for some reason
+  def resolution_message_templates
+    @conventions = AmpNamingConvention.all
+    @templates = ResolutionMessageTemplate.for_file_reputation_disputes
+    @check_for_footer_filerep = ResolutionMessageTemplate.by_file_reputation_resolution_disputes('Customer Footer').exists?
+  end
+
   private
 
   def datatables_search_params

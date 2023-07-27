@@ -151,6 +151,10 @@ class FileReputationDispute < ApplicationRecord
     self.disposition&.downcase == DISPOSITION_CLEAN.downcase
   end
 
+  def cleanish?
+    [DISPOSITION_CLEAN.downcase, DISPOSITION_UNKNOWN.downcase, DISPOSITION_COMMON.downcase, DISPOSITION_UNSEEN].include?(self.disposition&.downcase)
+  end
+
   def suggested_clean?
     self.disposition_suggested&.downcase == DISPOSITION_CLEAN.downcase
   end
@@ -829,8 +833,14 @@ class FileReputationDispute < ApplicationRecord
       end
       ar_log += "--------------------------------\n"
 
-      if (self.clean? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
-        self.update(status: STATUS_RESOLVED, resolution: STATUS_AUTO_RESOLVED_MATCH, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT, auto_resolve_log: ar_log)
+      if (self.cleanish? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
+        if self.cleanish? && self.suggested_clean?
+          resolution_comment = generate_generic_non_blocking_comment
+        end
+        if (self.malicious? && self.suggested_malicious?)
+          resolution_comment = generate_generic_blocking_comment
+        end
+        self.update(status: STATUS_RESOLVED, resolution: STATUS_AUTO_RESOLVED_MATCH, resolution_comment: resolution_comment, auto_resolve_log: ar_log)
 
         auto_resolved_boolean = true
       end
@@ -940,7 +950,7 @@ class FileReputationDispute < ApplicationRecord
         file_rep.disposition = DISPOSITION_MALICIOUS
         file_rep.status = STATUS_RESOLVED
         file_rep.resolution = STATUS_AUTO_RESOLVED_FN
-        file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT
+        file_rep.resolution_comment = file_rep.generate_auto_resolve_fn_comment #RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT
         file_rep.auto_resolve_log += ar_log
         file_rep.save
         conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
@@ -1359,5 +1369,49 @@ class FileReputationDispute < ApplicationRecord
     end
 
     return nil
+  end
+
+  def generate_generic_non_blocking_comment
+    disposition_comment = ""
+    sanitized_disposition = ""
+
+    case self.disposition.downcase
+
+    when 'clean'
+      disposition_comment = "A Clean disposition means that Talos has high confidence positive threat intelligence on a file, and this indicates exceptional safety. "
+    else
+      disposition_comment = "An Unknown disposition means that Talos has no negative threat intelligence on a file, but it has been evaluated. "
+    end
+
+    case self.disposition.downcase
+
+    when 'clean'
+      sanitized_disposition = "Clean"
+    else
+      sanitized_disposition = "Unknown"
+    end
+
+    comment = "Thank you for your submission! Your dispute was resolved automatically because #{self.sha256_hash} currently has a #{sanitized_disposition} disposition and is not globally blocked on Cisco devices.#{disposition_comment} Talos does NOT recommend that our customers block sites with a #{sanitized_disposition} disposition– customers who choose to block #{sanitized_disposition} files should be prepared to locally allow-list files frequently."
+    if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
+      comment += "If you need further assistance with this dispute, please open a TAC case."
+    end
+
+    comment
+  end
+
+  def generate_generic_blocking_comment
+    comment = "Thank you for your submission! Your dispute was resolved automatically because #{self.sha256_hash} has a Malicious disposition and is globally blocked on Cisco devices. A Malicious disposition is applied when Talos has negative threat intelligence on a file and that information is sufficient to warrant a block; having a Malicious disposition indicates the file is exceptionally bad, malicious, or undesirable."
+    if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
+      comment += "If you need further assistance with this dispute, please open a TAC case."
+    end
+    comment
+  end
+
+  def generate_auto_resolve_fn_comment
+    comment = "Thank you for your submission! Your submission triggered a dynamic reassessment of #{self.sha256_hash}. Sufficient negative threat intelligence exists to warrant a Malicious disposition for #{self.sha256_hash}. This change will be reflected on Cisco Secure devices within 24 hours."
+    if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
+      comment += "If you need further assistance with this dispute, please open a TAC case."
+    end
+    comment
   end
 end

@@ -6,6 +6,20 @@ module API
           include API::V1::Defaults
           resource "escalations/webrep/resolution_message_templates" do
 
+            desc "get a filtered resolution message templates by resolution"
+            params do
+              requires :resolution, type: String, desc: "Resolution of the resolution message template"
+              requires :ticket_type, type: String, desc: "The type of ticket (web or email)"
+            end
+
+            get  "", root: "resolution_message_template" do
+              if params[:ticket_type] == 'EmailDispute'
+                ResolutionMessageTemplate.by_email_resolution_disputes(params[:resolution]).to_json
+              else
+                ResolutionMessageTemplate.by_web_resolution_disputes(params[:resolution]).to_json
+              end
+            end
+
             desc "get a resolution message template"
             params do
               requires :id, type: String, desc: "ID of the resolution message template"
@@ -20,6 +34,7 @@ module API
             params do
               requires :id, type: Integer, desc: "The resolution message template's id in the database."
               optional :name, type: String, desc: "The template name of the template."
+              optional  :resolution_type, type: String, desc: "Subtype for resolution"
               optional :description, type: String, desc: "The description of the resolution message template."
               optional :body, type: String, desc: "The body of the template."
             end
@@ -28,25 +43,29 @@ module API
               authorize!(:update, ResolutionMessageTemplate)
               template = ResolutionMessageTemplate.find(permitted_params[:id])
               authorize!(:update, template)
-              template.update(permitted_params)
+              attrs = permitted_params.merge(editor_id: current_user.id)
+              template.update(attrs)
             end
 
-            desc "create an resolution message template"
+            desc "create a resolution message template"
             params do
               requires :name, type: String, desc: "The resolution message template's template name."
               requires :body, type: String, desc: "The contents of the template."
+              requires :ticket_type, type: String, desc: "Ticket type of the template."
+              requires :resolution_type, type: String, desc: "Subtype for resolution"
               optional :description, type: String, desc: "The description of the template."
             end
 
             post "", root: "resolution_message_template" do
               authorize!(:create, ResolutionMessageTemplate)
-              template = ResolutionMessageTemplate.create(permitted_params)
+              template_data = { status: :resolved, creator: current_user, editor: current_user }
+              template = ResolutionMessageTemplate.create(permitted_params.merge(template_data))
               if !template.save
                 raise template.errors.full_messages.to_sentence
               end
             end
 
-            desc "delete an resolution message template"
+            desc "delete a resolution message template"
             params do
               requires :id, type: Integer, desc: "The resolution message template's id in the database."
             end
