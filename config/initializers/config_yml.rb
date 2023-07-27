@@ -224,3 +224,13 @@ file_mgmt_config = env_config.fetch('file_mgmt', nil)
 raise 'config.yml missing file_mgmt section' unless file_mgmt_config
 Rails.configuration.base_host_path = file_mgmt_config['base_host_path']
 Rails.configuration.base_file_path = file_mgmt_config['base_file_path']
+jira_config = env_config['jira']
+raise "config.yml missing jira section" unless jira_config
+Rails.configuration.jira                = ApiRequester::ApiRequester.config_of(jira_config)
+Rails.configuration.jira.project_key    = jira_config['project_key']
+Rails.configuration.jira.token          = jira_config['token']
+Rails.configuration.jira.auth_type      = jira_config['auth_type'].to_sym
+
+bast_config = env_config.fetch('bast', nil)
+raise 'config.yml missing bast section' unless bast_config
+Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)

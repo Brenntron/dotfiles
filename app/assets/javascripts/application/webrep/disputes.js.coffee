@@ -648,6 +648,11 @@ window.save_dispute_entries = () ->
         if new_value != old_value
           changes_made = true
           if new_value == "RESOLVED_CLOSED"
+            resolution_status = {
+              id: id
+              field: "status"
+              new: new_value
+            }
             resolution_data = {
               id: id
               field: "resolution"
@@ -658,6 +663,7 @@ window.save_dispute_entries = () ->
               field: "resolution_comment"
               new: $(this).find("textarea[name='resolution-comment']")[0].value
             }
+            data[id].push(resolution_status)
             data[id].push(resolution_data)
             data[id].push(resolution_comment)
 
@@ -959,6 +965,8 @@ $ ->
       headers: {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       data: build_webrep_data()
       complete: () ->
+        #cache current filters for export_all form
+        $('#disputes-index-export-data-input').val(JSON.stringify(build_webrep_data()))
         $('#inline-webrep').addClass('hidden')
     order: [ [
       9
@@ -1007,6 +1015,7 @@ $ ->
       }
       {
         targets: [ 10 ]
+        orderData: 20 # The age column is ordered by the age_int column. If columns are added or removed this must be updated.
         className: 'age-col'
       }
     ]
@@ -1052,31 +1061,14 @@ $ ->
       {
         data: 'case_age'
         'render': (data,type,full,meta) ->
-          if data != "<1 hr"
-            dispute_duration = moment(full.case_opened_at).fromNow()
-            if dispute_duration.includes('minute')
-              dispute_latency = data
-            if dispute_duration.includes('hour')
-              hours = parseInt(dispute_duration.replace(/[^0-9]/g, ''))
-              if hours <= 18
-                dispute_latency = data
-              else
-                dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            else
-              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            if dispute_duration.includes('day')
-              day = parseInt(data.replace(/[^0-9]/g, ''))
-              if day >= 1
-                dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            if dispute_duration.includes('months')
-              month = parseInt(data.replace(/[^0-9]/g, ''))
-              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            if dispute_duration.includes('year')
-              year = parseInt(data.replace(/[^0-9]/g, ''))
-              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-            dispute_latency
-          else
-            data
+          { age_int, status } = full
+          age_class = ''
+
+          unless status == 'RESOLVED_CLOSED' || status == 'CLOSED'
+            if age_int >= 64800 #age_int is measured in seconds
+              age_class = 'ticket-age-over18hr'
+
+          "<span class='#{age_class}'>#{data}</span>"
       }
       { data: 'source' }
       {
@@ -2768,8 +2760,6 @@ window.build_webrep_data = () ->
   else if localStorage.webRepFilters
     data = JSON.parse(localStorage.webRepFilters)
 
-
-
   format_webrep_header(data)
 
   data
@@ -2851,9 +2841,10 @@ window.format_webrep_header = (data) ->
         else if condition_types[conditionName]
           selectedFilters.push({name: condition_types[conditionName], value: search_conditions[conditionName]})
         container = $('#dispute-advaced-search-selected-filters')
-      for item in selectedFilters
-        html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value.split(',').join(', ') + '</span>'
-        $('#dispute-advaced-search-selected-filters').append(html)
+      if container.html() == ''
+        for item in selectedFilters
+          html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value.split(',').join(', ') + '</span>'
+          $('#dispute-advaced-search-selected-filters').append(html)
     else if search_type == 'named'
       new_header =
         '<div>Results for "' + search_name + '" Saved Search' +

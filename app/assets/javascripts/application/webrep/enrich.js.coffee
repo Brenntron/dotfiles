@@ -11,6 +11,12 @@ window.get_enrichment_service = (query_item, query_type) ->
     data: data
     success: (response) ->
       return response
+    error: (response) ->
+      $('.prevalence-webrep-table-data-present').addClass('hidden')
+      $('.prevalence-webrep-table-data-missing').removeClass('hidden')
+      $('.enrich-webrep-table-data-present').addClass('hidden')
+      $('.enrich-webrep-table-data-missing').removeClass('hidden')
+      std_msg_error('Error Gathering Enrichment data', [response.responseJSON.message])
   )
 
 ##create each enrichment section under webrep research tab
@@ -101,10 +107,7 @@ create_webrep_enrichment_section = (tags, context, enrich_toolbar_cell, table, c
 create_webrep_prevalence_section = (prevalence_data, table) ->
   response_key = Object.keys(prevalence_data)[0]
   data = prevalence_data[response_key]
-  if data.count == 0
-    $('.prevalence-webrep-table-data-present').hide()
-    $('.prevalence-webrep-table-data-missing').show()
-  else
+  if data.count != 0
     total_row = $("<tr></tr>")
     $(total_row).append($("<td>Total</td>"))
 
@@ -147,7 +150,6 @@ create_webrep_prevalence_section = (prevalence_data, table) ->
 
 
 window.setup_enrichment_section = () ->
-
   if $('#research-tab').length || $('.reputation-research-search-wrapper').length
     $('.research-table-row').each ->
       create_index = 0 #track if first entry in table
@@ -159,7 +161,8 @@ window.setup_enrichment_section = () ->
       # enrichment services uses a separate API call - needs to be handled w/ a js promise (1-2 sec lag)
       enrich_promise = new Promise (resolve, reject) ->
         enrich_json = get_enrichment_service(ip_uri)  # this is the actual api call
-        if enrich_json then resolve enrich_json
+        if enrich_json
+          resolve enrich_json
 
       enrich_promise.then (response) ->
 
@@ -194,11 +197,12 @@ window.setup_enrichment_section = () ->
             create_webrep_enrichment_section(enrichment_context_tags, 'Enrichment',  enrich_toolbar_cell, table, create_index)
 
         else
-          $('.enrich-webrep-table-data-present').hide()
-          $('.enrich-webrep-table-data-missing').show()
+          $('.enrich-webrep-table-data-present').addClass('hidden')
+          $('.enrich-webrep-table-data-missing').removeClass('hidden')
 
         if response?.data?.prevalence?.responses?
           create_webrep_prevalence_section(response.data.prevalence.responses, prevalence_table)
-        else
-          $('.prevalence-webrep-table-data-present').hide()
-          $('.prevalence-webrep-table-data-missing').show()
+
+$(document).ready( ()->
+  setup_enrichment_section()
+)

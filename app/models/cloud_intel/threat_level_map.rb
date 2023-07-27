@@ -10,7 +10,11 @@ class CloudIntel::ThreatLevelMap
   end
 
   def self.cache_map
-    threat_level_map = Beaker::Sdr.query_threat_level_map
+    begin
+      threat_level_map = Beaker::Sdr.query_threat_level_map
+    rescue GRPC::Unavailable => e
+      return '{}'
+    end
     threat_level_map_json = threat_level_map.to_h.to_json
     Rails.cache.write("threat_level_map_version", threat_level_map.version)
     Rails.cache.write("threat_level_map", threat_level_map_json)

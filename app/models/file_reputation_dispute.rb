@@ -151,6 +151,10 @@ class FileReputationDispute < ApplicationRecord
     self.disposition&.downcase == DISPOSITION_CLEAN.downcase
   end
 
+  def cleanish?
+    [DISPOSITION_CLEAN.downcase, DISPOSITION_UNKNOWN.downcase, DISPOSITION_COMMON.downcase, DISPOSITION_UNSEEN].include?(self.disposition&.downcase)
+  end
+
   def suggested_clean?
     self.disposition_suggested&.downcase == DISPOSITION_CLEAN.downcase
   end
@@ -333,15 +337,28 @@ class FileReputationDispute < ApplicationRecord
   def self.advanced_search(params, search_name:, user:)
     search_hash = non_blank_fields(params)
     sha256_hash = search_hash.delete('sha256_hash')
+    assignee_cvs_usernames = search_hash.delete('assigned')&.split(',')
+    detection_last_set = search_hash.delete('detection_last_set')
     file_name = search_hash.delete('file_name')
-    platform_ids = search_hash.delete('platform_ids')
+    platform_names = search_hash.delete('platforms')
     threatgrid_range = search_hash.delete('threatgrid_score') || {}
     sandbox_range = search_hash.delete('sandbox_score') || {}
     created_at_range = search_hash.delete('created_at') || {}
     updated_at_range = search_hash.delete('updated_at') || {}
     dispute_fields = matching_field(search_hash)
 
+
+    if assignee_cvs_usernames.present?
+      user_ids = User.where(cvs_username: assignee_cvs_usernames).pluck(:id)
+      dispute_fields['user_id'] = user_ids if user_ids.present?
+    end
+
     relation = where(dispute_fields)
+
+    if detection_last_set.present?
+      date = Date.parse(detection_last_set)
+      relation = relation.where(detection_last_set: date.beginning_of_day..date.end_of_day)
+    end
 
     if sha256_hash.present?
       relation = relation.where('sha256_hash like :sha256_hash', sha256_hash: "%#{sanitize_sql_like(sha256_hash)}%")
@@ -351,8 +368,8 @@ class FileReputationDispute < ApplicationRecord
       relation = relation.where('file_name like :file_name', file_name: "%#{sanitize_sql_like(file_name)}%")
     end
 
-    if platform_ids.present?
-      ids = platform_ids.split(',').map {|m| m.to_i}
+    if platform_names.present?
+      ids = Platform.where(public_name: platform_names.split(',')).pluck(:id)
       relation = relation.where(platform_id: ids)
     end
 
@@ -373,21 +390,21 @@ class FileReputationDispute < ApplicationRecord
     end
 
     if created_at_range['from'].present?
-      relation = relation.where('created_at >= :created_at_from', created_at_from: created_at_range['from'])
+      relation = relation.where('file_reputation_disputes.created_at >= :created_at_from', created_at_from: created_at_range['from'])
     end
 
     if created_at_range['to'].present?
       created_at_to = created_at_range['to']
-      relation = relation.where('created_at <= ADDDATE(:created_at_to, INTERVAL 1 DAY)', created_at_to: created_at_to)
+      relation = relation.where('file_reputation_disputes.created_at <= ADDDATE(:created_at_to, INTERVAL 1 DAY)', created_at_to: created_at_to)
     end
 
     if updated_at_range['from'].present?
-      relation = relation.where('updated_at >= :updated_at_from', updated_at_from: updated_at_range['from'])
+      relation = relation.where('file_reputation_disputes.updated_at >= :updated_at_from', updated_at_from: updated_at_range['from'])
     end
 
     if updated_at_range['to'].present?
       updated_at_to = updated_at_range['to']
-      relation = relation.where('updated_at <= ADDDATE(:updated_at_to, INTERVAL 1 DAY)', updated_at_to: updated_at_to)
+      relation = relation.where('file_reputation_disputes.updated_at <= ADDDATE(:updated_at_to, INTERVAL 1 DAY)', updated_at_to: updated_at_to)
     end
 
     if %w{customer_name customer_email company_name}.any? {|key_name| search_hash[key_name].present? }
@@ -816,8 +833,14 @@ class FileReputationDispute < ApplicationRecord
       end
       ar_log += "--------------------------------\n"
 
-      if (self.clean? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
-        self.update(status: STATUS_RESOLVED, resolution: STATUS_AUTO_RESOLVED_MATCH, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT, auto_resolve_log: ar_log)
+      if (self.cleanish? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
+        if self.cleanish? && self.suggested_clean?
+          resolution_comment = generate_generic_non_blocking_comment
+        end
+        if (self.malicious? && self.suggested_malicious?)
+          resolution_comment = generate_generic_blocking_comment
+        end
+        self.update(status: STATUS_RESOLVED, resolution: STATUS_AUTO_RESOLVED_MATCH, resolution_comment: resolution_comment, auto_resolve_log: ar_log)
 
         auto_resolved_boolean = true
       end
@@ -927,7 +950,7 @@ class FileReputationDispute < ApplicationRecord
         file_rep.disposition = DISPOSITION_MALICIOUS
         file_rep.status = STATUS_RESOLVED
         file_rep.resolution = STATUS_AUTO_RESOLVED_FN
-        file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT
+        file_rep.resolution_comment = file_rep.generate_auto_resolve_fn_comment #RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT
         file_rep.auto_resolve_log += ar_log
         file_rep.save
         conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
@@ -1346,5 +1369,49 @@ class FileReputationDispute < ApplicationRecord
     end
 
     return nil
+  end
+
+  def generate_generic_non_blocking_comment
+    disposition_comment = ""
+    sanitized_disposition = ""
+
+    case self.disposition.downcase
+
+    when 'clean'
+      disposition_comment = "A Clean disposition means that Talos has high confidence positive threat intelligence on a file, and this indicates exceptional safety. "
+    else
+      disposition_comment = "An Unknown disposition means that Talos has no negative threat intelligence on a file, but it has been evaluated. "
+    end
+
+    case self.disposition.downcase
+
+    when 'clean'
+      sanitized_disposition = "Clean"
+    else
+      sanitized_disposition = "Unknown"
+    end
+
+    comment = "Thank you for your submission! Your dispute was resolved automatically because #{self.sha256_hash} currently has a #{sanitized_disposition} disposition and is not globally blocked on Cisco devices. #{disposition_comment} Talos does NOT recommend that our customers block files with #{sanitized_disposition} dispositions– customers who choose to block #{sanitized_disposition} files should be prepared to locally allow-list files frequently."
+    if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
+      comment += " If you need further assistance with this dispute, please open a TAC case."
+    end
+
+    comment
+  end
+
+  def generate_generic_blocking_comment
+    comment = "Thank you for your submission! Your dispute was resolved automatically because #{self.sha256_hash} has a Malicious disposition and is globally blocked on Cisco devices. A Malicious disposition is applied when Talos has negative threat intelligence on a file and that information is sufficient to warrant a block; having a Malicious disposition indicates the file is exceptionally bad, malicious, or undesirable."
+    if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
+      comment += " If you need further assistance with this dispute, please open a TAC case."
+    end
+    comment
+  end
+
+  def generate_auto_resolve_fn_comment
+    comment = "Thank you for your submission! Your submission triggered a dynamic reassessment of #{self.sha256_hash}. Sufficient negative threat intelligence exists to warrant a Malicious disposition for #{self.sha256_hash}. This change will be reflected on Cisco Secure devices within 24 hours."
+    if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
+      comment += " If you need further assistance with this dispute, please open a TAC case."
+    end
+    comment
   end
 end

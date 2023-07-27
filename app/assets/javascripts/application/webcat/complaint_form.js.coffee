@@ -26,14 +26,12 @@ $ ->
 
 
   $('#advanced-search-button').on 'click', ->
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
+    std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/customers_names'
       method: 'GET'
       dataType: 'json'
       headers: headers
       success: (response) ->
-
         $('#channel-input-list').empty()
         $('#status-input-list').empty()
         $('#resolution-input-list').empty()
@@ -54,17 +52,20 @@ $ ->
         for resolution in complaint_resolution_list
           $('#resolution-input-list').append '<option value="' + resolution + '"></option>'
 
-        if window.location.pathname.includes('webcat') || window.location.pathname.includes('filerep')
+        if window.location.pathname.includes('webcat')
           AC.WebCat.createCompanyOptions()
           AC.WebCat.createCustomerNameOptions()
           AC.WebCat.createAssigneeOptions()
-
-        if window.location.pathname.includes('webcat')
           AC.WebCat.populateSearchCriteria()
+
+        if window.location.pathname.includes('file_rep')
+          AC.FileRep.createAssigneeOptions()
+          AC.FileRep.populateSearchCriteria()
+          AC.FileRep.createPlatformOptions()
     )
 
 
-    $.ajax(
+    std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/customers_company_name'
       method: 'GET'
       dataType: 'json'
@@ -82,7 +83,7 @@ $ ->
           $('#customerCompanyList').append '<option value="' + company + '"></option>'
     )
 
-    $.ajax(
+    std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/customers_email'
       method: 'GET'
       dataType: 'json'

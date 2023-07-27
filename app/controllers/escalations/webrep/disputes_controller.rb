@@ -7,7 +7,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
     respond_to do |format|
       format.html
       format.xlsx do
-        index_params = JSON.parse(params['data_json'])
+        index_params = params['data_json'].empty? ? {} : JSON.parse(params['data_json'])
         search_type = index_params['search_type']
         search_name = 'advanced' == search_type ? nil : index_params['search_name']
         @disputes = Dispute.robust_search(search_type,

@@ -1548,14 +1548,17 @@ For future Web categorization requests, please open a Web categorization ticket 
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
     dispute_fields = %w{disputes.id case_number case_guid org_domain subject description
-                        source_ip_address problem_summary research_notes status}
+                        source_ip_address problem_summary research_notes disputes.status}
     dispute_where = dispute_fields.map{|field| "#{field} like :pattern"}.join(' or ')
+
+    dispute_entry_fields = %w{ip_address uri hostname subdomain domain path}
+    dispute_entry_where = dispute_entry_fields.map{|field| "#{field} like :pattern"}.join(' or ')
 
     customer_where = %w{name email}.map{|field| "customers.#{field} like :pattern"}.join(' or ')
     company_where = 'companies.name like :pattern'
 
-    where_str = "#{dispute_where} or #{customer_where} or #{company_where}"
-    left_joins(customer: :company).where(where_str, pattern: "%#{value}%")
+    where_str = "#{dispute_where} or #{dispute_entry_where} or #{customer_where} or #{company_where}"
+    left_joins(:dispute_entries).left_joins(customer: :company).where(where_str, pattern: "%#{value}%")
   end
 
   def self.process_status_changes(disputes, status, resolution = nil, comment = nil, current_user = nil)

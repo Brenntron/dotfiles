@@ -138,12 +138,12 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       vrt_user_id = User.where(:cvs_username => "vrtincom").first.id
       by_unassigned_first = FileReputationDispute.send(:sanitize_sql_array, [ 'case when user_id = %d then 0 else 1 end', vrt_user_id ])
       by_unassigned_last = FileReputationDispute.send(:sanitize_sql_array, [ 'case when user_id = %d then 1 else 0 end', vrt_user_id ])
-
+      
       case datatable.orders.first.direction
       when 'DESC'
-        records.left_joins(:user).order(by_unassigned_first).order("users.cvs_username #{datatable.orders.first.direction}")
+        records.left_joins(:user).order(Arel.sql(by_unassigned_first)).order("users.cvs_username #{datatable.orders.first.direction}")
       when 'ASC'
-        records.left_joins(:user).order(by_unassigned_last).order("users.cvs_username #{datatable.orders.first.direction}")
+        records.left_joins(:user).order(Arel.sql(by_unassigned_last)).order("users.cvs_username #{datatable.orders.first.direction}")
       else
         super # We shouldn't ever be in here but we have to do something if ever we are
       end
