@@ -63,9 +63,9 @@ class WebRepDatatable < AjaxDatatablesRails::ActiveRecord
 
       case datatable.orders.first.direction
       when 'DESC' then
-        records.left_joins(:user).order(by_unassigned_first).order("users.cvs_username #{datatable.orders.first.direction}")
+        records.left_joins(:user).order(Arel.sql(by_unassigned_first)).order("users.cvs_username #{datatable.orders.first.direction}")
       when 'ASC' then
-        records.left_joins(:user).order(by_unassigned_last).order("users.cvs_username #{datatable.orders.first.direction}")
+        records.left_joins(:user).order(Arel.sql(by_unassigned_last)).order("users.cvs_username #{datatable.orders.first.direction}")
       else
         super
       end

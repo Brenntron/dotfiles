@@ -13816,6 +13816,23 @@ table > tbody > tr > td.no-padding {
     margin-left: -7px;
   }
 }
+
+.jira-result-note{
+  font-size: 11px;
+  line-height: 1.25em;
+  word-break: break-word;
+}
+.jira-status{
+  font-weight: 600;
+}
+.result-container{
+  display:flex;
+  justify-content: space-between;
+  max-width: 125px;
+}
+.result-col{
+  width: 150px;
+}
 .bold-note{
   font-weight: bold;
 }

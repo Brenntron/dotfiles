@@ -966,9 +966,9 @@ class ComplaintEntry < ApplicationRecord
       ip_or_uri_clause = nil
       ip_or_uri.each_with_index do |single, index|
         if index == 0
-          ip_or_uri_clause = "ip_address = '#{single}' OR uri like '%#{single}%' OR domain like '%#{single}%'"
+          ip_or_uri_clause = "complaint_entries.ip_address = '#{single}' OR complaint_entries.uri like '%#{single}%' OR complaint_entries.domain like '%#{single}%'"
         else
-          ip_or_uri_clause = ip_or_uri_clause + " OR " + "ip_address = '#{single}' OR uri like '%#{single}%' OR domain like '%#{single}%'"
+          ip_or_uri_clause = ip_or_uri_clause + " OR " + "complaint_entries.ip_address = '#{single}' OR complaint_entries.uri like '%#{single}%' OR complaint_entries.domain like '%#{single}%'"
         end
       end
 

@@ -537,9 +537,9 @@ class AutoResolve
 
     defanged_hostlookup = hostlookup.gsub(".", "[.]")
 
-    message = "Thank you for your submission! Your dispute was resolved automatically because #{defanged_hostlookup} currently has a #{threat_level} Threat Level and is not globally blocked on Cisco devices. #{threat_level_comment} Talos does NOT recommend that our customers block sites with a #{threat_level} Threat Level– customers who choose to block #{threat_level} sites should be prepared to locally allow-list sites frequently. "
+    message = "Thank you for your submission! Your dispute was resolved automatically because #{defanged_hostlookup} currently has a #{threat_level} Threat Level and is not globally blocked on Cisco devices. #{threat_level_comment} Talos does NOT recommend that our customers block sites with a #{threat_level} Threat Level– customers who choose to block #{threat_level} sites should be prepared to locally allow-list sites frequently."
     if is_customer == true
-      message += "If you need further assistance with this dispute, please open a TAC case."
+      message += " If you need further assistance with this dispute, please open a TAC case."
     end
 
     message
@@ -548,9 +548,9 @@ class AutoResolve
   def self.generate_generic_blocking_message(hostlookup, is_customer = false)
     defanged_hostlookup = hostlookup.gsub(".", "[.]")
 
-    message = "Thank you for your submission! Your dispute was resolved automatically because #{defanged_hostlookup} has an Untrusted Threat Level and is globally blocked on Cisco devices. An Untrusted Threat Level is applied when Talos has negative threat intelligence on a site and that information is sufficient to warrant a block; having an Untrusted Threat Level indicates the site is exceptionally bad, malicious, or undesirable"
+    message = "Thank you for your submission! Your dispute was resolved automatically because #{defanged_hostlookup} has an Untrusted Threat Level and is globally blocked on Cisco devices. An Untrusted Threat Level is applied when Talos has negative threat intelligence on a site and that information is sufficient to warrant a block; having an Untrusted Threat Level indicates the site is exceptionally bad, malicious, or undesirable."
     if is_customer == true
-      message += "If you need further assistance with this dispute, please open a TAC case."
+      message += " If you need further assistance with this dispute, please open a TAC case."
     end
     message
   end
@@ -562,7 +562,7 @@ class AutoResolve
 
     message = "Thank you for your submission! Your submission triggered a dynamic reassessment of #{defanged_hostlookup}. Sufficient negative threat intelligence exists to warrant an Untrusted Threat Level for #{defanged_hostlookup}. This change will be reflected on Cisco Secure devices within 24 hours."
     if is_customer == true
-      message += "If you need further assistance with this dispute, please open a TAC case."
+      message += " If you need further assistance with this dispute, please open a TAC case."
     end
     message
 

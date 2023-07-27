@@ -1391,9 +1391,9 @@ class FileReputationDispute < ApplicationRecord
       sanitized_disposition = "Unknown"
     end
 
-    comment = "Thank you for your submission! Your dispute was resolved automatically because #{self.sha256_hash} currently has a #{sanitized_disposition} disposition and is not globally blocked on Cisco devices.#{disposition_comment} Talos does NOT recommend that our customers block sites with a #{sanitized_disposition} disposition– customers who choose to block #{sanitized_disposition} files should be prepared to locally allow-list files frequently."
+    comment = "Thank you for your submission! Your dispute was resolved automatically because #{self.sha256_hash} currently has a #{sanitized_disposition} disposition and is not globally blocked on Cisco devices. #{disposition_comment} Talos does NOT recommend that our customers block files with #{sanitized_disposition} dispositions– customers who choose to block #{sanitized_disposition} files should be prepared to locally allow-list files frequently."
     if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
-      comment += "If you need further assistance with this dispute, please open a TAC case."
+      comment += " If you need further assistance with this dispute, please open a TAC case."
     end
 
     comment
@@ -1402,7 +1402,7 @@ class FileReputationDispute < ApplicationRecord
   def generate_generic_blocking_comment
     comment = "Thank you for your submission! Your dispute was resolved automatically because #{self.sha256_hash} has a Malicious disposition and is globally blocked on Cisco devices. A Malicious disposition is applied when Talos has negative threat intelligence on a file and that information is sufficient to warrant a block; having a Malicious disposition indicates the file is exceptionally bad, malicious, or undesirable."
     if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
-      comment += "If you need further assistance with this dispute, please open a TAC case."
+      comment += " If you need further assistance with this dispute, please open a TAC case."
     end
     comment
   end
@@ -1410,7 +1410,7 @@ class FileReputationDispute < ApplicationRecord
   def generate_auto_resolve_fn_comment
     comment = "Thank you for your submission! Your submission triggered a dynamic reassessment of #{self.sha256_hash}. Sufficient negative threat intelligence exists to warrant a Malicious disposition for #{self.sha256_hash}. This change will be reflected on Cisco Secure devices within 24 hours."
     if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
-      comment += "If you need further assistance with this dispute, please open a TAC case."
+      comment += " If you need further assistance with this dispute, please open a TAC case."
     end
     comment
   end
