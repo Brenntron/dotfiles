@@ -84,6 +84,10 @@
   .enrich-cell-description {
     width: 52%;
   }
+  .enrich-cell-description p.condensed {
+    max-height: 60px;
+    overflow-y: hidden;
+  }
   .filerep-enrich-cell-name {
     width: 20%;
   }
@@ -93,9 +97,8 @@
   .enrich-cell-taxonomy, .enrich-cell-name {
     white-space: nowrap;
   }
-  .enrich-cell-description p, .filerep-enrich-cell-description p {
-    max-height: 120px;  // desc can get huge, use overflow scroll if so
-    overflow-y: auto;
+  .enrich-cell-description p,
+  .filerep-enrich-cell-description p {
     white-space: pre-wrap;  // retain formatting from source
     padding-right: 20px;
   }
@@ -368,33 +371,6 @@
     font-weight: 600;
     margin-bottom: 5px;
   }
-  .read-more-button {
-    width: 100%;
-    color: #999;
-    border: none;
-    padding: 2px 10px;
-    background-color: #fff;
-    height: 20px;
-    margin: 2px 0 0;
-    font-style: italic;
-    font-size: 8pt;
-    font-weight: 500;
-    box-shadow: 0px -6px 8px 2px #ffffff;
-  }
-  .down-caret {
-    background-image: url(image_path('icon_down_arrow_grey.svg'));
-    background-repeat: no-repeat;
-    background-size: 12px 12px;
-    background-position: 0 3px;
-    opacity: 0.9;
-    width: 12px;
-    height: 12px;
-    display: inline-block;
-    &.expanded {
-      transform: scaleY(-1);  // flip arrow up
-      background-position: 0 -2px;
-    }
-  }
   .new-line {
     height: 10px;
   }
@@ -430,6 +406,42 @@
     background-color: #666;
     color: #fff;
   }
+}
+
+
+
+.read-more-button {
+  width: 100%;
+  color: #999;
+  border: none;
+  padding: 2px 10px;
+  background-color: #fff;
+  height: 20px;
+  margin: 2px 0 0;
+  font-style: italic;
+  font-size: 8pt;
+  font-weight: 500;
+  box-shadow: 0px -2px 2px 2px #ffffff;
+}
+.down-caret {
+  background-image: url(image_path('icon_down_arrow_grey.svg'));
+  background-repeat: no-repeat;
+  background-size: 12px 12px;
+  background-position: 0 3px;
+  opacity: 0.9;
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  &.expanded {
+    transform: scaleY(-1);  // flip arrow up
+    background-position: 0 -2px;
+  }
+}
+
+
+// prev data needs much less width than tmi/enrich
+.prevalence-area {
+  width: 50%;
 }
 
 

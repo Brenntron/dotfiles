@@ -120,7 +120,7 @@ window.tmi_ajax_get_data = (query_item) ->
 
 
     error: (response) ->
-      std_msg_error("Error with loading data", [response.responseText], reload: false)
+      std_msg_error("Error with loading data", [response.responseJSON.message], reload: false)
       $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # remove all loaders
       $('.tmi-error').removeClass('hidden')
 
@@ -199,7 +199,6 @@ window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
 
 window.create_webrep_enrichment_section = (tags, context) ->
   $('.enrichment-table').removeClass('hidden')
-  enrich_tbody = $('.enrichment-table tbody')
 
   $(tags).each (index, tag) ->
     name = ''
@@ -226,8 +225,12 @@ window.create_webrep_enrichment_section = (tags, context) ->
     name_cell = $("<td class='enrich-cell-name'></td>")
     $(name_cell).text(name)
 
-    description_cell = $("<td class='enrich-cell-description'><p></p></td>")
+    description_cell = $("<td class='enrich-cell-description'><p class='condensed'></p><button class='read-more-button hidden'>Read More <span class='down-caret'></span></button></td>")
     $(description_cell).find('p').text(description)
+
+    # long descriptions on enrich table get the read-more button
+    if description.length > 200
+      $(description_cell).find('button').removeClass('hidden')
 
     external_ref_cell = $("<td class='enrich-cell-external-references'></td>")
 
@@ -590,6 +593,11 @@ window.enrich_prev_dt_init = () ->
       searching: false
       info: false
 
+  # read more btn handler for huge enrich descs
+  $('.enrichment-area .read-more-button').click ->
+    $(this).prev().toggleClass('condensed')
+    $(this).find('.down-caret').toggleClass('expanded')
+
 
 
 # determine if a string is an ip/url/domain/sha, return the type
@@ -702,7 +710,7 @@ window.add_context_tags_dialog = () ->
                  <td class='tag-desc-col'>
                    <p class='tag-mitre-fqn hidden'>#{short_description}</p>
                    <p class='tag-entry-description'>#{description}</p>
-                   <button class='read-more-button hidden' onclick='mitre_read_more(\"#{full_id}\");'>Read More <span class='down-caret'></span></button>
+                   <button class='read-more-button hidden'>Read More <span class='down-caret'></span></button>
                  </td>
                </tr>"
 
@@ -718,7 +726,6 @@ window.add_context_tags_dialog = () ->
             all_tag_rows_html += entry_tr  # build one block of html
 
 
-        
         # add one big string at once, less interaction with dom == better performance
         $('.tag-entries-area .taxonomy-table tbody').append(all_tag_rows_html)  # ADD TO DOM
 
@@ -728,6 +735,10 @@ window.add_context_tags_dialog = () ->
         # add flag to dom that the dialog is now built
         $('.tab-context-tags').addClass('tags-dialog-built')
 
+        # read more btn handler for huge tag descs
+        $('.tags-dialog .read-more-button').click ->
+          $(this).prev().toggleClass('condensed')
+          $(this).find('.down-caret').toggleClass('expanded')
 
 
 # TAG PREVIEW CLICK HANDLERS AND STUFF
@@ -824,20 +835,6 @@ window.all_tags_dt_init = () ->
 
 
 
-
-
-# read more button for mitre descriptions in dialog
-window.mitre_read_more = (full_id) ->
-  $(".tag-#{full_id} .tag-entry-description").toggleClass('condensed')
-  $(".tag-#{full_id} .read-more-button .down-caret").toggleClass('expanded')
-
-
-$ ->
-  # cancel button for tags dialog
-  $('.tags-cancel-button').click ->
-    $('#add-context-tags-dialog').dialog('close')
-
-
 # adding tags inside of the dialog
 window.add_tags_submit = () ->
   data = {}
@@ -882,7 +879,7 @@ window.add_tags_submit = () ->
         $('#add-context-tags-dialog').dialog('close')
         std_msg_success("Success!", ["Tags added to observable. Reloading page."], reload: true)
       error: (response) ->
-        std_msg_error("Error adding tags", ["#{response.responseText}"], reload: false)
+        std_msg_error("Error adding tags", ["#{response.responseJSON.message}"], reload: false)
 
 
 
@@ -953,8 +950,9 @@ window.other_tag_functions = (action) ->
 
 
 
-# FIX THIS, dry out and add label handler
+# misc stuff to do on dom load
 $ ->
+  # FIX THIS, dry out and add label handler
   $('.suppressed-context-tags-toggle').click ->
     if $(this).find('input:checkbox').prop('checked') == true
       $('.tmi-tr-suppressed-yes').removeClass('hidden')
@@ -969,8 +967,7 @@ $ ->
 
 
 
-# tags dialog jquery init here
-$ ->
+  # tags dialog jquery init here
   $('#add-context-tags-dialog').dialog(
     autoOpen: false
     dialogClass: 'add-context-tags-dialog'
@@ -980,3 +977,7 @@ $ ->
     minHeight: 500
   )
 
+
+  # cancel button for tags dialog
+  $('.tags-cancel-button').click ->
+    $('#add-context-tags-dialog').dialog('close')
