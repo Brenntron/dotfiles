@@ -70,6 +70,7 @@ window.tmi_ajax_get_data = (query_item) ->
               else
                 # convert unix timecode to utc date/time
                 suppression_date = moment.unix(suppressed_by.suppressed_ts).utc().format('YYYY-MM-DD hh:mm:ss')
+                if suppression_date.length > 10 then suppression_date += ' UTC'
 
           # start a new row
           report_tr = ""
@@ -85,6 +86,7 @@ window.tmi_ajax_get_data = (query_item) ->
 
             # convert unix timecode to utc date/time, created means when report was created
             report_date = moment.unix(created_ts).utc().format('YYYY-MM-DD hh:mm:ss')
+            if report_date.length > 10 then report_date += ' UTC'
 
             # fully unique id for a tag is the tax id + entry id
             full_id = "#{taxonomy_id}-#{taxonomy_entry_id}"
@@ -106,8 +108,6 @@ window.tmi_ajax_get_data = (query_item) ->
                  <td class='tmi-suppression-source tmi-gray'>#{suppression_source}</td>
                  <td class='tmi-suppression-platform tmi-gray'>#{suppression_platform}</td>
                  <td class='tmi-suppression-date tmi-gray'>#{suppression_date}</td></tr>"
-
-
 
 
             # default is no with red cell and gray cells to the right
@@ -605,7 +605,7 @@ window.determine_string_type = (curr_string) ->
   ip_regex = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi
   sha_regex = /^[a-f0-9]{64}$/gi
 
-  # add ip v6 handling later on when needed
+  # add ip v6 handling later on if/when needed
   if ip_regex.test(curr_string) == true
     return 'ip'
   else if sha_regex.test(curr_string) == true
@@ -877,7 +877,7 @@ window.add_tags_submit = () ->
       data: data
       success: (response) ->
         $('#add-context-tags-dialog').dialog('close')
-        std_msg_success("Success!", ["Tags added to observable. Reloading page."], reload: true)
+        std_msg_success("Success! Tags added to observable.", ["Tags added to observable. Reloading page."], reload: true)
       error: (response) ->
         std_msg_error("Error adding tags", ["#{response.responseJSON.message}"], reload: false)
 
@@ -907,8 +907,7 @@ window.other_tag_functions = (action) ->
   else
     # remove tags and the tags are suppressed, stop and error out
     if action == 'delete' && any_tags_suppressed == true
-      std_msg_error('Error', ['One or more tags is suppressed, can not proceed with removing tags.'])
-
+      std_msg_error('Error', ['One or more selected tags is suppressed, can only remove unsuppressed.'])
     else
       $('.tmi-cb:checked').each ->
         tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
@@ -950,23 +949,9 @@ window.other_tag_functions = (action) ->
 
 
 
+
 # misc stuff to do on dom load
 $ ->
-  # FIX THIS, dry out and add label handler
-  $('.suppressed-context-tags-toggle').click ->
-    if $(this).find('input:checkbox').prop('checked') == true
-      $('.tmi-tr-suppressed-yes').removeClass('hidden')
-    else
-      $('.tmi-tr-suppressed-yes').addClass('hidden')
-
-  $('.unsuppressed-context-tags-toggle').click ->
-    if $(this).find('input:checkbox').prop('checked') == true
-      $('.tmi-tr-suppressed-no').removeClass('hidden')
-    else
-      $('.tmi-tr-suppressed-no').addClass('hidden')
-
-
-
   # tags dialog jquery init here
   $('#add-context-tags-dialog').dialog(
     autoOpen: false
@@ -978,6 +963,28 @@ $ ->
   )
 
 
+  # if this has class suppressed or unsuppressed, do that
+  $('.suppressed-label-toggle, .unsuppressed-label-toggle').on "click", (e) ->
+    if $(this).hasClass('suppressed-label-toggle')
+      $('.tmi-tr-suppressed-yes').toggleClass('hidden')
+    else if $(this).hasClass('unsuppressed-label-toggle')
+      $('.tmi-tr-suppressed-no').toggleClass('hidden')
+
+    unless e.target.nodeName == 'INPUT'
+      if $(this).find('input').prop('checked') == true
+        $(this).find('input').prop('checked', false)
+      else if $(this).find('input').prop('checked') == false
+        $(this).find('input').prop('checked', true)
+
+
+  # click the select all checkbox in tmi table
+  $('.tmi-cb-select-all').click ->
+    if $(this).prop('checked') == true
+      $('.tmi-cb').prop('checked', true)
+    else
+      $('.tmi-cb').prop('checked', false)
+
+    
   # cancel button for tags dialog
   $('.tags-cancel-button').click ->
     $('#add-context-tags-dialog').dialog('close')
