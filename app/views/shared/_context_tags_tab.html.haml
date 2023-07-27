@@ -156,23 +156,25 @@
 
   -# MAIN DIV
   .actd-tags-area.hidden
-    .row.taxonomy-row
+    .row.tags-header-row
       .col-xs-3
         %label.content-label-sm
           Taxonomy
         -# context tags js will generate options below
 
         %select.taxonomy-select.no-tax-selected
-          %option.first-option Select a taxonomy
+          %option.first-option{"data-id":'0'} Select a taxonomy
 
-      -# tag search will exist here when dt inits
-      .col-xs-3
+      -# tag search will be moved here when dt inits
+      .col-xs-3.tag-search-area
+        %label.content-label-sm
+          Tag Search
 
       -# preview area for tags to be added
-      .col-xs-6
-        .preview-tag-area
-          %label.content-label-sm
-            Tags to Add
+      .col-xs-6.preview-tag-area
+        %label.content-label-sm
+          Tags to Add
+
 
 
     .row.tags-content-row

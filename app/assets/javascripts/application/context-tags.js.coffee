@@ -730,7 +730,7 @@ window.add_context_tags_dialog = () ->
         $('.tag-entries-area .taxonomy-table tbody').append(all_tag_rows_html)  # ADD TO DOM
 
         # open the dialog and dt init with all tags showing
-        all_tags_dt_init()
+        tags_dialog_dt_init()
 
         # add flag to dom that the dialog is now built
         $('.tab-context-tags').addClass('tags-dialog-built')
@@ -779,13 +779,12 @@ window.add_preview_tag = (curr_tag_id) ->
 
 
 
-
 # dt init the taxonomy table on initial load or change select
-window.all_tags_dt_init = () ->
+window.tags_dialog_dt_init = () ->
   # show all 7000+ tag rows by default, dt init all
   unless $(".taxonomy-table").hasClass('dataTable')
     tags_table_dt = $(".taxonomy-table").DataTable
-      dom: 'ilftipr'
+      dom: 'filtipr'
       columnDefs: [
         {
           targets: [0]
@@ -797,10 +796,14 @@ window.all_tags_dt_init = () ->
       pageLength: 10
       pagingType: 'full_numbers'
       language: {
-        search: "Tag Search"
+        search: "_INPUT_"
         searchPlaceholder: "Search for tags by keyword"
         zeroRecords: "No matching tags found"
       }
+
+    # get the auto-generated dt search and move it into header
+    tag_search_html = $('.tags-dialog .dataTables_filter input').detach()
+    $('.tags-dialog .tag-search-area').append(tag_search_html)
 
     # highlight substrings here (uses dt/jquery plugin)
     tags_table_dt.on 'draw', ->
@@ -809,29 +812,21 @@ window.all_tags_dt_init = () ->
       tags_dt_body.highlight(tags_table_dt.search())
 
 
-    # FIX THIS
-    # FIX THIS
     # select change does a search and draw
     $('.taxonomy-select').change ->
       new_text = $(this).find('option:selected').text()
+      selected_id = $(this).find('option:selected').attr('data-id')
       tags_table_dt.columns(3).search(new_text).draw()
 
-      # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
-      # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
-      if new_text == "Select a taxonomy"
-        $(this).addClass('no-tax-selected')
+      # if default option selected, show all
+      if selected_id == "0"
         tags_table_dt.columns(3).search('').draw()
         $('.tag-entries-area .dataTables_filter input').val('')
-      else
-        $(this).removeClass('no-tax-selected')
 
-
-    # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
-    # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
     # change the text in the dt search field, and if 'select a taxonomy' is already selected, reset the dt results
     $('.tag-entries-area .dataTables_filter input').click ->
-      if $('.taxonomy-select option:selected').text() == "Select a taxonomy" && !$(this).text().length > 0
-        tags_table_dt.columns(3).search('').draw()
+      if $('.taxonomy-select option:selected').attr('data-id') == "0" && !$(this).text().length > 0
+        tags_table_dt.columns(3).search('').draw()  # show all
 
 
 
@@ -957,9 +952,9 @@ $ ->
     autoOpen: false
     dialogClass: 'add-context-tags-dialog'
     width: 1200
-    height: 500
+    height: 600
     minWidth: 1000
-    minHeight: 500
+    minHeight: 600
   )
 
 
