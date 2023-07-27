@@ -298,7 +298,12 @@
   }
   .preview-tag-area {
     border-left: solid 1px #eee;
-    height: 100%;
+    border-bottom: solid 1px #eee;
+    background-color: #fff;
+    padding-bottom: 10px;
+    overflow-y: auto;
+    min-height: 70px;
+    //z-index: 9999;
   }
   .preview-tag {
     display: inline-block;
@@ -375,7 +380,7 @@
     background-color: #fff;
   }
   code {
-    color: #333;  // code tag appears from api in desc randomly
+    color: #333;  // code tag appears from api in desc randomly, fyi
     background-color: #fff;
   }
   .tag-entry-cb {
@@ -509,12 +514,13 @@
 
 .actd-loader-area {
   width: 100%;
-  padding: 20px;
+  padding: 30px;
+  text-align: center;
 }
 
 .actd-error-area p {
-  text-align: center;
   padding: 20px;
+  text-align: center;
 }
 
 .tmi-error {

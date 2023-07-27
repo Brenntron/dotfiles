@@ -10,8 +10,8 @@ window.tmi_ajax_get_data = (query_item) ->
     method: 'GET'
     data: data
     success: (response) ->
-      console.log 'read observable data here'
-      console.log response
+#      console.log 'read observable data here'
+#      console.log response
 
       { items } = response  # list of observables
 
@@ -737,9 +737,9 @@ window.add_preview_tag = (curr_tag_id) ->
     $(".preview-tag-#{curr_tag_id}").remove()
   else
     # stop at 5 tags to be added at once
-    if $('.preview-tag-area .preview-tag').length == 5 && $('.tag-entry-cb:checked').length == 5
+    if $('.preview-tag-area .preview-tag').length >= 5
+      $(".tag-entry-cb-#{curr_tag_id}").prop('checked', false)
       std_msg_error("Maximum of 5 new tags at once.","")
-
     else
       $('.tag-entry-cb:checked').each ->
         taxonomy_id = $(this).attr('data-tax-id')
@@ -784,7 +784,7 @@ window.tags_dialog_dt_init = () ->
       language: {
         search: "_INPUT_"
         searchPlaceholder: "Search for tags by keyword"
-        zeroRecords: "No matching tags found"
+        zeroRecords: "No matching tags found."
       }
       drawCallback: ->
         $('.tags-dialog .read-more-button').click ->
@@ -863,7 +863,7 @@ window.add_tags_submit = () ->
       data: data
       success: (response) ->
         $('#add-context-tags-dialog').dialog('close')
-        std_msg_success("Success! Tags added to observable.", ["Tags added to observable. Reloading page."], reload: true)
+        std_msg_success("Success - Tags added to observable.", ["Reloading page."], reload: true)
       error: (response) ->
         std_msg_error("Error adding tags", ["#{response.responseJSON.message}"], reload: false)
 
@@ -928,7 +928,7 @@ window.other_tag_functions = (action) ->
         method: 'POST'
         data: data
         success: (response) ->
-          std_msg_success("Success!", ["#{success_msg}. Reloading page."], reload: true)
+          std_msg_success("Success - #{success_msg}", ["Reloading page."], reload: true)
         error: (response) ->
           std_msg_error("Error with tags", ["#{response.responseText}"], reload: false)
 
