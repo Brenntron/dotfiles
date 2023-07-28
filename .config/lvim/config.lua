@@ -101,7 +101,10 @@ lvim.plugins = {
         requires = "nvim-tree/nvim-web-devicons",
         config = function() require("trouble").setup {} end
     }, {'kchmck/vim-coffee-script'}, {'junegunn/vim-easy-align'},
-    {'Mofiqul/dracula.nvim'},
+    {'Mofiqul/dracula.nvim'}, {
+        'norcalli/nvim-colorizer.lua',
+        setup = function() require'colorizer'.setup() end
+    },
     {
         "nvim-telescope/telescope-fzy-native.nvim",
         run = "make",
@@ -189,7 +192,7 @@ require("mason-lspconfig").setup({
     }
 })
 
--- -- Coffeesense Setup
+-- Coffeesense Setup
 require'lspconfig'.coffeesense.setup {}
 
 -- Telescope plugin update
