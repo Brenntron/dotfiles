@@ -1,0 +1,525 @@
+// context tags tab for webrep & filerep
+.tab-context-tags {
+  h2 {
+    font-size: 11pt;
+    font-weight: 700;
+    padding: 3px 3px 10px;
+  }
+  .ctt-choose-an-entry {
+    position: absolute;
+    left: 160px;
+    top: 10px;
+    white-space: nowrap;  // ensure superlong strings dont break ui
+    .ctt-entry-label {
+      position: relative;
+      left: 60px;
+      top: 0;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 8.5pt;
+    }
+    .ctt-entry-select {
+      position: relative;
+      left: 70px;
+      top: 0;
+      min-width: 200px;
+      font-size: 9pt;
+      padding: 3px;
+      border: solid 1px #ddd;
+    }
+  }
+
+  .ctt-table {
+    margin-bottom: 30px;
+    border-bottom: none !important;
+    thead th {
+      border-bottom: solid 1px #f6f6f6;
+      border-top: solid 1px #f6f6f6;
+      padding: 8px 14px 8px 10px;  // extra pad for tight widths
+      vertical-align: middle;
+      background-position-y: center !important;  // override dt defaults
+      line-height: 10pt;
+    }
+    tbody td {
+      padding: 8px 10px;
+      line-height: 12pt;
+      vertical-align: top;
+    }
+    .tmi-cb {
+      margin: 0;
+      position: relative;
+      top: 2px;
+      display: inline-block;
+    }
+  }
+  .tmi-table {
+    margin-bottom: 20px;
+  }
+  .tmi-suppressed {
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .tmi-suppressed, .tmi-suppression-source, .tmi-suppression-platform, .tmi-suppression-date {
+    width: 6%;
+  }
+  .tmi-suppression-platform, .tmi-tag-type {
+    text-transform: capitalize;
+  }
+  .tmi-tag-name {
+    width: 15%;
+  }
+  .tmi-taxonomy, .tmi-report-date, .tmi-suppression-date {
+    white-space: nowrap;
+  }
+  .tmi-red {
+    background-color: #f8bbbb;
+  }
+  .tmi-gray {
+    background-color: #f6f6f6;
+  }
+  .enrich-cell-context, .enrich-cell-taxonomy, .enrich-cell-name,
+  .enrich-cell-external-references {
+    width: 12%;
+  }
+  .enrich-cell-description {
+    width: 52%;
+  }
+  .filerep-enrich-cell-name {
+    width: 20%;
+  }
+  .filerep-enrich-cell-description {
+    width: 70%;
+  }
+  .enrich-cell-taxonomy, .enrich-cell-name {
+    white-space: nowrap;
+  }
+  .enrich-cell-description p, .filerep-enrich-cell-description p {
+    max-height: 120px;  // desc can get huge, use overflow scroll if so
+    overflow-y: auto;
+    white-space: pre-wrap;  // retain formatting from source
+    padding-right: 20px;
+  }
+  .enrich-cell-external-references a {
+    text-decoration: underline;
+  }
+  .filerep-enrich-cell-description p {
+    margin-right: 40px;
+  }
+  .observable-container {
+    display: inline-block;
+    //width: 160px;  // retain and restore this later on
+    text-overflow: ellipsis;  // ellipsis trick long urls
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: middle;
+  }
+  .data-report-table {
+    font-size: 9pt;
+    line-height: 12pt;
+    margin-top: 10px;
+  }
+  .filerep-prevalence-table-disposition-td {
+    text-transform: capitalize;  // data comes back all lowercase
+  }
+}
+
+// used globally on ctt
+.ctt-loader {
+  display: inline-block;
+  margin-bottom: 10px;
+  position: relative;
+  left: 5px;
+  .gears-icon {
+    display: inline-block;
+    width: 26px;
+    height: 26px;
+    margin-right: 4px;
+  }
+  .loader-msg {
+    position: relative;
+    left: 0;
+    bottom: 7px;
+    font-size: 9pt;
+    color: #777;
+  }
+}
+
+// toolbar styles
+.tmi-toolbar {
+  input {
+    margin: 2px;
+    vertical-align: text-top;
+  }
+  span {
+    float: none;
+  }
+  button.disabled {
+    opacity: 0.6;
+  }
+  .toggle-label {
+    padding: 0 3px;
+  }
+  .toolbar-button {
+    margin-right: 3px;
+    padding-left: 22px;
+    background-position-x: 5px;
+  }
+  .toolbar-button-text {
+    margin-left: 0;
+  }
+  .toolbar-button:last-of-type {
+    margin-right: 0;
+  }
+  .context-tags-toggle, .toggle-label {
+    display: inline-block;
+  }
+  .context-tags-toggle {
+    padding: 5px;
+    background-color: #f6f6f6;
+    cursor: default;
+  }
+  .context-tags-toggle:first-of-type {
+    margin-right: -3px;
+  }
+  .show-col-context-tags  {
+    background-image: url(image_path('icon_columns.svg'));
+    background-size: 18px 18px;
+  }
+  .add-context-tag-button {
+    background-image: url(image_path('icon_add_grey.svg'));
+  }
+  .suppress-context-tag-button {
+    background-image: url(image_path('icon_hide.svg'));
+    background-position-y: 3px;
+  }
+  .unsuppress-context-tag-button {
+    background-image: url(image_path('icon_view.svg'));
+  }
+  .remove-context-tag-button {
+    background-image: url(image_path('icon_delete.svg'));
+  }
+  .toggle-col-tmi {
+    cursor: default;
+  }
+}
+
+.dropdown.open .show-col-context-tags {
+  background-image: url(image_path('icon_columns_white.svg'));
+}
+
+// show/hide columns
+.tmi-columns-dropdown {
+  width: 400px;
+  margin: 0;
+  ul {
+    display: inline-block;
+    vertical-align: top;
+    width: 190px;
+    padding: 10px 5px;
+    input[type='checkbox'] {
+      margin-right: 8px;
+    }
+  }
+}
+
+// ensure bg color if tmi, enrich, or prev table width extends off page on context tags tab
+.ctt-table {
+  background-color: #fff;
+}
+
+
+// DIALOG STYLES HERE
+// add tags dialog on ct tab
+.add-context-tags-dialog {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 500;
+  font-size: 9pt;
+  background-color: #fff;
+  min-height: 500px;
+  // jquery builds the id inside the same parent class
+  #add-context-tags-dialog {
+    display: flex;
+    flex-flow: column;
+    height: 100% !important;
+    border: none;
+    padding: 10px 15px;
+  }
+
+  .ui-dialog-titlebar {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    font-size: 10pt;
+    background-color: #3e5a72;
+    padding-left: 35px;
+    background-image: url(image_path('icon_add_white.svg'));
+    background-repeat: no-repeat;
+    background-position: 8px center;
+    background-size: 20px 20px;
+  }
+  table.dataTable.taxonomy-table.no-footer {
+    border: none;
+  }
+  td {
+    padding: 2px 8px 4px !important;
+  }
+  .content-label-sm {
+    display: block;
+  }
+  .preview-tag-area {
+    border: solid 1px #eee;
+    border-top: none;
+    min-height: 76px;
+    max-height: 130px;
+    width: 100%;
+    padding: 10px 15px;
+    position: absolute;
+    background-color: #fff;
+    top: -10px;
+    right: 0;
+    overflow-y: auto;
+    z-index: 9999;
+  }
+  .preview-tag {
+    display: inline-block;
+    color: #fff;
+    background-color: #6dbcdb;
+    padding: 0;  // full height for close btn
+    border-radius: 2px;
+    margin: 2px 4px 1px 0;
+    cursor: default;
+    .preview-tag-name {
+      display: inline-block;
+      text-overflow: ellipsis;
+      white-space: nowrap;  // ellipsis-trick tag name
+      overflow-x: hidden;
+      padding: 4px 2px 4px 8px;
+      max-width: 240px;
+      height: 20px;
+      font-size: 8.5pt;
+      vertical-align: middle;
+    }
+    .preview-tag-close {
+      display: inline-block;
+      font-size: 12pt;
+      color: #fff;
+      width: 20px;
+      vertical-align: middle;
+      height: 25px;
+      padding: 4px 5px;
+      margin-left: 5px;
+      border-left: solid 1px #8bcfea;
+      &:hover {
+        opacity: 0.5;
+        cursor: pointer;
+        text-decoration: none;
+      }
+    }
+  }
+
+  .tags-content-row {
+    min-height: 300px;
+    //flex: 1 1 auto;
+  }
+  .save-button-row {
+    padding: 10px;
+    width: 100%;
+    margin: 0 auto;
+    height: 70px;
+    border-top: solid 1px #eee;
+    z-index: 9999;
+    background-color: #fff;
+    &.dialog-resized {
+      position: relative;
+      top: 10px;
+    }
+  }
+  .taxonomy-row {
+    border-bottom: solid 1px #eee;
+  }
+  .tag-entry-row {
+    font-size: 8.5pt;
+    line-height: 12pt;
+  }
+  .tag-cb-col {
+    width: 2%;
+  }
+  .tag-name-col {
+    width: 20%;
+  }
+  .tag-taxonomy-col, .tag-mnemonic-col {
+    width: 12%;
+  }
+  // show 3 lines at top
+  .tag-entry-description {
+    white-space: pre-line;
+    line-height: 11pt;
+    padding-bottom: 5px;
+  }
+  .highlight {
+    background-color: #fff7cd;
+    font-weight: 600;
+  }
+  .tag-entry-description.condensed {
+    max-height: 40px;
+    overflow-y: hidden;
+  }
+  .tag-mitre-fqn {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  .read-more-button {
+    width: 100%;
+    color: #999;
+    border: none;
+    padding: 2px 10px;
+    background-color: #fff;
+    height: 20px;
+    margin: 2px 0 0;
+    font-style: italic;
+    font-size: 8pt;
+    font-weight: 500;
+    box-shadow: 0px -6px 8px 2px #ffffff;
+  }
+  .down-caret {
+    background-image: url(image_path('icon_down_arrow_grey.svg'));
+    background-repeat: no-repeat;
+    background-size: 12px 12px;
+    background-position: 0 3px;
+    opacity: 0.9;
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    &.expanded {
+      transform: scaleY(-1);  // flip arrow up
+      background-position: 0 -2px;
+    }
+  }
+  .new-line {
+    height: 10px;
+  }
+  select {
+    background-color: #fff;
+  }
+  code {
+    color: #333;  // code tag appears from api in desc randomly
+    background-color: #fff;
+  }
+  .tag-entry-cb {
+    width: 20px;
+    position: relative;
+    top: 2px;
+  }
+  .taxonomy-select {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 8.5pt;
+    width: 100%;
+    border: solid 1px #ddd;
+    padding: 4px;
+    margin-bottom: 15px;
+    &.no-tax-selected {
+      color: #777;
+    }
+  }
+  button {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    margin-top: 5px;
+  }
+  button.secondary:active, button.secondary:focus {
+    background-color: #666;
+    color: #fff;
+  }
+}
+
+
+// taxonomy table dt style one-offs needed for dt ui elems
+.tag-entries-area {
+  .taxonomy-table th {
+    border-bottom: solid 1px #eee;
+    vertical-align: middle;
+    padding-left: 8px;
+  }
+  .dataTables_info {
+    margin: 20px 0;
+    padding: 0;
+  }
+  .dataTables_paginate {
+    margin: 10px 0;
+    .paginate_button {
+      background-color: #fff;
+      margin-right: 2px;
+      border-color: #ddd !important;
+    }
+    .paginate_button.disabled {
+      border: solid 1px #f6f6f6 !important;  // fix these imps if time avail
+      background-color: #f6f6f6;
+      color: #aaa !important;
+    }
+  }
+  .dataTables_length {
+    float: right;
+    position: relative;
+    top: 20px;
+    label {
+      background-color: #eee;
+    }
+    select {
+      border: solid 1px #eee;
+      padding: 2px;
+    }
+  }
+  .dataTables_filter label {
+    position: absolute;
+    top: -65px;
+    left: 290px;
+    display: block;
+    font-size: 7pt;
+    color: #999;
+    text-align: left;
+    padding: 2px;
+    input {
+      display: block;
+      width: 270px;
+      font-size: 8.5pt;
+      height: 28px;
+      position: relative;
+      bottom: 0;
+      font-family: 'Open Sans', sans-serif;
+      color: #333;
+      border: solid 1px #ddd;
+      padding: 6px;
+      margin: 0;
+      margin-top: 10px;
+      background-image: url(image_path('icon_search_dark.svg'));
+      background-repeat: no-repeat;
+      background-position: 98% center;
+      background-size: 15px 15px;
+    }
+  }
+  .dataTables_empty {
+    padding: 30px !important;
+  }
+}
+
+
+// two primary divs within the act dialog
+.actd-loader-area, .actd-tags-area {
+  padding: 0;
+  margin: 0;
+}
+.actd-loader-area {
+  display: flex;
+  width: 100%;
+  padding: 30px;
+  justify-content: center;
+}
+.actd-error-area p {
+  text-align: center;
+  padding: 20px;
+}
+
+.tmi-error {
+  padding: 10px 5px 5px;
+  font-size: 9pt;
+}

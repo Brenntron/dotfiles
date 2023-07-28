@@ -4018,6 +4018,7 @@ fieldset.top-content {
 .nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
 .nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
+.nav-tabs > li > a#context-tags-tab-link {background-image: url(image_path('icon_context_tag.svg'));}
 
 .email-msg-content {
   background-color: $content-bg-color;
@@ -6429,10 +6430,16 @@ h5.entry-details-table-header {
   right: 0;
   margin-top: 0;
 }
+
+// show full toolbar labels on smaller screens for less-wide toolbars
 @media (min-width: 1100px) {
   #research-tab-toolbar .toolbar-button-text {
     display: block;
     margin-left: 8px;
+  }
+  // context tags tab exists on both webrep and filerep
+  .tab-context-tags .toolbar-button-text {
+    display: block;
   }
 }
 
@@ -11181,7 +11188,7 @@ button.secondary.view-report-external-button {
 
 
 
-// dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
+// tooltips for modals on file rep get too wide, limit the max-width a little bit
 .tooltipster-sidetip .tooltipster-box {
   max-width: 460px !important;
 }
@@ -11196,7 +11203,8 @@ button.secondary.view-report-external-button {
   margin-bottom: 10px;
 }
 
-.data-report-table > tbody > tr > td, .data-report-table > thead > tr > th  {
+.data-report-table:not(.filerep-enrich-taxonomy-table) > tbody > tr > td,
+.data-report-table:not(.filerep-enrich-taxonomy-table) > thead > tr > th  {
   padding: 6px 6px;
 }
 
@@ -11255,7 +11263,7 @@ button.secondary.view-report-external-button {
   color: $second-section-color;
   font-weight: 600;
   padding-left: 22px !important;
-  // dbinebri: ensure RL result data strings wrap correctly
+  // ensure RL result data strings wrap correctly
   word-break: break-all;
 }
 
@@ -11273,7 +11281,7 @@ button.secondary.view-report-external-button {
   margin-left: -22px;
 }
 
-// dbinebri: fix for "not detected" left padding in RL table on Show
+// fix for "not detected" left padding in RL table on Show
 .scanner-unk {
   padding-left: 22px !important;
   color: $type-lighter-color;
@@ -13026,20 +13034,6 @@ table > tbody > tr > td.no-padding {
   }
 }
 
-.enrich-cell-external-references {
-  display: flex;
-  flex-direction: column;
-}
-
-.enrich-external-reference-link, .enrich-external-reference-link:hover, .enrich-external-reference-link:focus {
-  color: #fff;
-  text-decoration: underline;
-}
-
-.enrich-webrep-external-ref-header {
-  width: 137px;
-}
-
 #research_tab {
   .research-first-row {
     td {
@@ -13771,30 +13765,11 @@ table > tbody > tr > td.no-padding {
   border-top: 1px solid #f2f2f2;
 }
 
-.filerep-enrich-table-header-row th:first-child {
-  padding-left: 4px;
+.filerep-enrich-taxonomy-table th {
+  padding: 8px 6px;
 }
-
-.filerep-enrich-table-header-row th:last-child {
-  padding-right: 4px;
-}
-
-.filerep-enrich-table-description-th {
-  padding: 8px 8px 6px 8px;
-}
-
-.filerep-enrich-cell-external-references {
-  padding: 0;
-}
-
-.filerep-enrich-cell-name {
-  min-width: 85px;
-  padding: 0;
-}
-
-.filerep-enrich-cell-external-references {
-  min-width: 86px;
-  text-align: right;
+.filerep-enrich-taxonomy-table td {
+  padding: 8px 6px;
 }
 
 .filerep-enrich-external-ref {

@@ -331,9 +331,6 @@ $ ->
     if $(this).hasClass('reptool-checkbox')
       table = $(entry_row).find('.reptool-details-table')[0]
 
-    if $(this).hasClass('enrich-checkbox')
-      table = $(entry_row).find('.enrich-details-table, .prevalence-details-table')
-
     if $(this).prop('checked')
       $(table).show()
     else
