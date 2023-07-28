@@ -116,7 +116,7 @@ window.tmi_ajax_get_data = (query_item) ->
 
     error: (response) ->
       std_msg_error("Error with loading data", [response.responseJSON.message], reload: false)
-      $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # remove all loaders
+      $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # show all loaders
       $('.tmi-error').removeClass('hidden')
 
 
@@ -574,7 +574,7 @@ window.tmi_dt_init = () ->
 
 # init the enrichment and prevalence dts
 window.enrich_prev_dt_init = () ->
-  $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # remove all loaders
+  $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # hide all loaders
 
   # dt inits for enrich and prev dts for webrep, and only if not already inited
   if $('.tab-ctt-webrep').length > 0
@@ -611,39 +611,6 @@ window.determine_string_type = (curr_string) ->
     return 'url'
 
 
-
-# HOUSEKEEPING STUFF, MOVE THIS INTO A FUNCTION BELOW
-$ ->
-  # webrep - tmi page load on webrep, we need the first ip/domain/url entry on this case
-  if $('.tab-ctt-webrep').length > 0
-    if $('.top-case-info .dispute-entry-ip-uri').length > 0
-      curr_entry = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
-      tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
-
-    # on webrep, if user clicks the 'select an entry' element
-    $('.tab-ctt-webrep .ctt-entry-select').change ->
-      $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
-      $('.tmi-error').addClass('hidden')
-      curr_entry = $(this).find('option:selected').attr('data-entry')
-      tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
-
-    # select - build options for choose-an-entry
-    $('.research-table-row').each ->
-      curr_entry = $(this).find('.entry-data-content').text().trim()  # entry can be url/ip/domain
-      curr_option = "<option class='mult-entry-option' data-entry='#{curr_entry}'>#{curr_entry}</option>"
-      $(".ctt-entry-select").append(curr_option)
-
-    # show the choose-an-entry if multiple entries exist on webrep dispute case
-    entries_str = $('.top-case-info .dispute-entry-count').text().trim()
-    entries_num = parseInt(entries_str)
-    if entries_num > 1
-      $('.ctt-choose-an-entry').removeClass('hidden')
-
-
-  # filerep - tmi kick things off on filerep, we need the sha (one sha per dispute)
-  else if $('.tab-ctt-filerep').length > 0
-    curr_entry = $('#sha256_hash').text().trim()  # get url or ip
-    tmi_enrich_prev_dt_inits('initial', curr_entry)
 
 
 # initialize and open the tags dialog
@@ -708,7 +675,6 @@ window.add_context_tags_dialog = () ->
                    <button class='read-more-button hidden'>Read More <span class='down-caret'></span></button>
                  </td>
                </tr>"
-
 
             # mitre descriptions are huge, show the mitre fqn (short_desc) and show the read more button
             if taxonomy_name.includes('MITRE') && short_description
@@ -863,7 +829,13 @@ window.add_tags_submit = () ->
       data: data
       success: (response) ->
         $('#add-context-tags-dialog').dialog('close')
-        std_msg_success("Success - Tags added to observable.", ["Reloading page."], reload: true)
+        std_msg_success("Success", ["Tags added."], reload: false)
+
+        # now reload the dts instead of the whole page to show latest data
+        curr_observable = $('.ctt-entry-select option:selected').text().trim()
+        tmi_enrich_prev_dt_inits('update', curr_observable)  # on add tags, lets try just re-loading the dt
+        $('.enrichment-loader, .prevalence-loader, .tmi-loader').removeClass('hidden')  # show all loaders
+
       error: (response) ->
         std_msg_error("Error adding tags", ["#{response.responseJSON.message}"], reload: false)
 
@@ -882,9 +854,9 @@ window.other_tag_functions = (action) ->
     if suppressed_status == 'yes' then any_tags_suppressed = true
 
   switch action
-    when 'suppress_tag' then success_msg = "Tags suppressed"
-    when 'unsuppress_tag' then success_msg = "Tags unsuppressed"
-    when 'delete' then success_msg = "Tags removed from observable"
+    when 'suppress_tag' then success_msg = "Suppressed tags."
+    when 'unsuppress_tag' then success_msg = "Unsuppressed tags."
+    when 'delete' then success_msg = "Removed tags."
 
   if $('.tmi-cb:checked').length == 0
     std_msg_error('No tag selected', ['Please select at least one tag.'])
@@ -928,7 +900,13 @@ window.other_tag_functions = (action) ->
         method: 'POST'
         data: data
         success: (response) ->
-          std_msg_success("Success - #{success_msg}", ["Reloading page."], reload: true)
+          std_msg_success("Success", ["#{success_msg}"], reload: false)
+
+          # now reload the dts instead of the whole page to show latest data
+          curr_observable = $('.ctt-entry-select option:selected').text().trim()
+          tmi_enrich_prev_dt_inits('update', curr_observable)  # on add tags, lets try just re-loading the dt
+          $('.enrichment-loader, .prevalence-loader, .tmi-loader').removeClass('hidden')  # show all loaders
+
         error: (response) ->
           std_msg_error("Error with tags", ["#{response.responseText}"], reload: false)
 
@@ -969,3 +947,37 @@ $ ->
   # cancel button for tags dialog
   $('.tags-cancel-button').click ->
     $('#add-context-tags-dialog').dialog('close')
+
+
+# more housekeeping stuff
+$ ->
+  # WEBREP - tmi page load on webrep, we need the first ip/domain/url entry on this case
+  if $('.tab-ctt-webrep').length > 0
+    if $('.top-case-info .dispute-entry-ip-uri').length > 0
+      curr_entry = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
+      tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
+
+    # on webrep, if user clicks the 'select an entry' element
+    $('.tab-ctt-webrep .ctt-entry-select').change ->
+      $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
+      $('.tmi-error').addClass('hidden')
+      curr_entry = $(this).find('option:selected').attr('data-entry')
+      tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
+
+    # select - build options for choose-an-entry
+    $('.research-table-row').each ->
+      curr_entry = $(this).find('.entry-data-content').text().trim()  # entry can be url/ip/domain
+      curr_option = "<option class='mult-entry-option' data-entry='#{curr_entry}'>#{curr_entry}</option>"
+      $(".ctt-entry-select").append(curr_option)
+
+    # show the choose-an-entry if multiple entries exist on webrep dispute case
+    entries_str = $('.top-case-info .dispute-entry-count').text().trim()
+    entries_num = parseInt(entries_str)
+    if entries_num > 1
+      $('.ctt-choose-an-entry').removeClass('hidden')
+
+
+  # FILEREP - tmi kick things off on filerep, we need the sha (one sha per dispute)
+  else if $('.tab-ctt-filerep').length > 0
+    curr_entry = $('#sha256_hash').text().trim()  # get url or ip
+    tmi_enrich_prev_dt_inits('initial', curr_entry)
