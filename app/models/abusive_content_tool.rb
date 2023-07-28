@@ -34,7 +34,7 @@ class AbusiveContentTool
 
     params["Reporting_Type"] = "R"
     if Rails.env == "production"
-      params["Live_Report"] = "L" #(this will send a test report that will not affect our real data, once you are ready to go live, change this to “L".)
+      params["Live_Report"] = "L"
     else
       params["Live_Report"] = "T" #(this will send a test report that will not affect our real data, once you are ready to go live, change this to “L".)
     end

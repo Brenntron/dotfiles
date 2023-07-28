@@ -92,14 +92,12 @@ class Webcat::Iwf
   end
 
   def self.call_request(method, request)
-    #binding.pry
+
     case method
       when :post
-        #if gssnegotiate?
-        #  HTTPI.post(request, :curb)
-        #else
-          HTTPI.post(request)
-        #end
+
+        HTTPI.post(request)
+
       else #:get
         if gssnegotiate?
           HTTPI.get(request, :curb)
@@ -120,10 +118,6 @@ class Webcat::Iwf
     rescue Exception => e
 
     end
-
-    #if response.code >= 300
-    #  raise RepApi::RepApiError, "HTTP response #{response.code}"
-    #end
 
     if response.code > 204
       raise RepApi::RepApiError, "HTTP code: #{response.code} Error code #{code.to_s}: #{description}"
