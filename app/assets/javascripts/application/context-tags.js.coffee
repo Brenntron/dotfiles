@@ -556,6 +556,10 @@ window.tmi_dt_init = () ->
         sortable: false
       }
     ]
+    drawCallback: ->
+      $('.tab-context-tags .esc-tooltipped').tooltipster
+        theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']  # tt init all tmi observ dt tts
+
 
   # show or hide columns in tmi table
   $('.toggle-col-tmi').each ->
