@@ -1618,53 +1618,54 @@ $ ->
     ]
 
 $ ->
-  set_file_rep_link = () ->
-    url = '/escalations/file_rep/disputes'
-    search = if window.location.pathname == url # only if we're on index page
-               window.location.search
-             else
-               localStorage.file_rep_search_name
+  url = '/escalations/file_rep/disputes'
+  if window.location.pathname.includes(url)
+    set_file_rep_link = () ->
+      search = if window.location.pathname == url # only if we're on index page
+                 window.location.search
+               else
+                 localStorage.file_rep_search_name
 
-    if search && window.location.href.indexOf('file_rep') > 0
-      localStorage.setItem('file_rep_search_name', search)
-      link = url + search
-      $('#amp-link').attr('href', link)
-      $('#amp-icon-link').attr('href', link)
-      $('#queue').attr('href', link)
+      if search && window.location.href.indexOf('file_rep') > 0
+        localStorage.setItem('file_rep_search_name', search)
+        link = url + search
+        $('#amp-link').attr('href', link)
+        $('#amp-icon-link').attr('href', link)
+        $('#queue').attr('href', link)
 
-  set_file_rep_link()
+    set_file_rep_link()
 
-  if $('#assignee-input').length > 0
-    assignee_input = $('#assignee-input').selectize {
+    if $('#assignee-input').length > 0
+      assignee_input = $('#assignee-input').selectize {
+        persist: true
+        create: false
+        valueField: 'name',
+        labelField: 'display_name',
+        searchField: ['name', 'display_name'],
+        options: AC.FileRep.createAssigneeOptions()
+        render:
+          option: (item, escape) ->
+            name = item.display_name
+            cvs_name = item.name
+            '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(cvs_name) + ')' + '</span></div>'
+        onFocus: () ->
+          window.toggle_selectize_layer(this, 'true')
+        onBlur: () ->
+          window.toggle_selectize_layer(this, 'false')
+      }
+
+    platforms_input = $('#platform-input').selectize {
       persist: true
       create: false
-      valueField: 'name',
-      labelField: 'display_name',
-      searchField: ['name', 'display_name'],
-      options: AC.FileRep.createAssigneeOptions()
+      valueField: 'public_name',
+      labelField: 'public_name',
+      searchField: 'public_name',
+      options: AC.FileRep.createPlatformOptions()
       render:
         option: (item, escape) ->
-          name = item.display_name
-          cvs_name = item.name
-          '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(cvs_name) + ')' + '</span></div>'
+         '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-
-  platforms_input = $('#platform-input').selectize {
-    persist: true
-    create: false
-    valueField: 'public_name',
-    labelField: 'public_name',
-    searchField: 'public_name',
-    options: AC.FileRep.createPlatformOptions()
-    render:
-      option: (item, escape) ->
-       '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'
-    onFocus: () ->
-      window.toggle_selectize_layer(this, 'true')
-    onBlur: () ->
-      window.toggle_selectize_layer(this, 'false')
-  }

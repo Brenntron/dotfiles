@@ -9,6 +9,14 @@ $(document).on 'click', '.paginate_button', ->
 $(document).on 'change','.nested-table-input','.selectize-input', ->
   touchedFormChange(this.dataset.domain)
 
+
+init_tooltip = () ->
+  $('.esc-tooltipped:not(.tooltipstered)').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
+
 #### WBNP Reporting ####
 webcat_loader_timeout = ''
 
@@ -118,6 +126,7 @@ window.build_single_row = (rd, data) ->
                     <thead>
                     <tr>
                       <th><input type='checkbox' name='cbox' class='imports-url-checkbox-bulk' id='cbox-#{issue_key}-urls' value='#{issue_key}'/></th>
+                      <th></th>
                       <th>Original</th>
                       <th>Sanitized Domain</th>
                       <th>Entry ID</th>
@@ -151,55 +160,60 @@ window.build_single_row = (rd, data) ->
         dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
         columnDefs:
           [{
-            targets: [ 0 ]
+            targets: [ 0,1 ]
             orderable: false
             searchable: false
           }
           {
-            targets: [ 9 ]
+            targets: [ 0 ]
+            className:'checkbox-cell'
+          }
+          {
+            targets: [ 10 ]
             className:'entry-assignee'
           }]
+        drawCallback:()->
+          init_tooltip()  #initialize tooltip after table is drawn and html exists (this is just for important tags at the moment)
+
         createdRow: (row, data, index) ->
-          url =          data[1]
-          entry_id =     data[3]
-          complaint_id = data[4]
-          status =       data[5]
-          age =          data[10]
+            url =          data[2]
+            entry_id =     data[4]
+            complaint_id = data[5]
+            status =       data[6]
+            age =          data[11]
+            is_important = data[1]
 
+            checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
+            $('td', row).eq(0).html(checkbox)
 
-          checkbox = "<input type='checkbox' name='cbox' class='imports-url-checkbox imports-url-checkbox-#{issue_key}'  id='cbox-#{issue_key}-#{index}-urls' value='#{entry_id}'/>"
-          $('td', row).eq(0).append(checkbox).addClass('checkbox-cell')
+            if is_important
+              $('td', row).eq(1).html('<span class="entry-important-flag esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>')
 
-          if url
-            updated_url = "<span class='jira-url esc-tooltipped' title='#{url}'>#{url}</span>"
-            $('td', row).eq(1).html(updated_url)
+            if url
+              updated_url = "<span class='jira-url esc-tooltipped' title='#{url}'>#{url}</span>"
+              $('td', row).eq(2).html(updated_url)
 
-          if complaint_id
-            complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
-            $('td', row).eq(4).html(complaint_link)
+            if complaint_id
+              complaint_link = "<a target='_blank' class='ticket-id' href='/escalations/webcat/complaints/#{complaint_id}'>#{complaint_id}<a>"
+              $('td', row).eq(5).html(complaint_link)
 
-          if age
-            unless status == 'COMPLETED' || status == 'RESOLVED'
-              if age.indexOf('h') != -1 && age.indexOf('h') >= 3
-                hour = parseInt( age.split("h")[0] )
-                if hour>= 3 && hour < 12
-                  age_class = 'ticket-age-over3hr'
-                else if hour >= 12
+            if age
+              unless status == 'COMPLETED' || status == 'RESOLVED'
+                if age.indexOf('h') != -1 && age.indexOf('h') >= 3
+                  hour = parseInt( age.split("h")[0] )
+                  if hour>= 3 && hour < 12
+                    age_class = 'ticket-age-over3hr'
+                  else if hour >= 12
+                    age_class = 'ticket-age-over12hr'
+                else if age.indexOf('mo') != -1
                   age_class = 'ticket-age-over12hr'
-              else if age.indexOf('mo') != -1
-                age_class = 'ticket-age-over12hr'
-              else if (age.indexOf('m') != -1) || (age.indexOf('s') != -1)
-                age_class = ''
-              else
-                age_class = 'ticket-age-over12hr'
-              $('td', row).eq(10).html("<span class='#{age_class}'>#{age}</span>")
-        initComplete: () ->
-          $('.esc-tooltipped:not(.tooltipstered)').tooltipster
-            theme: [
-              'tooltipster-borderless'
-              'tooltipster-borderless-customized'
-            ]
-    )
+                else if (age.indexOf('m') != -1) || (age.indexOf('s') != -1)
+                  age_class = ''
+                else
+                  age_class = 'ticket-age-over12hr'
+                $('td', row).eq(11).html("<span class='#{age_class}'>#{age}</span>")
+
+        )
   else
     ticket_html += "<hr/></div>"
     $('.webcat-ticket-view').append(ticket_html)
@@ -390,7 +404,6 @@ window.close_related_issues = () ->
       ids.push(parseInt(r.id))
   )
   if ids.length
-    console.log ids
     std_msg_ajax
       method: 'put'
       url: '/escalations/api/v1/escalations/jira_import_tasks/close_related_issues'
@@ -412,7 +425,7 @@ window.build_imports_table = () ->
   $('#webcat-imports-index').DataTable(
     serverSide: true
     ajax: "/escalations/webcat/jira_import_tasks.json"
-    order:[]
+    order:[[1, 'desc']]
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     language: {
       search: "_INPUT_"
@@ -458,18 +471,28 @@ window.build_imports_table = () ->
       },
       {
         data: 'result'
+        className:'result-col'
+        width:'150px'
         render: (data,type,full,meta) ->
           {status, result, id}=full
 
+          html = "<div class='result-container'>"
+
           if result && result != status
-            html = "<span>#{status} - #{result}</span>"
+            html += "<div>
+                      <div class='jira-status'>#{status}</div>
+                      <div class='jira-result-note'>#{result}</div>
+                     </div>"
           else
-            html = "<span>#{status}</span>"
+            html = "<span class='jira-status'>#{status}</span>"
 
           if status == 'Failure'
-            html += "<button class='inline-retry-button retry-button tooltipped tooltipstered' title='Retry' onclick='retry_imports(#{id})'></button>"
+            html += "<div>
+                  <button class='inline-retry-button retry-button tooltipped tooltipstered' title='Retry' onclick='retry_imports(#{id})'></button>
+                 </div>"
 
-          return html
+          html += "</div>"
+
       },
       {
         data: 'issue_status'

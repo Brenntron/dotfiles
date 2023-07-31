@@ -1123,6 +1123,7 @@ $ ->
       }
       {
         targets: [ 10 ]
+        orderData: 20 # The age column is ordered by the age_int column. If columns are added or removed this must be updated.
         className: 'age-col'
       }
     ]
@@ -1168,16 +1169,14 @@ $ ->
       {
         data: 'case_age'
         'render': (data,type,full,meta) ->
-          if data == "<1 hr"
-            data
-          else if data.includes('h') && !data.includes('d')
-            hours = parseInt(data.split('h')[0])
-            if hours < 18
-              dispute_latency = data
-            else
-              dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
-          else
-            dispute_latency = '<span class="ticket-age-over18hr">' + data + '</span>'
+          { age_int, status } = full
+          age_class = ''
+
+          unless status == 'RESOLVED_CLOSED' || status == 'CLOSED'
+            if age_int >= 64800 #age_int is measured in seconds
+              age_class = 'ticket-age-over18hr'
+
+          "<span class='#{age_class}'>#{data}</span>"
       }
       { data: 'source' }
       {
@@ -2929,9 +2928,10 @@ window.format_webrep_header = (data) ->
         else if condition_types[conditionName]
           selectedFilters.push({name: condition_types[conditionName], value: search_conditions[conditionName]})
         container = $('#dispute-advaced-search-selected-filters')
-      for item in selectedFilters
-        html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value.split(',').join(', ') + '</span>'
-        $('#dispute-advaced-search-selected-filters').append(html)
+      if container.html() == ''
+        for item in selectedFilters
+          html = '<span class="search-condition-name text-uppercase">' + item.name + ': </span>' + "<span class='search-condition'>" + item.value.split(',').join(', ') + '</span>'
+          $('#dispute-advaced-search-selected-filters').append(html)
     else if search_type == 'named'
       new_header =
         '<div>Results for "' + search_name + '" Saved Search' +

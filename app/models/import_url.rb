@@ -6,6 +6,7 @@ class ImportUrl < ApplicationRecord
   def url_dt_format
     entry = ComplaintEntry.where(complaint_id:complaint_id).first if complaint_id.present?
     age = ComplaintEntry.first_two_time_layers(time_ago_in_words(entry.created_at.to_time, {scope: 'datetime.distance_in_words', include_seconds: false})) if entry.present?
+
     assignee = User.find(entry&.user_id).cvs_username if entry.present?
 
     imported = bast_verdict == "1" ? "Imported" : "Not Imported"
@@ -14,6 +15,7 @@ class ImportUrl < ApplicationRecord
     end
     [
       '',                                                          #empty val for checkbox col
+      entry&.is_important,                                         #important icon
       submitted_url,                                               #url
       domain,                                                      #domain
       entry&.id,                                                   #entry_id
