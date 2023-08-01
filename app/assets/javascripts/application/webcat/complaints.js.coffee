@@ -578,7 +578,7 @@ window.export_selected_jira_tasks = ()->
   selected_tasks = $('.imports_check_box:checked').map((i, el) => el.value).get()
   if !selected_tasks.length
     $('#jira-tasks-filter-input').val([])
-  else      
+  else
     $('#jira-tasks-filter-input').val(selected_tasks)
   form.submit()
 
@@ -1034,6 +1034,7 @@ window.domain_whois = (IP_Domain) ->
 
 window.review_bulk_submit = () ->
   selected_rows = $("tr.highlight-second-review.shown")
+  self_review = $('#self_review').is(':checked')
   if selected_rows.length < 1
     return
   entries_to_update = []
@@ -1062,6 +1063,7 @@ window.review_bulk_submit = () ->
           named_categories += ", "
     if status != "ignore"
       entries_to_update.push({
+        'self_review': self_review,
         'id': entry_id,
         'prefix': prefix,
         'commit':status,
@@ -1071,6 +1073,7 @@ window.review_bulk_submit = () ->
         'categories': categories,
         'category_names':named_categories
       })
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
       method: 'POST'
@@ -1090,6 +1093,7 @@ processSubmitPending=(entry_id,row_id)->
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   resolution = $('.complaint-resolution'+entry_id).text()
+  self_review = $('#self_review').is(':checked')
 
   #get the selectize control for the category input
   selectizeControl = $('#input_cat_'+entry_id).selectize()[0].selectize
@@ -1111,7 +1115,19 @@ processSubmitPending=(entry_id,row_id)->
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
-    data: {data: [{'id': entry_id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories, 'category_names':named_categories }]}
+    data: {
+      data: [{
+        'self_review': self_review,
+        'id': entry_id,
+        'prefix': prefix,
+        'commit':status,
+        'status':resolution,
+        'comment':comment,
+        'resolution_comment': resolution_comment,
+        'categories': categories,
+        'category_names':named_categories
+      }]
+    }
     success: (response) ->
       {uri, domain, subdomain, path, categories, error, entry_id, was_dismissed, status} = $.parseJSON(response)
       if error
@@ -1192,6 +1208,7 @@ processSubmitEntry = (entry_id,row_id) ->
   uri_as_categorized = $('#complaint_prefix_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   fixed_flag = $('#fixed'+entry_id).is(':checked')
+  self_review = $('#self_review').is(':checked')
 
   # If resolution is set to fixed, make sure it has categories applied
   if categories == null && fixed_flag == true
@@ -1203,7 +1220,7 @@ processSubmitEntry = (entry_id,row_id) ->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
       headers: headers
-      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment, 'uri_as_categorized': uri_as_categorized }
+      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment, 'uri_as_categorized': uri_as_categorized , 'self_review': self_review}
       success: (response) ->
         {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
 
@@ -2617,6 +2634,7 @@ processSubmitMaster = () ->
   # remove empty values
   selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
   selectedEntries = []
+  self_review = $('#self_review').is(':checked')
   $('#complaints-index').DataTable().rows (idx, data, node) ->
     entry_item = data.domain || data.ip_address
     if selectedEntryDomains.includes(entry_item)
@@ -2646,7 +2664,19 @@ processSubmitMaster = () ->
       if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
       else if status == 'UNCHANGED' || status == 'INVALID'
-        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
+        data.push({
+          entry_id: entry_id,
+          error: false,
+          row_id: row_id,
+          prefix: prefix,
+          categories: categories,
+          category_names: category_names,
+          status: status,
+          comment: comment,
+          resolution_comment: resolution_comment,
+          uri_as_categorized: uri_as_categorized,
+          self_review: self_review
+        })
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
   std_msg_ajax(
