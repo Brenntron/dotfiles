@@ -251,7 +251,8 @@
   .tags-header-row {
     height: 70px;
     margin: 0;
-    border-bottom: solid 1px #eee;
+    border-bottom: solid 1px #ececec;
+    background-color: #f6f6f6;
     padding: 0;
   }
   // middle row, fill remaining height intrinsically
@@ -297,9 +298,9 @@
     margin-top: 6px;
   }
   .preview-tag-area {
-    border-left: solid 1px #eee;
-    border-bottom: solid 1px #eee;
-    background-color: #fff;
+    border-left: solid 1px #ececec;
+    border-bottom: solid 1px #ececec;
+    background-color: #f6f6f6;
     padding-bottom: 10px;
     overflow-y: auto;
     min-height: 70px;

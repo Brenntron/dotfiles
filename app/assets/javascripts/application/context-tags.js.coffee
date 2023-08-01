@@ -865,9 +865,9 @@ window.other_tag_functions = (action) ->
     if suppressed_status == 'yes' then any_tags_suppressed = true
 
   switch action
-    when 'suppress_tag' then success_msg = "suppressing tags."
-    when 'unsuppress_tag' then success_msg = "unsuppressing tags."
-    when 'delete' then success_msg = "removing tags."
+    when 'suppress_tag' then success_msg = "suppress"
+    when 'unsuppress_tag' then success_msg = "unsuppress"
+    when 'delete' then success_msg = "remov"
 
   if $('.tmi-cb:checked').length == 0
     std_msg_error('No tag selected', ['Please select at least one tag.'])
@@ -875,7 +875,7 @@ window.other_tag_functions = (action) ->
   else
     # remove tags and the tags are suppressed, stop and error out
     if action == 'delete' && any_tags_suppressed == true
-      std_msg_error('Error', ['One or more selected tags is suppressed, can only remove unsuppressed.'])
+      std_msg_error('Error', ['One or more selected tags is suppressed, suppressed tags cannot be removed.'])
     else
       $('.tmi-cb:checked').each ->
         tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
@@ -911,7 +911,7 @@ window.other_tag_functions = (action) ->
         method: 'POST'
         data: data
         success: (response) ->
-          std_msg_success("Success on #{success_msg}", ["Updating data."], reload: false)
+          std_msg_success("Tags successfully #{success_msg}ed", [], reload: false)
 
           # now reload the dts instead of the whole page to show latest data
           curr_observable = $('.ctt-entry-select option:selected').text().trim()
