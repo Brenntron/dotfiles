@@ -71,19 +71,22 @@
     color: #333;
     text-transform: uppercase;
   }
+  .tmi-answer {
+    display: inline-block;
+    padding-top: 2px;
+  }
   .tmi-warning {
     color: #f58a4b;
-    background-color: #fff;
   }
   .tmi-alert-icon {
     display: inline-block;
-    width: 20px;
+    width: 18px;
     height: 18px;
     padding: 0;
     float: right;
     background-image: url(image_path('icon_rule_warning.svg'));
     background-size: 17px 18px;
-    background-position: 0 -1px;
+    background-position: 0 0;
     background-repeat: no-repeat;
   }
   .tmi-gray {

@@ -101,7 +101,7 @@ window.tmi_ajax_get_data = (query_item) ->
                  <td class='tmi-source'>#{source}</td>
                  <td class='tmi-processor'>#{processor}</td>
                  <td class='tmi-report-date'>#{report_date}</td>
-                 <td class='tmi-suppressed tmi-warning'>#{suppressed} <span class='tmi-alert-icon ctt-tooltipped' title='Tags that are not suppressed are in the Enrichment Service and will be visible to customers'></span></td>
+                 <td class='tmi-suppressed tmi-warning'><span class='tmi-answer'>#{suppressed}</span> <span class='tmi-alert-icon ctt-tooltipped' title='Tags that are not suppressed are in the Enrichment Service and will be visible to customers'></span></td>
                  <td class='tmi-suppression-source tmi-gray'>#{suppression_source}</td>
                  <td class='tmi-suppression-platform tmi-gray'>#{suppression_platform}</td>
                  <td class='tmi-suppression-date tmi-gray'>#{suppression_date}</td></tr>"
@@ -110,8 +110,6 @@ window.tmi_ajax_get_data = (query_item) ->
             if suppressed == 'yes'
               report_tr = report_tr.replace(/tmi-warning/g,'')
               report_tr = report_tr.replace(/tmi-gray/g,'')
-
-
               report_tr = report_tr.replace(/tmi-alert-icon/g,'tmi-alert-icon hidden')
 
             # add row to dom
@@ -138,7 +136,6 @@ window.enrich_ajax_webrep = (query_item, query_type) ->
       return response
     error: () ->
       $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # hide all loaders
-#      $('.tmi-error').removeClass('hidden')
 
 
 window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
@@ -693,12 +690,12 @@ window.add_context_tags_dialog = () ->
                  <td class='tag-taxonomy-col'><p class='tag-entry-taxonomy'>#{taxonomy_name}</p></td>
                  <td class='tag-desc-col'>
                    <p class='tag-mitre-fqn hidden'>#{short_description}</p>
-                   <p class='tag-entry-description'>#{description}</p>
-                   <button class='read-more-button hidden'>Read More <span class='down-caret'></span></button>
+                   <p class='tag-entry-description tag-entry-description-#{full_id}'>#{description}</p>
+                   <button class='read-more-button hidden' onclick='tags_dialog_read_more(\"#{full_id}\");'>Read More <span class='down-caret down-caret-#{full_id}'></span></button>
                  </td>
                </tr>"
 
-            # mitre descriptions are huge, show the mitre fqn (short_desc) and show the read more button
+            # if description text is for mitre and fqn exists, show the read more btn
             if taxonomy_name.includes('MITRE') && short_description
               entry_tr = entry_tr.replace('tag-mitre-fqn hidden','tag-mitre-fqn')
               # show read more button if the description is verbose
@@ -772,13 +769,8 @@ window.tags_dialog_dt_init = () ->
       language: {
         search: "_INPUT_"
         searchPlaceholder: "Search for tags by keyword"
-        zeroRecords: "No matching tags found."
+        zeroRecords: "No matching tags found"
       }
-      drawCallback: ->
-        $('.tags-dialog .read-more-button').click ->
-          $(this).prev().toggleClass('condensed')  # after a draw or redraw of dt, add click handler
-          $(this).find('.down-caret').toggleClass('expanded')
-
 
     # get the auto-generated dt search and move it into header
     tag_search_html = $('.tags-dialog .dataTables_filter input').detach()
@@ -806,6 +798,13 @@ window.tags_dialog_dt_init = () ->
     $('.tag-entries-area .dataTables_filter input').click ->
       if $('.taxonomy-select option:selected').attr('data-id') == "0" && !$(this).text().length > 0
         tags_table_dt.columns(3).search('').draw()  # show all
+
+
+
+# read more button on tags dialog
+window.tags_dialog_read_more = (id) ->
+  $(".tag-entry-description-#{id}").toggleClass('condensed')
+  $(".down-caret-#{id}").toggleClass('expanded')
 
 
 
