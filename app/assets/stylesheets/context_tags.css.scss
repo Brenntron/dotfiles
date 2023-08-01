@@ -54,10 +54,6 @@
   .tmi-table {
     margin-bottom: 20px;
   }
-  .tmi-suppressed {
-    font-weight: 600;
-    text-transform: uppercase;
-  }
   .tmi-suppressed, .tmi-suppression-source, .tmi-suppression-platform, .tmi-suppression-date {
     width: 6%;
   }
@@ -70,8 +66,25 @@
   .tmi-taxonomy, .tmi-report-date, .tmi-suppression-date {
     white-space: nowrap;
   }
-  .tmi-red {
-    background-color: #f8bbbb;
+  .tmi-suppressed {
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+  }
+  .tmi-warning {
+    color: #f58a4b;
+    background-color: #fff;
+  }
+  .tmi-alert-icon {
+    display: inline-block;
+    width: 20px;
+    height: 18px;
+    padding: 0;
+    float: right;
+    background-image: url(image_path('icon_rule_warning.svg'));
+    background-size: 17px 18px;
+    background-position: 0 -1px;
+    background-repeat: no-repeat;
   }
   .tmi-gray {
     background-color: #f6f6f6;
@@ -528,4 +541,11 @@
 .tmi-error {
   padding: 10px 5px 5px;
   font-size: 9pt;
+}
+
+// ctt toolbar buttons dont need breaks
+.tooltipster-no-break .tooltipster-content {
+  word-break: break-word;
+  text-align: left;
+  padding-left: 12px !important;
 }

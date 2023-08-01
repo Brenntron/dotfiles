@@ -61,19 +61,19 @@
           %div
             %label.toolbar-section-label Actions
 
-            %button.toolbar-button.add-context-tag-button.dialog-button{onclick: "add_context_tags_dialog();"}
+            %button.toolbar-button.add-context-tag-button.dialog-button.ctt-tooltipped{title: "Add Tag", onclick: "add_context_tags_dialog();"}
               %span.toolbar-button-text Add Tag
 
             -# hook this one up
-            %button.toolbar-button.suppress-context-tag-button{onclick: "other_tag_functions('suppress_tag');"}
+            %button.toolbar-button.suppress-context-tag-button.ctt-tooltipped{title: "Suppressed tags will not show up in the Enrichment Service and will not be visible to customers", onclick: "other_tag_functions('suppress_tag');"}
               %span.toolbar-button-text Suppress Tag
 
             -# hook this one up
-            %button.toolbar-button.unsuppress-context-tag-button{onclick: "other_tag_functions('unsuppress_tag');"}
+            %button.toolbar-button.unsuppress-context-tag-button.ctt-tooltipped{title: "Tags that are not suppressed will show up in the Enrichment Service and be visible to customers", onclick: "other_tag_functions('unsuppress_tag');"}
               %span.toolbar-button-text Unsuppress Tag
 
             -# hook this one up
-            %button.toolbar-button.remove-context-tag-button{onclick: "other_tag_functions('delete');"}
+            %button.toolbar-button.remove-context-tag-button.ctt-tooltipped{title: "Remove Tag", onclick: "other_tag_functions('delete');"}
               %span.toolbar-button-text Remove Tag
 
 

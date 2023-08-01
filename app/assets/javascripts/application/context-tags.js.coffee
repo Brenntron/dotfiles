@@ -101,18 +101,22 @@ window.tmi_ajax_get_data = (query_item) ->
                  <td class='tmi-source'>#{source}</td>
                  <td class='tmi-processor'>#{processor}</td>
                  <td class='tmi-report-date'>#{report_date}</td>
-                 <td class='tmi-suppressed tmi-red'>#{suppressed}</td>
+                 <td class='tmi-suppressed tmi-warning'>#{suppressed} <span class='tmi-alert-icon ctt-tooltipped' title='Tags that are not suppressed are in the Enrichment Service and will be visible to customers'></span></td>
                  <td class='tmi-suppression-source tmi-gray'>#{suppression_source}</td>
                  <td class='tmi-suppression-platform tmi-gray'>#{suppression_platform}</td>
                  <td class='tmi-suppression-date tmi-gray'>#{suppression_date}</td></tr>"
 
             # default is no with red cell and gray cells to the right
             if suppressed == 'yes'
-              report_tr = report_tr.replace(/tmi-red/g,'')
+              report_tr = report_tr.replace(/tmi-warning/g,'')
               report_tr = report_tr.replace(/tmi-gray/g,'')
+
+
+              report_tr = report_tr.replace(/tmi-alert-icon/g,'tmi-alert-icon hidden')
 
             # add row to dom
             $('.tmi-tbody').append(report_tr)  # add to dom
+
 
     error: (response) ->
       std_msg_error("Error with loading data", [response.responseJSON.message], reload: false)
@@ -566,6 +570,13 @@ window.tmi_dt_init = () ->
       # tt re-init all tmi observ dt tts
       $('.tab-context-tags .esc-tooltipped').tooltipster
         theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+        debug: false
+
+      # tt toolbar btns needs one-offs
+      $('.tab-context-tags .ctt-tooltipped').tooltipster
+        theme: ['tooltipster-borderless', 'tooltipster-borderless-customized', 'tooltipster-no-break']
+        debug: false
+        maxWidth: 380
 
 
   # show or hide columns in tmi table
