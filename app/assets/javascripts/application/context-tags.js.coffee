@@ -116,7 +116,7 @@ window.tmi_ajax_get_data = (query_item) ->
 
     error: (response) ->
       std_msg_error("Error with loading data", [response.responseJSON.message], reload: false)
-      $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # show all loaders
+      $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # hide all loaders
       $('.tmi-error').removeClass('hidden')
 
 
@@ -132,6 +132,9 @@ window.enrich_ajax_webrep = (query_item, query_type) ->
     data: data
     success: (response) ->
       return response
+    error: () ->
+      $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # hide all loaders
+#      $('.tmi-error').removeClass('hidden')
 
 
 window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
@@ -557,8 +560,12 @@ window.tmi_dt_init = () ->
       }
     ]
     drawCallback: ->
+      # ensure reset of tmi cbs
+      $('.tmi-cb, .tmi-cb-select-all').prop('checked', false)
+
+      # tt re-init all tmi observ dt tts
       $('.tab-context-tags .esc-tooltipped').tooltipster
-        theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']  # tt init all tmi observ dt tts
+        theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
 
 
   # show or hide columns in tmi table
@@ -833,7 +840,7 @@ window.add_tags_submit = () ->
       data: data
       success: (response) ->
         $('#add-context-tags-dialog').dialog('close')
-        std_msg_success("Success", ["Tags added."], reload: false)
+        std_msg_success("Success on adding tags.", ["Updating data."], reload: false)
 
         # now reload the dts instead of the whole page to show latest data
         curr_observable = $('.ctt-entry-select option:selected').text().trim()
@@ -858,9 +865,9 @@ window.other_tag_functions = (action) ->
     if suppressed_status == 'yes' then any_tags_suppressed = true
 
   switch action
-    when 'suppress_tag' then success_msg = "Suppressed tags."
-    when 'unsuppress_tag' then success_msg = "Unsuppressed tags."
-    when 'delete' then success_msg = "Removed tags."
+    when 'suppress_tag' then success_msg = "suppressing tags."
+    when 'unsuppress_tag' then success_msg = "unsuppressing tags."
+    when 'delete' then success_msg = "removing tags."
 
   if $('.tmi-cb:checked').length == 0
     std_msg_error('No tag selected', ['Please select at least one tag.'])
@@ -904,7 +911,7 @@ window.other_tag_functions = (action) ->
         method: 'POST'
         data: data
         success: (response) ->
-          std_msg_success("Success", ["#{success_msg}"], reload: false)
+          std_msg_success("Success on #{success_msg}", ["Updating data."], reload: false)
 
           # now reload the dts instead of the whole page to show latest data
           curr_observable = $('.ctt-entry-select option:selected').text().trim()
