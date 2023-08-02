@@ -16,6 +16,7 @@ module API
             end
             get "read_observable" do
               std_api_v2 do
+                authorize!(:read_observable, Tmi)
                 ::CloudIntel::TagManagementInterface.read(domain: params[:domain],
                                                           ip: params[:ip],
                                                           url: params[:url],
@@ -26,6 +27,7 @@ module API
             desc "Return the taxonomy map"
             get "taxonomy_map" do
               std_api_v2 do
+                authorize!(:read_taxonomy_map, Tmi)
                 map = ::EnrichmentService::TaxonomyMap.load_condensed_map
                 JSON.parse(map)
               end
@@ -48,6 +50,7 @@ module API
             end
             post "update_by_context" do
               std_api_v2 do
+                authorize!(:update_observable, Tmi)
                 response = ::Tmi::TmiGrpc.update_by_context(items: params[:items], source: current_user.cvs_username)
                 response.to_h
               end
