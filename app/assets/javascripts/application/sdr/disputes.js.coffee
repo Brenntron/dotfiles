@@ -83,9 +83,11 @@ $ ->
       error: () ->
     )
 
-  $('.sdr-ticket-status-radio').click ->
+  # Show page resolution select
+  $('.show-action .sdr-ticket-status-radio').click ->
     if $(this).is(':checked')
       wrapper = $(this).parent()
+      $('.show-action .status-radio-wrapper').removeClass('selected')
       $(wrapper).addClass('selected')
 
     if $(this).attr('id') == 'RESOLVED_CLOSED'
@@ -93,6 +95,13 @@ $ ->
       stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
       $('#ticket-non-res-submit').hide()
       $(stat_comment).val('')
+      # check first resolution checkbox (and Fixed-FP parent) if none checked after opening
+      if !($("input.ticket-resolution-radio").is(':checked'))
+        $('input#FIXED_FP').prop('checked', true)
+        $('#FIXED_FP_SUDDEN_SPIKE').prop('checked', true)
+        is_customer = check_for_customer_show_page_sdr()
+        populate_resolved_sdr_templates('Fixed - FP: Sudden Spike', is_customer)
+
     else
       $('#ticket-non-res-submit').show()
       res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
@@ -152,25 +161,92 @@ $ ->
         $('#advanced-search-dropdown').show()
     )
 
-  $('#sdr-resolution-selector input.sdr-ticket-resolution-radio').click (event)->
-    fixed_fp_message_types = ['FIXED_FP_SUDDEN_SPIKE', 'FIXED_FP_DOMAIN_AGE', 'FIXED_FP_NEGATIVE_WEBREP']
+  assemble_sdr_response_templates = (templates, customer_footer) ->
+    resolution_select = $('#sdr-resolution-message-template-select.resolution-message-template-select')
+    resolution_select.empty()
+    is_customer = false
 
-    resolution_comments =
-      'FIXED_FP_SUDDEN_SPIKE': 'The domain was impacted due to Talos sensors observing suspicious behavior typically indicative of spamming. This behavior is no longer observed and the reputation has been adjusted accordingly.'
-      'FIXED_FP_DOMAIN_AGE': 'The domains were penalized by SDR due to a combination of domain registration and sending attributes prevalent in spam sending domains. The issue has been rectified and the domain reputation has been adjusted accordingly.'
-      'FIXED_FP_NEGATIVE_WEBREP': 'This domain was penalized by SDR as it used to have a Untrusted Web Reputation score due to malicious or suspicious behavior. The issue has been rectified and the domain reputation has been adjusted accordingly.'
-      'FIXED_FN': "Talos has concluded that the submission has been associated with recent spam campaigns; the submission's reputation has been decreased. This update will be publicly visible in the next 24 hours."
-      'UNCHANGED': "Talos has not found sufficient evidence to modify the current reputation of the submission; we cannot change the submission's reputation because it can negatively affect our customers."
-    value = $(event.target.closest('input')).val()
-    comment = resolution_comments[value] || ''
-    if  value in fixed_fp_message_types
+    if templates.length == 0
+      resolution_select.val ''
+      $('.ticket-resolution-description').text ''
+      $('.ticket-resolution-comment').val ''
+
+    $(templates).each (index, template) ->
+      #append customer footer to saved message
+      if customer_footer != ''
+        customer_message = template.body + ' ' + customer_footer
+        is_customer = true
+      else customer_message = template.body
+
+      template_option = $("<option class='sdr-resolution-template-option'></option>")
+      $(template_option).val template.name
+      $(template_option).text template.name
+      $(template_option).attr('data-body', customer_message )
+      $(template_option).attr('data-description', template.description )
+      resolution_select.append template_option
+
+      #show first option as body and description
+      if index == 0
+        $('.ticket-resolution-description').text template.description
+        $('.ticket-resolution-comment').val customer_message
+        resolution_select.attr('data-has-footer', is_customer)
+
+  window.populate_resolved_sdr_templates = (resolution_type, is_customer) ->
+
+    get_resolution_templates_by_resolution('sdr', resolution_type).then (response) ->
+      templates = JSON.parse response
+      customer_footer = ''
+
+      if is_customer == true
+        #fetch customer footer to append to message if customer ticket
+        get_resolution_templates_by_resolution('sdr', 'Customer Footer').then (customer_footer_response) ->
+          if customer_footer_response.length > 0
+            customer_footer = JSON.parse customer_footer_response
+            if customer_footer[0]?
+              customer_footer = customer_footer[0].body
+            assemble_sdr_response_templates(templates, customer_footer)
+      else
+        assemble_sdr_response_templates(templates, customer_footer)
+
+  # Resolution status change - Index and Show page
+  $('#sdr-resolution-selector .sdr-ticket-resolution-radio').change (event)->
+    fixed_fp_message_types = ['Fixed - FP: Sudden Spike', 'Fixed - FP: Domain Age', 'Fixed - FP: Negative Webrep']
+
+    resolution_type = $(event.target.closest('input')).attr('data-saved-resolution-type')
+    #uncheck Fixed - FP choices if clicking outside Fixed - FP
+    if resolution_type in fixed_fp_message_types
       $("input[name='dispute-resolution']").prop('checked', false)
       $('input#FIXED_FP').prop('checked', true)
     else
       $("input[name='dispute-preset-resolution']").prop('checked', false)
 
-    $(".ticket-resolution-comment").html(comment)
+    #check if on index table or show page, then check if customer
+    if $('.escalations--sdr--disputes-controller.show-action').length > 0
+      is_customer = check_for_customer_show_page_sdr()
+    else
+      is_customer = check_for_customer_checkbox_sdr()
+    populate_resolved_sdr_templates(resolution_type, is_customer)
 
+
+window.check_for_customer_show_page_sdr = () ->
+  submitter_type = $(".submitter-type-wrapper p").text().toLowerCase()
+  if submitter_type == 'customer'
+    is_customer = true
+  else
+    is_customer = false
+  is_customer
+
+window.check_for_customer_checkbox_sdr = () ->
+  #show customer message if any checked rows are for customers
+  checkboxes = $('#sdr-disputes-index').find('.sdr_dispute_check_box:checked')
+  table = $('#sdr-disputes-index').DataTable()
+  is_customer = false
+  $(checkboxes).each ->
+    tr = $(this).closest('tr')
+    row = table.row(tr)
+    if row.data().submitter_type.toLowerCase() == 'customer'
+      is_customer = true
+  is_customer
 
 window.initialize_sdr_disputes_datatable = () ->
   $('#sdr-disputes-index').DataTable(
@@ -376,24 +452,21 @@ window.hide_loading_gears = () ->
       loader.addClass('hidden')
   )
 
-window.sdr_dispute_status_drop_down = (dispute_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+window.sdr_dispute_status_drop_down = () ->
+  #deselect all statuses
+  $('.status-radio-wrapper').removeClass 'selected'
+  $('.sdr-ticket-status-radio').prop("checked", false)
 
-  $.ajax(
-    url: "/escalations/api/v1/escalations/sdr/disputes/dispute_status/#{dispute_id}"
-    method: 'GET'
-    headers: headers
-    data: {}
-    dataType: 'json'
-    success: (response) ->
-      response = JSON.parse(response)
-      status = response.status
-      comment = response.comment
+  #close comment dropdowns
+  $('.sdr-non-resolution-submit-wrapper').hide()
+  $('#show-ticket-resolution-submenu').hide()
 
-      $("#{status}").prop("checked", true)
-      if comment?
-        $('.ticket-status-comment').text(comment)
-  )
+  #select current status in dropdown (NEW is not an option so that won't select anything)
+  status = $('#show-edit-ticket-status-button').text().trim()
+  radio = $(".sdr-ticket-status-radio[data-status='#{status}'] ")
+  radio.prop("checked", true)
+  wrapper = radio.parent()
+  wrapper.addClass('selected')
 
 window.sdr_show_page_edit_status = (dispute_id) ->
   statusName = $('input[name=dispute-status]:checked').val()
@@ -729,19 +802,43 @@ window.export_sdr_selected = () ->
   $('#index-export-data-input').val(data_json)
   document.getElementById("sdr-disputes-export-form").onsubmit = ""
 
+# index edit status button press
 window.sdr_index_edit_ticket_status = () ->
     dropdown = $('#sdr-index-edit-ticket-status-dropdown').parent()
 
     if ($('.sdr_dispute_check_box:checked').length > 0)
-# Select Status
-      $('.sdr-ticket-status-radio-label').click ->
-        radio_button = $(this).prev('.sdr-ticket-status-radio')
-        $(radio_button[0]).trigger('click')
+
+      # If menu is being re-opened, check if customer status has changed for checked rows and reload dropdown if it has
+      if $('#sdr-index-dispute-resolution-submenu .sdr-ticket-resolution-radio:checked').length > 0
+        is_customer = check_for_customer_checkbox_sdr()
+        current_resolution = $('#sdr-index-dispute-resolution-submenu .sdr-ticket-resolution-radio:checked').siblings('.ticket-res-radio-label').text()
+        current_resolution = current_resolution.replace('Fixed - FP', 'Fixed - FP: ') #need to format the top three options in a specific way
+        customer_loaded_in_form = $('#sdr-resolution-message-template-select').attr('data-has-footer')
+        if is_customer == true && customer_loaded_in_form == 'false' || is_customer == false && customer_loaded_in_form == 'true'
+          #reload form data to add/remove customer footer
+          populate_resolved_sdr_templates(current_resolution, is_customer)
+          $('#sdr-resolution-message-template-select').attr('data-has-footer', is_customer)
+
+      # Select Status
+      $('.sdr-ticket-status-radio').change ->
+        radio_button = $(this)
+        all_stat_radios = $('#sdr-index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+        wrapper = $(this).parent()
+        $(all_stat_radios).removeClass('selected')
+        $(wrapper).addClass('selected')
+
         if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
           $('#sdr-index-dispute-resolution-submenu').show()
           stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
           $('#ticket-non-res-submit').hide()
           $(stat_comment).val('')
+          $('input#FIXED_FP').prop('checked', true)
+          $('#FIXED_FP_SUDDEN_SPIKE').prop('checked', true)
+
+          #show customer message if any checked rows are for customers
+          is_customer = check_for_customer_checkbox_sdr()
+          populate_resolved_sdr_templates('Fixed - FP: Sudden Spike', is_customer)
+
         else
           $('#ticket-non-res-submit').show()
           res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
@@ -749,25 +846,16 @@ window.sdr_index_edit_ticket_status = () ->
           $('#sdr-index-dispute-resolution-submenu').hide()
           $(res_comment[0]).val('')
 
-      $('.sdr-ticket-status-radio').click ->
-        all_stat_radios = $('#sdr-index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
-        if $(this).is(':checked')
-          wrapper = $(this).parent()
-          $(all_stat_radios).removeClass('selected')
-          $(wrapper).addClass('selected')
-        if $(this).attr('id') == 'RESOLVED_CLOSED'
-          $('#sdr-index-dispute-resolution-submenu').show()
-          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-          $('#ticket-non-res-submit').hide()
-          $(stat_comment).val('')
-        else
-          $('#ticket-non-res-submit').show()
-          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-          $('.ticket-resolution-radio').prop('checked', false)
-          $('#sdr-index-dispute-resolution-submenu').hide()
-          $(res_comment[0]).val('')
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
+
+      #reset the resolution dropdown if it is already populated
+      if $('.sdr-ticket-status-radio').prop('checked', true)
+        $('.sdr-ticket-resolution-radio').prop('checked', false)
+        $('.sdr-ticket-status-radio').prop('checked', false)
+        $('#sdr-index-dispute-resolution-submenu').hide()
+        $('#ticket-non-res-submit').hide()
+        $('.status-radio-wrapper').removeClass 'selected'
 
 window.sdr_index_change_ticket_status = () ->
   checkboxes = $('#sdr-disputes-index').find('.sdr_dispute_check_box')

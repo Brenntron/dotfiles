@@ -126,7 +126,7 @@ development:
     gssnegotiate: false
     auth_token: "redacted"
   k2:
-    host: "k2-api.sv4.ironport.com"
+    host: "k2-api-int.sv4.ironport.com"
     port: 443
     token: "redacted"
   enrichment_service:
@@ -142,8 +142,18 @@ development:
     ca_file: ""
     cert_file: ""
     key_file: ""
+  jira:
+    host: "https://fmd-drgjr-01tst.vrt.sourcefire.com:443/"
+    token: "redacted"
+    verify_mode: "verify-none"
+    auth_type: "basic"
+    project_key: "SDOCS"
+  bast:
+    host: "prod-webcat-app3.sv4.ironport.com"
+    port: 5000
+    api_key: "redacted"
+    tls: "verify-none"  
 
- 
 test:
   api_timeout:
     timeout: 15
@@ -277,14 +287,19 @@ test:
     verify_mode: "no-tls"
     gssnegotiate: false
   k2:
-    host: "k2-api.sv4.ironport.com"
+    host: "k2-api-int.sv4.ironport.com"
     port: 443
     token: "redacted"
   umbrella_data_fetcher:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
-
+  jira:
+    host: "https://fmd-drgjr-01tst.vrt.sourcefire.com:443/"
+    token: "redacted"
+    verify_mode: "verify-none"
+    auth_type: "basic"
+    project_key: "SD"
 staging:
   amp_poke:
     host: "localhost"
@@ -427,14 +442,18 @@ staging:
     verify_mode: "no-tls"
     gssnegotiate: false
   k2:
-    host: "k2-api.sv4.ironport.com"
+    host: "k2-api-int.sv4.ironport.com"
     port: 443
     token: "redacted"
   umbrella_data_fetcher:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
-
+  jira:
+    host: "fmd-drgjr-01tst.vrt.sourcefire.com"
+    username: "TBD.gen"
+    password: "redacted"
+    verify_mode: "verify-none"
 production:
   amp_poke: 
     host: "poke.vrt.sourcefire.com"
@@ -585,4 +604,8 @@ production:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
-
+  jira:
+    host: "fmd-drgjr-01tst.vrt.sourcefire.com"
+    username: "TBD.gen"
+    password: "redacted"
+    verify_mode: "verify-none"

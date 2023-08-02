@@ -63,6 +63,7 @@ $ ->
     channels = if $('#channel-input')[0].selectize? then $('#channel-input')[0].selectize.items else []
     entry_ids = if $('#entryid-input')[0].selectize? then $('#entryid-input')[0].selectize.items else []
     complaint_ids = if $('#complaintid-input')[0].selectize? then $('#complaintid-input')[0].selectize.items else []
+    jira_ids = if $('#jiraid-input')[0].selectize? then $('#jiraid-input')[0].selectize.items else []
     platform_ids = if $('#platform-input')[0].selectize? then $('#platform-input')[0].selectize.items else []
     submitter_types = if $('#submitter-type-input')[0].selectize? then $('#submitter-type-input')[0].selectize.items else []
 
@@ -88,6 +89,8 @@ $ ->
       form['entry_id'] = entry_ids.join(', ')
     if complaint_ids.length
       form['complaint_id'] = complaint_ids.join(', ')
+    if jira_ids.length
+      form['jira_id'] = jira_ids.join(', ')
     if user_id.length
       form['user_id'] = user_id.join(', ')
     if submitter_types.length
@@ -114,6 +117,7 @@ $ ->
       channel: form.channel
       company_name: form.company
       complaint_id: form.complaint_id
+      jira_id: form.jira_id
       customer_email: form.customer_email
       customer_name: form.customer_name
       domain: form.domain
@@ -875,7 +879,7 @@ $ ->
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
-      options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"}]
+      options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"},{name: "Jira"} ]
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
@@ -907,7 +911,19 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-
+    jira_ids = $('#jiraid-input').selectize {
+      delimiter: ',',
+      persist: false,
+      create: (input) ->
+        {
+          value: input
+          text: input
+        }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
+    }
     $('#submitter-type-input').selectize {
       delimiter: ',',
       persist: false,

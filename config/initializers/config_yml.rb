@@ -232,3 +232,13 @@ Rails.configuration.tmi.hostport  =  tmi_config['hostport']
 Rails.configuration.tmi.ca_file   =  tmi_config['ca_file']
 Rails.configuration.tmi.cert_file =  tmi_config['cert_file']
 Rails.configuration.tmi.key_file  =  tmi_config['key_file']
+jira_config = env_config['jira']
+raise "config.yml missing jira section" unless jira_config
+Rails.configuration.jira                = ApiRequester::ApiRequester.config_of(jira_config)
+Rails.configuration.jira.project_key    = jira_config['project_key']
+Rails.configuration.jira.token          = jira_config['token']
+Rails.configuration.jira.auth_type      = jira_config['auth_type'].to_sym
+
+bast_config = env_config.fetch('bast', nil)
+raise 'config.yml missing bast section' unless bast_config
+Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)

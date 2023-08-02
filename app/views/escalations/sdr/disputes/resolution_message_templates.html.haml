@@ -1,0 +1,52 @@
+- content_for(:title) do
+  = "Manage Resolution Templates"
+.content-wrapper#resolution-message-templates
+  %h1.index-table-header Manage Resolution Templates
+
+  - if current_user.has_role?('sdr manager') || current_user.has_role?('manager')
+    .toolbar-container
+      %label.toolbar-section-label
+        Create
+      %span.dropdown
+        %button.add-message-template.toolbar-button.show-col-button.tooltipped{title: 'New Resolution Template', 'data-toggle': 'dropdown', onclick: 'manage_resolution_message_templates()'}
+          %span.toolbar-button-text.new-resolution-button-text
+            New Resolution Template
+
+  %table.table#resolution-message-templates-table
+    %thead
+      %tr
+        %th
+        %th.text-uppercase Name
+        %th.text-uppercase Option For
+        %th.text-uppercase Description
+        %th.text-uppercase Created On
+        %th.text-uppercase Created By
+        %th.text-uppercase Last Edited On
+        %th.text-uppercase Updated By
+        %th
+      %tbody
+        - @templates.each do |template|
+          %tr
+            %td
+              %span
+                - if template.resolution_type == 'Customer Footer'
+                  %i.glyphicon.glyphicon-pencil.resolved.edit-resolution-message-template{title: 'Edit', data: {resolution_message_template_id: template.id, is_footer: true}}
+                -else
+                  %i.glyphicon.glyphicon-pencil.resolved.edit-resolution-message-template{title: 'Edit', data: {resolution_message_template_id: template.id, is_footer: false}}
+            %td.se-resolution-table-name=template.name
+            %td=template.resolution_type
+            %td=template.description
+            %td=template.created_at.strftime(Dispute::SIMPLE_DATE_FORMAT)
+            %td=template.creator&.display_name
+            %td=template.updated_at.strftime(Dispute::SIMPLE_DATE_FORMAT)
+            %td=template.editor&.display_name
+
+            %td
+              - if current_user.has_role?('sdr manager') || current_user.has_role?('manager')
+                - if template.resolution_type != 'Customer Footer'
+                  .remove-button.manage-response-delete-icon{title: 'Delete', data: {resolution_message_template_id: template.id}}
+
+#createResolutionMessageTemplatesDialog{ title: 'Create Resolution Template' }
+  = render 'escalations/sdr/disputes/resolution_message_templates_form', { action: :create }
+#editResolutionMessageTemplatesDialog{ title: 'Manage Resolution Message Templates' }
+  = render 'escalations/sdr/disputes/resolution_message_templates_form', { action: :update }
