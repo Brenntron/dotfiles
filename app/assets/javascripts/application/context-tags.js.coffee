@@ -10,9 +10,6 @@ window.tmi_ajax_get_data = (query_item) ->
     method: 'GET'
     data: data
     success: (response) ->
-#      console.log 'read observable data here'
-#      console.log response
-
       { items } = response  # list of observables
 
       $(items).each (i, val) ->
@@ -117,8 +114,10 @@ window.tmi_ajax_get_data = (query_item) ->
 
 
     error: (response) ->
-      std_msg_error("Error with loading data", [response.responseJSON.message], reload: false)
-      $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # hide all loaders
+      # user is not tmi viewer/manager? dont show read_observable error, just hide the tmi data, show enrich data
+      unless response.responseJSON.message.includes('read_observable')
+        std_msg_error("Error with loading data", [response.responseJSON.message], reload: false)
+      $('.tmi-loader, .enrichment-loader, .prevalence-loader').addClass('hidden')  # hide all loaders
       $('.tmi-error').removeClass('hidden')
 
 
@@ -136,6 +135,7 @@ window.enrich_ajax_webrep = (query_item, query_type) ->
       return response
     error: () ->
       $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # hide all loaders
+      $('.enrichment-error, .prevalence-error').removeClass('hidden')  # enrich and prev data are packaged together
 
 
 window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
@@ -194,6 +194,12 @@ window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
 
     # init the dts on ct tab now
     enrich_prev_dt_init()
+
+    # read more btn handler for huge enrich descs on webrep and filerep
+    $('.enrichment-area .read-more-button').click ->
+      $(this).prev('p').toggleClass('condensed')
+      $(this).find('.down-caret').toggleClass('expanded')
+
 
 
 window.create_webrep_enrichment_section = (tags, context) ->
@@ -322,7 +328,7 @@ window.create_webrep_prevalence_section = (prevalence_data) ->
 
 
 # FILEREP ENRICHMENT
-# FILEREP ENRICHMENT
+# FILEREP ENRICHMENT (this is called from research js)
 window.enrich_ajax_filerep = (sha256_hash) ->
   std_msg_ajax(
     method: 'GET'
@@ -348,8 +354,7 @@ window.enrich_ajax_filerep = (sha256_hash) ->
         create_filerep_prevalence_section(response.data.prevalence.responses)
 
     error: (response) ->
-      std_msg_error('Error with Enrichment Service', ['There was an error.'])
-
+      std_msg_error('Error with Enrichment Service', [response.responseJSON.message])
   )
 
 window.create_filerep_enrich_section = (tags, context) ->
@@ -447,7 +452,6 @@ window.create_filerep_enrich_section = (tags, context) ->
       $(table_wrapper).append(row_wrapper)
 
     $(section_wrapper).append(table_wrapper)
-
 
     $('.enrichment-area').append(section_wrapper)  # add to dom
 
@@ -607,11 +611,6 @@ window.enrich_prev_dt_init = () ->
       searching: false
       info: false
 
-  # read more btn handler for huge enrich descs
-  $('.enrichment-area .read-more-button').click ->
-    $(this).prev().toggleClass('condensed')
-    $(this).find('.down-caret').toggleClass('expanded')
-
 
 
 # determine if a string is an ip/url/domain/sha, return the type
@@ -648,10 +647,6 @@ window.add_context_tags_dialog = () ->
         $('.actd-error-area').removeClass('hidden')
 
       success: (response) ->
-#        console.clear()
-#        console.log 'TAXONOMY DATA BELOW'
-#        console.log response
-
         # hide loader, show main content
         $('.actd-loader-area').addClass('hidden')
         $('.actd-tags-area').removeClass('hidden')
@@ -858,7 +853,7 @@ window.add_tags_submit = () ->
         $('.enrichment-loader, .prevalence-loader, .tmi-loader').removeClass('hidden')  # show all loaders
 
       error: (response) ->
-        std_msg_error("Error adding tags", ["#{response.responseJSON.message}"], reload: false)
+        std_msg_error("Error adding tags", [response.responseJSON.message], reload: false)
 
 
 
@@ -911,10 +906,6 @@ window.other_tag_functions = (action) ->
       # items is fully built, add to data object
       data.items = items
 
-  #    console.clear()
-#      console.log 'data for tags to SUPPRESS OR UNSUPPRESS OR REMOVE'
-#      console.log data
-
       # data is finished construction, send to endpoint with action specified
       std_msg_ajax
         url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
@@ -929,7 +920,7 @@ window.other_tag_functions = (action) ->
           $('.enrichment-loader, .prevalence-loader, .tmi-loader').removeClass('hidden')  # show all loaders
 
         error: (response) ->
-          std_msg_error("Error with tags", ["#{response.responseText}"], reload: false)
+          std_msg_error("Error with tags", [response.responseJSON.message], reload: false)
 
 
 
@@ -981,7 +972,8 @@ $ ->
     # on webrep, if user clicks the 'select an entry' element
     $('.tab-ctt-webrep .ctt-entry-select').change ->
       $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
-      $('.tmi-error').addClass('hidden')
+      $('.tmi-error, .enrichment-error, .prevalence-error').addClass('hidden')
+
       curr_entry = $(this).find('option:selected').attr('data-entry')
       tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
 
