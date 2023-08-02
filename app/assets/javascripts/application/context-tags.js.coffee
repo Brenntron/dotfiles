@@ -10,7 +10,9 @@ window.tmi_ajax_get_data = (query_item) ->
     method: 'GET'
     data: data
     success: (response) ->
+#      console.log 'read observable data here'
 #      console.log response
+
       { items } = response  # list of observables
 
       $(items).each (i, val) ->
@@ -18,7 +20,8 @@ window.tmi_ajax_get_data = (query_item) ->
 
         # tags array
         $(tags).each (i, val) ->
-          { reports, taxonomy, taxonomy_entry, suppressed_by } = this
+          { tag, reports, taxonomy, taxonomy_entry, suppressed_by } = this
+          { taxonomy_id, taxonomy_entry_id } = tag
 
           # issue with indexing, below works to show full set
           unless i > $(tags).length - 1
@@ -64,6 +67,7 @@ window.tmi_ajax_get_data = (query_item) ->
               else
                 # convert unix timecode to utc date/time
                 suppression_date = moment.unix(suppressed_by.suppressed_ts).utc().format('YYYY-MM-DD hh:mm:ss')
+                if suppression_date.length > 10 then suppression_date += ' UTC'
 
           # start a new row
           report_tr = ""
@@ -79,12 +83,16 @@ window.tmi_ajax_get_data = (query_item) ->
 
             # convert unix timecode to utc date/time, created means when report was created
             report_date = moment.unix(created_ts).utc().format('YYYY-MM-DD hh:mm:ss')
+            if report_date.length > 10 then report_date += ' UTC'
+
+            # fully unique id for a tag is the tax id + entry id
+            full_id = "#{taxonomy_id}-#{taxonomy_entry_id}"
 
             # one table row for each report
             report_tr =
               "<tr class='tmi-tr tmi-tr-suppressed-#{suppressed}'>
                  <td class='tmi-cb-cell'>
-                   <input type='checkbox' class='tmi-cb'></input></td>
+                   <input type='checkbox' class='tmi-cb tmi-cb-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{taxonomy_entry_id}' data-full-id='#{full_id}'></input></td>
                  <td class='tmi-observable'>
                    <span class='observable-container esc-tooltipped' title='#{raw_observable}'>#{raw_observable}</span></td>
                  <td class='tmi-tag-name'>#{tag_name}</td>
@@ -93,23 +101,24 @@ window.tmi_ajax_get_data = (query_item) ->
                  <td class='tmi-source'>#{source}</td>
                  <td class='tmi-processor'>#{processor}</td>
                  <td class='tmi-report-date'>#{report_date}</td>
-                 <td class='tmi-suppressed tmi-red'>#{suppressed}</td>
+                 <td class='tmi-suppressed tmi-warning'><span class='tmi-answer'>#{suppressed}</span> <span class='tmi-alert-icon ctt-tooltipped' title='Tags that are not suppressed are in the Enrichment Service and will be visible to customers'></span></td>
                  <td class='tmi-suppression-source tmi-gray'>#{suppression_source}</td>
                  <td class='tmi-suppression-platform tmi-gray'>#{suppression_platform}</td>
                  <td class='tmi-suppression-date tmi-gray'>#{suppression_date}</td></tr>"
 
             # default is no with red cell and gray cells to the right
             if suppressed == 'yes'
-              report_tr = report_tr.replace(/tmi-red/g,'')
+              report_tr = report_tr.replace(/tmi-warning/g,'')
               report_tr = report_tr.replace(/tmi-gray/g,'')
+              report_tr = report_tr.replace(/tmi-alert-icon/g,'tmi-alert-icon hidden')
 
-            # created ts is unique enough for now, fix this though to something even more unique
+            # add row to dom
             $('.tmi-tbody').append(report_tr)  # add to dom
 
 
     error: (response) ->
-      std_msg_error("Error with loading data", [response.responseText], reload: false)
-      $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # remove all loaders
+      std_msg_error("Error with loading data", [response.responseJSON.message], reload: false)
+      $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # hide all loaders
       $('.tmi-error').removeClass('hidden')
 
 
@@ -125,6 +134,8 @@ window.enrich_ajax_webrep = (query_item, query_type) ->
     data: data
     success: (response) ->
       return response
+    error: () ->
+      $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # hide all loaders
 
 
 window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
@@ -187,7 +198,6 @@ window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
 
 window.create_webrep_enrichment_section = (tags, context) ->
   $('.enrichment-table').removeClass('hidden')
-  enrich_tbody = $('.enrichment-table tbody')
 
   $(tags).each (index, tag) ->
     name = ''
@@ -214,8 +224,12 @@ window.create_webrep_enrichment_section = (tags, context) ->
     name_cell = $("<td class='enrich-cell-name'></td>")
     $(name_cell).text(name)
 
-    description_cell = $("<td class='enrich-cell-description'><p></p></td>")
+    description_cell = $("<td class='enrich-cell-description'><p class='condensed'></p><button class='read-more-button hidden'>Read More <span class='down-caret'></span></button></td>")
     $(description_cell).find('p').text(description)
+
+    # long descriptions on enrich table get the read-more button
+    if description.length > 200
+      $(description_cell).find('button').removeClass('hidden')
 
     external_ref_cell = $("<td class='enrich-cell-external-references'></td>")
 
@@ -546,6 +560,21 @@ window.tmi_dt_init = () ->
         sortable: false
       }
     ]
+    drawCallback: ->
+      # ensure reset of tmi cbs
+      $('.tmi-cb, .tmi-cb-select-all').prop('checked', false)
+
+      # tt re-init all tmi observ dt tts
+      $('.tab-context-tags .esc-tooltipped').tooltipster
+        theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+        debug: false
+
+      # tt toolbar btns needs one-offs
+      $('.tab-context-tags .ctt-tooltipped').tooltipster
+        theme: ['tooltipster-borderless', 'tooltipster-borderless-customized', 'tooltipster-no-break']
+        debug: false
+        maxWidth: 380
+
 
   # show or hide columns in tmi table
   $('.toggle-col-tmi').each ->
@@ -564,7 +593,7 @@ window.tmi_dt_init = () ->
 
 # init the enrichment and prevalence dts
 window.enrich_prev_dt_init = () ->
-  $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # remove all loaders
+  $('.enrichment-loader, .prevalence-loader, .tmi-loader').addClass('hidden')  # hide all loaders
 
   # dt inits for enrich and prev dts for webrep, and only if not already inited
   if $('.tab-ctt-webrep').length > 0
@@ -578,6 +607,11 @@ window.enrich_prev_dt_init = () ->
       searching: false
       info: false
 
+  # read more btn handler for huge enrich descs
+  $('.enrichment-area .read-more-button').click ->
+    $(this).prev().toggleClass('condensed')
+    $(this).find('.down-caret').toggleClass('expanded')
+
 
 
 # determine if a string is an ip/url/domain/sha, return the type
@@ -585,7 +619,7 @@ window.determine_string_type = (curr_string) ->
   ip_regex = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi
   sha_regex = /^[a-f0-9]{64}$/gi
 
-  # add ip v6 handling later on when needed
+  # add ip v6 handling later on if/when needed
   if ip_regex.test(curr_string) == true
     return 'ip'
   else if sha_regex.test(curr_string) == true
@@ -596,39 +630,6 @@ window.determine_string_type = (curr_string) ->
     return 'url'
 
 
-
-# HOUSEKEEPING STUFF, MOVE THIS INTO A FUNCTION BELOW
-$ ->
-  # webrep - tmi page load on webrep, we need the first ip/domain/url entry on this case
-  if $('.tab-ctt-webrep').length > 0
-    if $('.top-case-info .dispute-entry-ip-uri').length > 0
-      curr_entry = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
-      tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
-
-    # on webrep, if user clicks the 'select an entry' element
-    $('.tab-ctt-webrep .ctt-entry-select').change ->
-      $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
-      $('.tmi-error').addClass('hidden')
-      curr_entry = $(this).find('option:selected').attr('data-entry')
-      tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
-
-    # select - build options for choose-an-entry
-    $('.research-table-row').each ->
-      curr_entry = $(this).find('.entry-data-content').text().trim()  # entry can be url/ip/domain
-      curr_option = "<option class='mult-entry-option' data-entry='#{curr_entry}'>#{curr_entry}</option>"
-      $(".ctt-entry-select").append(curr_option)
-
-    # show the choose-an-entry if multiple entries exist on webrep dispute case
-    entries_str = $('.top-case-info .dispute-entry-count').text().trim()
-    entries_num = parseInt(entries_str)
-    if entries_num > 1
-      $('.ctt-choose-an-entry').removeClass('hidden')
-
-
-  # filerep - tmi kick things off on filerep, we need the sha (one sha per dispute)
-  else if $('.tab-ctt-filerep').length > 0
-    curr_entry = $('#sha256_hash').text().trim()  # get url or ip
-    tmi_enrich_prev_dt_inits('initial', curr_entry)
 
 
 # initialize and open the tags dialog
@@ -647,9 +648,9 @@ window.add_context_tags_dialog = () ->
         $('.actd-error-area').removeClass('hidden')
 
       success: (response) ->
-        console.clear()
-        console.log 'TAXONOMY DATA BELOW'
-        console.log response
+#        console.clear()
+#        console.log 'TAXONOMY DATA BELOW'
+#        console.log response
 
         # hide loader, show main content
         $('.actd-loader-area').addClass('hidden')
@@ -689,13 +690,12 @@ window.add_context_tags_dialog = () ->
                  <td class='tag-taxonomy-col'><p class='tag-entry-taxonomy'>#{taxonomy_name}</p></td>
                  <td class='tag-desc-col'>
                    <p class='tag-mitre-fqn hidden'>#{short_description}</p>
-                   <p class='tag-entry-description'>#{description}</p>
-                   <button class='read-more-button hidden' onclick='mitre_read_more(\"#{full_id}\");'>Read More <span class='down-caret'></span></button>
+                   <p class='tag-entry-description tag-entry-description-#{full_id}'>#{description}</p>
+                   <button class='read-more-button hidden' onclick='tags_dialog_read_more(\"#{full_id}\");'>Read More <span class='down-caret down-caret-#{full_id}'></span></button>
                  </td>
                </tr>"
 
-
-            # mitre descriptions are huge, show the mitre fqn (short_desc) and show the read more button
+            # if description text is for mitre and fqn exists, show the read more btn
             if taxonomy_name.includes('MITRE') && short_description
               entry_tr = entry_tr.replace('tag-mitre-fqn hidden','tag-mitre-fqn')
               # show read more button if the description is verbose
@@ -705,17 +705,14 @@ window.add_context_tags_dialog = () ->
 
             all_tag_rows_html += entry_tr  # build one block of html
 
-
-        
         # add one big string at once, less interaction with dom == better performance
-        $('.tag-entries-area .taxonomy-table tbody').append(all_tag_rows_html)  # ADD TO DOM
+        $('.tag-entries-area .all-tags-table tbody').append(all_tag_rows_html)  # ADD TO DOM
 
         # open the dialog and dt init with all tags showing
-        all_tags_dt_init()
+        tags_dialog_dt_init()
 
         # add flag to dom that the dialog is now built
         $('.tab-context-tags').addClass('tags-dialog-built')
-
 
 
 # TAG PREVIEW CLICK HANDLERS AND STUFF
@@ -725,9 +722,9 @@ window.add_preview_tag = (curr_tag_id) ->
     $(".preview-tag-#{curr_tag_id}").remove()
   else
     # stop at 5 tags to be added at once
-    if $('.preview-tag-area .preview-tag').length == 5 && $('.tag-entry-cb:checked').length == 5
+    if $('.preview-tag-area .preview-tag').length >= 5
+      $(".tag-entry-cb-#{curr_tag_id}").prop('checked', false)
       std_msg_error("Maximum of 5 new tags at once.","")
-
     else
       $('.tag-entry-cb:checked').each ->
         taxonomy_id = $(this).attr('data-tax-id')
@@ -754,15 +751,11 @@ window.add_preview_tag = (curr_tag_id) ->
 
 
 
-
-
-
 # dt init the taxonomy table on initial load or change select
-window.all_tags_dt_init = () ->
-  # show all 7000+ tag rows by default, dt init all
-  unless $(".taxonomy-table").hasClass('dataTable')
-    tags_table_dt = $(".taxonomy-table").DataTable
-      dom: 'ilftipr'
+window.tags_dialog_dt_init = () ->
+  unless $(".all-tags-table").hasClass('dataTable')
+    tags_table_dt = $(".all-tags-table").DataTable
+      dom: 'filtipr'
       columnDefs: [
         {
           targets: [0]
@@ -774,10 +767,14 @@ window.all_tags_dt_init = () ->
       pageLength: 10
       pagingType: 'full_numbers'
       language: {
-        search: "Tag Search"
+        search: "_INPUT_"
         searchPlaceholder: "Search for tags by keyword"
         zeroRecords: "No matching tags found"
       }
+
+    # get the auto-generated dt search and move it into header
+    tag_search_html = $('.tags-dialog .dataTables_filter input').detach()
+    $('.tags-dialog .tag-search-area').append(tag_search_html)
 
     # highlight substrings here (uses dt/jquery plugin)
     tags_table_dt.on 'draw', ->
@@ -786,54 +783,35 @@ window.all_tags_dt_init = () ->
       tags_dt_body.highlight(tags_table_dt.search())
 
 
-    # FIX THIS
-    # FIX THIS
     # select change does a search and draw
     $('.taxonomy-select').change ->
       new_text = $(this).find('option:selected').text()
+      selected_id = $(this).find('option:selected').attr('data-id')
       tags_table_dt.columns(3).search(new_text).draw()
 
-      # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
-      # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
-      if new_text == "Select a taxonomy"
-        $(this).addClass('no-tax-selected')
+      # if default option selected, show all
+      if selected_id == "0"
         tags_table_dt.columns(3).search('').draw()
         $('.tag-entries-area .dataTables_filter input').val('')
-      else
-        $(this).removeClass('no-tax-selected')
 
-
-    # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
-    # FIX THIS TO USE A VALUE/ID INSTEAD OF STRING
     # change the text in the dt search field, and if 'select a taxonomy' is already selected, reset the dt results
     $('.tag-entries-area .dataTables_filter input').click ->
-      if $('.taxonomy-select option:selected').text() == "Select a taxonomy" && !$(this).text().length > 0
-        tags_table_dt.columns(3).search('').draw()
+      if $('.taxonomy-select option:selected').attr('data-id') == "0" && !$(this).text().length > 0
+        tags_table_dt.columns(3).search('').draw()  # show all
 
 
 
-
-
-# read more button for mitre descriptions in dialog
-window.mitre_read_more = (full_id) ->
-  $(".tag-#{full_id} .tag-entry-description").toggleClass('condensed')
-  $(".tag-#{full_id} .read-more-button .down-caret").toggleClass('expanded')
-
-
-$ ->
-  # cancel button for tags dialog
-  $('.tags-cancel-button').click ->
-    $('#add-context-tags-dialog').dialog('close')
+# read more button on tags dialog
+window.tags_dialog_read_more = (id) ->
+  $(".tag-entry-description-#{id}").toggleClass('condensed')
+  $(".down-caret-#{id}").toggleClass('expanded')
 
 
 
-
-# add the tag of 'dns' in taxonomy of 'intelligence types' to observable of 'cisco.com'
-# actions can be 'add', 'delete', 'suppress_tag', or 'unsuppress_tag', multiple actions allowed at once
-window.tags_action = (action) ->
-  #  action will be add/suppress/unsuppress/delete
-  console.log 'tag action to do:'
-  console.log action
+# adding tags inside of the dialog
+window.add_tags_submit = () ->
+  data = {}
+  items = []
 
   # if preview tags are visible, proceed with everything
   if $('.preview-tag:visible').length == 0
@@ -841,19 +819,6 @@ window.tags_action = (action) ->
 
   # if preview tags are visible, proceed with everything
   else if $('.preview-tag:visible').length > 0
-    switch action
-      when 'add' then success_msg = "Tags added to observable"
-      when 'suppress' then success_msg = "Tags suppressed"
-      when 'unsuppress' then success_msg = "Tags unsuppressed"
-      when 'delete' then success_msg = "Tags removed from observable"
-
-    data = {}
-    items = []
-
-    # all of below is set up for ADD tags
-    # logic will need to be adjusted for suppress/remove/etc
-
-    # every existing tag preview to be added
     $('.preview-tag-area .preview-tag').each ->
       tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
       entry_id = parseInt($(this).attr('data-entry-id'))
@@ -865,7 +830,7 @@ window.tags_action = (action) ->
       # add new item object to add to array, 'add' can change action to suppress or remove
       new_item = {
         "#{observable_type}": curr_observable
-        action: action
+        action: 'add'
         tags: [
           {
             taxonomy_id: tax_id
@@ -873,13 +838,10 @@ window.tags_action = (action) ->
           }
         ]
       }
-
       items.push(new_item)
 
+    # items is fully built, add to data object
     data.items = items
-
-    console.log 'HERE IS YOUR DATA'
-    console.log data
 
     # data is finished construction, send to endpoint with action specified
     std_msg_ajax
@@ -888,34 +850,155 @@ window.tags_action = (action) ->
       data: data
       success: (response) ->
         $('#add-context-tags-dialog').dialog('close')
-        std_msg_success("Success", ["#{success_msg}. Reloading page."], reload: true)
+        std_msg_success("Success on adding tags.", ["Updating data."], reload: false)
+
+        # now reload the dts instead of the whole page to show latest data
+        curr_observable = $('.ctt-entry-select option:selected').text().trim()
+        tmi_enrich_prev_dt_inits('update', curr_observable)  # on add tags, lets try just re-loading the dt
+        $('.enrichment-loader, .prevalence-loader, .tmi-loader').removeClass('hidden')  # show all loaders
+
+      error: (response) ->
+        std_msg_error("Error adding tags", ["#{response.responseJSON.message}"], reload: false)
 
 
 
-# FIX THIS, dry out and add label handler
-$ ->
-  $('.suppressed-context-tags-toggle').click ->
-    if $(this).find('input:checkbox').prop('checked') == true
-      $('.tmi-tr-suppressed-yes').removeClass('hidden')
+# suppress tags and unsuppress tags and remove tags, all handled here
+window.other_tag_functions = (action) ->
+  data = {}
+  items = []
+
+  any_tags_suppressed = false
+
+  # any tags are suppressed? this affects remove tag func
+  $('.tmi-cb:checked').each ->
+    suppressed_status = $(this).closest('tr').find('.tmi-suppressed').text().trim()
+    if suppressed_status == 'yes' then any_tags_suppressed = true
+
+  switch action
+    when 'suppress_tag' then success_msg = "suppress"
+    when 'unsuppress_tag' then success_msg = "unsuppress"
+    when 'delete' then success_msg = "remov"
+
+  if $('.tmi-cb:checked').length == 0
+    std_msg_error('No tag selected', ['Please select at least one tag.'])
+
+  else
+    # remove tags and the tags are suppressed, stop and error out
+    if action == 'delete' && any_tags_suppressed == true
+      std_msg_error('Error', ['One or more selected tags is suppressed, suppressed tags cannot be removed.'])
     else
-      $('.tmi-tr-suppressed-yes').addClass('hidden')
+      $('.tmi-cb:checked').each ->
+        tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
+        entry_id = parseInt($(this).attr('data-entry-id'))
+        curr_observable = $('.ctt-entry-select option:selected').text().trim()  # this works even when hidden
 
-  $('.unsuppressed-context-tags-toggle').click ->
-    if $(this).find('input:checkbox').prop('checked') == true
-      $('.tmi-tr-suppressed-no').removeClass('hidden')
-    else
-      $('.tmi-tr-suppressed-no').addClass('hidden')
+        # make tags array dynamic
+        observable_type = determine_string_type(curr_observable)  # ip or sha or url or domain
+
+        # add new item object to add to array, 'add' can change action to suppress or remove
+        new_item = {
+          "#{observable_type}": curr_observable
+          action: action
+          tags: [
+            {
+              taxonomy_id: tax_id
+              taxonomy_entry_id: entry_id
+            }
+          ]
+        }
+        items.push(new_item)
+
+      # items is fully built, add to data object
+      data.items = items
+
+  #    console.clear()
+#      console.log 'data for tags to SUPPRESS OR UNSUPPRESS OR REMOVE'
+#      console.log data
+
+      # data is finished construction, send to endpoint with action specified
+      std_msg_ajax
+        url: '/escalations/api/v1/escalations/cloud_intel/tag_management/update_by_context'
+        method: 'POST'
+        data: data
+        success: (response) ->
+          std_msg_success("Tags successfully #{success_msg}ed", [], reload: false)
+
+          # now reload the dts instead of the whole page to show latest data
+          curr_observable = $('.ctt-entry-select option:selected').text().trim()
+          tmi_enrich_prev_dt_inits('update', curr_observable)  # on add tags, lets try just re-loading the dt
+          $('.enrichment-loader, .prevalence-loader, .tmi-loader').removeClass('hidden')  # show all loaders
+
+        error: (response) ->
+          std_msg_error("Error with tags", ["#{response.responseText}"], reload: false)
 
 
 
-# tags dialog jquery init here
+# misc stuff to do on dom load
 $ ->
+  # tags dialog jquery init here
   $('#add-context-tags-dialog').dialog(
     autoOpen: false
     dialogClass: 'add-context-tags-dialog'
     width: 1200
-    height: 500
+    height: 600
     minWidth: 1000
-    minHeight: 500
+    minHeight: 600
   )
 
+  # if this has class suppressed or unsuppressed, do that
+  $('.suppressed-label-toggle, .unsuppressed-label-toggle').on "click", (e) ->
+    if $(this).hasClass('suppressed-label-toggle')
+      $('.tmi-tr-suppressed-yes').toggleClass('hidden')
+    else if $(this).hasClass('unsuppressed-label-toggle')
+      $('.tmi-tr-suppressed-no').toggleClass('hidden')
+
+    unless e.target.nodeName == 'INPUT'
+      if $(this).find('input').prop('checked') == true
+        $(this).find('input').prop('checked', false)
+      else if $(this).find('input').prop('checked') == false
+        $(this).find('input').prop('checked', true)
+
+  # click the select all checkbox in tmi table
+  $('.tmi-cb-select-all').click ->
+    if $(this).prop('checked') == true
+      $('.tmi-cb').prop('checked', true)
+    else
+      $('.tmi-cb').prop('checked', false)
+
+  # cancel button for tags dialog
+  $('.tags-cancel-button').click ->
+    $('#add-context-tags-dialog').dialog('close')
+
+
+# more housekeeping stuff
+$ ->
+  # WEBREP - tmi page load on webrep, we need the first ip/domain/url entry on this case
+  if $('.tab-ctt-webrep').length > 0
+    if $('.top-case-info .dispute-entry-ip-uri').length > 0
+      curr_entry = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
+      tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
+
+    # on webrep, if user clicks the 'select an entry' element
+    $('.tab-ctt-webrep .ctt-entry-select').change ->
+      $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
+      $('.tmi-error').addClass('hidden')
+      curr_entry = $(this).find('option:selected').attr('data-entry')
+      tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
+
+    # select - build options for choose-an-entry
+    $('.research-table-row').each ->
+      curr_entry = $(this).find('.entry-data-content').text().trim()  # entry can be url/ip/domain
+      curr_option = "<option class='mult-entry-option' data-entry='#{curr_entry}'>#{curr_entry}</option>"
+      $(".ctt-entry-select").append(curr_option)
+
+    # show the choose-an-entry if multiple entries exist on webrep dispute case
+    entries_str = $('.top-case-info .dispute-entry-count').text().trim()
+    entries_num = parseInt(entries_str)
+    if entries_num > 1
+      $('.ctt-choose-an-entry').removeClass('hidden')
+
+
+  # FILEREP - tmi kick things off on filerep, we need the sha (one sha per dispute)
+  else if $('.tab-ctt-filerep').length > 0
+    curr_entry = $('#sha256_hash').text().trim()  # get url or ip
+    tmi_enrich_prev_dt_inits('initial', curr_entry)

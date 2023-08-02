@@ -28,7 +28,6 @@
       border: solid 1px #ddd;
     }
   }
-
   .ctt-table {
     margin-bottom: 30px;
     border-bottom: none !important;
@@ -55,10 +54,6 @@
   .tmi-table {
     margin-bottom: 20px;
   }
-  .tmi-suppressed {
-    font-weight: 600;
-    text-transform: uppercase;
-  }
   .tmi-suppressed, .tmi-suppression-source, .tmi-suppression-platform, .tmi-suppression-date {
     width: 6%;
   }
@@ -71,8 +66,28 @@
   .tmi-taxonomy, .tmi-report-date, .tmi-suppression-date {
     white-space: nowrap;
   }
-  .tmi-red {
-    background-color: #f8bbbb;
+  .tmi-suppressed {
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+  }
+  .tmi-answer {
+    display: inline-block;
+    padding-top: 2px;
+  }
+  .tmi-warning {
+    color: #f58a4b;
+  }
+  .tmi-alert-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    float: right;
+    background-image: url(image_path('icon_rule_warning.svg'));
+    background-size: 17px 18px;
+    background-position: 0 0;
+    background-repeat: no-repeat;
   }
   .tmi-gray {
     background-color: #f6f6f6;
@@ -83,6 +98,11 @@
   }
   .enrich-cell-description {
     width: 52%;
+    padding-bottom: 2px !important;  // FIX THIS
+  }
+  .enrich-cell-description p.condensed {
+    max-height: 60px;
+    overflow-y: hidden;
   }
   .filerep-enrich-cell-name {
     width: 20%;
@@ -93,9 +113,8 @@
   .enrich-cell-taxonomy, .enrich-cell-name {
     white-space: nowrap;
   }
-  .enrich-cell-description p, .filerep-enrich-cell-description p {
-    max-height: 120px;  // desc can get huge, use overflow scroll if so
-    overflow-y: auto;
+  .enrich-cell-description p,
+  .filerep-enrich-cell-description p {
     white-space: pre-wrap;  // retain formatting from source
     padding-right: 20px;
   }
@@ -107,7 +126,7 @@
   }
   .observable-container {
     display: inline-block;
-    //width: 160px;  // retain and restore this later on
+    max-width: 200px;  // revisit when time avail, ok for now
     text-overflow: ellipsis;  // ellipsis trick long urls
     white-space: nowrap;
     overflow: hidden;
@@ -235,16 +254,44 @@
   font-weight: 500;
   font-size: 9pt;
   background-color: #fff;
-  min-height: 500px;
-  // jquery builds the id inside the same parent class
+  min-height: 600px;
   #add-context-tags-dialog {
-    display: flex;
-    flex-flow: column;
-    height: 100% !important;
-    border: none;
-    padding: 10px 15px;
+    display: block;
+    width: 100% !important;
+    height: 98% !important;
+    z-index: 10;
+    overflow: hidden;
+    position: absolute;
   }
-
+  // top row, affix to top of dialog on resize/scroll
+  .tags-header-row {
+    height: 70px;
+    margin: 0;
+    border-bottom: solid 1px #ececec;
+    background-color: #f6f6f6;
+    padding: 0;
+  }
+  // middle row, fill remaining height intrinsically
+  .tags-content-row {
+    width: 100%;
+    position: absolute;
+    top: 70px;
+    bottom: 95px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+  }
+  // bottom row, affix to bottom of dialog on resize/scroll
+  .save-button-row {
+    width: 100%;
+    height: 70px;
+    position: absolute;
+    bottom: 25px;
+    padding-top: 10px;
+    background-color: #fff;
+    margin: 0 auto;
+    border-top: solid 1px #eee;
+  }
   .ui-dialog-titlebar {
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
@@ -256,7 +303,7 @@
     background-position: 8px center;
     background-size: 20px 20px;
   }
-  table.dataTable.taxonomy-table.no-footer {
+  table.dataTable.all-tags-table.no-footer {
     border: none;
   }
   td {
@@ -264,20 +311,17 @@
   }
   .content-label-sm {
     display: block;
+    margin-top: 6px;
   }
   .preview-tag-area {
-    border: solid 1px #eee;
-    border-top: none;
-    min-height: 76px;
-    max-height: 130px;
-    width: 100%;
-    padding: 10px 15px;
-    position: absolute;
-    background-color: #fff;
-    top: -10px;
-    right: 0;
+    border-left: solid 1px #ececec;
+    border-bottom: solid 1px #ececec;
+    background-color: #f6f6f6;
+    padding-bottom: 10px;
     overflow-y: auto;
-    z-index: 9999;
+    min-height: 70px;
+    max-height: 100px;
+    z-index: 999;  // needed for ff
   }
   .preview-tag {
     display: inline-block;
@@ -315,27 +359,6 @@
       }
     }
   }
-
-  .tags-content-row {
-    min-height: 300px;
-    //flex: 1 1 auto;
-  }
-  .save-button-row {
-    padding: 10px;
-    width: 100%;
-    margin: 0 auto;
-    height: 70px;
-    border-top: solid 1px #eee;
-    z-index: 9999;
-    background-color: #fff;
-    &.dialog-resized {
-      position: relative;
-      top: 10px;
-    }
-  }
-  .taxonomy-row {
-    border-bottom: solid 1px #eee;
-  }
   .tag-entry-row {
     font-size: 8.5pt;
     line-height: 12pt;
@@ -368,33 +391,6 @@
     font-weight: 600;
     margin-bottom: 5px;
   }
-  .read-more-button {
-    width: 100%;
-    color: #999;
-    border: none;
-    padding: 2px 10px;
-    background-color: #fff;
-    height: 20px;
-    margin: 2px 0 0;
-    font-style: italic;
-    font-size: 8pt;
-    font-weight: 500;
-    box-shadow: 0px -6px 8px 2px #ffffff;
-  }
-  .down-caret {
-    background-image: url(image_path('icon_down_arrow_grey.svg'));
-    background-repeat: no-repeat;
-    background-size: 12px 12px;
-    background-position: 0 3px;
-    opacity: 0.9;
-    width: 12px;
-    height: 12px;
-    display: inline-block;
-    &.expanded {
-      transform: scaleY(-1);  // flip arrow up
-      background-position: 0 -2px;
-    }
-  }
   .new-line {
     height: 10px;
   }
@@ -402,7 +398,7 @@
     background-color: #fff;
   }
   code {
-    color: #333;  // code tag appears from api in desc randomly
+    color: #333;  // code tag appears from api in desc randomly, fyi
     background-color: #fff;
   }
   .tag-entry-cb {
@@ -416,10 +412,7 @@
     width: 100%;
     border: solid 1px #ddd;
     padding: 4px;
-    margin-bottom: 15px;
-    &.no-tax-selected {
-      color: #777;
-    }
+    height: 27px;
   }
   button {
     font-family: 'Open Sans', sans-serif;
@@ -433,9 +426,45 @@
 }
 
 
+// used in tags dialog (mitre tags) and enrich table on ctt
+.read-more-button {
+  width: 100%;
+  color: #999;
+  border: none;
+  padding: 2px 10px;
+  background-color: #fff;
+  height: 20px;
+  margin: 2px 0 0;
+  font-style: italic;
+  font-size: 8pt;
+  font-weight: 500;
+  box-shadow: 0px -2px 2px 2px #ffffff;
+}
+.down-caret {
+  background-image: url(image_path('icon_down_arrow_grey.svg'));
+  background-repeat: no-repeat;
+  background-size: 12px 12px;
+  background-position: 0 3px;
+  opacity: 0.9;
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  &.expanded {
+    transform: scaleY(-1);  // flip arrow up
+    background-position: 0 -2px;
+  }
+}
+
+
+// prev data needs much less width than tmi/enrich
+.prevalence-area {
+  width: 50%;
+}
+
+
 // taxonomy table dt style one-offs needed for dt ui elems
 .tag-entries-area {
-  .taxonomy-table th {
+  .all-tags-table th {
     border-bottom: solid 1px #eee;
     vertical-align: middle;
     padding-left: 8px;
@@ -469,36 +498,28 @@
       padding: 2px;
     }
   }
-  .dataTables_filter label {
-    position: absolute;
-    top: -65px;
-    left: 290px;
-    display: block;
-    font-size: 7pt;
-    color: #999;
-    text-align: left;
-    padding: 2px;
-    input {
-      display: block;
-      width: 270px;
-      font-size: 8.5pt;
-      height: 28px;
-      position: relative;
-      bottom: 0;
-      font-family: 'Open Sans', sans-serif;
-      color: #333;
-      border: solid 1px #ddd;
-      padding: 6px;
-      margin: 0;
-      margin-top: 10px;
-      background-image: url(image_path('icon_search_dark.svg'));
-      background-repeat: no-repeat;
-      background-position: 98% center;
-      background-size: 15px 15px;
-    }
-  }
+
   .dataTables_empty {
     padding: 30px !important;
+  }
+}
+
+.tag-search-area {
+  position: relative;
+  left: -10px;
+  input {
+    display: block;
+    width: 100%;
+    font-size: 8.5pt;
+    height: 27px;
+    font-family: 'Open Sans', sans-serif;
+    color: #333;
+    border: solid 1px #ddd;
+    padding: 6px;
+    background-image: url(image_path('icon_search_dark.svg'));
+    background-repeat: no-repeat;
+    background-position: 98% center;
+    background-size: 15px 15px;
   }
 }
 
@@ -508,18 +529,26 @@
   padding: 0;
   margin: 0;
 }
+
 .actd-loader-area {
-  display: flex;
   width: 100%;
   padding: 30px;
-  justify-content: center;
-}
-.actd-error-area p {
   text-align: center;
+}
+
+.actd-error-area p {
   padding: 20px;
+  text-align: center;
 }
 
 .tmi-error {
   padding: 10px 5px 5px;
   font-size: 9pt;
+}
+
+// ctt toolbar buttons dont need breaks
+.tooltipster-no-break .tooltipster-content {
+  word-break: break-word;
+  text-align: left;
+  padding-left: 12px !important;
 }
