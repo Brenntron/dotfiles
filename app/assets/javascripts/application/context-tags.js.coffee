@@ -580,16 +580,21 @@ window.tmi_dt_init = () ->
         maxWidth: 380
 
 
-  # show or hide columns in tmi table
-  $('.toggle-col-tmi').each ->
+  # show or hide columns in tmi table, click the <li>
+  $('li.toggle-col-tmi').each ->
     checkbox = $(this).find('input')
     column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
-    if $(checkbox).prop('checked') then column.visible(true)
-    else column.visible(false)
+
+    if $(checkbox).prop('checked')
+      column.visible(true)
+    else
+      column.visible(false)
+
     # click anywhere in the li to toggle
     $(this).click ->
       $(checkbox).prop('checked', !checkbox.prop('checked'))
       column.visible(!column.visible())
+
     # or click the cb specifically to toggle
     $(checkbox).click ->
       $(checkbox).prop('checked', !checkbox.prop('checked'))
