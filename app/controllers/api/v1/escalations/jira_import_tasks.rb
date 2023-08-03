@@ -72,7 +72,7 @@ module API
               end
             end
             unless open_complaints.empty?
-              raise "Cannot close #{open_complaints.join(', ')} due to outstanding open complaints"
+              raise "Cannot close #{open_complaints.join(', ')} due to unresolved complaints"
             end
             response
           end
