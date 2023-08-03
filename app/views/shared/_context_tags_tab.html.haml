@@ -24,7 +24,7 @@
               %label.toolbar-section-label
                 Show
               %span.dropdown
-                %button#tmi-columns-button.toolbar-button.show-col-context-tags.dropdown-toggle{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                %button#tmi-columns-button.toolbar-button.show-col-context-tags.dropdown-toggle.ctt-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                   %span.toolbar-button-text
                     Show/Hide Columns
 
@@ -169,7 +169,7 @@
         -# context tags js will generate options below
 
         %select.taxonomy-select.no-tax-selected
-          %option.first-option{"data-id":'0'} Select a taxonomy
+          %option.first-option{"data-id": '0', value: '0'} Select a taxonomy
 
       -# tag search will be moved here when dt inits
       .col-xs-3.tag-search-area
@@ -179,7 +179,9 @@
       -# preview area for tags to be added
       .col-xs-6.preview-tag-area
         %label.content-label-sm
-          Tags to Add
+          Tags to add to
+          %span.curr-observable-label
+            urlgoeshere.com
 
 
     .row.tags-content-row
@@ -187,7 +189,7 @@
         .tag-entries-area
 
           -# all tag rows will be generated into this table
-          %table.all-tags-table
+          %table.tags-dialog-table
             %thead
               %th
               %th Tag Name

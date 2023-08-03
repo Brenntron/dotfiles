@@ -568,14 +568,14 @@ window.tmi_dt_init = () ->
       # ensure reset of tmi cbs
       $('.tmi-cb, .tmi-cb-select-all').prop('checked', false)
 
-      # tt re-init all tmi observ dt tts
+      # tt re-init all
       $('.tab-context-tags .esc-tooltipped').tooltipster
         theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
         debug: false
 
-      # tt toolbar btns needs one-offs
+      # tmi tts need a few one-offs
       $('.tab-context-tags .ctt-tooltipped').tooltipster
-        theme: ['tooltipster-borderless', 'tooltipster-borderless-customized', 'tooltipster-no-break']
+        theme: ['tooltipster-borderless', 'tooltipster-borderless-customized', 'tooltipster-ctt-theme']
         debug: false
         maxWidth: 380
 
@@ -635,7 +635,6 @@ window.determine_string_type = (curr_string) ->
 
 
 
-
 # initialize and open the tags dialog
 window.add_context_tags_dialog = () ->
   # open the dialog
@@ -681,10 +680,13 @@ window.add_context_tags_dialog = () ->
 
             if !description then description = ''
 
+            # escape out any apostrophes in tag name
+            name = name.replace(/'/g, '')
+
             entry_tr =
               "<tr class='tag-entry-row tag-#{full_id} taxonomy-row taxonomy-row-#{taxonomy_id}'>
                  <td class='tag-cb-col'>
-                   <input class='tag-entry-cb tag-entry-cb-#{full_id}' type='checkbox' data-tax-id='#{taxonomy_id}' data-tax-name='#{taxonomy_name}' data-entry-name='#{name}' data-entry-id='#{entry_id}' onclick='add_preview_tag(\"#{full_id}\");'></td>
+                   <input class='tag-entry-cb tag-entry-cb-#{full_id}' type='checkbox' data-tax-id='#{taxonomy_id}' data-tax-name='#{taxonomy_name}' data-entry-name='#{name}' data-entry-id='#{entry_id}' data-mitre-fqn='not-mitre' onclick='add_preview_tag(\"#{full_id}\");'></td>
                  <td class='tag-name-col'><p class='tag-entry-name'>#{name}</p></td>
                  <td class='tag-mnemonic-col'><p class='tag-entry-mnemonic'>#{mnemonic}</p></td>
                  <td class='tag-taxonomy-col'><p class='tag-entry-taxonomy'>#{taxonomy_name}</p></td>
@@ -703,10 +705,13 @@ window.add_context_tags_dialog = () ->
                 entry_tr = entry_tr.replace('tag-entry-description','tag-entry-description condensed')
                 entry_tr = entry_tr.replace('read-more-button hidden','read-more-button')
 
+                # mitre preview tag tooltips should show fqn for accuracy
+                entry_tr = entry_tr.replace('not-mitre', short_description)
+
             all_tag_rows_html += entry_tr  # build one block of html
 
         # add one big string at once, less interaction with dom == better performance
-        $('.tag-entries-area .all-tags-table tbody').append(all_tag_rows_html)  # ADD TO DOM
+        $('.tag-entries-area .tags-dialog-table tbody').append(all_tag_rows_html)  # ADD TO DOM
 
         # open the dialog and dt init with all tags showing
         tags_dialog_dt_init()
@@ -731,15 +736,26 @@ window.add_preview_tag = (curr_tag_id) ->
         taxonomy_name = $(this).attr('data-tax-name')
         entry_name = $(this).attr('data-entry-name')  # tag name is entry name
         entry_id = $(this).attr('data-entry-id')
+        mitre_fqn = $(this).attr('data-mitre-fqn')  # only populated for mitre tags
         full_id = "#{taxonomy_id}-#{entry_id}"
 
+        if mitre_fqn != 'not-mitre'
+          tooltip_name = mitre_fqn
+        else
+          tooltip_name = "#{taxonomy_name}: #{entry_name}"
+
         # BUILD PREVIEW TAG
-        new_entry = "<div class='preview-tag preview-tag-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{entry_id}'><span class='preview-tag-name'>#{taxonomy_name}: #{entry_name}</span> <a href='javascript:void(0);' class='preview-tag-close' data-full-id='#{full_id}' title='Remove'>×</a></div>"
+        new_entry = "<div class='preview-tag preview-tag-#{full_id}' data-tax-id='#{taxonomy_id}' data-entry-id='#{entry_id}'><span class='preview-tag-name ctt-tooltipped' title='#{tooltip_name}'>#{taxonomy_name}: #{entry_name}</span> <a href='javascript:void(0);' class='preview-tag-close' data-full-id='#{full_id}' title='Remove'>×</a></div>"
 
         # ensure no duplicate tags added
         unless $(".preview-tag-area .preview-tag-#{full_id}").length > 0
           # ADD PREVIEW TAG
           $('.preview-tag-area').append(new_entry)  # add to dom
+
+          $('.tags-dialog .preview-tag-name.ctt-tooltipped').tooltipster
+            theme: ['tooltipster-borderless', 'tooltipster-borderless-customized', 'tooltipster-ctt-theme']
+            debug: false
+            maxWidth: 800
 
         # PREVIEW TAG CLOSE BUTTON NOW EXISTS IN DOM, ATTACH HANDLER
         # on close click, uncheck the id for that cb
@@ -753,8 +769,8 @@ window.add_preview_tag = (curr_tag_id) ->
 
 # dt init the taxonomy table on initial load or change select
 window.tags_dialog_dt_init = () ->
-  unless $(".all-tags-table").hasClass('dataTable')
-    tags_table_dt = $(".all-tags-table").DataTable
+  unless $(".tags-dialog-table").hasClass('dataTable')
+    tags_table_dt = $(".tags-dialog-table").DataTable
       dom: 'filtipr'
       columnDefs: [
         {
@@ -772,16 +788,17 @@ window.tags_dialog_dt_init = () ->
         zeroRecords: "No matching tags found"
       }
 
-    # get the auto-generated dt search and move it into header
+    # get the auto-generated dt search and move it into header so it all looks better
     tag_search_html = $('.tags-dialog .dataTables_filter input').detach()
     $('.tags-dialog .tag-search-area').append(tag_search_html)
 
-    # highlight substrings here (uses dt/jquery plugin)
+    # highlight substrings here (uses dt jquery plugin)
     tags_table_dt.on 'draw', ->
       tags_dt_body = $(tags_table_dt.table().body())
       tags_dt_body.unhighlight()
-      tags_dt_body.highlight(tags_table_dt.search())
-
+      # tag search field, if substring is 2 or more chars, highlight it
+      if $('.tag-search-area input').val().length > 1
+        tags_dt_body.highlight(tags_table_dt.search())
 
     # select change does a search and draw
     $('.taxonomy-select').change ->
@@ -792,12 +809,17 @@ window.tags_dialog_dt_init = () ->
       # if default option selected, show all
       if selected_id == "0"
         tags_table_dt.columns(3).search('').draw()
-        $('.tag-entries-area .dataTables_filter input').val('')
 
-    # change the text in the dt search field, and if 'select a taxonomy' is already selected, reset the dt results
-    $('.tag-entries-area .dataTables_filter input').click ->
-      if $('.taxonomy-select option:selected').attr('data-id') == "0" && !$(this).text().length > 0
-        tags_table_dt.columns(3).search('').draw()  # show all
+    # click the cancel button to reset the dt and dialog state (but dont redo api call)
+    $('.tags-cancel-button').click ->
+      $('#add-context-tags-dialog').dialog('close')
+      tags_table_dt.columns(3).search('').draw()  # show all
+
+      $('.tag-entry-cb').prop('checked', false)
+      $('.preview-tag').remove()
+      $('.curr-observable-label').text('')
+      $(".taxonomy-select").val('0')
+      $('.tag-search-area input').val('')
 
 
 
@@ -850,7 +872,7 @@ window.add_tags_submit = () ->
       data: data
       success: (response) ->
         $('#add-context-tags-dialog').dialog('close')
-        std_msg_success("Success on adding tags.", ["Updating data."], reload: false)
+        std_msg_success("Tags successfully added", [], reload: false)
 
         # now reload the dts instead of the whole page to show latest data
         curr_observable = $('.ctt-entry-select option:selected').text().trim()
@@ -961,9 +983,6 @@ $ ->
     else
       $('.tmi-cb').prop('checked', false)
 
-  # cancel button for tags dialog
-  $('.tags-cancel-button').click ->
-    $('#add-context-tags-dialog').dialog('close')
 
 
 # more housekeeping stuff
@@ -973,6 +992,7 @@ $ ->
     if $('.top-case-info .dispute-entry-ip-uri').length > 0
       curr_entry = $('.top-case-info .dispute-entry-ip-uri').text().trim()  # get url or ip
       tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
+      $('.curr-observable-label').text(curr_entry)  # tags to add to example.com
 
     # on webrep, if user clicks the 'select an entry' element
     $('.tab-ctt-webrep .ctt-entry-select').change ->
@@ -981,6 +1001,7 @@ $ ->
 
       curr_entry = $(this).find('option:selected').attr('data-entry')
       tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
+      $('.curr-observable-label').text(curr_entry)  # tags to add to example.com
 
     # select - build options for choose-an-entry
     $('.research-table-row').each ->
@@ -999,3 +1020,4 @@ $ ->
   else if $('.tab-ctt-filerep').length > 0
     curr_entry = $('#sha256_hash').text().trim()  # get url or ip
     tmi_enrich_prev_dt_inits('initial', curr_entry)
+    $('.curr-observable-label').text(curr_entry)  # tags to add to sha

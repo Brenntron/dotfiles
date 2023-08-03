@@ -303,7 +303,7 @@
     background-position: 8px center;
     background-size: 20px 20px;
   }
-  table.dataTable.all-tags-table.no-footer {
+  table.dataTable.tags-dialog-table.no-footer {
     border: none;
   }
   td {
@@ -329,7 +329,7 @@
     background-color: #6dbcdb;
     padding: 0;  // full height for close btn
     border-radius: 2px;
-    margin: 2px 4px 1px 0;
+    margin: 0 4px 3px 0;
     cursor: default;
     .preview-tag-name {
       display: inline-block;
@@ -393,6 +393,17 @@
   }
   .new-line {
     height: 10px;
+  }
+  .curr-observable-label {
+    font-weight: 700;
+    color: #555;
+    max-width: 80%;  // keep huge urls contained
+    display: inline-block;
+    padding: 0 0 2px;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
   }
   select {
     background-color: #fff;
@@ -464,7 +475,7 @@
 
 // taxonomy table dt style one-offs needed for dt ui elems
 .tag-entries-area {
-  .all-tags-table th {
+  .tags-dialog-table th {
     border-bottom: solid 1px #eee;
     vertical-align: middle;
     padding-left: 8px;
@@ -547,7 +558,7 @@
 }
 
 // ctt toolbar buttons dont need breaks
-.tooltipster-no-break .tooltipster-content {
+.tooltipster-ctt-theme .tooltipster-content {
   word-break: break-word;
   text-align: left;
   padding-left: 12px !important;
