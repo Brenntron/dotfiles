@@ -47,6 +47,7 @@ $disabled-txt: #A0A0A0;
 $communication-accent-color: #C14B92;
 $grey-section-color: #e2e2e2;
 $yellow-graph-bar:#f9cf81;
+$yet-another-pale-grey: #e8e8e8;
 
 /* Content Label Color */
 $content-label-color: #999;     /* Light Grey     */
@@ -94,10 +95,10 @@ body {
 }
 
 #page-wrapper {
-  min-height: 100%;
   align-content: center;
   display: block;
   margin-left: $sidebar-width;
+  min-height: 100%;
 }
 
 #page-content-wrapper {
@@ -299,6 +300,31 @@ table.dataTable thead .sorting_desc {
   background-image: url(image_path('layout/icon_sort_dec.svg'));
 }
 
+.entry-details-table {
+  /* scrollY misaligns datatable headers with the column bodies if
+    the page isn't show on page load. This overflow and max-height
+    gets the table scrollable while keeping the heads and body inline. */
+  .dataTables_wrapper.no-footer {
+      max-height: 200px;
+      overflow: auto;
+  }
+  .dataTable.no-footer {
+    overflow: auto;
+
+    th {
+      background-position-x: 95% !important;
+    }
+  }
+
+  .dataTables_wrapper.no-footer, .dataTable.no-footer {
+    border-bottom: 1px solid $table-dark-header;
+
+    .dataTable.no-footer {
+      border: 0;
+    }
+  }
+}
+
 .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
   height: 100%;
   display: inline-block;
@@ -359,6 +385,19 @@ table.dataTable.no-footer {
   color: $type-lighter-color;
 }
 
+#webcat-imports-index_wrapper .table-search-input {
+  width: 96%;
+  padding: 3px 3px 4px 25px;
+  .toolbar-button{
+    padding-left: 28px;
+  }
+}
+.import-note{
+  font-size: 8pt;
+}
+.total-imports{
+  font-weight: 600;
+}
 .restricted-table-search-input {
   height: 100%;
   padding: 0 8px;
@@ -664,7 +703,7 @@ button {
   border: none;
 }
 
-.toolbar-button, .toolbar-button-animated {
+.toolbar-button, .toolbar-button-animated, .inline-retry-button{
   background-color: $nav-toolbar-color;
   border: none;
   border-radius: 2px;
@@ -679,12 +718,34 @@ button {
   transition: all 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-.toolbar-button {
+.toolbar-button, .toolbar-button-animated {
+  float: left;
+  min-height: 27px;
+}
+
+.toolbar-button,.inline-retry-button{
   background-repeat: no-repeat;
   background-size: 20px 20px;
   background-position: 4px center;
 }
+.inline-retry-button{
+  float: right;
+  height: 27px;
+  margin-top: -3px;
+  margin-left: 7px;
+  position: absolute;
+}
 
+.webcat-reports-toolbar{
+  margin-bottom: -35px;
+  margin-top: 37px;
+  z-index: 1;
+  width: fit-content;
+  .toolbar-button-select.toolbar-button-text{
+    padding-left: 25px;
+  }
+
+}
 .toolbar-button-animated.active {
   background-color: $bug-accent-color;
   color: $content-bg-color;
@@ -770,7 +831,10 @@ button {
 .rmt-delete-button    {background-image: url(image_path('icon_delete.svg'));}
 .list-button      {background-image: url(image_path('icon_list.svg'));}
 .view-button      {background-image: url(image_path('icon_view.svg'));}
-.splitview-button {background-image: url(image_path('icon_splitview.svg'));}
+.retry-button      {background-image: url(image_path('icon_retry_grey.svg'));}
+.close-ticket-button{background-image: url(image_path('icon_my_closed_tickets_grey.svg'));}
+.splitview-button {background-image: url(image_path('icon_splitview.svg'));
+}
 .duplicate-button {background-image: url(image_path('icon_duplicate.svg'));}
 .smtp-button      {background-image: url(image_path('icon_smtp.svg'));}
 .copydoc-button   {background-image: url(image_path('icon_copydoc.svg'));}
@@ -781,6 +845,7 @@ button {
 .commit-button, .committer-label, .commit-logs-label, .commit-label  {background-image: url(image_path('icon_committer.svg'));}
 .research-label   {background-image: url(image_path('icon_researcher.svg'));}
 .export-button    {background-image: url(image_path('icon_export.svg'));}
+.close-ticket-button{background-image: url(image_path('icon_my_closed_tickets_grey.svg'));}
 .clear-button    {background-image: url(image_path('icon_clear.svg'));}
 .clear-action-button {
     background-image: url(image_path('icon_delete_grey.svg'));
@@ -823,6 +888,7 @@ button {
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .mark-related-button {background-image: url(image_path('icon_related.svg'));}
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
+.import-ticket-button {background-image: url(image_path('icon_import_dark_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
 .auto-resolve-button {background-image: url(image_path('icon_reports_white.svg'));}
@@ -840,7 +906,8 @@ button {
   left: 7px;}
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 .sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
-.remove-assignee-toolbar-button {background-image: url(image_path('icon_unassign_grey.svg'));}
+.remove-assignee-toolbar-button {
+  background-image: url(image_path('icon_unassign_grey.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -854,8 +921,10 @@ button {
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
 .open-all {background-image: url(image_path('icon_open_viewable.svg'));}
-.take-ticket-toolbar-button {background-image: url(image_path('icon_take.svg'));}
-.return-ticket-toolbar-button {background-image: url(image_path('icon_return.svg'));}
+.take-ticket-toolbar-button {
+  background-image: url(image_path('icon_take.svg'));}
+.return-ticket-toolbar-button {
+  background-image: url(image_path('icon_return.svg'));}
 .convert-ticket-button{background-image: url(image_path('icon_convert_ticket_grey.svg'));}
 .open .convert-ticket-button {background-image: url(image_path('icon_convert_ticket.svg'))};
 .collapse-all {background-image: url(image_path('icon_collapse_all.svg'));}
@@ -870,6 +939,14 @@ button {
   float: right;
   margin-left: 3px;
 }
+
+.close-ticket-button, .export-button, .ticket-owner-button, .import-ticket-button,.return-ticket-toolbar-button,.take-ticket-toolbar-button,.remove-assignee-toolbar-button,.retry-button,.convert-ticket-button{
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
 .delete-search {
   display: inline-block;
   float: right;
@@ -879,11 +956,6 @@ button {
   right: 40px;
   height: 20px !important;
   position: absolute;
-}
-
-.convert-ticket-button:disabled {
-  opacity: .5;
-  cursor: not-allowed;
 }
 
 #research-tab-toolbar {
@@ -1357,21 +1429,27 @@ thead th.sorting.center {
   background-repeat: no-repeat;
   background-size: 26px;
   background-position: 5px center;
-}
 
-.nav-tabs > li > a#admin-rule-tab-link, .nav-tabs > li > a#bug-rules-tab-link {background-image: url(image_path('icon_rules.svg'));}
-.nav-tabs > li > a#admin-validations-tab-link {background-image: url(image_path('icon_validations.svg'));}
-.nav-tabs > li > a#bug-overview-tab-link {background-image: url(image_path('icon_overview.svg'));}
-.nav-tabs > li > a#bug-attachments-tab-link {background-image: url(image_path('icon_attachments.svg'));}
-.nav-tabs > li > a#bug-jobs-tab-link {background-image: url(image_path('icon_jobs.svg'));}
-.nav-tabs > li > a#bug-notes-tab-link {background-image: url(image_path('icon_notes.svg'));}
-.nav-tabs > li > a#user-open-bugs-tab {background-image: url(image_path('icon_open.svg'));}
-.nav-tabs > li > a#user-pending-bugs-tab {background-image: url(image_path('icon_pending.svg'));}
-.nav-tabs > li > a#user-closed-bugs-tab {background-image: url(image_path('icon_closed.svg'));}
+  &:hover, &:focus {
+    background-color: $sidebar-nav-base;
+    border-color: transparent;
+  }
 
-.nav-tabs > li > a.active {
-  background-color: $content-bg-color;
-  color: $type-lighter-color;
+  &.active {
+    background-color: $content-bg-color;
+    color: $type-lighter-color;
+  }
+  &#admin-rule-tab-link, &#bug-rules-tab-link {background-image: url(image_path('icon_rules.svg'));}
+  &#admin-validations-tab-link {background-image: url(image_path('icon_validations.svg'));}
+  &#bug-overview-tab-link {background-image: url(image_path('icon_overview.svg'));}
+  &#bug-attachments-tab-link {background-image: url(image_path('icon_attachments.svg'));}
+  &#bug-jobs-tab-link {background-image: url(image_path('icon_jobs.svg'));}
+  &#bug-notes-tab-link {background-image: url(image_path('icon_notes.svg'));}
+  &#user-open-bugs-tab {background-image: url(image_path('icon_open.svg'));}
+  &#user-pending-bugs-tab {background-image: url(image_path('icon_pending.svg'));}
+  &#user-closed-bugs-tab {background-image: url(image_path('icon_closed.svg'));}
+  &#generate-reports-tab-link {background-image: url(image_path('icon-generate-reports.svg'));}
+  &#mothra-tab-link{background-image: url(image_path('icon_mothra.svg'));}
 }
 
 .nav-tabs > li.active > a {
@@ -1389,11 +1467,6 @@ thead th.sorting.center {
   border-top-right-radius: 2px;
   margin-left: -1px;
   border-left: 1px solid $faint-neutral-color;
-}
-
-.nav > li > a:hover, .nav > li > a:focus {
-  background-color: $sidebar-nav-base;
-  border-color: transparent;
 }
 
 .tab-label {
@@ -1423,8 +1496,6 @@ thead th.sorting.center {
 }
 
 /******** Messages / Warnings ********/
-
-.content-wrapper .message-div {}
 
 .message-div {
   border: 2px solid $content-bg-color;
@@ -1883,15 +1954,6 @@ form select#bug_priority {
   font-size: 8pt;
 }
 
-.required:before {
-  content: '*';
-  color: $user-section-color;
-  font-weight: 600;
-  left: -10px;
-  position: absolute;
-  font-size: 8pt;
-}
-
 .col-align-right {
   text-align: right;
   padding-right: 15px;
@@ -1991,24 +2053,24 @@ button.close {
 
 #sidenav-menu-div {
   background-color: $sidebar-nav-base;
-  display: block;
-  position: absolute;
-  color: $content-bg-color;
-  text-transform: uppercase;
-  font-weight: 700;
-  line-height: $sidebar-width;
-  z-index: -1;
-  width: 200px;
-  height: 100%;
-  top: 0;
   bottom: 0;
+  color: $content-bg-color;
+  display: block;
+  font-weight: 700;
+  height: 100%;
   left: 0;
-  -webkit-transform: translateX(-100%);
+  line-height: $sidebar-width;
+  position: absolute;
+  text-transform: uppercase;
+  top: 0;
   transform: translateX(-100%);
+  -webkit-transform: translateX(-100%);
   -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
   transition: -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
-  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
   transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), -webkit-transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  width: 200px;
+  z-index: -1;
 }
 
 #sidenav-menu-div a {
@@ -2031,6 +2093,10 @@ button.close {
 #sidenav-menu-div .sub-nav li a, .sidenav-icons .sub-nav li a {
   color: $type-base-color;
   font-size: 8pt;
+}
+
+#sidenav-menu-div .sub-nav li a, .sidenav-icons ul li a, .nav-container ul li a {
+  color: $type-base-color;
 }
 
 .sub-nav.collapse.in {
@@ -2061,12 +2127,12 @@ button.close {
 }
 
 #admin-subnav, #admin-subnav-icons {
-  background-color: lighten($admin-section-color, 30%);
+  background-color: lighten($admin-section-color, 33%);
 }
 
 .sub-nav svg {
   width: 20px;
-  height: auto;
+  height: 20px;
   margin-left: 12px;
   margin-top: 5px;
 }
@@ -2165,6 +2231,33 @@ a.static-nav-item {
   margin-top: -1px;
 }
 
+.temp-links {
+  margin-top: 20px;
+  padding-left: 2px;
+
+  li {
+    border-bottom: none !important;
+    font-size: 8pt;
+    font-weight: normal;
+  }
+
+  .icon-link svg {
+    bottom: 2px;
+    height: 42px;
+    left: 12px;
+    position: relative;
+    width: 15px;
+  }
+
+  .temp-link-full {
+    background: $sidebar-nav-base;
+    bottom: 4px;
+    padding-left: 12px;
+    position: relative;
+    right: 20px;
+  }
+}
+
 /***** End of Side Nav *****/
 
 
@@ -2255,6 +2348,7 @@ a.static-nav-item {
 .icon-active-tickets {background-image: url(image_path('icon_active_tickets_white.svg')); background-size: 18px;}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
+.icon-autoresolved-white{background-image: url(image_path('icon_autoresolved_white.svg'));}
 .icon-team-grey {background-image: url(image_path('icon_team_grey.svg'));}
 .icon-custom-user-grey {background-image: url(image_path('icon_custom_user_grey.svg'));}
 .icon-invalid-grey {background-image: url(image_path('icon_invalid_grey.svg'));}
@@ -2278,7 +2372,16 @@ a.static-nav-item {
 .icon-talos-white {background-image: url(image_path('icon_talos_white.svg'));}
 .icon-web-white {background-image: url(image_path('icon_web_white.svg'));}
 .icon-company-white {background-image: url(image_path('icon_company_white.svg'));}
+.icon-mothra-white {background-image: url(image_path('icon_mothra_white.svg'));}
+.icon-pending-import {background-image: url(image_path('icon_pending_grey.svg'));}
+.icon-complete-import {background-image: url(image_path('icon_my_closed_tickets_grey.svg'));}
+.icon-failed-import {background-image: url(image_path('icon_cancel.svg'));}
 
+.checkbox-icon{
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  background-position: 4px center;
+}
 .saved-search {
   text-transform: none !important;
   font-weight: 400;
@@ -2372,7 +2475,7 @@ a.static-nav-item {
 }
 
 #saved-searches-wrapper.webcat-named-search-list {
-  min-height: 495px;
+  min-height: 530px;
 }
 
 .search-wrapper {
@@ -3992,10 +4095,6 @@ fieldset.top-content {
   max-width: 100%;
 }
 
-#manageResolutionMessageTemplatesDialog .template-content {
-  max-height: 145px;
-}
-
 .email-response-button-wrapper {
   float: right;
   border-left: solid 1px darken($faint-neutral-color, 10%);
@@ -4019,15 +4118,13 @@ fieldset.top-content {
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
 .nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
 
-.email-msg-body pre {
+.email-msg-content {
   background-color: $content-bg-color;
   color: $type-lighter-color;
   line-height: 1.4em;
   margin-top: 12px;
   margin-bottom: 40px;
   font-size: 9pt;
-  white-space: pre-wrap;
-  word-wrap: break-word;
 }
 
 .table-toolbar {
@@ -4172,53 +4269,12 @@ input.communication-subject {
   font-size: 9pt;
 }
 
-.mng-resolution-message-templates-button {
-  background-image: url(image_path('icon_comment_template_white.svg'));
-  background-color: darken($nav-toolbar-color, 10%);
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 14px 15px;
-  border-radius: 2px;
-  height: 20px;
-  width: 22px;
-  display: inline-block;
-  float: right;
-  border: none;
-  padding-right: 0;
-  margin-top: 1px;
-  margin-left: 12px;
-  font-weight: 300;
-  font-size: 9pt;
-  &:hover {
-    background-color: $primary-section-color !important;
-  }
-}
-
-//bump up button when next to duplicate status
-.duplicate-status-notice + .mng-resolution-message-templates-button {
-  position: relative;
-  bottom: 5px;
-}
-
 .select-a-template{
   margin-left: 26px;
   margin-top: 2px;
   color: $type-base-color;
   text-transform: uppercase;
   font-weight: 700;
-}
-
-.select-resolution-message-templates-button {
-  background-image: url(image_path('icon_comment_template_dk_grey.svg'));
-  background-repeat: no-repeat;
-  background-position: 0 0px;
-  background-size: 18px 18px;
-  height: 24px;
-  display: inline-block;
-  background-color: transparent;
-  border: none;
-  font-weight: 300;
-  font-size: 9pt;
 }
 
 .note-info-item {
@@ -4440,6 +4496,8 @@ input.communication-subject {
   font-size: 8pt;
   border-radius: 0;
   border: 1px solid darken($faint-neutral-color, 5%);
+  width: 100%;
+  max-width: 475px;
 }
 
 #communication h1 {
@@ -4831,6 +4889,7 @@ button.tertiary {
 .icon-related-users {background-image: url(image_path('icon_team_white.svg'));}
 .icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}
 .icon-notes {background-image: url(image_path('icon_status_comment.svg'));}
+.icon-resolution-manager-page {background-image: url(image_path('icon_email_read_white.svg'));}
 
 .remove-input {
   background-image: url(image_path('icon_minus_blue.svg'));
@@ -5071,27 +5130,6 @@ input.file_attachment {
 }
 
 #new-template-form-wrapper {
-  display: none;
-  height: 0;
-  margin: 12px;
-  border: 1px solid $faint-neutral-color;
-}
-
-#new-resolution-message-template-form-wrapper {
-  display: none;
-  height: 0;
-  margin: 12px;
-  border: 1px solid $faint-neutral-color;
-}
-
-#edit-template-form-wrapper {
-  display: none;
-  height: 0;
-  margin: 12px;
-  border: 1px solid $faint-neutral-color;
-}
-
-#edit-resolution-message-template-form-wrapper,  #edit-resolved-resolution-message-template-form-wrapper{
   display: none;
   height: 0;
   margin: 12px;
@@ -5980,7 +6018,7 @@ input.table-entry-input:focus {
   }
 
   .domain-name-normal {
-    color: #333;
+    color: $type-base-color;
   }
 
   .domain-name {
@@ -6010,7 +6048,9 @@ input.table-entry-input:focus {
     margin-top: 5px;
   }
 }
-
+.webcat-reports-wrapper {
+  width: auto;
+}
 .webcat-research-wrapper {
   width: auto;
 
@@ -6441,7 +6481,7 @@ h5.entry-details-table-header {
   padding: 0 8px !important;
 }
 
-.inline-select-dropdown {
+.inline-select-dropdown{
   padding-right: 20px;
   background-image: url(image_path('icon_dropdown_grey.svg'));
   background-repeat: no-repeat;
@@ -6476,10 +6516,18 @@ h5.entry-details-table-header {
 }
 
 .ticket-resolution-submenu {
-  left: -219%;
+  left: -298%;
   margin-top: -56px;
   margin-left: 1px;
-  width: 350px;
+  width: 475px;
+  background-color: $bug-section-color;
+}
+
+//Research tab entries get a little extra padding since they are missing submit button
+#disputes-research-table {
+  .non-resolution-submit-wrapper {
+    padding-bottom: 8px;
+  }
 }
 
 .ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label, #index-entry-resolution-submenu
@@ -6599,10 +6647,38 @@ h5.entry-details-table-header {
   background-color: darken($bug-section-color, 5%);
 }
 
+.selected #show-ticket-resolution-submenu,
+.selected #sdr-index-dispute-resolution-submenu,
+.selected #index-ticket-resolution-submenu,
+.selected #index-entry-resolution-submenu {
+  display: flex;
+}
+
+.submenu-left-wrapper {
+  max-width: fit-content;
+  ul li {
+    padding-right: 4px !important;
+  }
+  .radio-label {
+    padding-right: 10px !important;
+  }
+}
+
+//workaround for webrep single entries - delete after we remove this section
+.research-table-row.editing-row .submenu-left-wrapper {
+  max-width: 100%;
+}
+
 .submenu-left-wrapper, .submenu-right-wrapper {
   padding-left: 0  !important;
   padding-right: 0 !important;
   margin-right: 0  !important;
+}
+
+.submenu-right-wrapper {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  flex-grow: 1; //stretch right submenu to fill rest of width
 }
 
 .submenu-header {
@@ -6635,6 +6711,19 @@ input[type="radio"].ticket-status-radio {
   margin-top: 0;
 }
 
+//tweak to get webrep radio buttons to align better
+#index-edit-ticket-status-dropdown {
+  input[type="radio"].ticket-status-radio {
+    margin-top: 4px;
+  }
+}
+
+.escalations--webrep--disputes-controller {
+  input[type="radio"].ticket-status-radio {
+    margin-top: 3px;
+  }
+}
+
 .radio-label {
   text-transform: none !important;
   font-weight: 400 !important;
@@ -6658,23 +6747,54 @@ input[type="radio"].ticket-status-radio {
   margin-top: 4px;
 }
 
+.dispute-type-radio-wrapper {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  input, label {
+    cursor: pointer;
+  }
+}
+
+#resolution-message-template-form-wrapper select {
+  min-height: 22px;
+  padding-left: 3px;
+  //overwrite firefox and safari default select styles
+  appearance: none;
+  background-color: #fff;
+}
+
+
+.webrep-resolution-template-type {
+  margin-right: 6px !important;
+}
+
+#dispute-type-web-wrapper {
+  margin-bottom: 5px;
+}
 .resolution-comment-wrapper {
-  display: inline-block;
   background-color: $content-bg-color;
   padding: 4px 12px !important;;
 }
 
 textarea.ticket-resolution-comment {
-  display: inline-block;
+  font-size: 8pt;
+}
+
+.ticket-resolution-comment, .entry-resolution-comment {
+  min-height: 180px;
+  resize: vertical;
+  line-height: 12px;
+}
+
+//extra padding for werbrep show entry resolution menu
+.entry-resolution-comment-wrapper-research-tab {
+  padding-bottom: 10px !important;
 }
 
 .resolution-comment-wrapper input[type='text'] {
   width: 100%;
   min-height: 40px;
-}
-
-.non-resolution-submit-wrapper .content-label-sm {
-  margin-top: 12px;
 }
 
 .sdr-non-resolution-submit-wrapper .content-label-sm {
@@ -6687,6 +6807,13 @@ textarea.ticket-resolution-comment {
   border-radius: 0;
   border: 1px solid darken($faint-neutral-color, 5%);
   width: 100%;
+  background-color: #fff; //firefox specific fix to get rid of default color
+  background-image: url(image_path('icon_dropdown_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+  background-size: 14px;
+  -webkit-appearance: none;
+  padding: 3px 0 3px 3px;
 }
 
 #wlbl_adjust_entries, #wlbl_adjust_entries_index {
@@ -7003,16 +7130,37 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-E, .dispute-e {background-image: url(image_path('icon_type_email.svg'));}
 .dispute-EW, .dispute-ew {background-image: url(image_path('icon_type_email_web.svg'));}
 
-
-.team-dashboard-header-area, .dashboard-header-area, .complaint-mgt-top-area, .reputation-research-search-wrapper,
+.team-dashboard-header-area, .dashboard-header-area, .reputation-research-search-wrapper,
 .webcat-research-search-wrapper {
   background-color: $content-tab-color;
-  margin-top: -15px;
-  margin-right: -15px;
-  margin-left: -15px;
   border-radius: 4px 4px 0 0;
   color: $content-bg-color;
   padding: 15px;
+  margin: -15px -15px 0 -15px;
+}
+
+.webcat-reports-top-content{
+  background-color: $content-tab-color;
+  margin: -15px;
+  border-radius: 4px;
+  .metric-header{
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .header-content{
+    padding-top: 15px;
+    display: flex;
+    h1{color: $content-bg-color!important;}
+    .top-info-icon{
+      padding-right: 40px;
+      margin-left: 5px;}
+  }
+}
+.complaint-mgt-top-area{
+  background-color: $content-bg-color;
+  padding: 15px;
+  border-radius: 0 4px 4px 0;
+  margin-right: -15px ;
 }
 
 .dashboard-header-area {
@@ -7080,19 +7228,9 @@ table.dispute_tool_current tr:last-of-type td {
 .team-icon {  background-image: url(image_path('icon_team.svg'));}
 .team-icon-grey {background-image: url(image_path('icon_team_grey.svg'));}
 
-.tickets-totals-table td {
-  border-bottom: none;
-  font-weight: 300;
-  font-size: 10pt;
+.active-view{
+  background-color:#E0F1F7;
 }
-
-.ticket-type-label {
-  font-weight: 700;
-  font-size: 9pt;
-  text-transform: uppercase;
-  padding-right: 4px;
-}
-
 td.ticket-total, td.entries-total {
   text-align: center;
   font-size: 11pt;
@@ -7242,11 +7380,6 @@ td.ticket-total::before {
   min-width: 200px;
   top: 0;
   left: 100%;
-  height: 100%;
-}
-
-.sdr-non-resolution-submit-wrapper {
-  padding-top: 6px !important;
 }
 
 .non-resolution-submit-wrapper textarea, .resolution-comment-wrapper textarea {
@@ -7255,7 +7388,14 @@ td.ticket-total::before {
   border: 1px solid darken($faint-neutral-color, 5%);
   font-size: 8pt;
   padding: 6px;
+}
+
+.non-resolution-submit-wrapper textarea {
   min-height: 50px;
+}
+
+.resolution-comment-wrapper textarea {
+  min-height: 180px;
 }
 
 #sdr-index-dispute-resolution-submenu .resolution-comment-wrapper, #show-ticket-resolution-submenu .resolution-comment-wrapper {
@@ -7297,6 +7437,17 @@ td.ticket-total::before {
   left: 100%;
   padding: 0;
   margin-top: -56px;
+  background-color: $bug-section-color;
+}
+
+#index-ticket-resolution-submenu, #index-entry-resolution-submenu {
+  min-width: 475px;
+  .resolution-status-comment, .entry-status-comment{
+    min-height: 186px;
+    height: 105px;
+    font-size: 8pt;
+    line-height: 12px;
+  }
 }
 
 .non-resolution-submit-wrapper {
@@ -7681,11 +7832,7 @@ table.dispute-entry-table tbody tr.selected {
   width: 475px;
   margin-top: -55px;
   padding: 0;
-  .resolution-status-comment{
-    height: 105px;
-    font-size: 12px;
-    line-height: 1.4em;
-  }
+  background-color: $bug-section-color;
   button.primary{
     margin: 2% 0px 0px 33%
   }
@@ -7702,6 +7849,10 @@ table.dispute-entry-table tbody tr.selected {
 
 .show-toolbar-wrapper {
   margin-top: 40px;
+}
+
+.ticket-resolution-submit-wrapper {
+  padding: 12px 6px 6px 6px !important;
 }
 
 .preview-website-col {
@@ -8115,12 +8266,17 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 .tag-capsule {
-  padding: 2px 4px;
-  margin: 4px 2px 0 2px;
   background-color: $bug-section-color;
   border-radius: 2px;
   color: $content-bg-color;
+  cursor: pointer;
   display: inline-block;
+  margin: 4px 2px 0 2px;
+  padding: 2px 4px;
+
+  &:hover {
+    background-color: darken($bug-section-color, 7%);
+  }
 }
 
 .nested-complaint-data-wrapper a {
@@ -8364,29 +8520,6 @@ hr.condensed {
   text-decoration: underline;
 }
 
-#disputes-research-table label.customer-facing-comment {
-  font-weight: 600;
-  padding-right: 0;
-}
-
-.customer-facing-comment {
-  color: $warning-accent-color !important;
-  font-weight: 600;
-  text-transform: none !important;
-}
-
-.customer-facing-comment::before {
-  content: '';
-  background-image: url(image_path('icon_warning_orange.svg'));
-  background-repeat: no-repeat;
-  width: 14px;
-  height: 14px;
-  display: inline-block;
-  float: left;
-  margin-top: -2px;
-  margin-right: 2px;
-}
-
 th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc {
   background-position-x: center !important;
 }
@@ -8552,7 +8685,7 @@ h2 {
   text-transform: uppercase;
   margin-top: 24px;
   margin-bottom: 6px;
-  color: #333;
+  color: $type-base-color;
 }
 
 .dashboard-header-area {
@@ -9278,6 +9411,8 @@ td.text-center span {
 .cluster-mgt-top-area {
   background-color: $content-tab-color;
   padding-bottom: 20px;
+  border-radius: 4px 4px 0 0;
+  margin: -15px;
 }
 #wsa_statuses, #clusters-index_filter, #cluster_comment_field{
   &:empty{
@@ -10738,7 +10873,7 @@ hr.thin.form-divider {
   }
 }
 
-.top-case-info h4 {
+.top-case-info h4, h4.ticket-report-header {
   text-transform: uppercase;
   font-weight: 700 !important;
   color: $type-lighter-color;
@@ -10994,12 +11129,27 @@ button.secondary.view-report-external-button {
   margin-right: 0;
 }
 
-.toolbar-select-wrapper .toolbar-button-text {
-  padding-left: 22px;
-  padding-right: 6px;
-  line-height: 1.65em;
+.toolbar-select-wrapper {
+  .toolbar-button-text{padding-left: 8px;}
+  .toolbar-button-text, .toolbar-button-select {
+    padding-right: 6px;
+    line-height: 1.65em;
+  }
 }
+#report-tab-content{
+  .toolbar-select-wrapper input[type='checkbox'] {
+    margin-top: 3px;
+  }
+  .entries-th {
+    text-transform: none;
+    font-weight: 600;
+    font-size: 10px;
+  }
 
+  #jira-tasks-disputes-export-form {
+    display: contents;
+  }
+}
 // dbinebri: updates below for file rep navbar layout new
 .escalations--file_rep--disputes-controller {
   .nav-tool-blocks.search-wrapper {
@@ -11064,9 +11214,6 @@ button.secondary.view-report-external-button {
 
   // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
   @media screen and (min-width: 1200px) {
-    .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
-      width: 12%;
-    }
     // below ensures the navbar widths adds up correctly
     .col-lg-2.nav-username {
       width: 17%;
@@ -11077,10 +11224,7 @@ button.secondary.view-report-external-button {
   }
 
   // 1430px specific
-  @media screen and (min-width: 1201px) and (max-width: 1500px) {
-    .nav-page-button-wrapper {
-      width: 120px;
-    }
+  @media screen and (min-width: 1401px) and (max-width: 1500px) {
     .col-lg-2.nav-username {
       display: none;
     }
@@ -12040,7 +12184,7 @@ table.rl-content {
   white-space: pre!important;
 }
 .amp-url{
-  color: #333;
+  color: $type-base-color;
 }
 // ensure AMP disposition on File Rep > Show is capitalized in all 3 instances
 #create-detection-dialog .top-info-data,
@@ -12260,7 +12404,7 @@ input[type="radio"].resolution_radio_button {
 }
 .toolbar#webcat-index-toolbar {
   background: $content-bg-color;
-  bottom: 18px;
+  bottom: 2px;
   box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
   flex-direction: row;
   float: left;
@@ -12276,12 +12420,16 @@ input[type="radio"].resolution_radio_button {
     font-weight: normal;
   }
 
-  label {
-    display: none;
-  }
-
   div {
     margin: 4px 3px 0 0;
+  }
+
+  .toolbar-dropdown {
+    margin-top: 0 !important;
+  }
+
+  .primary-text-divider {
+    margin-top: 0 !important;
   }
 
   .btn-group.toolbar-btn-group {
@@ -12794,7 +12942,9 @@ span.threat-cat-no-data {
 .no-padding-right {
   padding-right: 0 !important;
 }
-
+.no-padding-left {
+  padding-left: 0 !important;
+}
 .uri-plus-ip-rule-indicator {
   background-image: url(image_path('icon_plus_ip_blue.svg'));
   background-repeat: no-repeat;
@@ -12949,9 +13099,7 @@ table > tbody > tr > td.no-padding {
 
 // handling the top-right username width issues
 @media screen and (max-width: 1200px) {
-  #nav-banner a.nav-username {
-    display: none;
-  }
+  #nav-banner a.nav-username {display: none;}
 }
 
 
@@ -13360,6 +13508,12 @@ table > tbody > tr > td.no-padding {
 .complaints-metrics-banner {
   display: flex;  // handle vertical centering
   align-items: center;
+  background-color: $content-tab-color;
+  color: $content-bg-color;
+  margin: -30px -15px -30px -30px;
+  border-radius: 4px 4px 0 0;
+  padding: 15px 5px;
+
   h1 {
     margin-bottom: 2px;
     margin-right: 10px;
@@ -13385,10 +13539,10 @@ table > tbody > tr > td.no-padding {
     padding-right: 0;
   }
   .metrics-col {
-    padding: 4px 4px 4px 22px;
+    padding-right: 21px;
     max-width: 400px;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
   }
   .metric-header {
     display: inline-block;
@@ -13435,8 +13589,6 @@ table > tbody > tr > td.no-padding {
     float: right;
     text-align: right;
     padding-left: 0;
-    padding-right: 1vw;
-    padding-top: 2px;
     max-width: 300px;  // accommodate the loading spinner
     display: inline-block;
     .wbnp-report-status {
@@ -13499,6 +13651,21 @@ table > tbody > tr > td.no-padding {
 
 // shorter widths, minor tweaks
 @media screen and (max-width: 1550px) {
+  .complaints-metrics-banner {
+    .main-metrics {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+  .wbnp-area .metric-header {
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+@media screen and (max-width: 1513px) {
+  .wbnp-area{padding-top: 30px;}
+}
+@media screen and (max-width: 2080px) {
   .complaint-mgt-top-area {
     padding: 6px 15px;
   }
@@ -13515,13 +13682,6 @@ table > tbody > tr > td.no-padding {
       padding: 6px 5px 0 0;
       display: block;
     }
-    .wbnp-area {
-      padding: 0.8vw 1vw;
-    }
-    .wbnp-area .metric-header {
-      display: inline-block;
-      vertical-align: middle;
-    }
     .metric-header {
       padding-top: 0;
       vertical-align: top;
@@ -13533,32 +13693,17 @@ table > tbody > tr > td.no-padding {
 }
 
 // 1350px and smaller
-@media screen and (max-width: 1350px) {
-  #nav-banner a.nav-username {
-    display: none;
-  }
-  .complaints-metrics-banner {
-    .wbnp-area {
-      padding: 8px 15px 8px 10px;
-    }
-    .wbnp-area .metric-header {
-      width: 110px;
-    }
-  }
-}
 
 // 1255px and smaller
 @media screen and (max-width: 1255px) {
-  #nav-banner a.nav-username {
-    display: none;
-  }
   .complaints-metrics-banner {
     .metrics-col {
       max-width: 200px;
+      padding-right: unset;
+      }
     }
-    .wbnp-area {
-      padding: 15px;
-    }
+  .wbnp-area{
+    max-width: unset!important;
   }
 }
 
@@ -13581,8 +13726,7 @@ table > tbody > tr > td.no-padding {
       max-width: 160px;
     }
     .wbnp-area {
-      padding: 15px;
-      max-width: 200px;
+      max-width: unset;
     }
   }
 }
@@ -13628,8 +13772,162 @@ table > tbody > tr > td.no-padding {
 .ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
 }
+.jira-ticket-id {
+  font-size: 13px;
+  font-weight: bold;
+  color: $type-base-color!important;
+}
+.ticket-id{
+  text-decoration: underline;
+  color:#23527c;
+}
+.urls-container {
+  padding-top: 30px;
+  margin-bottom: -20px;
+  .data-report-label {
+    width: auto;
+    position: absolute;
+  }
+}
+.jira-url{
+  max-width: 300px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#webcat-imports-index_wrapper .jira-ticket-id:hover {
+  cursor:pointer;
+  border-bottom: 1px solid #666;
+}
 
+.jira-ticket-type-wrapper {
+  float: right;
+  max-width: 350px;
+  padding: 5px 14px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.25em;
+  border: 1px solid $yet-another-pale-grey;
+  background-color: $content-bg-color;
+  &::before {
+    content: '*';
+    color: $second-section-color;
+    position: absolute;
+    display: block;
+    margin-left: -7px;
+  }
+}
+
+.jira-result-note{
+  font-size: 11px;
+  line-height: 1.25em;
+  word-break: break-word;
+}
+.jira-status{
+  font-weight: 600;
+}
+.result-container{
+  display:flex;
+  justify-content: space-between;
+  max-width: 125px;
+}
+.result-col{
+  width: 150px;
+}
+.bold-note{
+  font-weight: bold;
+}
+// ff one-off fix for the red asterisk
+@-moz-document url-prefix() {
+  .jira-ticket-type-wrapper::before {
+    margin-top: -14px;
+  }
+}
+
+.webcat-ticket-view{
+  margin-top: 50px;
+  .data-report-content{
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .data-report-content{
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .vis-ticket {
+    padding: 4px;
+    &:only-of-type{
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: unset;
+    }
+    .data-report-content {
+      font-size: 13px;
+    }
+    .content-label-sm {
+      display: block;
+      margin-bottom: 0;
+    }
+    hr {
+      margin-top: 40px;
+      margin-bottom: 50px;
+    }
+  }
+
+  .ticket-rows{
+    .dataTables_wrapper{
+      top: -10px;
+    }
+  }
+}
+.checkbox-cell {
+  padding-bottom: 0 !important;
+  padding-top: 6px !important;
+}
+.url-datatable{
+  background-color: #fff;
+  th{white-space: nowrap}
+}
 .webcat-reports-only {
+  display: flex;
+  flex-wrap: wrap;
+  .header-td{
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 8pt;
+    width: 110px;
+    color: $table-dark-body;
+    white-space: nowrap;
+  }
+  .wbnp-table .header-td{
+    width: 130px;
+  }
+  .content-td{
+    font-weight: 400!important;
+  }
+  .tickets-totals-table{
+    margin-left: 10px;
+    max-width: 220px;
+    td{
+      border-bottom: none;
+      font-size: 8pt;
+    }
+  }
+  &>* { flex: 1 1 220px; }
+  @media (max-width: 1485px) {
+    .tickets-totals-table{
+      max-width: 180px;
+    }
+  }
+  @media (max-width: 1220px) {
+    &>* {flex: 1 1 170px;}
+    .tickets-totals-table{
+      max-width: 180px;
+      margin-bottom: 20px;
+    }
+  }
+
   .table-condensed > tbody > tr > td {
     padding: 3px 4px !important; // need override
   }
@@ -14196,6 +14494,13 @@ input.wl-bl-list-inline {
   }
 }
 
+//overridding the webrep toolbar div style for convert ticket dropdown
+#convert-ticket-dropdown  {
+  div {
+    margin-right: 0 !important;
+  }
+}
+
 .align-top {
   vertical-align: top;
 }
@@ -14350,4 +14655,111 @@ input.wl-bl-list-inline {
 .text-wrap {
   max-width: 300px;
   word-wrap: break-word;
+}
+
+//Manage Resolution Message Templates
+
+#resolved-resolution-message-dialogue-form-information {
+  padding: 0 20px;
+}
+
+.resolved-resolution-message-template-input {
+  width: 100%;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  font-size: 8pt;
+}
+
+#resolution-message-templates {
+  .index-table-header {
+    float: none;
+  }
+  .toolbar-container {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+}
+
+#resolution-message-templates-table {
+  margin-top: 10px;
+}
+
+.resolution-template-description {
+  font-size: 12px;
+}
+
+.new-resolution-button-text{
+  text-transform: capitalize;
+  display: inline-block;
+  padding-left: 8px;
+  float: right;
+  font-size: 9pt;
+}
+
+.add-message-template {
+  background-image: url(image_path('icon_add_black.svg'));
+}
+
+.resolution-modal-label {
+  padding: 0 !important;
+  margin-top: 14px;
+}
+
+.resolution-modal-button-wrapper {
+  padding: 20px 0 30px 0;
+}
+
+.resolution-modal-textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 38px;
+  max-width: 100%;
+  min-width: 100%;
+  padding: 5px;
+}
+
+.ticket-resolution-description, .entry-resolution-description {
+  min-height: 14px;
+  font-size: 8pt;
+}
+
+#resolution-message-templates-table {
+  margin-top: 10px;
+}
+
+.resolution-template-description {
+  font-size: 12px;
+}
+
+.white-bg {
+  background-color: #fff;
+}
+
+#create-resolution-template-submit:disabled {
+  background-color:#6dbcdb !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resolution_message_templates-action .ui-dialog-title {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.edit-resolution-message-template {
+  cursor: pointer;
+}
+
+.edit-webrep-resolution-message-template {
+  cursor: pointer;
+}
+
+.manage-response-delete-icon {
+  background-repeat: no-repeat;
+  cursor: pointer;
+  height: 18px;
+  width: 18px;
+}
+
+.hide-temporarily {
+  display: none;
 }

@@ -175,29 +175,10 @@ $ ->
           $(ip_input).val(old_ips)
 
 
-# Inline Edit Status
-  $('.radio-label').click ->
+  ## Inline Edit Status
+  $('.escalations--webrep--disputes-controller.show-action .status-cell .radio-label').click ->
     radio_button = $(this).prev('input[type="radio"]')
-    $(radio_button[0]).trigger('click')
-    dropdown_wrapper = $(this).parents('.inline-dropdown-menu')
-    active_status = $(dropdown_wrapper[0]).prev('.inline-select-dropdown')
-    if $(radio_button[0]).hasClass('entry-status-radio')
-      selected_status = $(radio_button[0]).attr('id')
-      $(active_status[0]).text(selected_status)
-
-    li = $(this).parent('.status-radio-wrapper')
-    parent = li[0]
-    $('.status-radio-wrapper').each ->
-      if $(this).hasClass('selected')
-        $(this).removeClass('selected')
-    $(parent).addClass('selected')
-
-    if radio_button.hasClass('resolution-drodown-menu') or radio_button.hasClass('entry-resolution-radio')
-      submenu = $(this).siblings('.dropdown-menu')
-      $(submenu[0]).show()
-      return false
-    else
-      $('.ticket-resolution-submenu').hide()
+    $(radio_button[0]).prop('checked', true)
 
   # Expand All Rows
   $('#expand-all-rows').click ->
@@ -224,7 +205,6 @@ $ ->
     nested_row = $(entry_row).find('.nested-data-row')[0]
     $(nested_row).toggle()
     $(expand_button).toggleClass('shown')
-
 
   ## WL/BL Form manipulation
   $('.wl-bl-list-inline').click ->
@@ -339,16 +319,69 @@ $ ->
     else
       $(table).hide()
 
-  # Scrollable tables in the expanded rows
-  $('.table-scrollable').DataTable({
-    scrollY: 200,
-#    scrollCollapse: true,
+  # Tables in the expanded rows
+
+  $('.virustotal-table').DataTable({
+    info: false,
+    ordering: true,
     paging: false,
-    searching: false,
-    ordering: false,
-    info: false
+    searching: false
   })
 
+  $('.sbrs-table').DataTable({
+    info: false,
+    ordering: true,
+    paging: false,
+    searching: false
+  })
+
+  $('.shared-xbrs-timeline-table').DataTable({
+    columnDefs: [
+      {
+        orderData: [6],
+        targets: [0]
+      },
+      {
+        visible: false,
+        targets: [6]
+      }
+    ]
+    info: false,
+    ordering: true,
+    paging: false,
+    searching: false,
+  })
+
+  $('.wbrs-table').DataTable({
+    columnDefs: [{
+      targets: [0],
+      orderable: false
+    }]
+    info: false,
+    order: [[1, 'asc']],
+    paging: false,
+    searching: false
+  })
+
+  $('.crosslisted-table').DataTable({
+    columnDefs: [
+      {
+        orderData: [7],
+        targets: [5],
+      },
+      {
+        orderData: [8],
+        targets: [6],
+      },
+      {
+        visible: false,
+        targets: [7, 8]
+      }
+    ]
+    info: false,
+    paging: false,
+    searching: false
+  })
 
   #  Rule escalations email
   $('.wbrs-rule-trigger').click ->
@@ -454,44 +487,7 @@ $ ->
         std_api_error(response, "Error recovering dispute entry content", reload: false)
     )
 
-
 $(document).ready ->
-
-  ### Using 'tooltipped' class instead of 'tooltip' so that it doesn't interfere with Bootstrap ###
-#    Edit Ticket (Show page). Edit Ticket Status
-  $('.ticket-status-radio-label').click ->
-    radio_button = $(this).prev('.ticket-status-radio')
-    $(radio_button[0]).trigger('click')
-    if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
-      $('#show-ticket-resolution-submenu').show()
-      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-      $('#ticket-non-res-submit').hide()
-      $(stat_comment).val('')
-    else
-      $('#ticket-non-res-submit').show()
-      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-      $('.ticket-resolution-radio').prop('checked', false)
-      $('#show-ticket-resolution-submenu').hide()
-      $(res_comment[0]).val('')
-
-  $('.ticket-status-radio').click ->
-    all_stat_radios = $('#show-edit-ticket-status-dropdown').find('.status-radio-wrapper')
-    if $(this).is(':checked')
-      wrapper = $(this).parent()
-      $(all_stat_radios).removeClass('selected')
-      $(wrapper).addClass('selected')
-    if $(this).attr('id') == 'RESOLVED_CLOSED'
-      $('#show-ticket-resolution-submenu').show()
-      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-      $('#ticket-non-res-submit').hide()
-      $(stat_comment).val('')
-    else
-      $('#ticket-non-res-submit').show()
-      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-      $('.ticket-resolution-radio').prop('checked', false)
-      $('#show-ticket-resolution-submenu').hide()
-      $(res_comment[0]).val('')
-
 
   # XBRS history on webrep: fixes to ensure showing the correct table headers, removing conflicting inline styles
   $('.xbrs-details-table .dataTables_scrollHead').addClass('hidden')

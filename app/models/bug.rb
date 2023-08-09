@@ -51,4 +51,5 @@ class Bug < ApplicationRecord
   def self.call_thing(one, two, three:, four:)
     puts 'here'
   end
+
 end

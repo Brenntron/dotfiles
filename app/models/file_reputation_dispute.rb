@@ -151,6 +151,10 @@ class FileReputationDispute < ApplicationRecord
     self.disposition&.downcase == DISPOSITION_CLEAN.downcase
   end
 
+  def cleanish?
+    [DISPOSITION_CLEAN.downcase, DISPOSITION_UNKNOWN.downcase, DISPOSITION_COMMON.downcase, DISPOSITION_UNSEEN].include?(self.disposition&.downcase)
+  end
+
   def suggested_clean?
     self.disposition_suggested&.downcase == DISPOSITION_CLEAN.downcase
   end
@@ -645,7 +649,7 @@ class FileReputationDispute < ApplicationRecord
     customer = Customer.file_rep_process_and_get_customer(customer_payload)
 
     bugzilla_rest_session = message_payload[:bugzilla_rest_session]
-
+    message_payload.delete(:bugzilla_rest_session)
     summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     full_description = <<~HEREDOC
@@ -712,15 +716,17 @@ class FileReputationDispute < ApplicationRecord
       new_dispute.update_amp_detection
     end
 
-    if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
-      ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
-      linked_dispute_comment = FileRepComment.new
-      linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
-      linked_dispute_comment.user_id = user.id
-      linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
-      linked_dispute_comment.save(:validate => false)
+    # commenting this functionality out until bugzilla snort bugs have been successfully moved to JIRA, then
+    # this functionality will need to be rebuilt, if it's even necessary (since this feature isn't even being used)
+    #if message_payload[:payload][:network].present? && message_payload[:payload][:network] == true
+    #  ips_bug_proxy= build_ips_bug(bugzilla_rest_session, message_payload[:payload][:file_name], message_payload[:payload][:sha256], message_payload[:payload][:summary_description], bug_proxy.id)
+    #  linked_dispute_comment = FileRepComment.new
+    #  linked_dispute_comment.file_reputation_dispute_id = new_dispute.id
+    #  linked_dispute_comment.user_id = user.id
+    #  linked_dispute_comment.comment = "File Reputation Dispute is [in network], IPS bugzilla bug created. Reference Bugzilla ID: #{ips_bug_proxy.id}"
+    #  linked_dispute_comment.save(:validate => false)
 
-    end
+    #end
 
     if is_duplicate == true
       return new_dispute
@@ -827,8 +833,14 @@ class FileReputationDispute < ApplicationRecord
       end
       ar_log += "--------------------------------\n"
 
-      if (self.clean? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
-        self.update(status: STATUS_RESOLVED, resolution: STATUS_AUTO_RESOLVED_MATCH, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT, auto_resolve_log: ar_log)
+      if (self.cleanish? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
+        if self.cleanish? && self.suggested_clean?
+          resolution_comment = generate_generic_non_blocking_comment
+        end
+        if (self.malicious? && self.suggested_malicious?)
+          resolution_comment = generate_generic_blocking_comment
+        end
+        self.update(status: STATUS_RESOLVED, resolution: STATUS_AUTO_RESOLVED_MATCH, resolution_comment: resolution_comment, auto_resolve_log: ar_log)
 
         auto_resolved_boolean = true
       end
@@ -938,7 +950,7 @@ class FileReputationDispute < ApplicationRecord
         file_rep.disposition = DISPOSITION_MALICIOUS
         file_rep.status = STATUS_RESOLVED
         file_rep.resolution = STATUS_AUTO_RESOLVED_FN
-        file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT
+        file_rep.resolution_comment = file_rep.generate_auto_resolve_fn_comment #RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT
         file_rep.auto_resolve_log += ar_log
         file_rep.save
         conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
@@ -1295,29 +1307,30 @@ class FileReputationDispute < ApplicationRecord
       Rails.logger.error("Error saving updated detection information -- #{$!.message}")
     end
   end
+  #this is part of a feature that isn't being used, and will need to be rebuilt at some point if it intends to be used
+  # after switching from BZ to JIRA
+  #def self.build_ips_bug(bugzilla_rest_session, filename, sha256, problem, original_bug_id)
+  #  summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-  def self.build_ips_bug(bugzilla_rest_session, filename, sha256, problem, original_bug_id)
-    summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+  #  full_description = <<~HEREDOC
+  #        File name: #{filename}
+  #        File Rep Sha: #{sha256}
 
-    full_description = <<~HEREDOC
-          File name: #{filename}
-          File Rep Sha: #{sha256}
+  #        Summary: #{problem}
+  #  HEREDOC
 
-          Summary: #{problem}
-    HEREDOC
+  #  bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
+  #  logger.debug "Creating bugzilla bug"
 
-    bug_attrs = Bug.build_bugzilla_attrs(summary, full_description)
-    logger.debug "Creating bugzilla bug"
+  #  research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-    research_bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+  #  linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
+  #  linked_bug_proxy.save!
 
-    linked_bug_proxy = bugzilla_rest_session.build_bug({id: original_bug_id, depends_on:[research_bug_proxy.id]})
-    linked_bug_proxy.save!
+  #  new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
 
-    new_bug = Bug.build_local_research_bug_from_bugzilla_bug(research_bug_proxy)
-
-    research_bug_proxy
-  end
+  #  research_bug_proxy
+  #end
 
 
   def get_email_meta_data
@@ -1356,5 +1369,49 @@ class FileReputationDispute < ApplicationRecord
     end
 
     return nil
+  end
+
+  def generate_generic_non_blocking_comment
+    disposition_comment = ""
+    sanitized_disposition = ""
+
+    case self.disposition.downcase
+
+    when 'clean'
+      disposition_comment = "A Clean disposition means that Talos has high confidence positive threat intelligence on a file, and this indicates exceptional safety. "
+    else
+      disposition_comment = "An Unknown disposition means that Talos has no negative threat intelligence on a file, but it has been evaluated. "
+    end
+
+    case self.disposition.downcase
+
+    when 'clean'
+      sanitized_disposition = "Clean"
+    else
+      sanitized_disposition = "Unknown"
+    end
+
+    comment = "Thank you for your submission! Your dispute was resolved automatically because #{self.sha256_hash} currently has a #{sanitized_disposition} disposition and is not globally blocked on Cisco devices. #{disposition_comment} Talos does NOT recommend that our customers block files with #{sanitized_disposition} dispositions– customers who choose to block #{sanitized_disposition} files should be prepared to locally allow-list files frequently."
+    if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
+      comment += " If you need further assistance with this dispute, please open a TAC case."
+    end
+
+    comment
+  end
+
+  def generate_generic_blocking_comment
+    comment = "Thank you for your submission! Your dispute was resolved automatically because #{self.sha256_hash} has a Malicious disposition and is globally blocked on Cisco devices. A Malicious disposition is applied when Talos has negative threat intelligence on a file and that information is sufficient to warrant a block; having a Malicious disposition indicates the file is exceptionally bad, malicious, or undesirable."
+    if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
+      comment += " If you need further assistance with this dispute, please open a TAC case."
+    end
+    comment
+  end
+
+  def generate_auto_resolve_fn_comment
+    comment = "Thank you for your submission! Your submission triggered a dynamic reassessment of #{self.sha256_hash}. Sufficient negative threat intelligence exists to warrant a Malicious disposition for #{self.sha256_hash}. This change will be reflected on Cisco Secure devices within 24 hours."
+    if self.submitter_type == SUBMITTER_TYPE_CUSTOMER
+      comment += " If you need further assistance with this dispute, please open a TAC case."
+    end
+    comment
   end
 end

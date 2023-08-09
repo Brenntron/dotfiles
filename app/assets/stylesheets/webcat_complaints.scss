@@ -167,3 +167,16 @@
     width: auto;
     display: inline-block;
 }
+
+.entry-disposition {
+  .inline-radio-wrapper {
+    label {
+      border-bottom: dotted 1px lighten(#4E4E4E, 40%);
+
+      &:hover {
+        text-decoration: none;
+        color: #4E4E4E;
+      }
+    }
+  }
+}

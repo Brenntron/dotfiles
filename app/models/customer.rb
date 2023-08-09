@@ -1,5 +1,7 @@
 class Customer < ApplicationRecord
-  belongs_to :company, optional:true
+  JIRA_GENERATED = 'ace-jira.gen@cisco.com'.freeze
+
+  belongs_to :company, optional: true
   has_many :complaints
   has_many :disputes
   has_many :file_reputation_disputes

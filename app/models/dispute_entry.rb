@@ -684,7 +684,7 @@ class DisputeEntry < ApplicationRecord
 
 
     if extra_wbrs_stuff.present?
-      self.score = extra_wbrs_stuff["wbrs"]&["score"]
+      self.score = extra_wbrs_stuff.dig("wbrs", "score")
 
       threat_cats = extra_wbrs_stuff["threat_cats"]
 
@@ -1282,9 +1282,11 @@ class DisputeEntry < ApplicationRecord
               self.status = STATUS_RESOLVED
               self.resolution = STATUS_AUTO_RESOLVED_MATCH
               if self.dispute.submitter_type == "NON-CUSTOMER"
-                self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. Talos does not decrease the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers can access the submission, that is due to lax settings on their side and can only be fixed locally by that customer."
+
+                self.resolution_comment = AutoResolve.generate_generic_blocking_message(self.hostlookup, false)
               else
-                self.resolution_comment = "This case was resolved by automation due to the submission already having a blocking score. Talos does not decrease the reputation of already inaccessible submissions as this would affect the way our automated system functions. If one of our customers can access the submission, that is due to lax settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a Cisco TAC case."
+
+                self.resolution_comment = AutoResolve.generate_generic_blocking_message(self.hostlookup, true)
               end
 
               self.save
@@ -1329,8 +1331,11 @@ class DisputeEntry < ApplicationRecord
             end
 
             results = RepApi::Blacklist.where(entries: [ self.hostlookup ]) rescue nil
-
-            is_blacklisted = results.any?{|result| result.status == "ACTIVE"} rescue true
+            if results.kind_of?(Array)
+              is_blacklisted = results.any?{|result| result.status.upcase == "ACTIVE"} rescue true
+            else
+              is_blacklisted = results.status.upcase == "ACTIVE" rescue true
+            end
 
             #WEB-10157
             #if is blacklisted OR has phishtank rulehit, then send to auto resolve : else hit the below block matching disposition/cat check
@@ -1366,9 +1371,9 @@ class DisputeEntry < ApplicationRecord
               self.resolution = STATUS_AUTO_RESOLVED_MATCH
 
               if self.dispute.submitter_type == "NON-CUSTOMER"
-                self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer."
+                self.resolution_comment = AutoResolve.generate_generic_non_blocking_message(self.hostlookup, raw_score, false)
               else
-                self.resolution_comment = "This case was resolved by automation due to the submission already having a non-blocking score. Talos does not improve the reputation of already accessible submissions as this would affect the way our automated system functions. If one of our customers cannot access the submission, that is due to aggressive settings on their side and can only be fixed locally by that customer. If you would like this to be reviewed further, please open a Cisco TAC case."
+                self.resolution_comment = AutoResolve.generate_generic_non_blocking_message(self.hostlookup, raw_score,true)
               end
 
               self.save

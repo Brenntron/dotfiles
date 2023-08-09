@@ -48,10 +48,9 @@ class FileReputationApi::SampleZoo
 
   def self.query_from_data(api_response)
     in_zoo = false
-
     if api_response[:error]
       raise ("#{api_response[:error]}")
-    elsif api_response&.dig("hits","total") and api_response["hits"]["total"] > 0
+    elsif api_response&.dig("hits","total","value") and api_response["hits"]["total"]["value"] > 0
       in_zoo = true
     else
       in_zoo = false

@@ -1,5 +1,5 @@
 class Escalations::Webrep::DisputesController < ApplicationController
-  load_and_authorize_resource class: 'Dispute'
+  load_and_authorize_resource class: 'Dispute', :except => :download_email_attachment_file
 
   before_action :require_login
 
@@ -21,6 +21,16 @@ class Escalations::Webrep::DisputesController < ApplicationController
         send_data export.to_s, filename: "disputes_search_#{Time.now.utc.iso8601}.xlsx", disposition: 'attachment'
       end
     end
+  end
+
+  def download_email_attachment_file
+    dispute_email_attachment = DisputeEmailAttachment.find(params[:id])
+
+    dispute_file_name = dispute_email_attachment.file_name
+
+    file_data = File.open(dispute_email_attachment.direct_upload_url).read
+
+    send_data file_data, filename: dispute_file_name, disposition: 'attachment'
   end
 
   def show
@@ -62,6 +72,15 @@ class Escalations::Webrep::DisputesController < ApplicationController
   end
 
   def update
+  end
+
+
+  def resolution_message_templates
+    @web_templates = ResolutionMessageTemplate.for_web_disputes
+    @email_templates = ResolutionMessageTemplate.for_email_disputes
+    @templates = @web_templates + @email_templates
+    @check_for_footer_web = ResolutionMessageTemplate.by_web_resolution_disputes('Customer Footer').exists?
+    @check_for_footer_email = ResolutionMessageTemplate.by_email_resolution_disputes('Customer Footer').exists?
   end
 
   # TODO We should not have a 400 line method in a controller.

@@ -121,6 +121,98 @@ namespace :escalations do
   end
 
   ##########################################################
+  task :convert_files_from_bugzilla_to_local => :environment do
+
+    morsel = Morsel.new
+    morsel.output = ""
+    morsel.output += "Starting migration...\n"
+    morsel.output += "Grabbing Bugzilla rest session...\n"
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+
+    #HANDLE DISPUTE EMAIL ATTACHMENTS
+    morsel.output += "Grabbing all dispute email attachments...\n"
+    all_attachments = DisputeEmailAttachment.all
+
+    dispute_ids = all_attachments.map {|att| att.dispute_email.dispute&.id}
+
+    dispute_ids.each do |dispute_id|
+      begin
+        morsel.output += "Starting Dispute #{dispute_id}...\n"
+        bug_proxy = bugzilla_rest_session.build_bug(id: dispute_id)
+        bug_attachments = bug_proxy.attachments
+
+        bug_attachments.each do |bug_attachment|
+          begin
+            full_file_path = DisputeEmailAttachment::FULL_FILE_DIRECTORY_PATH + "#{bug_attachment.id}/#{bug_attachment.file_name}"
+
+            directory_to_create = Pathname(full_file_path)
+            directory_to_create.dirname.mkpath
+
+            File.open(full_file_path, 'wb') { |f| f.write bug_attachment.file_contents }
+            if open(full_file_path).read != nil
+              dispute_email_attachment = all_attachments.find {|attach| attach.id == bug_attachment.id}
+              dispute_email_attachment.direct_upload_url = full_file_path
+              dispute_email_attachment.save
+            else
+              morsel.output += "attachment #{bug_attachment.id} was blank, didn't save. investigate \n"
+            end
+          rescue
+            morsel.output += "Failed to migration file with attachment id #{bug_attachment.id}...\n"
+            morsel.output += "moving on...\n"
+          end
+
+        end
+      rescue
+        morsel.output += "Failed to successfully build bug with dispute id #{dispute_id}...\n"
+        morsel.output += "moving on...\n"
+      end
+
+    end
+    morsel.save
+    #HANDLE SDR ATTACHMENTS
+    morsel.output += "Grabbing all sdr attachments...\n"
+    all_attachments = SenderDomainReputationDisputeAttachment.all
+
+    dispute_ids = all_attachments.map {|att| att.sender_domain_reputation_dispute&.id}
+
+    dispute_ids.each do |dispute_id|
+      begin
+        morsel.output += "Starting SDR #{dispute_id}...\n"
+        bug_proxy = bugzilla_rest_session.build_bug(id: dispute_id)
+        bug_attachments = bug_proxy.attachments
+
+        bug_attachments.each do |bug_attachment|
+          begin
+            full_file_path = SenderDomainReputationDisputeAttachment::FULL_FILE_DIRECTORY_PATH + "#{bug_attachment.id}/#{bug_attachment.file_name}"
+
+            directory_to_create = Pathname(full_file_path)
+            directory_to_create.dirname.mkpath
+
+            File.open(full_file_path, 'wb') { |f| f.write bug_attachment.file_contents }
+            if open(full_file_path).read != nil
+              dispute_attachment = all_attachments.find {|attach| attach.id == bug_attachment.id}
+              dispute_attachment.direct_upload_url = full_file_path
+              dispute_attachment.save
+            else
+              morsel.output += "attachment #{bug_attachment.id} was blank, didn't save. investigate \n"
+            end
+
+          rescue
+            morsel.output += "Failed to migration file with attachment id #{bug_attachment.id}...\n"
+            morsel.output += "moving on...\n"
+          end
+
+        end
+      rescue
+        morsel.output += "Failed to successfully build bug with dispute id #{dispute_id}...\n"
+        morsel.output += "moving on...\n"
+      end
+
+    end
+    morsel.save
+  end
+
+
 end
 
 namespace :bugs do
@@ -428,7 +520,6 @@ namespace :bugs do
 
     Morsel.create(:output => report_blob)
 
-
   end
 
 
@@ -449,4 +540,6 @@ namespace :bugs do
       raise "Missing bugzilla_username or bugzilla_password."
     end
   end
+
+
 end
