@@ -580,7 +580,6 @@ window.tmi_dt_init = () ->
         debug: false
         maxWidth: 380
 
-
   # initial page load, show or hide dt columns (keep this separate from click handler)
   $('.tmi-columns-dropdown .toggle-col-tmi').each ->
     column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
@@ -589,16 +588,22 @@ window.tmi_dt_init = () ->
     else
       column.visible(false)
 
-  # on click input, show or hide dt columns. add <li> toggling an addition
+  # reset click handlers inside tmi show/hide cols for change entry scenario
+  $('.tmi-columns-dropdown .toggle-col-tmi').off()
+
+  # on click input, show or hide dt columns
   $('.tmi-columns-dropdown .toggle-col-tmi').on 'click', (e) ->
     checkbox = $(this).find('input')
     column = tmi_table.column($(this).attr('data-column'))
 
-    if $(checkbox).prop('checked') == true
-      column.visible(true)
+    # click input for normal toggle, click li to click the input (safer for change entry scenario)
+    if e.target.nodeName == 'INPUT'
+      if $(checkbox).prop('checked') == true
+        column.visible(true)
+      else
+        column.visible(false)
     else
-      column.visible(false)
-
+      $(checkbox).click()
 
 
 # init the enrichment and prevalence dts
