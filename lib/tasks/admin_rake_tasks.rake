@@ -72,11 +72,19 @@ namespace :escalations do
     disputes_to_auto_resolve = Dispute.where(:status => Dispute::PROCESSING)
 
     disputes_to_auto_resolve.each do |new_dispute|
+
+      dispute_packet = JSON.parse(new_dispute.bridge_packet)
+
       begin
         new_dispute.dispute_entries.each do |dispute_entry|
 
-          if dispute_entry.status == DisputeEntry::STATUS_RESOLVED
+          if dispute_entry.status == DisputeEntry::STATUS_RESOLVED || dispute_entry.status == DisputeEntry::NEW
             next
+          end
+
+          if dispute_entry.claim.blank?
+            dispute_entry.build_claim(dispute_packet)
+            dispute_entry.reload
           end
 
           initial_log = "--------Starting Data---------<br>"
@@ -89,7 +97,7 @@ namespace :escalations do
           dispute_entry.reload
 
           auto_resolve_params = {}
-          auto_resolve_params[:entry_claim] = entry_claim
+          auto_resolve_params[:entry_claim] = dispute_entry.claim
           auto_resolve_params[:dispute_entry] = dispute_entry
 
           AutoResolve.process_auto_resolution(auto_resolve_params)
@@ -97,7 +105,7 @@ namespace :escalations do
         end
 
         new_dispute.reload
-        new_dispute.auto_check_entries_and_update(ALL_AUTO_RESOLVED)
+        new_dispute.auto_check_entries_and_update(Dispute::ALL_AUTO_RESOLVED)
 
 
         message = Bridge::DisputeEntryUpdateStatusEvent.new

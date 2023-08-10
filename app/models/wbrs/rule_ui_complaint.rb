@@ -23,6 +23,10 @@ class Wbrs::RuleUiComplaint < Wbrs::Base
     @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def self.new_from_attributes(attributes)
     new(attributes)
   end

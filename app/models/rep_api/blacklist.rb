@@ -25,6 +25,10 @@ class RepApi::Blacklist < RepApi::Base
     @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def new_record?
     @new_record
   end
@@ -38,7 +42,7 @@ class RepApi::Blacklist < RepApi::Base
   end
 
   def self.classifications
-    unless @classifications
+    unless @classifications.present?
       #response = call_json_request(:get, '/blacklist/classifications', body: {})
       response = call_json_request(:get, '/api/v3/classifications/get', body: {})
       @classifications = JSON.parse(response.body)
@@ -47,7 +51,7 @@ class RepApi::Blacklist < RepApi::Base
   end
 
   def self.detailed_classifications
-    unless @classifications
+    unless @classifications.present?
       #response = call_json_request(:get, '/blacklist/classifications', body: {})
       response = call_json_request(:get, '/api/v3/classifications/get', body: {})
       @classifications = JSON.parse(response.body)
