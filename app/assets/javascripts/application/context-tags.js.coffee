@@ -555,6 +555,7 @@ window.tmi_dt_init = () ->
   tmi_table = $('#tmi-dt').DataTable
     paging: false
     searching: false
+    stateSave: false
     info: false
     order: [[ 7, 'desc']]
     columnDefs: [
@@ -580,24 +581,24 @@ window.tmi_dt_init = () ->
         maxWidth: 380
 
 
-  # show or hide columns in tmi table, click the <li>
-  $('li.toggle-col-tmi').each ->
-    checkbox = $(this).find('input')
+  # initial page load, show or hide dt columns (keep this separate from click handler)
+  $('.tmi-columns-dropdown .toggle-col-tmi').each ->
     column = tmi_table.column($(this).attr('data-column'))  # uses tmi_table defined above
-
-    if $(checkbox).prop('checked')
+    if $(this).find('input').prop('checked')
       column.visible(true)
     else
       column.visible(false)
 
-    # click anywhere in the li to toggle
-    $(this).click ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
-      column.visible(!column.visible())
+  # on click input, show or hide dt columns. add <li> toggling an addition
+  $('.tmi-columns-dropdown .toggle-col-tmi').on 'click', (e) ->
+    checkbox = $(this).find('input')
+    column = tmi_table.column($(this).attr('data-column'))
 
-    # or click the cb specifically to toggle
-    $(checkbox).click ->
-      $(checkbox).prop('checked', !checkbox.prop('checked'))
+    if $(checkbox).prop('checked') == true
+      column.visible(true)
+    else
+      column.visible(false)
+
 
 
 # init the enrichment and prevalence dts
