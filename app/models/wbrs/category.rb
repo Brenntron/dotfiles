@@ -22,6 +22,10 @@ class Wbrs::Category < Wbrs::Base
     @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def self.system_reload
     begin
       RuntimeConfig.get_category_reload

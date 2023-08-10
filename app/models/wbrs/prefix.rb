@@ -13,6 +13,10 @@ class Wbrs::Prefix < Wbrs::Base
     @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def is_active?
     0 < is_active
   end

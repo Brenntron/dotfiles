@@ -11,6 +11,10 @@ class Umbrella::DomainInfo
     @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
 
   def self.domain_whois(domain: nil, as_hash: false)
 

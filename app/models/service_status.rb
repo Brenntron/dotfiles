@@ -82,7 +82,7 @@ class ServiceStatus < ApplicationRecord
       service_status_log = ServiceStatusLog.new
       service_status_log.service_status_id = self.id
       service_status_log.exception = log_data[:exception]
-      service_status_log.exception_details = log_data[:exception_details] if log_data[:excepton_details].present?
+      service_status_log.exception_details = log_data[:exception_details] if log_data[:exception_details].present?
       service_status_log.save
     end
   end

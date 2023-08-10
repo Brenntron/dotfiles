@@ -425,7 +425,6 @@ For future Web categorization requests, please open a Web categorization ticket 
     self.dispute_entries.each do |entry|
       if entry.status != DisputeEntry::STATUS_RESOLVED
         is_resolved = false
-        break
       end
       if entry.status == DisputeEntry::PROCESSING
         has_completed_processing = false
@@ -486,7 +485,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     auto_resolve_message += "SUBMITTED BY: #{user.cvs_username}<br />"
 
     dispute.status = Dispute::PROCESSING
-    dispute.save
+    dispute.save(:validate => false)
 
     dispute.dispute_entries.each do |dispute_entry|
 
@@ -1102,7 +1101,6 @@ For future Web categorization requests, please open a Web categorization ticket 
           new_dispute_entry.dispute_id = new_dispute.id
           new_dispute_entry.ip_address = ip
           new_dispute_entry.entry_type = "IP"
-          new_dispute_entry.status = DisputeEntry::PROCESSING
           new_dispute_entry.resolution = ""
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
           new_dispute_entry.suggested_threat_category = entry[:sbrs]["suggested_threat_category"] unless entry[:sbrs]["suggested_threat_category"].blank?
@@ -1112,6 +1110,13 @@ For future Web categorization requests, please open a Web categorization ticket 
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
           new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
           new_dispute_entry.platform = entry[:sbrs]["platform"] if (entry[:sbrs]["platform"].present? && !entry[:sbrs]["platform"].kind_of?(Integer))
+
+          if new_dispute_entry.suggested_threat_category.blank?
+            new_dispute_entry.status = DisputeEntry::PROCESSING
+          else
+            new_dispute_entry.status = DisputeEntry::NEW
+          end
+
           new_dispute_entry.save!
 
           if entry && entry[:wbrs] && entry[:wbrs]["WBRS_Rule_Hits"]
@@ -1168,11 +1173,16 @@ For future Web categorization requests, please open a Web categorization ticket 
           new_dispute_entry.uri = sanitized_url
           new_dispute_entry.entry_type = "URI/DOMAIN"
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
-          new_dispute_entry.status = DisputeEntry::PROCESSING
           new_dispute_entry.resolution = ""
           new_dispute_entry.suggested_threat_category = entry["suggested_threat_category"] unless entry["suggested_threat_category"].blank?
           new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
+
+          if new_dispute_entry.suggested_threat_category.blank?
+            new_dispute_entry.status = DisputeEntry::PROCESSING
+          else
+            new_dispute_entry.status = DisputeEntry::NEW
+          end
 
           resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
           if resolved_ip.present?

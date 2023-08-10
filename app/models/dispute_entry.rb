@@ -71,6 +71,27 @@ class DisputeEntry < ApplicationRecord
 
   end
 
+  def build_claim(packet)
+    real_claim = nil
+    if self.entry_type == "IP"
+      claim_exists = packet["payload"]["investigate_ips"][self.hostlookup]
+      if claim_exists.present?
+        real_claim = claim_exists["sbrs"]["claim"]
+      end
+    else
+      claim_exists = packet["payload"]["investigate_urls"][self.hostlookup]
+      if claim_exists.present?
+        real_claim = claim_exists["claim"]
+      end
+    end
+
+    if real_claim.present?
+      self.claim = real_claim
+      self.save(:validate => false)
+    end
+
+  end
+
   def self.create_dispute_entry(dispute, ip_url, status = NEW)
     begin
       ip_url = ip_url.gsub("\u200B", "")

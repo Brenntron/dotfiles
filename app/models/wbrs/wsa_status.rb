@@ -8,6 +8,10 @@ class Wbrs::WsaStatus < Wbrs::Base
     @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   class << self
     def check_statuses(serials, companies)
       service_status_data = {}

@@ -9,6 +9,10 @@ class Umbrella::Whois
     @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def self.new_request(address)
 
     full_url = UMBRELLA_VOLUME_BASE_URL + address

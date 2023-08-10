@@ -6,6 +6,10 @@ class Wbrs::Cluster < Wbrs::Base
     @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   # Get all the categories.
   # @return [Array<Wbrs::Category>] Array of the results.
   def self.all(test = nil, conditions: {})

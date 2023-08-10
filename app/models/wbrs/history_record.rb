@@ -9,6 +9,10 @@ class Wbrs::HistoryRecord < Wbrs::Base
     @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def prefix
     @prefix ||= Wbrs::Prefix.find(prefix_id)
   end

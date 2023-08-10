@@ -7,6 +7,10 @@ class RepApi::Base
     @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def self.host
     @host ||= Rails.configuration.rep_api.host || 'localhost'
   end
@@ -182,6 +186,7 @@ class RepApi::Base
       service_status_data[:exception] = "#{path} not loading or responding"
       service_status_data[:exception_details] = e.message + " " + e.backtrace.join("\n")
       service_status.log(service_status_data)
+      raise e.message + " " + e.backtrace.join("\n")
     end
 
   end

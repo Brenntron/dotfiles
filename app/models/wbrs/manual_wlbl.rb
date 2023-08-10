@@ -18,6 +18,10 @@ class Wbrs::ManualWlbl < Wbrs::Base
     @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def initialize(attributes = {})
     if attributes.keys.present?
       attributes.keys.each do |attr|
