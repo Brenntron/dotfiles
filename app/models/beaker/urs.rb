@@ -15,15 +15,46 @@ class Beaker::Urs < Beaker::BeakerBase
   # `ReputationRequest` and `ReputationReplyV2` messages in `urs.proto` for
   # the structure of the request and response.
   # rpc :QueryReputationV2, ::Talos::URS::ReputationRequest, ::Talos::URS::ReputationReplyV2
-  def self.query_reputation(url)
-    url = Talos::URL.new(raw_url: url)
+  def self.query_reputation(url, resolved_ip = nil)
+    #url = Talos::URL.new(raw_url: url)
+
+    if resolved_ip.present?
+      if resolved_ip.kind_of?(String)
+        resolved_ip = [get_ip_endpoint(resolved_ip)]
+      end
+      if resolved_ip.kind_of?(Array)
+        resolved_ip = resolved_ip.map {|ip_addr| get_ip_endpoint(ip_addr) }
+      end
+
+      url = Talos::URL.new(raw_url: url, endpoint: resolved_ip)
+    else
+      url = Talos::URL.new(raw_url: url)
+    end
 
     reputation_request = Talos::URS::ReputationRequest.new(app_info: get_app_info,
                                                            connection: get_connection,
                                                            msg_guid: [SecureRandom.uuid.gsub("-", "")].pack("H*"),
                                                            url: [url],
                                                            no_reputation_block_threshold: true)
-    binding.pry
+
+    remote_stub.query_reputation_v2(reputation_request)
+  end
+
+  def self.query_reputation_for_ip(ip)
+    #url = Talos::URL.new(raw_url: url)
+    if ip.kind_of?(String)
+      ip = [get_ip_endpoint(ip)]
+    elsif ip.kind_of?(Array)
+      ip = ip.map {|ip_addr| get_ip_endpoint(ip_addr) }
+    end
+    url = Talos::URL.new(raw_url: nil, endpoint: ip)
+
+    reputation_request = Talos::URS::ReputationRequest.new(app_info: get_app_info,
+                                                           connection: get_connection,
+                                                           msg_guid: [SecureRandom.uuid.gsub("-", "")].pack("H*"),
+                                                           url: [url],
+                                                           no_reputation_block_threshold: true)
+
     remote_stub.query_reputation_v2(reputation_request)
   end
 
