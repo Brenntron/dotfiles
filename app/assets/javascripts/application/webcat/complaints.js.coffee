@@ -1099,10 +1099,10 @@ window.drop_current_categories = () ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
-window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
-  event.preventDefault();
-  $('#' + input_id)[0].value = qual_subdomain
-  return false;
+#window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
+#  event.preventDefault();
+#  $('#' + input_id)[0].value = qual_subdomain
+#  return false;
 
 
 format = (complaint_entry_row) ->
@@ -1199,7 +1199,7 @@ format = (complaint_entry_row) ->
       '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>'
 
 
-#
+
 ## Complaint history dialog box. Includes tabs for domain history, complaint entry history, and xbrs history of the url.
 window.history_dialog = (id, url) ->
 
