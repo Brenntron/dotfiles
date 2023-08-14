@@ -136,8 +136,6 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
         else
           $('.wbnp-full-report-title-status').remove()
 
-
-
       else
         curr_report = response.data
         currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
@@ -1101,10 +1099,10 @@ window.drop_current_categories = () ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
-#window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
-#  event.preventDefault();
-#  $('#' + input_id)[0].value = qual_subdomain
-#  return false;
+window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
+  event.preventDefault();
+  $('#' + input_id)[0].value = qual_subdomain
+  return false;
 
 
 format = (complaint_entry_row) ->
@@ -1198,10 +1196,10 @@ format = (complaint_entry_row) ->
       '<button class="secondary inline-button" onclick="inheritCategories(' + entry_id + ')">Inherit</button><br/>' +
       '</div>' +'</div><div class="col-xs-8">' +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>'
 
 
-
+#
 ## Complaint history dialog box. Includes tabs for domain history, complaint entry history, and xbrs history of the url.
 window.history_dialog = (id, url) ->
 
@@ -1901,8 +1899,8 @@ $ ->
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
-# Convert webcat to webrep
-# Enable / disable button to attempt based on if anything is selected
+## Convert webcat to webrep
+## Enable / disable button to attempt based on if anything is selected
 $(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
   if $('tr.selected').length == 1
     $('#convert-ticket-button').removeAttr('disabled')
