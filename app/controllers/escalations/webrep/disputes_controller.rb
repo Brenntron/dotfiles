@@ -49,7 +49,12 @@ class Escalations::Webrep::DisputesController < ApplicationController
     #
     # rulehit.desc_long
     @all_rulehits = Wbrs::RuleHit.all
-
+    @disabled_when_processing =
+      if @dispute.status == "PROCESSING"
+        true
+      else
+        false
+      end
     @entries = @dispute.dispute_entries
 
     @entries.each do |entry|

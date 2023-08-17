@@ -1100,6 +1100,7 @@ button {
 .ticket-status-button:hover,
 .ticket-owner-button:hover,
 .ticket-owner-unassigned-button:hover,
+.refresh-sdr-button:hover,
 .adjust-reptool-button:hover,
 .adjust-wlbl-button:hover,
 .export-button:hover,
@@ -1116,7 +1117,9 @@ button {
 .expand-all:hover,
 .approve-all-button:hover,
 .reject-all-button:hover {
-  background-color: lighten($nav-toolbar-color, 8%)!important;
+  &:not(:disabled){
+    background-color: lighten($nav-toolbar-color, 8%)!important;
+  }
 }
 
 .expand-row-button:focus,
@@ -6961,7 +6964,7 @@ td.data-table-emph {
 button[disabled] {
   background-color: lighten($content-label-color, 10%) !important;
   color: $faint-neutral-color;
-  cursor: not-allowed;
+  cursor: not-allowed!important;
 }
 
 button.dropdown-submit-button {
@@ -7334,7 +7337,7 @@ td.ticket-total::before {
 #index-change-assign-dropdown .toolbar, #file-disp-dropdown .toolbar {
   margin-bottom: 5px;
 }
-.secondary.ticket-owner-unassigned-button{
+.secondary.ticket-owner-unassigned-button, .secondary.refresh-sdr-button{
   background-color: darken($nav-toolbar-color, 10%);
   margin: 0 0 0 5px;
   text-transform: none;
@@ -7344,24 +7347,9 @@ td.ticket-total::before {
   font-size: 11px;
   line-height: .75em;
   font-weight: 600;
-  &:hover {
-    background-color: $bug-section-color !important;
-  }
 }
-.secondary.refresh-sdr-button{
-  background-color: darken($nav-toolbar-color, 10%);
-  margin: 0 5px 5px 5px;
-  text-transform: none;
-  display: inline-block;
-  padding: 0 20px;
-  height: 20px;
-  font-size: 11px;
-  line-height: .75em;
-  font-weight: 600;
+.secondary{
   float: right;
-  &:hover {
-    background-color: $bug-section-color !important;
-  }
 }
 .container_unassign {
   display: inline-block;

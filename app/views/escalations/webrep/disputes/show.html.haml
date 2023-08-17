@@ -25,22 +25,19 @@
         %label.content-label-sm
           Assignee
         %div
-          - if @dispute.assignee == 'Unassigned'
-            %span.missing-data#dispute-assignee= @dispute.assignee || "None"
-          - else
-            %span#dispute-assignee= @dispute.assignee || "None"
+          %span#dispute-assignee{class:"#{'missing-data' if @dispute.assignee == 'Unassigned'}"}= @dispute.assignee || "None"
           - if can? :update, Dispute
             .dispute-owner-buttons-wrapper
               - if @dispute.assignee == current_user.cvs_username
                 - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                  %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
+                  %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();', :disabled=> @disabled_when_processing}
               - else
                 - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED) && (@dispute.user.cvs_username == 'vrtincom')
-                  %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
+                  %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});", :disabled=> @disabled_when_processing}
 
                 %span.dropdown
                   - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                    %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                    %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', :disabled=> @disabled_when_processing}
                   .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
                     .change-assignee-dropdown-wrapper
                       %h3 Change Assignee
@@ -49,12 +46,12 @@
                           %div
                             %label.toolbar-section-label Assignee
                             =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
-                          %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
+                          %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();', :disabled=> @disabled_when_processing}
                             Assign
 
               - if (@dispute.assignee != 'Unassigned')
                 .container_unassign
-                  %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
+                  %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();', :disabled=> @disabled_when_processing}
                     Unassign
 
 
@@ -62,7 +59,12 @@
           %label.content-label-sm
             Status
           %br
-          - if (@dispute.resolution != Dispute::DUPLICATE)
+          - if @dispute.resolution == Dispute::DUPLICATE
+            .duplicate-status-notice
+              =@dispute.resolution
+          -elsif @dispute.status == Dispute::PROCESSING
+            =@dispute.status
+          -else
             %span.dropdown
               %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "dispute_status_drop_down()"}
                 - if @dispute.status.nil?
@@ -131,9 +133,6 @@
             - elsif @dispute&.resolution_comment.present?
               %button.status-comment-button.esc-tooltipped{title: @dispute&.resolution_comment}
 
-          - else
-            .duplicate-status-notice
-              =@dispute.resolution
 
     .col-xs-2.col-with-divider
       .disposition-wrapper
@@ -178,7 +177,7 @@
         %div=@dispute.dispute_age
       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         .top-info-buttons-wrapper
-          %button.edit-button.dispute-top-buttons#edit-dispute-button.esc-tooltipped{title: 'Edit ticket information'}
+          %button.edit-button.dispute-top-buttons#edit-dispute-button.esc-tooltipped{title: 'Edit ticket information', :disabled=> @disabled_when_processing}
           %button.save-button.dispute-top-buttons#save-dispute-button.hidden.esc-tooltipped{title: 'Save ticket changes', onclick: 'save_dispute();'}
           %button.cancel-button.dispute-top-buttons#cancel-dispute-button.hidden.esc-tooltipped{title: 'Cancel'}
 
