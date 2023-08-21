@@ -1,0 +1,2 @@
+CREATE TABLE `telemetry_histories` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `wbrs_score` float(24), `sbrs_score` float(24), `multi_ip_score` float(24), `rule_hits` text, `multi_rule_hits` text, `threat_categories` text, `multi_threat_categories` text, `dispute_entry_id` int, `original_snapshot` tinyint(1), `created_at` datetime(6) NOT NULL, `updated_at` datetime(6) NOT NULL);
+INSERT INTO `schema_migrations` (`version`) VALUES ('20230820232022');
