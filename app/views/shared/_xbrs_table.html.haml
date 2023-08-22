@@ -13,7 +13,7 @@
             %span.missing-data
               No XBRS data available.
   - else
-    %table
+    %table.shared-xbrs-timeline-table
       %thead
         %tr
           %th Timestamp
@@ -22,6 +22,7 @@
           %th V3 Content Cats
           %th Threat Cats
           %th Rule Hits
+          %th
 
       %tbody
         - unless xbrs_timeline.empty?
@@ -46,3 +47,4 @@
               
               %td= timeline_row['threatCats'].empty? ? '-' : timeline_row['threatCats'].join(", ")
               %td= timeline_row['ruleHits'].empty? ? '-' : timeline_row['ruleHits'].join(", ")
+              %td= timeline_row['time']

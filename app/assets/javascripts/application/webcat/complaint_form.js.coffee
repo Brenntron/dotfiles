@@ -32,7 +32,6 @@ $ ->
       dataType: 'json'
       headers: headers
       success: (response) ->
-
         $('#channel-input-list').empty()
         $('#status-input-list').empty()
         $('#resolution-input-list').empty()

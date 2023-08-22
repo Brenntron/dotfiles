@@ -32,60 +32,67 @@
                 .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
                   %ul
                     %li.status-radio-wrapper
-                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESEARCHING}", value: "#{Dispute::STATUS_RESEARCHING}"}
+                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESEARCHING}", 'data-status': "#{Dispute::STATUS_RESEARCHING}", value: "#{Dispute::STATUS_RESEARCHING}"}
                       %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_RESEARCHING}"} Researching
                     %li.status-radio-wrapper
-                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ESCALATED}", value: "#{Dispute::STATUS_ESCALATED}"}
+                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ESCALATED}", 'data-status': "#{Dispute::STATUS_ESCALATED}", value: "#{Dispute::STATUS_ESCALATED}"}
                       %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_ESCALATED}"} Escalated
                     %li.status-radio-wrapper
-                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_CUSTOMER_PENDING}", value: "#{Dispute::STATUS_CUSTOMER_PENDING}"}
+                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_CUSTOMER_PENDING}", 'data-status': "#{Dispute::STATUS_CUSTOMER_PENDING}", value: "#{Dispute::STATUS_CUSTOMER_PENDING}"}
                       %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_CUSTOMER_PENDING}"} Customer Pending
                     %li.status-radio-wrapper
-                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ON_HOLD}", value: "#{Dispute::STATUS_ON_HOLD}"}
+                      %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_ON_HOLD}", 'data-status': "#{Dispute::STATUS_ON_HOLD}", value: "#{Dispute::STATUS_ON_HOLD}"}
                       %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_ON_HOLD}"} On Hold
                     %li.status-radio-wrapper
-                      %input.sdr-ticket-status-radio.resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESOLVED}", value: "#{Dispute::STATUS_RESOLVED}"}
+                      %input.sdr-ticket-status-radio.resolution-drodown-menu{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESOLVED}", 'data-status': "#{Dispute::STATUS_RESOLVED}", value: "#{Dispute::STATUS_RESOLVED}"}
                       %label.radio-label.sdr-ticket-status-radio-label{for: "#{Dispute::STATUS_RESOLVED}"} Resolved / Closed
                       .dropdown-menu#show-ticket-resolution-submenu
-                        .col-xs-5.submenu-left-wrapper{id: "sdr-resolution-selector"}
+                        .submenu-left-wrapper{id: "sdr-resolution-selector"}
                           .submenu-header
                             Ticket Resolution
                           %ul
                             %li
-                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"}
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", 'data-saved-resolution-type': 'Fixed - FP'}
                               %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
                               %ul
                                 %li.preset-resolution
-                                  %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_SUDDEN_SPIKE", value: "FIXED_FP_SUDDEN_SPIKE"}
+                                  %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_SUDDEN_SPIKE", value: "FIXED_FP_SUDDEN_SPIKE", 'data-saved-resolution-type': 'Fixed - FP: Sudden Spike'}
                                   %label.ticket-res-radio-label.radio-label{for: "FIXED_FP_SUDDEN_SPIKE"} Sudden Spike
                                 %li.preset-resolution
-                                  %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_DOMAIN_AGE", value: "FIXED_FP_DOMAIN_AGE"}
+                                  %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_DOMAIN_AGE", value: "FIXED_FP_DOMAIN_AGE", 'data-saved-resolution-type': 'Fixed - FP: Domain Age'}
                                   %label.ticket-res-radio-label.radio-label{for: "FIXED_FP_DOMAIN_AGE"} Domain Age
                                 %li.preset-resolution
-                                  %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_NEGATIVE_WEBREP", value: "FIXED_FP_NEGATIVE_WEBREP"}
+                                  %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-preset-resolution', id: "FIXED_FP_NEGATIVE_WEBREP", value: "FIXED_FP_NEGATIVE_WEBREP", 'data-saved-resolution-type': 'Fixed - FP: Negative Webrep'}
                                   %label.ticket-res-radio-label.radio-label{for: "FIXED_FP_NEGATIVE_WEBREP"} Negative Webrep
                             %li
-                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"}
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", 'data-status': "#{Dispute::STATUS_RESOLVED_FIXED_FN}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", 'data-saved-resolution-type': 'Fixed - FN' }
                               %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
                             %li
-                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", value: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"}
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", 'data-status': "#{Dispute::STATUS_RESOLVED_UNCHANGED}", value: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", 'data-saved-resolution-type': 'Unchanged'}
                               %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"} Unchanged
                             %li
-                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_INVALID}", value: "#{Dispute::STATUS_RESOLVED_INVALID}"}
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_INVALID}", 'data-status': "#{Dispute::STATUS_RESOLVED_INVALID}", value: "#{Dispute::STATUS_RESOLVED_INVALID}", 'data-saved-resolution-type': 'Invalid / Junk Mail'}
                               %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
                             %li
-                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_TEST}", value: "#{Dispute::STATUS_RESOLVED_TEST}"}
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_TEST}", 'data-status': "#{Dispute::STATUS_RESOLVED_TEST}", value: "#{Dispute::STATUS_RESOLVED_TEST}", 'data-saved-resolution-type': 'Test / Training'}
                               %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_TEST}"} Test / Training
                             %li
-                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
+                              %input.sdr-ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", 'data-status': "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}", 'data-saved-resolution-type': 'Other'}
                               %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
-                        .col-xs-7.submenu-right-wrapper
+                        .submenu-right-wrapper
                           .resolution-comment-wrapper
-                            %label.content-label-sm.customer-facing-comment
-                              Customer Facing Comment
-                            %textarea.ticket-resolution-comment
-                            %button.primary{onClick: 'sdr_show_page_edit_status()'}
-                              Submit
+                            %label.content-label-sm
+                              Template
+                            %select#sdr-resolution-message-template-select.resolution-message-template-select
+                            %label.content-label-sm
+                              Description
+                            %p.ticket-resolution-description
+                            %label.content-label-sm
+                              Comment
+                            %textarea.ticket-resolution-comment.resolution-status-comment
+                            .ticket-resolution-submit-wrapper
+                              %button.primary{onClick: 'sdr_show_page_edit_status()'}
+                                Submit
 
                     %li.status-radio-wrapper
                       %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}

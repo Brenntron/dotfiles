@@ -3,6 +3,7 @@ class Complaint < ApplicationRecord
   has_many :complaint_entries, dependent: :restrict_with_exception
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
   belongs_to :platform, optional: true
+  has_many :import_urls
   has_paper_trail on: [:update], ignore: [:updated_at]
 
   delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
@@ -12,6 +13,7 @@ class Complaint < ApplicationRecord
     { label: 'New Tickets', param: 'NEW', icon: 'icon-new-tickets' },
     { label: 'New Talos Tickets', param: 'NEW TALOS', icon: 'icon-talos-white' },
     { label: 'New WBNP Tickets', param: 'NEW WBNP', icon: 'icon-web-white' },
+    { label: 'New Jira Tickets', param: 'NEW JIRA', icon: 'icon-mothra-white' },
     { label: 'New Internal Tickets', param: 'NEW INTERNAL', icon: 'icon-company-white' },
     { label: 'Manager Queue', param: 'MANAGER QUEUE', icon: 'icon-manager-queue' },
     { label: 'Waiting for Review', param: 'REVIEW', icon: 'icon-pending-bugs' },
@@ -49,6 +51,7 @@ class Complaint < ApplicationRecord
   TI_CHANNEL = 'talosintel'
   INT_CHANNEL = 'internal'
   WBNP_CHANNEL = 'wbnp'
+  JIRA_CHANNEL = 'jira'
 
   SOURCE_RULEUI = "RuleUI"
 
@@ -68,9 +71,10 @@ For future web and email reputation requests, please open a web and email reputa
   scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
   scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
 
-  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
+  scope :from_ti,   -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
+  scope :from_jira, -> { includes(:complaint_entries).where(channel: JIRA_CHANNEL) }
 
   validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
 
@@ -878,7 +882,7 @@ For future web and email reputation requests, please open a web and email reputa
     wbnp_report.save
   end
 
-  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, platform, status=NEW, categories = nil, user_email = nil)
+  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, platform, status=NEW, categories = nil, user_email = nil, channel = INT_CHANNEL)
 
     response = {}
     response[:status] = "success"
@@ -915,7 +919,9 @@ For future web and email reputation requests, please open a web and email reputa
                                        customer_id: cust&.id,
                                        platform_id: platform_record&.id,
                                        status: status,
-                                       channel: INT_CHANNEL)
+                                       channel: channel)
+
+      response[:complaint_id] = new_complaint.id
 
 
       handle_tags(new_complaint, tags) if tags
@@ -1145,7 +1151,8 @@ For future web and email reputation requests, please open a web and email reputa
             resolution_comment,
             uri_as_categorized,
             user,
-            nil
+            nil,
+            false
         )
         response[:data][:completed] << new_complaint.id
       rescue => e

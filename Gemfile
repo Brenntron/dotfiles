@@ -1,18 +1,18 @@
 source 'https://rubygems.org'
 
-ruby "2.7.6"
+ruby "3.0.4"
 
 # Web-framework
 gem 'rack', '>= 2.2.4'
 gem 'rails', '6.1.7'
 gem 'rack-cors', '0.4.1', require: 'rack/cors'
 gem 'active_model_serializers', '0.10.12'
-gem 'grape', '1.3.1'
+gem 'grape', '1.6.2'
 gem 'grape-swagger', '0.31.1'
 gem 'grape-swagger-rails', '0.3.1'
 gem 'grape-active_model_serializers', '1.5.2'
 gem 'hashie-forbidden_attributes', '~> 0.1.1'
-gem 'activerecord-session_store', '1.1.1'
+gem 'activerecord-session_store', '2.0.0'
 gem 'simple_form', '4.0.1'
 
 # Asset Pipeline
@@ -25,7 +25,7 @@ gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'bootstrap-sass', '~> 3.4.1'
 gem "sassc", '2.4.0'
 gem "sassc-rails", '~> 2.0'
-gem 'libv8', '3.16.14.19'
+gem 'mini_racer', '0.8.0'
 gem 'turbolinks', '5.2.0'
 gem "sprockets", '~> 3.7.1'
 gem 'jbuilder', '2.9.0'
@@ -67,15 +67,18 @@ gem 'peake-bridge-client', '0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/ta
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'
 gem 'aws-sdk', '3.1.0'
-gem 'grpc', '1.45.0'
+gem 'grpc', '1.56.0'
 gem 'grpc-tools', '1.45.0'
 
 # Bugzilla
 gem 'xmlrpc'
 gem 'bugzilla', require: 'bugzilla'
 
+# Jira
+gem 'jira-ruby', '2.3.0'
+
 # Formatting and Presentation
-gem 'nokogiri' ,'1.13.9'
+gem 'nokogiri', '1.15.3'
 gem 'diffy', '3.2.1'
 gem 'gzip', '1.0'
 gem 'chart-js-rails', '~> 0.1.7'
@@ -113,10 +116,8 @@ gem 'whois-parser', '2.0'
 
 gem 'clipboard-rails', '1.7.1'
 
-gem 'capybara', '2.11.0'
 gem 'poltergeist', '1.18.1'
-gem 'selenium-webdriver', "~> 3.142.7"
-
+gem 'webdrivers', '5.2.0'
 
 gem 'public_suffix', '4.0.7'
 gem 'addressable', '~> 2.8.0'
@@ -148,18 +149,17 @@ end
 group :test do
   gem 'factory_bot', '4.11.1'
   gem 'factory_bot_rails', '4.11.1'
-  gem 'cucumber-rails', '1.4.0', :require => false
+  gem 'cucumber-rails', '2.6.1', require: false
   gem 'database_cleaner', '1.7.0'
   gem 'launchy', '~> 2.4.2'
   gem 'rb-fsevent', '0.10.3'
-  gem 'guard-cucumber', '~> 2.1.2'
   gem 'rspec-rails', '4.0.1'
   gem 'faker', '1.9.1'
   # gem 'json_spec', '1.1.5' # cannot find any usage of this one, last updated in 2017
   gem 'simplecov', '0.16.1', :require => false
-  gem 'cucumber-api-steps', '~>0.14', require: false
   gem "timecop"
   gem 'geckodriver-helper'
+  gem 'rexml', '3.2.5'
 end
 
 
