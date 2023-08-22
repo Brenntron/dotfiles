@@ -73,7 +73,10 @@ namespace :escalations do
 
     disputes_to_auto_resolve.each do |new_dispute|
 
-      dispute_packet = JSON.parse(new_dispute.bridge_packet)
+      dispute_packet = JSON.parse(new_dispute.bridge_packet) rescue nil
+      if dispute_packet.blank?
+        next
+      end
 
       begin
         new_dispute.dispute_entries.each do |dispute_entry|
