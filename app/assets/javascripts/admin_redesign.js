@@ -53,6 +53,7 @@
 //= require application/webcat/categories
 //= require application/webcat/advanced_search
 //= require application/webcat/research
+//= require application/webcat/jira_imports
 //= require application/escalations_users
 //= require application/webcat/webCatRepLookup
 //= require application/webrep/webrep-report-engine
