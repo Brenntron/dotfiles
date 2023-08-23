@@ -81,7 +81,7 @@ namespace :escalations do
       begin
         new_dispute.dispute_entries.each do |dispute_entry|
 
-          if dispute_entry.status == DisputeEntry::STATUS_RESOLVED || dispute_entry.status == DisputeEntry::NEW
+          if dispute_entry.status != DisputeEntry::PROCESSING
             next
           end
 

@@ -479,6 +479,7 @@ For future Web categorization requests, please open a Web categorization ticket 
 
     return if [Dispute::STATUS_RESOLVED, Dispute::STATUS_CUSTOMER_PENDING, Dispute::STATUS_CUSTOMER_UPDATE].include?(dispute.status)
 
+    return if dispute.bridge_packet.blank?
 
     auto_resolve_message = "<br />###########################<br />"
     auto_resolve_message += "MANUAL AUTO RESOLVE OF DISPUTE ID: #{dispute.id.to_s}<br />"
@@ -488,7 +489,11 @@ For future Web categorization requests, please open a Web categorization ticket 
     dispute.save(:validate => false)
 
     dispute.dispute_entries.each do |dispute_entry|
-
+      if dispute_entry.claim.blank?
+        dispute_entry.build_claim(dispute_packet)
+        dispute_entry.reload
+      end
+      next if dispute_entry.claim.blank?
       if dispute_entry.status == DisputeEntry::NEW
         dispute_entry.status = DisputeEntry::PROCESSING
         if dispute_entry.auto_resolve_log.present?

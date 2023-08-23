@@ -74,12 +74,12 @@ class DisputeEntry < ApplicationRecord
   def build_claim(packet)
     real_claim = nil
     if self.entry_type == "IP"
-      claim_exists = packet["payload"]["investigate_ips"][self.hostlookup]
+      claim_exists = packet["payload"]["investigate_ips"][self.hostlookup] rescue nil
       if claim_exists.present?
         real_claim = claim_exists["sbrs"]["claim"]
       end
     else
-      claim_exists = packet["payload"]["investigate_urls"][self.hostlookup]
+      claim_exists = packet["payload"]["investigate_urls"][self.hostlookup] rescue nil
       if claim_exists.present?
         real_claim = claim_exists["claim"]
       end
