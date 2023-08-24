@@ -412,7 +412,8 @@ $ ->
         if !el.includes('temp_row')
           subheader = $("##{el} .saved-search")[0].dataset.search_conditions
         else
-          subheader = $('#saved-search-tbody').last('tr').find('.saved-search').attr('data-search_conditions')
+          last_row = $('#saved-search-tbody')[0].lastElementChild
+          subheader = $(last_row).find('.saved-search').attr('data-search_conditions')
         build_subheader(subheader)
       else if search_type == 'contains'
         new_header =
@@ -1095,11 +1096,11 @@ window.temporary_search_link = (webcat_search_name, webcat_search_conditions) ->
   new_delete = document.createElement('a')
   new_fav_icon = document.createElement('span')
 
-  $(new_tr).attr('id','temp_row')
+  new_tr.setAttribute('id','temp_row')
   $(new_link).addClass('input-truncate saved-search esc-tooltipped')
-    .attr('title', webcat_search_name)
-    .attr('data-search_conditions', webcat_search_conditions)
-    .text(webcat_search_name)
+  $(new_link).attr('title', webcat_search_name)
+  $(new_link).attr('data-search_conditions', webcat_search_conditions)
+  $(new_link).text(webcat_search_name)
   $(new_delete).addClass("delete-search")
   $(new_delete_image).addClass('delete-search-image')
   $(new_fav_icon).addClass('nav-dropdown-icon favorite-search-icon')
