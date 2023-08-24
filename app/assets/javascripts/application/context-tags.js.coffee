@@ -816,15 +816,17 @@ window.tags_dialog_dt_init = () ->
       if selected_id == "0"
         tags_table_dt.columns(3).search('').draw()
 
-    # click the cancel button to reset the dt and dialog state (but dont redo api call)
-    $('.tags-cancel-button').click ->
+    # click any tag-related button to reset the dt and dialog state (but dont redo api call)
+    $('.tags-cancel-button, .tags-save-button').click ->
       tags_table_dt.columns(3).search('').draw()  # show all
-      cancel_tags_dialog()  # resets state of dialog
+      reset_tags_dialog()  # resets state of dialog
 
 
 # reset everything in dialog
-window.cancel_tags_dialog = () ->
+window.reset_tags_dialog = () ->
+  # see above function for the tmi dt reset, cancel/save btns handle that for the dt var
   $('#add-context-tags-dialog').dialog('close')
+  $('.tags-dialog-table th.sorting:first').click() # ensure sorting by first col on reset
   $('.tag-entry-cb').prop('checked', false)
   $('.preview-tag').remove()
   $(".taxonomy-select").val('0')
@@ -886,6 +888,8 @@ window.add_tags_submit = () ->
         curr_observable = $('.ctt-entry-select option:selected').text().trim()
         tmi_enrich_prev_dt_inits('update', curr_observable)  # on add tags, lets try just re-loading the dt
         $('.enrichment-loader, .prevalence-loader, .tmi-loader').removeClass('hidden')  # show all loaders
+
+        reset_tags_dialog()  # reset state of dialog
 
       error: (response) ->
         std_msg_error("Error adding tags", [response.responseJSON.message], reload: false)
@@ -954,6 +958,8 @@ window.other_tag_functions = (action) ->
           tmi_enrich_prev_dt_inits('update', curr_observable)  # on add tags, lets try just re-loading the dt
           $('.enrichment-loader, .prevalence-loader, .tmi-loader').removeClass('hidden')  # show all loaders
 
+          reset_tags_dialog()  # reset state of dialog
+
         error: (response) ->
           std_msg_error("Error with tags", [response.responseJSON.message], reload: false)
 
@@ -1006,7 +1012,7 @@ $ ->
     $('.tab-ctt-webrep .ctt-entry-select').change ->
       $('.tmi-loader, .enrichment-loader, .prevalence-loader').removeClass('hidden')
       $('.tmi-error, .enrichment-error, .prevalence-error').addClass('hidden')
-      cancel_tags_dialog()  # on change entry, close the tags dialog if open and reset it
+      reset_tags_dialog()  # on change entry, close the tags dialog if open and reset it
       curr_entry = $(this).find('option:selected').attr('data-entry')
       tmi_enrich_prev_dt_inits('update', curr_entry)  # do enrich and prev stuff
       $('.curr-observable-label').text(curr_entry)  # tags to add to example.com
