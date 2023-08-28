@@ -502,16 +502,15 @@ $ ->
     if $('#sandbox-score-input').closest('.form-group').hasClass('.hidden')
       sandbox_score = {}
     if $('time-submitted-input').closest('.form-group').hasClass('.hidden')
-      last_updated = {}
-    if $('last-updated-input').closest('.form-group').hasClass('.hidden')
       time_submitted = {}
+    if $('last-updated-input').closest('.form-group').hasClass('.hidden')
+      last_updated = {}
 
     platforms = $('#platform-input')[0].selectize? && $('#platform-input')[0].selectize.items
     platform_display = []
     if platforms.length
       for platform in platforms
         platform_display.push($('#platform-input')[0].selectize.options[platform].public_name)
-
     localStorage.search_type = 'advanced'
     localStorage.search_name = form.find('input[name="search_name"]').val()
     localStorage.search_conditions = JSON.stringify(
@@ -1091,37 +1090,31 @@ $ ->
         s = '0' + s
       s
 
-  $(document).on 'focus', '#time-submitted-input', (e) ->
-    if time_submitted != ''
-      placeholder = time_submitted.from + ' - ' + time_submitted.to
-    else
-      placeholder = AC.FileRep.daterangepickerFormat
-    $('#time-submitted-input').attr('placeholder', placeholder)
+  $(document).on 'focus', '#time-submitted-input, #last-updated-input', (event) ->
+      if event.target.id == 'time-submitted-input'
+        data = time_submitted
+      else if event.target.id == 'last-updated-input'
+        data = last_updated
 
-    $('#time-submitted-input').daterangepicker( { locale: { format: AC.FileRep.daterangepickerFormat } },
-      (start, end) ->
-        time_submitted = {
-          from : start.format(AC.FileRep.daterangepickerFormat)
-          to : end.format(AC.FileRep.daterangepickerFormat)
-        }
-        $('#advanced-search-dropdown').show()
-        $('#advanced-search-dropdown').css('display', 'block')
-    )
+      if data != ''
+        placeholder = [time_submitted.from, time_submitted.to].join(' - ')
+      else
+        placeholder = AC.FileRep.daterangepickerFormat
 
-  $(document).on 'focus', '#last-updated-input', () ->
-    if last_updated != ''
-      placeholder = last_updated.from + ' - ' + last_updated.to
-    else
-      placeholder = AC.FileRep.daterangepickerFormat
-    $('#last-updated-input').attr('placeholder', placeholder)
+      $(event.target).attr('placeholder', placeholder)
+      $(event.target).daterangepicker( { locale: { format: AC.FileRep.daterangepickerFormat } } )
+      $('#advanced-search-dropdown').show()
+      $('#advanced-search-dropdown').css('display', 'block')
 
-    $('#last-updated-input').daterangepicker( { locale: { format: AC.FileRep.daterangepickerFormat } },
-      (start, end) ->
-        last_updated = {
-          from : start.format(AC.FileRep.daterangepickerFormat)
-          to : end.format(AC.FileRep.daterangepickerFormat)
-        }
-    )
+  $('#time-submitted-input, #last-updated-input').on 'change', (event) ->
+    [startDate, endDate] = $(event.target).val().split(' - ')
+    if startDate && endDate
+      if event.target.id == 'time-submitted-input'
+        time_submitted = { from: startDate, to: endDate }
+      else if event.target.id == 'last-updated-input'
+        last_updated = { from: startDate, to: endDate }
+
+
   $('#sandbox-score-input').slider(
     {
       range: true,

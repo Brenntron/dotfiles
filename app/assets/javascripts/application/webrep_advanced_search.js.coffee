@@ -90,12 +90,11 @@ window.toggle_search_criteria = (element) ->
     else
       search_pref[search_item] = 'true'
   data = search_pref
-
   # save to db
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/user_preferences/update"
     method: 'POST'
-    data: {data, name: 'WebRepAdvancedSearchFieldsDisplayed'}
+    data: {data, name: window.pageFiltersIdentifier() }
     dataType: 'json'
     success: (response) ->
       return false
@@ -107,7 +106,7 @@ window.set_advanced_search_pref = () ->
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: 'WebRepAdvancedSearchFieldsDisplayed'}
+    data: {name: window.pageFiltersIdentifier()}
     success: (response) ->
       response = JSON.parse(response)
       if response?
@@ -124,3 +123,9 @@ window.set_advanced_search_pref = () ->
             $(search_input).addClass('hidden')
             $(search_toggle).removeClass('hidden')
   )
+
+window.pageFiltersIdentifier = ()->
+  if window.location.href.includes('file_rep')
+    'FileRepAdvancedSearchFieldsDisplayed'
+  else
+    'WebRepAdvancedSearchFieldsDisplayed'
