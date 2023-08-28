@@ -1,9 +1,7 @@
 window.auto_resolve_tickets = (current_user, id) ->
-
   if id != undefined
-#show page single ticket auto resolve
+    #show page single ticket auto resolve
     data = { user_id: current_user, dispute_id: id }
-
     autoresolve(data).then( (result) ->
       if result.status = 'success'
         std_msg_success('All Dispute Entries Auto Resolved', [], reload: false)
@@ -12,7 +10,7 @@ window.auto_resolve_tickets = (current_user, id) ->
     )
 
   else
-#index page bulk select auto resolve
+    #index page bulk select auto resolve
     checkboxes = $('#disputes-index').find('.dispute_check_box')
     checked_disputes = []
     dispute_promises = []
@@ -37,7 +35,7 @@ window.autoresolve = (data) ->
   )
 
 window.auto_resolve_msg = (result) ->
-#index page auto resolve success/error messaging
+  #index page auto resolve success/error messaging
   success_message = 'The following tickets have been Auto Resolved:'
   error_message   = 'Error Auto Resolving the following tickets:'
   success_arr   = []
@@ -58,15 +56,13 @@ window.auto_resolve_msg = (result) ->
       error = true
 
 
-  if success
-    success_message += "<br><span class='code-content'>#{success_arr.join(' ')}</span>"
+  if success then success_message += "<br><span class='code-content'>#{success_arr.join(' ')}</span>"
 
-  if error
-    error_message += "<br><span class='code-content'>#{error_arr.join(' ')}</span>"
+  if error then error_message += "<br><span class='code-content'>#{error_arr.join(' ')}</span>"
 
   if success && error
     std_msg_success('Some Tickets Auto Resolved', [success_message, error_message], reload: false)
   else if success
     std_msg_success('Tickets Auto Resolved', [success_message, ""], reload: false)
   else
-    std_msg_error('Unable to Auto Resolve Tickets', [error_message,""], reload: fal
+    std_msg_error('Unable to Auto Resolve Tickets', [error_message,""], reload: false)
