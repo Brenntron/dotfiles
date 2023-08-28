@@ -342,10 +342,9 @@ $ ->
       subheader = JSON.parse(subheader)
 
     container = $('#webcat_searchref_container')
-
     for condition_name, condition of subheader
       if condition != ''
-        if condition_name == 'platform_ids'
+        if condition_name == 'platform_ids' || condition_name == 'category_ids'
           continue
         if condition_name == 'id'
           condition_name = 'Entry Id'

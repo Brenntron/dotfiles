@@ -52,18 +52,19 @@ namespace 'AC.WebCat', (exports) ->
   exports.populateSearchCriteria = ->
 
     {webcat_search_conditions, webcat_search_type} = localStorage
+
     advanced = webcat_search_conditions && webcat_search_type == 'advanced'
     named = webcat_search_type == 'named'
-
     return unless advanced || named
     # if there is no advance search or search conditions then break
 
     if named
       searchConditions = JSON.parse $("##{webcat_search_conditions} a").attr('data-search_conditions')
-
+    if advanced
+      searchConditions = JSON.parse webcat_search_conditions
     company_val = []
     name_val = []
-
+    cat_val = []
     for label, search_value of searchConditions
       continue if search_value == ''
       selectize_elements = ['tags','assignee','category','company','status','resolution','name','complaint','channel','entryid','complaintid','jiraid','submitter-type','platform']
@@ -88,7 +89,6 @@ namespace 'AC.WebCat', (exports) ->
       if selectize_elements.includes(label)
         #set values of known selectize inputs
         values = search_value.split(',').map( (val) => return val.trim())
-
         if label == 'company'
           # the company selectize requires a timeout to avoid timing issues
           company_val = values
@@ -96,6 +96,12 @@ namespace 'AC.WebCat', (exports) ->
             $("#company-input")[0].selectize.addOption(val)
           setTimeout ->
             $("#company-input")[0].selectize.setValue(company_val)
+          ,500
+
+        else if label == 'category_ids' || label == 'category'
+          cat_val = values
+          setTimeout ->
+           $("#category-input")[0].selectize.setValue( cat_val )
           ,500
         else if label == 'name'
           # the company names selectize requires a timeout to avoid timing issues
@@ -105,6 +111,7 @@ namespace 'AC.WebCat', (exports) ->
               $("#name-input")[0].selectize.addOption(val)
             $("#name-input")[0].selectize.setValue(name_val)
           ,5500
+
         else
           for val in values
             input_element[0].selectize.addOption({value: val, text: val })
