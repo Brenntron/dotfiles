@@ -228,15 +228,24 @@ $ ->
   $(document).on 'click', '.sorting[aria-controls="file-rep-datatable"]', () ->
     sorting_request = true
 
-  # Displays comment/resolution modal for FileRep Status radio labels
-  $('.fr-ticket-status-radio-label').click ->
-    radio_button = $(this).prev('.fr-ticket-status-radio')
-    $(radio_button[0]).trigger('click')
+  # Show page status picker radio buttons
+  $(".fr-ticket-status-radio[name='file-dispute-status']").change ->
+    wrapper = $(this).parent()
+    $('.show-action .status-radio-wrapper').removeClass('selected')
+    $(wrapper).addClass('selected')
+
+    radio_button = $(this)
     if $(radio_button).attr('id') == 'file-status-closed'
       $('#show-ticket-resolution-submenu').show()
       stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
       $('#ticket-non-res-submit').hide()
       $(stat_comment).val('')
+
+      #check first resolution checkbox if none selected
+      if !($("input.ticket-resolution-radio").is(':checked'))
+        $('input#FIXED_FP').prop('checked', true)
+        populate_resolved_filerep_templates('Fixed - FP')
+
     else
       $('#ticket-non-res-submit').show()
       res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
@@ -244,41 +253,148 @@ $ ->
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
 
-  # Displays comment/resolution modal depending for FileRep Status radio buttons
-  $('.fr-ticket-status-radio').click ->
-    if $(this)[0].id == 'file-status-closed'
-      $('#show-ticket-resolution-submenu').show()
-      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
-      $('#ticket-non-res-submit').hide()
-      $(stat_comment).val('')
+  # Reset status picker dropdown after clicking off of it
+  window.file_dispute_status_drop_down = () ->
+    $('.status-radio-wrapper').removeClass 'selected'
+    status = $('#show-edit-ticket-status-button').text().trim()
+    radio = $(".fr-ticket-status-radio[data-status='#{status}'] ")
+    radio.prop("checked", true)
+    wrapper = radio.parent()
+    wrapper.addClass('selected')
+    $('.non-resolution-submit-wrapper').hide()
+    $('#ticket-non-res-submit').hide()
+    $('#show-ticket-resolution-submenu').hide()
+    $('.ticket-resolution-radio').prop('checked', false)
+
+  # Edit Ticket Status on index page
+  $('.escalations--file_rep--disputes-controller #index_ticket_status').click ->
+    dropdown = $('#index-edit-ticket-status-dropdown').parent()
+    if ($('.dispute_check_box:checked').length > 0)
+
+      # If menu is being re-opened, check if customer status has changed for checked rows and reload dropdown if it has
+      if $('#index-ticket-resolution-submenu .ticket-resolution-radio:checked').length > 0
+        is_customer = filerep_check_for_customer()
+        current_resolution = $('#index-ticket-resolution-submenu .ticket-resolution-radio:checked').siblings('.ticket-res-radio-label').text()
+        customer_loaded_in_form = $('#filerep-resolution-message-template-select').attr('data-has-footer')
+        if is_customer == true && customer_loaded_in_form == 'false' || is_customer == false && customer_loaded_in_form == 'true'
+          #reload form data to add/remove customer footer
+          populate_resolved_filerep_templates(current_resolution, is_customer)
+          $('#filerep-resolution-message-template-select').attr('data-has-footer', is_customer)
+
+      # Select Status
+      $('.ticket-status-radio').change ->
+        radio_button = $(this)
+
+        all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+        $(all_stat_radios).removeClass('selected')
+        wrapper = radio_button.parent()
+        $(wrapper).addClass('selected')
+
+        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+          $('#index-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+
+          #check first resolution checkbox if none selected
+          if !($("#index-edit-ticket-status-dropdown input.ticket-resolution-radio").is(':checked'))
+            $('#index-edit-ticket-status-dropdown input#FIXED_FP').prop('checked', true)
+            is_customer = filerep_check_for_customer()
+            populate_resolved_filerep_templates('Fixed - FP', is_customer)
+
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#index-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
+
     else
-      $('#ticket-non-res-submit').show()
-      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
-      $('.ticket-resolution-radio').prop('checked', false)
-      $('#show-ticket-resolution-submenu').hide()
-      $(res_comment[0]).val('')
+      std_msg_error('No rows selected', ['Please select at least one row.'])
 
+      #reset the resolution dropdown if it is already populated
+      if $('.ticket-status-radio').prop('checked', true)
+        $('.ticket-resolution-radio').prop('checked', false)
+        $('.ticket-status-radio').prop('checked', false)
+        $('#index-ticket-resolution-submenu').hide()
+        $('#ticket-non-res-submit').hide()
+        $('.status-radio-wrapper').removeClass 'selected'
 
-  $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change ->
-    if $('input[name=filerep-dispute-customer-company-name]').val() != 'Guest'
-      is_customer = true
+  window.assemble_filerep_response_templates = (templates, customer_footer) ->
 
-    $(".resolution-status-comment").html('')
-    resolution_comment = ''
-    switch @value
-      when 'FIXED_FP'
-        resolution_comment += "Talos has concluded that the file is safe to access at this time; the file has been marked unknown/clean. This update will be publicly visible in the next 24 hours."
-        if is_customer
-          resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
-      when 'FIXED_FN'
-        resolution_comment += "Talos has concluded that the file is unsafe due to malicious activity; the file has been marked malicious. This update will be publicly visible in the next 24 hours."
-        if is_customer
-          resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
-      when 'UNCHANGED'
-        resolution_comment += "Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file's disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file's disposition, if they understand the risks in doing so."
-        if is_customer
-          resolution_comment += " Please open a TAC case and provide additional details if you need further assistance."
-    $(".resolution-status-comment").html(resolution_comment)
+    resolution_select = $('#filerep-resolution-message-template-select.resolution-message-template-select')
+    resolution_select.empty()
+    is_customer = false
+
+    if templates.length == 0
+      resolution_select.val ''
+      $('.ticket-resolution-description').text ''
+      $('.resolution-status-comment').val ''
+
+    $(templates).each (index, template) ->
+      #append customer footer to preset message
+      if customer_footer != ''
+        customer_message = template.body + ' ' + customer_footer
+        is_customer = true
+      else customer_message = template.body
+
+      template_option = $("<option class='filerep-resolution-template-option'></option>")
+      $(template_option).val template.name
+      $(template_option).text template.name
+      $(template_option).attr('data-body', customer_message )
+      $(template_option).attr('data-description', template.description )
+      resolution_select.append template_option
+
+      #show first option as body and description
+      if index == 0
+        $('.ticket-resolution-description').text template.description
+        $('.resolution-status-comment').val customer_message
+        resolution_select.attr('data-has-footer', is_customer)
+
+  window.populate_resolved_filerep_templates = (resolution_type, is_customer) ->
+
+    get_resolution_templates_by_resolution('file_rep', resolution_type).then (response) ->
+      templates = JSON.parse response
+      customer_footer = ''
+
+      if is_customer == true
+        #fetch customer footer to append to message if customer ticket
+        get_resolution_templates_by_resolution('file_rep', 'Customer Footer').then (customer_footer_response) ->
+          if customer_footer_response.length > 0
+            customer_footer = JSON.parse customer_footer_response
+            if customer_footer[0]?
+              customer_footer = customer_footer[0].body
+            assemble_filerep_response_templates(templates, customer_footer)
+      else
+        assemble_filerep_response_templates(templates, customer_footer)
+
+  # Filerep show page resolution select
+  $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change () ->
+    resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+    submitter_type = ''
+    if $('#filerep-dispute-customer-submitter-type').val()? #workaround for a cucumber test that hates hidden fields
+      submitter_type = $('#filerep-dispute-customer-submitter-type').val().toLowerCase()
+    if submitter_type == 'customer' then is_customer = true else is_customer = false
+    populate_resolved_filerep_templates(resolution_type, is_customer)
+
+  filerep_check_for_customer = () ->
+    checkboxes = $('#file-rep-datatable').find('.dispute_check_box:checked')
+    table = $('#file-rep-datatable').DataTable()
+    is_customer = false
+    #show customer message if any checked rows are for customers
+    $(checkboxes).each ->
+      if $(this).is(':checked')
+        tr = $(this).closest('tr')
+        row = table.row(tr)
+        if row.data().submitter_type.toLowerCase() == 'customer'
+          is_customer = true
+    return is_customer
+
+  # Filerep index page resolution select
+  $('#filerep-resolution-selector input[type=radio][name=ticket-resolution]').change () ->
+    resolution_type = $(this).siblings('.ticket-res-radio-label').text()
+    is_customer = filerep_check_for_customer()
+    populate_resolved_filerep_templates(resolution_type, is_customer)
 
   # note: this function below affects the global space, can be accessed everywhere
   # these window-level funcs should probably be moved into a "global JS" file when time available
@@ -1502,53 +1618,54 @@ $ ->
     ]
 
 $ ->
-  set_file_rep_link = () ->
-    url = '/escalations/file_rep/disputes'
-    search = if window.location.pathname == url # only if we're on index page
-               window.location.search
-             else
-               localStorage.file_rep_search_name
+  url = '/escalations/file_rep/disputes'
+  if window.location.pathname.includes(url)
+    set_file_rep_link = () ->
+      search = if window.location.pathname == url # only if we're on index page
+                 window.location.search
+               else
+                 localStorage.file_rep_search_name
 
-    if search && window.location.href.indexOf('file_rep') > 0
-      localStorage.setItem('file_rep_search_name', search)
-      link = url + search
-      $('#amp-link').attr('href', link)
-      $('#amp-icon-link').attr('href', link)
-      $('#queue').attr('href', link)
+      if search && window.location.href.indexOf('file_rep') > 0
+        localStorage.setItem('file_rep_search_name', search)
+        link = url + search
+        $('#amp-link').attr('href', link)
+        $('#amp-icon-link').attr('href', link)
+        $('#queue').attr('href', link)
 
-  set_file_rep_link()
+    set_file_rep_link()
 
-  if $('#assignee-input').length > 0
-    assignee_input = $('#assignee-input').selectize {
+    if $('#assignee-input').length > 0
+      assignee_input = $('#assignee-input').selectize {
+        persist: true
+        create: false
+        valueField: 'name',
+        labelField: 'display_name',
+        searchField: ['name', 'display_name'],
+        options: AC.FileRep.createAssigneeOptions()
+        render:
+          option: (item, escape) ->
+            name = item.display_name
+            cvs_name = item.name
+            '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(cvs_name) + ')' + '</span></div>'
+        onFocus: () ->
+          window.toggle_selectize_layer(this, 'true')
+        onBlur: () ->
+          window.toggle_selectize_layer(this, 'false')
+      }
+
+    platforms_input = $('#platform-input').selectize {
       persist: true
       create: false
-      valueField: 'name',
-      labelField: 'display_name',
-      searchField: ['name', 'display_name'],
-      options: AC.FileRep.createAssigneeOptions()
+      valueField: 'public_name',
+      labelField: 'public_name',
+      searchField: 'public_name',
+      options: AC.FileRep.createPlatformOptions()
       render:
         option: (item, escape) ->
-          name = item.display_name
-          cvs_name = item.name
-          '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(cvs_name) + ')' + '</span></div>'
+         '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
-
-  platforms_input = $('#platform-input').selectize {
-    persist: true
-    create: false
-    valueField: 'public_name',
-    labelField: 'public_name',
-    searchField: 'public_name',
-    options: AC.FileRep.createPlatformOptions()
-    render:
-      option: (item, escape) ->
-       '<div class="custom-render-selectize"><span>' + item.public_name + '</span></div>'
-    onFocus: () ->
-      window.toggle_selectize_layer(this, 'true')
-    onBlur: () ->
-      window.toggle_selectize_layer(this, 'false')
-  }

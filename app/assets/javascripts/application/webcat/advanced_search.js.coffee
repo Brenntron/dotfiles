@@ -118,3 +118,4 @@ namespace 'AC.WebCat', (exports) ->
 
       # if the value has been searched, make sure that the input isn't hidden
       $(form_el).removeClass('hidden')
+

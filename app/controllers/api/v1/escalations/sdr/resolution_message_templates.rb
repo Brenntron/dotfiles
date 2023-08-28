@@ -1,23 +1,18 @@
 module API
   module V1
     module Escalations
-      module Webrep
+      module Sdr
         class ResolutionMessageTemplates < Grape::API
           include API::V1::Defaults
-          resource "escalations/webrep/resolution_message_templates" do
+          resource "escalations/sdr/resolution_message_templates" do
 
             desc "get a filtered resolution message templates by resolution"
             params do
               requires :resolution, type: String, desc: "Resolution of the resolution message template"
-              requires :ticket_type, type: String, desc: "The type of ticket (web or email)"
             end
 
             get  "", root: "resolution_message_template" do
-              if params[:ticket_type] == 'EmailDispute'
-                ResolutionMessageTemplate.by_email_resolution_disputes(params[:resolution]).to_json
-              else
-                ResolutionMessageTemplate.by_web_resolution_disputes(params[:resolution]).to_json
-              end
+              ResolutionMessageTemplate.by_sdr_reputation_disputes(params[:resolution]).to_json
             end
 
             desc "get a resolution message template"
@@ -30,7 +25,7 @@ module API
               ResolutionMessageTemplate.find(permitted_params[:id])
             end
 
-            desc "edit an resolution message template"
+            desc "edit a resolution message template"
             params do
               requires :id, type: Integer, desc: "The resolution message template's id in the database."
               optional :name, type: String, desc: "The template name of the template."

@@ -81,28 +81,22 @@ Rails.application.routes.draw do
           get :resolution_age_report
           get :export_resolution_age_report
           get 'download_email_attachment_file/:id', to: 'disputes#download_email_attachment_file'
+          get :resolution_message_templates
         end
         member do
           get :export
         end
       end
+
       resources :dispute_emails         # TODO This route has no controller so determine if it should be removed.
       resources :dispute_comments       # TODO This route has no controller so determine if it should be removed.
       resources :email_templates        # TODO This route has no controller so determine if it should be removed.
 
       get 'dashboard', to: 'disputes#dashboard'
       get 'research', to: 'disputes#research'
+      get 'resolution_message_templates' => 'disputes#resolution_message_templates'
       get :export_selected_dispute_rows, to: 'disputes#export_selected_dispute_rows'
       get :export_selected_dispute_entry_rows, to: 'disputes#export_selected_dispute_entry_rows'
-    end
-
-
-    namespace :file_rep do
-      root 'disputes#index'
-      resources :disputes, only: [:index, :show]
-
-      get 'naming_guide', to: 'disputes#naming_guide'
-      get 'sandbox-html-report', to: 'disputes#sandbox_html_report'
     end
 
     namespace :sdr do
@@ -112,7 +106,21 @@ Rails.application.routes.draw do
           get 'download_sdr_attachment_file/:id', to: 'disputes#download_sdr_attachment_file'
         end
         get :all_attachments
+        get :resolution_message_templates
       end
+      get 'resolution_message_templates' => 'disputes#resolution_message_templates'
+    end
+
+    namespace :file_rep do
+      root 'disputes#index'
+      resources :disputes, only: [:index, :show] do
+        get :resolution_message_templates, on: :collection
+      end
+
+      get 'naming_guide', to: 'disputes#naming_guide'
+      get 'sandbox-html-report', to: 'disputes#sandbox_html_report'
+      get 'resolution_message_templates' => 'disputes#resolution_message_templates'
+
     end
 
     resources :users, controller: '/users', only: [:index, :show, :update] do

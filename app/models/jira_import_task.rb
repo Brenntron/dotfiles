@@ -15,6 +15,7 @@ class JiraImportTask < ApplicationRecord
   STATUS_FAILURE = "Failure"
   STATUS_PENDING = "Pending"
   STATUS_AWAITING_BAST_VERDICT = "Awaiting Bast Verdict"
+  STATUS_GENERATING_TICKETS = "Generating Tickets"
 
   VALID_FILE_TYPE = "text/csv"
   
@@ -74,64 +75,70 @@ class JiraImportTask < ApplicationRecord
 
   #Read CSV from Jira and send URLs to Bast
   def process_import
-    update(imported_at: Time.now)
-
-    custom_fields = JiraRest::Project.new(Rails.configuration.jira.project_key).custom_fields
-    issue = JiraRest::Issue.new(issue_key)
-    # fetch data from 'URL(s)' ticket field
     begin
-      url_field = issue.issue.fields[custom_fields[:urls]].to_s
-      url_field = url_field.gsub("URLs ONLY - ONE PER LINE - MAXIMUM OF 50", "")
-      urls = url_field.split(/[\n,\s]+/).reject(&:blank?)
-    rescue
-      urls = []
-    end
+      update(imported_at: Time.now)
 
-    # fetch data from ticket attachment
-    begin
-      attachment_to_process = issue.attachments_data.first
-    rescue
+      custom_fields = JiraRest::Project.new(Rails.configuration.jira.project_key).custom_fields
+      issue = JiraRest::Issue.new(issue_key)
+      # fetch data from 'URL(s)' ticket field
+      begin
+        url_field = issue.issue.fields[custom_fields[:urls]].to_s
+        url_field = url_field.gsub("URLs ONLY - ONE PER LINE - MAXIMUM OF 50", "")
+        urls = url_field.split(/[\n,\s]+/).reject(&:blank?)
+      rescue
+        urls = []
+      end
+
+      # fetch data from ticket attachment
+      begin
+        attachment_to_process = issue.attachments_data.first
+      rescue => e
+        if urls.empty?
+          update(status: STATUS_FAILURE, result: "Error reading attachment data: #{e.message}")
+          return
+        end
+        attachment_to_process = {}
+      end
+
+      if attachment_to_process&.dig(:type) == VALID_FILE_TYPE
+        csv_data = attachment_to_process[:content]
+        urls += csv_data.map { |m| m[0]&.strip }.reject(&:blank?)
+      end
+
       if urls.empty?
-        update(status: STATUS_FAILURE, result: "Error reading attachment data: #{e.message}")
+        update(status: STATUS_FAILURE, result: 'No URLs found on ticket')
         return
       end
-      attachment_to_process = {}
-    end
 
-    if attachment_to_process&.dig(:type) == VALID_FILE_TYPE
-      csv_data = attachment_to_process[:content]
-      urls += csv_data.map { |m| m[0]&.strip }.reject(&:blank?)
-    end
-
-    if urls.empty?
-      update(status: STATUS_FAILURE, result: 'No URLs found on ticket')
-      return
-    end
-
-    urls_to_submit = []
-    urls.each do |url|
-      begin
-        url_parts = Complaint.parse_url(url)
-        import_urls.find_or_create_by(submitted_url: url, domain: url_parts[:domain])
-        urls_to_submit << url
-      rescue PublicSuffix::DomainNotAllowed, PublicSuffix::DomainInvalid, Addressable::URI::InvalidURIError
-        next
+      urls_to_submit = []
+      urls.each do |url|
+        begin
+          url_parts = Complaint.parse_url(url)
+          import_urls.find_or_create_by(submitted_url: url, domain: url_parts[:domain])
+          urls_to_submit << url
+        rescue PublicSuffix::DomainNotAllowed, PublicSuffix::DomainInvalid, Addressable::URI::InvalidURIError
+          next
+        end
       end
-    end
 
-    if urls_to_submit.empty?
-      update(status: STATUS_FAILURE, result: 'No valid URLs to import')
-      return
-    end
+      if urls_to_submit.empty?
+        update(status: STATUS_FAILURE, result: 'No valid URLs to import')
+        return
+      end
 
-    begin
-      response = Bast::Base.create_task(urls_to_submit)
-      update(status: STATUS_AWAITING_BAST_VERDICT, bast_task: response['task_id'])
-    rescue ApiRequester::ApiRequester::ApiRequesterError => e
-      update(status: STATUS_FAILURE, result: e.message)
+      begin
+        response = Bast::Base.create_task(urls_to_submit)
+        update(status: STATUS_AWAITING_BAST_VERDICT, bast_task: response['task_id'])
+      rescue ApiRequester::ApiRequester::ApiRequesterError => e
+        update(status: STATUS_FAILURE, result: e.message)
+      end
+    rescue SystemExit, Interrupt
+      update(status: STATUS_FAILURE, result: "Import was interrupted")
+      raise
+    rescue => e
+      update(status: STATUS_FAILURE, result: "Import failed: #{e.message}")
     end
   end
-  handle_asynchronously :process_import, :queue => "process_jira_import", :priority => 1
 
   def create_tickets
     return unless status == STATUS_AWAITING_BAST_VERDICT
@@ -144,49 +151,62 @@ class JiraImportTask < ApplicationRecord
     task_status = Bast::Base.get_task_status(bast_task)
     return unless task_status["status"] == "Completed"
 
-    task_results = Bast::Base.get_task_result(bast_task)
+    begin
+      task_results = Bast::Base.get_task_result(bast_task)
 
-    description = "Created from Jira Issue #{issue_key}"
-    task_results.each do |k,v|
+      update(status: STATUS_GENERATING_TICKETS, result: nil)
 
-      ticketable_urls = import_urls.where(domain: k)
+      description = "Created from Jira Issue #{issue_key}"
+      task_results.each do |k,v|
 
-      unless ticketable_urls.empty?
-        if v["import"] == true
-          existing_entry = ComplaintEntry.open.where(domain: k).first
-          if existing_entry.present?
-            ticketable_urls.each do |ticketable_url|
-              ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
+        ticketable_urls = import_urls.where(domain: k)
+
+        unless ticketable_urls.empty?
+          begin
+            if v["import"] == true
+              existing_entry = ComplaintEntry.open.where(domain: k).first
+              if existing_entry.present?
+                ticketable_urls.each do |ticketable_url|
+                  ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
+                end
+              else
+                complaint_options = [
+                  BugzillaRest::Session.default_session,
+                  ticketable_urls.first.submitted_url,
+                  description,
+                  Customer::JIRA_GENERATED,
+                  nil,                     # tags
+                  nil,                     # platform
+                  Complaint::NEW,          # status
+                  nil,                     # categories
+                  nil,                     # user email
+                  Complaint::JIRA_CHANNEL  # channel
+                ]
+                response = Complaint.create_action(*complaint_options)
+                ticketable_urls.each do |ticketable_url|
+                  ticketable_url.update(bast_verdict: v["import"], complaint_id: response[:complaint_id])
+                end
+              end
+            else
+              ticketable_urls.each do |ticketable_url|
+                ticketable_url.update(bast_verdict: v["import"], verdict_reason: v["reason"])
+              end
             end
-          else
-            complaint_options = [
-              BugzillaRest::Session.default_session,
-              ticketable_urls.first.submitted_url,
-              description,
-              Customer::JIRA_GENERATED,
-              nil,                     # tags
-              nil,                     # platform
-              Complaint::NEW,          # status
-              nil,                     # categories
-              nil,                     # user email
-              Complaint::JIRA_CHANNEL  # channel
-            ]
-            response = Complaint.create_action(*complaint_options)
-            ticketable_urls.each do |ticketable_url|
-              ticketable_url.update(bast_verdict: v["import"], complaint_id: response[:complaint_id])
-            end
-          end
-        else
-          ticketable_urls.each do |ticketable_url|
-            ticketable_url.update(bast_verdict: v["import"], verdict_reason: v["reason"])
+          rescue
+            next
           end
         end
       end
+    rescue SystemExit, Interrupt
+      update(status: STATUS_FAILURE, result: "Ticket creation was interrupted")
+      raise
+    rescue => e
+      update(status: STATUS_FAILURE, result: "Ticket creation failed: #{e.message}")
+      return
     end
 
-    update(status: STATUS_COMPLETE)
+    update(status: STATUS_COMPLETE, result: nil)
   end
-  handle_asynchronously :create_tickets, :queue => "create_complaint_tickets", :priority => 1
 
   def retry
     return unless status == STATUS_FAILURE

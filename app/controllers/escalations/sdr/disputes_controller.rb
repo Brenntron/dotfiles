@@ -91,6 +91,11 @@ class Escalations::Sdr::DisputesController < ApplicationController
     end
   end
 
+  def resolution_message_templates
+    @templates = ResolutionMessageTemplate.for_sdr_disputes
+    @customer_footer_exists = ResolutionMessageTemplate.by_sdr_reputation_disputes('Customer Footer').exists?
+  end
+
   private
 
     def datatables_search_params
