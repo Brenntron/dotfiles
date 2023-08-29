@@ -9800,7 +9800,9 @@ td.text-center span {
 .webcat-loader-wrapper, .webrep-loader-wrapper, .sdr-loader-wrapper {
   margin: 0 37%;
 }
-
+.webcat-loader-wrapper{
+  margin-top: 25px;
+}
 .sdr-loader-wrapper {
   top: 5px;
 }
@@ -11134,6 +11136,9 @@ button.secondary.view-report-external-button {
     line-height: 1.65em;
   }
 }
+
+.hidden-selectize-dropdown .selectize-dropdown{ display: none!important; }
+
 #report-tab-content{
   .toolbar-select-wrapper input[type='checkbox'] {
     margin-top: 3px;
@@ -11859,6 +11864,9 @@ div[aria-describedby='create-detection-dialog'] {
 // dbinebri: on Index, ensure "Unassigned" and buttons can exist w/o breaking in the Assignee col
 .table > tbody > tr > td.assignee-col, table > tbody > tr > td.assignee-col {
   min-width: 90px !important;
+}
+td.channel-col{
+  text-transform: capitalize;
 }
 
  // dbinebri: adding a specific on-click sha tooltip
