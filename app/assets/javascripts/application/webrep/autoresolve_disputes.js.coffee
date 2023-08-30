@@ -4,8 +4,7 @@ window.auto_resolve_tickets = (current_user, id) ->
     data = { user_id: current_user, dispute_id: id }
     autoresolve(data).then( (result) ->
       if result.status = 'success'
-        std_msg_success('All Dispute Entries Auto Resolved', [], reload: false)
-        $('#disputes-index').DataTable().draw()
+        std_msg_success('All Dispute Entries Auto Resolved', [], reload: true)
       else
         std_msg_error('Unable to Auto Resolve Dispute Entries', [], reload: false)
     )
