@@ -481,6 +481,11 @@ For future Web categorization requests, please open a Web categorization ticket 
 
     return if dispute.bridge_packet.blank?
 
+    dispute_packet = JSON.parse(dispute.bridge_packet) rescue nil
+    if dispute_packet.blank?
+      return
+    end
+
     auto_resolve_message = "<br />###########################<br />"
     auto_resolve_message += "MANUAL AUTO RESOLVE OF DISPUTE ID: #{dispute.id.to_s}<br />"
     auto_resolve_message += "SUBMITTED BY: #{user.cvs_username}<br />"
