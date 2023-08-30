@@ -1088,7 +1088,7 @@ module API
                 Dispute.process_manual_auto_resolve(auto_resolve_params)
                 {:status => "success", :dispute_id=> permitted_params[:dispute_id]}
               rescue Exception => e
-                {:status => "failed", :error => e.message}
+                {:status => "failed", :error => e.message,:dispute_id=> permitted_params[:dispute_id]}
               end
 
             end

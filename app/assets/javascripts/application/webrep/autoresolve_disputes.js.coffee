@@ -5,10 +5,10 @@ window.auto_resolve_tickets = (current_user, id) ->
     autoresolve(data).then( (result) ->
       if result.status = 'success'
         std_msg_success('All Dispute Entries Auto Resolved', [], reload: false)
+        $('#disputes-index').DataTable().draw()
       else
         std_msg_error('Unable to Auto Resolve Dispute Entries', [], reload: false)
     )
-
   else
     #index page bulk select auto resolve
     checkboxes = $('#disputes-index').find('.dispute_check_box')
@@ -18,12 +18,14 @@ window.auto_resolve_tickets = (current_user, id) ->
       if $(this).is(':checked')
         dispute_id = $(this).val()
         checked_disputes.push(dispute_id)
-
-    for dispute_id in checked_disputes
-      data = { user_id: current_user, dispute_id: dispute_id }
-      dispute_promises.push(data)
-    # make all auto resolve calls, messaging function only gets called after all promises resolve
-    Promise.allSettled( dispute_promises.map( (data) -> return autoresolve(data)) ).then( (result)-> auto_resolve_msg(result) )
+    if checked_disputes.length == 0
+      std_msg_error('No rows selected', ['Please select at least one row.'])
+    else
+      for dispute_id in checked_disputes
+        data = { user_id: current_user, dispute_id: dispute_id }
+        dispute_promises.push(data)
+      # make all auto resolve calls, messaging function only gets called after all promises resolve
+      Promise.allSettled( dispute_promises.map( (data) -> return autoresolve(data)) ).then( (result)-> auto_resolve_msg(result) )
 
 window.autoresolve = (data) ->
   std_msg_ajax(
@@ -56,9 +58,12 @@ window.auto_resolve_msg = (result) ->
       error = true
 
 
-  if success then success_message += "<br><span class='code-content'>#{success_arr.join(' ')}</span>"
+  if success
+    success_message += "<br><span class='code-content'>#{success_arr.join(' ')}</span>"
+    $('#disputes-index').DataTable().draw()
 
-  if error then error_message += "<br><span class='code-content'>#{error_arr.join(' ')}</span>"
+  if error
+    error_message += "<br><span class='code-content'>#{error_arr.join(' ')}</span>"
 
   if success && error
     std_msg_success('Some Tickets Auto Resolved', [success_message, error_message], reload: false)
