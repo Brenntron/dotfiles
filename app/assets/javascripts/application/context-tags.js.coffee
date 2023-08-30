@@ -773,7 +773,7 @@ window.add_preview_tag = (curr_tag_id) ->
 
 
 
-# dt init the taxonomy table on initial load or change select
+# dt init the taxonomy table on initial load or change select, add tags dialog
 window.tags_dialog_dt_init = () ->
   unless $(".tags-dialog-table").hasClass('dataTable')
     tags_table_dt = $(".tags-dialog-table").DataTable
@@ -818,7 +818,8 @@ window.tags_dialog_dt_init = () ->
 
     # click any tag-related button to reset the dt and dialog state (but dont redo api call)
     $('.tags-cancel-button, .tags-save-button').click ->
-      tags_table_dt.columns(3).search('').draw()  # show all
+      tags_table_dt.search('').columns(3).search('').draw()  # show all, retain both searches
+      tags_table_dt.order([1,'asc']).draw()  # ensure sorted/ordered correctly by default
       reset_tags_dialog()  # resets state of dialog
 
 
@@ -826,11 +827,10 @@ window.tags_dialog_dt_init = () ->
 window.reset_tags_dialog = () ->
   # see above function for the tmi dt reset, cancel/save btns handle that for the dt var
   $('#add-context-tags-dialog').dialog('close')
-  $('.tags-dialog-table th.sorting:first').click() # ensure sorting by first col on reset
   $('.tag-entry-cb').prop('checked', false)
   $('.preview-tag').remove()
   $(".taxonomy-select").val('0')
-  $('.tag-search-area input').val('')
+  $(".tag-search-area input").val('')
 
 
 # read more button on tags dialog
