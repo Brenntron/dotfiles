@@ -839,6 +839,13 @@ window.tags_dialog_read_more = (id) ->
   $(".down-caret-#{id}").toggleClass('expanded')
 
 
+# web rep or file rep, determine the current observable string to apply tags to
+window.get_observable_string = () ->
+  if $('.tab-ctt-filerep').length > 0
+    curr_observable = $('#sha256_hash').text()   # file rep is current page, obs str is the sha
+  else
+    curr_observable = $('.ctt-entry-select option:selected').text().trim()   # webrep, this works even when hidden
+
 
 # adding tags inside of the dialog
 window.add_tags_submit = () ->
@@ -851,10 +858,11 @@ window.add_tags_submit = () ->
 
   # if preview tags are visible, proceed with everything
   else if $('.preview-tag:visible').length > 0
+    curr_observable = get_observable_string()
+
     $('.preview-tag-area .preview-tag').each ->
       tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
       entry_id = parseInt($(this).attr('data-entry-id'))
-      curr_observable = $('.ctt-entry-select option:selected').text().trim()  # this works even when hidden
 
       # make tags array dynamic
       observable_type = determine_string_type(curr_observable)  # ip or sha or url or domain
@@ -884,9 +892,9 @@ window.add_tags_submit = () ->
         $('#add-context-tags-dialog').dialog('close')
         std_msg_success("Tags successfully added", [], reload: false)
 
-        # now reload the dts instead of the whole page to show latest data
-        curr_observable = $('.ctt-entry-select option:selected').text().trim()
+        curr_observable = get_observable_string()
         tmi_enrich_prev_dt_inits('update', curr_observable)  # on add tags, lets try just re-loading the dt
+
         $('.enrichment-loader, .prevalence-loader, .tmi-loader').removeClass('hidden')  # show all loaders
 
         reset_tags_dialog()  # reset state of dialog
@@ -911,7 +919,7 @@ window.other_tag_functions = (action) ->
   switch action
     when 'suppress_tag' then success_msg = "suppress"
     when 'unsuppress_tag' then success_msg = "unsuppress"
-    when 'delete' then success_msg = "remov"
+    when 'delete' then success_msg = "remov"  # yes, leave this spelling
 
   if $('.tmi-cb:checked').length == 0
     std_msg_error('No tag selected', ['Please select at least one tag.'])
@@ -921,10 +929,11 @@ window.other_tag_functions = (action) ->
     if action == 'delete' && any_tags_suppressed == true
       std_msg_error('Error', ['One or more selected tags is suppressed, suppressed tags cannot be removed.'])
     else
+      curr_observable = get_observable_string()
+
       $('.tmi-cb:checked').each ->
         tax_id = parseInt($(this).attr('data-tax-id'))  # endpoint needs ints
         entry_id = parseInt($(this).attr('data-entry-id'))
-        curr_observable = $('.ctt-entry-select option:selected').text().trim()  # this works even when hidden
 
         # make tags array dynamic
         observable_type = determine_string_type(curr_observable)  # ip or sha or url or domain
@@ -954,8 +963,9 @@ window.other_tag_functions = (action) ->
           std_msg_success("Tags successfully #{success_msg}ed", [], reload: false)
 
           # now reload the dts instead of the whole page to show latest data
-          curr_observable = $('.ctt-entry-select option:selected').text().trim()
+          curr_observable = get_observable_string()
           tmi_enrich_prev_dt_inits('update', curr_observable)  # on add tags, lets try just re-loading the dt
+
           $('.enrichment-loader, .prevalence-loader, .tmi-loader').removeClass('hidden')  # show all loaders
 
           reset_tags_dialog()  # reset state of dialog
