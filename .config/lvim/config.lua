@@ -96,12 +96,41 @@ lvim.plugins = {
             require('trim').setup({trim_last_line = false})
         end
     }, {'edluffy/hologram.nvim', auto_display = true}, {"fladson/vim-kitty"}, {
+        "folke/neodev.nvim",
+        config = function()
+            require('neodev').setup({
+                library = {plugins = {"neotest"}, types = true}
+            })
+        end
+    }, {
         "folke/trouble.nvim",
         cmd = "TroubleToggle",
         requires = "nvim-tree/nvim-web-devicons",
         config = function() require("trouble").setup {} end
-    }, {'kchmck/vim-coffee-script'}, {'junegunn/vim-easy-align'},
-    {'Mofiqul/dracula.nvim'},
+    }, {'kchmck/vim-coffee-script'},
+    {"kristijanhusak/vim-dadbod-completion", requires = "tpope/vim-dadbod"},
+    {"kristijanhusak/vim-dadbod-ui", requires = "tpope/vim-dadbod"},
+    {'junegunn/vim-easy-align'}, {'Mofiqul/dracula.nvim'}, {
+        "nvim-neotest/neotest",
+        requires = {
+            "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter",
+            "antoinemadec/FixCursorHold.nvim"
+        },
+        config = {
+            function()
+                require("neotest").setup({
+                    adapters = {
+                        require("neotest-plenary"),
+                        require("neotest-vim-test")(
+                            {ignore_file_types = {"vim"}})
+                    }
+                })
+            end
+        }
+    }, {
+        'nvim-neotest/neotest-plenary',
+        config = function() require("neotest-plenary").setup({}) end
+    }, {"nvim-neotest/neotest-vim-test", requires = {"vim-test/vim-test"}},
     {
         "nvim-telescope/telescope-fzy-native.nvim",
         run = "make",
