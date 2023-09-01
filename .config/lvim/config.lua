@@ -218,7 +218,7 @@ require("mason-lspconfig").setup({
     }
 })
 
--- -- Coffeesense Setup
+-- Coffeesense Setup
 require'lspconfig'.coffeesense.setup {}
 
 -- Telescope plugin update
