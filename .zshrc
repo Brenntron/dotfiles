@@ -220,6 +220,8 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
 
+eval "$(starship init zsh)"
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
@@ -235,6 +237,11 @@ export KERL_CONFIGURE_OPTIONS="--disable-hipe --with-ssl=$(brew --prefix openssl
 if [ -x "$(command -v exa)" ]; then
     alias ls="exa"
     alias la="exa --long --all --group"
+    alias tree="exa --tree"
+fi
+
+if [ -x "$(command -v cat)" ]; then
+  alias cat="bat"
 fi
 
 # Use homebrew installed gcc
