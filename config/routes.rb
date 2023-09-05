@@ -38,6 +38,7 @@ Rails.application.routes.draw do
           get :named_search
           get :standard_search
           get :contains_search
+          get :resolution_message_templates
         end
       end
       resources :complaint_entries, only: [:index, :show, :update] do
