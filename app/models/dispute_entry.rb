@@ -367,7 +367,7 @@ class DisputeEntry < ApplicationRecord
 
     # change uri from email to hostname
     if url.include?("@")
-      self.uri = self.hostname
+      self.uri = self.domain
     end
 
     self
