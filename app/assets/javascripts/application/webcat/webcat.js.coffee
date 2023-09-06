@@ -390,7 +390,7 @@ $ ->
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
-      options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"},{name: "Jira"} ]
+      options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"},{name: "Jira"}, {name: "RMS"}, {name: "RMS Alert"} ]
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
