@@ -161,6 +161,12 @@
         -#  = entry.hostlookup
       %span.dispute-entry-count
         = @entries.count
+      - if @dispute.channel.present?
+        %div
+          %label.content-label-sm
+            Channel
+          %div
+            = @dispute.channel
 
     .col-xs-3.col-with-divider
       .dispute-time-wrapper

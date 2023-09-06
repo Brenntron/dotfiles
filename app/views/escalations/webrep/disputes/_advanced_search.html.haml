@@ -10,6 +10,11 @@
     %input.form-control#dispute-input{name: 'ip_or_uri'}
     %button.remove-input#remove-criteria-dispute{type: 'button'}
   .form-group.search-item
+    %label.content-label-sm{for: 'channel'} Added Through Channel
+    %input.form-control.selectize#channel-input{name: 'channel', list: 'channel-input-list', multiple: 'multiple', tabindex:'-1'}
+    %datalist#channel-input-list
+    %button#remove-criteria-channel.remove-input{onclick:'clearSelectize("channel-input")'}
+  .form-group.search-item
     %label.content-label-sm Assignee
     %input.form-control#owner-input{name: 'username', list: 'user-list'}
     %datalist#user-list
@@ -166,6 +171,10 @@
           %label.search-criteria-label
             %input.search-checkbox#platform-cb{type: 'checkbox', name: 'search-criteria', value: 'Platform', for: 'platform-input'}
             Platform
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#channel-cb{type: 'checkbox', name: 'search-criteria', value: 'Channel', for: 'channel-input'}
+            Channel
         %li
           %label.search-criteria-label
             %input.search-checkbox#submitted-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Newer)', for: 'submitted-newer-input'}
