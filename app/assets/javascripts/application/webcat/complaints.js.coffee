@@ -2461,7 +2461,7 @@ window.fetch_complaints = () ->
   )
 
 
-open_selected = (selected_rows, toggle) ->
+open_rows = (selected_rows, toggle) ->
   low_rep_entries = []
   error_message = ''
 
@@ -2495,26 +2495,30 @@ open_selected = (selected_rows, toggle) ->
         domains_and_ips.push "<li>#{lre.ip_address}</li>"
 
     error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores. <ul>#{domains_and_ips.join('')}</ul>"
-
-  show_message('error', "#{error_message}", false, '#alertMessage')
+    show_message('error', "#{error_message}", false, '#alertMessage')
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, "true")
+  open_rows(selected_rows, "true")
+
 window.open_nonviewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, "false")
+  open_rows(selected_rows, "false")
+
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
+
   if selected_rows[0].length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
   else
-    open_selected(selected_rows, "true")
+    open_rows(selected_rows, "true")
+
 window.open_all = () ->
   open_all = confirm("Are you sure you want to open ALL the windows on this page?!!")
+
   if (open_all == true)
-    selected_rows = $('#complaints-index').DataTable().rows()
-    open_selected(selected_rows, "true")
+    all_rows = $('#complaints-index').DataTable().rows()
+    open_rows(all_rows, "true")
 
 toggle_selected = (selectedRows, expand)->
   selectState = $('.selected')
@@ -2526,6 +2530,7 @@ toggle_selected = (selectedRows, expand)->
       if $(row).hasClass('shown')
         $(row).find('.expand-row-button-inline').click()
         $(row).addClass('selected')
+
   $(selectState).addClass('selected')
 
 window.collapse_selected =()->
