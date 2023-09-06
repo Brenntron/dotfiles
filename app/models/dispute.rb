@@ -964,6 +964,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
       new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
       new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
+      new_dispute.channel = message_payload["payload"]["channel"]
       new_dispute.status = NEW
 
       new_dispute.customer_id = customer&.id
@@ -1384,7 +1385,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       dispute_fields[field] = dispute_fields[field].split(/[\s,]+/)
     end
 
-    ['status', 'resolution'].each do |field|
+    ['status', 'resolution', 'channel'].each do |field|
       next unless params[field].present?
       dispute_fields[field] = params[field].split(',')
     end
@@ -1744,6 +1745,8 @@ For future Web categorization requests, please open a Web categorization ticket 
       dispute_packet.each do |k, v|
         dispute_packet[k] = '' if dispute_packet[k].nil?
       end
+
+      dispute_packet[:channel] = dispute.channel
 
       dispute_packet
     end
