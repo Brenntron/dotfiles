@@ -157,12 +157,12 @@
                   %label.content-label-sm.edit-resolution-label Resolution
                   .resolution-controls
                     .resolution-input-wrapper
-                      %input{type: 'radio', name: 'complaint[resolution]', value: 'UNCHANGED'}
-                      %label.resolution-radio-label Unchanged
-                      %input{type: 'radio', name: 'complaint[resolution]', value: 'FIXED'}
-                      %label.resolution-radio-label Fixed
-                      %input{type: 'radio', name: 'complaint[resolution]', value: 'INVALID'}
-                      %label.resolution-radio-label Invalid
+                      %input{type: 'radio', id: 'webcat_resolution_unchanged_option', name: 'complaint[resolution]', value: 'UNCHANGED'}
+                      %label.resolution-radio-label{for: 'webcat_resolution_unchanged_option'} Unchanged
+                      %input{type: 'radio', id: 'webcat_resolution_fixed_option', name: 'complaint[resolution]', value: 'FIXED'}
+                      %label.resolution-radio-label{for: 'webcat_resolution_fixed_option'} Fixed
+                      %input{type: 'radio', id: 'webcat_resolution_invalid_option', name: 'complaint[resolution]', value: 'INVALID'}
+                      %label.resolution-radio-label{for: 'webcat_resolution_invalid_option'} Invalid
                     .resolution-apply-wrapper
                       %button#resolution-apply-button.resolution-apply-button
                 .col-xs-12.customer-facing-comment-container
