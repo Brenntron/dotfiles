@@ -2819,6 +2819,8 @@ window.updateResolutionDialog = (confirm) ->
       $('#resolution_text').css('padding-left', '7px')
   , 200
 
+
+
 window.updateResolution = () ->
   resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected.filtered-row')
@@ -3164,3 +3166,26 @@ $ ->
   $('#wbnp-report-button').click ->
     $('#wbnp-full-report').dialog('open')
 
+  resolutionStatus = $('input[name="complaint[resolution]"]:checked').val()?
+  customerFacingComment = $('input[name="customer_facing_comment]').val()?
+  categories = $('input[name="complaint[resolution]"]:checked').val() == 'DROP_ALL'
+
+  if resolutionStatus?
+    $('.resolution-container').find('.resolution-apply-button').addClass('applied')
+  if customerFacingComment?
+    $('customer-facing-comment-container').find('.resolution-apply-button').addClass('applied')
+  if categories?
+    $('categories-container').find('.resolution-apply-button').addClass('applied')
+
+  $('#index_change_resolution_dialog').dialog
+    autoOpen: false
+    classes: { 'ui-dialog': 'index-change-resolution-dialog'}
+    width: 450
+    minHeight: 300
+    position:
+      my: 'right top'
+      at: 'right top+150'
+      of: window
+
+  $("#index_update_resolution").click ->
+    $('#index_change_resolution_dialog').dialog('open')
