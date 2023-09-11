@@ -9763,6 +9763,8 @@ td.text-center span {
 
       .internal-comment-textbox {
         height: 100px;
+        min-height: 100px;
+
       }
 
       .resolution-controls {
@@ -9839,10 +9841,14 @@ td.text-center span {
     .resolution-radio-label {
       color: $type-lighter-color;
       margin: 0 15px 0 0;
+      padding-left: 5px;
+      cursor: pointer;
+      user-select: none;
     }
 
     input[type='radio'] {
-      margin: 0 5px 0 0;
+      cursor: pointer;
+      margin: 0;
     }
 
     .resolution-category-options {
@@ -13267,7 +13273,7 @@ table > tbody > tr > td.no-padding {
 .webrep-change-assignee-wrapper .dropdown-menu {
   border-radius: 0 4px 4px 4px;
   border: none;
-  background-color: #6dbcdb;
+  background-color: $primary-section-color;
   min-width: 200px;
   top: 29px;
   left: -2px;
