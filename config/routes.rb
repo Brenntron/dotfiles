@@ -48,6 +48,7 @@ Rails.application.routes.draw do
       end
       resources :customers, only: :index
 
+      get 'resolution_message_templates', to: 'complaints#resolution_message_templates'
       get 'show_multiple', to: 'complaints#show_multiple'
       get 'clusters', to: 'complaints#clusters'
       get 'research', to: 'complaints#research'

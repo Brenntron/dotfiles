@@ -1,10 +1,10 @@
 module API
   module V1
     module Escalations
-      module Sdr
-        class Complaints < Grape::API
+      module Webcat
+        class ResolutionMessageTemplates < Grape::API
           include API::V1::Defaults
-          resource "escalations/sdr/resolution_message_templates" do
+          resource "escalations/webcat/resolution_message_templates" do
 
             desc "get a filtered resolution message templates by resolution"
             params do
