@@ -9754,8 +9754,6 @@ td.text-center span {
     }
 
     .internal-comment-container {
-      height: 135px;
-      padding-bottom: 100px;
 
       .resolution-apply-wrapper {
         align-items: start;
@@ -9764,15 +9762,15 @@ td.text-center span {
       .internal-comment-textbox {
         height: 100px;
         min-height: 100px;
-
+        resize: vertical;
       }
 
       .resolution-controls {
-        height: 110px;
+        min-height: 110px;
       }
 
       .resolution-input-wrapper {
-        height: 100px;
+        min-height: 100px;
       }
     }
 
@@ -9812,6 +9810,10 @@ td.text-center span {
         width: 100% !important;
       }
 
+    }
+
+    .webcat-textarea-input-rapper {
+      display: block;
     }
 
     .selectize-input.items {
