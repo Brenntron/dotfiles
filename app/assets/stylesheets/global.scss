@@ -9774,6 +9774,19 @@ td.text-center span {
       }
     }
 
+    #webcat-resolution-select-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #email-response-to-customers {
+      width: 100%;
+      margin-top: 10px;
+      min-height: 70px;
+      resize: vertical;
+      padding: 2px 5px;
+    }
+
     .edit-resolution-comment {
       border-bottom: 1px solid $faint-neutral-color;
       color: $type-lighter-color;
@@ -9811,6 +9824,12 @@ td.text-center span {
         width: 100% !important;
       }
 
+    }
+
+    #email-response-to-customers-select {
+      padding: 2px;
+      outline: 1px solid #bfbfbf;
+      border: 0;
     }
 
     .webcat-textarea-input-rapper {
