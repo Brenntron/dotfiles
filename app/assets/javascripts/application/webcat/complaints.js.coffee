@@ -2775,9 +2775,8 @@ window.verifyMasterSubmit = () ->
   return boolean
 
 window.updateResolutionDialog = (confirm) ->
-
   $('#complaint_entries_to_update').empty()
-  resolution = $('#complaint_resolution')[0].value
+  resolution = $('input[name="complaint[resolution]"]:checked').val()
   selected_rows = $('tr.selected')
   pending_msg = ''
   complaint_entries = []
@@ -2819,13 +2818,17 @@ window.updateResolutionDialog = (confirm) ->
       $('#resolution_text').css('padding-left', '7px')
   , 200
 
-
+window.clearBulkResolution = () ->
+#  $('.resolution-apply-button').removeClass('applied')
+  $('#email-response-to-customers').val('')
+#  $('#webcat-bulk-categories')[0].selectize.clear()
+  $('#internal_comment').val('')
 
 window.updateResolution = () ->
-  resolution = $('#complaint_resolution')[0].value
+  resolution = $('input[name="complaint[resolution]"]:checked').val()
   selected_rows = $('tr.selected.filtered-row')
   internal_comment = $('#internal_comment')[0].value
-  customer_facing_comment = $('#customer_facing_comment')[0].value
+  customer_facing_comment = $('#customer_facing_comment').value
 
   complaint_entries = []
   for row in selected_rows
@@ -3166,16 +3169,16 @@ $ ->
   $('#wbnp-report-button').click ->
     $('#wbnp-full-report').dialog('open')
 
-  resolutionStatus = $('input[name="complaint[resolution]"]:checked').val()?
-  customerFacingComment = $('input[name="customer_facing_comment]').val()?
-  categories = $('input[name="complaint[resolution]"]:checked').val() == 'DROP_ALL'
-
-  if resolutionStatus?
-    $('.resolution-container').find('.resolution-apply-button').addClass('applied')
-  if customerFacingComment?
-    $('customer-facing-comment-container').find('.resolution-apply-button').addClass('applied')
-  if categories?
-    $('categories-container').find('.resolution-apply-button').addClass('applied')
+#  resolutionStatus = $('input[name="complaint[resolution]"]:checked').val()?
+#  customerFacingComment = $('input[name="customer_facing_comment]').val()?
+#  categories = $('input[name="complaint[resolution]"]:checked').val() == 'DROP_ALL'
+#
+#  if resolutionStatus?
+#    $('.resolution-container').find('.resolution-apply-button').addClass('applied')
+#  if customerFacingComment?
+#    $('customer-facing-comment-container').find('.resolution-apply-button').addClass('applied')
+#  if categories?
+#    $('categories-container').find('.resolution-apply-button').addClass('applied')
 
   $('#index_change_resolution_dialog').dialog
     autoOpen: false

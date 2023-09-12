@@ -194,13 +194,13 @@
                 .resolution-apply-wrapper
                   %button#internal-comment-button.resolution-apply-button
             .col-xs-12.button-wrapper
-              -#%button{class: 'primary button-update-resolution resolution-clear-button', type:'button', onclick:'clearBulkResolution();'}
-              -#  =inline_svg 'icon_clear_white.svg', class: 'resolution-button-icon'
-              -#  %span Clear
+              %button{class: 'primary button-update-resolution resolution-clear-button', type:'button', onclick:'clearBulkResolution();'}
+                =inline_svg 'icon_clear_white.svg', class: 'resolution-button-icon'
+                %span Clear
               -#%button{class: 'primary button-update-resolution apply-all-button', type:'button', onclick:'applyAll();'}
               -#  =inline_svg 'icon_apply_all_white.svg', class: 'resolution-button-icon'
               -#  %span Apply All
-              %button{class: 'primary button-update-resolution update-resolution-button', type:'button', onclick:'bulkResolution();'}
+              %button{class: 'primary button-update-resolution update-resolution-button', type:'button', onclick:'updateResolutionDialog();'}
                 =inline_svg 'icon_submit_arrow.svg', class: 'resolution-button-icon'
                 %span Submit
 

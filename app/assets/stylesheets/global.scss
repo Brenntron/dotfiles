@@ -9801,6 +9801,7 @@ td.text-center span {
       display: flex;
       height: 100%;
       width: 80%;
+      width: 100%; //WEB-8151 temp fix
 
       .selectize-control.multi {
         width: 100%;
@@ -9889,6 +9890,7 @@ td.text-center span {
       height: 100%;
       justify-content: end;
       width: 20%;
+      display: none; //WEB-8151 temp fix to hide apply buttons
 
       .resolution-apply-button {
         background-color: lighten($nav-toolbar-color, 7%);
@@ -9912,6 +9914,7 @@ td.text-center span {
     .button-wrapper{
       display: flex;
       justify-content: space-evenly;
+      justify-content: center ; //WEB-8151 temp fix to hide apply all button and center other buttons
       margin-bottom: 25px;
 
       .button-update-resolution{
