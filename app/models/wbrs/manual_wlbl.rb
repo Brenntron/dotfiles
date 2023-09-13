@@ -244,7 +244,8 @@ class Wbrs::ManualWlbl < Wbrs::Base
       details = Wbrs::ManualWlbl.find(response.id)
 
       if details.notes.any?
-        details.notes.each do |note|
+        notes = details.notes.uniq
+        notes.each do |note|
           note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response, "#{note['user']} - #{note['ctime']}: #{note['note']}")
         end
       else
