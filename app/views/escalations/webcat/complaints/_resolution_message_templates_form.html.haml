@@ -3,10 +3,7 @@
     #resolved-resolution-message-dialogue-form-information{class: local_assigns[:action]}
       %label.content-label-sm.resolution-modal-label Resolution
       - if current_user.has_role?('webcat manager') || current_user.has_role?('manager')
-        - if @customer_footer_exists == true
-          = select "#{local_assigns[:action]}-form", 'resolution_type', options_for_select(['Unchanged', 'Fixed', 'Invalid']),{}, {class: 'inline-select-dropdown resolved-resolution-message-template-input', name:'resolution_type'}
-        -else
-          = select "#{local_assigns[:action]}-form", 'resolution_type', options_for_select(['Unchanged', 'Fixed', 'Invalid', 'Customer Footer']),{}, {class: 'inline-select-dropdown resolved-resolution-message-template-input', name:'resolution_type'}
+        = select "#{local_assigns[:action]}-form", 'resolution_type', options_for_select(['Unchanged', 'Fixed', 'Invalid']),{}, {class: 'inline-select-dropdown resolved-resolution-message-template-input', name:'resolution_type'}
       -else
         %p.resolution-template-resolution-type.resolution-template-lesser-permission-text
       %p.resolution-template-footer-text.hide Customer Footer

@@ -3194,10 +3194,9 @@ $ ->
     $('#index_change_resolution_dialog').dialog('open')
 
   # Populate bulk webcat response templates
-  assemble_webcat_response_templates = (templates, customer_footer) ->
+  assemble_webcat_response_templates = (templates) ->
     resolution_select = $('#email-response-to-customers-select')
     resolution_select.empty()
-    is_customer = false
 
     if templates.length == 0
       resolution_select.val ''
@@ -3205,12 +3204,7 @@ $ ->
       $('#email-response-to-customers').val ''
 
     $(templates).each (index, template) ->
-      #append customer footer to saved message
-      if customer_footer != ''
-        customer_message = template.body + ' ' + customer_footer
-        is_customer = true
-      else customer_message = template.body
-
+      customer_message = template.body
       template_option = $("<option class='webcat-resolution-template-option'></option>")
       $(template_option).val template.name
       $(template_option).text template.name
@@ -3222,29 +3216,17 @@ $ ->
       if index == 0
         $('#email-response-to-customers').text customer_message
         $('#email-response-to-customers').val customer_message
-        resolution_select.attr('data-has-footer', is_customer)
 
-  window.populate_resolved_webcat_templates = (resolution_type, is_customer) ->
+  window.populate_resolved_webcat_templates = (resolution) ->
 
-    get_resolution_templates_by_resolution('webcat', resolution_type).then (response) ->
+    get_resolution_templates_by_resolution('webcat', resolution).then (response) ->
       templates = JSON.parse response
-      customer_footer = ''
-
-      if is_customer == true
-        #fetch customer footer to append to message if customer ticket
-        get_resolution_templates_by_resolution('webcat', 'Customer Footer').then (customer_footer_response) ->
-          if customer_footer_response.length > 0
-            customer_footer = JSON.parse customer_footer_response
-            if customer_footer[0]?
-              customer_footer = customer_footer[0].body
-            assemble_webcat_response_templates(templates, customer_footer)
-      else
-        assemble_webcat_response_templates(templates, customer_footer)
+      assemble_webcat_response_templates(templates)
 
   # Load resolution template comments after clicking new status
   $("input[type=radio][name='complaint[resolution]']").change ->
     resolution = $(this).val()
-    populate_resolved_webcat_templates(resolution, 'false')
+    populate_resolved_webcat_templates(resolution)
 
   # Populate current resolution comment after changing resolution template
   $('#email-response-to-customers-select').on 'change', (i, e) ->

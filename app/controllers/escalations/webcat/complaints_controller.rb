@@ -40,7 +40,6 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
 
   def resolution_message_templates
     @templates = ResolutionMessageTemplate.for_webcat_disputes
-    @customer_footer_exists = ResolutionMessageTemplate.by_webcat_resolution_disputes('Customer Footer').exists?
   end
 
   private
