@@ -1131,6 +1131,7 @@ processSubmitPending=(entry_id,row_id)->
         temp_row.invalidate().page(table_page).draw(false)
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
+        populate_webcat_entry_template_select(temp_row)
         nested_tooltip()
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
           persist: false,
@@ -1224,6 +1225,7 @@ processSubmitEntry = (entry_id,row_id) ->
           temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
+          populate_webcat_entry_template_select(temp_row)
           nested_tooltip()
 
           $('#input_cat_'+ temp_row.data().entry_id).selectize {
@@ -1966,6 +1968,7 @@ format = (complaint_entry_row) ->
   whois_lookup = if ip_address then ip_address else domain
   complaint_entry_html = ''
   input_cat = 'input_cat_' + entry_id
+  input_cat_templates = 'input_cat_templates_' + entry_id
 
   if complaint_entry.status == "PENDING"
     if complaint_entry.uri_as_categorized  == ""
@@ -2069,6 +2072,7 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Internal Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + entry_id + '" type="text" data-domain="' + domain + '" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
+      '<select id="' + input_cat_templates + '" name="[' + input_cat_templates + '][]" class="input-cat-select-resolution"></select>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div>' +
       '<div class="col-xs-4">' +
@@ -2077,6 +2081,48 @@ format = (complaint_entry_row) ->
       '</div></div></div></div></td></tr></table>'
 
   complaint_entry_html
+
+window.populate_webcat_entry_template_select = (complaint_entry_row) ->
+
+  complaint_entry = complaint_entry_row.data()
+  row_id = complaint_entry_row[0][0]
+  entry_id = complaint_entry.entry_id
+  input_cat_templates = 'input_cat_templates_' + entry_id
+
+  complaint_resolution = ""
+  if complaint_entry.resolution
+    complaint_resolution = complaint_entry.resolution
+  else
+    complaint_resolution = "FIXED"
+
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/webcat/resolution_message_templates"
+    data: {resolution: complaint_resolution}
+    dataType: 'json'
+    success_reload: false
+    success: (response) ->
+      templates = JSON.parse response
+      resolution_select = $("##{input_cat_templates}")
+      $(templates).each (index, template) ->
+        if templates.length == 0
+          $("#complaint_resolution_comment_#{entry_id}").val template.body
+
+        customer_message = template.body
+        template_option = $("<option class='webcat-resolution-template-option'></option>")
+        $(template_option).val template.name
+        $(template_option).text template.name
+        $(template_option).attr('data-body', customer_message )
+        $(template_option).attr('data-description', template.description )
+        resolution_select.append template_option
+
+        #show first option as body and description
+        if index == 0
+          $("#complaint_resolution_comment_#{entry_id}").val template.body
+
+    error: (response) ->
+      std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
+  )
 
 
 ## Complaint history dialog box. Includes tabs for domain history, complaint entry history, and xbrs history of the url.
@@ -2338,6 +2384,7 @@ window.click_table_buttons = (complaint_table, button)->
               category_ids.push(y)
 
         row.child(format(row)).show()
+        populate_webcat_entry_template_select(row)
         nested_tooltip()
 
         tr.removeClass 'not-shown'
@@ -2696,6 +2743,7 @@ processSubmitMaster = () ->
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
           nested_tooltip()
+          populate_webcat_entry_template_select(temp_row)
           $('#input_cat_'+ entry.entry_id).selectize {
             persist: false,
             create: false,
@@ -2906,6 +2954,7 @@ $ ->
 
         row.child(format(row)).show()
         nested_tooltip()
+        populate_webcat_entry_template_select(row)
 
         tr.addClass 'shown'
 
