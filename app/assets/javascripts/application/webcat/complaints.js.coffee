@@ -2124,6 +2124,13 @@ window.populate_webcat_entry_template_select = (complaint_entry_row) ->
       std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
   )
 
+  # Update inline customer comments when selecting new template
+  $(".input-cat-select-resolution").change (i, e) ->
+    comment = $(this).find(":selected").attr("data-body")
+    id = this.id
+    id = id.replace('input_cat_templates_', '')
+    $("#complaint_resolution_comment_#{id}").val comment
+
 
 ## Complaint history dialog box. Includes tabs for domain history, complaint entry history, and xbrs history of the url.
 window.history_dialog = (id, url) ->
