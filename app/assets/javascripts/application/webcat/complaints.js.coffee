@@ -2082,18 +2082,21 @@ format = (complaint_entry_row) ->
 
   complaint_entry_html
 
-window.populate_webcat_entry_template_select = (complaint_entry_row) ->
+window.populate_webcat_entry_template_select = (complaint_entry_row, new_resolution) ->
 
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
   entry_id = complaint_entry.entry_id
   input_cat_templates = 'input_cat_templates_' + entry_id
-
   complaint_resolution = ""
-  if complaint_entry.resolution
-    complaint_resolution = complaint_entry.resolution
+
+  if new_resolution?
+    complaint_resolution = new_resolution
   else
-    complaint_resolution = "FIXED"
+    if complaint_entry.resolution
+      complaint_resolution = complaint_entry.resolution
+    else
+      complaint_resolution = "FIXED"
 
   std_msg_ajax(
     method: 'GET'
@@ -2104,6 +2107,7 @@ window.populate_webcat_entry_template_select = (complaint_entry_row) ->
     success: (response) ->
       templates = JSON.parse response
       resolution_select = $("##{input_cat_templates}")
+      resolution_select.html ''
       $(templates).each (index, template) ->
         if templates.length == 0
           $("#complaint_resolution_comment_#{entry_id}").val template.body
@@ -2948,6 +2952,13 @@ $ ->
     domain = $("#complaint_prefix_"+id)[0].dataset.domain
     touchedFormChange(domain)
     $('#master-submit').prop('disabled', false)
+
+    #update response template select
+    complaint_table = $('#complaints-index').DataTable()
+    tr = $(this).closest('tr')
+    row_id = $(tr).attr('row_id')
+    row = complaint_table.row(row_id)
+    populate_webcat_entry_template_select(row, $(this).val())
 
   $('.expand-all').click ->
     complaint_table = $('#complaints-index').DataTable()
