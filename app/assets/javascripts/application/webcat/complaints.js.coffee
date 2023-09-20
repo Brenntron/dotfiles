@@ -2072,7 +2072,7 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Internal Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + entry_id + '" type="text" data-domain="' + domain + '" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<select id="' + input_cat_templates + '" name="[' + input_cat_templates + '][]" class="input-cat-select-resolution"></select>' +
+      '<select id="' + input_cat_templates + '" name="[' + input_cat_templates + '][]" class="complaint-comment-select"></select>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div>' +
       '<div class="col-xs-4">' +
@@ -2129,7 +2129,7 @@ window.populate_webcat_entry_template_select = (complaint_entry_row, new_resolut
   )
 
   # Update inline customer comments when selecting new template
-  $(".input-cat-select-resolution").change (i, e) ->
+  $(".complaint-comment-select").change ->
     comment = $(this).find(":selected").attr("data-body")
     id = this.id
     id = id.replace('input_cat_templates_', '')
