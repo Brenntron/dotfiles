@@ -2099,8 +2099,8 @@ window.populate_webcat_entry_template_select = (complaint_entry_row, new_resolut
     else
       complaint_resolution = "FIXED"
 
-  #disable select if entry is completed
-  if complaint_entry.status == "COMPLETED"
+  #disable select if entry is completed and customer comment input is enabled
+  if complaint_entry.status == "COMPLETED" && $("#complaint_resolution_comment_#{entry_id}").prop('disabled') == true
     resolution_select.prop('disabled', true)
 
   std_msg_ajax(
