@@ -1350,6 +1350,7 @@ window.reopenComplaint = (entry_id, button) ->
       $("#reopen_" + entry_id).addClass('hidden')
       $("#submit_changes_" + entry_id).removeClass('hidden')
       $(status_col).text('REOPENED')
+      $("#input_cat_templates_#{entry_id}").prop('disabled', false)
     error: (response) ->
       std_msg_error(response,"", reload: false)
   )
@@ -2085,11 +2086,11 @@ format = (complaint_entry_row) ->
 window.populate_webcat_entry_template_select = (complaint_entry_row, new_resolution) ->
 
   complaint_entry = complaint_entry_row.data()
-  row_id = complaint_entry_row[0][0]
   entry_id = complaint_entry.entry_id
-  input_cat_templates = 'input_cat_templates_' + entry_id
-  complaint_resolution = ""
+  resolution_select = $("#input_cat_templates_#{entry_id}")
+  resolution_select.html ''
 
+  #use new resolution if passed one, otherwise use current one
   if new_resolution?
     complaint_resolution = new_resolution
   else
@@ -2097,6 +2098,10 @@ window.populate_webcat_entry_template_select = (complaint_entry_row, new_resolut
       complaint_resolution = complaint_entry.resolution
     else
       complaint_resolution = "FIXED"
+
+  #disable select if entry is completed
+  if complaint_entry.status == "COMPLETED"
+    resolution_select.prop('disabled', true)
 
   std_msg_ajax(
     method: 'GET'
@@ -2106,17 +2111,14 @@ window.populate_webcat_entry_template_select = (complaint_entry_row, new_resolut
     success_reload: false
     success: (response) ->
       templates = JSON.parse response
-      resolution_select = $("##{input_cat_templates}")
-      resolution_select.html ''
       $(templates).each (index, template) ->
         if templates.length == 0
           $("#complaint_resolution_comment_#{entry_id}").val template.body
 
-        customer_message = template.body
         template_option = $("<option class='webcat-resolution-template-option'></option>")
         $(template_option).val template.name
         $(template_option).text template.name
-        $(template_option).attr('data-body', customer_message )
+        $(template_option).attr('data-body', template.body )
         $(template_option).attr('data-description', template.description )
         resolution_select.append template_option
 
@@ -3261,7 +3263,7 @@ $ ->
     $('#index_change_resolution_dialog').dialog('open')
 
   # Populate bulk webcat response templates
-  assemble_webcat_response_templates = (templates) ->
+  assemble_webcat_bulk_response_templates = (templates, resolution_select) ->
     resolution_select = $('#email-response-to-customers-select')
     resolution_select.empty()
 
@@ -3271,24 +3273,23 @@ $ ->
       $('#email-response-to-customers').val ''
 
     $(templates).each (index, template) ->
-      customer_message = template.body
       template_option = $("<option class='webcat-resolution-template-option'></option>")
       $(template_option).val template.name
       $(template_option).text template.name
-      $(template_option).attr('data-body', customer_message )
+      $(template_option).attr('data-body', template.body )
       $(template_option).attr('data-description', template.description )
       resolution_select.append template_option
 
       #show first option as body and description
       if index == 0
-        $('#email-response-to-customers').text customer_message
-        $('#email-response-to-customers').val customer_message
+        $('#email-response-to-customers').text template.body
+        $('#email-response-to-customers').val template.body
 
   window.populate_resolved_webcat_templates = (resolution) ->
 
     get_resolution_templates_by_resolution('webcat', resolution).then (response) ->
       templates = JSON.parse response
-      assemble_webcat_response_templates(templates)
+      assemble_webcat_bulk_response_templates(templates)
 
   # Load resolution template comments after clicking new status
   $("input[type=radio][name='complaint[resolution]']").change ->
