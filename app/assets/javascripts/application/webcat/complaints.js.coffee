@@ -2111,9 +2111,11 @@ window.populate_webcat_entry_template_select = (complaint_entry_row, new_resolut
     success_reload: false
     success: (response) ->
       templates = JSON.parse response
+
+      if templates.length == 0 #clear out input if no templates returned
+        $("#complaint_resolution_comment_#{entry_id}").val ''
+
       $(templates).each (index, template) ->
-        if templates.length == 0
-          $("#complaint_resolution_comment_#{entry_id}").val template.body
 
         template_option = $("<option class='webcat-resolution-template-option'></option>")
         $(template_option).val template.name
