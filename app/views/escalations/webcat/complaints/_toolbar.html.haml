@@ -152,15 +152,13 @@
           .edit-resolution-container
             .col-xs-12
               .edit-resolution-comment
-                Apply any below attributes or all attributes at once to selected tickets.
+                Fixed submission resolutions cannot be chosen in bulk.
             .col-xs-12.resolution-container
               %label.content-label-sm.edit-resolution-label Resolution
               .resolution-controls
                 .resolution-input-wrapper
                   %input{type: 'radio', id: 'webcat_resolution_unchanged_option', name: 'complaint[resolution]', value: 'UNCHANGED'}
                   %label.resolution-radio-label{for: 'webcat_resolution_unchanged_option'} Unchanged
-                  %input{type: 'radio', id: 'webcat_resolution_fixed_option', name: 'complaint[resolution]', value: 'FIXED'}
-                  %label.resolution-radio-label{for: 'webcat_resolution_fixed_option'} Fixed
                   %input{type: 'radio', id: 'webcat_resolution_invalid_option', name: 'complaint[resolution]', value: 'INVALID'}
                   %label.resolution-radio-label{for: 'webcat_resolution_invalid_option'} Invalid
                 .resolution-apply-wrapper
@@ -197,7 +195,7 @@
             .col-xs-12.button-wrapper
               %button{class: 'primary button-update-resolution resolution-clear-button', type:'button', onclick:'clearBulkResolution();'}
                 =inline_svg 'icon_clear_white.svg', class: 'resolution-button-icon'
-                %span Clear
+                %span Reset
               -#%button{class: 'primary button-update-resolution apply-all-button', type:'button', onclick:'applyAll();'}
               -#  =inline_svg 'icon_apply_all_white.svg', class: 'resolution-button-icon'
               -#  %span Apply All
