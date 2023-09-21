@@ -9931,7 +9931,6 @@ td.text-center span {
 
       .button-update-resolution{
         align-items: center;
-        background-color: lighten($content-label-color, 15%);
         background-position: 5% center;
         background-repeat: no-repeat;
         background-size: 25px 25px;
@@ -9944,6 +9943,15 @@ td.text-center span {
         margin-right: 10px;
         width: 25px;
       }
+
+      .resolution-clear-button {
+        background-color: $content-label-color;
+      }
+
+      .update-resolution-button {
+        background-color: #E47433;
+      }
+
     }
   }
 }
