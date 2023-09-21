@@ -2074,7 +2074,7 @@ format = (complaint_entry_row) ->
       '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + entry_id + '" type="text" data-domain="' + domain + '" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
       '<select id="' + input_cat_templates + '" name="[' + input_cat_templates + '][]" class="complaint-comment-select"></select>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
+      '<textarea class="nested-table-input complaint-comment-input complain-comment-textarea" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '/>' +
       '</div>' +
       '<div class="col-xs-4">' +
       '<label class="content-label-sm">Resolution</label><br/>' +

@@ -8274,6 +8274,12 @@ table.dispute-entry-table tbody tr.selected {
 
 .complaint-comment-input {
   width: 100%;
+
+}
+
+.complain-comment-textarea {
+  resize: vertical;
+  min-height: 34px;
 }
 
 .complaint-comment-select {
