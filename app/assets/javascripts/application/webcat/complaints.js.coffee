@@ -3251,6 +3251,10 @@ $ ->
 #  if categories?
 #    $('categories-container').find('.resolution-apply-button').addClass('applied')
 
+  webcat_bulk_response_templates_check_if_checked = () ->
+    if $("input[type=radio][name='complaint[resolution]']:checked").length <= 0
+      $('#webcat_resolution_unchanged_option').trigger('click')
+
   $('#index_change_resolution_dialog').dialog
     autoOpen: false
     classes: { 'ui-dialog': 'index-change-resolution-dialog'}
@@ -3260,6 +3264,9 @@ $ ->
       my: 'right top'
       at: 'right top+150'
       of: window
+    open:  () ->
+      #select radio button if none is selected (needs to be clicked so data can load)
+      webcat_bulk_response_templates_check_if_checked()
 
   $("#index_update_resolution").click ->
     $('#index_change_resolution_dialog').dialog('open')
