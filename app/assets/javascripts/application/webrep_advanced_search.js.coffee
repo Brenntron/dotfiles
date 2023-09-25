@@ -12,7 +12,8 @@ $(document).ready ->
     $('#search-criteria-options').hide()
     return
 
-  $('.remove-input').click ->
+  $('#disputes-advanced-search-form .remove-input').click ->
+
     field = $(this).parent()
     field.find('input').val('')  # on a minus icon click, clear value of field
     field_name = field.find('input').attr('id') || field.find('select').attr('id')
