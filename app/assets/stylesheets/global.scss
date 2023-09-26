@@ -5440,6 +5440,12 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: transparent;
 }
 
+.dispute-owner-buttons-wrapper {
+  .take-ticket-button, .return-ticket-button {
+    background-color: transparent !important;
+  }
+}
+
 .return-ticket-button {
   background-image: url(image_path('icon_return_light2.svg'));
   background-repeat: no-repeat;
@@ -7614,6 +7620,25 @@ table.dispute-entry-table tbody tr.selected {
   display: inline-block;
   margin-top: -4px;
   margin-left: 10px;
+
+  .return-ticket-button {
+    margin-right: 3px;
+  }
+
+  button:disabled {
+    opacity: .5;
+  }
+}
+
+.file-rep-dispute-assignee {
+  width: 100%;
+}
+
+.file-rep-dispute-owner-buttons-wrapper {
+  margin-left: 0;
+  margin-top: 10px;
+  padding-left: 0;
+  width: 100%;
 }
 
 .dispute-owner-buttons-wrapper .dropdown.open, .webrep-change-assignee-wrapper .dropdown.open{
@@ -7664,7 +7689,7 @@ table.dispute-entry-table tbody tr.selected {
 .priority-col-wrapper, .case-id-wrapper {
   float: left;
   border-right: solid 1px $faint-neutral-color;
-  margin-right: 12px;
+  margin-right: 10px;
 }
 #user-open-disputes-tab{
   background-image: url(image_path('icon_open.svg'))
@@ -8238,23 +8263,23 @@ table.dispute-entry-table tbody tr.selected {
   font-size: 8pt;
 }
 
-#copiedAlert {
+#copiedAlert, #assignedAlert, #unassignedAlert {
   color: $success-color;
   color: #5FB766;
   font-size: 80%;
   display: inline;
   vertical-align: top;
 }
-.nested-complaint-static-data .copied-container{
+.nested-complaint-static-data .copied-container, .assigned-check-container {
   margin-top: -7px;
 }
-.copied-check{
+.copied-check, .assigned-check{
   height: 12px;
   width: 10px;
   display: inline-block;
   background-image: url(image_path('icon_check_dark_green.svg'));
 }
-.copied-container{
+.copied-container, .assigned-check-container {
   position: absolute;
 }
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {

@@ -29,6 +29,10 @@ class Escalations::Sdr::DisputesController < ApplicationController
   def show
     @dispute = SenderDomainReputationDispute.where(id: params[:id]).first
     @beaker_info = @dispute.beaker_info
+    @is_assignee = @dispute.user_id == current_user.id
+    @is_duplicate = @dispute.resolution == Dispute::DUPLICATE
+    @is_resolved = @dispute.status == Dispute::RESOLVED
+    @is_unassigned = @dispute.user_id.nil? || @dispute.user&.cvs_username == 'vrtincom'
     @versioned_items = @dispute.compose_versioned_items
   end
 
