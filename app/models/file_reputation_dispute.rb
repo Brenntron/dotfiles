@@ -1,5 +1,11 @@
 # class FileReputationTicket < ApplicationRecord
 class FileReputationDispute < ApplicationRecord
+
+  require 'httparty'
+  require 'json'
+  require 'openssl'
+  include HTTParty
+
   has_paper_trail on: [:update], ignore: [:updated_at, :user_id]
 
   belongs_to :customer, optional:true
@@ -545,6 +551,42 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.message}")
   end
 
+  def local_reversing_labs
+    api_key = ENV["REVERSING_LABS_API"]
+    file = FileReputationApi::ReversingLabs.lookup(self.sha256_hash)
+    file_hash = file.sha256_hash
+    url_classification = "https://rl.vrt.sourcefire.com/api/samples/#{file_hash}/classification/"
+    url_ticore = "https://rl.vrt.sourcefire.com/api/samples/#{file_hash}/ticore/"                            
+
+    classification_response = HTTParty.get(
+      url_classification,
+      :verify => false,
+      :headers => {"Authorization" => "Token #{api_key}"}
+      )
+ 
+    results = {}
+
+    if classification_response.present?
+      results["threat_status"] = classification_response["threat_status"]
+      results["last_scan_date"] =  classification_response["last_seen"]
+      results["threat_name"] = classification_response["threat_name"]
+      # results.push(threat_status, last_scan_date, threat_name)
+    end
+
+    ticore_response = HTTParty.get(
+      url_ticore,
+      :verify => false,
+      :headers => {"Authorization" => "Token #{api_key}"}
+      )
+        
+    if ticore_response.present?
+      results["digital_signers"] = ticore_response["digital_signers"]
+      # results.push(digital_signers)
+    end
+
+    return results
+  end
+
   def pdf?
     if self.file_name.present?
       /\.pdf$/i =~ self.file_name
@@ -611,6 +653,10 @@ class FileReputationDispute < ApplicationRecord
     update_reversing_labs_score
     update_sandbox_score
     update_sample_zoo
+  end
+  
+  def local_reversing_labs_api
+    local_reversing_labs
   end
 
   def ack_create(envelope_params, sender_params)

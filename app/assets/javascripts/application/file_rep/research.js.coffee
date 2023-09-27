@@ -12,6 +12,7 @@ $ ->
 window.refresh_research_data = (sha256_hash) ->
   sha256_hash = $('#sha256_hash')[0].innerText
   window.research_data(sha256_hash)
+  window.get_local_reversinglabs_api()
   window.update_file_rep_data()
 
 
@@ -564,6 +565,38 @@ window.update_file_rep_data = () ->
       $(sync_button).removeClass('syncing')
       std_api_error(response, "There was a problem refreshing some research data", reload: false)
   )
+
+########### REVERSING LABS LOCAL API ############
+window.get_local_reversinglabs_api = () ->
+  file_rep_id = $(".case-id-tag")[0].innerText
+
+  threat_name = $("#local-rl-threat-name")
+  threat_status = $("#local-rl-threat-status")
+  threat_scan = $("#local-rl-threat-scan")
+  threat_signer = $("#local-rl-signer")
+
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/filerep/research/local_reversinglabs_api"
+    data: {id: file_rep_id}
+    success_reload: false
+    success: (response) ->
+      name = response['threat_name']
+      status = response['threat_status']
+      scan = response['last_scan_date']
+      signer = response['digital_signer']
+      # format date:
+      scan_date = moment(new Date(scan)).format('MMM D, YYYY h:mm A')
+
+      # add data from response to page:
+      threat_name.text(name)
+      threat_status.text(status)
+      threat_scan.text(scan_date)
+      threat_signer.text(signer)
+
+    error: (response) ->
+      console.log("error", response)
+  )  
 
 
 $ ->
