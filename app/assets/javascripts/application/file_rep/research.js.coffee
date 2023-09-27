@@ -10,7 +10,6 @@ $ ->
 
 # load the local RL api data the first time page loads:
 $(document).on 'ready',->
-  sha256_hash = $('#sha256_hash')[0].innerText
   window.get_local_reversinglabs_api()
 
 
@@ -591,6 +590,16 @@ window.get_local_reversinglabs_api = () ->
       status = response['threat_status']
       scan = response['last_scan_date']
       signer = response['digital_signer']
+
+      if not name?
+        name = "N/A"
+      if not status?
+        status = "N/A"
+      if not scan?
+        scan = "N/A"
+      if not signer?
+        signer = "N/A"
+
       # format date:
       scan_date = moment(new Date(scan)).format('MMM D, YYYY h:mm A')
 
@@ -601,7 +610,7 @@ window.get_local_reversinglabs_api = () ->
       threat_signer.text(signer)
 
     error: (response) ->
-      console.log("error", response)
+      std_api_error(response, "There was a problem retrieving data from the local Reversing Labs api", reload: false)
   )  
 
 

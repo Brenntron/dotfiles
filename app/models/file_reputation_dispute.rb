@@ -1,10 +1,6 @@
 # class FileReputationTicket < ApplicationRecord
 class FileReputationDispute < ApplicationRecord
 
-  require 'httparty'
-  require 'json'
-  require 'openssl'
-  include HTTParty
 
   has_paper_trail on: [:update], ignore: [:updated_at, :user_id]
 
@@ -570,7 +566,6 @@ class FileReputationDispute < ApplicationRecord
       results["threat_status"] = classification_response["threat_status"]
       results["last_scan_date"] =  classification_response["last_seen"]
       results["threat_name"] = classification_response["threat_name"]
-      # results.push(threat_status, last_scan_date, threat_name)
     end
 
     ticore_response = HTTParty.get(
@@ -581,7 +576,6 @@ class FileReputationDispute < ApplicationRecord
         
     if ticore_response.present?
       results["digital_signers"] = ticore_response["digital_signers"]
-      # results.push(digital_signers)
     end
 
     return results
