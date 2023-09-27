@@ -2481,7 +2481,14 @@ open_rows = (selected_rows, toggle) ->
         new_domain = domain
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
-        window.open("http://"+selected_row.ip_address)
+        ipv4_regex = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/gm
+
+        # Because IPv6 includes colons an IPv6 must be wrapped in square brackets if it's used as a hostname.
+        if ipv4_regex.test(selected_row.ip_address)
+          window.open("http://#{selected_row.ip_address}")
+        else
+          console.log "Opening #{selected_row.ip_address}"
+          window.open("http://[#{selected_row.ip_address}]")
 
   if low_rep_entries.length >= 10
     error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores."
