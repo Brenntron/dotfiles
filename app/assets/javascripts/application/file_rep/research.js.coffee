@@ -8,6 +8,12 @@ $ ->
     sha256_hash = $('#sha256_hash')[0].innerText
     window.research_data(sha256_hash)
 
+# load the local RL api data the first time page loads:
+$(document).on 'ready',->
+  sha256_hash = $('#sha256_hash')[0].innerText
+  window.get_local_reversinglabs_api()
+
+
 # Update the research reports and the items in the db
 window.refresh_research_data = (sha256_hash) ->
   sha256_hash = $('#sha256_hash')[0].innerText
