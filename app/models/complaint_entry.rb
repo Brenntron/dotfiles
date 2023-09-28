@@ -187,8 +187,8 @@ class ComplaintEntry < ApplicationRecord
   def remote_prefixes(prefix_given: self.hostlookup, reload: false)
     @remote_prefixes = nil if reload
     # IPv6 cannot be parsed like URI, since it does not follow rfc3986 (URLs standard)
-    # If it is IPv6, do not escape prefix
-    escaped_prefix = !!(prefix_given =~ Resolv::IPv6::Regex) ? prefix_given : Addressable::URI.escape(prefix_given)
+    # If it is IPv6, do not escape prefix and add brackets to transform it to url
+    escaped_prefix = !!(prefix_given =~ Resolv::IPv6::Regex) ? "[#{prefix_given}]" : Addressable::URI.escape(prefix_given)
     @remote_prefixes ||= Wbrs::Prefix.where({:urls => [escaped_prefix]})
   end
 
