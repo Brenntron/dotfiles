@@ -62,7 +62,7 @@ gem 'httparty', '~> 0.15.3'
 # gem 'peake-bridge-client', '0.1.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
 
 # gem 'peake-bridge-client', '0.2.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
-gem 'peake-bridge-client', '0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
+gem 'peake-bridge-client', '~> 0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'

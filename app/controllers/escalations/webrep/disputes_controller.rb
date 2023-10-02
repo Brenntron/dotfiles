@@ -73,6 +73,15 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def update
   end
 
+
+  def resolution_message_templates
+    @web_templates = ResolutionMessageTemplate.for_web_disputes
+    @email_templates = ResolutionMessageTemplate.for_email_disputes
+    @templates = @web_templates + @email_templates
+    @check_for_footer_web = ResolutionMessageTemplate.by_web_resolution_disputes('Customer Footer').exists?
+    @check_for_footer_email = ResolutionMessageTemplate.by_email_resolution_disputes('Customer Footer').exists?
+  end
+
   # TODO We should not have a 400 line method in a controller.
   # TODO avoid defining methods in the body of other methods.
   def dashboard

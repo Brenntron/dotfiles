@@ -300,6 +300,31 @@ table.dataTable thead .sorting_desc {
   background-image: url(image_path('layout/icon_sort_dec.svg'));
 }
 
+.entry-details-table {
+  /* scrollY misaligns datatable headers with the column bodies if
+    the page isn't show on page load. This overflow and max-height
+    gets the table scrollable while keeping the heads and body inline. */
+  .dataTables_wrapper.no-footer {
+      max-height: 200px;
+      overflow: auto;
+  }
+  .dataTable.no-footer {
+    overflow: auto;
+
+    th {
+      background-position-x: 95% !important;
+    }
+  }
+
+  .dataTables_wrapper.no-footer, .dataTable.no-footer {
+    border-bottom: 1px solid $table-dark-header;
+
+    .dataTable.no-footer {
+      border: 0;
+    }
+  }
+}
+
 .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
   height: 100%;
   display: inline-block;
@@ -4069,10 +4094,6 @@ fieldset.top-content {
   max-width: 100%;
 }
 
-#manageResolutionMessageTemplatesDialog .template-content {
-  max-height: 145px;
-}
-
 .email-response-button-wrapper {
   float: right;
   border-left: solid 1px darken($faint-neutral-color, 10%);
@@ -4095,6 +4116,7 @@ fieldset.top-content {
 .nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
 .nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
+.nav-tabs > li > a#context-tags-tab-link {background-image: url(image_path('icon_context_tag.svg'));}
 
 .email-msg-content {
   background-color: $content-bg-color;
@@ -4247,53 +4269,12 @@ input.communication-subject {
   font-size: 9pt;
 }
 
-.mng-resolution-message-templates-button {
-  background-image: url(image_path('icon_comment_template_white.svg'));
-  background-color: darken($nav-toolbar-color, 10%);
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 14px 15px;
-  border-radius: 2px;
-  height: 20px;
-  width: 22px;
-  display: inline-block;
-  float: right;
-  border: none;
-  padding-right: 0;
-  margin-top: 1px;
-  margin-left: 12px;
-  font-weight: 300;
-  font-size: 9pt;
-  &:hover {
-    background-color: $primary-section-color !important;
-  }
-}
-
-//bump up button when next to duplicate status
-.duplicate-status-notice + .mng-resolution-message-templates-button {
-  position: relative;
-  bottom: 5px;
-}
-
 .select-a-template{
   margin-left: 26px;
   margin-top: 2px;
   color: $type-base-color;
   text-transform: uppercase;
   font-weight: 700;
-}
-
-.select-resolution-message-templates-button {
-  background-image: url(image_path('icon_comment_template_dk_grey.svg'));
-  background-repeat: no-repeat;
-  background-position: 0 0px;
-  background-size: 18px 18px;
-  height: 24px;
-  display: inline-block;
-  background-color: transparent;
-  border: none;
-  font-weight: 300;
-  font-size: 9pt;
 }
 
 .note-info-item {
@@ -4907,6 +4888,7 @@ button.tertiary {
 .icon-related-users {background-image: url(image_path('icon_team_white.svg'));}
 .icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}
 .icon-notes {background-image: url(image_path('icon_status_comment.svg'));}
+.icon-resolution-manager-page {background-image: url(image_path('icon_email_read_white.svg'));}
 
 .remove-input {
   background-image: url(image_path('icon_minus_blue.svg'));
@@ -5147,27 +5129,6 @@ input.file_attachment {
 }
 
 #new-template-form-wrapper {
-  display: none;
-  height: 0;
-  margin: 12px;
-  border: 1px solid $faint-neutral-color;
-}
-
-#new-resolution-message-template-form-wrapper {
-  display: none;
-  height: 0;
-  margin: 12px;
-  border: 1px solid $faint-neutral-color;
-}
-
-#edit-template-form-wrapper {
-  display: none;
-  height: 0;
-  margin: 12px;
-  border: 1px solid $faint-neutral-color;
-}
-
-#edit-resolution-message-template-form-wrapper,  #edit-resolved-resolution-message-template-form-wrapper{
   display: none;
   height: 0;
   margin: 12px;
@@ -6508,10 +6469,16 @@ h5.entry-details-table-header {
   right: 0;
   margin-top: 0;
 }
+
+// show full toolbar labels on smaller screens for less-wide toolbars
 @media (min-width: 1100px) {
   #research-tab-toolbar .toolbar-button-text {
     display: block;
     margin-left: 8px;
+  }
+  // context tags tab exists on both webrep and filerep
+  .tab-context-tags .toolbar-button-text {
+    display: block;
   }
 }
 
@@ -6519,7 +6486,7 @@ h5.entry-details-table-header {
   padding: 0 8px !important;
 }
 
-.inline-select-dropdown {
+.inline-select-dropdown{
   padding-right: 20px;
   background-image: url(image_path('icon_dropdown_grey.svg'));
   background-repeat: no-repeat;
@@ -6554,10 +6521,18 @@ h5.entry-details-table-header {
 }
 
 .ticket-resolution-submenu {
-  left: -219%;
+  left: -298%;
   margin-top: -56px;
   margin-left: 1px;
-  width: 350px;
+  width: 475px;
+  background-color: $bug-section-color;
+}
+
+//Research tab entries get a little extra padding since they are missing submit button
+#disputes-research-table {
+  .non-resolution-submit-wrapper {
+    padding-bottom: 8px;
+  }
 }
 
 .ticket-resolution-submenu li label, #index-ticket-resolution-submenu .radio-label, #index-entry-resolution-submenu
@@ -6677,10 +6652,38 @@ h5.entry-details-table-header {
   background-color: darken($bug-section-color, 5%);
 }
 
+.selected #show-ticket-resolution-submenu,
+.selected #sdr-index-dispute-resolution-submenu,
+.selected #index-ticket-resolution-submenu,
+.selected #index-entry-resolution-submenu {
+  display: flex;
+}
+
+.submenu-left-wrapper {
+  max-width: fit-content;
+  ul li {
+    padding-right: 4px !important;
+  }
+  .radio-label {
+    padding-right: 10px !important;
+  }
+}
+
+//workaround for webrep single entries - delete after we remove this section
+.research-table-row.editing-row .submenu-left-wrapper {
+  max-width: 100%;
+}
+
 .submenu-left-wrapper, .submenu-right-wrapper {
   padding-left: 0  !important;
   padding-right: 0 !important;
   margin-right: 0  !important;
+}
+
+.submenu-right-wrapper {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  flex-grow: 1; //stretch right submenu to fill rest of width
 }
 
 .submenu-header {
@@ -6713,6 +6716,19 @@ input[type="radio"].ticket-status-radio {
   margin-top: 0;
 }
 
+//tweak to get webrep radio buttons to align better
+#index-edit-ticket-status-dropdown {
+  input[type="radio"].ticket-status-radio {
+    margin-top: 4px;
+  }
+}
+
+.escalations--webrep--disputes-controller {
+  input[type="radio"].ticket-status-radio {
+    margin-top: 3px;
+  }
+}
+
 .radio-label {
   text-transform: none !important;
   font-weight: 400 !important;
@@ -6736,23 +6752,54 @@ input[type="radio"].ticket-status-radio {
   margin-top: 4px;
 }
 
+.dispute-type-radio-wrapper {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  input, label {
+    cursor: pointer;
+  }
+}
+
+#resolution-message-template-form-wrapper select {
+  min-height: 22px;
+  padding-left: 3px;
+  //overwrite firefox and safari default select styles
+  appearance: none;
+  background-color: #fff;
+}
+
+
+.webrep-resolution-template-type {
+  margin-right: 6px !important;
+}
+
+#dispute-type-web-wrapper {
+  margin-bottom: 5px;
+}
 .resolution-comment-wrapper {
-  display: inline-block;
   background-color: $content-bg-color;
   padding: 4px 12px !important;;
 }
 
 textarea.ticket-resolution-comment {
-  display: inline-block;
+  font-size: 8pt;
+}
+
+.ticket-resolution-comment, .entry-resolution-comment {
+  min-height: 180px;
+  resize: vertical;
+  line-height: 12px;
+}
+
+//extra padding for werbrep show entry resolution menu
+.entry-resolution-comment-wrapper-research-tab {
+  padding-bottom: 10px !important;
 }
 
 .resolution-comment-wrapper input[type='text'] {
   width: 100%;
   min-height: 40px;
-}
-
-.non-resolution-submit-wrapper .content-label-sm {
-  margin-top: 12px;
 }
 
 .sdr-non-resolution-submit-wrapper .content-label-sm {
@@ -6765,6 +6812,13 @@ textarea.ticket-resolution-comment {
   border-radius: 0;
   border: 1px solid darken($faint-neutral-color, 5%);
   width: 100%;
+  background-color: #fff; //firefox specific fix to get rid of default color
+  background-image: url(image_path('icon_dropdown_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+  background-size: 14px;
+  -webkit-appearance: none;
+  padding: 3px 0 3px 3px;
 }
 
 #wlbl_adjust_entries, #wlbl_adjust_entries_index {
@@ -7331,11 +7385,6 @@ td.ticket-total::before {
   min-width: 200px;
   top: 0;
   left: 100%;
-  height: 100%;
-}
-
-.sdr-non-resolution-submit-wrapper {
-  padding-top: 6px !important;
 }
 
 .non-resolution-submit-wrapper textarea, .resolution-comment-wrapper textarea {
@@ -7344,7 +7393,14 @@ td.ticket-total::before {
   border: 1px solid darken($faint-neutral-color, 5%);
   font-size: 8pt;
   padding: 6px;
+}
+
+.non-resolution-submit-wrapper textarea {
   min-height: 50px;
+}
+
+.resolution-comment-wrapper textarea {
+  min-height: 180px;
 }
 
 #sdr-index-dispute-resolution-submenu .resolution-comment-wrapper, #show-ticket-resolution-submenu .resolution-comment-wrapper {
@@ -7386,6 +7442,17 @@ td.ticket-total::before {
   left: 100%;
   padding: 0;
   margin-top: -56px;
+  background-color: $bug-section-color;
+}
+
+#index-ticket-resolution-submenu, #index-entry-resolution-submenu {
+  min-width: 475px;
+  .resolution-status-comment, .entry-status-comment{
+    min-height: 186px;
+    height: 105px;
+    font-size: 8pt;
+    line-height: 12px;
+  }
 }
 
 .non-resolution-submit-wrapper {
@@ -7770,11 +7837,7 @@ table.dispute-entry-table tbody tr.selected {
   width: 475px;
   margin-top: -55px;
   padding: 0;
-  .resolution-status-comment{
-    height: 105px;
-    font-size: 12px;
-    line-height: 1.4em;
-  }
+  background-color: $bug-section-color;
   button.primary{
     margin: 2% 0px 0px 33%
   }
@@ -7791,6 +7854,10 @@ table.dispute-entry-table tbody tr.selected {
 
 .show-toolbar-wrapper {
   margin-top: 40px;
+}
+
+.ticket-resolution-submit-wrapper {
+  padding: 12px 6px 6px 6px !important;
 }
 
 .preview-website-col {
@@ -8456,29 +8523,6 @@ hr.condensed {
 .top-case-info a {
   color: $content-bg-color;
   text-decoration: underline;
-}
-
-#disputes-research-table label.customer-facing-comment {
-  font-weight: 600;
-  padding-right: 0;
-}
-
-.customer-facing-comment {
-  color: $warning-accent-color !important;
-  font-weight: 600;
-  text-transform: none !important;
-}
-
-.customer-facing-comment::before {
-  content: '';
-  background-image: url(image_path('icon_warning_orange.svg'));
-  background-repeat: no-repeat;
-  width: 14px;
-  height: 14px;
-  display: inline-block;
-  float: left;
-  margin-top: -2px;
-  margin-right: 2px;
 }
 
 th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc {
@@ -11175,9 +11219,6 @@ button.secondary.view-report-external-button {
 
   // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
   @media screen and (min-width: 1200px) {
-    .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
-      width: 12%;
-    }
     // below ensures the navbar widths adds up correctly
     .col-lg-2.nav-username {
       width: 17%;
@@ -11188,10 +11229,7 @@ button.secondary.view-report-external-button {
   }
 
   // 1430px specific
-  @media screen and (min-width: 1201px) and (max-width: 1500px) {
-    .nav-page-button-wrapper {
-      width: 120px;
-    }
+  @media screen and (min-width: 1401px) and (max-width: 1500px) {
     .col-lg-2.nav-username {
       display: none;
     }
@@ -11288,7 +11326,7 @@ button.secondary.view-report-external-button {
 
 
 
-// dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
+// tooltips for modals on file rep get too wide, limit the max-width a little bit
 .tooltipster-sidetip .tooltipster-box {
   max-width: 460px !important;
 }
@@ -11303,7 +11341,8 @@ button.secondary.view-report-external-button {
   margin-bottom: 10px;
 }
 
-.data-report-table > tbody > tr > td, .data-report-table > thead > tr > th  {
+.data-report-table:not(.filerep-enrich-taxonomy-table) > tbody > tr > td,
+.data-report-table:not(.filerep-enrich-taxonomy-table) > thead > tr > th  {
   padding: 6px 6px;
 }
 
@@ -11362,7 +11401,7 @@ button.secondary.view-report-external-button {
   color: $second-section-color;
   font-weight: 600;
   padding-left: 22px !important;
-  // dbinebri: ensure RL result data strings wrap correctly
+  // ensure RL result data strings wrap correctly
   word-break: break-all;
 }
 
@@ -11380,7 +11419,7 @@ button.secondary.view-report-external-button {
   margin-left: -22px;
 }
 
-// dbinebri: fix for "not detected" left padding in RL table on Show
+// fix for "not detected" left padding in RL table on Show
 .scanner-unk {
   padding-left: 22px !important;
   color: $type-lighter-color;
@@ -13133,20 +13172,6 @@ table > tbody > tr > td.no-padding {
   }
 }
 
-.enrich-cell-external-references {
-  display: flex;
-  flex-direction: column;
-}
-
-.enrich-external-reference-link, .enrich-external-reference-link:hover, .enrich-external-reference-link:focus {
-  color: #fff;
-  text-decoration: underline;
-}
-
-.enrich-webrep-external-ref-header {
-  width: 137px;
-}
-
 #research_tab {
   .research-first-row {
     td {
@@ -14028,30 +14053,11 @@ table > tbody > tr > td.no-padding {
   border-top: 1px solid #f2f2f2;
 }
 
-.filerep-enrich-table-header-row th:first-child {
-  padding-left: 4px;
+.filerep-enrich-taxonomy-table th {
+  padding: 8px 6px;
 }
-
-.filerep-enrich-table-header-row th:last-child {
-  padding-right: 4px;
-}
-
-.filerep-enrich-table-description-th {
-  padding: 8px 8px 6px 8px;
-}
-
-.filerep-enrich-cell-external-references {
-  padding: 0;
-}
-
-.filerep-enrich-cell-name {
-  min-width: 85px;
-  padding: 0;
-}
-
-.filerep-enrich-cell-external-references {
-  min-width: 86px;
-  text-align: right;
+.filerep-enrich-taxonomy-table td {
+  padding: 8px 6px;
 }
 
 .filerep-enrich-external-ref {
@@ -14622,4 +14628,111 @@ input.wl-bl-list-inline {
 .text-wrap {
   max-width: 300px;
   word-wrap: break-word;
+}
+
+//Manage Resolution Message Templates
+
+#resolved-resolution-message-dialogue-form-information {
+  padding: 0 20px;
+}
+
+.resolved-resolution-message-template-input {
+  width: 100%;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  font-size: 8pt;
+}
+
+#resolution-message-templates {
+  .index-table-header {
+    float: none;
+  }
+  .toolbar-container {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+}
+
+#resolution-message-templates-table {
+  margin-top: 10px;
+}
+
+.resolution-template-description {
+  font-size: 12px;
+}
+
+.new-resolution-button-text{
+  text-transform: capitalize;
+  display: inline-block;
+  padding-left: 8px;
+  float: right;
+  font-size: 9pt;
+}
+
+.add-message-template {
+  background-image: url(image_path('icon_add_black.svg'));
+}
+
+.resolution-modal-label {
+  padding: 0 !important;
+  margin-top: 14px;
+}
+
+.resolution-modal-button-wrapper {
+  padding: 20px 0 30px 0;
+}
+
+.resolution-modal-textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 38px;
+  max-width: 100%;
+  min-width: 100%;
+  padding: 5px;
+}
+
+.ticket-resolution-description, .entry-resolution-description {
+  min-height: 14px;
+  font-size: 8pt;
+}
+
+#resolution-message-templates-table {
+  margin-top: 10px;
+}
+
+.resolution-template-description {
+  font-size: 12px;
+}
+
+.white-bg {
+  background-color: #fff;
+}
+
+#create-resolution-template-submit:disabled {
+  background-color:#6dbcdb !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resolution_message_templates-action .ui-dialog-title {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.edit-resolution-message-template {
+  cursor: pointer;
+}
+
+.edit-webrep-resolution-message-template {
+  cursor: pointer;
+}
+
+.manage-response-delete-icon {
+  background-repeat: no-repeat;
+  cursor: pointer;
+  height: 18px;
+  width: 18px;
+}
+
+.hide-temporarily {
+  display: none;
 }

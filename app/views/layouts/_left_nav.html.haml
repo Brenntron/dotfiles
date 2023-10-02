@@ -22,7 +22,7 @@
         %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav-icons'}
           - if is_rule_user?
             %li{class: 'ips-link'}
-              %a{href: '/escalation_bugs'}
+              %a{href: '/snort_escalations'}
                 =inline_svg 'icon_snort.svg'
           - if can?(:read, Admin)
             %li{class: 'clam-link disabled-link'}
@@ -121,7 +121,7 @@
           %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav'}
             - if is_rule_user?
               %li{class: 'ips-link'}
-                %a{href: '/escalation_bugs'} Snort Escalations
+                %a{href: '/snort_escalations'} Snort Escalations
             - if can?(:read, Admin)
               %li{class: 'clam-link disabled-link'}
                 %a.disabled-link Clam

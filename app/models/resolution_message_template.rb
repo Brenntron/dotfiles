@@ -10,16 +10,21 @@ class ResolutionMessageTemplate < ApplicationRecord
 
   enum status: { in_progress: 0, resolved: 1 }
 
-  validates_presence_of :name
+  belongs_to :creator, class_name: 'User', foreign_key: :creator_id, optional: true
+  belongs_to :editor, class_name: 'User', foreign_key: :editor_id, optional: true
+
+  validates_presence_of :name, :ticket_type
   validates :body, presence: true, if: :in_progress?
-  validate :resolved_message?
 
-  private
+  scope :for_web_disputes, -> { where(ticket_type: 'WebDispute')}
+  scope :for_email_disputes, -> { where(ticket_type: 'EmailDispute')}
+  scope :for_file_reputation_disputes, -> { where(ticket_type: 'FileReputationDispute')}
+  scope :for_sdr_disputes, -> { where(ticket_type: 'SenderDomainReputationDispute')}
 
-  def resolved_message?
-    if resolved? && (name_changed? || description_changed?) && !new_record?
-      errors.add(:base, "You can't change name or description for 'Resolved / Closed' messages")
-    end
-  end
- end
+  scope :by_web_resolution_disputes, ->(resolution) { for_web_disputes.where(resolution_type: resolution)}
+  scope :by_email_resolution_disputes, ->(resolution) { for_email_disputes.where(resolution_type: resolution)}
+  scope :by_file_reputation_resolution_disputes, ->(resolution) { for_file_reputation_disputes.where(resolution_type: resolution)}
+  scope :by_sdr_reputation_disputes, ->(resolution) { for_sdr_disputes.where(resolution_type: resolution)}
+
+end
  

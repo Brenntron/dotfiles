@@ -86,21 +86,21 @@
           %ul
             %li.status-radio-wrapper
               %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'RESEARCHING', value:'RESEARCHING' }
-              %label.ticket-status-radio-label.radio-label{for: 'RESEARCHING'} Researching
+              %label.ticket-status-radio-label.radio-label.fr-ticket-status-radio-label-index{for: 'RESEARCHING'} Researching
             %li.status-radio-wrapper
               %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ESCALATED', value: 'ESCALATED'}
-              %label.ticket-status-radio-label.radio-label{for: 'ESCALATED'} Escalated
+              %label.ticket-status-radio-label.radio-label.fr-ticket-status-radio-label-index{for: 'ESCALATED'} Escalated
             %li.status-radio-wrapper
               %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'CUSTOMER_PENDING', value: 'CUSTOMER_PENDING'}
-              %label.ticket-status-radio-label.radio-label{for: 'CUSTOMER_PENDING'} Customer Pending
+              %label.ticket-status-radio-label.radio-label.fr-ticket-status-radio-label-index{for: 'CUSTOMER_PENDING'} Customer Pending
             %li.status-radio-wrapper
               %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ON_HOLD', value: 'ON_HOLD'}
-              %label.ticket-status-radio-label.radio-label{for: 'ON_HOLD'} On Hold
+              %label.ticket-status-radio-label.radio-label.fr-ticket-status-radio-label-index{for: 'ON_HOLD'} On Hold
             %li.status-radio-wrapper
               %input.ticket-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'ticket-status', id: 'RESOLVED_CLOSED', value: 'RESOLVED_CLOSED'}
-              %label.ticket-status-radio-label.radio-label{for: 'RESOLVED_CLOSED'} Resolved / Closed
+              %label.ticket-status-radio-label.radio-label.fr-ticket-status-radio-label-index{for: 'RESOLVED_CLOSED'} Resolved / Closed
               .dropdown-menu#index-ticket-resolution-submenu
-                .col-xs-6.submenu-left-wrapper
+                .submenu-left-wrapper#filerep-resolution-selector
                   .submenu-header
                     Ticket Resolution
                   %ul
@@ -119,16 +119,22 @@
                     %li
                       %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'OTHER', value: 'OTHER'}
                       %label.ticket-res-radio-label.radio-label{for: 'OTHER'} Other
-                .col-xs-6.submenu-right-wrapper
+                .submenu-right-wrapper
                   .resolution-comment-wrapper
-                    %label.content-label-sm.customer-facing-comment
-                      Customer Facing Comment
-                    %textarea.resolution-status-comment
-                    .button-row-center
+                    %label.content-label-sm
+                      Template
+                    %select#filerep-resolution-message-template-select.resolution-message-template-select
+                    %label.content-label-sm
+                      Description
+                    %p.ticket-resolution-description
+                    %label.content-label-sm
+                      Comment
+                    %textarea#filerep-resolution-comment.resolution-status-comment.ticket-resolution-comment
+                    .button-row-center.ticket-resolution-submit-wrapper
                       %button.primary.change_ticket_status_button{type:'button', id:'webrep_resolve_ticket', onclick:'update_file_rep_status();'}
                         Submit
             %li.status-radio-wrapper
-              %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ON_HOLD', value: 'RE-OPENED'}
+              %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'RE-OPENED', value: 'RE-OPENED'}
               %label.ticket-status-radio-label.radio-label{for: 'RE-OPENED'} Re-Opened
 
             %li.non-resolution-submit-wrapper#ticket-non-res-submit

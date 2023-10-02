@@ -100,20 +100,6 @@
         .email-msg-content
 
     = render 'escalations/webrep/disputes/new_email_dialog'
-   
-    #manageResolutionMessageTemplatesDialog{ title: 'Manage Resolution Message Templates' }
-      %ul.nav.nav-tabs{role: 'tablist'}
-        %li.nav-item
-          %a.nav-link#in-progress-tab-link{href: '#in_progress_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
-            In Progress
-        %li.nav-item
-          %a.nav-link#resolved-tab-link{href: '#resolved_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
-            Resolved / Closed
-      .tab-content.content-wrapper
-        .tab-pane#in_progress_tab.active{role: 'tabpanel'}
-          = render 'escalations/webrep/disputes/resolution_messages/list', { items: ResolutionMessageTemplate.in_progress, status: :in_progress}
-        .tab-pane#resolved_tab{role: 'tabpanel'}
-          = render 'escalations/webrep/disputes/resolution_messages/list', { items: ResolutionMessageTemplate.resolved, status: :resolved}
 
     #manageTemplatesDialog{title: 'Manage Email Templates'}
       %table.table

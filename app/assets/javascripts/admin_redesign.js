@@ -32,6 +32,7 @@
 //= require application/helpers
 //= require clipboard
 //= require moment
+//= require resolution_message_templates
 
 //= require application/chart.pieceLabel.min
 //= require application/chartjs-plugin-annotation.min
@@ -64,5 +65,6 @@
 //= require application/users
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
-//= require application/webrep/enrich
+//= require application/context-tags
+//= require application/dt-jquery-highlight.js
 //= require admin/admin-tools
