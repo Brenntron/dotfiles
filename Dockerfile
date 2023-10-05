@@ -1,4 +1,4 @@
-FROM ruby:2.7.4
+FROM ruby:3.0.4
 
 WORKDIR /analyst_console_escalations
 COPY . /analyst_console_escalations
@@ -19,6 +19,25 @@ RUN apt-get -y install iputils-ping
 RUN apt-get -y install nodejs
 RUN apt-get -y install cmake
 RUN apt-get -y install vim
+RUN apt-get install -y iproute2
+
+# red-parque dependencies:
+RUN apt update
+RUN apt install -y -V ca-certificates lsb-release wget
+RUN wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
+RUN apt install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
+RUN apt update
+RUN apt install -y -V libarrow-dev # For C++
+RUN apt install -y -V libarrow-glib-dev # For GLib (C)
+RUN apt install -y -V libarrow-dataset-dev # For Apache Arrow Dataset C++
+RUN apt install -y -V libarrow-dataset-glib-dev # For Apache Arrow Dataset GLib (C)
+RUN apt install -y -V libarrow-acero-dev # For Apache Arrow Acero
+RUN apt install -y -V libarrow-flight-dev # For Apache Arrow Flight C++
+RUN apt install -y -V libarrow-flight-glib-dev # For Apache Arrow Flight GLib (C)
+RUN apt install -y -V libgandiva-dev # For Gandiva C++
+RUN apt install -y -V libgandiva-glib-dev # For Gandiva GLib (C)
+RUN apt install -y -V libparquet-dev # For Apache Parquet C++
+RUN apt install -y -V libparquet-glib-dev # For Apache Parquet GLib (C)
 
 RUN gem install httparty
 RUN gem install httpi -v 2.5.0

@@ -137,6 +137,11 @@ development:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
+  tmi:
+    hostport: "tmi-qa.sl.talos.cisco.com:50051"
+    ca_file: ""
+    cert_file: ""
+    key_file: ""
   jira:
     host: "https://fmd-drgjr-01tst.vrt.sourcefire.com:443/"
     token: "redacted"

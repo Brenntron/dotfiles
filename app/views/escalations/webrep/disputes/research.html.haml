@@ -1148,43 +1148,7 @@
                                       %td= entry.blacklist.first_seen
                                       %td= entry.blacklist.last_seen
 
-                            .entry-details-table.enrich-details-table{'data-entry-id': "#{entry.id}"}
-                              %h5.entry-details-table-header Enrichment
-                              %table.enrich-webrep-table-data-present
-                                %thead
-                                  %tr
-                                    %th Context
-                                    %th Taxonomy
-                                    %th Name
-                                    %th Description
-                                    %th.enrich-webrep-external-ref-header External References
-                                %tbody
-                                  %tr
-                              %table.enrich-webrep-table-data-missing
-                                %tbody
-                                  %tr
-                                    %td.missing-data No enrichment services data.
-
-                            .entry-details-table.prevalence-details-table{'data-entry-id': "#{entry.id}"}
-                              %h5.entry-details-table-header Prevalence
-                              %table.prevalence-webrep-table-data-present
-                                %thead
-                                  %tr
-                                    %th Dataset
-                                    %th Count
-                                    %th First Seen
-                                    %th Last Seen
-                                %tbody
-                              %table.prevalence-webrep-table-data-missing
-                                %tbody
-                                  %tr
-                                    %td.missing-data No Prevalence Data
 
 = render 'escalations/webrep/disputes/new_email_dialog'
 %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
 %input{:name => "xml_token", :type => "hidden", :value => "#{xml_token}"}
-
-:javascript
-  $(document).ready(function(){
-    setup_enrichment_section()
-  })
