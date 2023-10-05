@@ -1712,7 +1712,7 @@ For future Web categorization requests, please open a Web categorization ticket 
             dispute_packet[:assigned_to] =
                 ("<span class='dispute_username' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} </span><button class='esc-tooltipped return-ticket-button return-ticket-#{dispute.id}' title='Return ticket.' onclick='return_dispute(#{dispute.id});'></button>").html_safe
           else
-            if dispute.user.is_inactive?
+            if dispute.user&.is_inactive?
               dispute_packet[:assigned_to] =
                   ("<span class='dispute_username inactive-user' id='owner_#{dispute.id}'> #{dispute.user&.cvs_username} (inactive) </span><button class='esc-tooltipped take-ticket-button take-dispute-#{dispute.id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute.id});'></button>").html_safe
             else
