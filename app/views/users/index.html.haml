@@ -125,7 +125,7 @@
                               .button-row-center
                                 %button.primary.dropdown-submit-button{type: 'submit'} Add User
               - else
-                %td.alt-col.user-col-divider.user-displayname-col= user.display_name
+                %td.alt-col.user-col-divider.user-displayname-col{class: ('inactive-user' if user.is_inactive?)}= user.is_inactive? ? "#{user.display_name} (inactive)" : user.display_name
                 %td.alt-col.user-col-divider.user-name-col= link_to user.cvs_username, escalations_user_path(user)
                 %td.alt-col.user-col-divider=user.children.length
                 %td.alt-col=user.descendants.length
