@@ -30,7 +30,10 @@
         %label.content-label-sm
           Assignee
         %div
-          %span#dispute-assignee{class: ('missing-data' if @is_unassigned)}= @dispute.assignee || "None"
+          - if User.find_by_cvs_username(@dispute.assignee)&.is_inactive?
+            %span#dispute-assignee.inactive-user="#{@dispute.assignee} (inactive)"
+          -else
+            %span#dispute-assignee{class: ('missing-data' if @is_unassigned)}= @dispute.assignee || "None"
           - if can? :update, Dispute
             .dispute-owner-buttons-wrapper
               %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();', disabled: ((@is_assignee && !@is_duplicate && !@is_resolved) ? false : true)}

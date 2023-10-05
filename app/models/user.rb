@@ -94,6 +94,14 @@ class User < ApplicationRecord
     (parent.nil? && children.empty?) ? false : true
   end
 
+  def is_inactive? 
+    if roles.blank?
+      return true
+    else
+      return false
+    end
+  end
+
   def team_manager
     if children.empty? && parent
       parent
