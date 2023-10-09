@@ -155,6 +155,8 @@ Rails.configuration.rep_api             = ApiRequester::ApiRequester.config_of(r
 reversing_labs_config = env_config['reversing_labs']
 raise 'config.yml missing ReversingLabs section' unless reversing_labs_config
 Rails.configuration.reversing_labs      = ApiRequester::ApiRequester.config_of(reversing_labs_config)
+Rails.configuration.reversing_labs.local_api = reversing_labs_config['api_key']
+Rails.configuration.reversing_labs.local_url = reversing_labs_config['local_api_url']
 
 
 sds_config = env_config.fetch('sds', nil)

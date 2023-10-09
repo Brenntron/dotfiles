@@ -547,12 +547,15 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.message}")
   end
 
-  def local_reversing_labs
-    api_key = ENV["REVERSING_LABS_API"]
+  def local_reversing_labs_api
+    api_key = Rails.configuration.reversing_labs.local_api
+
     file = FileReputationApi::ReversingLabs.lookup(self.sha256_hash)
-    file_hash = file.sha256_hash
-    url_classification = "https://rl.vrt.sourcefire.com/api/samples/#{file_hash}/classification/"
-    url_ticore = "https://rl.vrt.sourcefire.com/api/samples/#{file_hash}/ticore/"                            
+    file_hash = file.sha256_hash           
+
+    url = Rails.configuration.reversing_labs.local_url
+    url_classification = "#{url}#{file_hash}/classification/"
+    url_ticore = "#{url}#{file_hash}/ticore/"                
 
     classification_response = HTTParty.get(
       url_classification,
@@ -649,9 +652,6 @@ class FileReputationDispute < ApplicationRecord
     update_sample_zoo
   end
   
-  def local_reversing_labs_api
-    local_reversing_labs
-  end
 
   def ack_create(envelope_params, sender_params)
     sender_params[:addressee_id] = self.id

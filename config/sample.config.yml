@@ -544,6 +544,8 @@ production:
     username: "u/sourcefire"
     password: "redacted"
     url: "https://ticloud-cdn-api.reversinglabs.com/"
+    api_key: "redacted"
+    local_api_url: "https://rl.vrt.sourcefire.com/api/samples/"
   sds:
     host: "v2.sds.cisco.com"
     v3_host: "v3-web-intel-rest.talos.cisco.com"
