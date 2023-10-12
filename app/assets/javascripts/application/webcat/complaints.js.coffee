@@ -2661,9 +2661,10 @@ processSubmitMaster = () ->
       comment = data_wrapper.find("#complaint_comment_#{entry_id}")[0].value
       resolution_comment = data_wrapper.find("#complaint_resolution_comment_#{entry_id}")[0].value
       uri_as_categorized = data_wrapper.find("#complaint_prefix_#{entry_id}")[0].value
-      if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
-        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
-      else if status == 'UNCHANGED' || status == 'INVALID'
+
+      if (categories.length == 0) && status == 'FIXED'
+        data.push({entry_id, error: true, reason: 'nil_categories'})
+      else
         data.push({
           entry_id: entry_id,
           error: false,
@@ -2677,8 +2678,7 @@ processSubmitMaster = () ->
           uri_as_categorized: uri_as_categorized,
           self_review: self_review
         })
-      else if (categories.length == 0) && status == 'FIXED'
-        data.push({entry_id, error: true, reason: 'nil_categories'})
+
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"

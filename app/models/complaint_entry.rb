@@ -213,7 +213,7 @@ class ComplaintEntry < ApplicationRecord
 
       # If the prefix is a high telemetry value then the status needs to be set to PENDING, unless it has the
       # self_review flag
-      if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED && self_review == false
+      if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED && self_review != true
         if self.status == "PENDING"
           if commit_pending == "commit"
             # commit from pending of important case
