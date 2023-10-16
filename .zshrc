@@ -256,6 +256,9 @@ fi
 # Use homebrew installed gcc
 alias cc='gcc'
 
+# User the cfg directory to track dotfiles
+alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+
 export PATH="${HOME}/.local/bin:$PATH"
 export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
 export PATH="/usr/local/opt/openssl@3/bin:$PATH"
