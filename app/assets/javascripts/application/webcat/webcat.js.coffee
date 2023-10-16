@@ -1,9 +1,3 @@
-window.display_tooltip = (id)->
-  $('#cat_tooltip_' + id).tooltip('toggle')
-
-window.td_truncate = (str, max, long) ->
-  long = long or '...'
-  if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
 
 window.wbrs_display = (score) ->
   score = parseFloat(score)
@@ -924,24 +918,11 @@ $ ->
     # Make the datatables search prettier
     $('#complaints-index_filter input').addClass('restricted-table-search-input');
 
-    $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
-      $(this).focus()
-      $(this).toggleClass('highlight-text')
-      element = $(this)
-      innertext = $(this).text()
-      copyToClipboard(innertext)
 
-      html = "<div class='copied-container'>
-                <span class='copied-check'></span>
-                <p id='copiedAlert'>Copied to clipboard</p>
-              </div>"
-      $(element).after( html )
-      $('.copied-container').delay(1000).fadeOut(1000);
-      setTimeout (->
-          $(".copied-container").remove()
-        ), 2000
+    ## WEBCAT ADVANCED SEARCH FUNCTIONS
 
-
+    ## Note - this function is not currently used,
+    # it's for Adv searching tags
     createSelectOptions = ->
       tags = $('#search_tag_list')[0]
       if tags
@@ -1125,10 +1106,6 @@ $ ->
 
     window.clearSelectize = (input) ->
       $("##{input}")[0].selectize.clear()
-
-$('#exampleModal').on 'shown.bs.modal', ->
-  $('button.toolbar-button.cat-btn').addClass('active')
-
 
 get_current_cats = (rows) ->
   # Grab up-to-date list of categories ONE time for all entries
@@ -1601,7 +1578,7 @@ window.copy_description = (item) ->
   ), 2000
 
 
-
+## SAVED (NAMED) SEARCH FUNCTIONS
 window.add_tmp_tr_to_named_search_list = (webcat_search_name) ->
   new_tr = document.createElement('tr')
   new_td = document.createElement('td')
