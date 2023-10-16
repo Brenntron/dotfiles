@@ -211,9 +211,9 @@ source $ZSH/oh-my-zsh.sh
 
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
+#   export EDITOR='nvim'
 # else
-#   export EDITOR='mvim'
+#   export EDITOR='vim'
 # fi
 
 # Compilation flags
@@ -263,6 +263,8 @@ export PATH="/usr/local/opt/llvm@13/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 export PATH="$PATH::$(yarn global bin)"
 
+# Increase the default max memeory allowed for Node.js
+export NODE_OPTIONS="--max-old-space-size=8192"
 
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 export RUBY_CONFIGURE_OPTS="--with-libyaml-dir=$(brew --prefix libyaml) --with-openssl-dir=$(brew --prefix openssl@3)"
