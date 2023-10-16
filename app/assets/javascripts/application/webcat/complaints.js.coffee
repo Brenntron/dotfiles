@@ -165,7 +165,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 
 
 
-
+#TODO - is touchedform needed any more
 
 window.touchedFormChange = (url) ->
   urls_touched = (sessionStorage.getItem("touchedForm")|| "" )
@@ -695,23 +695,6 @@ window.updatePending = (id,row_id) ->
 
 
 
-## Called when user submits categories / information to close a ticket
-window.updateEntryColumns = (entry_id,row_id) ->
-  timesTouched = getTouchedFormCount()
-  if timesTouched > 1
-    std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this entry? It will reload the page and you will lose your changes.",
-      [],
-      {
-        reload: false,
-        confirm_dismiss: true,
-        confirm: ->
-          processSubmitEntry(entry_id,row_id)
-      })
-  else
-    processSubmitEntry(entry_id,row_id)
-
-
 ## Allows analyst to set ticket status to reopened and allows them to interact with the submission form
 window.reopenComplaint = (entry_id, button) ->
 
@@ -814,6 +797,8 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaint
     invalid_opt.prop('selected', true)
 
   comment_check()
+
+
 $(document).on 'change','#complaint_resolution', ->
   internal_comment = $('.internal_comment_container')
   customer_comment = $('.customer_facing_comment_container')
@@ -929,15 +914,6 @@ window.select_cat_text_field = (id) ->
   if (typeof numericalValue)
     $( "#category_input"+id ).select();
 
-window.edit_selected_complaints = () ->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  if selected_rows.count() > 0
-    complaint_ids = []
-    for row, i in selected_rows[0]
-      complaint_ids.push(selected_rows.data()[i].complaint_id)
-    window.location = 'show_multiple?selected_ids=' + complaint_ids;
-  else
-    std_msg_error("alert",["There was an error. Please select an entry to edit"])
 
 selected_options = (category_names) ->
 
@@ -973,26 +949,9 @@ $(document).on 'click', ".popover .screenshot-retake-button", ->
       std_msg_success('Screenshot job initiated. Check back in about 10 seconds.', [], reload: true)
   )
 
-$(document).on 'click', ".popover .screenshot-reload-button", ->
-  location.reload(true)
 
-$(document).on 'click', ".screenshot-close-button", ->
-  $('.webcat-screenshot').hide()
 
-window.enlarge_image = (id,image,retake_in_progress)->
-  image_content = ""
-  if retake_in_progress
-    image_content = '<img height=600 width=800 src="' + image + '"><span class="screenshot-button screenshot-reload-button esc-tooltipped" title="Reload Page">Reload Page</span>'
-  else
-    image_content = '<img height=600 width=800 src="' + image + '"><span class="screenshot-button screenshot-retake-button esc-tooltipped" id="se_id_' + id + '" title="Retake Screenshot"></span><span class="screenshot-button screenshot-close-button"></span>'
-
-  $('#screenshot_id_'+ id).popover(
-    html: true
-    container: 'body'
-    trigger: 'focus'
-    template: '<div class="popover webcat-screenshot"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
-    content: image_content).popover 'show'
-
+#TODO - check for usage
   # What is this for exactly?
 window.lookup_prefix = () ->
 
@@ -1490,7 +1449,8 @@ window.lookup_dialog  = (id) ->
       std_msg_error("<p>Something went wrong: #{response.responseText}","")
   , this)
 
-
+# This function is on the webcat show page - since we are redoing that
+# this should probably be removed along with that effort - TODO
 window.display_preview_window = (entry) ->
   {domain, category, id} = entry
   $('#complaint_id_x_prefix')[0].value = domain
@@ -1636,6 +1596,7 @@ window.triggerTooltips = (item) ->
   return
 
 processSubmitMaster = () ->
+  debugger
   data = []
   selectedEntryDomains = (sessionStorage.getItem("touchedForm")|| "" )
   return if selectedEntryDomains.length == 0
@@ -1805,10 +1766,9 @@ window.verifyMasterSubmit = () ->
         boolean = true
   return boolean
 
+
+
 window.updateResolutionDialog = (confirm) ->
-
-
-
 #   { status } = row
 #  if status == 'COMPLETED'
 #    reopened = true

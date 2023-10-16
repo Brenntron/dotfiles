@@ -668,6 +668,10 @@ $ ->
         {
           data: 'description'
           className: 'description-col'
+          render: (data) ->
+            if data?
+              description = '<span onclick="copy_description(this)">' + data + '</span>'
+            return description
         }
         {
           data: 'suggested_disposition'
@@ -917,7 +921,7 @@ $ ->
     # Create index table
     build_complaints_table()
 
-    # Make the search prettier
+    # Make the datatables search prettier
     $('#complaints-index_filter input').addClass('restricted-table-search-input');
 
     $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
@@ -1575,13 +1579,28 @@ window.toggle_selectize_layer = (input, focus) ->
   else
     $(select_parent).css('z-index', '2')
 
-window.copyToClipboard = (text) ->
+
+# Let users copy the customer description
+window.copy_description = (item) ->
+  description = $(item).text()
   dummy = document.createElement('input')
   document.body.appendChild dummy
-  dummy.setAttribute 'value', text
+  dummy.setAttribute 'value', description
   dummy.select()
   document.execCommand 'copy'
   document.body.removeChild dummy
+
+  html = "<div class='copied-container'>
+                <span class='copied-check'></span>
+                <p id='copiedAlert'>Copied to clipboard</p>
+              </div>"
+  $(item).after( html )
+  $('.copied-container').delay(1000).fadeOut(1000);
+  setTimeout (->
+    $(".copied-container").remove()
+  ), 2000
+
+
 
 window.add_tmp_tr_to_named_search_list = (webcat_search_name) ->
   new_tr = document.createElement('tr')
