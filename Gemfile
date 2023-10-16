@@ -61,8 +61,8 @@ gem 'httparty', '~> 0.15.3'
 # gem 'peake-bridge-client', '0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 # gem 'peake-bridge-client', '0.1.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
 
-# gem 'peake-bridge-client', '0.2.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
-gem 'peake-bridge-client', '0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
+gem 'peake-bridge-client', '0.2.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
+#gem 'peake-bridge-client', '0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'
@@ -130,6 +130,10 @@ gem 'hashie'
 gem 'mail'
 gem 'simpleidn'
 gem 'red-parquet', '8.0.0'
+
+gem 'symmetric-encryption', require: false
+gem 'vault'
+
 
 group :production, :staging do
   gem 'elastic-apm', '4.5.0'

@@ -1,3 +1,5 @@
+require 'symmetric-encryption'
+
 all_configs = YAML.load_file(Rails.root.join("config", "config.yml"))
 env_config = all_configs[Rails.env]
 env_config['bugzilla']
@@ -224,6 +226,7 @@ file_mgmt_config = env_config.fetch('file_mgmt', nil)
 raise 'config.yml missing file_mgmt section' unless file_mgmt_config
 Rails.configuration.base_host_path = file_mgmt_config['base_host_path']
 Rails.configuration.base_file_path = file_mgmt_config['base_file_path']
+
 jira_config = env_config['jira']
 raise "config.yml missing jira section" unless jira_config
 Rails.configuration.jira                = ApiRequester::ApiRequester.config_of(jira_config)
@@ -234,3 +237,38 @@ Rails.configuration.jira.auth_type      = jira_config['auth_type'].to_sym
 bast_config = env_config.fetch('bast', nil)
 raise 'config.yml missing bast section' unless bast_config
 Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)
+
+##### VAULT AND ENCRYPTION STUFF######
+# ORDER MATTERS HERE
+# ###################################
+
+#problem with the config.token constantly expiring every 3 hours
+
+#in this order:
+
+vault_key_config = env_config.fetch('vault_config', nil)
+raise 'config.yml missing vault_config section' unless vault_key_config
+
+begin
+  Vault.address = "https://vault.vrt.sourcefire.com"
+  Vault.ssl_verify = nil
+  Vault.auth.approle(vault_key_config['role_id'], vault_key_config['secret_id'])
+  vault_result = Vault.logical.read("/webdevops-kv/config/ace")
+  se_creds = JSON.parse(vault_result.data[:"SE.json"])
+rescue
+  raise "Unable to connect to Vault to retrieve necessary keys.  Vault must be running and keys must exist to continue."
+end
+
+SymmetricEncryption.cipher = SymmetricEncryption::Cipher.new(
+    :key         => se_creds["key"],
+    :iv          => se_creds["iv"],
+    :cipher_name => 'aes-128-cbc'
+)
+
+######END VAULT STUFF################
+iwf_abuse_config = env_config.fetch('iwf_abuse_config', nil)
+raise 'config.yml missing iwf_abuse_config section' unless iwf_abuse_config
+iwf_config = OpenStruct.new
+iwf_config.username = SymmetricEncryption.decrypt(iwf_abuse_config['username'])
+iwf_config.password = SymmetricEncryption.decrypt(iwf_abuse_config['password'])
+Rails.configuration.iwf_config = iwf_config
