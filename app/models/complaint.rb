@@ -1151,8 +1151,7 @@ For future web and email reputation requests, please open a web and email reputa
             resolution_comment,
             uri_as_categorized,
             user,
-            nil,
-            false
+            nil
         )
         response[:data][:completed] << new_complaint.id
       rescue => e
