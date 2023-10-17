@@ -17,7 +17,7 @@ M.opts = {
     prompt_prefix = " ",
     selection_caret = " ",
     path_display = { "smart" },
-    file_ignore_patterns = { ".git/", "node_modules" },
+    file_ignore_patterns = { ".git/", "node_modules", "vendor" },
     mappings = {
       i = {
         ["<Down>"] = actions.move_selection_next,
@@ -27,6 +27,12 @@ M.opts = {
       },
     },
   },
+  extensions = {
+    fzy_native = {
+      override_generic_sorter = false,
+      override_file_sorter = true,
+    }
+  }
 }
 
 return M
