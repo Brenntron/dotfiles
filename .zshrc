@@ -256,7 +256,7 @@ fi
 # Use homebrew installed gcc
 alias cc='gcc'
 
-# User the cfg directory to track dotfiles
+# Set alias for dotfiles config
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
 export PATH="${HOME}/.local/bin:$PATH"
@@ -265,9 +265,6 @@ export PATH="/usr/local/opt/openssl@3/bin:$PATH"
 export PATH="/usr/local/opt/llvm@13/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 export PATH="$PATH::$(yarn global bin)"
-
-# Increase the default max memeory allowed for Node.js
-export NODE_OPTIONS="--max-old-space-size=8192"
 
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 export RUBY_CONFIGURE_OPTS="--with-libyaml-dir=$(brew --prefix libyaml) --with-openssl-dir=$(brew --prefix openssl@3)"
