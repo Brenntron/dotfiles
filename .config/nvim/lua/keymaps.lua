@@ -111,11 +111,11 @@ maps.n["<leader>sp"] =
 
 -- Trouble
 maps.n["<leader>t"] = sections.t
-maps.n["<leader>tr"] = { "<cmd>Trouble lsp_references<cr>", desc = "References" }
-maps.n["<leader>tf"] = { "<cmd>Trouble lsp_definitions<cr>", desc = "Definitions" }
-maps.n["<leader>td"] = { "<cmd>Trouble document_diagnostics<cr>", desc = "Diagnostics" }
-maps.n["<leader>tq"] = { "<cmd>Trouble quickfix<cr>", desc = "QuickFix" }
-maps.n["<leader>tl"] = { "<cmd>Trouble loclist<cr>", desc = "LocationList" }
-maps.n["<leader>tw"] = { "<cmd>Trouble workspace_diagnostics<cr>", desc = "Workspace Diagnostics" }
+maps.n["<leader>tr"] = { function() require("trouble").toggle("lsp_references") end, desc = "References" }
+maps.n["<leader>tf"] = { function() require("trouble").toggle("lsp_definitions") end, desc = "Definitions" }
+maps.n["<leader>td"] = { function() require("trouble").toggle("document_diagnostics") end, desc = "Diagnostics" }
+maps.n["<leader>tq"] = { function() require("trouble").toggle("quickfix") end, desc = "QuickFix" }
+maps.n["<leader>tl"] = { function() require("trouble").toggle("loclist") end, desc = "LocationList" }
+maps.n["<leader>tw"] = { function() require("trouble").toggle("workspace_diagnostics") end, desc = "Workspace Diagnostics" }
 
 utils.set_mappings(maps)
