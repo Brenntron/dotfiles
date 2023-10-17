@@ -1181,6 +1181,16 @@ load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status)
       searchField: ['category_name', 'category_code'],
       options: cat_options,
       items: category_ids,
+      onItemAdd: ->
+        store_entry_changes(entry_id)
+        if verifyMasterSubmit() == true
+          $('#master-submit').prop('disabled', false)
+      onItemRemove: ->
+        store_entry_changes(entry_id)
+        if verifyMasterSubmit() == true
+          $('#master-submit').prop('disabled', false)
+        else
+          $('#master-submit').prop('disabled', true)
       score: (input) ->
         #  Adding some customization for autofill
         #  restricting on certain cats to avoid accidental categorization
@@ -1318,7 +1328,7 @@ process_entry = (entry_data) ->
         msg = $('#' + data.entry_id + ' .temp-msg')
         $(msg).text('Submitted. Refresh to see new results.')
         $(msg).addClass('submitted-row')
-
+        remove_entry_from_changes(data.entry_id)
       error: (response) ->
         std_msg_error(response,"", reload: false)
     , this)
@@ -1567,10 +1577,11 @@ window.copy_description = (item) ->
   document.execCommand 'copy'
   document.body.removeChild dummy
 
-  html = "<div class='copied-container'>
-                <span class='copied-check'></span>
-                <p id='copiedAlert'>Copied to clipboard</p>
-              </div>"
+  html = "<div class='copied-container'>" +
+            "<span class='copied-check'></span>" +
+            "<p id='copiedAlert'>Copied to clipboard</p>" +
+          "</div>"
+
   $(item).after( html )
   $('.copied-container').delay(1000).fadeOut(1000);
   setTimeout (->

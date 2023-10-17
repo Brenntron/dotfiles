@@ -6,8 +6,6 @@ $(document).on 'click', '.paginate_button', ->
     table = $('#complaints-index').DataTable()
     table_page = table.page.info().page
 
-$(document).on 'change','.nested-table-input','.selectize-input', ->
-  touchedFormChange(this.dataset.domain)
 
 
 init_tooltip = () ->
@@ -22,7 +20,6 @@ init_tooltip = () ->
 webcat_loader_timeout = ''
 $(document).ready ->
 
-  sessionStorage.removeItem("touchedForm")
   loader = $('#inline-webcat')
   $(this).bind(
     ajaxStart: () ->
@@ -164,37 +161,52 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
   )
 
 
+# Below edge case I'm unsure of is removing a category and adding a new one,
+# or adding and then removing the same one
+# Consulting Adam on this one
 
-# Form 'touches' are to keep track of user changes on the page
-# in case they want to use bulk tools
+# Store changes in local storage to see if Bulk Submit can be used
+# call this when resolution is changed or a cat is added
+window.store_entry_changes = (entry_id) ->
+  changes = (sessionStorage.getItem("webcat_entries_changed") || "")
+  unless changes.includes(entry_id)
+    entries = changes.split(",").filter((item) -> return item)
+    entries.push(entry_id)
+    new_changes = entries.join(",")
+    sessionStorage.setItem("webcat_entries_changed", new_changes)
 
-window.touchedFormChange = (url) ->
-  urls_touched = (sessionStorage.getItem("touchedForm")|| "" )
 
-  if !urls_touched.includes(url)
-    url_items = urls_touched.split(",")
-    url_items = url_items.filter((item) -> return item)
-    url_items.push(url)
-    urls_touched = url_items.join(",")
-  sessionStorage.setItem("touchedForm", urls_touched)
+# If user submits individual entry, remove it from the local storage changes
+window.remove_entry_from_changes = (entry_id) ->
+  changes = (sessionStorage.getItem("webcat_entries_changed") || "")
+  if changes.includes(entry_id)
+    entries = changes.split(",").filter((item) -> return item)
+    submitted_entry = entries.indexOf(entry_id)
+    new_changes = entries.splice(submitted_entry, 1)
+    sessionStorage.setItem("webcat_entries_changed", new_changes)
 
-window.removeTouchedFormChange = (url) ->
-  urls_touched = (sessionStorage.getItem("touchedForm")|| "" )
-
-  if urls_touched.includes(url)
-    url_items = urls_touched.split(",")
-    url_items = url_items.filter((item) -> return item)
-    url_index = url_items.indexOf(url)
-    url_items.splice(url_index, 1)
-    urls_touched = url_items.join(",")
-  sessionStorage.setItem("touchedForm", urls_touched)
+# remove below after updating the submit pending functions
+#window.removeTouchedFormChange = (url) ->
+#  urls_touched = (sessionStorage.getItem("touchedForm")|| "" )
+#  if urls_touched.includes(url)
+#    url_items = urls_touched.split(",")
+#    url_items = url_items.filter((item) -> return item)
+#    url_index = url_items.indexOf(url)
+#    url_items.splice(url_index, 1)
+#    urls_touched = url_items.join(",")
+#  sessionStorage.setItem("touchedForm", urls_touched)
 
 getTouchedFormCount = ()->
-  form_item = (sessionStorage.getItem("touchedForm") || "")
+  form_item = (sessionStorage.getItem("webcat_entries_changed") || "")
   form_item = form_item.split(",")
   form_item = form_item.filter((item) -> return item)
   return form_item.length
 
+
+
+
+# TODO - fix this function
+# New layout does not save this separately from submitting the updates, need to rethink how this is done
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
 
@@ -1552,7 +1564,7 @@ window.triggerTooltips = (item) ->
 processSubmitMaster = () ->
   debugger
   data = []
-  selectedEntryDomains = (sessionStorage.getItem("touchedForm")|| "" )
+  selectedEntryDomains = (sessionStorage.getItem("webcat_entries_changed")|| "" )
   return if selectedEntryDomains.length == 0
 
   # disable the master submit button while processing
@@ -1713,11 +1725,10 @@ window.master_submit = () ->
 
 
 window.verifyMasterSubmit = () ->
+  changes = getTouchedFormCount()
   boolean = false
-  if $('.shown').length > 0 && $('.has-items').length > 0
-    $('.has-items').each ->
-      if (!$(this).closest('tr').hasClass("pending"))
-        boolean = true
+  if $(changes).length > 0
+    boolean = true
   return boolean
 
 
@@ -1834,10 +1845,12 @@ $ ->
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
 
+      #Call new function, fix this
   $(document).on 'change', '.resolution_radio_button', ->
+    debugger
     id = this.name.split("resolution")[1]
     domain = $("#complaint_prefix_"+id)[0].dataset.domain
-    touchedFormChange(domain)
+    store_entry_changes(domain)
     $('#master-submit').prop('disabled', false)
 
 
