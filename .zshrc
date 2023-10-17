@@ -210,11 +210,11 @@ source $ZSH/oh-my-zsh.sh
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='nvim'
-# else
-#   export EDITOR='vim'
-# fi
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='nvim'
+else
+  export EDITOR='vim'
+fi
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -255,6 +255,9 @@ fi
 
 # Use homebrew installed gcc
 alias cc='gcc'
+
+# User the cfg directory to track dotfiles
+alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
 export PATH="${HOME}/.local/bin:$PATH"
 export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
