@@ -6,9 +6,9 @@ local sections = {
   f = { desc = "󰭎 Telescope" },
   g = { desc = "󰊢 Git" },
   l = { desc = " LSP" },
-  n = { desc = "Neovim Config" },
-  s = { desc = "Spectre" },
-  t = { desc = "Trouble" },
+  n = { desc = " Neovim Config" },
+  s = { desc = "󱙝 Spectre" },
+  t = { desc = "󱉯 Trouble" },
 }
 
 -- Standart --
