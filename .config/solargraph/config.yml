@@ -13,4 +13,6 @@ domains: []
 reporters:
 - require_not_found
 formatter:
+plugins:
+- solargraph-rails
 max_files: 5000
