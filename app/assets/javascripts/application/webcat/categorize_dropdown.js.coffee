@@ -2,6 +2,33 @@
 
 $ ->
 
+  # Populate the category selectizes on the dropdown
+  new_url_cats = $('select.cat_new_url')
+  for select in new_url_cats
+    $(select).selectize {
+      persist: true,
+      create: false,
+      maxItems: 5,
+      closeAfterSelect: true,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: AC.WebCat.createSelectOptions("##{select.id}")
+      score: (input) ->
+        #  Adding some customization for autofill
+        #  restricting on certain cats to avoid accidental categorization
+        #  (replaces selectize's built-in `getScoreFunction()` with our own)
+        (item) ->
+          if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+            item.category_code == input ? 1 : 0
+          else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+            1
+          else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+            0.9
+          else
+            0
+    }
+
   # Switch which form type is shown
   $('#cat-urls-diff').click ->
     if $('#cat-urls-diff').prop('checked')
@@ -54,9 +81,7 @@ window.lookup_prefix = () ->
 window.drop_current_categories = () ->
   $(".cat-url-error").hide()
   $(".cat-url-success").hide()
-
   $('.lookup-drop-loader').removeClass('hidden')
-
   $("#url_#{i}").css("border-width", "")
   $("#url_#{i}").css("border-color", "")
 
@@ -182,21 +207,3 @@ window.multiple_url_categorization = () ->
     )
   else
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
-
-
-
-# TODO - let's just clear the form rather than reload the page
-#window.cat_new_url = ()->
-#  timesTouched = getTouchedFormCount()
-#  if timesTouched > 1
-#    std_msg_confirm(
-#      "You have made " + timesTouched + " changes on this page. Do you want to proceed with categorizing this new item? It will reload the page and you will lose your changes.",
-#      [],
-#      {
-#        reload: false,
-#        confirm_dismiss: true,
-#        confirm: ->
-#          processSubmitNewURL()
-#      })
-#  else
-#    processSubmitNewURL()

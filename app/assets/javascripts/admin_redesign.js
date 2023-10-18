@@ -74,3 +74,5 @@
 //=require application/webcat/categorize_dropdown
 //=require application/webcat/index_toolbar
 //=require application/webcat/wbnp_reports
+//=require application/webcat/convert_to_webrep
+//=require application/webcat/dialog_boxes

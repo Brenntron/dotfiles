@@ -41,17 +41,6 @@ window.remove_entry_from_changes = (entry_id) ->
     new_changes = entries.splice(submitted_entry, 1)
     sessionStorage.setItem("webcat_entries_changed", new_changes)
 
-# remove below after updating the submit pending functions
-#window.removeTouchedFormChange = (url) ->
-#  urls_touched = (sessionStorage.getItem("touchedForm")|| "" )
-#  if urls_touched.includes(url)
-#    url_items = urls_touched.split(",")
-#    url_items = url_items.filter((item) -> return item)
-#    url_index = url_items.indexOf(url)
-#    url_items.splice(url_index, 1)
-#    urls_touched = url_items.join(",")
-#  sessionStorage.setItem("touchedForm", urls_touched)
-
 # we may not need this
 getTouchedFormCount = ()->
   form_item = (sessionStorage.getItem("webcat_entries_changed") || "")
@@ -155,114 +144,9 @@ window.inheritCategories = (complaint_entry_id) ->
       std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
     )
 
-# TODO - what is this for
-name_servers =(server_list)->
-  if undefined == server_list
-    ''
-  else
-    text = ""
-    for server in server_list
-      text += server + '<br>'
-    text
-
-# TODO - what is this for
-format_domain_info = (info)->
-  '<div class="dialog-content-wrapper">' +
-    '<h5>Domain Name</h5>' +
-    '<p>' + info['domain'] + '</p>' +
-    '<hr class="thin">' +
-    '<h5>Registrant </h5>' +
-    '<table class="nested-dialog-table">' +
-      '<tr>' +
-        '<td class="table-side-header">' +
-           'Organization' +
-        '</td>' +
-        '<td>' +
-          info['organisation'] +
-      '</tr><tr>' +
-        '<td class="table-side-header">' +
-          'Country' +
-        '</td>' +
-        '<td>' +
-          info['registrant_country'] +
-        '</td>' +
-      '</tr><tr>' +
-        '<td class="table-side-header">' +
-        'State/Province' +
-        '</td>' +
-        '<td>' +
-          info['registrant_state/province'] +
-        '</td>' +
-      '</tr>' +
-    '</table>' +
-    '<hr class="thin">' +
-    '<h5>Name Servers</h5>'+
-    name_servers(info['nserver']) +
-    '<hr class="thin">' +
-    '<h5> Dates</h5>'+
-    '<table class="nested-dialog-table">' +
-      '<tr>' +
-        '<td class="table-side-header">' +
-          'Created' +
-        '</td>' +
-        '<td>' + info['created'] + '</td>'+
-      '</tr><tr>' +
-        '<td class="table-side-header">' +
-          'Last updated' +
-        '</td>' +
-        '<td>' +
-          info['changed'] +
-        '</td>' +
-      '</tr><tr>' +
-        '<td class="table-side-header">' +
-          'Expiry_date' +
-        '</td>' +
-        '<td>' +
-          info['registry_expiry_date'] +
-        '</td>' +
-      '</tr>' +
-    '</table>' +
-  '</div>'
 
 
 
-window.domain_whois = (IP_Domain) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/domain_whois'
-    method: 'POST'
-    headers: headers
-    data: {'lookup': IP_Domain}
-    success: (response) ->
-      info = $.parseJSON(response)
-      if info.error
-        notice_html = "<p>Something went wrong: #{info.error}</p>"
-        alert(info.error)
-      else
-        dialog_content = $(format_domain_info(info))
-        if $("#complaint_button_dialog").length
-          complaint_dialog = this
-
-          $('#complaint_button_dialog').html("")
-          $('body').innerHTML=""
-
-          $('body').append(complaint_dialog)
-          $('#complaint_button_dialog').append(dialog_content[0])
-          $('#complaint_button_dialog').dialog
-            autoOpen: true
-            minWidth: 400
-            position: { my: "right bottom", at: "right bottom", of: window }
-        else
-          complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
-          $('body').append(complaint_dialog)
-          $('#complaint_button_dialog').append(dialog_content[0])
-          $('#complaint_button_dialog').dialog
-            autoOpen: true
-            minWidth: 400
-            position: { my: "right bottom", at: "right bottom", of: window }
-    error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-  , this)
 
 
 window.review_bulk_submit = () ->

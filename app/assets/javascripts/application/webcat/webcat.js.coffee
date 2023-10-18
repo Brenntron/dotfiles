@@ -1,4 +1,4 @@
-
+# determines the proper icon to display next to the score
 window.wbrs_display = (score) ->
   score = parseFloat(score)
   if score == NaN
@@ -131,9 +131,7 @@ $ ->
     )
     refresh_url()
 
-  window.webcat_refresh = ()->
-    refresh_localStorage()
-    refresh_url()
+
 
   window.build_webcat_named_search = (search_name) ->
     link_el = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
@@ -202,6 +200,14 @@ $ ->
         }
     $.when(pull_user_preference_filter()).done -> build_header(data)
     return data
+
+
+
+  current_url = window.location.href
+
+  window.webcat_refresh = ()->
+    refresh_localStorage()
+    refresh_url()
 
   refresh_url = (href) ->
     { webcat_search_type, webcat_search_name } = localStorage
@@ -301,35 +307,9 @@ $ ->
 
   pull_user_preference_filter()
 
-  for select in $('select.cat_new_url')
 
-    $(select).selectize {
-      persist: true,
-      create: false,
-      maxItems: 5,
-      closeAfterSelect: true,
-      valueField: 'category_id',
-      labelField: 'category_name',
-      searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions("##{select.id}")
-      score: (input) ->
-        #  Adding some customization for autofill
-        #  restricting on certain cats to avoid accidental categorization
-        #  (replaces selectize's built-in `getScoreFunction()` with our own)
-        (item) ->
-          if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
-            item.category_code == input ? 1 : 0
-          else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
-            1
-          else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
-            0.9
-          else
-            0
-    }
+  # what are these for
 
-  url = $('#complaints-index').data('source')
-  current_url = window.location.href
-  complaint_table = ''
 
 
 
@@ -422,8 +402,9 @@ $ ->
     else
       $('#webcat-index-title')[0].innerHTML = 'All Tickets'
 
-
-
+      
+  # This is needed for the function below it
+  url = $('#complaints-index').data('source')
   #### New complaints setup
   build_complaints_table = () ->
     complaint_table = $('#complaints-index').DataTable(
