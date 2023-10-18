@@ -127,7 +127,9 @@ function M.config()
   end
 
   -- Setup coffeesense as it is not included in mason-lspconfig
-  lspconfig.coffeesense.setup {}
+  lspconfig.coffeesense.setup({
+    root_dir = lspconfig.util.root_pattern '.git'
+  })
 
   local signs = {
     { name = "DiagnosticSignError", text = "" },
