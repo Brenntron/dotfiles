@@ -1,5 +1,56 @@
 ## WEBCAT CATEGORIZE URLS DROPDOWN FUNCTIONS ##
 
+$ ->
+
+  # Switch which form type is shown
+  $('#cat-urls-diff').click ->
+    if $('#cat-urls-diff').prop('checked')
+      $('#categorize-same-form').hide()
+      $('#categorize-diff-form').show()
+
+  $('#cat-urls-same').click ->
+    if $('#cat-urls-same').prop('checked')
+      $('#categorize-diff-form').hide()
+      $('#categorize-same-form').show()
+
+
+
+# Lookup current categories of input urls
+window.lookup_prefix = () ->
+  $('.lookup-drop-loader').removeClass('hidden')
+
+  urls = []
+  for i in [1 .. 5]
+    $select= $('#cat_new_url_' + i).selectize()
+    selectize = $select[0].selectize
+    selectize.clear()
+    urls.push($("#url_" + i ).val())
+
+  std_msg_ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaints/lookup_prefix'
+    method: 'POST'
+    data: { 'urls': urls }
+
+    success: (response) ->
+      i = 1
+      for [i .. 5]
+        j = 0
+        try
+          for [j .. Object.keys(response.json[i]).length]
+            selector = '#cat_new_url_' + i.toString()
+            $select= $(selector).selectize()
+            selectize = $select[0].selectize
+            selectize.addItem(response.json[i][j])
+            j++
+        catch
+          i++
+          continue
+        i++
+      $('.lookup-drop-loader').addClass('hidden')
+  )
+
+
+
 window.drop_current_categories = () ->
   $(".cat-url-error").hide()
   $(".cat-url-success").hide()

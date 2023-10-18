@@ -18,6 +18,19 @@ $ ->
   if (page).hasClass('escalations--webcat--complaints-controller') || $(page).hasClass('escalations--webcat--reports-controller') && $(page).hasClass('index-action')
     check_wbnp_status()
 
+  $('#wbnp-full-report').dialog
+    autoOpen: false
+    width: 700
+    minHeight: 300
+    position:
+      my: "right top"
+      at: "right top+150"
+      of: window
+
+  $('#wbnp-report-button').click ->
+    $('#wbnp-full-report').dialog('open')
+
+
 
 
 # WBNP - Get report id
