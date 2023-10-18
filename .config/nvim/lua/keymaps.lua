@@ -7,6 +7,7 @@ local sections = {
   f = { desc = "󰭎 Telescope" },
   g = { desc = "󰊢 Git" },
   l = { desc = " LSP" },
+  m = { desc = "🏗 Mason"},
   n = { desc = "␀ Null-Ls" },
   s = { desc = "󱙝 Spectre" },
   t = { desc = "󱉯 Trouble" },
@@ -103,11 +104,15 @@ maps.n["<leader>lf"] = { "<cmd>lua vim.lsp.buf.format{ async = true, timeout_ms 
 maps.n["<leader>li"] = { "<cmd>LspInfo<cr>", desc = "Lsp Info" }
 maps.n["<leader>ll"] = { "<cmd>LspLog<cr>", desc = "Lsp Log"}
 
+-- Mason
+maps.n["<leader>m"] = sections.m
+maps.n["<leader>mi"] = { "<cmd>Mason<cr>", desc = "Mason Control Panel" }
+maps.n["<leader>ml"] = { "<cmd>MasonLog<cr>", desc = "Mason Log" }
+
 -- Null-Ls (None-Ls)
-maps.n["<leader>nm"] = { "<cmd>Mason<cr>", desc = "Mason Control Panel" }
-maps.n["<leader>nm"] = { "<cmd>MasonLog<cr>", desc = "Mason Log" }
-maps.n["<leader>nn"] = { "<cmd>NullLsInfo<cr>", desc = "Null-Ls Info" }
-maps.n["<leader>nnl"] = { "<cmd>NullsLsLog<cr>", desc = "Null-Ls Log"}
+maps.n["<leader>n"] = sections.n
+maps.n["<leader>ni"] = { "<cmd>NullLsInfo<cr>", desc = "Null-Ls Info" }
+maps.n["<leader>nl"] = { "<cmd>NullsLsLog<cr>", desc = "Null-Ls Log"}
 
 -- Spectre
 maps.n["<leader>s"] = sections.s
