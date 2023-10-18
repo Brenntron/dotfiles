@@ -68,3 +68,9 @@
 //= require application/webrep/wbrs_wlbl
 //= require application/webrep/enrich
 //= require admin/admin-tools
+
+// Temp stuff, move / remove and grab whole director after culling ticket goes through
+
+//=require application/webcat/categorize_dropdown
+//=require application/webcat/index_toolbar
+//=require application/webcat/wbnp_reports

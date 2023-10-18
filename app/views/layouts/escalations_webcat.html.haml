@@ -46,7 +46,7 @@
 
       .nav-tool-content-wrapper#categorize-urls-form-wrapper
         #categorize-diff-form
-          %form{method: 'get', 'accept-charset': 'UTF-8', onsubmit:"cat_new_url(); return false;"}
+          %form{method: 'get', 'accept-charset': 'UTF-8'}
             %h5 Categorize URLs with Different Categories
             .toolbar
               %div
@@ -126,7 +126,7 @@
               .webcat-loader.gear-loader-wrapper.hidden
                 = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
                 %span.loader-msg Loading data...
-              %button#cat_dif_submit.primary{:type => "button", :onclick=>"cat_new_url()", tabindex: '11'} Categorize URLs
+              %button#cat_dif_submit.primary{:type => "button", :onclick=>"submit_categorize_urls()", tabindex: '11'} Categorize URLs
 
         %form{method: 'get', 'accept-charset': 'UTF-8'}
           #categorize-same-form

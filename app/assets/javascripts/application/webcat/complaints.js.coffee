@@ -15,150 +15,6 @@ init_tooltip = () ->
       'tooltipster-borderless-customized'
     ]
 
-#### WBNP Reporting ####
-### DO NOT BREAK UP WBNP FUNTIONS ###
-webcat_loader_timeout = ''
-$(document).ready ->
-
-  loader = $('#inline-webcat')
-  $(this).bind(
-    ajaxStart: () ->
-      webcat_loader_timeout = setTimeout ->
-        loader.removeClass('hidden')
-      , 500
-    ajaxStop: () ->
-      clearTimeout(webcat_loader_timeout)
-      loader.addClass('hidden')
-    )
-  if ($('body').hasClass('escalations--webcat--complaints-controller') || $('body').hasClass('escalations--webcat--reports-controller')) &&
-     $('body').hasClass('index-action')
-    window.check_wbnp_status()
-
-
-# WBNP - Get report id
-window.fetch_wbnp_data = () ->
-  $('#fetch_wbnp').attr('disabled', true)
-  $('#fetch_wbnp').addClass('esc-tooltipped')
-  $('.wbnp-loading-spinner').show()
-  # Set status on header to checking
-  top_status = $('.top-area-bar').find('.wbnp-report-status')[0]
-  $(top_status).text('Checking...')
-
-  std_msg_ajax(
-    method: 'POST'
-    url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
-    data: {}
-    success: (response) ->
-      json = $.parseJSON(response)
-      wbnp_report_id = json.wbnp_report_id
-      check_wbnp_status(wbnp_report_id)
-
-    error: (response) ->
-      std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
-  )
-
-
-# WBNP - Check report info
-check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
-  if $('#wbnp-full-report').length > 0
-    # this is a webcat manager and they get the full WBNP report
-    data = {}
-    full_report = true
-    # Turn on the checking message if needed
-    unless $('#current-wbnp-report .wbnp-status').hasClass('status_complete')
-      wbnp_check = $('.wbnp-full-report-title-status')[0]
-      $(wbnp_check).addClass('active')
-      wbnp_status = 'Checking report status...'
-      $(wbnp_check).text(wbnp_status)
-
-  else
-    data = {wbnp_report_id: wbnp_report_id}
-    full_report = false
-
-  std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/webcat/complaints/wbnp_report_status"
-    data: data
-    success: (response) ->
-      $('.wbnp-loading-spinner').hide()
-      # Turn off loader indicator
-      if full_report == true
-        # Clear old data
-        $('.wbnp-status').empty();
-        $('.wbnp-status-msg').empty();
-        $('.wbnp-full-report-table tbody').empty();
-        $('.wbnp-notes').empty();
-
-        curr_report = response.data[0]
-        last_report = response.data[1]
-        currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
-
-        # Add current report info to top bar report area
-
-        $('.wbnp-report-status').text(curr_report.status)
-        $('#wbnp-report-attempted').text(curr_report.total_new_cases)
-        $('#wbnp-report-succeeded').text(curr_report.cases_imported)
-        $('#wbnp-report-rejected').text(curr_report.cases_failed)
-        $('#wbnp-quick-report-skipped').text(currentSkippedText)
-        $('#wbnp-full-report-skipped').text(currentSkippedText)
-
-        # Build the full report for webcat managers
-        wbnp_dialog = $('#wbnp-full-report')
-
-        # Current report:
-        if curr_report.status == 'complete'
-          $('#current-wbnp-report .wbnp-status').addClass('status_complete')
-        else
-          $('#current-wbnp-report .wbnp-status').removeClass('status_complete')
-        $('#current-wbnp-report .wbnp-status').text(curr_report.status)
-        $('#current-wbnp-report .wbnp-status-msg').text(curr_report.status_message)
-        current_table = $('#current-wbnp-report .wbnp-full-report-table')
-        curr_table_content = '<tr><td>' + curr_report.id + '</td><td>' + curr_report.attempts + '</td><td>' + curr_report.total_new_cases + '</td><td>' + curr_report.cases_imported + '</td><td>' + curr_report.cases_failed + '</td><td>' + currentSkippedText + '</td><td>' + curr_report.created_at + '</td><td>' + curr_report.updated_at + '</td></tr>'
-        $(current_table).append(curr_table_content)
-        $('#current-wbnp-report .wbnp-notes').html(curr_report.notes)
-
-        # Previous report:
-        if last_report?
-          lastSkippedText = if last_report.cases_skipped? then last_report.cases_skipped else '0'
-          if last_report.status == 'complete'
-            $('#previous-wbnp-report .wbnp-status').addClass('status_complete')
-          else
-            $('#previous-wbnp-report .wbnp-status').removeClass('status_complete')
-          $('#previous-wbnp-report .wbnp-status').text(last_report.status)
-          $('#previous-wbnp-report .wbnp-status-msg').text(last_report.status_message)
-          prev_table = $('#previous-wbnp-report .wbnp-full-report-table')
-          prev_table_content = '<tr><td>' + last_report.id + '</td><td>' + last_report.attempts + '</td><td>' + last_report.total_new_cases + '</td><td>' + last_report.cases_imported + '</td><td>' + last_report.cases_failed + '</td><td>' + lastSkippedText + '</td><td>' + last_report.created_at + '</td><td>' + last_report.updated_at + '</td></tr>'
-          $(prev_table).append(prev_table_content)
-          $('#previous-wbnp-report .wbnp-notes').html(last_report.notes)
-
-        # Keep checking / updating if Current report is unfinished
-        if curr_report.status != 'complete'
-          if $('.wbnp-full-report-title-status').length == 0
-            $('.ui-dialog .ui-dialog-title').append('<span class="wbnp-full-report-title-status"></span>')
-          wbnp_check = $('.wbnp-full-report-title-status')[0]
-          wbnp_status = 'Checking report status in 45 seconds...'
-          $(wbnp_check).removeClass('active')
-          $(wbnp_check).text(wbnp_status)
-          setTimeout(check_wbnp, 45000)
-        else
-          $('.wbnp-full-report-title-status').remove()
-
-      else
-        curr_report = response.data[0]
-        currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
-        # Add current report info to top bar report area
-        $('.wbnp-report-status').text(curr_report.status)
-        $('#wbnp-report-attempted').text(curr_report.total_new_cases)
-        $('#wbnp-report-succeeded').text(curr_report.cases_imported)
-        $('#wbnp-report-rejected').text(curr_report.cases_failed)
-        $('#wbnp-quick-report-skipped').text(currentSkippedText)
-        $('#wbnp-full-report-skipped').text(currentSkippedText)
-
-    error: (response) ->
-      $('.wbnp-loading-spinner').hide()
-
-      std_msg_error("Unable to pull wbnp status", [], reload: false)
-  )
 
 
 # Below edge case I'm unsure of is removing a category and adding a new one,
@@ -208,126 +64,52 @@ getTouchedFormCount = ()->
 
 # TODO - fix this function
 # New layout does not save this separately from submitting the updates, need to rethink how this is done
-window.updateURI = (event, complaint_entry_id) ->
-  event.preventDefault()
+# pretty sure this is not needed
+#window.updateURI = (event, complaint_entry_id) ->
+#  event.preventDefault()
+#
+#  uri = $("#complaint_prefix_#{complaint_entry_id}").val()
+#
+#  std_msg_ajax(
+#    method: 'POST'
+#    url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
+#    data: {complaint_entry_id: complaint_entry_id, uri: uri }
+#    success: (response) ->
+#      {current_categories, category, wbrs_score, domain, subdomain, path, status} = response.json
+#
+#      if subdomain
+#        qual_subdomain = subdomain + '.' + domain
+#      else
+#        qual_subdomain = domain
+#
+#      $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
+#
+#      if 'ip' == status
+#        std_msg_error("Cannot edit IP entries.","")
+#      else
+#        $("#domain_#{complaint_entry_id}").tooltipster('content', uri);
+#        $("#site-search-#{complaint_entry_id}").tooltipster('content', uri);
+#        $("#entry-uri-#{complaint_entry_id}").tooltipster('content', uri);
+#        $.each current_categories, (key, entry) ->
+#          $(".simple-nested-table#entry-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
+#
+#        $("#domain_#{complaint_entry_id}").text(domain)
+#        $("#subdomain_#{complaint_entry_id}").text(subdomain)
+#        $("#path_#{complaint_entry_id}").text(path)
+#        $("#category_#{complaint_entry_id}").text(category)
+#        $("#wbrs_score_#{complaint_entry_id}").text(wbrs_score)
+#        query_who_params = "#{domain}, #{complaint_entry_id}"
+#        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
+#        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
+#
+#        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.whoIsLookups(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Whois</button>')
+#        $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
+#    error: (response) ->
+#      std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
+#
+# )
 
-  uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
-    data: {complaint_entry_id: complaint_entry_id, uri: uri }
-    success: (response) ->
-      {current_categories, category, wbrs_score, domain, subdomain, path, status} = response.json
-
-      if subdomain
-        qual_subdomain = subdomain + '.' + domain
-      else
-        qual_subdomain = domain
-
-      $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
-
-      if 'ip' == status
-        std_msg_error("Cannot edit IP entries.","")
-      else
-        $("#domain_#{complaint_entry_id}").tooltipster('content', uri);
-        $("#site-search-#{complaint_entry_id}").tooltipster('content', uri);
-        $("#entry-uri-#{complaint_entry_id}").tooltipster('content', uri);
-        $.each current_categories, (key, entry) ->
-          $(".simple-nested-table#entry-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
-
-        $("#domain_#{complaint_entry_id}").text(domain)
-        $("#subdomain_#{complaint_entry_id}").text(subdomain)
-        $("#path_#{complaint_entry_id}").text(path)
-        $("#category_#{complaint_entry_id}").text(category)
-        $("#wbrs_score_#{complaint_entry_id}").text(wbrs_score)
-        query_who_params = "#{domain}, #{complaint_entry_id}"
-        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
-        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
-
-        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.whoIsLookups(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Whois</button>')
-        $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
-    error: (response) ->
-      std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
-
- )
-
-processSubmitNewURL = () ->
-  data = {}
-  isEmpty = true
-  $('#categorize-urls').dropdown('toggle')
-  for i in [1...6] by 1
-    categories = []
-    for j in [0...5] by 1
-      if $("#cat_new_url_#{i}")[0][j]
-        categories.push($("#cat_new_url_#{i}")[0][j].text)
-
-    data[i] = {url: $("#url_#{i}").val(), category_names: categories, category_ids: $("#cat_new_url_#{i}").val()}
-
-    if data[i].url.length > 0 && data[i].category_ids != null
-      isEmpty = false
-
-  if !isEmpty
-    std_msg_ajax(
-      url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
-      method: 'POST'
-      data: {data: data}
-      success: (response) ->
-        timesTouched = 0
-        popular_entries = []
-        message = ""
-        for key, val of response
-          if val.popular == true
-            popular_entries.push(val.url)
-
-        if popular_entries.length > 0
-           message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
-        else
-           message = "No pending complaint entries have been created"
-
-        reload_message = "</br><a href='.'>Refresh the page</a> to see the result"
-        std_msg_success(
-          'URLs categorized successfully',
-          [message, "All other entries have been submitted directly to WBRS.", reload_message],
-          reload: false,
-          complete: (->
-            # clear url inputs
-            $('#url_1').val('')
-            $('#url_2').val('')
-            $('#url_3').val('')
-            $('#url_4').val('')
-            $('#url_5').val('')
-            # clear categories inputs
-            $('#cat_new_url_1')[0].selectize.clear()
-            $('#cat_new_url_2')[0].selectize.clear()
-            $('#cat_new_url_3')[0].selectize.clear()
-            $('#cat_new_url_4')[0].selectize.clear()
-            $('#cat_new_url_5')[0].selectize.clear()
-            )
-        )
-      error: (response) ->
-        if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
-          std_api_error(response, "Please make sure you have the appropriate permissions. Unable to categorize url.", reload: false)
-        else
-          std_api_error(response, "Unable to categorize url.", reload: false)
-    )
-  else
-    std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
-
-window.cat_new_url = ()->
-  timesTouched = getTouchedFormCount()
-  if timesTouched > 1
-    std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with categorizing this new item? It will reload the page and you will lose your changes.",
-      [],
-      {
-        reload: false,
-        confirm_dismiss: true,
-        confirm: ->
-          processSubmitNewURL()
-      })
-  else
-    processSubmitNewURL()
 
 window.webcat_reset_search = ()->
   inputs = document.getElementsByClassName('form-control')
@@ -358,35 +140,8 @@ window.webcat_reset_search = ()->
   entry_input.clear()
   complaint_id_input.clear()
 
-window.multiple_url_categorization = () ->
-  loader = $('.lookup-drop-loader')
-  loader.removeClass('hidden')
 
-  urls = $("#categorize_urls").val().split(/\n/)
-  category_ids = $("#multi_cat_url_cats").val()
-  category_names = []
-  for category in $("#multi_cat_url_cats")
-    for i in [0..5] by 1
-      if category[i]
-        category_names.push(category[i].text)
-
-  if $("#categorize_urls").val() != "" && category_ids != null && category_names != null
-    std_msg_ajax(
-      url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
-      method: 'POST'
-      data: {urls: urls, category_names: category_names, category_ids: category_ids}
-      success: (response) ->
-        loader.addClass('hidden')
-        std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
-      error: (response) ->
-        loader.addClass('hidden')
-        std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
-
-    )
-  else
-    std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
-
-
+#TODO - when do we use this
 window.inheritCategories = (complaint_entry_id) ->
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaint_entries/inherit_categories_from_master_domain'
@@ -400,6 +155,7 @@ window.inheritCategories = (complaint_entry_id) ->
       std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
     )
 
+# TODO - what is this for
 name_servers =(server_list)->
   if undefined == server_list
     ''
@@ -409,6 +165,7 @@ name_servers =(server_list)->
       text += server + '<br>'
     text
 
+# TODO - what is this for
 format_domain_info = (info)->
   '<div class="dialog-content-wrapper">' +
     '<h5>Domain Name</h5>' +
@@ -467,6 +224,8 @@ format_domain_info = (info)->
     '</table>' +
   '</div>'
 
+
+
 window.domain_whois = (IP_Domain) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -504,6 +263,7 @@ window.domain_whois = (IP_Domain) ->
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
+
 
 window.review_bulk_submit = () ->
   selected_rows = $("tr.highlight-second-review.shown")
@@ -557,6 +317,8 @@ window.review_bulk_submit = () ->
         notice_html = "<p>Something went wrong</p>"
     , this)
 
+
+    
 processSubmitPending=(entry_id,row_id)->
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   status = $('[name=resolution_review_'+entry_id+']:checked').val()
@@ -700,36 +462,9 @@ window.reopenComplaint = (entry_id, button) ->
 
 
 
-window.take_selected = ()->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  if selected_rows[0].length > 0
-    entry_ids = []
-    for row, i in selected_rows[0]
-      entry_ids.push(selected_rows.data()[i].entry_id)
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
-      method: 'POST'
-      headers: headers
-      data: 'complaint_entry_ids': entry_ids
-      success: (response) ->
-        json = $.parseJSON(response)
-        if json.error
-          notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('Error Taking Entries', json.error)
-        else
-          for row, i in selected_rows[0]
-            selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
-            selected_rows.data().cell(selected_rows[0][i],4).data("ASSIGNED").draw()
-
-      error: (response) ->
-        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-    , this)
-  else
-    std_msg_error('No rows selected', ['Please select at least one row.'])
 
 
-
+# TODO - check this function
 $(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
   rows = $('#complaints-index').DataTable().rows('.selected').data()
   reopened = false
@@ -793,102 +528,10 @@ window.comment_check = ()->
     internal_comment.css('display', 'none')
     customer_comment.css('display', 'none')
 
-window.return_selected = ()->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  if selected_rows[0].length > 0
-    entry_ids = []
-    for row, i in selected_rows[0]
-      entry_ids.push(selected_rows.data()[i].entry_id)
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
-      method: 'POST'
-      headers: headers
-      data: 'complaint_entry_ids': entry_ids
-      success: (response) ->
-        json = $.parseJSON(response)
-        if json.error
-          notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('Error Returning Entries', json.error)
-        else
-          for row, i in selected_rows[0]
-            selected_rows.data().cell(row,14).data("Vrt Incoming").draw()
-            selected_rows.data().cell(row,4).data("NEW").draw()
 
-      error: (response) ->
-        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-    , this)
-  else
-    std_msg_error('no rows selected', ['Please select at least one row.'])
-
-window.webcat_remove_assignee = () ->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  if selected_rows[0].length > 0
-    entry_ids = []
-    for row, i in selected_rows[0]
-      entry_ids.push(selected_rows.data()[i].entry_id)
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries/unassign_all'
-      method: 'POST'
-      headers: headers
-      data: 'complaint_entry_ids': entry_ids
-      success: (response) ->
-        json = $.parseJSON(response)
-        if json.error
-          notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('Error Removing Assignees', json.error)
-        else
-          #reload table data
-          $('#complaints-index').DataTable().draw()
-
-      error: (response) ->
-        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-    , this)
-  else
-    std_msg_error('no rows selected', ['Please select at least one row.'])
-
-window.webcat_change_assignee = () ->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  if selected_rows[0].length > 0
-    entry_ids = []
-    for row, i in selected_rows[0]
-      entry_ids.push(selected_rows.data()[i].entry_id)
-
-    user_id = $('#index_target_assignee option:selected').val()
-
-    data = {
-      'complaint_entry_ids': entry_ids,
-      'user_id': user_id
-    }
-
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries/change_assignee'
-      method: 'POST'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) ->
-        json = $.parseJSON(response)
-        if json.error
-          notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('Error Assigning Entries', json.error)
-        else
-          #reload table data
-          $('#complaints-index').DataTable().draw()
-
-    )
-  else
-    std_msg_error('no rows selected', ['Please select at least one row.'])
-
-window.select_cat_text_field = (id) ->
-  if (typeof numericalValue)
-    $( "#category_input"+id ).select();
 
 
 selected_options = (category_names) ->
-
   options = []
   if category_names
     options = category_names.split(',')
@@ -901,25 +544,20 @@ selected_options = (category_names) ->
         else if category == ' Conferences and Trade Shows'
           i2 = i - 1
           options.splice(i2, 1, 'Conventions, Conferences and Trade Shows')
-
   return options
 
-$('html').on 'click', (e) ->
-  if typeof $(e.target).data('original-title') == 'undefined' and !$(e.target).parents().is('.popover.in')
-    $('[data-original-title]').popover 'hide'
 
-
-$(document).on 'click', ".popover .screenshot-retake-button", ->
-  $('[data-original-title]').popover 'hide'
-  se_id = this.id.slice(6)
-  std_msg_ajax(
-    method: 'GET'
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/' + se_id + '/retake_screenshot'
-    data: {}
-    error_prefix: 'Error retaking screenshot.'
-    success: (response) ->
-      std_msg_success('Screenshot job initiated. Check back in about 10 seconds.', [], reload: true)
-  )
+#$(document).on 'click', ".popover .screenshot-retake-button", ->
+#  $('[data-original-title]').popover 'hide'
+#  se_id = this.id.slice(6)
+#  std_msg_ajax(
+#    method: 'GET'
+#    url: '/escalations/api/v1/escalations/webcat/complaint_entries/' + se_id + '/retake_screenshot'
+#    data: {}
+#    error_prefix: 'Error retaking screenshot.'
+#    success: (response) ->
+#      std_msg_success('Screenshot job initiated. Check back in about 10 seconds.', [], reload: true)
+#  )
 
 
 
@@ -1063,137 +701,100 @@ window.retrieve_history = (position) ->
 
 
 
-window.drop_current_categories = () ->
-  $(".cat-url-error").hide()
-  $(".cat-url-success").hide()
-
-  $('.lookup-drop-loader').removeClass('hidden')
-
-  $("#url_#{i}").css("border-width", "")
-  $("#url_#{i}").css("border-color", "")
-
-  urls = {}
-
-  for i in [1 .. 5]
-    if $("#url_" + i ).val() != ""
-      urls[i] = $("#url_" + i ).val()
-
-  std_msg_ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
-    method: 'POST'
-    data: { 'urls': urls }
-    success: (response) ->
-      for key, value of response.json
-        if value && value.code == 200
-          $("#cat-url-success-message-#{key}").text("Categories successfully dropped.")
-          $("#cat-url-success-#{key}").show()
-          select= $("#cat_new_url_#{key}").selectize()
-          selectize = select[0].selectize
-          selectize.clear()
-        else
-          $("#url_#{key}").css("border-width", "2px")
-          $("#url_#{key}").css("border-color", "#E47433")
-          $("#cat-url-error-message-#{key}").text("Unable to drop categories.")
-          $("#cat-url-#{key}").show()
-      $('.lookup-drop-loader').addClass('hidden')
-    error: (response) ->
-      $('.lookup-drop-loader').addClass('hidden')
-      std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
-)
 
 #window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
 #  event.preventDefault();
 #  $('#' + input_id)[0].value = qual_subdomain
 #  return false;
 
-
-format = (complaint_entry_row) ->
-  complaint_entry = complaint_entry_row.data()
-  row_id = complaint_entry_row[0][0]
-
-  if complaint_entry.uri
-    host = complaint_entry.uri
-    url = host
-    uri = '<a href="http://' + complaint_entry.uri + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
-    uri_no_path = complaint_entry.uri
-    qual_subdomain = complaint_entry.domain
-    lookup_val = complaint_entry.domain
-    if uri_no_path.indexOf('/') > 0
-      uri_no_path = uri_no_path.split('/')[0] # strip out the path in a uri for Site Search, it's extraneous
-    search_uri = '<a href="https://www.google.com/search?q=site%3A' + uri_no_path + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + uri_no_path + '</a>'
-  else if complaint_entry.domain
-    if complaint_entry.subdomain
-      host = complaint_entry.subdomain + '.'
-    host = host + complaint_entry.domain
-    url = host
-    if complaint_entry.path
-      url = host
-    uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
-    search_uri = '<a href="https://www.google.com/search?q=site%3A' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
-    lookup_val = complaint_entry.domain
-  else if  complaint_entry.ip_address
-    host = complaint_entry.ip_address
-    url = host
-    lookup_val = complaint_entry.ip_address
-    uri = '<a href="http://' + complaint_entry.ip_address + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
-    search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
-  else
-    uri = missing_data
-  if complaint_entry.subdomain
-    qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
-    lookup_val = complaint_entry.subdomain + '.' + qual_subdomain
-
-  entry_status = ""
-  reopen_class = "hidden"
-  submit_class = ""
-  status_class = ""
-
-
-  if complaint_entry.entry_history?
-    if complaint_entry.entry_history.complaint_history.length >= 1
-      complaint_history = complaint_entry.entry_history.complaint_history
-    else
-      complaint_history = ''
-
-  { entry_id, domain, complaint_id, ip_address } = complaint_entry
-  whois_lookup = if ip_address then ip_address else domain
-  complaint_entry_html = ''
-  input_cat = 'input_cat_' + entry_id
-
-  if complaint_entry.status == "PENDING"
-    if complaint_entry.uri_as_categorized  == ""
-      # if a subdomain string exists, prepend it to the domain
-      if complaint_entry.subdomain.length > 0
-        domain = complaint_entry.subdomain + "." + complaint_entry.domain
-      else
-        domain = complaint_entry.domain
-    else
-      domain = complaint_entry.uri_as_categorized
-    # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
-
-  edit_input = if domain != "" then domain else host #if the domain is empty, then display host for ips in edit input
-
-
-  form_change_item = domain || complaint_entry.ip_address
-
-  complaint_entry_html =
-      complaint_table_row_html +
-
-      '<div><label class="content-label-sm">Original</label></div> ' +
-      '<div>' + host  + '</div>' +
-      '<label class="content-label-sm">Edit URI</label><br/>' +
-      '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" data-domain="' + form_change_item + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
-      '"' + entry_status + '>' +
-      '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
-      '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
-
-      '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
-      '<ul id="main-domain-categories_' + entry_id + '"></ul>'+
-      '<button class="secondary inline-button" onclick="inheritCategories(' + entry_id + ')">Inherit</button><br/>' +
-      '</div>' +'</div><div class="col-xs-8">' +
-      '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>'
+# what is this for
+#format = (complaint_entry_row) ->
+#  complaint_entry = complaint_entry_row.data()
+#  row_id = complaint_entry_row[0][0]
+#
+#  if complaint_entry.uri
+#    host = complaint_entry.uri
+#    url = host
+#    uri = '<a href="http://' + complaint_entry.uri + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
+#    uri_no_path = complaint_entry.uri
+#    qual_subdomain = complaint_entry.domain
+#    lookup_val = complaint_entry.domain
+#    if uri_no_path.indexOf('/') > 0
+#      uri_no_path = uri_no_path.split('/')[0] # strip out the path in a uri for Site Search, it's extraneous
+#    search_uri = '<a href="https://www.google.com/search?q=site%3A' + uri_no_path + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + uri_no_path + '</a>'
+#  else if complaint_entry.domain
+#    if complaint_entry.subdomain
+#      host = complaint_entry.subdomain + '.'
+#    host = host + complaint_entry.domain
+#    url = host
+#    if complaint_entry.path
+#      url = host
+#    uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
+#    search_uri = '<a href="https://www.google.com/search?q=site%3A' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
+#    lookup_val = complaint_entry.domain
+#  else if  complaint_entry.ip_address
+#    host = complaint_entry.ip_address
+#    url = host
+#    lookup_val = complaint_entry.ip_address
+#    uri = '<a href="http://' + complaint_entry.ip_address + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
+#    search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
+#  else
+#    uri = missing_data
+#  if complaint_entry.subdomain
+#    qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
+#    lookup_val = complaint_entry.subdomain + '.' + qual_subdomain
+#
+#  entry_status = ""
+#  reopen_class = "hidden"
+#  submit_class = ""
+#  status_class = ""
+#
+#
+#  if complaint_entry.entry_history?
+#    if complaint_entry.entry_history.complaint_history.length >= 1
+#      complaint_history = complaint_entry.entry_history.complaint_history
+#    else
+#      complaint_history = ''
+#
+#  { entry_id, domain, complaint_id, ip_address } = complaint_entry
+#  whois_lookup = if ip_address then ip_address else domain
+#  complaint_entry_html = ''
+#  input_cat = 'input_cat_' + entry_id
+#
+#  if complaint_entry.status == "PENDING"
+#    if complaint_entry.uri_as_categorized  == ""
+#      # if a subdomain string exists, prepend it to the domain
+#      if complaint_entry.subdomain.length > 0
+#        domain = complaint_entry.subdomain + "." + complaint_entry.domain
+#      else
+#        domain = complaint_entry.domain
+#    else
+#      domain = complaint_entry.uri_as_categorized
+#    # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
+#
+#  edit_input = if domain != "" then domain else host #if the domain is empty, then display host for ips in edit input
+#
+#
+#  form_change_item = domain || complaint_entry.ip_address
+#
+#  complaint_entry_html =
+#      complaint_table_row_html +
+#
+#      '<div><label class="content-label-sm">Original</label></div> ' +
+#      '<div>' + host  + '</div>' +
+#      '<label class="content-label-sm">Edit URI</label><br/>' +
+#      '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
+#      '" type="text" data-domain="' + form_change_item + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
+#      '"' + entry_status + '>' +
+#      '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
+#      '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
+#
+#      '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
+#      '<ul id="main-domain-categories_' + entry_id + '"></ul>'+
+#      '<button class="secondary inline-button" onclick="inheritCategories(' + entry_id + ')">Inherit</button><br/>' +
+#      '</div>' +'</div><div class="col-xs-8">' +
+#      '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
+#      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>'
 
 
 
@@ -1416,45 +1017,46 @@ window.lookup_dialog  = (id) ->
       std_msg_error("<p>Something went wrong: #{response.responseText}","")
   , this)
 
-# This function is on the webcat show page - since we are redoing that
-# this should probably be removed along with that effort - TODO
-window.display_preview_window = (entry) ->
-  {domain, category, id} = entry
-  $('#complaint_id_x_prefix')[0].value = domain
-  $('#complaint_id_x_categories')[0].value = category
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  #when checkbox is clicked take the domain and path and try to open it in the iframe
-  path = ""
-  subdomain = ""
-  if entry.subdomain
-    subdomain = entry.subdomain + "."
-  if entry.path
-    path = entry.path
-  loc = "http://" + subdomain + domain + path
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaints/test_url'
-    method: 'GET'
-    headers: headers
-    data: {
-      url:loc
-    }
-    success: (response) ->
-      #yay you can visit the site
-    error: (response) ->
-      #that page wont load. lets display someting else
-      switch response["status"]
-        when 404
-          document.getElementById('preview_window').src = "/unknown_url.html"
-        when 403
-          document.getElementById('preview_window').src = "/same_origin_url.html"
+# Part of the screenshot code. Keeping for ref for when that is reimplemented
+#window.display_preview_window = (entry) ->
+#  {domain, category, id} = entry
+#  $('#complaint_id_x_prefix')[0].value = domain
+#  $('#complaint_id_x_categories')[0].value = category
+#  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+#  #when checkbox is clicked take the domain and path and try to open it in the iframe
+#  path = ""
+#  subdomain = ""
+#  if entry.subdomain
+#    subdomain = entry.subdomain + "."
+#  if entry.path
+#    path = entry.path
+#  loc = "http://" + subdomain + domain + path
+#  $.ajax(
+#    url: '/escalations/api/v1/escalations/webcat/complaints/test_url'
+#    method: 'GET'
+#    headers: headers
+#    data: {
+#      url:loc
+#    }
+#    success: (response) ->
+#      #yay you can visit the site
+#    error: (response) ->
+#      #that page wont load. lets display someting else
+#      switch response["status"]
+#        when 404
+#          document.getElementById('preview_window').src = "/unknown_url.html"
+#        when 403
+#          document.getElementById('preview_window').src = "/same_origin_url.html"
+#
+#  , this)
+#
+#  $(".complaint_selected" ).removeClass("complaint_selected")
+#  $("#complaint_entry_row_"+ id ).addClass("complaint_selected")
+#  document.getElementById('preview_window').src = loc
+#  document.getElementById('preview_window_header_p').innerHTML = loc
+#  document.getElementById('preview_window_header_a').href = loc
 
-  , this)
 
-  $(".complaint_selected" ).removeClass("complaint_selected")
-  $("#complaint_entry_row_"+ id ).addClass("complaint_selected")
-  document.getElementById('preview_window').src = loc
-  document.getElementById('preview_window_header_p').innerHTML = loc
-  document.getElementById('preview_window_header_a').href = loc
 
 window.fetch_complaints = () ->
   std_msg_ajax(
@@ -1466,60 +1068,10 @@ window.fetch_complaints = () ->
   )
 
 
-open_selected = (selected_rows, toggle) ->
-  low_rep_entries = []
-  error_message = ''
-
-  for selected_row in selected_rows.data()
-    { viewable, subdomain, domain, path, ip_address, wbrs_score } = selected_row
-    if parseInt(wbrs_score) <= -6
-      low_rep_entries.push selected_row
-    else if viewable == toggle
-      new_subdomain = ""
-      new_domain = ""
-      new_path = ""
-      if path
-        new_path = path
-      if subdomain
-        new_subdomain = subdomain + "."
-      if domain
-        new_domain = domain
-        window.open("http://"+ new_subdomain + new_domain + new_path)
-      else
-        window.open("http://"+selected_row.ip_address)
-
-  if low_rep_entries.length >= 10
-    error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores."
-  else if low_rep_entries.length > 0
-    domains_and_ips = []
-
-    for lre in low_rep_entries
-      if lre.domain
-        domains_and_ips.push "<li>#{lre.domain}</li>"
-      else
-        domains_and_ips.push "<li>#{lre.ip_address}</li>"
-
-    error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores. <ul>#{domains_and_ips.join('')}</ul>"
-
-  show_message('error', "#{error_message}", false, '#alertMessage')
-
-window.open_viewable = () ->
-  selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, "true")
-
-window.open_selected = () ->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  if selected_rows[0].length == 0
-    std_msg_error('No rows selected', ['Please select at least one row.'])
-  else
-    open_selected(selected_rows, "true")
-window.open_all = () ->
-  open_all = confirm("Are you sure you want to open ALL the windows on this page?!!")
-  if (open_all == true)
-    selected_rows = $('#complaints-index').DataTable().rows()
-    open_selected(selected_rows, "true")
 
 
+
+# What does this do?
 window.mark_for_commit = () ->
   entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
     this.dataset['entryId']
@@ -1541,6 +1093,7 @@ window.mark_for_commit = () ->
       popup_response_error(response, 'Error marking for commit')
   )
 
+# what does this do?
 window.commit_marked = () ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -1562,6 +1115,7 @@ window.triggerTooltips = (item) ->
     side: 'bottom'
   return
 
+#bulk submit
 processSubmitMaster = () ->
   debugger
   data = []

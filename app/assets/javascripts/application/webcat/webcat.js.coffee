@@ -158,6 +158,7 @@ $ ->
 
     refresh_url()
 
+
   build_data = () ->
     ###
     # This function builds the argument to get data from the backend for DataTables
@@ -216,6 +217,8 @@ $ ->
     localStorage.removeItem('webcat_search_type')
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
+
+
 
   $('#filter-dropdown').on 'click', '.favorite-search-icon', () ->
     name = $(this).parent().find('a').attr('href') || $(this).parent().find('a').text().trim()
@@ -361,6 +364,7 @@ $ ->
 
         container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
 
+
   build_header = (data) ->
     ###
     # Depending on the data, this function builds the search header
@@ -379,7 +383,6 @@ $ ->
         webcat_search_conditions = {}
 
       if search_type == 'standard'
-
         search_name = search_name.toLowerCase().replace('complaints', 'tickets')
 
         if !search_name.endsWith('tickets')
@@ -1491,44 +1494,6 @@ $ ->
     toggle_display_data(this)
     save_display_prefs()
 
-
-  # Sorting functions
-  window.sort_webcat_index = () ->
-    order = $('#webcat-index-sort-order').attr('data-sort')
-    sort_by = $('#webcat-index-sort-select').val()
-    complaint_table = $('#complaints-index').DataTable()
-    complaint_table
-      .order( [ sort_by, order ] )
-      .draw();
-
-  window.toggle_direct_sort = (col, field, button) ->
-    order = $(button).attr('data-sort')
-    if order == 'asc'
-      $(button).attr('data-sort', 'desc')
-      $(button).removeClass('sort-asc').addClass('sort-desc')
-      title = 'Sort by ' + field + ': descending'
-      $(button).attr('title', title)
-    else
-      $(button).attr('data-sort', 'asc')
-      $(button).removeClass('sort-desc').addClass('sort-asc')
-      title = 'Sort by ' + field + ': ascending'
-      $(button).attr('title', title)
-
-    complaint_table = $('#complaints-index').DataTable()
-    complaint_table
-      .order( [ col, order] )
-      .draw();
-
-  window.toggle_select_order = (button) ->
-    order = $(button).attr('data-sort')
-    if order == 'asc'
-      $(button).attr('data-sort', 'desc')
-      $(button).removeClass('sort-asc').addClass('sort-desc')
-      $(button).next().text('Descending')
-    else
-      $(button).attr('data-sort', 'asc')
-      $(button).removeClass('sort-desc').addClass('sort-asc')
-      $(button).next().text('Ascending')
 
 
   # TODO move these to other on page load function section
