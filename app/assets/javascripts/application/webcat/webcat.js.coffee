@@ -308,7 +308,6 @@ $ ->
   pull_user_preference_filter()
 
 
-  # what are these for
 
 
 
@@ -402,7 +401,7 @@ $ ->
     else
       $('#webcat-index-title')[0].innerHTML = 'All Tickets'
 
-      
+
   # This is needed for the function below it
   url = $('#complaints-index').data('source')
   #### New complaints setup
@@ -777,7 +776,7 @@ $ ->
                 '<tr><td class="edit-cat-col">' +
                 '<select id="input_cat_' + full.entry_id + '" name="input_cat_' +
                 full.entry_id + '" class="nested-table-input" placeholder="Enter categories / confidence order" ' +
-                'onchange="touchedFormChange(\'' + domain + '\')">' +
+                'onchange="store_entry_changes(\'' + full.entry_id + '\')">' +
                 '</select>' +
                 '</td></tr>' +
                 '</tbody>' +
@@ -793,9 +792,15 @@ $ ->
               submit_res_wrapper =
                 '<div class="submit-res-wrapper pending-ticket-res-wrapper">' +
                   '<div class="res-radio-row">' +
-                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="commit"><label>Commit</label></div>' +
-                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="decline" checked="checked"><label>Decline</label></div>' +
-                  '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="ignore"><label>Ignore (Bulk change only)</label></div>' +
+                  '<div class="res-radio-wrapper">' +
+                  '<input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="commit" id="commit' + full.entry_id + '">' +
+                  '<label for="commit' + full.entry_id + '">Commit</label></div>' +
+                  '<div class="res-radio-wrapper">' +
+                  '<input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="decline" checked="checked" id="decline' + full.entry_id + '">' +
+                  '<label for="decline' + full.entry_id + '">Decline</label></div>' +
+                  '<div class="res-radio-wrapper">' +
+                  '<input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="ignore" id="ignore' + full.entry_id + '">' +
+                  '<label for="ignore' + full.entry_id + '">Ignore (Bulk change only)</label></div>' +
                   '</div>' +
                   '<div class="submit-row">' +
                   '<span class="dropdown internal-comment-wrapper">' +
@@ -824,9 +829,15 @@ $ ->
                 submit_res_wrapper =
                   '<div class="submit-res-wrapper completed-ticket-res-wrapper">' +
                     '<div class="res-radio-row">' +
-                    '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="UNCHANGED" disabled="true" ' + unchanged_check + '><label>Unchanged</label></div>' +
-                    '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="FIXED" disabled="true" ' + fixed_check + '><label>Fixed</label></div>' +
-                    '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="INVALID" disabled="true" ' + invalid_check + '><label>Invalid</label></div>' +
+                    '<div class="res-radio-wrapper">' +
+                    '<input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="UNCHANGED" disabled="true" ' + unchanged_check + ' id="unchanged' + full.entry_id + '">' +
+                    '<label for="unchanged' + full.entry_id + '">Unchanged</label></div>' +
+                    '<div class="res-radio-wrapper">' +
+                    '<input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="FIXED" disabled="true" ' + fixed_check + ' id="fixed' + full.entry_id + '">' +
+                    '<label for="fixed' + full.entry_id + '">Fixed</label></div>' +
+                    '<div class="res-radio-wrapper">' +
+                    '<input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="INVALID" disabled="true" ' + invalid_check + ' id="invalid' + full.entry_id + '">' +
+                    '<label for="invalid' + full.entry_id + '">Invalid</label></div>' +
                     '</div>' +
                     '<div class="submit-row">' +
                     '<span class="dropdown internal-comment-wrapper">' +
@@ -843,9 +854,15 @@ $ ->
                 submit_res_wrapper =
                   '<div class="submit-res-wrapper open-ticket-res-wrapper">' +
                     '<div class="res-radio-row">' +
-                      '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="UNCHANGED"><label>Unchanged</label></div>' +
-                      '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="FIXED" checked><label>Fixed</label></div>' +
-                      '<div class="res-radio-wrapper"><input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="INVALID"><label>Invalid</label></div>' +
+                      '<div class="res-radio-wrapper">' +
+                    '<input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="UNCHANGED" id="unchanged' + full.entry_id + '">' +
+                    '<label for="unchanged' + full.entry_id + '">Unchanged</label></div>' +
+                      '<div class="res-radio-wrapper">' +
+                    '<input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="FIXED" checked id="fixed' + full.entry_id + '">' +
+                    '<label for="fixed' + full.entry_id + '">Fixed</label></div>' +
+                      '<div class="res-radio-wrapper">' +
+                    '<input type="radio" class="resolution_radio_button" name="resolution' + full.entry_id + '" value="INVALID" id="invalid' + full.entry_id + '">' +
+                    '<label for="invalid' + full.entry_id + '">Invalid</label></div>' +
                     '</div>' +
                     '<div class="submit-row">' +
                     '<span class="dropdown internal-comment-wrapper">' +
@@ -1476,11 +1493,6 @@ $ ->
     save_display_prefs()
 
 
-
-  # TODO move these to other on page load function section
-  # webcat > complaints index, disable two Submit toolbar buttons on page load
-  if $('body').hasClass('escalations--webcat--complaints-controller')
-    $('#master-submit, #index_update_resolution').prop('disabled','disabled')
 
   # webcat > complaints index, ensure this JS gets called
   if $('body').hasClass('escalations--webcat--complaints-controller') && $('body').hasClass('show-action')

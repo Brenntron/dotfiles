@@ -49,6 +49,14 @@ getTouchedFormCount = ()->
   return form_item.length
 
 
+# Bulk webcat entry submit
+bulk_submit_categorize_entries = () ->
+  debugger
+  # grab what has been touched / stored in session?
+  # grab selected if we are using that
+  # compare
+
+  # from selected
 
 
 # TODO - fix this function
@@ -148,7 +156,7 @@ window.inheritCategories = (complaint_entry_id) ->
 
 
 
-
+# Bulk submission of Pending (in review) entries
 window.review_bulk_submit = () ->
   selected_rows = $("tr.highlight-second-review.shown")
   self_review = $('#self_review').is(':checked')
@@ -201,114 +209,6 @@ window.review_bulk_submit = () ->
         notice_html = "<p>Something went wrong</p>"
     , this)
 
-
-
-processSubmitPending=(entry_id,row_id)->
-  prefix = $('#complaint_prefix_'+entry_id)[0].value
-  status = $('[name=resolution_review_'+entry_id+']:checked').val()
-  if status == "ignore"
-    alert("Because the 'Ignore' radio is checked, this operation did nothing")
-    return
-  comment = $('#complaint_comment_'+entry_id)[0].value
-  resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
-  resolution = $('.complaint-resolution'+entry_id).text()
-  self_review = $('#self_review').is(':checked')
-
-  #get the selectize control for the category input
-  selectizeControl = $('#input_cat_'+entry_id).selectize()[0].selectize
-  if $('#input_cat_'+entry_id).val() == null
-    categories = null
-  else
-    categories = $('#input_cat_'+entry_id).val().toString()
-
-  named_categories = ""
-  if categories == null
-    cat_array = []
-  else
-    cat_array = categories.split(',')
-    for cat, i in cat_array
-      named_categories = named_categories + selectizeControl.getItem(cat).text()
-      if i < cat_array.length
-        named_categories += ", "
-
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
-    method: 'POST'
-    data: {
-      data: [{
-        'self_review': self_review,
-        'id': entry_id,
-        'prefix': prefix,
-        'commit':status,
-        'status':resolution,
-        'comment':comment,
-        'resolution_comment': resolution_comment,
-        'categories': categories,
-        'category_names':named_categories
-      }]
-    }
-    success: (response) ->
-      {uri, domain, subdomain, path, categories, error, entry_id, was_dismissed, status} = $.parseJSON(response)
-      if error
-        notice_html = "<p>Something went wrong: #{error}</p>"
-        alert(error)
-      else
-        table = $('#complaints-index').DataTable()
-        temp_row = table.row(row_id)
-        td = $(temp_row).next('tr').find('td:first')
-        unless $(td).hasClass 'nested-complaint-data-wrapper'
-          $(td).addClass 'nested-complaint-data-wrapper'
-        if was_dismissed
-          temp_row.node().className += ' highlight-was-dismissed'
-        temp_row.data().uri = uri
-        temp_row.data().category = categories
-        temp_row.data().status = status
-        temp_row.data().resolution = resolution
-        temp_row.data().internal_comment = comment
-        temp_row.data().resolution_comment = resolution_comment
-        temp_row.invalidate().page(table_page).draw(false)
-        temp_row.child().remove()
-        temp_row.child(format(temp_row)).show()
-        nested_tooltip()
-        $('#input_cat_'+ temp_row.data().entry_id).selectize {
-          persist: false,
-          create: false,
-          maxItems: 5,
-          closeAfterSelect: true,
-          valueField: 'category_id',
-          labelField: 'category_name',
-          searchField: ['category_name', 'category_code'],
-          options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id),
-          items: selected_options(temp_row.data().category)
-        }
-        $("#domain_#{entry_id}").text(domain)
-        $("#subdomain_#{entry_id}").text(subdomain)
-        $("#path_#{entry_id}").text(path)
-        removeTouchedFormChange(uri)
-        timesTouched = 0
-
-      tds = $('#complaints-index tbody').closest('td')
-      for td in tds
-        if td.className == ''
-          td.classList.add('nested-complaint-data-wrapper')
-    error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-  , this)
-
-window.updatePending = (id,row_id) ->
-  timesTouched = getTouchedFormCount()
-  if timesTouched > 1
-    std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this pending item? It will reload the page and you will lose your changes.",
-      [],
-      {
-        reload: false,
-        confirm_dismiss: true,
-        confirm: ->
-          processSubmitPending(id,row_id)
-      })
-  else
-    processSubmitPending(id,row_id)
 
 
 
@@ -390,6 +290,7 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaint
   comment_check()
 
 
+# TODO - check these
 $(document).on 'change','#complaint_resolution', ->
   internal_comment = $('.internal_comment_container')
   customer_comment = $('.customer_facing_comment_container')
@@ -598,7 +499,7 @@ window.fetch_complaints = () ->
 
 
 
-# What does this do?
+# TODO - What does this do?
 window.mark_for_commit = () ->
   entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
     this.dataset['entryId']
@@ -642,7 +543,9 @@ window.triggerTooltips = (item) ->
     side: 'bottom'
   return
 
-#bulk submit
+#bulk submit old
+# For bulk submissions do we reload the page or do the same thing that we do w/ indv submissions
+# confirm with Adam
 processSubmitMaster = () ->
   debugger
   data = []
@@ -656,6 +559,7 @@ processSubmitMaster = () ->
   selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
   selectedEntries = []
   self_review = $('#self_review').is(':checked')
+
   $('#complaints-index').DataTable().rows (idx, data, node) ->
     entry_item = data.domain || data.ip_address
     if selectedEntryDomains.includes(entry_item)
@@ -683,7 +587,18 @@ processSubmitMaster = () ->
       resolution_comment = data_wrapper.find("#complaint_resolution_comment_#{entry_id}")[0].value
       uri_as_categorized = data_wrapper.find("#complaint_prefix_#{entry_id}")[0].value
       if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
-        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
+        data.push({
+          entry_id: entry_id,
+          error: false,
+          row_id: row_id,
+          prefix: prefix,
+          categories: categories,
+          category_names: category_names,
+          status: status,
+          comment: comment,
+          resolution_comment: resolution_comment,
+          uri_as_categorized: uri_as_categorized})
+
       else if status == 'UNCHANGED' || status == 'INVALID'
         data.push({
           entry_id: entry_id,
@@ -790,8 +705,9 @@ processSubmitMaster = () ->
 
   , this)
 
+
 window.master_submit = () ->
-  selectedItems = $('.selected + tr td.nested-complaint-data-wrapper')
+  selectedItems = $('tr.selected')
   thingsSelected = getTouchedFormCount()
   if thingsSelected > selectedItems.length
     std_msg_confirm(
@@ -921,19 +837,16 @@ $ ->
 
 
 
-      #Call new function, fix this
+  # If resolution is changed (to unchanged or invalid) enable the bulk submit button
   $(document).on 'change', '.resolution_radio_button', ->
-    debugger
     id = this.name.split("resolution")[1]
-    domain = $("#complaint_prefix_"+id)[0].dataset.domain
-    store_entry_changes(domain)
-    $('#master-submit').prop('disabled', false)
+    store_entry_changes(id)
+    $('#master-submit').removeAttr('disabled')
 
 
 
   $('#complaints_check_box, #complaints_select_all').click ->
     checked = $(this).prop('checked')
-
     if checked
       $('#complaints-index').DataTable().rows( { page: 'current' } ).select()
     else

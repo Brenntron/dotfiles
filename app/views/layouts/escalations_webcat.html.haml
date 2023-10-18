@@ -66,10 +66,10 @@
                 %button.categorize-urls-success-icon
                 %span#cat-url-success-message-1 Categories successfully dropped.
               %label.content-label-sm URL
-              %input.inline-input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL", autofocus: 'true', tabindex: '1', onchange:'touchedFormChange()'}/
+              %input.inline-input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL", autofocus: 'true', tabindex: '1', onchange:'store_entry_changes()'}/
               %button.inline-button.history-button.esc-tooltipped#history-1{type: 'button', onclick: 'retrieve_history(1)', title: 'Entry Category History'}
               %label.content-label-sm Categories
-              %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", tabindex: "2", onchange:'touchedFormChange()'}
+              %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", tabindex: "2", onchange:'store_entry_changes()'}
             %hr.thin.condensed
             .form-group
               %div.cat-url-error#cat-url-2
@@ -79,10 +79,10 @@
                 %button.categorize-urls-success-icon
                 %span#cat-url-success-message-2 Categories successfully dropped.
               %label.content-label-sm URL
-              %input.inline-input.form-control#url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '3', onchange:'touchedFormChange()'}/
+              %input.inline-input.form-control#url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '3', onchange:'store_entry_changes()'}/
               %button.inline-button.history-button.esc-tooltipped#history-2{type: 'button', onclick: 'retrieve_history(2)', title: 'Entry Category History'}
               %label.content-label-sm Categories
-              %select.form-control#cat_new_url_2.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "4", onchange:'touchedFormChange()'}
+              %select.form-control#cat_new_url_2.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "4", onchange:'store_entry_changes()'}
             %hr.thin.condensed
             .form-group
               %div.cat-url-error#cat-url-3
@@ -92,10 +92,10 @@
                 %button.categorize-urls-success-icon
                 %span#cat-url-success-message-3 Categories successfully dropped.
               %label.content-label-sm URL
-              %input.inline-input.form-control#url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '5', onchange:'touchedFormChange()'}/
+              %input.inline-input.form-control#url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '5', onchange:'store_entry_changes()'}/
               %button.inline-button.history-button.esc-tooltipped#history-3{type: 'button', onclick: 'retrieve_history(3)', title: 'Entry Category History'}
               %label.content-label-sm Categories
-              %select.form-control#cat_new_url_3.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "6", onchange:'touchedFormChange()'}
+              %select.form-control#cat_new_url_3.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "6", onchange:'store_entry_changes()'}
             %hr.thin.condensed
             .form-group
               %div.cat-url-error#cat-url-4
@@ -105,10 +105,10 @@
                 %button.categorize-urls-success-icon
                 %span#cat-url-success-message-4 Categories successfully dropped.
               %label.content-label-sm URL
-              %input.inline-input.form-control#url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '7', onchange:'touchedFormChange()'}/
+              %input.inline-input.form-control#url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '7', onchange:'store_entry_changes()'}/
               %button.inline-button.history-button.esc-tooltipped#history-4{type: 'button', onclick: 'retrieve_history(4)', title: 'Entry Category History'}
               %label.content-label-sm Categories
-              %select.form-control#cat_new_url_4.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "8", onchange:'touchedFormChange()'}
+              %select.form-control#cat_new_url_4.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "8", onchange:'store_entry_changes()'}
             %hr.thin.condensed
             .form-group
               %div.cat-url-error#cat-url-5
@@ -118,10 +118,10 @@
                 %button.categorize-urls-success-icon
                 %span#cat-url-success-message-5 Categories successfully dropped.
               %label.content-label-sm URL
-              %input.inline-input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '9', onchange:'touchedFormChange()'}/
+              %input.inline-input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '9', onchange:'store_entry_changes()'}/
               %button.inline-button.history-button.esc-tooltipped#history-5{type: 'button', onclick: 'retrieve_history(5)', title: 'Entry Category History'}
               %label.content-label-sm Categories
-              %select.form-control#cat_new_url_5.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10", onchange:'touchedFormChange()'}
+              %select.form-control#cat_new_url_5.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10", onchange:'store_entry_changes()'}
             .form-group.text-center
               .webcat-loader.gear-loader-wrapper.hidden
                 = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'

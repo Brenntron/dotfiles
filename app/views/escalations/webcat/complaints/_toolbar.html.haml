@@ -188,7 +188,7 @@
 
   %div.webcat-toolbar-push
     - if params[:f] != "REVIEW"
-      %button#index_update_resolution.toolbar-button.resolution-submit-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_update_resolution.toolbar-button.resolution-submit-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'disabled'}
         %span
           Bulk Resolution Tool
       .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_update_resolution'}
@@ -201,15 +201,13 @@
           .comment-wrapper.customer_facing_comment_container
             %label.toolbar-section-label{'for':'customer_facing_comment'} Customer Facing Comment
             %input.form-control#customer_facing_comment{:name => "customer_facing_comment", :placeholder => "Add a comment for the customer.", :type => "text", :value => ""}
-          %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
+          %button#button_update_resolution.primary{type:'button', onclick:'updateResolutionDialog();'}
             Update
-      %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'master_submit();', title: 'Submit multiple edited entries with any changes entered.'}
-        %span
-          Bulk Submit
-      %span.dropdown
+      %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'master_submit();', title: 'Submit multiple edited entries with any changes entered.', disabled: 'disabled'}
+        %span Bulk Submit
     - else
       %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
-        %span.toolbar-button-text Confirm Review
+        %span Confirm Review
   %div.webcat-toolbar-tall-wrapper
     %input{type: 'checkbox', id:'self_review'}
     %label{for: 'self_review'} Allow Self Review
