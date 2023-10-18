@@ -8464,16 +8464,19 @@ hr.condensed {
 .categorize-radio-wrapper {
   line-height: initial;
   background-color: $faint-neutral-color;
-}
 
-.categorize-radio-wrapper .radio-label {
-  font-size: 8pt;
-  padding-left: 8px;
-}
+  .radio-label {
+    font-size: 8pt;
+    padding-left: 8px;
+    vertical-align: middle;
+  }
 
-.categorize-radio-wrapper input[type="radio"] {
-  border: none !important;
-  outline: none !important;
+  .cat-url-radio {
+    border: none !important;
+    margin-top: -1px;
+    outline: none !important;
+    vertical-align: middle;
+  }
 }
 
 .categorize-radio-wrapper.row {
