@@ -2,11 +2,12 @@ local utils = require "utils.keymaps-helpers"
 local maps = utils.empty_map_table()
 
 local sections = {
+  b = { desc = " Neovim Config" },
   d = { desc = " Debug" },
   f = { desc = "󰭎 Telescope" },
   g = { desc = "󰊢 Git" },
   l = { desc = " LSP" },
-  n = { desc = " Neovim Config" },
+  n = { desc = "␀ Null-Ls" },
   s = { desc = "󱙝 Spectre" },
   t = { desc = "󱉯 Trouble" },
 }
@@ -35,13 +36,15 @@ maps.n["<leader>h"] = { "<cmd>nohlsearch<cr>", desc = "Clear highlights" }
 maps.n["<S-q>"] = { "<cmd>Bdelete!<cr>", desc = "Close buffer" }
 
 -- Save buffer
-maps.n["<S-w>"] = { "<cmd>w!<cr>", desc = "Save buffer" }
+maps.n["<leader>w"] = { "<cmd>w!<cr>", desc = "Save buffer" }
 
--- Neovim Config
-maps.n["<leader>n"] = sections.n
-maps.n["<leader>nod"] = { "<cmd>e ~/.config/nvim/init.lua<cr>", desc = "Open config directory" }
-maps.n["<leader>ns"] = { "<cmd>ReloadNvim<cr>", desc = "Reload Neovim's configuration" }
+-- Close Window
+maps.n["<leader>q"] = { "<cmd>q!<cr>", desc = "Clase window" }
 
+-- Brenntron's Neovim Config
+maps.n["<leader>b"] = sections.b
+maps.n["<leader>bod"] = { "<cmd>e ~/.config/nvim/init.lua<cr>", desc = "Open config directory" }
+maps.n["<leader>br"] = { "<cmd>ReloadNvim<cr>", desc = "Reload Neovim's configuration" }
 -- Better paste
 maps.v["p"] = { "P", desc = "Better paste" }
 
@@ -69,6 +72,16 @@ maps.n["<leader>dl"] = { "<cmd>lua require'dap'.run_last()<cr>", desc = "Run las
 maps.n["<leader>du"] = { "<cmd>lua require'dapui'.toggle()<cr>", desc = "Toggle Dap UI" }
 maps.n["<leader>dt"] = { "<cmd>lua require'dap'.terminate()<cr>", desc = "Terminate" }
 
+-- Explorer
+maps.n["<leader>e"] = { "<cmd>NvimTreeToggle<cr>", desc = "Toggle explorer" }
+
+-- Finder
+maps.n["<leader>f"] = sections.f
+maps.n["<leader>ff"] = { "<cmd>Telescope find_files<cr>", desc = "Find files" }
+maps.n["<leader>fw"] = { "<cmd>Telescope live_grep<cr>", desc = "Find words" }
+maps.n["<leader>fp"] = { "<cmd>Telescope projects<cr>", desc = "Find projects" }
+maps.n["<leader>fb"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
+
 -- Git
 maps.n["<leader>g"] = sections.g
 maps.n["<leader>gg"] = { "<cmd>lua _LAZYGIT_TOGGLE()<cr>", desc = "Lazygit" }
@@ -84,22 +97,17 @@ maps.n["<leader>gd"] = { "<cmd>lua require('gitsigns').diffthis()<cr>", desc = "
 maps.n["]g"] = { "<cmd>lua require('gitsigns').next_hunk()", desc = "Next Git hunk" }
 maps.n["[g"] = { "<cmd>lua require('gitsigns').prev_hunk()<cr>", desc = "Previous Git hunk" }
 
--- Easy-Align
-maps.n["<leader>ea"] = { "<Plug>(EasyAlign)", desc = "Align text" }
-maps.v["<leader>ea"] = { "<Plug>(EasyAlign)", desc = "Align block" }
-
 -- Lsp
 maps.n["<leader>l"] = sections.l
 maps.n["<leader>lf"] = { "<cmd>lua vim.lsp.buf.format{ async = true, timeout_ms = 5000 }<cr>", desc = "Format file" }
+maps.n["<leader>li"] = { "<cmd>LspInfo<cr>", desc = "Lsp Info" }
+maps.n["<leader>ll"] = { "<cmd>LspLog<cr>", desc = "Lsp Log"}
 
--- NvimTree
-maps.n["<leader>e"] = { "<cmd>NvimTreeToggle<cr>", desc = "Toggle explorer" }
-
-maps.n["<leader>f"] = sections.f
-maps.n["<leader>ff"] = { "<cmd>Telescope find_files<cr>", desc = "Find files" }
-maps.n["<leader>ft"] = { "<cmd>Telescope live_grep<cr>", desc = "Find words" }
-maps.n["<leader>fp"] = { "<cmd>Telescope projects<cr>", desc = "Find projects" }
-maps.n["<leader>fb"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
+-- Null-Ls (None-Ls)
+maps.n["<leader>nm"] = { "<cmd>Mason<cr>", desc = "Mason Control Panel" }
+maps.n["<leader>nm"] = { "<cmd>MasonLog<cr>", desc = "Mason Log" }
+maps.n["<leader>nn"] = { "<cmd>NullLsInfo<cr>", desc = "Null-Ls Info" }
+maps.n["<leader>nnl"] = { "<cmd>NullsLsLog<cr>", desc = "Null-Ls Log"}
 
 -- Spectre
 maps.n["<leader>s"] = sections.s

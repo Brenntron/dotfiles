@@ -1,8 +1,10 @@
 local M = {
-  "tpope/vim-surround",
-  init = function()
-    vim.o.timeoutlen = 500
-  end,
+  "kylechui/nvim-surround",
+  event = "VeryLazy"
 }
+
+function M.config()
+  require('nvim-surround').setup {}
+end
 
 return M

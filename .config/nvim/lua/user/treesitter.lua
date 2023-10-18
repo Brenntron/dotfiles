@@ -29,7 +29,6 @@ function M.config()
       "lua",
       "markdown",
       "markdown_inline",
-      "python",
       "regex",
       "ruby",
       "scss",
@@ -48,7 +47,7 @@ function M.config()
     autopairs = {
       enable = true,
     },
-    indent = { enable = true, disable = { "python", "css" } },
+    indent = { enable = true, disable = { "css" } },
     context_commentstring = {
       enable = true,
       enable_autocmd = false,

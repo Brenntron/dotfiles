@@ -1,8 +1,8 @@
--- _G.reload = require('utils.modules').reload
+_G.reload = require('utils.modules').reload
 
--- local commands = require "commands"
+local commands = require "commands"
 
--- commands.load(commands.command_list)
+commands.load(commands.command_list)
 
 require "options"
 require "keymaps"
