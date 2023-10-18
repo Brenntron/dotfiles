@@ -2,7 +2,7 @@ local utils = require "utils.keymaps-helpers"
 local maps = utils.empty_map_table()
 
 local sections = {
-  b = { desc = " Neovim Config" },
+  b = { desc = " Brenntron's Neovim Config" },
   d = { desc = " Debug" },
   f = { desc = "󰭎 Telescope" },
   g = { desc = "󰊢 Git" },
