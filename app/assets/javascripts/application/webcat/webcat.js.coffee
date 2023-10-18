@@ -328,9 +328,7 @@ $ ->
   current_url = window.location.href
   complaint_table = ''
 
-  window.webcat_refresh = ()->
-    refresh_localStorage()
-    refresh_url()
+
 
   build_subheader = (subheader) ->
     if typeof subheader == 'string'
@@ -367,7 +365,8 @@ $ ->
     ###
     # Depending on the data, this function builds the search header
     # With the search header the reset filter button is attached
-    # If the search_type is 'named' or 'advanced', a subheader with search definitions will be made with the build_subheader function
+    # If the search_type is 'named' or 'advanced', a subheader with
+    # search definitions will be made with the build_subheader function
     ###
     container = $('#webcat_searchref_container')
     if data != undefined && container.length > 0
@@ -1532,19 +1531,14 @@ $ ->
       $(button).next().text('Ascending')
 
 
-  # webcat > complaints show page, disable two Submit toolbar buttons on page load
+  # TODO move these to other on page load function section
+  # webcat > complaints index, disable two Submit toolbar buttons on page load
   if $('body').hasClass('escalations--webcat--complaints-controller')
     $('#master-submit, #index_update_resolution').prop('disabled','disabled')
 
-  # webcat > complaints show page, ensure this JS gets called
+  # webcat > complaints index, ensure this JS gets called
   if $('body').hasClass('escalations--webcat--complaints-controller') && $('body').hasClass('show-action')
     check_wbnp_status()
-
-  # webcat > reports page, show full metrics banner at top, not the streamlined one
-  if $('body').hasClass("escalations--webcat--reports-controller")
-    $('#tooltip-wbnp').empty()
-    $('.complaints-metrics-banner').addClass('hidden')
-    $('.webcat-reports-only').removeClass('hidden')
 
   # wbnp report status link shows a tooltip table
   $('.complaints-mgt-area #wbnp-report-status-link').tooltipster

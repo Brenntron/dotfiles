@@ -196,6 +196,7 @@ window.remove_entry_from_changes = (entry_id) ->
 #    urls_touched = url_items.join(",")
 #  sessionStorage.setItem("touchedForm", urls_touched)
 
+# we may not need this
 getTouchedFormCount = ()->
   form_item = (sessionStorage.getItem("webcat_entries_changed") || "")
   form_item = form_item.split(",")
