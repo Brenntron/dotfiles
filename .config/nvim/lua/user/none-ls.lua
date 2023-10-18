@@ -16,6 +16,8 @@ function M.config()
   local formatting = null_ls.builtins.formatting
   -- https://github.com/nvimtools/none-ls.nvim/tree/main/lua/none-ls/builtins/diagnostics
   local diagnostics = null_ls.builtins.diagnostics
+  -- https://github.com/nvimtools/none-ls.nvim/blob/main/doc/BUILTINS.md#completion
+  local completions = null_ls.builtins.completion
   -- https://github.com/nvimtools/none-ls.nvim/tree/main/lua/none-ls/builtins/helpders
   local helpers = require "null-ls.helpers"
   local coffeelint_query = {
@@ -27,6 +29,17 @@ function M.config()
   null_ls.setup {
     debug = false,
     sources = {
+      -- completions
+      completions.spell.with {
+        filetypes = { "markdown" }
+      },
+      -- diagnostics
+      diagnostics.codespell.with {
+        filetypes = { "coffee", "erb", "eruby", "html", "markdown" },
+      },
+      diagnostics.haml_lint,
+      diagnostics.shellcheck,
+      diagnostics.zsh,
       -- formatters
       formatting.beautysh.with {
         filetypes = { "bash", "zsh" },
@@ -39,13 +52,6 @@ function M.config()
       },
       formatting.rubocop,
       formatting.stylua,
-      -- diagnostics
-      diagnostics.codespell.with {
-        filetypes = { "coffee", "erb", "eruby", "html", "markdown" },
-      },
-      diagnostics.haml_lint,
-      diagnostics.shellcheck,
-      diagnostics.zsh,
     },
   }
 
