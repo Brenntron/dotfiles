@@ -139,6 +139,7 @@ window.webcat_reset_search = ()->
 
 
 #TODO - when do we use this
+# this button appears to be hidden all the time
 window.inheritCategories = (complaint_entry_id) ->
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaint_entries/inherit_categories_from_master_domain'
@@ -213,7 +214,8 @@ window.review_bulk_submit = () ->
 
 
 
-## Allows analyst to set ticket status to reopened and allows them to interact with the submission form
+## Allows analyst to set ticket status to reopened and allows them to interact
+# with the submission form
 window.reopenComplaint = (entry_id, button) ->
 
 # Getting all the fields that need to be interactive if reopened
@@ -248,70 +250,6 @@ window.reopenComplaint = (entry_id, button) ->
 
 
 
-# TODO - check this function
-$(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
-  rows = $('#complaints-index').DataTable().rows('.selected').data()
-  reopened = false
-  invalid_unchanged = false
-  disabled = true
-  for row in rows
-    { status } = row
-
-    if status == 'COMPLETED'
-        reopened = true
-        disabled = false
-    if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
-        invalid_unchanged = true
-        disabled = false
-
-  if disabled == false
-    $('#index_update_resolution').attr('disabled', false)
-  else
-    $('#index_update_resolution').prop('disabled', disabled)
-
-  reopened_opt = $('#complaint_resolution option:contains("Reopened")')
-  invalid_opt = $('#complaint_resolution option:contains("Invalid")')
-  unchanged_opt = $('#complaint_resolution option:contains("Unchanged")')
-
-  if !reopened
-    reopened_opt.attr("disabled","disabled");
-  else
-    reopened_opt.removeAttr("disabled");
-    reopened_opt.prop('selected', true)
-
-  if !invalid_unchanged
-    invalid_opt.attr("disabled","disabled");
-    unchanged_opt.attr("disabled","disabled");
-  else
-    invalid_opt.removeAttr("disabled");
-    unchanged_opt.removeAttr("disabled");
-    invalid_opt.prop('selected', true)
-
-  comment_check()
-
-
-# TODO - check these
-$(document).on 'change','#complaint_resolution', ->
-  internal_comment = $('.internal_comment_container')
-  customer_comment = $('.customer_facing_comment_container')
-  if $(this).val() == 'REOPENED'
-    internal_comment.css('display', 'none')
-    customer_comment.css('display', 'none')
-  else
-    internal_comment.css('display', 'block')
-    customer_comment.css('display', 'block')
-
-window.comment_check = ()->
-  invalid_opt = $('#complaint_resolution option:contains("Invalid"):not(:disabled)').length == 1
-  reopened_opt = $('#complaint_resolution option:contains("Reopened"):not(:disabled)').length == 1
-  internal_comment = $('.internal_comment_container')
-  customer_comment = $('.customer_facing_comment_container')
-  if reopened_opt && invalid_opt || invalid_opt
-    internal_comment.css('display', 'block')
-    customer_comment.css('display', 'block')
-  else
-    internal_comment.css('display', 'none')
-    customer_comment.css('display', 'none')
 
 
 
@@ -332,158 +270,6 @@ selected_options = (category_names) ->
   return options
 
 
-#$(document).on 'click', ".popover .screenshot-retake-button", ->
-#  $('[data-original-title]').popover 'hide'
-#  se_id = this.id.slice(6)
-#  std_msg_ajax(
-#    method: 'GET'
-#    url: '/escalations/api/v1/escalations/webcat/complaint_entries/' + se_id + '/retake_screenshot'
-#    data: {}
-#    error_prefix: 'Error retaking screenshot.'
-#    success: (response) ->
-#      std_msg_success('Screenshot job initiated. Check back in about 10 seconds.', [], reload: true)
-#  )
-
-
-
-#window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
-#  event.preventDefault();
-#  $('#' + input_id)[0].value = qual_subdomain
-#  return false;
-
-# what is this for
-#format = (complaint_entry_row) ->
-#  complaint_entry = complaint_entry_row.data()
-#  row_id = complaint_entry_row[0][0]
-#
-#  if complaint_entry.uri
-#    host = complaint_entry.uri
-#    url = host
-#    uri = '<a href="http://' + complaint_entry.uri + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
-#    uri_no_path = complaint_entry.uri
-#    qual_subdomain = complaint_entry.domain
-#    lookup_val = complaint_entry.domain
-#    if uri_no_path.indexOf('/') > 0
-#      uri_no_path = uri_no_path.split('/')[0] # strip out the path in a uri for Site Search, it's extraneous
-#    search_uri = '<a href="https://www.google.com/search?q=site%3A' + uri_no_path + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + uri_no_path + '</a>'
-#  else if complaint_entry.domain
-#    if complaint_entry.subdomain
-#      host = complaint_entry.subdomain + '.'
-#    host = host + complaint_entry.domain
-#    url = host
-#    if complaint_entry.path
-#      url = host
-#    uri = '<a href="http://' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
-#    search_uri = '<a href="https://www.google.com/search?q=site%3A' + url + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + url + '</a>'
-#    lookup_val = complaint_entry.domain
-#  else if  complaint_entry.ip_address
-#    host = complaint_entry.ip_address
-#    url = host
-#    lookup_val = complaint_entry.ip_address
-#    uri = '<a href="http://' + complaint_entry.ip_address + '"  target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
-#    search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
-#  else
-#    uri = missing_data
-#  if complaint_entry.subdomain
-#    qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
-#    lookup_val = complaint_entry.subdomain + '.' + qual_subdomain
-#
-#  entry_status = ""
-#  reopen_class = "hidden"
-#  submit_class = ""
-#  status_class = ""
-#
-#
-#  if complaint_entry.entry_history?
-#    if complaint_entry.entry_history.complaint_history.length >= 1
-#      complaint_history = complaint_entry.entry_history.complaint_history
-#    else
-#      complaint_history = ''
-#
-#  { entry_id, domain, complaint_id, ip_address } = complaint_entry
-#  whois_lookup = if ip_address then ip_address else domain
-#  complaint_entry_html = ''
-#  input_cat = 'input_cat_' + entry_id
-#
-#  if complaint_entry.status == "PENDING"
-#    if complaint_entry.uri_as_categorized  == ""
-#      # if a subdomain string exists, prepend it to the domain
-#      if complaint_entry.subdomain.length > 0
-#        domain = complaint_entry.subdomain + "." + complaint_entry.domain
-#      else
-#        domain = complaint_entry.domain
-#    else
-#      domain = complaint_entry.uri_as_categorized
-#    # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
-#
-#  edit_input = if domain != "" then domain else host #if the domain is empty, then display host for ips in edit input
-#
-#
-#  form_change_item = domain || complaint_entry.ip_address
-#
-#  complaint_entry_html =
-#      complaint_table_row_html +
-#
-#      '<div><label class="content-label-sm">Original</label></div> ' +
-#      '<div>' + host  + '</div>' +
-#      '<label class="content-label-sm">Edit URI</label><br/>' +
-#      '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-#      '" type="text" data-domain="' + form_change_item + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
-#      '"' + entry_status + '>' +
-#      '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
-#      '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
-#
-#      '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
-#      '<ul id="main-domain-categories_' + entry_id + '"></ul>'+
-#      '<button class="secondary inline-button" onclick="inheritCategories(' + entry_id + ')">Inherit</button><br/>' +
-#      '</div>' +'</div><div class="col-xs-8">' +
-#      '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-#      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>'
-
-
-
-
-
-
-# Part of the screenshot code. Keeping for ref for when that is reimplemented
-#window.display_preview_window = (entry) ->
-#  {domain, category, id} = entry
-#  $('#complaint_id_x_prefix')[0].value = domain
-#  $('#complaint_id_x_categories')[0].value = category
-#  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-#  #when checkbox is clicked take the domain and path and try to open it in the iframe
-#  path = ""
-#  subdomain = ""
-#  if entry.subdomain
-#    subdomain = entry.subdomain + "."
-#  if entry.path
-#    path = entry.path
-#  loc = "http://" + subdomain + domain + path
-#  $.ajax(
-#    url: '/escalations/api/v1/escalations/webcat/complaints/test_url'
-#    method: 'GET'
-#    headers: headers
-#    data: {
-#      url:loc
-#    }
-#    success: (response) ->
-#      #yay you can visit the site
-#    error: (response) ->
-#      #that page wont load. lets display someting else
-#      switch response["status"]
-#        when 404
-#          document.getElementById('preview_window').src = "/unknown_url.html"
-#        when 403
-#          document.getElementById('preview_window').src = "/same_origin_url.html"
-#
-#  , this)
-#
-#  $(".complaint_selected" ).removeClass("complaint_selected")
-#  $("#complaint_entry_row_"+ id ).addClass("complaint_selected")
-#  document.getElementById('preview_window').src = loc
-#  document.getElementById('preview_window_header_p').innerHTML = loc
-#  document.getElementById('preview_window_header_a').href = loc
-
 
 
 window.fetch_complaints = () ->
@@ -499,49 +285,7 @@ window.fetch_complaints = () ->
 
 
 
-# TODO - What does this do?
-window.mark_for_commit = () ->
-  entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
-    this.dataset['entryId']
-  ).toArray()
-  data = {
-    'complaint_entry_ids': entry_ids
-    'category_list': $('#complaint_id_x_categories').val()
-    'comment': $('#complaint_id_x_comment').val()
-  }
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaints/mark_for_commit'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    error: (response) ->
-      popup_response_error(response, 'Error marking for commit')
-  )
-
-# what does this do?
-window.commit_marked = () ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaints/commit_marked'
-    method: 'POST'
-    headers: headers
-    data: {}
-    dataType: 'json'
-    error: (response) ->
-      popup_response_error(response, 'Error committing marked entries.')
-  )
-
-window.triggerTooltips = (item) ->
-  $('.nested-tooltipped').tooltipster
-    theme: [
-      'tooltipster-borderless'
-      'tooltipster-borderless-customized'
-    ]
-    side: 'bottom'
-  return
 
 #bulk submit old
 # For bulk submissions do we reload the page or do the same thing that we do w/ indv submissions
