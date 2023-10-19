@@ -138,24 +138,6 @@ window.webcat_reset_search = ()->
   complaint_id_input.clear()
 
 
-#TODO - when do we use this
-# this button appears to be hidden all the time
-window.inheritCategories = (complaint_entry_id) ->
-  std_msg_ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaint_entries/inherit_categories_from_master_domain'
-    method: 'POST'
-    data: {'id': complaint_entry_id}
-    success: (response) ->
-      $('.domain-categories').hide()
-      std_msg_success('Success',["Successfully inherited categories from main domain."], reload: false)
-
-    error: (response) ->
-      std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
-    )
-
-
-
-
 
 # Bulk submission of Pending (in review) entries
 window.review_bulk_submit = () ->
