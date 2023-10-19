@@ -271,7 +271,7 @@
 
 -# tabs navigation UI
 %ul.nav.nav-tabs#research-tab{role: 'tablist'}
-  %li.nav-item{role:'presentation'}
+  %li.nav-item.active{role:'presentation'}
     %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
       Research
   %li.nav-item{role:'presentation'}
@@ -287,7 +287,7 @@
 
 -# tabs content rendered here
 .tab-content.content-wrapper#bug-tab-content
-  .tab-pane#research_tab{role: 'tabpanel'}
+  .tab-pane#research_tab.active{role: 'tabpanel'}
     = render 'escalations/webrep/disputes/research_tab'
 
   .tab-pane#communication_tab{role: 'tabpanel'}
