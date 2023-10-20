@@ -1,0 +1,42 @@
+local M = {
+  "windwp/nvim-autopairs",
+  commit = "f6c71641f6f183427a651c0ce4ba3fb89404fa9e",
+  event = "InsertEnter",
+}
+
+function M.config()
+  require("nvim-autopairs").setup {
+    check_ts = true, -- treesitter integration
+    disable_filetype = { "TelescopePrompt", "spectre_panel" },
+    disable_in_macro = false,
+    disable_in_visualblock = false,
+    enable_check_bracket_line = false,
+    enable_afterquote = true,
+    enable_moveright = true,
+    fast_wrap = {
+      chars = { "{", "[", "(", '"', "'" },
+      check_comma = true,
+      end_key = "$",
+      highlight = "Search",
+      highlight_grey = "Comment",
+      keys = "qwertyuiopzxcvbnmasdfghjkl",
+      map = "<M-e>",
+      offset = 0, -- Offset from pattern match
+      pattern = string.gsub([[ [%'%"%)%>%]%)%}%,] ]], "%s+", ""),
+    },
+    ignore_next_char = string.gsub([[ [%w%%%'%[%"%.] ]], "%s+", ""),
+    map_bs = true,
+    map_c_w = false,
+    map_char = {
+      all = "(",
+      text = "{",
+    },
+    ts_config = {
+      lua = { "string", "source" },
+      javascript = { "string", "template_string" },
+      java = false,
+    },
+  }
+end
+
+return M

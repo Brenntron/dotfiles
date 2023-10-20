@@ -1,6 +1,6 @@
 stds.nvim = {
   globals = {
-    "reload",
+    "spec",
     vim = { fields = { "g" } },
   },
   read_globals = {

@@ -13,15 +13,18 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
--- example using a list of specs with the default options
 vim.g.mapleader = " " -- make sure to set `mapleader` before lazy so your mappings are correct
 
 -- load lazy
-require("lazy").setup("user", {
-  install = { colorscheme = { require("user.colorscheme").name } },
+require("lazy").setup("plugins", {
   defaults = { lazy = true, version = "57cce98dfdb2f2dd05a0567d89811e6d0505e13b" },
-  ui = { wrap = "true" },
-  change_detection = { enabled = true },
+  install = {
+    colorscheme = { require("plugins.colorscheme").name }
+  },
+  change_detection = {
+    enabled = true,
+    notify = false,
+  },
   debug = false,
   performance = {
     rtp = {
@@ -36,5 +39,10 @@ require("lazy").setup("user", {
         --  "zipPlugin", -- Handles browsing zipfiles
       },
     },
+  },
+  spec = LAZY_PLUGIN_SPEC,
+  ui = {
+    border = "rounded",
+    wrap = "true"
   },
 })
