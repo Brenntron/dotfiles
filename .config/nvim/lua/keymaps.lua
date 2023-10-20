@@ -95,21 +95,21 @@ maps.n["[g"] = { "<cmd>lua require('gitsigns').prev_hunk()<cr>", desc = "Previou
 
 -- Lsp
 maps.n["<leader>l"] = sections.l
-maps.n["<leader>li"] = { "<cmd>LspInfo<cr>", desc = "Lsp Log"}
+maps.n["<leader>li"] = { "<cmd>LspInfo<cr>", desc = "Lsp Info"}
 maps.n["<leader>ll"] = { "<cmd>LspLog<cr>", desc = "Lsp Log"}
 maps.n["<leader>lf"] = { "<cmd>lua vim.lsp.buf.format{ async = true, timeout_ms = 5000 }<cr>", desc = "Format file" }
-maps.n["<leader>lgD"] = { "<cmd>lua vim.lsp.buf.declaration()<CR>", { noremap = true, silent = true, desc = "GoTo declaration" }}
-maps.n["<leader>lgd"] = { "<cmd>lua vim.lsp.buf.definition()<CR>", { noremap = true, silent = true, desc = "GoTo definition" }}
-maps.n["<leader>lK"] = { "<cmd>lua vim.lsp.buf.hover()<CR>", { noremap = true, silent = true, desc = "Hover" }}
-maps.n["<leader>lI"] = { "<cmd>lua vim.lsp.buf.implementation()<CR>", { noremap = true, silent = true, desc = "GoTo implementation" }}
-maps.n["<leader>lr"] = { "<cmd>lua vim.lsp.buf.references()<CR>", { noremap = true, silent = true, desc = "GoTo references" }}
-maps.n["<leader>ld"] = { "<cmd>lua vim.diagnostic.open_float()<CR>", { noremap = true, silent = true, desc = "Float diagnostic" }}
-maps.n["<leader>la"] = { "<cmd>lua vim.lsp.buf.code_action()<cr>", { noremap = true, silent = true, desc = "Code action" }}
-maps.n["<leader>lj"] = { "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", { noremap = true, silent = true, desc = "Next diagnostic" }}
-maps.n["<leader>lk"] = { "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", { noremap = true, silent = true, desc = "Previous diagnostic" }}
-maps.n["<leader>lr"] = { "<cmd>lua vim.lsp.buf.rename()<cr>", { noremap = true, silent = true, desc = "Rename" }}
-maps.n["<leader>ls"] = { "<cmd>lua vim.lsp.buf.signature_help()<CR>", { noremap = true, silent = true, desc = "Signature help" }}
-maps.n["<leader>lq"] = { "<cmd>lua vim.diagnostic.setloclist()<CR>", { noremap = true, silent = true, desc = "Setloclist" }}
+maps.n["<leader>lgD"] = { "<cmd>lua vim.lsp.buf.declaration()<CR>", desc = "GoTo declaration" }
+maps.n["<leader>lgd"] = { "<cmd>lua vim.lsp.buf.definition()<CR>", desc = "GoTo definition" }
+maps.n["<leader>lK"] = { "<cmd>lua vim.lsp.buf.hover()<CR>", desc = "Hover" }
+maps.n["<leader>lI"] = { "<cmd>lua vim.lsp.buf.implementation()<CR>", desc = "GoTo implementation" }
+maps.n["<leader>lr"] = { "<cmd>lua vim.lsp.buf.references()<CR>", desc = "GoTo references" }
+maps.n["<leader>ld"] = { "<cmd>lua vim.diagnostic.open_float()<CR>", desc = "Float diagnostic" }
+maps.n["<leader>la"] = { "<cmd>lua vim.lsp.buf.code_action()<cr>", desc = "Code action" }
+maps.n["<leader>lj"] = { "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", desc = "Next diagnostic" }
+maps.n["<leader>lk"] = { "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", desc = "Previous diagnostic" }
+maps.n["<leader>lr"] = { "<cmd>lua vim.lsp.buf.rename()<cr>", desc = "Rename" }
+maps.n["<leader>ls"] = { "<cmd>lua vim.lsp.buf.signature_help()<CR>", desc = "Signature help" }
+maps.n["<leader>lq"] = { "<cmd>lua vim.diagnostic.setloclist()<CR>", desc = "Setloclist" }
 
 -- Mason
 maps.n["<leader>m"] = sections.m

@@ -22,7 +22,7 @@ function M.config()
   })
 
   require("mason-lspconfig").setup {
-    ensure_installed = require("utils.servers"),
+    ensure_installed = require("utils.servers").server_list,
     automatic_installation = true,
   }
 end

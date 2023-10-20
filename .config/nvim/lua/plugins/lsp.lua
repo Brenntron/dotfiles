@@ -34,10 +34,11 @@ function M.config()
       },
     }
   end
+
   local diagnostics_icons = require("utils.icons").diagnostics
   local lspconfig = require "lspconfig"
 
-  local servers = require("utils.servers")
+  local servers = require("utils.servers").server_list
 
   local default_diagnostic_config = {
     float = {
@@ -84,7 +85,6 @@ function M.config()
 
   for _, server in ipairs(servers) do
     local opts = {
-      on_attach = on_attach,
       capabilities = common_capabilities(),
     }
 
@@ -103,7 +103,6 @@ function M.config()
 
   -- Setup coffeesense as it is not included in mason-lspconfig
   local coffeesense_opts = {
-    on_attach = on_attach,
     capabilities = common_capabilities(),
   }
   local require_ok, settings = pcall(require, "lspsettings.coffeesense")
