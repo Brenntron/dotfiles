@@ -10,6 +10,7 @@ local sections = {
   n = { desc = "␀ Null-Ls" },
   s = { desc = "󱙝 Spectre" },
   t = { desc = "󱉯 Trouble" },
+  v = { desc = " Vim"}
 }
 
 -- Normal --
@@ -32,11 +33,13 @@ maps.n["<S-h>"] = { "<cmd>bprevious<cr>", desc = "Previous buffer" }
 -- Clear highlights
 maps.n["<leader>h"] = { "<cmd>nohlsearch<cr>", desc = "Clear highlights" }
 
--- Save buffer
+-- Write file
 maps.n["<leader>w"] = { "<cmd>w!<cr>", desc = "Save buffer" }
 
--- Close Window
-maps.n["<S-q>"] = { "<cmd>q<cr>", desc = "Close window" }
+-- Vim commonds
+maps.n["<leader>vbd"] = { "<cmd>bd<cr>", desc = "Close Buffer" }
+maps.n["<leader>vc"] = { "<cmd>close<cr>", desc = "Close Window" }
+maps.n["<leader>vq"] = { "<cmd>q<cr>", desc = "Quit Neovim" }
 
 -- Visual --
 -- Better paste
