@@ -278,5 +278,8 @@ export NODE_OPTIONS="--max-old-space-size=8192"
 
 source "$(brew --prefix zsh-syntax-highlighting)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
+# Precommand for kitty tab title
+precmd () {print -Pn "\e]0;%~\a"}
+
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
