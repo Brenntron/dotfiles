@@ -36,7 +36,7 @@ maps.n["<leader>h"] = { "<cmd>nohlsearch<cr>", desc = "Clear highlights" }
 maps.n["<leader>w"] = { "<cmd>w!<cr>", desc = "Save buffer" }
 
 -- Close Window
-maps.n["<S-q>"] = { "<cmd>q!<cr>", desc = "Clase window" }
+maps.n["<S-q>"] = { "<cmd>q<cr>", desc = "Close window" }
 
 -- Visual --
 -- Better paste
