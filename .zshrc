@@ -207,7 +207,8 @@ source $ZSH/oh-my-zsh.sh
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
-# export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
@@ -272,6 +273,8 @@ export XDG_CONFIG_HOME="${HOME}/.config"
 export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
 export LDFLAGS="-L/usr/local/opt/llvm@13/lib/c++ -Wl,-rpath,/usr/local/opt/llvm@13/lib/c++"
 export CPPFLAGS="-I/usr/local/opt/llvm@13/include"
+export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
+export NODE_OPTIONS="--max-old-space-size=8192"
 
 source "$(brew --prefix zsh-syntax-highlighting)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 

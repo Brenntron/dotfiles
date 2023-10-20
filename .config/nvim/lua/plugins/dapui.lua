@@ -13,7 +13,7 @@ local M = {
 function M.config()
   require("dapui").setup {
     expand_lines = true,
-    icons = { expanded = "", collapsed = "", circular = "" },
+    icons = require("utils.icons").dapui,
     mappings = {
       -- Use a table to apply multiple mappings
       expand = { "<CR>", "<2-LeftMouse>" },

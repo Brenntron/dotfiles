@@ -31,11 +31,11 @@ function M.config()
     sources = {
       -- completions
       completions.spell.with {
-        filetypes = { "markdown" }
+        filetypes = { "coffee", "erb", "eruby", "haml", "html", "markdown" }
       },
       -- diagnostics
       diagnostics.codespell.with {
-        filetypes = { "coffee", "erb", "eruby", "html", "markdown" },
+        filetypes = { "coffee", "erb", "eruby", "haml", "html", "markdown" },
       },
       diagnostics.haml_lint,
       diagnostics.shellcheck,

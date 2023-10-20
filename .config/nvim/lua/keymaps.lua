@@ -2,7 +2,6 @@ local utils = require "utils.keymaps-helpers"
 local maps = utils.empty_map_table()
 
 local sections = {
-  b = { desc = " Brenntron's Neovim Config" },
   d = { desc = " Debug" },
   f = { desc = "󰭎 Telescope" },
   g = { desc = "󰊢 Git" },
@@ -13,7 +12,7 @@ local sections = {
   t = { desc = "󱉯 Trouble" },
 }
 
--- Standart --
+-- Normal --
 -- Better window navigation
 maps.n["<C-h>"] = { "<C-w>h", desc = "Navigate to the left split" }
 maps.n["<C-j>"] = { "<C-w>j", desc = "Navigate to the bottom split" }
@@ -33,23 +32,16 @@ maps.n["<S-h>"] = { "<cmd>bprevious<cr>", desc = "Previous buffer" }
 -- Clear highlights
 maps.n["<leader>h"] = { "<cmd>nohlsearch<cr>", desc = "Clear highlights" }
 
--- Close buffer
-maps.n["<S-q>"] = { "<cmd>Bdelete!<cr>", desc = "Close buffer" }
-
 -- Save buffer
 maps.n["<leader>w"] = { "<cmd>w!<cr>", desc = "Save buffer" }
 
 -- Close Window
-maps.n["<leader>q"] = { "<cmd>q!<cr>", desc = "Clase window" }
+maps.n["<S-q>"] = { "<cmd>q!<cr>", desc = "Clase window" }
 
--- Brenntron's Neovim Config
-maps.n["<leader>b"] = sections.b
-maps.n["<leader>bod"] = { "<cmd>e ~/.config/nvim/init.lua<cr>", desc = "Open config directory" }
-maps.n["<leader>br"] = { "<cmd>ReloadNvim<cr>", desc = "Reload Neovim's configuration" }
+-- Visual --
 -- Better paste
 maps.v["p"] = { "P", desc = "Better paste" }
 
--- Visual --
 -- Stay in indent mode
 maps.v["<"] = { "<gv", desc = "Indent to the left" }
 maps.v[">"] = { ">gv", desc = "Indent to the right" }
@@ -60,6 +52,9 @@ maps.v[">"] = { ">gv", desc = "Indent to the right" }
 maps.n["<leader>/"] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", desc = "Toggle comment line" }
 maps.v["<leader>/"] =
   { "<esc><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", desc = "Toggle comment line" }
+
+-- Dad Bod UI
+maps.n["<S-d>"] = { "<cmd>DBUI<cr>", desc = "Open Dad Bod UI" }
 
 -- Dap
 maps.n["<leader>d"] = sections.d
@@ -85,7 +80,7 @@ maps.n["<leader>fb"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
 
 -- Git
 maps.n["<leader>g"] = sections.g
-maps.n["<leader>gg"] = { "<cmd>lua _LAZYGIT_TOGGLE()<cr>", desc = "Lazygit" }
+maps.n["<leader>gg"] = { "<cmd>LazyGit<cr>", desc = "Lazygit" }
 maps.n["<leader>gl"] = { "<cmd>lua require('gitsigns').blame_line()<cr>", desc = "View Git blame" }
 maps.n["<leader>gL"] = { "<cmd>lua require('gitsigns').blame_line { full = true }<cr>", desc = "View full Git blame" }
 maps.n["<leader>gp"] = { "<cmd>lua require('gitsigns').preview_hunk()<cr>", desc = "Preview Git hunk" }
@@ -100,9 +95,21 @@ maps.n["[g"] = { "<cmd>lua require('gitsigns').prev_hunk()<cr>", desc = "Previou
 
 -- Lsp
 maps.n["<leader>l"] = sections.l
-maps.n["<leader>lf"] = { "<cmd>lua vim.lsp.buf.format{ async = true, timeout_ms = 5000 }<cr>", desc = "Format file" }
-maps.n["<leader>li"] = { "<cmd>LspInfo<cr>", desc = "Lsp Info" }
+maps.n["<leader>li"] = { "<cmd>LspInfo<cr>", desc = "Lsp Log"}
 maps.n["<leader>ll"] = { "<cmd>LspLog<cr>", desc = "Lsp Log"}
+maps.n["<leader>lf"] = { "<cmd>lua vim.lsp.buf.format{ async = true, timeout_ms = 5000 }<cr>", desc = "Format file" }
+maps.n["<leader>lgD"] = { "<cmd>lua vim.lsp.buf.declaration()<CR>", { noremap = true, silent = true, desc = "GoTo declaration" }}
+maps.n["<leader>lgd"] = { "<cmd>lua vim.lsp.buf.definition()<CR>", { noremap = true, silent = true, desc = "GoTo definition" }}
+maps.n["<leader>lK"] = { "<cmd>lua vim.lsp.buf.hover()<CR>", { noremap = true, silent = true, desc = "Hover" }}
+maps.n["<leader>lI"] = { "<cmd>lua vim.lsp.buf.implementation()<CR>", { noremap = true, silent = true, desc = "GoTo implementation" }}
+maps.n["<leader>lr"] = { "<cmd>lua vim.lsp.buf.references()<CR>", { noremap = true, silent = true, desc = "GoTo references" }}
+maps.n["<leader>ld"] = { "<cmd>lua vim.diagnostic.open_float()<CR>", { noremap = true, silent = true, desc = "Float diagnostic" }}
+maps.n["<leader>la"] = { "<cmd>lua vim.lsp.buf.code_action()<cr>", { noremap = true, silent = true, desc = "Code action" }}
+maps.n["<leader>lj"] = { "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", { noremap = true, silent = true, desc = "Next diagnostic" }}
+maps.n["<leader>lk"] = { "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", { noremap = true, silent = true, desc = "Previous diagnostic" }}
+maps.n["<leader>lr"] = { "<cmd>lua vim.lsp.buf.rename()<cr>", { noremap = true, silent = true, desc = "Rename" }}
+maps.n["<leader>ls"] = { "<cmd>lua vim.lsp.buf.signature_help()<CR>", { noremap = true, silent = true, desc = "Signature help" }}
+maps.n["<leader>lq"] = { "<cmd>lua vim.diagnostic.setloclist()<CR>", { noremap = true, silent = true, desc = "Setloclist" }}
 
 -- Mason
 maps.n["<leader>m"] = sections.m

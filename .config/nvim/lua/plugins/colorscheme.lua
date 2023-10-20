@@ -1,6 +1,5 @@
 local M = {
   "folke/tokyonight.nvim",
-  commit = "433b217d95debf6591974c0070e3bfc9f72cb6c1",
   lazy = false,    -- make sure we load this during startup if it is your main colorscheme
   name = "tokyonight-night",
   priority = 1000, -- make sure to load this before all the other start plugins
