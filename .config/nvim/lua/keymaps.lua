@@ -119,7 +119,7 @@ maps.n["<leader>ml"] = { "<cmd>MasonLog<cr>", desc = "Mason Log" }
 -- Null-Ls (None-Ls)
 maps.n["<leader>n"] = sections.n
 maps.n["<leader>ni"] = { "<cmd>NullLsInfo<cr>", desc = "Null-Ls Info" }
-maps.n["<leader>nl"] = { "<cmd>NullsLsLog<cr>", desc = "Null-Ls Log"}
+maps.n["<leader>nl"] = { "<cmd>NullLsLog<cr>", desc = "Null-Ls Log"}
 
 -- Spectre
 maps.n["<leader>s"] = sections.s
