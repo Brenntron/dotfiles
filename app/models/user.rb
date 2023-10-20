@@ -182,6 +182,11 @@ class User < ApplicationRecord
     metrics_timeframe ? metrics_timeframe : DEFAULT_METRICS_TIMEFRAME
   end
 
+  def allowed_self_review
+    self_review = JSON.parse(self.user_preferences.where(name: 'SelfReview').first&.value || '{}')
+    !!self_review['allowed']
+  end
+
   private
 
   def generate_authentication_token
