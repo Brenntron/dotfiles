@@ -38,6 +38,7 @@ function M.config()
         filetypes = { "coffee", "erb", "eruby", "haml", "html", "markdown" },
       },
       diagnostics.haml_lint,
+      diagnostics.rubocop,
       diagnostics.shellcheck,
       diagnostics.zsh,
       -- formatters
