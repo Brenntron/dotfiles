@@ -189,6 +189,7 @@ plugins=(
   git
   rails
   ruby
+  ssh-agent
   thefuck
   yarn
 )
