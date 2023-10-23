@@ -33,7 +33,6 @@ window.remove_entry_from_changes = (entry_id) ->
     new_changes = entries.splice(submitted_entry, 1)
     sessionStorage.setItem("webcat_entries_changed", new_changes)
 
-# we may not need this
 getTouchedFormCount = ()->
   form_item = (sessionStorage.getItem("webcat_entries_changed") || "")
   form_item = form_item.split(",")
@@ -50,38 +49,63 @@ window.bulk_submit_categorize_entries = () ->
   if changes.split(',').length < 0
     return
 
-  data = []
-  # make array of entries
+  # disable the master submit button while processing
+  $('#master-submit').prop('disabled', true)
+
   entries = changes.split(",").filter((item) -> return item)
   self_review = $('#self_review').is(':checked')
 
+  # array if user tries to submit Fixed w/ no cats
+  data = []
+  incomplete_entries = []
+
   $(entries).each ->
-    debugger
     entry_row = $('#' + this)
 
     entry_id = this
-    entry_to_submit = $($(entry_row).find('.complaint-uri-input')[0]).val()
+    uri = $($(entry_row).find('.complaint-uri-input')[0]).val()
     status = $(entry_row).find('.resolution_radio_button:checked').val()
     comment = $(entry_row).find('textarea.internal-comment').val()
     # TODO add in resolution comments
 
-    categories = $(entry_row).find("#input_cat_#{entry_id}").val().toString()
+    if $('#input_cat_' + entry_id).val() != null
+      cat_ids = $('#input_cat_' + entry_id).val().toString()
+    else
+      cat_ids = null
+    category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
+    category_names = []
+    category_name.each ->
+      category_names.push($(this).text())
+    category_names = category_names.toString()
 
-#    data.push
+    if (cat_ids.length == 0) && status == 'FIXED'
+      incomplete_entries.push(entry_id)
+    else
+      data.push({
+        entry_id: entry_id,
+        prefix: uri,
+        categories: cat_ids,
+        category_names: category_names
+        status: status,
+        comment: comment,
+  #      resolution_comment: resolution_comment,
+        uri_as_categorized: uri,
+        self_review: self_review
+      })
 
-    #what is diff between prefix and uri_as_categorized?
-  # data we are grabbing for the backend
-#    entry_id: entry_id,
-#    error: false,?
-#    prefix: prefix,
-#    categories: categories,
-#    category_names: category_names
-#    status: status,
-#    comment: comment,
-#    resolution_comment: resolution_comment,
-#    uri_as_categorized: uri_as_categorized, <- this makes no sense, same as prefix
-#    self_review: self_review
-
+  # TODO - add confirmation modal
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
+    data: {data: data}
+    success: (response) ->
+      debugger
+      json = JSON.parse(response)
+      std_msg_success('Success',["All complaints successfully processed."], reload: true)
+    error: (response) ->
+      debugger
+      console.log response
+)
 
 
 
@@ -278,180 +302,180 @@ window.fetch_complaints = () ->
 #bulk submit old
 # For bulk submissions do we reload the page or do the same thing that we do w/ indv submissions
 # confirm with Adam
-processSubmitMaster = () ->
-  debugger
-  data = []
-  selectedEntryDomains = (sessionStorage.getItem("webcat_entries_changed")|| "" )
-  return if selectedEntryDomains.length == 0
+#processSubmitMaster = () ->
+#  debugger
+#  data = []
+#  selectedEntryDomains = (sessionStorage.getItem("webcat_entries_changed")|| "" )
+#  return if selectedEntryDomains.length == 0
+#
+#  # disable the master submit button while processing
+#  $('#master-submit').prop('disabled', true)
+#
+#  # remove empty values
+#  selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
+#  selectedEntries = []
+#  self_review = $('#self_review').is(':checked')
+#
+#  $('#complaints-index').DataTable().rows (idx, data, node) ->
+#    entry_item = data.domain || data.ip_address
+#    if selectedEntryDomains.includes(entry_item)
+#      selectedEntries.push data
+#    false
+#  for entry in selectedEntries
+#    data_wrapper = $("##{entry.entry_id}").closest('tr').next().find('.nested-complaint-data-wrapper')
+#    entry_id = data_wrapper.find('tr').attr('entry_id')
+#    row_id = data_wrapper.find('tr').attr('row_id')
+#    type = data_wrapper.find('tr').attr('type')
+#
+#    if type == 'submit_changes' && entry_id && row_id
+#      prefix = data_wrapper.find("#complaint_prefix_#{entry_id}")[0].value
+#
+#      category_names = []
+#      categories = ""
+#      if data_wrapper.find("#input_cat_#{entry_id}").val()
+#        categories = data_wrapper.find("#input_cat_#{entry_id}").val().toString()
+#      category_name = data_wrapper.find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
+#      category_name.each ->
+#        category_names.push($(this).text())
+#      category_names = category_names.toString()
+#      status = data_wrapper.find("[name=resolution#{entry_id}]:checked").val()
+#      comment = data_wrapper.find("#complaint_comment_#{entry_id}")[0].value
+#      resolution_comment = data_wrapper.find("#complaint_resolution_comment_#{entry_id}")[0].value
+#      uri_as_categorized = data_wrapper.find("#complaint_prefix_#{entry_id}")[0].value
+#      if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
+#        data.push({
+#          entry_id: entry_id,
+#          error: false,
+#          row_id: row_id,
+#          prefix: prefix,
+#          categories: categories,
+#          category_names: category_names,
+#          status: status,
+#          comment: comment,
+#          resolution_comment: resolution_comment,
+#          uri_as_categorized: uri_as_categorized})
+#
+#      else if status == 'UNCHANGED' || status == 'INVALID'
+#        data.push({
+#          entry_id: entry_id,
+#          error: false,
+#          row_id: row_id,
+#          prefix: prefix,
+#          categories: categories,
+#          category_names: category_names,
+#          status: status,
+#          comment: comment,
+#          resolution_comment: resolution_comment,
+#          uri_as_categorized: uri_as_categorized,
+#          self_review: self_review
+#        })
+#      else if (categories.length == 0) && status == 'FIXED'
+#        data.push({entry_id, error: true, reason: 'nil_categories'})
+#  std_msg_ajax(
+#    method: 'POST'
+#    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
+#    data: {data: data}
+#    success: (response) ->
+#      errors = false
+#
+#      nil_categories_errors = []
+#      api_errors = []
+#      success = []
+#
+#      json = JSON.parse(response)
+#
+#      table = $('#complaints-index').DataTable()
+#
+#      for entry in json
+#        if entry.error == true && entry.reason == 'nil_categories'
+#          nil_categories_errors.push(entry.entry_id)
+#          errors = true
+#        else if entry.error == true && entry.reason == 'api'
+#          api_errors.push(entry.entry_id)
+#          errors = true
+#        else
+#          success.push(entry.entry_id)
+#
+#          temp_row = table.row(entry.row_id)
+#          temp_row.data().status = entry.status
+#          temp_row.data().resolution = entry.resolution
+#          temp_row.data().internal_comment = entry.comment
+#          temp_row.data().resolution_comment = entry.resolution_comment
+#          temp_row.data().category = entry.category_names
+#          temp_row.data().category_names = entry.category_names
+#          temp_row.invalidate().page(table_page).draw(false)
+#          temp_row.child().remove()
+#          temp_row.child(format(temp_row)).show()
+#          nested_tooltip()
+#          $('#input_cat_'+ entry.entry_id).selectize {
+#            persist: false,
+#            create: false,
+#            maxItems: 5,
+#            closeAfterSelect: true,
+#            valueField: 'category_id',
+#            labelField: 'category_name',
+#            searchField: ['category_name', 'category_code'],
+#            options: AC.WebCat.createSelectOptions('#input_cat_'+ entry.entry_id)
+#            items: selected_options(entry.categories)
+#          }
+#          $('#input_cat_pending'+ entry.entry_id).selectize {
+#            persist: false,
+#            create: false,
+#            maxItems: 5,
+#            closeAfterSelect: true,
+#            valueField: 'category_id',
+#            labelField: 'category_name',
+#            searchField: ['category_name', 'category_code'],
+#            options: AC.WebCat.createSelectOptions('#input_cat_pending'+ entry.entry_id)
+#            items: selected_options(entry.categories)
+#          }
+#
+#      success_boiler_plate = "The following entries were successfully saved: " + success.toString() + "<br>"
+#      api_boiler_plate =  "The following entries could not be saved due to API errors: " + api_errors.toString() + "<br>"
+#      no_cats_boiler_plate = "The following entries could not be saved (no categories): " + nil_categories_errors.toString()
+#
+#      error_msg = ''
+#
+#      if success.length > 0
+#        error_msg += success_boiler_plate
+#      if api_errors.length > 0
+#        error_msg += api_boiler_plate
+#
+#      if nil_categories_errors.length > 0
+#        error_msg += no_cats_boiler_plate
+#
+#      if errors == true
+#        std_msg_error(error_msg,"")
+#      else
+#        std_msg_success('Success',["All complaints successfully processed."], reload: true)
+#
+#      tds = $('#complaints-index tbody').closest('td')
+#      for td in tds
+#        if td.className == ''
+#          td.classList.add('nested-complaint-data-wrapper')
+#
+#      $('#master-submit').prop('disabled', false)
+#    error: (response) ->
+#      std_msg_error("Unable to submit changes for selected entries.","", reload: false)
+#      $('#master-submit').prop('disabled', false)
+#
+#  , this)
 
-  # disable the master submit button while processing
-  $('#master-submit').prop('disabled', true)
 
-  # remove empty values
-  selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
-  selectedEntries = []
-  self_review = $('#self_review').is(':checked')
-
-  $('#complaints-index').DataTable().rows (idx, data, node) ->
-    entry_item = data.domain || data.ip_address
-    if selectedEntryDomains.includes(entry_item)
-      selectedEntries.push data
-    false
-  for entry in selectedEntries
-    data_wrapper = $("##{entry.entry_id}").closest('tr').next().find('.nested-complaint-data-wrapper')
-    entry_id = data_wrapper.find('tr').attr('entry_id')
-    row_id = data_wrapper.find('tr').attr('row_id')
-    type = data_wrapper.find('tr').attr('type')
-
-    if type == 'submit_changes' && entry_id && row_id
-      prefix = data_wrapper.find("#complaint_prefix_#{entry_id}")[0].value
-
-      category_names = []
-      categories = ""
-      if data_wrapper.find("#input_cat_#{entry_id}").val()
-        categories = data_wrapper.find("#input_cat_#{entry_id}").val().toString()
-      category_name = data_wrapper.find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
-      category_name.each ->
-        category_names.push($(this).text())
-      category_names = category_names.toString()
-      status = data_wrapper.find("[name=resolution#{entry_id}]:checked").val()
-      comment = data_wrapper.find("#complaint_comment_#{entry_id}")[0].value
-      resolution_comment = data_wrapper.find("#complaint_resolution_comment_#{entry_id}")[0].value
-      uri_as_categorized = data_wrapper.find("#complaint_prefix_#{entry_id}")[0].value
-      if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
-        data.push({
-          entry_id: entry_id,
-          error: false,
-          row_id: row_id,
-          prefix: prefix,
-          categories: categories,
-          category_names: category_names,
-          status: status,
-          comment: comment,
-          resolution_comment: resolution_comment,
-          uri_as_categorized: uri_as_categorized})
-
-      else if status == 'UNCHANGED' || status == 'INVALID'
-        data.push({
-          entry_id: entry_id,
-          error: false,
-          row_id: row_id,
-          prefix: prefix,
-          categories: categories,
-          category_names: category_names,
-          status: status,
-          comment: comment,
-          resolution_comment: resolution_comment,
-          uri_as_categorized: uri_as_categorized,
-          self_review: self_review
-        })
-      else if (categories.length == 0) && status == 'FIXED'
-        data.push({entry_id, error: true, reason: 'nil_categories'})
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
-    data: {data: data}
-    success: (response) ->
-      errors = false
-
-      nil_categories_errors = []
-      api_errors = []
-      success = []
-
-      json = JSON.parse(response)
-
-      table = $('#complaints-index').DataTable()
-
-      for entry in json
-        if entry.error == true && entry.reason == 'nil_categories'
-          nil_categories_errors.push(entry.entry_id)
-          errors = true
-        else if entry.error == true && entry.reason == 'api'
-          api_errors.push(entry.entry_id)
-          errors = true
-        else
-          success.push(entry.entry_id)
-
-          temp_row = table.row(entry.row_id)
-          temp_row.data().status = entry.status
-          temp_row.data().resolution = entry.resolution
-          temp_row.data().internal_comment = entry.comment
-          temp_row.data().resolution_comment = entry.resolution_comment
-          temp_row.data().category = entry.category_names
-          temp_row.data().category_names = entry.category_names
-          temp_row.invalidate().page(table_page).draw(false)
-          temp_row.child().remove()
-          temp_row.child(format(temp_row)).show()
-          nested_tooltip()
-          $('#input_cat_'+ entry.entry_id).selectize {
-            persist: false,
-            create: false,
-            maxItems: 5,
-            closeAfterSelect: true,
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions('#input_cat_'+ entry.entry_id)
-            items: selected_options(entry.categories)
-          }
-          $('#input_cat_pending'+ entry.entry_id).selectize {
-            persist: false,
-            create: false,
-            maxItems: 5,
-            closeAfterSelect: true,
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions('#input_cat_pending'+ entry.entry_id)
-            items: selected_options(entry.categories)
-          }
-
-      success_boiler_plate = "The following entries were successfully saved: " + success.toString() + "<br>"
-      api_boiler_plate =  "The following entries could not be saved due to API errors: " + api_errors.toString() + "<br>"
-      no_cats_boiler_plate = "The following entries could not be saved (no categories): " + nil_categories_errors.toString()
-
-      error_msg = ''
-
-      if success.length > 0
-        error_msg += success_boiler_plate
-      if api_errors.length > 0
-        error_msg += api_boiler_plate
-
-      if nil_categories_errors.length > 0
-        error_msg += no_cats_boiler_plate
-
-      if errors == true
-        std_msg_error(error_msg,"")
-      else
-        std_msg_success('Success',["All complaints successfully processed."], reload: true)
-
-      tds = $('#complaints-index tbody').closest('td')
-      for td in tds
-        if td.className == ''
-          td.classList.add('nested-complaint-data-wrapper')
-
-      $('#master-submit').prop('disabled', false)
-    error: (response) ->
-      std_msg_error("Unable to submit changes for selected entries.","", reload: false)
-      $('#master-submit').prop('disabled', false)
-
-  , this)
-
-
-window.master_submit = () ->
-  selectedItems = $('tr.selected')
-  thingsSelected = getTouchedFormCount()
-  if thingsSelected > selectedItems.length
-    std_msg_confirm(
-      "Changes have been made to at least " + thingsSelected +  " complaints but only " + selectedItems.length + " items are selected.", ["Updating selected items will reload the page and other changes will be lost."],
-      {
-        reload: false,
-        confirm_dismiss: true,
-        confirm: ->
-          processSubmitMaster()
-      })
-  else
-    processSubmitMaster()
+#window.master_submit = () ->
+#  selectedItems = $('tr.selected')
+#  thingsSelected = getTouchedFormCount()
+#  if thingsSelected > selectedItems.length
+#    std_msg_confirm(
+#      "Changes have been made to at least " + thingsSelected +  " complaints but only " + selectedItems.length + " items are selected.", ["Updating selected items will reload the page and other changes will be lost."],
+#      {
+#        reload: false,
+#        confirm_dismiss: true,
+#        confirm: ->
+#          processSubmitMaster()
+#      })
+#  else
+#    processSubmitMaster()
 
 
 # Checks if there have been changes on the page
