@@ -1,4 +1,5 @@
 # determines the proper icon to display next to the score
+# TODO - there is probably a better place to put this
 window.wbrs_display = (score) ->
   score = parseFloat(score)
   if score == NaN
@@ -13,8 +14,18 @@ window.wbrs_display = (score) ->
     return 'favorable'
   else if score >= 6
     return 'trusted'
-$ ->
 
+
+# clear out 'touched' entries
+window.clear_stored_entries = () ->
+  sessionStorage.getItem("webcat_entries_changed") || ""
+  sessionStorage.setItem("webcat_entries_changed", "")
+
+$ ->
+  clear_stored_entries()
+
+
+  # TODO - just add these classes on the view, no need to call js
   # webcat: have top navigation bar scroll with page per user request
   if $('body').hasClass("escalations--webcat--complaints-controller") && $('body').hasClass("index-action")
     $('#nav-banner').addClass('fixed-nav')
@@ -869,7 +880,7 @@ $ ->
                     '<button class="comment-button" id="internal_comment_button' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>' +
                     '<div id="internal_comment_dropdown_' + full.entry_id + '" class="dropdown-menu dropdown-menu-right internal-comment-dropdown" aria-labelledby="internal_comment_button' + full.entry_id + '">' +
                     '<div class="dropdown-reverse-header">Internal Comment</div>' +
-                    '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories">' + full.internal_comment + '</textarea>' +
+                    '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories" class="internal-comment">' + full.internal_comment + '</textarea>' +
                     '</div></span>' +
                     '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="submit_changes(' + full.entry_id + ')">Submit</button>' +
                     '</div>' +
@@ -1324,11 +1335,12 @@ process_entry = (entry_data) ->
       headers: headers
       data: entry_data
       success: (response) ->
+        debugger
         data = $.parseJSON(response)
         msg = $('#' + data.entry_id + ' .temp-msg')
         $(msg).text('Submitted. Refresh to see new results.')
         $(msg).addClass('submitted-row')
-        remove_entry_from_changes(data.entry_id)
+#        remove_entry_from_changes(data.entry_id)
       error: (response) ->
         std_msg_error(response,"", reload: false)
     , this)
@@ -1481,7 +1493,7 @@ $ ->
       'resolution_comment': '',
       'uri_as_categorized': uri
     }
-
+    remove_entry_from_changes(entry_id)
     process_entry(entry_data)
     # submit for real
 

@@ -10,7 +10,8 @@
     min-height: 20px;
     &.wbrs-score-col {
       background-repeat: no-repeat;
-      background-position: -5px center;
+      background-position: left -5px top 0;
+      background-size: 20px auto;
       padding-left: 13px;
     }
   }

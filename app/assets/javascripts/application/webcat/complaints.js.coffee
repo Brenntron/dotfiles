@@ -1,11 +1,3 @@
-table_page = 0
-
-$(document).on 'click', '.paginate_button', ->
-  complaint_table = $('#complaints-index').DataTable().context
-  if complaint_table.length > 0
-    table = $('#complaints-index').DataTable()
-    table_page = table.page.info().page
-
 
 
 init_tooltip = () ->
@@ -48,18 +40,55 @@ getTouchedFormCount = ()->
   form_item = form_item.filter((item) -> return item)
   return form_item.length
 
-
+#NEW
 # Bulk webcat entry submit
-bulk_submit_categorize_entries = () ->
+# TODO test when uri has been edited?
+window.bulk_submit_categorize_entries = () ->
   debugger
-  # grab what has been touched / stored in session?
-  # grab selected if we are using that
-  # compare
+  # grab what has been touched / stored in session
+  changes = (sessionStorage.getItem("webcat_entries_changed")|| "" )
+  if changes.split(',').length < 0
+    return
 
-  # from selected
+  data = []
+  # make array of entries
+  entries = changes.split(",").filter((item) -> return item)
+  self_review = $('#self_review').is(':checked')
+
+  $(entries).each ->
+    debugger
+    entry_row = $('#' + this)
+
+    entry_id = this
+    entry_to_submit = $($(entry_row).find('.complaint-uri-input')[0]).val()
+    status = $(entry_row).find('.resolution_radio_button:checked').val()
+    comment = $(entry_row).find('textarea.internal-comment').val()
+    # TODO add in resolution comments
+
+    categories = $(entry_row).find("#input_cat_#{entry_id}").val().toString()
+
+#    data.push
+
+    #what is diff between prefix and uri_as_categorized?
+  # data we are grabbing for the backend
+#    entry_id: entry_id,
+#    error: false,?
+#    prefix: prefix,
+#    categories: categories,
+#    category_names: category_names
+#    status: status,
+#    comment: comment,
+#    resolution_comment: resolution_comment,
+#    uri_as_categorized: uri_as_categorized, <- this makes no sense, same as prefix
+#    self_review: self_review
+
+
+
 
 
 # TODO - fix this function
+# Talk to Adam - maybe we allow them to do a refetch on cats if they edit the uRI?
+
 # New layout does not save this separately from submitting the updates, need to rethink how this is done
 # pretty sure this is not needed
 #window.updateURI = (event, complaint_entry_id) ->
