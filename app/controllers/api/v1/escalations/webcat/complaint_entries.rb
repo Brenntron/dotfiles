@@ -479,6 +479,7 @@ module API
             post 'retrieve_current_categories_by_url' do
               std_api_v2 do
                 complaint_entry = ComplaintEntry.where(:domain => params[:domain]).order(:created_at).last
+                sds_domain_category = ""
 
                 if complaint_entry.subdomain.present? || complaint_entry.path.present?
                   master_categories = complaint_entry.get_category_names_from_master
@@ -491,16 +492,19 @@ module API
                 # Pull category from SDS
                 sds_params = {}
 
-                if complaint_entry.entry_type == 'URI/DOMAIN'
-                  sds_params['url'] = complaint_entry.uri
-                elsif complaint_entry.entry_type == 'IP'
-                  sds_params['url'] = complaint_entry.ip_address
-                end
+                sds_category = if complaint_entry.entry_type == 'URI/DOMAIN'
+                                sds_params['url'] = complaint_entry.uri
+                                category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+                                sds_domain_category = category
+                                category
+                              elsif complaint_entry.entry_type == 'IP'
+                                sds_params['url'] = complaint_entry.ip_address
+                                Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+                              end
 
-                sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
 
                 {master_categories: master_categories, current_category_data: wbrs_categories,
-                 sds_category: sds_category, complaint_entry_id: complaint_entry.id }.to_json
+                  sds_category: sds_category, sds_domain_category: sds_domain_category, complaint_entry_id: complaint_entry.id }.to_json
               end
             end
 
@@ -624,6 +628,7 @@ module API
                                   :path => nil,
                                   :action => nil,
                                   :confidence => nil,
+                                  :certainty => nil,
                                   :score => base_score,
                                   :time_of_action => nil,
                                   :description => "baseline domain",
@@ -692,6 +697,8 @@ module API
                 data_point[:path] = SimpleIDN.to_unicode(record["path"])
                 data_point[:action] = ""
                 data_point[:confidence] = "#{record["confidence"]}|certainty: #{record["certainty"]} "
+                data_point[:confidence_int] = record["confidence"]
+                data_point[:certainty] = record['certainty']
                 data_point[:score] = record_score
                 data_point[:time_of_action] = ""
                 data_point[:description] = record["source_description"]

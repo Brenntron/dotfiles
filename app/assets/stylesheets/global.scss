@@ -4523,6 +4523,7 @@ td.wbrs-highlight, td.sbrs-highlight {
 // TODO We should consolidate these soon and make a single class that just covers all this
 .escalations--webrep--disputes-controller,
 .escalations--webcat--complaints-controller,
+.escalations--webcat--complaint_entries-controller,
 .escalations--webcat--reports-controller,
 .users-controller,
 .escalations--file_rep--disputes-controller,
@@ -5989,19 +5990,19 @@ input.table-entry-input:focus {
     height: 100%;
   }
 
-  .webcat-research-svg {
-    background-repeat: no-repeat;
-    display: none;
-    float: left;
-    height: 20px;
-    margin-right: 3px;
-    margin-top: 0;
-    width: 20px;
-  }
-
   .table .webcat-research-svg {
     display: initial;
   }
+}
+
+.webcat-research-svg {
+  background-repeat: no-repeat;
+  display: none;
+  float: left;
+  height: 20px;
+  margin-right: 3px;
+  margin-top: 0;
+  width: 20px;
 }
 
 #domain-history-table_filter, #xbrs-history-table_filter {
@@ -7572,10 +7573,16 @@ table.dispute-entry-table tbody tr.selected {
   background-color: transparent !important;
 }
 
-.dispute-owner-buttons-wrapper .ticket-owner-button {
+.complaint-owner-buttons-wrapper .ticket-owner-button, .dispute-owner-buttons-wrapper .ticket-owner-button {
   background-image: url(image_path('icon_user_white.svg'));
   &:hover {
     background-color: $primary-section-color !important;
+  }
+}
+
+.complaint-owner-buttons-wrapper {
+  .dropdown {
+    padding-top: 8px;
   }
 }
 
@@ -7592,6 +7599,12 @@ table.dispute-entry-table tbody tr.selected {
   padding: 2px 10px !important;
 }
 
+.complaint-owner-wrapper {
+  .content-label-sm {
+    margin-bottom: 0;
+  }
+}
+
 #dispute-assignee {
   margin-top: 0;
   float: left;
@@ -7605,11 +7618,11 @@ table.dispute-entry-table tbody tr.selected {
   margin: 0 6px 0 6px;
 }
 
-.dispute-owner-buttons-wrapper .inline-tool-content-wrapper {
+.complaint-owner-buttons-wrapper .inline-tool-content-wrapper, .dispute-owner-buttons-wrapper .inline-tool-content-wrapper {
   padding-bottom: 20px;
 }
 
-.priority-col-wrapper, .case-id-wrapper, .dispute-owner-wrapper, .dispute-time-wrapper, .top-info-buttons-wrapper {
+.priority-col-wrapper, .case-id-wrapper, .complaint-owner-wrapper, .dispute-owner-wrapper, .dispute-time-wrapper, .top-info-buttons-wrapper {
   display: inline-block;
 }
 
@@ -8081,6 +8094,7 @@ table.dispute-entry-table tbody tr.selected {
   color: $content-bg-color;
   font-weight: 300;
 }
+
 .retake-screenshot:hover{
   background-color: darken($type-lighter-color, 8%);
   color: $content-bg-color;
@@ -8088,13 +8102,16 @@ table.dispute-entry-table tbody tr.selected {
   font-weight: 300;
 }
 
-
 .nested-complaint-static-data .col-with-divider {
   border-color: darken($faint-neutral-color, 15%);
 }
 
 .nested-complaint-editable-data .col-with-divider {
   border-color: lighten($content-bg-color, 5%);
+}
+
+.bottom-divider {
+  border-bottom: 2px solid darken($content-bg-color, 6.5%)
 }
 
 .simple-nested-table th {

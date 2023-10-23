@@ -13,6 +13,8 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
 
   def show
     @complaint_entry = ComplaintEntry.find(params[:id])
+    @complaint = @complaint_entry.complaint
+    @source = @complaint.ticket_source
   end
 
   def update

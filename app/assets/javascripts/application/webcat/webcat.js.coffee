@@ -19,19 +19,24 @@ window.wbrs_display = (score) ->
     return 'favorable'
   else if score >= 6
     return 'trusted'
-$ ->
 
+$ ->
+  $body = $('body')
   # webcat: have top navigation bar scroll with page per user request
-  if $('body').hasClass("escalations--webcat--complaints-controller")
+  if $body.hasClass("escalations--webcat--complaints-controller") || $body.hasClass('escalations--webcat--complaint_entriess-controller')
     $('#nav-banner').addClass('fixed-nav')
 
     #pin webcat toolbar under navigation bar, add padding
     toolbar = $('#webcat-index-toolbar')
+
     $('#nav-banner').append(toolbar)
-    $('.escalations--webcat--complaints-controller.index-action #page-content-wrapper').css('padding-top','60px')
+
+    if $body.hasClass(".index-action")
+      $('.escalations--webcat--complaints-controller.index-action #page-content-wrapper').css('padding-top','60px')
+    else
 
     #align tooltips under toolbar
-    $('body').addClass('pinned-toolbar-true')
+    $body.addClass('pinned-toolbar-true')
 
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
@@ -487,8 +492,6 @@ $ ->
               search_name_check = webcat_search_name != ''
               if webcat_search_type == 'advanced' && search_name_check && text_check
                 window.temporary_search_link(webcat_search_name, webcat_search_conditions)
-
-
           pagingType: 'full_numbers'
           order: [ [
             3
@@ -564,6 +567,8 @@ $ ->
               }
               {
                 data: 'entry_id'
+                render: (data) ->
+                  "<a href='/escalations/webcat/complaint_entries/#{data}'>#{data}</a>"
                 width: '50px'
               }
               {

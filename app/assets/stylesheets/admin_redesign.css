@@ -15,6 +15,7 @@
  *= require global
  *= require webcat_telemetry
  *= require webcat_complaints
+ *= require webcat_complaint_entries
  *= require webcat_clusters
  *= require tooltipster.bundle.min
  *= require tooltipster-sideTip-borderless.min

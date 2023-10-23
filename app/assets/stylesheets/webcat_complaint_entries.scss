@@ -1,0 +1,310 @@
+@import 'colors';
+
+.complaint-entry-show-content-wrapper {
+  @-moz-document url-prefix() {
+    .complaint-owner-buttons-wrapper button#index_change_assign {
+      position: relative;
+      top: -2px;
+    }
+  }
+
+  @media screen and (max-width: 1700px) and (min-width: 1201px){
+    .ticket-overview-wrapper {
+      .complaint-owner-buttons-wrapper {
+        margin-left: 1px;
+      }
+    }
+  }
+
+  .complaint-assignee-wrapper {
+    margin-bottom: 10px;
+  }
+
+  .complaint-owner-buttons-wrapper {
+    h3 {
+      padding: 2px 10px !important;
+    }
+
+    .dropdown.open {
+      background-color: transparent !important;
+    }
+
+    .dropdown-menu {
+      background-color: $primary-section-color;
+      border-radius: 0 4px 4px 4px;
+      border: none;
+      left: 3px;
+      min-width: 200px;
+      top: 18px;
+
+      h3 {
+        color: $content-bg-color;
+        font-size: 9pt;
+        font-weight: 400;
+        margin-bottom: 6px;
+        padding: 0 10px;
+      }
+    }
+
+    .inline-tool-content-wrapper {
+      padding-bottom: 20px;
+    }
+
+    .return-ticket-button, .take-ticket-button {
+      background-color: transparent !important;
+      margin: 0;
+    }
+
+    .take-ticket-button {
+      float: none;
+    }
+
+    .ticket-owner-button {
+      background-image: url(image_path('icon_user_white.svg'));
+
+      &:hover {
+        background-color: $primary-section-color !important;
+      }
+    }
+  }
+
+  .complaint-inline-buttons {
+    background-color: darken($nav-toolbar-color, 10%);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    border-radius: 2px;
+    border: none;
+    display: inline-block;
+    height: 20px;
+    margin: 0 3px;
+    width: 20px;
+  }
+
+}
+
+.ce-research-tab {
+  & > div {
+    border-left: 1px solid darken($content-bg-color, 6.5%);
+    border-right: 1px solid darken($content-bg-color, 6.5%);
+
+    &:first-child {
+      border-left: none;
+    }
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+}
+
+.ce-research-column, .ce-history-column {
+  & > div {
+    margin: 10px 0;
+  }
+
+  & > label {
+    width: 100%;
+  }
+
+  div {
+    box-sizing: border-box;
+  }
+
+  .research-data-header, .history-data-header {
+    border-bottom: none;
+    color: $type-lighter-color;
+    font-size: initial;
+    padding-left: 0;
+  }
+
+  .ce-submitted-wbrs-wrapper {
+    display: flex;
+    justify-content: space-between;
+
+    .ce-submitted-ip-uri {
+      font-weight: 700;
+    }
+  }
+
+  #ce-wbrs-score-wrapper {
+    float: right;
+
+    .webcat-research-svg {
+      display: initial;
+    }
+
+    #ce-wbrs-score {
+      line-height: normal;
+    }
+  }
+
+  .data-report-table {
+    margin-bottom: 20px;
+
+    > thead > tr > th {
+      border-bottom-color: $faint-neutral-color;
+      color: $type-base-color;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    > tbody > tr > td {
+      color: $type-lighter-color;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  .ce-resolved-ip-uri-button-wrapper {
+    margin: 5px 0 40px;
+  }
+
+  #ce-tags-wrapper {
+    button {
+      background-position: center center;
+      background-repeat: no-repeat;
+      border: none;
+      border-radius: 2px;
+      display: inline-block;
+      height: 20px;
+      padding: 4px;
+      width: 20px;
+    }
+  }
+
+  .ce-categories-wrapper, .ce-resolution-wrapper, .ce-customer-comment-wrapper,
+  .ce-internal-comment-wrapper {
+    margin-bottom: 20px;
+  }
+
+  .ce-input {
+    background-color: lighten($faint-accent-color, 5%);
+    border: 2px solid lighten($faint-accent-color, 5%);
+    border-radius: 1px;
+    margin: 0;
+    padding: 0;
+    outline: 1px solid $type-faint-accent;
+    width: 100%;
+  }
+
+  .ip-uri-button {
+    background-color: darken($type-faint-accent, 5%);
+    border: none;
+    border-radius: 2px;
+    color: $type-lighter-color;
+    float: left;
+    font-size: 10px;
+    margin: 0 5px 5px;
+    min-height: 15px;
+    padding: 0 10px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+
+  .ce-ip-uri-input, .ce-categories-select, .ce-customer-comment-select-box {
+    min-height: 30px;
+  }
+
+  .ce-customer-comment-select-box {
+    margin: 0 0 10px;
+  }
+
+  .bug-button {
+    background-color: $type-faint-accent;
+    background-image: url(image_path('bugs_icon.svg'));
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    border-radius: 2px;
+    border: none;
+    float: right;
+    height: 20px;
+    width: 20px;
+  }
+
+  .ce-radio-group-wrapper {
+    display: flex;
+    gap: 20px;
+  }
+
+  .ce-radio-group {
+    display: flex;
+    gap: 4px;
+
+    .ce-resolution-radio-button {
+      appearance: none;
+      --webkit-appearance: none;
+      background-color: $content-bg-color;
+      border: 1px solid $type-lighter-color;
+      border-radius: 50%;
+      color: black;
+      display: grid;
+      height: 14px;
+      margin: 0;
+      place-content: center;
+      transform: translateY(-1px);
+      width: 14px;
+
+      &::before {
+        border-radius: 50%;
+        box-shadow: inset 16px 16px $type-lighter-color;
+        content: "";
+        height: 6px;
+        transform: scale(0);
+        transition: 120ms transform ease-in-out;
+        width: 6px;
+      }
+
+      &:checked {
+        background-color: black;
+      }
+
+      &:checked::before {
+        background-color: $type-lighter-color;
+        border: 1px solid $type-lighter-color;
+        outline: 2px solid $type-lighter-color;
+        outline-offset: 2px;
+        transform: scale(1)
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .radio-label {
+      display: inline;
+    }
+  }
+
+  .ce-customer-comment-textarea, .ce-internal-comment-textarea {
+    color: $type-lighter-color;
+    font-size: 12px;
+    line-height: 1.4;
+    resize: none;
+  }
+
+  .ce-customer-comment-textarea {
+    min-height: 150px;
+  }
+
+  .ce-internal-comment-textarea {
+    min-height: 50px;
+  }
+
+  #ce-registrant-label, #ce-name-servers-label {
+    border-bottom: 1px solid $faint-neutral-color;
+  }
+
+  #ce-registrant-table {
+    margin-top: 0;
+    border-bottom: 1px solid $faint-neutral-color;
+  }
+
+  .data-report-table-column-header {
+    font-weight: 900;
+  }
+}

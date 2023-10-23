@@ -1,0 +1,283 @@
+.content-wrapper.complaint-entry-show-content-wrapper#page-content-wrapper
+  .row
+    .col-xs-2.col-with-divider.webcat-complaint-case-wrapper
+      .webcat-complaint-case-id-wrapper
+        .complaint-entry-id
+          -# ToDo: This is neither a link nor
+            part of a dropdown. Should be changed to a span and have the
+            dropdown class removed.
+          %span.complet-entry-id#complaint-id
+            = @complaint_entry.id.to_s
+        .complaint-status-col-wrapper
+          %label.content-label-sm
+            Status
+          %br
+          -# bugzilla_popover_state
+          - if @complaint_entry.resolution == ComplaintEntry::STATUS_RESOLVED_DUPLICATE
+            .duplicate-status-notice
+              = @complaint_entry.resolution
+          - else
+            %span.dropdown
+              %button#show-edit-ticket-status-button{ 'aria-expanded': 'false',
+                                                      'aria-haspopup': 'true',
+                                                      'data-toggle': 'dropdown',
+                                                      class: ['inline-select-dropdown',
+                                                              'ticket-status-button',
+                                                              'dropdown-toggle'],
+                                                      onclick: "webcat_complaint_drop_down(#{@complaint_entry.id})",
+                                                      title: 'Edit Ticket Status' }
+                - if @complaint_entry.status.nil?
+                  NEW
+                - else
+                  = @complaint_entry.status
+
+              - if can? :update, ComplaintEntry
+                #show-edit-ticket-status-dropdown{ 'aria-labelledby': 'show-edit-ticket-status-button',
+                                                   class: ['dropdown-menu', 'inline-dropdown-menu'] }
+                  %ul
+                    %li.status-radio-wrapper
+                      %input.webcat-ticket-status-radio{ 'data-status': ComplaintEntry::PENDING.to_s,
+                                                         id: ComplaintEntry::PENDING.to_s,
+                                                         name: 'complaint-status',
+                                                         type: 'radio',
+                                                         value: ComplaintEntry::PENDING.to_s }
+                      %label.radio-label.webcat-ticket-status-radio-label{ for: ComplaintEntry::PENDING.to_s } Pending
+                    %li.status-radio-wrapper
+                      %input.webcat-ticket-status-radio{ 'data-status': ComplaintEntry::STATUS_COMPLETED.to_s,
+                                                         id: ComplaintEntry::STATUS_COMPLETED.to_s,
+                                                         name: 'complaint-status',
+                                                         type: 'radio',
+                                                         value: ComplaintEntry::STATUS_COMPLETED.to_s }
+                      %label.radio-label.webcat-ticket-status-radio-label{ for: ComplaintEntry::STATUS_COMPLETED.to_s } Completed
+                    %li.status-radio-wrapper
+                      %input.webcat-ticket-status-radio.resolution-drodown-menu{ 'data-status': ComplaintEntry::RESOLVED.to_s,
+                                                                                 id: ComplaintEntry::RESOLVED.to_s,
+                                                                                 name: 'complaint-status',
+                                                                                 type: 'radio',
+                                                                                 value: ComplaintEntry::RESOLVED.to_s }
+                      %label.radio-label.webcat-ticket-status-radio-label{ for: ComplaintEntry::RESOLVED.to_s } Resolved / Closed
+                      .dropdown-menu#show-ticket-resolution-submenu
+                        .submenu-left-wrapper#webcat-resolution-selector
+                          .submenu-header
+                            Ticket Resolution
+                          %ul
+                            %li
+                              %input.webcat-ticket-resolution-radio{ 'data-saved-resolution-type': 'Fixed - FN',
+                                                                     id: ComplaintEntry::STATUS_RESOLVED_FIXED_FN.to_s,
+                                                                     name: 'complaint-resolution-fixed-fn',
+                                                                     type: 'radio',
+                                                                     value: ComplaintEntry::STATUS_RESOLVED_FIXED_FN.to_s }
+                              %label.ticket-res-radio-label.radio-label{ for: ComplaintEntry::STATUS_RESOLVED_FIXED_FN.to_s } Fixed - FN
+                            %li
+                              %input.webcat-ticket-resolution-radio{ 'data-saved-resolution-type': 'Fixed - FP',
+                                                                     id: ComplaintEntry::STATUS_RESOLVED_FIXED_FP.to_s,
+                                                                     name: 'complaint-resolution-fixed-fn',
+                                                                     type: 'radio',
+                                                                     value: ComplaintEntry::STATUS_RESOLVED_FIXED_FP.to_s }
+                              %label.ticket-res-radio-label.radio-label{ for: ComplaintEntry::STATUS_RESOLVED_FIXED_FP.to_s } Fixed - FP
+                            %li
+                              %input.webcat-ticket-resolution-radio{ 'data-saved-resolution-type': 'Unchanged',
+                                                                     'data-status': ComplaintEntry::STATUS_RESOLVED_FIXED_UNCHANGED.to_s,
+                                                                     id: ComplaintEntry::STATUS_RESOLVED_FIXED_UNCHANGED.to_s,
+                                                                     name: 'complaint-resolution',
+                                                                     type: 'radio',
+                                                                     value: ComplaintEntry::STATUS_RESOLVED_FIXED_UNCHANGED.to_s }
+                              %label.ticket-res-radio-label.radio-label{ for: ComplaintEntry::STATUS_RESOLVED_FIXED_UNCHANGED.to_s }
+                                Unchanged
+                            %li
+                              %input.webcat-ticket-resolution-radio{ 'data-saved-resolution-type': 'Invalid',
+                                                                     'data-status': ComplaintEntry::STATUS_RESOLVED_FIXED_INVALID.to_s,
+                                                                     id: ComplaintEntry::STATUS_RESOLVED_FIXED_INVALID.to_s,
+                                                                     name: 'complaint-resolution',
+                                                                     type: 'radio',
+                                                                     value: ComplaintEntry::STATUS_RESOLVED_FIXED_INVALID.to_s }
+                              %label.ticket-res-radio-label.radio-label{ for: ComplaintEntry::STATUS_RESOLVED_FIXED_INVALID.to_s }
+                                Invalid
+                            %li
+                              %input.webcat-ticket-resolution-radio{ 'data-saved-resolution-type': 'Duplicate',
+                                                                     'data-status': ComplaintEntry::STATUS_RESOLVED_DUPLICATE.to_s,
+                                                                     id: ComplaintEntry::STATUS_RESOLVED_DUPLICATE.to_s,
+                                                                     name: 'complaint-resolution',
+                                                                     type: 'radio',
+                                                                     value: ComplaintEntry::STATUS_RESOLVED_DUPLICATE.to_s }
+                              %label.ticket-res-radio-label.radio-label{ for: ComplaintEntry::STATUS_RESOLVED_DUPLICATE.to_s }
+                                Duplicate
+                        .submenu-right-wrapper
+                          .resolution-comment-wrapper
+                            %label.content-label-sm
+                              Template
+                            %select.resolution-message-template-select#webcat-resolution-message-template-select
+                            %label.content-label-sm
+                              Description
+                            %p.ticket-resolution-description
+                            %label.content-label-sm
+                              Comment
+                            %textarea.ticket-resolution-comment.resolution-status-comment
+                            .ticket-resolution-submit-wrapper
+                              %button.primary{ onClick: 'webcat_show_page_edit_status()' }
+                                Submit
+
+                    %li.status-radio-wrapper
+                      %input.webcat-ticket-status-radio{ class: "complaint-status-#{@complaint_entry.id}",
+                                                         id: ComplaintEntry::STATUS_REOPENED.to_s,
+                                                         name: 'complaint-status',
+                                                         type: 'radio',
+                                                         value: ComplaintEntry::STATUS_REOPENED.to_s }
+                      %label.radio-label.webcat-ticket-status-radio-label{ for: ComplaintEntry::STATUS_REOPENED.to_s }
+                        Re-Opened
+                    %li.non-resolution-submit-wrapper.webcat-non-resolution-submit-wrapper#ticket-non-res-submit
+                      %label.content-label-sm
+                        Comment
+                      %textarea.ticket-status-comment
+                      .button-row-center
+                        %button.primary{ onClick: 'webcat_show_page_edit_status()' }
+                          Submit
+
+            - if @complaint_entry&.resolution_comment.present?
+              %button.status-comment-button.esc-tooltipped{ title: @complaint_entry&.resolution_comment }
+
+    .col-xs-2.col-with-divider
+      .row.complaint-assignee-wrapper
+        .complaint-owner-wrapper.col-xs-6
+          %label.content-label-sm
+            Assignee
+          %div
+            %span#complaint-assignee{ class: ('missing-data' if @complaint_entry.user_id.nil? || @complaint_entry.user.cvs_username == 'vrtincom' ) }= @complaint_entry.user&.cvs_username || Unassigned
+        - if can? :update, ComplaintEntry
+          .complaint-owner-buttons-wrapper.col-xs-6
+            - if @complaint_entry.user_id == current_user.id
+              - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
+                %button.return-ticket-button.esc-tooltipped{ onclick: 'webcat_toolbar_unassign_complaint();',
+                                                             title: 'Return ticket to open queue' }
+            - else
+              %span.dropdown
+                - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
+                  %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-assign{ onclick: "take_single_webcat_complaint(#{@complaint_entry.id});",
+                                                                                                                title: 'Assign this ticket to me' }
+                  .dropdown-menu#show-change-assigne-dropdown{ 'aria-labelledby': 'index_change_assign' }
+                    .change-assignee-dropdown-wrapper
+                      %h3 Change Assignee
+                      .inline-tool-content-wrapper
+                        .toolbar
+                          %div
+                            %label.toolbar-section-label Assignee
+                            = select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+                          %button.primary{ id: 'button_reassign',
+                                           onclick: 'webcat_toolbar_show_change_assignee();',
+                                           type: 'button' }
+                            Assign
+                  %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#webcat-index-change-assign{ 'aria-expanded': 'false',
+                                                                                                                                  'aria-haspopup': 'true',
+                                                                                                                                  'data-toggle': 'dropdown',
+                                                                                                                                  title: 'Change Assignee' }
+      .row.complaint-reviewer-wrapper
+        .complaint-owner-wrapper.col-xs-6
+          %label.content-label-sm
+            Reviewer
+          %div
+            %span#complaint-reviewer{ class: ('missing-data' if @complaint_entry.reviewer_id.nil? || @complaint_entry.reviewer.cvs_username == 'vrtincom' ) }= @complaint_entry.reviewer&.cvs_username || 'Unassigned'
+        - if can? :update, ComplaintEntry
+          .complaint-owner-buttons-wrapper.col-xs-6
+            - if @complaint_entry.user_id == current_user.id
+              - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
+                %button.return-ticket-button.esc-tooltipped{ onclick: 'webcat_toolbar_unassign_complaint();',
+                                                             title: 'Return ticket to open queue' }
+            - else
+              %span.dropdown
+                - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
+                  %button.complaint-inline-buttons.take-ticket-button.esc-tooltipped#webcat-show-ticket-reviewer{ onclick: "take_single_webcat_complaint(#{@complaint_entry.id});",
+                                                                                                                  title: 'Assign this ticket to me' }
+                  .dropdown-menu#show-change-reviewer-dropdown{ 'aria-labelledby': 'index_change_assign' }
+                    .change-assignee-dropdown-wrapper
+                      %h3 Change Reviewer
+                      .inline-tool-content-wrapper
+                        .toolbar
+                          %div
+                            %label.toolbar-section-label reviewer
+                            = select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+                          %button.primary{ id: 'button_reassign',
+                                           onclick: 'webcat_toolbar_show_change_assignee();',
+                                           type: 'button' }
+                            Reviewer
+                  %button.complaint-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped#webcat-index-change-reviewer{ 'aria-expanded': 'false',
+                                                                                                                                    'aria-haspopup': 'true',
+                                                                                                                                    'data-toggle': 'dropdown',
+                                                                                                                                    title: 'Change Assignee' }
+    .col-xs-2.col-with-divider
+      .complaint-submitted-at-wrapper
+        %label.content-label-sm
+          Submitted At
+        %p.submitted-time
+          = @complaint_entry.created_at
+      .complaint-age-wrapper
+        %label.content-label-sm
+          Age
+        %p.complaint-complaint_entry-age
+          = complaint_entry_age @complaint_entry.created_at
+    .col-xs-2.col-with-divider
+      .complaint-submitted-at-wrapper
+        %label.content-label-sm
+          Platform
+        %p.submitted-time
+          = @complaint_entry.platform&.public_name || 'None'
+      .complaint-age-wrapper
+        %label.content-label-sm
+          Source
+        %p.complaint-complaint_entry-age
+          - if @source
+            - if @source == 'talos-intelligence'
+              TI Webform
+            - elsif @source == 'talos-intelligence-api'
+              TI API
+            - else
+              = @source
+          - else
+            Internal
+    .col-xs-2.com-with-divider
+      .submitter-type-wrapper
+        %label.content-label-sm
+          Submitter Type
+        %p= @complaint.submitter_type || 'None'
+      .submitter-org-wrapper
+        %label.content-label-sm
+          Submitter Organization
+        %p= @complaint.customer_org || 'None'
+    .col-xs-2
+      .contact-name-wrapper
+        %label.content-label-sm
+          Contact Name
+        %p.complaint-edit-field#complaint-customer-name= @complaint.customer&.name || 'None'
+      .contact-email-wrapper
+        %label.content-label-sm
+          Contact Email
+        %p.complaint-edit-field#complaint-customer-email= @complaint.customer&.email || 'None'
+
+%ul.nav.nav-tabs#ce-tabs{ role: 'tablist' }
+  %li.nav-item.active{ role: 'presentation' }
+    %a.nav-link#ce-research-tab-link{ 'aria-controls': 'research',
+                                      'data-toggle': 'tab',
+                                      href: '#research-tab',
+                                      role: 'tab' }
+      research
+  %li.nav-item{ role: 'presentation' }
+    %a.nav-link#ce-history-tab-link{ 'aria-controls': 'history',
+                                     'data-toggle': 'tab', href: '#history-tab',
+                                     role: 'tab' }
+      history
+-# Bootstrap tabs: https://getbootstrap.com/docs/3.4/javascript/#tabs
+.tab-content.content-wrapper#ce-tab-content
+  .tab-pane.active#research-tab{ role: 'tabpanel' }
+    = render 'escalations/webcat/complaint_entries/research_tab'
+  .tab-pane#history-tab{ role: 'tabpanel' }
+    = render 'escalations/webcat/complaint_entries/history_tab'
+
+:javascript
+  $(document).ready(function() {
+    var domain = "#{@complaint_entry.domain}";
+
+    window.get_suggested_categories(domain)
+    window.get_current_categories(domain);
+    window.get_ce_domain_history(domain);
+    window.get_ce_xbrs_history(domain);
+    window.get_ce_related_history(domain);
+  })

@@ -1,0 +1,60 @@
+.row.ce-history-tab
+  .col-xs-6.ce-history-column
+    %h1.ce-tab-titleHistory
+      History
+    %h5.text-uppercase
+      domain history
+    %table.data-report-table.bottom-divider#ce-domain-history-table
+      %thead
+        %tr
+          %th
+            action
+          %th
+            confidence
+          %th
+            time
+          %th
+            user
+          %th
+            category
+      %tbody#ce-domain-history-table-body
+    %h5.text-uppercase
+      entry history
+    %p.data-missing#entry-history
+      No entry history
+    %h5.text-uppercase
+      xbrs history
+    %table.data-report-table.bottom-divider#ce-xbrs-history-table
+      %thead
+        %tr
+          %th
+            cat mnemonic
+          %th
+            creation time
+          %th
+            subdomain
+          %th
+            domain
+          %th
+            path
+          %th
+            operation
+      %tbody#ce-xbrs-history-table-body
+    %h5.text-uppercase
+      related history
+    %table#ce-related-history-table
+      %thead
+        %tr
+          %th
+            subdomain
+          %th
+            domain
+          %th
+            path
+          %th
+            categories
+          %th
+            user/source
+          %th
+            last modified
+      %tbody#cw-related-history-table-body

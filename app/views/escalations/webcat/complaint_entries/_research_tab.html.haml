@@ -1,0 +1,140 @@
+.row.ce-research-tab
+  .col-xs-3.ce-research-column
+    %h1.ce-tab-title Research
+    %h5.research-data-header.text-uppercase
+      customer submitted info
+    #ce-research-toolbar
+      .toolbar
+        .view-btn-group
+          %label.toolbar-section-label
+            View
+          .btn-group.toolbar-btn-group
+            %button.btn.toolbar-button.toolbar-button-spacer.esc-tooltipped-webcat-toolbar.tooltipstered.open-all{ type: 'button' }
+            %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.tooltipstered.google-btn{ type: 'button' }
+        .edit-btn-group
+          %label.toolbar-section-label
+            Edit
+          .btn-group.toolbar-btn-group
+            %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.tooltipstered.convert-ticket-button{ type: 'button' }
+    .ce-submitted-wbrs-wrapper
+      #ce-submitted-ip-uri-wrapper
+        %label.content-label-sm
+          Submitted IP/URI
+        %p.ce-submitted-ip-uri
+          = @complaint_entry.domain
+      #ce-wbrs-score-wrapper
+        %label.content-label-sm
+          WBRS Score
+    #ce-suggested-categories-wrapper
+      %label.content-label-sm
+        Suggested Categories
+    .bottom-divider#ce-description-wrapper
+      %label.content-label-sm
+        Description
+      %p#ce-description
+    %h5.research-data-header.text-uppercase
+      current categories
+    %table.data-report-table.bottom-divider#ce-categories-data-table
+      %thead
+        %tr
+          %th source
+          %th conf
+          %th categories
+          %th certainty
+      %tbody
+    %h5.research-data-header.text-uppercase
+      tags
+    #ce-tags-wrapper
+      %p.missing-data#ce-tags No tags
+
+  .col-xs-3.ce-research-column
+    %h5.research-data-header.text-uppercase
+      categorization resolution
+    .ce-resolved-ip-uri-wrapper
+      %label.content-label-sm
+        Resolved IP/URI
+      %input.ce-input.ce-ip-uri-input{ value: @complaint_entry.domain }
+      .ce-resolved-ip-uri-button-wrapper
+        %button.ip-uri-button
+          domain
+        %button.ip-uri-button
+          subdomain
+        %button.ip-uri-button
+          original uri
+        %button.bug-button
+    .ce-categories-wrapper
+      %label.content-label-sm
+        Categories
+      %input.ce-categories-select.ce-input{ placeholder: 'Enter Categories / Confidence Order' }
+    .ce-resolution-wrapper
+      %label.content-label-sm
+        Resolution
+      .ce-radio-group-wrapper
+        .ce-radio-group
+          %input.ce-resolution-radio-button{ name: 'resolution',
+                                             type: 'radio',
+                                             value: 'unchanged' }
+          %label.radio-label{ for: 'unchanged' }
+            Unchanged
+        .ce-radio-group
+          %input.ce-resolution-radio-button{ name: 'resolution',
+                                             type: 'radio',
+                                             value: 'fixed' }
+          %label.radio-label{ for: 'fixed' }
+            Fixed
+        .ce-radio-group
+          %input.ce-resolution-radio-button{ name: 'resolution',
+                                             type: 'radio',
+                                             value: 'invalid' }
+          %label.radio-label{ for: 'invalid' }
+            Invalid
+    .ce-customer-comment-wrapper
+      %label.content-label-sm
+        Email Response to Customer
+      %select.ce-customer-comment-select-box.ce-input
+        %option{ value: 'fixed', selected: true } Fixed- Default Response
+      %textarea.ce-customer-comment-textarea.ce-input{ name: 'ce_customer_comment_textarea',
+                                                       maxlength: '64000' }
+    .ce-internal-comment-wrapper
+      %label.content-label-sm
+        Internal Comment
+      %textarea.ce-internal-comment-textarea.ce-input{ name: 'ce_internal_comment_textarea',
+                                                       placeholder: 'Internal note for choosing categories' }
+    .text-center
+      %button.tertiary.ce-submit-button
+        submit
+  .col-xs-6.ce-research-column
+    %h5.research-data-header.text-uppercase
+      whois
+    %label.data-report-label
+      domain
+    %table.data-report-table#ce-domain-table
+      %tbody
+        %tr
+          %td
+            = @complaint_entry.domain
+    %label.data-report-label#ce-registrant-label
+      registrant
+    %table.data-report-table#ce-registrant-table
+      %tbody
+        %tr
+          %td.data-report-table-column-header
+            Organization
+          %td#registrant-organization
+        %tr
+          %td.data-report-table-column-header
+            Country
+          %td#registrant-country
+        %tr
+          %td.data-report-table-column-header
+            State/Province
+          %td#registrant-state
+    %label.data-report-label#ce-name-servers-label
+      name servers
+    %table.data-report-table#ce-name-servers-table
+      %thead
+        %tr
+          %th
+      %tbody
+        %tr
+          %td
