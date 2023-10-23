@@ -1,5 +1,4 @@
 ## WEBCAT CATEGORIZE URLS DROPDOWN FUNCTIONS ##
-
 $ ->
 
   # Populate the category selectizes on the dropdown
@@ -115,8 +114,123 @@ window.drop_current_categories = () ->
   )
 
 
+window.retrieve_history = (position) ->
+  $(".cat-url-error").hide()
+  loader = $('.lookup-drop-loader')
+  loader.removeClass('hidden')
+  for url_position in [1..5]
+    $("#url_#{url_position}").css("border-width", "")
+    $("#url_#{url_position}").css("border-color", "")
 
-submit_categorize_urls = () ->
+  url = $("#url_" + position).val()
+
+  if url.length > 0
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
+      method: 'POST'
+      data: {'position': position, url: url}
+      success: (response) ->
+        loader.addClass('hidden')
+        json = JSON.parse(response)
+        if json.error
+          std_msg_error("<p>Something went wrong: #{json.error}","")
+        else
+          history_dialog_content =
+              "<div class='cat-history-dialog dialog-content-wrapper'>
+               <h4>#{url}</h4>
+               <ul class='nav nav-tabs dialog-tabs' role='tablist'>
+               <li class='nav-item active' role='presentation'>
+                <a class='nav-link' role='tab' data-toggle='tab' href='#domain-history-tab' aria-controls='domain-history-tab'>
+                   Domain History
+                </a>
+               </li>
+               <li class='nav-item' role='presentation'>
+                <a class='nav-link xbrs-history-tab' role='tab' data-toggle='tab' href='#xbrs-history-tab' aria-controls='xbrs-history-tab' onclick='get_xbrs_history(\"#{url}\", this)'>
+                  XBRS History
+                </a>
+               </li>
+               </ul>
+                <div class='tab-pane active' role='tabpanel' id='domain-history-tab'>
+                  <h5>Domain History</h5>
+                  <table class='history-table'>
+                    <thead>
+                       <tr>
+                        <th>Action</th>
+                        <th>Confidence</th>
+                        <th>Description</th>
+                        <th>Time</th>
+                        <th>User</th>
+                        <th>Category</th>
+                       </tr>
+                    </thead>
+                    <tbody>"
+          for entry in json
+            { action, confidence, description, time, user, category } = entry
+            entry_string =
+              "<tr>
+                <td> #{action}</td>
+                <td> #{confidence}</td>
+                <td> #{description}</td>
+                <td> #{time} </td>
+                <td> #{user}</td>
+                <td> #{category.descr}</td>
+               </tr>"
+
+            history_dialog_content += entry_string
+
+          history_dialog_content +=
+            "</tbody></table>
+             </div>
+             <div class='tab-pane' role='tabpanel' id='xbrs-history-tab'>
+                <h5>XBRS History</h5>
+                <table class='history-table xbrs-history-table' id='webcat-xbrs-history'></table>
+             </div>"
+
+          if $("history_dialog").length
+            history_dialog = this
+            $("#history_dialog").html(history_dialog_content)
+            $('#history_dialog').dialog('open')
+          else
+            history_dialog = '<div id="history_dialog" title="History Information"></div>'
+            $('body').append(history_dialog)
+            $("#history_dialog").html(history_dialog_content)
+            $('#history_dialog').dialog
+              autoOpen: false
+              minWidth: 600
+              position: { my: "right top", at: "right top", of: window }
+            $('#history_dialog').dialog('open')
+            $('dialog_tabs').tabs();
+
+      error: (response) ->
+        $("#cat-url-error-message-#{position}").text("No history associated with this url.")
+        loader.addClass('hidden')
+        $("#cat-url-#{position}").show()
+        $("#url_#{position}").css("border-width", "2px")
+        $("#url_#{position}").css("border-color", "#E47433")
+    , this)
+  else
+    $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
+    $("#cat-url-#{position}").show()
+    $("#url_#{position}").css("border-width", "2px")
+    $("#url_#{position}").css("border-color", "#E47433")
+
+
+window.cat_new_url = ()->
+  timesTouched = getTouchedFormCount()
+  if timesTouched > 1
+    std_msg_confirm(
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with categorizing this new item? It will reload the page and you will lose your changes.",
+      [],
+      {
+        reload: false,
+        confirm_dismiss: true,
+        confirm: ->
+          processSubmitNewURL()
+      })
+  else
+    processSubmitNewURL()
+
+processSubmitNewURL = () ->
   data = {}
   isEmpty = true
   $('#categorize-urls').dropdown('toggle')
@@ -145,9 +259,9 @@ submit_categorize_urls = () ->
             popular_entries.push(val.url)
 
         if popular_entries.length > 0
-          message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+           message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
         else
-          message = "No pending complaint entries have been created"
+           message = "No pending complaint entries have been created"
 
         reload_message = "</br><a href='.'>Refresh the page</a> to see the result"
         std_msg_success(
@@ -199,7 +313,7 @@ window.multiple_url_categorization = () ->
       data: {urls: urls, category_names: category_names, category_ids: category_ids}
       success: (response) ->
         loader.addClass('hidden')
-        std_msg_success('Success',["URLs/IPs successfully categorized."])
+        std_msg_success('Success',["URLs/IPs successfully categorized."], reload: false)
       error: (response) ->
         loader.addClass('hidden')
         std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
@@ -207,3 +321,34 @@ window.multiple_url_categorization = () ->
     )
   else
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
+
+
+window.drop_multiple_url_categories = () ->
+  loader = $('.lookup-drop-loader')
+  urls = {}
+
+  for url, index in $("#categorize_urls").val().trim().split(/\s+/)
+    if url != ''
+      urls[index + 1] = url
+
+  loader.removeClass('hidden')
+
+  if $("#categorize_urls").val() != ""
+    std_msg_ajax(
+      url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
+      method: 'POST'
+      data: { 'urls': urls }
+      success: (response) ->
+        for key, value of response.json
+          if value && value.code == 200
+            loader.addClass('hidden')
+            std_msg_success('Success', ["URLs/IPs categories successfully dropped."], reload: true)
+          else
+            std_msg_error('Error', ['Unable to drop categories.'], reload: false)
+      error: (response) ->
+        loader.addClass('hidden')
+        std_msg_error("Error #{response.responseJSON.message}", '', reload: false)
+    )
+  else
+    std_msg_error('Error', ['Please check that a URL/IP has been inputted.'], reload: false)
+

@@ -1,0 +1,204 @@
+-# context tags tab (ctt) exists on both webrep and filerep, this file used in both places
+.row
+  .col-sm-12.tab-top
+    %h1 Context Tags
+
+    -# contain everything tmi-related into this tmi div, hide everything if no tmi roles on user
+    - if current_user.has_role?('tmi viewer') || current_user.has_role?('tmi manager')
+      .tmi-area
+
+        -# tmi data for webrep and filerep
+        %h2 Tag Management Interface
+
+        -# choose an entry if multiple entries exist, single is default
+        .ctt-choose-an-entry.hidden
+          %span.ctt-entry-label
+            Entry:
+          -# options will be generated from js into select below
+          %select.ctt-entry-select
+
+        -# tmi data and toolbar is all below
+        .tmi-main-content.hidden
+          .toolbar.tmi-toolbar
+            %div
+              %label.toolbar-section-label
+                Show
+              %span.dropdown
+                %button#tmi-columns-button.toolbar-button.show-col-context-tags.dropdown-toggle.ctt-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                  %span.toolbar-button-text
+                    Show/Hide Columns
+
+                .dropdown-menu.toolbar-dropdown.tmi-columns-dropdown{'aria-labelledby': 'tmi-columns-button'}
+                  %ul
+                    %li.toggle-col-tmi{'data-column':'1'}
+                      %input{type: 'checkbox', checked: true, id: 'tmi-observable-checkbox'} Observable
+                    %li.toggle-col-tmi{'data-column':'2'}
+                      %input{type: 'checkbox', checked: true, id: 'tmi-tag-name-checkbox'} Tag Name
+                    %li.toggle-col-tmi{'data-column':'3'}
+                      %input{type: 'checkbox', checked: true, id: 'tmi-mnemonic-checkbox'} Mnemonic
+                    %li.toggle-col-tmi{'data-column':'4'}
+                      %input{type: 'checkbox', checked: true, id: 'tmi-taxonomy-checkbox'} Taxonomy
+                    %li.toggle-col-tmi{'data-column':'5'}
+                      %input{type: 'checkbox', checked: true, id: 'tmi-source-checkbox'} Source
+                    %li.toggle-col-tmi{'data-column':'6'}
+                      %input{type: 'checkbox', checked: true, id: 'tmi-processor-checkbox'} Processor
+                  %ul
+                    %li.toggle-col-tmi{'data-column':'7'}
+                      %input{type: 'checkbox', checked: true, id: 'tmi-report-date-checkbox'} Report Date
+                    %li.toggle-col-tmi{'data-column':'8'}
+                      %input{type: 'checkbox', checked: true, id: 'tmi-suppressed-checkbox'} Suppressed?
+                    %li.toggle-col-tmi{'data-column':'9'}
+                      %input{type: 'checkbox', checked: true, id: 'tmi-suppression-source-checkbox'} Suppression Source
+                    %li.toggle-col-tmi{'data-column':'10'}
+                      %input{type: 'checkbox', checked: true, id: 'tmi-suppression-platform-checkbox'} Suppression Platform
+                    %li.toggle-col-tmi{'data-column':'11'}
+                      %input{type: 'checkbox', checked: true, id: 'tmi-suppression-date-checkbox'} Suppression Date
+            %div
+              %label.toolbar-section-label View
+              %span.context-tags-toggle.suppressed-label-toggle
+                %input.cb-suppressed-tags{type:'checkbox', checked: true}
+                %span.toggle-label Suppressed Tags
+              %span.context-tags-toggle.unsuppressed-label-toggle
+                %input.cb-suppressed-tags{type:'checkbox', checked: true}
+                %span.toggle-label Unsuppressed Tags
+
+
+            -# tmi manager role allows adding and suppressing tags
+            - if current_user.has_role?('tmi manager')
+              %div
+                %label.toolbar-section-label Actions
+                %button.toolbar-button.add-context-tag-button.dialog-button.ctt-tooltipped{title: "Add Tag", onclick: "add_context_tags_dialog();"}
+                  %span.toolbar-button-text Add Tag
+                %button.toolbar-button.suppress-context-tag-button.ctt-tooltipped{title: "Suppressed tags will not show up in the Enrichment Service and will not be visible to customers", onclick: "other_tag_functions('suppress_tag');"}
+                  %span.toolbar-button-text Suppress Tag
+                %button.toolbar-button.unsuppress-context-tag-button.ctt-tooltipped{title: "Tags that are not suppressed will show up in the Enrichment Service and be visible to customers", onclick: "other_tag_functions('unsuppress_tag');"}
+                  %span.toolbar-button-text Unsuppress Tag
+                %button.toolbar-button.remove-context-tag-button.ctt-tooltipped{title: "Remove Tag", onclick: "other_tag_functions('delete');"}
+                  %span.toolbar-button-text Remove Tag
+
+
+          -# tmi dt on both webrep and filerep
+          %table.ctt-table#tmi-dt.tmi-table
+            %thead
+              %tr
+                %th
+                  %input.tmi-cb-select-all{type:'checkbox'}
+                %th Observable
+                %th Tag Name
+                %th Mnemonic
+                %th Taxonomy
+                %th Source
+                %th Processor
+                %th Report Date
+                %th Suppressed?
+                %th Suppression Source
+                %th Suppression Platform
+                %th Suppression Date
+            %tbody.tmi-tbody
+
+        %p.tmi-loader.ctt-loader
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
+          %span.loader-msg Loading...
+
+        %p.tmi-error.missing-data.hidden
+          Error loading data.
+
+
+    -# enrichment data for webrep and filerep
+    %h2 Enrichment Service
+    .enrichment-area
+
+      %table#enrichment-dt.ctt-table.enrichment-table.hidden
+        %thead
+          %tr
+            %th Context
+            %th Taxonomy
+            %th Name
+            %th Description
+            %th External References
+        %tbody
+
+      %p.enrichment-loader.ctt-loader
+        = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
+        %span.loader-msg Loading...
+
+      %p.enrichment-error.missing-data.hidden
+        Error loading data.
+
+
+    -# prevalence data for webrep and filerep
+    %h2 Prevalence
+    .prevalence-area
+
+      %table#prevalence-dt.ctt-table.prevalence-table.hidden
+        %thead
+          %th Dataset
+          %th Count
+          %th First Seen
+          %th Last Seen
+        %tbody
+
+      %p.prevalence-loader.ctt-loader
+        = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
+        %span.loader-msg Loading...
+
+      %p.prevalence-error.missing-data.hidden
+        Error loading data.
+
+
+
+-# add tags dialog below
+#add-context-tags-dialog.tags-dialog{title: 'Add Tags to Observable'}
+
+  -# LOADER DIV
+  .actd-loader-area
+    %p.ctt-loader.loading-tags
+      = inline_svg 'icon_gears_loader.svg', class: 'gears-icon'
+      %span.loader-msg Loading tag data...
+
+  -# ERROR DIV
+  .actd-error-area.hidden
+    %p.missing-info Error loading tag data.
+
+  -# MAIN DIV
+  .actd-tags-area.hidden
+    .row.tags-header-row
+      .col-xs-3
+        %label.content-label-sm
+          Taxonomy
+        -# context tags js will generate options below
+
+        %select.taxonomy-select.no-tax-selected
+          %option.first-option{"data-id": '0', value: '0'} Select a taxonomy
+
+      -# tag search will be moved here when dt inits
+      .col-xs-3.tag-search-area
+        %label.content-label-sm
+          Tag Search
+
+      -# preview area for tags to be added
+      .col-xs-6.preview-tag-area
+        %label.content-label-sm
+          Tags to add to
+          %span.curr-observable-label
+
+
+    .row.tags-content-row
+      .col-xs-12
+        .tag-entries-area
+
+          -# all tag rows will be generated into this table
+          %table.tags-dialog-table
+            %thead
+              %th
+              %th Tag Name
+              %th Mnemonic
+              %th Taxonomy
+              %th Description
+            %tbody
+
+
+    .row.save-button-row
+      .col-xs-12.text-center
+        %button.secondary.tags-cancel-button Cancel
+        %button.primary.tags-save-button{onclick: "add_tags_submit();"} Add Tags to Observable

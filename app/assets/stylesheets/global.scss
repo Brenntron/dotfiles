@@ -4113,6 +4113,7 @@ fieldset.top-content {
 .nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
 .nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
+.nav-tabs > li > a#context-tags-tab-link {background-image: url(image_path('icon_context_tag.svg'));}
 
 .email-msg-content {
   background-color: $content-bg-color;
@@ -5440,6 +5441,12 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: transparent;
 }
 
+.dispute-owner-buttons-wrapper {
+  .take-ticket-button, .return-ticket-button {
+    background-color: transparent !important;
+  }
+}
+
 .return-ticket-button {
   background-image: url(image_path('icon_return_light2.svg'));
   background-repeat: no-repeat;
@@ -6453,10 +6460,16 @@ h5.entry-details-table-header {
   right: 0;
   margin-top: 0;
 }
+
+// show full toolbar labels on smaller screens for less-wide toolbars
 @media (min-width: 1100px) {
   #research-tab-toolbar .toolbar-button-text {
     display: block;
     margin-left: 8px;
+  }
+  // context tags tab exists on both webrep and filerep
+  .tab-context-tags .toolbar-button-text {
+    display: block;
   }
 }
 
@@ -7602,6 +7615,25 @@ table.dispute-entry-table tbody tr.selected {
   display: inline-block;
   margin-top: -4px;
   margin-left: 10px;
+
+  .return-ticket-button {
+    margin-right: 3px;
+  }
+
+  button:disabled {
+    opacity: .5;
+  }
+}
+
+.file-rep-dispute-assignee {
+  width: 100%;
+}
+
+.file-rep-dispute-owner-buttons-wrapper {
+  margin-left: 0;
+  margin-top: 10px;
+  padding-left: 0;
+  width: 100%;
 }
 
 .dispute-owner-buttons-wrapper .dropdown.open, .webrep-change-assignee-wrapper .dropdown.open{
@@ -7652,7 +7684,7 @@ table.dispute-entry-table tbody tr.selected {
 .priority-col-wrapper, .case-id-wrapper {
   float: left;
   border-right: solid 1px $faint-neutral-color;
-  margin-right: 12px;
+  margin-right: 10px;
 }
 #user-open-disputes-tab{
   background-image: url(image_path('icon_open.svg'))
@@ -8226,23 +8258,23 @@ table.dispute-entry-table tbody tr.selected {
   font-size: 8pt;
 }
 
-#copiedAlert {
+#copiedAlert, #assignedAlert, #unassignedAlert {
   color: $success-color;
   color: #5FB766;
   font-size: 80%;
   display: inline;
   vertical-align: top;
 }
-.nested-complaint-static-data .copied-container{
+.nested-complaint-static-data .copied-container, .assigned-check-container {
   margin-top: -7px;
 }
-.copied-check{
+.copied-check, .assigned-check{
   height: 12px;
   width: 10px;
   display: inline-block;
   background-image: url(image_path('icon_check_dark_green.svg'));
 }
-.copied-container{
+.copied-container, .assigned-check-container {
   position: absolute;
 }
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
@@ -8435,16 +8467,19 @@ hr.condensed {
 .categorize-radio-wrapper {
   line-height: initial;
   background-color: $faint-neutral-color;
-}
 
-.categorize-radio-wrapper .radio-label {
-  font-size: 8pt;
-  padding-left: 8px;
-}
+  .radio-label {
+    font-size: 8pt;
+    padding-left: 8px;
+    vertical-align: middle;
+  }
 
-.categorize-radio-wrapper input[type="radio"] {
-  border: none !important;
-  outline: none !important;
+  .cat-url-radio {
+    border: none !important;
+    margin-top: -1px;
+    outline: none !important;
+    vertical-align: middle;
+  }
 }
 
 .categorize-radio-wrapper.row {
@@ -11110,6 +11145,9 @@ button.secondary.view-report-external-button {
     line-height: 1.65em;
   }
 }
+
+.hidden-selectize-dropdown .selectize-dropdown{ display: none!important; }
+
 #report-tab-content{
   .toolbar-select-wrapper input[type='checkbox'] {
     margin-top: 3px;
@@ -11295,7 +11333,7 @@ button.secondary.view-report-external-button {
 
 
 
-// dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
+// tooltips for modals on file rep get too wide, limit the max-width a little bit
 .tooltipster-sidetip .tooltipster-box {
   max-width: 460px !important;
 }
@@ -11310,7 +11348,8 @@ button.secondary.view-report-external-button {
   margin-bottom: 10px;
 }
 
-.data-report-table > tbody > tr > td, .data-report-table > thead > tr > th  {
+.data-report-table:not(.filerep-enrich-taxonomy-table) > tbody > tr > td,
+.data-report-table:not(.filerep-enrich-taxonomy-table) > thead > tr > th  {
   padding: 6px 6px;
 }
 
@@ -11369,7 +11408,7 @@ button.secondary.view-report-external-button {
   color: $second-section-color;
   font-weight: 600;
   padding-left: 22px !important;
-  // dbinebri: ensure RL result data strings wrap correctly
+  // ensure RL result data strings wrap correctly
   word-break: break-all;
 }
 
@@ -11387,7 +11426,7 @@ button.secondary.view-report-external-button {
   margin-left: -22px;
 }
 
-// dbinebri: fix for "not detected" left padding in RL table on Show
+// fix for "not detected" left padding in RL table on Show
 .scanner-unk {
   padding-left: 22px !important;
   color: $type-lighter-color;
@@ -11835,6 +11874,9 @@ div[aria-describedby='create-detection-dialog'] {
 // dbinebri: on Index, ensure "Unassigned" and buttons can exist w/o breaking in the Assignee col
 .table > tbody > tr > td.assignee-col, table > tbody > tr > td.assignee-col {
   min-width: 90px !important;
+}
+td.channel-col{
+  text-transform: capitalize;
 }
 
  // dbinebri: adding a specific on-click sha tooltip
@@ -13009,20 +13051,6 @@ table > tbody > tr > td.no-padding {
   }
 }
 
-.enrich-cell-external-references {
-  display: flex;
-  flex-direction: column;
-}
-
-.enrich-external-reference-link, .enrich-external-reference-link:hover, .enrich-external-reference-link:focus {
-  color: #fff;
-  text-decoration: underline;
-}
-
-.enrich-webrep-external-ref-header {
-  width: 137px;
-}
-
 #research_tab {
   .research-first-row {
     td {
@@ -13898,30 +13926,11 @@ table > tbody > tr > td.no-padding {
   border-top: 1px solid #f2f2f2;
 }
 
-.filerep-enrich-table-header-row th:first-child {
-  padding-left: 4px;
+.filerep-enrich-taxonomy-table th {
+  padding: 8px 6px;
 }
-
-.filerep-enrich-table-header-row th:last-child {
-  padding-right: 4px;
-}
-
-.filerep-enrich-table-description-th {
-  padding: 8px 8px 6px 8px;
-}
-
-.filerep-enrich-cell-external-references {
-  padding: 0;
-}
-
-.filerep-enrich-cell-name {
-  min-width: 85px;
-  padding: 0;
-}
-
-.filerep-enrich-cell-external-references {
-  min-width: 86px;
-  text-align: right;
+.filerep-enrich-taxonomy-table td {
+  padding: 8px 6px;
 }
 
 .filerep-enrich-external-ref {

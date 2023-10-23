@@ -365,6 +365,11 @@ class DisputeEntry < ApplicationRecord
     self.hostname                       = uri_parsed.host
     self.top_level_domain               = public_suffix.tld
 
+    # change uri from email to domain
+    if url.include?("@")
+      self.uri = self.domain
+    end
+
     self
   end
 

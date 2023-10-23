@@ -183,6 +183,7 @@ module API
               status_response[:servers][:amp] = Rails.configuration.amp_poke.host
               status_response[:servers][:k2] = Rails.configuration.k2.host
               status_response[:servers][:enrichment_service] = Rails.configuration.enrichment_service.hostport
+              status_response[:servers][:tmi] = Rails.configuration.tmi.hostport
               status_response[:servers][:jira] = Rails.configuration.jira.host
               status_response[:servers][:bast] = Rails.configuration.bast.host
               begin
@@ -198,11 +199,11 @@ module API
                 status_response[:amp] = FileReputationApi::Detection.health_check
                 status_response[:k2] = K2::History.health_check
                 status_response[:enrichment_service] = EnrichmentService::QueryInterface.health_check
+                status_response[:tmi] = ::CloudIntel::TagManagementInterface.health_check
                 status_response[:jira] = JiraRest::Session.health_check
                 status_response[:bast] = Bast::Base.health_check
 
                 status_response[:status] = "success"
-
               rescue
                 status_response[:status] = "error"
                 status_response[:message] = "An Error Occurred trying to build a status report"

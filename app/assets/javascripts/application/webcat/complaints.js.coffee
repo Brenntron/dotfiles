@@ -142,29 +142,10 @@ window.webcat_reset_search = ()->
   for i in inputs
     i.value = ""
 
-  tag_input = $('#tags-input')[0].selectize
-  assignee_input = $('#assignee-input')[0].selectize
-  category_input = $('#category-input')[0].selectize
-  company_input = $('#company-input')[0].selectize
-  status_input = $('#status-input')[0].selectize
-  resolution_input = $('#resolution-input')[0].selectize
-  customer_input = $('#name-input')[0].selectize
-  complaint_input = $('#complaint-input')[0].selectize
-  channel_input = $('#channel-input')[0].selectize
-  entry_input = $('#entryid-input')[0].selectize
-  complaint_id_input = $('#complaintid-input')[0].selectize
-
-  tag_input.clear()
-  assignee_input.clear()
-  category_input.clear()
-  company_input.clear()
-  status_input.clear()
-  resolution_input.clear()
-  customer_input.clear()
-  complaint_input.clear()
-  channel_input.clear()
-  entry_input.clear()
-  complaint_id_input.clear()
+  els = ['tags','assignee','category','company','status','resolution','name','complaint','channel','entryid','complaintid','jiraid','submitter-type','platform']
+  for el in els
+    selectize_el = $("##{el}-input")[0].selectize
+    selectize_el.clear()
 
 
 
@@ -291,10 +272,6 @@ window.fetch_complaints = () ->
     success_msg: 'Complaint updates requested from Talos-Intelligence.  Please refresh your page shortly.'
     error_prefix: 'Error fetching complaints.'
   )
-
-
-
-
 
 
 
@@ -496,6 +473,7 @@ window.updateResolutionDialog = (confirm) ->
 #  if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
 #    invalid_unchanged = true
 #    disabled = false
+
   $('#complaint_entries_to_update').empty()
   resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected')
