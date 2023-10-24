@@ -1,0 +1,32 @@
+-# Confirm submit entries to be resolved modal
+
+#bulk-submit-confirmation.modal.fade{'aria-labelledby': 'bulk-submit-modal-title', role: 'dialog', tabindex: '-1'}
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{'aria-label': 'Close', 'data-dismiss': 'modal', type: 'button'}
+        #bulk-submit-modal-title.modal-title Entries to Submit
+
+      .modal-body
+        %h5#incomplete-entries-msg.hidden The following entries are incomplete or incorrect
+        %table#incomplete-entries-table.entry-confirmation-table.hidden
+          %thead
+            %tr
+              %th.entry-id-col Entry ID
+              %th URI/IP
+              %th Categories
+              %th.resolution-col Resolution
+
+        %h5#complete-entries-msg.hidden The following entries are ready to be submitted
+        %table#complete-entries-table.entry-confirmation-table.hidden
+          %thead
+            %tr
+              %th.entry-id-col Entry ID
+              %th URI/IP
+              %th Categories
+              %th.resolution-col Resolution
+
+        #bulk-submit-buttons.text-center
+          %button.btn.secondary{type: 'button', 'data-dismiss': 'modal'} Cancel
+          %button.btn.btn-primary.primary{type: 'button'} Submit correct entries
+

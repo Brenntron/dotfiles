@@ -41,7 +41,21 @@ getTouchedFormCount = ()->
 
 #NEW
 # Bulk webcat entry submit
-# TODO test when uri has been edited?
+# SCENARIOS:
+# 1 - FIXED with new added or changed categories - correct
+# 2 - FIXED with zero categories - wrong whether dropped or nothing added
+# 3 - FIXED with category that was already there (should be unchanged then) - wrong
+# 4 - UNCHANGED with zero categories - wrong, should fix or call invalid
+# 5 - UNCHANGED with added categories - wrong, should be FIXED res
+# 6 - INVALID with no categories - correct
+# 7 - INVALID with added categories - wrong
+## Need to store initial cats somewhere else so we can compare
+
+
+# TODO If a domain already has a manually assigned category
+#  but we get a new complaint for it, that category is automatically
+#  supplied in the category field … I wouldn't want that to be included in a
+#  bulk submit unless that complaint is marked unchanged
 window.bulk_submit_categorize_entries = () ->
   debugger
   # grab what has been touched / stored in session
@@ -56,22 +70,29 @@ window.bulk_submit_categorize_entries = () ->
   self_review = $('#self_review').is(':checked')
 
   # array if user tries to submit Fixed w/ no cats
-  data = []
+  entries_to_submit = []
   incomplete_entries = []
+  submit_table = $('#complete-entries-table')
+  incomplete_table = $('#incomplete-entries-table')
+
+  $('#bulk-submit-confirmation').modal('show')
+
 
   $(entries).each ->
+    debugger
     entry_row = $('#' + this)
 
     entry_id = this
     uri = $($(entry_row).find('.complaint-uri-input')[0]).val()
     status = $(entry_row).find('.resolution_radio_button:checked').val()
     comment = $(entry_row).find('textarea.internal-comment').val()
-    # TODO add in resolution comments
+    # TODO add in resolution comments (currently in QA)
 
+    debugger
     if $('#input_cat_' + entry_id).val() != null
       cat_ids = $('#input_cat_' + entry_id).val().toString()
     else
-      cat_ids = null
+      cat_ids = ''
     category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
     category_names = []
     category_name.each ->
@@ -79,85 +100,61 @@ window.bulk_submit_categorize_entries = () ->
     category_names = category_names.toString()
 
     if (cat_ids.length == 0) && status == 'FIXED'
-      incomplete_entries.push(entry_id)
+      incomplete_table_row = '<tr><td>' + entry_id + '</td><td>' + uri + '</td><td>' + category_names + '</td><td>' + status + '</td>'
+      $(incomplete_table).append(incomplete_table_row)
+
+    # INVALID status should always have zero cats on it, even if user tries to add one
     else
-      data.push({
+      if status == 'INVALID'
+        cat_ids = ''
+        category_names = ''
+
+      entries_to_submit.push({
         entry_id: entry_id,
         prefix: uri,
         categories: cat_ids,
-        category_names: category_names
+        category_names: category_names,
         status: status,
         comment: comment,
   #      resolution_comment: resolution_comment,
         uri_as_categorized: uri,
         self_review: self_review
       })
+      submit_table_row = '<tr><td>' + entry_id + '</td><td>' + uri + '</td><td>' + category_names + '</td><td>' + status + '</td>'
+      $(submit_table).append(submit_table_row)
+
+  debugger
+  if incomplete_entries.length == 0 && entries_to_submit.length == 0
+    return
+  else
+    if incomplete_entries != 0
+      $('#incomplete-entries-msg').removeClass('hidden')
+      $('#incomplete-entries-table').removeClass('hidden')
+    if entries_to_submit != 0
+      $('#complete-entries-msg').removeClass('hidden')
+      $('#complete-entries-table').removeClass('hidden')
+
+  # Populate confirmation dialog
+#  $('#bulk-submit-confirmation').modal('show')
+
+
 
   # TODO - add confirmation modal
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
-    data: {data: data}
-    success: (response) ->
-      debugger
-      json = JSON.parse(response)
-      std_msg_success('Success',["All complaints successfully processed."], reload: true)
-    error: (response) ->
-      debugger
-      console.log response
-)
-
-
-
-
-# TODO - fix this function
-# Talk to Adam - maybe we allow them to do a refetch on cats if they edit the uRI?
-
-# New layout does not save this separately from submitting the updates, need to rethink how this is done
-# pretty sure this is not needed
-#window.updateURI = (event, complaint_entry_id) ->
-#  event.preventDefault()
-#
-#  uri = $("#complaint_prefix_#{complaint_entry_id}").val()
-#
 #  std_msg_ajax(
 #    method: 'POST'
-#    url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
-#    data: {complaint_entry_id: complaint_entry_id, uri: uri }
+#    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
+#    data: {data: data}
 #    success: (response) ->
-#      {current_categories, category, wbrs_score, domain, subdomain, path, status} = response.json
-#
-#      if subdomain
-#        qual_subdomain = subdomain + '.' + domain
-#      else
-#        qual_subdomain = domain
-#
-#      $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
-#
-#      if 'ip' == status
-#        std_msg_error("Cannot edit IP entries.","")
-#      else
-#        $("#domain_#{complaint_entry_id}").tooltipster('content', uri);
-#        $("#site-search-#{complaint_entry_id}").tooltipster('content', uri);
-#        $("#entry-uri-#{complaint_entry_id}").tooltipster('content', uri);
-#        $.each current_categories, (key, entry) ->
-#          $(".simple-nested-table#entry-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
-#
-#        $("#domain_#{complaint_entry_id}").text(domain)
-#        $("#subdomain_#{complaint_entry_id}").text(subdomain)
-#        $("#path_#{complaint_entry_id}").text(path)
-#        $("#category_#{complaint_entry_id}").text(category)
-#        $("#wbrs_score_#{complaint_entry_id}").text(wbrs_score)
-#        query_who_params = "#{domain}, #{complaint_entry_id}"
-#        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
-#        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
-#
-#        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.whoIsLookups(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Whois</button>')
-#        $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
+#      debugger
+#      json = JSON.parse(response)
+#      std_msg_success('Success',["All complaints successfully processed."], reload: true)
 #    error: (response) ->
-#      std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
-#
-# )
+#      debugger
+#      console.log response
+#)
+
+
+
 
 
 

@@ -660,3 +660,29 @@ table.dataTable tbody tr.submitting-entry {
 #webcat-index-toolbar .dropdown.open {
   background-color: transparent !important;
 }
+
+
+// Webcat bulk submission confirmation modal
+#bulk-submit-confirmation {
+
+  .modal-header {
+    color: #fff;
+    background-color: #6dbcdb;
+    padding: 10px;
+    border-radius: 4px 4px 0 0;
+    .modal-title {
+      font-weight: 300;
+      font-size: 10px;
+    }
+  }
+
+  .entry-id-col {
+    width: 80px;
+  }
+  .resolution-col {
+    width: 100px;
+  }
+  .entry-confirmation-table {
+    margin: 5px 0 40px 0;
+  }
+}
