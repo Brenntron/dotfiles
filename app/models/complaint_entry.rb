@@ -3,6 +3,14 @@ include ActionView::Helpers::DateHelper
 class ComplaintEntry < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
 
+  before_update :update_duplicates
+
+  after_create :check_and_process_duplicate
+
+  belongs_to :canonical, class_name: "ComplaintEntry", optional: true
+
+  has_many :duplicate_entries, class_name: "ComplaintEntry", foreign_key: 'canonical_id'
+
   belongs_to :complaint
   belongs_to :user, optional: true
   belongs_to :reviewer, class_name: 'User', optional: true
@@ -15,6 +23,7 @@ class ComplaintEntry < ApplicationRecord
   delegate :cvs_username, :display_name, to: :user, allow_nil: true, prefix: true
 
   scope :open, -> { where.not(status: [STATUS_COMPLETED, RESOLVED]) }
+  scope :open_tickets, -> { where.not(status: [STATUS_COMPLETED, RESOLVED]) }
   scope :closed, -> { where(status: [STATUS_COMPLETED, RESOLVED]) }
   scope :new_entries, -> { where(status: [NEW]) }
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
@@ -33,7 +42,49 @@ class ComplaintEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_INVALID = "INVALID"
   STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
+  #this is a temporary status until R-ACE has made it across all of ac-e
+  STATUS_WEBCAT_DUPLICATE = "WC-DUPLICATE"
+
   validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
+
+  def find_duplicates
+    uri_or_ip = self.hostlookup
+    is_ip_address = !!(uri_or_ip  =~ Resolv::IPv4::Regex)
+
+    if is_ip_address
+      ComplaintEntry.open_tickets.where(:ip_address => uri_or_ip).where("id <> #{self.id}").first
+    else
+      ComplaintEntry.open_tickets.where(:uri => uri_or_ip).where("id <> #{self.id}").first
+    end
+
+  end
+
+  def convert_to_duplicate(canonical_entry)
+    self.canonical_id = canonical_entry.id
+    self.status = STATUS_WEBCAT_DUPLICATE
+    self.save
+  end
+
+  def check_and_process_duplicate
+    canonical = find_duplicates
+
+    if canonical.present?
+      convert_to_duplicate(canonical)
+    end
+  end
+
+  def update_duplicates
+
+    self.duplicate_entries.each do |dupe|
+
+      dupe.status = self.status
+      dupe.resolution = self.resolution
+      dupe.resolution_comment = self.resolution_comment
+      dupe.save
+      message = Bridge::ComplaintUpdateStatusEvent.new
+      message.post_complaint(self.complaint)
+    end
+  end
 
   def self.what_time_is_it(value)
     distance_of_time_in_words(value)
