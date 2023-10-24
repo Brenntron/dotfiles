@@ -1503,4 +1503,11 @@ class ComplaintEntry < ApplicationRecord
     return nil
   end
 
+  def ti_status
+    if self.status == STATUS_WEBCAT_DUPLICATE
+      return PENDING
+    else
+      return self.status
+    end
+  end
 end

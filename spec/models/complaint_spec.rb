@@ -236,7 +236,7 @@ describe Complaint do
 
     new_complaint_entry.reload
     new_complaint_entry2.reload
-
+    
     expect(new_complaint_entry2.status).to eql("WC-DUPLICATE")
     expect(new_complaint_entry.duplicate_entries.size).to eql(1)
 
