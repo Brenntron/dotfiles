@@ -1353,6 +1353,7 @@ fetch_external_categories = (entry_id) ->
 process_entry = (entry_data) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
+  # TODO add more of the incorrect submissions here 
   # If resolution is set to fixed, make sure it has categories applied
   if entry_data.categories == null && entry_data.status == "FIXED"
     std_msg_error("Must include at least one category.","", reload: false)
