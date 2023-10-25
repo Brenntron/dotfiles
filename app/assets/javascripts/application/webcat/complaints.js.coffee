@@ -30,7 +30,7 @@ $(document).ready ->
     ajaxStart: () ->
       webcat_loader_timeout = setTimeout ->
         loader.removeClass('hidden')
-      , 500
+      , 100
     ajaxStop: () ->
       clearTimeout(webcat_loader_timeout)
       loader.addClass('hidden')
@@ -861,29 +861,10 @@ window.webcat_reset_search = ()->
   for i in inputs
     i.value = ""
 
-  tag_input = $('#tags-input')[0].selectize
-  assignee_input = $('#assignee-input')[0].selectize
-  category_input = $('#category-input')[0].selectize
-  company_input = $('#company-input')[0].selectize
-  status_input = $('#status-input')[0].selectize
-  resolution_input = $('#resolution-input')[0].selectize
-  customer_input = $('#name-input')[0].selectize
-  complaint_input = $('#complaint-input')[0].selectize
-  channel_input = $('#channel-input')[0].selectize
-  entry_input = $('#entryid-input')[0].selectize
-  complaint_id_input = $('#complaintid-input')[0].selectize
-
-  tag_input.clear()
-  assignee_input.clear()
-  category_input.clear()
-  company_input.clear()
-  status_input.clear()
-  resolution_input.clear()
-  customer_input.clear()
-  complaint_input.clear()
-  channel_input.clear()
-  entry_input.clear()
-  complaint_id_input.clear()
+  els = ['tags','assignee','category','company','status','resolution','name','complaint','channel','entryid','complaintid','jiraid','submitter-type','platform']
+  for el in els
+    selectize_el = $("##{el}-input")[0].selectize
+    selectize_el.clear()
 
 window.multiple_url_categorization = () ->
   loader = $('.lookup-drop-loader')
@@ -2480,7 +2461,7 @@ window.fetch_complaints = () ->
   )
 
 
-open_selected = (selected_rows, toggle) ->
+open_rows = (selected_rows, toggle) ->
   low_rep_entries = []
   error_message = ''
 
@@ -2500,7 +2481,14 @@ open_selected = (selected_rows, toggle) ->
         new_domain = domain
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
-        window.open("http://"+selected_row.ip_address)
+        ipv4_regex = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/gm
+
+        # Because IPv6 includes colons an IPv6 must be wrapped in square brackets if it's used as a hostname.
+        if ipv4_regex.test(selected_row.ip_address)
+          window.open("http://#{selected_row.ip_address}")
+        else
+          console.log "Opening #{selected_row.ip_address}"
+          window.open("http://[#{selected_row.ip_address}]")
 
   if low_rep_entries.length >= 10
     error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores."
@@ -2514,26 +2502,30 @@ open_selected = (selected_rows, toggle) ->
         domains_and_ips.push "<li>#{lre.ip_address}</li>"
 
     error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores. <ul>#{domains_and_ips.join('')}</ul>"
-
-  show_message('error', "#{error_message}", false, '#alertMessage')
+    show_message('error', "#{error_message}", false, '#alertMessage')
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, "true")
+  open_rows(selected_rows, "true")
+
 window.open_nonviewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, "false")
+  open_rows(selected_rows, "false")
+
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
+
   if selected_rows[0].length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
   else
-    open_selected(selected_rows, "true")
+    open_rows(selected_rows, "true")
+
 window.open_all = () ->
   open_all = confirm("Are you sure you want to open ALL the windows on this page?!!")
+
   if (open_all == true)
-    selected_rows = $('#complaints-index').DataTable().rows()
-    open_selected(selected_rows, "true")
+    all_rows = $('#complaints-index').DataTable().rows()
+    open_rows(all_rows, "true")
 
 toggle_selected = (selectedRows, expand)->
   selectState = $('.selected')
@@ -2545,6 +2537,7 @@ toggle_selected = (selectedRows, expand)->
       if $(row).hasClass('shown')
         $(row).find('.expand-row-button-inline').click()
         $(row).addClass('selected')
+
   $(selectState).addClass('selected')
 
 window.collapse_selected =()->
@@ -2795,15 +2788,6 @@ window.verifyMasterSubmit = () ->
 
 window.updateResolutionDialog = (confirm) ->
 
-
-
-#   { status } = row
-#  if status == 'COMPLETED'
-#    reopened = true
-#    disabled = false
-#  if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
-#    invalid_unchanged = true
-#    disabled = false
   $('#complaint_entries_to_update').empty()
   resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected')

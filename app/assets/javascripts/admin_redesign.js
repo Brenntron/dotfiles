@@ -22,6 +22,7 @@
 //= require admin/std_msg
 //= require application/custom
 //= require application/webcat/complaints-support
+//= require application/webcat/categorize_dropdown
 //= require application/webrep/disputes-support
 //= require application/webrep/disputes
 //= require application/webrep/communications
@@ -65,5 +66,6 @@
 //= require application/users
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
-//= require application/webrep/enrich
+//= require application/context-tags
+//= require application/dt-jquery-highlight.js
 //= require admin/admin-tools

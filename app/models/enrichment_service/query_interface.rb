@@ -47,11 +47,15 @@ class EnrichmentService::QueryInterface
   end
 
   def self.get_suggestion(query_item)
-    return 'url' if query_item.match(/https?:\/\//).present?
     return 'sha' if query_item.match(/^[a-fA-F0-9]{64}$/).present?
     ip = IPAddr.new(query_item) rescue nil
     return 'ip' if ip&.ipv4? || ip&.ipv6?
-    'domain'
+
+    parser = Addressable::URI
+    uri = parser.parse(parser.parse(query_item).scheme.nil? ? "http://#{query_item}" : query_item)
+    return 'domain' if uri.hostname == query_item
+
+    'url'
   end
 
   private
