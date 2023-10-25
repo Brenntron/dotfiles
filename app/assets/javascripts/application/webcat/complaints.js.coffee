@@ -49,15 +49,8 @@ getTouchedFormCount = ()->
 # 5 - UNCHANGED with added categories - wrong, should be FIXED res
 # 6 - INVALID with no categories - correct
 # 7 - INVALID with added categories - wrong
-## Need to store initial cats somewhere else so we can compare
 
-
-# TODO If a domain already has a manually assigned category
-#  but we get a new complaint for it, that category is automatically
-#  supplied in the category field … I wouldn't want that to be included in a
-#  bulk submit unless that complaint is marked unchanged
 window.bulk_submit_categorize_entries = () ->
-  debugger
   # grab what has been touched / stored in session
   changes = (sessionStorage.getItem("webcat_entries_changed")|| "" )
   if changes.split(',').length < 0
@@ -75,40 +68,48 @@ window.bulk_submit_categorize_entries = () ->
   submit_table = $('#complete-entries-table')
   incomplete_table = $('#incomplete-entries-table')
 
-  $('#bulk-submit-confirmation').modal('show')
-
-
   $(entries).each ->
-    debugger
-    entry_row = $('#' + this)
-
     entry_id = this
+    entry_row = $('#' + entry_id)
+    curr_cats = $(entry_row).attr('data-categories').split(',')
+    curr_cat_ids = $(entry_row).attr('data-cat-ids').split(',')
     uri = $($(entry_row).find('.complaint-uri-input')[0]).val()
     status = $(entry_row).find('.resolution_radio_button:checked').val()
     comment = $(entry_row).find('textarea.internal-comment').val()
+    user_action = ''
     # TODO add in resolution comments (currently in QA)
 
-    debugger
     if $('#input_cat_' + entry_id).val() != null
-      cat_ids = $('#input_cat_' + entry_id).val().toString()
+      cat_ids_array = $('#input_cat_' + entry_id).val()
+      cat_ids = cat_ids_array.toString()
     else
       cat_ids = ''
-    category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
-    category_names = []
-    category_name.each ->
-      category_names.push($(this).text())
-    category_names = category_names.toString()
+      cat_ids_array = []
 
-    if (cat_ids.length == 0) && status == 'FIXED'
-      incomplete_table_row = '<tr><td>' + entry_id + '</td><td>' + uri + '</td><td>' + category_names + '</td><td>' + status + '</td>'
-      $(incomplete_table).append(incomplete_table_row)
-
-    # INVALID status should always have zero cats on it, even if user tries to add one
+    # compare current categories to what user entered
+    # check with webcat to see if they want more detailed confirmation panel
+    if cat_ids_array.length > curr_cat_ids.length
+      user_action = 'add'
+    else if cat_ids_array.length < curr_cat_ids.length
+      user_action = 'remove'
     else
-      if status == 'INVALID'
-        cat_ids = ''
-        category_names = ''
+      # same number of cats, do they match?
+      if cat_ids_array.sort().toString() == curr_cat_ids.sort().toString()
+        user_action = 'none'
+      else
+        user_action = 'swap'
 
+    category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
+    category_names_arr = []
+    category_name.each ->
+      category_names_arr.push($(this).text())
+    category_names = category_names_arr.toString()
+
+    if (cat_ids.length == 0 && status == 'FIXED') || (user_action == 'none' && status == 'FIXED') || (status == 'UNCHANGED' && user_action != 'none') || (status == 'INVALID' && cat_ids.length != 0)
+      incomplete_table_row = '<tr><td class="entry-id-col">' + entry_id + '</td><td>' + uri + '</td><td>' + category_names_arr.join(', ') + '</td><td>' + status + '</td><td>' + user_action + '</td>'
+      $(incomplete_table).append(incomplete_table_row)
+      incomplete_entries.push(entry_id)
+    else
       entries_to_submit.push({
         entry_id: entry_id,
         prefix: uri,
@@ -120,38 +121,64 @@ window.bulk_submit_categorize_entries = () ->
         uri_as_categorized: uri,
         self_review: self_review
       })
-      submit_table_row = '<tr><td>' + entry_id + '</td><td>' + uri + '</td><td>' + category_names + '</td><td>' + status + '</td>'
+      submit_table_row = '<tr><td class="entry-id-col">' + entry_id + '</td><td>' + uri + '</td><td>' + category_names_arr.join(', ') + '</td><td>' + status + '</td><td>' + user_action + '</td>'
       $(submit_table).append(submit_table_row)
 
-  debugger
   if incomplete_entries.length == 0 && entries_to_submit.length == 0
     return
   else
-    if incomplete_entries != 0
-      $('#incomplete-entries-msg').removeClass('hidden')
-      $('#incomplete-entries-table').removeClass('hidden')
-    if entries_to_submit != 0
-      $('#complete-entries-msg').removeClass('hidden')
-      $('#complete-entries-table').removeClass('hidden')
+    $('#bulk-submit-buttons').removeClass('hidden')
+    if incomplete_entries.length > 0
+      $('#incomplete-entries-wrapper').removeClass('hidden')
+    if entries_to_submit.length > 0
+      $('#complete-entries-wrapper').removeClass('hidden')
 
+  # TODO - after UI testing, remove the action column from the tables, or hide
   # Populate confirmation dialog
-#  $('#bulk-submit-confirmation').modal('show')
+  $('#bulk-submit-confirmation').modal('show')
+  entries_to_submit = JSON.stringify(entries_to_submit)
+  sessionStorage.setItem('webcat-entries-to-submit', entries_to_submit)
 
 
+window.process_bulk_submission = () ->
+  $('#incomplete-entries-wrapper').addClass('hidden')
+  $('#complete-entries-wrapper').addClass('hidden')
+  $('#bulk-submit-buttons').addClass('hidden')
+  $('#bulk-submit-confirmation .loader-wrapper').removeClass('hidden')
+  entries_to_submit = sessionStorage.getItem('webcat-entries-to-submit')
+  data = JSON.parse(entries_to_submit)
+  # loader?
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
+    data: {data: data}
+    success: (response) ->
+      debugger
+      json = JSON.parse(response)
 
-  # TODO - add confirmation modal
-#  std_msg_ajax(
-#    method: 'POST'
-#    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
-#    data: {data: data}
-#    success: (response) ->
-#      debugger
-#      json = JSON.parse(response)
-#      std_msg_success('Success',["All complaints successfully processed."], reload: true)
-#    error: (response) ->
-#      debugger
-#      console.log response
-#)
+      $('#bulk-submit-confirmation').modal('hide')
+      $('#incomplete-entries-wrapper tbody').empty()
+      $('#bulk-submit-confirmation .loader-wrapper').addClass('hidden')
+      success_entries = []
+      entries = $('#complete-entries-wrapper .entry-id-col')
+      $(entries).each ->
+        entry = $(this).text()
+        success_entries.push(entry)
+
+      # remove the entries that were successful from the touched entries
+      sessionStorage.removeItem('webcat-entries-to-submit')
+      changed = sessionStorage.getItem("webcat_entries_changed").split(',')
+      remaining_to_change = changed.filter((x) ->
+        success_entries.indexOf(x) < 0
+      )
+      sessionStorage.setItem("webcat_entries_changed", remaining_to_change)
+      $('#complete-entries-wrapper tbody').empty()
+
+      std_msg_success('Success',["All complaints successfully processed."], reload: true)
+    error: (response) ->
+      console.log response
+      std_msg_error('Error', [response], reload: false)
+)
 
 
 

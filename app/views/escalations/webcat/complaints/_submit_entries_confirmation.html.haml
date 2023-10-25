@@ -8,25 +8,34 @@
         #bulk-submit-modal-title.modal-title Entries to Submit
 
       .modal-body
-        %h5#incomplete-entries-msg.hidden The following entries are incomplete or incorrect
-        %table#incomplete-entries-table.entry-confirmation-table.hidden
-          %thead
-            %tr
-              %th.entry-id-col Entry ID
-              %th URI/IP
-              %th Categories
-              %th.resolution-col Resolution
+        .loader-wrapper.hidden
+          .gear-loader-wrapper
+            = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+          %span.loader-msg Submitting entries...
 
-        %h5#complete-entries-msg.hidden The following entries are ready to be submitted
-        %table#complete-entries-table.entry-confirmation-table.hidden
-          %thead
-            %tr
-              %th.entry-id-col Entry ID
-              %th URI/IP
-              %th Categories
-              %th.resolution-col Resolution
+        #incomplete-entries-wrapper.hidden
+          %h5 The following entries are incomplete or incorrect
+          %table#incomplete-entries-table.entry-confirmation-table
+            %thead
+              %tr
+                %th Entry ID
+                %th URI/IP
+                %th Categories
+                %th.resolution-col Resolution
+                %th
 
-        #bulk-submit-buttons.text-center
+        #complete-entries-wrapper.hidden
+          %h5 The following entries are ready to be submitted
+          %table#complete-entries-table.entry-confirmation-table
+            %thead
+              %tr
+                %th Entry ID
+                %th URI/IP
+                %th Categories
+                %th.resolution-col Resolution
+                %th
+
+        #bulk-submit-buttons.text-center.hidden
           %button.btn.secondary{type: 'button', 'data-dismiss': 'modal'} Cancel
-          %button.btn.btn-primary.primary{type: 'button'} Submit correct entries
+          %button.btn.btn-primary.primary{type: 'button', onclick: 'process_bulk_submission();'} Submit correct entries
 

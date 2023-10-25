@@ -664,18 +664,25 @@ table.dataTable tbody tr.submitting-entry {
 
 // Webcat bulk submission confirmation modal
 #bulk-submit-confirmation {
-
+  .modal-dialog {
+    min-width: 800px;
+  }
   .modal-header {
     color: #fff;
     background-color: #6dbcdb;
     padding: 10px;
     border-radius: 4px 4px 0 0;
     .modal-title {
-      font-weight: 300;
-      font-size: 10px;
+      font-weight: 400;
+      font-size: 14px;
     }
   }
-
+  .loader-wrapper {
+    text-align: center;
+  }
+  .loader-msg {
+    display: block;
+  }
   .entry-id-col {
     width: 80px;
   }

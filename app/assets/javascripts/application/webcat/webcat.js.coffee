@@ -1191,6 +1191,9 @@ load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status)
       if name.trim() == value_name
         category_ids.push(y)
 
+  # adds category ids to row for fetching later
+  $('#' + entry_id).attr('data-cat-ids', category_ids.join(','))
+
   if entry_status == 'COMPLETED'
     # need to initialize the selectize function but disable it here if entry is completed
     $completed_selectize = $('#input_cat_'+ entry_id).selectize {
