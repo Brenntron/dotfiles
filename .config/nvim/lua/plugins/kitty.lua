@@ -1,9 +1,8 @@
 local M = {
-  "fladson/vim-kitty"
+  "fladson/vim-kitty",
+  event = "BufRead",
 }
 
-function M.config()
-  require('vim-kitty').setup {}
-end
+function M.config() end
 
 return M

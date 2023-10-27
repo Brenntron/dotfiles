@@ -54,6 +54,7 @@ function M.config()
       },
       formatting.rubocop,
       formatting.sqlfluff,
+      formatting.stylelint,
       formatting.stylua,
     },
   }

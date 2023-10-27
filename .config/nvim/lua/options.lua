@@ -52,6 +52,7 @@ vim.g.lazygit_floating_window_use_plenary = 1 -- use plenary.nvim to manage floa
 vim.g.lazygit_use_neovim_remote = 1 -- fallback to 0 if neovim-remote is not installed
 vim.g.lazygit_use_custom_config_file_path = 0 -- config file path is evaluated if this value is 1
 vim.g.lazygit_config_file_path = {} -- table of custom config file paths
+vim.g.loaded_perl_provider = 0 -- Disable Perl provider
 
 -- add filetypes
 vim.filetype.add({ extension = { coffee = "coffee" }, { config = "conf" } })

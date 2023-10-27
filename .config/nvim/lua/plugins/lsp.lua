@@ -8,12 +8,6 @@ local M = {
       "folke/neodev.nvim",
        commit = "b094a663ccb71733543d8254b988e6bebdbdaca4",
     },
-    {
-      "hrsh7th/cmp-nvim-lsp",
-      commit = "0e6b2ed705ddcff9738ec4ea838141654f12eeef",
-    },
-    "tamago324/nlsp-settings.nvim",
-    "williambowman/mason-lspconfig.nvim",
   },
 }
 

@@ -10,6 +10,7 @@ local sections = {
   n = { desc = "␀ Null-Ls" },
   s = { desc = "󱙝 Spectre" },
   t = { desc = "󱉯 Trouble" },
+  u = { desc = " Dadbod UI" },
   v = { desc = " Vim"}
 }
 
@@ -34,12 +35,17 @@ maps.n["<S-h>"] = { "<cmd>bprevious<cr>", desc = "Previous buffer" }
 maps.n["<leader>h"] = { "<cmd>nohlsearch<cr>", desc = "Clear highlights" }
 
 -- Write file
-maps.n["<leader>w"] = { "<cmd>w!<cr>", desc = "Save buffer" }
+maps.n["<leader>w"] = { "<cmd>w!<cr>", desc = "Write to file" }
+maps.n["<leader>wq"] = { "<cmd>wq!<cr>", desc = "Write to file and quit" }
+
+-- Quite
+maps.n["<leader>q"] = { "<cmd>q<cr>", desc = "Quit" }
 
 -- Vim commonds
-maps.n["<leader>vbd"] = { "<cmd>bd<cr>", desc = "Close Buffer" }
-maps.n["<leader>vc"] = { "<cmd>close<cr>", desc = "Close Window" }
-maps.n["<leader>vq"] = { "<cmd>q<cr>", desc = "Quit Neovim" }
+maps.n["<leader>v"] = sections.v
+maps.n["<leader>vb"] = { desc = 'Buffer commands' }
+maps.n["<leader>vbd"] = { "<cmd>bdelete<cr>", desc = "Delete Buffer" }
+maps.n["<leader>vbc"] = { "<cmd>Bclose<cr>", desc = "Close Buffer" }
 
 -- Visual --
 -- Better paste
@@ -57,7 +63,9 @@ maps.v["<leader>/"] =
   { "<esc><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", desc = "Toggle comment line" }
 
 -- Dad Bod UI
-maps.n["<S-d>"] = { "<cmd>DBUI<cr>", desc = "Open Dad Bod UI" }
+maps.n["<leader>u"] = sections.u
+maps.n["<leader>ui"] = { "<cmd>DBUI<cr>", desc = "Open Dad Bod UI" }
+maps.n["<leader>ua"] = { "<cmd>DBUIAddConnection", desc = "Add Dad Bod UI connection" }
 
 -- Dap
 maps.n["<leader>d"] = sections.d
