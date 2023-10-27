@@ -1,4 +1,3 @@
-require "utils.lazy-helpers"
 require "options"
 require "keymaps"
 require "autocommands"
