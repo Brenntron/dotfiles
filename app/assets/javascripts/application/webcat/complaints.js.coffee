@@ -11,23 +11,34 @@ init_tooltip = () ->
 
 # Store changes in local storage to see if Bulk Submit can be used
 # call this when resolution is changed or a cat is added
-window.store_entry_changes = (entry_id) ->
-  changes = (sessionStorage.getItem("webcat_entries_changed") || "")
+window.store_entry_changes = (entry_id, type) ->
+  if type == 'submit'
+    changed = "webcat_entries_changed"
+  else if type == 'review'
+    changed = "webcat_entries_reviewed"
+
+  changes = (sessionStorage.getItem(changed) || "")
   unless changes.includes(entry_id)
     entries = changes.split(",").filter((item) -> return item)
     entries.push(entry_id)
     new_changes = entries.join(",")
-    sessionStorage.setItem("webcat_entries_changed", new_changes)
+    sessionStorage.setItem(changed, new_changes)
 
 
 # If user submits individual entry, remove it from the local storage changes
-window.remove_entry_from_changes = (entry_id) ->
-  changes = (sessionStorage.getItem("webcat_entries_changed") || "")
+window.remove_entry_from_changes = (entry_id, type) ->
+  if type == 'submit'
+    changed = "webcat_entries_changed"
+  else if type == 'review'
+    changed = "webcat_entries_reviewed"
+
+  changes = (sessionStorage.getItem(changed) || "")
   if changes.includes(entry_id)
     entries = changes.split(",").filter((item) -> return item)
     submitted_entry = entries.indexOf(entry_id)
     new_changes = entries.splice(submitted_entry, 1)
-    sessionStorage.setItem("webcat_entries_changed", new_changes)
+    sessionStorage.setItem(changed, new_changes)
+
 
 getTouchedFormCount = ()->
   form_item = (sessionStorage.getItem("webcat_entries_changed") || "")
@@ -35,7 +46,7 @@ getTouchedFormCount = ()->
   form_item = form_item.filter((item) -> return item)
   return form_item.length
 
-#NEW
+
 # Bulk webcat entry submit
 # SCENARIOS:
 # 1 - FIXED with new added or changed categories - correct
@@ -58,7 +69,6 @@ window.bulk_submit_categorize_entries = () ->
   entries = changes.split(",").filter((item) -> return item)
   self_review = $('#self_review').is(':checked')
 
-  # array if user tries to submit Fixed w/ no cats
   entries_to_submit = []
   incomplete_entries = []
   submit_table = $('#complete-entries-table')
@@ -195,6 +205,7 @@ window.webcat_reset_search = ()->
 
 # Bulk submission of Pending (in review) entries
 window.review_bulk_submit = () ->
+  debugger
   selected_rows = $("tr.highlight-second-review.shown")
   self_review = $('#self_review').is(':checked')
   if selected_rows.length < 1
@@ -245,7 +256,6 @@ window.review_bulk_submit = () ->
       error: (response) ->
         notice_html = "<p>Something went wrong</p>"
     , this)
-
 
 
 
@@ -503,8 +513,18 @@ $ ->
   # If resolution is changed (to unchanged or invalid) enable the bulk submit button
   $(document).on 'change', '.resolution_radio_button', ->
     id = this.name.split("resolution")[1]
-    store_entry_changes(id)
+    store_entry_changes(id, 'submit')
     $('#master-submit').removeAttr('disabled')
+
+
+  $(document).on 'change', '.review_radio_button', ->
+    id = this.name.split("resolution_review")[1]
+    res = $('input[name="resolution_review' + id + '"').val()
+    if res != 'ignore'
+      $('#submit_changes_' + id).removeAttr('disabled')
+      store_entry_changes(id, 'review')
+    else
+      $('#submit_changes_' + id).attr('disabled', 'true')
 
 
 

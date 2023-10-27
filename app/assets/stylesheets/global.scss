@@ -12246,16 +12246,7 @@ table.rl-content {
   padding-bottom: 6px;
 }
 
-.nested-complaint-editable-table {
-  label.content-label-sm {
-    padding-top: 0 !important;
-  }
-  input[type="radio"].resolution_radio_button {
-    margin-right: 3px;
-  }
-}
-
-input[type="radio"].resolution_radio_button {
+input[type="radio"].resolution_radio_button, input[type="radio"].review_radio_button {
   margin-right: 3px;
 }
 

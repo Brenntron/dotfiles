@@ -25,7 +25,6 @@ $ ->
   clear_stored_entries()
 
 
-  # TODO - just add these classes on the view, no need to call js
   # webcat: have top navigation bar scroll with page per user request
   if $('body').hasClass("escalations--webcat--complaints-controller") && $('body').hasClass("index-action")
     $('#nav-banner').addClass('fixed-nav')
@@ -679,6 +678,10 @@ $ ->
           data: 'uri'
           className: 'uri-col'
           render: (data, type, full, meta) ->
+            if full.status == 'PENDING'
+              disabled = "disabled=true"
+            else
+              disabled = ''
 
             rep = wbrs_display(full.wbrs_score)
             wbrs_score = parseFloat(full.wbrs_score).toFixed(1)
@@ -692,9 +695,9 @@ $ ->
             # disabling domain status since it is the default
             domain_status = 'disabled'
 
-            if (full.status == 'COMPLETED') || (full.subdomain == '' && full.path == '')
+            if (full.status == 'COMPLETED') || (full.status == 'PENDING') || (full.subdomain == '' && full.path == '')
               edit_button_status = 'disabled="disabled"'
-              if full.status == 'COMPLETED'
+              if (full.status == 'COMPLETED') || (full.status == 'PENDING')
                 input_status = 'disabled="disabled"'
               else
                 input_status = ''
@@ -778,6 +781,10 @@ $ ->
           className: 'categories-col alt-col'
           render: (data, type, full, meta) ->
             domain = full.domain || full.ip_address
+            if full.status == 'PENDING'
+              disabled = "disabled=true"
+            else
+              disabled = ''
 
             cat_table =
               '<table class="nested-col-table">' +
@@ -786,7 +793,7 @@ $ ->
                 '<tr><td class="edit-cat-col">' +
                 '<select id="input_cat_' + full.entry_id + '" name="input_cat_' +
                 full.entry_id + '" class="nested-table-input" placeholder="Enter categories / confidence order" ' +
-                'onchange="store_entry_changes(\'' + full.entry_id + '\')">' +
+                'onchange="store_entry_changes(\'' + full.entry_id + '\')"' + disabled + '>' +
                 '</select>' +
                 '</td></tr>' +
                 '</tbody>' +
@@ -803,13 +810,13 @@ $ ->
                 '<div class="submit-res-wrapper pending-ticket-res-wrapper">' +
                   '<div class="res-radio-row">' +
                   '<div class="res-radio-wrapper">' +
-                  '<input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="commit" id="commit' + full.entry_id + '">' +
+                  '<input type="radio" class="review_radio_button" name="resolution_review' + full.entry_id + '" value="commit" id="commit' + full.entry_id + '">' +
                   '<label for="commit' + full.entry_id + '">Commit</label></div>' +
                   '<div class="res-radio-wrapper">' +
-                  '<input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="decline" checked="checked" id="decline' + full.entry_id + '">' +
+                  '<input type="radio" class="review_radio_button" name="resolution_review' + full.entry_id + '" value="decline" id="decline' + full.entry_id + '">' +
                   '<label for="decline' + full.entry_id + '">Decline</label></div>' +
                   '<div class="res-radio-wrapper">' +
-                  '<input type="radio" class="resolution_radio_button" name="resolution_review' + full.entry_id + '" value="ignore" id="ignore' + full.entry_id + '">' +
+                  '<input type="radio" class="review_radio_button" name="resolution_review' + full.entry_id + '" value="ignore" checked="checked" id="ignore' + full.entry_id + '">' +
                   '<label for="ignore' + full.entry_id + '">Ignore (Bulk change only)</label></div>' +
                   '</div>' +
                   '<div class="submit-row">' +
@@ -820,7 +827,7 @@ $ ->
                   '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories">' + full.internal_comment + '</textarea>' +
                   '</div></span>' +
 
-                  '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="updatePending(' + full.entry_id + ')">Submit</button>' +
+                  '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" disabled=true onclick="submit_changes(' + full.entry_id + ')">Submit</button>' +
                   '</div>' +
                 '</div>'
             else
@@ -1349,14 +1356,16 @@ fetch_external_categories = (entry_id) ->
   )
 
 
-
+# Sending individual entry info to the backend
 process_entry = (entry_data) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  # TODO add more of the incorrect submissions here 
+  # TODO add more of the incorrect submissions here
   # If resolution is set to fixed, make sure it has categories applied
   if entry_data.categories == null && entry_data.status == "FIXED"
     std_msg_error("Must include at least one category.","", reload: false)
+  else if entry_data.status == "INVALID" && entry_data.categories != null
+    std_msg_error("Cannot include categories with an INVALID resolution.", "", reload: false)
   else
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
@@ -1364,15 +1373,38 @@ process_entry = (entry_data) ->
       headers: headers
       data: entry_data
       success: (response) ->
-        debugger
         data = $.parseJSON(response)
         msg = $('#' + data.entry_id + ' .temp-msg')
         $(msg).text('Submitted. Refresh to see new results.')
         $(msg).addClass('submitted-row')
-#        remove_entry_from_changes(data.entry_id)
+        remove_entry_from_changes(data.entry_id, 'submit')
       error: (response) ->
         std_msg_error(response,"", reload: false)
     , this)
+
+
+# Sending individual reviewed (PENDING) entry info to the backend
+process_review = (entry_data) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
+    method: 'POST'
+    headers: headers
+    data: {
+      data: [entry_data]
+    }
+    success: (response) ->
+      data = $.parseJSON(response)
+      msg = $('#' + data.entry_id + ' .temp-msg')
+      $(msg).text('Submitted. Refresh to see new results.')
+      $(msg).addClass('submitted-row')
+      remove_entry_from_changes(data.entry_id, 'review')
+    error: (response) ->
+      msg = response.resonseJSON.error
+      std_msg_error("Error submitting reviewed entries", msg, reload: false)
+  , this)
+
+
 
 
 
@@ -1481,13 +1513,25 @@ $ ->
         $(uri_link).attr('onclick', 'update_editURI(\'' + entry_id + '\', \'' + uri_val + '\', \'uri\')')
 
 
+
+
   # New submit function that maintains current layout and spacing
   # by adding a screen overtop the submitted row, does not reload the page
-  # Single submissions only
+  # Single submissions only, both PENDING and non PENDING
   window.submit_changes = (entry_id) ->
     row = $('#' + entry_id)
-    res = $('input[name=resolution' + entry_id + ']:checked').val()
+    curr_status = $(row).attr('data-status')
+    if curr_status == 'PENDING'
+      res = $('input[name=resolution_review' + entry_id+ ']:checked').val()
+    else
+      res = $('input[name=resolution' + entry_id + ']:checked').val()
+      # we are disabling the button if ignore is checked, but just in case
+      if res == 'ignore'
+        return
+
+    ## TODO finish hookup so that PENDING tix can use this function
     comment = $('#internal_comment_' + entry_id).val()
+#    resolution = $('.complaint-resolution' + entry_id).text()
     uri = $('#edit_uri_input_' + entry_id).val()
     if $('#input_cat_'+entry_id).val() != null
       cat_ids = $('#input_cat_'+entry_id).val().toString()
@@ -1522,9 +1566,11 @@ $ ->
       'resolution_comment': '',
       'uri_as_categorized': uri
     }
-    remove_entry_from_changes(entry_id)
-    process_entry(entry_data)
-    # submit for real
+    if curr_status == 'PENDING'
+      process_review(entry_data)
+    else
+      process_entry(entry_data)
+      # submit for real
 
 
 

@@ -216,21 +216,6 @@ window.retrieve_history = (position) ->
 
 
 window.cat_new_url = ()->
-  timesTouched = getTouchedFormCount()
-  if timesTouched > 1
-    std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with categorizing this new item? It will reload the page and you will lose your changes.",
-      [],
-      {
-        reload: false,
-        confirm_dismiss: true,
-        confirm: ->
-          processSubmitNewURL()
-      })
-  else
-    processSubmitNewURL()
-
-processSubmitNewURL = () ->
   data = {}
   isEmpty = true
   $('#categorize-urls').dropdown('toggle')
