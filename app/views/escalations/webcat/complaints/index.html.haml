@@ -60,6 +60,8 @@
         %button.secondary{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Cancel'} Cancel
 
 = render 'escalations/webcat/complaints/submit_entries_confirmation'
+= render 'escalations/webcat/complaints/submit_reviewed_confirmation'
+
 
 - if current_user.is_webcat_manager?
   = render 'escalations/webcat/complaints/wbnp_full_report'

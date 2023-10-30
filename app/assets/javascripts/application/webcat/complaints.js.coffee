@@ -111,9 +111,10 @@ window.bulk_submit_categorize_entries = () ->
       category_names_arr.push($(this).text())
     category_names = category_names_arr.toString()
 
+    table_row = '<tr><td class="entry-id-col">' + entry_id + '</td><td>' + uri + '</td><td>' + category_names_arr.join(', ') + '</td><td>' + status + '</td><td>' + user_action + '</td>'
+
     if (cat_ids.length == 0 && status == 'FIXED') || (user_action == 'none' && status == 'FIXED') || (status == 'UNCHANGED' && user_action != 'none') || (status == 'INVALID' && cat_ids.length != 0)
-      incomplete_table_row = '<tr><td class="entry-id-col">' + entry_id + '</td><td>' + uri + '</td><td>' + category_names_arr.join(', ') + '</td><td>' + status + '</td><td>' + user_action + '</td>'
-      $(incomplete_table).append(incomplete_table_row)
+      $(incomplete_table).append(table_row)
       incomplete_entries.push(entry_id)
     else
       entries_to_submit.push({
@@ -127,8 +128,7 @@ window.bulk_submit_categorize_entries = () ->
         uri_as_categorized: uri,
         self_review: self_review
       })
-      submit_table_row = '<tr><td class="entry-id-col">' + entry_id + '</td><td>' + uri + '</td><td>' + category_names_arr.join(', ') + '</td><td>' + status + '</td><td>' + user_action + '</td>'
-      $(submit_table).append(submit_table_row)
+      $(submit_table).append(table_row)
 
   if incomplete_entries.length == 0 && entries_to_submit.length == 0
     return
@@ -153,14 +153,16 @@ window.process_bulk_submission = () ->
   $('#bulk-submit-confirmation .loader-wrapper').removeClass('hidden')
   entries_to_submit = sessionStorage.getItem('webcat-entries-to-submit')
   data = JSON.parse(entries_to_submit)
-  # loader?
+
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
     data: {data: data}
     success: (response) ->
-      debugger
+      #TODO - need to figure out partial success / fails
+
       json = JSON.parse(response)
+      console.log json
 
       $('#bulk-submit-confirmation').modal('hide')
       $('#incomplete-entries-wrapper tbody').empty()
@@ -180,14 +182,14 @@ window.process_bulk_submission = () ->
       sessionStorage.setItem("webcat_entries_changed", remaining_to_change)
       $('#complete-entries-wrapper tbody').empty()
 
-      std_msg_success('Success',["All complaints successfully processed."], reload: true)
+      std_msg_success('Success',["All entries successfully processed."], reload: true)
     error: (response) ->
       console.log response
-      std_msg_error('Error', [response], reload: false)
+      $('#bulk-submit-confirmation').modal('hide')
+      $('#bulk-submit-confirmation .loader-wrapper').addClass('hidden')
+      msg = response.responseJSON.error
+      std_msg_error('Error processing entries', [msg], reload: false)
 )
-
-
-
 
 
 
@@ -205,57 +207,113 @@ window.webcat_reset_search = ()->
 
 # Bulk submission of Pending (in review) entries
 window.review_bulk_submit = () ->
-  debugger
-  selected_rows = $("tr.highlight-second-review.shown")
-  self_review = $('#self_review').is(':checked')
-  if selected_rows.length < 1
-    return
-  entries_to_update = []
-  selected_rows.each ->
-    entry_id = this.id
-    prefix = $('#complaint_prefix_'+entry_id)[0].value
-    status = $('[name=resolution_review_'+entry_id+']:checked').val()
-    comment = $('#complaint_comment_'+entry_id)[0].value
-    resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
-    resolution = $('.complaint-resolution'+entry_id).text()
-    #get the selectize control for the category input
-    selectizeControl = $('#input_cat_'+entry_id).selectize()[0].selectize
-    if $('#input_cat_'+entry_id).val() == null
-      categories = null
-    else
-      categories = $('#input_cat_'+entry_id).val().toString()
+  # grab what has been touched / stored in session
+  changes = (sessionStorage.getItem("webcat_entries_reviewed")|| "" )
+  if (changes.split(',').length < 0) || (changes == '')
+    std_msg_error('No changes to submit', ['Select "Commit" or "Decline on at least 1 entry."'])
 
-    named_categories = ""
-    if categories == null
-      cat_array = []
+  entries = changes.split(",").filter((item) -> return item)
+  self_review = $('#self_review').is(':checked')
+
+  entries_to_update = []
+  declined_entries = []
+  approved_entries = []
+  declined_table = $('#declined-entries-table')
+  approved_table = $('#approved-entries-table')
+
+  $(entries).each ->
+    entry_id = this
+    entry_row = $('#' + entry_id)
+    uri = $($(entry_row).find('.complaint-uri-input')[0]).val()
+    status = $(entry_row).find('.review_radio_button:checked').val()
+    comment = $(entry_row).find('textarea.internal-comment').val()
+
+    if $('#input_cat_' + entry_id).val() != null
+      cat_ids_array = $('#input_cat_' + entry_id).val()
+      cat_ids = cat_ids_array.toString()
     else
-      cat_array = categories.split(',')
-      for cat, i in cat_array
-        named_categories = named_categories + selectizeControl.getItem(cat).text()
-        if i < cat_array.length
-          named_categories += ", "
+      cat_ids = ''
+      cat_ids_array = []
+
+    category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
+    category_names_arr = []
+    category_name.each ->
+      category_names_arr.push($(this).text())
+    category_names = category_names_arr.toString()
+
+    table_row = '<tr><td class="entry-id-col">' + entry_id + '</td><td>' + uri + '</td><td>' + category_names_arr.join(', ') + '</td>'
+
+    if status == 'commit'
+      $(approved_table).append(table_row)
+      approved_entries.push(entry_id)
+    else if status == 'decline'
+      $(declined_table).append(table_row)
+      declined_entries.push(entry_id)
+
     if status != "ignore"
       entries_to_update.push({
-        'self_review': self_review,
-        'id': entry_id,
-        'prefix': prefix,
-        'commit':status,
-        'status':resolution,
-        'comment':comment,
-        'resolution_comment': resolution_comment,
-        'categories': categories,
-        'category_names':named_categories
+        id: entry_id,
+        prefix: uri,
+        commit: status,
+#        status: resolution, #I dont see the old var in current dom??
+        comment: comment,
+#        resolution_comment: resolution_comment,
+        categories: cat_ids,
+        category_names: category_names,
+        self_review: self_review
       })
 
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
-      method: 'POST'
-      data: {data: entries_to_update}
-      success: (response) ->
-        window.location.reload(false);
-      error: (response) ->
-        notice_html = "<p>Something went wrong</p>"
-    , this)
+  if entries_to_update.length > 0
+    $('#bulk-submit-review-buttons').removeClass('hidden')
+    if approved_entries.length > 0
+      $('#approved-entries-wrapper').removeClass('hidden')
+    if declined_entries.length > 0
+      $('#declined-entries-wrapper').removeClass('hidden')
+
+  $('#bulk-submit-review-confirmation').modal('show')
+  entries_to_update = JSON.stringify(entries_to_update)
+  sessionStorage.setItem('webcat-reviewed-entries-to-submit', entries_to_update)
+
+
+
+window.process_bulk_reviews = () ->
+  debugger
+  $('#bulk-submit-review-buttons').addClass('hidden')
+  $('#approved-entries-wrapper').addClass('hidden')
+  $('#declined-entries-wrapper').addClass('hidden')
+  $('#bulk-submit-review-confirmation .loader-wrapper').removeClass('hidden')
+  reviewed_entries =   sessionStorage.getItem('webcat-reviewed-entries-to-submit')
+  data = JSON.parse(reviewed_entries)
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
+    method: 'POST'
+    data: {data: reviewed_entries}
+    success: (response) ->
+      debugger
+      #TODO - need to figure out partial success / fails
+      json = JSON.parse(response)
+      console.log json
+
+      $('#bulk-submit-review-confirmation').modal('hide')
+
+      sessionStorage.removeItem('webcat-reviewed-entries-to-submit')
+      sessionStorage.removeItem('webcat_entries_reviewed')
+
+      $('#approved-entries-wrapper tbody').empty()
+      $('#declined-entries-wrapper tbody').empty()
+      $('#bulk-submit-review-confirmation .loader-wrapper').addClass('hidden')
+
+      std_msg_success('Success',["All reviewed entries successfully processed."], reload: true)
+
+    error: (response) ->
+      debugger
+      console.log response
+      $('#bulk-submit-review-confirmation').modal('hide')
+      $('#bulk-submit-review-confirmation .loader-wrapper').addClass('hidden')
+      msg = response.responseJSON.error
+      std_msg_error('Error processing reviewed entries', [msg], reload: false)
+  , this)
 
 
 

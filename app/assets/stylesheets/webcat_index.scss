@@ -663,7 +663,7 @@ table.dataTable tbody tr.submitting-entry {
 
 
 // Webcat bulk submission confirmation modal
-#bulk-submit-confirmation {
+.bulk-entries-modal {
   .modal-dialog {
     min-width: 800px;
   }

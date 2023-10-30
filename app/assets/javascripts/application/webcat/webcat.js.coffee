@@ -20,6 +20,9 @@ window.wbrs_display = (score) ->
 window.clear_stored_entries = () ->
   sessionStorage.getItem("webcat_entries_changed") || ""
   sessionStorage.setItem("webcat_entries_changed", "")
+  sessionStorage.getItem("webcat_entries_reviewed") || ""
+  sessionStorage.setItem("webcat_entries_reviewed", "")
+
 
 $ ->
   clear_stored_entries()
@@ -419,10 +422,6 @@ $ ->
       initComplete: ->
         # Get display prefs
         get_display_prefs()
-
-        # Grab current categories per entry
-        rows = $('#complaints-index').find('.cat-index-main-row')
-        get_current_cats(rows)
 
         input = $('.dataTables_filter input').unbind()
         self = @api()
@@ -1253,14 +1252,14 @@ load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status)
     }
 
 
-
+#TODO - this looks like it fetches for all results? - change to do results on page only
+# Also seems to be hit multiple times in places, find out why
 fetch_external_categories = (entry_id) ->
   std_msg_ajax(
     method: 'POST'
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': entry_id}
     success: (response) ->
-
       row_id = JSON.parse(this.data).id
       { current_category_data : current_categories, master_categories, sds_category, sds_domain_category} = JSON.parse(response)
 
@@ -1352,6 +1351,8 @@ fetch_external_categories = (entry_id) ->
           minWidth: '820'
 
     error: (response) ->
+      # maintain this for troubleshooting external api responses
+      console.log response
       current_categories = ''
   )
 
@@ -1379,6 +1380,7 @@ process_entry = (entry_data) ->
         $(msg).addClass('submitted-row')
         remove_entry_from_changes(data.entry_id, 'submit')
       error: (response) ->
+        debugger
         std_msg_error(response,"", reload: false)
     , this)
 
