@@ -1389,7 +1389,8 @@ process_entry = (entry_data) ->
         remove_entry_from_changes(data.entry_id, 'submit')
       error: (response) ->
         debugger
-        std_msg_error(response,"", reload: false)
+        msg = response.resonseJSON.error
+        std_msg_error("Error submitting entries",msg, reload: false)
     , this)
 
 
@@ -1539,7 +1540,6 @@ $ ->
       if res == 'ignore'
         return
 
-    ## TODO finish hookup so that PENDING tix can use this function
     comment = $('#internal_comment_' + entry_id).val()
 #    resolution = $('.complaint-resolution' + entry_id).text()
     uri = $('#edit_uri_input_' + entry_id).val()
@@ -1684,6 +1684,7 @@ window.find_saved_search_by_name = (name) ->
 
 $ ->
 
+  # TODO - lots of tooltip initializing, see if this can be consolidated
 #  Webcat toolbar and wbnp status report tooltips need slight adjustment
   $('.esc-tooltipped-webcat-toolbar').tooltipster
     theme: [

@@ -330,41 +330,46 @@ window.process_bulk_reviews = () ->
 
 ## Allows analyst to set ticket status to reopened and allows them to interact
 # with the submission form
-window.reopenComplaint = (entry_id, button) ->
-
-# Getting all the fields that need to be interactive if reopened
-  # Changing these on the fly so the full page doesn't need to be reloaded
-  editable_stuff = $(button).parents('.nested-complaint-editable-data')[0]
-  inputs = $(editable_stuff).find('.nested-table-input')
-  radios = $(editable_stuff).find('.resolution_radio_button')
-  wrapper = $(button).parents('.nested-complaint-data-wrapper')[0]
-  nested_row = $(wrapper).parents('tr')[0]
-  parent_row = $(nested_row).prev()
-  status_col = $(parent_row).find('.state-col')
-
+window.reopenComplaint = (entry_id) ->
+  # Redrawing the row redraws the whole datatable and removes the 'reopened' entry from the results
+  # Faking the update on the front after success to avoid DT resetting
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/reopen_complaint_entry'
     method: 'POST'
     data: {'complaint_entry_id': entry_id}
     success: (response) ->
-      $(inputs).each ->
-        $(this).prop('disabled', false)
-      $(radios).each ->
-        $(this).prop('disabled', false)
-      select_input =   $('#input_cat_' + entry_id)[0].selectize
-      select_input.enable()
-      $("#reopen_" + entry_id).addClass('hidden')
-      $("#submit_changes_" + entry_id).removeClass('hidden')
-      $(status_col).text('REOPENED')
+      debugger
+    entry_row = $('#' + entry_id)
+
+    $(entry_row).find('.state-row td').text('REOPENED')
+    $(entry_row).find('.resolution_radio_button').each ->
+      $(this).prop('disabled', false)
+    $('#edit_uri_input_' + entry_id).removeAttr('disabled')
+
+    # res comment when avail
+    cat_input = $('#input_cat_' + entry_id)
+    cat_input =   $('#input_cat_' + entry_id)[0].selectize
+    cat_input.enable()
+
+    comment_dropdown = $('#internal_comment_dropdown_' + entry_id)
+    comment = $('#internal_comment_' + entry_id)
+    if $(comment).text() != ''
+      comment_text = $(comment).text()
+    else
+      comment_text = ''
+    comment_input = '<textarea id="' + entry_id + '" placeholder="Internal note for choosing categories" class="intenral-comment">' + comment_text + '</textarea>'
+    comment.remove()
+    $(comment_dropdown).append(comment_input)
+
+    button = $('#reopen_' + entry_id)
+    $(button).attr('onclick', 'submit_changes(' + entry_id + ');')
+    $(button).text('Submit')
+    $(button).attr('id', 'submit_changes_' + entry_id)
+
     error: (response) ->
+      console.log response
       std_msg_error(response,"", reload: false)
   )
-
-
-
-
-
-
 
 
 
@@ -582,9 +587,3 @@ $ ->
   $('.email-row').find('.case-history-author').each ->
     if $(this).text().length > 28
       $(this).addClass('break-word')
-
-
-
-
-
-
