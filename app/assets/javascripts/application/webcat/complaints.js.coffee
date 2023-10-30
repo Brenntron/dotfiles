@@ -277,7 +277,6 @@ window.review_bulk_submit = () ->
 
 
 window.process_bulk_reviews = () ->
-  debugger
   $('#bulk-submit-review-buttons').addClass('hidden')
   $('#approved-entries-wrapper').addClass('hidden')
   $('#declined-entries-wrapper').addClass('hidden')
@@ -288,9 +287,8 @@ window.process_bulk_reviews = () ->
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
-    data: {data: reviewed_entries}
+    data: {data: data}
     success: (response) ->
-      debugger
       #TODO - need to figure out partial success / fails
       json = JSON.parse(response)
       console.log json
@@ -307,7 +305,6 @@ window.process_bulk_reviews = () ->
       std_msg_success('Success',["All reviewed entries successfully processed."], reload: true)
 
     error: (response) ->
-      debugger
       console.log response
       $('#bulk-submit-review-confirmation').modal('hide')
       $('#bulk-submit-review-confirmation .loader-wrapper').addClass('hidden')
