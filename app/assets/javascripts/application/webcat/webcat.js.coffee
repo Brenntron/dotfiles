@@ -1227,15 +1227,23 @@ load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status)
       options: cat_options,
       items: category_ids,
       onItemAdd: ->
-        store_entry_changes(entry_id)
-        if verifyMasterSubmit() == true
-          $('#master-submit').prop('disabled', false)
-      onItemRemove: ->
-        store_entry_changes(entry_id)
-        if verifyMasterSubmit() == true
-          $('#master-submit').prop('disabled', false)
+        if entry_status == 'PENDING'
+          store_entry_changes(entry_id, 'review')
         else
-          $('#master-submit').prop('disabled', true)
+          store_entry_changes(entry_id, 'submit')
+          if verifyMasterSubmit() == true
+            $('#master-submit').prop('disabled', false)
+          else
+            $('#master-submit').prop('disabled', true)
+      onItemRemove: ->
+        if entry_status == 'PENDING'
+          store_entry_changes(entry_id, 'review')
+        else
+          store_entry_changes(entry_id, 'submit')
+          if verifyMasterSubmit() == true
+            $('#master-submit').prop('disabled', false)
+          else
+            $('#master-submit').prop('disabled', true)
       score: (input) ->
         #  Adding some customization for autofill
         #  restricting on certain cats to avoid accidental categorization

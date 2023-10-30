@@ -77,8 +77,17 @@ window.bulk_submit_categorize_entries = () ->
   $(entries).each ->
     entry_id = this
     entry_row = $('#' + entry_id)
-    curr_cats = $(entry_row).attr('data-categories').split(',')
-    curr_cat_ids = $(entry_row).attr('data-cat-ids').split(',')
+
+    if $(entry_row).attr('data-categories') == ''
+      curr_cats = ''
+    else
+      curr_cats = $(entry_row).attr('data-categories').split(',')
+
+    if $(entry_row).attr('data-cat-ids') == ''
+      curr_cat_ids = ''
+    else
+      curr_cat_ids = $(entry_row).attr('data-cat-ids').split(',')
+
     uri = $($(entry_row).find('.complaint-uri-input')[0]).val()
     status = $(entry_row).find('.resolution_radio_button:checked').val()
     comment = $(entry_row).find('textarea.internal-comment').val()
@@ -94,9 +103,14 @@ window.bulk_submit_categorize_entries = () ->
 
     # compare current categories to what user entered
     # check with webcat to see if they want more detailed confirmation panel
-    if cat_ids_array.length > curr_cat_ids.length
+    if curr_cat_ids == ''
+      curr_cat_count = 0
+    else
+      curr_cat_count = curr_cat_ids.length
+
+    if cat_ids_array.length > curr_cat_count
       user_action = 'add'
-    else if cat_ids_array.length < curr_cat_ids.length
+    else if cat_ids_array.length < curr_cat_count
       user_action = 'remove'
     else
       # same number of cats, do they match?
@@ -159,8 +173,7 @@ window.process_bulk_submission = () ->
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
     data: {data: data}
     success: (response) ->
-      #TODO - need to figure out partial success / fails
-
+      #TODO - need to figure out partial success / fails w/ api calls
       json = JSON.parse(response)
       console.log json
 
@@ -385,67 +398,25 @@ window.fetch_complaints = () ->
 
 
 #bulk submit old
-# For bulk submissions do we reload the page or do the same thing that we do w/ indv submissions
-# confirm with Adam
+# TODO - api error handling, below for reference temporarily
 #processSubmitMaster = () ->
-#  debugger
-
 #  std_msg_ajax(
 #    method: 'POST'
 #    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
 #    data: {data: data}
 #    success: (response) ->
 #      errors = false
-#
-#      nil_categories_errors = []
-#      api_errors = []
-#      success = []
-#
-#      json = JSON.parse(response)
-#
-#      table = $('#complaints-index').DataTable()
-#
-#      for entry in json
-#        if entry.error == true && entry.reason == 'nil_categories'
-#          nil_categories_errors.push(entry.entry_id)
-#          errors = true
-#        else if entry.error == true && entry.reason == 'api'
-#          api_errors.push(entry.entry_id)
-#          errors = true
-#        else
-#          success.push(entry.entry_id)
+##      api_errors = []
 
-#
-#      success_boiler_plate = "The following entries were successfully saved: " + success.toString() + "<br>"
 #      api_boiler_plate =  "The following entries could not be saved due to API errors: " + api_errors.toString() + "<br>"
-#      no_cats_boiler_plate = "The following entries could not be saved (no categories): " + nil_categories_errors.toString()
 #
 #      error_msg = ''
-#
-#      if success.length > 0
-#        error_msg += success_boiler_plate
-#      if api_errors.length > 0
-#        error_msg += api_boiler_plate
-#
-#      if nil_categories_errors.length > 0
-#        error_msg += no_cats_boiler_plate
-#
+
 #      if errors == true
 #        std_msg_error(error_msg,"")
 #      else
-#        std_msg_success('Success',["All complaints successfully processed."], reload: true)
-#
-#      tds = $('#complaints-index tbody').closest('td')
-#      for td in tds
-#        if td.className == ''
-#          td.classList.add('nested-complaint-data-wrapper')
-#
-#      $('#master-submit').prop('disabled', false)
-#    error: (response) ->
 #      std_msg_error("Unable to submit changes for selected entries.","", reload: false)
-#      $('#master-submit').prop('disabled', false)
-#
-#  , this)
+
 
 
 
