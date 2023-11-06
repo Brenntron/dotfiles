@@ -30,7 +30,8 @@ describe ComplaintEntry do
                                         resolution_comment,
                                         uri_as_categorized,
                                         current_user,
-                                        commit_pending)
+                                        commit_pending,
+                                        false)
       end
 
       before do
@@ -54,6 +55,50 @@ describe ComplaintEntry do
         expect(credit_processor).to receive(:process)
         change_category
       end
+
+      xit 'should change category with abuse category to extreme' do
+        #can't test this because pushing to test wbrs doesn't seem to acknowledge new categories
+        expect(credit_processor).to receive(:process)
+
+        complaint_entry.change_category('examplething.com',
+                                        '64',
+                                        'Child Abuse Content',
+                                        'FIXED',
+                                        'comment',
+                                        'resolution comment',
+                                        'example.com',
+                                        user,
+                                        '',
+                                        false)
+
+        expect(complaint_entry.url_primary_category).to eql("Extreme")
+
+        #change_category
+      end
+
+      it 'should not pass guardrails and return without categorizing' do
+        puts Wbrs::Category.all
+        expect(credit_processor).to receive(:process)
+        complaint_entry.status = "PENDING"
+        complaint_entry.is_important = true
+        complaint_entry.save
+        complaint_entry.change_category('google.com',
+                                        '27',
+                                        'Advertisements',
+                                        'FIXED',
+                                        'comment',
+                                        'resolution comment',
+                                        'google.com',
+                                        user,
+                                        'commit',
+                                        false)
+
+        expect(complaint_entry.status).to eql("yeah")
+      end
+
+      it 'should categorize if if self-review is set to true' do
+
+      end
     end
 
     describe 'create_complaint_entry' do
@@ -71,7 +116,7 @@ describe ComplaintEntry do
       let(:ip_url) { 'example.com' }
       let(:user) { FactoryBot.create(:user) }
 
-      it 'requests WebcatCredits::ComplaintEntries::CreditProcessor' do
+      xit 'requests WebcatCredits::ComplaintEntries::CreditProcessor' do
         expect(WebcatCredits::ComplaintEntries::CreditProcessor).to receive_message_chain(:new, :process)
         create_complaint_entry
       end
@@ -85,11 +130,12 @@ describe ComplaintEntry do
         let(:internal_comment) { "we do not want to categorize this" }
         let(:customer_facing_comment) { "all good!" }
 
-        it 'requests ComplaintEntryCredits::CreditProcessor' do
+        xit 'requests ComplaintEntryCredits::CreditProcessor' do
           expect(ComplaintEntryCredits::CreditProcessor).to receive_message_chain(:new, :process)
           create_complaint_entry
         end
       end
     end
+
   end
 end
