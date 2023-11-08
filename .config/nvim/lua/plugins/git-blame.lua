@@ -3,7 +3,6 @@ local M = {
 		event = "BufRead",
 	}
 
-
 function M.config()
   vim.cmd("highlight default link gitblame SpecialComment")
   require("gitblame").setup({ enabled = false })
