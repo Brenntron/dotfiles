@@ -1,6 +1,8 @@
 local M = {
   "Tastyep/structlog.nvim",
-  lazy = true
+  lazy = true,
 }
+
+function M.config() end
 
 return M

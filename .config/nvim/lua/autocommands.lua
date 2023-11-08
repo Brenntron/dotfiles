@@ -69,4 +69,3 @@ vim.api.nvim_create_autocmd({ "VimResized" }, {
   end,
 })
 
-

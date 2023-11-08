@@ -68,7 +68,6 @@ function M.config()
     pickers = {
       buffers = {
         theme = "dropdown",
-        previewer = false,
         initial_mode = "normal",
         mappings = {
           i = {
