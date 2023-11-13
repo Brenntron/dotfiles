@@ -1005,7 +1005,9 @@ class AutoResolve
       return true
 
     end
-
+    #setting this to NEW here otherwise it will perpetually be in PROCESSING
+    dispute_entry.status = DisputeEntry::NEW
+    dispute_entry.save
     return false
 
   end
