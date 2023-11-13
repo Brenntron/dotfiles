@@ -105,7 +105,10 @@ class ComplaintEntry < ApplicationRecord
   def return_complaint(current_user)
 
     if self.user != User.where(display_name: 'Vrt Incoming').first
-
+      if status == STATUS_COMPLETED
+        return("Already completed")
+      end
+      # TODO: refactor nested if statements
       if !self.is_important
         if status!="COMPLETED"
           if self.user.id != current_user.id
