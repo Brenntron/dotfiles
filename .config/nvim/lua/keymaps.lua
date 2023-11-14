@@ -46,6 +46,7 @@ maps.n["<leader>v"] = sections.v
 maps.n["<leader>vb"] = { desc = 'Buffer commands' }
 maps.n["<leader>vbd"] = { "<cmd>bdelete<cr>", desc = "Delete Buffer" }
 maps.n["<leader>vbc"] = { "<cmd>Bclose<cr>", desc = "Close Buffer" }
+maps.n["<leader>vl"] = { "<cmd>Lazy<cr>", desc = "Lazy Plugin Manager" }
 
 -- Visual --
 -- Better paste
