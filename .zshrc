@@ -1,12 +1,3 @@
-# Handle Mac platforms
-CPU=$(uname -p)
-if [[ "$CPU" == "arm" ]]; then
-    export PATH="/opt/homebrew/bin:$PATH"
-    alias oldbrew=/usr/local/bin/brew
-else
-    export PATH="/usr/local/bin:$PATH"
-fi
-
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -31,6 +22,8 @@ export ZSH="${HOME}/.oh-my-zsh"
 # If set to an empty array, this variable will have no effect.
 # ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
 ZSH_THEME="powerlevel10k/powerlevel10k"
+
+source $HOME/.oh-my-zsh/custom/themes/powerlevel10k/powerlevel10k.zsh-theme
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -186,6 +179,7 @@ plugins=(
   docker-compose
   fzf
   gh
+  gpg-agent
   git
   rails
   ruby
@@ -193,9 +187,6 @@ plugins=(
   yarn
 )
 
-ssh-add --apple-use-keychain
-
-export ZPLUG_HOME=/usr/local/opt/zplug
 source $ZPLUG_HOME/init.zsh
 
 zplug "dracula/zsh", as:theme
@@ -228,9 +219,12 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
 
-eval "$(starship init zsh)"
+if [[ $(uname) == "Linux" ]]; then
+  source .config/linux/linux.zsh
+else
+  source .config/osx/osx.zsh
+fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -240,8 +234,6 @@ eval "$(starship init zsh)"
 export FZF_DEFAULT_COMMAND='rg --files --hidden'
 export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4 --preview "bat --color=always {}" --preview-window "~3"'
 
-export KERL_CONFIGURE_OPTIONS="--disabled-debug --without-javac --disable-hipe --with-ssl=$(brew --prefix openssl)"
-
 . ~/.asdf/plugins/java/set-java-home.zsh
 
 if [ -x "$(command -v exa)" ]; then
@@ -250,33 +242,20 @@ if [ -x "$(command -v exa)" ]; then
     alias tree="exa --tree"
 fi
 
-if [ -x "$(command -v cat)" ]; then
-  alias cat="bat"
+if [ -x "$(command -v colorls)" ]; then
+  source $(dirname $(gem which colorls))/tab_complete.sh
+  alias lc='colorls -lA --sd --dark'
 fi
-
-# Use homebrew installed gcc
-alias cc='gcc'
 
 # Set alias for dotfiles config
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
 export PATH="${HOME}/.local/bin:$PATH"
-export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
-export PATH="/usr/local/opt/openssl@3/bin:$PATH"
-export PATH="/usr/local/opt/llvm@13/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
-export PATH="$PATH::$(yarn global bin)"
 
-export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-export RUBY_CONFIGURE_OPTS="--with-libyaml-dir=$(brew --prefix libyaml) --with-openssl-dir=$(brew --prefix openssl@3)"
 export XDG_CONFIG_HOME="${HOME}/.config"
 export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
-export LDFLAGS="-L/usr/local/opt/llvm@13/lib/c++ -Wl,-rpath,/usr/local/opt/llvm@13/lib/c++"
-export CPPFLAGS="-I/usr/local/opt/llvm@13/include"
 export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
-export NODE_OPTIONS="--max-old-space-size=8192"
-
-source "$(brew --prefix zsh-syntax-highlighting)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # Precommand for kitty tab title
 precmd () {print -Pn "\e]0;%~\a"}
