@@ -206,7 +206,7 @@ class DisputeEntry < ApplicationRecord
       end
 
       th_packet[:rule_hits] = rule_hits_snapshot.to_json
-      TelemetryHistory.save_dispute_entry_snapshot(th_packet, new_dispute_entry, true)
+      TelemetryHistory.save_dispute_entry_snapshot(th_packet, new_dispute_entry.id, true)
       return new_dispute_entry
     rescue Exception => ex
       log_exception(ex)
@@ -762,7 +762,7 @@ class DisputeEntry < ApplicationRecord
 
     end
     th_packet[:rule_hits] = rule_hits_snapshot
-    TelemetryHistory.save_dispute_entry_snapshot(th_packet, self, false)
+    TelemetryHistory.save_dispute_entry_snapshot(th_packet, self.id, false)
     save
   end
 
