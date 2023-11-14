@@ -762,7 +762,7 @@ class DisputeEntry < ApplicationRecord
 
     end
     th_packet[:rule_hits] = rule_hits_snapshot
-    TelemetryHistory.save_dispute_entry_snapshot(th_packet, self. false)
+    TelemetryHistory.save_dispute_entry_snapshot(th_packet, self, false)
     save
   end
 
