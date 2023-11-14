@@ -8,6 +8,7 @@ local M = {
       "folke/neodev.nvim",
        commit = "b094a663ccb71733543d8254b988e6bebdbdaca4",
     },
+    { "Smitesh/nvim-navic" }
   },
 }
 
@@ -27,6 +28,15 @@ function M.config()
         "additionalTextEdits",
       },
     }
+  end
+
+  local function on_attach(client, bufnr)
+    if client.server_capabilities.documentSymbolProvider then
+      local status_ok, navic = pcall(require, "nvim-navic")
+      if status_ok then
+        return navic.attach(client, bufnr)
+      end
+    end
   end
 
   local diagnostics_icons = require("utils.icons").diagnostics
@@ -80,6 +90,7 @@ function M.config()
   for _, server in ipairs(servers) do
     local opts = {
       capabilities = common_capabilities(),
+      on_attach = on_attach
     }
 
     local require_ok, settings = pcall(require, "lspsettings." .. server)
@@ -98,6 +109,7 @@ function M.config()
   -- Setup coffeesense as it is not included in mason-lspconfig
   local coffeesense_opts = {
     capabilities = common_capabilities(),
+    on_attach = on_attach
   }
   local require_ok, settings = pcall(require, "lspsettings.coffeesense")
 

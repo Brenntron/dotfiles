@@ -66,10 +66,10 @@ function M.config()
             unstaged = icons.git.FileUnstaged,
             untracked = icons.git.FileUntracked,
           },
-          padding = " ",
-          symlink_arrow = icons.ui.symlink_arrow,
           symlink = icons.ui.FileSymlink
         },
+        padding = " ",
+        symlink_arrow = icons.ui.symlink_arrow,
       },
       group_empty = false,
       highlight_git = false,
