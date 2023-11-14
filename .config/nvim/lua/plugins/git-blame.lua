@@ -5,7 +5,7 @@ local M = {
 
 function M.config()
   vim.cmd("highlight default link gitblame SpecialComment")
-  require("gitblame").setup({ enabled = false })
+  require("gitblame").setup({ enabled = true })
 end
 
 return M

@@ -31,7 +31,7 @@ function M.config()
     sources = {
       -- completions
       completions.spell.with {
-        filetypes = { "coffee", "erb", "eruby", "haml", "html", "markdown" }
+        filetypes = { "coffee", "erb", "eruby", "haml", "html", "markdown" },
       },
       -- diagnostics
       diagnostics.codespell.with {
@@ -79,16 +79,6 @@ function M.config()
 
           return success
         end,
-        on_output = helpers.diagnostics.from_patterns {
-          {
-            pattern = [[:(%d+):(%d+) [%w-/]+ (.*)]],
-            groups = { "row", "col", "message" },
-          },
-          {
-            pattern = [[:(%d+) [%w-/]+ (.*)]],
-            groups = { "row", "message" },
-          },
-        },
       },
     }
 
