@@ -47,6 +47,8 @@ maps.n["<leader>vb"] = { desc = 'Buffer commands' }
 maps.n["<leader>vbd"] = { "<cmd>bdelete<cr>", desc = "Delete Buffer" }
 maps.n["<leader>vbc"] = { "<cmd>Bclose<cr>", desc = "Close Buffer" }
 maps.n["<leader>vl"] = { "<cmd>Lazy<cr>", desc = "Lazy Plugin Manager" }
+maps.n["<leader>vm"] = { "<cmd>messages<cr>", desc = "Open messages" }
+maps.n["<leader>vn"] = { "<cmd>Notifications<cr>", desc = "Open notifications" }
 
 -- Visual --
 -- Better paste
@@ -87,6 +89,7 @@ maps.n["<leader>e"] = { "<cmd>NvimTreeToggle<cr>", desc = "Toggle explorer" }
 maps.n["<leader>f"] = sections.f
 maps.n["<leader>ff"] = { "<cmd>Telescope find_files<cr>", desc = "Find files" }
 maps.n["<leader>fw"] = { "<cmd>Telescope live_grep<cr>", desc = "Find words" }
+maps.n["<leader>fn"] = { "<cmd>Telescope notify<cr>", desc = "Search message history" }
 maps.n["<leader>fp"] = { "<cmd>Telescope projects<cr>", desc = "Find projects" }
 maps.n["<leader>fb"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
 

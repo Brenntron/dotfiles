@@ -37,8 +37,8 @@ function M.config()
       diagnostics.codespell.with {
         filetypes = { "coffee", "erb", "eruby", "haml", "html", "markdown" },
       },
-      diagnostics.haml_lint,
-      diagnostics.rubocop,
+      diagnostics.haml_lint.with { "haml" },
+      diagnostics.rubocop.with { "ruby" },
       diagnostics.shellcheck,
       diagnostics.zsh,
       -- formatters
@@ -60,16 +60,37 @@ function M.config()
   }
 
   if not null_ls.is_registered(coffeelint_query) then
+    local handle_coffeelint_output = function(params)
+      if params.output and params.output.stdin then
+        local parser = helpers.diagnostics.from_json {}
+        local offenses = {}
+
+        for _, offense in ipairs(params.output.stdin) do
+          local message_context = (offense.message .. " " .. offense.context)
+
+          table.insert(offenses, {
+            ruleId = offense.name,
+            message = message_context,
+            level = offense.level,
+            line = offense.lineNumber,
+          })
+        end
+
+        return parser { output = offenses }
+      end
+
+      return {}
+    end
+
     local coffeelint = {
       name = "coffeelint",
       method = null_ls.methods.DIAGNOSTICS,
       filetypes = { "coffee" },
       generator = null_ls.generator {
         command = "coffeelint",
-        args = { "--stdin -f coffeelint.json" },
+        args = { "-s", "-f", "coffeelint.json", "--reporter", "raw", "$FILENAME" },
         to_stdin = true,
-        from_stderr = true,
-        format = "line",
+        format = "json",
         check_exit_code = function(code, stderr)
           local success = code <= 1
 
@@ -79,6 +100,7 @@ function M.config()
 
           return success
         end,
+        on_output = handle_coffeelint_output,
       },
     }
 

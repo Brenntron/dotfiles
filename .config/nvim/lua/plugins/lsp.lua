@@ -111,6 +111,7 @@ function M.config()
     capabilities = common_capabilities(),
     on_attach = on_attach
   }
+
   local require_ok, settings = pcall(require, "lspsettings.coffeesense")
 
   if require_ok then

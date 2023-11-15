@@ -14,6 +14,10 @@ local M = {
         build = "make",
         lazy = true,
       },
+      {
+        "rcarriga/nvim-notify",
+        lazy = true,
+      },
     },
   },
   event = "Bufenter",
@@ -123,6 +127,7 @@ function M.config()
   }
 
   telescope.load_extension 'fzf'
+  telescope.load_extension 'notify'
   telescope.load_extension "projects"
 end
 
