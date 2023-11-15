@@ -1081,7 +1081,7 @@ module API
             get 'get_telemetry_history/:dispute_entry_id' do
               begin
                 dispute_entry = DisputeEntry.find(params[:dispute_entry_id])
-                data = dispute_entry.telemetry_historires.to_json
+                data = dispute_entry.telemetry_histories.to_json
                 {status => "success", :data => data}
               rescue => e
                 Rails.logger.error e
