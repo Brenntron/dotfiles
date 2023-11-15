@@ -1123,3 +1123,19 @@
                               %tbody
                                 %tr
                                   %td.missing-data No prevalence data
+
+                          .entry-details-table.telemetry-history-details-table{'data-entry-id': "#{entry.id}"}
+                            %h5.entry-details-table-header Telemetry History
+                            %table.telemetry-history-webrep-table-data-present.hidden
+                              %thead
+                                %tr
+                                  %th Dataset
+                                  %th Count
+                                  %th First Seen
+                                  %th Last Seen
+                              %tbody
+
+                            %table.telemetry-history-webrep-table-data-missing
+                              %tbody
+                                %tr
+                                  %td.missing-data No telemetry history data

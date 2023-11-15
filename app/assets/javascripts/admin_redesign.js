@@ -66,4 +66,5 @@
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
 //= require application/webrep/enrich
+//= require application/webrep/telemetry_history
 //= require admin/admin-tools
