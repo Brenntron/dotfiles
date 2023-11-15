@@ -187,7 +187,7 @@ plugins=(
   yarn
 )
 
-source $ZPLUG_HOME/init.zsh
+source ~/.zplug/init.zsh
 
 zplug "dracula/zsh", as:theme
 
@@ -221,9 +221,9 @@ fi
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 if [[ $(uname) == "Linux" ]]; then
-  source .config/linux/linux.zsh
+  source ~/.config/linux/linux.zsh
 else
-  source .config/osx/osx.zsh
+  source ~/.config/osx/osx.zsh
 fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
