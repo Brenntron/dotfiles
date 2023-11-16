@@ -4,7 +4,7 @@
     %h1 Context Tags
 
     -# contain everything tmi-related into this tmi div, hide everything if no tmi roles on user
-    - if current_user.has_role?('tmi viewer') || current_user.has_role?('tmi manager')
+    - if @tmi_viewer || @tmi_manager
       .tmi-area
 
         -# tmi data for webrep and filerep
@@ -64,7 +64,7 @@
 
 
             -# tmi manager role allows adding and suppressing tags
-            - if current_user.has_role?('tmi manager')
+            - if @tmi_manager
               %div
                 %label.toolbar-section-label Actions
                 %button.toolbar-button.add-context-tag-button.dialog-button.ctt-tooltipped{title: "Add Tag", onclick: "add_context_tags_dialog();"}
@@ -202,3 +202,7 @@
       .col-xs-12.text-center
         %button.secondary.tags-cancel-button Cancel
         %button.primary.tags-save-button{onclick: "add_tags_submit();"} Add Tags to Observable
+
+:javascript
+  window.tmi_manager = ("#{@tmi_manager}" == 'true')
+  window.tmi_viewer = ("#{@tmi_viewer}" == 'true')

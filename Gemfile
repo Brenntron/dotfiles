@@ -158,7 +158,7 @@ group :test do
   # gem 'json_spec', '1.1.5' # cannot find any usage of this one, last updated in 2017
   gem 'simplecov', '0.16.1', :require => false
   gem "timecop"
-  gem 'geckodriver-helper'
+  gem 'selenium-webdriver'
   gem 'rexml', '3.2.5'
 end
 

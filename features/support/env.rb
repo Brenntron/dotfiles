@@ -5,10 +5,10 @@
 # files.
 
 require 'selenium-webdriver'
+require 'cucumber/rails'
 require 'capybara/cucumber'
 
-
-if ENV['COVERAGE'] && ("0" != ENV['COVERAGE'])
+if ENV['COVERAGE'] && (ENV['COVERAGE'] != "0")
   require 'simplecov'
   SimpleCov.start do
     add_filter %r{^/config}
@@ -36,10 +36,13 @@ require 'paper_trail/frameworks/cucumber'
 require 'will_paginate/array'
 
 Capybara.default_driver = :selenium_chrome
+Capybara.javascript_driver = :selenium_chrome
 Selenium::WebDriver.logger.level = :error
 
 # This setting is required for DataTables to be compatible with Selenium
-Capybara.server = :puma
+Capybara.server = :puma, { Silent: true }
+
+# frozen_string_literal: true
 
 # Capybara defaults to CSS3 selectors rather than XPath.
 # If you'd prefer to use XPath, just uncomment this line and adjust any
@@ -76,28 +79,28 @@ end
 # See the DatabaseCleaner documentation for details. Example:
 #
 #   Before('@no-txn,@selenium,@culerity,@celerity,@javascript') do
-#     # { :except => [:widgets] } may not do what you expect here
+#     # { except: [:widgets] } may not do what you expect here
 #     # as Cucumber::Rails::Database.javascript_strategy overrides
 #     # this setting.
 #     DatabaseCleaner.strategy = :truncation
 #   end
 #
-#   Before('~@no-txn', '~@selenium', '~@culerity', '~@celerity', '~@javascript') do
+#   Before('not @no-txn', 'not @selenium', 'not @culerity', 'not @celerity', 'not @javascript') do
 #     DatabaseCleaner.strategy = :transaction
 #   end
 #
 
 Before('@debug') do
-  options = {:js_errors => true, :inspector => true}
+  options = { js_errors: true, inspector: true }
   Capybara.register_driver :poltergeist do |app|
-    Capybara::Poltergeist::Driver.new(app,options)
+    Capybara::Poltergeist::Driver.new(app, options)
   end
 end
 
 Before('@no-js-errors') do
   Capybara.register_driver :poltergeist do |app|
-    options = {js_errors: false}
-    Capybara::Poltergeist::Driver.new(app,options)
+    options = { js_errors: false }
+    Capybara::Poltergeist::Driver.new(app, options)
   end
 end
 
@@ -105,9 +108,7 @@ Before('@poltergeist') do
   Capybara.javascript_driver = :selenium_chrome
 end
 
-
 # Possible values are :truncation and :transaction
 # The :transaction strategy is faster, but might give you threading problems.
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
-
