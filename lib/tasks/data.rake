@@ -12,7 +12,7 @@ namespace :data do
       { name: "RULEAPI:CATEGORY_HISTORY", model: ""},
       { name: "RULEAPI:CLUSTER", model: ""},
       { name: "RULEAPI:THREAT_CATEGORY", model: ""},
-
+      { name: "RULEAPI:TOP_URL", model: ""},
 
       { name: "RULEAPI:WSA_STATUS", model: ""},
       { name: "RULEAPI:RULEHIT", model: ""},
@@ -35,6 +35,12 @@ namespace :data do
 
     end
 
+
+  end
+
+  task :remove_service_status_records => :environment do
+
+    ServiceStatus.destroy_all
 
   end
 
