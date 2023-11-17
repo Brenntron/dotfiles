@@ -213,8 +213,7 @@ window.dispute_status_drop_down = () ->
   wrapper.addClass('selected')
 
 window.popup_response_error = (response, prefix) ->
-  assemble_error_message(response)
-
+  errormsg = assemble_error_message(response)
   alert(prefix + "\n" + errormsg)
 
 
