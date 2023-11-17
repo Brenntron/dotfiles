@@ -1085,23 +1085,6 @@
                                     %td= entry.blacklist.first_seen
                                     %td= entry.blacklist.last_seen
 
-                          .entry-details-table.enrich-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header Enrichment
-                            %table.hidden.enrich-webrep-table-data-present
-                              %thead
-                                %tr
-                                  %th Context
-                                  %th Taxonomy
-                                  %th Name
-                                  %th Description
-                                  %th.enrich-webrep-external-ref-header External References
-                              %tbody
-
-                            %table.enrich-webrep-table-data-missing
-                              %tbody
-                                %tr
-                                  %td.missing-data No enrichment services data
-
                           .entry-details-table.prevalence-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header Prevalence
                             %table.prevalence-webrep-table-data-present.hidden
