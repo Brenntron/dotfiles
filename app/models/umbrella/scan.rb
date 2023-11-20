@@ -2,6 +2,15 @@ class Umbrella::Scan
 
   TEST_URL = "www.google.com"
 
+  SERVICE_STATUS_NAME = "UMBRELLA:SCAN"
+  def self.service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def self.new_request(address)
     request = HTTPI::Request.new(Rails.configuration.umbrella.url)
     request.ssl = true
