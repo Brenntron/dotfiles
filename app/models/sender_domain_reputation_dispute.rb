@@ -456,23 +456,23 @@ class SenderDomainReputationDispute < ApplicationRecord
 
     if dispute_params['case_owner'].present?
       user = User.find_by(cvs_username: dispute_params.delete('case_owner'))
-      dispute_fields['user_id'] = user.id
+      dispute_fields['user_id'] = user&.id
     end
 
     relation = where(dispute_fields)
 
     if dispute_params['submitted_newer'].present?
       relation =
-        relation.where('created_at >= :submitted_newer', submitted_newer: dispute_params['submitted_newer'])
+        relation.where("#{self.table_name}.created_at >= :submitted_newer", submitted_newer: dispute_params['submitted_newer'])
     end
 
     if dispute_params['submitted_older'].present?
       if dispute_params['submitted_older'].kind_of?(Date)
         relation =
-          relation.where('created_at < :submitted_older', submitted_older: (dispute_params['submitted_older']) + 1)
+          relation.where("#{self.table_name}.created_at < :submitted_older", submitted_older: (dispute_params['submitted_older']) + 1)
       elsif dispute_params['submitted_older'].kind_of?(String)
         relation =
-          relation.where('created_at < :submitted_older', submitted_older: Date.parse(dispute_params['submitted_older']) + 1)
+          relation.where("#{self.table_name}.created_at < :submitted_older", submitted_older: Date.parse(dispute_params['submitted_older']) + 1)
       end
     end
 
@@ -481,7 +481,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       if seconds_ago != 0
         age_newer_cutoff = Time.now - seconds_ago
         relation =
-          relation.where('created_at >= :submitted_newer', submitted_newer: age_newer_cutoff)
+          relation.where("#{self.table_name}.created_at >= :submitted_newer", submitted_newer: age_newer_cutoff)
       end
     end
 
@@ -490,7 +490,7 @@ class SenderDomainReputationDispute < ApplicationRecord
       if seconds_ago != 0
         age_older_cutoff = Time.now - seconds_ago
         relation =
-          relation.where('created_at < :submitted_older', submitted_older: age_older_cutoff)
+          relation.where("#{self.table_name}.created_at < :submitted_older", submitted_older: age_older_cutoff)
       end
     end
 

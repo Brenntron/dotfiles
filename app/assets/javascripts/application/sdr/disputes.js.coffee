@@ -160,8 +160,30 @@ $ ->
         for priority in response.json.priorities
           $('#priority-list').append '<option value=\'' + priority + '\'></option>'
 
+        for submitter_type in ["CUSTOMER", "NON-CUSTOMER", "Internal"]
+          $('#submittertype-list').append '<option value=\'' + submitter_type + '\'></option>'
+
         $('#advanced-search-dropdown').show()
     )
+    # populate SDR search is advanced search is open
+    if localStorage.sdr_search_type == 'advanced' && localStorage.sdr_search_conditions
+      search_conditions = JSON.parse(localStorage.sdr_search_conditions)
+      $('#caseid-input').val(search_conditions.id)
+      $('#name-input').val(search_conditions.customer_name)
+      $('#email-input').val(search_conditions.customer_email)
+      $('#submitter-org-input').val(search_conditions.company_name)
+      $('#dispute-input').val(search_conditions.sender_domain_entry)
+      $('#suggested-rep-input').val(search_conditions.suggested_disposition)
+      $('#owner-input').val(search_conditions.case_owner)
+      $('#status-input').val(search_conditions.status)
+      $('#priority-input').val(search_conditions.priority)
+      $('#resolution-input').val(search_conditions.resolution)
+      $('#submitter-input').val(search_conditions.submitter_type)
+      $('#platform-input')[0].selectize.setValue(search_conditions.platforms.split(', '))
+      $('#submitted-older-input').val(search_conditions.submitted_older)
+      $('#submitted-newer-input').val(search_conditions.submitted_newer)
+      $('#age-older-input').val(search_conditions.age_older)
+      $('#age-newer-input').val(search_conditions.age_newer)
 
   assemble_sdr_response_templates = (templates, customer_footer) ->
     resolution_select = $('#sdr-resolution-message-template-select.resolution-message-template-select')
@@ -694,6 +716,7 @@ window.advanced_search_sdr_index_table = () ->
     case_owner: form.find('input[id="owner-input"]').val()
     status: form.find('input[id="status-input"]').val()
     priority: form.find('input[id="priority-input"]').val()
+    submitter_type: form.find('input[id="submitter-input"]').val()
     resolution: form.find('input[id="resolution-input"]').val()
     platform_ids: form.find('input[id="platform-input"]').val()
     submitted_older: form.find('input[id="submitted-older-input"]').val()
