@@ -24,43 +24,36 @@ function M.config()
     dapui.close()
   end
 
-  dap.adapters.codelldb = {
-    type = "server",
-    port = "${port}",
-    executable = {
-      -- provide the absolute path for `codelldb` command if not using the one installed using `mason.nvim`
-      command = "codelldb",
-      args = { "--port", "${port}" },
-      -- On windows you may have to uncomment this:
-      -- detached = false,
-    },
-  }
-  dap.configurations.c = {
+  dap.adapters.ruby = function(callback, config)
+    callback {
+      type = "server",
+      host = "127.0.0.1",
+      port = "${port}",
+      executable = {
+        command = "bundle",
+        args = { "exec", "rdbg", "-n", "--open", "--port", "${port}", "-c", "--", "bundle", "exec", config.command, config.script,
+        },
+      },
+    }
+  end
+  dap.configurations.ruby = {
     {
-      name = "Launch file",
-      type = "codelldb",
-      request = "launch",
-      program = function()
-        local path
-        vim.ui.input({ prompt = "Path to executable: ", default = vim.loop.cwd() .. "/build/" }, function(input)
-          path = input
-        end)
-        vim.cmd [[redraw]]
-        return path
-      end,
-      cwd = "${workspaceFolder}",
-      stopOnEntry = false,
+      type = "ruby",
+      name = "debug current file",
+      request = "attach",
+      localfs = true,
+      command = "ruby",
+      script = "${file}",
     },
+    {
+      type = "ruby",
+      name = "run current spec file",
+      request = "attach",
+      localfs = true,
+      command = "rspec",
+      script = "${file}",
+    }
   }
 end
-
-M = {
-  "ravenxrz/DAPInstall.nvim",
-  commit = "8798b4c36d33723e7bba6ed6e2c202f84bb300de",
-  config = function()
-    require("dap_install").setup {}
-    require("dap_install").config("python", {})
-  end,
-}
 
 return M

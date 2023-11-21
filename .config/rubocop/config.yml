@@ -6,4 +6,6 @@ Style/Encoding:
   Enabled: true
 Style/FrozenStringLiteralComment:
   Enabled: false
-require: rubocop-rails
+require:
+  rubocop-performance
+  rubocop-rails
