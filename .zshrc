@@ -187,10 +187,6 @@ plugins=(
   yarn
 )
 
-source ~/.zplug/init.zsh
-
-zplug "dracula/zsh", as:theme
-
 source $ZSH/oh-my-zsh.sh
 
 # User configuration

@@ -68,7 +68,7 @@ function M.config()
     underline = true,
     update_in_insert = true,
     -- disable virtual text
-    virtual_text = false,
+    -- virtual_text = false,
   }
 
   vim.diagnostic.config(default_diagnostic_config)

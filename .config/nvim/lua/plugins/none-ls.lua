@@ -37,6 +37,7 @@ function M.config()
       diagnostics.codespell.with {
         filetypes = { "coffee", "erb", "eruby", "haml", "html", "markdown" },
       },
+      diagnostics.stylelint,
       diagnostics.haml_lint.with { "haml" },
       diagnostics.rubocop.with { "ruby" },
       diagnostics.shellcheck,
@@ -54,7 +55,6 @@ function M.config()
       },
       formatting.rubocop,
       formatting.sqlfluff,
-      formatting.stylelint,
       formatting.stylua,
     },
   }
@@ -63,14 +63,19 @@ function M.config()
     local handle_coffeelint_output = function(params)
       if params.output and params.output.stdin then
         local parser = helpers.diagnostics.from_json {}
+        local message
         local offenses = {}
 
         for _, offense in ipairs(params.output.stdin) do
-          local message_context = (offense.message .. " " .. offense.context)
+          if offense.context then
+            message = (offense.message .. " " .. offense.context)
+          else
+            message = offense.message
+          end
 
           table.insert(offenses, {
             ruleId = offense.name,
-            message = message_context,
+            message = message,
             level = offense.level,
             line = offense.lineNumber,
           })
