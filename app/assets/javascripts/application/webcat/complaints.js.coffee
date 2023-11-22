@@ -1433,38 +1433,6 @@ window.reopenComplaint = (entry_id, button) ->
       std_msg_error(response,"", reload: false)
   )
 
-
-
-window.take_selected = ()->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  if selected_rows[0].length > 0
-    entry_ids = []
-    for row, i in selected_rows[0]
-      entry_ids.push(selected_rows.data()[i].entry_id)
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
-      method: 'POST'
-      headers: headers
-      data: 'complaint_entry_ids': entry_ids
-      success: (response) ->
-        json = $.parseJSON(response)
-        if json.error
-          notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('Error Taking Entries', json.error)
-        else
-          for row, i in selected_rows[0]
-            selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
-            selected_rows.data().cell(selected_rows[0][i],4).data("ASSIGNED").draw()
-
-      error: (response) ->
-        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-    , this)
-  else
-    std_msg_error('No rows selected', ['Please select at least one row.'])
-
-
-
 $(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
   rows = $('#complaints-index').DataTable().rows('.selected').data()
   reopened = false
@@ -1504,6 +1472,7 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaint
     invalid_opt.prop('selected', true)
 
   comment_check()
+
 $(document).on 'change','#complaint_resolution', ->
   internal_comment = $('.internal_comment_container')
   customer_comment = $('.customer_facing_comment_container')
@@ -1526,8 +1495,45 @@ window.comment_check = ()->
     internal_comment.css('display', 'none')
     customer_comment.css('display', 'none')
 
+window.take_selected = ()->
+  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  assignment_type = $('.assignment-type-input:checked').val()
+
+  if selected_rows[0].length > 0
+    entry_ids = []
+    for row, i in selected_rows[0]
+      entry_ids.push(selected_rows.data()[i].entry_id)
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
+      method: 'POST'
+      headers: headers
+      data: 'complaint_entry_ids': entry_ids, 'assignment_type': assignment_type
+      success: (response) ->
+        json = $.parseJSON(response)
+        if json.error
+          notice_html = "<p>Something went wrong: #{json.error}</p>"
+          std_msg_error('Error Taking Entries', [json.error[1]])
+        else
+          for row, i in selected_rows[0]
+            if assignment_type is 'assignee'
+              selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
+              selected_rows.data().cell(selected_rows[0][i],4).data("ASSIGNED").draw()
+            else if assignment_type is 'reviewer'
+              selected_rows.data().cell(selected_rows[0][i],18).data(json.name).draw()
+            else if assignment_type is 'second_reviewer'
+              selected_rows.data().cell(selected_rows[0][i],19).data(json.name).draw()
+
+      error: (response) ->
+        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+    , this)
+  else
+    std_msg_error('No rows selected', ['Please select at least one row.'])
+
 window.return_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  assignment_type = $('.assignment-type-input:checked').val()
+
   if selected_rows[0].length > 0
     entry_ids = []
     for row, i in selected_rows[0]
@@ -1537,16 +1543,26 @@ window.return_selected = ()->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
       method: 'POST'
       headers: headers
-      data: 'complaint_entry_ids': entry_ids
+      data: 'complaint_entry_ids': entry_ids, 'assignment_type': assignment_type
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Returning Entries', json.error)
-        else
-          for row, i in selected_rows[0]
+        for row, i in selected_rows[0]
+          if assignment_type == 'assignee'
             selected_rows.data().cell(row,14).data("Vrt Incoming").draw()
             selected_rows.data().cell(row,4).data("NEW").draw()
+            if !$('#assignee-checkbox').is(':checked')
+              $('#assignee-checkbox').prop('checked', true).trigger('click')
+          else if assignment_type is 'reviewer'
+            selected_rows.data().cell(selected_rows[0][i],18).data('').draw()
+            if !$('#reviewer-checkbox').is(':checked')
+              $('#reviewer-checkbox').prop('checked', true).trigger('click')
+          else if assignment_type is 'second_reviewer'
+            selected_rows.data().cell(selected_rows[0][i],19).data('').draw()
+            if !$('#second-reviewer-checkbox').is(':checked')
+              $('#second-reviewer-checkbox').prop('checked', true).trigger('click')
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -1556,6 +1572,8 @@ window.return_selected = ()->
 
 window.webcat_remove_assignee = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  assignment_type = $('.assignment-type-input:checked').val()
+
   if selected_rows[0].length > 0
     entry_ids = []
     for row, i in selected_rows[0]
@@ -1565,7 +1583,7 @@ window.webcat_remove_assignee = () ->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/unassign_all'
       method: 'POST'
       headers: headers
-      data: 'complaint_entry_ids': entry_ids
+      data: 'complaint_entry_ids': entry_ids, 'assignment_type': assignment_type
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
@@ -1583,6 +1601,8 @@ window.webcat_remove_assignee = () ->
 
 window.webcat_change_assignee = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  assignment_type = $('.assignment-type-input:checked').val()
+
   if selected_rows[0].length > 0
     entry_ids = []
     for row, i in selected_rows[0]
@@ -1591,6 +1611,7 @@ window.webcat_change_assignee = () ->
     user_id = $('#index_target_assignee option:selected').val()
 
     data = {
+      'assignment_type': assignment_type,
       'complaint_entry_ids': entry_ids,
       'user_id': user_id
     }
@@ -3303,11 +3324,18 @@ $ ->
 # Convert webcat to webrep
 # Enable / disable button to attempt based on if anything is selected
 $(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
-  if $('tr.selected').length == 1
+  if $('tr.selected').length >= 1
     $('#convert-ticket-button').removeAttr('disabled')
+    $('.take-ticket-toolbar-button').removeAttr('disabled')
+    $('.return-ticket-toolbar-button').removeAttr('disabled')
+    $('.remove-assignee-toolbar-button').removeAttr('disabled')
+    $('.ticket-owner-button').removeAttr('disabled')
   else
     $('#convert-ticket-button').attr('disabled', 'disabled')
-
+    $('.take-ticket-toolbar-button').attr('disabled', 'disabled')
+    $('.return-ticket-toolbar-button').attr('disabled', 'disabled')
+    $('.remove-assignee-toolbar-button').attr('disabled', 'disabled')
+    $('.ticket-owner-button').attr('disabled', 'disabled')
 
 # Prepare ticket for converting
 window.prep_complaint_to_convert = () ->
