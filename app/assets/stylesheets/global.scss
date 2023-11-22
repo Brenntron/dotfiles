@@ -12715,6 +12715,71 @@ input[type="radio"].resolution_radio_button {
     vertical-align: baseline;
   }
 
+  .btn-group.toolbar-btn-group.assignment-btn-group {
+    align-items: center;
+    background-color: $nav-toolbar-color;
+    border: none;
+    display: flex;
+    margin: 0 3px 0 0;
+    float: left;
+    padding-left: 0;
+
+    .inline-radio-wrapper {
+      align-items: center;
+      border: none;
+      display: flex;
+      height: 27px;
+      margin-top: 0;
+    }
+
+    .assignment-type-input {
+      -webkit-appearance: none;
+      appearance: none;
+      background-color: $content-bg-color;
+      border-radius: 50%;
+      border: 0.15em solid $type-lighter-color;
+      color: $type-lighter-color;
+      display: grid;
+      font: inherit;
+      height: 1.15em;
+      margin: 0 3px 0 0;
+      place-content: center;
+      vertical-align: middle;
+      width: 1.15em;
+    }
+
+    .assignment-type-input:checked {
+      background-color: $type-darkest;
+    }
+
+    .assignment-type-input::before {
+      border-color: lighten($type-base-color, 15%);
+      border-radius: 50%;
+      box-shadow: inset 1em 1em lighten($type-base-color, 15%);
+      content: '';
+      height: 0.65em;
+      transform: scale(0);
+      transition: 120ms transform ease-in-out;
+      width: 0.65em;
+    }
+
+    .assignment-type-input:checked::before {
+      transform: scale(1);
+    }
+
+    .assignment-type-input:first-of-type {
+      margin-left: 3px;
+    }
+
+    label:last-of-type {
+      margin-right: 3px;
+    }
+  }
+
+  .concise-button:disabled {
+    opacity: 0.5;
+  }
+
   .webcat-toolbar-select-all-wrapper, .webcat-toolbar-tall-wrapper {
     background-color: $faint-neutral-color;
     display: block;
@@ -14484,7 +14549,7 @@ table > tbody > tr > td.no-padding {
 
 // webcat index DT, adhering to existing naming conventions
 #webcat-index-table-show-columns-dropdown {
-  width: 320px;
+  width: 330px;
   ul {
     display: inline-block;
     padding: 10px;
