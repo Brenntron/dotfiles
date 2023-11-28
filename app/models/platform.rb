@@ -1,11 +1,17 @@
 class Platform < ApplicationRecord
-
   def self.find_by_all_names(name)
 
     platform = Platform.where("public_name like '%#{name}%' or internal_name like '%#{name}%'").first
     platform
   end
 
+  def self.ngfw
+    where('LOWER(internal_name) LIKE ?', '%ngfw%').first
+  end
+
+  def self.umbrella
+    where('LOWER(internal_name) LIKE ?', '%umbrella%').first
+  end
 
   def self.process_bridge_payload(message_payload)
 
