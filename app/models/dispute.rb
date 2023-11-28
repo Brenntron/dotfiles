@@ -1143,7 +1143,7 @@ For future Web categorization requests, please open a Web categorization ticket 
           end
           packet = {}
           packet[:wbrs_score] = new_dispute_entry.wbrs_score
-          packet[:rule_hits] = rule_hits_snapshot
+          packet[:rule_hits] = rule_hits_snapshot.to_json
           TelemetryHistory.save_dispute_entry_snapshot(packet, new_dispute_entry. true)
 
         end
