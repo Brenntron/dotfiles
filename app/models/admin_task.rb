@@ -173,25 +173,13 @@ class AdminTask
   end
   handle_asynchronously :parse_complaint_entry_uris
 
-  def ngfw_clusters_import(morsel_id, args)
+  def clusters_import(morsel_id, args)
     morsel = Morsel.find(morsel_id)
     morsel.output += "############################################\n"
-    morsel.output += "starting NGFW clusters import now.\n"
+    morsel.output += "starting clusters import now.\n"
     morsel.output += "running.....\n"
     morsel.save
-    Ngfw::Importer.import_without_delay
-    morsel.output += "completed.\n"
-    morsel.output += "############################################\n"
-    morsel.save
-  end
-
-  def umbrella_clusters_import(morsel_id, args)
-    morsel = Morsel.find(morsel_id)
-    morsel.output += "############################################\n"
-    morsel.output += "starting Umbrella clusters import now.\n"
-    morsel.output += "running.....\n"
-    morsel.save
-    Umbrella::Importer.import_without_delay
+    Clusters::Importer.import_without_delay
     morsel.output += "completed.\n"
     morsel.output += "############################################\n"
     morsel.save
