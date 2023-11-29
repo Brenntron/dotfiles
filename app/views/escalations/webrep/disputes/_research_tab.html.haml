@@ -292,6 +292,11 @@
           %button.toolbar-button.ping-button.esc-tooltipped{title: 'Entry Recovery - Ping bridge to grab missing Entry content', onclick: "dispute_entry_recovery(#{@dispute.id});"}
             %span.toolbar-button-text Dispute Entry Recovery
 
+      %div
+        %label.toolbar-section-label Observable History
+        %button.toolbar-button.sync-button#observable-history-button.toolbar-button-spacer{title: 'Observable History', onclick: "get_observable_history();"}
+          %span.toolbar-button-text Observable History
+
       .edit-button-wrapper.edit-entries-buttons.hidden
         %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',
                                                                      onclick: 'save_dispute_entries();'}
@@ -1084,19 +1089,3 @@
                                     %td= entry.blacklist.primary_source
                                     %td= entry.blacklist.first_seen
                                     %td= entry.blacklist.last_seen
-
-                          .entry-details-table.telemetry-history-details-table{'data-entry-id': "#{entry.id}"}
-                            %h5.entry-details-table-header Telemetry History
-                            %table.telemetry-history-webrep-table-data-present.hidden
-                              %thead
-                                %tr
-                                  %th Timestamp
-                                  %th Rule Hits
-                                  %th SBRS Score
-                                  %th WBRS Score
-                              %tbody
-
-                            %table.telemetry-history-webrep-table-data-missing
-                              %tbody
-                                %tr
-                                  %td.missing-data No telemetry history data
