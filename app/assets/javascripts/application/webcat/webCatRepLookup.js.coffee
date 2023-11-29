@@ -96,6 +96,7 @@ namespace 'WebCat.RepLookup', (exports) ->
 
     reducedData['domain status'] = domainStatuses if domainStatuses.length > 0
     reducedData['nserver'] = nservers
+    reducedData['domain name'] = reducedData['name'].toLowerCase() if reducedData['name']?
     reducedData['domain name'] = reducedData['domain name'].toLowerCase() if reducedData['domain name']?
     reducedData['updated'] = reducedData['last-update'] if reducedData['last-update']
     return reducedData
@@ -104,6 +105,7 @@ namespace 'WebCat.RepLookup', (exports) ->
     # TESS doesn't send the same key/value pairs for every request....
     keys = ['domain name',
             'domain',
+            'name',
             'organization name',
             'registrant organization',
             'registrant country',

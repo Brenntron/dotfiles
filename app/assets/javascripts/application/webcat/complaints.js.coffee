@@ -852,7 +852,7 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#wbrs_score_#{complaint_entry_id}").text(wbrs_score)
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{new_uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{new_uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{new_uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{new_uri}</a>")
-        $("#lookup-#{complaint_entry_id}").replaceWith("<button class='secondary' id='lookup-#{complaint_entry_id}' data-fqdn='#{qual_subdomain}' onclick='WebCat.RepLookup.whoIsLookups(\"#{complaint_entry_id}\", \"#{qual_subdomain}\")'>Whois</button>")
+        $("#lookup-#{complaint_entry_id}").replaceWith("<button class='secondary' id='lookup-#{complaint_entry_id}' data-fqdn='#{qual_subdomain}' onclick='WebCat.RepLookup.whoIsLookup(\"#{complaint_entry_id}\", \"#{qual_subdomain}\")'>Whois</button>")
         $("#history-#{complaint_entry_id}").replaceWith("<button class='secondary' id='history-#{complaint_entry_id}' onclick='history_dialog(\"#{complaint_entry_id}\", \"#{new_uri}\")'>History</button>")
         $("#submit_changes_#{complaint_entry_id}").attr('onclick', "updateEntryColumns('#{complaint_entry_id}', '#{row_id}')")
     error: (response) ->
@@ -1975,7 +1975,7 @@ format = (complaint_entry_row) ->
       complaint_history = ''
 
   { entry_id, domain, complaint_id, ip_address } = complaint_entry
-  whois_lookup = if ip_address then ip_address else domain
+  whois_lookup = if domain then domain else ip_address
   complaint_entry_html = ''
   input_cat = 'input_cat_' + entry_id
   input_cat_templates = 'input_cat_templates_' + entry_id
@@ -2133,7 +2133,7 @@ format = (complaint_entry_row) ->
                   History
                 </button>
                 <br/>
-                <button class='secondary' id='domain-#{entry_id}' onclick='WebCat.RepLookup.whoIsLookups("#{whois_lookup}")'>
+                <button class='secondary' id='domain-#{entry_id}' onclick='WebCat.RepLookup.whoIsLookup("#{whois_lookup}")'>
                   Whois
                 </domain>
               </div>
