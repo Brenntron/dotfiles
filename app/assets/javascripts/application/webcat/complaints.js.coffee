@@ -570,6 +570,7 @@ $ ->
     $("#complaints_select_all").prop('checked', checked)
     return
 
+  # TODO - is this needed?
   $(document).ready ->
     if !window.location.pathname.includes('/escalations/webcat')
       $('#filter-complaints-nav').hide()

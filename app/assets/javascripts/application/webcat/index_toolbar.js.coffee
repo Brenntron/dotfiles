@@ -1,5 +1,70 @@
 ## WEBCAT INDEX TOOLBAR FUNCTIONS ##
 
+
+# Data display functions & storage
+
+# Hide / Show data and columns on index table
+$ ->
+  $('.webcat-view-data-cb').click ->
+    toggle_display_data(this)
+    save_display_prefs()
+
+window.get_display_prefs = () ->
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/user_preferences/"
+    data: {name: 'WebCatVisible'}
+    success: (response) ->
+      response = JSON.parse(response)
+      $.each response, (data, state) ->
+        # HTML5 uses 'checked' rather than 'checked=true'
+        checkbox = $("##{data}")
+        if state == 'true'
+          $(checkbox).prop('checked')
+        else
+          $(checkbox).removeAttr('checked')
+        toggle_display_data(checkbox)
+  )
+
+toggle_display_data = (checkbox) ->
+  # check if col or data toggle
+  if $(checkbox).hasClass('webcat-view-col-cb')
+    # this is a column toggle
+    table = $('#complaints-index').DataTable()
+    column = table.column($(checkbox).attr('data-column'))
+    if $(checkbox).prop('checked')
+      column.visible(true)
+    else
+      column.visible(false)
+  else
+    # this is a data toggle
+    data_class = $(checkbox).attr('data-class')
+    if $(checkbox).prop('checked')
+      $('.' + data_class).show()
+    else
+      $('.' + data_class).hide()
+
+save_display_prefs = () ->
+  data = {}
+  $('.webcat-view-data-cb').each ->
+    data_id = $(this).attr('id')
+    state = $(this).is(':checked')
+    if state == true
+      data[data_id] = 'true'
+    else
+      data[data_id] = 'false'
+
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/user_preferences/update"
+    method: 'POST'
+    data: {data: data, name: 'WebCatVisible'}
+    dataType: 'json'
+    success: (response) ->
+      console.log 'Webcat show/hide preferences are updated in user_prefs table.'
+  )
+
+
+
 # Sorting functions
 window.sort_webcat_index = () ->
   order = $('#webcat-index-sort-order').attr('data-sort')
@@ -186,7 +251,7 @@ window.webcat_change_assignee = () ->
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Assigning Entries', json.error)
         else
-#reload table data
+          #reload table data
           $('#complaints-index').DataTable().draw()
 
     )

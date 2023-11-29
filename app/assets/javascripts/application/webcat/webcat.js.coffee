@@ -280,19 +280,7 @@ $ ->
 
 
 
-
-
-
-
-
-
-
   if $('#complaints-index').length
-#    # Create index table
-#    build_complaints_table()
-#
-#    # Make the datatables search prettier
-#    $('#complaints-index_filter input').addClass('restricted-table-search-input');
 
 
     ## WEBCAT ADVANCED SEARCH FUNCTIONS
@@ -509,6 +497,8 @@ $ ->
     window.clearSelectize = (input) ->
       $("##{input}")[0].selectize.clear()
 
+
+
 window.get_current_cats = (rows) ->
   # Grab up-to-date list of categories ONE time for all entries
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -617,8 +607,7 @@ load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status)
     }
 
 
-#TODO - this looks like it fetches for all results? - change to do results on page only
-# Also seems to be hit multiple times in places, find out why
+# Is this hit multiple times in places? Confirm.
 fetch_external_categories = (entry_id) ->
   std_msg_ajax(
     method: 'POST'
@@ -774,65 +763,6 @@ process_review = (entry_data) ->
 
 
 
-
-window.get_display_prefs = () ->
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: 'WebCatVisible'}
-    success: (response) ->
-      response = JSON.parse(response)
-      $.each response, (data, state) ->
-        # HTML5 uses 'checked' rather than 'checked=true'
-        checkbox = $("##{data}")
-        if state == 'true'
-          $(checkbox).prop('checked')
-        else
-          $(checkbox).removeAttr('checked')
-        toggle_display_data(checkbox)
-
-  )
-
-
-toggle_display_data = (checkbox) ->
-  # check if col or data toggle
-  if $(checkbox).hasClass('webcat-view-col-cb')
-    # this is a column toggle
-    table = $('#complaints-index').DataTable()
-    column = table.column($(checkbox).attr('data-column'))
-    if $(checkbox).prop('checked')
-      column.visible(true)
-    else
-      column.visible(false)
-  else
-    # this is a data toggle
-    data_class = $(checkbox).attr('data-class')
-    if $(checkbox).prop('checked')
-      $('.' + data_class).show()
-    else
-      $('.' + data_class).hide()
-
-
-save_display_prefs = () ->
-  data = {}
-  $('.webcat-view-data-cb').each ->
-    data_id = $(this).attr('id')
-    state = $(this).is(':checked')
-    if state == true
-      data[data_id] = 'true'
-    else
-      data[data_id] = 'false'
-
-  std_msg_ajax(
-    url: "/escalations/api/v1/escalations/user_preferences/update"
-    method: 'POST'
-    data: {data: data, name: 'WebCatVisible'}
-    dataType: 'json'
-    success: (response) ->
-      console.log 'Webcat show/hide preferences are updated in user_prefs table.'
-  )
-
-
 $ ->
   ### New for card style rows ###
   # Changes which value is in the entry's uri input
@@ -938,12 +868,6 @@ $ ->
       process_entry(entry_data)
       # submit for real
 
-
-
-  # Hide / Show data and columns on index table
-  $('.webcat-view-data-cb').click ->
-    toggle_display_data(this)
-    save_display_prefs()
 
 
 
