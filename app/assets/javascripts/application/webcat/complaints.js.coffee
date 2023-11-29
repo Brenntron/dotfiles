@@ -2133,7 +2133,7 @@ format = (complaint_entry_row) ->
                   History
                 </button>
                 <br/>
-                <button class='secondary' id='domain-'#{entry_id}' onclick='WebCat.RepLookup.whoIsLookups("#{whois_lookup}")'>
+                <button class='secondary' id='domain-#{entry_id}' onclick='WebCat.RepLookup.whoIsLookups("#{whois_lookup}")'>
                   Whois
                 </domain>
               </div>
