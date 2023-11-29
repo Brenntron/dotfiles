@@ -587,18 +587,15 @@ load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status)
       options: cat_options,
       items: category_ids,
       onItemAdd: ->
-        if entry_status == 'PENDING'
-          store_entry_changes(entry_id, 'review')
-        else
+        # User shouldn't be able to change cats in pending, but just in case
+        unless entry_status == 'PENDING'
           store_entry_changes(entry_id, 'submit')
           if verifyMasterSubmit() == true
             $('#master-submit').prop('disabled', false)
           else
             $('#master-submit').prop('disabled', true)
       onItemRemove: ->
-        if entry_status == 'PENDING'
-          store_entry_changes(entry_id, 'review')
-        else
+        unless entry_status == 'PENDING'
           store_entry_changes(entry_id, 'submit')
           if verifyMasterSubmit() == true
             $('#master-submit').prop('disabled', false)
@@ -729,7 +726,6 @@ fetch_external_categories = (entry_id) ->
 process_entry = (entry_data) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  # TODO add more of the incorrect submissions here
   # If resolution is set to fixed, make sure it has categories applied
   if entry_data.categories == null && entry_data.status == "FIXED"
     std_msg_error("Must include at least one category.","", reload: false)
@@ -787,7 +783,7 @@ window.get_display_prefs = () ->
     success: (response) ->
       response = JSON.parse(response)
       $.each response, (data, state) ->
-        # HTML5 uses 'checked' presense rather than 'checked=true'
+        # HTML5 uses 'checked' rather than 'checked=true'
         checkbox = $("##{data}")
         if state == 'true'
           $(checkbox).prop('checked')
