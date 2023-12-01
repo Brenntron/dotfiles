@@ -14,9 +14,11 @@ window.get_observable_history_data = (dispute_entry_id) ->
   )
 
 window.create_observable_history_popup = (id) ->
+  console.log 'create_observable_history_popup'
 
   get_observable_history_data(id).then (response) ->
     telemetry_data = JSON.parse(response.data)
+    console.log 'telemetry_data'
     console.log telemetry_data
     table = $('#observable-history-dialog-table')
 
@@ -42,8 +44,12 @@ window.create_observable_history_popup = (id) ->
         {
           data: 'rule_hits'
           render: (data, type, full, meta) ->
-            #figure out how to grab each rule hit
-            return data
+            wrapper = ""
+            parsed = JSON.parse(data)
+            $(parsed).each (i, rule) ->
+              wrapper += "<div class='dispute_observable_history_row_wrapper'>
+                <div>#{rule.name}</div><div>#{rule.rule_type}</div></div>"
+            return wrapper
         }
         {
           data: 'multi_ip_score'
