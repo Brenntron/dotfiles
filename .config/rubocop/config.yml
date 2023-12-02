@@ -7,5 +7,5 @@ Style/Encoding:
 Style/FrozenStringLiteralComment:
   Enabled: false
 require:
-  rubocop-performance
-  rubocop-rails
+  - rubocop-performance
+  - rubocop-rails

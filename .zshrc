@@ -240,7 +240,9 @@ fi
 
 if [ -x "$(command -v colorls)" ]; then
   source $(dirname $(gem which colorls))/tab_complete.sh
-  alias lc='colorls -lA --sd --dark'
+  alias cls='colorls --sd --dark'
+  alias cla='colorls -lA --sd --dark'
+  alias ctree='colorls --sd -t --dark'
 fi
 
 # Set alias for dotfiles config

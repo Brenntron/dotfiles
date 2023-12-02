@@ -87,11 +87,12 @@ function M.config()
 
   require("lspconfig.ui.windows").default_options_border = "rounded"
 
+  local opts = {
+    capabilities = common_capabilities(),
+    on_attach = on_attach
+  }
+
   for _, server in ipairs(servers) do
-    local opts = {
-      capabilities = common_capabilities(),
-      on_attach = on_attach
-    }
 
     local require_ok, settings = pcall(require, "lspsettings." .. server)
 
@@ -107,18 +108,26 @@ function M.config()
   end
 
   -- Setup coffeesense as it is not included in mason-lspconfig
-  local coffeesense_opts = {
-    capabilities = common_capabilities(),
-    on_attach = on_attach
-  }
+  local coffeesense_opts = opts
 
-  local require_ok, settings = pcall(require, "lspsettings.coffeesense")
+  local coffee_require_ok, coffee_settings = pcall(require, "lspsettings.coffeesense")
 
-  if require_ok then
-    coffeesense_opts = vim.tbl_deep_extend("force", settings, coffeesense_opts)
+  if coffee_require_ok then
+    coffeesense_opts = vim.tbl_deep_extend("force", coffee_settings, coffeesense_opts)
   end
 
   lspconfig.coffeesense.setup(coffeesense_opts)
+
+  -- Setup cucumber_language_server with a forked ls.
+  -- local cucumber_language_server_opts = opts
+  --
+  -- local cucumber_require_ok, cucumber_settings = pcall(require, "lspsettings.cucumber_language_server")
+  --
+  -- if cucumber_require_ok then
+  --   cucumber_language_server_opts = vim.tbl_deep_extend("force", cucumber_settings, cucumber_language_server_opts)
+  -- end
+  --
+  -- lspconfig.cucumber_language_server.setup(cucumber_language_server_opts)
 end
 
 return M
