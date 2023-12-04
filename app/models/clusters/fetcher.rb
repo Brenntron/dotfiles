@@ -2,9 +2,10 @@ class Clusters::Fetcher
   attr_accessor :filter, :regex, :user, :save_regex
 
   PLATFORM_TO_DATA_PROVIDER = {
-    Clusters::Wbnp::DataFetcher::DATA_PATFORM => Clusters::Wbnp::DataFetcher,
-    Clusters::Ngfw::DataFetcher::DATA_PATFORM => Clusters::Ngfw::DataFetcher,
+    Clusters::Wbnp::DataFetcher::DATA_PLATFORM => Clusters::Wbnp::DataFetcher,
+    Clusters::Ngfw::DataFetcher::DATA_PLATFORM => Clusters::Ngfw::DataFetcher,
     Clusters::Umbrella::DataFetcher::DATA_PLATFORM => Clusters::Umbrella::DataFetcher,
+    Clusters::Meraki::DataFetcher::DATA_PLATFORM => Clusters::Meraki::DataFetcher
   }.freeze
 
   ALL_DATA_PROVIDERS = PLATFORM_TO_DATA_PROVIDER.values.freeze
