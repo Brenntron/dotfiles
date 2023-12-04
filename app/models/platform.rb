@@ -13,6 +13,10 @@ class Platform < ApplicationRecord
     where('LOWER(internal_name) LIKE ?', '%umbrella%').first
   end
 
+  def self.meraki
+    where('LOWER(internal_name) LIKE ?', '%meraki%').first
+  end
+
   def self.process_bridge_payload(message_payload)
 
     payload = message_payload[:attributes]
