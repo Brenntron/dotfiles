@@ -350,3 +350,5 @@ window.get_resolution_templates = (resolution) ->
     id = id.replace('input_cat_templates_', '')
     $("#entry-email-response-to-customers").val comment
 
+#TODO - finalize this so the response message is saved on the entry
+# Also need to assume a message regardless of if user opens the dialog.

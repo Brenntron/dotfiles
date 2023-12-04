@@ -186,7 +186,10 @@ class ComplaintEntry < ApplicationRecord
   # @return [Array[Wbrs::Prefix]] the object for the Prefix remote stub.
   def remote_prefixes(prefix_given: self.hostlookup, reload: false)
     @remote_prefixes = nil if reload
-    @remote_prefixes ||= Wbrs::Prefix.where({:urls => [Addressable::URI.escape(prefix_given)]})
+    # IPv6 cannot be parsed like URI, since it does not follow rfc3986 (URLs standard)
+    # If it is IPv6, do not escape prefix and add brackets to transform it to url
+    escaped_prefix = !!(prefix_given =~ Resolv::IPv6::Regex) ? "[#{prefix_given}]" : Addressable::URI.escape(prefix_given)
+    @remote_prefixes ||= Wbrs::Prefix.where({:urls => [escaped_prefix]})
   end
 
   # Returns the Wbrs::Prefix object called on domain_of_with_path
@@ -371,9 +374,9 @@ class ComplaintEntry < ApplicationRecord
 
   def commit_category(existing_prefixes, ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
     # Look for existing prefix
-    is_ip_address = !!(ip_or_uri  =~ Resolv::IPv4::Regex)
+    is_ip_address = !!(ip_or_uri =~ Resolv::IPv4::Regex || ip_or_uri =~ Resolv::IPv6::Regex)
 
-    url_parts = Complaint.parse_url(ip_or_uri)
+    url_parts = Complaint.parse_url(ip_or_uri) unless is_ip_address
     existing_prefix = nil
     if existing_prefixes.present? && !is_ip_address
       existing_prefixes.each do |prefix_found|
