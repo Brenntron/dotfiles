@@ -464,6 +464,7 @@ build_complaints_table = (url) ->
                   '</div>'
 
             else
+              console.log full
               submit_res_wrapper =
                 '<div class="submit-res-wrapper open-ticket-res-wrapper">' +
                   '<div class="res-radio-row">' +
@@ -483,7 +484,9 @@ build_complaints_table = (url) ->
                   '<div id="internal_comment_dropdown_' + full.entry_id + '" class="dropdown-menu dropdown-menu-right internal-comment-dropdown" aria-labelledby="internal_comment_button' + full.entry_id + '">' +
                   '<div class="dropdown-reverse-header">Internal Comment</div>' +
                   '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories" class="internal-comment">' + full.internal_comment + '</textarea>' +
-                  '</div></span>' +
+                  '</div>' +
+                  '</span>' +
+                  '<button class="resolution-comment-button" id="resolution_comment_button' + full.entry_id + '" onclick="resolution_comment_dialog(' + full.entry_id + ');"></button>' +
                   '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="submit_changes(' + full.entry_id + ')">Submit</button>' +
                   '</div>' +
                   '</div>'

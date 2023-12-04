@@ -158,6 +158,19 @@
       background-color: darken(#D7DADB, 10%);
     }
   }
+  .resolution-comment-button {
+    background-image: url(image_path('icon_email_read.svg'));
+    background-size: 16px;
+    display: inline-block;
+    float: left;
+    margin-top: 5px;
+    margin-left: 4px;
+    width: 24px;
+    height: 24px;
+    &:hover {
+      background-color: darken(#D7DADB, 10%);
+    }
+  }
   .dropdown.open {
     .edit-button {
       background-color: #6DBCDB;
@@ -692,4 +705,34 @@ table.dataTable tbody tr.submitting-entry {
   .entry-confirmation-table {
     margin: 5px 0 40px 0;
   }
+}
+
+
+[aria-describedby="resolution_comment_dialog"] {
+  .ui-dialog-titlebar {
+    background-color: #6dbcdb;
+    background-image: url(image_path('icon_email_read_white.svg'));
+    background-repeat: no-repeat;
+    background-position: left 10px center;
+    background-size: 16px;
+  }
+  .ui-dialog-title {
+    padding-left: 25px;
+  }
+  .content-label-sm {
+    display: block;
+  }
+  .email-response-input {
+    border: none;
+    outline: 1px solid #bfbfbf;
+    min-height: 150px;
+    width: 100%;
+    margin-top: 10px;
+    display: inline-block;
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+#entry-email-response-to-customers-select {
+  width: 100%;
 }

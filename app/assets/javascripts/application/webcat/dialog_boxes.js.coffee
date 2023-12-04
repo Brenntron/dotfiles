@@ -277,3 +277,76 @@ format_domain_info = (info)->
     '</div>'
 
 
+# ^TODO - there are more than one whois function - consolidate
+
+
+window.resolution_comment_dialog = (entry_id) ->
+  res_comment_dialog_html = '<div id="resolution_comment_dialog"></div>'
+  res_content =
+    '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
+      '<label class="content-label-sm">Email Response to Customer</label>' +
+      '<select id="entry-email-response-to-customers-select"></select>' +
+      '</div></div><div class="row"><div class="col-xs-12">' +
+      '<textarea class="email-response-input" id="entry-email-response-to-customers" name="customer_facing_comment" type="text"></textarea>' +
+    '</div></div></div>'
+
+  observable = $('#edit_uri_input_' + entry_id).val()
+  selected_res = $('[name="resolution' + entry_id + '"]:checked').val()
+  dialog_title = 'Customer Response for: ' + observable
+
+  # Only one resolution dialog open at a time - content gets swapped out
+  if $("#resolution_comment_dialog").length
+    $("#resolution_comment_dialog").dialog( "option", "title", dialog_title )
+  else
+    $('body').append(res_comment_dialog_html)
+    $("#resolution_comment_dialog").dialog
+      autoOpen: false
+      minWidth: 500
+      position: { my: "right top", at: "right top", of: window }
+      title: dialog_title
+
+  $("#resolution_comment_dialog").html(res_content)
+  $("#resolution_comment_dialog").dialog('open')
+  get_resolution_templates(selected_res)
+
+
+window.get_resolution_templates = (resolution) ->
+  resolution_select = $("#entry-email-response-to-customers-select")
+  loading_display = '<option>Loading templates...</option>'
+  resolution_select.append loading_display
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/webcat/resolution_message_templates"
+    data: {resolution: resolution}
+    dataType: 'json'
+    success_reload: false
+    success: (response) ->
+      templates = JSON.parse response
+      $(resolution_select).empty()
+
+      if templates.length > 0
+        $(templates).each (index, template) ->
+          template_option = $("<option class='webcat-resolution-template-option'></option>")
+          $(template_option).val template.name
+          $(template_option).text template.name
+          $(template_option).attr('data-body', template.body )
+          $(template_option).attr('data-description', template.description )
+          resolution_select.append template_option
+
+          #show first option as body and description
+          if index == 0
+            $("#entry-email-response-to-customers").val template.body
+
+      else
+        $(resolution_select).append('<option>No templates available for ' + resolution + ' resolution</option>')
+
+      error: (response) ->
+        std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
+  )
+  # Update inline customer comments when selecting new template
+  $(resolution_select).change ->
+    comment = $(this).find(":selected").attr("data-body")
+    id = this.id
+    id = id.replace('input_cat_templates_', '')
+    $("#entry-email-response-to-customers").val comment
+
