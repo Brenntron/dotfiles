@@ -15007,3 +15007,15 @@ input.wl-bl-list-inline {
 .hide-temporarily {
   display: none;
 }
+
+.dispute_observable_history_row_wrapper {
+  border-top: 1px solid black;
+}
+
+.dispute_observable_history_row_wrapper:first-of-type {
+  border-top: none;
+}
+
+#data-snapshot-button {
+  background-image: url(image_path('icon_history.svg'));
+}

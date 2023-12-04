@@ -282,6 +282,9 @@
         %label.toolbar-section-label Data
         %button.toolbar-button.sync-button#sync-data-button.toolbar-button-spacer
           %span.toolbar-button-text Refresh Data
+
+        %button.toolbar-button.sync-button#data-snapshot-button.esc-tooltipped.toolbar-button-spacer{title: 'Data Snapshots', onclick: "get_observable_history();"}
+          %span.toolbar-button-text Data Snapshots
         %form#dispute_research_export_form{action: export_escalations_webrep_dispute_path(@dispute, format: :csv), method: 'get'}
           %button.toolbar-button.export-button
             %span.toolbar-button-text Export
@@ -292,10 +295,7 @@
           %button.toolbar-button.ping-button.esc-tooltipped{title: 'Entry Recovery - Ping bridge to grab missing Entry content', onclick: "dispute_entry_recovery(#{@dispute.id});"}
             %span.toolbar-button-text Dispute Entry Recovery
 
-      %div
-        %label.toolbar-section-label Observable History
-        %button.toolbar-button.sync-button#observable-history-button.toolbar-button-spacer{title: 'Observable History', onclick: "get_observable_history();"}
-          %span.toolbar-button-text Observable History
+
 
       .edit-button-wrapper.edit-entries-buttons.hidden
         %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',

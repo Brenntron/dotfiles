@@ -26,11 +26,17 @@ window.create_observable_history_popup = (id) ->
       data: telemetry_data
       info: false,
       ordering: true,
+      destroy: true,
       paging: false,
       searching: false,
       columns: [
         {
           data: 'created_at'
+          render: (data) ->
+            if data
+              return moment(data, "YYYY-MM-DD HH:mm").format("YYYY-MM-DD HH:mm")
+            else
+              return ''
         }
         {
           data: 'wbrs_score'
@@ -40,15 +46,34 @@ window.create_observable_history_popup = (id) ->
         }
         {
           data: 'threat_categories'
+          render: (data) ->
+            if data
+              parsed = JSON.parse(data)
+              parsed.join(', ')
+            else return ''
         }
         {
           data: 'rule_hits'
-          render: (data, type, full, meta) ->
+          render: (data) ->
             wrapper = ""
             parsed = JSON.parse(data)
+            wbrs = []
+            sbrs = []
+
             $(parsed).each (i, rule) ->
+              if rule.rule_type == 'WBRS'
+                wbrs.push rule.name
+              else if rule.rule_type == 'SBRS'
+                sbrs.push rule.name
+
+            if wbrs.length > 0
               wrapper += "<div class='dispute_observable_history_row_wrapper'>
-                <div>#{rule.name}</div><div>#{rule.rule_type}</div></div>"
+               <div>WBRS:</div><div>#{wbrs.join(', ')}</div></div>"
+
+            if sbrs.length > 0
+              wrapper += "<div class='dispute_observable_history_row_wrapper'>
+               <div>SBRS:</div><div>#{sbrs.join(', ')}</div></div>"
+
             return wrapper
         }
         {
@@ -56,9 +81,35 @@ window.create_observable_history_popup = (id) ->
         }
         {
           data: 'multi_rule_hits'
+          render: (data) ->
+            wrapper = ""
+            parsed = JSON.parse(data)
+            wbrs = []
+            sbrs = []
+
+            $(parsed).each (i, rule) ->
+              if rule.rule_type == 'WBRS'
+                wbrs.push rule.name
+              else if rule.rule_type == 'SBRS'
+                sbrs.push rule.name
+
+            if wbrs.length > 0
+              wrapper += "<div class='dispute_observable_history_row_wrapper'>
+               <div>WBRS:</div><div>#{wbrs.join(', ')}</div></div>"
+
+            if sbrs.length > 0
+              wrapper += "<div class='dispute_observable_history_row_wrapper'>
+               <div>SBRS:</div><div>#{sbrs.join(', ')}</div></div>"
+
+            return wrapper
         }
         {
           data: 'multi_threat_categories'
+          render: (data) ->
+            if data
+              parsed = JSON.parse(data)
+              parsed.join(', ')
+            else return ''
         }
       ]
 
