@@ -40,15 +40,22 @@ class Clusters::Importer
       raise 'Umbrella platform not found' if umbrella_platform.blank?
       raise 'Meraki platform not found' if meraki_platform.blank?
 
+      platform_ids = {
+          'SecureFirewall' => ngwf_platform.id,
+          'Umbrella' => umbrella_platform.id,
+          'Meraki' => meraki_platform.id
+      }
+
       data = Clusters::DataFetcher.fetch
       # all the rest clusters were deleted by destroy_existing_clusters!
       pending_cluster_domains = NgfwCluster.pluck(:domain).concat(UmbrellaCluster.pluck(:domain)).concat(MerakiCluster.pluck(:domain))
       data.each do |cluster|
         next if pending_cluster_domains.include?(cluster[:domain])
         next unless PLAFORM_SOURCES.keys.include?(cluster['platform'])
+
         data = {
           domain: cluster['cluster_domain'].delete_prefix('www.'),
-          platform_id: cluster['platform'] == 'Umbrella' ? umbrella_platform.id : ngwf_platform.id,
+          platform_id: platform_ids[cluster['platform']],
           traffic_hits: cluster['global_volume']
         }
 
