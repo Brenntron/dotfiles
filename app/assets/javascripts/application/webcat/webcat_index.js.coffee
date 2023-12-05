@@ -239,8 +239,8 @@ build_complaints_table = (url) ->
             '<table class="nested-col-table">' +
               '<tbody>' +
               '<tr class="assignee-row"><td>' + user + '</td></tr>' +
-              #                  '<tr class="reviewer-row"><td>' + data.customer_name + '</td></tr>' +
-              #                  '<tr class="second-reviewer-row"><td>' + data.customer_email + '</td></tr>' +
+              '<tr class="reviewer-row"><td>' + full.reviewer + '</td></tr>' +
+              '<tr class="second-reviewer-row"><td>' + full.second_reviewer + '</td></tr>' +
               '</tbody>' +
               '</table>'
 

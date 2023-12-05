@@ -105,6 +105,43 @@ window.toggle_select_order = (button) ->
 
 
 
+# Selecting rows / enabling / disabling buttons based on selections
+
+
+$ ->
+  $('#complaints_select_all').click ->
+    toggle_select_all_entries(this, '#complaints-index')
+    check_enable_toolbar_buttons()
+
+  $(document).on 'click', '#complaints-index tbody tr', ->
+    check_enable_toolbar_buttons()
+
+# Select all rows in datatable
+window.toggle_select_all_entries = (checkbox, table) ->
+  checked = $(checkbox).prop('checked')
+  if checked
+    $(table).DataTable().rows( { page: 'current' } ).select()
+  else
+    $(table).DataTable().rows().deselect()
+  $(checkbox).prop('checked', checked)
+  return
+
+# Enable buttons if entries are selected
+window.check_enable_toolbar_buttons = () ->
+  if $('tr.selected').length >= 1
+    $('#convert-ticket-button').removeAttr('disabled')
+    $('.take-ticket-toolbar-button').removeAttr('disabled')
+    $('.return-ticket-toolbar-button').removeAttr('disabled')
+    $('.remove-assignee-toolbar-button').removeAttr('disabled')
+    $('.ticket-owner-button').removeAttr('disabled')
+  else
+    $('#convert-ticket-button').attr('disabled', 'disabled')
+    $('.take-ticket-toolbar-button').attr('disabled', 'disabled')
+    $('.return-ticket-toolbar-button').attr('disabled', 'disabled')
+    $('.remove-assignee-toolbar-button').attr('disabled', 'disabled')
+    $('.ticket-owner-button').attr('disabled', 'disabled')
+
+
 
 # Opening urls in tabs
 
@@ -167,6 +204,8 @@ open_selected = (selected_rows, toggle) ->
 
 window.take_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  assignment_type = $('.assignment-type-input:checked').val()
+
   if selected_rows[0].length > 0
     entry_ids = []
     for row, i in selected_rows[0]
@@ -176,19 +215,24 @@ window.take_selected = ()->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
       method: 'POST'
       headers: headers
-      data: 'complaint_entry_ids': entry_ids
+      data: 'complaint_entry_ids': entry_ids, 'assignment_type': assignment_type
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
-          notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('Error Taking Entries', json.error)
         else
+          debugger
           for row, i in selected_rows[0]
-            selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
-            selected_rows.data().cell(selected_rows[0][i],4).data("ASSIGNED").draw()
+            if assignment_type is 'assignee'
+              selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
+              selected_rows.data().cell(selected_rows[0][i],4).data("ASSIGNED").draw()
+            else if assignment_type is 'reviewer'
+              selected_rows.data().cell(selected_rows[0][i],18).data(json.name).draw()
+            else if assignment_type is 'second_reviewer'
+              selected_rows.data().cell(selected_rows[0][i],19).data(json.name).draw()
 
       error: (response) ->
-        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+        std_msg_error('Error Taking Entries', response.responseText)
     , this)
   else
     std_msg_error('No rows selected', ['Please select at least one row.'])

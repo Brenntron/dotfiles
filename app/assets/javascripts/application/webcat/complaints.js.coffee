@@ -559,17 +559,6 @@ $ ->
 
 
 
-  $('#complaints_check_box, #complaints_select_all').click ->
-    checked = $(this).prop('checked')
-    if checked
-      $('#complaints-index').DataTable().rows( { page: 'current' } ).select()
-    else
-      $('#complaints-index').DataTable().rows().deselect()
-
-    $("#complaints_check_box").prop('checked', checked)
-    $("#complaints_select_all").prop('checked', checked)
-    return
-
   # TODO - is this needed?
   $(document).ready ->
     if !window.location.pathname.includes('/escalations/webcat')
