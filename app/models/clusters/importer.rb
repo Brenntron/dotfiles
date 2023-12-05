@@ -1,7 +1,8 @@
 class Clusters::Importer
   PLAFORM_SOURCES = {
     'Umbrella' => UmbrellaCluster,
-    'SecureFirewall' => NgfwCluster
+    'SecureFirewall' => NgfwCluster,
+    'Meraki' => MerakiCluster
   }.freeze
 
   class << self
@@ -23,7 +24,8 @@ class Clusters::Importer
 
       assigned_domains = ClusterAssignment.fetch_all_assignments.pluck(:domain)
       UmbrellaCluster.where.not(status: :pending, domain: assigned_domains).delete_all
-      NgfwCluster.where.not(status: :pending).delete_all 
+      NgfwCluster.where.not(status: :pending).delete_all
+      MerakiCluster.where.not(status: :pending, domain: assigned_domains).delete_all
     end
 
     def handle_import
@@ -32,21 +34,28 @@ class Clusters::Importer
     end
 
     def import_new_clusters
-      ngwf_platform, umbrella_platform = [Platform.ngfw, Platform.umbrella]
+      ngwf_platform, umbrella_platform, meraki_platform = [Platform.ngfw, Platform.umbrella, Platform.meraki]
 
       raise 'NGFW platform not found' if ngwf_platform.blank?
       raise 'Umbrella platform not found' if umbrella_platform.blank?
+      raise 'Meraki platform not found' if meraki_platform.blank?
+
+      platform_ids = {
+          'SecureFirewall' => ngwf_platform.id,
+          'Umbrella' => umbrella_platform.id,
+          'Meraki' => meraki_platform.id
+      }
 
       data = Clusters::DataFetcher.fetch
       # all the rest clusters were deleted by destroy_existing_clusters!
-      pending_cluster_domains = NgfwCluster.pluck(:domain).concat(UmbrellaCluster.pluck(:domain)) 
-
+      pending_cluster_domains = NgfwCluster.pluck(:domain).concat(UmbrellaCluster.pluck(:domain)).concat(MerakiCluster.pluck(:domain))
       data.each do |cluster|
         next if pending_cluster_domains.include?(cluster[:domain])
         next unless PLAFORM_SOURCES.keys.include?(cluster['platform'])
+
         data = {
           domain: cluster['cluster_domain'].delete_prefix('www.'),
-          platform_id: cluster['platform'] == 'Umbrella' ? umbrella_platform.id : ngwf_platform.id,
+          platform_id: platform_ids[cluster['platform']],
           traffic_hits: cluster['global_volume']
         }
 
