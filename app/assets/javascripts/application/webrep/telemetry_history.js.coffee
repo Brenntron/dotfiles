@@ -14,12 +14,9 @@ window.get_observable_history_data = (dispute_entry_id) ->
   )
 
 window.create_observable_history_popup = (id) ->
-  console.log 'create_observable_history_popup'
 
   get_observable_history_data(id).then (response) ->
     telemetry_data = JSON.parse(response.data)
-    console.log 'telemetry_data'
-    console.log telemetry_data
     table = $('#observable-history-dialog-table')
 
     $(table).DataTable
@@ -40,9 +37,17 @@ window.create_observable_history_popup = (id) ->
         }
         {
           data: 'wbrs_score'
+          render: (data) ->
+            if !data
+              return "<span class='missing-data'>No score</span>"
+            else return data
         }
         {
           data: 'sbrs_score'
+          render: (data) ->
+            if !data
+              return "<span class='missing-data'>No score</span>"
+            else return data
         }
         {
           data: 'threat_categories'
@@ -54,6 +59,7 @@ window.create_observable_history_popup = (id) ->
         }
         {
           data: 'rule_hits'
+          className: 'dispute_observable_history_rule_hits'
           render: (data) ->
             wrapper = ""
             parsed = JSON.parse(data)
@@ -67,20 +73,25 @@ window.create_observable_history_popup = (id) ->
                 sbrs.push rule.name
 
             if wbrs.length > 0
-              wrapper += "<div class='dispute_observable_history_row_wrapper'>
+              wrapper += "<div class='dispute_observable_history_cell_wrapper'>
                <div>WBRS:</div><div>#{wbrs.join(', ')}</div></div>"
 
             if sbrs.length > 0
-              wrapper += "<div class='dispute_observable_history_row_wrapper'>
+              wrapper += "<div class='dispute_observable_history_cell_wrapper'>
                <div>SBRS:</div><div>#{sbrs.join(', ')}</div></div>"
 
             return wrapper
         }
         {
           data: 'multi_ip_score'
+          render: (data) ->
+            if !data
+              return "<span class='missing-data'>No score</span>"
+            else return data
         }
         {
           data: 'multi_rule_hits'
+          className: 'dispute_observable_history_rule_hits'
           render: (data) ->
             wrapper = ""
             parsed = JSON.parse(data)
@@ -94,11 +105,11 @@ window.create_observable_history_popup = (id) ->
                 sbrs.push rule.name
 
             if wbrs.length > 0
-              wrapper += "<div class='dispute_observable_history_row_wrapper'>
+              wrapper += "<div class='dispute_observable_history_cell_wrapper'>
                <div>WBRS:</div><div>#{wbrs.join(', ')}</div></div>"
 
             if sbrs.length > 0
-              wrapper += "<div class='dispute_observable_history_row_wrapper'>
+              wrapper += "<div class='dispute_observable_history_cell_wrapper'>
                <div>SBRS:</div><div>#{sbrs.join(', ')}</div></div>"
 
             return wrapper
@@ -129,10 +140,9 @@ $ ->
   ## init observable history dialog
   $('#observable-history-dialog').dialog
     autoOpen: false,
-    minWidth: 520,
+    minWidth: 680,
     minHeight: 560,
-    resizable: false,
-
+    resizable: true,
     classes: {
       "ui-dialog": "form-dialog"
     },

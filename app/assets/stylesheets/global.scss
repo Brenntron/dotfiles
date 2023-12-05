@@ -15008,12 +15008,16 @@ input.wl-bl-list-inline {
   display: none;
 }
 
-.dispute_observable_history_row_wrapper {
-  border-top: 1px solid black;
+.dispute_observable_history_cell_wrapper {
+  border-top: 1px solid #f2f2f2;;
 }
 
-.dispute_observable_history_row_wrapper:first-of-type {
+.dispute_observable_history_cell_wrapper:first-of-type {
   border-top: none;
+}
+
+.dispute_observable_history_rule_hits {
+  min-width: 80px;
 }
 
 #data-snapshot-button {
