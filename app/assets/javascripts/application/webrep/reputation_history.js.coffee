@@ -3,7 +3,7 @@
 ################################################################################
 #data is loaded separately and fed into the Research Data, similar to wbrs and Prevalence
 
-window.get_observable_history_data = (dispute_entry_id) ->
+window.get_reputation_history_data = (dispute_entry_id) ->
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/webrep/disputes/get_telemetry_history/#{dispute_entry_id}"
     method: 'GET'
@@ -13,11 +13,13 @@ window.get_observable_history_data = (dispute_entry_id) ->
       std_msg_error('Error Gathering Telemetry data', [response.responseJSON.message])
   )
 
-window.create_observable_history_popup = (id) ->
+window.create_reputation_history_popup = (id, entry) ->
 
-  get_observable_history_data(id).then (response) ->
+  get_reputation_history_data(id).then (response) ->
     telemetry_data = JSON.parse(response.data)
-    table = $('#observable-history-dialog-table')
+    table = $('#reputation-history-dialog-table')
+    #Update modal title
+    $('[aria-describedby="reputation-history-dialog"] .ui-dialog-title').text("Reputation History: #{entry}")
 
     $(table).DataTable
       data: telemetry_data
@@ -26,6 +28,8 @@ window.create_observable_history_popup = (id) ->
       destroy: true,
       paging: false,
       searching: false,
+      language:
+        emptyTable: "No reputation history available for this dispute entry."
       columns: [
         {
           data: 'created_at'
@@ -73,11 +77,11 @@ window.create_observable_history_popup = (id) ->
                 sbrs.push rule.name
 
             if wbrs.length > 0
-              wrapper += "<div class='dispute_observable_history_cell_wrapper'>
+              wrapper += "<div class='dispute_reputation_history_cell_wrapper'>
                <div>WBRS:</div><div>#{wbrs.join(', ')}</div></div>"
 
             if sbrs.length > 0
-              wrapper += "<div class='dispute_observable_history_cell_wrapper'>
+              wrapper += "<div class='dispute_reputation_history_cell_wrapper'>
                <div>SBRS:</div><div>#{sbrs.join(', ')}</div></div>"
 
             return wrapper
@@ -105,11 +109,11 @@ window.create_observable_history_popup = (id) ->
                 sbrs.push rule.name
 
             if wbrs.length > 0
-              wrapper += "<div class='dispute_observable_history_cell_wrapper'>
+              wrapper += "<div class='dispute_reputation_history_cell_wrapper'>
                <div>WBRS:</div><div>#{wbrs.join(', ')}</div></div>"
 
             if sbrs.length > 0
-              wrapper += "<div class='dispute_observable_history_cell_wrapper'>
+              wrapper += "<div class='dispute_reputation_history_cell_wrapper'>
                <div>SBRS:</div><div>#{sbrs.join(', ')}</div></div>"
 
             return wrapper
@@ -124,13 +128,17 @@ window.create_observable_history_popup = (id) ->
         }
       ]
 
-    $('#observable-history-dialog').dialog('open')
+    $('#reputation-history-dialog').dialog('open')
 
 
-window.get_observable_history = () ->
+window.get_reputation_history = () ->
   if ($('.dispute_check_box:checked').length == 1)
     id = $('.dispute_check_box:checked').attr('data-entry-id')
-    create_observable_history_popup(id)
+    wrapper = $('.dispute_check_box:checked').parents('.research-table-row-wrapper')[0]
+    entry = $(wrapper).find('.entry-data-content')[0]
+    entry_text = $(entry).text().trim()
+
+    create_reputation_history_popup(id, entry_text)
   else if ($('.dispute_check_box:checked').length > 1)
     std_msg_error('Too many rows selected', ['A single row must be selected to view observable history'])
   else if ($('.dispute_check_box:checked').length < 1)
@@ -138,7 +146,7 @@ window.get_observable_history = () ->
 
 $ ->
   ## init observable history dialog
-  $('#observable-history-dialog').dialog
+  $('#reputation-history-dialog').dialog
     autoOpen: false,
     minWidth: 680,
     minHeight: 560,

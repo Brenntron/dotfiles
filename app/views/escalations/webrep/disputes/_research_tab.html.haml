@@ -282,9 +282,8 @@
         %label.toolbar-section-label Data
         %button.toolbar-button.sync-button#sync-data-button.toolbar-button-spacer
           %span.toolbar-button-text Refresh Data
-
-        %button.toolbar-button.sync-button#data-snapshot-button.esc-tooltipped.toolbar-button-spacer{title: 'Data Snapshots', onclick: "get_observable_history();"}
-          %span.toolbar-button-text Data Snapshots
+        %button.toolbar-button#reputation-history-button.esc-tooltipped.toolbar-button-spacer{title: 'Reputation History', onclick: "get_reputation_history();"}
+          %span.toolbar-button-text Reputation History
         %form#dispute_research_export_form{action: export_escalations_webrep_dispute_path(@dispute, format: :csv), method: 'get'}
           %button.toolbar-button.export-button
             %span.toolbar-button-text Export
@@ -1090,4 +1089,4 @@
                                     %td= entry.blacklist.first_seen
                                     %td= entry.blacklist.last_seen
 
-= render 'escalations/webrep/disputes/observable_history_dialog'
+= render 'escalations/webrep/disputes/reputation_history_dialog'
