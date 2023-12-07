@@ -217,23 +217,23 @@ window.take_selected = ()->
       headers: headers
       data: 'complaint_entry_ids': entry_ids, 'assignment_type': assignment_type
       success: (response) ->
-#        debugger
         json = $.parseJSON(response)
         if json.error
-          std_msg_error('Error Taking Entries', json.error)
+          std_msg_error('Error Taking Entries', [json.error.join(' ')])
         else
-#          debugger
-          for row, i in selected_rows[0]
-            if assignment_type is 'assignee'
-              selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
-              selected_rows.data().cell(selected_rows[0][i],4).data("ASSIGNED").draw()
-            else if assignment_type is 'reviewer'
-              selected_rows.data().cell(selected_rows[0][i],18).data(json.name).draw()
-            else if assignment_type is 'second_reviewer'
-              selected_rows.data().cell(selected_rows[0][i],19).data(json.name).draw()
+          $(selected_rows).each ->
+            row = this
+            if assignment_type == 'assignee'
+              $(row).find('.assignee-row td').text(json.name)
+              status = $(row).find('.state-row td')
+              if ($(status).text() == 'NEW') || ($(status).text() == 'REOPENED')
+                $(status).text('ASSIGNED')
+            else if assignment_type == 'reviewer'
+              $(row).find('.reviewer-row td').text(json.name)
+            else if assignment_type == 'second_reviewer'
+              $(row).find('.second-reviewer-row td').text(json.name)
 
       error: (response) ->
-#        debugger
         std_msg_error('Error Taking Entries', response.responseText)
     , this)
   else
@@ -246,25 +246,33 @@ window.return_selected = ()->
   $(selected_rows).each ->
     entry_id = $(this).attr('id')
     entry_ids.push(entry_id)
+  assignment_type = $('.assignment-type-input:checked').val()
   if entry_ids.length > 0
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
       method: 'POST'
       headers: headers
-      data: 'complaint_entry_ids': entry_ids
+      data: 'complaint_entry_ids': entry_ids, 'assignment_type': assignment_type
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
-          notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('Error Returning Entries', json.error)
+          std_msg_error('Error Returning Entries', [json.error.join(' ')])
         else
-          for row, i in selected_rows[0]
-            selected_rows.data().cell(row,14).data("Vrt Incoming").draw()
-            selected_rows.data().cell(row,4).data("NEW").draw()
+          $(selected_rows).each ->
+            row = this
+            if assignment_type == 'assignee'
+              $(row).find('.assignee-row td').text("Vrt Incoming")
+              status = $(row).find('.state-row td')
+              if $(status).text() == 'ASSIGNED'
+                $(status).text('NEW')
+            else if assignment_type == 'reviewer'
+              $(row).find('.reviewer-row td').text("")
+            else if assignment_type == 'second_reviewer'
+              $(row).find('.second-reviewer-row td').text("")
 
       error: (response) ->
-        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+        std_msg_error('Error Returning Entries', [response.responseText])
     , this)
   else
     std_msg_error('no rows selected', ['Please select at least one row.'])
@@ -277,13 +285,14 @@ window.webcat_change_assignee = () ->
   $(selected_rows).each ->
     entry_id = $(this).attr('id')
     entry_ids.push(entry_id)
+  assignment_type = $('.assignment-type-input:checked').val()
+  user_id = $('#index_target_assignee option:selected').val()
+
   if entry_ids.length > 0
-
-    user_id = $('#index_target_assignee option:selected').val()
-
     data = {
       'complaint_entry_ids': entry_ids,
-      'user_id': user_id
+      'user_id': user_id,
+      'assignment_type': assignment_type
     }
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -296,12 +305,21 @@ window.webcat_change_assignee = () ->
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
-          notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('Error Assigning Entries', json.error)
+          std_msg_error('Error Assigning Entries', [json.error])
         else
-          #reload table data
-          $('#complaints-index').DataTable().draw()
-
+          $(selected_rows).each ->
+            row = this
+            if assignment_type == 'assignee'
+              $(row).find('.assignee-row td').text(json.name)
+              status = $(row).find('.state-row td')
+              if ($(status).text() == 'NEW') || ($(status).text() == 'REOPENED')
+                $(status).text('ASSIGNED')
+            else if assignment_type == 'reviewer'
+              $(row).find('.reviewer-row td').text(json.name)
+            else if assignment_type == 'second_reviewer'
+              $(row).find('.second-reviewer-row td').text(json.name)
+      error: (response) ->
+        std_msg_error('Error Assigning Entries', [response.responseText])
     )
   else
     std_msg_error('no rows selected', ['Please select at least one row.'])
@@ -313,24 +331,34 @@ window.webcat_remove_assignee = () ->
   $(selected_rows).each ->
     entry_id = $(this).attr('id')
     entry_ids.push(entry_id)
+  assignment_type = $('.assignment-type-input:checked').val()
+  
   if entry_ids.length > 0
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/unassign_all'
       method: 'POST'
       headers: headers
-      data: 'complaint_entry_ids': entry_ids
+      data: 'complaint_entry_ids': entry_ids, 'assignment_type': assignment_type
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
-          notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('Error Removing Assignees', json.error)
+          std_msg_error('Error Removing Assignees', [json.error])
         else
-          #reload table data
-          $('#complaints-index').DataTable().draw()
+          $(selected_rows).each ->
+            row = this
+            if assignment_type == 'assignee'
+              $(row).find('.assignee-row td').text("Vrt Incoming")
+              status = $(row).find('.state-row td')
+              if $(status).text() == 'ASSIGNED'
+                $(status).text('NEW')
+            else if assignment_type == 'reviewer'
+              $(row).find('.reviewer-row td').text("")
+            else if assignment_type == 'second_reviewer'
+              $(row).find('.second-reviewer-row td').text("")
 
       error: (response) ->
-        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+        std_msg_error('Error Removing Assignees', [response.responseText])
     , this)
   else
     std_msg_error('no rows selected', ['Please select at least one row.'])
