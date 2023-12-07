@@ -15008,18 +15008,14 @@ input.wl-bl-list-inline {
   display: none;
 }
 
-.dispute_reputation_history_cell_wrapper {
-  border-top: 1px solid #f2f2f2;;
-}
-
-.dispute_reputation_history_cell_wrapper:first-of-type {
-  border-top: none;
-}
-
-.dispute_observable_history_rule_hits {
-  min-width: 80px;
+.reputation_history_resolved_ip{
+  text-align: center;
 }
 
 #reputation-history-button {
   background-image: url(image_path('icon_history.svg'));
+}
+
+.reputation_history_rule_hits {
+  padding-left: 6px;
 }
