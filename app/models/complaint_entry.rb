@@ -202,7 +202,7 @@ class ComplaintEntry < ApplicationRecord
       update(second_reviewer: assignee)
 
     end
-    "#{assignee.cvs_username} assigned to entry as #{assignment_type}"
+    return {name: assignee.display_name, assignment_type: assignment_type}
   end
 
   def is_pending?

@@ -219,8 +219,12 @@ window.take_selected = ()->
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
-          std_msg_error('Error Taking Entries', [json.error.join(' ')])
+          if entry_ids.length == 1
+            std_msg_error('Error Taking Entries', [json.error])
+          else
+            std_msg_error('Error Taking Entries', [json.error.join(' ')])
         else
+          # TODO add flash success
           $(selected_rows).each ->
             row = this
             if assignment_type == 'assignee'
@@ -257,7 +261,10 @@ window.return_selected = ()->
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
-          std_msg_error('Error Returning Entries', [json.error.join(' ')])
+          if entry_ids.length == 1
+            std_msg_error('Error Returning Entries', [json.error])
+          else
+            std_msg_error('Error Returning Entries', [json.error.join(' ')])
         else
           $(selected_rows).each ->
             row = this
@@ -303,21 +310,24 @@ window.webcat_change_assignee = () ->
       data: data
       dataType: 'json'
       success: (response) ->
+        $('#webcat-change-assignee-index-dropdown').dropdown('toggle')
         json = $.parseJSON(response)
         if json.error
           std_msg_error('Error Assigning Entries', [json.error])
         else
+          #TODO add flash success
+          assignee = json.data[0].result.name
           $(selected_rows).each ->
             row = this
             if assignment_type == 'assignee'
-              $(row).find('.assignee-row td').text(json.name)
+              $(row).find('.assignee-row td').text(assignee)
               status = $(row).find('.state-row td')
               if ($(status).text() == 'NEW') || ($(status).text() == 'REOPENED')
                 $(status).text('ASSIGNED')
             else if assignment_type == 'reviewer'
-              $(row).find('.reviewer-row td').text(json.name)
+              $(row).find('.reviewer-row td').text(assignee)
             else if assignment_type == 'second_reviewer'
-              $(row).find('.second-reviewer-row td').text(json.name)
+              $(row).find('.second-reviewer-row td').text(assignee)
       error: (response) ->
         std_msg_error('Error Assigning Entries', [response.responseText])
     )
@@ -332,7 +342,7 @@ window.webcat_remove_assignee = () ->
     entry_id = $(this).attr('id')
     entry_ids.push(entry_id)
   assignment_type = $('.assignment-type-input:checked').val()
-  
+
   if entry_ids.length > 0
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
