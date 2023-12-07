@@ -464,7 +464,6 @@ build_complaints_table = (url) ->
                   '</div>'
 
             else
-              console.log full
               submit_res_wrapper =
                 '<div class="submit-res-wrapper open-ticket-res-wrapper">' +
                   '<div class="res-radio-row">' +

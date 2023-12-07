@@ -203,13 +203,13 @@ open_selected = (selected_rows, toggle) ->
 # Assignment Functions #
 
 window.take_selected = ()->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
+  selected_rows = $('#complaints-index tr.selected')
+  entry_ids = []
+  $(selected_rows).each ->
+    entry_id = $(this).attr('id')
+    entry_ids.push(entry_id)
   assignment_type = $('.assignment-type-input:checked').val()
-
-  if selected_rows[0].length > 0
-    entry_ids = []
-    for row, i in selected_rows[0]
-      entry_ids.push(selected_rows.data()[i].entry_id)
+  if entry_ids.length > 0
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
@@ -217,11 +217,12 @@ window.take_selected = ()->
       headers: headers
       data: 'complaint_entry_ids': entry_ids, 'assignment_type': assignment_type
       success: (response) ->
+#        debugger
         json = $.parseJSON(response)
         if json.error
           std_msg_error('Error Taking Entries', json.error)
         else
-          debugger
+#          debugger
           for row, i in selected_rows[0]
             if assignment_type is 'assignee'
               selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
@@ -232,6 +233,7 @@ window.take_selected = ()->
               selected_rows.data().cell(selected_rows[0][i],19).data(json.name).draw()
 
       error: (response) ->
+#        debugger
         std_msg_error('Error Taking Entries', response.responseText)
     , this)
   else
@@ -239,11 +241,12 @@ window.take_selected = ()->
 
 
 window.return_selected = ()->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  if selected_rows[0].length > 0
-    entry_ids = []
-    for row, i in selected_rows[0]
-      entry_ids.push(selected_rows.data()[i].entry_id)
+  selected_rows = $('#complaints-index tr.selected')
+  entry_ids = []
+  $(selected_rows).each ->
+    entry_id = $(this).attr('id')
+    entry_ids.push(entry_id)
+  if entry_ids.length > 0
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
@@ -269,11 +272,12 @@ window.return_selected = ()->
 
 
 window.webcat_change_assignee = () ->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  if selected_rows[0].length > 0
-    entry_ids = []
-    for row, i in selected_rows[0]
-      entry_ids.push(selected_rows.data()[i].entry_id)
+  selected_rows = $('#complaints-index tr.selected')
+  entry_ids = []
+  $(selected_rows).each ->
+    entry_id = $(this).attr('id')
+    entry_ids.push(entry_id)
+  if entry_ids.length > 0
 
     user_id = $('#index_target_assignee option:selected').val()
 
@@ -304,11 +308,12 @@ window.webcat_change_assignee = () ->
 
 
 window.webcat_remove_assignee = () ->
-  selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  if selected_rows[0].length > 0
-    entry_ids = []
-    for row, i in selected_rows[0]
-      entry_ids.push(selected_rows.data()[i].entry_id)
+  selected_rows = $('#complaints-index tr.selected')
+  entry_ids = []
+  $(selected_rows).each ->
+    entry_id = $(this).attr('id')
+    entry_ids.push(entry_id)
+  if entry_ids.length > 0
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/unassign_all'
