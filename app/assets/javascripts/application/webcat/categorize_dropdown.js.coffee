@@ -1,8 +1,51 @@
+## WEBCAT CATEGORIZE URLS DROPDOWN FUNCTIONS ##
+$ ->
+
+  # Populate the category selectizes on the dropdown
+  new_url_cats = $('select.cat_new_url')
+  for select in new_url_cats
+    $(select).selectize {
+      persist: true,
+      create: false,
+      maxItems: 5,
+      closeAfterSelect: true,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: AC.WebCat.createSelectOptions("##{select.id}")
+      score: (input) ->
+        #  Adding some customization for autofill
+        #  restricting on certain cats to avoid accidental categorization
+        #  (replaces selectize's built-in `getScoreFunction()` with our own)
+        (item) ->
+          if item.category_code == 'cprn' || item.category_code == 'xpol' || item.category_code == 'xita' || item.category_code == 'xgbr' || item.category_code == 'xdeu' || item.category_code == 'piah'
+            item.category_code == input ? 1 : 0
+          else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+            1
+          else if item.category_name.toLowerCase().includes(input.toLowerCase()) || item.category_code.toLowerCase().includes(input.toLowerCase())
+            0.9
+          else
+            0
+    }
+
+  # Switch which form type is shown
+  $('#cat-urls-diff').click ->
+    if $('#cat-urls-diff').prop('checked')
+      $('#categorize-same-form').hide()
+      $('#categorize-diff-form').show()
+
+  $('#cat-urls-same').click ->
+    if $('#cat-urls-same').prop('checked')
+      $('#categorize-diff-form').hide()
+      $('#categorize-same-form').show()
+
+
+
+# Lookup current categories of input urls
 window.lookup_prefix = () ->
   $('.lookup-drop-loader').removeClass('hidden')
 
   urls = []
-
   for i in [1 .. 5]
     $select= $('#cat_new_url_' + i).selectize()
     selectize = $select[0].selectize
@@ -32,12 +75,12 @@ window.lookup_prefix = () ->
       $('.lookup-drop-loader').addClass('hidden')
   )
 
+
+
 window.drop_current_categories = () ->
   $(".cat-url-error").hide()
   $(".cat-url-success").hide()
-
   $('.lookup-drop-loader').removeClass('hidden')
-
   $("#url_#{i}").css("border-width", "")
   $("#url_#{i}").css("border-color", "")
 
@@ -68,7 +111,8 @@ window.drop_current_categories = () ->
     error: (response) ->
       $('.lookup-drop-loader').addClass('hidden')
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
-)
+  )
+
 
 window.retrieve_history = (position) ->
   $(".cat-url-error").hide()
@@ -172,21 +216,6 @@ window.retrieve_history = (position) ->
 
 
 window.cat_new_url = ()->
-  timesTouched = getTouchedFormCount()
-  if timesTouched > 1
-    std_msg_confirm(
-      "You have made " + timesTouched + " changes on this page. Do you want to proceed with categorizing this new item? It will reload the page and you will lose your changes.",
-      [],
-      {
-        reload: false,
-        confirm_dismiss: true,
-        confirm: ->
-          processSubmitNewURL()
-      })
-  else
-    processSubmitNewURL()
-
-processSubmitNewURL = () ->
   data = {}
   isEmpty = true
   $('#categorize-urls').dropdown('toggle')
@@ -237,9 +266,10 @@ processSubmitNewURL = () ->
             $('#cat_new_url_3')[0].selectize.clear()
             $('#cat_new_url_4')[0].selectize.clear()
             $('#cat_new_url_5')[0].selectize.clear()
-            )
+          )
         )
       error: (response) ->
+        # TODO - Find out where this response text is generated and fix, it makes no sense
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
           std_api_error(response, "Please make sure you have the appropriate permissions. Unable to categorize url.", reload: false)
         else
@@ -247,6 +277,8 @@ processSubmitNewURL = () ->
     )
   else
     std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
+
+
 
 window.multiple_url_categorization = () ->
   loader = $('.lookup-drop-loader')
@@ -267,13 +299,15 @@ window.multiple_url_categorization = () ->
       data: {urls: urls, category_names: category_names, category_ids: category_ids}
       success: (response) ->
         loader.addClass('hidden')
-        std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
+        std_msg_success('Success',["URLs/IPs successfully categorized."], reload: false)
       error: (response) ->
         loader.addClass('hidden')
-        std_msg_error("Error #{response.responseJSON.message}",'', reload: false)
+        std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
+
     )
   else
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
+
 
 window.drop_multiple_url_categories = () ->
   loader = $('.lookup-drop-loader')
@@ -304,17 +338,3 @@ window.drop_multiple_url_categories = () ->
   else
     std_msg_error('Error', ['Please check that a URL/IP has been inputted.'], reload: false)
 
-$ ->
-  $('#cat_new_url_modal').on 'shown.bs.modal', ->
-    $('#url_1').focus()
-    return
-
-  $('#cat-urls-diff').click ->
-    if $('#cat-urls-diff').prop('checked')
-      $('#categorize-same-form').hide()
-      $('#categorize-diff-form').show()
-
-  $('#cat-urls-same').click ->
-    if $('#cat-urls-same').prop('checked')
-      $('#categorize-diff-form').hide()
-      $('#categorize-same-form').show()

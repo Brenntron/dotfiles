@@ -13,6 +13,7 @@
  *= require font_import_opensans
  *= require font_import_firamono
  *= require global
+ *= require webcat_index
  *= require webcat_telemetry
  *= require webcat_complaints
  *= require webcat_clusters
