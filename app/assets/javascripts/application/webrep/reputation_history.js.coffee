@@ -155,7 +155,9 @@ window.expand_all_reputation_history_rows = () ->
     this.child(format_child_row(this.data())).show()
     $(this.node()).addClass('shown')
   $('#reputation-history-dialog').dialog('open')
-  table.columns.adjust().draw();
+  table.columns.adjust().draw()
+  #set width of first column after render - annoying workaround! Otherwise the width of the columns keeps resetting.
+  $('#reputation-history-dialog-table th:first-of-type').width(90)
 
 $ ->
   ## init observable history dialog
