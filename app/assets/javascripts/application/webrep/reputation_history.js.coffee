@@ -28,7 +28,7 @@ window.create_reputation_history_popup = (id, entry) ->
       paging: false,
       searching: false,
       stateSave: false,
-      responsive: true,
+      responsive: false,
       autowidth: false,
       language:
         emptyTable: "No reputation history available for this dispute entry."
@@ -37,7 +37,7 @@ window.create_reputation_history_popup = (id, entry) ->
       columns: [
         {
           data: 'created_at',
-          width: '88px',
+          width: '90px',
           render: (data) ->
             if data
               return moment(data, "YYYY-MM-DD HH:mm").format("YYYY-MM-DD HH:mm")
