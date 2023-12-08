@@ -1,0 +1,54 @@
+#index_change_resolution_dialog.row{title: 'Bulk Resolution Tool'}
+  .edit-resolution-container
+    .col-xs-12
+      .edit-resolution-comment
+        Fixed submission resolutions cannot be chosen in bulk.
+    .col-xs-12.resolution-container
+      %label.content-label-sm.edit-resolution-label Resolution
+      .resolution-controls
+        .resolution-input-wrapper
+          %input{type: 'radio', id: 'webcat_resolution_unchanged_option', name: 'complaint[resolution]', value: 'UNCHANGED'}
+          %label.resolution-radio-label{for: 'webcat_resolution_unchanged_option'} Unchanged
+          %input{type: 'radio', id: 'webcat_resolution_invalid_option', name: 'complaint[resolution]', value: 'INVALID'}
+          %label.resolution-radio-label{for: 'webcat_resolution_invalid_option'} Invalid
+        .resolution-apply-wrapper
+          %button#resolution-apply-button.resolution-apply-button
+    .col-xs-12.customer-facing-comment-container
+      %label.content-label-sm.edit-resolution-label{'for':'customer_facing_comment'} Customer Facing Comment
+      .resolution-controls
+        #webcat-resolution-select-wrapper.resolution-input-wrapper
+          %select#email-response-to-customers-select{name: 'customer_facing_comment_select'}
+          %textarea#email-response-to-customers.email-response-input{type: 'text', name: 'customer_facing_comment'}
+        .resolution-apply-wrapper
+          %button#customer-facing-apply-button.resolution-apply-button
+    -#.col-xs-12.categories-container
+            -#  .resolution-category-options
+            -#    %label.content-label-sm.edit-resolution-label{for: 'complaint[categories]'} Categories to Apply
+            -#    %input{type: 'radio', name: 'complaint[category_option]', value: 'ADD', checked: 'checked'}
+            -#    %label.resolution-radio-label Add
+            -#    %input{type: 'radio', name: 'complaint[category_option]', value: 'REPLACE'}
+            -#    %label.resolution-radio-label Replace
+            -#    %input{type: 'radio', name: 'complaint[category_option]', value: 'DROP_ALL'}
+            -#    %label.resolution-radio-label Drop All
+            -#  .resolution-controls
+            -#    .resolution-input-wrapper
+            -#      %select#webcat-bulk-categories.edit-resolution-select{name: 'webcat-bulk-categories', placeholder: 'Enter Categories / Confidence Order', value: ''}
+            -#    .resolution-apply-wrapper
+            -#      %button#category-apply-button.resolution-apply-button
+    .col-xs-12.internal-comment-container
+      %label.content-label-sm.edit-resolution-label{'for':'internal_comment'} Internal Comment
+      .resolution-controls
+        .resolution-input-wrapper.webcat-textarea-input-rapper
+          %textarea.form-control.internal-comment-textbox#internal_comment{:name => "internal_comment", :type => "text", :value => ""}
+        .resolution-apply-wrapper
+          %button#internal-comment-button.resolution-apply-button
+    .col-xs-12.button-wrapper
+      %button{class: 'primary button-update-resolution resolution-clear-button', type:'button', onclick:'clearBulkResolution();'}
+        =inline_svg 'icon_clear_white.svg', class: 'resolution-button-icon'
+        %span Reset
+      -#%button{class: 'primary button-update-resolution apply-all-button', type:'button', onclick:'applyAll();'}
+      -#  =inline_svg 'icon_apply_all_white.svg', class: 'resolution-button-icon'
+      -#  %span Apply All
+      %button{class: 'primary button-update-resolution update-resolution-button', type:'button', onclick:'updateResolutionDialog();'}
+        =inline_svg 'icon_submit_arrow.svg', class: 'resolution-button-icon'
+        %span Submit

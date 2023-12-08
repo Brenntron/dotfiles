@@ -280,6 +280,68 @@ format_domain_info = (info)->
 # ^TODO - there are more than one whois function - consolidate
 
 
+$ ->
+
+  # initialize bulk resolution dialog
+  $('#index_change_resolution_dialog').dialog
+    autoOpen: false
+    classes: { 'ui-dialog': 'index-change-resolution-dialog'}
+    width: 450
+    minHeight: 300
+    position:
+      my: 'right top'
+      at: 'right top+150'
+      of: window
+    open:  () ->
+      #select radio button if none is selected (needs to be clicked so data can load)
+      webcat_bulk_response_templates_check_if_checked()
+
+  webcat_bulk_response_templates_check_if_checked = () ->
+    if $("input[type=radio][name='complaint[resolution]']:checked").length <= 0
+      $('#webcat_resolution_unchanged_option').trigger('click')
+
+  # Load resolution template comments after clicking new status
+  $("input[type=radio][name='complaint[resolution]']").change ->
+    resolution = $(this).val()
+    populate_resolved_webcat_templates(resolution)
+
+  # Populate current resolution comment after changing resolution template
+  $('#email-response-to-customers-select').on 'change', (i, e) ->
+    comment = $('#email-response-to-customers-select option:selected').attr('data-body')
+    $('#email-response-to-customers').val comment
+
+
+# Populate bulk webcat response templates
+assemble_webcat_bulk_response_templates = (templates, resolution_select) ->
+  resolution_select = $('#email-response-to-customers-select')
+  resolution_select.empty()
+
+  if templates.length == 0
+    resolution_select.val ''
+    $('#email-response-to-customers').text ''
+    $('#email-response-to-customers').val ''
+
+  $(templates).each (index, template) ->
+    template_option = $("<option class='webcat-resolution-template-option'></option>")
+    $(template_option).val template.name
+    $(template_option).text template.name
+    $(template_option).attr('data-body', template.body )
+    $(template_option).attr('data-description', template.description )
+    resolution_select.append template_option
+
+    #show first option as body and description
+    if index == 0
+      $('#email-response-to-customers').text template.body
+      $('#email-response-to-customers').val template.body
+
+window.populate_resolved_webcat_templates = (resolution) ->
+  get_resolution_templates_by_resolution('webcat', resolution).then (response) ->
+    templates = JSON.parse response
+    assemble_webcat_bulk_response_templates(templates)
+
+
+
+
 window.resolution_comment_dialog = (entry_id) ->
   res_comment_dialog_html = '<div id="resolution_comment_dialog"></div>'
   res_content =

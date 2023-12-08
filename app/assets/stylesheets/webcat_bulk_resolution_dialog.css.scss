@@ -1,0 +1,242 @@
+.index-change-resolution-dialog {
+  border: none !important;
+  border-radius: 3px;
+  z-index: 999;
+
+  .ui-dialog-titlebar {
+    background-color: #3e5a72;
+    padding: 5px 2px;
+  }
+
+  .ui-dialog-title {
+    background-image: url(image_path('icon_bulk_resolve_white.svg'));
+    background-position: left -2px;
+    background-repeat: no-repeat;
+    background-size: 25px 25px;
+    font-weight: 600;
+    margin-left: 5px;
+    padding: 5px 0 5px 30px
+  }
+
+  .edit-resolution-container{
+    padding: 10px 20px;
+
+    .resolution-container, .email-response-to-customer-container, .categories-container, .internal-comment-container {
+      margin-top: 5px;
+    }
+
+    .internal-comment-container, .customer-facing-comment-container {
+      .toolbar-section-label{
+        margin-top: -25px;
+      }
+    }
+
+    .internal-comment-container {
+
+      .resolution-apply-wrapper {
+        align-items: start;
+      }
+
+      .internal-comment-textbox {
+        height: 100px;
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      .resolution-controls {
+        min-height: 110px;
+      }
+
+      .resolution-input-wrapper {
+        min-height: 100px;
+      }
+    }
+
+    #webcat-resolution-select-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #email-response-to-customers {
+      width: 100%;
+      margin-top: 10px;
+      min-height: 70px;
+      resize: vertical;
+      padding: 2px 5px;
+    }
+
+    .edit-resolution-comment {
+      border-bottom: 1px solid #f2f2f2;
+      color: #666;
+      font-size: 0.75em;
+      font-weight: 400;
+      padding-bottom: 15px;
+    }
+
+    .edit-resolution-label {
+      font-size: 0.75em;
+      margin-bottom: 5px;
+      padding-bottom: 0;
+      padding-top: 0;
+    }
+
+    .resolution-controls {
+      border-bottom: 1px solid #f2f2f2;
+      display: flex;
+      min-height: 35px;
+      padding-bottom: 10px;
+    }
+
+    .resolution-input-wrapper {
+      align-items: center;
+      display: flex;
+      height: 100%;
+      width: 80%;
+      //width: 100%; //WEB-8151 temp fix
+
+      .selectize-control.multi {
+        width: 100%;
+      }
+
+      input[type='text'], input[type='select-multiple'], select {
+        width: 100% !important;
+      }
+
+    }
+
+    #email-response-to-customers-select {
+      padding: 2px;
+      outline: 1px solid #bfbfbf;
+      border: 0;
+    }
+
+    .webcat-textarea-input-rapper {
+      display: block;
+    }
+
+    .selectize-input.items {
+      margin: 0 !important;
+      padding: 0 !important;
+      min-height: 30px !important;
+      border-radius: 1px;
+      border: none;
+      outline: 1px solid lighten(#999, 15%) !important;
+      box-shadow: none;
+      font-size: 8pt;
+
+      input[type='select-multiple'] {
+        padding: 5px !important;
+
+        &::placeholder {
+          font-size: 10px;
+          font-style: italic;
+        }
+      }
+
+      &.disabled {
+        background-color: lighten(#d7dadb, 10%) !important;
+      }
+    }
+
+    .resolution-radio-label {
+      color: #666;
+      margin: 0 15px 0 0;
+      padding-left: 5px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    input[type='radio'] {
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .resolution-category-options {
+      align-items: center;
+      display: flex;
+      justify-content: end;
+      margin-bottom: 10px;
+      position: relative;
+      width: 80%;
+
+      .content-label-sm {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    }
+
+    .email-response-input {
+      height: 20px;
+      border: none;
+      outline: 1px solid lighten(#999, 15%);
+    }
+
+    .edit-resolution-select .selectize-input, .internal-comment-textbox {
+      /* Important flag is to override selectize defaults */
+      background-color: #dff1f7 !important;
+      border-radius: 0;
+      margin-left: 0px !important;
+      outline: 1px solid lighten(#999, 15%);
+      padding-bottom: 15px;
+    }
+
+    .resolution-apply-wrapper {
+      align-items: center;
+      display: flex;
+      height: 100%;
+      justify-content: end;
+      width: 20%;
+      display: none; //WEB-8151 temp fix to hide apply buttons
+
+      .resolution-apply-button {
+        background-color: lighten(#d7dadb, 7%);
+        background-image: url(image_path('icon_apply_light_grey.svg'));
+        background-repeat: no-repeat;
+        background-size: 20px 20px;
+        background-position: center center;
+        border: none;
+        border-radius: 3px;
+        height: 35px;
+        padding: 0 6px;
+        width: 35px;
+
+        &.applied {
+          background-color: #d7dadb;
+          background-image: url(image_path('icon_apply_grey.svg'));
+        }
+      }
+    }
+
+    .button-wrapper{
+      display: flex;
+      justify-content: space-evenly;
+      justify-content: center ; //WEB-8151 temp fix to hide apply all button and center other buttons
+      margin-bottom: 25px;
+
+      .button-update-resolution{
+        align-items: center;
+        background-position: 5% center;
+        background-repeat: no-repeat;
+        background-size: 25px 25px;
+        display: flex;
+        padding: 10px 15px;
+      }
+
+      .resolution-button-icon {
+        height: 25px;
+        margin-right: 10px;
+        width: 25px;
+      }
+
+      .resolution-clear-button {
+        background-color: #999;
+      }
+
+      .update-resolution-button {
+        background-color: #E47433;
+      }
+
+    }
+  }
+}
