@@ -97,26 +97,62 @@ class ComplaintEntry < ApplicationRecord
 
     return("Already completed") if status == "COMPLETED"
 
-    if assignment_type == 'assignee' && [reviewer&.id, second_reviewer&.id].include?(current_user.id)
-      return('A Reviewer cannot also be the Assignee.')
-    elsif assignment_type == 'assignee' && (user.nil? || user.display_name == 'Vrt Incoming')
-      update(user: current_user, status: "ASSIGNED", case_assigned_at: Time.now)
-      complaint.set_status("ASSIGNED")
-    elsif ['second_reviewer', 'reviewer'].include?(assignment_type) && user.id == current_user.id
-      return('The Assignee cannot also be a Reviewer.')
-    elsif assignment_type == 'reviewer' && reviewer.nil? && second_reviewer.id == user.id
-      return('The Reviewer cannot also be the Second Reviewer.')
-    elsif assignment_type == 'reviewer' && reviewer.nil?
-      update(reviewer: current_user)
-    elsif assignment_type == 'reviewer' && second_reviewer.nil? && reviewer.id == user.id
-      return('The Second Reviewer cannot also be the Reviewer.')
-    elsif assignment_type == 'second_reviewer' && second_reviewer.nil?
-      update(second_reviewer: current_user)
+    if assignment_type == 'assignee'
+      # check reviewer and second reviewer
+      unless reviewer.nil?
+        if reviewer.id == current_user.id
+          return('A reviewer cannot also be the assignee.')
+        end
+      end
+      unless second_reviewer.nil?
+        if second_reviewer.id == current_user.id
+          return('A reviewer cannot also be the assignee.')
+        end
+      end
+      if user.nil? || user.display_name == 'Vrt Incoming'
+        update(user: current_user, status: "ASSIGNED", case_assigned_at: Time.now)
+        complaint.set_status("ASSIGNED")
+      else
+        return('Entry is already assigned')
+      end
+
+    elsif assignment_type == 'reviewer' || assignment_type == 'second_reviewer'
+      unless user.nil?
+        if user.id == current_user.id
+          return('The assignee cannot also be a reviewer.')
+        end
+      end
+
+      if assignment_type == 'reviewer'
+        unless second_reviewer.nil?
+          if second_reviewer.id == current_user.id
+            return('The second reviewer cannot also be the reviewer.')
+          end
+        end
+        if reviewer.nil?
+          update(reviewer: current_user)
+        else
+          return('Entry has a reviewer assigned')
+        end
+      elsif assignment_type == 'second_reviewer'
+        unless reviewer.nil?
+          if reviewer.id == current_user.id
+            return('The Reviewer cannot also be the second reviewer.')
+          end
+        end
+        if second_reviewer.nil?
+          update(second_reviewer: current_user)
+        else
+          return('Entry already has a second reviewer assigned')
+        end
+      end
+
     else
       return(error_messages[assignment_type])
     end
     return 'Entry taken'
   end
+
 
   def return_complaint(current_user, assignment_type)
     return("Already completed") if status == 'COMPLETED'

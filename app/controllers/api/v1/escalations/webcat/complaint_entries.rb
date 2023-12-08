@@ -145,7 +145,7 @@ module API
                 permitted_params['complaint_entry_ids'].each do |id|
                   status = ComplaintEntry.find(id).take_complaint(current_user, permitted_params['assignment_type'])
 
-                  next if status == "Complaint taken"
+                  next if status == "Entry taken"
 
                   error_count += 1
                   if error_entry_ids[status].nil?
@@ -157,9 +157,9 @@ module API
 
                 unless error_entry_ids.keys.empty?
                   error_message = if error_count == permitted_params['complaint_entry_ids'].count
-                                    ["The following entries could not be taken:"]
+                                    ["The following entries could not be taken: "]
                                   else
-                                    ["Some entries were successfully taken, but the following entries could not be taken:"]
+                                    ["Some entries were successfully taken, but the following entries could not be taken: "]
                                   end
 
                   error_entry_ids.each_key do |key|
@@ -175,7 +175,7 @@ module API
                 error = e.message.to_s
                 return { error: error }.to_json
               end
-              {name: current_user.display_name, cvs_username: current_user.cvs_username}.to_json
+              {name: current_user.display_name}.to_json
             end
 
 

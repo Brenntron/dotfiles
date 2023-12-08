@@ -201,7 +201,13 @@ open_selected = (selected_rows, toggle) ->
 
 
 # Assignment Functions #
-
+# take unassigned as assignee - check
+# take unassigned as reviewer
+# take unassigned as second reviewer
+# confirm below scenarios should be prevented - reviewer and second reviewer may not want to prevent
+# unable to take assigned as assignee
+# unable to take assigned as reviewer
+# unable to take assigned as second reviewer
 window.take_selected = ()->
   selected_rows = $('#complaints-index tr.selected')
   entry_ids = []
@@ -219,10 +225,10 @@ window.take_selected = ()->
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
-          if entry_ids.length == 1
-            std_msg_error('Error Taking Entries', [json.error])
-          else
+          if jQuery.type(json.error) == 'array'
             std_msg_error('Error Taking Entries', [json.error.join(' ')])
+          else
+            std_msg_error('Error Taking Entries', [json.error])
         else
           # TODO add flash success
           $(selected_rows).each ->
@@ -261,7 +267,7 @@ window.return_selected = ()->
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
-          if entry_ids.length == 1
+          if jQuery.type(json.error) != 'array'
             std_msg_error('Error Returning Entries', [json.error])
           else
             std_msg_error('Error Returning Entries', [json.error.join(' ')])
@@ -313,7 +319,10 @@ window.webcat_change_assignee = () ->
         $('#webcat-change-assignee-index-dropdown').dropdown('toggle')
         json = $.parseJSON(response)
         if json.error
-          std_msg_error('Error Assigning Entries', [json.error])
+          if jQuery.type(json.error) != 'array'
+            std_msg_error('Error Assigning Entries', [json.error])
+          else
+            std_msg_error('Error Assigning Entries', [json.error.join(' ')])
         else
           #TODO add flash success
           assignee = json.data[0].result.name
@@ -353,7 +362,10 @@ window.webcat_remove_assignee = () ->
       success: (response) ->
         json = $.parseJSON(response)
         if json.error
-          std_msg_error('Error Removing Assignees', [json.error])
+          if jQuery.type(json.error) != 'array'
+            std_msg_error('Error Removing Assignees', [json.error])
+          else
+            std_msg_error('Error Removing Assignees', [json.error.join(' ')])
         else
           $(selected_rows).each ->
             row = this
