@@ -16,6 +16,7 @@ window.create_reputation_history_popup = (id, entry) ->
 
   get_reputation_history_data(id).then (response) ->
     telemetry_data = JSON.parse(response.data)
+    console.log telemetry_data
     table = $('#reputation-history-dialog-table')
     #Update modal title
     $('[aria-describedby="reputation-history-dialog"] .ui-dialog-title').text("Reputation History: #{entry}")
@@ -46,14 +47,13 @@ window.create_reputation_history_popup = (id, entry) ->
         {
           data: 'wbrs_score'
           render: (data, type, full) ->
-            if !data
+            if !data && data != 0
               return ''
             else
               #show rule hits next to score if any
               if full.rule_hits?
                 wrapper = "<span>#{data}</span>"
                 rule_hits_parsed = JSON.parse(full.rule_hits)
-
                 wbrs_rules = []
                 $(rule_hits_parsed).each (i, rule) ->
                   if rule.rule_type == 'WBRS'
@@ -68,7 +68,7 @@ window.create_reputation_history_popup = (id, entry) ->
         {
           data: 'sbrs_score'
           render: (data, type, full) ->
-            if !data
+            if !data && data != 0
               return ''
             else
               #show rule hits next to score if any
