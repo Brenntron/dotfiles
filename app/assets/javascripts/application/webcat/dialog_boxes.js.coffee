@@ -315,11 +315,12 @@ $ ->
 assemble_webcat_bulk_response_templates = (templates, resolution_select) ->
   resolution_select = $('#email-response-to-customers-select')
   resolution_select.empty()
+  resolution_select.removeAttr('disabled')
 
   if templates.length == 0
-    resolution_select.val ''
-    $('#email-response-to-customers').text ''
-    $('#email-response-to-customers').val ''
+    resolution_select.attr('disabled', true)
+    resolution_select.append('<option>No templates available for this resolution</option>')
+    $('#email-response-to-customers').val('')
 
   $(templates).each (index, template) ->
     template_option = $("<option class='webcat-resolution-template-option'></option>")
