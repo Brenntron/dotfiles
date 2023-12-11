@@ -8,6 +8,7 @@ local sections = {
   l = { desc = " LSP" },
   m = { desc = "🏗 Mason"},
   n = { desc = "␀ Null-Ls" },
+  r = { desc = "🧪 Tests" },
   s = { desc = "󱙝 Spectre" },
   t = { desc = "󱉯 Trouble" },
   u = { desc = " Dadbod UI" },
@@ -135,6 +136,14 @@ maps.n["<leader>ml"] = { "<cmd>MasonLog<cr>", desc = "Mason Log" }
 maps.n["<leader>n"] = sections.n
 maps.n["<leader>ni"] = { "<cmd>NullLsInfo<cr>", desc = "Null-Ls Info" }
 maps.n["<leader>nl"] = { "<cmd>NullLsLog<cr>", desc = "Null-Ls Log"}
+
+-- Vim-Test
+maps.n["<leader>r"] = sections.r
+maps.n["<leader>rt"] = { "<cmd>TestNearest<cr>", desc = "Run the nearest test in this file" }
+maps.n["<leader>rT"] = { "<cmd>TestFile<cr>", desc = "Run all tests in this file" }
+maps.n["<leader>ra"] = { "<cmd>TestSuite<cr>", desc = "Run the test suite" }
+maps.n["<leader>rl"] = { "<cmd>TestLast<cr>", desc = "Run the last test" }
+maps.n["<leader>rg"] = { "<cmd>TestVisit<cr>", desc = "Visits the last run test file" }
 
 -- Spectre
 maps.n["<leader>s"] = sections.s

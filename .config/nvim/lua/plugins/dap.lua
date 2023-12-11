@@ -31,8 +31,7 @@ function M.config()
       port = "${port}",
       executable = {
         command = "bundle",
-        args = { "exec", "rdbg", "-n", "--open", "--port", "${port}", "-c", "--", "bundle", "exec", config.command, config.script,
-        },
+        args = { "exec", "rdbg", "-n", "--open", "--port", "${port}", "-c", "--", "bundle", "exec", config.command, config.script, },
       },
     }
   end
@@ -52,8 +51,25 @@ function M.config()
       localfs = true,
       command = "rspec",
       script = "${file}",
+    },
+    {
+      type = "ruby",
+      name = "run current cucumber file",
+      request = "attach",
+      localfs = true,
+      command = "cucumber",
+      script = "${file}",
     }
   }
 end
+
+M = {
+  "ravenxrz/DAPInstall.nvim",
+  commit = "8798b4c36d33723e7bba6ed6e2c202f84bb300de",
+  config = function()
+    require("dap_install").setup {}
+    require("dap_install").config("ruby", {})
+  end,
+}
 
 return M

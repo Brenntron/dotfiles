@@ -22,7 +22,7 @@ vim.opt.numberwidth = 4 -- minimal number of columns to use for the line number 
 vim.opt.pumblend = 10
 vim.opt.pumheight = 10 -- pop up menu height
 vim.opt.relativenumber = true -- set relative numbered lines
-vim.opt.ruler = false -- hide the line and column number of the cursor position
+vim.opt.ruler = true -- hide the line and column number of the cursor position
 vim.opt.scrolloff = 0 -- minimal number of screen lines to keep above and below the cursor
 vim.opt.shiftwidth = 2 -- the number of spaces inserted for each indentation
 vim.opt.shortmess:append "c" -- hide all the completion messages, e.g. "-- XXX completion (YYY)", "match 1 of 2", "The only match", "Pattern not found"
