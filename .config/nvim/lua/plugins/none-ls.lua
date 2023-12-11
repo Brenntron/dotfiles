@@ -12,13 +12,15 @@ local M = {
 
 function M.config()
   local null_ls = require "null-ls"
-  -- https://github.com/nvimtools/null-ls.nvim/tree/main/lua/none-ls/builtins/formatting
-  local formatting = null_ls.builtins.formatting
-  -- https://github.com/nvimtools/null-ls.nvim/tree/main/lua/none-ls/builtins/diagnostics
-  local diagnostics = null_ls.builtins.diagnostics
-  -- https://github.com/nvimtools/null-ls.nvim/blob/main/doc/BUILTINS.md#completion
+  -- https://github.com/nvimtools/none-ls.nvim/blob/main/doc/BUILTINS.md#completion
   local completions = null_ls.builtins.completion
-  -- https://github.com/nvimtools/null-ls.nvim/tree/main/lua/none-ls/builtins/helpders
+  -- https://github.com/nvimtools/none-ls.nvim/tree/main/lua/none-ls/builtins/diagnostics
+  local diagnostics = null_ls.builtins.diagnostics
+  -- https://github.com/nvimtools/none-ls.nvim/tree/main/lua/none-ls/builtins/formatting
+  local formatting = null_ls.builtins.formatting
+  -- https://github.com/nvimtools/none-ls.nvim/tree/main/lua/none-ls/builtins/hover
+  local hover = null_ls.builtins.formatting
+  -- https://github.com/nvimtools/none-ls.nvim/tree/main/lua/none-ls/builtins/helpders
   local helpers = require "null-ls.helpers"
   local coffeelint_query = {
     name = "coffeelint",
@@ -38,8 +40,8 @@ function M.config()
         filetypes = { "coffee", "erb", "eruby", "haml", "html", "markdown" },
       },
       diagnostics.stylelint,
-      diagnostics.haml_lint.with { "haml" },
-      diagnostics.rubocop.with { "ruby" },
+      diagnostics.haml_lint,
+      diagnostics.rubocop,
       diagnostics.shellcheck,
       diagnostics.zsh,
       -- formatters
@@ -56,6 +58,7 @@ function M.config()
       formatting.rubocop,
       formatting.sqlfluff,
       formatting.stylua,
+      hover.dictionary,
     },
   }
 
