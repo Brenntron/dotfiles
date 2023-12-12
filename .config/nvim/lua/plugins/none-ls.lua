@@ -58,7 +58,6 @@ function M.config()
       formatting.rubocop,
       formatting.sqlfluff,
       formatting.stylua,
-      hover.dictionary,
     },
   }
 
