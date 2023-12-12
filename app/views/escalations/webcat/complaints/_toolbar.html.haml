@@ -165,5 +165,8 @@
       %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
         %span.toolbar-button-text Confirm Review
   %div.webcat-toolbar-tall-wrapper
-    %input{type: 'checkbox', id:'self_review'}
+    - if current_user.allowed_self_review
+      %input{type: 'checkbox', id: 'self_review', checked: true}
+    - else
+      %input{type: 'checkbox', id:'self_review', checked: false}
     %label{for: 'self_review'} Allow Self Review
