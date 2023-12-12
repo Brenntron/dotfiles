@@ -38,10 +38,6 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
   def contains_search
   end
 
-  def resolution_message_templates
-    @templates = ResolutionMessageTemplate.for_webcat_disputes
-  end
-
   private
 
 

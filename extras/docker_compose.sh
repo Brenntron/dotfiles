@@ -17,7 +17,7 @@ echo "starting docker build script"
 docker-compose up --build
 
 #wait for the docker command to finish
-PID=$!
+PID = $!
 wait $PID
 
 echo "Finished building. Removing certs from local folder"
@@ -33,10 +33,10 @@ if [ ! -z "$1" ]
   then
     if ([ "$1" == "start" ]); then
       echo "starting image"
-      docker-compose start
+      docker compose start
     elif ([ "$1" == "up" ]); then
       echo "creating and starting image"
-      docker-compose up
+      docker compose up
     else
       echo "Not a recognised argument. Use up or start."
     fi

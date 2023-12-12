@@ -10,7 +10,7 @@ class Escalations::Sdr::DisputesController < ApplicationController
         render json: SdrDisputeDatatable.new(params, initialize_params, user: current_user)
       end
       format.xlsx do
-        workbook = SenderDomainReputationDispute.export_xlsx(params['data_json'], current_user)
+        workbook = SenderDomainReputationDispute.export_xlsx(params['data_json'], current_user: current_user)
         send_data workbook.stream.string, filename: "sdr_search_#{Time.now}.xlsx", disposition: 'attachment'
       end
     end
@@ -29,10 +29,6 @@ class Escalations::Sdr::DisputesController < ApplicationController
   def show
     @dispute = SenderDomainReputationDispute.where(id: params[:id]).first
     @beaker_info = @dispute.beaker_info
-    @is_assignee = @dispute.user_id == current_user.id
-    @is_duplicate = @dispute.resolution == Dispute::DUPLICATE
-    @is_resolved = @dispute.status == Dispute::RESOLVED
-    @is_unassigned = @dispute.user_id.nil? || @dispute.user&.cvs_username == 'vrtincom'
     @versioned_items = @dispute.compose_versioned_items
   end
 

@@ -38,7 +38,6 @@ Rails.application.routes.draw do
           get :named_search
           get :standard_search
           get :contains_search
-          get :resolution_message_templates
         end
       end
       resources :complaint_entries, only: [:index, :show, :update] do
@@ -48,7 +47,6 @@ Rails.application.routes.draw do
       end
       resources :customers, only: :index
 
-      get 'resolution_message_templates', to: 'complaints#resolution_message_templates'
       get 'show_multiple', to: 'complaints#show_multiple'
       get 'clusters', to: 'complaints#clusters'
       get 'research', to: 'complaints#research'
