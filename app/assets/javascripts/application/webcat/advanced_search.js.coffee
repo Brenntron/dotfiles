@@ -6,22 +6,22 @@ namespace 'AC.WebCat', (exports) ->
       url: "/escalations/api/v1/escalations/webcat/companies"
       success_reload: false
       success: (response) ->
-        for company in JSON.parse(response)
-          $('#company-input')[0].selectize.addOption(company)
-      error : (response) ->
-        console.log response
-    )
+        element = $('#company-input')
+        selectize = element[0].selectize
 
-  exports.createPlatformOptions = ->
-    std_msg_ajax(
-      method: 'GET'
-      url: '/escalations/api/v1/escalations/webcat/platforms_names'
-      success_reload: false
-      success: (response) ->
-        for platform in response.data
-          $('#platform-input')[0].selectize.addOption({ public_name: platform })
-      error : (response) ->
-        console.log response
+        json = JSON.parse(response)
+
+        for company in json
+          selectize.addOption(company)
+
+        { webcat_search_conditions, webcat_search_type } = localStorage
+
+        if webcat_search_type?
+          if webcat_search_type == 'advanced'
+            { company_name } = JSON.parse localStorage.webcat_search_conditions
+
+            if company_name
+              element[0].selectize.setValue(company_name.split(', '))
     )
 
   exports.createCustomerNameOptions = ->
@@ -30,11 +30,22 @@ namespace 'AC.WebCat', (exports) ->
       url: "/escalations/api/v1/escalations/webcat/customers_names_selectize"
       success_reload: false
       success: (response) ->
-        for customer_name in JSON.parse(response)
-          $('#name-input')[0].selectize.addOption(customer_name)
+        element = $('#name-input')
+        selectize = element[0].selectize
 
-      error : (response) ->
-        console.log response
+        json = JSON.parse(response)
+
+        for customer_name in json
+          selectize.addOption(customer_name)
+
+        { webcat_search_conditions, webcat_search_type } = localStorage
+
+        if webcat_search_type?
+          if webcat_search_type == 'advanced'
+            { customer_name } = JSON.parse localStorage.webcat_search_conditions
+
+            if customer_name
+              element[0].selectize.setValue(customer_name.split(', '))
     )
 
   exports.createAssigneeOptions = ->
@@ -43,86 +54,73 @@ namespace 'AC.WebCat', (exports) ->
       url: "/escalations/api/v1/users/json"
       success_reload: false
       success: (response) ->
-        for assignee in JSON.parse(response)
-          $('#assignee-input')[0].selectize.addOption(assignee)
-      error : (response) ->
-        console.log response
+        element = $('#assignee-input')
+        selectize = element[0].selectize
+
+        json = JSON.parse(response)
+
+        for assignee in json
+          selectize.addOption(assignee)
+
+        { webcat_search_conditions, webcat_search_type } = localStorage
+        if webcat_search_type?
+          if webcat_search_type == 'advanced'
+            { user_id } = JSON.parse localStorage.webcat_search_conditions
+            if user_id
+              element[0].selectize.setValue(user_id.split(', '))
     )
 
   exports.populateSearchCriteria = ->
-
-    {webcat_search_conditions, webcat_search_type} = localStorage
-
-    advanced = webcat_search_conditions && webcat_search_type == 'advanced'
-    named = webcat_search_type == 'named'
-    return unless advanced || named
-    # if there is no advance search or search conditions then break
-
-    if named
-      searchConditions = JSON.parse $("##{webcat_search_conditions} a").attr('data-search_conditions')
-    if advanced
-      searchConditions = JSON.parse webcat_search_conditions
-    company_val = []
-    name_val = []
-    cat_val = []
-    for label, search_value of searchConditions
-      continue if search_value == ''
-      selectize_elements = ['tags','assignee','category','company','status','resolution','name','complaint','channel','entryid','complaintid','jiraid','submitter-type','platform']
-
-      #make sure that labels match the corresponding adv search input
-      label = label.replace('_',  '')
-                   .replace('modified',  'modified-')
-                   .replace('submitted',  'submitted-')
-                   .replace('ids',  '')
-      #make sure that labels match the corresponding adv search input
-      if label == 'id'             then label = 'entryid'
-      if label == 'userid'         then label = 'assignee'
-      if label == 'platform_ids'   then label = 'platform'
-      if label == 'ipor_uri'       then label = 'complaint'
-      if label == 'customeremail'  then label = 'email'
-      if label == 'companyname'    then label = 'company'
-      if label == 'submittertype'  then label = 'submitter-type'
-      if label == 'customername'   then label = 'name'
-
-      input_element = $("##{label}-input")
-      form_el = input_element.closest(".search-item")
-      if selectize_elements.includes(label)
-        #set values of known selectize inputs
-        values = search_value.split(',').map( (val) => return val.trim())
-        if label == 'company'
-          # the company selectize requires a timeout to avoid timing issues
-          company_val = values
-          for val in company_val
-            $("#company-input")[0].selectize.addOption(val)
-          setTimeout ->
-            $("#company-input")[0].selectize.setValue(company_val)
-          ,500
-
-        else if label == 'category_ids' || label == 'category'
-          cat_val = values
-          setTimeout ->
-           $("#category-input")[0].selectize.setValue( cat_val )
-          ,500
-        else if label == 'name'
-          # the company names selectize requires a timeout to avoid timing issues
-          name_val = values
-          setTimeout ->
-            for val in name_val
-              $("#name-input")[0].selectize.addOption(val)
-            $("#name-input")[0].selectize.setValue(name_val)
-          ,5500
-
-        else
-          for val in values
-            input_element[0].selectize.addOption({value: val, text: val })
-
-        input_element[0].selectize.setValue(values)
+    return unless localStorage.webcat_search_conditions
+    searchConditions = JSON.parse localStorage.webcat_search_conditions
+    for searchLabel, searchCriteria of searchConditions
+      continue if searchCriteria == '' 
+     
+      # company_name, user_id, customer_name we populate by 
+      # calling the createCompanyOptions, createCustomerNameOptions, createAssigneeOptions functions
+      # so no need to do it here
+      continue if ['company_name', 'user_id', 'customer_name'].includes(searchLabel)
+     
+      if searchLabel == 'platform_ids'
+        $searchLabel = $('#platform-input')
+      else if searchLabel == 'ip_or_uri'
+        $searchLabel = $('#complaint-input')
+        $searchLabel[0].selectize.addOption({ value: searchCriteria, text: searchCriteria })
+        complaints = searchCriteria.split(', ')
+        for complaint in complaints
+          $searchLabel[0].selectize.addOption({ value: complaint, text: complaint })
+      else if searchLabel == 'id'
+        $searchLabel = $('#entryid-input')
+        entryids = searchCriteria.split(', ')
+        for entryid in entryids
+          $searchLabel[0].selectize.addOption({ value: entryid, text: entryid })
+      else if searchLabel == 'customer_email'
+        $searchLabel = $('#email-input')
+      else if searchLabel == 'jira_id'
+        $searchLabel = $('#jiraid-input')
+        ticketIds = searchCriteria.split(', ')
+        for ticketId in ticketIds
+          $searchLabel[0].selectize.addOption({ value: ticketId, text: ticketId })
+      else if searchLabel == 'platforms'
+        $searchLabel = $('#platform-input')
+      else if searchLabel == 'complaint_id'
+        $searchLabel = $('#complaintid-input')
+        complaintIds = searchCriteria.split(', ')
+        for complaintId in complaintIds
+          $searchLabel[0].selectize.addOption({ value: complaintId, text: complaintId })
+      else if searchLabel == 'category_ids'
+        $searchLabel = $('#category-input')
       else
-        if input_element[0] && input_element[0].selectize #catchall for selectize inputs that fall through the cracks
-          input_element[0].selectize.setValue(search_value)
-        else #set values of non selectize inputs
-          input_element.val(search_value)
+        searchLabelTransformed = searchLabel.replace /_ids/, ''
+        searchLabelTransformed = searchLabelTransformed.replace /_/, '-'
+        $searchLabel = $("##{searchLabelTransformed}-input")
+      multipleFields = ['id', 'ip_or_uri', 'complaint_id', 'tags', 'status', 'channel', 'jira_id', 'resolution', 'platforms', 'submitter_type', 'category_ids']
 
-      # if the value has been searched, make sure that the input isn't hidden
-      $(form_el).removeClass('hidden')
-
+      if multipleFields.includes(searchLabel)
+        splitSearchCriteria = searchCriteria.split(', ')
+        $searchLabel[0].selectize.setValue(splitSearchCriteria)
+      else if $searchLabel[0] && $searchLabel[0].selectize
+        $searchLabel[0].selectize.setValue(searchCriteria)
+      else
+        $searchLabel.val(searchCriteria)
+      $("##{searchLabel}-input").removeClass('hidden')

@@ -98,22 +98,20 @@
 
 
             .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider.col-assignee
-              .assigned-check-container
-                .assigned-check.hidden
-                %p#assignedAlert.hidden Assigned
-                %p#unassignedAlert.hidden Unassigned
               %label.content-label-sm
                 Assignee
               .top-info-data
-                - if @is_unassigned
-                  %span#dispute-assignee.missing-data Unassigned
+                - if @file_rep_dispute.assigned.nil? || @file_rep_dispute.assigned == 'Unassigned' || @file_rep_dispute.assigned.cvs_username == 'vrtincom'
+                  %span.missing-data#dispute-assignee Unassigned
                 - else
-                  %span#dispute-assignee.file-rep-dispute-assignee= @file_rep_dispute.assigned.cvs_username
+                  %span#dispute-assignee= @file_rep_dispute.assigned.cvs_username
 
                 - if can? :update, @file_rep_dispute
-                  .dispute-owner-buttons-wrapper.file-rep-dispute-owner-buttons-wrapper
-                    %button.return-ticket-button.esc-tooltipped{disabled: ((can?(:return, @file_rep_dispute) && @is_assignee) ? false : true), title: 'Return ticket to open queue', onclick: "file_rep_show_return_dispute(#{@file_rep_dispute.id});"}
-                    %button#show_ticket_assign.take-ticket-button.esc-tooltipped{disabled: ((can?(:take, @file_rep_dispute) && @is_assignee) ? true : false), title: 'Assign this ticket to me', onclick: "file_rep_show_take_dispute(#{@file_rep_dispute.id});"}
+                  .dispute-owner-buttons-wrapper
+                    - if can? :take, @file_rep_dispute
+                      %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "file_rep_show_take_dispute(#{@file_rep_dispute.id});"}
+                    - elsif can? :return, @file_rep_dispute
+                      %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: "file_rep_show_return_dispute(#{@file_rep_dispute.id});"}
                     %span.dropdown
                       - if can? :change_assignee, @file_rep_dispute
                         %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -186,7 +184,7 @@
                   - else
                     = @file_rep_dispute.source
                 - else
-                  Internal
+                  Internal 
 
 
       .row

@@ -1,4 +1,5 @@
 class Escalations::FileRep::DisputesController < ApplicationController
+
   def index
     @conventions = AmpNamingConvention.all
 
@@ -23,9 +24,6 @@ class Escalations::FileRep::DisputesController < ApplicationController
 
     @versioned_items = @file_rep_dispute.compose_versioned_items
     @conventions = AmpNamingConvention.all
-
-    @is_assignee = @file_rep_dispute.user_id == current_user.id
-    @is_unassigned = @file_rep_dispute.assigned.nil? || @file_rep_dispute.assigned == 'Unassigned' || @file_rep_dispute.assigned.cvs_username == 'vrtincom'
   end
 
   def sandbox_html_report

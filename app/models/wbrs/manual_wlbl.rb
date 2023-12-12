@@ -244,8 +244,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
       details = Wbrs::ManualWlbl.find(response.id)
 
       if details.notes.any?
-        notes = details.notes
-        notes.each do |note|
+        details.notes.each do |note|
           note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response, "#{note['user']} - #{note['ctime']}: #{note['note']}")
         end
       else
@@ -257,18 +256,10 @@ class Wbrs::ManualWlbl < Wbrs::Base
 
   def self.add_to_history_modal(response, note)
     note_entries = []
-
-    if response.mtime.blank?
-      m_date = ''
-    else
-      m_date = Date.parse(response.mtime).to_s
-    end
-
-    if response.ctime.blank?
-      c_date = ''
-    else
-      c_date = Date.parse(response.ctime).to_s
-    end
+    m_date = ''
+    c_date = ''
+    m_date = Date.parse(response.mtime).to_s unless response.mtime.blank?
+    c_date = Date.parse(response.ctime).to_s unless response.ctime.blank?
 
     if response.ctime != response.mtime
       note_entries.push({:state => response.state, :date => m_date, :sort_date => DateTime.parse(response.mtime), :list_type => response.list_type, :note => note})
