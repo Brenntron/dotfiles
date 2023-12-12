@@ -214,7 +214,6 @@
     .button-wrapper{
       display: flex;
       justify-content: space-evenly;
-      justify-content: center ; //WEB-8151 temp fix to hide apply all button and center other buttons
       margin-bottom: 25px;
 
       .button-update-resolution{
@@ -245,5 +244,5 @@
 }
 
 .customer-facing-comment-container {
-  padding-top: 30px;
+  padding-top: 10px;
 }

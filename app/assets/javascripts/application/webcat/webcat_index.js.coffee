@@ -6,6 +6,7 @@ $ ->
 
     # Create index table
     url = $('#complaints-index').data('source')
+    console.log 'page loaded'
     build_complaints_table(url)
 
     # Make the datatables search prettier
@@ -401,6 +402,11 @@ build_complaints_table = (url) ->
         data: 'status'
         className: 'resolution-col'
         render: (data, type, full, meta) ->
+          if (full.internal_comment == null) || (full.internal_comment == '')
+            comment = '<span class="missing-data">No internal comment.</span>'
+          else
+            comment = full.internal_comment
+
           if data == 'PENDING'
             submit_res_wrapper =
               '<div class="submit-res-wrapper pending-ticket-res-wrapper">' +
@@ -420,9 +426,9 @@ build_complaints_table = (url) ->
                 '<button class="comment-button" id="internal_comment_button' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>' +
                 '<div id="internal_comment_dropdown_' + full.entry_id + '" class="dropdown-menu dropdown-menu-right internal-comment-dropdown" aria-labelledby="internal_comment_button' + full.entry_id + '">' +
                 '<div class="dropdown-reverse-header">Internal Comment</div>' +
-                '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories">' + full.internal_comment + '</textarea>' +
-                '</div></span>' +
-
+                '<div class="dropdown-comment" id="internal_comment_' + full.entry_id + '">' + comment + '</div>' +
+                '</div>' +
+                '</span>' +
                 '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" disabled=true onclick="submit_changes(' + full.entry_id + ')">Submit</button>' +
                 '</div>' +
                 '</div>'
@@ -457,7 +463,7 @@ build_complaints_table = (url) ->
                   '<button class="comment-button" id="internal_comment_button' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>' +
                   '<div id="internal_comment_dropdown_' + full.entry_id + '" class="dropdown-menu dropdown-menu-right internal-comment-dropdown" aria-labelledby="internal_comment_button' + full.entry_id + '">' +
                   '<div class="dropdown-reverse-header">Internal Comment</div>' +
-                  '<div id="internal_comment_' + full.entry_id + '">' + full.internal_comment + '</div>' +
+                  '<div class="dropdown-comment" id="internal_comment_' + full.entry_id + '">' + comment + '</div>' +
                   '</div></span>' +
                   '<button class="tertiary submit_changes" id="reopen_' + full.entry_id + '" onclick="reopenComplaint(' + full.entry_id + ')">Reopen</button>' +
                   '</div>' +

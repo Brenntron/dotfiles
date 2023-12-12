@@ -801,3 +801,14 @@ table.dataTable tbody tr.submitting-entry {
 .concise-button:disabled {
   opacity: 0.5;
 }
+
+.internal-comment-wrapper {
+  .dropdown-comment {
+    font-size: 11px;
+    line-height: 1.25em;
+    margin: 8px 0;
+    overflow-y: scroll;
+    max-height: 100px;
+    border: none;
+  }
+}
