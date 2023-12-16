@@ -232,17 +232,11 @@ export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f
 
 . ~/.asdf/plugins/java/set-java-home.zsh
 
-if [ -x "$(command -v exa)" ]; then
-    alias ls="exa"
-    alias la="exa --long --all --group"
-    alias tree="exa --tree"
-fi
-
 if [ -x "$(command -v colorls)" ]; then
   source $(dirname $(gem which colorls))/tab_complete.sh
-  alias cls='colorls --sd --dark'
-  alias cla='colorls -lA --sd --dark'
-  alias ctree='colorls --sd -t --dark'
+  alias ls='colorls --sd --dark'
+  alias la='colorls -lA --sd --dark'
+  alias tree='colorls --sd -t --dark'
 fi
 
 # Set alias for dotfiles config
