@@ -34,7 +34,7 @@ class DisputeExport
       'time-submitted' => 'Date Submitted',
       'last-updated' => 'Last Updated',
       'age' => 'Age',
-      'case-origin' => 'Case Origin',
+      'case-origin' => 'Case origin',
       'platform' => 'Platform',
       'submitter-type' => 'Submitter Type',
       'submitter-org' => 'Submitter Org',

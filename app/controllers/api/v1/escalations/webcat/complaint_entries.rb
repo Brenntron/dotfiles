@@ -22,7 +22,6 @@ module API
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
               optional :uri_as_categorized, type: String, desc: 'Value of the `Edit Uri` box at the time analyst submitted it'
-              optional :self_review, type: Boolean, desc: 'If a category change could be done with a self review'
             end
             post 'update'do
               std_api_v2 do
@@ -38,8 +37,7 @@ module API
                                        permitted_params['resolution_comment'],
                                        uri_as_categorized,
                                        current_user,
-                                       "",
-                                       permitted_params['self_review'])
+                                       "")
 
                 Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
@@ -90,8 +88,7 @@ module API
                                          submitted_complaint[:resolution_comment],
                                          '',
                                          current_user,
-                                         submitted_complaint[:commit],
-                                         submitted_complaint[:self_review])
+                                         submitted_complaint[:commit])
 
                   if submitted_complaint[:commit] == 'decline'
                     category_data = @entry.current_category_data.to_a
@@ -132,134 +129,125 @@ module API
               end
             end
 
+
             desc 'take entry'
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
-              requires :assignment_type, type: String, desc: 'Assignment type'
             end
             post 'take_entry' do
               begin
                 error_entry_ids = {}
                 error_count = 0
-
                 permitted_params['complaint_entry_ids'].each do |id|
-                  status = ComplaintEntry.find(id).take_complaint(current_user, permitted_params['assignment_type'])
-
-                  next if status == "Complaint taken"
-
-                  error_count += 1
-                  if error_entry_ids[status].nil?
-                    error_entry_ids[status] = [id]
-                  else
-                    error_entry_ids[status] << id
+                  status = ComplaintEntry.find(id).take_complaint(current_user)
+                  if status != "Complaint taken"
+                    error_count += 1
+                    if error_entry_ids[status].nil?
+                      error_entry_ids[status] = [id]
+                    else
+                      error_entry_ids[status] << id
+                    end
                   end
                 end
-
                 unless error_entry_ids.keys.empty?
-                  error_message = if error_count == permitted_params['complaint_entry_ids'].count
-                                    ["The following entries could not be taken:"]
-                                  else
-                                    ["Some entries were successfully taken, but the following entries could not be taken:"]
-                                  end
-
-                  error_entry_ids.each_key do |key|
+                  if error_count == permitted_params['complaint_entry_ids'].count
+                    error_message = ["The following entries could not be taken:"]
+                  else
+                    error_message = ["Some entries were successfully taken, but the following entries could not be taken:"]
+                  end
+                  error_entry_ids.keys.each do |key|
                     error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
                   end
                   unless error_count == permitted_params['complaint_entry_ids'].count
                     error_message << "Refresh the page to pickup the latest changes."
                   end
-                  return { error: error_message }.to_json
+                  return {:error => error_message}.to_json
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
-                error = e.message.to_s
-                return { error: error }.to_json
+                error = "#{e.message}"
+                return {:error => error}.to_json
               end
               {name:current_user.display_name, cvs_username: current_user.cvs_username}.to_json
             end
 
+
             desc 'return entry'
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
-              requires :assignment_type, type: String, desc: 'Assignment type'
             end
             post 'return_entry' do
               begin
                 error_entry_ids = {}
                 error_count = 0
                 permitted_params['complaint_entry_ids'].each do |id|
-                  status = ComplaintEntry.find(id).return_complaint(current_user, permitted_params['assignment_type'])
-
-                  next if status == "Complaint returned"
-
-                  error_count += 1
-
-                  if error_entry_ids[status].nil?
-                    error_entry_ids[status] = [id]
-                  else
-                    error_entry_ids[status] << id
+                  status = ComplaintEntry.find(id).return_complaint(current_user)
+                  if status != "Complaint returned"
+                    error_count += 1
+                    if error_entry_ids[status].nil?
+                      error_entry_ids[status] = [id]
+                    else
+                      error_entry_ids[status] << id
+                    end
                   end
                 end
-
                 unless error_entry_ids.keys.empty?
-                  error_message = if error_count == permitted_params['complaint_entry_ids'].count
-                                    ["The following entries could not be returned:"]
-                                  else
-                                    ["Some entries were successfully returned, but the following entries could not be returned:"]
-                                  end
-
-                  error_entry_ids.each_key do |key|
+                  if error_count == permitted_params['complaint_entry_ids'].count
+                    error_message = ["The following entries could not be returned:"]
+                  else
+                    error_message = ["Some entries were successfully returned, but the following entries could not be returned:"]
+                  end
+                  error_entry_ids.keys.each do |key|
                     error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
                   end
-
                   unless error_count == permitted_params['complaint_entry_ids'].count
                     error_message << "Refresh the page to pickup the latest changes."
                   end
-
-                  return { error: error_message }.to_json
+                  return {:error => error_message}.to_json
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
-                error = e.message.to_s
-                return { error: error }.to_json
+                error = "#{e.message}"
+                return {:error => error}.to_json
               end
-              { name: current_user.display_name }.to_json
+              {name:current_user.display_name}.to_json
+
             end
+
 
             desc "Remove assignee from a group of complaint entry IDs (revert to vrtincoming)"
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: "analyst-console database id"
-              requires :assignment_type, type: String, desc: 'Assignment type'
             end
             post "unassign_all" do
               results = []
-
               params[:complaint_entry_ids].each do |id|
                 entry = ComplaintEntry.find(id)
-                result = entry.unassign(permitted_params['assignment_type'])
-                results << { id: id, result: result }
+                result = entry.unassign
+                results << {id: id, result: result}
               end
 
-              { status: "success", data: results }.to_json
+              {:status => "success", :data => results}.to_json
             end
+
 
             desc "Reassign complaint entry to another user"
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: "analyst-console database id"
               requires :user_id, type: Integer, desc: "analyst-console database id"
-              requires :assignment_type, type: String, desc: 'Assignment type'
             end
             post "change_assignee" do
               results = []
               user = User.find(params[:user_id])
               params[:complaint_entry_ids].each do |id|
                 entry = ComplaintEntry.find(id)
-                result = entry.reassign(user, permitted_params['assignment_type'])
-                results << { id: id, result: result }
+                result = entry.reassign(user)
+                results << {id: id, result: result}
               end
 
-              { status: "success", data: results, cvs_username: user.cvs_username }.to_json
+              {:status => "success", :data => results, :cvs_username => user.cvs_username}.to_json
             end
+
 
             desc 'Get the history'
             params do
@@ -515,8 +503,7 @@ module API
                                                       entry['resolution_comment'],
                                                       uri_as_categorized,
                                                       current_user,
-                                                      "",
-                                                      entry['self_review'])
+                                                      "")
 
                       Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry) }
                       if complaint_entry.complaint.ticket_source != Complaint::SOURCE_RULEUI

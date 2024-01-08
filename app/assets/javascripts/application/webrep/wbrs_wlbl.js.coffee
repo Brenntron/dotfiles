@@ -1016,17 +1016,17 @@ window.wlbl_history_dialog = (id) ->
         alert(json.error)
       else
 #      #parse this json properly
-        history_dialog_content = "<div class='dialog-content-wrapper'>
-          <table class='history-table'><thead><tr><th>WL/BL Result</th><th>State</th><th>Comment</th><th>Date</th></tr></thead>
-          <tbody>"
+        history_dialog_content = '<div class="dialog-content-wrapper">' +
+          '<table class="history-table"><thead><tr><th>WL/BL Result</th><th>State</th><th>Comment</th><th>Date</th></tr></thead>' +
+          '<tbody>'
         for entry in json.data
-          {list_type, state, note, date} = entry
-          entry_string = "<tr>
-                          <td>#{list_type}</td>
-                          <td>#{state}</td>
-                          <td>#{note}</td>
-                          <td>#{date}</td>
-                          </tr>"
+          entry_string = "" +
+            '<tr>' +
+            '<td>' + entry.list_type + '</td>' +
+            '<td>' + entry.state + '</td>' +
+            '<td>' + entry.note + '</td>' +
+            '<td>' + entry.date + '</td>' +
+            '</tr>'
           history_dialog_content += entry_string
 
         history_dialog_content += '</tbody></table>'

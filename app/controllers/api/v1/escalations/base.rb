@@ -33,7 +33,6 @@ module API
         mount API::V1::Escalations::Webcat::Clusters
         mount API::V1::Escalations::Webcat::Companies
         mount API::V1::Escalations::Webcat::Platforms
-        mount API::V1::Escalations::Webcat::ResolutionMessageTemplates
         mount API::V1::Escalations::CloudIntel::Whois
         mount API::V1::Escalations::CloudIntel::Tea
         mount API::V1::Escalations::CloudIntel::EnrichmentService
