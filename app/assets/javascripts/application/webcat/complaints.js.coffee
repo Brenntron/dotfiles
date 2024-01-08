@@ -1944,7 +1944,6 @@ format = (complaint_entry_row) ->
 
   form_change_item = domain || complaint_entry.ip_address
 
-<<<<<<< HEAD
   complaint_entry_html = """
           #{complaint_table_row_html}
           <div class='col-xs-12 col-sm-8 nested-complaint-static-data'>
@@ -2128,66 +2127,6 @@ format = (complaint_entry_row) ->
     </tr>
   </table>
   """
-=======
-  complaint_entry_html =
-      complaint_table_row_html +
-      "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
-      "<div class='row'>" +
-      "<div class='col-xs-3 col-with-divider'>" +
-      "<div class='screenshot-thumb-wrapper'>" +
-      "<img id='screenshot_id_#{entry_id}' class='screenshot-thumb-img' title='#{screen_shot_error}' data-toggle='popover' onclick='enlarge_image('#{entry_id} , complaint_entries/serve_image?complaint_entry_id='#{entry_id} , #{retake_in_progress}')' src='complaint_entries/serve_image?complaint_entry_id=#{entry_id}'/>" +
-      "</div>" +
-      "<div class='complaint-entry-info'>" +
-      "<label class='content-label-sm'>Case ID</label>"+
-      "<span class='nested-complaint-data case-id'><a href='complaints/#{complaint_id}'>#{complaint_id}</a></span>" +
-      "<label class='content-label-sm'>Entry URI</label>" +
-      "<span class='nested-complaint-data input-truncate esc-tooltipped' id='entry-uri-#{entry_id}' title='#{url}'><a href='http://#{url}' target='_blank'>#{url}</a></span>" +
-      "<label class='content-label-sm' id='site-search'>Site Search</label>" +
-      "<span class='nested-complaint-data input-truncate esc-tooltipped' id='site-search-#{entry_id}' title='#{url}'>#{search_uri}</span>" +
-      "<label class='content-label-sm'>Customer Name</label>" +
-      "<span class='nested-complaint-data'>#{customer_name}</span>" +
-      "<label class='content-label-sm'>Customer Description</label>" +
-      "<span class='nested-complaint-data'>#{customer_description}</span>" +
-      "<label class='content-label-sm'>Complaint Source</label>" +
-      "<span class='nested-complaint-data'>#{complaint_source}</span>" +
-      "</div></div><div class='col-xs-7 col-with-divider'>" +
-      '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-3">WBRS Categories</th><th class="col-sm-2">WBRS Certainty</th><th class="col-sm-3">SDS URI Category</th><th class="col-sm-3">SDS Domain Category</th></tr></thead>' +
-      '</table>' +
-      '</br>' +
-      '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="history-' + entry_id + '" onclick="history_dialog(' + entry_id  + ',\'' + url + '\')">History</button><br/>' +
-      '<button class="secondary" id="domain-' + entry_id + '" onclick="WebCat.RepLookup.whoIsLookups(\'' + whois_lookup + '\')">Whois</domain>' +
-      '</div></div>' +
-      '</div><div class="col-xs-12 col-sm-4 nested-complaint-editable-data">' +
-      '<div class="row">' +
-      '<div class="col-xs-12">' +
-      '<div><label class="content-label-sm">Original</label></div> ' +
-      '<div>' + host  + '</div>' +
-      '<label class="content-label-sm">Edit URI</label><br/>' +
-      '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" data-domain="' + form_change_item + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + edit_input +
-      '"' + entry_status + '>' +
-      '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
-      '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
-      '<div class="complaint-selectize-col-wrapper">' +
-      '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
-      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + form_change_item + '\')"></select>' +
-      '</div>' +
-      '<div class="domain-categories" >' +
-      '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
-      '<ul id="main-domain-categories_' + entry_id + '"></ul>'+
-      '<button class="secondary inline-button" onclick="inheritCategories(' + entry_id + ')">Inherit</button><br/>' +
-      '</div>' +'</div><div class="col-xs-8">' +
-      '<label class="content-label-sm">Internal Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + entry_id + '" type="text" data-domain="' + domain + '" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
-      '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
-      '</div>' +
-      '<div class="col-xs-4">' +
-      '<label class="content-label-sm">Resolution</label><br/>' +
-      complaint_submission_html +
-      '</div></div></div></div></td></tr></table>'
->>>>>>> 9f770def7d77cc3c25c10615e9005044f125dc70
 
   complaint_entry_html
 
