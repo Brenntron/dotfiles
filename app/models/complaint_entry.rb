@@ -25,6 +25,7 @@ class ComplaintEntry < ApplicationRecord
   RESOLVED = "RESOLVED"
   NEW = "NEW"
   PENDING = "PENDING"
+  ASSIGNED = "ASSIGNED"
   STATUS_COMPLETED = "COMPLETED"
   STATUS_REOPENED = "REOPENED"
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
@@ -199,6 +200,107 @@ class ComplaintEntry < ApplicationRecord
     @remote_prefixes_with_path ||= Wbrs::Prefix.where({:urls => [DisputeEntry.domain_of_with_path(prefix_given)]})
   end
 
+  #################################################################################################################
+  # CATEGORY CHANGING SECTION
+  #################################################################################################################
+
+  def categorize_simple(prefix,
+                        categories_string,
+                        category_names_string,
+                        entry_status,
+                        comment,
+                        resolution_comment,
+                        uri_as_categorized,
+                        current_user,
+                        commit_pending,
+                        self_review)
+
+    # not important case or resolution is "unchanged"
+    current_status = STATUS_COMPLETED
+    self.case_assigned_at ||= Time.now
+    # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
+    update!(resolution: entry_status,
+            url_primary_category: categories_string,
+            category: categories_string,
+            status: current_status,
+            internal_comment: comment,
+            resolution_comment: resolution_comment,
+            uri_as_categorized: uri_as_categorized,
+            case_resolved_at: Time.now,user:current_user)
+    complaint.set_status(current_status)
+
+
+    #this is where we should send off the category to the API
+    if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && categories_string.present?
+      existing_prefixes = remote_prefixes(prefix_given: prefix)
+      commit_category(existing_prefixes,
+                      ip_or_uri: prefix,
+                      categories_string: categories_string,
+                      description: comment,
+                      user: current_user.email,
+                      casenumber: self.complaint.id )
+      update!(url_primary_category: category_names_string, category: category_names_string, uri_as_categorized: uri_as_categorized)
+    else
+      # TODO Do we need to update the record when we are not making a change?
+      existing_prefixes = remote_prefixes(prefix_given: prefix)
+      cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
+      update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+    end
+
+  end
+
+  def categorize_important(prefix,
+                           categories_string,
+                           category_names_string,
+                           entry_status,
+                           comment,
+                           resolution_comment,
+                           uri_as_categorized,
+                           current_user,
+                           commit_pending,
+                           self_review)
+
+    self.case_assigned_at ||= Time.now
+    # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
+    update!(status:STATUS_COMPLETED,
+            category: categories_string,
+            internal_comment: comment,
+            resolution_comment: resolution_comment,
+            uri_as_categorized: uri_as_categorized,
+            case_resolved_at: Time.now,
+            user:current_user)
+    complaint.set_status(STATUS_COMPLETED)
+    #this is where we should send off the category to the API
+
+    if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
+      existing_prefixes = remote_prefixes(prefix_given: prefix)
+      commit_category(existing_prefixes,
+                      ip_or_uri: prefix,
+                      categories_string: categories_string,
+                      description: comment,
+                      user: current_user.email,
+                      casenumber: self.complaint.id)
+      update!(url_primary_category: category_names_string, category: category_names_string)
+    else
+      # TODO Do we need to update the record when we are not making a change?
+      existing_prefixes = remote_prefixes(prefix_given: prefix)
+      cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
+      update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+    end
+
+  end
+
+
+  def post_categorize(current_user)
+    WebcatCredits::ComplaintEntries::CreditProcessor.new(current_user, self).process
+
+    if self.status == STATUS_COMPLETED && self.complaint_entry_screenshot.present?
+      self.complaint_entry_screenshot.destroy
+    end
+
+    return
+  end
+
   def change_category(prefix,
                       categories_string,
                       category_names_string,
@@ -211,166 +313,110 @@ class ComplaintEntry < ApplicationRecord
                       self_review)
     ActiveRecord::Base.transaction do
 
-      # If the prefix is a high telemetry value then the status needs to be set to PENDING, unless it has the
-      # self_review flag
-      if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED && self_review == false
-        if self.status == "PENDING"
-          if commit_pending == "commit"
-            # commit from pending of important case
+      if categories_string.blank?
+        raise "categories string is empty"
+      end
 
-            ###############################################################################################################################################################
-            ###guard rails
+      #Although it's more code efficient to put this in one block, i seperated it out for the sake of visual clarity since there's a ton
+      # of stuff going on with the categorization workflow
 
-            # TODO: this code should be refactored to use Webcat::EntryVerdictChecker class
-            verdict_pass = true
-            verdict_reasons = []
-            if categories_string.blank?
-              raise "categories string is empty"
-            end
-            begin
-              all_cats = Wbrs::Category.all
+      #First, check if not important.  If not, super simple no guardrails categorization path
+      if !self.is_important
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        return post_categorize(current_user)
+      end
 
-              category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
+      #Second, check to see if this is an unchanged decision, if it is, then there's nothing to guardrails here.
+      if entry_status == Complaint::RESOLUTION_UNCHANGED
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        return post_categorize(current_user)
+      end
 
-              cats_by_short = []
+      #Third if self-review is set to true, then it's not necessary to go through full guard rails workflow (i see this path being potentially worked on later for security reasons)
+      if self_review == true
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        return post_categorize(current_user)
+      end
 
-              category_ids_array.each do |cat_id|
-                all_cats.each do |base_cat|
-                  if base_cat.category_id == cat_id
-                    cats_by_short << base_cat.mnem
-                  end
-                end
-              end
+      #################
 
-              cats_by_short.each do |cat|
-                result = JSON.parse(Webcat::GuardRails.verdict_for_entry(prefix, cat).body)
-
-                verdict_data = result[prefix]
-
-                if verdict_data["color"] != Webcat::GuardRails::PASS
-                  verdict_pass = false
-                  verdict_reason = "|#{cat} = #{verdict_data["color"]}:"
-                  verdict_reason += "#{verdict_data["why"]["reason"].pluck("reason").join(",")} \n" rescue "no reasons data\n"
-                  verdict_reasons << verdict_reason
-                end
-
-              end
-            rescue Exception => e
-              Rails.logger.error(e.message)
-              verdict_pass = false
-              verdict_reasons << "there was an api call failure, erring to manager review"
-            end
-
-            ###############################################################################################################################################################
-            if verdict_pass == true || current_user.is_webcat_manager?
-
-              #################################################
-              current_status = "COMPLETED"
-              self.case_assigned_at ||= Time.now
-              # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
-              update!(status:current_status,
-                     category: categories_string,
-                     internal_comment: comment,
-                     resolution_comment: resolution_comment,
-                     uri_as_categorized: uri_as_categorized,
-                     case_resolved_at: Time.now,
-                     user:current_user)
-              complaint.set_status(current_status)
-              #this is where we should send off the category to the API
-
-              if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
-                existing_prefixes = remote_prefixes(prefix_given: prefix)
-                commit_category(existing_prefixes,
-                                ip_or_uri: prefix,
-                                categories_string: categories_string,
-                                description: comment,
-                                user: current_user.email,
-                                casenumber: self.complaint.id)
-                update!(url_primary_category: category_names_string, category: category_names_string)
-              else
-                # TODO Do we need to update the record when we are not making a change?
-                existing_prefixes = remote_prefixes(prefix_given: prefix)
-                cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
-                update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
-              end
-              ###################################################
-            end
-
-            if !current_user.is_webcat_manager?
-              if verdict_pass == false
-                manager_user = User.where(:cvs_username => Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
-                guard_rails_reasons = verdict_reasons.join(";")
-                update!(user: manager_user,
-                              internal_comment: "FAILED GUARDRAILS! Reason: #{guard_rails_reasons}"
-                )
-              end
-            end
-          else
-            # dismiss from pending of important case
-            current_status = "ASSIGNED"
-            update!(status:current_status,
-                   url_primary_category: self.category,
-                   internal_comment: comment,
-                   resolution_comment: resolution_comment,
-                   uri_as_categorized: uri_as_categorized,
-                   case_assigned_at: Time.now,
-                   was_dismissed: true)
-          end
-        else
-          # important not from pending
-          current_status = "PENDING"
-          update!(resolution: entry_status,
-                 url_primary_category: category_names_string,
-                 status:current_status,
-                 internal_comment: comment,
-                 resolution_comment: resolution_comment,
-                 uri_as_categorized: uri_as_categorized,
-                 user:current_user)
-        end
-      else
-        # not important case or resolution is "unchanged"
-        current_status = "COMPLETED"
-        self.case_assigned_at ||= Time.now
-        # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
+      #if the code has made it here then it's going to get guardrailed.  First step is to set the categorization attempt to "PENDING" so that it goes into
+      # 2nd person review box, which is done here.  This will set it to PENDING, and the next go around it will skip this and head closer to the workflow.
+      if self.status != PENDING
         update!(resolution: entry_status,
-               url_primary_category: categories_string,
-               category: categories_string,
-               status: current_status,
-               internal_comment: comment,
-               resolution_comment: resolution_comment,
-               uri_as_categorized: uri_as_categorized,
-               case_resolved_at: Time.now,user:current_user)
-        complaint.set_status(current_status)
-        #this is where we should send off the category to the API
-        if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && categories_string.present?
-          existing_prefixes = remote_prefixes(prefix_given: prefix)
-          commit_category(existing_prefixes,
-                          ip_or_uri: prefix,
-                          categories_string: categories_string,
-                          description: comment,
-                          user: current_user.email,
-                          casenumber: self.complaint.id )
-          update!(url_primary_category: category_names_string, category: category_names_string, uri_as_categorized: uri_as_categorized)
-        else
-          # TODO Do we need to update the record when we are not making a change?
-          existing_prefixes = remote_prefixes(prefix_given: prefix)
-          cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
-          update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+                url_primary_category: category_names_string,
+                status: PENDING,
+                internal_comment: comment,
+                resolution_comment: resolution_comment,
+                uri_as_categorized: uri_as_categorized,
+                user:current_user)
+        return post_categorize(current_user)
+      end
+
+      #if the code has made it here it's because it was in the 2nd person review and failed that review, as in, the peer reviewer did not agree with the
+      # category and has denied the commital of the categorization, which effectively sets the ticket back to assigned for the original analyst to keep
+      # working on
+      if commit_pending != "commit"
+        update!(status: ASSIGNED,
+                url_primary_category: self.category,
+                internal_comment: comment,
+                resolution_comment: resolution_comment,
+                uri_as_categorized: uri_as_categorized,
+                case_assigned_at: Time.now,
+                was_dismissed: true)
+        return post_categorize(current_user)
+      end
+
+      ###  this section deals with the full guardrails of categorizing a high traffic "important" domain
+
+      verdict_pass = true
+      verdict_reasons = []
+
+      ## call guardrails
+
+      #begin
+        category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
+
+        verdict_results = Webcat::EntryVerdictChecker.new(prefix, category_ids_array).check
+
+        verdict_pass = verdict_results[:verdict_pass]
+        verdict_reasons = verdict_results[:verdict_reasons]
+        #binding.pry
+      #rescue Exception => e
+      #  Rails.logger.error(e.message)
+      #  verdict_pass = false
+      #  verdict_reasons << "there was an api call failure, erring to manager review"
+      #end
+
+      ## if verdict does not pass and is not a webcat manager then kickback to manager with why it failed
+      if verdict_pass == false
+        if !current_user.is_webcat_manager?
+          manager_user = User.where(:cvs_username => Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
+          guard_rails_reasons = verdict_reasons.join(";")
+          update!(user: manager_user,
+                  internal_comment: "FAILED GUARDRAILS! Reason: #{guard_rails_reasons}"
+          )
+          return post_categorize(current_user)
         end
       end
 
-      # add credit for user's contribution to complaint entry
-      WebcatCredits::ComplaintEntries::CreditProcessor.new(current_user, self).process
+      ## The remaining logic belows handles a verdict_pass of true or a webcat manager's categorization, which is exempt from verdicts.
 
-      if self.status == "COMPLETED" && self.complaint_entry_screenshot.present?
-        self.complaint_entry_screenshot.destroy
-      end
+      categorize_important(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+
+      return post_categorize(current_user)
+      ###
+
     end
 
   end
 
-  def commit_category(existing_prefixes, ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
-    # Look for existing prefix
+
+  #############################################################################################
+  # CATEGORY COMMIT LOGIC
+  # ###########################################################################################
+
+  def find_matching_prefix_with_observable(existing_prefixes, ip_or_uri)
     is_ip_address = !!(ip_or_uri  =~ Resolv::IPv4::Regex)
 
     url_parts = Complaint.parse_url(ip_or_uri)
@@ -416,9 +462,14 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
-    category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
+    return existing_prefix
 
-    ####IDF INTERCEPTION#######
+  end
+
+  ####Generic method to handle any logic to alter categories and any other necessary activities before sending categories
+  # to RuleAPI
+  def pre_commit_processing(category_ids_array, ip_or_uri)
+
     if category_ids_array.include?(AbusiveContentTool.current_child_abuse_category[:id])
       category_ids_array = AbusiveContentTool.reclassify_abuse_categories(category_ids_array)
       result = AbusiveContentTool.submit_abuse_to_authorities(self, user, SimpleIDN.to_ascii(ip_or_uri))
@@ -443,7 +494,23 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
-    ####END INTERCEPTION#######
+    return category_ids_array
+
+  end
+
+  #####Generic method to handle any finishing logic that should happen after committing categories to RuleAPI
+  def post_commit_processing()
+
+  end
+
+  def commit_category(existing_prefixes, ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
+
+    # Look for existing prefix
+    existing_prefix = find_matching_prefix_with_observable(existing_prefixes, ip_or_uri)
+
+    category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
+
+    category_ids_array = pre_commit_processing(category_ids_array, ip_or_uri)
 
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"
@@ -455,6 +522,8 @@ class ComplaintEntry < ApplicationRecord
     else
       Wbrs::Prefix.create_from_url(url: SimpleIDN.to_ascii(ip_or_uri), categories: category_ids_array, user: user, description: description)
     end
+
+    post_commit_processing()
   end
 
   def inherit_categories(ip_or_uri:, description:, user:, casenumber: nil)
