@@ -233,6 +233,7 @@ $ ->
       saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
 
   window.use_user_preference_filter = () ->
+
     return if window.location.pathname != '/escalations/webcat/complaints'
 
     { icon, link, name } = chosen_default_filter()

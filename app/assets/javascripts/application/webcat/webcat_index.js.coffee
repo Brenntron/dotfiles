@@ -19,6 +19,7 @@ build_complaints_table = (url) ->
   console.log 'build complaints table triggered'
   complaint_table = $('#complaints-index').DataTable(
     initComplete: ->
+      console.log 'complaint table initcomplete'
       # Get display prefs
       get_display_prefs()
 
@@ -60,14 +61,17 @@ build_complaints_table = (url) ->
         console.log 'There has been an error calling the backend data'
         webcat_refresh()
       complete: ->
+        console.log 'complaints table "complete"'
         # Get display prefs
         # This is in 2 locations for initial build
+        # TODO confirm that both are needed.
         # and then sort or moving to another page
         get_display_prefs()
 
         # Grab current categories per entry
         rows = $('#complaints-index').find('.cat-index-main-row')
         get_current_cats(rows)
+        create_ind_res_dialogs()
 
         # confirm this function is in the right locatino
         use_user_preference_filter()
@@ -77,7 +81,7 @@ build_complaints_table = (url) ->
       $(row).attr('data-status', data.status)
 
     drawCallback: () ->
-
+      console.log 'complaint drawcallback'
       if localStorage.webcat_reset_page
         localStorage.removeItem('webcat_reset_page')
       #         trying to figure out why we are redrawing the table here
@@ -402,10 +406,37 @@ build_complaints_table = (url) ->
         data: 'status'
         className: 'resolution-col'
         render: (data, type, full, meta) ->
+          # Internal comment
           if (full.internal_comment == null) || (full.internal_comment == '')
             comment = '<span class="missing-data">No internal comment.</span>'
           else
             comment = full.internal_comment
+
+          # Resolution comment (for customer)
+          observable = full.uri || full.ip_address
+          dialog_title = 'Customer Response for: ' + observable
+          if (full.resolution_comment == null) || (full.resolution_comment == '')
+            res_comment = 'No response created or sent to customer.'
+
+          res_comment_dialog_html =
+            '<div class="resolution-comment-dialog hide" id="resolution_comment_dialog_' + full.entry_id + '" title="' + dialog_title + '">' +
+              '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
+              '<label class="content-label-sm">Email Response to Customer</label>' +
+              '<select id="entry-email-response-to-customers-select_' + full.entry_id + '"></select>' +
+              '</div></div><div class="row"><div class="col-xs-12">' +
+              '<textarea class="email-response-input" id="entry-email-response-to-customers_' + full.entry_id + '" name="customer_facing_comment" type="text"></textarea>' +
+              '</div></div></div>' +
+            '</div>'
+
+          res_submitted_dialog_html =
+            '<div class="resolution-comment-dialog hide submitted-resolution-dialog" id="resolution_comment_dialog_' + full.entry_id + '" title="' + dialog_title + '">' +
+              '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
+              '<label class="content-label-sm">Email Response to Customer</label>' +
+              '</div></div><div class="row"><div class="col-xs-12">' +
+              '<div id="entry-email-response-to-customers_' + full.entry_id + '">' + res_comment + '</div>' +
+              '</div></div></div>' +
+              '</div>'
+
 
           if data == 'PENDING'
             submit_res_wrapper =
@@ -429,8 +460,10 @@ build_complaints_table = (url) ->
                 '<div class="dropdown-comment" id="internal_comment_' + full.entry_id + '">' + comment + '</div>' +
                 '</div>' +
                 '</span>' +
+                '<button class="resolution-comment-button" id="resolution_comment_button' + full.entry_id + '" onclick="open_ind_res_dialog(' + full.entry_id + ');"></button>' +
                 '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" disabled=true onclick="submit_changes(' + full.entry_id + ')">Submit</button>' +
                 '</div>' +
+                res_submitted_dialog_html +
                 '</div>'
           else
             if data == 'COMPLETED'
@@ -465,8 +498,10 @@ build_complaints_table = (url) ->
                   '<div class="dropdown-reverse-header">Internal Comment</div>' +
                   '<div class="dropdown-comment" id="internal_comment_' + full.entry_id + '">' + comment + '</div>' +
                   '</div></span>' +
+                  '<button class="resolution-comment-button" id="resolution_comment_button' + full.entry_id + '" onclick="open_ind_res_dialog(' + full.entry_id + ');"></button>' +
                   '<button class="tertiary submit_changes" id="reopen_' + full.entry_id + '" onclick="reopenComplaint(' + full.entry_id + ')">Reopen</button>' +
                   '</div>' +
+                  res_submitted_dialog_html +
                   '</div>'
 
             else
@@ -491,9 +526,10 @@ build_complaints_table = (url) ->
                   '<textarea id="internal_comment_' + full.entry_id + '" placeholder="Internal note for choosing categories" class="internal-comment">' + full.internal_comment + '</textarea>' +
                   '</div>' +
                   '</span>' +
-                  '<button class="resolution-comment-button" id="resolution_comment_button' + full.entry_id + '" onclick="resolution_comment_dialog(' + full.entry_id + ');"></button>' +
+                  '<button class="resolution-comment-button" id="resolution_comment_button' + full.entry_id + '" onclick="open_ind_res_dialog(' + full.entry_id + ');"></button>' +
                   '<button class="tertiary submit_changes" id="submit_changes_' + full.entry_id + '" onclick="submit_changes(' + full.entry_id + ')">Submit</button>' +
                   '</div>' +
+                  res_comment_dialog_html +
                   '</div>'
 
           return submit_res_wrapper

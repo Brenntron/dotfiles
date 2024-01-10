@@ -10,12 +10,14 @@ $ ->
     save_display_prefs()
 
 window.get_display_prefs = () ->
+  console.log 'getting display prefs'
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/user_preferences/"
     data: {name: 'WebCatVisible'}
     success: (response) ->
       response = JSON.parse(response)
+      console.log response
       $.each response, (data, state) ->
         # HTML5 uses 'checked' rather than 'checked=true'
         checkbox = $("##{data}")
