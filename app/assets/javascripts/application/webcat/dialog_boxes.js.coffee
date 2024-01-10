@@ -429,6 +429,7 @@ window.get_resolution_templates = (resolution, entry_ids) ->
           entry_id = this
           select = $('#entry-email-response-to-customers-select_' + entry_id)
           email_text = $("#entry-email-response-to-customers_" + entry_id)
+          select.empty()
           select.append(template_options)
           $(email_text).val(templates[0].body)
 
@@ -436,7 +437,10 @@ window.get_resolution_templates = (resolution, entry_ids) ->
         $(entry_ids).each ->
           entry_id = this
           select = $('#entry-email-response-to-customers-select_' + entry_id)
+          email_text = $("#entry-email-response-to-customers_" + entry_id)
+          select.empty()
           $(select).append('<option>No templates available for ' + resolution + ' resolution</option>')
+          $(email_text).val('')
 
       error: (response) ->
         std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
@@ -450,3 +454,9 @@ window.get_resolution_templates = (resolution, entry_ids) ->
     id = $(this).attr('id').replace('entry-email-response-to-customers-select_', '')
     $("#entry-email-response-to-customers_#{id}").val(comment)
 
+  # Update response templates and text when a user selects a different resolution
+  $('.resolution_radio_button').change ->
+    resolution = $(this).val()
+    lc_res = resolution.toLowerCase()
+    entry_id = $(this).attr('id').replace(lc_res, '')
+    get_resolution_templates(resolution, [entry_id])
