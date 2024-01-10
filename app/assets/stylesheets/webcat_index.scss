@@ -708,7 +708,9 @@ table.dataTable tbody tr.submitting-entry {
 }
 
 
-[aria-describedby="resolution_comment_dialog"] {
+.resolution-response-dialog {
+  border-radius: 4px;
+  border: none !important;
   .ui-dialog-titlebar {
     background-color: #6dbcdb;
     background-image: url(image_path('icon_email_read_white.svg'));
@@ -718,6 +720,9 @@ table.dataTable tbody tr.submitting-entry {
   }
   .ui-dialog-title {
     padding-left: 25px;
+  }
+  .dialog-content-wrapper {
+    border: none;
   }
   .content-label-sm {
     display: block;
@@ -733,8 +738,9 @@ table.dataTable tbody tr.submitting-entry {
     padding: 8px;
   }
 }
-#entry-email-response-to-customers-select {
+.response-template-select {
   width: 100%;
+  margin: 2px 0 10px 0;
 }
 
 .btn-group.toolbar-btn-group.assignment-btn-group {

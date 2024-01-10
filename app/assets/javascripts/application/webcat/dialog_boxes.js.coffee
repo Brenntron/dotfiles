@@ -372,6 +372,9 @@ window.create_ind_res_dialogs = () ->
     $(this).dialog
       autoOpen: false
       minWidth: 500
+      classes: {
+        "ui-dialog": "resolution-response-dialog"
+      }
 
     # hide class keeps generated html from displaying before the dialogs are initialized
     $(this).removeClass('hide')
@@ -387,7 +390,7 @@ window.create_ind_res_dialogs = () ->
       else
         invalid_res.push(entry_id)
 
-  # grab needed templates once per needed resolution
+  # grab needed templates once per needed resolution type
   if fixed_res.length > 0
     fixed_templates = get_resolution_templates('FIXED', fixed_res)
   if unchanged_res.length > 0
@@ -398,33 +401,8 @@ window.create_ind_res_dialogs = () ->
 
 
 
-
-#window.resolution_comment_dialog = (entry_id) ->
-##  res_comment_dialog_html = '<div id="resolution_comment_dialog"></div>'
-##  res_content =
-##    '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
-##      '<label class="content-label-sm">Email Response to Customer</label>' +
-##      '<select id="entry-email-response-to-customers-select"></select>' +
-##      '</div></div><div class="row"><div class="col-xs-12">' +
-##      '<textarea class="email-response-input" id="entry-email-response-to-customers" name="customer_facing_comment" type="text"></textarea>' +
-##    '</div></div></div>'
-#
-#  observable = $('#edit_uri_input_' + entry_id).val()
-#  selected_res = $('[name="resolution' + entry_id + '"]:checked').val()
-#  dialog_title = 'Customer Response for: ' + observable
-
-  # Only one resolution dialog open at a time
-  #find all with this class
-  # unless it has this id, make sure areadescribedby this id is display:none (this wont matter if it isnt initialized)
-
-#
-##  $("#resolution_comment_dialog").html(res_content)
-#  $("#resolution_comment_dialog_#{entry_id}").dialog('open')
-#  get_resolution_templates(selected_res)
-
-
+# fetches the resolution templates from the backend when called
 window.get_resolution_templates = (resolution, entry_ids) ->
-
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/webcat/resolution_message_templates"
@@ -463,12 +441,12 @@ window.get_resolution_templates = (resolution, entry_ids) ->
       error: (response) ->
         std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
   )
-  # Update inline customer comments when selecting new template
-#  $(resolution_select).change ->
-#    comment = $(this).find(":selected").attr("data-body")
-#    id = this.id
-#    id = id.replace('input_cat_templates_', '')
-#    $("#entry-email-response-to-customers").val comment
 
-#TODO - finalize this so the response message is saved on the entry
-# Also need to assume a message regardless of if user opens the dialog.
+
+  # Update inline customer comments when selecting new template
+  $('.response-template-select').change ->
+    # get id of this select
+    comment = $(this).find(":selected").attr("data-body")
+    id = $(this).attr('id').replace('entry-email-response-to-customers-select_', '')
+    $("#entry-email-response-to-customers_#{id}").val(comment)
+

@@ -421,17 +421,19 @@ build_complaints_table = (url) ->
           res_comment_dialog_html =
             '<div class="resolution-comment-dialog hide" id="resolution_comment_dialog_' + full.entry_id + '" title="' + dialog_title + '">' +
               '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
-              '<label class="content-label-sm">Email Response to Customer</label>' +
-              '<select id="entry-email-response-to-customers-select_' + full.entry_id + '"></select>' +
+              '<label class="content-label-sm full-row-label">Resolution Email Templates</label>' +
+              '<select class="response-template-select" id="entry-email-response-to-customers-select_' + full.entry_id + '"></select>' +
               '</div></div><div class="row"><div class="col-xs-12">' +
+              '<label class="content-label-sm full-row-label">Response to Customer</label>' +
               '<textarea class="email-response-input" id="entry-email-response-to-customers_' + full.entry_id + '" name="customer_facing_comment" type="text"></textarea>' +
+              '<label class="content-label-sm full-row-label">*Edits to the above textarea will be saved upon submitting the entry. Selecting a different template or resolution will replace any text added above.</label>' +
               '</div></div></div>' +
             '</div>'
 
           res_submitted_dialog_html =
             '<div class="resolution-comment-dialog hide submitted-resolution-dialog" id="resolution_comment_dialog_' + full.entry_id + '" title="' + dialog_title + '">' +
               '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
-              '<label class="content-label-sm">Email Response to Customer</label>' +
+              '<label class="content-label-sm full-row-label">Email Response to Customer</label>' +
               '</div></div><div class="row"><div class="col-xs-12">' +
               '<div id="entry-email-response-to-customers_' + full.entry_id + '">' + res_comment + '</div>' +
               '</div></div></div>' +
