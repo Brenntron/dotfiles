@@ -1,6 +1,6 @@
 = form_for NamedSearch.new, url: escalations_webcat_complaint_entries_path, method: 'get', 'accept-charset': 'UTF-8', html: {id: 'cat_named_search'} do |named_form|
   -# Default search criteria
-  .form-group.search-item.hidden-selectize-dropdown
+  .form-group.search-item
     %label.content-label-sm{for: 'ip_or_uri'} Complaint (URL/IP/Domain)
     %input.form-control.selectize#complaint-input{name: 'ip_or_uri', multiple: 'multiple', tabindex:'-1'}
     %button#remove-criteria-complaint.remove-input{onclick:'clearSelectize("complaint-input")'}
@@ -43,17 +43,17 @@
     %select.form-control.selectize#category-input{name: 'category-input', multiple: 'multiple', tabindex:'-1'}
     %button#remove-criteria-category.remove-input{onclick:'clearSelectize("category-input")'}
 
-  .form-group.search-item.hidden.hidden-selectize-dropdown
+  .form-group.search-item.hidden
     %label.content-label-sm Entry ID
     %input.form-control.selectize#entryid-input{name: 'entry_id', multiple: 'multiple', tabindex:'-1'}
     %button#remove-criteria-entryid.remove-input{onclick:'clearSelectize("entryid-input")'}
 
-  .form-group.search-item.hidden.hidden-selectize-dropdown
+  .form-group.search-item.hidden
     %label.content-label-sm Complaint ID(s) (comma separate multiples)
     %input.form-control.selectize#complaintid-input{name: 'complaint_id', multiple: 'multiple', tabindex:'-1'}
     %button#remove-criteria-complaintid.remove-input{onclick:'clearSelectize("complaintid-input")'}
 
-  .form-group.search-item.hidden.hidden-selectize-dropdown
+  .form-group.search-item.hidden
     %label.content-label-sm Jira ID(s) (comma separate multiples)
     %input.form-control.selectize#jiraid-input{name: 'jira_id', multiple: 'multiple', tabindex:'-1', placeholder: 'ex: SDOCS-123'}
     %button#remove-criteria-jiraid.remove-input{onclick:'clearSelectize("jiraid-input")'}

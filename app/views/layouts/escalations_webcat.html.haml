@@ -167,7 +167,7 @@
           My Saved Searches
         %table{class: 'table', id: 'saved-search'}
           %tbody#saved-search-tbody
-            - current_user.named_searches.where_project_type('Complaint').order(:created_at).each do |named_search|
+            - current_user.named_searches.where_project_type('Complaint').order(:name).each do |named_search|
               %tr{id: "saved_search_#{named_search.id}"}
                 %td
                   %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_webcat_named_search('#{named_search.name}');", title: named_search.name, :'data-search_conditions' => search_condition_json(named_search)}

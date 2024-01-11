@@ -72,6 +72,7 @@ RailsAdmin.config do |config|
       "FileReputationDispute",
       "ImportUrl",
       "JiraImportTask",
+      "MerakiCluster",
       "NgfwCluster",
       "Platform",
       "ResolutionMessageTemplate",

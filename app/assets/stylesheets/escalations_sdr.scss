@@ -3,15 +3,12 @@
 }
 
 .sdr-dispute-priority-wrapper {
+  flex: 1;
   margin-top: 15px;
 }
 
-.sdr-ticket-status-button, .sdr-dropdown-menu {
-  min-width: 145px;
-
-  .status-radio-wrapper, .sdr-ticket-status-radio-label {
-    padding-right: 0;
-  }
+.sdr-dispute-case-id-wrapper {
+  flex: 4;
 }
 
 .sdr-age-wrapper, .submitter-org-wrapper, .contact-email-wrapper {
@@ -25,14 +22,6 @@
 .sdr-dispute-owner-buttons-wrapper {
   margin-top: 10px;
   padding-left: 0;
-
-  .return-ticket-button {
-    margin-right: 3px;
-  }
-
-  button:disabled {
-    opacity: .5;
-  }
 }
 
 .sdr-research-data-title, .sdr-dispute-info-title {

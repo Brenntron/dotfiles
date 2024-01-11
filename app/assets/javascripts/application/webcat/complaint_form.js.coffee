@@ -55,7 +55,6 @@ $ ->
         if window.location.pathname.includes('webcat')
           AC.WebCat.createCompanyOptions()
           AC.WebCat.createCustomerNameOptions()
-          AC.FileRep.createPlatformOptions() #filerep and webcat use the same enddpoint to get platforms
           AC.WebCat.createAssigneeOptions()
           AC.WebCat.populateSearchCriteria()
 
