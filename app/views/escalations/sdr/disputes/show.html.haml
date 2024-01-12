@@ -117,7 +117,7 @@
         %label.content-label-sm
           Assignee
         %div
-          %span#dispute-assignee{class: ('missing-data' if @is_unassigned) || ('inactive-user' if @dispute.user&.is_inactive?)}= (@is_unassigned ? 'Unassigned' : (@dispute.user&.is_inactive? ? "#{@dispute.user&.cvs_username} (inactive)" : @dispute.user&.cvs_username))
+          %span#dispute-assignee{class: ('missing-data' if (@dispute.user_id.nil? || @dispute.user&.cvs_username == 'vrtincom')) || ('inactive-user' if @dispute.user&.is_inactive?)}= ((@dispute.user_id.nil? || @dispute.user&.cvs_username == 'vrtincom') ? 'Unassigned' : (@dispute.user&.is_inactive? ? "#{@dispute.user&.cvs_username} (inactive)" : @dispute.user&.cvs_username))
       - if can? :update, Dispute
         .dispute-owner-buttons-wrapper.sdr-dispute-owner-buttons-wrapper.col-xs-12
           - if @dispute.user_id == current_user.id
