@@ -12,8 +12,7 @@ $(document).ready ->
     $('#search-criteria-options').hide()
     return
 
-  $('#disputes-advanced-search-form .remove-input').click ->
-
+  $('.remove-input').click ->
     field = $(this).parent()
     field.find('input').val('')  # on a minus icon click, clear value of field
     field_name = field.find('input').attr('id') || field.find('select').attr('id')
@@ -91,11 +90,12 @@ window.toggle_search_criteria = (element) ->
     else
       search_pref[search_item] = 'true'
   data = search_pref
+
   # save to db
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/user_preferences/update"
     method: 'POST'
-    data: {data, name: window.pageFiltersIdentifier() }
+    data: {data, name: 'WebRepAdvancedSearchFieldsDisplayed'}
     dataType: 'json'
     success: (response) ->
       return false
@@ -107,7 +107,7 @@ window.set_advanced_search_pref = () ->
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: window.pageFiltersIdentifier()}
+    data: {name: 'WebRepAdvancedSearchFieldsDisplayed'}
     success: (response) ->
       response = JSON.parse(response)
       if response?
@@ -124,9 +124,3 @@ window.set_advanced_search_pref = () ->
             $(search_input).addClass('hidden')
             $(search_toggle).removeClass('hidden')
   )
-
-window.pageFiltersIdentifier = ()->
-  if window.location.href.includes('file_rep')
-    'FileRepAdvancedSearchFieldsDisplayed'
-  else
-    'WebRepAdvancedSearchFieldsDisplayed'

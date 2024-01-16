@@ -5,6 +5,7 @@ class Clusters::Processor
     'WSA' => Clusters::Wbnp::Processor,
     'NGFW' => Clusters::Ngfw::Processor,
     'Umbrella' => Clusters::Umbrella::Processor,
+    'Meraki' => Clusters::Meraki::Processor
   }
 
   def initialize(clusters, user)

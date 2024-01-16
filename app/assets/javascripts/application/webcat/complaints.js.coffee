@@ -30,7 +30,7 @@ $(document).ready ->
     ajaxStart: () ->
       webcat_loader_timeout = setTimeout ->
         loader.removeClass('hidden')
-      , 100
+      , 500
     ajaxStop: () ->
       clearTimeout(webcat_loader_timeout)
       loader.addClass('hidden')
@@ -861,10 +861,29 @@ window.webcat_reset_search = ()->
   for i in inputs
     i.value = ""
 
-  els = ['tags','assignee','category','company','status','resolution','name','complaint','channel','entryid','complaintid','jiraid','submitter-type','platform']
-  for el in els
-    selectize_el = $("##{el}-input")[0].selectize
-    selectize_el.clear()
+  tag_input = $('#tags-input')[0].selectize
+  assignee_input = $('#assignee-input')[0].selectize
+  category_input = $('#category-input')[0].selectize
+  company_input = $('#company-input')[0].selectize
+  status_input = $('#status-input')[0].selectize
+  resolution_input = $('#resolution-input')[0].selectize
+  customer_input = $('#name-input')[0].selectize
+  complaint_input = $('#complaint-input')[0].selectize
+  channel_input = $('#channel-input')[0].selectize
+  entry_input = $('#entryid-input')[0].selectize
+  complaint_id_input = $('#complaintid-input')[0].selectize
+
+  tag_input.clear()
+  assignee_input.clear()
+  category_input.clear()
+  company_input.clear()
+  status_input.clear()
+  resolution_input.clear()
+  customer_input.clear()
+  complaint_input.clear()
+  channel_input.clear()
+  entry_input.clear()
+  complaint_id_input.clear()
 
 window.multiple_url_categorization = () ->
   loader = $('.lookup-drop-loader')
@@ -1015,7 +1034,6 @@ window.domain_whois = (IP_Domain) ->
 
 window.review_bulk_submit = () ->
   selected_rows = $("tr.highlight-second-review.shown")
-  self_review = $('#self_review').is(':checked')
   if selected_rows.length < 1
     return
   entries_to_update = []
@@ -1044,7 +1062,6 @@ window.review_bulk_submit = () ->
           named_categories += ", "
     if status != "ignore"
       entries_to_update.push({
-        'self_review': self_review,
         'id': entry_id,
         'prefix': prefix,
         'commit':status,
@@ -1074,7 +1091,6 @@ processSubmitPending=(entry_id,row_id)->
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   resolution = $('.complaint-resolution'+entry_id).text()
-  self_review = $('#self_review').is(':checked')
 
   #get the selectize control for the category input
   selectizeControl = $('#input_cat_'+entry_id).selectize()[0].selectize
@@ -1098,7 +1114,6 @@ processSubmitPending=(entry_id,row_id)->
     method: 'POST'
     data: {
       data: [{
-        'self_review': self_review,
         'id': entry_id,
         'prefix': prefix,
         'commit':status,
@@ -1131,7 +1146,6 @@ processSubmitPending=(entry_id,row_id)->
         temp_row.invalidate().page(table_page).draw(false)
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
-        populate_webcat_entry_template_select(temp_row)
         nested_tooltip()
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
           persist: false,
@@ -1190,7 +1204,6 @@ processSubmitEntry = (entry_id,row_id) ->
   uri_as_categorized = $('#complaint_prefix_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   fixed_flag = $('#fixed'+entry_id).is(':checked')
-  self_review = $('#self_review').is(':checked')
 
   # If resolution is set to fixed, make sure it has categories applied
   if categories == null && fixed_flag == true
@@ -1202,7 +1215,7 @@ processSubmitEntry = (entry_id,row_id) ->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
       headers: headers
-      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment, 'uri_as_categorized': uri_as_categorized , 'self_review': self_review}
+      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment, 'uri_as_categorized': uri_as_categorized }
       success: (response) ->
         {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
 
@@ -1225,7 +1238,6 @@ processSubmitEntry = (entry_id,row_id) ->
           temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
-          populate_webcat_entry_template_select(temp_row)
           nested_tooltip()
 
           $('#input_cat_'+ temp_row.data().entry_id).selectize {
@@ -1350,7 +1362,6 @@ window.reopenComplaint = (entry_id, button) ->
       $("#reopen_" + entry_id).addClass('hidden')
       $("#submit_changes_" + entry_id).removeClass('hidden')
       $(status_col).text('REOPENED')
-      $("#input_cat_templates_#{entry_id}").prop('disabled', false)
     error: (response) ->
       std_msg_error(response,"", reload: false)
   )
@@ -1969,7 +1980,6 @@ format = (complaint_entry_row) ->
   whois_lookup = if ip_address then ip_address else domain
   complaint_entry_html = ''
   input_cat = 'input_cat_' + entry_id
-  input_cat_templates = 'input_cat_templates_' + entry_id
 
   if complaint_entry.status == "PENDING"
     if complaint_entry.uri_as_categorized  == ""
@@ -2073,8 +2083,7 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Internal Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + entry_id + '" type="text" data-domain="' + domain + '" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<select id="' + input_cat_templates + '" name="[' + input_cat_templates + '][]" class="complaint-comment-select"></select>' +
-      '<textarea class="nested-table-input complaint-comment-input complain-comment-textarea" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '/>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div>' +
       '<div class="col-xs-4">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
@@ -2082,62 +2091,6 @@ format = (complaint_entry_row) ->
       '</div></div></div></div></td></tr></table>'
 
   complaint_entry_html
-
-window.populate_webcat_entry_template_select = (complaint_entry_row, new_resolution) ->
-
-  complaint_entry = complaint_entry_row.data()
-  entry_id = complaint_entry.entry_id
-  resolution_select = $("#input_cat_templates_#{entry_id}")
-  resolution_select.html ''
-
-  #use new resolution if passed one, otherwise use current one
-  if new_resolution?
-    complaint_resolution = new_resolution
-  else
-    if complaint_entry.resolution
-      complaint_resolution = complaint_entry.resolution
-    else
-      complaint_resolution = "FIXED"
-
-  #disable select if entry is completed and customer comment input is enabled
-  if complaint_entry.status == "COMPLETED" && $("#complaint_resolution_comment_#{entry_id}").prop('disabled') == true
-    resolution_select.prop('disabled', true)
-
-  std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/webcat/resolution_message_templates"
-    data: {resolution: complaint_resolution}
-    dataType: 'json'
-    success_reload: false
-    success: (response) ->
-      templates = JSON.parse response
-
-      if templates.length == 0 #clear out input if no templates returned
-        $("#complaint_resolution_comment_#{entry_id}").val ''
-
-      $(templates).each (index, template) ->
-
-        template_option = $("<option class='webcat-resolution-template-option'></option>")
-        $(template_option).val template.name
-        $(template_option).text template.name
-        $(template_option).attr('data-body', template.body )
-        $(template_option).attr('data-description', template.description )
-        resolution_select.append template_option
-
-        #show first option as body and description
-        if index == 0
-          $("#complaint_resolution_comment_#{entry_id}").val template.body
-
-    error: (response) ->
-      std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
-  )
-
-  # Update inline customer comments when selecting new template
-  $(".complaint-comment-select").change ->
-    comment = $(this).find(":selected").attr("data-body")
-    id = this.id
-    id = id.replace('input_cat_templates_', '')
-    $("#complaint_resolution_comment_#{id}").val comment
 
 
 ## Complaint history dialog box. Includes tabs for domain history, complaint entry history, and xbrs history of the url.
@@ -2399,7 +2352,6 @@ window.click_table_buttons = (complaint_table, button)->
               category_ids.push(y)
 
         row.child(format(row)).show()
-        populate_webcat_entry_template_select(row)
         nested_tooltip()
 
         tr.removeClass 'not-shown'
@@ -2523,7 +2475,7 @@ window.fetch_complaints = () ->
   )
 
 
-open_rows = (selected_rows, toggle) ->
+open_selected = (selected_rows, toggle) ->
   low_rep_entries = []
   error_message = ''
 
@@ -2543,14 +2495,7 @@ open_rows = (selected_rows, toggle) ->
         new_domain = domain
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
-        ipv4_regex = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/gm
-
-        # Because IPv6 includes colons an IPv6 must be wrapped in square brackets if it's used as a hostname.
-        if ipv4_regex.test(selected_row.ip_address)
-          window.open("http://#{selected_row.ip_address}")
-        else
-          console.log "Opening #{selected_row.ip_address}"
-          window.open("http://[#{selected_row.ip_address}]")
+        window.open("http://"+selected_row.ip_address)
 
   if low_rep_entries.length >= 10
     error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores."
@@ -2564,30 +2509,26 @@ open_rows = (selected_rows, toggle) ->
         domains_and_ips.push "<li>#{lre.ip_address}</li>"
 
     error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores. <ul>#{domains_and_ips.join('')}</ul>"
-    show_message('error', "#{error_message}", false, '#alertMessage')
+
+  show_message('error', "#{error_message}", false, '#alertMessage')
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_rows(selected_rows, "true")
-
+  open_selected(selected_rows, "true")
 window.open_nonviewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_rows(selected_rows, "false")
-
+  open_selected(selected_rows, "false")
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
-
   if selected_rows[0].length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
   else
-    open_rows(selected_rows, "true")
-
+    open_selected(selected_rows, "true")
 window.open_all = () ->
   open_all = confirm("Are you sure you want to open ALL the windows on this page?!!")
-
   if (open_all == true)
-    all_rows = $('#complaints-index').DataTable().rows()
-    open_rows(all_rows, "true")
+    selected_rows = $('#complaints-index').DataTable().rows()
+    open_selected(selected_rows, "true")
 
 toggle_selected = (selectedRows, expand)->
   selectState = $('.selected')
@@ -2599,7 +2540,6 @@ toggle_selected = (selectedRows, expand)->
       if $(row).hasClass('shown')
         $(row).find('.expand-row-button-inline').click()
         $(row).addClass('selected')
-
   $(selectState).addClass('selected')
 
 window.collapse_selected =()->
@@ -2689,7 +2629,6 @@ processSubmitMaster = () ->
   # remove empty values
   selectedEntryDomains = selectedEntryDomains.split(',').filter((item) -> item);
   selectedEntries = []
-  self_review = $('#self_review').is(':checked')
   $('#complaints-index').DataTable().rows (idx, data, node) ->
     entry_item = data.domain || data.ip_address
     if selectedEntryDomains.includes(entry_item)
@@ -2716,9 +2655,10 @@ processSubmitMaster = () ->
       comment = data_wrapper.find("#complaint_comment_#{entry_id}")[0].value
       resolution_comment = data_wrapper.find("#complaint_resolution_comment_#{entry_id}")[0].value
       uri_as_categorized = data_wrapper.find("#complaint_prefix_#{entry_id}")[0].value
-      if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
-        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment, uri_as_categorized: uri_as_categorized})
-      else if status == 'UNCHANGED' || status == 'INVALID'
+
+      if (categories.length == 0) && status == 'FIXED'
+        data.push({entry_id, error: true, reason: 'nil_categories'})
+      else
         data.push({
           entry_id: entry_id,
           error: false,
@@ -2729,11 +2669,9 @@ processSubmitMaster = () ->
           status: status,
           comment: comment,
           resolution_comment: resolution_comment,
-          uri_as_categorized: uri_as_categorized,
-          self_review: self_review
+          uri_as_categorized: uri_as_categorized
         })
-      else if (categories.length == 0) && status == 'FIXED'
-        data.push({entry_id, error: true, reason: 'nil_categories'})
+
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
@@ -2770,7 +2708,6 @@ processSubmitMaster = () ->
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
           nested_tooltip()
-          populate_webcat_entry_template_select(temp_row)
           $('#input_cat_'+ entry.entry_id).selectize {
             persist: false,
             create: false,
@@ -2850,8 +2787,18 @@ window.verifyMasterSubmit = () ->
   return boolean
 
 window.updateResolutionDialog = (confirm) ->
+
+
+
+#   { status } = row
+#  if status == 'COMPLETED'
+#    reopened = true
+#    disabled = false
+#  if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
+#    invalid_unchanged = true
+#    disabled = false
   $('#complaint_entries_to_update').empty()
-  resolution = $('input[name="complaint[resolution]"]:checked').val()
+  resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected')
   pending_msg = ''
   complaint_entries = []
@@ -2893,17 +2840,11 @@ window.updateResolutionDialog = (confirm) ->
       $('#resolution_text').css('padding-left', '7px')
   , 200
 
-window.clearBulkResolution = () ->
-#  $('.resolution-apply-button').removeClass('applied')
-  $('#email-response-to-customers').val('')
-#  $('#webcat-bulk-categories')[0].selectize.clear()
-  $('#internal_comment').val('')
-
 window.updateResolution = () ->
-  resolution = $('input[name="complaint[resolution]"]:checked').val()
+  resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected.filtered-row')
   internal_comment = $('#internal_comment')[0].value
-  customer_facing_comment = $('#customer_facing_comment').value
+  customer_facing_comment = $('#customer_facing_comment')[0].value
 
   complaint_entries = []
   for row in selected_rows
@@ -2969,13 +2910,6 @@ $ ->
     touchedFormChange(domain)
     $('#master-submit').prop('disabled', false)
 
-    #update response template select
-    complaint_table = $('#complaints-index').DataTable()
-    tr = $(this).closest('tr')
-    row_id = $(tr).attr('row_id')
-    row = complaint_table.row(row_id)
-    populate_webcat_entry_template_select(row, $(this).val())
-
   $('.expand-all').click ->
     complaint_table = $('#complaints-index').DataTable()
     td = $('#complaints-index').find('td.expandable-row-column')
@@ -2988,7 +2922,6 @@ $ ->
 
         row.child(format(row)).show()
         nested_tooltip()
-        populate_webcat_entry_template_select(row)
 
         tr.addClass 'shown'
 
@@ -3079,6 +3012,18 @@ $ ->
         )
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
+
+  $('#self_review').click ->
+    self_review = $(this).prop('checked')
+
+    data = {'allowed': self_review}
+    std_msg_ajax(
+      url: "/escalations/api/v1/escalations/user_preferences/update"
+      method: 'POST'
+      data: {data, name: 'SelfReview'}
+      dataType: 'json'
+      success: (response) ->
+    )
 
 # Convert webcat to webrep
 # Enable / disable button to attempt based on if anything is selected
@@ -3252,72 +3197,3 @@ $ ->
   $('#wbnp-report-button').click ->
     $('#wbnp-full-report').dialog('open')
 
-#  resolutionStatus = $('input[name="complaint[resolution]"]:checked').val()?
-#  customerFacingComment = $('input[name="customer_facing_comment]').val()?
-#  categories = $('input[name="complaint[resolution]"]:checked').val() == 'DROP_ALL'
-#
-#  if resolutionStatus?
-#    $('.resolution-container').find('.resolution-apply-button').addClass('applied')
-#  if customerFacingComment?
-#    $('customer-facing-comment-container').find('.resolution-apply-button').addClass('applied')
-#  if categories?
-#    $('categories-container').find('.resolution-apply-button').addClass('applied')
-
-  webcat_bulk_response_templates_check_if_checked = () ->
-    if $("input[type=radio][name='complaint[resolution]']:checked").length <= 0
-      $('#webcat_resolution_unchanged_option').trigger('click')
-
-  $('#index_change_resolution_dialog').dialog
-    autoOpen: false
-    classes: { 'ui-dialog': 'index-change-resolution-dialog'}
-    width: 450
-    minHeight: 300
-    position:
-      my: 'right top'
-      at: 'right top+150'
-      of: window
-    open:  () ->
-      #select radio button if none is selected (needs to be clicked so data can load)
-      webcat_bulk_response_templates_check_if_checked()
-
-  $("#index_update_resolution").click ->
-    $('#index_change_resolution_dialog').dialog('open')
-
-  # Populate bulk webcat response templates
-  assemble_webcat_bulk_response_templates = (templates, resolution_select) ->
-    resolution_select = $('#email-response-to-customers-select')
-    resolution_select.empty()
-
-    if templates.length == 0
-      resolution_select.val ''
-      $('#email-response-to-customers').text ''
-      $('#email-response-to-customers').val ''
-
-    $(templates).each (index, template) ->
-      template_option = $("<option class='webcat-resolution-template-option'></option>")
-      $(template_option).val template.name
-      $(template_option).text template.name
-      $(template_option).attr('data-body', template.body )
-      $(template_option).attr('data-description', template.description )
-      resolution_select.append template_option
-
-      #show first option as body and description
-      if index == 0
-        $('#email-response-to-customers').text template.body
-        $('#email-response-to-customers').val template.body
-
-  window.populate_resolved_webcat_templates = (resolution) ->
-
-    get_resolution_templates_by_resolution('webcat', resolution).then (response) ->
-      templates = JSON.parse response
-      assemble_webcat_bulk_response_templates(templates)
-
-  # Load resolution template comments after clicking new status
-  $("input[type=radio][name='complaint[resolution]']").change ->
-    resolution = $(this).val()
-    populate_resolved_webcat_templates(resolution)
-
-  # Populate current resolution comment after changing resolution template
-  $('#email-response-to-customers-select').on 'change', (i, e) ->
-    comment = $('#email-response-to-customers-select option:selected').attr('data-body')
-    $('#email-response-to-customers').val comment
