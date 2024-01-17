@@ -21,8 +21,7 @@ class Beaker::Urs < Beaker::BeakerBase
     if resolved_ip.present?
       if resolved_ip.kind_of?(String)
         resolved_ip = [get_ip_endpoint(resolved_ip)]
-      end
-      if resolved_ip.kind_of?(Array)
+      elsif resolved_ip.kind_of?(Array)
         resolved_ip = resolved_ip.map {|ip_addr| get_ip_endpoint(ip_addr) }
       end
 

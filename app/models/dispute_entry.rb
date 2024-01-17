@@ -125,7 +125,8 @@ class DisputeEntry < ApplicationRecord
         end
 
         #wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
-        urs_stuff = Beaker::Urs.query_reputation(self.hostlookup, resolved_ip).result.first.result.first rescue nil
+        
+        urs_stuff = Beaker::Urs.query_reputation(ip_url, resolved_ip).result.first.result.first rescue nil
 
         wbrs_api_response["wbrs"]["score"] = (urs_stuff.reputation_score_x10 / 10.0).to_f
 
