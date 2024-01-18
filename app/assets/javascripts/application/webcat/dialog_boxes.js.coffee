@@ -289,9 +289,7 @@ $ ->
     width: 450
     minHeight: 300
     position:
-      my: 'right top'
-      at: 'right top+150'
-      of: window
+      my: 'center top'
     open:  () ->
       #select radio button if none is selected (needs to be clicked so data can load)
       webcat_bulk_response_templates_check_if_checked()
@@ -322,11 +320,6 @@ $ ->
       else
         $('#' + dialog_id).dialog('open')
 
-
-    # close others if they aren't this one
-    #check observable (could be edited)
-    # check selected resolution (could be changed)
-    # update accordingly
 
 
 

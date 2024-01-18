@@ -421,7 +421,7 @@ build_complaints_table = (url) ->
           res_comment_dialog_html =
             '<div class="resolution-comment-dialog hide" id="resolution_comment_dialog_' + full.entry_id + '" title="' + dialog_title + '">' +
               '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
-              '<label class="content-label-sm full-row-label">Resolution Email Templates</label>' +
+              '<label class="content-label-sm full-row-label">Resolution Email Template</label>' +
               '<select class="response-template-select" id="entry-email-response-to-customers-select_' + full.entry_id + '"></select>' +
               '</div></div><div class="row"><div class="col-xs-12">' +
               '<label class="content-label-sm full-row-label">Response to Customer</label>' +
