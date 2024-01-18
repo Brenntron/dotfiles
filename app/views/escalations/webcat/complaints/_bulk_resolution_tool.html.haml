@@ -10,9 +10,9 @@
       .col-xs-10
         %label.content-label-sm Resolution (Fixed resolution cannot be applied in bulk.)
         .resolution-input-wrapper
-          %input{type: 'radio', id: 'webcat_resolution_unchanged_option', name: 'complaint[resolution]', value: 'UNCHANGED'}
+          %input#webcat_resolution_unchanged_option.bulk-resolution-radio{type: 'radio',  name: 'complaint[resolution]', value: 'UNCHANGED', checked: 'checked'}
           %label.resolution-radio-label{for: 'webcat_resolution_unchanged_option'} Unchanged
-          %input{type: 'radio', id: 'webcat_resolution_invalid_option', name: 'complaint[resolution]', value: 'INVALID'}
+          %input#webcat_resolution_invalid_option.bulk-resolution-radio{type: 'radio', name: 'complaint[resolution]', value: 'INVALID'}
           %label.resolution-radio-label{for: 'webcat_resolution_invalid_option'} Invalid
       .col-xs-2.text-right
         %button#resolution-apply-button.resolution-apply-button
