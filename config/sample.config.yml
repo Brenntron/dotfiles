@@ -155,7 +155,9 @@ development:
     host: "prod-webcat-app3.sv4.ironport.com"
     port: 5000
     api_key: "redacted"
-    tls: "verify-none"  
+    tls: "verify-none"
+  resolution_report:
+    cache_expiration: 60
 
 test:
   api_timeout:
@@ -300,13 +302,15 @@ test:
       bucket: "redacted"
       prefix: "redacted" 
       region: "redacted"
-
   jira:
     host: "https://fmd-drgjr-01tst.vrt.sourcefire.com:443/"
     token: "redacted"
     verify_mode: "verify-none"
     auth_type: "basic"
     project_key: "SD"
+  resolution_report:
+    cache_expiration: 60
+
 staging:
   amp_poke:
     host: "localhost"
@@ -464,6 +468,9 @@ staging:
     username: "TBD.gen"
     password: "redacted"
     verify_mode: "verify-none"
+  resolution_report:
+    cache_expiration: 60
+
 production:
   amp_poke: 
     host: "poke.vrt.sourcefire.com"
@@ -622,3 +629,5 @@ production:
     username: "TBD.gen"
     password: "redacted"
     verify_mode: "verify-none"
+  resolution_report:
+    cache_expiration: 60

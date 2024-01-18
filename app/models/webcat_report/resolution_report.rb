@@ -54,7 +54,7 @@ class WebcatReport::ResolutionReport
       if @date_to < Date.today
         Rails.cache.write("total_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}", res_count.to_json)
       else
-        Rails.cache.write("total_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}", res_count.to_json, expires_in: 1.hour)
+        Rails.cache.write("total_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}", res_count.to_json, expires_in: Rails.configuration.resolution_report.cache_expiration.minutes)
       end
     end
 
@@ -98,7 +98,7 @@ class WebcatReport::ResolutionReport
         if @date_to < Date.today
           Rails.cache.write("#{user.cvs_username}_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}", res_count.to_json)
         else
-          Rails.cache.write("#{user.cvs_username}_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}", res_count.to_json, expires_in: 1.hour)
+          Rails.cache.write("#{user.cvs_username}_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}", res_count.to_json, expires_in: Rails.configuration.resolution_report.cache_expiration.minutes)
         end
       end
 
