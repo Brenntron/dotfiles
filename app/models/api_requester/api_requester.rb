@@ -350,9 +350,7 @@ module ApiRequester::ApiRequester
             new_json_request(path, body: input, headers: headers)
           when :query_string
             new_query_string_request(path, query: input, headers: headers)
-          when :query_body
-            new_query_body_request(path, query: input, headers: headers)
-          when :form_data
+          when :form_data, :query_body
             new_form_data_request(path, body: input, headers: headers)
           else
             raise 'Unknown request type, must be :json, :query_string, or :query_body'
