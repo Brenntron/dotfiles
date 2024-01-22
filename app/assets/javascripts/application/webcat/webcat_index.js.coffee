@@ -12,7 +12,8 @@ $ ->
     # Make the datatables search prettier
     $('#complaints-index_filter input').addClass('restricted-table-search-input');
 
-
+    window.onbeforeunload = (e) ->
+      e.preventDefault()
 
 #### New complaints index table setup
 build_complaints_table = (url) ->
