@@ -8,7 +8,7 @@ local M = {
       "folke/neodev.nvim",
        commit = "b094a663ccb71733543d8254b988e6bebdbdaca4",
     },
-    { "Smitesh/nvim-navic" }
+    { "SmiteshP/nvim-navic" }
   },
 }
 
