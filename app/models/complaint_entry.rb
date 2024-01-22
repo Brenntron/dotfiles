@@ -426,13 +426,13 @@ class ComplaintEntry < ApplicationRecord
       ## call guardrails
 
       #begin
-      category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
+        category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
-      verdict_results = Webcat::EntryVerdictChecker.new(prefix, category_ids_array).check
+        verdict_results = Webcat::EntryVerdictChecker.new(prefix, category_ids_array).check
 
-      verdict_pass = verdict_results[:verdict_pass]
-      verdict_reasons = verdict_results[:verdict_reasons]
-      #binding.pry
+        verdict_pass = verdict_results[:verdict_pass]
+        verdict_reasons = verdict_results[:verdict_reasons]
+        #binding.pry
       #rescue Exception => e
       #  Rails.logger.error(e.message)
       #  verdict_pass = false
@@ -804,11 +804,11 @@ class ComplaintEntry < ApplicationRecord
     ###this should be eventually removed, but commenting out for now to see if it speeds up the NEW button for bulk entries
 
     #begin
-    #this is where screen grabs happen.
+      #this is where screen grabs happen.
     #  screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
     #  screenshot_entry.grab_screenshot
     #rescue Timeout::Error => e
-    #couldnt complete in time
+      #couldnt complete in time
     #  Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
     #  ces = ComplaintEntryScreenshot.new
     #  ces.error_message = e.message
@@ -819,7 +819,7 @@ class ComplaintEntry < ApplicationRecord
     #  ces.save!
     #rescue Exception => e
     #  Rails.logger.error("#{e.message}")
-    # do nothing, it was worth a try. kittens are sad now
+      # do nothing, it was worth a try. kittens are sad now
     #  ces = ComplaintEntryScreenshot.new
     #  ces.error_message = e.message
     #  ces.complaint_entry_id = new_complaint_entry.id
@@ -843,16 +843,16 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.robust_search(search_type, search_name: nil, params: nil, user:)
     case search_type
-    when 'advanced'
-      advanced_search(params, search_name: search_name, user: user)
-    when 'named'
-      named_search(search_name, user: user)
-    when 'standard'
-      standard_search(search_name, user: user)
-    when 'contains'
-      contains_search(params['value'])
-    else
-      where({})
+      when 'advanced'
+        advanced_search(params, search_name: search_name, user: user)
+      when 'named'
+        named_search(search_name, user: user)
+      when 'standard'
+        standard_search(search_name, user: user)
+      when 'contains'
+        contains_search(params['value'])
+      else
+        where({})
     end
   end
 
@@ -890,62 +890,62 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.standard_search(search_name, user:)
     case search_name
-    when "NEW"
-      new_entries
-    when "COMPLETED"
-      closed
-    when "ACTIVE"
-      open.where.not(status:"NEW")
-    when "REVIEW"
-      where(status: "PENDING")
-    when "MY COMPLAINTS"
-      where(user_id: user.id)
-    when "MY OPEN COMPLAINTS"
-      open.where(user_id: user.id)
-    when "MY CLOSED COMPLAINTS"
-      closed.where(user_id: user.id)
-    when "MANAGER QUEUE"
-      joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
-    when "NEW JIRA"
-      where(status: 'NEW', complaint_id: Complaint.from_jira)
-    when "JIRA OVERDUE"
-      where(complaint_id: Complaint.from_jira).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-    when "JIRA ASSIGNED"
-      where(status: 'ASSIGNED', complaint_id: Complaint.from_jira)
-    when "ALL JIRA"
-      where(complaint_id: Complaint.from_jira)
-    when "ALL TALOS"
-      where(complaint_id: Complaint.from_ti)
-    when "NEW TALOS"
-      where(status: 'NEW', complaint_id: Complaint.from_ti)
-    when "TALOS OVERDUE"
-      where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-    when "TALOS ASSIGNED"
-      where(status: 'ASSIGNED', complaint_id: Complaint.from_ti)
-    when "ALL WBNP"
-      where(complaint_id: Complaint.from_wbnp)
-    when "NEW WBNP"
-      where(status: 'NEW', complaint_id: Complaint.from_wbnp)
-    when "WBNP OVERDUE"
-      where(complaint_id: Complaint.from_wbnp).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-    when "WBNP ASSIGNED"
-      where(status: 'ASSIGNED', complaint_id: Complaint.from_wbnp)
-    when "ALL INTERNAL"
-      where(complaint_id: Complaint.from_int)
-    when "NEW INTERNAL"
-      where(status: 'NEW', complaint_id: Complaint.from_int)
-    when "INTERNAL OVERDUE"
-      where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-    when "INTERNAL ASSIGNED"
-      where(status: 'ASSIGNED', complaint_id: Complaint.from_int)
-    when "ALL PENDING"
-      where(status: 'PENDING')
-    when "PENDING OVERDUE"
-      where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
-    when "ALL"
-      all
-    else
-      all
+      when "NEW"
+        new_entries
+      when "COMPLETED"
+        closed
+      when "ACTIVE"
+        open.where.not(status:"NEW")
+      when "REVIEW"
+        where(status: "PENDING")
+      when "MY COMPLAINTS"
+        where(user_id: user.id)
+      when "MY OPEN COMPLAINTS"
+        open.where(user_id: user.id)
+      when "MY CLOSED COMPLAINTS"
+        closed.where(user_id: user.id)
+      when "MANAGER QUEUE"
+        joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
+      when "NEW JIRA"
+          where(status: 'NEW', complaint_id: Complaint.from_jira)
+      when "JIRA OVERDUE"
+        where(complaint_id: Complaint.from_jira).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "JIRA ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_jira)
+      when "ALL JIRA"
+        where(complaint_id: Complaint.from_jira)
+      when "ALL TALOS"
+        where(complaint_id: Complaint.from_ti)
+      when "NEW TALOS"
+        where(status: 'NEW', complaint_id: Complaint.from_ti)
+      when "TALOS OVERDUE"
+        where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "TALOS ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_ti)
+      when "ALL WBNP"
+        where(complaint_id: Complaint.from_wbnp)
+      when "NEW WBNP"
+        where(status: 'NEW', complaint_id: Complaint.from_wbnp)
+      when "WBNP OVERDUE"
+        where(complaint_id: Complaint.from_wbnp).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "WBNP ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_wbnp)
+      when "ALL INTERNAL"
+        where(complaint_id: Complaint.from_int)
+      when "NEW INTERNAL"
+        where(status: 'NEW', complaint_id: Complaint.from_int)
+      when "INTERNAL OVERDUE"
+        where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+      when "INTERNAL ASSIGNED"
+        where(status: 'ASSIGNED', complaint_id: Complaint.from_int)
+      when "ALL PENDING"
+        where(status: 'PENDING')
+      when "PENDING OVERDUE"
+        where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
+      when "ALL"
+        all
+      else
+        all
     end
   end
 
@@ -1024,7 +1024,7 @@ class ComplaintEntry < ApplicationRecord
       relation =
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
     end
-
+    
     if params['jira_id'].present?
       relation = relation.joins(complaint: {import_urls: :jira_import_task}).where(jira_import_tasks: {issue_key: present_params['jira_id']})
     end
@@ -1111,8 +1111,8 @@ class ComplaintEntry < ApplicationRecord
     if ip_or_uri.present?
       vals = ip_or_uri.map{ |e| "'#{e}'"}.join(',')
       relation = relation.where("complaint_entries.domain in (#{vals})")
-                     .or(where("complaint_entries.ip_address in (#{vals})"))
-                     .or(where("complaint_entries.uri in (#{vals})"))
+                         .or(where("complaint_entries.ip_address in (#{vals})"))
+                         .or(where("complaint_entries.uri in (#{vals})"))
     end
 
     complaint_fields = present_params.to_h.slice(*%w{description channel})
@@ -1122,7 +1122,7 @@ class ComplaintEntry < ApplicationRecord
         if type == Complaint::SUBMITTER_TYPE_CUSTOMER
           memo << Complaint::SUBMITTER_TYPE_CUSTOMER
         else 'GUEST'
-        memo.push(Complaint::SUBMITTER_TYPE_NONCUSTOMER, nil)
+          memo.push(Complaint::SUBMITTER_TYPE_NONCUSTOMER, nil)
         end
         memo
       end
@@ -1141,12 +1141,12 @@ class ComplaintEntry < ApplicationRecord
 
   def hostlookup
     case
-    when self.entry_type == "IP"
-      self.ip_address
-    when self.entry_type == "URI/DOMAIN"
-      self.uri
-    else
-      self.uri.blank? ? self.ip_address : self.uri
+      when self.entry_type == "IP"
+        self.ip_address
+      when self.entry_type == "URI/DOMAIN"
+        self.uri
+      else
+        self.uri.blank? ? self.ip_address : self.uri
     end
   end
 
