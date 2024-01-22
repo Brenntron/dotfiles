@@ -165,6 +165,14 @@ ZSH_HIGHLIGHT_STYLES[arg0]='fg=#F8F8F2'
 ZSH_HIGHLIGHT_STYLES[default]='fg=#F8F8F2'
 ZSH_HIGHLIGHT_STYLES[cursor]='standout'
 
+# Source zsh config based on operating system used.
+
+if [[ $(uname) == "Linux" ]]; then
+  source ~/.config/linux/linux.zsh
+else
+  source ~/.config/osx/osx.zsh
+fi
+
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
@@ -216,12 +224,6 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-if [[ $(uname) == "Linux" ]]; then
-  source ~/.config/linux/linux.zsh
-else
-  source ~/.config/osx/osx.zsh
-fi
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
@@ -251,6 +253,3 @@ export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 
 # Precommand for kitty tab title
 precmd () {print -Pn "\e]0;%~\a"}
-
-# Generated for envman. Do not edit.
-[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
