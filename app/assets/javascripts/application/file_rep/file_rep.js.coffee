@@ -1,3 +1,5 @@
+assigned_timeout_id = ''
+
 $(document).on 'ready',->
   $('#advanced-search-button').click ->
     $('#advanced-search-dropdown').show()
@@ -177,7 +179,18 @@ window.file_rep_show_take_dispute = (dispute_id) ->
     success: (response) ->
       $("#dispute-assignee").text(response.username).removeClass('missing-data')
       $('#show-edit-ticket-status-button').text("ASSIGNED")
-      $('.take-ticket-button').replaceWith("<button class='return-ticket-button esc-tooltipped' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
+      $('.take-ticket-button').attr('disabled', true)
+      $('.return-ticket-button').attr('disabled', false)
+      $('#show-edit-ticket-status-button').text('ASSIGNED')
+
+      clearTimeout(assigned_timeout_id)
+      $('#unassignedAlert').addClass('hidden') if !$('#unassignedAlert').hasClass('hidden')
+      $('#assignedAlert').removeClass('hidden') if $('#assignedAlert').hasClass('hidden')
+      $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+      assigned_timeout_id = setTimeout () ->
+        $('.assigned-check').addClass('hidden')
+        $('#assignedAlert').addClass('hidden')
+      , 5000
   )
 
 window.file_rep_show_return_dispute = (dispute_id) ->
@@ -190,7 +203,19 @@ window.file_rep_show_return_dispute = (dispute_id) ->
     success: (response) ->
       $("#dispute-assignee").text("Unassigned").addClass('missing-data')
       $("#show-edit-ticket-status-button").text("NEW")
-      $(".return-ticket-button").replaceWith("<button class='take-ticket-button esc-tooltipped' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
+      $(".return-ticket-button").attr('disabled', true)
+      $(".ticket-owner-unassigned-button").attr('disabled', true)
+      $('.take-ticket-button').attr('disabled', false)
+      $('#show-edit-ticket-status-button').text('NEW')
+
+      clearTimeout(assigned_timeout_id)
+      $('#assignedAlert').addClass('hidden') if !$('#assignedAlert').hasClass('hidden')
+      $('#unassignedAlert').removeClass('hidden') if $('#unassignedAlert').hasClass('hidden')
+      $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+      assigned_timeout_id = setTimeout () ->
+        $('.assigned-check').addClass('hidden')
+        $('#unassignedAlert').addClass('hidden')
+      , 5000
   )
 
 window.file_rep_show_change_assignee = (dispute_id) ->
@@ -208,7 +233,37 @@ window.file_rep_show_change_assignee = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      window.location.reload()
+      parsed_response = JSON.parse response
+      { user_id } = parsed_response.data[0]
+      current_user_id = $('input[name="current_user_id"]').val()
+      $assignee_select = $('#index_target_assignee')
+      is_assignee = parseInt(current_user_id) is parseInt(user_id)
+      $dispute_assignee = $('#dispute-assignee')
+
+      $assignee_select.val(user_id)
+      username = $assignee_select.find(':selected').text()
+
+      $dispute_assignee.text(username)
+
+      $('#index_change_assign').dropdown('toggle')
+      $('#show-edit-ticket-status-button').text('ASSIGNED')
+      $('.ticket-owner-unassigned-button').attr('disabled', false)
+      $dispute_assignee.removeClass('missing-data') if $dispute_assignee.hasClass('missing-data')
+
+      if is_assignee
+        $(".return-ticket-button").attr('disabled', false)
+        $('.take-ticket-button').attr('disabled', true)
+      else
+        $(".return-ticket-button").attr('disabled', true)
+
+      clearTimeout(assigned_timeout_id)
+      $('#unassignedAlert').addClass('hidden') if !$('#unassignedAlert').hasClass('hidden')
+      $('#assignedAlert').removeClass('hidden') if $('#assignedAlert').hasClass('hidden')
+      $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+      assigned_timeout_id = setTimeout () ->
+        $('.assigned-check').addClass('hidden')
+        $('#assignedAlert').addClass('hidden')
+      , 5000
   )
 
 $ ->
@@ -502,16 +557,15 @@ $ ->
     if $('#sandbox-score-input').closest('.form-group').hasClass('.hidden')
       sandbox_score = {}
     if $('time-submitted-input').closest('.form-group').hasClass('.hidden')
-      last_updated = {}
-    if $('last-updated-input').closest('.form-group').hasClass('.hidden')
       time_submitted = {}
+    if $('last-updated-input').closest('.form-group').hasClass('.hidden')
+      last_updated = {}
 
     platforms = $('#platform-input')[0].selectize? && $('#platform-input')[0].selectize.items
     platform_display = []
     if platforms.length
       for platform in platforms
         platform_display.push($('#platform-input')[0].selectize.options[platform].public_name)
-
     localStorage.search_type = 'advanced'
     localStorage.search_name = form.find('input[name="search_name"]').val()
     localStorage.search_conditions = JSON.stringify(
@@ -1018,7 +1072,10 @@ $ ->
           else if data == 'vrtincom' || data == ""
             return "<span class='missing-data missing-data-index' id='owner_#{full.id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.id}' onClick='file_rep_take_dispute(#{full.id})'/></button></span>"
           else
-            return data
+            if data.includes("(inactive)")            
+              return "<span class='inactive-user'> #{data} </span>"
+            else
+              return data
       }
     ]
 
@@ -1091,37 +1148,31 @@ $ ->
         s = '0' + s
       s
 
-  $(document).on 'focus', '#time-submitted-input', (e) ->
-    if time_submitted != ''
-      placeholder = time_submitted.from + ' - ' + time_submitted.to
-    else
-      placeholder = AC.FileRep.daterangepickerFormat
-    $('#time-submitted-input').attr('placeholder', placeholder)
+  $(document).on 'focus', '#time-submitted-input, #last-updated-input', (event) ->
+      if event.target.id == 'time-submitted-input'
+        data = time_submitted
+      else if event.target.id == 'last-updated-input'
+        data = last_updated
 
-    $('#time-submitted-input').daterangepicker( { locale: { format: AC.FileRep.daterangepickerFormat } },
-      (start, end) ->
-        time_submitted = {
-          from : start.format(AC.FileRep.daterangepickerFormat)
-          to : end.format(AC.FileRep.daterangepickerFormat)
-        }
-        $('#advanced-search-dropdown').show()
-        $('#advanced-search-dropdown').css('display', 'block')
-    )
+      if data != ''
+        placeholder = [time_submitted.from, time_submitted.to].join(' - ')
+      else
+        placeholder = AC.FileRep.daterangepickerFormat
 
-  $(document).on 'focus', '#last-updated-input', () ->
-    if last_updated != ''
-      placeholder = last_updated.from + ' - ' + last_updated.to
-    else
-      placeholder = AC.FileRep.daterangepickerFormat
-    $('#last-updated-input').attr('placeholder', placeholder)
+      $(event.target).attr('placeholder', placeholder)
+      $(event.target).daterangepicker( { locale: { format: AC.FileRep.daterangepickerFormat } } )
+      $('#advanced-search-dropdown').show()
+      $('#advanced-search-dropdown').css('display', 'block')
 
-    $('#last-updated-input').daterangepicker( { locale: { format: AC.FileRep.daterangepickerFormat } },
-      (start, end) ->
-        last_updated = {
-          from : start.format(AC.FileRep.daterangepickerFormat)
-          to : end.format(AC.FileRep.daterangepickerFormat)
-        }
-    )
+  $('#time-submitted-input, #last-updated-input').on 'change', (event) ->
+    [startDate, endDate] = $(event.target).val().split(' - ')
+    if startDate && endDate
+      if event.target.id == 'time-submitted-input'
+        time_submitted = { from: startDate, to: endDate }
+      else if event.target.id == 'last-updated-input'
+        last_updated = { from: startDate, to: endDate }
+
+
   $('#sandbox-score-input').slider(
     {
       range: true,
@@ -1361,11 +1412,12 @@ $ ->
 
         if amp_hist_array.length == 0 || amp_hist_array == undefined
           $('#amp-history-icon').hide()
-        else if amp_hist_array.length > 0
+        else if typeof amp_hist_array is 'array'
           # Each entry, build a new html row with that source data using object destructuring
           for entry in amp_hist_array
             {time, disposition, name, user, _poke_server, mode} = entry._source
             datetime = moment.utc(moment.unix(time)).format("MMMM DD, YYYY h:mm A z")
+
             if disposition == 'malicious'
               disposition = '<span class="disp-negative">' + disposition + '</span>'
 
@@ -1654,6 +1706,7 @@ $ ->
           window.toggle_selectize_layer(this, 'false')
       }
 
+  if $('#platform-input').length > 0
     platforms_input = $('#platform-input').selectize {
       persist: true
       create: false
@@ -1669,3 +1722,4 @@ $ ->
       onBlur: () ->
         window.toggle_selectize_layer(this, 'false')
     }
+

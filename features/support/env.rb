@@ -4,7 +4,6 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-require 'cucumber/api_steps'
 require 'selenium-webdriver'
 require 'capybara/cucumber'
 
@@ -36,7 +35,7 @@ require 'capybara/poltergeist'
 require 'paper_trail/frameworks/cucumber'
 require 'will_paginate/array'
 
-Capybara.default_driver = :selenium
+Capybara.default_driver = :selenium_chrome
 Selenium::WebDriver.logger.level = :error
 
 # This setting is required for DataTables to be compatible with Selenium
@@ -103,7 +102,7 @@ Before('@no-js-errors') do
 end
 
 Before('@poltergeist') do
-  Capybara.javascript_driver = :poltergeist
+  Capybara.javascript_driver = :selenium_chrome
 end
 
 
