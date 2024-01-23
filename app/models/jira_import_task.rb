@@ -171,7 +171,7 @@ class JiraImportTask < ApplicationRecord
                 end
               else
                 complaint_options = [
-                  BugzillaRest::Session.default_session,
+                  EscalationTicket
                   ticketable_urls.first.submitted_url,
                   description,
                   Customer::JIRA_GENERATED,
