@@ -9,7 +9,10 @@
     %tbody
       - @users.each do |user|
         %tr
-          %td.alt-col.user-col-divider= user.display_name
+          - if user.is_inactive?
+            %td.alt-col.user-col-divider.inactive-user="#{user.display_name} (inactive)"
+          - else
+            %td.alt-col.user-col-divider= user.display_name  
           - if current_user.has_role?('admin')
             %td.alt-col.user-name-col.user-col-divider= link_to user.cvs_username, escalations_user_path(user)
           - else

@@ -78,7 +78,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           company_name:     complaint_entry.customer_company_name,
           customer_email:   complaint.customer&.email,
           complaint_source: complaint.ticket_source || 'Internal',
-          assigned_to:      complaint_entry.user&.display_name,
+          assigned_to:      complaint_entry.user&.is_inactive? ? "#{complaint_entry.user&.display_name} (inactive)" : complaint_entry.user&.display_name,
 
           uri:              complaint_entry.uri,
           resolution:       complaint_entry.resolution,

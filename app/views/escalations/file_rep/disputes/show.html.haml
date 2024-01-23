@@ -104,7 +104,10 @@
                 - if @file_rep_dispute.assigned.nil? || @file_rep_dispute.assigned == 'Unassigned' || @file_rep_dispute.assigned.cvs_username == 'vrtincom'
                   %span.missing-data#dispute-assignee Unassigned
                 - else
-                  %span#dispute-assignee= @file_rep_dispute.assigned.cvs_username
+                  - if @file_rep_dispute.assigned.is_inactive?
+                    %span#dispute-assignee.file-rep-dispute-assignee.inactive-user="#{@file_rep_dispute.assigned.cvs_username} (inactive)"
+                  - else 
+                    %span#dispute-assignee.file-rep-dispute-assignee= @file_rep_dispute.assigned.cvs_username
 
                 - if can? :update, @file_rep_dispute
                   .dispute-owner-buttons-wrapper
