@@ -171,7 +171,7 @@ class JiraImportTask < ApplicationRecord
                 end
               else
                 complaint_options = [
-                  EscalationTicket
+                  EscalationTicket,
                   ticketable_urls.first.submitted_url,
                   description,
                   Customer::JIRA_GENERATED,
