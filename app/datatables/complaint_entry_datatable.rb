@@ -14,6 +14,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
         entry_id:           {source: "ComplaintEntry.id", data: :entry_id, cond: :like},
         created_at:         {source: "ComplaintEntry.created_at", data: :created_at, cond: :date_range},
         age_int:            {source: "ComplaintEntry.age_int", data: :age_int, searchable: false, orderable: false},
+        channel:            {source: "ComplaintEntry.channel", data: :channel, searchable: false, orderable: false},
         age:                {source: "ComplaintEntry.age", data: :age, searchable: false, orderable: false},
         status:             {source: "ComplaintEntry.status", data: :status, cond: :string_eq},
         subdomain:          {source: "ComplaintEntry.subdomain", data: :subdomain, cond: :like},
@@ -28,6 +29,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
         customer_name:      {source: "ComplaintEntry.customer_name", data: :customer_name, cond: :like},
         company_name:       {source: "ComplaintEntry.company_name", data: :company_name, cond: :like},
         assigned_to:        {source: "ComplaintEntry.assigned_to", data: :assigned_to, cond: :date_range},
+        reviewer:           {source: "ComplaintEntry.reviewer", data: :reviewer, cond: :like},
+        second_reviewer:    {source: "ComplaintEntry.second_reviewer", data: :second_reviewer, cond: :like},
         uri:                {source: "ComplaintEntry.uri", data: :uri, cond: :like},
         resolution:         {source: "ComplaintEntry.resolution", data: :resolution, cond: :string_eq},
         internal_comment:   {source: "ComplaintEntry.internal_comment", data: :internal_comment, cond: :like},
@@ -57,12 +60,14 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
 
     complaint_entries.map do |complaint_entry|
       complaint = complaint_entry.complaint
+
       suggested_dispositions = complaint_entry.suggested_disposition&.split(',')
 
       {
           entry_id:         complaint_entry.id,
           created_at:       complaint_entry.created_at,
           age_int:          (Time.now - complaint_entry.created_at).to_i,
+          channel:          complaint.channel,
           age:              ComplaintEntry.first_two_time_layers(time_ago_in_words(complaint_entry.created_at.to_time, {scope: 'datetime.distance_in_words', include_seconds: false})),
           status:           complaint_entry.status,
           subdomain:        complaint_entry.subdomain,
@@ -78,7 +83,9 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           company_name:     complaint_entry.customer_company_name,
           customer_email:   complaint.customer&.email,
           complaint_source: complaint.ticket_source || 'Internal',
-          assigned_to:      complaint_entry.user&.is_inactive? ? "#{complaint_entry.user&.display_name} (inactive)" : complaint_entry.user&.display_name,
+          assigned_to:      complaint_entry.user&.display_name,
+          reviewer:         complaint_entry.reviewer&.display_name,
+          second_reviewer:  complaint_entry.second_reviewer&.display_name,
 
           uri:              complaint_entry.uri,
           resolution:       complaint_entry.resolution,
@@ -136,8 +143,14 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
       records.left_joins(complaint: :customer).order("customers.email #{datatable.orders.first.direction}")
     when 'complaint_entries.assigned_to'
       records.left_joins(:user).order("users.display_name #{datatable.orders.first.direction}")
+    when 'complaint_entries.reviewer'
+      records.left_joins(:reviewer).order("users.display_name #{datatable.orders.first.direction}")
+    when 'complaint_entries.second_reviewer'
+      records.left_joins(:second_reviewer).order("users.display_name #{datatable.orders.first.direction}")
     when 'complaint_tags.name'
       records.left_joins(complaint: :complaint_tags).order("complaint_tags.name #{datatable.orders.first.direction}")
+    when 'complaint_entries.channel'
+      records.left_joins(complaint: :channel).order("complaints.channel #{datatable.orders.first.direction}")
     else
       super
     end
