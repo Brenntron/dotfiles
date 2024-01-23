@@ -61,13 +61,13 @@
     %span.btn-group.toolbar-btn-group.assignment-btn-group
       .inline-radio-wrapper
         %input#assignment-type-assignee.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'assignee', checked: 'checked'}
-        %label{for: 'assignment-type-assignee'} Assignee
+        %label.toolbar-button-text{for: 'assignment-type-assignee'} Assignee
       .inline-radio-wrapper
         %input#assignment-type-reviewer.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'reviewer'}
-        %label{for: 'assignment-type-reviewer'} Reviewer
+        %label.toolbar-button-text{for: 'assignment-type-reviewer'} Reviewer
       .inline-radio-wrapper
         %input#assignment-type-second-reviewer.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'second_reviewer'}
-        %label{for: 'assignment-type-second-reviewer'} Second Reviewer
+        %label.toolbar-button-text{for: 'assignment-type-second-reviewer'} Second Reviewer
     %span.toolbar-concise-button-area
       %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)', disabled: 'true'}
         %span.toolbar-button-text Take
@@ -159,7 +159,7 @@
   %div.webcat-toolbar-push
     - if params[:f] != "REVIEW"
       %button#index_update_resolution.toolbar-button.resolution-submit-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-        %span
+        %span.toolbar-button-text
           Bulk Resolution Tool
       .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_update_resolution'}
         #index_change_resolution_dialog.row{title: 'Bulk Resolution Tool'}
@@ -218,7 +218,7 @@
                 %span Submit
 
       %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'master_submit();', title: 'Submit multiple selected entries with any changes entered by row'}
-        %span
+        %span.toolbar-button-text
           Bulk Submit
       %span.dropdown
     - else
