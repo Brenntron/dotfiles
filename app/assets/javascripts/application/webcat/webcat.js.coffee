@@ -731,6 +731,11 @@ $ ->
               {
                 data: 'assigned_to'
                 className: 'assignee-col'
+                render: (data) ->
+                  if data.includes("(inactive)")
+                    "<span class='inactive-user'> #{data} </span>"
+                  else
+                    data
               }
               {
                 data: 'reviewer'
