@@ -27,6 +27,8 @@ development:
   bugzilla:
     host: "fmd-bugzil-01tst.vrt.sourcefire.com"
     api_key: "redacted"
+  bunhammer:
+    host: 'http://localhost:5173/search/'
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   elastic:
@@ -188,6 +190,8 @@ test:
   bugzilla:
     host: "fmd-bugzil-01tst.vrt.sourcefire.com"
     api_key: "redacted"
+  bunhammer:
+    host: 'http://localhost:5173/search/'
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   elastic:
@@ -346,6 +350,8 @@ staging:
     login: "talosweb@cisco.com"
     password: "redacted"
     api_key: "redacted"
+  bunhammer:
+    host: 'http://localhost:5173/search/'
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   elastic:

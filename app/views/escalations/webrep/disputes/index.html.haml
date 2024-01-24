@@ -15,7 +15,7 @@
 
   .row
     .col-xs-12
-      %table.table.responsive#disputes-index
+      %table.table.responsive#disputes-index{'data-bunhammer-host': Rails.configuration.bunhammer_host}
         %thead
           %tr
             %th

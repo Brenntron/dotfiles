@@ -1262,7 +1262,11 @@ $ ->
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
       { data: 'submitter_name' }
-      { data: 'submitter_email' }
+      {
+        data: 'submitter_email'
+        render: (data) ->
+          return "<span>#{data}</span> <a href='#{$('#disputes-index').data('bunhammer-host') + '?q=' + data}' target='_blank' title='Block #{data}' class='ban esc-tooltipped'></a>"
+      }
       { data: 'status_comment' }
       { data: 'updated_at' }
       {
@@ -1721,7 +1725,8 @@ $ ->
 
     $('#dispute-customer-name').hide()
     $('#dispute-customer-email').hide()
-
+    $('a.ban.dispute-show').hide()
+    
     $('.dispute-edit-input').css('display','block')
 
     $('#save-dispute-button').removeClass('hidden')
@@ -1742,6 +1747,7 @@ $ ->
     $('.dispute-edit-field').show()
     $('#dispute-submission-type-select').hide()
     $('.dispute-submission-type').show()
+    $('#dispute-customer-email .ban').show()
 
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')
