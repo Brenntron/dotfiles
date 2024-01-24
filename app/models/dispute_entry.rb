@@ -676,12 +676,12 @@ class DisputeEntry < ApplicationRecord
 
       extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.uri, web_ips_formatted)
 
-      is_ip_address = !!(self.domain_of(self.hostlookup)  =~ Resolv::IPv4::Regex)
+      is_ip_address = !!(DisputeEntry.domain_of(self.hostlookup)  =~ Resolv::IPv4::Regex)
 
       if is_ip_address
         urs_stuff = Beaker::Urs.query_reputation_for_ip(DisputeEntry.domain_of(self.hostlookup)).result.first.result.first rescue nil   #domain_of will strip something like http://2.3.4.5/something.php down to just 2.3.4.5
       else
-        resolved_ip = Resolv.getaddress(self.domain_of(self.hostlookup)) rescue nil
+        resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(self.hostlookup)) rescue nil
         if resolved_ip.blank?
           urs_stuff = Beaker::Urs.query_reputation(self.hostlookup).result.first.result.first rescue nil
         else
@@ -815,7 +815,7 @@ class DisputeEntry < ApplicationRecord
     end
 
     if attributes['uri'].present? && attributes['web_ips'].blank?
-      resolved_ip = Resolv.getaddress(self.domain_of(self.uri)) rescue nil
+      resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(self.uri)) rescue nil
       if resolved_ip.present?
         attributes['web_ips'] = resolved_ip
       end
@@ -1302,13 +1302,13 @@ class DisputeEntry < ApplicationRecord
       #urs_stuff = Beaker::Urs.query_reputation("google.com").result.first.result.first rescue nil
 
 
-      is_ip_address = !!(self.domain_of(self.hostlookup)  =~ Resolv::IPv4::Regex)
+      is_ip_address = !!(DisputeEntry.domain_of(self.hostlookup)  =~ Resolv::IPv4::Regex)
 
       if is_ip_address
-        urs_stuff = Beaker::Urs.query_reputation_for_ip(self.domain_of(self.hostlookup)).result.first.result.first rescue nil    #domain_of will strip something like http://2.3.4.5/something.php down to just 2.3.4.5
+        urs_stuff = Beaker::Urs.query_reputation_for_ip(DisputeEntry.domain_of(self.hostlookup)).result.first.result.first rescue nil    #domain_of will strip something like http://2.3.4.5/something.php down to just 2.3.4.5
       else
 
-        resolved_ip = Resolv.getaddress(self.domain_of(self.hostlookup)) rescue nil
+        resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(self.hostlookup)) rescue nil
 
         if resolved_ip.blank?
           urs_stuff = Beaker::Urs.query_reputation(self.hostlookup).result.first.result.first rescue nil
