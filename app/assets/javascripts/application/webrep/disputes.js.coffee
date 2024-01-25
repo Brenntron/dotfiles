@@ -212,18 +212,6 @@ window.dispute_status_drop_down = () ->
   wrapper = radio.parent()
   wrapper.addClass('selected')
 
-window.popup_response_error =(response, prefix) ->
-  if response.responseJSON == undefined
-    response_lines = response.responseText.split("\n")
-    if 2 < response_lines.length
-      errormsg = response_lines[0] + "\n" + response_lines[1]
-    else
-      errormsg = response.responseText
-  else if response.responseJSON.error != undefined
-    errormsg = response.responseJSON.error
-  else
-    errormsg = response.responseText
-
 window.popup_response_error = (response, prefix) ->
   assemble_error_message(response)
 
