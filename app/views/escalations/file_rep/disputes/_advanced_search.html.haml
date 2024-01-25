@@ -5,7 +5,7 @@
   .form-group.search-item.hidden
     %label.content-label-sm Case IDs
     %input.form-control#caseid-input{name: 'case_id', type:"number", min:"0"}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item
     %label.content-label-sm Status
     %input.form-control#status-input{name: 'status', list: 'filerep-status-list'}
@@ -18,26 +18,26 @@
       %option{value: 'RE-OPENED'}
       %option{value: 'NEW'}
       %option{value: 'ASSIGNED'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
     %input.form-control#resolution-input{name: 'resolution', list: 'resolution-list'}
     %datalist#resolution-list
       - Dispute::RESOLUTIONS.map { |x| x == Dispute::ALL_AUTO_RESOLVED ? 'Auto Resolved' : x }.each do |resolution_status|
         %option{value: resolution_status}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm File Name
     %input.form-control#file-name-input{name: 'file_name'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item
     %label.content-label-sm SHA256
     %input.form-control#sha256-input{name: 'SHA256'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Sample Type
     %input.form-control#sample-type-input{name: 'sample_type'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item
     %label.content-label-sm AMP Disposition
     %input.form-control#amp-disposition-input{name: 'amp_disposition', list:'amp-disp-list'}
@@ -47,33 +47,33 @@
       %option{value: 'Malicious'}
       %option{value: 'Unknown'}
       %option{value: 'Unseen'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm AMP Detection Name
     %input.form-control#amp-detection-name-input{name: 'amp_detection_name'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm AMP Detection - Last Set
     %input.form-control#amp-detection-created-input{name: 'amp_detection_created', placeholder: Date.today.strftime('%Y-%m-%d')}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Assignee
     %input.form-control.selectize#assignee-input{name: 'assignee', multiple: 'multiple', tabindex: '-1' }
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item
     %label.content-label-sm{for:'sandbox_score'} Sandbox Score
     .form-control.require-float#sandbox-score-input{name: 'sandbox_score'}
       .ui-slider-handle
-    %button.remove-input{onclick: 'reset_slider("sandbox")'}
+    %button.remove-input{type: 'button', onclick: 'reset_slider("sandbox")'}
   .form-group.search-item
     %label.content-label-sm TG Score
     .form-control.require-float#tg-score-input{name: 'tg_score'}
       .ui-slider-handle
-    %button.remove-input{onclick: 'reset_slider("threatgrid")'}
+    %button.remove-input{type: 'button', onclick: 'reset_slider("threatgrid")'}
   .form-group.search-item.hidden.in-sample-zoo_container
     %label.content-label-sm In Sample Zoo
     %input.form-control#in-sample-zoo-input{name: 'in_sample_zoo', type: 'checkbox', value: 'checked', for: 'in-sample-zoo'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item
     %label.content-label-sm Suggested Disposition
     %input.form-control#suggested-disposition-input{name: 'suggested_disposition', list:'suggested-disposition-list'}
@@ -83,7 +83,7 @@
       %option{value: 'Malicious'}
       %option{value: 'Unknown'}
       %option{value: 'Unseen'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
     %input.form-control#submitter-type-input{name: 'submitter_type', list: 'submitter-type-list'}
@@ -91,31 +91,31 @@
       %option{value: FileReputationDispute::SUBMITTER_TYPE_CUSTOMER}
       %option{value: FileReputationDispute::SUBMITTER_TYPE_NONCUSTOMER}
       %option{value: FileReputationDispute::SUBMITTER_TYPE_INTERNAL}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Customer Name
     %input.form-control#customer-name-input{name: 'customer_name'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Customer Email
     %input.form-control#customer-email-input{name: 'customer_email'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Customer Company
     %input.form-control#customer-company-input{name: 'customer_company'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Platform
     %input.form-control.selectize#platform-input{name: 'platform', multiple: 'multiple', tabindex: '-1', data: 'filerep'}
-    %button#remove-criteria-platform.remove-input{onclick: 'clearSelectize("platform-input")'}
+    %button#remove-criteria-platform.remove-input{type: 'button', onclick: 'clearSelectize("platform-input")'}
   .form-group.search-item.hidden
     %label.content-label-sm Date Submitted
     %input.form-control#time-submitted-input{name: 'time_submitted', placeholder: 'YYYY-MM-DD'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Last Updated
     %input.form-control#last-updated-input{name: 'last_updated', placeholder: 'YYYY-MM-DD'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden#submission-type
     %label.content-label-sm Submission Type
     .radio-wrapper
@@ -128,50 +128,50 @@
       .ticket-radio-button-wrapper
         = advanced_search_form.check_box(:submission_type, {id: 'submission-type-ew-cb', class: 'form-control', checked: 'checked'}, 'ew')
         %label.content-label-sm{for: 'submission-type-ew-cb'} Email/Web Tickets (EW)
-    %button.remove-input.remove-radio-input
+    %button.remove-input.remove-radio-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
     %input.form-control#submitter-input{name: 'submitter', list: 'submittertype-list'}
     %datalist#submittertype-list
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Contact Name
     %input.form-control#name-input{name: 'contact-name', list: 'contactname-list'}
     %datalist#contactname-list
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Contact Email
     %input.form-control#email-input{name: 'contact-email', list: 'contactemail-list'}
     %datalist#contactemail-list
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Domain
     %input.form-control#domain-input{name: 'domain'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Date Submitted (Newer)
     %input.form-control#submitted-newer-input{type: 'date', name: 'date-submitted-newer'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Date Submitted (Older)
     %input.form-control#submitted-older-input{type: 'date', name: 'date-submitted-older'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Case Age (Newer) ex: 30d 12h
     %input.form-control#age-newer-input{name: 'age'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Case Age (Older) ex: 7d 12h
     %input.form-control#age-older-input{name: 'age'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Last Modified (Newer)
     %input.form-control#modified-newer-input{type: 'date', name: 'date-modified-newer'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
   .form-group.search-item.hidden
     %label.content-label-sm Last Modified (Older)
     %input.form-control#modified-older-input{type: 'date', name: 'date-modified-older'}
-    %button.remove-input
+    %button.remove-input{type: 'button'}
 
   %button#add-search-items-button
     Add Search Criteria
@@ -259,7 +259,7 @@
             %input.search-checkbox#last-updated-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Updated', for: 'last-updated-input'}
             Last Updated
     .form-group.text-center
-      %button.tertiary#cancel-add-criteria
+      %button.tertiary#cancel-add-criteria{type: 'button'}
         Close
 
   %hr.thin
@@ -272,15 +272,3 @@
       Submit Search
     %button.secondary#reset-advanced-search.reset{type: 'button', onclick: 'file_rep_reset_search()'}
       Reset Search
-
-
--#= simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
--#  = dispute_form.input :search_type, as: :hidden, input_html: {value: 'advanced'}
--#  = dispute_form.input :customer_name
--#  = dispute_form.input :customer_email
--#  = dispute_form.input :customer_company_name
--#  = dispute_form.input :status
--#  = dispute_form.input :resolution
--#  = dispute_form.input :subject
--#  = dispute_form.input :search_name, input_html: {value: ''}
--#  = dispute_form.submit 'Search'

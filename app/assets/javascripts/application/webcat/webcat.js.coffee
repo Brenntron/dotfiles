@@ -233,6 +233,7 @@ $ ->
       saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
 
   window.use_user_preference_filter = () ->
+
     return if window.location.pathname != '/escalations/webcat/complaints'
 
     { icon, link, name } = chosen_default_filter()
@@ -827,7 +828,7 @@ $ ->
         return
 
     comment = $('#internal_comment_' + entry_id).val()
-#    resolution = $('.complaint-resolution' + entry_id).text()
+    resolution = $('#entry-email-response-to-customers_' + entry_id).text()
     uri = $('#edit_uri_input_' + entry_id).val()
     if $('#input_cat_'+entry_id).val() != null
       cat_ids = $('#input_cat_'+entry_id).val().toString()
@@ -859,7 +860,7 @@ $ ->
       'category_names': category_names,
       'status': res,
       'comment': comment,
-      'resolution_comment': '',
+      'resolution_comment': resolution,
       'uri_as_categorized': uri
     }
     if curr_status == 'PENDING'

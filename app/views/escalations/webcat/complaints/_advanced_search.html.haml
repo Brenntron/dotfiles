@@ -3,104 +3,104 @@
   .form-group.search-item.hidden-selectize-dropdown
     %label.content-label-sm{for: 'ip_or_uri'} Complaint (URL/IP/Domain)
     %input.form-control.selectize#complaint-input{name: 'ip_or_uri', multiple: 'multiple', tabindex:'-1'}
-    %button#remove-criteria-complaint.remove-input{onclick:'clearSelectize("complaint-input")'}
+    %button#remove-criteria-complaint.remove-input{onclick:'clearSelectize("complaint-input")', type: 'button'}
 
   .form-group.search-item
     %label.content-label-sm{for: 'company-input'} Submitter Org
     %select.form-control.selectize#company-input{name: 'company-input', multiple: 'multiple', tabindex:'-1'}
-    %button#remove-criteria-company.remove-input{onclick:'clearSelectize("company-input")'}
+    %button#remove-criteria-company.remove-input{onclick:'clearSelectize("company-input")', type: 'button'}
 
   .form-group.search-item
     %label.content-label-sm{for: 'channel'} Added Through Channel
     %input.form-control.selectize#channel-input{name: 'channel', list: 'channel-input-list', multiple: 'multiple', tabindex:'-1'}
     %datalist#channel-input-list
-    %button#remove-criteria-channel.remove-input{onclick:'clearSelectize("channel-input")'}
+    %button#remove-criteria-channel.remove-input{onclick:'clearSelectize("channel-input")', type: 'button'}
 
   .form-group.search-item
     %label.content-label-sm{for: 'status'} Status
     %input.form-control.selectize#status-input{name: 'status', multiple: 'multiple', tabindex:'-1'}
-    %button#remove-criteria-status.remove-input{onclick:'clearSelectize("status-input")'}
+    %button#remove-criteria-status.remove-input{onclick:'clearSelectize("status-input")', type: 'button'}
 
   .form-group.search-item
     %label.content-label-sm{for: 'date-submitted-newer'} Date Submitted (Newer)
     %input.form-control#submitted-newer-input{name: 'date-submitted-newer', type: 'date'}
-    %button#remove-criteria-submitted-newer.remove-input
+    %button#remove-criteria-submitted-newer.remove-input{type: 'button'}
 
   .form-group.search-item
     %label.content-label-sm{for: 'tags'} Tags
     %select.form-control.selectize#tags-input{name: 'tags', multiple: 'multiple', tabindex:'-1'}
     %input.hidden#search_tag_list{value: ComplaintTag.all.sort_by(&:name).map { |tag| tag.name }.join(','), name: 'tags'}
-    %button#remove-criteria-tags.remove-input{onclick:'clearSelectize("tags-input")'}
+    %button#remove-criteria-tags.remove-input{onclick:'clearSelectize("tags-input")', type: 'button'}
 
   -# Additional search criteria
   .form-group.search-item.hidden
     %label.content-label-sm Assignee
     %select.form-control.selectize#assignee-input{name: 'assignee-input', multiple: 'multiple', tabindex:"-1"}
-    %button#remove-criteria-assignee.remove-input{onclick:'clearSelectize("assignee-input")'}
+    %button#remove-criteria-assignee.remove-input{onclick:'clearSelectize("assignee-input")', type: 'button'}
 
   .form-group.search-item.hidden
     %label.content-label-sm Category
     %select.form-control.selectize#category-input{name: 'category-input', multiple: 'multiple', tabindex:'-1'}
-    %button#remove-criteria-category.remove-input{onclick:'clearSelectize("category-input")'}
+    %button#remove-criteria-category.remove-input{onclick:'clearSelectize("category-input")', type: 'button'}
 
   .form-group.search-item.hidden.hidden-selectize-dropdown
     %label.content-label-sm Entry ID
     %input.form-control.selectize#entryid-input{name: 'entry_id', multiple: 'multiple', tabindex:'-1'}
-    %button#remove-criteria-entryid.remove-input{onclick:'clearSelectize("entryid-input")'}
+    %button#remove-criteria-entryid.remove-input{onclick:'clearSelectize("entryid-input")', type: 'button'}
 
   .form-group.search-item.hidden.hidden-selectize-dropdown
     %label.content-label-sm Complaint ID(s) (comma separate multiples)
     %input.form-control.selectize#complaintid-input{name: 'complaint_id', multiple: 'multiple', tabindex:'-1'}
-    %button#remove-criteria-complaintid.remove-input{onclick:'clearSelectize("complaintid-input")'}
+    %button#remove-criteria-complaintid.remove-input{onclick:'clearSelectize("complaintid-input")', type: 'button'}
 
   .form-group.search-item.hidden.hidden-selectize-dropdown
     %label.content-label-sm Jira ID(s) (comma separate multiples)
     %input.form-control.selectize#jiraid-input{name: 'jira_id', multiple: 'multiple', tabindex:'-1', placeholder: 'ex: SDOCS-123'}
-    %button#remove-criteria-jiraid.remove-input{onclick:'clearSelectize("jiraid-input")'}
+    %button#remove-criteria-jiraid.remove-input{onclick:'clearSelectize("jiraid-input")', type: 'button'}
 
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
     %input.form-control.selectize#resolution-input{name: 'resolution', multiple: 'multiple', tabindex:'-1'}
-    %button#remove-criteria-resolution.remove-input{onclick:'clearSelectize("resolution-input")'}
+    %button#remove-criteria-resolution.remove-input{onclick:'clearSelectize("resolution-input")', type: 'button'}
   
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
     %input.form-control.selectize#submitter-type-input{name: 'submitter-type', multiple: 'multiple', tabindex: '-1', data: 'webcat'}
-    %button#remove-criteria-submitter-type.remove-input{onclick: 'clearSelectize("submitter-type-input")'}
+    %button#remove-criteria-submitter-type.remove-input{onclick: 'clearSelectize("submitter-type-input")', type: 'button'}
 
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Name
     %input.form-control.selectize#name-input{name: 'customer-name', multiple: 'multiple', tabindex:'-1'}
-    %button#remove-criteria-customer-name.remove-input{onclick:'clearSelectize("name-input")'}
+    %button#remove-criteria-customer-name.remove-input{onclick:'clearSelectize("name-input")', type: 'button'}
 
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Email
     %input.form-control#email-input{name: 'customer-email', list: 'customerEmailList'}
     %datalist#customerEmailList
-    %button#remove-criteria-customer-email.remove-input
+    %button#remove-criteria-customer-email.remove-input{type: 'button'}
 
   .form-group.search-item.hidden
     %label.content-label-sm Platform
     %input.form-control.selectize#platform-input{name: 'platform', multiple: 'multiple', tabindex: '-1', data: 'webcat'}
-    %button#remove-criteria-platform.remove-input{onclick: 'clearSelectize("platform-input")'}
+    %button#remove-criteria-platform.remove-input{onclick: 'clearSelectize("platform-input")', type: 'button'}
 
   .form-group.search-item.hidden
     %label.content-label-sm Date Submitted (Older)
     %input.form-control#submitted-older-input{name: 'date-submitted-older', type: 'date'}
-    %button#remove-criteria-submitted-older.remove-input
+    %button#remove-criteria-submitted-older.remove-input{type: 'button'}
 
   .form-group.search-item.hidden
     %label.content-label-sm Last Modified (Newer)
     %input.form-control#modified-newer-input{type: 'date', name: 'date-modified-newer'}
-    %button#remove-criteria-modified-newer.remove-input
+    %button#remove-criteria-modified-newer.remove-input{type: 'button'}
 
   .form-group.search-item.hidden
     %label.content-label-sm Last Modified (Older)
     %input.form-control#modified-older-input{type: 'date', name: 'date-modified-older'}
-    %button#remove-criteria-modified-older.remove-input
+    %button#remove-criteria-modified-older.remove-input{type: 'button'}
 
   .form-group-wrapper-relative
-    %button#add-search-items-button
+    %button#add-search-items-button{type: 'button'}
       Add Search Criteria
     #search-criteria-options
       .multicol-2
@@ -185,7 +185,7 @@
               Last Modified (Older)
 
       .form-group.text-center
-        %button.tertiary#cancel-add-criteria
+        %button.tertiary#cancel-add-criteria{type: 'button'}
           Close
 
   %hr.thin

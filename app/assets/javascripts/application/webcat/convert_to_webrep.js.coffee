@@ -1,11 +1,4 @@
 ## Convert webcat to webrep
-## Enable / disable button to attempt based on if anything is selected
-$(document).on 'click', '#complaints-index tr, #complaints_check_box, #complaints_select_all', ->
-  if $('tr.selected').length == 1
-    $('#convert-ticket-button').removeAttr('disabled')
-  else
-    $('#convert-ticket-button').attr('disabled', 'disabled')
-
 
 # Prepare ticket for converting
 window.prep_complaint_to_convert = () ->

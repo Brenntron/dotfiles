@@ -277,3 +277,143 @@ format_domain_info = (info)->
     '</div>'
 
 
+# ^TODO - there are more than one whois function - consolidate
+
+
+$ ->
+
+  # initialize bulk resolution dialog
+  $('#index_change_resolution_dialog').dialog
+    autoOpen: false
+    classes: { 'ui-dialog': 'index-change-resolution-dialog'}
+    width: 450
+    minHeight: 300
+    position:
+      my: 'center top'
+
+  get_resolution_templates('UNCHANGED', 'bulk')
+
+  # Update bulk response templates
+  $('.bulk-resolution-radio').change ->
+    resolution = $(this).val()
+    get_resolution_templates(resolution, 'bulk')
+
+  # Populate current resolution comment after changing resolution template
+  $('#email-response-to-customers-select').on 'change', (i, e) ->
+    comment = $('#email-response-to-customers-select option:selected').attr('data-body')
+    $('#email-response-to-customers').val comment
+
+  window.open_ind_res_dialog = (entry_id) ->
+    target_dialog_id = 'resolution_comment_dialog_' + entry_id
+
+    $(".resolution-comment-dialog").each ->
+      dialog_id = $(this).attr('id')
+      if dialog_id != target_dialog_id
+        $('#' + dialog_id).dialog('close')
+      else
+        $('#' + dialog_id).dialog('open')
+
+  # Update inline customer comments when selecting new template
+  $('.response-template-select').change ->
+    # get id of this select
+    comment = $(this).find(":selected").attr("data-body")
+    id = $(this).attr('id').replace('entry-email-response-to-customers-select_', '')
+    $("#entry-email-response-to-customers_#{id}").val(comment)
+
+  # Update individual response templates and text when a user selects a different resolution
+  $('.resolution_radio_button').change ->
+    resolution = $(this).val()
+    lc_res = resolution.toLowerCase()
+    entry_id = $(this).attr('id').replace(lc_res, '')
+    get_resolution_templates(resolution, 'individual', [entry_id])
+
+
+window.create_ind_res_dialogs = () ->
+  fixed_res = []
+  unchanged_res = []
+  invalid_res = []
+
+  $(".resolution-comment-dialog").each ->
+    $(this).dialog
+      autoOpen: false
+      minWidth: 500
+      classes: {
+        "ui-dialog": "resolution-response-dialog"
+      }
+
+    # hide class keeps generated html from displaying before the dialogs are initialized
+    $(this).removeClass('hide')
+
+    # no need to call templates for submitted entries
+    unless $(this).hasClass('submitted-resolution-dialog')
+      entry_id = $(this).attr('id').replace('resolution_comment_dialog_', '')
+      selected_res = $('[name="resolution' + entry_id + '"]:checked').val()
+      if selected_res == 'FIXED'
+        fixed_res.push(entry_id)
+      else if selected_res == 'UNCHANGED'
+        unchanged_res.push(entry_id)
+      else
+        invalid_res.push(entry_id)
+
+  # grab needed templates once per needed resolution type
+  if fixed_res.length > 0
+    fixed_templates = get_resolution_templates('FIXED', 'individual', fixed_res)
+  if unchanged_res.length > 0
+    get_resolution_templates('UNCHANGED', 'individual', unchanged_res)
+  if invalid_res.length > 0
+    get_resolution_templates('INVALID', 'individual', invalid_res)
+
+
+
+
+
+# fetches the resolution templates from the backend when called
+window.get_resolution_templates = (resolution, dialog_type, entry_ids) ->
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/webcat/resolution_message_templates"
+    data: {resolution: resolution}
+    dataType: 'json'
+    success_reload: false
+    success: (response) ->
+      templates = JSON.parse response
+
+      template_options = ''
+      text_area = ''
+      email_text = ''
+
+      # split out template options
+      if templates.length > 0
+        $(templates).each (index, template) ->
+          template_option =
+            "<option class='webcat-resolution-template-option' val='" + template.name +
+            "' data-body='" + template.body +
+            "' data-description='" + template.description + "' >" +
+            template.name +
+            "</option>"
+          template_options = template_options + template_option
+          email_text = templates[0].body
+      else
+        template_options = '<option>No templates available for ' + resolution + ' resolution</option>'
+
+      # add to the dialogs
+      if dialog_type == 'bulk'
+        select = $('#email-response-to-customers-select')
+        text_area = $("#email-response-to-customers")
+        select.empty()
+        select.append(template_options)
+        $(text_area).val(email_text)
+
+      else # dialog_type == 'individual'
+        # add options to each dialog
+        $(entry_ids).each ->
+          entry_id = this
+          select = $('#entry-email-response-to-customers-select_' + entry_id)
+          text_area = $("#entry-email-response-to-customers_" + entry_id)
+          select.empty()
+          select.append(template_options)
+          $(text_area).val(email_text)
+
+      error: (response) ->
+        std_api_error(response, "There was an error fetching the resolution message templates", reload: false)
+  )
