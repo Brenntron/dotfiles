@@ -238,3 +238,8 @@ Rails.configuration.jira.auth_type      = jira_config['auth_type'].to_sym
 bast_config = env_config.fetch('bast', nil)
 raise 'config.yml missing bast section' unless bast_config
 Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)
+
+resolution_report_config = env_config.fetch('resolution_report', nil)
+raise 'config.yml missing resolution_report section' unless resolution_report_config
+Rails.configuration.resolution_report = OpenStruct.new
+Rails.configuration.resolution_report.cache_expiration = resolution_report_config['cache_expiration']

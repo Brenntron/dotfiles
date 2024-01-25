@@ -22,6 +22,7 @@
 //= require admin/std_msg
 //= require application/custom
 //= require application/webcat/complaints-support
+//= require application/webcat/categorize_dropdown
 //= require application/webrep/disputes-support
 //= require application/webrep/disputes
 //= require application/webrep/communications

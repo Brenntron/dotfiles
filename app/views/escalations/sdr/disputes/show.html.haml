@@ -3,7 +3,8 @@
   %input{type:'hidden', name: 'sdr-dispute-customer-company-name', value: "#{@dispute.customer.company.name}"}
 %input{type: 'hidden', name: 'sdr-dispute-submitter-type', value: "#{@dispute.submitter_type}"}
 
-.content-wrapper.top-case-info
+.content-wrapper.top-case-info.sdr-show
+  #alertMessage
   .row
     .col-xs-2.col-with-divider.sdr-dispute-case-priority-wrapper
       .sdr-dispute-priority-wrapper
@@ -20,16 +21,16 @@
             Status
           %br
           -##bugzilla_popover_state
-          - if (@dispute.resolution != Dispute::DUPLICATE)
+          - if !@is_duplicate
             %span.dropdown
-              %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "sdr_dispute_status_drop_down(#{@dispute.id})"}
+              %button#show-edit-ticket-status-button.sdr-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "sdr_dispute_status_drop_down(#{@dispute.id})"}
                 - if @dispute.status.nil?
                   NEW
                 - else
                   = @dispute.status
 
               - if can? :update, Dispute
-                .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
+                .sdr-dropdown-menu.dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
                   %ul
                     %li.status-radio-wrapper
                       %input.sdr-ticket-status-radio{type: 'radio', name: 'dispute-status', id: "#{Dispute::STATUS_RESEARCHING}", 'data-status': "#{Dispute::STATUS_RESEARCHING}", value: "#{Dispute::STATUS_RESEARCHING}"}
@@ -114,38 +115,35 @@
 
     .col-xs-2.col-with-divider.row
       .dispute-owner-wrapper.col-xs-12
+        .assigned-check-container
+          .assigned-check.hidden
+          %p#assignedAlert.hidden Assigned
+          %p#unassignedAlert.hidden Unassigned
         %label.content-label-sm
           Assignee
         %div
-          - if @dispute.user_id == nil || @dispute.user.cvs_username == 'vrtincom'
-            %span.missing-data#dispute-assignee Unassigned
-          - else
-            %span#dispute-assignee= @dispute.user&.cvs_username || Unassigned
+          %span#dispute-assignee{class: ('missing-data' if (@dispute.user_id.nil? || @dispute.user&.cvs_username == 'vrtincom')) || ('inactive-user' if @dispute.user&.is_inactive?)}= ((@dispute.user_id.nil? || @dispute.user&.cvs_username == 'vrtincom') ? 'Unassigned' : (@dispute.user&.is_inactive? ? "#{@dispute.user&.cvs_username} (inactive)" : @dispute.user&.cvs_username))
       - if can? :update, Dispute
         .dispute-owner-buttons-wrapper.sdr-dispute-owner-buttons-wrapper.col-xs-12
-          - if @dispute.user_id == current_user.id
-            - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-              %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'sdr_toolbar_unassign_dispute();'}
-          - else
-            %span.dropdown
-              - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_sdr_dispute(#{@dispute.id});"}
-                %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-              .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
-                .change-assignee-dropdown-wrapper
-                  %h3 Change Assignee
-                  .inline-tool-content-wrapper
-                    .toolbar
-                      %div
-                        %label.toolbar-section-label Assignee
-                        =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
-                      %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'sdr_toolbar_show_change_assignee();'}
-                        Assign
+          %span.dropdown
+            - if !@is_duplicate && !@is_resolved
+              %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: "return_sdr_dispute(#{@dispute.id});", disabled: ((@is_assignee && !@is_duplicate && !@is_resolved) ? false : true)}
+              %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_sdr_dispute(#{@dispute.id});", disabled: (@is_assignee ? true : false)}
+              %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+              .change-assignee-dropdown-wrapper
+                %h3 Change Assignee
+                .inline-tool-content-wrapper
+                  .toolbar
+                    %div
+                      %label.toolbar-section-label Assignee
+                      =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+                    %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'sdr_toolbar_show_change_assignee();'}
+                      Assign
 
-          - if (!@dispute.user_id.nil? && @dispute.user.cvs_username != 'vrtincom')
-            .container_unassign
-              %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'sdr_toolbar_unassign_dispute();'}
-                Unassign
+          .container_unassign
+            %button.secondary.ticket-owner-unassigned-button{disabled: (@is_unassigned ? true : false), type: 'button', id: 'unassign-dispute-button', onclick: 'sdr_toolbar_unassign_dispute();'}
+              Unassign
 
     .col-xs-2.col-with-divider
       .sdr-submitted-at-wrapper
@@ -222,4 +220,3 @@
   $(document).ready(function(){
   get_sdr_research_data("#{@dispute.sender_domain_entry}")
   })
-

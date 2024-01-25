@@ -667,30 +667,20 @@ module API
                 api_response = JSON.parse(RepApi::Blacklist.where({entries: permitted_params[:ip_uris] }, true))
                 return_data = []
 
-                api_response.each do |key, value|
-                  next if value == true || value == false
-                  if value[value.keys.first]["result"].downcase == 'not_found' || value[value.keys.first]["result"].downcase == 'failed'
-                    return_data.push(:entry => value.keys.first, :classification => "No active classifications", :expiration => "", :status => "INACTIVE", :comment => "")
-                    # TODO Make expiration human readable - Just the date
+                api_response['entries'].each do |entry, result|
+                  if result['result'].downcase == 'not_found' || result['result'].downcase == 'failed'
+                    return_data << { entry: entry, classification: 'No active classifications', expiration: '', status: 'INACTIVE', comment: '' }
                   else
+                    expiration = Date.parse(result.dig('data', 'expiration')).to_s rescue result.dig('data', 'expiration')
+                    comment = result.dig('data', 'sources', 'VRT', 'comment').presence || ''
 
-                    expiration = ""
-                    begin
-                      expiration = Date.parse(value[value.keys.first]["data"]["expiration"]).to_s
-                    rescue
-                      expiration = value[value.keys.first]["data"]["expiration"]
-                    end
-
-                    comment = ""
-
-                    begin
-                      comment = value[value.keys.first]["data"]["sources"].fetch("VRT", {}).fetch("comment", "")
-                    rescue
-                      comment = ""
-                    end
-
-                    return_data.push(:entry => value.keys.first, :classification => value[value.keys.first]["data"]["classifications"], :expiration => expiration, :status => value[value.keys.first]["data"]["status"].upcase, :comment => comment).to_json
-
+                    return_data << {
+                      entry: entry,
+                      classification: result.dig('data', 'classifications'),
+                      expiration: expiration,
+                      status: result.dig('data', 'status').upcase,
+                      comment: comment
+                    }
                   end
                 end
                 return_data.to_json
