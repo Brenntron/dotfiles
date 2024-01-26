@@ -1460,10 +1460,9 @@ $ ->
       column.visible true
     else
       column.visible false
-    $(this).on 'click', ->Ω
+    $(this).on 'click', ->
       $(checkbox).prop 'checked', !checkbox.prop('checked')
       column.visible !column.visible()
-
       update_webrep_checkbox_user_preferences() #update checkbox history whenever checkbox container is clicked
       return
     $(checkbox).on 'click', ->
