@@ -10138,6 +10138,10 @@ td.text-center span {
       padding-left: 25px;
     }
   }
+
+  .dialog-content-wrapper {
+    border: none;
+  }
 }
 
 .ticket-age-over3hr {
@@ -12661,7 +12665,6 @@ input[type="radio"].resolution_radio_button {
 }
 // webcat - 1950px below is our current "widest" breakpoint
 @media (min-width: 1950px) {
-
   #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
@@ -12673,11 +12676,13 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
-@media (max-width: 1951px)  {
+
+@media (max-width: 2042px)  {
   #webcat-index-toolbar .toolbar-button-text {
     display: none !important;
   }
 }
+
 @media screen and (max-width: 1800px) and (min-width: 1705px){
   #webcat-index-toolbar .toolbar-button-text {
     .toolbar-button {
