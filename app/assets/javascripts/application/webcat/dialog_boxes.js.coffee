@@ -305,6 +305,8 @@ $ ->
 
   window.open_ind_res_dialog = (entry_id) ->
     target_dialog_id = 'resolution_comment_dialog_' + entry_id
+    button_id = '#resolution_comment_button' + entry_id
+    $('.resolution-comment-button').removeClass('active')
 
     $(".resolution-comment-dialog").each ->
       dialog_id = $(this).attr('id')
@@ -312,6 +314,7 @@ $ ->
         $('#' + dialog_id).dialog('close')
       else
         $('#' + dialog_id).dialog('open')
+    $(button_id).addClass('active')
 
   # Update inline customer comments when selecting new template
   $('.response-template-select').change ->
@@ -340,6 +343,8 @@ window.create_ind_res_dialogs = () ->
       classes: {
         "ui-dialog": "resolution-response-dialog"
       }
+      close: () ->
+        $('.resolution-comment-button').removeClass('active')
 
     # hide class keeps generated html from displaying before the dialogs are initialized
     $(this).removeClass('hide')

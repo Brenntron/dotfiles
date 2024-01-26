@@ -170,6 +170,10 @@
     &:hover {
       background-color: darken(#D7DADB, 10%);
     }
+    &.active {
+      background-image: url(image_path('icon_email_read_white.svg'));
+      background-color: #6DBCDB;
+    }
   }
   .dropdown.open {
     .edit-button {
