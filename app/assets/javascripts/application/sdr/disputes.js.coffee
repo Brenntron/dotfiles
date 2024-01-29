@@ -1,3 +1,5 @@
+assigned_timeout_id = ''
+
 $(document).ready ->
 
   hide_loading_gears()
@@ -321,7 +323,10 @@ window.initialize_sdr_disputes_datatable = () ->
           else if data == 'vrtincom' || data == ""
             return "<span class='missing-data missing-data-index' id='owner_#{full.case_id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.case_id}' onClick='take_sdr_dispute(#{full.case_id})'/></button></span>"
           else
-            return data
+            if data.includes("inactive")
+              return "<span class='inactive-user'> #{data} </span>"
+            else
+              return data
       }
       { data: 'source' }
       { data: 'platform' }
@@ -348,9 +353,7 @@ window.initialize_sdr_disputes_datatable = () ->
   )
 
 window.reload_sdr_dispute = () ->
-  #$('#sdr-disputes-index').DataTable().ajax.reload(null, false)
   $('#sdr-disputes-index').DataTable().draw('page')
-  #$('#sdr_disputes_check_box').prop('checked', false)
 
 
 window.sdr_disputes_select_all_check_box = () ->
@@ -400,8 +403,25 @@ window.return_sdr_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      reload_sdr_dispute()
-      show_message('success', "SDR Dispute #{dispute_id} has been returned.", 5, '#alertMessage')
+      $assignee_element = $('#dispute-assignee')
+
+      $assignee_element.text('Unassigned')
+      $assignee_element.addClass('missing-data')
+
+      $('.take-ticket-button').attr('disabled', false)
+      $('#index_change_assign').attr('disabled', false)
+      $('.return-ticket-button').attr('disabled', true)
+      $('.ticket-owner-unassign-button').attr('disabled', true)
+      $('#show-edit-ticket-status-button').text('NEW')
+
+      clearTimeout(assigned_timeout_id)
+      $('#assignedAlert').addClass('hidden') if !$('#assignedAlert').hasClass('hidden')
+      $('#unassignedAlert').removeClass('hidden') if $('#unassignedAlert').hasClass('hidden')
+      $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+      assigned_timeout_id = setTimeout () ->
+        $('.assigned-check').addClass('hidden')
+        $('#unassignedAlert').addClass('hidden')
+      , 5000
     error: (error) ->
       show_message('error', [
         "Failed to return #{dispute_id} due to: #{error.responseJSON.message}"
@@ -513,9 +533,31 @@ window.sdr_toolbar_unassign_dispute = () ->
     data: data
     dataType: 'json'
     success: (response) ->
-      window.location.reload()
+      parsed_response = JSON.parse response
+      if parsed_response.status == 'success'
+        $assignee_element = $('#dispute-assignee')
+
+        $assignee_element.text('Unassigned')
+        $assignee_element.addClass('missing-data')
+        $('.take-ticket-button').attr('disabled', false)
+        $('#index_change_assign').attr('disabled', false)
+        $('.ticket-owner-unassign-button').attr('disabled', true)
+        $('.return-ticket-button').attr('disabled', true)
+        $('#show-edit-ticket-status-button').text('NEW')
+
+        clearTimeout(assigned_timeout_id)
+        $('#assignedAlert').addClass('hidden') if !$('#assignedAlert').hasClass('hidden')
+        $('#unassignedAlert').removeClass('hidden') if $('#unassignedAlert').hasClass('hidden')
+        $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+        assigned_timeout_id = setTimeout () ->
+          $('.assigned-check').addClass('hidden')
+          $('#unassignedAlert').addClass('hidden')
+        , 5000
+      else
+        show_message('error', 'Ticket assingment could not be updated.', 5, '#alertMessage')
     error: (response) ->
-      show_customer_cb('error', "Error removing assignee. #{response}", 5, '#alertMessage')
+      parsed_response = JSON.parse response
+      show_customer_cb('error', "Error removing assignee. #{parsed_response}", 5, '#alertMessage')
   )
 
 window.take_single_sdr_dispute = (id) ->
@@ -529,8 +571,24 @@ window.take_single_sdr_dispute = (id) ->
       error_prefix: 'Error updating ticket.'
       success: (response) ->
         if response.dispute_ids.length > 0
-          show_message('success', 'Ticket assignment has been updated.', 5, '#alertMessage')
-          reload_sdr_dispute()
+          $assignee_element = $('#dispute-assignee')
+          $assignee_element.text(response.username)
+
+          $('.take-ticket-button').attr('disabled', true)
+          $('#index_change_assign').attr('disabled', false)
+          $('.return-ticket-button').attr('disabled', false)
+          $('.ticket-owner-unassign-button').attr('disabled', false)
+          $assignee_element.removeClass('missing-data') if $assignee_element.hasClass('missing-data')
+          $('#show-edit-ticket-status-button').text('ASSIGNED')
+
+          clearTimeout(assigned_timeout_id)
+          $('#unassignedAlert').addClass('hidden') if !$('#unassignedAlert').hasClass('hidden')
+          $('#assignedAlert').removeClass('hidden') if $('#assignedAlert').hasClass('hidden')
+          $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+          assigned_timeout_id = setTimeout () ->
+            $('.assigned-check').addClass('hidden')
+            $('#assignedAlert').addClass('hidden')
+          , 5000
         else
           show_message('error', 'Ticket assnigment could not be updated.', 5, '#alertMessage')
     )
@@ -544,20 +602,21 @@ window.sdr_toolbar_index_change_assignee = () ->
     Number(this.value)
   ).toArray()
   $('#index_change_assign').dropdown('toggle')
-  sdr_change_assignee(disputeIdArray)
+  sdr_change_assignee(disputeIdArray, 'index')
 
 window.sdr_toolbar_show_change_assignee = () ->
   singleId = $('#dispute_id').text()
   disputeIdArray = [singleId]
-  sdr_change_assignee(disputeIdArray)
+  sdr_change_assignee(disputeIdArray, 'show')
 
-sdr_change_assignee = (disputeIdArray) ->
+sdr_change_assignee = (disputeIdArray, page) ->
   new_assignee = $('#index_target_assignee option:selected').val()
   data = {
     'dispute_ids': disputeIdArray,
     'new_assignee': new_assignee
   }
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $('#index_change_assign').dropdown('toggle')
 
   $.ajax(
     url: '/escalations/api/v1/escalations/sdr/disputes/change_assignee'
@@ -569,12 +628,47 @@ sdr_change_assignee = (disputeIdArray) ->
       responseData = JSON.parse(response).data
       page = $('#sdr-disputes-index').DataTable().page
 
-      if responseData.length > 0 && (data.dispute_ids.length == responseData.length)
-        show_message('success', "#{responseData.length} ticket assignment(s) updated.", 5, '#alertMessage')
-        reload_sdr_dispute()
-      else if responseData.length > 0 && (data.dispute_ids.length != responseData.length)
-        show_message('success', "#{responseData.length} ticket assignment(s) updated, but not every ticket was updated. Closed tickets cannot change their assignee", 5, '#alertMessage')
-        reload_sdr_dispute()
+      if responseData.length > 0
+        success_message = ''
+
+        if data.dispute_ids.length == responseData.length
+          success_message = "#{responseData.length} ticket assignment(s) updated."
+        else
+          success_message = "#{responseData.length} ticket assignment(s) updated, but not every ticket was updated. Closed tickets cannot change their assignee"
+
+        if page is 'index'
+          reload_sdr_dispute()
+
+          show_message('success', success_message, 5, '#alertMessage')
+        else
+          current_user_id = $('input[name="current_user_id"]').val()
+          user_id = $('#index_target_assignee option:selected').val()
+          new_assignee = $('#index_target_assignee option:selected').text()
+          is_assignee = parseInt(current_user_id) is parseInt(user_id)
+          $assignee_element = $('#dispute-assignee')
+
+          $assignee_element.text(new_assignee)
+
+          if is_assignee
+            $('.return-ticket-button').attr('disabled', false)
+            $('.take-ticket-button').attr('disabled', true)
+            $('.ticket-owner-unassign-button').attr('disabled', true)
+          else
+            $('.return-ticket-button').attr('disabled', true)
+            $('.take-ticket-button').attr('disabled', false)
+            $('.ticket-owner-unassign-button').attr('disabled', false)
+
+          $assignee_element.removeClass('missing-data') if $assignee_element.hasClass('missing-data')
+          $('#show-edit-ticket-status-button').text('ASSIGNED')
+
+          clearTimeout(assigned_timeout_id)
+          $('#unassignedAlert').addClass('hidden') if !$('#unassignedAlert').hasClass('hidden')
+          $('#assignedAlert').removeClass('hidden') if $('#assignedAlert').hasClass('hidden')
+          $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+          assigned_timeout_id = setTimeout () ->
+            $('.assigned-check').addClass('hidden')
+            $('#assignedAlert').addClass('hidden')
+          , 5000
       else
         show_message('error', 'No tickets updated. Closed tickets cannot change their assignee.', 5, '#alertMessage')
     error: (error) ->
@@ -804,8 +898,6 @@ window.export_sdr_selected = () ->
 
 # index edit status button press
 window.sdr_index_edit_ticket_status = () ->
-    dropdown = $('#sdr-index-edit-ticket-status-dropdown').parent()
-
     if ($('.sdr_dispute_check_box:checked').length > 0)
 
       # If menu is being re-opened, check if customer status has changed for checked rows and reload dropdown if it has
