@@ -54,16 +54,25 @@ module API
           end
 
           put '/close_related_issues' do
+            open_complaints = []
             response = { closed: [], failed: []}
             JiraImportTask.where(id: params[:task_ids]).each do |task|
-              issue = JiraRest::Issue.new(task.issue_key)
-              close_status = issue.close_issue
-              if close_status == true
-                task.update(issue_status: task.issue_status(reload: true))
-                response[:closed] << task.issue_key
-              else
+              if task.has_open_complaints?
                 response[:failed] << task.issue_key
+                open_complaints << task.issue_key
+              else
+                issue = JiraRest::Issue.new(task.issue_key)
+                close_status = issue.close_issue
+                if close_status == true
+                  task.update(issue_status: task.issue_status(reload: true))
+                  response[:closed] << task.issue_key
+                else
+                  response[:failed] << task.issue_key
+                end
               end
+            end
+            unless open_complaints.empty?
+              raise "Cannot close #{open_complaints.join(', ')} due to unresolved complaints"
             end
             response
           end

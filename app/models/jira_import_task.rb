@@ -320,4 +320,8 @@ class JiraImportTask < ApplicationRecord
     end
     issue_status
   end
+
+  def has_open_complaints?
+    self.import_urls.joins(:complaint).where.not(complaint: {status: [Complaint::COMPLETED, Complaint::RESOLVED]}).any?
+  end
 end
