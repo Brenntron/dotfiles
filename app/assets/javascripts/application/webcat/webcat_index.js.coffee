@@ -6,12 +6,9 @@ $ ->
 
     # Create index table
     url = $('#complaints-index').data('source')
-    console.log 'page loaded'
     build_complaints_table(url)
 
-    # Make the datatables search prettier
-    $('#complaints-index_filter input').addClass('restricted-table-search-input');
-
+    # simple way of preventing user from accidentally closing tab/window
     window.onbeforeunload = (e) ->
       e.preventDefault()
 
@@ -20,7 +17,8 @@ build_complaints_table = (url) ->
   console.log 'build complaints table triggered'
   complaint_table = $('#complaints-index').DataTable(
     initComplete: ->
-      console.log 'complaint table initcomplete'
+
+      console.log 'init complete'
       # Get display prefs
       get_display_prefs()
 
@@ -37,6 +35,9 @@ build_complaints_table = (url) ->
         return
       )
       $('.dataTables_filter').append $clearButton, $searchButton
+
+      # Make the datatables search prettier
+      $('#complaints-index_filter input').addClass('restricted-table-search-input');
 
       # properly init these search/clear icons
       $('.dt-button').tooltipster
@@ -62,12 +63,7 @@ build_complaints_table = (url) ->
         console.log 'There has been an error calling the backend data'
         webcat_refresh()
       complete: ->
-        console.log 'complaints table "complete"'
-        # Get display prefs
-        # This is in 2 locations for initial build
-        # TODO confirm that both are needed.
-        # and then sort or moving to another page
-        get_display_prefs()
+        console.log 'complete'
 
         # Grab current categories per entry
         rows = $('#complaints-index').find('.cat-index-main-row')
@@ -76,6 +72,11 @@ build_complaints_table = (url) ->
 
         # confirm this function is in the right locatino
         use_user_preference_filter()
+
+        $('#complaints-index tbody tr *').click ->
+          main_row = $(this).parents('tr.cat-index-main-row')[0]
+          $(main_row).toggleClass('selected')
+
     createdRow: (row, data) ->
       $(row).addClass('cat-index-main-row')
       $(row).attr('data-categories', data.category)
@@ -568,6 +569,8 @@ build_complaints_table = (url) ->
 
     ]
   )
+
+
 
 
 ###

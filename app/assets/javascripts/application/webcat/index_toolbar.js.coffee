@@ -108,8 +108,6 @@ window.toggle_select_order = (button) ->
 
 
 # Selecting rows / enabling / disabling buttons based on selections
-
-
 $ ->
   $('#complaints_select_all').click ->
     toggle_select_all_entries(this, '#complaints-index')
