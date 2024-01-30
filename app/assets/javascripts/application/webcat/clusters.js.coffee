@@ -289,7 +289,7 @@ $ ->
 
           # only show WHOIS lookup button for normal domains, not ip addresses
           if !is_ip.test(domain)
-            html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='domain_whois(\"#{domain}\")'></button>"
+            html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='WebCat.RepLookup.whoIsLookup(\"#{domain}\")'></button>"
           else
             html += "<button type='button' class='whois-btn right-margin domain-spacer'></button>"
 
@@ -1136,7 +1136,7 @@ window.category_ids_to_names = (categories_hash, category_ids) ->
 
 window.webcat_platform_filter = () ->
   platforms = $("input.show-platforms-filter:checked")
-  if $(platforms).length == 3 || $(platforms).length == 0
+  if $(platforms).length == 4 || $(platforms).length == 0
     selected_platform = 'All'
   else
     selected_platform = []

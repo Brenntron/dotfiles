@@ -133,10 +133,13 @@ development:
     hostport: "grpc.talos.cisco.com:443"
     cert_file: "/usr/local/etc/talos/tess-client.pem"
     key_file: "/usr/local/etc/talos/tess-pkey.key"
-  umbrella_data_fetcher:
+  clusters_telemetry:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
+      bucket: "redacted"
+      prefix: "redacted" 
+      region: "redacted"
   tmi:
     hostport: "tmi-qa.sl.talos.cisco.com:50051"
     ca_file: ""
@@ -152,7 +155,9 @@ development:
     host: "prod-webcat-app3.sv4.ironport.com"
     port: 5000
     api_key: "redacted"
-    tls: "verify-none"  
+    tls: "verify-none"
+  resolution_report:
+    cache_expiration: 60
 
 test:
   api_timeout:
@@ -290,16 +295,22 @@ test:
     host: "k2-api-int.sv4.ironport.com"
     port: 443
     token: "redacted"
-  umbrella_data_fetcher:
+  clusters_telemetry:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
+      bucket: "redacted"
+      prefix: "redacted" 
+      region: "redacted"
   jira:
     host: "https://fmd-drgjr-01tst.vrt.sourcefire.com:443/"
     token: "redacted"
     verify_mode: "verify-none"
     auth_type: "basic"
     project_key: "SD"
+  resolution_report:
+    cache_expiration: 60
+
 staging:
   amp_poke:
     host: "localhost"
@@ -445,15 +456,21 @@ staging:
     host: "k2-api-int.sv4.ironport.com"
     port: 443
     token: "redacted"
-  umbrella_data_fetcher:
+  clusters_telemetry:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
+      bucket: "redacted"
+      prefix: "redacted" 
+      region: "redacted"
   jira:
     host: "fmd-drgjr-01tst.vrt.sourcefire.com"
     username: "TBD.gen"
     password: "redacted"
     verify_mode: "verify-none"
+  resolution_report:
+    cache_expiration: 60
+
 production:
   amp_poke: 
     host: "poke.vrt.sourcefire.com"
@@ -600,12 +617,17 @@ production:
     host: "k2-api.sv4.ironport.com"
     port: 443
     token: "redacted"
-  umbrella_data_fetcher:
+  clusters_telemetry:
     aws:
       access_key_id: "redacted"
       secret_access_key: "redacted"
+      bucket: "redacted"
+      prefix: "redacted" 
+      region: "redacted"
   jira:
     host: "fmd-drgjr-01tst.vrt.sourcefire.com"
     username: "TBD.gen"
     password: "redacted"
     verify_mode: "verify-none"
+  resolution_report:
+    cache_expiration: 60

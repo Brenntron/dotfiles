@@ -107,13 +107,6 @@ gem 'delayed_job_web', '1.4.3'
 gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
 
-
-
-
-gem 'whois', '4.1.0'
-gem 'whois-parser', '2.0'
-
-
 gem 'clipboard-rails', '1.7.1'
 
 gem 'poltergeist', '1.18.1'
@@ -129,7 +122,6 @@ gem 'hashie'
 
 gem 'mail'
 gem 'simpleidn'
-gem 'red-parquet', '8.0.0'
 
 group :production, :staging do
   gem 'elastic-apm', '4.5.0'

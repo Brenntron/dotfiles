@@ -26,12 +26,12 @@
             %input.path-checkbox{type: 'checkbox', checked: true, id: 'path-checkbox'} Path
           %li.toggle-vis-webcat{'data-column':'9'}
             %input.uri-checkbox{type: 'checkbox', checked: true, id: 'uri-checkbox'} URI
-
-        %ul
           %li.toggle-vis-webcat{'data-column':'10'}
             %input.primary-checkbox{type: 'checkbox', checked: true, id: 'primary-checkbox'} Primary Cat
           %li.toggle-vis-webcat{'data-column':'11'}
             %input.suggested-checkbox{type: 'checkbox', checked: true, id: 'suggested-checkbox' } Suggested Cat
+
+        %ul
           %li.toggle-vis-webcat{'data-column':'12'}
             %input.wbrs-checkbox{type: 'checkbox', checked: true, id: 'wbrs-checkbox'} WBRS
           %li.toggle-vis-webcat{'data-column':'13'}
@@ -46,6 +46,10 @@
             %input.channel-checkbox{type: 'checkbox', checked: true, id: 'channel-checkbox'} Channel
           %li.toggle-vis-webcat{'data-column':'18'}
             %input.assignee-checkbox{type: 'checkbox', checked: true, id: 'assignee-checkbox'} Assignee
+          %li.toggle-vis-webcat{'data-column':'19'}
+            %input.reviewer-checkbox{type: 'checkbox', checked: false, id: 'reviewer-checkbox'} Reviewer
+          %li.toggle-vis-webcat{'data-column':'20'}
+            %input.second-reviewer-checkbox{type: 'checkbox', checked: false, id: 'second-reviewer-checkbox' } Second Reviewer
 
   %div
     %div.btn-group.toolbar-btn-group
@@ -54,15 +58,25 @@
       %button.btn.toolbar-button.open-all.esc-tooltipped-webcat-toolbar{onclick: 'open_all()', type: 'button', title: 'Open All (shift + alt + o)'}
         %span.toolbar-button-text.text-button-all All
   %div
+    %span.btn-group.toolbar-btn-group.assignment-btn-group
+      .inline-radio-wrapper
+        %input#assignment-type-assignee.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'assignee', checked: 'checked'}
+        %label{for: 'assignment-type-assignee'} Assignee
+      .inline-radio-wrapper
+        %input#assignment-type-reviewer.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'reviewer'}
+        %label{for: 'assignment-type-reviewer'} Reviewer
+      .inline-radio-wrapper
+        %input#assignment-type-second-reviewer.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'second_reviewer'}
+        %label{for: 'assignment-type-second-reviewer'} Second Reviewer
     %span.toolbar-concise-button-area
-      %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)'}
+      %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)', disabled: 'true'}
         %span.toolbar-button-text Take
-      %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)'}
+      %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)', disabled: 'true'}
         %span.toolbar-button-text Return
     %span.toolbar-concise-button-area.webrep-change-assignee-wrapper
-      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true'}
       %span.dropdown
-        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true'}
           %span.toolbar-button-text
             Change Assignee
         .dropdown-menu.toolbar-dropdown{'aria-labelledby': 'index_change_assign'}
@@ -145,7 +159,7 @@
   %div.webcat-toolbar-push
     - if params[:f] != "REVIEW"
       %button#index_update_resolution.toolbar-button.resolution-submit-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-        %span
+        %span.toolbar-button-text
           Bulk Resolution Tool
       .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_update_resolution'}
         #index_change_resolution_dialog.row{title: 'Bulk Resolution Tool'}
@@ -204,12 +218,15 @@
                 %span Submit
 
       %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'master_submit();', title: 'Submit multiple selected entries with any changes entered by row'}
-        %span
+        %span.toolbar-button-text
           Bulk Submit
       %span.dropdown
     - else
       %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
         %span.toolbar-button-text Confirm Review
   %div.webcat-toolbar-tall-wrapper
-    %input{type: 'checkbox', id:'self_review'}
+    - if current_user.allowed_self_review
+      %input{type: 'checkbox', id: 'self_review', checked: true}
+    - else
+      %input{type: 'checkbox', id:'self_review', checked: false}
     %label{for: 'self_review'} Allow Self Review
