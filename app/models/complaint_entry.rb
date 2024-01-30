@@ -52,7 +52,7 @@ class ComplaintEntry < ApplicationRecord
     uri_or_ip = self.hostlookup
     #support for ipv6 carried over from work done in WEB-11015 while this was being developed
     #is_ip_address = !!(uri_or_ip  =~ Resolv::IPv4::Regex)
-    is_ip_address = !!(ip_or_uri =~ Resolv::IPv4::Regex || ip_or_uri =~ Resolv::IPv6::Regex)
+    is_ip_address = !!(uri_or_ip =~ Resolv::IPv4::Regex || uri_or_ip =~ Resolv::IPv6::Regex)
 
     if is_ip_address
       ComplaintEntry.open_tickets.where(:ip_address => uri_or_ip).where("id <> #{self.id}").first
