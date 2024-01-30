@@ -108,12 +108,6 @@ gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
 
 
-
-
-gem 'whois', '4.1.0'
-gem 'whois-parser', '2.0'
-
-
 gem 'clipboard-rails', '1.7.1'
 
 gem 'capybara', '2.11.0'
