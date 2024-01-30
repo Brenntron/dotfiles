@@ -1,4 +1,4 @@
-require 'service-tess_services_pb'
+require 'service-tess-internal_services_pb'
 
 class Tess::Whois
 
@@ -51,11 +51,11 @@ class Tess::Whois
   end
 
   def self.remote_stub
-    @remote_stub ||= Talos::Service::TESS::Stub.new(hostport, creds)
+    @remote_stub ||= Talos::Internal::Service::TESS::Stub.new(hostport, creds)
   end
 
   def self.whois_query(name)
-    whois_search_request = Talos::TESS::WhoisSearchRequest.new(app_info: get_app_info, search_string: name)
+    whois_search_request = Talos::Internal::TESS::WhoisSearchRequest.new(app_info: get_app_info, search_string: name)
     response = remote_stub.whois_query(whois_search_request)
 
     unless :WHOIS_SUCCESS == response.status

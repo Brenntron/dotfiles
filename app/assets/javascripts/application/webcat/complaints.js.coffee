@@ -772,7 +772,7 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
-        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.whoIsLookups(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Whois</button>')
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" data-fqdn="' + qual_subdomain + '" onclick="WebCat.RepLookup.whoIsLookup(' + complaint_entry_id  + ',\'' + qual_subdomain + '\')">Whois</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
     error: (response) ->
       std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
@@ -927,111 +927,6 @@ window.inheritCategories = (complaint_entry_id) ->
       std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
     )
 
-name_servers =(server_list)->
-  if undefined == server_list
-    ''
-  else
-    text = ""
-    for server in server_list
-      text += server + '<br>'
-    text
-
-format_domain_info = (info)->
-  '<div class="dialog-content-wrapper">' +
-    '<h5>Domain Name</h5>' +
-    '<p>' + info['domain'] + '</p>' +
-    '<hr class="thin">' +
-    '<h5>Registrant </h5>' +
-    '<table class="nested-dialog-table">' +
-      '<tr>' +
-        '<td class="table-side-header">' +
-           'Organization' +
-        '</td>' +
-        '<td>' +
-          info['organisation'] +
-      '</tr><tr>' +
-        '<td class="table-side-header">' +
-          'Country' +
-        '</td>' +
-        '<td>' +
-          info['registrant_country'] +
-        '</td>' +
-      '</tr><tr>' +
-        '<td class="table-side-header">' +
-        'State/Province' +
-        '</td>' +
-        '<td>' +
-          info['registrant_state/province'] +
-        '</td>' +
-      '</tr>' +
-    '</table>' +
-    '<hr class="thin">' +
-    '<h5>Name Servers</h5>'+
-    name_servers(info['nserver']) +
-    '<hr class="thin">' +
-    '<h5> Dates</h5>'+
-    '<table class="nested-dialog-table">' +
-      '<tr>' +
-        '<td class="table-side-header">' +
-          'Created' +
-        '</td>' +
-        '<td>' + info['created'] + '</td>'+
-      '</tr><tr>' +
-        '<td class="table-side-header">' +
-          'Last updated' +
-        '</td>' +
-        '<td>' +
-          info['changed'] +
-        '</td>' +
-      '</tr><tr>' +
-        '<td class="table-side-header">' +
-          'Expiry_date' +
-        '</td>' +
-        '<td>' +
-          info['registry_expiry_date'] +
-        '</td>' +
-      '</tr>' +
-    '</table>' +
-  '</div>'
-
-window.domain_whois = (IP_Domain) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/domain_whois'
-    method: 'POST'
-    headers: headers
-    data: {'lookup': IP_Domain}
-    success: (response) ->
-      info = $.parseJSON(response)
-      if info.error
-        notice_html = "<p>Something went wrong: #{info.error}</p>"
-        alert(info.error)
-      else
-        dialog_content = $(format_domain_info(info))
-        if $("#complaint_button_dialog").length
-          complaint_dialog = this
-
-          $('#complaint_button_dialog').html("")
-          $('body').innerHTML=""
-
-          $('body').append(complaint_dialog)
-          $('#complaint_button_dialog').append(dialog_content[0])
-          $('#complaint_button_dialog').dialog
-            autoOpen: true
-            minWidth: 400
-            position: { my: "right bottom", at: "right bottom", of: window }
-        else
-          complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
-          $('body').append(complaint_dialog)
-          $('#complaint_button_dialog').append(dialog_content[0])
-          $('#complaint_button_dialog').dialog
-            autoOpen: true
-            minWidth: 400
-            position: { my: "right bottom", at: "right bottom", of: window }
-    error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-  , this)
-
 window.review_bulk_submit = () ->
   selected_rows = $("tr.highlight-second-review.shown")
   if selected_rows.length < 1
@@ -1077,7 +972,7 @@ window.review_bulk_submit = () ->
       method: 'POST'
       data: {data: entries_to_update}
       success: (response) ->
-        window.location.reload(false);
+        window.location.reload(false)
       error: (response) ->
         notice_html = "<p>Something went wrong</p>"
     , this)
@@ -2058,7 +1953,7 @@ format = (complaint_entry_row) ->
       '</br>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="history-' + entry_id + '" onclick="history_dialog(' + entry_id  + ',\'' + url + '\')">History</button><br/>' +
-      '<button class="secondary" id="domain-' + entry_id + '" onclick="WebCat.RepLookup.whoIsLookups(\'' + whois_lookup + '\')">Whois</domain>' +
+      '<button class="secondary" id="domain-' + entry_id + '" onclick="WebCat.RepLookup.whoIsLookup(\'' + whois_lookup + '\')">Whois</domain>' +
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-4 nested-complaint-editable-data">' +
       '<div class="row">' +
@@ -3197,3 +3092,72 @@ $ ->
   $('#wbnp-report-button').click ->
     $('#wbnp-full-report').dialog('open')
 
+#  resolutionStatus = $('input[name="complaint[resolution]"]:checked').val()?
+#  customerFacingComment = $('input[name="customer_facing_comment]').val()?
+#  categories = $('input[name="complaint[resolution]"]:checked').val() == 'DROP_ALL'
+#
+#  if resolutionStatus?
+#    $('.resolution-container').find('.resolution-apply-button').addClass('applied')
+#  if customerFacingComment?
+#    $('customer-facing-comment-container').find('.resolution-apply-button').addClass('applied')
+#  if categories?
+#    $('categories-container').find('.resolution-apply-button').addClass('applied')
+
+  webcat_bulk_response_templates_check_if_checked = () ->
+    if $("input[type=radio][name='complaint[resolution]']:checked").length <= 0
+      $('#webcat_resolution_unchanged_option').trigger('click')
+
+  $('#index_change_resolution_dialog').dialog
+    autoOpen: false
+    classes: { 'ui-dialog': 'index-change-resolution-dialog'}
+    width: 450
+    minHeight: 300
+    position:
+      my: 'right top'
+      at: 'right top+150'
+      of: window
+    open:  () ->
+      #select radio button if none is selected (needs to be clicked so data can load)
+      webcat_bulk_response_templates_check_if_checked()
+
+  $("#index_update_resolution").click ->
+    $('#index_change_resolution_dialog').dialog('open')
+
+  # Populate bulk webcat response templates
+  assemble_webcat_bulk_response_templates = (templates, resolution_select) ->
+    resolution_select = $('#email-response-to-customers-select')
+    resolution_select.empty()
+
+    if templates.length == 0
+      resolution_select.val ''
+      $('#email-response-to-customers').text ''
+      $('#email-response-to-customers').val ''
+
+    $(templates).each (index, template) ->
+      template_option = $("<option class='webcat-resolution-template-option'></option>")
+      $(template_option).val template.name
+      $(template_option).text template.name
+      $(template_option).attr('data-body', template.body )
+      $(template_option).attr('data-description', template.description )
+      resolution_select.append template_option
+
+      #show first option as body and description
+      if index == 0
+        $('#email-response-to-customers').text template.body
+        $('#email-response-to-customers').val template.body
+
+  window.populate_resolved_webcat_templates = (resolution) ->
+
+    get_resolution_templates_by_resolution('webcat', resolution).then (response) ->
+      templates = JSON.parse response
+      assemble_webcat_bulk_response_templates(templates)
+
+  # Load resolution template comments after clicking new status
+  $("input[type=radio][name='complaint[resolution]']").change ->
+    resolution = $(this).val()
+    populate_resolved_webcat_templates(resolution)
+
+  # Populate current resolution comment after changing resolution template
+  $('#email-response-to-customers-select').on 'change', (i, e) ->
+    comment = $('#email-response-to-customers-select option:selected').attr('data-body')
+    $('#email-response-to-customers').val comment
