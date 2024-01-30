@@ -191,7 +191,7 @@ module API
                 permitted_params['complaint_entry_ids'].each do |id|
                   status = ComplaintEntry.find(id).return_complaint(current_user, permitted_params['assignment_type'])
 
-                  next if status == "Complaint returned"
+                  next if status == "Entry returned"
 
                   error_count += 1
 

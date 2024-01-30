@@ -129,12 +129,14 @@ window.toggle_select_all_entries = (checkbox, table) ->
 # Enable buttons if entries are selected
 window.check_enable_toolbar_buttons = () ->
   if $('tr.selected').length >= 1
+    $('.open-selected').removeAttr('disabled')
     $('#convert-ticket-button').removeAttr('disabled')
     $('.take-ticket-toolbar-button').removeAttr('disabled')
     $('.return-ticket-toolbar-button').removeAttr('disabled')
     $('.remove-assignee-toolbar-button').removeAttr('disabled')
     $('.ticket-owner-button').removeAttr('disabled')
   else
+    $('.open-selected').attr('disabled', 'disabled')
     $('#convert-ticket-button').attr('disabled', 'disabled')
     $('.take-ticket-toolbar-button').attr('disabled', 'disabled')
     $('.return-ticket-toolbar-button').attr('disabled', 'disabled')
@@ -201,7 +203,7 @@ open_selected = (selected_rows, toggle) ->
 
 
 # Assignment Functions #
-# take unassigned as assignee - check
+# take unassigned as assignee
 # take unassigned as reviewer
 # take unassigned as second reviewer
 # confirm below scenarios should be prevented - reviewer and second reviewer may not want to prevent
