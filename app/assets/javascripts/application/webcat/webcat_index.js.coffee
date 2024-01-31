@@ -364,19 +364,19 @@ build_complaints_table = (url) ->
           whois_url = full.domain || full.ip_address
           whois_button =
             '<button class="whois-button" id="domain-' + full.entry_id + '" ' +
-              'onclick="WebCat.RepLookup.whoIsLookups(\'' + whois_url + '\')"></button>'
+              'onclick="WebCat.RepLookup.whoIsLookup(\'' + whois_url + '\')"></button>'
 
           lookup_url = full.subdomain + '.' + full.domain || full.ip_address
           lookup_button =
-            '<a class="button-wrapper-link" href="https://www.google.com/search?q=site%3A' + lookup_url + '" target="_blank"><button class="lookup-button"></button></a>'
+            '<a class="button-wrapper-link" href="https://www.google.com/search?q=site%3A' + lookup_url + '" target="_blank"><button id="google-' + full.entry_id + '" class="lookup-button"></button></a>'
 
           visit_url = history_url
           if full.wbrs_score <= -6
             visit_button =
-              '<button class="open-all" disabled></button>'
+              '<button id="open-' + full.entry_id + '" class="open-all" disabled></button>'
           else
             visit_button =
-              '<a class="button-wrapper-link" href="http://' + visit_url + '" target="_blank"><button class="open-all"></button></a>'
+              '<a class="button-wrapper-link" href="http://' + visit_url + '" target="_blank"><button id="open-' + full.entry_id + '" class="open-all"></button></a>'
 
           return history_button + whois_button + lookup_button + visit_button
       }

@@ -82,7 +82,51 @@ Feature: Webcat complaints index
   Scenario: a user can open a url that does not have a low WBRS score using the Open URL button within the row of that entry
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
-      | id  | uri            | domain          | entry_type | status |
-      | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    |
-      | 222 | google.com     | google.com      | URI/DOMAIN | NEW    |
+      | id  | uri            | domain          | entry_type | status | wbrs_score |
+      | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    | 0.0        |
+      | 222 | google.com     | google.com      | URI/DOMAIN | NEW    | 2.5        |
+      | 333 | badurl.com     | badurl.com      | URI/DOMAIN | NEW    | -7.8       |
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "2" seconds
+    And I click "#open-111"
+    And I wait for "2" seconds
+    Then a new window should be opened
+
+  @javascript
+  Scenario: a user cannot open a url with a low WBRS score using the Open URL button within the row of that entry
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri            | domain          | entry_type | status | wbrs_score |
+      | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    | 0.0        |
+      | 222 | google.com     | google.com      | URI/DOMAIN | NEW    | 2.5        |
+      | 333 | badurl.com     | badurl.com      | URI/DOMAIN | NEW    | -7.8       |
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "2" seconds
+    And button with id "open-333" should be disabled
+
+  @javascript
+  Scenario: a user can click a button to do a google search on an entry
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri            | domain          | entry_type | status | wbrs_score |
+      | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    | 0.0        |
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "2" seconds
+    And I click "#google-111"
+    And I wait for "2" seconds
+    Then a new window should be opened
+
+  @javascript
+  Scenario: a user looks at the the history of an entry
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri            | domain          | entry_type | status | wbrs_score |
+      | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    | 0.0        |
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "2" seconds
+    And I click "#history-111"
+    And I wait for "2" seconds
+    And I should see "History Information"
+    And I should see "COMPLAINT ENTRY HISTORY"
+    And I should see "XBRS TIMELINE"
 
