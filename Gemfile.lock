@@ -1,5 +1,5 @@
 GIT
-  remote: https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git
+  remote: https://github.com/cisco-sbg/talos-atlas-peake-bridge-client.git
   revision: bc42826c08fce28b56b6eb66a1768d320d70191e
   specs:
     peake-bridge-client (0.2.0.2)
@@ -1700,7 +1700,6 @@ GEM
     kaminari-core (1.1.1)
     launchy (2.4.3)
       addressable (~> 2.3)
-    libv8 (3.16.14.19)
     listen (3.7.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -1940,6 +1939,7 @@ GEM
     zeitwerk (2.6.6)
 
 PLATFORMS
+  amd64-freebsd-13
   ruby
   x86_64-darwin-22
 
@@ -2005,7 +2005,6 @@ DEPENDENCIES
   jquery-ui-rails (~> 6.0)
   kaminari (= 1.1.1)
   launchy (~> 2.4.2)
-  libv8 (= 3.16.14.19)
   mail
   mysql2 (= 0.5.4)
   net-http
@@ -2015,7 +2014,7 @@ DEPENDENCIES
   net-ssh (= 5.0.2)
   nokogiri (= 1.13.9)
   paper_trail (= 12.0.0)
-  peake-bridge-client (~> 0.2.0.0)!
+  peake-bridge-client (~> 0.2.0)!
   poltergeist (= 1.18.1)
   pry (= 0.12.2)
   pry-remote (~> 0.1.8)
