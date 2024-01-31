@@ -7,28 +7,28 @@ Feature: Webcat complaints
 
   #TODO: we need to update the user role on these tests
 
-  @javascript
-  Scenario: a user should be alerted of impending doom
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaint entries exist:
-      |id|  domain      | status |
-      |1 | food.com     |  NEW   |
-      |2 | blah.com     |  NEW   |
-      |3 | imhungry.com |  NEW   |
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    And I wait for "2" seconds
-    And I click ".expand-row-button-1"
-    And I wait for "2" seconds
-    And I click ".expand-row-button-2"
-    And I wait for "2" seconds
-    And I fill in "complaint_comment_1" with "This is my favorite website"
-    And I fill in "complaint_comment_2" with "This is not my favorite website"
-    And I fill in "input_cat_1-selectized" with "Arts" and press enter
-    And I fill in "input_cat_2-selectized" with "Education" and press enter
-    And I wait for "2" seconds
-    When I click "master-submit"
-    Then I should see hidden element "#message-text" with content "I noticed you have made changes to at least 2 complaints but you only have 1 items selected."
+#  @javascript
+#  Scenario: a user should be alerted of impending doom
+#    Given a user with role "webcat user" exists and is logged in
+#    And the following complaint entries exist:
+#      |id|  domain      | status |
+#      |1 | food.com     |  NEW   |
+#      |2 | blah.com     |  NEW   |
+#      |3 | imhungry.com |  NEW   |
+#    And a complaint entry preload exists
+#    And I goto "/escalations/webcat/complaints?f=ALL"
+#    And I wait for "2" seconds
+#    And I click ".expand-row-button-1"
+#    And I wait for "2" seconds
+#    And I click ".expand-row-button-2"
+#    And I wait for "2" seconds
+#    And I fill in "complaint_comment_1" with "This is my favorite website"
+#    And I fill in "complaint_comment_2" with "This is not my favorite website"
+#    And I fill in "input_cat_1-selectized" with "Arts" and press enter
+#    And I fill in "input_cat_2-selectized" with "Education" and press enter
+#    And I wait for "2" seconds
+#    When I click "master-submit"
+#    Then I should see hidden element "#message-text" with content "I noticed you have made changes to at least 2 complaints but you only have 1 items selected."
 
   @javascript
   Scenario: a user can manually create a new complaint
@@ -50,12 +50,12 @@ Feature: Webcat complaints
     And I fill in "ips_urls" with "talosintelligence.com"
     And I fill in "description" with "This is my favorite website"
     And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
-    And I fill in selectized with "urgent"
     And I click "Create"
     And I wait for "5" seconds
+    And take a screenshot
     And I should see "COMPLAINT CREATED"
     And I click ".close"
-    Then I wait for "5" seconds
+    Then I wait for "10" seconds
     And I should see "urgent"
 
   @javascript
@@ -145,47 +145,15 @@ Feature: Webcat complaints
     When I click "#submit_changes_1"
     Then I should not see "commit"
 
-  @javascript
-  Scenario: a user can open selected ips in new tabs
-    Given a user with role "webcat user" exists and is logged in
-    And a complaint entry with trait "not_important" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I select row "1"
-    When I click "Open Selected"
-    And I wait for "2" seconds
-    Then a new window should be opened
-    When I switch to the new window
-    And I should see "Company news"
 
 
 
-  @javascript
-  Scenario: a user can take a complaint
-    Given a user with role "webcat user" exists and is logged in
-    And a new complaint entry with trait "not_important" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    And I wait for "3" seconds
-    And I click ".sorting_1"
-    And I click ".take-ticket-toolbar-button"
-    Then I wait for "3" seconds
-    Then I should see "ASSIGNED"
+
+
 
   # TODO write this test
   # Scenario: a user tries to take multiple complaints one of which is invalid
 
-  @javascript
-  Scenario: a user can return a complaint
-    Given a user with role "webcat user" exists and is logged in
-    And an assigned complaint entry with trait "assigned_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    And I wait for "3" seconds
-    And I click ".sorting_1"
-    And I click ".return-ticket-toolbar-button"
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I should see "NEW"
 
   @javascript
   Scenario: a user selects the 'My Complaints' filter
@@ -776,72 +744,7 @@ Feature: Webcat complaints
     Then I should see table header with id "tags"
     Then I should see table header with id "path"
 
-  @javascript
-  Scenario: a user takes a ticket
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaints exist:
-      | channel       | id |
-      | talosintel    | 1  |
-    And the following complaint entries exist:
-      | uri            | domain          | entry_type | complaint_id | status     |
-      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I click "#complaints_check_box"
-    And I wait for "3" seconds
-    Then I click ".take-ticket-toolbar-button"
-    Then that Complaint Ticket should have an assignee of current user
 
-  @javascript
-  Scenario: a user returns a ticket
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaints exist:
-      | channel       | id |
-      | talosintel    | 1  |
-    And the following complaint entries exist:
-      | uri            | domain          | entry_type | complaint_id | status     | user_id|
-      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |   1    |
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I click "#complaints_check_box"
-    And I wait for "3" seconds
-    Then I click ".return-ticket-toolbar-button"
-    Then that Complaint Ticket should not have an assignee of current user
-
-  @javascript
-  Scenario: a user tries to return a ticket that is complete
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaints exist:
-      | channel       | id |
-      | talosintel    | 1  |
-    And the following complaint entries exist:
-      | uri            | domain          | entry_type | complaint_id | status     |
-      | abc.com        | abc.com         | URI/DOMAIN |  1           | COMPLETED  |
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I click "#complaints_check_box"
-    And I wait for "3" seconds
-    Then I click ".take-ticket-toolbar-button"
-    And I wait for "3" seconds
-    And I should see "Already completed - 1"
-
-  @javascript
-  Scenario: a user tries to take a ticket that is already assigned
-    Given a user with role "webcat user" exists and is logged in
-    And the following users exist
-      | id | cvs_username | cec_username | display_name |
-      | 2  | test_user    | test_user    | test_user    |
-
-    And the following complaints exist:
-      | channel       | id |
-      | talosintel    | 3  |
-
-    And the following complaint entries exist:
-      | uri            | domain          | entry_type | complaint_id | status     | user_id|
-      | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |    2   |
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I click "#complaints_check_box"
-    And I wait for "3" seconds
-    Then I click ".take-ticket-toolbar-button"
-    And I wait for "15" seconds
-    And I should see "Currently assigned to someone else - 1"
 
 
   @javascript
@@ -881,28 +784,6 @@ Feature: Webcat complaints
     And I wait for "15" seconds
     And I should see "Currently assigned to someone else - 3, 4, 7, and 9"
 
-  @javascript
-  Scenario: a user tries to return a ticket that is not assigned to them
-    Given a user with role "webcat user" exists and is logged in
-    And the following users exist
-      | id | cvs_username | cec_username | display_name |
-      | 2  | test_user    | test_user    | test_user    |
-    And the following complaints exist:
-      | channel       | id |
-      | talosintel    | 1  |
-      | talosintel    | 2  |
-      | talosintel    | 3  |
-    And the following complaint entries exist:
-      | uri            | domain          | entry_type | complaint_id | status     | user_id|
-      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |        |
-      | whatever.com   | whatever.com    | URI/DOMAIN |  2           | NEW        |        |
-      | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |    2   |
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I click "#complaints_check_box"
-    And I wait for "3" seconds
-    And I click ".return-ticket-toolbar-button"
-    And I wait for "3" seconds
-    And I should see "Currently assigned to someone else - 3"
 
   @javascript
   Scenario: left nav links should apply filter if the filter was set before

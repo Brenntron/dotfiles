@@ -43,6 +43,10 @@ Then(/^a new window should be opened$/) do
   raise("Page did not open") if page.driver.browser.window_handles.count <= 1
 end
 
+Then(/^"(.*?)" new windows should be opened$/) do |number_of_windows|
+  raise("Page did not open") if page.driver.browser.window_handles.count <= number_of_windows.to_i
+end
+
 When(/^I switch to the new window$/) do
   popup = page.driver.browser.window_handles.last
   page.driver.browser.switch_to.window(popup)
@@ -624,4 +628,9 @@ end
 
 And(/the table "(.*?)" should have "(.*?)" number of rows/) do | table, number_of_rows|
   page.all("table##{table} tbody tr").count.should == Integer(number_of_rows)
+end
+
+Then(/^I accept the user prompt$/) do
+  alert = page.driver.browser.switch_to.alert
+  alert.accept
 end

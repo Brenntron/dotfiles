@@ -14,6 +14,7 @@ Feature: Webcat complaint entry assignment
     And  I click ".take-ticket-toolbar-button"
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
+    And that Complaint Ticket should have an assignee of current user
 
   @javascript
   Scenario: a user can return (unassign self from) a complaint
@@ -32,6 +33,7 @@ Feature: Webcat complaint entry assignment
     Then I wait for "8" seconds
     And  I should not see "ASSIGNED"
     And  I should see "Vrt Incoming"
+    And that Complaint Ticket should not have an assignee of current user
 
   @javascript
   Scenario: a user cannot take (assign self to) a complaint that is assigned to another user
@@ -49,6 +51,7 @@ Feature: Webcat complaint entry assignment
     Then I wait for "3" seconds
     And  I should see "ERROR TAKING ENTRIES"
     And  I should see "Currently assigned to someone else"
+    Then that Complaint Ticket should not have an assignee of current user
 
   @javascript
   Scenario: a user cannot return (unassign self from) a complaint that is assigned to another user
@@ -94,7 +97,7 @@ Feature: Webcat complaint entry assignment
     Then I wait for "3" seconds
     And  I should see "ERROR TAKING ENTRIES"
     And  I should see "Already completed"
-
+    And that Complaint Ticket should not have an assignee of current user
 
   @javascript
   Scenario: a user can assign themself as a (first) reviewer on a complaint
@@ -196,5 +199,25 @@ Feature: Webcat complaint entry assignment
     And  I should not see "ERROR RETURNING ENTRIES"
 
 
-#  @javascript
+# TODO
+#  Scenario: a user can take multiple selected entries
+#  Scenario: a user can return multiple selected entries
+
 #  Scenario: a manager can assign a user to a complaint
+#  Scenario: a manager can assign a user to multiple complaints
+#  Scenario: a manager can assign a user as a reviewer to a complaint
+#  Scenario: a manager can assign a user as a second reviewer to a complaint
+#  Scenario: a manager can unassign an assignee from a complaint
+#  Scenario: a manager can unassign a reviewer from a complaint
+#  Scenario: a manager can unassign a second reviewer from a complaint
+#  Scenario: a manager cannot assign the same user as assignee and reviewer on a complaint
+
+#  Scenario: a non-manager can unassign a user from a complaint
+#  Scenario: a non-manager cannot unassign a reviewer from a complaint
+#  Scenario: a non-manager cannot unassign a second reviewer from a complaint
+#  Scenario: a non-manager cannot assign a user other than themself to a complaint
+#  Scenario: a non-manager cannot assign a user other than themself as a reviewer to a complaint
+#  Scenario: a non-manager cannot assign a user other than themself as a second reviewer to a complaint
+
+#  Scenario: a user cannot change the reviewer on a COMPLETED entry
+#  Scenario: a user cannot change the second reviewer on a COMPLETED entry
