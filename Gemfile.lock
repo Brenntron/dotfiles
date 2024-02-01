@@ -92,7 +92,7 @@ GEM
       io-like (~> 0.3.0)
     atlassian-jwt (0.2.1)
       jwt (~> 2.1)
-    autoprefixer-rails (10.4.7.0)
+    autoprefixer-rails (10.4.13.0)
       execjs (~> 2)
     awesome_nested_set (3.5.0)
       activerecord (>= 4.0.0, < 7.1)
