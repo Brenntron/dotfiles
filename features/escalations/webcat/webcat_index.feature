@@ -171,3 +171,20 @@ Feature: Webcat complaints index
   # Scenario: user tries to submit bulk selected entries with Unchanged resolution
   # Scenario: user tries to submit bulk selected entries with Invalid resolution and a category
   # Scenario: user tries to submit bulk selected entries with Unchanged resolution and a category
+
+
+  # TODO - this does not work in testing env yet
+  # might need tweaks to testing browser
+#  @javascript
+#  Scenario: a user sees a pop-up window if they make changes to an entry but do not submit
+#    Given a user with role "webcat user" exists and is logged in
+#    And the following complaint entries exist:
+#      | id  | uri          | domain        | entry_type | status |
+#      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+#      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+#    And I goto "/escalations/webcat/complaints?f=NEW"
+#    And I wait for "2" seconds
+#    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+#    And I refresh the page
+#    And I wait for "3" seconds
+#    And take a screenshot

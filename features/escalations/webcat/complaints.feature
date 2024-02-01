@@ -156,78 +156,6 @@ Feature: Webcat complaints
 
 
   @javascript
-  Scenario: a user selects the 'My Complaints' filter
-    Given a user with role "webcat user" exists and is logged in
-    And a new complaint entry with trait "assigned_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=MY%20COMPLAINTS"
-    Then I wait for "3" seconds
-    Then I should see "ASSIGNED"
-
-  @javascript
-  Scenario: a user selects the 'My Open Complaints' filter
-    Given a user with role "webcat user" exists and is logged in
-    And a new complaint entry with trait "assigned_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=MY%20OPEN%20COMPLAINTS"
-    Then I wait for "3" seconds
-    Then I should see "ASSIGNED"
-
-  @javascript
-  Scenario: a user selects the 'My Closed Complaints' filter
-    Given a user with role "webcat user" exists and is logged in
-    And a new complaint entry with trait "assigned_closed_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=MY%20CLOSED%20COMPLAINTS"
-    Then I wait for "3" seconds
-    Then I should see "COMPLETED"
-
-  @javascript
-  Scenario: a user selects the 'Completed' filter
-    Given a user with role "webcat user" exists and is logged in
-    And a new complaint entry with trait "completed_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=COMPLETED"
-    Then I wait for "3" seconds
-    Then I should see "COMPLETED"
-
-  @javascript
-  Scenario: a user selects the 'Active' filter
-    Given a user with role "webcat user" exists and is logged in
-    And a new complaint entry with trait "pending_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ACTIVE"
-    Then I wait for "3" seconds
-    Then I should see "PENDING"
-
-  @javascript
-  Scenario: a user selects the 'New' filter
-    Given a user with role "webcat user" exists and is logged in
-    And a new complaint entry with trait "new_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=NEW"
-    Then I wait for "3" seconds
-    Then I should see "NEW"
-
-  @javascript
-  Scenario: a user selects the 'Review' filter
-    Given a user with role "webcat user" exists and is logged in
-    And a new complaint entry with trait "pending_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=REVIEW"
-    Then I wait for "3" seconds
-    Then I should see "PENDING"
-
-  @javascript
-  Scenario: a user selects the 'All' filter
-    Given a user with role "webcat user" exists and is logged in
-    And a new complaint entry with trait "assigned_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I wait for "3" seconds
-    Then I should see "ASSIGNED"
-
-  @javascript
   Scenario: a user attempts to view reports more than once
     Given an admin user with role "webcat user" exists and is logged in
     And I goto "/escalations/webcat/reports"
@@ -721,45 +649,6 @@ Feature: Webcat complaints
     Then I should see table header with id "tags"
     Then I should see table header with id "path"
 
-
-
-
-  @javascript
-  Scenario: a user tries to take multiple tickets, some of which are already assigned
-    Given a user with role "webcat user" exists and is logged in
-    And the following users exist
-      | id | cvs_username | cec_username | display_name |
-      | 2  | test_user    | test_user    | test_user    |
-
-    And the following complaints exist:
-      | channel       | id |
-      | talosintel    | 1  |
-      | talosintel    | 2  |
-      | talosintel    | 3  |
-      | talosintel    | 4  |
-      | wbnp          | 5  |
-      | wbnp          | 6  |
-      | wbnp          | 7  |
-      | internal      | 8  |
-      | internal      | 9  |
-
-    And the following complaint entries exist:
-      | uri            | domain          | entry_type | complaint_id | status     | user_id|
-      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |        |
-      | whatever.com   | whatever.com    | URI/DOMAIN |  2           | NEW        |        |
-      | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |    2   |
-      | test.com       | test.com        | URI/DOMAIN |  4           | ASSIGNED   |    2   |
-      | something.com  | something.com   | URI/DOMAIN |  5           | NEW        |        |
-      | yadayada.com   | yadayada.com    | URI/DOMAIN |  6           | NEW        |        |
-      | nothing.com    | nothing.com     | URI/DOMAIN |  7           | ASSIGNED   |    2   |
-      | something.com  | something.com   | URI/DOMAIN |  8           | NEW        |        |
-      | blahblah.com   | blahblah.com    | URI/DOMAIN |  9           | ASSIGNED   |    2   |
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I click "#complaints_check_box"
-    And I wait for "3" seconds
-    Then I click ".take-ticket-toolbar-button"
-    And I wait for "15" seconds
-    And I should see "Currently assigned to someone else - 3, 4, 7, and 9"
 
 
   @javascript

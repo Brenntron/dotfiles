@@ -634,3 +634,7 @@ Then(/^I accept the user prompt$/) do
   alert = page.driver.browser.switch_to.alert
   alert.accept
 end
+
+And(/^I refresh the page$/) do
+  page.driver.browser.navigate.refresh
+end
