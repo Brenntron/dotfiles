@@ -144,3 +144,30 @@ Feature: Webcat complaints index
     And I should see "REGISTRANT"
     And I should see "NAME SERVERS"
 
+  @javascript
+  Scenario: bulk submit submits all selected complaint entries
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+    And I fill in "input_cat_222-selectized" with "Education" and press enter
+    When I click "master-submit"
+    And I wait for "5" seconds
+    And I click "#bulk-submit-correct-btn"
+    And I wait for "5" seconds
+    And I should see "SUCCESS"
+    And I dismiss modal "#msg-modal" if needed
+    And I wait for "5" seconds
+    Then I should not see "food.com"
+    And I should not see "blah.com"
+
+#    TODO
+#  Scenario: user tries to submit bulk selected entries with Fixed resolution that do not have a category
+#  Scenario: user tries to submit bulk selected entries with Invalid resolution
+  # Scenario: user tries to submit bulk selected entries with Unchanged resolution
+  # Scenario: user tries to submit bulk selected entries with Invalid resolution and a category
+  # Scenario: user tries to submit bulk selected entries with Unchanged resolution and a category

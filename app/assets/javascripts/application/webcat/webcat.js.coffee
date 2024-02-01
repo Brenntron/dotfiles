@@ -583,15 +583,19 @@ load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status)
           store_entry_changes(entry_id, 'submit')
           if verifyMasterSubmit() == true
             $('#master-submit').prop('disabled', false)
+            window.prevent_close('true')
           else
             $('#master-submit').prop('disabled', true)
+            window.prevent_close()
       onItemRemove: ->
         unless entry_status == 'PENDING'
           store_entry_changes(entry_id, 'submit')
           if verifyMasterSubmit() == true
             $('#master-submit').prop('disabled', false)
+            window.prevent_close('true')
           else
             $('#master-submit').prop('disabled', true)
+            window.prevent_close()
       score: (input) ->
         #  Adding some customization for autofill
         #  restricting on certain cats to avoid accidental categorization
@@ -869,8 +873,14 @@ $ ->
       process_entry(entry_data)
       # submit for real
 
-
-
+  window.prevent_close = (prevent) ->
+    if prevent == 'true'
+      window.onbeforeunload = (e) ->
+        e.preventDefault()
+        e = e || window.event
+        e.returnValue = ''
+    else
+      window.onbeforeunload = null
 
   # webcat > complaints index, ensure this JS gets called
   if $('body').hasClass('escalations--webcat--complaints-controller') && $('body').hasClass('show-action')

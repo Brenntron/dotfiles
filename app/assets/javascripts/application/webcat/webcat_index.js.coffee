@@ -8,10 +8,6 @@ $ ->
     url = $('#complaints-index').data('source')
     build_complaints_table(url)
 
-    # simple way of preventing user from accidentally closing tab/window
-    # TODO - this needs to be redone - it gets triggered on everything
-#    window.onbeforeunload = (e) ->
-#      e.preventDefault()
 
 #### New complaints index table setup
 build_complaints_table = (url) ->
