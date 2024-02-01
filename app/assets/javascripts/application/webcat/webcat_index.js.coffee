@@ -363,7 +363,7 @@ build_complaints_table = (url) ->
 
           whois_url = full.domain || full.ip_address
           whois_button =
-            '<button class="whois-button" id="domain-' + full.entry_id + '" ' +
+            '<button class="whois-button" id="whois-' + full.entry_id + '" ' +
               'onclick="WebCat.RepLookup.whoIsLookup(\'' + whois_url + '\')"></button>'
 
           lookup_url = full.subdomain + '.' + full.domain || full.ip_address

@@ -130,3 +130,17 @@ Feature: Webcat complaints index
     And I should see "COMPLAINT ENTRY HISTORY"
     And I should see "XBRS TIMELINE"
 
+  @javascript
+  Scenario: user should retrieve ICANN whois data for complaint entries on the webcat/complaints index page.
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id|  domain      | status |
+      |1 | food.com     |  NEW   |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#whois-1"
+    And I wait for the ajax request to finish
+    Then I should see "DOMAIN NAME"
+    And I should see "FOOD.COM"
+    And I should see "REGISTRANT"
+    And I should see "NAME SERVERS"
+
