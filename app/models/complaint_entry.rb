@@ -122,17 +122,22 @@ class ComplaintEntry < ApplicationRecord
   def return_complaint(current_user, assignment_type)
     return("Already completed") if status == 'COMPLETED'
 
-    case assignment_type
-    when 'assignee'
-      return("Not yet assigned") if user.display_name == 'Vrt Incoming'
+    if self.user != User.where(display_name: 'Vrt Incoming').first
+      if status == STATUS_COMPLETED
+        return("Already completed")
+      end
+      # TODO: refactor nested if statements
+      case assignment_type
+      when 'assignee'
+        return("Not yet assigned") if user.display_name == 'Vrt Incoming'
 
-      if !is_important
-        return("Currently assigned to someone else") if user.id != current_user.id
+        if !is_important
+          return("Currently assigned to someone else") if user.id != current_user.id
 
-        update(user: User.vrtincoming, status: "NEW")
-        complaint.set_status("NEW")
-      elsif is_important && status != "PENDING"
-        update(user: User.vrtincoming, status: "NEW")
+          update(user: User.vrtincoming, status: "NEW")
+          complaint.set_status("NEW")
+        elsif is_important && status != "PENDING"
+          update(user: User.vrtincoming, status: "NEW")
         complaint.set_status("NEW")
       else
         return("Status is pending")
