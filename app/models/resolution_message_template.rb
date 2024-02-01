@@ -20,11 +20,13 @@ class ResolutionMessageTemplate < ApplicationRecord
   scope :for_email_disputes, -> { where(ticket_type: 'EmailDispute')}
   scope :for_file_reputation_disputes, -> { where(ticket_type: 'FileReputationDispute')}
   scope :for_sdr_disputes, -> { where(ticket_type: 'SenderDomainReputationDispute')}
+  scope :for_webcat_disputes, -> { where(ticket_type: 'WebCategoryDispute')}
 
   scope :by_web_resolution_disputes, ->(resolution) { for_web_disputes.where(resolution_type: resolution)}
   scope :by_email_resolution_disputes, ->(resolution) { for_email_disputes.where(resolution_type: resolution)}
   scope :by_file_reputation_resolution_disputes, ->(resolution) { for_file_reputation_disputes.where(resolution_type: resolution)}
   scope :by_sdr_reputation_disputes, ->(resolution) { for_sdr_disputes.where(resolution_type: resolution)}
+  scope :by_webcat_resolution_disputes, ->(resolution) { for_webcat_disputes.where(resolution_type: resolution)}
 
 end
  

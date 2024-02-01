@@ -74,7 +74,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           updated_at:                   file_rep.updated_at,
           status:                       file_rep.status,
           resolution:                   file_rep.resolution,
-          assigned:                     file_rep.assigned&.cvs_username,
+          assigned:                     file_rep.assigned&.is_inactive? ? "#{file_rep.assigned&.cvs_username} (inactive)" : file_rep.assigned&.cvs_username,
           file_name:                    file_rep.file_name,
           file_size:                    file_rep.bytes_to_kb,
           sha256_hash:                  file_rep.sha256_hash,
