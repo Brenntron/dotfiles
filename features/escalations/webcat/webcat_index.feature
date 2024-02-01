@@ -124,7 +124,7 @@ Feature: Webcat complaints index
       | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    | 0.0        |
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "2" seconds
-    And I click "#history-111"
+    And I click "#entry-history-111"
     And I wait for "2" seconds
     And I should see "History Information"
     And I should see "COMPLAINT ENTRY HISTORY"

@@ -358,7 +358,7 @@ build_complaints_table = (url) ->
         render: (data, type, full, meta) ->
           history_url = full.uri || full.ip_address
           history_button =
-            '<button class="history-button" id="history-' + full.entry_id + '" ' +
+            '<button class="history-button" id="entry-history-' + full.entry_id + '" ' +
               'onclick="history_dialog(\'' + full.entry_id + '\', \'' + history_url + '\')"></button>'
 
           whois_url = full.domain || full.ip_address
