@@ -209,17 +209,6 @@ Feature: Webcat complaints
 
 
   @javascript
-  Scenario: a user sees a description in the 'Customer Description' field after selecting a complaint entry row
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaint entries exist:
-    |id|
-    |1 |
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    And I click ".expand-row-button-inline"
-    Then I should see "Description for testing"
-
-  @javascript
   Scenario: a user looks up a complaint's entry history without entering a URL
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"

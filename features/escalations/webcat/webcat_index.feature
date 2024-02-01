@@ -173,7 +173,9 @@ Feature: Webcat complaints index
   # Scenario: user tries to submit bulk selected entries with Unchanged resolution and a category
 
 
-  # TODO - this does not work in testing env yet
+
+
+  # TODO - this does not work in testing env yet - the pop up does not prevent refresh
   # might need tweaks to testing browser
 #  @javascript
 #  Scenario: a user sees a pop-up window if they make changes to an entry but do not submit

@@ -207,7 +207,7 @@ Feature: Webcat index filters
   # Scenario: a user selects the 'New Internal Tickets' and does not see closed internal tickets
   # Scenario: a user selects the 'New Internal Tickets' and does not see in progress internal tickets
 
-  
+
   @javascript
   Scenario: a user selects the 'Completed Tickets' filter and only sees tickets with status COMPLETED
     Given a user with role "webcat user" exists and is logged in
@@ -260,29 +260,54 @@ Feature: Webcat index filters
     And I should not see "gurl.com"
     And I should not see "twirl.com"
 
+  @javascript
+  Scenario: a user selects the 'Active Tickets' filter and does not see tickets with status 'NEW' or 'COMPLETED'
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id | uri            | domain          | entry_type |  status     | user_id |
+      |  1 | abc.com        | abc.com         | URI/DOMAIN |  ASSIGNED   |    1    |
+      |  2 | whatever.com   | whatever.com    | URI/DOMAIN |  PENDING    |    1    |
+      |  3 | purl.com       | purl.com        | URI/DOMAIN |  PENDING    |    2    |
+      |  4 | gurl.com       | gurl.com        | URI/DOMAIN |  COMPLETED  |    1    |
+      |  5 | twirl.com      | twirl.com       | URI/DOMAIN |  NEW        |         |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I should see "abc.com"
+    And I should see "whatever.com"
+    And I should see "purl.com"
+    And I should see "gurl.com"
+    And I should see "twirl.com"
+    And I click "#filter-complaints"
+    And I wait for "2" seconds
+    And I click "Active Tickets"
+    Then I wait for "6" seconds
+    Then I should see "abc.com"
+    And I should see "whatever.com"
+    And I should see "purl.com"
+    And I should not see "gurl.com"
+    And I should not see "twirl.com"
 
-
-
-
-
-#
-#  @javascript
-#  Scenario: a user selects the 'Active' filter
-#    Given a user with role "webcat user" exists and is logged in
-#    And a new complaint entry with trait "pending_entry" exists
-#    And a complaint entry preload exists
-#    And I goto "/escalations/webcat/complaints?f=ACTIVE"
-#    Then I wait for "3" seconds
-#    Then I should see "PENDING"
-#
-#
-
-#
-#  @javascript
-#  Scenario: a user selects the 'All' filter
-#    Given a user with role "webcat user" exists and is logged in
-#    And a new complaint entry with trait "assigned_entry" exists
-#    And a complaint entry preload exists
-#    And I goto "/escalations/webcat/complaints?f=ALL"
-#    Then I wait for "3" seconds
-#    Then I should see "ASSIGNED"
+  @javascript
+  Scenario: a user selects the 'All Tickets' filter and can see tickets of every status
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id | uri            | domain          | entry_type |  status     | user_id |
+      |  1 | abc.com        | abc.com         | URI/DOMAIN |  ASSIGNED   |    1    |
+      |  2 | whatever.com   | whatever.com    | URI/DOMAIN |  PENDING    |    1    |
+      |  3 | purl.com       | purl.com        | URI/DOMAIN |  PENDING    |    2    |
+      |  4 | gurl.com       | gurl.com        | URI/DOMAIN |  COMPLETED  |    1    |
+      |  5 | twirl.com      | twirl.com       | URI/DOMAIN |  NEW        |         |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I should not see "abc.com"
+    And I should not see "whatever.com"
+    And I should not see "purl.com"
+    And I should not see "gurl.com"
+    And I should see "twirl.com"
+    And I click "#filter-complaints"
+    And I wait for "2" seconds
+    And I click "All Tickets"
+    Then I wait for "6" seconds
+    And I should see "abc.com"
+    And I should see "whatever.com"
+    And I should see "purl.com"
+    And I should see "gurl.com"
+    And I should see "twirl.com"
