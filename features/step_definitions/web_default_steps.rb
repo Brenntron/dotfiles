@@ -14,7 +14,7 @@ Given(/^I fill in "(.*?)" with "(.*?)" and press enter$/) do |field_label, value
   find(:id, field_label).native.send_keys(:enter)
 end
 
-Given(/^I fill in element, "(.*?)" with "(.*?)"$/) do |identifier, value|
+Given(/^I fill in element "(.*?)" with "(.*?)"$/) do |identifier, value|
   page.find(identifier).set(value)
 end
 

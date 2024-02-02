@@ -84,7 +84,7 @@ Feature: Disputes index, Research tab
     Then I click "input[name='all attachments']"
     Then I click ".sdr-corpus-button"
     Then I click "input[name='email-category-1'][value='not ads']"
-    Then I fill in element, "input[name='subject-1']" with "Test Subject"
+    Then I fill in element "input[name='subject-1']" with "Test Subject"
     Then I click checkbox with name "tag-bulk-1"
     Then button with id "submitCorpus" should be enabled
     Then I click "#submitCorpus"
