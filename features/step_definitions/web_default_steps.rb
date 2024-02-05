@@ -634,3 +634,7 @@ Then(/^I accept the user prompt$/) do
   alert = page.driver.browser.switch_to.alert
   alert.accept
 end
+
+When(/^I click element with tag "(.*?)" and text "(.*?)"$/) do |tag, text|
+  page.find(tag, text: text).click
+end
