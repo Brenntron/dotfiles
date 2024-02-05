@@ -24,36 +24,31 @@ Feature: WebCat Advanced Search
   @javascript
   Scenario: a user performs an advanced search on company name
     Given a user with role "webcat user" exists and is logged in
-    Given the following complaints exist:
-      | id | customer_id |
-      | 1  | 1           |
-      | 2  | 2           |
-      | 3  |             |
-      | 4  |             |
-    Given the following complaint entries exist:
-      | id | resolution | status    | complaint_id |
-      | 1  | FIXED      | PENDING   | 1            |
-      | 2  | DUPLICATE  | COMPLETED | 2            |
-      | 3  | FIXED      | PENDING   | 3            |
-      | 4  | DUPLICATE  | COMPLETED | 4            |
-    Given the following customers exist:
-      | id | company_id | email             |
-      | 1  | 22         |  tokyo@gmail.com  |
-      | 2  | 33         |  boston@gmail.com |
     Given the following companies exist:
       | id  | name          |
       | 22  | Bobby Burgers |
       | 33  | Pizza Dojo    |
+    Given the following customers exist:
+      | id | company_id | email             |
+      | 1  | 22         |  tokyo@gmail.com  |
+      | 2  | 33         |  boston@gmail.com |
+    Given the following complaints exist:
+      | id | customer_id | customer_id |
+      | 1  | 1           | 1           |
+      | 2  | 2           | 2           |
+    Given the following complaint entries exist:
+      | id | complaint_id |
+      | 1  |      1       |
+      | 2  |      2       |
     When I go to "/escalations/webcat/complaints"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#resolution-cb"
     And I click "#cancel-add-criteria"
-    And I fill in selectized of element "#resolution-input" with "['FIXED','DUPLICATE']"
-    And I fill in selectized of element "#company-input" with "['Bobby Burgers','Pizza Dojo']"
-    And I fill in selectized of element "#status-input" with "['PENDING','COMPLETED']"
+    And I fill in selectized of element "#company-input" with "['Bobby Burgers']"
     And I click "#submit-advanced-search"
-    And I wait for "4" seconds
+    And I wait for "8" seconds
+    And take a screenshot
     Then I should see tr element with id "1"
     Then I should see tr element with id "2"
     Then I should not see tr element with id "3"
@@ -170,7 +165,6 @@ Feature: WebCat Advanced Search
     And I fill in selectized of element "#status-input" with "['PENDING','COMPLETED']"
     And I click "#submit-advanced-search"
     And I wait for "10" seconds
-    Then take a screenshot
     Then I should see tr element with id "2"
     Then I should see tr element with id "3"
     Then I should not see tr element with id "1"

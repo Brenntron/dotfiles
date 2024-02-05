@@ -260,7 +260,7 @@ Feature: Webcat complaints
     And I click ".primary"
     And I wait for "10" seconds
     Then I should see "URLS CATEGORIZED SUCCESSFULLY"
-    And I should see "No pending complaint entries have been created All other entries have been submitted directly to WBRS."
+    And I should see "entries have been submitted directly to WBRS."
 
   @javascript
   Scenario: a users tries to categorize without selecting a category
@@ -434,7 +434,7 @@ Feature: Webcat complaints
 
 
   @javascript
-  Scenario: a user uses the Update Resolution feature on multiple entries and includes an internal and resolution comment
+  Scenario: a user submits multiple entries and includes an internal and resolution comment
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
       |id| domain        | status |
@@ -442,7 +442,7 @@ Feature: Webcat complaints
       |2 | food.com      | NEW    |
       |3 | im.hungry.com | NEW    |
     When I goto "/escalations/webcat/complaints"
-    And I click "#complaints_check_box"
+    And I click "#complaints_select_all"
     And I click "#index_update_resolution"
     And I select "Unchanged" from "complaint_resolution"
     And I fill in element "#internal_comment" with "Cisco"

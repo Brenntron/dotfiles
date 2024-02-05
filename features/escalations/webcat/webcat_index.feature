@@ -144,6 +144,8 @@ Feature: Webcat complaints index
     And I should see "REGISTRANT"
     And I should see "NAME SERVERS"
 
+
+  # Bulk Submit tests #
   @javascript
   Scenario: bulk submit submits all selected complaint entries
     Given a user with role "webcat user" exists and is logged in
@@ -165,6 +167,8 @@ Feature: Webcat complaints index
     Then I should not see "food.com"
     And I should not see "blah.com"
 
+
+
 #    TODO
 #  Scenario: user tries to submit bulk selected entries with Fixed resolution that do not have a category
 #  Scenario: user tries to submit bulk selected entries with Invalid resolution
@@ -177,16 +181,173 @@ Feature: Webcat complaints index
 
   # TODO - this does not work in testing env yet - the pop up does not prevent refresh
   # might need tweaks to testing browser
-#  @javascript
-#  Scenario: a user sees a pop-up window if they make changes to an entry but do not submit
-#    Given a user with role "webcat user" exists and is logged in
-#    And the following complaint entries exist:
-#      | id  | uri          | domain        | entry_type | status |
-#      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
-#      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
-#    And I goto "/escalations/webcat/complaints?f=NEW"
-#    And I wait for "2" seconds
-#    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+  @javascript
+  Scenario: a user sees a pop-up window if they make changes to an entry but do not submit
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+    And pending
 #    And I refresh the page
 #    And I wait for "3" seconds
 #    And take a screenshot
+
+
+  @javascript
+  Scenario: a users tries to fetch complaints
+    Given a user with role "webcat user" exists and is logged in
+    And PeakeBridge poll is stubbed
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#fetch"
+    Then I wait for "3" seconds
+    Then I should see "COMPLAINT UPDATES REQUESTED FROM TALOS-INTELLIGENCE."
+
+  @javascript
+  Scenario: a users tries to fetch WBNP data
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#fetch_wbnp"
+    And I wait for "10" seconds
+    Then I should see content "Active" within ".wbnp-report-status"
+
+
+
+  # Submitting individual entries ###############
+
+  @javascript
+  Scenario: a user submits an individual entry with a new category and a Fixed resolution
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I fill in selectized of element "#input_cat_111" with "['77']"
+    And I click "#submit_changes_111"
+    And I wait for "2" seconds
+    And I should see "Submitted"
+    And I refresh the page
+    And I should not see "food.com"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I should see "Alcohol"
+    And I wait for "6" seconds
+
+
+  @javascript
+  Scenario: a user submits an individual entry with a changed category and a Fixed resolution
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | url_primary_category | category               |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    | Health and Nutrition | Health and Nutrition   |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |                      |                        |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "25" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And pending
+  # TODO - this is not loading the existing category, not sure why
+#    And I fill in selectized of element "#input_cat_111" with "['77']"
+#    And I click "#submit_changes_111"
+#    And I wait for "2" seconds
+#    And I should see "Submitted"
+#    And I refresh the page
+#    And I should not see "food.com"
+#    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+#    And I should see "Alcohol"
+
+
+  @javascript
+  Scenario: a user cannot submit an individual entry with no categories and a Fixed resolution
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "MUST INCLUDE AT LEAST ONE CATEGORY"
+
+
+  @javascript
+  Scenario: a user submits an individual entry with an Unchanged resolution, and tries to add a new category that will not be saved
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#unchanged111"
+    And I fill in selectized of element "#input_cat_111" with "['77']"
+    And I should see "Alcohol"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I refresh the page
+    And I should not see "Alcohol"
+
+  @javascript
+  Scenario: a user cannot submit an individual entry with an Invalid resolution and a new category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#invalid111"
+    And I fill in selectized of element "#input_cat_111" with "['77']"
+    And I should see "Alcohol"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "CANNOT INCLUDE CATEGORIES WITH AN INVALID RESOLUTION"
+
+
+  @javascript
+  Scenario: a user submits a non-high traffic entry and it gets resolved and does not go into PENDING
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | is_important |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |      0       |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |      0       |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#unchanged111"
+    And I click "#submit_changes_111"
+    And I wait for "10" seconds
+    And take a screenshot
+    And I should see "Submitted"
+    And I fill in selectized of element "#input_cat_222" with "['77']"
+    And I click "#submit_changes_222"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I should see "food.com"
+    And I should see "blah.com"
+
+
+
+  # Scenario: a user cannot submit an individual entry with no changes to categories and a Fixed resolution
+  # Scenario: a user submits an individual entry with no category changes and an Unchanged resolution
+  # Scenario: a user submits an individual entry with no category changes and an Invalid resolution
+
+  # Scenario: a user submits a high traffic entry and it goes into PENDING
+
+  # Scenario: a reviewer commits a PENDING entry
+  # Scenario: a reviewer ...

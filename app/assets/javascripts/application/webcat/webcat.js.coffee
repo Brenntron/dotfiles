@@ -719,29 +719,23 @@ fetch_external_categories = (entry_id) ->
 # Sending individual entry info to the backend
 process_entry = (entry_data) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
-  # If resolution is set to fixed, make sure it has categories applied
-  if entry_data.categories == null && entry_data.status == "FIXED"
-    std_msg_error("Must include at least one category.","", reload: false)
-  else if entry_data.status == "INVALID" && entry_data.categories != null
-    std_msg_error("Cannot include categories with an INVALID resolution.", "", reload: false)
-  else
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
-      method: 'POST'
-      headers: headers
-      data: entry_data
-      success: (response) ->
-        data = $.parseJSON(response)
-        msg = $('#' + data.entry_id + ' .temp-msg')
-        $(msg).text('Submitted. Refresh to see new results.')
-        $(msg).addClass('submitted-row')
-        remove_entry_from_changes(data.entry_id, 'submit')
-      error: (response) ->
-        debugger
-        msg = response.resonseJSON.error
-        std_msg_error("Error submitting entries",msg, reload: false)
-    , this)
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
+    method: 'POST'
+    headers: headers
+    data: entry_data
+    success: (response) ->
+#      debugger
+      data = $.parseJSON(response)
+      msg = $('#' + data.entry_id + ' .temp-msg')
+      $(msg).text('Submitted. Refresh to see new results.')
+      $(msg).addClass('submitted-row')
+      remove_entry_from_changes(data.entry_id, 'submit')
+    error: (response) ->
+      debugger
+      msg = response.resonseJSON.error
+      std_msg_error("Error submitting entries", msg, reload: false)
+  , this)
 
 
 # Sending individual reviewed (PENDING) entry info to the backend
@@ -844,19 +838,6 @@ $ ->
       category_names.push($(this).text())
     category_names = category_names.toString()
 
-    # need number of cols for replacement temp col
-    visible_cols = $('#complaints-index thead th').length
-
-    # gets submission row height, then assigns it so it won't change
-    row_height = $(row).height()
-    $(row).css('height', row_height + 'px')
-    $(row).empty()
-    $(row).addClass('submitting-entry')
-
-    temp_msg = '<h3 class="temp-msg">Submitting entry...</h3>'
-    fin_msg = '<h3 class="temp-msg submitted-entry">Submitted entry. Refresh page to see results</h3>'
-    $(row).append('<td colspan="' + visible_cols + '">' + temp_msg + '</td>')
-
     entry_data = {
       'id': entry_id,
       'prefix': uri,
@@ -867,11 +848,34 @@ $ ->
       'resolution_comment': resolution,
       'uri_as_categorized': uri
     }
+
+    # check data here before submitting
+    # If resolution is set to fixed, make sure it has categories applied
+    if entry_data.categories == null && entry_data.status == "FIXED"
+      std_msg_error("Must include at least one category.","", reload: false)
+      return
+    else if entry_data.status == "INVALID" && entry_data.categories != null
+      std_msg_error("Cannot include categories with an INVALID resolution.", "", reload: false)
+      return
+
+    # need number of cols for replacement temp col
+    visible_cols = $('#complaints-index thead th').length
+
+    # gets submission row height, then assigns it so it won't change
+    row_height = $(row).height()
+    $(row).css('height', row_height + 'px')
+    $(row).empty()
+    $(row).addClass('submitting-entry')
+
+    temp_msg = '<h3 class="temp-msg">Submitting entry...</h3>'
+    $(row).append('<td colspan="' + visible_cols + '">' + temp_msg + '</td>')
+
     if curr_status == 'PENDING'
       process_review(entry_data)
     else
       process_entry(entry_data)
       # submit for real
+
 
   window.prevent_close = (prevent) ->
     if prevent == 'true'
