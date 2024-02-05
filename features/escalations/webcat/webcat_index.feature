@@ -299,6 +299,30 @@ Feature: Webcat complaints index
     And I refresh the page
     And I should not see "Alcohol"
 
+
+  # TODO - backend is throwing an error and looking for a category when one should not be required
+  @javascript
+  Scenario: a user correctly submits an individual entry with an Unchanged resolution and no category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#unchanged111"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "Submitted"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should not see "blah.com"
+
+
   @javascript
   Scenario: a user cannot submit an individual entry with an Invalid resolution and a new category
     Given a user with role "webcat user" exists and is logged in
@@ -318,9 +342,29 @@ Feature: Webcat complaints index
     And I wait for "5" seconds
     And I should see "CANNOT INCLUDE CATEGORIES WITH AN INVALID RESOLUTION"
 
+  @javascript
+  Scenario: a user correctly submits an individual entry with an Invalid resolution and no category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#invalid111"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "Submitted"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should not see "blah.com"
 
   @javascript
-  Scenario: a user submits a non-high traffic entry and it gets resolved and does not go into PENDING
+  Scenario: a user submits a non-high traffic entry and it gets resolved and does not go into the Review queue
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
       | id  | uri          | domain        | entry_type | status | is_important |
@@ -332,22 +376,57 @@ Feature: Webcat complaints index
     And I should see "blah.com"
     And I click "#unchanged111"
     And I click "#submit_changes_111"
-    And I wait for "10" seconds
+    And I wait for "5" seconds
     And take a screenshot
     And I should see "Submitted"
     And I fill in selectized of element "#input_cat_222" with "['77']"
     And I click "#submit_changes_222"
+    And I wait for "5" seconds
     Then I goto "/escalations/webcat/complaints?f=COMPLETED"
     And I should see "food.com"
     And I should see "blah.com"
+    Then I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And I should not see "food.com"
+    And I should not see "blah.com"
 
+
+  @javascript
+  Scenario: a user submits a high traffic (important) entry and it goes into the Review queue
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | is_important |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |      1       |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |      1       |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I fill in selectized of element "#input_cat_222" with "['77']"
+    And I click "#submit_changes_222"
+    Then I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And I should not see "food.com"
+    And I should see "blah.com"
+
+  @javascript
+  Scenario: a reviewer commits a PENDING entry
+    Given a user with role "webcat manager" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status     |
+      | 111 | food.com     | food.com      | URI/DOMAIN | PENDING    |
+    And a complaint entry preload exists
+    When I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And pending
+    And take a screenshot
 
 
   # Scenario: a user cannot submit an individual entry with no changes to categories and a Fixed resolution
   # Scenario: a user submits an individual entry with no category changes and an Unchanged resolution
   # Scenario: a user submits an individual entry with no category changes and an Invalid resolution
 
-  # Scenario: a user submits a high traffic entry and it goes into PENDING
-
+# a non-manager can view pending entries
+  # a non-manager cannot commit pending entries
   # Scenario: a reviewer commits a PENDING entry
   # Scenario: a reviewer ...

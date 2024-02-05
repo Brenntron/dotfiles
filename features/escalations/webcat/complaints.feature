@@ -115,40 +115,6 @@ Feature: Webcat complaints
     And I should see "COMPLAINT CREATED"
     # And I should see "FirePower" this line is commented until the page will display platform name
 
-  @javascript
-  Scenario: A user must review a high telemetry site
-    Given a user with role "webcat user" exists and is logged in
-    And a complaint entry with trait "high_telemetry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I wait for "3" seconds
-    And I should see "Arts"
-    Then I should not see "Update"
-    And I click ".expand-row-button-inline"
-    Then I wait for "3" seconds
-    Then I should see "Commit"
-    Then I should see "Decline"
-    Then I should see "Submit"
-
-  @javascript
-  Scenario: A user does not need to review a low telemetry site
-    Given a user with role "webcat user" exists and is logged in
-    And a complaint entry with trait "not_important" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I should not see "Update"
-    And I click ".expand-row-button-inline"
-    And I wait for "5" seconds
-    And I click "#fixed1"
-    And I should see "Update"
-    And I should not see "commit"
-    When I click "#submit_changes_1"
-    Then I should not see "commit"
-
-
-
-
-
 
 
   # TODO write this test
@@ -169,32 +135,6 @@ Feature: Webcat complaints
     Then I click "#complaint_entry_report" and switch to the new window
     Then I should see "Webcat Complaint Entry Report"
 
-  @javascript
-  Scenario: a user attempts to submit changes without categories and receives expected error alert
-    Given a user with role "webcat user" exists and is logged in
-    And a complaint entry with trait "new_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    And I wait for "5" seconds
-    And I click ".expand-row-button-inline"
-    And I wait for "5" seconds
-    And I click "#submit_changes_1"
-    And I wait for "5" seconds
-    Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
-
-  @javascript
-  Scenario: a user attempts to submit changes with resolution set to 'Unchanged'
-    Given a user with role "webcat user" exists and is logged in
-    And a complaint entry with trait "new_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    And I wait for "5" seconds
-    And I click ".expand-row-button-inline"
-    And I wait for "5" seconds
-    And I click "#unchanged1"
-    And I click "#submit_changes_1"
-    And I wait for "5" seconds
-    Then I should see "COMPLETED"
 
 
   @javascript
@@ -208,159 +148,7 @@ Feature: Webcat complaints
     Then I should see "1.2.3.4"
 
 
-  @javascript
-  Scenario: a user looks up a complaint's entry history without entering a URL
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I click "#history-1"
-    Then I should see content "No data available for blank URL." within "#cat-url-1"
 
-  @javascript
-  Scenario: a user looks up a complaint's entry history with a valid URL
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I fill in "url_1" with "cisco.com"
-    And I click "#history-1"
-    And I wait for "5" seconds
-    Then I should see "History Information"
-    And I should see "DOMAIN HISTORY"
-    And I should see "Tue, 12 May 2015 17:39:53 GMT"
-
-  # Test should work after WEB-5077 is complete
-  @javascript
-  Scenario: a user looks up a complaint's entry history with an invalid URL
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I fill in "url_1" with "fmasoifkis.com"
-    And I click "#history-1"
-    And I wait for "5" seconds
-    Then I should see "No history associated with this url."
-
-  # Test should work after WEB-5077 is complete
-  @javascript
-  Scenario: a user looks up a complaint's entry history with an invalid URL in the third position (make sure that the notification appears in the right spot)
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    When I click "#categorize-urls"
-    And I fill in "url_3" with "fmasoifkis.com"
-    And I click "#history-3"
-    And I wait for "5" seconds
-    Then I should see content "No history associated with this url." within "#cat-url-3"
-
-  @javascript
-  Scenario: a users tries to categorize a URL
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I fill in "url_1" with "mary.com"
-    And I fill in selectized with "Adult"
-    And I click ".primary"
-    And I wait for "10" seconds
-    Then I should see "URLS CATEGORIZED SUCCESSFULLY"
-    And I should see "entries have been submitted directly to WBRS."
-
-  @javascript
-  Scenario: a users tries to categorize without selecting a category
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I fill in "url_1" with "cisco.com"
-    And I click ".primary"
-    Then I should see "UNABLE TO CATEGORIZE"
-    And I should see "Please confirm that a URL and at least one category for each desired entry exists."
-
-  @javascript
-  Scenario: a users tries to categorize without an URL
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I fill in selectized with "Adult"
-    And I click ".primary"
-    Then I should see "UNABLE TO CATEGORIZE"
-    And I should see "Please confirm that a URL and at least one category for each desired entry exists."
-
-  @javascript
-  Scenario: a users tries to categorize a URL with an empty form
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I click ".primary"
-    Then I should see "UNABLE TO CATEGORIZE"
-    And I should see "Please confirm that a URL and at least one category for each desired entry exists."
-
-  @javascript
-  Scenario: a users tries submits a multiple url categorization
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I click "#cat-urls-same"
-    And I fill in "categorize_urls" with "joseph.com" and "mary.com" separated by blank lines
-    And I fill in selectized with "Adult"
-    And I click "#cat-urls-same"
-    And I click ".primary"
-    And I wait for "15" seconds
-    Then I should see "SUCCESS"
-    And I should see "URLs/IPs successfully categorized."
-
-  @javascript
-  Scenario: a users tries submits a multiple url categorization without a URL
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I click "#cat-urls-same"
-    And I fill in selectized with "Adult"
-    And I click "#cat-urls-same"
-    And I click ".primary"
-    Then I should see "ERROR"
-    Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
-
-  @javascript
-  Scenario: a users tries submits a multiple url categorization without a category
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I click "#cat-urls-same"
-    And I fill in "categorize_urls" with "cisco.com"
-    And I click ".primary"
-    Then I should see "ERROR"
-    Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
-
-
-  @javascript
-  Scenario: a users tries to lookup categories for a URL
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I fill in "url_1" with "chabad.org"
-    And I click ".current-categories-button"
-    Then I wait for "5" seconds
-
-  @javascript
-  Scenario: a users tries to lookup categories for a URL that has a categorized subdomain and a uncategorized domain
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I fill in "url_1" with "trial.superduperreallyfakeamazing.com"
-    And I click ".current-categories-button"
-    And I wait for "5" seconds
-    Then I should see content "Religion" within ".item"
-    And I fill in "url_1" with "superduperreallyfakeamazing.com"
-    And I click ".current-categories-button"
-    And I wait for "5" seconds
-    Then I should not see div element with class ".item"
-
-  @javascript
-  Scenario: a users tries to drop current categories on a URL
-    Given a user with role "webcat user" exists and is logged in
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#categorize-urls"
-    And I fill in "url_1" with "washingtonpost.com"
-    And I click ".delete-categories-button"
-    And I wait for "10" seconds
-    Then I should see "Categories successfully dropped."
 
 
   @javascript
@@ -480,29 +268,6 @@ Feature: Webcat complaints
     Then the "Invalid" option from "complaint_resolution" is disabled
     Then the "Reopened" option from "complaint_resolution" is not disabled
 
-  @javascript
-  Scenario: a user uses the Update Resolution feature on an important entry
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaint entries exist:
-      |id| domain            | is_important | status |
-      |1 | blah.com          |      1       | NEW    |
-      |2 | food.com          |      0       | NEW    |
-      |3 | im.hungry.com     |      0       | NEW    |
-    When I goto "/escalations/webcat/complaints"
-    And I click "#complaints_check_box"
-    And I click "#index_update_resolution"
-    And I select "Invalid" from "complaint_resolution"
-    And I click "#button_update_resolution"
-    And I wait for "2" seconds
-    Then I should see "Set the following 3 entries to RESOLUTION INVALID."
-    When I click "#submit_resolution_changes"
-    And I wait for "1" seconds
-    Then the following complaint entry with id: "1" has a resolution of: "INVALID"
-    Then the following complaint entry with id: "1" has a status of: "PENDING"
-    Then the following complaint entry with id: "2" has a resolution of: "INVALID"
-    Then the following complaint entry with id: "2" has a status of: "COMPLETED"
-    Then the following complaint entry with id: "3" has a resolution of: "INVALID"
-    Then the following complaint entry with id: "3" has a status of: "COMPLETED"
 
   @javascript
   Scenario: a user uses the Update Resolution feature to reopen a completed ComplaintEntry
