@@ -521,7 +521,7 @@ window.jira_assignee_hub = (type) ->
       selected_rows.push( $(entry).closest('tr') )
 
   if entry_ids.length > 0
-    data = {'complaint_entry_ids': entry_ids}
+    data = {'complaint_entry_ids': entry_ids, 'assignment_type': 'assignee'}
     url = "/escalations/api/v1/escalations/webcat/complaint_entries/#{type}"
     err_msg = "Something Went Wrong:"
     succ_msg = "Entries successfully assigned"
