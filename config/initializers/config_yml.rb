@@ -155,6 +155,8 @@ Rails.configuration.rep_api             = ApiRequester::ApiRequester.config_of(r
 reversing_labs_config = env_config['reversing_labs']
 raise 'config.yml missing ReversingLabs section' unless reversing_labs_config
 Rails.configuration.reversing_labs      = ApiRequester::ApiRequester.config_of(reversing_labs_config)
+Rails.configuration.reversing_labs.local_api = reversing_labs_config['api_key']
+Rails.configuration.reversing_labs.local_url = reversing_labs_config['local_api_url']
 
 
 sds_config = env_config.fetch('sds', nil)
@@ -238,3 +240,8 @@ Rails.configuration.jira.auth_type      = jira_config['auth_type'].to_sym
 bast_config = env_config.fetch('bast', nil)
 raise 'config.yml missing bast section' unless bast_config
 Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)
+
+resolution_report_config = env_config.fetch('resolution_report', nil)
+raise 'config.yml missing resolution_report section' unless resolution_report_config
+Rails.configuration.resolution_report = OpenStruct.new
+Rails.configuration.resolution_report.cache_expiration = resolution_report_config['cache_expiration']

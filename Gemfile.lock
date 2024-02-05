@@ -1,6 +1,5 @@
-GIT
-  remote: https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git
-  revision: bc42826c08fce28b56b6eb66a1768d320d70191e
+PATH
+  remote: vendor/gems/peake-bridge-client
   specs:
     peake-bridge-client (0.2.0.2)
       curb (>= 0.9)
@@ -1507,7 +1506,7 @@ GEM
     aws-sigv2 (1.1.0)
     aws-sigv4 (1.6.0)
       aws-eventstream (~> 1, >= 1.0.2)
-    bcrypt (3.1.18)
+    bcrypt (3.1.19)
     bootstrap-multiselect-rails (0.9.9)
       rails (>= 4.0.0)
     bootstrap-sass (3.4.1)
@@ -1762,8 +1761,7 @@ GEM
     kaminari-core (1.1.1)
     launchy (2.4.3)
       addressable (~> 2.3)
-    libv8-node (18.16.0.0-arm64-darwin)
-    listen (3.8.0)
+    listen (3.7.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     llhttp-ffi (0.4.0)
@@ -2003,10 +2001,6 @@ GEM
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    whois (4.1.0)
-    whois-parser (2.0.0)
-      activesupport (>= 4)
-      whois (>= 4.1.0)
     will_paginate (3.3.1)
     with_advisory_lock (4.6.0)
       activerecord (>= 4.2)
@@ -2017,7 +2011,9 @@ GEM
     zeitwerk (2.6.8)
 
 PLATFORMS
-  arm64-darwin-22
+  amd64-freebsd-13
+  ruby
+  x86_64-darwin-22
 
 DEPENDENCIES
   active_model_serializers (= 0.10.12)
@@ -2088,7 +2084,7 @@ DEPENDENCIES
   net-ssh (= 5.0.2)
   nokogiri (= 1.15.3)
   paper_trail (= 12.0.0)
-  peake-bridge-client (~> 0.2.0.0)!
+  peake-bridge-client (= 0.2.0.2)!
   poltergeist (= 1.18.1)
   pry (= 0.12.2)
   pry-remote (~> 0.1.8)
@@ -2117,9 +2113,6 @@ DEPENDENCIES
   turbolinks (= 5.2.0)
   uglifier (= 4.1.20)
   uri (= 0.12.0)
-  webdrivers (= 5.2.0)
-  whois (= 4.1.0)
-  whois-parser (= 2.0)
   will_paginate (= 3.3.1)
   with_advisory_lock (~> 4.0)
   xmlrpc
@@ -2128,4 +2121,4 @@ RUBY VERSION
    ruby 3.0.4p208
 
 BUNDLED WITH
-   2.4.16
+   2.3.10
