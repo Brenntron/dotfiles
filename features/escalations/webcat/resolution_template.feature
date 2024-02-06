@@ -142,30 +142,60 @@ Feature: Webcat resolution template manager
 
 ###  webcat index table actions ###
 
-#  @javascript
-#  Scenario: A user can load the resolution templates using the actions in the bulk resolution tool
-#    Given a user with role "webcat user" exists and is logged in
-#
-#  @javascript
-#  Scenario: A user can load the resolution templates using the actions in the resolution column
-#    Given a user with role "webcat user" exists and is logged in
-#    And the following complaint entries exist:
-#      | id  | uri            | domain          | entry_type | status |
-#      | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    |
-#      | 222 | google.com     | google.com      | URI/DOMAIN | NEW    |
-#    And the following resolution message templates exist:
-#      |body                                   |resolution_type      |ticket_type                |name           |description        |
-#      |This is the first unchanged comment    |Unchanged            |WebCategoryDispute         |Unchanged - 01 |First Unchanged    |
-#      |This is the second unchanged comment   |Unchanged            |WebCategoryDispute         |Unchanged - 02 |Second Unchanged   |
-#      |This is the first invalid comment      |Invalid              |WebCategoryDispute         |Invalid - 01   |First Invalid      |
-#      |This is the second invalid comment     |Invalid              |WebCategoryDispute         |Invalid - 02   |Second Invalid     |
-#      |This is the first fixed comment        |Fixed                |WebCategoryDispute         |Fixed - 01     |First Fixed        |
-#      |This is the second fixed comment       |Fixed                |WebCategoryDispute         |Fixed - 02     |Second Fixed       |
-#    Then I goto "escalations/webcat/complaints"
-#    And I should see "abc.com"
-#    And I should see "google.com"
-#    Then I click "#resolution_comment_button111"
-#    And element with id "entry-email-response-to-customers_111" should contain a value of "This is the first fixed comment"
-#    And I click "#entry-email-response-to-customers-select_111"
-#    Then I click element with tag "option" and text "Fixed - 02"
-    #confirm textarea updates
+  @javascript
+  Scenario: A user can load the resolution templates using the actions in the resolution column
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri            | domain          | entry_type | status |
+      | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    |
+      | 222 | google.com     | google.com      | URI/DOMAIN | NEW    |
+    And the following resolution message templates exist:
+      |body                                   |resolution_type      |ticket_type                |name           |description        |
+      |This is the first unchanged comment    |Unchanged            |WebCategoryDispute         |Unchanged - 01 |First Unchanged    |
+      |This is the second unchanged comment   |Unchanged            |WebCategoryDispute         |Unchanged - 02 |Second Unchanged   |
+      |This is the first invalid comment      |Invalid              |WebCategoryDispute         |Invalid - 01   |First Invalid      |
+      |This is the second invalid comment     |Invalid              |WebCategoryDispute         |Invalid - 02   |Second Invalid     |
+      |This is the first fixed comment        |Fixed                |WebCategoryDispute         |Fixed - 01     |First Fixed        |
+      |This is the second fixed comment       |Fixed                |WebCategoryDispute         |Fixed - 02     |Second Fixed       |
+    Then I goto "escalations/webcat/complaints"
+    And I should see "abc.com"
+    And I should see "google.com"
+    Then I click "#resolution_comment_button111"
+    And element with id "entry-email-response-to-customers_111" should contain a value of "This is the first fixed comment"
+    And I click "#entry-email-response-to-customers-select_111"
+    Then I click element with tag "option" and text "Fixed - 02"
+    #todo: finish when fixes are in
+
+  @javascript
+  Scenario: A user can load the resolution templates using the bulk actions
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri            | domain          | entry_type | status |
+      | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    |
+      | 222 | google.com     | google.com      | URI/DOMAIN | NEW    |
+    And the following resolution message templates exist:
+      |body                                   |resolution_type      |ticket_type                |name           |description        |
+      |This is the first unchanged comment    |Unchanged            |WebCategoryDispute         |Unchanged - 01 |First Unchanged    |
+      |This is the second unchanged comment   |Unchanged            |WebCategoryDispute         |Unchanged - 02 |Second Unchanged   |
+      |This is the first invalid comment      |Invalid              |WebCategoryDispute         |Invalid - 01   |First Invalid      |
+      |This is the second invalid comment     |Invalid              |WebCategoryDispute         |Invalid - 02   |Second Invalid     |
+      |This is the first fixed comment        |Fixed                |WebCategoryDispute         |Fixed - 01     |First Fixed        |
+      |This is the second fixed comment       |Fixed                |WebCategoryDispute         |Fixed - 02     |Second Fixed       |
+    Then I goto "escalations/webcat/complaints"
+    And I should see "abc.com"
+    And I should see "google.com"
+    Then I click button "index_update_resolution"
+    And I should see element "#index_change_resolution_dialog"
+    #Unchanged is selected by default
+    And I should see the radio with id "webcat_resolution_unchanged_option" checked
+    And element with id "email-response-to-customers" should contain a value of "This is the first unchanged comment"
+    Then I click "#email-response-to-customers-select"
+    Then I click element with tag "option" and text "Unchanged - 02"
+    And element with id "email-response-to-customers" should contain a value of "This is the second unchanged comment"
+    #Select invalid radio
+    Then I click "#webcat_resolution_invalid_option"
+    And element with id "email-response-to-customers" should contain a value of "This is the first invalid comment"
+    Then I click "#email-response-to-customers-select"
+    Then I click element with tag "option" and text "Invalid - 02"
+    And element with id "email-response-to-customers" should contain a value of "This is the second invalid comment"
+
