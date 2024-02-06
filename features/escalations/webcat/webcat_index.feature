@@ -323,6 +323,31 @@ Feature: Webcat complaints index
 
 
   @javascript
+  Scenario: a user submits an individual entry with an Unchanged resolution that maintains its initial category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | url_primary_category | category               |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    | Health and Medicine  | Health and Medicine    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |                      |                        |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "5" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#unchanged111"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "Submitted"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "8" seconds
+    And I should see "food.com"
+    And pending
+    # TODO - why is this not loading the established category
+    And I should see "Health and Medicine"
+    And I should not see "blah.com"
+
+
+  @javascript
   Scenario: a user cannot submit an individual entry with an Invalid resolution and a new category
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
@@ -361,6 +386,7 @@ Feature: Webcat complaints index
     And I wait for "3" seconds
     And I should see "food.com"
     And I should not see "blah.com"
+
 
   @javascript
   Scenario: a user submits a non-high traffic entry and it gets resolved and does not go into the Review queue
@@ -411,16 +437,21 @@ Feature: Webcat complaints index
   @javascript
   Scenario: a reviewer commits a PENDING entry
     Given a user with role "webcat manager" exists and is logged in
-    And a complaint entry with trait "pending_entry" exists
-    And a complaint entry preload exists
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status     | url_primary_category | category              |
+      | 111 | food.com     | food.com      | URI/DOMAIN | PENDING    | Health and Medicine  | Health and Medicine   |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | PENDING    | Arts                 | Arts                  |
     When I goto "/escalations/webcat/complaints?f=REVIEW"
     And I wait for "3" seconds
+    And I click "#commit222"
+    And I click "#submit_changes_222"
+    And I wait for "2" seconds
     And take a screenshot
     And pending
 
 
 
-# TODO - unable to get current categories of entries to load, preventing tests from working
+
 
   # Scenario: a user cannot submit an individual entry with no changes to categories and a Fixed resolution
   # Scenario: a user submits an individual entry with no category changes and an Unchanged resolution
