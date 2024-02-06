@@ -305,10 +305,9 @@ class ComplaintEntry < ApplicationRecord
     # not important case or resolution is "unchanged"
     current_status = STATUS_COMPLETED
     self.case_assigned_at ||= Time.now
-    # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
     update!(resolution: entry_status,
-            url_primary_category: categories_string,
-            category: categories_string,
+            url_primary_category: category_names_string,
+            category: category_names_string,
             status: current_status,
             internal_comment: comment,
             resolution_comment: resolution_comment,
