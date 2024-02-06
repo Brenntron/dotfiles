@@ -445,9 +445,12 @@ Feature: Webcat complaints index
     And I wait for "3" seconds
     And I click "#commit222"
     And I click "#submit_changes_222"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
     And I wait for "2" seconds
-    And take a screenshot
-    And pending
+    And I should see "blah.com"
+    And I should see "Arts"
+    And I should not see "food.com"
+
 
 
 
@@ -481,11 +484,11 @@ Feature: Webcat complaints index
       | id | public_name       | internal_name     | webcat |
       | 1  | TalosIntelligence | TalosIntelligence |   1    |
     And the following complaints exist:
-      | id   | description        | customer_id | submitter_type | channel    |
-      | 5111 | weather            |      12     | CUSTOMER       | talosintel |
-      | 5112 | travel site        |      13     | CUSTOMER       | talosintel |
-      | 5113 | John Bly owns this |      14     | CUSTOMER       | talosintel |
-      | 5114 | Unknown origin     |      15     | CUSTOMER       | talosintel |
+      | id   | description        | customer_id | submitter_type | ticket_source      |
+      | 5111 | weather            |      12     | CUSTOMER       | talos-intelligence |
+      | 5112 | travel site        |      13     | CUSTOMER       | talos-intelligence |
+      | 5113 | John Bly owns this |      14     | CUSTOMER       | talos-intelligence |
+      | 5114 | Unknown origin     |      15     | CUSTOMER       | talos-intelligence |
     And the following complaint entries exist:
       | id   | complaint_id | uri                    | domain                | entry_type | status | platform_id |
       | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | NEW    |      1      |

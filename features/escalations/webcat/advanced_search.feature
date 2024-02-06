@@ -45,19 +45,18 @@ Feature: WebCat Advanced Search
       | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |      1002    |
     When I go to "/escalations/webcat/complaints"
     And I wait for "5" seconds
-    And take a screenshot
-#    And I click "#advanced-search-button"
-#    And I click "#add-search-items-button"
-#    And I click "#resolution-cb"
-#    And I click "#cancel-add-criteria"
-#    And I fill in selectized of element "#company-input" with "['Bobby Burgers']"
-#    And I click "#submit-advanced-search"
-#    And I wait for "8" seconds
-#
-#    Then I should see tr element with id "1"
-#    Then I should see tr element with id "2"
-#    Then I should not see tr element with id "3"
-#    Then I should not see tr element with id "4"
+#    And take a screenshot
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#resolution-cb"
+    And I click "#cancel-add-criteria"
+    And I fill in selectized of element "#company-input" with "['Bobby Burgers']"
+    And I click "#submit-advanced-search"
+    And I wait for "8" seconds
+    Then I should see tr element with id "1"
+    Then I should see tr element with id "2"
+    Then I should not see tr element with id "3"
+    Then I should not see tr element with id "4"
 
 
   @javascript
