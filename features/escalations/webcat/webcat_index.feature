@@ -245,22 +245,21 @@ Feature: Webcat complaints index
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
       | id  | uri          | domain        | entry_type | status | url_primary_category | category               |
-      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    | Health and Nutrition | Health and Nutrition   |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    | Health and Medicine  | Health and Medicine   |
       | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |                      |                        |
     When I goto "/escalations/webcat/complaints?f=NEW"
-    And I wait for "25" seconds
+    And I wait for "5" seconds
     And I should see "food.com"
     And I should see "blah.com"
-    And pending
-  # TODO - this is not loading the existing category, not sure why
-#    And I fill in selectized of element "#input_cat_111" with "['77']"
-#    And I click "#submit_changes_111"
-#    And I wait for "2" seconds
-#    And I should see "Submitted"
-#    And I refresh the page
-#    And I should not see "food.com"
-#    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
-#    And I should see "Alcohol"
+    And I fill in selectized of element "#input_cat_111" with "['77']"
+    And I wait for "3" seconds
+    And I click "#submit_changes_111"
+    And I wait for "2" seconds
+    And I should see "Submitted"
+    And I refresh the page
+    And I should not see "food.com"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I should see "Alcohol"
 
 
   @javascript
@@ -412,15 +411,16 @@ Feature: Webcat complaints index
   @javascript
   Scenario: a reviewer commits a PENDING entry
     Given a user with role "webcat manager" exists and is logged in
-    And the following complaint entries exist:
-      | id  | uri          | domain        | entry_type | status     |
-      | 111 | food.com     | food.com      | URI/DOMAIN | PENDING    |
+    And a complaint entry with trait "pending_entry" exists
     And a complaint entry preload exists
     When I goto "/escalations/webcat/complaints?f=REVIEW"
     And I wait for "3" seconds
-    And pending
     And take a screenshot
+    And pending
 
+
+
+# TODO - unable to get current categories of entries to load, preventing tests from working
 
   # Scenario: a user cannot submit an individual entry with no changes to categories and a Fixed resolution
   # Scenario: a user submits an individual entry with no category changes and an Unchanged resolution
@@ -430,3 +430,65 @@ Feature: Webcat complaints index
   # a non-manager cannot commit pending entries
   # Scenario: a reviewer commits a PENDING entry
   # Scenario: a reviewer ...
+
+
+
+  @javascript
+  Scenario: a user can show/hide columns in the webcat/complaints view
+    Given a user with role "webcat user" exists and is logged in
+    And the following companies exist:
+      | id | name                    |
+      | 5  | Gilligan's Co.          |
+      | 7  | Western Investigations  |
+    And the following customers exist:
+      | id | name                | company_id | email                    |
+      | 12 | Maryanne Summers    |     5      | msummers@islandtours.com |
+      | 13 | Ginger Grant        |     5      | ggrant@islandtours.com   |
+      | 14 | Brisco County, Jr.  |     7      | bcjr@wpi.com             |
+      | 15 | Dixie Cousins       |     7      | dxc@wpi.com              |
+    And the following platforms exist:
+      | id | public_name       | internal_name     | webcat |
+      | 1  | TalosIntelligence | TalosIntelligence |   1    |
+    And the following complaints exist:
+      | id   | description        | customer_id | submitter_type | channel    |
+      | 5111 | weather            |      12     | CUSTOMER       | talosintel |
+      | 5112 | travel site        |      13     | CUSTOMER       | talosintel |
+      | 5113 | John Bly owns this |      14     | CUSTOMER       | talosintel |
+      | 5114 | Unknown origin     |      15     | CUSTOMER       | talosintel |
+    And the following complaint entries exist:
+      | id   | complaint_id | uri                    | domain                | entry_type | status | platform_id |
+      | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | NEW    |      1      |
+      | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | NEW    |      1      |
+      | 9333 | 5113         | evilmastermind.com     | evilmastermind.com    | URI/DOMAIN | NEW    |      1      |
+      | 9444 | 5114         | timetravelingorb.com   | timetravelingorb.com  | URI/DOMAIN | NEW    |      1      |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And take a screenshot
+    When I click "#webcat-index-table-show-columns-button"
+    And I wait for "2" seconds
+
+
+
+  @javascript
+  Scenario: a user can ensure show/hide column states are saved in the database after a page reload
+    Given a user with role "webcat user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id | submitter_type |
+      | 1  | CUSTOMER       |
+    Then I goto "escalations/webcat/complaints"
+    And I wait for "2" seconds
+    And I click "#webcat-index-table-show-columns-button"
+    And I should see the ".subdomain-checkbox" checkbox checked
+    And I should see the ".assignee-checkbox" checkbox checked
+    And I click ".subdomain-checkbox"
+    And I click ".assignee-checkbox"
+    Then I should not see table header with id "subdomain"
+    Then I should not see table header with id "assignee"
+    Then I should see table header with id "tags"
+    Then I should see table header with id "path"
+    And I goto "escalations/webcat/complaints"
+    And I wait for "2" seconds
+    Then I should not see table header with id "subdomain"
+    Then I should not see table header with id "assignee"
+    Then I should see table header with id "tags"
+    Then I should see table header with id "path"
