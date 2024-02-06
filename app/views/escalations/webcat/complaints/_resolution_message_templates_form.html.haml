@@ -10,20 +10,20 @@
 
       %label.content-label-sm.resolution-modal-label Template Name
       - if current_user.has_role?('webcat manager')
-        %input#create-resolution-template-name.resolved-resolution-message-template-input.form-control.white-bg{type: 'text', name: 'name', required: true}
+        %input.resolved-resolution-message-template-input.form-control.white-bg{id: "#{local_assigns[:action]}-resolution-template-name", type: 'text', name: 'name', required: true}
       -else
         %p.resolution-template-name.resolution-template-lesser-permission-text
 
       %label.content-label-sm.resolution-modal-label Description (When should this be used?)
       - if current_user.has_role?('webcat manager')
-        %textarea#create-resolution-template-description.form-control.resolution-template-description.resolution-modal-textarea.white-bg{name: 'description', rows: 2}
+        %textarea.form-control.resolution-template-description.resolution-modal-textarea.white-bg{id: "#{local_assigns[:action]}-resolution-template-description", name: 'description', rows: 2}
       -else
         %p.resolution-template-description.resolution-template-lesser-permission-text
 
       %input.hidden{type: 'hidden', name: 'template-id'}
       %label.content-label-sm.resolution-modal-label Message to Customer
       - if current_user.has_role?('webcat manager')
-        %textarea#create-resolution-template-message.resolution-template-message.form-control.resolution-modal-textarea.white-bg{name: 'body', required: true, placeholder: 'Your Web Categorization Ticket...', rows: 9}
+        %textarea.resolution-template-message.form-control.resolution-modal-textarea.white-bg{id: "#{local_assigns[:action]}-resolution-template-message", name: 'body', required: true, placeholder: 'Your Web Categorization Ticket...', rows: 9}
       - else
         %p.resolution-template-message.resolution-template-lesser-permission-text
 
@@ -33,12 +33,12 @@
         %button#create-resolution-template-submit.primary{onclick: "create_resolution_message_template('webcat')", disabled: true}
           Create Template
       - else
-        %button.primary{onclick: "update_resolved_resolution_message_template('webcat')"}
+        %button#update-resolution-template-submit.primary{onclick: "update_resolved_resolution_message_template('webcat')"}
           Update Template
 
     - if current_user.has_role?('webcat manager')
-      %button.secondary{onclick: 'close_resolution_template_dialog()'}
+      %button.secondary{id: "#{local_assigns[:action]}-resolution-template-cancel", onclick: 'close_resolution_template_dialog()'}
         Cancel
     - else
-      %button.secondary{onclick: 'close_resolution_template_dialog()'}
+      %button#update-resolution-template-close.secondary{onclick: 'close_resolution_template_dialog()'}
         Close
