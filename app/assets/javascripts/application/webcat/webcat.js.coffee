@@ -725,14 +725,12 @@ process_entry = (entry_data) ->
     headers: headers
     data: entry_data
     success: (response) ->
-#      debugger
       data = $.parseJSON(response)
       msg = $('#' + data.entry_id + ' .temp-msg')
       $(msg).text('Submitted. Refresh to see new results.')
       $(msg).addClass('submitted-row')
       remove_entry_from_changes(data.entry_id, 'submit')
     error: (response) ->
-      debugger
       msg = response.resonseJSON.error
       std_msg_error("Error submitting entries", msg, reload: false)
   , this)
@@ -749,6 +747,7 @@ process_review = (entry_data) ->
       data: [entry_data]
     }
     success: (response) ->
+#      debugger
       data = $.parseJSON(response)
       msg = $('#' + data.entry_id + ' .temp-msg')
       $(msg).text('Submitted. Refresh to see new results.')
@@ -817,16 +816,20 @@ $ ->
   window.submit_changes = (entry_id) ->
     row = $('#' + entry_id)
     curr_status = $(row).attr('data-status')
+
+    # slight differences in data sent
     if curr_status == 'PENDING'
-      res = $('input[name=resolution_review' + entry_id+ ']:checked').val()
-    else
-      res = $('input[name=resolution' + entry_id + ']:checked').val()
+      status = ''
+      commit = $('input[name=resolution_review' + entry_id+ ']:checked').val()
       # we are disabling the button if ignore is checked, but just in case
-      if res == 'ignore'
+      if commit == 'ignore'
         return
+    else
+      commit = ''
+      status = $('input[name=resolution' + entry_id + ']:checked').val()
 
     comment = $('#internal_comment_' + entry_id).val()
-    resolution = $('#entry-email-response-to-customers_' + entry_id).text()
+    resolution_msg = $('#entry-email-response-to-customers_' + entry_id).text()
     uri = $('#edit_uri_input_' + entry_id).val()
     if $('#input_cat_'+entry_id).val() != null
       cat_ids = $('#input_cat_'+entry_id).val().toString()
@@ -843,9 +846,10 @@ $ ->
       'prefix': uri,
       'categories': cat_ids,
       'category_names': category_names,
-      'status': res,
+      'status': status,
+      'commit': commit,
       'comment': comment,
-      'resolution_comment': resolution,
+      'resolution_comment': resolution_msg,
       'uri_as_categorized': uri
     }
 

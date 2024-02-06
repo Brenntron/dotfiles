@@ -245,7 +245,7 @@ Feature: Webcat complaints index
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
       | id  | uri          | domain        | entry_type | status | url_primary_category | category               |
-      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    | Health and Medicine  | Health and Medicine   |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    | Health and Medicine  | Health and Medicine    |
       | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |                      |                        |
     When I goto "/escalations/webcat/complaints?f=NEW"
     And I wait for "5" seconds
@@ -260,6 +260,7 @@ Feature: Webcat complaints index
     And I should not see "food.com"
     Then I goto "/escalations/webcat/complaints?f=COMPLETED"
     And I should see "Alcohol"
+    And I should not see "Health and Medicine"
 
 
   @javascript
@@ -341,8 +342,6 @@ Feature: Webcat complaints index
     Then I goto "/escalations/webcat/complaints?f=COMPLETED"
     And I wait for "8" seconds
     And I should see "food.com"
-    And pending
-    # TODO - why is this not loading the established category
     And I should see "Health and Medicine"
     And I should not see "blah.com"
 
@@ -435,24 +434,86 @@ Feature: Webcat complaints index
     And I should see "blah.com"
 
   @javascript
-  Scenario: a reviewer commits a PENDING entry
+  Scenario: a reviewer commits a FIXED PENDING entry
     Given a user with role "webcat manager" exists and is logged in
+    And the following users exist
+      | id  | display_name    |
+      | 123 | Wembly Catalyst |
     And the following complaint entries exist:
-      | id  | uri          | domain        | entry_type | status     | url_primary_category | category              |
-      | 111 | food.com     | food.com      | URI/DOMAIN | PENDING    | Health and Medicine  | Health and Medicine   |
-      | 222 | blah.com     | blah.com      | URI/DOMAIN | PENDING    | Arts                 | Arts                  |
+      | id  | uri          | domain        | entry_type | status     | url_primary_category | resolution | user_id | is_important |
+      | 111 | food.com     | food.com      | URI/DOMAIN | PENDING    | Health and Medicine  |            |         |       0      |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | PENDING    | Arts                 | FIXED      |    123  |       1      |
     When I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And I click row with id "222"
+    And I click "#assignment-type-reviewer"
+    And I click ".take-ticket-toolbar-button"
     And I wait for "3" seconds
     And I click "#commit222"
     And I click "#submit_changes_222"
-    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
     And I wait for "2" seconds
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And take a screenshot
+    And I should see "blah.com"
+    And I should see "Arts"
+    And I should not see "food.com"
+
+  @javascript
+  Scenario: a reviewer commits an UNCHANGED PENDING entry
+    Given a user with role "webcat manager" exists and is logged in
+    And the following users exist
+      | id  | display_name    |
+      | 123 | Wembly Catalyst |
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status     | url_primary_category | resolution | user_id | is_important |
+      | 111 | food.com     | food.com      | URI/DOMAIN | PENDING    | Health and Medicine  |            |         |       0      |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | PENDING    | Arts                 | UNCHANGED  |    123  |       1      |
+    When I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And I click row with id "222"
+    And I click "#assignment-type-reviewer"
+    And I click ".take-ticket-toolbar-button"
+    And I wait for "3" seconds
+    And I click "#commit222"
+    And I click "#submit_changes_222"
+    And I wait for "2" seconds
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And take a screenshot
     And I should see "blah.com"
     And I should see "Arts"
     And I should not see "food.com"
 
 
-
+  @javascript
+  Scenario: a reviewer declines a PENDING entry (and that entry then goes back into ASSIGNED queue)
+    Given a user with role "webcat manager" exists and is logged in
+    And the following users exist
+    | id  | display_name   |
+    | 123 | Webby Catalyst |
+    And the following complaint entries exist:
+      | id  | uri       | domain    | entry_type | status  | url_primary_category | category              | resolution | user_id | is_important |
+      | 111 | food.com  | food.com  | URI/DOMAIN | NEW     | Health and Medicine  | Health and Medicine   |            |         |       0      |
+      | 222 | blah.com  | blah.com  | URI/DOMAIN | PENDING | Arts                 |                       | FIXED      |    123  |       1      |
+    When I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And I click row with id "222"
+    And I click "#assignment-type-reviewer"
+    And I click ".take-ticket-toolbar-button"
+    And I wait for "3" seconds
+    And I click "#decline222"
+    And I click "#submit_changes_222"
+    And I wait for "2" seconds
+    When I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And I should not see "blah.com"
+    And I should not see "food.com"
+    Then I goto "/escalations/webcat/complaints?f=ASSIGNED"
+    And I wait for "3" seconds
+    And I should see "blah.com"
+#    And I should not see "food.com" <- TODO got a filter problem here
+    And I should not see "Arts"
 
 
 
@@ -462,8 +523,6 @@ Feature: Webcat complaints index
 
 # a non-manager can view pending entries
   # a non-manager cannot commit pending entries
-  # Scenario: a reviewer commits a PENDING entry
-  # Scenario: a reviewer ...
 
 
 
