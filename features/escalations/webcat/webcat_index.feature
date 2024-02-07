@@ -280,6 +280,32 @@ Feature: Webcat complaints index
 
 
   @javascript
+  Scenario: a user cannot submit an individual entry with no changes in categories and a Fixed resolution
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | category                              |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    | Health and Medicine, Recipes and Food |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |                                       |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "10" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And take a screenshot
+    And pending
+    And I should see "Health and Medicine"
+    And I should see "Recipes and Food"
+#    And I fill in selectized of element "#input_cat_111" with ""
+    And I wait for "3" seconds
+    And I click "#submit_changes_111"
+    And I wait for "2" seconds
+
+
+    #TODO
+#  @javascript
+#  Scenario: a user submits an individual entry with a single removed category and a Fixed resolution
+
+
+  @javascript
   Scenario: a user submits an individual entry with an Unchanged resolution, and tries to add a new category that will not be saved
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
@@ -342,6 +368,29 @@ Feature: Webcat complaints index
     And I wait for "8" seconds
     And I should see "food.com"
     And I should see "Health and Medicine"
+    And I should not see "blah.com"
+
+
+  @javascript
+  Scenario: a user submits an individual entry that has no existing categories with an Unchanged resolution
+    # this can happen if there is not yet enough data for the analyst to classify the url, but its not an invalid ticket
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "5" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#unchanged111"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "Submitted"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "8" seconds
+    And I should see "food.com"
     And I should not see "blah.com"
 
 
@@ -518,8 +567,6 @@ Feature: Webcat complaints index
 
 # TODO
   # Scenario: a user cannot submit an individual entry with no changes to categories and a Fixed resolution
-  # Scenario: a user submits an individual entry with no category changes and an Unchanged resolution
-  # Scenario: a user submits an individual entry with no category changes and an Invalid resolution
 
 # a non-manager can view pending entries
   # a non-manager cannot commit pending entries

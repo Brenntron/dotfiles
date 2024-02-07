@@ -4,12 +4,13 @@ Feature: WebCat Advanced Search
   Scenario: a user performs an advanced search on status and resolution fields simultaneously
     Given a user with role "webcat user" exists and is logged in
     Given the following complaint entries exist:
-      | id | resolution | status    |
-      | 1  | FIXED      | PENDING   |
-      | 2  | DUPLICATE  | COMPLETED |
-      | 3  | UNCHANGED  | NEW       |
-      | 4  | FIXED      | NEW       |
+      | id | resolution | status    | uri          | domain        | entry_type |
+      | 1  | FIXED      | PENDING   | bestbobs.com | bestbobs.com  | URI/DOMAIN |
+      | 2  | DUPLICATE  | COMPLETED | blah.com     | blah.com      | URI/DOMAIN |
+      | 3  | UNCHANGED  | NEW       | food.com     | food.com      | URI/DOMAIN |
+      | 4  | FIXED      | NEW       | abc.com      | abc.com       | URI/DOMAIN |
     When I go to "/escalations/webcat/complaints"
+    And I wait for "3" seconds
     And I click "#advanced-search-button"
     And I fill in selectized of element "#resolution-input" with "['FIXED','DUPLICATE']"
     And I fill in selectized of element "#status-input" with "['PENDING','COMPLETED']"
@@ -179,7 +180,7 @@ Feature: WebCat Advanced Search
       | 1  | FIXED      | PENDING   | 1            |             |
       | 2  | DUPLICATE  | COMPLETED | 2            |             |
       | 3  | FIXED      | PENDING   | 3            | 1           |
-    
+
     When I go to "/escalations/webcat/complaints"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
@@ -210,9 +211,9 @@ Feature: WebCat Advanced Search
     And  I should not see "Added Through Channel"
     And  I click "#add-search-items-button"
     And  I click "#name-cb"
-    And  I should see "Customer Name"
+    And  I should see "Submitter Name"
     And  I go to "/escalations/webcat/complaints"
     And  I click "#advanced-search-button"
     And  I should not see "Complaint (URL/IP/Domain)"
     And  I should not see "Added Through Channel"
-    And  I should see "Customer Name"
+    And  I should see "Submitter Name"
