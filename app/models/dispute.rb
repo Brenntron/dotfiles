@@ -1059,7 +1059,7 @@ For future Web categorization requests, please open a Web categorization ticket 
           end
 
           #total_hits = (wbrs_hits + sbrs_hits).uniq
-
+          rule_hits_snapshot = []
 
           sbrs_hits.each do |rule_hit|
             new_rule_hit = DisputeRuleHit.new
@@ -1067,6 +1067,7 @@ For future Web categorization requests, please open a Web categorization ticket 
             new_rule_hit.name = rule_hit.strip
             new_rule_hit.rule_type = "SBRS"
             new_rule_hit.save!
+            rule_hits_snapshot << {:name => new_rule_hit.name, :rule_type => new_rule_hit.rule_type}
           end
 
           wbrs_hits.each do |rule_hit|
@@ -1075,8 +1076,14 @@ For future Web categorization requests, please open a Web categorization ticket 
             new_rule_hit.name = rule_hit.strip
             new_rule_hit.rule_type = "WBRS"
             new_rule_hit.save!
+            rule_hits_snapshot << {:name => new_rule_hit.name, :rule_type => new_rule_hit.rule_type}
           end
 
+          packet = {}
+          packet[:wbrs_score] = new_dispute_entry.wbrs_score
+          packet[:sbrs_score] = new_dispute_entry.sbrs_score
+          packet[:rule_hits] = rule_hits_snapshot.to_json
+          TelemetryHistory.save_dispute_entry_snapshot(packet, new_dispute_entry, true)
         end
 
         new_entries_urls.each do |url, entry|
@@ -1122,7 +1129,7 @@ For future Web categorization requests, please open a Web categorization ticket 
 
 
           new_dispute_entry.save
-
+          rule_hits_snapshot = []
           if entry["WBRS_Rule_Hits"].present?
             all_hits = entry["WBRS_Rule_Hits"].split(",")
             all_hits.each do |rule_hit|
@@ -1131,8 +1138,13 @@ For future Web categorization requests, please open a Web categorization ticket 
               new_rule_hit.name = rule_hit.strip
               new_rule_hit.rule_type = "WBRS"
               new_rule_hit.save!
+              rule_hits_snapshot << {:name => new_rule_hit.name, :rule_type => new_rule_hit.rule_type}
             end
           end
+          packet = {}
+          packet[:wbrs_score] = new_dispute_entry.wbrs_score
+          packet[:rule_hits] = rule_hits_snapshot.to_json
+          TelemetryHistory.save_dispute_entry_snapshot(packet, new_dispute_entry. true)
 
         end
 
@@ -1151,6 +1163,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       end
 
       new_dispute.dispute_entries.each do |dispute_entry|
+        th = TelemetryHistory.where(:dispute_entry_id => dispute_entry.id).first
         begin
           if dispute_entry.web_ips.present?
 
@@ -1161,7 +1174,7 @@ For future Web categorization requests, please open a Web categorization ticket 
 
             if extra_wbrs_stuff.present?
               dispute_entry.score = extra_wbrs_stuff["wbrs"]["score"]
-
+              th.multi_ip_score = dispute_entry.score
               threat_cats = extra_wbrs_stuff["threat_cats"]
 
               threat_cat_names = []
@@ -1172,16 +1185,20 @@ For future Web categorization requests, please open a Web categorization ticket 
                 end
                 dispute_entry.multi_wbrs_threat_category = threat_cat_names
               end
+              th.multi_threat_categories = threat_cat_names.to_json rescue nil
             end
 
-
+            multi_rule_hits_snapshot = []
             extra_wbrs_stuff_rulehits.each do |rule_hit|
               new_rule_hit = DisputeRuleHit.new
               new_rule_hit.name = rule_hit.strip
               new_rule_hit.rule_type = "WBRS"
               new_rule_hit.is_multi_ip_rulehit = true
               dispute_entry.dispute_rule_hits << new_rule_hit
+              multi_rule_hits_snapshot << {:name => new_rule_hit.name, :rule_type => new_rule_hit.rule_type}
             end
+            th.multi_rule_hits = multi_rule_hits_snapshot.to_json rescue nil
+
           end
         rescue => e
           Rails.logger.error e
@@ -1202,6 +1219,8 @@ For future Web categorization requests, please open a Web categorization ticket 
           begin
             complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => dispute_entry.uri})
             dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
+            th.threat_categories = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.to_json rescue nil
+            th.save
           rescue => e
             Rails.logger.error e
             Rails.logger.error e.backtrace.join("\n")

@@ -66,6 +66,7 @@
 //= require application/users
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
+//= require application/webrep/reputation_history
 //= require application/context-tags
 //= require application/dt-jquery-highlight.js
 //= require admin/admin-tools
