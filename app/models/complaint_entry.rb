@@ -399,7 +399,7 @@ class ComplaintEntry < ApplicationRecord
                       self_review)
     ActiveRecord::Base.transaction do
 
-      if categories_string.blank?
+      if categories_string.blank? && entry_status == "FIXED"
         raise "categories string is empty"
       end
 
