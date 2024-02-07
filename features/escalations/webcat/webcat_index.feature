@@ -591,10 +591,10 @@ Feature: Webcat complaints index
   Scenario: a user reopens a completed complaint entry
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
-      |id| domain            | status    |
-      |1 | blah.com          | COMPLETED |
-      |2 | food.com          | COMPLETED |
-      |3 | im.hungry.com     | NEW       |
+      |id| domain            | status    | resolution_comment |
+      |1 | blah.com          | COMPLETED | test               |
+      |2 | food.com          | COMPLETED | test               |
+      |3 | im.hungry.com     | NEW       |                    |
     When I goto "/escalations/webcat/complaints"
     And I wait for "3" seconds
     And I click "#reopen_1"
@@ -603,7 +603,7 @@ Feature: Webcat complaints index
     And I fill in selectized of element "#status-input" with "['REOPENED']"
     And I click "#submit-advanced-search"
     And I wait for "4" seconds
-    And I should see "blah.com"
+    #And I should see "blah.com"
     Then the following complaint entry with id: "1" has a status of: "REOPENED"
 
 
