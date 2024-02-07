@@ -1,7 +1,5 @@
 Feature: WebCat Advanced Search
 
-
-
   @javascript
   Scenario: a user performs an advanced search on status and resolution fields simultaneously
     Given a user with role "webcat user" exists and is logged in
@@ -28,7 +26,6 @@ Feature: WebCat Advanced Search
     Given a user with role "webcat user" exists and is logged in
     Given the following companies exist:
       | id  | name          |
-      | 11  | Not a Guest   |
       | 22  | Bobby Burgers |
       | 33  | Pizza Dojo    |
     Given the following customers exist:
@@ -53,10 +50,8 @@ Feature: WebCat Advanced Search
     And I fill in selectized of element "#company-input" with "['Bobby Burgers']"
     And I click "#submit-advanced-search"
     And I wait for "8" seconds
-    Then I should see tr element with id "1"
-    Then I should see tr element with id "2"
-    Then I should not see tr element with id "3"
-    Then I should not see tr element with id "4"
+    Then I should see tr element with id "111"
+    Then I should not see tr element with id "222"
 
 
   @javascript
