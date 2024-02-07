@@ -565,12 +565,46 @@ Feature: Webcat complaints index
     And I should not see "Arts"
 
 
-# TODO
+  # TODO
   # Scenario: a user cannot submit an individual entry with no changes to categories and a Fixed resolution
 
-# a non-manager can view pending entries
-  # a non-manager cannot commit pending entries
 
+  @javascript
+  Scenario: a non-manager can view PENDING entries
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri       | domain    | entry_type | status  | is_important |
+      | 111 | food.com  | food.com  | URI/DOMAIN | NEW     |              |
+      | 222 | blah.com  | blah.com  | URI/DOMAIN | PENDING |       1      |
+    When I goto "/escalations/webcat/complaints"
+    And I wait for "3" seconds
+    And I click "#filter-complaints"
+    And I wait for "1" seconds
+    And I click "Waiting for Review"
+    And I wait for "5" seconds
+    And I should see "blah.com"
+    And I should not see "food.com"
+
+
+  # TODO - this test is not passing, but works in dev browser
+  @javascript
+  Scenario: a user reopens a completed complaint entry
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain            | status    |
+      |1 | blah.com          | COMPLETED |
+      |2 | food.com          | COMPLETED |
+      |3 | im.hungry.com     | NEW       |
+    When I goto "/escalations/webcat/complaints"
+    And I wait for "3" seconds
+    And I click "#reopen_1"
+    And I wait for "5" seconds
+    And I click "#advanced-search-button"
+    And I fill in selectized of element "#status-input" with "['REOPENED']"
+    And I click "#submit-advanced-search"
+    And I wait for "4" seconds
+    And I should see "blah.com"
+    Then the following complaint entry with id: "1" has a status of: "REOPENED"
 
 
   @javascript
@@ -596,16 +630,17 @@ Feature: Webcat complaints index
       | 5113 | John Bly owns this |      14     | CUSTOMER       | talos-intelligence |
       | 5114 | Unknown origin     |      15     | CUSTOMER       | talos-intelligence |
     And the following complaint entries exist:
-      | id   | complaint_id | uri                    | domain                | entry_type | status | platform_id |
-      | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | NEW    |      1      |
+      | id   | complaint_id | uri                    | domain                | entry_type | status | platform_id | suggested_disposition |
+      | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | NEW    |      1      | 
       | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | NEW    |      1      |
       | 9333 | 5113         | evilmastermind.com     | evilmastermind.com    | URI/DOMAIN | NEW    |      1      |
       | 9444 | 5114         | timetravelingorb.com   | timetravelingorb.com  | URI/DOMAIN | NEW    |      1      |
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "3" seconds
-    And take a screenshot
+
     When I click "#webcat-index-table-show-columns-button"
     And I wait for "2" seconds
+    And take a screenshot
     And pending
 
 

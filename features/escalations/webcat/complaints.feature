@@ -170,31 +170,6 @@ Feature: Webcat complaints
 
 
   @javascript
-  Scenario: a user uses the Update Resolution feature to reopen a completed ComplaintEntry
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaint entries exist:
-      |id| domain            | status    |
-      |1 | blah.com          | COMPLETED |
-      |2 | food.com          | COMPLETED |
-      |3 | im.hungry.com     | NEW       |
-    When I goto "/escalations/webcat/complaints"
-    And I click "#complaints_check_box"
-    And I click "#index_update_resolution"
-    And I select "Reopened" from "complaint_resolution"
-    And I click "#button_update_resolution"
-    And I wait for "5" seconds
-    Then I should see "Set the following 2 entries to RESOLUTION REOPENED"
-    When I click "#submit_resolution_changes"
-    And I wait for "1" seconds
-    Then the following complaint entry with id: "1" has a status of: "REOPENED"
-    Then the following complaint entry with id: "2" has a status of: "REOPENED"
-    Then the following complaint entry with id: "3" has a status of: "NEW"
-
-
-
-
-
-  @javascript
   Scenario: left nav links should apply filter if the filter was set before
     Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "assigned_entry" exists
