@@ -196,13 +196,142 @@ Feature: Webcat index filters
     And I should not see "gurl.com"
     And I should see "twirl.com"
 
+
+  @javascript
+  Scenario: a user selects the 'New Talos Tickets' and does not see internal tickets or tickets from WBRS
+    Given a user with role "webcat user" exists and is logged in
+    Given the following complaints exist:
+      | id | customer_id |  channel       |
+      | 1  | 1           |   talosintel   |
+      | 2  | 2           |   wbnp         |
+      | 3  | 3           |   internal     |
+    And the following complaint entries exist:
+      | id | uri            | domain            | entry_type |  status     | user_id | complaint_id |
+      |  1 | abc.com        | abc.com           | URI/DOMAIN |  ASSIGNED   |    1    | 1            |
+      |  2 | whatever.com   | whatever.com      | URI/DOMAIN |  PENDING    |    1    | 2            |
+      |  3 | purl.com       | purl.com          | URI/DOMAIN |  NEW        |         | 1            |
+      |  4 | gurl.com       | gurl.com          | URI/DOMAIN |  NEW        |    1    | 3            |
+      |  5 | twirl.com      | twirl.com         | URI/DOMAIN |  NEW        |         | 2            |
+      |  6 | unfurl.com     | unfurl.com        | URI/DOMAIN |  NEW        |         | 3            |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I should see "abc.com"
+    And I should see "whatever.com"
+    And I should see "purl.com"
+    And I should see "gurl.com"
+    And I should see "twirl.com"
+    And I should see "unfurl.com"
+    And I click "#filter-complaints"
+    And I wait for "2" seconds
+    Then I click "New Talos Tickets"
+    Then I wait for "6" seconds
+    And I should not see "abc.com"
+    And I should not see "whatever.com"
+    And I should see "purl.com"
+    And I should not see "gurl.com"
+    And I should not see "twirl.com"
+    And I should not see "unfurl.com"
+
+  @javascript
+  Scenario: a user selects the 'New Talos Tickets' and does not see closed tickets from Talos
+    Given a user with role "webcat user" exists and is logged in
+    Given the following complaints exist:
+      | id | customer_id |  channel       |
+      | 1  | 1           |   talosintel   |
+    And the following complaint entries exist:
+      | id | uri            | domain            | entry_type |  status     | user_id | complaint_id |
+      |  1 | abc.com        | abc.com           | URI/DOMAIN |  RESOLVED   |    1    |     1        |
+      |  2 | whatever.com   | whatever.com      | URI/DOMAIN |  PENDING    |    1    |     1        |
+      |  3 | purl.com       | purl.com          | URI/DOMAIN |  NEW        |         |     1        |
+      |  4 | gurl.com       | gurl.com          | URI/DOMAIN |  COMPLETED  |    1    |     1        |
+      |  5 | twirl.com      | twirl.com         | URI/DOMAIN |  NEW        |         |     1        |
+      |  6 | unfurl.com     | unfurl.com        | URI/DOMAIN |  COMPLETED  |         |     1        |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I should see "abc.com"
+    And I should see "whatever.com"
+    And I should see "purl.com"
+    And I should see "gurl.com"
+    And I should see "twirl.com"
+    And I should see "unfurl.com"
+    And I click "#filter-complaints"
+    And I wait for "2" seconds
+    Then I click "New Talos Tickets"
+    Then I wait for "6" seconds
+    And I should not see "abc.com"
+    And I should not see "whatever.com"
+    And I should see "purl.com"
+    And I should not see "gurl.com"
+    And I should see "twirl.com"
+    And I should not see "unfurl.com"
+
+  @javascript
+  Scenario: a user selects the 'New Talos Tickets' and does not see in progress tickets from Talos
+    Given a user with role "webcat user" exists and is logged in
+    Given the following complaints exist:
+      | id | customer_id |  channel       |
+      | 1  | 1           |   talosintel   |
+    And the following complaint entries exist:
+      | id | uri            | domain            | entry_type |  status     | user_id | complaint_id |
+      |  1 | abc.com        | abc.com           | URI/DOMAIN |  RESOLVED   |    1    |     1        |
+      |  2 | whatever.com   | whatever.com      | URI/DOMAIN |  ACTIVE     |    1    |     1        |
+      |  3 | purl.com       | purl.com          | URI/DOMAIN |  NEW        |         |     1        |
+      |  4 | gurl.com       | gurl.com          | URI/DOMAIN |  COMPLETED  |    1    |     1        |
+      |  5 | twirl.com      | twirl.com         | URI/DOMAIN |  NEW        |         |     1        |
+      |  6 | unfurl.com     | unfurl.com        | URI/DOMAIN |  ACTIVE     |         |     1        |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I should see "abc.com"
+    And I should see "whatever.com"
+    And I should see "purl.com"
+    And I should see "gurl.com"
+    And I should see "twirl.com"
+    And I should see "unfurl.com"
+    And I click "#filter-complaints"
+    And I wait for "2" seconds
+    Then I click "New Talos Tickets"
+    Then I wait for "6" seconds
+    And I should not see "abc.com"
+    And I should not see "whatever.com"
+    And I should see "purl.com"
+    And I should not see "gurl.com"
+    And I should see "twirl.com"
+    And I should not see "unfurl.com"
+
+  @javascript
+  Scenario: Scenario: a user selects the 'New WBNP Tickets' and does not see internal tickets or tickets from Talos
+    Given a user with role "webcat user" exists and is logged in
+    Given the following complaints exist:
+      | id | customer_id |  channel       |
+      | 1  | 1           |   talosintel   |
+      | 2  | 2           |   wbnp         |
+      | 3  | 3           |   internal     |
+    And the following complaint entries exist:
+      | id | uri            | domain            | entry_type |  status     | user_id | complaint_id |
+      |  1 | abc.com        | abc.com           | URI/DOMAIN |  NEW        |    1    | 1            |
+      |  2 | whatever.com   | whatever.com      | URI/DOMAIN |  NEW        |    1    | 1            |
+      |  3 | purl.com       | purl.com          | URI/DOMAIN |  NEW        |         | 2            |
+      |  4 | gurl.com       | gurl.com          | URI/DOMAIN |  NEW        |    1    | 2            |
+      |  5 | twirl.com      | twirl.com         | URI/DOMAIN |  NEW        |         | 3            |
+      |  6 | unfurl.com     | unfurl.com        | URI/DOMAIN |  NEW        |         | 3            |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I should see "abc.com"
+    And I should see "whatever.com"
+    And I should see "purl.com"
+    And I should see "gurl.com"
+    And I should see "twirl.com"
+    And I should see "unfurl.com"
+    And I click "#filter-complaints"
+    And I wait for "2" seconds
+    Then I click "New WBNP Tickets"
+    Then I wait for "6" seconds
+    And I should not see "abc.com"
+    And I should not see "whatever.com"
+    And I should see "purl.com"
+    And I should see "gurl.com"
+    And I should not see "twirl.com"
+    And I should not see "unfurl.com"
+
   # TODO - New Talos Tickets, New WBRS Tickets, New Internal Tickets
-  # Scenario: a user selects the 'New Talos Tickets' and does not see internal tickets or tickets from WBRS
-  # Scenario: a user selects the 'New Talos Tickets' and does not see closed tickets from Talos
-  # Scenario: a user selects the 'New Talos Tickets' and does not see in progress tickets from Talos
-  # Scenario: a user selects the 'New WBRS Tickets' and does not see internal tickets or tickets from Talos
-  # Scenario: a user selects the 'New WBRS Tickets' and does not see closed tickets from WBRS
-  # Scenario: a user selects the 'New WBRS Tickets' and does not see in progress tickets from WBRS
+  # Scenario: a user selects the 'New WBNP Tickets' and does not see closed tickets from WBNP
+  # Scenario: a user selects the 'New WBNP Tickets' and does not see in progress tickets from WBNP
   # Scenario: a user selects the 'New Internal Tickets' and does not see tickets from WBRS or from Talos
   # Scenario: a user selects the 'New Internal Tickets' and does not see closed internal tickets
   # Scenario: a user selects the 'New Internal Tickets' and does not see in progress internal tickets
