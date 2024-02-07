@@ -177,8 +177,8 @@ Feature: WebCat Advanced Search
       | 3  | 3           |
     Given the following complaint entries exist:
       | id | resolution | status    | complaint_id | platform_id |
-      | 1  | FIXED      | PENDING   | 1            |             |
-      | 2  | DUPLICATE  | COMPLETED | 2            |             |
+      | 1  | FIXED      | PENDING   | 1            | 3           |
+      | 2  | DUPLICATE  | COMPLETED | 2            | 3           |
       | 3  | FIXED      | PENDING   | 3            | 1           |
 
     When I go to "/escalations/webcat/complaints"
@@ -187,15 +187,19 @@ Feature: WebCat Advanced Search
     And I click "#platform-cb"
     And I click "#cancel-add-criteria"
     And I wait for "2" seconds
-    And I fill in selectized of element "#platform-input" with "['TalosIntelligence']"
+    And I fill in selectized of element "#platform-input" with "['1']"
     And I click "#submit-advanced-search"
-    And I wait for "5" seconds
-    And take a screenshot
-#    Then I should see "PLATFORMS: All, Webcat"
-#    Then I should see tr element with id "1"
-#    Then I should see tr element with id "3"
-#    Then I should not see tr element with id "2"
+    And I wait for "10" seconds
+    Then I should see "PLATFORMS: TalosIntelligence"
+    Then I should see tr element with id "3"
+    Then I should not see tr element with id "2"
+    Then I should not see tr element with id "1"
 
+  # TODO
+  # search by category
+  # search by channel
+  # search by email
+  # search with more combinations
 
   @javascript
   Scenario: a user changes the fields they want displayed in the advanced search and those are maintained
