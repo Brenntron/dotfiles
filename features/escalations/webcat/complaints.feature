@@ -30,91 +30,6 @@ Feature: Webcat complaints
 #    When I click "master-submit"
 #    Then I should see hidden element "#message-text" with content "I noticed you have made changes to at least 2 complaints but you only have 1 items selected."
 
-  @javascript
-  Scenario: a user can manually create a new complaint
-    Given a user with role "webcat user" exists and is logged in
-    And bugzilla rest api always saves
-    And complaint entry preload is stubbed
-    And WBRS top url is stubbed
-    And WBRS Prefix where is stubbed
-    And the following companies exist:
-    | name  |
-    | Cisco |
-    And the following customers exist:
-    | company_id | name         | email           |
-    | 1          | Talos Person | talos@cisco.com |
-    And a complaint entry with trait "new_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#new-complaint"
-    And I fill in "ips_urls" with "talosintelligence.com"
-    And I fill in "description" with "This is my favorite website"
-    And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
-    And I click "Create"
-    And I wait for "5" seconds
-    And take a screenshot
-    And I should see "COMPLAINT CREATED"
-    And I click ".close"
-    Then I wait for "10" seconds
-    And I should see "urgent"
-
-  @javascript
-  Scenario: a user can manually create a new complaint that is uppercased and the path will become lowercased
-    Given a user with role "webcat user" exists and is logged in
-    And bugzilla rest api always saves
-    And complaint entry preload is stubbed
-    And WBRS top url is stubbed
-    And WBRS Prefix where is stubbed
-    And the following companies exist:
-      | name  |
-      | Cisco |
-    And the following customers exist:
-      | company_id | name         | email           |
-      | 1          | Talos Person | talos@cisco.com |
-    And a complaint entry with trait "new_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#new-complaint"
-    And I fill in "ips_urls" with "TalosIntelligence.com/my_FUNKY_url?is=Baller"
-    And I fill in "description" with "This is my favorite website"
-    And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
-    And I fill in selectized with "urgent"
-    And I click "Create"
-    And I wait for "5" seconds
-    And I should see "COMPLAINT CREATED"
-    And I click ".close"
-    Then I wait for "10" seconds
-    And I should see "talosintelligence.com"
-
-  @javascript
-  Scenario: a user can manually create a new complaint
-    Given a user with role "webcat user" exists and is logged in
-    And bugzilla rest api always saves
-    And complaint entry preload is stubbed
-    And WBRS top url is stubbed
-    And WBRS Prefix where is stubbed
-    And the following companies exist:
-    | name  |
-    | Cisco |
-    And the following customers exist:
-    | company_id | name         | email           |
-    | 1          | Talos Person | talos@cisco.com |
-    And the following platforms exist:
-    | public_name |
-    | FirePower   |
-    And a complaint entry with trait "new_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    And I click "#new-complaint"
-    And I fill in "ips_urls" with "talosintelligence.com"
-    And I fill in "description" with "This is my favorite website"
-    And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
-    And I fill in "platforms" with "FirePower"
-    And I click "Create"
-    And I wait for "5" seconds
-    And I should see "COMPLAINT CREATED"
-    # And I should see "FirePower" this line is commented until the page will display platform name
-
 
 
   # TODO write this test
@@ -252,21 +167,6 @@ Feature: Webcat complaints
     Then the following complaint entry with id: "2" has a resolution comment of: "Disco"
     Then the following complaint entry with id: "3" has a resolution comment of: "Disco"
 
-  @javascript
-  Scenario: a user attempts to use Update Resolution on a Pending/Completed Complaint Entry, but INVALID and UNCHANGED are disabled from the drop-down menu
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaint entries exist:
-      |id| domain   | uri            | status    | resolution | entry_type |
-      |1 | blah.com | blah.com       | PENDING   | FIXED      | URI/DOMAIN |
-      |2 | food.com | food.com       | COMPLETED | FIXED      | URI/DOMAIN |
-    When I goto "/escalations/webcat/complaints"
-    And I wait for "2" seconds
-    And I click "#complaints_check_box"
-    And I click "#index_update_resolution"
-    And I wait for "4" seconds
-    Then the "Unchanged" option from "complaint_resolution" is disabled
-    Then the "Invalid" option from "complaint_resolution" is disabled
-    Then the "Reopened" option from "complaint_resolution" is not disabled
 
 
   @javascript

@@ -950,7 +950,7 @@ For future web and email reputation requests, please open a web and email reputa
     rescue Exception => e
       Rails.logger.error e.message
       Rails.logger.error e.backtrace.join("\n")
-      raise "error creating bug."
+      raise "error creating complaint."
     end
 
     response
