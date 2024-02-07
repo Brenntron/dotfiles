@@ -158,3 +158,31 @@ Feature: Webcat Categorize URLs dropdown
     And I click ".delete-categories-button"
     And I wait for "10" seconds
     Then I should see "Categories successfully dropped."
+
+  @javascript
+  Scenario: user should get credit for direct categorizations for non-important urls
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in "url_1" with "example123.com"
+    And I fill in selectized with "Advertisements"
+    And I click ".primary"
+    And I wait for "10" seconds
+    Then I should see "URLS CATEGORIZED SUCCESSFULLY"
+    And I should see "No pending complaint entries have been created All other entries have been submitted directly to WBRS."
+    Then I goto a "resolution" report surrounding the current year
+    And I should see my username
+
+  @javascript
+  Scenario: user should see the link to refresh the page after categorization
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in "url_1" with "example123.com"
+    And I fill in selectized with "Advertisements"
+    And I click ".primary"
+    And I wait for "10" seconds
+    Then I should see "URLS CATEGORIZED SUCCESSFULLY"
+    And I should see "Refresh the page to see the result"
+    Then I goto a "resolution" report surrounding the current year
+    And I should see my username

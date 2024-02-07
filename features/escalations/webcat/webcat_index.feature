@@ -586,7 +586,6 @@ Feature: Webcat complaints index
     And I should not see "food.com"
 
 
-  # TODO - this test is not passing, but works in dev browser
   @javascript
   Scenario: a user reopens a completed complaint entry
     Given a user with role "webcat user" exists and is logged in
@@ -603,23 +602,19 @@ Feature: Webcat complaints index
     And I fill in selectized of element "#status-input" with "['REOPENED']"
     And I click "#submit-advanced-search"
     And I wait for "4" seconds
-    #And I should see "blah.com"
     Then the following complaint entry with id: "1" has a status of: "REOPENED"
 
 
   @javascript
-  Scenario: a user can show/hide columns in the webcat/complaints view
+  Scenario: a user can show/hide entire columns in the complaints view
     Given a user with role "webcat user" exists and is logged in
     And the following companies exist:
       | id | name                    |
       | 5  | Gilligan's Co.          |
-      | 7  | Western Investigations  |
     And the following customers exist:
       | id | name                | company_id | email                    |
       | 12 | Maryanne Summers    |     5      | msummers@islandtours.com |
       | 13 | Ginger Grant        |     5      | ggrant@islandtours.com   |
-      | 14 | Brisco County, Jr.  |     7      | bcjr@wpi.com             |
-      | 15 | Dixie Cousins       |     7      | dxc@wpi.com              |
     And the following platforms exist:
       | id | public_name       | internal_name     | webcat |
       | 1  | TalosIntelligence | TalosIntelligence |   1    |
@@ -627,47 +622,122 @@ Feature: Webcat complaints index
       | id   | description        | customer_id | submitter_type | ticket_source      |
       | 5111 | weather            |      12     | CUSTOMER       | talos-intelligence |
       | 5112 | travel site        |      13     | CUSTOMER       | talos-intelligence |
-      | 5113 | John Bly owns this |      14     | CUSTOMER       | talos-intelligence |
-      | 5114 | Unknown origin     |      15     | CUSTOMER       | talos-intelligence |
     And the following complaint entries exist:
       | id   | complaint_id | uri                    | domain                | entry_type | status   | platform_id | suggested_disposition | user_id |
       | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | ASSIGNED |      1      | News                  |    1    |
       | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    |
-      | 9333 | 5113         | evilmastermind.com     | evilmastermind.com    | URI/DOMAIN | ASSIGNED |      1      | Paranormal            |    1    |
-      | 9444 | 5114         | timetravelingorb.com   | timetravelingorb.com  | URI/DOMAIN | ASSIGNED |      1      | Paranormal            |    1    |
     And the following complaint_tags exist:
       | id | name        |
       | 1  | Investigate |
     And I add a complaint_tag of id "1" to complaint of id "5111"
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "3" seconds
+    And I should see "9111"
+    And I should see "9222"
+    And I should see "TI Webform"
     When I click "#webcat-index-table-show-columns-button"
-    And I wait for "2" seconds
-    And take a screenshot
+    And I wait for "1" seconds
+    And I click "#view-ticket-col-cb"
+    And I wait for "1" seconds
+    And I should not see "9111"
+    And I should not see "9222"
+    And I should not see "TI Webform"
+    And I click "#view-ticket-col-cb"
+    And I wait for "1" seconds
+    And I should see "9111"
+    And I should see "9222"
+    And I should see "TI Webform"
+    And I should see "Ginger Grant"
+    And I should see "Maryanne Summers"
+    And I should see "Gilligan's Co."
+    And I should see "msummers@islandtours.com"
+    And I should see "ggrant@islandtours.com"
+    Then I click "#view-submitter-col-cb"
+    And I wait for "1" seconds
+    And I should not see "Ginger Grant"
+    And I should not see "Maryanne Summers"
+    And I should not see "Gilligan's Co."
+    And I should not see "msummers@isnlandtours.com"
+    And I should not see "ggrant@islandtours.com"
+    And I should see "Investigate"
+    And I click "#view-tags-col-cb"
+    And I wait for "1" seconds
+    And I should not see "Investigate"
 
 
 
   @javascript
   Scenario: a user can ensure show/hide column states are saved in the database after a page reload
     Given a user with role "webcat user" exists and is logged in
-    And the following disputes exist and have entries:
-      | id | submitter_type |
-      | 1  | CUSTOMER       |
-    Then I goto "escalations/webcat/complaints"
-    And I wait for "2" seconds
-    And pending
-#    And I click "#webcat-index-table-show-columns-button"
-#    And I should see the ".subdomain-checkbox" checkbox checked
-#    And I should see the ".assignee-checkbox" checkbox checked
-#    And I click ".subdomain-checkbox"
-#    And I click ".assignee-checkbox"
-#    Then I should not see table header with id "subdomain"
-#    Then I should not see table header with id "assignee"
-#    Then I should see table header with id "tags"
-#    Then I should see table header with id "path"
-#    And I goto "escalations/webcat/complaints"
-#    And I wait for "2" seconds
-#    Then I should not see table header with id "subdomain"
-#    Then I should not see table header with id "assignee"
-#    Then I should see table header with id "tags"
-#    Then I should see table header with id "path"
+    And the following companies exist:
+      | id | name                    |
+      | 5  | Gilligan's Co.          |
+    And the following customers exist:
+      | id | name                | company_id | email                    |
+      | 12 | Maryanne Summers    |     5      | msummers@islandtours.com |
+      | 13 | Ginger Grant        |     5      | ggrant@islandtours.com   |
+    And the following platforms exist:
+      | id | public_name       | internal_name     | webcat |
+      | 1  | TalosIntelligence | TalosIntelligence |   1    |
+    And the following complaints exist:
+      | id   | description        | customer_id | submitter_type | ticket_source      |
+      | 5111 | weather            |      12     | CUSTOMER       | talos-intelligence |
+      | 5112 | travel site        |      13     | CUSTOMER       | talos-intelligence |
+    And the following complaint entries exist:
+      | id   | complaint_id | uri                    | domain                | entry_type | status   | platform_id | suggested_disposition | user_id |
+      | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | ASSIGNED |      1      | News                  |    1    |
+      | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    When I click "#webcat-index-table-show-columns-button"
+    And I wait for "1" seconds
+    And I should see "Ginger Grant"
+    And I should see "Maryanne Summers"
+    And I should see "Gilligan's Co."
+    And I should see "msummers@islandtours.com"
+    And I should see "ggrant@islandtours.com"
+    Then I click "#view-submitter-col-cb"
+    And I wait for "1" seconds
+    And I should not see "Ginger Grant"
+    And I should not see "Maryanne Summers"
+    And I should not see "Gilligan's Co."
+    And I should not see "msummers@isnlandtours.com"
+    And I should not see "ggrant@islandtours.com"
+    And I refresh the page
+    And I wait for "3" seconds
+    And I should not see "Ginger Grant"
+    And I should not see "Maryanne Summers"
+    And I should not see "Gilligan's Co."
+    And I should not see "msummers@isnlandtours.com"
+    And I should not see "ggrant@islandtours.com"
+
+
+# Keepting these setups for reference for now
+#    And the following companies exist:
+#      | id | name                    |
+#      | 5  | Gilligan's Co.          |
+#      | 7  | Western Investigations  |
+#    And the following customers exist:
+#      | id | name                | company_id | email                    |
+#      | 12 | Maryanne Summers    |     5      | msummers@islandtours.com |
+#      | 13 | Ginger Grant        |     5      | ggrant@islandtours.com   |
+#      | 14 | Brisco County, Jr.  |     7      | bcjr@wpi.com             |
+#      | 15 | Dixie Cousins       |     7      | dxc@wpi.com              |
+#    And the following platforms exist:
+#      | id | public_name       | internal_name     | webcat |
+#      | 1  | TalosIntelligence | TalosIntelligence |   1    |
+#    And the following complaints exist:
+#      | id   | description        | customer_id | submitter_type | ticket_source      |
+#      | 5111 | weather            |      12     | CUSTOMER       | talos-intelligence |
+#      | 5112 | travel site        |      13     | CUSTOMER       | talos-intelligence |
+#      | 5113 | John Bly owns this |      14     | CUSTOMER       | talos-intelligence |
+#      | 5114 | Unknown origin     |      15     | CUSTOMER       | talos-intelligence |
+#    And the following complaint entries exist:
+#      | id   | complaint_id | uri                    | domain                | entry_type | status   | platform_id | suggested_disposition | user_id |
+#      | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | ASSIGNED |      1      | News                  |    1    |
+#      | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    |
+#      | 9333 | 5113         | evilmastermind.com     | evilmastermind.com    | URI/DOMAIN | ASSIGNED |      1      | Paranormal            |    1    |
+#      | 9444 | 5114         | timetravelingorb.com   | timetravelingorb.com  | URI/DOMAIN | ASSIGNED |      1      | Paranormal            |    1    |
+#    And the following complaint_tags exist:
+#      | id | name        |
+#      | 1  | Investigate |
