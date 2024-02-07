@@ -300,7 +300,6 @@ Feature: Webcat complaints index
     And I should not see "Alcohol"
 
 
-  # TODO - backend is throwing an error and looking for a category when one should not be required
   @javascript
   Scenario: a user correctly submits an individual entry with an Unchanged resolution and no category
     Given a user with role "webcat user" exists and is logged in
@@ -315,7 +314,6 @@ Feature: Webcat complaints index
     And I click "#unchanged111"
     And I wait for "1" seconds
     And I click "#submit_changes_111"
-    And pending
     And I wait for "5" seconds
     And I should see "Submitted"
     Then I goto "/escalations/webcat/complaints?f=COMPLETED"
@@ -366,7 +364,7 @@ Feature: Webcat complaints index
     And I wait for "5" seconds
     And I should see "CANNOT INCLUDE CATEGORIES WITH AN INVALID RESOLUTION"
 
-  # TODO - backend is throwing an error and looking for a category when one should not be required for invalid
+
   @javascript
   Scenario: a user correctly submits an individual entry with an Invalid resolution and no category
     Given a user with role "webcat user" exists and is logged in
@@ -389,7 +387,6 @@ Feature: Webcat complaints index
     And I should not see "blah.com"
 
 
-  # TODO - backend is throwing an error and looking for a category when one should not be required for unchanged
   @javascript
   Scenario: a user submits a non-high traffic entry and it gets resolved and does not go into the Review queue
     Given a user with role "webcat user" exists and is logged in
@@ -410,6 +407,7 @@ Feature: Webcat complaints index
     And I click "#submit_changes_222"
     And I wait for "5" seconds
     Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
     And I should see "food.com"
     And I should see "blah.com"
     Then I goto "/escalations/webcat/complaints?f=REVIEW"
@@ -489,7 +487,7 @@ Feature: Webcat complaints index
 
 
   @javascript
-  Scenario: a reviewer declines a PENDING entry (and that entry then goes back into ASSIGNED queue)
+  Scenario: a reviewer declines a PENDING entry (and that entry then goes back into ASSIGNED status)
     Given a user with role "webcat manager" exists and is logged in
     And the following users exist
     | id  | display_name   |
@@ -511,10 +509,10 @@ Feature: Webcat complaints index
     And I wait for "3" seconds
     And I should not see "blah.com"
     And I should not see "food.com"
-    Then I goto "/escalations/webcat/complaints?f=ASSIGNED"
+    Then I goto "/escalations/webcat/complaints?f=ACTIVE"
     And I wait for "3" seconds
     And I should see "blah.com"
-#    And I should not see "food.com" <- TODO got a filter problem here
+    And I should not see "food.com"
     And I should not see "Arts"
 
 
