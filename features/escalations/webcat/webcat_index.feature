@@ -635,13 +635,15 @@ Feature: Webcat complaints index
       | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    |
       | 9333 | 5113         | evilmastermind.com     | evilmastermind.com    | URI/DOMAIN | ASSIGNED |      1      | Paranormal            |    1    |
       | 9444 | 5114         | timetravelingorb.com   | timetravelingorb.com  | URI/DOMAIN | ASSIGNED |      1      | Paranormal            |    1    |
+    And the following complaint_tags exist:
+      | id | name        |
+      | 1  | Investigate |
+    And I add a complaint_tag of id "1" to complaint of id "5111"
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "3" seconds
-
     When I click "#webcat-index-table-show-columns-button"
     And I wait for "2" seconds
     And take a screenshot
-    And pending
 
 
 
