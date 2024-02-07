@@ -11,28 +11,15 @@ Feature: Webcat create new complaints
       | id | public_name       | internal_name     | webcat |
       | 1  | TalosIntelligence | TalosIntelligence | 1      |
       | 3  | FirePower         | NGFW              | 1      |
-#    And the following companies exist:
-#      | name  |
-#      | Cisco |
-#    And the following customers exist:
-#      | company_id | name         | email           |
-#      | 1          | Talos Person | talos@cisco.com |
-    #And a complaint entry with trait "new_entry" exists
-    #And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#new-complaint"
     And I fill in "ips_urls" with "talosintelligence.com"
     And I fill in "description" with "This is my favorite website"
-#    And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
     And I fill in "platforms" with "TalosIntelligence"
-#    And take a screenshot
     And I click "Create"
     And I wait for "5" seconds
-    And take a screenshot
     And I should see "THE FOLLOWING 1 COMPLAINTS WERE SUCCESSFULLY CREATED"
-    And I click ".close"
-    Then I wait for "10" seconds
-#    And I should see "urgent"
+
 
   @javascript
   Scenario: a user can manually create a new complaint that is uppercased and the path will become lowercased

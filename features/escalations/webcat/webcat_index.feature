@@ -630,11 +630,11 @@ Feature: Webcat complaints index
       | 5113 | John Bly owns this |      14     | CUSTOMER       | talos-intelligence |
       | 5114 | Unknown origin     |      15     | CUSTOMER       | talos-intelligence |
     And the following complaint entries exist:
-      | id   | complaint_id | uri                    | domain                | entry_type | status | platform_id | suggested_disposition |
-      | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | NEW    |      1      | 
-      | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | NEW    |      1      |
-      | 9333 | 5113         | evilmastermind.com     | evilmastermind.com    | URI/DOMAIN | NEW    |      1      |
-      | 9444 | 5114         | timetravelingorb.com   | timetravelingorb.com  | URI/DOMAIN | NEW    |      1      |
+      | id   | complaint_id | uri                    | domain                | entry_type | status   | platform_id | suggested_disposition | user_id |
+      | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | ASSIGNED |      1      | News                  |    1    |
+      | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    |
+      | 9333 | 5113         | evilmastermind.com     | evilmastermind.com    | URI/DOMAIN | ASSIGNED |      1      | Paranormal            |    1    |
+      | 9444 | 5114         | timetravelingorb.com   | timetravelingorb.com  | URI/DOMAIN | ASSIGNED |      1      | Paranormal            |    1    |
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "3" seconds
 
