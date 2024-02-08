@@ -305,12 +305,11 @@ Feature: Webcat complaint entry assignment
     And I click "#index_change_assign"
     And I wait for "1" seconds
     And I click "#index_target_assignee"
-#    And I click option
-#    And I select "linda_belcher" from "#index_target_assignee"
     And I click "#assignee_3"
     And I click "#button_reassign"
     And I wait for "3" seconds
-    And take a screenshot
+    And I should see "Linda Belcher"
+
 
 
 # TODO Part 1
