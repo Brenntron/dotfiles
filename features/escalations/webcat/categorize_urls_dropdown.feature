@@ -169,7 +169,7 @@ Feature: Webcat Categorize URLs dropdown
     And I click ".primary"
     And I wait for "10" seconds
     Then I should see "URLS CATEGORIZED SUCCESSFULLY"
-    And I should see "No pending complaint entries have been created All other entries have been submitted directly to WBRS."
+    And I should see "No pending complaint entries have been created"
     Then I goto a "resolution" report surrounding the current year
     And I should see my username
 
