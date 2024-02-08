@@ -211,6 +211,11 @@ Then(/^I should see the "(.*?)" radio checked$/) do |radio_class|
   raise "Radio with class #{radio_class} not checked" if radio.checked?.blank?
 end
 
+Then(/^I should see the radio with id "(.*?)" checked$/) do |radio_id|
+  radio = page.find(:xpath, "//input[@type='radio' and @id='#{radio_id}']")
+  raise "Radio with class #{radio_class} not checked" if radio.checked?.blank?
+end
+
 Then(/^I should see the "(.*?)" checkbox checked$/) do |checkbox_class|
   page.find(checkbox_class).should be_checked
 end
@@ -637,4 +642,8 @@ end
 
 And(/^I refresh the page$/) do
   page.driver.browser.navigate.refresh
+end
+
+When(/^I click element with tag "(.*?)" and text "(.*?)"$/) do |tag, text|
+  page.find(tag, text: text).click
 end
