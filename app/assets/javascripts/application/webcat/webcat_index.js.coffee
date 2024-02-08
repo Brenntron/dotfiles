@@ -8,7 +8,6 @@ $ ->
     url = $('#complaints-index').data('source')
     build_complaints_table(url)
 
-
 #### New complaints index table setup
 build_complaints_table = (url) ->
   console.log 'build complaints table triggered'
@@ -48,7 +47,7 @@ build_complaints_table = (url) ->
     processing: true
     serverSide: true
     stateSave: true
-    select: true
+    select: false
     ajax:
       url: url
       data: build_data()
@@ -70,9 +69,30 @@ build_complaints_table = (url) ->
         # confirm this function is in the right locatino
         use_user_preference_filter()
 
-        $('#complaints-index tbody tr *').click ->
-          main_row = $(this).parents('tr.cat-index-main-row')[0]
-          $(main_row).toggleClass('selected')
+        $('#complaints-index tbody tr *').click (e) ->
+          $main_row = $(this).parents('tr.cat-index-main-row')
+          data_table = $('#complaints-index').DataTable()
+          main_row_id = $main_row.attr('id')
+          row = data_table.row("##{main_row_id}")
+          selected = $main_row.hasClass 'selected'
+          $target = $(e.target)
+
+          # prevent deselecting the row if the user interacts with a button, link or input and prevent multiple events from firing
+          return if (selected and $target.prop('nodeName') in ['A', 'BUTTON', 'INPUT']) || e.target != e.currentTarget
+
+          # open the internal comment dropdown when the internal comment button is clicked and the row is selected
+          if $target.hasClass('comment-button')
+            $target.dropdown('toggle')
+
+          if selected
+            row.deselect()
+            disable_bulk_resolution_tool()
+          else
+            row.select()
+            enable_bulk_resolution_tool()
+
+          check_enable_toolbar_buttons()
+          verifyMasterSubmit()
 
     createdRow: (row, data) ->
       $(row).addClass('cat-index-main-row')
@@ -421,10 +441,10 @@ build_complaints_table = (url) ->
             '<div class="resolution-comment-dialog hide" id="resolution_comment_dialog_' + full.entry_id + '" title="' + dialog_title + '">' +
               '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
               '<label class="content-label-sm full-row-label">Resolution Email Template</label>' +
-              '<select class="response-template-select" id="entry-email-response-to-customers-select_' + full.entry_id + '"></select>' +
+              '<select class="response-template-select" id="entry_email_response_to_customers-select_' + full.entry_id + '"></select>' +
               '</div></div><div class="row"><div class="col-xs-12">' +
               '<label class="content-label-sm full-row-label">Response to Customer</label>' +
-              '<textarea class="email-response-input" id="entry-email-response-to-customers_' + full.entry_id + '" name="customer_facing_comment" type="text"></textarea>' +
+              '<textarea class="email-response-input" id="entry_email_response_to_customers_' + full.entry_id + '" name="customer_facing_comment" type="text"></textarea>' +
               '<label class="content-label-sm full-row-label">*Edits to the above textarea will be saved upon submitting the entry. Selecting a different template or resolution will replace any text added above.</label>' +
               '</div></div></div>' +
             '</div>'
@@ -434,7 +454,7 @@ build_complaints_table = (url) ->
               '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
               '<label class="content-label-sm full-row-label">Email Response to Customer</label>' +
               '</div></div><div class="row"><div class="col-xs-12">' +
-              '<div id="entry-email-response-to-customers_' + full.entry_id + '">' + res_comment + '</div>' +
+              '<div id="entry_email_response_to_customers_' + full.entry_id + '">' + res_comment + '</div>' +
               '</div></div></div>' +
               '</div>'
 
@@ -602,7 +622,7 @@ build_data = () ->
       }
     when 'standard'
       urlParams = new URLSearchParams(location.search);
-      refresh_localStorage()
+      refresh_webcat_localStorage()
       data = {
         search_type: webcat_search_type
         search_name: urlParams.get('f')
