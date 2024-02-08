@@ -276,8 +276,45 @@ Feature: Webcat complaint entry assignment
     And  I wait for "3" seconds
     And  I should not see "ERROR RETURNING ENTRIES"
 
+
+  #TODO - this is getting an error in the testing env, but not in browser
+  @javascript
+  Scenario: a manager can assign a user to a complaint
+    Given a user with role "webcat manager" exists and is logged in
+    And the following users exist
+      | id | cvs_username  | cec_username  | display_name   |
+      | 2  | bob_belcher   | bob_belcher   | Bob Belcher    |
+      | 3  | linda_belcher | linda_belcher | Linda Belcher  |
+      | 4  | tina_belcher  | tina_belcher  | Tina Belcher   |
+    And the following org_subsets exist:
+      | id | name   |
+      | 7  | webcat |
+    And the following roles exist:
+      | id | role        | org_subset_id |
+      | 17 | webcat user |     7         |
+    And a user with id "2" has a role of "webcat user"
+    And a user with id "3" has a role of "webcat user"
+    And a user with id "4" has a role of "webcat user"
+    And the following complaint entries exist:
+      | id    | uri                 | domain          | entry_type | status  |
+      | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
+      | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | NEW     |
+    And  I goto "/escalations/webcat/complaints"
+    And  I wait for "3" seconds
+    And I click row with id "1"
+    And I click "#index_change_assign"
+    And I wait for "1" seconds
+    And I click "#index_target_assignee"
+#    And I click option
+#    And I select "linda_belcher" from "#index_target_assignee"
+    And I click "#assignee_3"
+    And I click "#button_reassign"
+    And I wait for "3" seconds
+    And take a screenshot
+
+
 # TODO Part 1
-#  Scenario: a manager can assign a user to a complaint
+
 #  Scenario: a manager can assign a user to multiple complaints
 #  Scenario: a manager can assign a user as a reviewer to a complaint
 #  Scenario: a manager can assign a user as a second reviewer to a complaint
