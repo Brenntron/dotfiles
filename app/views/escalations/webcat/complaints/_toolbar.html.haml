@@ -1,6 +1,6 @@
 #webcat-index-toolbar.toolbar
   %div
-    %div.webcat-toolbar-select-all-wrapper
+    .webcat-toolbar-select-all-wrapper
       %input{type: 'checkbox', id:'complaints_select_all'}
       %label{for: 'complaints_select_all'} Select All
   %div
@@ -195,30 +195,14 @@
       %span.toolbar-button-text Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped-webcat-toolbar{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
       %span.toolbar-button-text WBNP Data
-
-  %div.webcat-toolbar-push
-    - if params[:f] != "REVIEW"
+  .webcat-toolbar-push
+    - if params[:f] == "REVIEW"
+      %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
+        %span Confirm Review
+    - else
       %button#index_update_resolution.toolbar-button.resolution-submit-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', onclick: "$('#index_change_resolution_dialog').dialog('open');"}
         %span
           Bulk Resolution Tool
-
-      -#.dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_update_resolution'}
-      -#  .edit-resolution-container
-      -#    %label.toolbar-section-label.edit-resolution-label{for:'complaint[resolution]'} Resolution
-      -#    = select(:complaint, :resolution, options_for_select([["Unchanged", "UNCHANGED"], ["Invalid", "INVALID"], ["Reopened", "REOPENED"]]))
-      -#    .comment-wrapper.internal_comment_container
-      -#      %label.toolbar-section-label{'for':'internal_comment'} Internal Comment
-      -#      %input.form-control#internal_comment{:name => "internal_comment", :placeholder => "Add a comment.", :type => "text", :value => ""}
-      -#    .comment-wrapper.customer_facing_comment_container
-      -#      %label.toolbar-section-label{'for':'customer_facing_comment'} Customer Facing Comment
-      -#      %input.form-control#customer_facing_comment{:name => "customer_facing_comment", :placeholder => "Add a comment for the customer.", :type => "text", :value => ""}
-      -#    %button#button_update_resolution.primary{type:'button', onclick:'updateResolutionDialog();'}
-      -#      Update
-      %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'bulk_submit_categorize_entries();', title: 'Submit multiple edited entries with any changes entered.', disabled: 'disabled'}
-        %span Bulk Submit
-    - else
-      %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
-        %span Confirm Review
   %div.webcat-toolbar-tall-wrapper
     %input{type: 'checkbox', id:'self_review'}
     %label{for: 'self_review'} Allow Self Review
