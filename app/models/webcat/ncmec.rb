@@ -1,8 +1,13 @@
-class Webcat::Iwf
+class Webcat::Ncmec
   include ActiveModel::Model
 
   def self.host
-    @host ||= "servicebak.iwf.org.uk"
+    if Rails.env == "production"
+      @host ||= "report.cybertip.org"
+    else
+      @host ||= "exttest.cybertip.org"
+    end
+
   end
 
   def self.port
@@ -122,7 +127,6 @@ class Webcat::Iwf
     if response.code > 204
       raise RepApi::RepApiError, "HTTP code: #{response.code} Error code #{code.to_s}: #{description}"
     else
-      response_body["IWFReportService1.0"]["rawBody"] = response.body
       data = response_body["IWFReportService1.0"]
     end
 

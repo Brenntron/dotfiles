@@ -564,6 +564,7 @@ class ComplaintEntry < ApplicationRecord
       result = AbusiveContentTool.submit_abuse_to_authorities(self, user, SimpleIDN.to_ascii(ip_or_uri))
 
       if result[:status].to_s == "success"
+        #move this to the abuse content tool
         abusive_info = {}
         abusive_info[:iwf_report_id] = "IWF report submission ID: #{result[:data]}"
         self.abuse_information = abusive_info.to_json
@@ -579,7 +580,7 @@ class ComplaintEntry < ApplicationRecord
         conn.post(report_alert_args, attachments_to_mail)
 
       else
-        raise "IWF submission issue: #{result[:message]}"
+        raise "Abuse submission issue: #{result[:message]}"
       end
     end
 
