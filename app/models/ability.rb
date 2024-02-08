@@ -43,10 +43,11 @@ class Ability
         user.ancestors.include?(current_user)
       end
       can [:read, :show_multiple, :advanced_search, :named_search, :standard_search, :contains_search], Complaint
+      can :manage, [Complaint, ComplaintEntry, ResolutionMessageTemplate]
     end
 
     if role_names.include?('webcat user')
-      can :manage, [Complaint, ComplaintEntry]
+      can :manage, [Complaint, ComplaintEntry, ResolutionMessageTemplate]
     end
 
 
