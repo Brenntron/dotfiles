@@ -222,18 +222,8 @@ $ ->
         icon.removeClass('favorite-search-icon-active').addClass('favorite-search-icon')
     )
 
-  set_icon_for_favorite_filter = (filter_name) ->
-    filter_dropdown = $("#filter-dropdown > #filter-cases-list a[href='#{filter_name}']")
-
-    saved_search = window.find_saved_search_by_name(filter_name)
-
-    if filter_dropdown.length > 0
-      filter_dropdown.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
-    else if saved_search
-      saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
 
   window.use_user_preference_filter = () ->
-
     return if window.location.pathname != '/escalations/webcat/complaints'
 
     { icon, link, name } = chosen_default_filter()
@@ -263,20 +253,6 @@ $ ->
     else
       return name == localStorage.webcat_search_name
 
-  window.pull_user_preference_filter = () ->
-    return if window.location.pathname != '/escalations/webcat/complaints'
-
-    std_msg_ajax(
-      method: 'POST'
-      url: '/escalations/api/v1/escalations/user_preferences/'
-      data: { name: 'webcat_complaints_filter' }
-      success: (response) ->
-        return unless response?
-        name = JSON.parse(response).name
-        set_icon_for_favorite_filter(name)
-    )
-
-  pull_user_preference_filter()
 
 
 

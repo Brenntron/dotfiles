@@ -6,7 +6,8 @@ $ ->
 
     # Create index table
     url = $('#complaints-index').data('source')
-    build_complaints_table(url)
+    $.when(pull_user_preference_filter()).done ->
+      build_complaints_table(url)
 
 
 #### New complaints index table setup
@@ -66,9 +67,6 @@ build_complaints_table = (url) ->
         rows = $('#complaints-index').find('.cat-index-main-row')
         get_current_cats(rows)
         create_ind_res_dialogs()
-
-        # confirm this function is in the right locatino
-        use_user_preference_filter()
 
         $('#complaints-index tbody tr *').click ->
           main_row = $(this).parents('tr.cat-index-main-row')[0]
@@ -576,7 +574,7 @@ build_complaints_table = (url) ->
 # build_header is called at the bottom of this function to format the search header
 ###
 build_data = () ->
-  console.log 'building data from search params'
+  # check local storage first
   { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
   { search } = location
 
@@ -588,33 +586,51 @@ build_data = () ->
   if search != ''
     webcat_search_type = 'standard'
     urlParams = new URLSearchParams(location.search);
-  switch(webcat_search_type)
-    when 'advanced'
-      data = {
-        search_type: webcat_search_type
-        search_name : webcat_search_name
-        search_conditions: webcat_search_conditions
-      }
-    when 'contains'
-      data = {
-        search_type: webcat_search_type
-        search_conditions: webcat_search_conditions
-      }
-    when 'standard'
-      urlParams = new URLSearchParams(location.search);
+
+  if webcat_search_type?
+    switch(webcat_search_type)
+      when 'advanced'
+        data = {
+          search_type: webcat_search_type
+          search_name : webcat_search_name
+          search_conditions: webcat_search_conditions
+        }
+      when 'contains'
+        data = {
+          search_type: webcat_search_type
+          search_conditions: webcat_search_conditions
+        }
+      when 'standard'
+        urlParams = new URLSearchParams(location.search);
+        refresh_localStorage()
+        data = {
+          search_type: webcat_search_type
+          search_name: urlParams.get('f')
+        }
+      when 'named'
+        data = {
+          search_type: webcat_search_type
+          search_name: webcat_search_name
+        }
+
+    build_header(data)
+    return data
+
+  else
+    # check users chosen default filter
+    fav = $('.favorite-search-icon-active')
+    if fav.length > 0
+      link = $(fav[0]).prev()
+      address = $(link).attr('href')
+      filter = address.split('=').pop();
+
       refresh_localStorage()
       data = {
-        search_type: webcat_search_type
-        search_name: urlParams.get('f')
+        search_type: 'standard'
+        search_name: filter
       }
-    when 'named'
-      data = {
-        search_type: webcat_search_type
-        search_name: webcat_search_name
-      }
-  $.when(pull_user_preference_filter()).done -> build_header(data)
-  return data
-
+      build_header(data)
+      return data
 
 
 ###
@@ -708,3 +724,26 @@ build_subheader = (subheader) ->
         condition_HTML = '<span>' + condition + '</span>'
 
       container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
+
+
+window.pull_user_preference_filter = () ->
+  return if window.location.pathname != '/escalations/webcat/complaints'
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/user_preferences/'
+    data: { name: 'webcat_complaints_filter' }
+    success: (response) ->
+      return unless response?
+      name = JSON.parse(response).name
+      set_icon_for_favorite_filter(name)
+  )
+
+
+set_icon_for_favorite_filter = (filter_name) ->
+  filter_dropdown = $("#filter-dropdown > #filter-cases-list a[href='#{filter_name}']")
+  saved_search = window.find_saved_search_by_name(filter_name)
+
+  if filter_dropdown.length > 0
+    filter_dropdown.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+  else if saved_search
+    saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
