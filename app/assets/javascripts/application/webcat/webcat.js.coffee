@@ -588,7 +588,6 @@ load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status)
     }
 
 
-# Is this hit multiple times in places? Confirm.
 fetch_external_categories = (entry_id) ->
   std_msg_ajax(
     method: 'POST'

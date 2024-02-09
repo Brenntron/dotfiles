@@ -12,11 +12,8 @@ $ ->
 
 #### New complaints index table setup
 build_complaints_table = (url) ->
-  console.log 'build complaints table triggered'
   complaint_table = $('#complaints-index').DataTable(
     initComplete: ->
-
-      console.log 'init complete'
       # Get display prefs
       get_display_prefs()
 
@@ -351,17 +348,21 @@ build_complaints_table = (url) ->
         render: (data, type, full, meta) ->
           history_url = full.uri || full.ip_address
           history_button =
-            '<button class="history-button" id="entry-history-' + full.entry_id + '" ' +
-              'onclick="history_dialog(\'' + full.entry_id + '\', \'' + history_url + '\')"></button>'
+            '<button class="history-button esc-tooltipped" id="entry-history-' + full.entry_id + '" ' +
+              'onclick="history_dialog(\'' + full.entry_id + '\', \'' + history_url + '\')" ' +
+              'title="Domain History"></button>'
 
           whois_url = full.domain || full.ip_address
           whois_button =
-            '<button class="whois-button" id="whois-' + full.entry_id + '" ' +
-              'onclick="WebCat.RepLookup.whoIsLookup(\'' + whois_url + '\')"></button>'
+            '<button class="whois-button esc-tooltipped" id="whois-' + full.entry_id + '" ' +
+              'onclick="WebCat.RepLookup.whoIsLookup(\'' + whois_url + '\')"' +
+              'title="Whois Information"></button>'
 
           lookup_url = full.subdomain + '.' + full.domain || full.ip_address
           lookup_button =
-            '<a class="button-wrapper-link" href="https://www.google.com/search?q=site%3A' + lookup_url + '" target="_blank"><button id="google-' + full.entry_id + '" class="lookup-button"></button></a>'
+            '<a class="button-wrapper-link" href="https://www.google.com/search?q=site%3A' + lookup_url +
+              '" target="_blank"><button id="google-' + full.entry_id + '" class="lookup-button esc-tooltipped" ' +
+              'title="Google Search"></button></a>'
 
           visit_url = history_url
           if full.wbrs_score <= -6
@@ -369,7 +370,8 @@ build_complaints_table = (url) ->
               '<button id="open-' + full.entry_id + '" class="open-all" disabled></button>'
           else
             visit_button =
-              '<a class="button-wrapper-link" href="http://' + visit_url + '" target="_blank"><button id="open-' + full.entry_id + '" class="open-all"></button></a>'
+              '<a class="button-wrapper-link" href="http://' + visit_url + '" target="_blank"><button id="open-' + full.entry_id +
+                '" class="open-all esc-tooltipped" title="Open in New Tab"></button></a>'
 
           return history_button + whois_button + lookup_button + visit_button
       }
