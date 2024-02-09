@@ -360,7 +360,7 @@ Feature: Webcat complaint entry assignment
     And I should see "The following entries could not be returned: Someone else is currently reviewing - 1"
 
   @javascript
-  Scenario:  a non-manager cannot unassign a reviewer from a complaint
+  Scenario:  a non-manager cannot unassign a second reviewer from a complaint
     Given a user with role "webcat user" exists and is logged in
     And the following users exist
       | id | cvs_username  | cec_username  | display_name |
@@ -377,6 +377,7 @@ Feature: Webcat complaint entry assignment
     And I wait for "2" seconds
     And I should see "ERROR RETURNING ENTRIES"
     And I should see "The following entries could not be returned: Someone else is currently reviewing - 1"
+
 
 # TODO Part 2
 #  Scenario: a non-manager cannot assign a user other than themself to a complaint

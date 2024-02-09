@@ -168,8 +168,19 @@ Feature: Webcat complaints index
     And I should not see "blah.com"
 
 
+  @javascript
+  Scenario: a user tries to submit bulk selected entries with Fixed resolution that do not have a category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And pending
 
 #    TODO
+  # the bulk submit button is disabled if there have been no changes to entries
 #  Scenario: user tries to submit bulk selected entries with Fixed resolution that do not have a category
 #  Scenario: user tries to submit bulk selected entries with Invalid resolution
   # Scenario: user tries to submit bulk selected entries with Unchanged resolution
@@ -179,7 +190,7 @@ Feature: Webcat complaints index
 
 
 
-  # TODO - this does not work in testing env yet - the pop up does not prevent refresh
+  # TODO - this does not work in testing env yet - the pop up does not prevent refresh, could be a ff setting
   # might need tweaks to testing browser
   @javascript
   Scenario: a user sees a pop-up window if they make changes to an entry but do not submit
@@ -605,6 +616,9 @@ Feature: Webcat complaints index
     Then the following complaint entry with id: "1" has a status of: "REOPENED"
 
 
+
+  ## Hide / Show functionality
+
   @javascript
   Scenario: a user can show/hide entire columns in the complaints view
     Given a user with role "webcat user" exists and is logged in
@@ -710,6 +724,38 @@ Feature: Webcat complaints index
     And I should not see "Gilligan's Co."
     And I should not see "msummers@isnlandtours.com"
     And I should not see "ggrant@islandtours.com"
+
+
+  ## Sorting functionality ###
+
+  @javascript
+  Scenario: a user can sort using the Age quicksort button in the toolbar
+    Given a user with role "webcat user" exists and is logged in
+    And the following platforms exist:
+      | id | public_name       | internal_name     | webcat |
+      | 1  | TalosIntelligence | TalosIntelligence |   1    |
+    And the following complaint entries exist:
+      | id   | uri                            | domain                        | entry_type | status   | platform_id | suggested_disposition | user_id | created_at          |
+      | 9111 | hurricaneshere.com             | hurricaneshere.com            | URI/DOMAIN | ASSIGNED |      1      | News                  |    1    | 2023-11-01 10:10:10 |
+      | 9222 | tinyhiddenislands.com          | tinyhiddenislands.com         | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    | 2023-12-01 10:10:10 |
+      | 9333 | totallysafetours.com           | totallysafetours.com          | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    | 2024-01-01 10:10:10 |
+      | 9444 | howtosurvivebeingstranded.com  | howtosurvivebeingstranded.com | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    | 2024-01-04 10:10:10 |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And pending
+#    And row with id x should be in the dom above row with id y?
+
+
+  #TODO
+  ## Sorting the new index
+  ## Not sure how to check the order of the rows in testing env
+
+  # - a user can sort using the Age quicksort button in the toolbar
+  # - a user can sort using the IP/URI quicksort button in the toolbar
+  # - a user can sort by additional criteria in the age dropdown
+  # - a users sort preferences should be stored upon page refresh
+  # - a user can sort by criteria that are not visible on that page
+
 
 
 # Keepting these setups for reference for now

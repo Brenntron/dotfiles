@@ -637,3 +637,10 @@ Feature: Webcat index filters
     Then I should see "ASSIGNED"
 
 
+#TODO - add tests for the favorite filter
+  # - a user sets a favorite filter and when they go to the index it loads that filter
+  # - a user has a set favorite filter, looks at a different filtered result set and uses the clear button to return to their chosen default
+  # - a user has a set favorite filter, performs a search and uses the clear button to return to their chosen default
+  # - a user has a set favorite filter, performs an advanced search and uses the clear button to return to their chosen default
+  # - a user changes their favorite filter and on refresh the filter dropdown shows the newly selected filter as starred
+
