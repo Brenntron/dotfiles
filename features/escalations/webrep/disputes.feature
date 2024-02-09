@@ -1172,8 +1172,7 @@ Feature: Disputes
     And  I wait for "3" seconds
     Then I click "#new-dispute"
     And  I wait for "1" seconds
-#    WHY IS THERE A COMMA IN THIS STEP DEF?
-    And  I fill in element, "#ips_urls" with "petful.com"
+    And  I fill in element "#ips_urls" with "petful.com"
     And  I click button "submit"
     And  I wait for "10" seconds
     And  I click button with class "close"

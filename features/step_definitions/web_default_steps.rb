@@ -14,7 +14,7 @@ Given(/^I fill in "(.*?)" with "(.*?)" and press enter$/) do |field_label, value
   find(:id, field_label).native.send_keys(:enter)
 end
 
-Given(/^I fill in element, "(.*?)" with "(.*?)"$/) do |identifier, value|
+Given(/^I fill in element "(.*?)" with "(.*?)"$/) do |identifier, value|
   page.find(identifier).set(value)
 end
 
@@ -638,6 +638,10 @@ end
 Then(/^I accept the user prompt$/) do
   alert = page.driver.browser.switch_to.alert
   alert.accept
+end
+
+And(/^I refresh the page$/) do
+  page.driver.browser.navigate.refresh
 end
 
 When(/^I click element with tag "(.*?)" and text "(.*?)"$/) do |tag, text|

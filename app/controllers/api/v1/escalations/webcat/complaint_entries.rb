@@ -261,7 +261,7 @@ module API
                 results << { id: id, result: result }
               end
 
-              {status: "success", data: results, cvs_username: user.cvs_username}.to_json
+              {status: "success", data: results, cvs_username: user.cvs_username, name: user.display_name }.to_json
             end
 
 

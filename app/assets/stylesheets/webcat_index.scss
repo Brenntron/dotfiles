@@ -2,7 +2,8 @@
 
 #complaints-index {
   tbody > tr > td, thead > tr > th {
-    padding: 6px
+    padding: 6px;
+    line-height: 1.22em;
   }
   table.nested-col-table td {
     padding: 1px 0;
@@ -40,6 +41,7 @@
   .current-cat-col {
     font-size: 11px;
     color: #4E4E4E;
+    padding-top: 3px !important;
     .tooltip-underline {
       text-decoration: underline dotted;
     }
@@ -76,10 +78,10 @@
   td.resolution-col {
     padding: 0 0 4px 0;
     .res-radio-row {
-      padding: 4px;
+      padding: 2px 4px 3px 4px;;
       background-color: #EEF7FB;
       .res-radio-wrapper {
-        margin: 1px 20px 1px 1px;
+        margin: 0 20px 1px 1px;
         width: auto;
         display: inline-block;
         input {
@@ -309,6 +311,24 @@
         margin: 0 0 4px 0;
       }
     }
+  }
+}
+
+.toolbar .no-float-no-pad {
+  float: none;
+  padding-left: 0 !important;
+}
+
+.toolbar-button-text-wider {
+  display: none;
+  @media (min-width: 1400px) {
+    display: inline-block;
+  }
+}
+.toolbar-button-text-wider-alt {
+  display: inline-block;
+  @media (min-width: 1400px) {
+    display: none;
   }
 }
 
@@ -749,7 +769,7 @@ table.dataTable tbody tr.submitting-entry {
 
 .btn-group.toolbar-btn-group.assignment-btn-group {
   align-items: center;
-  background-color: #d7dadb;
+  background-color: #f2f2f2;
   border: none;
   display: flex;
   margin: 0 3px 0 0;

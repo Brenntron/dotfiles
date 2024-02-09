@@ -26,7 +26,7 @@ namespace 'AC.FileRep', (exports) ->
         selectize = element[0].selectize
 
         for platform in response.data
-          selectize.addOption({ public_name: platform })
+          selectize.addOption(platform)
     )
 
   exports.populateSearchCriteria = ->
