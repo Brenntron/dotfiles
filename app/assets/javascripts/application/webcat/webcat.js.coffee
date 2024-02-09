@@ -805,7 +805,7 @@ $ ->
       status = $('input[name=resolution' + entry_id + ']:checked').val()
 
     comment = $('#internal_comment_' + entry_id).val()
-    resolution_msg = $('#entry-email-response-to-customers_' + entry_id).text()
+    resolution_msg = $('#entry-email-response-to-customers_' + entry_id).val()
     uri = $('#edit_uri_input_' + entry_id).val()
     if $('#input_cat_'+entry_id).val() != null
       cat_ids = $('#input_cat_'+entry_id).val().toString()
