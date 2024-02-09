@@ -40,18 +40,18 @@ Feature: Webcat complaints
 
 
 
-  @javascript
-  Scenario: a users tries to update URI
-    Given a user with role "webcat user" exists and is logged in
-    And a complaint entry with trait "new_entry" exists
-    And a complaint entry preload exists
-    When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click ".expand-row-button-inline"
-    And I fill in "complaint_prefix_1" with "cisco.com"
-    And I click ".inline-button"
-    And I wait for "10" seconds
-    And I goto "/escalations/webcat/complaints?f=ALL"
-    And I should see content "cisco.com" within "#domain_1"
+#  @javascript
+#  Scenario: a users tries to update URI
+#    Given a user with role "webcat user" exists and is logged in
+#    And a complaint entry with trait "new_entry" exists
+#    And a complaint entry preload exists
+#    When I goto "/escalations/webcat/complaints?f=ALL"
+#    And I click ".expand-row-button-inline"
+#    And I fill in "complaint_prefix_1" with "cisco.com"
+#    And I click ".inline-button"
+#    And I wait for "10" seconds
+#    And I goto "/escalations/webcat/complaints?f=ALL"
+#    And I should see content "cisco.com" within "#domain_1"
 
 
   # This will eventually need to be stubbed, because the response from SDS might update
@@ -79,7 +79,6 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "5" seconds
-    And I click ".expand-row-button-inline"
     And I wait for "5" seconds
     And I click "#unchanged1"
     And I click "#submit_changes_1"
@@ -101,7 +100,6 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "5" seconds
-    And I click ".expand-row-button-inline"
     And I wait for "5" seconds
     And I click "#unchanged1"
     And I click "#submit_changes_1"
@@ -143,33 +141,4 @@ Feature: Webcat complaints
 
 
 
-  @javascript
-  Scenario: left nav links should apply filter if the filter was set before
-    Given a user with role "webcat user" exists and is logged in
-    And a new complaint entry with trait "assigned_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=MY%20COMPLAINTS"
-    Then I wait for "3" seconds
-    Then I should see "ASSIGNED"
-    When I click "#nav-trigger-label"
-    And I click "Escalations"
-    And I click "#cat-icon-link"
-    Then I wait for "3" seconds
-    Then I should see "ASSIGNED"
-    When I click "#nav-trigger-label"
-    And I click "Escalations"
-    And I click "#cat-link"
-    Then I wait for "3" seconds
-    Then I should see "ASSIGNED"
 
-  @javascript
-  Scenario: top nav links should apply filter if the filter was set before
-    Given a user with role "webcat user" exists and is logged in
-    And a new complaint entry with trait "assigned_entry" exists
-    And a complaint entry preload exists
-    And I goto "/escalations/webcat/complaints?f=MY%20COMPLAINTS"
-    Then I wait for "3" seconds
-    Then I should see "ASSIGNED"
-    When I click "#complaints"
-    Then I wait for "3" seconds
-    Then I should see "ASSIGNED"

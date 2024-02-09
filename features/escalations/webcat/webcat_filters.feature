@@ -603,3 +603,37 @@ Feature: Webcat index filters
     And I should see "purl.com"
     And I should see "gurl.com"
     And I should see "twirl.com"
+
+
+  @javascript
+  Scenario: left nav links should apply filter if the filter was set before
+    Given a user with role "webcat user" exists and is logged in
+    And a new complaint entry with trait "assigned_entry" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=MY%20COMPLAINTS"
+    Then I wait for "3" seconds
+    Then I should see "ASSIGNED"
+    When I click "#nav-trigger-label"
+    And I click "Escalations"
+    And I click "#cat-icon-link"
+    Then I wait for "3" seconds
+    Then I should see "ASSIGNED"
+    When I click "#nav-trigger-label"
+    And I click "Escalations"
+    And I click "#cat-link"
+    Then I wait for "3" seconds
+    Then I should see "ASSIGNED"
+
+  @javascript
+  Scenario: top nav links should apply filter if the filter was set before
+    Given a user with role "webcat user" exists and is logged in
+    And a new complaint entry with trait "assigned_entry" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=MY%20COMPLAINTS"
+    Then I wait for "3" seconds
+    Then I should see "ASSIGNED"
+    When I click "#complaints"
+    Then I wait for "3" seconds
+    Then I should see "ASSIGNED"
+
+
