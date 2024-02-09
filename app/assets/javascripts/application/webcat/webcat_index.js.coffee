@@ -61,7 +61,6 @@ build_complaints_table = (url) ->
         console.log 'There has been an error calling the backend data'
         webcat_refresh()
       complete: ->
-        console.log 'complete'
 
         # Grab current categories per entry
         rows = $('#complaints-index').find('.cat-index-main-row')
@@ -390,8 +389,7 @@ build_complaints_table = (url) ->
               '<tr><td id="current_cat_' + full.entry_id + '" class="current-cat-col"></td></tr>' +
               '<tr><td class="edit-cat-col">' +
               '<select id="input_cat_' + full.entry_id + '" name="input_cat_' +
-              full.entry_id + '" class="nested-table-input" placeholder="Enter categories / confidence order" ' +
-              'onchange="store_entry_changes(\'' + full.entry_id + '\')"' + disabled + '>' +
+              full.entry_id + '" class="nested-table-input" placeholder="Enter categories / confidence order" ' + disabled + '>' +
               '</select>' +
               '</td></tr>' +
               '</tbody>' +

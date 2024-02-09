@@ -91,8 +91,8 @@ window.bulk_submit_categorize_entries = () ->
     uri = $($(entry_row).find('.complaint-uri-input')[0]).val()
     status = $(entry_row).find('.resolution_radio_button:checked').val()
     comment = $(entry_row).find('textarea.internal-comment').val()
+    resolution_comment = $("#entry-email-response-to-customers_#{entry_id}").val()
     user_action = ''
-    # TODO add in resolution comments (currently in QA)
 
     if $('#input_cat_' + entry_id).val() != null
       cat_ids_array = $('#input_cat_' + entry_id).val()
@@ -102,7 +102,6 @@ window.bulk_submit_categorize_entries = () ->
       cat_ids_array = []
 
     # compare current categories to what user entered
-    # check with webcat to see if they want more detailed confirmation panel
     if curr_cat_ids == ''
       curr_cat_count = 0
     else
@@ -114,10 +113,13 @@ window.bulk_submit_categorize_entries = () ->
       user_action = 'remove'
     else
       # same number of cats, do they match?
-      if cat_ids_array.sort().toString() == curr_cat_ids.sort().toString()
+      if cat_ids_array.length == 0 && curr_cat_ids.length == 0
         user_action = 'none'
       else
-        user_action = 'swap'
+        if cat_ids_array.sort().toString() == curr_cat_ids.sort().toString()
+          user_action = 'none'
+        else
+          user_action = 'swap'
 
     category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
     category_names_arr = []
@@ -138,7 +140,7 @@ window.bulk_submit_categorize_entries = () ->
         category_names: category_names,
         status: status,
         comment: comment,
-  #      resolution_comment: resolution_comment,
+        resolution_comment: resolution_comment,
         uri_as_categorized: uri,
         self_review: self_review
       })
@@ -150,10 +152,15 @@ window.bulk_submit_categorize_entries = () ->
     $('#bulk-submit-buttons').removeClass('hidden')
     if incomplete_entries.length > 0
       $('#incomplete-entries-wrapper').removeClass('hidden')
+    else
+      $('#incomplete-entries-wrapper').addClass('hidden')
     if entries_to_submit.length > 0
       $('#complete-entries-wrapper').removeClass('hidden')
+      $('#bulk-submit-correct-btn').removeAttr('disabled')
+    else
+      $('#complete-entries-wrapper').addClass('hidden')
+      $('#bulk-submit-correct-btn').attr('disabled', 'disabled')
 
-  # TODO - after UI testing, remove the action column from the tables, or hide
   # Populate confirmation dialog
   $('#bulk-submit-confirmation').modal('show')
   entries_to_submit = JSON.stringify(entries_to_submit)
@@ -167,12 +174,14 @@ window.process_bulk_submission = () ->
   $('#bulk-submit-confirmation .loader-wrapper').removeClass('hidden')
   entries_to_submit = sessionStorage.getItem('webcat-entries-to-submit')
   data = JSON.parse(entries_to_submit)
+  window.prevent_close()
 
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
     data: {data: data}
     success: (response) ->
+
       #TODO - need to figure out partial success / fails w/ api calls
       json = JSON.parse(response)
       console.log json
@@ -296,7 +305,7 @@ window.process_bulk_reviews = () ->
   $('#bulk-submit-review-confirmation .loader-wrapper').removeClass('hidden')
   reviewed_entries =   sessionStorage.getItem('webcat-reviewed-entries-to-submit')
   data = JSON.parse(reviewed_entries)
-
+  window.prevent_close()
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
@@ -399,30 +408,6 @@ window.fetch_complaints = () ->
     success_msg: 'Complaint updates requested from Talos-Intelligence.  Please refresh your page shortly.'
     error_prefix: 'Error fetching complaints.'
   )
-
-
-
-#bulk submit old
-# TODO - api error handling, below for reference temporarily
-#processSubmitMaster = () ->
-#  std_msg_ajax(
-#    method: 'POST'
-#    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
-#    data: {data: data}
-#    success: (response) ->
-#      errors = false
-##      api_errors = []
-
-#      api_boiler_plate =  "The following entries could not be saved due to API errors: " + api_errors.toString() + "<br>"
-#
-#      error_msg = ''
-
-#      if errors == true
-#        std_msg_error(error_msg,"")
-#      else
-#      std_msg_error("Unable to submit changes for selected entries.","", reload: false)
-
-
 
 
 # Checks if there have been changes on the page
