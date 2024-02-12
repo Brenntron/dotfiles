@@ -199,7 +199,11 @@
       .contact-email-wrapper
         %label.content-label-sm
           Contact Email
-        %p.dispute-edit-field#dispute-customer-email= @dispute.customer_email
+        %p.dispute-edit-field#dispute-customer-Email
+          - email = @dispute.customer.email
+          #{email}
+          %a.ban.dispute-show{title: "Ban #{email}", href: "#{Rails.configuration.bunhammer_host + '?q=' + email}", target: "_blank"}
+
         %input.dispute-edit-input#dispute-customer-email-input{type: 'text', value: "#{@dispute.customer_email}"}
 
 %ul.nav.nav-tabs#research-tab{role: 'tablist'}
