@@ -8,6 +8,10 @@ local M = {
       event = "InsertEnter",
     },
     {
+      "hrsh7th/cmp-calc",
+      event = "InsertEnter",
+    },
+    {
       "hrsh7th/cmp-cmdline",
       commit = "8ee981b4a91f536f52add291594e89fb6645e451",
       event = "InsertEnter",
@@ -16,6 +20,10 @@ local M = {
       "hrsh7th/cmp-emoji",
       event = "InsertEnter",
       commit = "19075c36d5820253d32e2478b6aaf3734aeaafa0",
+    },
+    {
+      "garyhurtz/cmp_kitty",
+      event = "InsertEnter",
     },
     {
       "saadparwaiz1/cmp_luasnip",
@@ -38,6 +46,10 @@ local M = {
       event = "InsertEnter",
     },
     {
+      "ray-x/cmp-treesitter",
+      event = "InsertEnter",
+    },
+    {
       "L3MON4D3/LuaSnip",
       commit = "80a8528f084a97b624ae443a6f50ff8074ba486b",
       event = "InsertEnter",
@@ -57,7 +69,6 @@ function M.config()
   require("luasnip/loaders/from_vscode").lazy_load()
 
   vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#6CC644" })
-  vim.api.nvim_set_hl(0, "CmpItemKindTabnine", { fg = "#CA42F0" })
   vim.api.nvim_set_hl(0, "CmpItemKindCrate", { fg = "#F64D00" })
   vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#FDE030" })
 
@@ -92,11 +103,6 @@ function M.config()
         if entry.source.name == "copilot" then
           vim_item.kind = icons.git.Octoface
           vim_item.kind_hl_group = "CmpItemKindCopilot"
-        end
-
-        if entry.source.name == "cmp_tabnine" then
-          vim_item.kind = icons.misc.Robot
-          vim_item.kind_hl_group = "CmpItemKindTabnine"
         end
 
         if entry.source.name == "crates" then
@@ -168,10 +174,10 @@ function M.config()
     },
     sources = {
       { name = "buffer" },
-      { name = "cal" },
+      { name = "calc" },
       { name = "emoji" },
-      { name = "luasnip" },
       { name = "kitty" },
+      { name = "luasnip" },
       { name = "nvim_lsp" },
       { name = "nvim_lua" },
       { name = "path" },

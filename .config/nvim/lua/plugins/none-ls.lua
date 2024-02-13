@@ -51,13 +51,14 @@ function M.config()
       },
       formatting.erb_lint,
       formatting.markdownlint,
-      formatting.pg_format,
       formatting.prettierd.with {
         extra_filetypes = { "toml" },
         extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
       },
       formatting.rubocop,
-      formatting.sqlfluff,
+      formatting.sqlfluff.with({
+        extra_args = { "--dialect", "mysql" }
+      }),
       formatting.stylua,
     },
   }
