@@ -2,6 +2,7 @@ local utils = require "utils.keymaps-helpers"
 local maps = utils.empty_map_table()
 
 local sections = {
+  c = { desc = " Copilot"},
   d = { desc = " Debug" },
   f = { desc = "󰭎 Telescope" },
   g = { desc = "󰊢 Git" },
@@ -60,6 +61,15 @@ maps.v["<"] = { "<gv", desc = "Indent to the left" }
 maps.v[">"] = { ">gv", desc = "Indent to the right" }
 
 -- Plugins --
+
+-- GitHub Copilot
+maps.n["<leader>c"] = sections.c
+maps.n["<leader>cd"] = { "<cmd>Copilot disable", desc = "Disable Copilot" }
+maps.n["<leader>ce"] = { "<cmd>Copilot enable", desc = "Enable Copilot" }
+maps.n["<leader>ch"] = { "<cmd>Copilot help", desc = "Display Copilot help page" }
+maps.n["<leader>cp"] = { "<cmd>Copilot panel", desc = "Display up to 10 Copilot completions for current buffer."}
+maps.n["<leader>csi"] = { "<cmd>Copilot signout", desc = "Signout of Copilot" }
+maps.n["<leader>cst"] = { "<cmd>Copilot status", desc = "Display Copilot status" }
 
 -- Comment
 maps.n["<leader>/"] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", desc = "Toggle comment line" }
