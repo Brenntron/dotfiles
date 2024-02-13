@@ -8,9 +8,10 @@ M.server_list = {
   "jsonls",
   "lua_ls",
   "marksman",
+  -- "rubocop",
   "solargraph",
   "sqlls",
-  "tailwindcss",
+  "volar",
   "yamlls",
 }
 
