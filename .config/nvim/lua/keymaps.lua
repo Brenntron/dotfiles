@@ -64,12 +64,12 @@ maps.v[">"] = { ">gv", desc = "Indent to the right" }
 
 -- GitHub Copilot
 maps.n["<leader>c"] = sections.c
-maps.n["<leader>cd"] = { "<cmd>Copilot disable", desc = "Disable Copilot" }
-maps.n["<leader>ce"] = { "<cmd>Copilot enable", desc = "Enable Copilot" }
-maps.n["<leader>ch"] = { "<cmd>Copilot help", desc = "Display Copilot help page" }
-maps.n["<leader>cp"] = { "<cmd>Copilot panel", desc = "Display up to 10 Copilot completions for current buffer."}
-maps.n["<leader>csi"] = { "<cmd>Copilot signout", desc = "Signout of Copilot" }
-maps.n["<leader>cst"] = { "<cmd>Copilot status", desc = "Display Copilot status" }
+maps.n["<leader>cd"] = { "<cmd>Copilot disable<cr>", desc = "Disable Copilot" }
+maps.n["<leader>ce"] = { "<cmd>Copilot enable<cr>", desc = "Enable Copilot" }
+maps.n["<leader>ch"] = { "<cmd>Copilot help<cr>", desc = "Display Copilot help page" }
+maps.n["<leader>cp"] = { "<cmd>Copilot panel<cr>", desc = "Display up to 10 Copilot completions for current buffer."}
+maps.n["<leader>csi"] = { "<cmd>Copilot signout<cr>", desc = "Signout of Copilot" }
+maps.n["<leader>cst"] = { "<cmd>Copilot status<cr>", desc = "Display Copilot status" }
 
 -- Comment
 maps.n["<leader>/"] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", desc = "Toggle comment line" }
