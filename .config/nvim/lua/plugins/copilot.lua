@@ -1,5 +1,6 @@
 local M = {
-  "github/copilot.vim"
+  "github/copilot.vim",
+  event = "VimEnter",
 }
 
 function M.config() end
