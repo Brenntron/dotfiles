@@ -39,10 +39,11 @@ function M.config()
       diagnostics.codespell.with {
         filetypes = { "coffee", "erb", "eruby", "haml", "html", "markdown" },
       },
-      diagnostics.stylelint,
+      diagnostics.eslint,
       diagnostics.haml_lint,
       diagnostics.rubocop,
       diagnostics.shellcheck,
+      diagnostics.stylelint,
       diagnostics.zsh,
       -- formatters
       formatting.beautysh.with {
