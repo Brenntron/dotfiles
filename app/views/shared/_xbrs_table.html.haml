@@ -30,7 +30,7 @@
             %tr
               %td= Time.at(timeline_row['time'] / 1000).strftime("%B %e, %Y at %I:%M %p")
               %td.text-center
-                - if timeline_row['score']
+                - if timeline_row['score'].present?
                   - if timeline_row['score'] < 0
                     %span.mal-highlight= timeline_row['score'] || '-'
                   - else
