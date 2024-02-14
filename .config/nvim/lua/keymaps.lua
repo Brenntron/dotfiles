@@ -98,11 +98,12 @@ maps.n["<leader>e"] = { "<cmd>NvimTreeToggle<cr>", desc = "Toggle tree explorer"
 
 -- Finder
 maps.n["<leader>f"] = sections.f
+maps.n["<leader>fbr"] = { "<cmd>Telescope file_browser path=:p:h select_buffer=true<cr>", desc = "Open file browser" }
+maps.n["<leader>fbu"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
 maps.n["<leader>ff"] = { "<cmd>Telescope find_files<cr>", desc = "Find files" }
-maps.n["<leader>fw"] = { "<cmd>Telescope live_grep<cr>", desc = "Find words" }
 maps.n["<leader>fn"] = { "<cmd>Telescope notify<cr>", desc = "Search message history" }
 maps.n["<leader>fp"] = { "<cmd>Telescope projects<cr>", desc = "Find projects" }
-maps.n["<leader>fb"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
+maps.n["<leader>fw"] = { "<cmd>Telescope live_grep<cr>", desc = "Find words" }
 
 -- Git
 maps.n["<leader>g"] = sections.g
