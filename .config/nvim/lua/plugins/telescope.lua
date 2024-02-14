@@ -4,19 +4,22 @@ local M = {
   cmd = "Telescope",
   dependencies = {
     {
-      {
-        "ahmedkhalf/project.nvim",
-        commit = "8c6bad7d22eef1b71144b401c9f74ed01526a4fb",
-        event = "VeryLazy",
-      },
-      {
-        "nvim-telescope/telescope-fzf-native.nvim",
-        build = "make",
-      },
-      {
-        "rcarriga/nvim-notify",
-        lazy = true,
-      },
+      "ahmedkhalf/project.nvim",
+      commit = "8c6bad7d22eef1b71144b401c9f74ed01526a4fb",
+      event = "VeryLazy",
+    },
+    {
+      "nvim-telescope/telescope-file-browser.nvim",
+      event = "VeryLazy"
+    },
+    {
+      "nvim-telescope/telescope-fzf-native.nvim",
+      build = "make",
+      event = "Bufenter",
+    },
+    {
+      "rcarriga/nvim-notify",
+      lazy = true,
     },
   },
   event = "Bufenter",
@@ -115,15 +118,47 @@ function M.config()
       },
     },
     extensions = {
+      file_browser = {
+        hijack_netrw = true,
+        mappings = {
+          i = {
+            ["<C-n>"] = actions.cycle_history_next,
+            ["<C-p>"] = actions.cycle_history_prev,
+            ["<C-j>"] = actions.move_selection_next,
+            ["<C-k>"] = actions.move_selection_previous,
+          },
+          n = {
+            ["<esc>"] = actions.close,
+            ["j"] = actions.move_selection_next,
+            ["k"] = actions.move_selection_previous,
+            ["q"] = actions.close,
+          },
+        },
+        theme = "dropdown,"
+      },
       fzf = {
         fuzzy = true, -- false will only do exact matching
         override_generic_sorter = true, -- override the generic sorter
         override_file_sorter = true, -- override the file sorter
         case_mode = "smart_case", -- or "ignore_case" or "respect_case"
       },
+      project = {
+        base_dirs = {
+          '~/.config/nvim/',
+        },
+        hidden_files = true,
+        on_project_select = function(prompt_bufnr)
+          local project_actions = require 'telescope._extensions.project.actions'
+          project_actions.change_working_directory(prompt_bufnr, false)
+        end,
+        order_by = 'asc',
+        search_by = 'title',
+        theme = 'dropdown',
+      },
     },
   }
 
+  telescope.load_extension 'file_browser'
   telescope.load_extension 'fzf'
   telescope.load_extension 'notify'
   telescope.load_extension "projects"
