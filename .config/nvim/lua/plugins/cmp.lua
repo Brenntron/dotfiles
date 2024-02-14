@@ -1,71 +1,74 @@
 local M = {
   "hrsh7th/nvim-cmp",
-  commit = "d3a3056204e1a9dbb7c7fe36c114dc43b681768c",
   dependencies = {
     {
       "hrsh7th/cmp-buffer",
-      commit = "3022dbc9166796b644a841a02de8dd1cc1d311fa",
-      event = "InsertEnter",
+      event = { "InsertEnter", "LspAttach" },
     },
     {
       "hrsh7th/cmp-calc",
-      event = "InsertEnter",
+      event = { "InsertEnter", "LspAttach" },
+    },
+    {
+      "zbirenbaum/copilot-cmp",
+      event = { "InsertEnter", "LspAttach" },
+      config = function ()
+        require("copilot_cmp").setup()
+      end
     },
     {
       "hrsh7th/cmp-cmdline",
-      commit = "8ee981b4a91f536f52add291594e89fb6645e451",
       event = "InsertEnter",
     },
     {
       "hrsh7th/cmp-emoji",
-      event = "InsertEnter",
-      commit = "19075c36d5820253d32e2478b6aaf3734aeaafa0",
+      event = { "InsertEnter", "LspAttach" },
     },
     {
       "garyhurtz/cmp_kitty",
-      event = "InsertEnter",
+      event = { "InsertEnter", "LspAttach" },
     },
     {
       "saadparwaiz1/cmp_luasnip",
-      commit = "05a9ab28b53f71d1aece421ef32fee2cb857a843",
-      event = "InsertEnter",
+      event = { "InsertEnter", "LspAttach" },
     },
     {
       "hrsh7th/cmp-nvim-lsp",
-      commit = "44b16d11215dce86f253ce0c30949813c0a90765",
-      event = "InsertEnter",
+      event = { "InsertEnter", "LspAttach" },
     },
     {
       "hrsh7th/cmp-nvim-lua",
-      commit = "f12408bdb54c39c23e67cab726264c10db33ada8",
-      event = "InsertEnter",
+      event = { "InsertEnter", "LspAttach" },
     },
     {
       "hrsh7th/cmp-path",
-      commit = "91ff86cd9c29299a64f968ebb45846c485725f23",
-      event = "InsertEnter",
+      event = { "InsertEnter", "LspAttach" },
     },
     {
       "ray-x/cmp-treesitter",
-      event = "InsertEnter",
+      event = { "InsertEnter", "LspAttach" },
+    },
+    {
+      "onsails/lspkind.nvim",
+      event = { "InsertEnter", "LspAttach" },
     },
     {
       "L3MON4D3/LuaSnip",
-      commit = "80a8528f084a97b624ae443a6f50ff8074ba486b",
-      event = "InsertEnter",
+      event = { "InsertEnter", "LspAttach" },
       dependencies = {
         "rafamadriz/friendly-snippets",
       },
     },
   },
-  event = {
-    "InsertEnter",
-  },
+  event = { "InsertEnter", "LspAttach" },
 }
 
 function M.config()
   local cmp = require "cmp"
+  local icons = require "utils.icons"
+  local lspkind = require "lspkind"
   local luasnip = require "luasnip"
+
   require("luasnip/loaders/from_vscode").lazy_load()
 
   vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#6CC644" })
@@ -77,7 +80,11 @@ function M.config()
     return col == 0 or vim.fn.getline("."):sub(col, col):match "%s"
   end
 
-  local icons = require "utils.icons"
+  local has_words_before = function()
+    if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
+    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    return col ~= 0 and vim.api.nvim_buf_get_text(0, line-1, 0, line-1, col, {})[1]:match("^%s*$") == nil
+  end
 
   cmp.setup {
     confirm_opts = {
@@ -89,39 +96,47 @@ function M.config()
     },
     formatting = {
       fields = { "kind", "abbr", "menu" },
-      format = function(entry, vim_item)
-        vim_item.kind = icons.kind[vim_item.kind]
-        vim_item.menu = ({
-          nvim_lsp = "",
-          nvim_lua = "",
-          luasnip = "",
-          buffer = "",
-          path = "",
-          emoji = "",
-        })[entry.source.name]
+      format = lspkind.cmp_format({
+        mod = 'symbol',
+        maxwidth = 10,
+        ellipsis_char = '...',
+        showlabelDetails = true,
+        symbol_map = { Copilot = "" }
 
-        if entry.source.name == "copilot" then
-          vim_item.kind = icons.git.Octoface
-          vim_item.kind_hl_group = "CmpItemKindCopilot"
-        end
+        function(entry, vim_item)
+          vim_item.kind = icons.kind[vim_item.kind]
+          vim_item.menu = ({
+            nvim_lsp = "",
+            nvim_lua = "",
+            luasnip = "",
+            buffer = "",
+            path = "",
+            emoji = "",
+          })[entry.source.name]
 
-        if entry.source.name == "crates" then
-          vim_item.kind = icons.misc.Package
-          vim_item.kind_hl_group = "CmpItemKindCrate"
-        end
+          if entry.source.name == "copilot" then
+            vim_item.kind = icons.git.Octoface
+            vim_item.kind_hl_group = "CmpItemKindCopilot"
+          end
 
-        if entry.source.name == "lab.quick_data" then
-          vim_item.kind = icons.misc.CircuitBoard
-          vim_item.kind_hl_group = "CmpItemKindConstant"
-        end
+          if entry.source.name == "emoji" then
+            vim_item.kind = icons.misc.Smiley
+            vim_item.kind_hl_group = "CmpItemKindEmoji"
+          end
 
-        if entry.source.name == "emoji" then
-          vim_item.kind = icons.misc.Smiley
-          vim_item.kind_hl_group = "CmpItemKindEmoji"
-        end
+          if entry.source.name == "crates" then
+            vim_item.kind = icons.misc.Package
+            vim_item.kind_hl_group = "CmpItemKindCrate"
+          end
 
-        return vim_item
-      end,
+          if entry.source.name == "lab.quick_data" then
+            vim_item.kind = icons.misc.CircuitBoard
+            vim_item.kind_hl_group = "CmpItemKindConstant"
+          end
+
+          return vim_item
+        end,
+      })
     },
     mapping = cmp.mapping.preset.insert {
       ["<C-k>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
@@ -139,7 +154,9 @@ function M.config()
       -- Set `select` to `false` to only confirm explicitly selected items.
       ["<CR>"] = cmp.mapping.confirm { select = true },
       ["<Tab>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
+        if cmp.visible() and has_words_before() then
+          cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+        elseif cmp.visible() then
           cmp.select_next_item()
         elseif luasnip.expandable() then
           luasnip.expand()
@@ -172,9 +189,27 @@ function M.config()
         luasnip.lsp_expand(args.body) -- For `luasnip` users.
       end,
     },
+    sorting = {
+      priority_weight =2,
+      comparators = {
+        require("copilot_cmp.comparators").prioritize,
+        -- Below is the default comparitor list and order for nvim-cmp
+        cmp.config.compare.offset,
+        -- cmp.config.compare.scopes, -- this is commented in nvim-cmp too
+        cmp.config.compare.exact,
+        cmp.config.compare.score,
+        cmp.config.compare.recently_used,
+        cmp.config.compare.locality,
+        cmp.config.compare.kind,
+        cmp.config.compare.sort_text,
+        cmp.config.compare.length,
+        cmp.config.compare.order,
+      },
+    },
     sources = {
       { name = "buffer" },
       { name = "calc" },
+      { name = "copilot" },
       { name = "emoji" },
       { name = "kitty" },
       { name = "luasnip" },
