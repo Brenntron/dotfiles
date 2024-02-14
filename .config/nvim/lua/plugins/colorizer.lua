@@ -1,9 +1,16 @@
 local M = {
-  "norcalli/nvim-colorizer.lua", ft = { "css", "html", "javascript", "scss" }, lazy = true
+  "norcalli/nvim-colorizer.lua",
+  event = "Bufenter",
+  ft = { "coffee", "conf", "css", "javascript", "scss", "yaml" },
 }
 
 function M.config()
-  require("colorizer").setup({ "css", "html", "javascript", "scss" }, {
+  require("colorizer").setup({
+    "*",
+    html = { names = false},
+    javascript = { names = false },
+    yaml = { names = false },
+  }, {
     RGB = true, -- #RGB hex codes
     RRGGBB = true, -- #RRGGBB hex codes
     RRGGBBAA = true, -- #RRGGBBAA hex codes

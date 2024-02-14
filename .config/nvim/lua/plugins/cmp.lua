@@ -12,9 +12,6 @@ local M = {
     {
       "zbirenbaum/copilot-cmp",
       event = { "InsertEnter", "LspAttach" },
-      config = function ()
-        require("copilot_cmp").setup()
-      end
     },
     {
       "hrsh7th/cmp-cmdline",
@@ -101,7 +98,7 @@ function M.config()
         maxwidth = 10,
         ellipsis_char = '...',
         showlabelDetails = true,
-        symbol_map = { Copilot = "" }
+        symbol_map = { Copilot = "" },
 
         function(entry, vim_item)
           vim_item.kind = icons.kind[vim_item.kind]
