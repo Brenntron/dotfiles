@@ -11,7 +11,7 @@
     min-height: 20px;
     &.wbrs-score-col {
       background-repeat: no-repeat;
-      background-position: left -5px top 0;
+      background-position: left -4px top -2px;
       background-size: 20px auto;
       padding-left: 13px;
     }
@@ -32,7 +32,7 @@
     }
     &.selectize-dropdown {
       background-color: #fff;
-      margin-top: 12px;
+      margin-top: 12px !important;
     }
   }
   .uri-col {
@@ -101,8 +101,8 @@
     padding-bottom: 0;
   }
   td.categories-col {
-    padding-bottom: 0;
-    padding-top: 2px;
+    padding-top: 3px;
+    padding-bottom: 6px;
   }
   .submit_changes {
     padding: 3px 30px;

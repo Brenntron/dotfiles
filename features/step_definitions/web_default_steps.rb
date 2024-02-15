@@ -18,6 +18,10 @@ Given(/^I fill in element "(.*?)" with "(.*?)"$/) do |identifier, value|
   page.find(identifier).set(value)
 end
 
+Given(/^I clear element "(.*?)"$/) do |identifier|
+  page.find(identifier).send_keys [:backspace]
+end
+
 Given(/^I fill in "(.*?)" with "(.*?)" and "(.*?)" separated by blank lines$/) do |field_label, value, value_2|
   fill_in field_label, :with => value + "\n" + value_2
 end
@@ -591,10 +595,9 @@ Given(/^I fill in selectized with "(.*?)"$/) do |value|
   find('div.selectize-dropdown-content > div', match: :first).click
 end
 
+# Needs #id and ['value'] like this
 Given(/^I fill in selectized of element "(.*?)" with "(.*?)"$/) do |element, value|
-
   page.execute_script("$('#{element}')[0].selectize.setValue(#{value})")
-
 end
 
 When(/^I select contenteditable text in "(.*?)"$/) do |target|
