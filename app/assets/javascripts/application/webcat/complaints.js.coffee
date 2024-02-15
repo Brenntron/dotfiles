@@ -63,8 +63,8 @@ window.bulk_submit_categorize_entries = () ->
   if changes.split(',').length < 0
     return
 
-  # disable the master submit button while processing
-  $('#master-submit').prop('disabled', true)
+  $('#complete-entries-wrapper tbody').empty()
+  $('#incomplete-entries-wrapper tbody').empty()
 
   entries = changes.split(",").filter((item) -> return item)
   self_review = $('#self_review').is(':checked')
