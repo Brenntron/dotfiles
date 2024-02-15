@@ -338,7 +338,7 @@ Feature: Webrep, the BFRP
     And  I should not see content "1.1.1.1" within "#resolved-ip-content-no-0"
     And  I should see element "#edit-ip-result-no-0"
     Then I click "#edit-ip-result-no-0"
-    And  I fill in element, "#table-ip-input-no-0" with "1.1.1.1"
+    And  I fill in element "#table-ip-input-no-0" with "1.1.1.1"
     And  I should see "Query IP Addresses"
     And  I click "Query IP Addresses"
     Then I wait for "15" seconds
@@ -356,7 +356,7 @@ Feature: Webrep, the BFRP
     And  I should not see content "1.1.1.1" within "#resolved-ip-content-no-0"
     And  I should see element "#edit-ip-result-no-0"
     Then I click "#edit-ip-result-no-0"
-    And  I fill in element, "#table-ip-input-no-0" with "1.1.1.1, 2.2.2.2"
+    And  I fill in element "#table-ip-input-no-0" with "1.1.1.1, 2.2.2.2"
     And  I should see "Query IP Addresses"
     And  I click "Query IP Addresses"
     Then I wait for "15" seconds
@@ -372,7 +372,7 @@ Feature: Webrep, the BFRP
     Then I click "submit-button rep-research"
     And  I wait for "60" seconds
     Then I click "#edit-ip-result-no-0"
-    And  I fill in element, "#table-ip-input-no-0" with "drumf"
+    And  I fill in element "#table-ip-input-no-0" with "drumf"
     And  I click "Query IP Addresses"
     Then I wait for "15" seconds
     And  I should not see content "drumf" within "#resolved-ip-content-no-0"

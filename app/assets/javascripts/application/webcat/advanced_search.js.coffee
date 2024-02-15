@@ -19,7 +19,7 @@ namespace 'AC.WebCat', (exports) ->
       success_reload: false
       success: (response) ->
         for platform in response.data
-          $('#platform-input')[0].selectize.addOption({ public_name: platform })
+          $('#platform-input')[0].selectize.addOption(platform)
       error : (response) ->
         console.log response
     )

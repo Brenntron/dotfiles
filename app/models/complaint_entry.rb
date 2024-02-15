@@ -231,8 +231,8 @@ class ComplaintEntry < ApplicationRecord
 
   def reassign(assignee, assignment_type)
     return("Complaint is already assigned to #{assignee.cvs_username}") if user == assignee
-    return("#{reviewer.cvs_username} is already reviewing Complaint") if user == reviewer
-    return("#{second_reviewer.cvs_username} is already the second reviewer for Complaint") if user == second_reviewer
+    return("#{reviewer.cvs_username} is already reviewing Complaint") if reviewer.present? && user == reviewer
+    return("#{second_reviewer.cvs_username} is already the second reviewer for Complaint") if second_reviewer.present? && user == second_reviewer
 
     case assignment_type
     when 'assignee'
@@ -252,7 +252,6 @@ class ComplaintEntry < ApplicationRecord
     when 'second_reviewer'
       update(second_reviewer: assignee)
     end
-
     "#{assignee.cvs_username} assigned to Complaint as #{assignment_type}"
   end
 
@@ -305,10 +304,9 @@ class ComplaintEntry < ApplicationRecord
     # not important case or resolution is "unchanged"
     current_status = STATUS_COMPLETED
     self.case_assigned_at ||= Time.now
-    # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
     update!(resolution: entry_status,
-            url_primary_category: categories_string,
-            category: categories_string,
+            url_primary_category: category_names_string,
+            category: category_names_string,
             status: current_status,
             internal_comment: comment,
             resolution_comment: resolution_comment,
@@ -400,7 +398,7 @@ class ComplaintEntry < ApplicationRecord
                       self_review)
     ActiveRecord::Base.transaction do
 
-      if categories_string.blank?
+      if categories_string.blank? && entry_status == "FIXED"
         raise "categories string is empty"
       end
 

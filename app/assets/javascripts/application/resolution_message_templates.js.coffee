@@ -47,9 +47,9 @@ $ ->
       method: 'POST'
       url: "/escalations/api/v1/escalations/#{type}/resolution_message_templates"
       data: get_resolution_template_data('create')
-      success_reload: false
+      success_reload: true
       success: (response) ->
-        std_msg_success('Resolution Message template Created.', [], reload: true)
+        std_msg_success('Resolution Message template Created.', [], timed_reload: true)
       error: (response) ->
         std_api_error(response, "There was an error creating the resolution message template.", reload: false)
     )
@@ -58,7 +58,6 @@ $ ->
     std_msg_ajax(
       method: 'GET'
       url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
-      success_reload: false
       success: (response) ->
         $(".update select[name=resolution_type]").val(response.resolution_type)
         $(".update .resolution-template-resolution-type").text(response.resolution_type)
@@ -101,8 +100,8 @@ $ ->
       data: get_resolution_template_data('update')
       success_reload: true
       success: (response) ->
-        std_msg_success('Resolution Message Template Updated.', [], reload: true)
         $('#editResolutionMessageTemplatesDialog').dialog 'close'
+        std_msg_success('Resolution Message Template Updated.', [], timed_reload: true)
       error: (response) ->
         std_api_error(response, "There was an error updating the resolution message template.", reload: false)
     )
@@ -118,6 +117,8 @@ $ ->
         path = 'file_rep'
       when 'SenderDomainReputationDispute'
         path = 'sdr'
+      when 'WebCategoryDispute'
+        path = 'webcat'
 
     template_id = $(this).attr('data-resolution-message-template-id')
     std_msg_confirm(
@@ -268,7 +269,7 @@ $ ->
       data: data
       success_reload: false
       success: (response) ->
-        std_msg_success('Resolution Message template Created.', [], reload: true)
+        std_msg_success('Resolution Message template Created.', [], timed_reload: true)
       error: (response) ->
         std_api_error(response, "There was an error creating the resolution message template.", reload: false)
     )
@@ -300,7 +301,7 @@ $ ->
       data: get_webrep_resolution_template_data('update', is_footer)
       success_reload: true
       success: (response) ->
-        std_msg_success('Resolution Message Template Updated.', [], reload: true)
+        std_msg_success('Resolution Message Template Updated.', [], timed_reload: true)
         $('#editResolutionMessageTemplatesDialog').dialog 'close'
       error: (response) ->
         std_api_error(response, "There was an error updating the resolution message template.", reload: false)

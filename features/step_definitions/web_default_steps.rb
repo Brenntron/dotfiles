@@ -14,7 +14,7 @@ Given(/^I fill in "(.*?)" with "(.*?)" and press enter$/) do |field_label, value
   find(:id, field_label).native.send_keys(:enter)
 end
 
-Given(/^I fill in element, "(.*?)" with "(.*?)"$/) do |identifier, value|
+Given(/^I fill in element "(.*?)" with "(.*?)"$/) do |identifier, value|
   page.find(identifier).set(value)
 end
 
@@ -208,6 +208,11 @@ end
 
 Then(/^I should see the "(.*?)" radio checked$/) do |radio_class|
   radio = page.find(:xpath, "//input[@type='radio' and @class='#{radio_class}']")
+  raise "Radio with class #{radio_class} not checked" if radio.checked?.blank?
+end
+
+Then(/^I should see the radio with id "(.*?)" checked$/) do |radio_id|
+  radio = page.find(:xpath, "//input[@type='radio' and @id='#{radio_id}']")
   raise "Radio with class #{radio_class} not checked" if radio.checked?.blank?
 end
 
@@ -633,4 +638,12 @@ end
 Then(/^I accept the user prompt$/) do
   alert = page.driver.browser.switch_to.alert
   alert.accept
+end
+
+And(/^I refresh the page$/) do
+  page.driver.browser.navigate.refresh
+end
+
+When(/^I click element with tag "(.*?)" and text "(.*?)"$/) do |tag, text|
+  page.find(tag, text: text).click
 end

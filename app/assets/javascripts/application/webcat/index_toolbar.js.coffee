@@ -327,7 +327,7 @@ window.webcat_change_assignee = () ->
             std_msg_error('Error Assigning Entries', [json.error.join(' ')])
         else
           #TODO add flash success
-          assignee = json.data[0].result.name
+          assignee = json.name
           $(selected_rows).each ->
             row = this
             if assignment_type == 'assignee'

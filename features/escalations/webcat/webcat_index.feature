@@ -144,6 +144,8 @@ Feature: Webcat complaints index
     And I should see "REGISTRANT"
     And I should see "NAME SERVERS"
 
+
+  # Bulk Submit tests #
   @javascript
   Scenario: bulk submit submits all selected complaint entries
     Given a user with role "webcat user" exists and is logged in
@@ -165,9 +167,623 @@ Feature: Webcat complaints index
     Then I should not see "food.com"
     And I should not see "blah.com"
 
+
+  @javascript
+  Scenario: a user tries to submit bulk selected entries with Fixed resolution that do not have a category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And pending
+
 #    TODO
+  # the bulk submit button is disabled if there have been no changes to entries
 #  Scenario: user tries to submit bulk selected entries with Fixed resolution that do not have a category
 #  Scenario: user tries to submit bulk selected entries with Invalid resolution
   # Scenario: user tries to submit bulk selected entries with Unchanged resolution
   # Scenario: user tries to submit bulk selected entries with Invalid resolution and a category
   # Scenario: user tries to submit bulk selected entries with Unchanged resolution and a category
+
+
+
+
+  # TODO - this does not work in testing env yet - the pop up does not prevent refresh, could be a ff setting
+  # might need tweaks to testing browser
+  @javascript
+  Scenario: a user sees a pop-up window if they make changes to an entry but do not submit
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+    And pending
+#    And I refresh the page
+#    And I wait for "3" seconds
+#    And take a screenshot
+
+
+  @javascript
+  Scenario: a users tries to fetch complaints
+    Given a user with role "webcat user" exists and is logged in
+    And PeakeBridge poll is stubbed
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#fetch"
+    Then I wait for "3" seconds
+    Then I should see "COMPLAINT UPDATES REQUESTED FROM TALOS-INTELLIGENCE."
+
+  @javascript
+  Scenario: a users tries to fetch WBNP data
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#fetch_wbnp"
+    And I wait for "10" seconds
+    Then I should see content "Active" within ".wbnp-report-status"
+
+
+
+  # Submitting individual entries ###############
+
+  @javascript
+  Scenario: a user submits an individual entry with a new category and a Fixed resolution
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I fill in selectized of element "#input_cat_111" with "['77']"
+    And I click "#submit_changes_111"
+    And I wait for "2" seconds
+    And I should see "Submitted"
+    And I refresh the page
+    And I should not see "food.com"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I should see "Alcohol"
+    And I wait for "6" seconds
+
+
+  @javascript
+  Scenario: a user submits an individual entry with a changed category and a Fixed resolution
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | url_primary_category | category               |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    | Health and Medicine  | Health and Medicine    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |                      |                        |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "5" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I fill in selectized of element "#input_cat_111" with "['77']"
+    And I wait for "3" seconds
+    And I click "#submit_changes_111"
+    And I wait for "2" seconds
+    And I should see "Submitted"
+    And I refresh the page
+    And I should not see "food.com"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I should see "Alcohol"
+    And I should not see "Health and Medicine"
+
+
+  @javascript
+  Scenario: a user cannot submit an individual entry with no categories and a Fixed resolution
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "MUST INCLUDE AT LEAST ONE CATEGORY"
+
+
+  @javascript
+  Scenario: a user cannot submit an individual entry with no changes in categories and a Fixed resolution
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | category                              |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    | Health and Medicine, Recipes and Food |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |                                       |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "10" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And take a screenshot
+    And pending
+    And I should see "Health and Medicine"
+    And I should see "Recipes and Food"
+#    And I fill in selectized of element "#input_cat_111" with ""
+    And I wait for "3" seconds
+    And I click "#submit_changes_111"
+    And I wait for "2" seconds
+
+
+    #TODO
+#  @javascript
+#  Scenario: a user submits an individual entry with a single removed category and a Fixed resolution
+
+
+  @javascript
+  Scenario: a user submits an individual entry with an Unchanged resolution, and tries to add a new category that will not be saved
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#unchanged111"
+    And I fill in selectized of element "#input_cat_111" with "['77']"
+    And I should see "Alcohol"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I refresh the page
+    And I should not see "Alcohol"
+
+
+  @javascript
+  Scenario: a user correctly submits an individual entry with an Unchanged resolution and no category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#unchanged111"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "Submitted"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should not see "blah.com"
+
+
+  @javascript
+  Scenario: a user submits an individual entry with an Unchanged resolution that maintains its initial category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | url_primary_category | category               |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    | Health and Medicine  | Health and Medicine    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |                      |                        |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "5" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#unchanged111"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "Submitted"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "8" seconds
+    And I should see "food.com"
+    And I should see "Health and Medicine"
+    And I should not see "blah.com"
+
+
+  @javascript
+  Scenario: a user submits an individual entry that has no existing categories with an Unchanged resolution
+    # this can happen if there is not yet enough data for the analyst to classify the url, but its not an invalid ticket
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "5" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#unchanged111"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "Submitted"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "8" seconds
+    And I should see "food.com"
+    And I should not see "blah.com"
+
+
+  @javascript
+  Scenario: a user cannot submit an individual entry with an Invalid resolution and a new category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#invalid111"
+    And I fill in selectized of element "#input_cat_111" with "['77']"
+    And I should see "Alcohol"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "CANNOT INCLUDE CATEGORIES WITH AN INVALID RESOLUTION"
+
+
+  @javascript
+  Scenario: a user correctly submits an individual entry with an Invalid resolution and no category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#invalid111"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And I should see "Submitted"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should not see "blah.com"
+
+
+  @javascript
+  Scenario: a user submits a non-high traffic entry and it gets resolved and does not go into the Review queue
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | is_important |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |      0       |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |      0       |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#unchanged111"
+    And I click "#submit_changes_111"
+    And I wait for "5" seconds
+    And take a screenshot
+    And I should see "Submitted"
+    And I fill in selectized of element "#input_cat_222" with "['77']"
+    And I click "#submit_changes_222"
+    And I wait for "5" seconds
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    Then I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And I should not see "food.com"
+    And I should not see "blah.com"
+
+
+  @javascript
+  Scenario: a user submits a high traffic (important) entry and it goes into the Review queue
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | is_important |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |      1       |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |      1       |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I fill in selectized of element "#input_cat_222" with "['77']"
+    And I click "#submit_changes_222"
+    Then I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And I should not see "food.com"
+    And I should see "blah.com"
+
+  @javascript
+  Scenario: a reviewer commits a FIXED PENDING entry
+    Given a user with role "webcat manager" exists and is logged in
+    And the following users exist
+      | id  | display_name    |
+      | 123 | Wembly Catalyst |
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status     | url_primary_category | resolution | user_id | is_important |
+      | 111 | food.com     | food.com      | URI/DOMAIN | PENDING    | Health and Medicine  |            |         |       0      |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | PENDING    | Arts                 | FIXED      |    123  |       1      |
+    When I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And I click row with id "222"
+    And I click "#assignment-type-reviewer"
+    And I click ".take-ticket-toolbar-button"
+    And I wait for "3" seconds
+    And I click "#commit222"
+    And I click "#submit_changes_222"
+    And I wait for "2" seconds
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And take a screenshot
+    And I should see "blah.com"
+    And I should see "Arts"
+    And I should not see "food.com"
+
+  @javascript
+  Scenario: a reviewer commits an UNCHANGED PENDING entry
+    Given a user with role "webcat manager" exists and is logged in
+    And the following users exist
+      | id  | display_name    |
+      | 123 | Wembly Catalyst |
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status     | url_primary_category | resolution | user_id | is_important |
+      | 111 | food.com     | food.com      | URI/DOMAIN | PENDING    | Health and Medicine  |            |         |       0      |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | PENDING    | Arts                 | UNCHANGED  |    123  |       1      |
+    When I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And I click row with id "222"
+    And I click "#assignment-type-reviewer"
+    And I click ".take-ticket-toolbar-button"
+    And I wait for "3" seconds
+    And I click "#commit222"
+    And I click "#submit_changes_222"
+    And I wait for "2" seconds
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And I should see "blah.com"
+    And I should see "Arts"
+    And I should not see "food.com"
+
+
+  @javascript
+  Scenario: a reviewer declines a PENDING entry (and that entry then goes back into ASSIGNED status)
+    Given a user with role "webcat manager" exists and is logged in
+    And the following users exist
+    | id  | display_name   |
+    | 123 | Webby Catalyst |
+    And the following complaint entries exist:
+      | id  | uri       | domain    | entry_type | status  | url_primary_category | category              | resolution | user_id | is_important |
+      | 111 | food.com  | food.com  | URI/DOMAIN | NEW     | Health and Medicine  | Health and Medicine   |            |         |       0      |
+      | 222 | blah.com  | blah.com  | URI/DOMAIN | PENDING | Arts                 |                       | FIXED      |    123  |       1      |
+    When I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And I click row with id "222"
+    And I click "#assignment-type-reviewer"
+    And I click ".take-ticket-toolbar-button"
+    And I wait for "3" seconds
+    And I click "#decline222"
+    And I click "#submit_changes_222"
+    And I wait for "2" seconds
+    When I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And I should not see "blah.com"
+    And I should not see "food.com"
+    Then I goto "/escalations/webcat/complaints?f=ACTIVE"
+    And I wait for "3" seconds
+    And I should see "blah.com"
+    And I should not see "food.com"
+    And I should not see "Arts"
+
+
+  # TODO
+  # Scenario: a user cannot submit an individual entry with no changes to categories and a Fixed resolution
+
+
+  @javascript
+  Scenario: a non-manager can view PENDING entries
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri       | domain    | entry_type | status  | is_important |
+      | 111 | food.com  | food.com  | URI/DOMAIN | NEW     |              |
+      | 222 | blah.com  | blah.com  | URI/DOMAIN | PENDING |       1      |
+    When I goto "/escalations/webcat/complaints"
+    And I wait for "3" seconds
+    And I click "#filter-complaints"
+    And I wait for "1" seconds
+    And I click "Waiting for Review"
+    And I wait for "5" seconds
+    And I should see "blah.com"
+    And I should not see "food.com"
+
+
+  @javascript
+  Scenario: a user reopens a completed complaint entry
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain            | status    | resolution_comment |
+      |1 | blah.com          | COMPLETED | test               |
+      |2 | food.com          | COMPLETED | test               |
+      |3 | im.hungry.com     | NEW       |                    |
+    When I goto "/escalations/webcat/complaints"
+    And I wait for "3" seconds
+    And I click "#reopen_1"
+    And I wait for "5" seconds
+    And I click "#advanced-search-button"
+    And I fill in selectized of element "#status-input" with "['REOPENED']"
+    And I click "#submit-advanced-search"
+    And I wait for "4" seconds
+    Then the following complaint entry with id: "1" has a status of: "REOPENED"
+
+
+
+  ## Hide / Show functionality
+
+  @javascript
+  Scenario: a user can show/hide entire columns in the complaints view
+    Given a user with role "webcat user" exists and is logged in
+    And the following companies exist:
+      | id | name                    |
+      | 5  | Gilligan's Co.          |
+    And the following customers exist:
+      | id | name                | company_id | email                    |
+      | 12 | Maryanne Summers    |     5      | msummers@islandtours.com |
+      | 13 | Ginger Grant        |     5      | ggrant@islandtours.com   |
+    And the following platforms exist:
+      | id | public_name       | internal_name     | webcat |
+      | 1  | TalosIntelligence | TalosIntelligence |   1    |
+    And the following complaints exist:
+      | id   | description        | customer_id | submitter_type | ticket_source      |
+      | 5111 | weather            |      12     | CUSTOMER       | talos-intelligence |
+      | 5112 | travel site        |      13     | CUSTOMER       | talos-intelligence |
+    And the following complaint entries exist:
+      | id   | complaint_id | uri                    | domain                | entry_type | status   | platform_id | suggested_disposition | user_id |
+      | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | ASSIGNED |      1      | News                  |    1    |
+      | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    |
+    And the following complaint_tags exist:
+      | id | name        |
+      | 1  | Investigate |
+    And I add a complaint_tag of id "1" to complaint of id "5111"
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "9111"
+    And I should see "9222"
+    And I should see "TI Webform"
+    When I click "#webcat-index-table-show-columns-button"
+    And I wait for "1" seconds
+    And I click "#view-ticket-col-cb"
+    And I wait for "1" seconds
+    And I should not see "9111"
+    And I should not see "9222"
+    And I should not see "TI Webform"
+    And I click "#view-ticket-col-cb"
+    And I wait for "1" seconds
+    And I should see "9111"
+    And I should see "9222"
+    And I should see "TI Webform"
+    And I should see "Ginger Grant"
+    And I should see "Maryanne Summers"
+    And I should see "Gilligan's Co."
+    And I should see "msummers@islandtours.com"
+    And I should see "ggrant@islandtours.com"
+    Then I click "#view-submitter-col-cb"
+    And I wait for "1" seconds
+    And I should not see "Ginger Grant"
+    And I should not see "Maryanne Summers"
+    And I should not see "Gilligan's Co."
+    And I should not see "msummers@isnlandtours.com"
+    And I should not see "ggrant@islandtours.com"
+    And I should see "Investigate"
+    And I click "#view-tags-col-cb"
+    And I wait for "1" seconds
+    And I should not see "Investigate"
+
+
+
+  @javascript
+  Scenario: a user can ensure show/hide column states are saved in the database after a page reload
+    Given a user with role "webcat user" exists and is logged in
+    And the following companies exist:
+      | id | name                    |
+      | 5  | Gilligan's Co.          |
+    And the following customers exist:
+      | id | name                | company_id | email                    |
+      | 12 | Maryanne Summers    |     5      | msummers@islandtours.com |
+      | 13 | Ginger Grant        |     5      | ggrant@islandtours.com   |
+    And the following platforms exist:
+      | id | public_name       | internal_name     | webcat |
+      | 1  | TalosIntelligence | TalosIntelligence |   1    |
+    And the following complaints exist:
+      | id   | description        | customer_id | submitter_type | ticket_source      |
+      | 5111 | weather            |      12     | CUSTOMER       | talos-intelligence |
+      | 5112 | travel site        |      13     | CUSTOMER       | talos-intelligence |
+    And the following complaint entries exist:
+      | id   | complaint_id | uri                    | domain                | entry_type | status   | platform_id | suggested_disposition | user_id |
+      | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | ASSIGNED |      1      | News                  |    1    |
+      | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    When I click "#webcat-index-table-show-columns-button"
+    And I wait for "1" seconds
+    And I should see "Ginger Grant"
+    And I should see "Maryanne Summers"
+    And I should see "Gilligan's Co."
+    And I should see "msummers@islandtours.com"
+    And I should see "ggrant@islandtours.com"
+    Then I click "#view-submitter-col-cb"
+    And I wait for "1" seconds
+    And I should not see "Ginger Grant"
+    And I should not see "Maryanne Summers"
+    And I should not see "Gilligan's Co."
+    And I should not see "msummers@isnlandtours.com"
+    And I should not see "ggrant@islandtours.com"
+    And I refresh the page
+    And I wait for "3" seconds
+    And I should not see "Ginger Grant"
+    And I should not see "Maryanne Summers"
+    And I should not see "Gilligan's Co."
+    And I should not see "msummers@isnlandtours.com"
+    And I should not see "ggrant@islandtours.com"
+
+
+  ## Sorting functionality ###
+
+  @javascript
+  Scenario: a user can sort using the Age quicksort button in the toolbar
+    Given a user with role "webcat user" exists and is logged in
+    And the following platforms exist:
+      | id | public_name       | internal_name     | webcat |
+      | 1  | TalosIntelligence | TalosIntelligence |   1    |
+    And the following complaint entries exist:
+      | id   | uri                            | domain                        | entry_type | status   | platform_id | suggested_disposition | user_id | created_at          |
+      | 9111 | hurricaneshere.com             | hurricaneshere.com            | URI/DOMAIN | ASSIGNED |      1      | News                  |    1    | 2023-11-01 10:10:10 |
+      | 9222 | tinyhiddenislands.com          | tinyhiddenislands.com         | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    | 2023-12-01 10:10:10 |
+      | 9333 | totallysafetours.com           | totallysafetours.com          | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    | 2024-01-01 10:10:10 |
+      | 9444 | howtosurvivebeingstranded.com  | howtosurvivebeingstranded.com | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    | 2024-01-04 10:10:10 |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And pending
+#    And row with id x should be in the dom above row with id y?
+
+
+  #TODO
+  ## Sorting the new index
+  ## Not sure how to check the order of the rows in testing env
+
+  # - a user can sort using the Age quicksort button in the toolbar
+  # - a user can sort using the IP/URI quicksort button in the toolbar
+  # - a user can sort by additional criteria in the age dropdown
+  # - a users sort preferences should be stored upon page refresh
+  # - a user can sort by criteria that are not visible on that page
+
+
+
+# Keepting these setups for reference for now
+#    And the following companies exist:
+#      | id | name                    |
+#      | 5  | Gilligan's Co.          |
+#      | 7  | Western Investigations  |
+#    And the following customers exist:
+#      | id | name                | company_id | email                    |
+#      | 12 | Maryanne Summers    |     5      | msummers@islandtours.com |
+#      | 13 | Ginger Grant        |     5      | ggrant@islandtours.com   |
+#      | 14 | Brisco County, Jr.  |     7      | bcjr@wpi.com             |
+#      | 15 | Dixie Cousins       |     7      | dxc@wpi.com              |
+#    And the following platforms exist:
+#      | id | public_name       | internal_name     | webcat |
+#      | 1  | TalosIntelligence | TalosIntelligence |   1    |
+#    And the following complaints exist:
+#      | id   | description        | customer_id | submitter_type | ticket_source      |
+#      | 5111 | weather            |      12     | CUSTOMER       | talos-intelligence |
+#      | 5112 | travel site        |      13     | CUSTOMER       | talos-intelligence |
+#      | 5113 | John Bly owns this |      14     | CUSTOMER       | talos-intelligence |
+#      | 5114 | Unknown origin     |      15     | CUSTOMER       | talos-intelligence |
+#    And the following complaint entries exist:
+#      | id   | complaint_id | uri                    | domain                | entry_type | status   | platform_id | suggested_disposition | user_id |
+#      | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | ASSIGNED |      1      | News                  |    1    |
+#      | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    |
+#      | 9333 | 5113         | evilmastermind.com     | evilmastermind.com    | URI/DOMAIN | ASSIGNED |      1      | Paranormal            |    1    |
+#      | 9444 | 5114         | timetravelingorb.com   | timetravelingorb.com  | URI/DOMAIN | ASSIGNED |      1      | Paranormal            |    1    |
+#    And the following complaint_tags exist:
+#      | id | name        |
+#      | 1  | Investigate |

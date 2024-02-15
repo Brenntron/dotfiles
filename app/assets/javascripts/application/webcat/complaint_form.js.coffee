@@ -1,4 +1,4 @@
-complaint_status_list= ["NEW", "RESOLVED", "ASSIGNED", "ACTIVE","COMPLETED", "PENDING", "REOPENED" ]
+complaint_status_list= ["NEW", "RESOLVED", "ASSIGNED", "COMPLETED", "PENDING", "REOPENED" ]
 complaint_resolution_list=["FIXED", "INVALID", "UNCHANGED", "DUPLICATE"]
 $ ->
 
