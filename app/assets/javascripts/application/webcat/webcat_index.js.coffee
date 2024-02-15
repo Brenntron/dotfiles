@@ -71,6 +71,7 @@ build_complaints_table = (url) ->
 
         $('#complaints-index tbody tr *').click (e) ->
           $main_row = $(this).parents('tr.cat-index-main-row')
+          bulk_submittable_statuses = ['ASSIGNED', 'NEW', 'COMPLETED', 'REOPENED', 'RESOLVED']
           data_table = $('#complaints-index').DataTable()
           main_row_id = $main_row.attr('id')
           row = data_table.row("##{main_row_id}")
@@ -86,10 +87,20 @@ build_complaints_table = (url) ->
 
           if selected
             row.deselect()
-            disable_bulk_resolution_tool()
+
+            submittable_rows = data_table.rows({selected: true})[0].filter((row) -> row.data().status in bulk_submittable_statuses).length
+
+            # the unless checks for a length of greater than one to account for the deselection
+            # of this row after the length is retrieved
+            $('#index_update_resolution').prop('disabled', true) unless submittable_rows_length > 0
           else
+            other_submittable_rows = data_table.rows({selected: true})[0].filter((row) -> row.data().status in bulk_submittable_statuses).length
+            row_submittable = row.data().status in bulk_submittable_statuses
+
             row.select()
-            enable_bulk_resolution_tool()
+
+            if row_submittable and other_submittable_rows is 0
+              $('#index_update_resolution').prop('disabled', false)
 
           check_enable_toolbar_buttons()
           verifyMasterSubmit()

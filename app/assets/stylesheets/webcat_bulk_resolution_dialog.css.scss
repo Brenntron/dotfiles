@@ -90,7 +90,6 @@
       input[type='text'], input[type='select-multiple'], select {
         width: 100% !important;
       }
-
     }
 
     #email-response-to-customers-select {
@@ -148,18 +147,36 @@
       margin: 0;
     }
 
-    .resolution-category-options {
-      align-items: center;
-      display: flex;
-      justify-content: end;
-      margin-bottom: 10px;
-      position: relative;
-      width: 80%;
+    .categories-container {
+      .resolution-category-options {
+        align-items: center;
+        display: flex;
+        justify-content: end;
+        margin-bottom: 10px;
+        position: relative;
+        width: 80%;
 
-      .content-label-sm {
-        position: absolute;
-        top: 0;
-        left: 0;
+        .content-label-sm {
+          position: absolute;
+          left: 0;
+        }
+
+        input, .resolution-radio-label {
+          margin-bottom: 4px;
+          margin-top: 8px;
+        }
+      }
+
+      .resolution-controls {
+        display: flex;
+      }
+
+      .resolution-input-wrapper {
+        padding: 0;
+      }
+
+      .resolution-apply-wrapper {
+        margin-top: -6px;
       }
     }
 
@@ -184,8 +201,6 @@
       height: 100%;
       justify-content: end;
       width: 20%;
-
-
     }
 
     .button-wrapper{

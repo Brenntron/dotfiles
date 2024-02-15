@@ -1,13 +1,9 @@
-
-
 init_tooltip = () ->
   $('.esc-tooltipped:not(.tooltipstered)').tooltipster
     theme: [
       'tooltipster-borderless'
       'tooltipster-borderless-customized'
     ]
-
-
 
 # Store changes in local storage to see if Bulk Submit can be used
 # call this when resolution is changed or a cat is added
@@ -39,8 +35,7 @@ window.remove_entry_from_changes = (entry_id, type) ->
     new_changes = entries.splice(submitted_entry, 1)
     sessionStorage.setItem(changed, new_changes)
 
-
-getTouchedFormCount = ()->
+getTouchedFormCount = () ->
   form_item = (sessionStorage.getItem("webcat_entries_changed") || "")
   form_item = form_item.split(",")
   form_item = form_item.filter((item) -> return item)
@@ -206,7 +201,7 @@ window.process_bulk_submission = () ->
 
 
 
-window.webcat_reset_search = ()->
+window.webcat_reset_search = () ->
   inputs = document.getElementsByClassName('form-control')
   for i in inputs
     i.value = ""
@@ -434,8 +429,6 @@ window.verifyMasterSubmit = () ->
     boolean = true
   return boolean
 
-
-
 window.updateResolutionDialog = (confirm) ->
 #   { status } = row
 #  if status == 'COMPLETED'
@@ -471,15 +464,18 @@ window.updateResolutionDialog = (confirm) ->
         full_domain = ''
         domain = $(row).find("#domain_#{id}").attr('data-full')
         $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
+
   $('#resolution_dialog').modal("show")
   if selected_rows.length > 1
     html = "Set the following #{complaint_entries.length} entries to <span class='bold'>RESOLUTION</span> <span class='resolution-emp bold'>#{resolution}.</span>"
   else
     html = "Set the following entry to <span class='bold'>RESOLUTION</span> <span class='resolution-emp bold'>#{resolution}.</span>"
   html += pending_msg
+
   $('#resolution_text').html(html)
 
   tbody = $('#resolution_dialog').find('tbody')
+
   setTimeout ->
     if $('#complaint_entries_to_update').height() > 399
       $(tbody).addClass('scrollable-table')
@@ -537,30 +533,192 @@ window.updateResolution = () ->
 
   )
 
+# Bulk resolution tool logic
+bulk_submittable_statuses = ['ASSIGNED', 'NEW', 'COMPLETED', 'REOPENED', 'RESOLVED']
+
+apply_resolution = () ->
+  data_table = $('#complaints-index').DataTable()
+  selected_rows = data_table.rows({selected: true})
+  resolution_to_apply = $('input[name="complaint[resolution]"]:checked')[0].value.toLowerCase()
+
+  for row in selected_rows
+    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+
+    $("##{resolution_to_apply}#{row + 1}").prop('checked', true)
+    store_entry_changes(row + 1, 'submit')
+    sessionStorage.setItem("#{row + 1}_resolution", 'staged')
+
+apply_customer_facing_comment = () ->
+  data_table = $('#complaints-index').DataTable()
+  selected_rows = data_table.rows({selected: true})
+  customer_facing_comment = $('#email_response_to_customers').val()
+
+  for row in selected_rows
+    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+
+    $("#entry_email_response_to_customers_#{row + 1}").val(customer_facing_comment)
+    store_entry_changes(row + 1, 'submit')
+    sessionStorage.setItem("#{row + 1}_customer_facing_comment", 'staged')
+
+apply_category = () ->
+  data_table = $('#complaints-index').DataTable()
+  selected_rows = data_table.rows({selected: true})
+  category_option = $('input[name="complaint[category_option]"]:checked')[0].value
+
+  if category_option is 'DROP_ALL'
+    categories_to_apply = []
+  else
+    categories_to_apply = $('#webcat_bulk_categories')[0].selectize.items
+
+  for row in selected_rows
+    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+
+    if category_option is 'ADD'
+      $("#input_cat_#{row + 1}")[0].selectize.addItems(categories_to_apply)
+    else if category_option is 'REPLACE'
+      $("#input_cat_#{row + 1}")[0].selectize.setValue(categories_to_apply)
+
+    store_entry_changes(row_id, 'submit')
+    sessionStorage.setItem("#{row + 1}_categories", 'staged')
+
+apply_internal_comment = () ->
+  data_table = $('#complaints-index').DataTable()
+  selected_rows = data_table.rows({selected: true})
+  internal_comment = $('#internal_comment').val()
+
+  for row in selected_rows
+    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+
+    row_id = row.attr('id')
+
+    $("internal_comment_#{row + 1}").val(internal_comment)
+    store_entry_changes(row + 1, 'submit')
+    sessionStorage.setItem("#{row + 1}_internal_facing_comment", 'staged')
+
+clear_resolution = () ->
+  data_table = $('#complaints-index').DataTable()
+  selected_rows = data_table.rows({selected: true})
+
+  for row in selected_rows
+    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+
+    resolution_to_apply = data_table.row(row).data().resolution.toLowerCase()
+
+    $("##{resolution_to_apply}#{row + 1}").prop('checked', true)
+
+    unless staged_changes("#{row + 1}_resolution")
+      remove_entry_changes(row + 1, 'submit')
+      sessionStorage.removeItem("#{row + 1}_resolution")
+
+clear_customer_facing_comment = () ->
+  data_table = $('#complaints-index').DataTable()
+  selected_rows = data_table.rows({selected: true})
+
+  for row in selected_rows
+    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+
+    $("#entry_email_response_to_customers_#{row + 1}").val('')
+
+    unless staged_changes("#{row + 1}_customer_facing_comment")
+      remove_entry_changes(row + 1, 'submit')
+      sessionStorage.removeItem("#{row + 1}_customer_facing_comment")
+
+clear_category = () ->
+  data_table = $('#complaints-index').DataTable()
+  selected_rows = data_table.rows({selected: true})
+
+  for row in selected_rows
+    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+
+    $("#input_cat_#{row + 1}")[0].selectize.clear()
+
+  unless staged_changes("#{row + 1}_categories")
+    remove_entry_changes(row + 1, 'submit')
+    sessionStorage.removeItem("#{row + 1}_categories")
+
+clear_internal_comment = () ->
+  data_table = $('#complaints-index').DataTable()
+  selected_rows = data_table.rows({selected: true})
+
+  for row in selected_rows
+    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+
+    $("internal_comment_#{row + 1}").val('')
+
+  unless staged_changes("#{row + 1}_internal_facing_comment")
+    remove_entry_changes(row + 1, 'submit')
+    sessionStorage.removeItem("#{row + 1}_internal_facing_comment")
+
+staged_changes = (storage_key) ->
+  storage_value = sessionStorage.getItem(storage_key) || ''
+
+  return !!storage_value
+
+window.clearBulkResolution = () ->
+  $('.apply_button').removeClass('applied')
+  clear_resolution()
+  $('#email_response_to_customers').val('')
+  clear_customer_facing_comment()
+  $('#webcat_bulk_categories')[0].selectize.clear()
+  clear_category()
+  $('#internal_comment').val('')
+  clear_internal_comment()
+
+window.applyAll = () ->
+  $('#resolution-apply-button').addClass('applied')
+  apply_resolution()
+
+  if $('#email_response_to_customers').val()
+    $('#customer_facing_apply_button').addClass('applied')
+    apply_customer_facing_comment()
+
+  if $('#webcat_bulk_categories')[0].selectize.getValue().length > 0 || $('input[name="complaint[category_option]"]:checked').val() is 'DROP_ALL'
+    $('#category_apply_button').addClass('applied')
+    apply_category()
+
+  if $('#internal_comment').val()
+    $('#internal_comment_button').addClass('applied')
+    apply_internal_comment()
+
 $ ->
+  if $('#complaints-index').length
+    $('.resolution-apply-button').click (event) ->
+      $button = $(event.target)
+      button_id = $button.attr('id')
 
+      if $button.hasClass('applied')
+        $button.removeClass('applied')
 
+        switch button_id
+          when 'resolution_apply_button' then clear_resolution()
+          when 'customer_facing_apply_button' then clear_customer_facing_comment()
+          when 'category_apply_button' then clear_category()
+          when 'internal_comment_button' then clear_internal_comment()
+      else
+        $button.addClass('applied')
 
-  # If resolution is changed (to unchanged or invalid) enable the bulk submit button
-  $(document).on 'change', '.resolution_radio_button', ->
-    id = this.name.split("resolution")[1]
-    store_entry_changes(id, 'submit')
-    $('#master-submit').removeAttr('disabled')
+        switch button_id
+          when 'resolution_apply_button' then apply_resolution()
+          when 'customer_facing_apply_button' then apply_customer_facing_comment()
+          when 'category_apply_button' then apply_category()
+          when 'internal_comment_button' then apply_internal_comment()
 
+    # If resolution is changed (to unchanged or invalid) enable the bulk submit button
+    $(document).on 'change', '.resolution_radio_button', ->
+      id = this.name.split("resolution")[1]
+      store_entry_changes(id, 'submit')
+      $('#master-submit').removeAttr('disabled')
 
-  $(document).on 'change', '.review_radio_button', ->
-    id = this.name.split("resolution_review")[1]
-    res = $('input[name="resolution_review' + id + '"').val()
-    if res != 'ignore'
-      $('#submit_changes_' + id).removeAttr('disabled')
-      store_entry_changes(id, 'review')
-    else
-      $('#submit_changes_' + id).attr('disabled', 'true')
+    $(document).on 'change', '.review_radio_button', ->
+      id = this.name.split("resolution_review")[1]
+      res = $('input[name="resolution_review' + id + '"').val()
+      if res != 'ignore'
+        $('#submit_changes_' + id).removeAttr('disabled')
+        store_entry_changes(id, 'review')
+      else
+        $('#submit_changes_' + id).attr('disabled', 'true')
 
-
-
-  # TODO - is this needed?
-  $(document).ready ->
+    # TODO - is this needed?
     if !window.location.pathname.includes('/escalations/webcat')
       $('#filter-complaints-nav').hide()
       $('#fetch').hide()
@@ -572,8 +730,19 @@ $ ->
       $('#complaints-nav-search-wrapper').show()
       $('#new-complaint-nav-wrapper').show()
 
-  # If a stupidly long email address is returned it will wrap
-  # rather than pushing the column into the column beside it
-  $('.email-row').find('.case-history-author').each ->
-    if $(this).text().length > 28
-      $(this).addClass('break-word')
+    # If a stupidly long email address is returned it will wrap
+    # rather than pushing the column into the column beside it
+    $('.email-row').find('.case-history-author').each ->
+      if $(this).text().length > 28
+        $(this).addClass('break-word')
+
+    $('#webcat-bulk-categories').selectize {
+      persist: true,
+      create: false,
+      maxItems: 5,
+      closeAfterSelect: false,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: AC.WebCat.createSelectOptions("#webat-bulk-categories")
+    }
