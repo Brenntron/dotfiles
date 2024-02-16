@@ -622,6 +622,13 @@ Then(/^I click input with id "(.*?)"$/) do |id_name|
   page.find(:xpath, "//input[@id='#{id_name}']").click
 end
 
+Then(/^element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
+  elem = page.find(:xpath, "//input[@id='#{id_name}']")[:value]
+  unless elem == content
+    raise "Element found but with different content; expected: '#{content}' but found: '#{elem}'"
+  end
+end
+
 Then(/^element with id "(.*?)" should contain a value of "(.*?)"$/) do |id_name, content|
   elem = find(:xpath, "//*[@id='#{id_name}']")
   unless elem.value == content

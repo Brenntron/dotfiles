@@ -169,7 +169,7 @@ Feature: Webcat complaints index
 
 
   @javascript
-  Scenario: a user tries to submit bulk selected entries with Fixed resolution that do not have a category
+  Scenario: the bulk submit button is disabled if there have been no changes to entries
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
       | id  | uri          | domain        | entry_type | status |
@@ -177,15 +177,204 @@ Feature: Webcat complaints index
       | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
     And I goto "/escalations/webcat/complaints?f=NEW"
     And I wait for "2" seconds
-    And pending
+    And button with id "master-submit" should be disabled
 
-#    TODO
-  # the bulk submit button is disabled if there have been no changes to entries
-#  Scenario: user tries to submit bulk selected entries with Fixed resolution that do not have a category
-#  Scenario: user tries to submit bulk selected entries with Invalid resolution
-  # Scenario: user tries to submit bulk selected entries with Unchanged resolution
-  # Scenario: user tries to submit bulk selected entries with Invalid resolution and a category
-  # Scenario: user tries to submit bulk selected entries with Unchanged resolution and a category
+
+  ### Bulk Fixed Resolution scenarios
+  @javascript
+  Scenario: a user tries to submit bulk entries with Fixed resolution but no category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And button with id "master-submit" should be disabled
+    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+    And I wait for "1" seconds
+    And button with id "master-submit" should be enabled
+    And I clear element "#input_cat_111-selectized"
+    And I click "#master-submit"
+    And I wait for "3" seconds
+    And I should see "THE FOLLOWING ENTRIES ARE INCOMPLETE OR INCORRECT"
+    And button with id "bulk-submit-correct-btn" should be disabled
+
+  @javascript
+  Scenario: a user can submit bulk entries with Fixed resolution and an added category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And button with id "master-submit" should be disabled
+    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+    And I wait for "1" seconds
+    And button with id "master-submit" should be enabled
+    And I click "#master-submit"
+    And I wait for "3" seconds
+    And I should see "THE FOLLOWING ENTRIES ARE READY TO BE SUBMITTED"
+    And button with id "bulk-submit-correct-btn" should be enabled
+    And I click "#bulk-submit-correct-btn"
+    And I wait for "3" seconds
+    And I should see "All entries successfully processed."
+
+
+  @javascript
+  Scenario: a user can submit bulk entries with Fixed resolution and a changed category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | url_primary_category | category               |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    | Health and Medicine  | Health and Medicine    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |                      |                        |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And button with id "master-submit" should be disabled
+    And I clear element "#input_cat_111-selectized"
+    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+    And I wait for "1" seconds
+    And button with id "master-submit" should be enabled
+    And I click "#master-submit"
+    And I wait for "3" seconds
+    And I should see "THE FOLLOWING ENTRIES ARE READY TO BE SUBMITTED"
+    And button with id "bulk-submit-correct-btn" should be enabled
+    And I click "#bulk-submit-correct-btn"
+    And I wait for "3" seconds
+    And I should see "All entries successfully processed."
+
+
+  @javascript
+  Scenario: a user can submit bulk entries with an Invalid resolution
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And button with id "master-submit" should be disabled
+    And I click "#invalid111"
+    And I wait for "1" seconds
+    And button with id "master-submit" should be enabled
+    And I click "#master-submit"
+    And I wait for "2" seconds
+    And I should see "THE FOLLOWING ENTRIES ARE READY TO BE SUBMITTED"
+
+  @javascript
+  Scenario: a user tries to submit bulk entries with an Invalid resolution, but has added a category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And button with id "master-submit" should be disabled
+    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+    And I wait for "1" seconds
+    And I click "#invalid111"
+    And I wait for "1" seconds
+    And button with id "master-submit" should be enabled
+    And I click "#master-submit"
+    And I wait for "2" seconds
+    And I should see "THE FOLLOWING ENTRIES ARE INCOMPLETE OR INCORRECT"
+
+  @javascript
+  Scenario: a user can to submit bulk entries with an Unchanged resolution
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And button with id "master-submit" should be disabled
+    And I click "#unchanged111"
+    And I wait for "1" seconds
+    And button with id "master-submit" should be enabled
+    And I click "#master-submit"
+    And I wait for "2" seconds
+    And I should see "THE FOLLOWING ENTRIES ARE READY TO BE SUBMITTED"
+
+  @javascript
+  Scenario: a user tries to submit bulk entries with an Unchanged resolution, but has added a category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And button with id "master-submit" should be disabled
+    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+    And I wait for "1" seconds
+    And I click "#unchanged111"
+    And I wait for "1" seconds
+    And button with id "master-submit" should be enabled
+    And I click "#master-submit"
+    And I wait for "2" seconds
+    And I should see "THE FOLLOWING ENTRIES ARE INCOMPLETE OR INCORRECT"
+
+  @javascript
+  Scenario: a user tries to submit bulk entries with an Unchanged resolution, but has added a category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And button with id "master-submit" should be disabled
+    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+    And I wait for "1" seconds
+    And I click "#unchanged111"
+    And I wait for "1" seconds
+    And button with id "master-submit" should be enabled
+    And I click "#master-submit"
+    And I wait for "2" seconds
+    And I should see "THE FOLLOWING ENTRIES ARE INCOMPLETE OR INCORRECT"
+
+  @javascript
+  Scenario: a user tries to submit bulk entries with an Unchanged resolution, but has changed a category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And button with id "master-submit" should be disabled
+    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+    And I wait for "1" seconds
+    And I click "#unchanged111"
+    And I wait for "1" seconds
+    And button with id "master-submit" should be enabled
+    And I click "#master-submit"
+    And I wait for "2" seconds
+    And I should see "THE FOLLOWING ENTRIES ARE INCOMPLETE OR INCORRECT"
+
+
+  @javascript
+  Scenario: a manager tries to commit bulk PENDING entries
+    Given a user with role "webcat manager" exists and is logged in
+    #TODO
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |
+    And I goto "/escalations/webcat/complaints?f=NEW"
+    And I wait for "2" seconds
+    And button with id "master-submit" should be disabled
+    And I fill in "input_cat_111-selectized" with "Arts" and press enter
+    And I wait for "1" seconds
+    And I click "#unchanged111"
+    And I wait for "1" seconds
+    And button with id "master-submit" should be enabled
+    And I click "#master-submit"
+    And I wait for "2" seconds
+    And I should see "THE FOLLOWING ENTRIES ARE INCOMPLETE OR INCORRECT"
 
 
 
@@ -305,13 +494,12 @@ Feature: Webcat complaints index
     And pending
     And I should see "Health and Medicine"
     And I should see "Recipes and Food"
-#    And I fill in selectized of element "#input_cat_111" with ""
     And I wait for "3" seconds
     And I click "#submit_changes_111"
     And I wait for "2" seconds
 
 
-    #TODO
+    #TODO - I am unable to get this to work locally, but it passes for Tim
 #  @javascript
 #  Scenario: a user submits an individual entry with a single removed category and a Fixed resolution
 
@@ -576,9 +764,6 @@ Feature: Webcat complaints index
     And I should not see "Arts"
 
 
-  # TODO
-  # Scenario: a user cannot submit an individual entry with no changes to categories and a Fixed resolution
-
 
   @javascript
   Scenario: a non-manager can view PENDING entries
@@ -724,6 +909,119 @@ Feature: Webcat complaints index
     And I should not see "Gilligan's Co."
     And I should not see "msummers@isnlandtours.com"
     And I should not see "ggrant@islandtours.com"
+
+
+  ## Editing URIs / submitting updated URIs
+
+  @javascript
+    Scenario: a user changes the uri to be categorized to the subdomain using the dropdown tool
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri                                       | subdomain | domain   | path                      | entry_type | status |
+      | 111 | vikings.com.au                            | vikings   | com.au   |                           | URI/DOMAIN | NEW    |
+      | 222 | flatmates.com.au/login?next=%2Flist-place | flatmates | com.au   | login?next=%2Flist-place  | URI/DOMAIN | NEW    |
+      | 333 | food.com                                  |           | food.com |                           | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And button with id "quick_edit_uri_111" should be enabled
+    And button with id "quick_edit_uri_222" should be enabled
+    And button with id "quick_edit_uri_333" should be disabled
+    And element with id "edit_uri_input_111" should have content "com.au"
+    And I click "#quick_edit_uri_111"
+    And I wait for "1" seconds
+    And I click ".quick-subdomain"
+    And I wait for "1" seconds
+    And element with id "edit_uri_input_111" should have content "vikings.com.au"
+
+  @javascript
+  Scenario: a user changes the uri to be categorized to the subdomain using the dropdown tool
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri                                       | subdomain | domain   | path                      | entry_type | status |
+      | 111 | vikings.com.au                            | vikings   | com.au   |                           | URI/DOMAIN | NEW    |
+      | 222 | flatmates.com.au/login?next=%2Flist-place | flatmates | com.au   | login?next=%2Flist-place  | URI/DOMAIN | NEW    |
+      | 333 | food.com                                  |           | food.com |                           | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And button with id "quick_edit_uri_111" should be enabled
+    And button with id "quick_edit_uri_222" should be enabled
+    And button with id "quick_edit_uri_333" should be disabled
+    And element with id "edit_uri_input_222" should have content "com.au"
+    And I click "#quick_edit_uri_222"
+    And I wait for "1" seconds
+    And I click ".quick-subdomain"
+    And I wait for "1" seconds
+    And element with id "edit_uri_input_222" should have content "flatmates.com.au"
+    And I click "#quick_edit_uri_222"
+    And I wait for "1" seconds
+    And I click ".quick-uri"
+    And I wait for "1" seconds
+    And element with id "edit_uri_input_222" should have content "flatmates.com.au/login?next=%2Flist-place"
+
+
+  @javascript
+  Scenario: a user changes the uri to be categorized to the subdomain using the dropdown tool, and submits a Fixed resolution with a category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri                                       | subdomain | domain   | path                      | entry_type | status |
+      | 111 | vikings.com.au                            | vikings   | com.au   |                           | URI/DOMAIN | NEW    |
+      | 222 | flatmates.com.au/login?next=%2Flist-place | flatmates | com.au   | login?next=%2Flist-place  | URI/DOMAIN | NEW    |
+      | 333 | food.com                                  |           | food.com |                           | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And button with id "quick_edit_uri_111" should be enabled
+    And button with id "quick_edit_uri_222" should be enabled
+    And button with id "quick_edit_uri_333" should be disabled
+    And element with id "edit_uri_input_111" should have content "com.au"
+    And I click "#quick_edit_uri_111"
+    And I wait for "1" seconds
+    And I click ".quick-subdomain"
+    And I wait for "1" seconds
+    And element with id "edit_uri_input_111" should have content "vikings.com.au"
+    Then I fill in selectized of element "#input_cat_111" with "['77']"
+    And I wait for "1" seconds
+    And I click "#submit_changes_111"
+    And I wait for "3" seconds
+    Then I go to "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And I should see "Alcohol"
+    And element with id "edit_uri_input_111" should have content "vikings.com.au"
+
+
+  @javascript
+  Scenario: a user changes the uri to be categorized to the subdomain using the dropdown tool, and bulk submits a Fixed resolution with a category
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri                                       | subdomain | domain   | path                      | entry_type | status |
+      | 111 | vikings.com.au                            | vikings   | com.au   |                           | URI/DOMAIN | NEW    |
+      | 222 | flatmates.com.au/login?next=%2Flist-place | flatmates | com.au   | login?next=%2Flist-place  | URI/DOMAIN | NEW    |
+      | 333 | food.com                                  |           | food.com |                           | URI/DOMAIN | NEW    |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And button with id "quick_edit_uri_111" should be enabled
+    And button with id "quick_edit_uri_222" should be enabled
+    And button with id "quick_edit_uri_333" should be disabled
+    And element with id "edit_uri_input_111" should have content "com.au"
+    And I click "#quick_edit_uri_111"
+    And I wait for "1" seconds
+    And I click ".quick-subdomain"
+    And I wait for "1" seconds
+    And element with id "edit_uri_input_111" should have content "vikings.com.au"
+    Then I fill in selectized of element "#input_cat_111" with "['77']"
+    And I wait for "1" seconds
+    And I click "#master-submit"
+    And I wait for "3" seconds
+
+#    Then I go to "/escalations/webcat/complaints?f=COMPLETED"
+#    And I wait for "3" seconds
+#    And I should see "Alcohol"
+#    And element with id "edit_uri_input_111" should have content "vikings.com.au"
+
+  
+  # - a user changes the uri to be categorized by editing the text field
+  # ^ Each of those testing with submitting a fixed res correctly and incorrectly
+  # - a user changes the uri to be submitted to the domain and submits a Fixed resolution with no category
+
 
 
   ## Sorting functionality ###
