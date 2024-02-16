@@ -1,7 +1,6 @@
 include ActionView::Helpers::DateHelper
 
 class ComplaintEntry < ApplicationRecord
-  require 'pp'
   has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
 
   before_update :update_duplicates
@@ -54,7 +53,7 @@ class ComplaintEntry < ApplicationRecord
     #support for ipv6 carried over from work done in WEB-11015 while this was being developed
     #is_ip_address = !!(uri_or_ip  =~ Resolv::IPv4::Regex)
     is_ip_address = !!(uri_or_ip =~ Resolv::IPv4::Regex || uri_or_ip =~ Resolv::IPv6::Regex)
-
+    
     if is_ip_address
       ComplaintEntry.open_tickets.where(:ip_address => uri_or_ip).where("id <> #{self.id}").first
     else
@@ -1061,7 +1060,7 @@ class ComplaintEntry < ApplicationRecord
       relation =
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
     end
-
+    
     if params['jira_id'].present?
       relation = relation.joins(complaint: {import_urls: :jira_import_task}).where(jira_import_tasks: {issue_key: present_params['jira_id']})
     end
