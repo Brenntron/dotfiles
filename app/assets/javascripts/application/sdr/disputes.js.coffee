@@ -350,7 +350,7 @@ window.initialize_sdr_disputes_datatable = () ->
       {
         data: 'contact_email',
         render: (data) ->
-          return "<span>#{data}</span> <a href='#{$('#sdr-disputes-index').data('bunhammer-host') + '?q=' + data}' target='_blank' title='Ban #{data}' class='ban esc-tooltipped'></a>"
+          return "<span>#{data}</span> <a href='#{$('#sdr-disputes-index').data('banhammer-host') + '?q=' + data}' target='_blank' title='Ban #{data}' class='ban esc-tooltipped'></a>"
       }
       { data: 'submitter_org' }
     ]

@@ -170,7 +170,7 @@
               .top-info-data
                 - unless @file_rep_dispute.customer.nil?
                   = @file_rep_dispute.customer.email
-                  %a.ban{title: "Ban #{@file_rep_dispute.customer.email}", href: "#{Rails.configuration.bunhammer_host + '?q=' + @file_rep_dispute.customer.email}", target: "_blank"}
+                  %a.ban{title: "Ban #{@file_rep_dispute.customer.email}", href: "#{Rails.configuration.banhammer_host + '?q=' + @file_rep_dispute.customer.email}", target: "_blank"}
                 - else
                   %span.missing-data No customer record
 

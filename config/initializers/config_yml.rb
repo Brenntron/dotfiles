@@ -246,6 +246,6 @@ raise 'config.yml missing resolution_report section' unless resolution_report_co
 Rails.configuration.resolution_report = OpenStruct.new
 Rails.configuration.resolution_report.cache_expiration = resolution_report_config['cache_expiration']
 
-bunhammer_host = env_config.dig('bunhammer', 'host')
-raise 'config.yml missing bunhammer section' unless bunhammer_host
-Rails.configuration.bunhammer_host = bunhammer_host
+banhammer_host = env_config.dig('banhammer', 'host')
+raise 'config.yml missing banhammer section' unless banhammer_host
+Rails.configuration.banhammer_host = banhammer_host

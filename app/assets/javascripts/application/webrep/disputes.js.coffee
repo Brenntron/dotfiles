@@ -1265,7 +1265,7 @@ $ ->
       {
         data: 'submitter_email'
         render: (data) ->
-          return "<span>#{data}</span> <a href='#{$('#disputes-index').data('bunhammer-host') + '?q=' + data}' target='_blank' title='Block #{data}' class='ban esc-tooltipped'></a>"
+          return "<span>#{data}</span> <a href='#{$('#disputes-index').data('banhammer-host') + '?q=' + data}' target='_blank' title='Block #{data}' class='ban esc-tooltipped'></a>"
       }
       { data: 'status_comment' }
       { data: 'updated_at' }

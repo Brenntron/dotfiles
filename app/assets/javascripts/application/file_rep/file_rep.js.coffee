@@ -1066,7 +1066,7 @@ $ ->
         data: 'customer_email',
         className: 'filerep-customer-email'
         render: (data) ->
-          return "<span>#{data}</span> <a href='#{$('#file-rep-datatable').data('bunhammer-host') + '?q=' + data}' target='_blank' title='Ban #{data}' class='ban esc-tooltipped'></a>"
+          return "<span>#{data}</span> <a href='#{$('#file-rep-datatable').data('banhammer-host') + '?q=' + data}' target='_blank' title='Ban #{data}' class='ban esc-tooltipped'></a>"
       }
       {
         data: 'assigned'

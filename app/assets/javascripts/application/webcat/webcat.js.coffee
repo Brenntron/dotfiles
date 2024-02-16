@@ -726,7 +726,7 @@ $ ->
                 className: 'webcat-customer-email',
                 render: (data) ->
                   if data
-                    return "<span>#{data}</span> <a href='#{$('#complaints-index').data('bunhammer-host') + '?q=' + data}' target='_blank' title='Ban #{data}' class='ban esc-tooltipped'></a>"
+                    return "<span>#{data}</span> <a href='#{$('#complaints-index').data('banhammer-host') + '?q=' + data}' target='_blank' title='Ban #{data}' class='ban esc-tooltipped'></a>"
                   else
                     return ''
 
