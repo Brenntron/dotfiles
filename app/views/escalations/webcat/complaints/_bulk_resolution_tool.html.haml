@@ -12,8 +12,6 @@
         .resolution-input-wrapper
           %input#webcat_resolution_unchanged_option.bulk-resolution-radio{type: 'radio',  name: 'complaint[resolution]', value: 'UNCHANGED', checked: 'checked'}
           %label.resolution-radio-label{for: 'webcat_resolution_unchanged_option'} Unchanged
-          %input#webcat_resolution_fixed_option.bulk-resolution-radio{ type: 'radio', name: 'complaint[resolution]', value: 'FIXED'}
-          %label.resolution-radio-label{ for: 'webcat_resolution_fixed_option' } Fixed
           %input#webcat_resolution_invalid_option.bulk-resolution-radio{type: 'radio', name: 'complaint[resolution]', value: 'INVALID'}
           %label.resolution-radio-label{for: 'webcat_resolution_invalid_option'} Invalid
       .col-xs-2.text-right
@@ -31,11 +29,11 @@
       .col-xs-12.categories-container
         .resolution-category-options
           %label.content-label-sm.edit-resolution-label{for: 'complaint[categories]'} Categories to Apply
-          %input{type: 'radio', name: 'complaint[category_option]', value: 'ADD', checked: 'checked'}
+          %input#webcat_resolution_add_option{type: 'radio', name: 'complaint[category_option]', value: 'ADD', checked: 'checked'}
           %label.resolution-radio-label Add
-          %input{type: 'radio', name: 'complaint[category_option]', value: 'REPLACE'}
+          %input#webcat_resolution_replace_option{type: 'radio', name: 'complaint[category_option]', value: 'REPLACE'}
           %label.resolution-radio-label Replace
-          %input{type: 'radio', name: 'complaint[category_option]', value: 'DROP_ALL'}
+          %input#webcat_resolution_drop_option{type: 'radio', name: 'complaint[category_option]', value: 'DROP_ALL'}
           %label.resolution-radio-label Drop All
         .resolution-controls
           .resolution-input-wrapper

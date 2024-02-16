@@ -342,7 +342,6 @@ window.reopenComplaint = (entry_id) ->
     method: 'POST'
     data: {'complaint_entry_id': entry_id}
     success: (response) ->
-      debugger
     entry_row = $('#' + entry_id)
 
     $(entry_row).find('.state-row td').text('REOPENED')
@@ -355,8 +354,8 @@ window.reopenComplaint = (entry_id) ->
     cat_input =   $('#input_cat_' + entry_id)[0].selectize
     cat_input.enable()
 
-    comment_dropdown = $('#internal_comment_dropdown_' + entry_id)
-    comment = $('#internal_comment_' + entry_id)
+    comment_dropdown = $('#internal-comment-dropdown_' + entry_id)
+    comment = $('#internal-comment-' + entry_id)
     if $(comment).text() != ''
       comment_text = $(comment).text()
     else
@@ -523,31 +522,35 @@ bulk_submittable_statuses = ['ASSIGNED', 'NEW', 'COMPLETED', 'REOPENED', 'RESOLV
 
 apply_resolution = () ->
   data_table = $('#complaints-index').DataTable()
-  selected_rows = data_table.rows({selected: true})
+  selected_rows = data_table.rows({selected: true})[0]
   resolution_to_apply = $('input[name="complaint[resolution]"]:checked')[0].value.toLowerCase()
 
   for row in selected_rows
-    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+    {entry_id, status} = data_table.row(row).data()
 
-    $("##{resolution_to_apply}#{row + 1}").prop('checked', true)
-    store_entry_changes(row + 1, 'submit')
-    sessionStorage.setItem("#{row + 1}_resolution", 'staged')
+    continue unless status in bulk_submittable_statuses
+
+    $("##{resolution_to_apply}#{entry_id}").prop('checked', true)
+    store_entry_changes(entry_id, 'submit')
+    sessionStorage.setItem("#{entry_id}_resolution", 'staged')
 
 apply_customer_facing_comment = () ->
   data_table = $('#complaints-index').DataTable()
-  selected_rows = data_table.rows({selected: true})
-  customer_facing_comment = $('#email_response_to_customers').val()
+  selected_rows = data_table.rows({selected: true})[0]
+  customer_facing_comment = $('#email-response-to-customers').val()
 
   for row in selected_rows
-    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+    {entry_id, status} = data_table.row(row).data()
 
-    $("#entry_email_response_to_customers_#{row + 1}").val(customer_facing_comment)
-    store_entry_changes(row + 1, 'submit')
-    sessionStorage.setItem("#{row + 1}_customer_facing_comment", 'staged')
+    continue unless status in bulk_submittable_statuses
+
+    $("#entry_email_response_to_customers_#{entry_id}").val(customer_facing_comment)
+    store_entry_changes(entry_id, 'submit')
+    sessionStorage.setItem("#{entry_id}_customer_facing_comment", 'staged')
 
 apply_category = () ->
   data_table = $('#complaints-index').DataTable()
-  selected_rows = data_table.rows({selected: true})
+  selected_rows = data_table.rows({selected: true})[0]
   category_option = $('input[name="complaint[category_option]"]:checked')[0].value
 
   if category_option is 'DROP_ALL'
@@ -556,83 +559,93 @@ apply_category = () ->
     categories_to_apply = $('#webcat_bulk_categories')[0].selectize.items
 
   for row in selected_rows
-    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+    {entry_id, status} = data_table.row(row).data()
+
+    continue unless status in bulk_submittable_statuses
 
     if category_option is 'ADD'
-      $("#input_cat_#{row + 1}")[0].selectize.addItems(categories_to_apply)
+      $("#input_cat_#{entry_id}")[0].selectize.addItems(categories_to_apply)
     else if category_option is 'REPLACE'
-      $("#input_cat_#{row + 1}")[0].selectize.setValue(categories_to_apply)
+      $("#input_cat_#{entry_id}")[0].selectize.setValue(categories_to_apply)
 
-    store_entry_changes(row_id, 'submit')
-    sessionStorage.setItem("#{row + 1}_categories", 'staged')
+    store_entry_changes(entry_id_id, 'submit')
+    sessionStorage.setItem("#{entry_id}_categories", 'staged')
 
 apply_internal_comment = () ->
   data_table = $('#complaints-index').DataTable()
-  selected_rows = data_table.rows({selected: true})
+  selected_rows = data_table.rows({selected: true})[0]
   internal_comment = $('#internal_comment').val()
 
   for row in selected_rows
-    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+    {entry_id, status} = data_table.row(row).data()
 
-    row_id = row.attr('id')
+    continue unless status in bulk_submittable_statuses
 
-    $("internal_comment_#{row + 1}").val(internal_comment)
-    store_entry_changes(row + 1, 'submit')
-    sessionStorage.setItem("#{row + 1}_internal_facing_comment", 'staged')
+    $("internal-comment-#{entry_id}").val(internal_comment)
+    store_entry_changes(entry_id, 'submit')
+    sessionStorage.setItem("#{entry_id}_internal_facing_comment", 'staged')
 
 clear_resolution = () ->
   data_table = $('#complaints-index').DataTable()
-  selected_rows = data_table.rows({selected: true})
+  selected_rows = data_table.rows({selected: true})[0]
 
   for row in selected_rows
-    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+    data = data_table.row(entry_id).data()
+    {entry_id, status} = data
+    resolution_to_apply = data.resolution.toLowerCase()
 
-    resolution_to_apply = data_table.row(row).data().resolution.toLowerCase()
+    continue unless status in bulk_submittable_statuses
 
-    $("##{resolution_to_apply}#{row + 1}").prop('checked', true)
+    $("##{resolution_to_apply}#{entry_id}").prop('checked', true)
 
-    unless staged_changes("#{row + 1}_resolution")
-      remove_entry_changes(row + 1, 'submit')
-      sessionStorage.removeItem("#{row + 1}_resolution")
+    unless staged_changes("#{entry_id}_resolution")
+      remove_entry_changes(entry_id, 'submit')
+      sessionStorage.removeItem("#{entry_id}_resolution")
 
 clear_customer_facing_comment = () ->
   data_table = $('#complaints-index').DataTable()
-  selected_rows = data_table.rows({selected: true})
+  selected_rows = data_table.rows({selected: true})[0]
 
   for row in selected_rows
-    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+    {entry_id, status} = data_table.row(row).data()
 
-    $("#entry_email_response_to_customers_#{row + 1}").val('')
+    continue unless status in bulk_submittable_statuses
 
-    unless staged_changes("#{row + 1}_customer_facing_comment")
-      remove_entry_changes(row + 1, 'submit')
-      sessionStorage.removeItem("#{row + 1}_customer_facing_comment")
+    $("#entry_email_response_to_customers_#{entry_id}").val('')
+
+    unless staged_changes("#{entry_id}_customer_facing_comment")
+      remove_entry_changes(entry_id, 'submit')
+      sessionStorage.removeItem("#{entry_id}_customer_facing_comment")
 
 clear_category = () ->
   data_table = $('#complaints-index').DataTable()
-  selected_rows = data_table.rows({selected: true})
+  selected_rows = data_table.rows({selected: true})[0]
 
   for row in selected_rows
-    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+    {entry_id, status} = data_table.row(row).data()
 
-    $("#input_cat_#{row + 1}")[0].selectize.clear()
+    continue unless status in bulk_submittable_statuses
 
-  unless staged_changes("#{row + 1}_categories")
-    remove_entry_changes(row + 1, 'submit')
-    sessionStorage.removeItem("#{row + 1}_categories")
+    $("#input_cat_#{entry_id}")[0].selectize.clear()
+
+  unless staged_changes("#{entry_id}_categories")
+    remove_entry_changes(entry_id, 'submit')
+    sessionStorage.removeItem("#{entry_id}_categories")
 
 clear_internal_comment = () ->
   data_table = $('#complaints-index').DataTable()
-  selected_rows = data_table.rows({selected: true})
+  selected_rows = data_table.rows({selected: true})[0]
 
   for row in selected_rows
-    continue unless data_table.row(row).data().status in bulk_submittable_statuses
+    {entry_id, status} = data_table.row(row).data()
 
-    $("internal_comment_#{row + 1}").val('')
+    continue unless status in bulk_submittable_statuses
 
-  unless staged_changes("#{row + 1}_internal_facing_comment")
-    remove_entry_changes(row + 1, 'submit')
-    sessionStorage.removeItem("#{row + 1}_internal_facing_comment")
+    $("internal-comment-#{entry_id}").val('')
+
+  unless staged_changes("#{entry_id}_internal_facing_comment")
+    remove_entry_changes(entry_id, 'submit')
+    sessionStorage.removeItem("#{entry_id}_internal_facing_comment")
 
 staged_changes = (storage_key) ->
   storage_value = sessionStorage.getItem(storage_key) || ''
@@ -654,15 +667,15 @@ window.applyAll = () ->
   apply_resolution()
 
   if $('#email_response_to_customers').val()
-    $('#customer_facing_apply_button').addClass('applied')
+    $('#customer-facing-apply-button').addClass('applied')
     apply_customer_facing_comment()
 
   if $('#webcat_bulk_categories')[0].selectize.getValue().length > 0 || $('input[name="complaint[category_option]"]:checked').val() is 'DROP_ALL'
-    $('#category_apply_button').addClass('applied')
+    $('#category-apply-button').addClass('applied')
     apply_category()
 
   if $('#internal_comment').val()
-    $('#internal_comment_button').addClass('applied')
+    $('#internal-comment-button').addClass('applied')
     apply_internal_comment()
 
 $ ->
@@ -675,18 +688,18 @@ $ ->
         $button.removeClass('applied')
 
         switch button_id
-          when 'resolution_apply_button' then clear_resolution()
-          when 'customer_facing_apply_button' then clear_customer_facing_comment()
-          when 'category_apply_button' then clear_category()
-          when 'internal_comment_button' then clear_internal_comment()
+          when 'resolution-apply-button' then clear_resolution()
+          when 'customer-facing-apply-button' then clear_customer_facing_comment()
+          when 'category-apply-button' then clear_category()
+          when 'internal-comment-button' then clear_internal_comment()
       else
         $button.addClass('applied')
 
         switch button_id
-          when 'resolution_apply_button' then apply_resolution()
-          when 'customer_facing_apply_button' then apply_customer_facing_comment()
-          when 'category_apply_button' then apply_category()
-          when 'internal_comment_button' then apply_internal_comment()
+          when 'resolution-apply-button' then apply_resolution()
+          when 'customer-facing-apply-button' then apply_customer_facing_comment()
+          when 'category-apply-button' then apply_category()
+          when 'internal-comment-button' then apply_internal_comment()
 
     # If resolution is changed (to unchanged or invalid) enable the bulk submit button
     $(document).on 'change', '.resolution_radio_button', ->
@@ -729,5 +742,5 @@ $ ->
       valueField: 'category_id',
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions("#webat-bulk-categories")
+      options: AC.WebCat.createSelectOptions("#webcat-bulk-categories")
     }

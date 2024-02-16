@@ -83,15 +83,24 @@ build_complaints_table = (url) ->
             $target.dropdown('toggle')
 
           if selected
+            rows = data_table.rows({selected: true})
             row.deselect()
 
-            submittable_rows = data_table.rows({selected: true})[0].filter((row) -> row.data().status in bulk_submittable_statuses).length
+            submittable_rows_length = if rows[0].length > 0
+                                        rows.filter((row) -> data_table.row(row).data().status in bulk_submittable_statuses).length
+                                      else
+                                        0
 
             # the unless checks for a length of greater than one to account for the deselection
             # of this row after the length is retrieved
             $('#index_update_resolution').prop('disabled', true) unless submittable_rows_length > 0
           else
-            other_submittable_rows = data_table.rows({selected: true})[0].filter((row) -> row.data().status in bulk_submittable_statuses).length
+            rows = data_table.rows({selected: true})
+
+            other_submittable_rows = if rows[0].length > 0
+                                       rows.filter((row) -> data_table.row(row).data().status in bulk_submittable_statuses).length
+                                     else
+                                       0
             row_submittable = row.data().status in bulk_submittable_statuses
 
             row.select()
