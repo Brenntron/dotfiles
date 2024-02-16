@@ -88,87 +88,118 @@ class ComplaintEntry < ApplicationRecord
     "http://#{subdomain+'.' if subdomain.present?}#{domain}#{path}"
   end
 
-  def take_complaint(current_user)
-    if user.nil? || user.display_name == "Vrt Incoming"
-      if status != "COMPLETED"
-        self.update(user:current_user, status:"ASSIGNED", case_assigned_at: Time.now)
-        complaint.set_status("ASSIGNED")
-      else
-        return("Already completed")
-      end
+  def take_complaint(current_user, assignment_type)
+    error_messages = {
+      'assignee' => 'Currently assigned to someone else',
+      'reviewer' => 'Someone else is currently reviewing',
+      'second_reviewer' => 'Someone else is currently reviewing'
+    }
+
+    return("Already completed") if status == "COMPLETED"
+
+    if assignment_type == 'assignee' && [reviewer&.id, second_reviewer&.id].include?(current_user.id)
+      return('A Reviewer cannot also be the Assignee.')
+    elsif assignment_type == 'assignee' && (self.user.nil? || self.user.display_name == 'Vrt Incoming')
+      update(user: current_user, status: "ASSIGNED", case_assigned_at: Time.now)
+      complaint.set_status("ASSIGNED")
+    elsif ['second_reviewer', 'reviewer'].include?(assignment_type) && self.user.id == current_user.id
+      return('The Assignee cannot also be a Reviewer.')
+    elsif assignment_type == 'reviewer' && reviewer.nil? && second_reviewer&.id == self.user.id
+      return('The Reviewer cannot also be the Second Reviewer.')
+    elsif assignment_type == 'reviewer' && reviewer.nil?
+      update(reviewer: current_user)
+    elsif assignment_type == 'reviewer' && second_reviewer.nil? && reviewer&.id == self.user.id
+      return('The Second Reviewer cannot also be the Reviewer.')
+    elsif assignment_type == 'second_reviewer' && second_reviewer.nil?
+      update(second_reviewer: current_user)
     else
-      return("Currently assigned to someone else")
+      return(error_messages[assignment_type])
     end
-    return("Complaint taken")
+
+    return 'Complaint taken'
   end
 
-  def return_complaint(current_user)
+  def return_complaint(current_user, assignment_type)
+    return("Already completed") if status == 'COMPLETED'
 
-    if self.user != User.where(display_name: 'Vrt Incoming').first
+    case assignment_type
+    when 'assignee'
+      return("Not yet assigned") if user.display_name == 'Vrt Incoming'
 
-      if !self.is_important
-        if status!="COMPLETED"
-          if self.user.id != current_user.id
-            return("Currently assigned to someone else")
-          else
-            self.update(user: User.vrtincoming, status:"NEW")
-            complaint.set_status("NEW")
-          end
-        else
-          return("Already completed")
-        end
-      elsif self.is_important && self.status != "PENDING"
-        self.update(user: User.vrtincoming, status:"NEW")
+      if !is_important
+        return("Currently assigned to someone else") if user.id != current_user.id
+
+        update(user: User.vrtincoming, status: "NEW")
+        complaint.set_status("NEW")
+      elsif is_important && status != "PENDING"
+        update(user: User.vrtincoming, status: "NEW")
         complaint.set_status("NEW")
       else
         return("Status is pending")
       end
-    else
-      return("Not yet assigned")
+    when 'reviewer'
+      return('Someone else is currently reviewing') if reviewer&.id != current_user.id
+
+      update(reviewer: nil)
+    when 'second_reviewer'
+      return('Someone else is currently reviewing') if second_reviewer&.id != current_user.id
+
+      update(second_reviewer: nil)
     end
-    return("Complaint returned")
+
+    'Complaint returned'
   end
 
-  def unassign
-    if self.user == User.vrtincoming
-      return("Complaint is already assigned to Vrt Incoming")
-    else
-      if !self.is_important
-        if status!="COMPLETED"
-          self.update(user: User.vrtincoming, status:"NEW")
-          complaint.set_status("NEW")
-        else
-          return("Already completed")
-        end
-      elsif self.is_important && self.status != "PENDING"
-        self.update(user: User.vrtincoming, status:"NEW")
+  def unassign(assignment_type)
+    return("Complaint is already assigned to Vrt Incoming") if user == User.vrtincoming
+
+    case assignment_type
+    when 'assignee'
+      if !is_important
+        return("Already completed") if status == 'COMPLETED'
+
+        update(user: User.vrtincoming, status: "NEW")
+        complaint.set_status("NEW")
+      elsif is_important && status != "PENDING"
+        update(user: User.vrtincoming, status: "NEW")
         complaint.set_status("NEW")
       else
         return("Status is pending")
       end
+    when 'reviewer'
+      update(reviewer: nil)
+    when 'second_reviewer'
+      update(second_reviewer: nil)
     end
-    return("Complaint unassigned")
+
+    "Unassigned the Complaint's #{assignment_type}"
   end
 
-  def reassign(user)
-    if self.user == user
-      return("Complaint is already assigned to #{user.cvs_username}")
-    else
-      if !self.is_important
-        if status!="COMPLETED"
-          self.update(user: user, status:"ASSIGNED", case_assigned_at: Time.now)
-          complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
-        else
-          return("Already completed")
-        end
-      elsif self.is_important && self.status != "PENDING"
-        self.update(user: user, status:"ASSIGNED", case_assigned_at: Time.now)
+  def reassign(assignee, assignment_type)
+    return("Complaint is already assigned to #{assignee.cvs_username}") if user == assignee
+    return("#{reviewer.cvs_username} is already reviewing Complaint") if user == reviewer
+    return("#{second_reviewer.cvs_username} is already the second reviewer for Complaint") if user == second_reviewer
+
+    case assignment_type
+    when 'assignee'
+      if !is_important
+        return("Already completed") if status == "COMPLETED"
+
+        update(user: assignee, status: "ASSIGNED", case_assigned_at: Time.now)
+        complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
+      elsif is_important && status != "PENDING"
+        update(user: assignee, status: "ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
       else
         return("Status is pending")
       end
+    when 'reviewer'
+      update(reviewer: assignee)
+    when 'second_reviewer'
+      update(second_reviewer: assignee)
     end
-    return("Complaint assigned to #{user.cvs_username}")
+
+    "#{assignee.cvs_username} assigned to Complaint as #{assignment_type}"
   end
 
   def is_pending?
@@ -186,7 +217,10 @@ class ComplaintEntry < ApplicationRecord
   # @return [Array[Wbrs::Prefix]] the object for the Prefix remote stub.
   def remote_prefixes(prefix_given: self.hostlookup, reload: false)
     @remote_prefixes = nil if reload
-    @remote_prefixes ||= Wbrs::Prefix.where({:urls => [Addressable::URI.escape(prefix_given)]})
+    # IPv6 cannot be parsed like URI, since it does not follow rfc3986 (URLs standard)
+    # If it is IPv6, do not escape prefix and add brackets to transform it to url
+    escaped_prefix = !!(prefix_given =~ Resolv::IPv6::Regex) ? "[#{prefix_given}]" : Addressable::URI.escape(prefix_given)
+    @remote_prefixes ||= Wbrs::Prefix.where({:urls => [escaped_prefix]})
   end
 
   # Returns the Wbrs::Prefix object called on domain_of_with_path
@@ -207,13 +241,11 @@ class ComplaintEntry < ApplicationRecord
                       resolution_comment,
                       uri_as_categorized,
                       current_user,
-                      commit_pending,
-                      self_review)
+                      commit_pending)
     ActiveRecord::Base.transaction do
 
-      # If the prefix is a high telemetry value then the status needs to be set to PENDING, unless it has the
-      # self_review flag
-      if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED && self_review == false
+      # If the prefix is a high telemetry value then the status needs to be set to PENDING
+      if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
         if self.status == "PENDING"
           if commit_pending == "commit"
             # commit from pending of important case
@@ -371,9 +403,9 @@ class ComplaintEntry < ApplicationRecord
 
   def commit_category(existing_prefixes, ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
     # Look for existing prefix
-    is_ip_address = !!(ip_or_uri  =~ Resolv::IPv4::Regex)
+    is_ip_address = !!(ip_or_uri =~ Resolv::IPv4::Regex || ip_or_uri =~ Resolv::IPv6::Regex)
 
-    url_parts = Complaint.parse_url(ip_or_uri)
+    url_parts = Complaint.parse_url(ip_or_uri) unless is_ip_address
     existing_prefix = nil
     if existing_prefixes.present? && !is_ip_address
       existing_prefixes.each do |prefix_found|
@@ -749,7 +781,11 @@ class ComplaintEntry < ApplicationRecord
       when "ACTIVE"
         open.where.not(status:"NEW")
       when "REVIEW"
-        where(status: "PENDING")
+        if user.allowed_self_review
+          where(status: "PENDING")
+        else
+          where(status: "PENDING").where.not(user_id: user.id)
+        end
       when "MY COMPLAINTS"
         where(user_id: user.id)
       when "MY OPEN COMPLAINTS"
@@ -867,16 +903,29 @@ class ComplaintEntry < ApplicationRecord
       present_params['jira_id'] = present_params['jira_id'].split(',').map {|item| item.strip}
     end
 
-    simple_params = present_params.slice(*%w{id complaint_id resolution status})
+    simple_params = present_params.slice(*%w{id complaint_id resolution})
 
     relation = where(simple_params)
+
+    if present_params['status'].include?('PENDING')
+      if user.allowed_self_review
+        relation = relation.where(status: present_params['status'])
+      else
+        present_params['status'].delete('PENDING')
+        relation = relation.where(status: present_params['status'])
+        pending_relation = where(status: "PENDING").where.not(user_id: user.id)
+        relation = relation.or(pending_relation)
+      end
+    else
+      relation = relation.where(status: present_params['status'])
+    end
 
     if params['user_id'].present?
 
       relation =
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
     end
-    
+
     if params['jira_id'].present?
       relation = relation.joins(complaint: {import_urls: :jira_import_task}).where(jira_import_tasks: {issue_key: present_params['jira_id']})
     end

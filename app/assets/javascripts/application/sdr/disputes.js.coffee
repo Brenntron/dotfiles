@@ -323,7 +323,10 @@ window.initialize_sdr_disputes_datatable = () ->
           else if data == 'vrtincom' || data == ""
             return "<span class='missing-data missing-data-index' id='owner_#{full.case_id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.case_id}' onClick='take_sdr_dispute(#{full.case_id})'/></button></span>"
           else
-            return data
+            if data.includes("inactive")
+              return "<span class='inactive-user'> #{data} </span>"
+            else
+              return data
       }
       { data: 'source' }
       { data: 'platform' }
@@ -344,7 +347,11 @@ window.initialize_sdr_disputes_datatable = () ->
       }
       { data: 'submitter_type' }
       { data: 'contact_name' }
-      { data: 'contact_email' }
+      {
+        data: 'contact_email',
+        render: (data) ->
+          return "<span>#{data}</span> <a href='#{$('#sdr-disputes-index').data('bunhammer-host') + '?q=' + data}' target='_blank' title='Ban #{data}' class='ban esc-tooltipped'></a>"
+      }
       { data: 'submitter_org' }
     ]
   )

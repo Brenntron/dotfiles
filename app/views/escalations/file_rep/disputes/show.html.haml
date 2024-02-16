@@ -108,7 +108,10 @@
                 - if @is_unassigned
                   %span#dispute-assignee.missing-data Unassigned
                 - else
-                  %span#dispute-assignee.file-rep-dispute-assignee= @file_rep_dispute.assigned.cvs_username
+                  - if @file_rep_dispute.assigned.is_inactive?
+                    %span#dispute-assignee.file-rep-dispute-assignee.inactive-user="#{@file_rep_dispute.assigned.cvs_username} (inactive)"
+                  - else
+                    %span#dispute-assignee.file-rep-dispute-assignee= @file_rep_dispute.assigned.cvs_username
 
                 - if can? :update, @file_rep_dispute
                   .dispute-owner-buttons-wrapper.file-rep-dispute-owner-buttons-wrapper
@@ -167,6 +170,7 @@
               .top-info-data
                 - unless @file_rep_dispute.customer.nil?
                   = @file_rep_dispute.customer.email
+                  %a.ban{title: "Ban #{@file_rep_dispute.customer.email}", href: "#{Rails.configuration.bunhammer_host + '?q=' + @file_rep_dispute.customer.email}", target: "_blank"}
                 - else
                   %span.missing-data No customer record
 

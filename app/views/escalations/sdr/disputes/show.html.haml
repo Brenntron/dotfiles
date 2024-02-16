@@ -122,7 +122,7 @@
         %label.content-label-sm
           Assignee
         %div
-          %span#dispute-assignee{class: ('missing-data' if @is_unassigned)}= (@is_unassigned ? 'Unassigned' : @dispute.user&.cvs_username)
+          %span#dispute-assignee{class: ('missing-data' if (@dispute.user_id.nil? || @dispute.user&.cvs_username == 'vrtincom')) || ('inactive-user' if @dispute.user&.is_inactive?)}= ((@dispute.user_id.nil? || @dispute.user&.cvs_username == 'vrtincom') ? 'Unassigned' : (@dispute.user&.is_inactive? ? "#{@dispute.user&.cvs_username} (inactive)" : @dispute.user&.cvs_username))
       - if can? :update, Dispute
         .dispute-owner-buttons-wrapper.sdr-dispute-owner-buttons-wrapper.col-xs-12
           %span.dropdown
@@ -199,7 +199,11 @@
       .contact-email-wrapper
         %label.content-label-sm
           Contact Email
-        %p.dispute-edit-field#dispute-customer-email= @dispute.customer_email
+        %p.dispute-edit-field#dispute-customer-Email
+          - email = @dispute.customer.email
+          #{email}
+          %a.ban.dispute-show{title: "Ban #{email}", href: "#{Rails.configuration.bunhammer_host + '?q=' + email}", target: "_blank"}
+
         %input.dispute-edit-input#dispute-customer-email-input{type: 'text', value: "#{@dispute.customer_email}"}
 
 %ul.nav.nav-tabs#research-tab{role: 'tablist'}

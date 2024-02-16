@@ -645,7 +645,6 @@ $ ->
     callsToMake = 0
     callsCompleted = 0
     urlListItems = $(listId).find('li')
-    self_review = $('#self_review').is(':checked')
 
     for listItem in urlListItems
       entries.push $(listItem).data().url
@@ -678,8 +677,7 @@ $ ->
         data:
           'entries': [entry],
           'category_ids': category_ids,
-          'categories': categories,
-          'self_review': self_review
+          'categories': categories
         success: (response) ->
           data = response.data
           callsCompleted += 1

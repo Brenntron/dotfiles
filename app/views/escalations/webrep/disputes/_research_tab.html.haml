@@ -284,6 +284,8 @@
         %label.toolbar-section-label Data
         %button.toolbar-button.sync-button#sync-data-button.toolbar-button-spacer
           %span.toolbar-button-text Refresh Data
+        %button.toolbar-button#reputation-history-button.esc-tooltipped.toolbar-button-spacer{title: 'Reputation History', onclick: "get_reputation_history();"}
+          %span.toolbar-button-text Reputation History
         %form#dispute_research_export_form{action: export_escalations_webrep_dispute_path(@dispute, format: :csv), method: 'get'}
           %button.toolbar-button.export-button
             %span.toolbar-button-text Export
@@ -293,6 +295,8 @@
         - if @entries.blank? && @dispute.bridge_packet.present?
           %button.toolbar-button.ping-button.esc-tooltipped{title: 'Entry Recovery - Ping bridge to grab missing Entry content', onclick: "dispute_entry_recovery(#{@dispute.id});"}
             %span.toolbar-button-text Dispute Entry Recovery
+
+
 
       .edit-button-wrapper.edit-entries-buttons.hidden
         %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',
@@ -1087,3 +1091,4 @@
                                     %td= entry.blacklist.first_seen
                                     %td= entry.blacklist.last_seen
 
+= render 'escalations/webrep/disputes/reputation_history_dialog'
