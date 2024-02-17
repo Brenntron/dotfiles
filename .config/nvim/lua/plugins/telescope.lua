@@ -134,7 +134,6 @@ function M.config()
             ["q"] = actions.close,
           },
         },
-        theme = "dropdown,"
       },
       fzf = {
         fuzzy = true, -- false will only do exact matching
