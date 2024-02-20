@@ -131,7 +131,18 @@ For future web and email reputation requests, please open a web and email reputa
   def self.is_possible_company_duplicate(complaint, entry, entry_type)
     company_id = complaint.customer.company.id
     possible_duplicates = false
-    candidates = Complaint.includes(:customer).includes(:complaint_entries).where("complaints.status != '#{RESOLVED}'").where(:customers => {:company_id => company_id}, :complaint_entries => {:entry_type => entry_type})
+    #hotfix WEB-12530 this commented url was apparently the identified culprit of a brutal load on the production mysql servers, leaving it for reference until the database people are satisfied, then can clean up later
+    #candidates = Complaint.includes(:customer).includes(:complaint_entries).where("complaints.status != '#{RESOLVED}'").where(:customers => {:company_id => company_id}, :complaint_entries => {:entry_type => entry_type})
+
+    #excluding "company id of 3" which is guest, we don't care about company duplicates for guest accounts, and guest accounts represent a massive amount of records to scan.
+    # also removing the entry_type filter clause as we can offload that filtering to ruby code which is done below in the candidates.each block, it's already
+    # filtering, it'll just need to work a little harder now that the sql query is giving it both entry types, but ruby array searches are extremely quick and efficient
+    # so should not be an issue
+    if company_id == Company.guest.id
+      candidates = []
+    else
+      candidates = Complaint.includes(:customer).includes(:complaint_entries).where("complaints.status != '#{RESOLVED}'").where(:customers => {:company_id => company_id})
+    end
 
     if candidates.blank?
       return false
