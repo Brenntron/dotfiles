@@ -102,7 +102,7 @@
   }
   td.categories-col {
     padding-top: 3px;
-    padding-bottom: 6px;
+    padding-bottom: 4px;
   }
   .submit_changes {
     padding: 3px 30px;
@@ -712,6 +712,12 @@ table.dataTable tbody tr.submitting-entry {
     .modal-title {
       font-weight: 400;
       font-size: 14px;
+    }
+    .close {
+      background-image: url(image_path('icon_cancel_white.svg'));
+      margin-top: 6px;
+      margin-right: 8px;
+      opacity: 1;
     }
   }
   .loader-wrapper {
