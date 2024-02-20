@@ -314,6 +314,11 @@ build_complaints_table = (url) ->
             path_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + full.uri + '\', \'uri\');"'
             path_val = full.uri
 
+          if (full.status == 'COMPLETED') || (full.status == 'PENDING')
+            input_uri = full.uri_as_categorized
+          else
+            input_uri = domain
+
           domain_col =
             '<table class="nested-col-table">' +
               '<tbody>' +
@@ -335,7 +340,7 @@ build_complaints_table = (url) ->
               '</td>' +
               '<td class="edit-uri-col">' +
               '<input class="nested-table-input complaint-uri-input" id="edit_uri_input_' +
-              full.entry_id + '" type="text" data-domain="' + domain + ' "value="' + domain + '"' + input_status + '/>' +
+              full.entry_id + '" type="text" data-domain="' + domain + ' "value="' + input_uri + '"' + input_status + '/>' +
               '</td></tr>' +
               '</tbody>' +
               '</table>'
