@@ -51,7 +51,7 @@ get_default_webcat_filter_data = (current_filter) ->
     when 'WebcatNewTalosColumns'
       return webcat_new_talos_tickets_column_filter
     when 'WebcatNewWbnpColumns'
-      return webcat_new_talos_tickets_column_filter
+      return webcat_new_wbnp_tickets_column_filter
     when 'WebcatNewJiraColumns'
       return webcat_new_jira_tickets_column_filter
     when 'WebcatNewInternalColumns'
