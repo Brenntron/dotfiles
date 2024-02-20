@@ -217,7 +217,7 @@ end
 
 Then(/^I should see the radio with id "(.*?)" checked$/) do |radio_id|
   radio = page.find(:xpath, "//input[@type='radio' and @id='#{radio_id}']")
-  raise "Radio with class #{radio_class} not checked" if radio.checked?.blank?
+  raise "Radio with id #{radio_id} not checked" if radio.checked?.blank?
 end
 
 Then(/^I should see the "(.*?)" checkbox checked$/) do |checkbox_class|
@@ -582,7 +582,6 @@ Then(/^button with id "(.*?)" should be disabled$/) do |id_name|
 
   button = find(:xpath, "//button[contains(@id, '#{id_name}')]")
   button.disabled?.should be true
-  #
 end
 
 Then(/^button with id "(.*?)" should be enabled$/) do |id_name|
@@ -598,6 +597,18 @@ end
 # Needs #id and ['value'] like this
 Given(/^I fill in selectized of element "(.*?)" with "(.*?)"$/) do |element, value|
   page.execute_script("$('#{element}')[0].selectize.setValue(#{value})")
+end
+
+Then(/^I should see at least these selectized item "(.*?)" within "(.*?)"$/) do |content, element|
+  page.has_select?(element, with_selected: content)
+end
+
+Then(/^I should see selectized items "(.*?)" within "(.*?)"$/) do |content, element|
+  page.has_select?(element, selected: content)
+end
+
+Then(/^I should not see any selectized items within "(.*?)"$/) do |element|
+  page.has_select?(element, selected: [])
 end
 
 When(/^I select contenteditable text in "(.*?)"$/) do |target|
