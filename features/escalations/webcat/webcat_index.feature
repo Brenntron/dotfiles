@@ -359,7 +359,6 @@ Feature: Webcat complaints index
   @javascript
   Scenario: a manager tries to commit bulk PENDING entries
     Given a user with role "webcat manager" exists and is logged in
-    #TODO
     And the following complaint entries exist:
       | id  | uri          | domain        | entry_type | status |
       | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |
@@ -1011,13 +1010,15 @@ Feature: Webcat complaints index
     And I wait for "1" seconds
     And I click "#master-submit"
     And I wait for "3" seconds
+    And I click "#bulk-submit-correct-btn"
+    And I wait for "3" seconds
+    Then I go to "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And I should see "Alcohol"
+    And element with id "edit_uri_input_111" should have content "vikings.com.au"
 
-#    Then I go to "/escalations/webcat/complaints?f=COMPLETED"
-#    And I wait for "3" seconds
-#    And I should see "Alcohol"
-#    And element with id "edit_uri_input_111" should have content "vikings.com.au"
 
-  
+  #TODO
   # - a user changes the uri to be categorized by editing the text field
   # ^ Each of those testing with submitting a fixed res correctly and incorrectly
   # - a user changes the uri to be submitted to the domain and submits a Fixed resolution with no category
