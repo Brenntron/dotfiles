@@ -10,14 +10,16 @@ $ ->
     save_display_prefs()
 
 window.get_display_prefs = () ->
-  console.log 'getting display prefs'
+  current_filter = get_current_webcat_filter() #check which page user is on for filter purposes
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: 'WebCatVisible'}
+    data: {name: current_filter}
     success: (response) ->
       response = JSON.parse(response)
-      console.log response
+      #check for userpref, if null get default filter values
+      if response == null
+        response = get_default_webcat_filter_data(current_filter)
       $.each response, (data, state) ->
         # HTML5 uses 'checked' rather than 'checked=true'
         checkbox = $("##{data}")
@@ -27,6 +29,33 @@ window.get_display_prefs = () ->
           $(checkbox).removeAttr('checked')
         toggle_display_data(checkbox)
   )
+
+get_current_webcat_filter = ->
+  full_url = window.location.href
+  if full_url.includes('?f=NEW%20TALOS')
+    return 'WebcatNewTalosColumns'
+  else if full_url.includes('?f=NEW%20WBNP')
+    return 'WebcatNewWbnpColumns'
+  else if full_url.includes('?f=NEW%20JIRA')
+    return 'WebcatNewJiraColumns'
+  else if full_url.includes('?f=NEW%20INTERNAL')
+    return 'WebcatNewInternalColumns'
+  else
+    return 'WebcatDefaultColumns'
+
+#load default filter values from the bottom of this page
+get_default_webcat_filter_data = (current_filter) ->
+  switch (current_filter)
+    when 'WebcatDefaultColumns'
+      return webcat_default_column_filter
+    when 'WebcatNewTalosColumns'
+      return webcat_new_talos_tickets_column_filter
+    when 'WebcatNewWbnpColumns'
+      return webcat_new_wbnp_tickets_column_filter
+    when 'WebcatNewJiraColumns'
+      return webcat_new_jira_tickets_column_filter
+    when 'WebcatNewInternalColumns'
+      return webcat_new_internal_tickets_column_filter
 
 toggle_display_data = (checkbox) ->
   # check if col or data toggle
@@ -56,10 +85,12 @@ save_display_prefs = () ->
     else
       data[data_id] = 'false'
 
+  current_filter = get_current_webcat_filter()
+
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/user_preferences/update"
     method: 'POST'
-    data: {data: data, name: 'WebCatVisible'}
+    data: {data: data, name: current_filter}
     dataType: 'json'
     success: (response) ->
       console.log 'Webcat show/hide preferences are updated in user_prefs table.'
@@ -389,3 +420,106 @@ window.webcat_remove_assignee = () ->
 
 
 
+## Webcat Default Filters ##
+## Load these when no userpref data found for that filter ##
+## Default is used for all except New Talos Tickets, New WBNP Tickets, New Jira Tickets and New Internal Tickets
+webcat_default_column_filter = {
+  "view-ticket-col-cb": "true",
+  "view-data-entry-id": "false",
+  "view-data-age": "true",
+  "view-data-status": "true",
+  "view-data-source": "false",
+  "view-submitter-col-cb": "true",
+  "view-data-org-cb": "true",
+  "view-data-name-cb": "true",
+  "view-data-email-cb": "false",
+  "view-data-platform-cb": "true",
+  "view-user-col-cb": "false",
+  "view-data-assignee-cb": "false",
+  "view-data-reviewer-cb": "false",
+  "view-data-sec-reviewer-cb": "false",
+  "view-tags-col-cb": "true",
+  "view-description-col-cb": "true",
+  "view-sugg-col-cb": "true",
+  "view-tools-col-cb": "false"
+}
+webcat_new_talos_tickets_column_filter = {
+  "view-ticket-col-cb": "true",
+  "view-data-entry-id": "false",
+  "view-data-age": "true",
+  "view-data-status": "true",
+  "view-data-source": "false",
+  "view-submitter-col-cb": "true",
+  "view-data-org-cb": "true",
+  "view-data-name-cb": "false",
+  "view-data-email-cb": "false",
+  "view-data-platform-cb": "true",
+  "view-user-col-cb": "false",
+  "view-data-assignee-cb": "false",
+  "view-data-reviewer-cb": "false",
+  "view-data-sec-reviewer-cb": "false",
+  "view-tags-col-cb": "false",
+  "view-description-col-cb": "true",
+  "view-sugg-col-cb": "true",
+  "view-tools-col-cb": "false"
+}
+webcat_new_wbnp_tickets_column_filter = {
+  "view-ticket-col-cb": "true",
+  "view-data-entry-id": "false",
+  "view-data-age": "true",
+  "view-data-status": "true",
+  "view-data-source": "false",
+  "view-submitter-col-cb": "false",
+  "view-data-org-cb": "false",
+  "view-data-name-cb": "true",
+  "view-data-email-cb": "false",
+  "view-data-platform-cb": "false",
+  "view-user-col-cb": "false",
+  "view-data-assignee-cb": "false",
+  "view-data-reviewer-cb": "false",
+  "view-data-sec-reviewer-cb": "false",
+  "view-tags-col-cb": "false",
+  "view-description-col-cb": "false",
+  "view-sugg-col-cb": "false",
+  "view-tools-col-cb": "false"
+}
+webcat_new_jira_tickets_column_filter = {
+  "view-ticket-col-cb": "true",
+  "view-data-entry-id": "false",
+  "view-data-age": "true",
+  "view-data-status": "true",
+  "view-data-source": "false",
+  "view-submitter-col-cb": "false",
+  "view-data-org-cb": "false",
+  "view-data-name-cb": "false",
+  "view-data-email-cb": "false",
+  "view-data-platform-cb": "true",
+  "view-user-col-cb": "false",
+  "view-data-assignee-cb": "false",
+  "view-data-reviewer-cb": "false",
+  "view-data-sec-reviewer-cb": "false",
+  "view-tags-col-cb": "true",
+  "view-description-col-cb": "true",
+  "view-sugg-col-cb": "false",
+  "view-tools-col-cb": "false"
+}
+webcat_new_internal_tickets_column_filter = {
+  "view-ticket-col-cb": "true",
+  "view-data-entry-id": "false",
+  "view-data-age": "true",
+  "view-data-status": "true",
+  "view-data-source": "false",
+  "view-submitter-col-cb": "false",
+  "view-data-org-cb": "false",
+  "view-data-name-cb": "false",
+  "view-data-email-cb": "false",
+  "view-data-platform-cb": "true",
+  "view-user-col-cb": "false",
+  "view-data-assignee-cb": "false",
+  "view-data-reviewer-cb": "false",
+  "view-data-sec-reviewer-cb": "false",
+  "view-tags-col-cb": "true",
+  "view-description-col-cb": "false",
+  "view-sugg-col-cb": "false",
+  "view-tools-col-cb": "false"
+}
