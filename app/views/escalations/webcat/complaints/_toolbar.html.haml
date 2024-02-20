@@ -205,9 +205,11 @@
       %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
         %span Confirm Review
     - else
-      %button.toolbar-button.resolution-submit-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res#index_update_resolution{ title: 'Resolve multiple selected entries with the same resolution and comments', onclick: "$('#index_change_resolution_dialog').dialog('open');", disabled: true }
+      %button#index_update_resolution.toolbar-button.resolution-submit-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', onclick: "$('#index_change_resolution_dialog').dialog('open');"}
         %span
           Bulk Resolution Tool
+      %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'bulk_submit_categorize_entries();', title: 'Submit multiple edited entries with any changes entered.', disabled: 'disabled'}
+        %span Bulk Submit
   .webcat-toolbar-tall-wrapper
     %button.toolbar-button.master-submit-button.esc-tooltipped-webcat-toolbar#master-submit{ onclick: 'bulk_submit_categorize_entries();', title: 'Submit multiple edited entries with any changes entered.', disabled: 'disabled' }
       %span Bulk Submit
