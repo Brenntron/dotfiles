@@ -645,10 +645,15 @@ build_data = () ->
   # search definitions will be made with the build_subheader function
 ###
 build_header = (data) ->
-  console.log 'building header'
   container = $('#webcat_searchref_container')
   if data != undefined && container.length > 0
-    reset_icon = "<span #{if current_page_is_favourite() then 'hidden style="display: none"' else ''} id='refresh-filter-button' class='reset-filter esc-tooltipped' title='Clear Search Results' onclick='webcat_refresh()'></span>"
+    if current_page_is_favourite()
+      reset_icon_class = 'hidden style="display: none"'
+    else
+      reset_icon_class = ''
+    reset_icon = "<span #{reset_icon_class} id='refresh-filter-button'
+        class='reset-filter esc-tooltipped'
+        title='Clear Search Results' onclick='webcat_refresh()'></span>"
     {search_type, search_name} = data
 
     try

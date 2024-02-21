@@ -189,7 +189,7 @@ $ ->
       window.location.replace('/escalations/webcat/complaints')
       localStorage.setItem('webcat_reset_page', true)
 
-  window.refresh_localStorage = () ->
+  refresh_localStorage = () ->
     localStorage.removeItem('webcat_search_type')
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
