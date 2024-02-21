@@ -31,7 +31,7 @@ build_complaints_table = (url) ->
       $('.dataTables_filter').append $clearButton, $searchButton
 
       # Make the datatables search prettier
-      $('#complaints-index_filter input').addClass('restricted-table-search-input');
+      $('#complaints-index_filter input').addClass('restricted-table-search-input')
 
       # properly init these search/clear icons
       $('.dt-button').tooltipster
@@ -45,7 +45,12 @@ build_complaints_table = (url) ->
     processing: true
     serverSide: true
     stateSave: true
-    select: false
+    select: {
+      # os is the default stype but must be declclared if using a config object
+      style: 'os',
+      # any td with the no-select class will not be selectable
+      selector: 'tr td:not(.no-select)'
+    }
     ajax:
       url: url
       data: build_data()
@@ -56,6 +61,7 @@ build_complaints_table = (url) ->
         ###
         console.log 'There has been an error calling the backend data'
         webcat_refresh()
+
       complete: ->
 
         # Grab current categories per entry
@@ -65,51 +71,6 @@ build_complaints_table = (url) ->
 
         # confirm this function is in the right locatino
         use_user_preference_filter()
-
-        $('#complaints-index tbody tr *').click (e) ->
-          $main_row = $(this).parents('tr.cat-index-main-row')
-          bulk_submittable_statuses = ['ASSIGNED', 'NEW', 'COMPLETED', 'REOPENED', 'RESOLVED']
-          data_table = $('#complaints-index').DataTable()
-          main_row_id = $main_row.attr('id')
-          row = data_table.row("##{main_row_id}")
-          selected = $main_row.hasClass 'selected'
-          $target = $(e.target)
-
-          # prevent deselecting the row if the user interacts with a button, link or input and prevent multiple events from firing
-          return if (selected and $target.prop('nodeName') in ['A', 'BUTTON', 'INPUT']) || e.target != e.currentTarget
-
-          # open the internal comment dropdown when the internal comment button is clicked and the row is selected
-          if $target.hasClass('comment-button')
-            $target.dropdown('toggle')
-
-          if selected
-            rows = data_table.rows({selected: true})
-            row.deselect()
-
-            submittable_rows_length = if rows[0].length > 0
-                                        rows.filter((row) -> data_table.row(row).data().status in bulk_submittable_statuses).length
-                                      else
-                                        0
-
-            # the unless checks for a length of greater than one to account for the deselection
-            # of this row after the length is retrieved
-            $('#index_update_resolution').prop('disabled', true) unless submittable_rows_length > 0
-          else
-            rows = data_table.rows({selected: true})
-
-            other_submittable_rows = if rows[0].length > 0
-                                       rows.filter((row) -> data_table.row(row).data().status in bulk_submittable_statuses).length
-                                     else
-                                       0
-            row_submittable = row.data().status in bulk_submittable_statuses
-
-            row.select()
-
-            if row_submittable and other_submittable_rows is 0
-              $('#index_update_resolution').prop('disabled', false)
-
-          check_enable_toolbar_buttons()
-          verifyMasterSubmit()
 
     createdRow: (row, data) ->
       $(row).addClass('cat-index-main-row')
@@ -134,9 +95,9 @@ build_complaints_table = (url) ->
         ###
         text_check = !window.find_saved_search_by_name(webcat_search_name)
         search_name_check = webcat_search_name != ''
+
         if webcat_search_type == 'advanced' && search_name_check && text_check
-          window.add_tmp_tr_to_named_search_list(webcat_search_name)
-          window.sort_named_search_list()
+          temporary_search_link(webcat_search_name, webcat_search_conditions)
 
     pagingType: 'full_numbers'
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
@@ -313,7 +274,7 @@ build_complaints_table = (url) ->
       }
       {
         data: 'uri'
-        className: 'uri-col'
+        className: 'uri-col no-select'
         render: (data, type, full, meta) ->
           if full.status == 'PENDING'
             disabled = "disabled=true"
@@ -392,7 +353,7 @@ build_complaints_table = (url) ->
       }
       {
         data: null
-        className: 'tools-col'
+        className: 'tools-col no-select'
         render: (data, type, full, meta) ->
           history_url = full.uri || full.ip_address
           history_button =
@@ -425,7 +386,7 @@ build_complaints_table = (url) ->
       }
       {
         data: null
-        className: 'categories-col alt-col'
+        className: 'categories-col alt-col no-select'
         render: (data, type, full, meta) ->
           domain = full.domain || full.ip_address
           if full.status == 'PENDING'
@@ -449,7 +410,7 @@ build_complaints_table = (url) ->
       }
       {
         data: 'status'
-        className: 'resolution-col'
+        className: 'resolution-col no-select'
         render: (data, type, full, meta) ->
           # Internal comment
           if (full.internal_comment == null) || (full.internal_comment == '')

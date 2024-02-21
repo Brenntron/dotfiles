@@ -8,32 +8,27 @@ Feature: WebCat Bulk Resolution Tool
       | 3  | abc.com  | abc.com  | URI/DOMAIN | NEW       |
       | 4  | test.com | test.com | URI/DOMAIN | ASSIGNED  |
 
-  Rule: The Bulk Resolution Tool button only enables when a submittable row is selected
+  Rule: The Bulk Resolution Tool button only updates submitable rows
     @javascript
     Scenario: a webcat user selects one pending entry
       When I go to "/escalations/webcat/complaints"
-      And I click row with id "2"
-      Then button with id "index_update_resolution" should be disabled
-
-    @javascript
-    Scenario: a webcat user selects multiple non-pending entry
-      When I go to "/escalations/webcat/complaints"
-      And I click row with id "3"
-      And I click row with id "4"
       And I wait for "2" seconds
-      Then button with id "index_update_resolution" should be enabled
-      When I click row with id "2"
-      Then button with id "index_update_resolution" should be enabled
-      When I click row with id "1"
-      Then button with id "index_update_resolution" should be enabled
+      And I click webcat row with id "2"
+      And I shift click webcat row with id "3"
+      And I click "#index_update_resolution"
+      And I wait for "2" seconds
+      And I click "#webcat_resolution_unchanged_option"
+      And I click "#resolution-apply-button"
+      And I wait for "2" seconds
+      Then I should see the radio with id "ignore2" checked
+      And I should see the radio with id "unchanged3" checked
 
   Rule: Submittable complaint entries should be updated by the bulk resolution tool
     @javascript
     Scenario: a webcat user updates a submittable tickets resolution
       When I go to "/escalations/webcat/complaints"
-      And I click row with id "3"
-      And I click row with id "4"
-      And I wait for "2" seconds
+      And I click webcat row with id "3"
+      And I shift click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I click "#webcat_resolution_unchanged_option"
@@ -45,9 +40,8 @@ Feature: WebCat Bulk Resolution Tool
     @javascript
     Scenario: a webcat user updates a submittable tickets customer comment
       When I go to "/escalations/webcat/complaints"
-      And I click row with id "3"
-      And I click row with id "4"
-      And I wait for "2" seconds
+      And I click webcat row with id "3"
+      And I click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I type content "test content" within input with id "customer_facing_comment"
@@ -63,9 +57,8 @@ Feature: WebCat Bulk Resolution Tool
       When I go to "/escalations/webcat/complaints"
       And I fill in "input_cat_3-selectized" with "Arts"
       And I fill in "input_cat_4-selectized" with "Arts"
-      And I click row with id "3"
-      And I click row with id "4"
-      And I wait for "2" seconds
+      And I click webcat row with id "3"
+      And I click webcat row with id "4"
       And I click "#index_update_resolution"
       When I fill in "webcat-bulk-categories-selectized" with "Auctions"
       And I click "#category-apply-button"
@@ -78,9 +71,8 @@ Feature: WebCat Bulk Resolution Tool
       When I go to "/escalations/webcat/complaints"
       And I fill in "input_cat_3-selectized" with "Auctions"
       And I fill in "input_cat_4-selectized" with "Arts"
-      And I click row with id "3"
-      And I click row with id "4"
-      And I wait for "2" seconds
+      And I click webcat row with id "3"
+      And I shift click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       When I fill in selectized of element "#webcat-bulk-categories" with "[88, 107, 110, 97, 82]"
@@ -96,9 +88,8 @@ Feature: WebCat Bulk Resolution Tool
     @javascript
     Scenario: a webcat user drops categories for submittable tickets
       When I go to "/escalations/webcat/complaints"
-      And I click row with id "3"
-      And I click row with id "4"
-      And I wait for "2" seconds
+      And I click webcat row with id "3"
+      And I click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I fill in "webcat-bulk-categories-selectized" with "Arts"
@@ -113,8 +104,8 @@ Feature: WebCat Bulk Resolution Tool
     @javascript
     Scenario: a webcat user updates a submittable tickets internal comment
       When I go to "/escalations/webcat/complaints"
-      And I click row with id "3"
-      And I click row with id "4"
+      And I click webcat row with id "3"
+      And I click webcat row with id "4"
       And I wait for "2" seconds
       And I click "#index_update_resolution"
       And I wait for "2" seconds
@@ -131,9 +122,8 @@ Feature: WebCat Bulk Resolution Tool
     @javascript
     Scenario: a webcat user updates resolution status, customer comment, categories and internal comments with the APPLY ALL button
       When I go to "/escalations/webcat/complaints"
-      And I click row with id "3"
-      And I click row with id "4"
-      And I wait for "2" seconds
+      And I click webcat row with id "3"
+      And I shift click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I click "#webcat_resolution_invalid_option"
@@ -163,8 +153,8 @@ Feature: WebCat Bulk Resolution Tool
     @javascript
     Scenario: a webcat user reverts updates to a submittable tickets resolution
       When I go to "/escalations/webcat/complaints"
-      And I click row with id "3"
-      And I click row with id "4"
+      And I click webcat row with id "3"
+      And I shift click webcat row with id "4"
       And I wait for "2" seconds
       And I click "#index_update_resolution"
       And I wait for "2" seconds
@@ -181,9 +171,8 @@ Feature: WebCat Bulk Resolution Tool
     @javascript
     Scenario: a webcat user reverts updates to a submittable tickets customer comment
       When I go to "/escalations/webcat/complaints"
-      And I click row with id "3"
-      And I click row with id "4"
-      And I wait for "2" seconds
+      And I click webcat row with id "3"
+      And I shift click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I type content "test content" within input with id "customer_facing_comment"
@@ -206,8 +195,8 @@ Feature: WebCat Bulk Resolution Tool
       When I go to "/escalations/webcat/complaints"
       And I fill in "input_cat_3-selectized" with "Arts"
       And I fill in "input_cat_4-selectized" with "Arts"
-      And I click row with id "3"
-      And I click row with id "4"
+      And I click webcat row with id "3"
+      And I shift click webcat row with id "4"
       And I wait for "2" seconds
       And I click "#index_update_resolution"
       When I fill in "webcat-bulk-categories-selectized" with "Auctions"
@@ -222,9 +211,8 @@ Feature: WebCat Bulk Resolution Tool
     @javascript
     Scenario: a webcat user reverts updates to a submittable tickets internal comment
       When I go to "/escalations/webcat/complaints"
-      And I click row with id "3"
-      And I click row with id "4"
-      And I wait for "2" seconds
+      And I click webcat row with id "3"
+      And I shift click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I fill in "internal_comment" with "This is an internal comment."
@@ -236,6 +224,7 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#internal_comment_button4"
       And I wait for "2" seconds
       Then I should see content "This is an internal comment." within "#internal_comment_4"
+      And I click "#internal_comment_button4"
       When I click "#internal-comment-button"
       And I click "#internal_comment_button3"
       Then I should not see content "This is an internal comment." within "#internal_comment_3"
@@ -246,9 +235,8 @@ Feature: WebCat Bulk Resolution Tool
     @javascript
     Scenario: a webcat user enters changes to stage on submittble tickets and then resets the resolution tool
       When I go to "/escalations/webcat/complaints"
-      And I click row with id "3"
-      And I click row with id "4"
-      And I wait for "2" seconds
+      And I click webcat row with id "3"
+      And I shift click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I click "#webcat_resolution_invalid_option"

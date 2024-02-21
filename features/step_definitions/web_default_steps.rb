@@ -39,10 +39,6 @@ When(/^I click "(.*?)"$/) do |target|
     end
 end
 
-When(/^I select row "(.*?)"$/) do |target|
-  page.execute_script("$('##{target}').addClass('selected')")
-end
-
 Then(/^a new window should be opened$/) do
   raise("Page did not open") if page.driver.browser.window_handles.count <= 1
 end
