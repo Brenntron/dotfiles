@@ -222,18 +222,8 @@ $ ->
         icon.removeClass('favorite-search-icon-active').addClass('favorite-search-icon')
     )
 
-  set_icon_for_favorite_filter = (filter_name) ->
-    filter_dropdown = $("#filter-dropdown > #filter-cases-list a[href='#{filter_name}']")
-
-    saved_search = window.find_saved_search_by_name(filter_name)
-
-    if filter_dropdown.length > 0
-      filter_dropdown.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
-    else if saved_search
-      saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
 
   window.use_user_preference_filter = () ->
-
     return if window.location.pathname != '/escalations/webcat/complaints'
 
     { icon, link, name } = chosen_default_filter()
@@ -263,20 +253,6 @@ $ ->
     else
       return name == localStorage.webcat_search_name
 
-  window.pull_user_preference_filter = () ->
-    return if window.location.pathname != '/escalations/webcat/complaints'
-
-    std_msg_ajax(
-      method: 'POST'
-      url: '/escalations/api/v1/escalations/user_preferences/'
-      data: { name: 'webcat_complaints_filter' }
-      success: (response) ->
-        return unless response?
-        name = JSON.parse(response).name
-        set_icon_for_favorite_filter(name)
-    )
-
-  pull_user_preference_filter()
 
 
 
@@ -469,7 +445,7 @@ $ ->
     $('#platform-input').selectize {
       persist: true,
       create: false,
-      valueField: 'public_name',
+      valueField: 'id',
       labelField: 'public_name',
       searchField: 'public_name',
       options: AC.WebCat.createPlatformOptions()
@@ -612,7 +588,6 @@ load_selectize_cats = (entry_id, entry_categories, all_categories, entry_status)
     }
 
 
-# Is this hit multiple times in places? Confirm.
 fetch_external_categories = (entry_id) ->
   std_msg_ajax(
     method: 'POST'
@@ -719,29 +694,21 @@ fetch_external_categories = (entry_id) ->
 # Sending individual entry info to the backend
 process_entry = (entry_data) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-
-  # If resolution is set to fixed, make sure it has categories applied
-  if entry_data.categories == null && entry_data.status == "FIXED"
-    std_msg_error("Must include at least one category.","", reload: false)
-  else if entry_data.status == "INVALID" && entry_data.categories != null
-    std_msg_error("Cannot include categories with an INVALID resolution.", "", reload: false)
-  else
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
-      method: 'POST'
-      headers: headers
-      data: entry_data
-      success: (response) ->
-        data = $.parseJSON(response)
-        msg = $('#' + data.entry_id + ' .temp-msg')
-        $(msg).text('Submitted. Refresh to see new results.')
-        $(msg).addClass('submitted-row')
-        remove_entry_from_changes(data.entry_id, 'submit')
-      error: (response) ->
-        debugger
-        msg = response.resonseJSON.error
-        std_msg_error("Error submitting entries",msg, reload: false)
-    , this)
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
+    method: 'POST'
+    headers: headers
+    data: entry_data
+    success: (response) ->
+      data = $.parseJSON(response)
+      msg = $('#' + data.entry_id + ' .temp-msg')
+      $(msg).text('Submitted. Refresh to see new results.')
+      $(msg).addClass('submitted-row')
+      remove_entry_from_changes(data.entry_id, 'submit')
+    error: (response) ->
+      msg = response.resonseJSON.error
+      std_msg_error("Error submitting entries", msg, reload: false)
+  , this)
 
 
 # Sending individual reviewed (PENDING) entry info to the backend
@@ -755,6 +722,7 @@ process_review = (entry_data) ->
       data: [entry_data]
     }
     success: (response) ->
+#      debugger
       data = $.parseJSON(response)
       msg = $('#' + data.entry_id + ' .temp-msg')
       $(msg).text('Submitted. Refresh to see new results.')
@@ -823,16 +791,20 @@ $ ->
   window.submit_changes = (entry_id) ->
     row = $('#' + entry_id)
     curr_status = $(row).attr('data-status')
+
+    # slight differences in data sent
     if curr_status == 'PENDING'
-      res = $('input[name=resolution_review' + entry_id+ ']:checked').val()
-    else
-      res = $('input[name=resolution' + entry_id + ']:checked').val()
+      status = ''
+      commit = $('input[name=resolution_review' + entry_id+ ']:checked').val()
       # we are disabling the button if ignore is checked, but just in case
-      if res == 'ignore'
+      if commit == 'ignore'
         return
+    else
+      commit = ''
+      status = $('input[name=resolution' + entry_id + ']:checked').val()
 
     comment = $('#internal_comment_' + entry_id).val()
-    resolution = $('#entry-email-response-to-customers_' + entry_id).text()
+    resolution_msg = $('#entry-email-response-to-customers_' + entry_id).val()
     uri = $('#edit_uri_input_' + entry_id).val()
     if $('#input_cat_'+entry_id).val() != null
       cat_ids = $('#input_cat_'+entry_id).val().toString()
@@ -844,6 +816,27 @@ $ ->
       category_names.push($(this).text())
     category_names = category_names.toString()
 
+    entry_data = {
+      'id': entry_id,
+      'prefix': uri,
+      'categories': cat_ids,
+      'category_names': category_names,
+      'status': status,
+      'commit': commit,
+      'comment': comment,
+      'resolution_comment': resolution_msg,
+      'uri_as_categorized': uri
+    }
+
+    # check data here before submitting
+    # If resolution is set to fixed, make sure it has categories applied
+    if entry_data.categories == null && entry_data.status == "FIXED"
+      std_msg_error("Must include at least one category.","", reload: false)
+      return
+    else if entry_data.status == "INVALID" && entry_data.categories != null
+      std_msg_error("Cannot include categories with an INVALID resolution.", "", reload: false)
+      return
+
     # need number of cols for replacement temp col
     visible_cols = $('#complaints-index thead th').length
 
@@ -854,24 +847,14 @@ $ ->
     $(row).addClass('submitting-entry')
 
     temp_msg = '<h3 class="temp-msg">Submitting entry...</h3>'
-    fin_msg = '<h3 class="temp-msg submitted-entry">Submitted entry. Refresh page to see results</h3>'
     $(row).append('<td colspan="' + visible_cols + '">' + temp_msg + '</td>')
 
-    entry_data = {
-      'id': entry_id,
-      'prefix': uri,
-      'categories': cat_ids,
-      'category_names': category_names,
-      'status': res,
-      'comment': comment,
-      'resolution_comment': resolution,
-      'uri_as_categorized': uri
-    }
     if curr_status == 'PENDING'
       process_review(entry_data)
     else
       process_entry(entry_data)
       # submit for real
+
 
   window.prevent_close = (prevent) ->
     if prevent == 'true'

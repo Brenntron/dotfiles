@@ -104,7 +104,7 @@ Feature: Disputes index, Research tab
     Then I click "#research-tab-link"
     And  I should see element ".add-ip-button"
     Then I click ".add-ip-button"
-    And  I fill in element, ".add-ip-input" with "1.1.1.1"
+    And  I fill in element ".add-ip-input" with "1.1.1.1"
     And  I click "Submit Query"
     And  take a screenshot
     Then I wait for "15" seconds
@@ -125,7 +125,7 @@ Feature: Disputes index, Research tab
     Then I click "#research-tab-link"
     And  I should see element ".add-ip-button"
     Then I click ".add-ip-button"
-    And  I fill in element, ".add-ip-input" with "1.1.1.1, 2.2.2.2"
+    And  I fill in element ".add-ip-input" with "1.1.1.1, 2.2.2.2"
     And  I click "Submit Query"
     Then I wait for "15" seconds
     Then I should see content "1.1.1.1, 2.2.2.2" within ".entry-resolved-ip-content"
@@ -144,7 +144,7 @@ Feature: Disputes index, Research tab
     And  I wait for "5" seconds
     Then I click "#research-tab-link"
     Then I click ".add-ip-button"
-    And  I fill in element, ".add-ip-input" with "drumf"
+    And  I fill in element ".add-ip-input" with "drumf"
     And  I click "Submit Query"
     Then I wait for "15" seconds
     And  I should not see content "drumf" within ".entry-resolved-ip-content"
@@ -179,7 +179,7 @@ Feature: Disputes index, Research tab
     Then I click "#research-tab-link"
     And  I should see content "1.1.1.1" within ".entry-resolved-ip-content"
     Then I click "Edit IP Addresses"
-    And  I fill in element, ".table-ip-input" with "2.2.2.2"
+    And  I fill in element ".table-ip-input" with "2.2.2.2"
     And  I click "Save IP Addresses"
     And  I wait for "5" seconds
     And  I should see content "2.2.2.2" within ".entry-resolved-ip-content"

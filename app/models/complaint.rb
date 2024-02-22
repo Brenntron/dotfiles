@@ -886,71 +886,68 @@ For future web and email reputation requests, please open a web and email reputa
 
     response = {}
     response[:status] = "success"
-    response[:total_entries] = 0
+    response[:total_entries] = 1
     response[:successful_entries_count] = 0
     response[:failed_entries_count] = 0
     response[:successful_entries] = []
     response[:failed_entries] = []
-
+    response[:complaint_id] = []
     begin
-      summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
-
-      full_description = <<~HEREDOC
-            IPs/URIs: #{ips_urls}
-            Problem Summary: #{description}
-      HEREDOC
-      bug_attrs = {
-          'product' => 'Escalations Console',
-          'component' => 'Categorization',
-          'summary' => summary,
-          'version' => 'unspecified', #self.version,
-          'description' => full_description,
-          'priority' => 'Unspecified',
-          'classification' => 'unclassified',
-      }
-
-      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
-
-
-      cust = find_customer(customer) if customer
-      platform_record = Platform.find_by_public_name(platform) if platform
-      new_complaint = Complaint.create(id: bug_proxy.id,
-                                       description: description,
-                                       customer_id: cust&.id,
-                                       platform_id: platform_record&.id,
-                                       status: status,
-                                       channel: channel)
-
-      response[:complaint_id] = new_complaint.id
-
-
-      handle_tags(new_complaint, tags) if tags
-
-      user = if user_email
-        User.find_by_email(user_email)
-      else
-        User.where(display_name:"Vrt Incoming").first
-      end
 
       ips_urls.split(' ').each do |ip_url|
-        response[:total_entries] += 1
-        begin
-          ComplaintEntry.create_complaint_entry(new_complaint, ip_url, platform_record, user, status, categories)
-          response[:successful_entries_count] += 1
-          response[:successful_entries] << ip_url
-        rescue Exception => e
-          Rails.logger.error e.message
-          Rails.logger.error e.backtrace.join("\n")
-          response[:failed_entries_count] += 1
-          response[:failed_entries] << ip_url
-          response[:status] = "error"
-        end
+
+        summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+        full_description = <<~HEREDOC
+              IPs/URIs: #{ip_url}
+              Problem Summary: #{description}
+        HEREDOC
+        bug_attrs = {
+            'product' => 'Escalations Console',
+            'component' => 'Categorization',
+            'summary' => summary,
+            'version' => 'unspecified', #self.version,
+            'description' => full_description,
+            'priority' => 'Unspecified',
+            'classification' => 'unclassified',
+        }
+
+        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+
+        cust = find_customer(customer) if customer
+        platform_record = Platform.find_by_public_name(platform) if platform
+        new_complaint = Complaint.create(id: bug_proxy.id,
+                                         description: description,
+                                         customer_id: cust&.id,
+                                         platform_id: platform_record&.id,
+                                         status: status,
+                                         channel: channel)
+
+        response[:complaint_id] << new_complaint.id
+
+        handle_tags(new_complaint, tags) if tags
+
+        user = if user_email
+                 User.find_by_email(user_email)
+               else
+                 User.where(display_name:"Vrt Incoming").first
+               end
+
+        ComplaintEntry.create_complaint_entry(new_complaint, ip_url, platform_record, user, status, categories)
+        response[:successful_entries_count] += 1
+        response[:successful_entries] << ip_url
 
       end
+
+      if response[:complaint_id].size == 1
+        response[:complaint_id] = response[:complaint_id].first
+      end
+
     rescue Exception => e
       Rails.logger.error e.message
       Rails.logger.error e.backtrace.join("\n")
-      raise "error creating bug."
+      raise "error creating complaint."
     end
 
     response

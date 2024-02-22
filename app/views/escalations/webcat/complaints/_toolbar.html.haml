@@ -2,7 +2,7 @@
   %div
     %div.webcat-toolbar-select-all-wrapper
       %input{type: 'checkbox', id:'complaints_select_all'}
-      %label{for: 'complaints_select_all'} Select All
+      %label.toolbar-button-text-wider{for: 'complaints_select_all'} Select All
   %div
     %span.dropdown
       %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -53,7 +53,6 @@
               %li.sub-checkbox-wrapper
                 %input#view-data-assignee-cb.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'assignee-row'}
                 %label{for: 'view-data-assignee-cb'} Assignee
-              -# coming soon...
               %li.sub-checkbox-wrapper
                 %input#view-data-reviewer-cb.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'reviewer-row'}
                 %label{for: 'view-data-reviewer-cb'} Reviewer
@@ -111,13 +110,19 @@
     %span.btn-group.toolbar-btn-group.assignment-btn-group
       .inline-radio-wrapper
         %input#assignment-type-assignee.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'assignee', checked: 'checked'}
-        %label{for: 'assignment-type-assignee'} Assignee
+        %label{for: 'assignment-type-assignee'}
+          %span.toolbar-button-text-wider-alt.no-float-no-pad Ass.
+          %span.toolbar-button-text-wider.no-float-no-pad Assignee
       .inline-radio-wrapper
         %input#assignment-type-reviewer.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'reviewer'}
-        %label{for: 'assignment-type-reviewer'} Reviewer
+        %label{for: 'assignment-type-reviewer'}
+          %span.toolbar-button-text-wider-alt.no-float-no-pad Rev.
+          %span.toolbar-button-text-wider.no-float-no-pad Reviewer
       .inline-radio-wrapper
         %input#assignment-type-second-reviewer.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'second_reviewer'}
-        %label{for: 'assignment-type-second-reviewer'} Second Reviewer
+        %label{for: 'assignment-type-second-reviewer'}
+          %span.no-float-no-pad 2nd
+          %span.toolbar-button-text-wider.no-float-no-pad Reviewer
     %span.toolbar-concise-button-area
       %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.darkened-button{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)', disabled: 'true'}
         %span.toolbar-button-text Take
@@ -137,7 +142,7 @@
                 %label.toolbar-section-label Assignee
                 %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
                   - User.joins(roles: :org_subset).where(org_subsets: { name: 'webcat' }).distinct.order(:cvs_username).each do |u|
-                    %option{id: u.id, value: u.id, label: u.cvs_username}
+                    %option{id: "assignee_#{u.id}", value: u.id, label: u.cvs_username}
                       = u.cvs_username
               %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'webcat_change_assignee();'}
                 Assign
@@ -199,26 +204,16 @@
   %div.webcat-toolbar-push
     - if params[:f] != "REVIEW"
       %button#index_update_resolution.toolbar-button.resolution-submit-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', onclick: "$('#index_change_resolution_dialog').dialog('open');"}
-        %span
+        %span.toolbar-button-text-wider
           Bulk Resolution Tool
 
-      -#.dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_update_resolution'}
-      -#  .edit-resolution-container
-      -#    %label.toolbar-section-label.edit-resolution-label{for:'complaint[resolution]'} Resolution
-      -#    = select(:complaint, :resolution, options_for_select([["Unchanged", "UNCHANGED"], ["Invalid", "INVALID"], ["Reopened", "REOPENED"]]))
-      -#    .comment-wrapper.internal_comment_container
-      -#      %label.toolbar-section-label{'for':'internal_comment'} Internal Comment
-      -#      %input.form-control#internal_comment{:name => "internal_comment", :placeholder => "Add a comment.", :type => "text", :value => ""}
-      -#    .comment-wrapper.customer_facing_comment_container
-      -#      %label.toolbar-section-label{'for':'customer_facing_comment'} Customer Facing Comment
-      -#      %input.form-control#customer_facing_comment{:name => "customer_facing_comment", :placeholder => "Add a comment for the customer.", :type => "text", :value => ""}
-      -#    %button#button_update_resolution.primary{type:'button', onclick:'updateResolutionDialog();'}
-      -#      Update
       %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'bulk_submit_categorize_entries();', title: 'Submit multiple edited entries with any changes entered.', disabled: 'disabled'}
-        %span Bulk Submit
+        %span.toolbar-button-text-wider Bulk Submit
     - else
       %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
-        %span Confirm Review
+        %span.toolbar-button-text-wider Confirm Review
   %div.webcat-toolbar-tall-wrapper
     %input{type: 'checkbox', id:'self_review'}
-    %label{for: 'self_review'} Allow Self Review
+    %label{for: 'self_review'}
+      %span.toolbar-button-text-wider.no-float-no-pad Allow
+      %span.no-float-no-pad Self Review

@@ -6,16 +6,14 @@ $ ->
 
     # Create index table
     url = $('#complaints-index').data('source')
-    build_complaints_table(url)
+    $.when(pull_user_preference_filter()).done ->
+      build_complaints_table(url)
 
 
 #### New complaints index table setup
 build_complaints_table = (url) ->
-  console.log 'build complaints table triggered'
   complaint_table = $('#complaints-index').DataTable(
     initComplete: ->
-
-      console.log 'init complete'
       # Get display prefs
       get_display_prefs()
 
@@ -60,15 +58,11 @@ build_complaints_table = (url) ->
         console.log 'There has been an error calling the backend data'
         webcat_refresh()
       complete: ->
-        console.log 'complete'
 
         # Grab current categories per entry
         rows = $('#complaints-index').find('.cat-index-main-row')
         get_current_cats(rows)
         create_ind_res_dialogs()
-
-        # confirm this function is in the right locatino
-        use_user_preference_filter()
 
         $('#complaints-index tbody tr *').click ->
           main_row = $(this).parents('tr.cat-index-main-row')[0]
@@ -320,6 +314,11 @@ build_complaints_table = (url) ->
             path_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + full.uri + '\', \'uri\');"'
             path_val = full.uri
 
+          if (full.status == 'COMPLETED') || (full.status == 'PENDING')
+            input_uri = full.uri_as_categorized
+          else
+            input_uri = domain
+
           domain_col =
             '<table class="nested-col-table">' +
               '<tbody>' +
@@ -341,7 +340,7 @@ build_complaints_table = (url) ->
               '</td>' +
               '<td class="edit-uri-col">' +
               '<input class="nested-table-input complaint-uri-input" id="edit_uri_input_' +
-              full.entry_id + '" type="text" data-domain="' + domain + ' "value="' + domain + '"' + input_status + '/>' +
+              full.entry_id + '" type="text" data-domain="' + domain + ' "value="' + input_uri + '"' + input_status + '/>' +
               '</td></tr>' +
               '</tbody>' +
               '</table>'
@@ -354,17 +353,21 @@ build_complaints_table = (url) ->
         render: (data, type, full, meta) ->
           history_url = full.uri || full.ip_address
           history_button =
-            '<button class="history-button" id="entry-history-' + full.entry_id + '" ' +
-              'onclick="history_dialog(\'' + full.entry_id + '\', \'' + history_url + '\')"></button>'
+            '<button class="history-button esc-tooltipped" id="entry-history-' + full.entry_id + '" ' +
+              'onclick="history_dialog(\'' + full.entry_id + '\', \'' + history_url + '\')" ' +
+              'title="Domain History"></button>'
 
           whois_url = full.domain || full.ip_address
           whois_button =
-            '<button class="whois-button" id="whois-' + full.entry_id + '" ' +
-              'onclick="WebCat.RepLookup.whoIsLookup(\'' + whois_url + '\')"></button>'
+            '<button class="whois-button esc-tooltipped" id="whois-' + full.entry_id + '" ' +
+              'onclick="WebCat.RepLookup.whoIsLookup(\'' + whois_url + '\')"' +
+              'title="Whois Information"></button>'
 
           lookup_url = full.subdomain + '.' + full.domain || full.ip_address
           lookup_button =
-            '<a class="button-wrapper-link" href="https://www.google.com/search?q=site%3A' + lookup_url + '" target="_blank"><button id="google-' + full.entry_id + '" class="lookup-button"></button></a>'
+            '<a class="button-wrapper-link" href="https://www.google.com/search?q=site%3A' + lookup_url +
+              '" target="_blank"><button id="google-' + full.entry_id + '" class="lookup-button esc-tooltipped" ' +
+              'title="Google Search"></button></a>'
 
           visit_url = history_url
           if full.wbrs_score <= -6
@@ -372,7 +375,8 @@ build_complaints_table = (url) ->
               '<button id="open-' + full.entry_id + '" class="open-all" disabled></button>'
           else
             visit_button =
-              '<a class="button-wrapper-link" href="http://' + visit_url + '" target="_blank"><button id="open-' + full.entry_id + '" class="open-all"></button></a>'
+              '<a class="button-wrapper-link" href="http://' + visit_url + '" target="_blank"><button id="open-' + full.entry_id +
+                '" class="open-all esc-tooltipped" title="Open in New Tab"></button></a>'
 
           return history_button + whois_button + lookup_button + visit_button
       }
@@ -392,8 +396,7 @@ build_complaints_table = (url) ->
               '<tr><td id="current_cat_' + full.entry_id + '" class="current-cat-col"></td></tr>' +
               '<tr><td class="edit-cat-col">' +
               '<select id="input_cat_' + full.entry_id + '" name="input_cat_' +
-              full.entry_id + '" class="nested-table-input" placeholder="Enter categories / confidence order" ' +
-              'onchange="store_entry_changes(\'' + full.entry_id + '\')"' + disabled + '>' +
+              full.entry_id + '" class="nested-table-input" placeholder="Enter categories / confidence order" ' + disabled + '>' +
               '</select>' +
               '</td></tr>' +
               '</tbody>' +
@@ -576,7 +579,7 @@ build_complaints_table = (url) ->
 # build_header is called at the bottom of this function to format the search header
 ###
 build_data = () ->
-  console.log 'building data from search params'
+  # check local storage first
   { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
   { search } = location
 
@@ -588,33 +591,51 @@ build_data = () ->
   if search != ''
     webcat_search_type = 'standard'
     urlParams = new URLSearchParams(location.search);
-  switch(webcat_search_type)
-    when 'advanced'
-      data = {
-        search_type: webcat_search_type
-        search_name : webcat_search_name
-        search_conditions: webcat_search_conditions
-      }
-    when 'contains'
-      data = {
-        search_type: webcat_search_type
-        search_conditions: webcat_search_conditions
-      }
-    when 'standard'
-      urlParams = new URLSearchParams(location.search);
+
+  if webcat_search_type?
+    switch(webcat_search_type)
+      when 'advanced'
+        data = {
+          search_type: webcat_search_type
+          search_name : webcat_search_name
+          search_conditions: webcat_search_conditions
+        }
+      when 'contains'
+        data = {
+          search_type: webcat_search_type
+          search_conditions: webcat_search_conditions
+        }
+      when 'standard'
+        urlParams = new URLSearchParams(location.search);
+        refresh_localStorage()
+        data = {
+          search_type: webcat_search_type
+          search_name: urlParams.get('f')
+        }
+      when 'named'
+        data = {
+          search_type: webcat_search_type
+          search_name: webcat_search_name
+        }
+
+    build_header(data)
+    return data
+
+  else
+    # check users chosen default filter
+    fav = $('.favorite-search-icon-active')
+    if fav.length > 0
+      link = $(fav[0]).prev()
+      address = $(link).attr('href')
+      filter = address.split('=').pop();
+
       refresh_localStorage()
       data = {
-        search_type: webcat_search_type
-        search_name: urlParams.get('f')
+        search_type: 'standard'
+        search_name: filter
       }
-    when 'named'
-      data = {
-        search_type: webcat_search_type
-        search_name: webcat_search_name
-      }
-  $.when(pull_user_preference_filter()).done -> build_header(data)
-  return data
-
+      build_header(data)
+      return data
 
 
 ###
@@ -708,3 +729,26 @@ build_subheader = (subheader) ->
         condition_HTML = '<span>' + condition + '</span>'
 
       container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
+
+
+window.pull_user_preference_filter = () ->
+  return if window.location.pathname != '/escalations/webcat/complaints'
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/user_preferences/'
+    data: { name: 'webcat_complaints_filter' }
+    success: (response) ->
+      return unless response?
+      name = JSON.parse(response).name
+      set_icon_for_favorite_filter(name)
+  )
+
+
+set_icon_for_favorite_filter = (filter_name) ->
+  filter_dropdown = $("#filter-dropdown > #filter-cases-list a[href='#{filter_name}']")
+  saved_search = window.find_saved_search_by_name(filter_name)
+
+  if filter_dropdown.length > 0
+    filter_dropdown.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+  else if saved_search
+    saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
