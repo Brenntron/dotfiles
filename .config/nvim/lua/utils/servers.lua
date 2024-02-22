@@ -10,6 +10,7 @@ M.server_list = {
   -- "rubocop",
   "solargraph",
   "sqlls",
+  "tailwindcss",
   "volar",
   "yamlls",
 }
