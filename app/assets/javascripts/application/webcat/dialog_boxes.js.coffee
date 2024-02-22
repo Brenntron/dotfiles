@@ -209,14 +209,14 @@ $ ->
     $(button_id).addClass('active')
 
   # Update inline customer comments when selecting new template
-  $('.response-template-select').change ->
+  $(document).on 'change', '.response-template-select', ->
     # get id of this select
     comment = $(this).find(":selected").attr("data-body")
     id = $(this).attr('id').replace('entry-email-response-to-customers-select_', '')
     $("#entry-email-response-to-customers_#{id}").val(comment)
 
   # Update individual response templates and text when a user selects a different resolution
-  $('.resolution_radio_button').change ->
+  $(document).on 'change', '.resolution_radio_button', ->
     resolution = $(this).val()
     lc_res = resolution.toLowerCase()
     entry_id = $(this).attr('id').replace(lc_res, '')
