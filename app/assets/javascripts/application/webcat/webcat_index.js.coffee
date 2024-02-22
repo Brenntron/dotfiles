@@ -621,6 +621,19 @@ build_data = () ->
     build_header(data)
     return data
 
+  #check if saved search favorite has been set - need to grab data from icon's sibling link
+  else if $('.favorite-search-icon-saved-searches').hasClass('favorite-search-icon-active')
+    fav = $('.favorite-search-icon-active')
+    if fav.length > 0
+      search_name = $('#saved-searches-wrapper .active-link').text().trim()
+      refresh_localStorage()
+      data = {
+        search_type: 'named'
+        search_name: search_name
+      }
+      build_header(data)
+      return data
+
   else
     # check users chosen default filter
     fav = $('.favorite-search-icon-active')

@@ -249,7 +249,7 @@ $ ->
   window.current_page_is_favourite = (search_name) ->
     { icon, name } = chosen_default_filter()
     if is_default_filter(icon)
-      filter_dropdown = $("#filter-dropdown > span.favorite-search-icon-active")
+      filter_dropdown = $("#filter-cases-list > span.favorite-search-icon-active")
       if filter_dropdown
         #Check if filter link matches current url path
         if name == decodeURIComponent(window.location.search)
@@ -259,12 +259,16 @@ $ ->
           link_text = $("#filter-dropdown > #filter-cases-list a.active-link").text().trim().toLowerCase()
           if link_text == search_name
             return true
-          else
-            return false
+
     #check if on current saved search
+    if name == localStorage.webcat_search_name
+      return true
     else
-      if name == localStorage.webcat_search_name
-        return true
+      saved_search_dropdown = $("#saved-searches-wrapper > span.favorite-search-icon-active")
+      if saved_search_dropdown
+        saved_name = $('#saved-searches-wrapper .active-link').text().trim()
+        if search_name == saved_name
+          return true
 
 
 
