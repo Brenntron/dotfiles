@@ -12,6 +12,9 @@ local M = {
     {
       "zbirenbaum/copilot-cmp",
       event = { "InsertEnter", "LspAttach" },
+      config = function()
+        require("copilot_cmp").setup()
+      end,
     },
     {
       "hrsh7th/cmp-cmdline",
@@ -24,6 +27,9 @@ local M = {
     {
       "garyhurtz/cmp_kitty",
       event = { "InsertEnter", "LspAttach" },
+      init = function()
+        require("cmp_kitty"):setup()
+      end,
     },
     {
       "saadparwaiz1/cmp_luasnip",
@@ -62,6 +68,7 @@ local M = {
 
 function M.config()
   local cmp = require "cmp"
+  local copilot_cmp = require "copilot_cmp"
   local icons = require "utils.icons"
   local lspkind = require "lspkind"
   local luasnip = require "luasnip"
@@ -187,7 +194,7 @@ function M.config()
       end,
     },
     sorting = {
-      priority_weight =2,
+      priority_weight = 2,
       comparators = {
         require("copilot_cmp.comparators").prioritize,
         -- Below is the default comparitor list and order for nvim-cmp
@@ -204,16 +211,16 @@ function M.config()
       },
     },
     sources = {
-      { name = "buffer" },
-      { name = "calc" },
-      { name = "copilot" },
-      { name = "emoji" },
-      { name = "kitty" },
-      { name = "luasnip" },
-      { name = "nvim_lsp" },
-      { name = "nvim_lua" },
-      { name = "path" },
-      { name = "treesitter" },
+      { name = "buffer", group_index = 2 },
+      { name = "calc", group_index = 2 },
+      { name = "copilot", group_index = 2 },
+      { name = "emoji", group_index = 2 },
+      { name = "kitty", group_index = 2 },
+      { name = "luasnip", group_index = 2 },
+      { name = "nvim_lsp", group_index = 2 },
+      { name = "nvim_lua", group_index = 2 },
+      { name = "path", group_index = 2 },
+      { name = "treesitter", group_index = 2 },
     },
     window = {
       completion = {
@@ -230,6 +237,29 @@ function M.config()
       },
     },
   }
+
+    -- `/` cmdline setup.
+  cmp.setup.cmdline('/', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = 'buffer' }
+    }
+  })
+
+  -- `:` cmdline setup.
+  cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      {
+        name = 'cmdline',
+        option = {
+          ignore_cmds = { 'Man', '!' }
+        }
+      }
+    })
+  })
 
   pcall(function()
     local function on_confirm_done(...)

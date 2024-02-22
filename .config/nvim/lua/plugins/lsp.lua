@@ -109,7 +109,6 @@ function M.config()
 
   -- Setup coffeesense as it is not included in mason-lspconfig
   local coffeesense_opts = opts
-
   local coffee_require_ok, coffee_settings = pcall(require, "lspsettings.coffeesense")
 
   if coffee_require_ok then
@@ -119,18 +118,7 @@ function M.config()
   lspconfig.coffeesense.setup(coffeesense_opts)
 
   -- Setup cucumber_language_server with a forked ls.
-  local cucumber_language_server_opts = {
-    settings = {
-      cucumber = {
-        features = { "features/**/*.feature" },
-        glue = { "features/step_definitions/**/*.rb" },
-      },
-      features = { "features/**/*.feature" },
-      glue = { "features/step_definitions/**/*.rb" },
-      parameterTypes = {},
-    }
-  }
-
+  local cucumber_language_server_opts = opts
   local cucumber_require_ok, cucumber_settings = pcall(require, "lspsettings.cucumber_language_server")
 
   if cucumber_require_ok then
@@ -138,6 +126,16 @@ function M.config()
   end
 
   lspconfig.cucumber_language_server.setup(cucumber_language_server_opts)
+
+  -- gramarly setup require nodejs 16
+  local grammarly_opts = opts
+  local grammarly_require_ok, grammarly_settings = pcall(require, "lspsettings.grammarly")
+
+  if grammarly_require_ok then
+    grammarly_opts = vim.tbl_deep_extend("force", grammarly_settings, grammarly_opts)
+  end
+
+  lspconfig.grammarly.setup(grammarly_opts)
 end
 
 return M

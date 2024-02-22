@@ -8,6 +8,8 @@ local M = {
   },
 }
 function M.config()
+  local colors = require('tokyonight.colors').setup()
+
   require("bufferline").setup {
     options = {
       close_command = "Bdelete! %d", -- can be a string | function, see "Mouse actions"
@@ -17,76 +19,76 @@ function M.config()
     },
     highlights = {
       fill = {
-        fg = { attribute = "fg", highlight = "TabLine" },
-        bg = { attribute = "bg", highlight = "TabLine" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLine" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLine" },
       },
       background = {
-        fg = { attribute = "fg", highlight = "TabLine" },
-        bg = { attribute = "bg", highlight = "TabLine" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLine" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLine" },
       },
       buffer_visible = {
-        fg = { attribute = "fg", highlight = "TabLine" },
-        bg = { attribute = "bg", highlight = "TabLine" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLine" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLine" },
       },
       close_button = {
-        fg = { attribute = "fg", highlight = "TabLine" },
-        bg = { attribute = "bg", highlight = "TabLine" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLine" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLine" },
       },
       close_button_visible = {
-        fg = { attribute = "fg", highlight = "TabLine" },
-        bg = { attribute = "bg", highlight = "TabLine" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLine" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLine" },
       },
       tab_selected = {
-        fg = { attribute = "fg", highlight = "Normal" },
-        bg = { attribute = "bg", highlight = "Normal" },
+        fg = { attribute = colors.fg_dark, highlight = "Normal" },
+        bg = { attribute = colors.bg_dark, highlight = "Normal" },
       },
       tab = {
-        fg = { attribute = "fg", highlight = "TabLine" },
-        bg = { attribute = "bg", highlight = "TabLine" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLine" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLine" },
       },
       tab_close = {
         -- fg = {attribute='fg',highlight='LspDiagnosticsDefaultError'},
-        fg = { attribute = "fg", highlight = "TabLineSel" },
-        bg = { attribute = "bg", highlight = "Normal" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLineSel" },
+        bg = { attribute = colors.bg_dark, highlight = "Normal" },
       },
       duplicate_selected = {
-        fg = { attribute = "fg", highlight = "TabLineSel" },
-        bg = { attribute = "bg", highlight = "TabLineSel" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLineSel" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLineSel" },
         italic = true,
       },
       duplicate_visible = {
-        fg = { attribute = "fg", highlight = "TabLine" },
-        bg = { attribute = "bg", highlight = "TabLine" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLine" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLine" },
         italic = true,
       },
       duplicate = {
-        fg = { attribute = "fg", highlight = "TabLine" },
-        bg = { attribute = "bg", highlight = "TabLine" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLine" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLine" },
         italic = true,
       },
       modified = {
-        fg = { attribute = "fg", highlight = "TabLine" },
-        bg = { attribute = "bg", highlight = "TabLine" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLine" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLine" },
       },
       modified_selected = {
-        fg = { attribute = "fg", highlight = "Normal" },
-        bg = { attribute = "bg", highlight = "Normal" },
+        fg = { attribute = colors.fg_dark, highlight = "Normal" },
+        bg = { attribute = colors.bg_dark, highlight = "Normal" },
       },
       modified_visible = {
-        fg = { attribute = "fg", highlight = "TabLine" },
-        bg = { attribute = "bg", highlight = "TabLine" },
+        fg = { attribute = colors.fg_dark, highlight = "TabLine" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLine" },
       },
       separator = {
-        fg = { attribute = "bg", highlight = "TabLine" },
-        bg = { attribute = "bg", highlight = "TabLine" },
+        fg = { attribute = colors.bg_dark, highlight = "TabLine" },
+        bg = { attribute = colors.bg_dark, highlight = "TabLine" },
       },
       separator_selected = {
-        fg = { attribute = "bg", highlight = "Normal" },
-        bg = { attribute = "bg", highlight = "Normal" },
+        fg = { attribute = colors.bg_dark, highlight = "Normal" },
+        bg = { attribute = colors.bg_dark, highlight = "Normal" },
       },
       indicator_selected = {
-        fg = { attribute = "fg", highlight = "LspDiagnosticsDefaultHint" },
-        bg = { attribute = "bg", highlight = "Normal" },
+        fg = { attribute = colors.fg_dark, highlight = "LspDiagnosticsDefaultHint" },
+        bg = { attribute = colors.bg_dark, highlight = "Normal" },
       },
     },
   }
