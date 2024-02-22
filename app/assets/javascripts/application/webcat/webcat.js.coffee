@@ -246,12 +246,25 @@ $ ->
     name = if is_default_filter(fav_icon) then link.attr('href') else link.text().trim()
     { icon: fav_icon, link: link, name: name }
 
-  window.current_page_is_favourite = ->
+  window.current_page_is_favourite = (search_name) ->
     { icon, name } = chosen_default_filter()
     if is_default_filter(icon)
-      return name == decodeURIComponent(window.location.search)
+      filter_dropdown = $("#filter-dropdown > span.favorite-search-icon-active")
+      if filter_dropdown
+        #Check if filter link matches current url path
+        if name == decodeURIComponent(window.location.search)
+          return true
+        #If no url path check if active link matches current filter name
+        else
+          link_text = $("#filter-dropdown > #filter-cases-list a.active-link").text().trim().toLowerCase()
+          if link_text == search_name
+            return true
+          else
+            return false
+    #check if on current saved search
     else
-      return name == localStorage.webcat_search_name
+      if name == localStorage.webcat_search_name
+        return true
 
 
 

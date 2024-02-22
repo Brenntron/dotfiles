@@ -647,13 +647,6 @@ build_data = () ->
 build_header = (data) ->
   container = $('#webcat_searchref_container')
   if data != undefined && container.length > 0
-    if current_page_is_favourite()
-      reset_icon_class = 'hidden style="display: none"'
-    else
-      reset_icon_class = ''
-    reset_icon = "<span #{reset_icon_class} id='refresh-filter-button'
-        class='reset-filter esc-tooltipped'
-        title='Clear Search Results' onclick='webcat_refresh()'></span>"
     {search_type, search_name} = data
 
     try
@@ -666,32 +659,39 @@ build_header = (data) ->
 
       if !search_name.endsWith('tickets')
         search_name += ' tickets'
-
+      search_name = search_name.replace(/_|%20/g, " ")
+      reset_icon = get_reset_icon(search_name)
       new_header =
         '<div>' +
-          '<span class="text-capitalize">' + search_name.replace(/_|%20/g, " ") + ' </span>' +
+          '<span class="text-capitalize">' + search_name + ' </span>' +
           reset_icon +
           '</div>'
 
     else if search_type == 'advanced'
+      reset_icon = get_visible_reset_icon()
       new_header =
         '<div>Results for Advanced Search ' +
           reset_icon +
           '</div>'
       build_subheader(webcat_search_conditions)
+
     else if search_type == 'named'
+      reset_icon = get_reset_icon(search_name)
       new_header =
         '<div>Results for "' + search_name + '" Saved Search' +
           reset_icon +
           '</div>'
       el = localStorage.webcat_search_conditions
-      if !el.includes('temp_row')
-        subheader = $("##{el} .saved-search")[0].dataset.search_conditions
+      if el
+        if !el.includes('temp_row')
+          subheader = $("##{el} .saved-search")[0].dataset.search_conditions
       else
         last_row = $('#saved-search-tbody')[0].lastElementChild
         subheader = $(last_row).find('.saved-search').attr('data-search_conditions')
       build_subheader(subheader)
+
     else if search_type == 'contains'
+      reset_icon = get_visible_reset_icon()
       new_header =
         '<div>Results for "' + webcat_search_conditions.value + '" '+
           reset_icon +
@@ -735,6 +735,22 @@ build_subheader = (subheader) ->
 
       container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
 
+get_visible_reset_icon = ->
+  reset_icon = "<span id='refresh-filter-button'
+    class='reset-filter esc-tooltipped'
+    title='Clear Search Results' onclick='webcat_refresh()'></span>"
+
+#for filters and saved searches we need to check if currently on the favorite page since it's the index
+get_reset_icon = (search_name) ->
+  if current_page_is_favourite(search_name)
+    reset_icon_class = 'hidden style="display: none"'
+  else
+    reset_icon_class = ''
+  reset_icon = "<span #{reset_icon_class} id='refresh-filter-button'
+    class='reset-filter esc-tooltipped'
+    title='Clear Search Results' onclick='webcat_refresh()'></span>"
+  return reset_icon
+
 
 window.pull_user_preference_filter = () ->
   return if window.location.pathname != '/escalations/webcat/complaints'
@@ -755,5 +771,8 @@ set_icon_for_favorite_filter = (filter_name) ->
 
   if filter_dropdown.length > 0
     filter_dropdown.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+    filter_dropdown.addClass 'active-link'
+
   else if saved_search
     saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+    saved_search.addClass 'active-link'
