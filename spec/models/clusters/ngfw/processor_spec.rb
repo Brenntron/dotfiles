@@ -20,7 +20,7 @@ describe Clusters::Ngfw::Processor do
 
   describe 'process_2nd_person_review' do
     subject { processor.process_2nd_person_review }
-    let!(:ngfw_cluster) { FactoryBot.create(:ngfw_cluster, domain: cluster[:domain]) }
+    let!(:ngfw_cluster) { FactoryBot.create(:cluster, :ngfw, domain: cluster[:domain]) }
 
     it 'creates ClusterAssignment instead of cluster processing' do
       expect(Wbrs::Prefix).not_to receive(:create_from_url)
@@ -36,7 +36,7 @@ describe Clusters::Ngfw::Processor do
   end
 
   describe 'process' do
-    let!(:ngfw_cluster) { FactoryBot.create(:ngfw_cluster, domain: cluster[:domain]) }
+    let!(:ngfw_cluster) { FactoryBot.create(:cluster, :ngfw, domain: cluster[:domain]) }
 
     context 'if cluster is not important' do
       before { cluster[:is_important] = false }
@@ -73,7 +73,7 @@ describe Clusters::Ngfw::Processor do
     subject { processor.decline }
 
     let!(:ngfw_cluster) do
-      FactoryBot.create(:ngfw_cluster, domain: cluster[:domain],
+      FactoryBot.create(:cluster, :ngfw, domain: cluster[:domain],
                                        category_ids: cluster[:categories].to_json,
                                        status: :processed)
     end
