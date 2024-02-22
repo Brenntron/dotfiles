@@ -263,9 +263,15 @@ $ ->
     #check if on current saved search
     if name == localStorage.webcat_search_name
       return true
+
+    #catch for when no favorites are set - currently loads All Tickets page, will need to be adjusted if that changes
+    else if $('.favorite-search-icon-active').length == 0 && search_name == 'all tickets'
+      return true
+
+    #check if saved search favorite is set but there's no local storage saved
     else
       saved_search_dropdown = $("#saved-searches-wrapper > span.favorite-search-icon-active")
-      if saved_search_dropdown
+      if saved_search_dropdown.length > 0
         saved_name = $('#saved-searches-wrapper .active-link').text().trim()
         if search_name == saved_name
           return true

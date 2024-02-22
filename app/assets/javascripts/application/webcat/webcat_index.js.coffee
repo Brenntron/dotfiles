@@ -650,6 +650,15 @@ build_data = () ->
       build_header(data)
       return data
 
+    #no saved settings, no filter, currently loads All Tickets by default
+    else
+      data = {
+        search_type: 'standard'
+        search_name: 'all'
+      }
+      build_header(data)
+      return data
+
 
 ###
   # Depending on the data, this function builds the search header
