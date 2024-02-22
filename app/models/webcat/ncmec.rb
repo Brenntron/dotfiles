@@ -71,7 +71,8 @@ class Webcat::Ncmec
 
     url = "#{protocol}://#{host}:#{port}#{path}"
     request = HTTPI::Request.new(url)
-    request.auth.basic(Rails.configuration.iwf_config.username, Rails.configuration.iwf_config.password)
+    #request.auth.basic(Rails.configuration.iwf_config.username, Rails.configuration.iwf_config.password)
+    request.auth.basic("CiscoSystemsInc", "Mw4+Cq2@Fq9%")
     request.read_timeout = read_timeout
     request.open_timeout = open_timeout
 
@@ -100,7 +101,7 @@ class Webcat::Ncmec
 
     case method
       when :post
-
+        binding.pry
         HTTPI.post(request)
 
       else #:get
@@ -116,30 +117,21 @@ class Webcat::Ncmec
 
     data = nil
 
-    begin
-      response_body = JSON.parse(response.body)
-      code = response_body["IWFReportService1.0"]["responseCode"].to_i
-      description = response_body["IWFReportService1.0"]["responseDescription"]
-    rescue Exception => e
-
-    end
-
     if response.code > 204
-      raise RepApi::RepApiError, "HTTP code: #{response.code} Error code #{code.to_s}: #{description}"
-    else
-      data = response_body["IWFReportService1.0"]
+      raise RepApi::RepApiError, "HTTP code: #{response.code}"
     end
 
-    return data
+    return response
 
   end
 
-  def self.call_json_request(body)
-    request = new_request("/reportservice/restv1/")
+
+  def self.call_xml_request(body, path)
+    request = new_request(path)
     method = :post
 
-    request.headers['Content-Type'] = "application/json"
-    request.body = body.to_json
+    request.headers['Content-Type'] = "text/xml; charset=utf-8"
+    request.body = body
 
     request_error_handling(call_request(method, request))
   end
