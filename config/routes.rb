@@ -53,6 +53,8 @@ Rails.application.routes.draw do
       get 'clusters', to: 'complaints#clusters'
       get 'research', to: 'complaints#research'
 
+      get 'csam_reports', to: 'complaints#csam_reports'
+
       resources :reports, only: [:index] do
         collection do
           get :index
