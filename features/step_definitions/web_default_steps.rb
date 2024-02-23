@@ -557,10 +557,6 @@ And(/^I enter the pin toolbar hot key$/) do
   page.find(:xpath, "//body").send_keys("^")
 end
 
-Then(/^button "(.*?)" should be enabled$/) do |button|
-  expect(page).to have_button(button)
-end
-
 Then(/^button "(.*?)" should be disabled$/) do |button|
   expect(page).to have_button(button, disabled: true)
 end

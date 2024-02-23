@@ -44,6 +44,7 @@ Feature: WebCat Bulk Resolution Tool
       And I click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
+      And I click "#index_update_resolution"
       And I type content "test content" within input with id "customer_facing_comment"
       And I click "#customer-facing-apply-button"
       And I wait for "2" seconds
@@ -148,6 +149,65 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#internal_comment_button4"
       And I wait for "2" seconds
       Then I should see content "This is an internal comment." within "#internal_comment_4"
+
+  Rule: The customer facing comments button should be disabled until a resolution status is applied
+    @javascript
+    Scenario: a webcat user attempts to apply a customer facing comment without applying a resolution status
+      When I go to "/escalations/webcat/complaints"
+      And I click webcat row with id "3"
+      And I click "#index_update_resolution"
+      And I wait for "2" seconds
+      And I type content "test content" within input with id "customer_facing_comment"
+      Then button with id "customer-facing-apply-button" should be disabled
+
+    @javascript
+    Scenario: a webcat user attempts to apply a customer facing comment after applying a resolution status
+      When I go to "/escalations/webcat/complaints"
+      And I click webcat row with id "3"
+      And I click "#index_update_resolution"
+      And I wait for "2" seconds
+      And I click "#resolution-apply-button"
+      And I type content "test content" within input with id "customer_facing_comment"
+      Then button with id "customer-facing-apply-button" should be enabled
+
+  Rule: the Internal Comment and Category buttons should be disabled until a row is selected
+    @javascript
+    Scenario: a webcat user attempts to apply an internal comment and category without selecting a row
+      When I go to "/escalations/webcat/complaints"
+      And I click "#index_update_resolution"
+      And I wait for "2" seconds
+      Then button with id "category-apply-button" should be disabled
+      Then button with id "internal-comment-button" should be disabled
+
+    @javascript
+    Scenario: a webcat user attempts to apply an internal comment and category after selecting a row
+      When I go to "/escalations/webcat/complaints"
+      And I click webcat row with id "3"
+      And I click "#index_update_resolution"
+      And I click "#webcat_resolution_replace_option"
+      And I fill in "internal_comment" with "This is an internal comment."
+      Then button with id "category-apply-button" should be enabled
+      Then button with id "internal-comment-button" should be enabled
+
+  Rule: The Bulk Resolution Tool should apply updates to rows selected after a first round of updates.
+    @javascript
+    Scenario: a webcat user updates a submittable tickets resolution and then updates a second selcetion
+      When I go to "/escalations/webcat/complaints"
+      And I click webcat row with id "3"
+      And I click "#index_update_resolution"
+      And I wait for "2" seconds
+      And I click "#webcat_resolution_unchanged_option"
+      And I click "#resolution-apply-button"
+      And I wait for "2" seconds
+      Then I should see the radio with id "unchanged3" checked
+      And I click webcat row with id "4"
+      And I click "#index_update_resolution"
+      And I wait for "2" seconds
+      And I click "#webcat_resolution_unchanged_option"
+      And I click "#resolution-apply-button"
+      And I wait for "2" seconds
+      Then I should see the radio with id "unchanged3" checked
+      And I should see the radio with id "unchanged4" checked
 
   Rule: Staged changes from the bulk resolution tool should be removed when the apply button is toggled off or the clear button is clicked
     @javascript
@@ -258,6 +318,8 @@ Feature: WebCat Bulk Resolution Tool
       When I click "#internal_comment_button3"
       And I click "#internal_comment_button4"
       Then I should see content "This is an internal comment." within "#internal_comment_4"
+      And I click webcat row with id "3"
+      And I shift click webcat row with id "4"
       When I click ".resolution-clear-button"
       And I wait for "2" seconds
       Then I should see the radio with id "fixed3" checked
@@ -274,3 +336,29 @@ Feature: WebCat Bulk Resolution Tool
       When I click "#internal_comment_button3"
       And I click "#internal_comment_button4"
       Then I should not see content "This is an internal comment." within "#internal_comment_4"
+
+  Rule: Staged changes from the bulk resolution tool should only remove staged changes from currently selected rows
+    @javascript
+    Scenario: a webcat user updates a submittable tickets resolution, updates a second selcetion and then undoes the changes of the first selection
+      When I go to "/escalations/webcat/complaints"
+      And I click webcat row with id "3"
+      And I click "#index_update_resolution"
+      And I wait for "2" seconds
+      And I click "#webcat_resolution_unchanged_option"
+      And I click "#resolution-apply-button"
+      And I wait for "2" seconds
+      Then I should see the radio with id "unchanged3" checked
+      When I click webcat row with id "4"
+      And I click "#index_update_resolution"
+      And I wait for "2" seconds
+      And I click "#webcat_resolution_unchanged_option"
+      And I click "#resolution-apply-button"
+      And I wait for "2" seconds
+      Then I should see the radio with id "unchanged3" checked
+      And I should see the radio with id "unchanged4" checked
+      When I click webcat row with id "3"
+      And I click "#index_update_resolution"
+      And I click "#resolution-apply-button"
+      And I wait for "2" seconds
+      Then I should see the radio with id "fixed3" checked
+      And I should see the radio with id "unchanged4" checked

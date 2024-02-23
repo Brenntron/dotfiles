@@ -2,14 +2,21 @@
 submittable_rows = []
 
 apply_resolution = () ->
-  resolution_to_apply = $('input[name="complaint[resolution]"]:checked')[0].value.toLowerCase()
+  entry_ids = []
+  resolution_to_apply = $('input[name="complaint[resolution]"]:checked')[0].value
 
   for row in submittable_rows
     {entry_id, status} = row
 
-    $("##{resolution_to_apply}#{entry_id}").prop('checked', true)
+    entry_ids.push(entry_id)
+    $("##{resolution_to_apply.toLowerCase()}#{entry_id}").prop('checked', true)
     store_entry_changes(entry_id, 'submit')
     sessionStorage.setItem("#{entry_id}_resolution", 'staged')
+
+  # Update the resolution templates for the submittable rows
+  get_resolution_templates(resolution_to_apply, 'individual', entry_ids)
+  # Enable the customer facing comment button if there is an applied resolution status
+  $('#customer-facing-apply-button').prop('disabled', false)
 
 apply_customer_facing_comment = () ->
   customer_facing_comment = $('#email-response-to-customers').val()
@@ -51,24 +58,37 @@ apply_internal_comment = () ->
     sessionStorage.setItem("#{entry_id}_internal_facing_comment", 'staged')
 
 clear_resolution = () ->
+  entry_ids = []
+
   for row in submittable_rows
     {entry_id, status} = row
 
     $("#fixed#{entry_id}").prop('checked', true)
 
-    unless staged_changes("#{entry_id}_resolution")
+    entry_ids.push(entry_id)
+
+    if staged_changes("#{entry_id}_resolution")
       remove_entry_from_changes(entry_id, 'submit')
       sessionStorage.removeItem("#{entry_id}_resolution")
 
+  # Update the resolution templates for the submittable rows
+  get_resolution_templates('FIXED', 'individual', entry_ids)
+  # Disable the customer facing comment button if there is not applied resolution status
+  $('#customer-facing-apply-button').prop('disabled', true)
+
 clear_customer_facing_comment = () ->
+  entry_ids = []
+
   for row in submittable_rows
     {entry_id, status} = row
 
-    $("#entry-email-response-to-customers_#{entry_id}").val('')
+    entry_ids.push(entry_id)
 
-    unless staged_changes("#{entry_id}_customer_facing_comment")
+    if staged_changes("#{entry_id}_customer_facing_comment")
       remove_entry_from_changes(entry_id, 'submit')
-      sessionStorage.removeItem("#{entry_id}_customer_facing_comment")
+      sessionStorage.removeItem("#{entry_id}_customer_facing")
+
+  get_resolution_templates('FIXED', 'individual', entry_ids)
 
 clear_category = () ->
   for row in submittable_rows
@@ -76,9 +96,9 @@ clear_category = () ->
 
     $("#input_cat_#{entry_id}")[0].selectize.clear()
 
-  unless staged_changes("#{entry_id}_categories")
+  if staged_changes("#{entry_id}_category")
     remove_entry_from_changes(entry_id, 'submit')
-    sessionStorage.removeItem("#{entry_id}_categories")
+    sessionStorage.removeItem("#{entry_id}_category")
 
 clear_internal_comment = () ->
   for row in submittable_rows
@@ -86,9 +106,9 @@ clear_internal_comment = () ->
 
     $("#internal-comment-#{entry_id}").val('')
 
-  unless staged_changes("#{entry_id}_internal_facing_comment")
+  if staged_changes("#{entry_id}_internal_comment")
     remove_entry_from_changes(entry_id, 'submit')
-    sessionStorage.removeItem("#{entry_id}_internal_facing_comment")
+    sessionStorage.removeItem("#{entry_id}_internal_comment")
 
 staged_changes = (storage_key) ->
   storage_value = sessionStorage.getItem(storage_key) || ''
@@ -100,13 +120,26 @@ has_submittable_status = (rowData) ->
 
   rowData.status in submittable_statuses
 
+should_clear = (button_id) ->
+  item_key = button_id.replace(/-apply-button|-button/, '')
+
+  # Fields should only clear if all submittable rows have staged changes
+  for row in submittable_rows
+    if staged_changes("#{row.entry_id}_#{item_key}")
+      continue
+    else
+      return false
+
+  return true
+
 window.bulk_resolution_select_handler = (dt, indexes) ->
   submittable_rows = dt.rows(indexes).data().toArray().filter(has_submittable_status)
 
   return if submittable_rows.length is 0
 
-  $('#customer-facing-apply-button').prop('disabled', false) if $('#email_response_to_customers').val()
-  $('#category-apply-button').prop('disabled', false) if $('#webcat_bulk_categories').val()
+  category_option = $('input[name="complaint[category_option]"]:checked')[0].value
+
+  $('#category-apply-button').prop('disabled', false) if $('#webcat_bulk_categories').val() || category_option is 'DROP_ALL'
   $('#internal-comment-button').prop('disabled', false) if $('#internal_comment').val()
 
 window.bulk_resolution_deselect_hander = (dt, indexes) ->
@@ -114,54 +147,62 @@ window.bulk_resolution_deselect_hander = (dt, indexes) ->
 
   return if submittable_rows.length > 0
 
-  $('#customer-facing-apply-button').prop('disabled', true)
   $('#category-apply-button').prop('disabled', true)
   $('#internal-comment-button').prop('disabled', true)
 
 window.clearBulkResolution = () ->
-  $('.apply_button').removeClass('applied')
+  return if submittable_rows.length is 0
+
   clear_resolution()
-  $('#email_response_to_customers').val('')
+
+  # reset customer facing comment in the bulk resolution tool
+  get_resolution_templates('UNCHANGED', 'bulk')
   clear_customer_facing_comment()
-  $('#webcat_bulk_categories')[0].selectize.clear()
-  clear_category()
-  $('#internal_comment').val('')
-  clear_internal_comment()
+
+  unless $('#category-apply-button').prop('disabled')
+    $('#webcat_bulk_categories')[0].selectize.clear()
+    clear_category()
+
+  unless $('#internal-comment-button').prop('disabled')
+    $('#internal_comment').val('')
+    clear_internal_comment()
 
 window.applyAll = () ->
+  return if submittable_rows.length is 0
+
   apply_resolution()
 
-  if $('#email_response_to_customers').val()
+  if $('#email-response-to-customers').val()
     apply_customer_facing_comment()
 
   if $('#webcat_bulk_categories')[0].selectize.getValue().length > 0 || $('input[name="complaint[category_option]"]:checked').val() is 'DROP_ALL'
-    $('#category-apply-button').addClass('applied')
     apply_category()
 
   if $('#internal_comment').val()
-    $('#internal-comment-button').addClass('applied')
     apply_internal_comment()
 
 $ ->
   if $('#complaints-index').length
     $('.resolution-apply-button').click (event) ->
-      $button = $(event.target)
-      button_id = $button.attr('id')
-      submit_changes_button = $
+      return if submittable_rows.length is 0
 
-      if $button.hasClass('applied')
-        $button.removeClass('applied')
+      button_id = $(event.target).attr('id')
 
+      if should_clear(button_id)
         switch button_id
           when 'resolution-apply-button' then clear_resolution()
           when 'customer-facing-apply-button' then clear_customer_facing_comment()
           when 'category-apply-button' then clear_category()
           when 'internal-comment-button' then clear_internal_comment()
       else
-        $button.addClass('applied')
-
         switch button_id
           when 'resolution-apply-button' then apply_resolution()
           when 'customer-facing-apply-button' then apply_customer_facing_comment()
           when 'category-apply-button' then apply_category()
           when 'internal-comment-button' then apply_internal_comment()
+
+    $('input[name="complaint[category_option]"]').on 'change', () ->
+      $('#category-apply-button').prop('disabled', false) if submittable_rows.length > 0
+
+    $('textarea#internal_comment').on 'input', () ->
+      $('#internal-comment-button').prop('disabled', false) if $('#internal-comment-button').prop('disabled') && submittable_rows.length > 0
