@@ -3,4 +3,108 @@
     .col-xs-12
       %h1 CSAM Reports
 
-      
+      .toolbar.csam-reports-toolbar
+        .toolbar-container
+          %label.toolbar-section-label
+            Send Report
+          %button.toolbar-button.toolbar-button-spacer.icon-reports.esc-tooltipped{title: 'Send report to IWF'}
+            %span.toolbar-button-text To IWF
+          %button.toolbar-button.icon-reports.esc-tooltipped{title: 'Send report to NCMEC'}
+            %span.toolbar-button-text To NCMEC
+        .toolbar-container
+          %label.toolbar-section-label
+            Email Report
+          %button.toolbar-button.icon-email.esc-tooltipped{title: 'Forward report to external email address'}
+            %span.toolbar-button-text
+              Forward Selected Report
+
+      -# Send report to IWF
+      -# Send report to NCMEC
+      -# Forward report
+
+      -# Entry id links to (complaint) show page
+      -# Report id's open up the compiled report in a dialog
+
+      %table.table.responsive.dataTable.no-footer.webcat-list-view#webcat-csam-reports-index{role:'datatable'}
+        %thead
+          %tr
+            %th Entry ID
+            -#%th Date Entry was Submitted
+            %th Date Entry was Resolved
+            %th Urgent
+            %th URL
+            %th Description
+            -#%th Additional Notes
+            -#%th Analyst
+            %th NCMEC ID
+            %th Date Sent
+            %th IWF ID
+            %th Date Sent
+
+        %tbody
+          %tr
+            %td 123456
+            -#%td 2024-02-21 21:11:35
+            %td 2024-02-21 22:01:14
+            %td
+            %td zoekertjesmarkt.be
+            %td
+            -#%td
+            -#%td mtaylor
+            %td
+            %td
+            %td
+            %td
+          %tr
+            %td 123456
+            -#%td 2024-02-21 21:11:35
+            %td 2024-02-21 22:01:14
+            %td
+            %td zoekertjesmarkt.be
+            %td
+            -#%td
+            -#%td mtaylor
+            %td
+            %td
+            %td
+            %td
+          %tr
+            %td 123456
+            -#%td 2024-02-21 21:11:35
+            %td 2024-02-21 22:01:14
+            %td
+            %td zoekertjesmarkt.be
+            %td
+            -#%td
+            -#%td mtaylor
+            %td
+            %td
+            %td
+            %td
+          %tr
+            %td 123456
+            -#%td 2024-02-21 21:11:35
+            %td 2024-02-21 22:01:14
+            %td
+            %td zoekertjesmarkt.be
+            %td
+            -#%td
+            -#%td mtaylor
+            %td
+            %td
+            %td
+            %td
+          %tr
+            %td 123456
+            -#%td 2024-02-21 21:11:35
+            %td 2024-02-21 22:01:14
+            %td
+            %td zoekertjesmarkt.be
+            %td
+            -#%td
+            -#%td mtaylor
+            %td
+            %td
+            %td
+            %td
+
