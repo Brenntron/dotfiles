@@ -19,3 +19,21 @@
     color: #6dbcdb;
   }
 }
+
+#webcat-csam-reports-index_wrapper {
+  margin-top: -55px;
+  z-index: 0;
+}
+
+#webcat-csam-reports-index_filter .table-search-input{
+  height: 27px;
+}
+
+.csam-reports-toolbar {
+  display: inline-block;
+  z-index: 1;
+  width: auto;
+  .toolbar-container {
+    display: inline-block;
+  }
+}

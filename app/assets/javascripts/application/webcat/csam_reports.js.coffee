@@ -23,6 +23,14 @@ build_csam_reports_table = () ->
   csam_table = $('#webcat-csam-reports-index').DataTable(
     stateSave: true
     select: true
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    language: {
+      search: "_INPUT_"
+      searchPlaceholder: "Search within table"
+    }
+
+    initComplete: ->
+      $('#webcat-csam-reports-index_filter input').addClass('table-search-input')
   )
 
 
