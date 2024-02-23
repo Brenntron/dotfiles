@@ -7,16 +7,16 @@
         .toolbar-container
           %label.toolbar-section-label
             Send Report
-          %button.toolbar-button.toolbar-button-spacer.icon-reports.esc-tooltipped{title: 'Send report to IWF'}
+          %button.toolbar-button.toolbar-button-spacer.icon-reports.esc-tooltipped#send-to-iwf-button{title: 'Send report to IWF', disabled: 'disabled'}
             %span.toolbar-button-text To IWF
-          %button.toolbar-button.icon-reports.esc-tooltipped{title: 'Send report to NCMEC'}
+          %button.toolbar-button.icon-reports.esc-tooltipped#send-to-ncmec-button{title: 'Send report to NCMEC', disabled: 'disabled'}
             %span.toolbar-button-text To NCMEC
-        .toolbar-container
-          %label.toolbar-section-label
-            Email Report
-          %button.toolbar-button.icon-email.esc-tooltipped{title: 'Forward report to external email address'}
-            %span.toolbar-button-text
-              Forward Selected Report
+        -#.toolbar-container
+        -#  %label.toolbar-section-label
+        -#    Email Report
+        -#  %button.toolbar-button.icon-email.esc-tooltipped{title: 'Forward report to external email address'}
+        -#    %span.toolbar-button-text
+        -#      Forward Selected Report
 
       -# Send report to IWF
       -# Send report to NCMEC
@@ -31,80 +31,121 @@
             %th Entry ID
             -#%th Date Entry was Submitted
             %th Date Entry was Resolved
-            %th Urgent
+            %th
+              %span.esc-tooltipped.tooltip-dotted-underline{title: 'Reports with the urgent flag indicate a higher level of urgency, such as an immediate risk to the child.  '} Urgent
             %th URL
             %th Description
             -#%th Additional Notes
             -#%th Analyst
-            %th NCMEC ID
+            %th.alt-col NCMEC ID
             %th Date Sent
-            %th IWF ID
+            %th.alt-col IWF ID
             %th Date Sent
 
         %tbody
           %tr
-            %td 123456
+            %td.entry-id-col
+              %a{href: ''} 123456
             -#%td 2024-02-21 21:11:35
             %td 2024-02-21 22:01:14
-            %td
-            %td zoekertjesmarkt.be
-            %td
+            %td{'data-urgent': 'false'}
+            %td badurlsobad.co/superbad
+            %td Submitted through WBNP
             -#%td
             -#%td mtaylor
+            %td.alt-col.csam-report-id-col.ncmec-report-id
             %td
-            %td
-            %td
+            %td.alt-col.csam-report-id-col.iwf-report-id
             %td
           %tr
-            %td 123456
+            %td.entry-id-col
+              %a{href: ''} 123522
             -#%td 2024-02-21 21:11:35
-            %td 2024-02-21 22:01:14
-            %td
-            %td zoekertjesmarkt.be
-            %td
+            %td 2024-02-18 12:03:08
+            %td{'data-urgent': 'false'}
+            %td alsobad.com/evisl&ick
+            %td Submitted through WBNP
             -#%td
             -#%td mtaylor
+            %td.alt-col.csam-report-id-col.ncmec-report-id
             %td
-            %td
-            %td
+            %td.alt-col.csam-report-id-col.iwf-report-id
             %td
           %tr
-            %td 123456
+            %td.entry-id-col
+              %a{href: ''} 123613
             -#%td 2024-02-21 21:11:35
-            %td 2024-02-21 22:01:14
-            %td
-            %td zoekertjesmarkt.be
-            %td
+            %td 2024-02-05 02:05:43
+            %td{'data-urgent': 'false'}
+            %td grossurl.com
+            %td Submitted through WBNP
             -#%td
             -#%td mtaylor
-            %td
-            %td
-            %td
+            %td.alt-col.csam-report-id-col.ncmec-report-id{'data-ncmec-id': '3962592'}
+              %span.report-id-wrapper 3962592
+              -#%span.report-email-wrapper
+              -#  %button.
+            %td 2024-02-05 13:45:07
+            %td.alt-col.csam-report-id-col.iwf-report-id
             %td
           %tr
-            %td 123456
+            %td.entry-id-col
+              %a{href: ''} 123747
             -#%td 2024-02-21 21:11:35
-            %td 2024-02-21 22:01:14
-            %td
-            %td zoekertjesmarkt.be
-            %td
+            %td 2024-01-05 17:23:19
+            %td.urgent-flag{'data-urgent': 'true'}
+            %td domainnamehere.com
+            %td This site was confirmed to have illegal content
             -#%td
             -#%td mtaylor
-            %td
-            %td
-            %td
-            %td
+            %td.alt-col.csam-report-id-col.ncmec-report-id{'data-ncmec-id': '3962514'} 3962514
+            %td 2024-01-05 23:43:10
+            %td.alt-col.csam-report-id-col.iwf-report-id{'data-iwf-id': '1124442'} 1124442
+            %td 2024-01-05 23:52:06
           %tr
-            %td 123456
+            %td.entry-id-col
+              %a{href: ''} 123785
             -#%td 2024-02-21 21:11:35
-            %td 2024-02-21 22:01:14
-            %td
-            %td zoekertjesmarkt.be
-            %td
+            %td 2024-01-01 13:56:22
+            %td{'data-urgent': 'false'}
+            %td morebadurl.com/no
+            %td This site was confirmed to have illegal content
             -#%td
             -#%td mtaylor
-            %td
-            %td
-            %td
-            %td
+            %td.alt-col.csam-report-id-col.ncmec-report-id{'data-ncmec-id': '3962220'} 3962220
+            %td 2024-01-02 07:43:22
+            %td.alt-col.csam-report-id-col.iwf-report-id{'data-iwf-id': '1124403'} 1124403
+            %td 2024-01-02 07:43:35
 
+
+
+
+.csam-report-dialog#ncmec_report_dialog_3962592{title: 'NCMEC Report #3962592'}
+  .dialog-content-wrapper
+    .row
+      .col-xs-12
+        Add report content here for NCMEC 3962592
+
+.csam-report-dialog#ncmec_report_dialog_3962514{title: 'NCMEC Report #3962514'}
+  .dialog-content-wrapper
+    .row
+      .col-xs-12
+        Add report content here for NCMEC 3962514
+
+.csam-report-dialog#ncmec_report_dialog_3962220{title: 'NCMEC Report #3962220'}
+  .dialog-content-wrapper
+    .row
+      .col-xs-12
+        Add report content here for NCMEC 3962220
+
+.csam-report-dialog#iwf_report_dialog_1124442{title: 'IWF Report #1124442'}
+  .dialog-content-wrapper
+    .row
+      .col-xs-12
+        Add report content here for IWF 1124442
+
+.csam-report-dialog#iwf_report_dialog_1124403{title: 'IWF Report #1124403'}
+  .dialog-content-wrapper
+    .row
+      .col-xs-12
+        Add report content here for IWF 1124403
