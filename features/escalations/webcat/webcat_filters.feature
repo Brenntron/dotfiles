@@ -846,7 +846,49 @@ Feature: Webcat index filters
 #TODO - add tests for the favorite filter
   # - a user sets a favorite filter and when they go to the index it loads that filter
   # - a user has a set favorite filter, looks at a different filtered result set and uses the clear button to return to their chosen default
-  # - a user has a set favorite filter, performs a search and uses the clear button to return to their chosen default
-  # - a user has a set favorite filter, performs an advanced search and uses the clear button to return to their chosen default
-  # - a user changes their favorite filter and on refresh the filter dropdown shows the newly selected filter as starred
 
+  @javascript
+  Scenario: a user has a set favorite filter, performs a search and uses the clear button to return to their chosen default
+    Given a user with role "webcat user" exists and is logged in
+    And a new complaint entry with trait "assigned_entry" exists
+    And a complaint entry preload exists
+    Then I goto "/escalations/webcat/complaints"
+    And I wait for "2" seconds
+    And I should not see "New Wbnp Tickets"
+    Then I click "#filter-complaints-nav"
+    Then I click "#webcat-favorite-search-icon-3"
+    Then I goto "/escalations/webcat/complaints"
+    And I wait for "2" seconds
+    And I should see "New Wbnp Tickets"
+    Then I fill in element "#general_search" with "testing" and press enter
+    And I wait for "2" seconds
+    And I should see "Results for "testing""
+    Then I click "#refresh-filter-button"
+    And I should not see "Results for "testing""
+    And I should see "New Wbnp Tickets"
+
+  @javascript
+  Scenario: a user has a set favorite filter, performs an advanced search and uses the clear button to return to their chosen default
+    Given a user with role "webcat user" exists and is logged in
+    And a new complaint entry with trait "assigned_entry" exists
+    And a complaint entry preload exists
+    Then I goto "/escalations/webcat/complaints"
+    And I wait for "2" seconds
+    And I should not see "New Wbnp Tickets"
+    Then I click "#filter-complaints-nav"
+    Then I click "#webcat-favorite-search-icon-3"
+    Then I goto "/escalations/webcat/complaints"
+    And I should see "New Wbnp Tickets"
+    Then I click "#advanced-search-button"
+    Then I wait for "2" seconds
+    And I fill in selectized of element "#status-input" with "['NEW','PENDING']"
+    Then I click button "submit-advanced-search"
+    And I wait for "2" seconds
+    And I should see "Results for Advanced Search"
+    And I should see "STATUS: NEW, PENDING"
+    Then I click "#refresh-filter-button"
+    And I should see "New Wbnp Tickets"
+    And I should not see "Results for Advanced Search"
+    And I should not see "STATUS: NEW, PENDING"
+
+  # - a user changes their favorite filter and on refresh the filter dropdown shows the newly selected filter as starred
