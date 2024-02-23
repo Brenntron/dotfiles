@@ -1066,7 +1066,24 @@ module API
             end
 
             params do
-              requires :dispute_entry_id, type: Integer
+              requires :user_id, type: Integer
+              requires :dispute_id, type: Integer
+            end
+
+            post 'manual_autoresolve' do
+              begin
+                auto_resolve_params = {}
+                auto_resolve_params[:dispute_id] = permitted_params[:dispute_id]
+                auto_resolve_params[:user_id] = permitted_params[:user_id]
+                Dispute.process_manual_auto_resolve(auto_resolve_params)
+                {:status => "success", :dispute_id=> permitted_params[:dispute_id]}
+              rescue Exception => e
+                {:status => "failed", :error => e.message,:dispute_id=> permitted_params[:dispute_id]}
+              end
+            end
+            
+            params do
+                requires :dispute_entry_id, type: Integer
             end
             get 'get_telemetry_history/:dispute_entry_id' do
               begin
@@ -1078,7 +1095,6 @@ module API
                 Rails.logger.error e.backtrace.join("\n")
                 {:status => "error", :error => e}
               end
-
             end
 
             params do

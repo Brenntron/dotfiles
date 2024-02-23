@@ -136,6 +136,7 @@ class Wbrs::Base
       return_response = AdhocErrorResponse.new
       return_response.body = "{\"data\":[]}"
       return_response.error = "HTTP response #{response.code} #{error}"
+      return_response.code = response.code
       return_response
     else
       body = JSON.parse(response.body) rescue nil
@@ -146,6 +147,7 @@ class Wbrs::Base
       return_response = AdhocErrorResponse.new
       return_response.body = "{\"data\": []}"
       return_response.error = "HTTP response #{response.code} #{error}"
+      return_response.code = response.code
       return_response
     end
   end

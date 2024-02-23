@@ -16,6 +16,8 @@ class DisputeEntry < ApplicationRecord
   NEW = "NEW"
   ASSIGNED = "ASSIGNED"
   CLOSED = "CLOSED"
+  PROCESSING = "PROCESSING"
+
 
   STATUS_RESEARCHING = "RESEARCHING"
   STATUS_ESCALATED = "ESCALATED"
@@ -66,6 +68,27 @@ class DisputeEntry < ApplicationRecord
       dispute_entry.uri = nil
       dispute_entry.entry_type = "IP"
       dispute_entry.hostname = nil
+    end
+
+  end
+
+  def build_claim(packet)
+    real_claim = nil
+    if self.entry_type == "IP"
+      claim_exists = packet["payload"]["investigate_ips"][self.hostlookup] rescue nil
+      if claim_exists.present?
+        real_claim = claim_exists["sbrs"]["claim"]
+      end
+    else
+      claim_exists = packet["payload"]["investigate_urls"][self.hostlookup] rescue nil
+      if claim_exists.present?
+        real_claim = claim_exists["claim"]
+      end
+    end
+
+    if real_claim.present?
+      self.claim = real_claim
+      self.save(:validate => false)
     end
 
   end
@@ -582,6 +605,11 @@ class DisputeEntry < ApplicationRecord
   def new_payload_item
 
     case
+    when PROCESSING == status
+      payload = {
+          status: Dispute::TI_NEW,
+          resolution_message: '',
+      }
     when NEW == status
       payload = {
           status: Dispute::TI_NEW,

@@ -21,6 +21,7 @@ class Dispute < ApplicationRecord
   ASSIGNED = 'ASSIGNED'
   CLOSED = 'CLOSED'
   DUPLICATE = 'DUPLICATE'
+  PROCESSING = 'PROCESSING'
 
   ANALYST_COMPLETED = "Analyst Completed"
   ALL_AUTO_RESOLVED = "All Auto Resolved"
@@ -426,6 +427,41 @@ For future Web categorization requests, please open a Web categorization ticket 
 
   end
 
+  #SPECIFICALLY FOR AUTO RESOLVE
+  def auto_check_entries_and_update(new_resolution = nil)
+    if new_resolution.blank?
+      new_resolution = ANALYST_COMPLETED
+    end
+    is_resolved = true
+    has_completed_processing = true
+
+    self.dispute_entries.each do |entry|
+      if entry.status != DisputeEntry::STATUS_RESOLVED
+        is_resolved = false
+      end
+      if entry.status == DisputeEntry::PROCESSING
+        has_completed_processing = false
+      end
+    end
+
+    if is_resolved == true
+      resolved_at = Time.now
+      self.status = Dispute::RESOLVED
+      self.resolution = new_resolution
+      self.case_closed_at = resolved_at
+      self.case_resolved_at = resolved_at
+      save!
+      return nil
+    end
+
+    if has_completed_processing == true
+      self.status = Dispute::NEW
+      save!
+      return nil
+    end
+
+  end
+
   def check_entries_and_resolve(new_resolution = nil)
     if new_resolution.blank?
       new_resolution = ANALYST_COMPLETED
@@ -448,6 +484,48 @@ For future Web categorization requests, please open a Web categorization ticket 
       save!
     end
   end
+
+  def self.process_manual_auto_resolve(params)
+
+    user = User.where(:id => params[:user_id]).first
+    dispute = Dispute.where(:id => params[:dispute_id]).first
+
+    return if [Dispute::STATUS_RESOLVED, Dispute::STATUS_CUSTOMER_PENDING, Dispute::STATUS_CUSTOMER_UPDATE].include?(dispute.status)
+
+    return if dispute.bridge_packet.blank?
+
+    dispute_packet = JSON.parse(dispute.bridge_packet) rescue nil
+    if dispute_packet.blank?
+      return
+    end
+
+    auto_resolve_message = "<br />###########################<br />"
+    auto_resolve_message += "MANUAL AUTO RESOLVE OF DISPUTE ID: #{dispute.id.to_s}<br />"
+    auto_resolve_message += "SUBMITTED BY: #{user.cvs_username}<br />"
+
+    dispute.status = Dispute::PROCESSING
+    dispute.save(:validate => false)
+
+    dispute.dispute_entries.each do |dispute_entry|
+      if dispute_entry.claim.blank?
+        dispute_entry.build_claim(dispute_packet)
+        dispute_entry.reload
+      end
+      next if dispute_entry.claim.blank?
+      if dispute_entry.status == DisputeEntry::NEW
+        dispute_entry.status = DisputeEntry::PROCESSING
+        if dispute_entry.auto_resolve_log.present?
+          dispute_entry.auto_resolve_log += auto_resolve_message
+        else
+          dispute_entry.auto_resolve_log = auto_resolve_message
+        end
+        dispute_entry.save
+      end
+
+    end
+
+  end
+
 
   #TODO: REFACTOR TO MAKE PROCESS_BRIDGE_PAYLOAD A SMALLER METHOD
   #These are instance methods used in building out the full dispute in a thread fired from self.process_bridge_payload
@@ -977,7 +1055,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
       new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
       new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
-      new_dispute.status = NEW
+      new_dispute.status = PROCESSING
 
       new_dispute.customer_id = customer&.id
       new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
@@ -1040,12 +1118,12 @@ For future Web categorization requests, please open a Web categorization ticket 
           end
 
           new_dispute_entry = DisputeEntry.new
+          new_dispute_entry.claim = claim
           new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.dispute_id = new_dispute.id
           new_dispute_entry.ip_address = ip
           new_dispute_entry.entry_type = "IP"
-          new_dispute_entry.status = DisputeEntry::NEW
           new_dispute_entry.resolution = ""
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
           new_dispute_entry.suggested_threat_category = entry[:sbrs]["suggested_threat_category"] unless entry[:sbrs]["suggested_threat_category"].blank?
@@ -1055,6 +1133,13 @@ For future Web categorization requests, please open a Web categorization ticket 
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
           new_dispute_entry.platform_id = entry_platform.id unless entry_platform.blank?
           new_dispute_entry.platform = entry[:sbrs]["platform"] if (entry[:sbrs]["platform"].present? && !entry[:sbrs]["platform"].kind_of?(Integer))
+
+          if new_dispute_entry.suggested_threat_category.blank?
+            new_dispute_entry.status = DisputeEntry::PROCESSING
+          else
+            new_dispute_entry.status = DisputeEntry::NEW
+          end
+
           new_dispute_entry.save!
 
           if entry && entry[:wbrs] && entry[:wbrs]["WBRS_Rule_Hits"]
@@ -1113,15 +1198,21 @@ For future Web categorization requests, please open a Web categorization ticket 
           sanitized_url = sanitize_url(url)
 
           new_dispute_entry = DisputeEntry.new
+          new_dispute_entry.claim = claim
           new_dispute_entry.dispute_id = new_dispute.id
           new_dispute_entry.uri = sanitized_url
           new_dispute_entry.entry_type = "URI/DOMAIN"
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
-          new_dispute_entry.status = DisputeEntry::NEW
           new_dispute_entry.resolution = ""
           new_dispute_entry.suggested_threat_category = entry["suggested_threat_category"] unless entry["suggested_threat_category"].blank?
           new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
+
+          if new_dispute_entry.suggested_threat_category.blank?
+            new_dispute_entry.status = DisputeEntry::PROCESSING
+          else
+            new_dispute_entry.status = DisputeEntry::NEW
+          end
 
           resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
           if resolved_ip.present?
@@ -1251,46 +1342,6 @@ For future Web categorization requests, please open a Web categorization ticket 
       end
 
       ######record creation completed######
-
-      ######AUTO RESOLVE LOGIC########
-      begin
-        #umbrella_no_reply = Platform.find_by_all_names("Umbrella - No Reply")
-
-        new_dispute.dispute_entries.each do |dispute_entry|
-          false_negative_claim = false
-          matching_disposition = false
-          entry_claim = entry_claims[dispute_entry.hostlookup]
-
-          auto_resolve_params = {}
-          auto_resolve_params[:entry_claim] = entry_claim
-          auto_resolve_params[:dispute_entry] = dispute_entry
-
-          initial_log = "--------Starting Data---------<br>"
-          initial_log += "suggested disposition: #{dispute_entry.suggested_disposition}<br>"
-          initial_log += "effective disposition info: #{dispute_entry.running_verdict.inspect.to_s}<br>"
-          initial_log += "-----------------------------<br>"
-
-          dispute_entry.auto_resolve_log += initial_log
-          dispute_entry.save!
-          begin
-            AutoResolve.process_auto_resolution(auto_resolve_params)
-          rescue Exception => e
-
-            Rails.logger.error e
-            Rails.logger.error e.backtrace.join("\n")
-          end
-          dispute_entry.save
-          dispute_entry.reload
-          return_payload[dispute_entry.hostlookup] = dispute_entry.new_payload_item
-          return_payload[dispute_entry.hostlookup]['sugg_type'] = dispute_entry.suggested_disposition
-
-
-        end
-      rescue Exception => e
-
-        Rails.logger.error e
-        Rails.logger.error e.backtrace.join("\n")
-      end
 
       new_dispute.reload
       new_dispute.check_entries_and_resolve(ALL_AUTO_RESOLVED)
@@ -1554,13 +1605,13 @@ For future Web categorization requests, please open a Web categorization ticket 
       when 'recently_viewed'
         joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
       when 'my_open'
-        where.not(status: STATUS_RESOLVED).where(user_id: user.id)
+        where.not(status: [STATUS_RESOLVED, PROCESSING]).where(user_id: user.id)
       when 'my_disputes'
-        where(user_id: user.id)
+        where.not(status: PROCESSING).where(user_id: user.id)
       when 'team_disputes'
-        where(user_id: user.my_team)
+        where.not(status: PROCESSING).where(user_id: user.my_team)
       when 'unassigned'
-        where(user_id: [nil, User.vrtincoming.id]).where.not(status: [STATUS_RESOLVED, CLOSED])
+        where(user_id: [nil, User.vrtincoming.id]).where.not(status: [STATUS_RESOLVED, CLOSED,PROCESSING])
       when 'open'
         where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
       when 'open_email'
@@ -1569,9 +1620,11 @@ For future Web categorization requests, please open a Web categorization ticket 
         wbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
       when 'closed'
         where(status: [CLOSED, STATUS_RESOLVED])
+      when 'autoresolved_processing'
+        where(status: PROCESSING)
       when 'all'
-        where({})
-      else
+        where.not(status: PROCESSING)
+    else
         raise "No search named '#{search_name}' known."
     end
   end
@@ -1668,7 +1721,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       when 'contains'
         contains_search(params['value'])
       else
-        where({})
+        where.not(status: PROCESSING)
     end
   end
 
