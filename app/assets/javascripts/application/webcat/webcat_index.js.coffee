@@ -45,12 +45,7 @@ build_complaints_table = (url) ->
     processing: true
     serverSide: true
     stateSave: true
-    select: {
-      # os is the default stype but must be declclared if using a config object
-      style: 'os',
-      # any td with the no-select class will not be selectable
-      selector: 'tr td:not(.no-select)'
-    }
+    select: true
     ajax:
       url: url
       data: build_data()
@@ -71,6 +66,13 @@ build_complaints_table = (url) ->
 
         # confirm this function is in the right locatino
         use_user_preference_filter()
+
+        # set listeners for bulk changes
+        $('#complaints-index').DataTable().on('select', (_e, dt, _type, indexes) ->
+          bulk_resolution_select_handler(dt, indexes)
+        ).on('dselect', (_e, dt, _type, indexes) ->
+          bulk_resolution_deselect_handler(dt, indexes)
+        )
 
     createdRow: (row, data) ->
       $(row).addClass('cat-index-main-row')
@@ -274,7 +276,7 @@ build_complaints_table = (url) ->
       }
       {
         data: 'uri'
-        className: 'uri-col no-select'
+        className: 'uri-col'
         render: (data, type, full, meta) ->
           if full.status == 'PENDING'
             disabled = "disabled=true"
@@ -353,7 +355,7 @@ build_complaints_table = (url) ->
       }
       {
         data: null
-        className: 'tools-col no-select'
+        className: 'tools-col'
         render: (data, type, full, meta) ->
           history_url = full.uri || full.ip_address
           history_button =
@@ -386,7 +388,7 @@ build_complaints_table = (url) ->
       }
       {
         data: null
-        className: 'categories-col alt-col no-select'
+        className: 'categories-col alt-col'
         render: (data, type, full, meta) ->
           domain = full.domain || full.ip_address
           if full.status == 'PENDING'
@@ -410,7 +412,7 @@ build_complaints_table = (url) ->
       }
       {
         data: 'status'
-        className: 'resolution-col no-select'
+        className: 'resolution-col'
         render: (data, type, full, meta) ->
           # Internal comment
           if (full.internal_comment == null) || (full.internal_comment == '')
@@ -428,10 +430,10 @@ build_complaints_table = (url) ->
             '<div class="resolution-comment-dialog hide" id="resolution_comment_dialog_' + full.entry_id + '" title="' + dialog_title + '">' +
               '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
               '<label class="content-label-sm full-row-label">Resolution Email Template</label>' +
-              '<select class="response-template-select" id="entry_email_response_to_customers-select_' + full.entry_id + '"></select>' +
+              '<select class="response-template-select" id="entry-email-response-to-customers-select_' + full.entry_id + '"></select>' +
               '</div></div><div class="row"><div class="col-xs-12">' +
               '<label class="content-label-sm full-row-label">Response to Customer</label>' +
-              '<textarea class="email-response-input" id="entry_email_response_to_customers_' + full.entry_id + '" name="customer_facing_comment" type="text"></textarea>' +
+              '<textarea class="email-response-input" id="entry-email-response-to-customers_' + full.entry_id + '" name="customer_facing_comment" type="text"></textarea>' +
               '<label class="content-label-sm full-row-label">*Edits to the above textarea will be saved upon submitting the entry. Selecting a different template or resolution will replace any text added above.</label>' +
               '</div></div></div>' +
             '</div>'
@@ -441,7 +443,7 @@ build_complaints_table = (url) ->
               '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
               '<label class="content-label-sm full-row-label">Email Response to Customer</label>' +
               '</div></div><div class="row"><div class="col-xs-12">' +
-              '<div id="entry_email_response_to_customers_' + full.entry_id + '">' + res_comment + '</div>' +
+              '<div id="entry-email-response-to-customers_' + full.entry_id + '">' + res_comment + '</div>' +
               '</div></div></div>' +
               '</div>'
 

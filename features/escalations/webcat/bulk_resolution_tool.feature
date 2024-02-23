@@ -48,9 +48,9 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#customer-facing-apply-button"
       And I wait for "2" seconds
       And I click "#resolution_comment_button3"
-      Then I should see content "test content" within "#entry_email_response_to_customers_3"
+      Then I should see content "test content" within "#entry-email-response-to-customers_3"
       When I click "#resolution_comment_button4"
-      Then I should see content "test content" within "#entry_email_response_to_customers_4"
+      Then I should see content "test content" within "#entry-email-response-to-customers_4"
 
     @javascript
     Scenario: a webcat user adds categories to submittable tickets
@@ -136,9 +136,9 @@ Feature: WebCat Bulk Resolution Tool
       Then I should see the radio with id "invalid3" checked
       And I should see the radio with id "invalid4" checked
       And I click "#resolution_comment_button3"
-      And I should see content "test content" within "#entry_email_response_to_customers_3"
+      And I should see content "test content" within "#entry-email-response-to-customers_3"
       When I click "#resolution_comment_button4"
-      Then I should see content "test content" within "#entry_email_response_to_customers_4"
+      Then I should see content "test content" within "#entry-email-response-to-customers_4"
       And I should see content "Arts" within "#input_cat_3-selectized"
       And I should see content "Arts" within "#input_cat_4-selectized"
       When I click "#internal_comment_button3"
@@ -179,16 +179,16 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#customer-facing-apply-button"
       And I wait for "2" seconds
       And I click "#resolution_comment_button3"
-      Then I should see content "test content" within "#entry_email_response_to_customers_3"
+      Then I should see content "test content" within "#entry-email-response-to-customers_3"
       When I click "#resolution_comment_button4"
-      Then I should see content "test content" within "#entry_email_response_to_customers_4"
+      Then I should see content "test content" within "#entry-email-response-to-customers_4"
       When I click "#index_update_resolution"
       And I click "#customer-facing-apply-button"
       And I wait for "2" seconds
       And I click "#resolution_comment_button3"
-      Then I should not see content "test content" within "#entry_email_response_to_customers_3"
+      Then I should not see content "test content" within "#entry-email-response-to-customers_3"
       When I click "#resolution_comment_button4"
-      Then I should not see content "test content" within "#entry_email_response_to_customers_4"
+      Then I should not see content "test content" within "#entry-email-response-to-customers_4"
 
     @javascript
     Scenario: a webcat user removes category updates to submittable tickets
@@ -248,9 +248,9 @@ Feature: WebCat Bulk Resolution Tool
       Then I should see the radio with id "invalid3" checked
       And I should see the radio with id "invalid4" checked
       When I click "#resolution_comment_button3"
-      Then I should see content "test content" within "#entry_email_response_to_customers_3"
+      Then I should see content "test content" within "#entry-email-response-to-customers_3"
       When I click "#resolution_comment_button4"
-      Then I should see content "test content" within "#entry_email_response_to_customers_4"
+      Then I should see content "test content" within "#entry-email-response-to-customers_4"
       And I should see content "Arts" within "#input_cat_3-selectized"
       And I should see content "Arts" within "#input_cat_4-selectized"
       When I click "#internal_comment_button3"
@@ -263,10 +263,10 @@ Feature: WebCat Bulk Resolution Tool
       Then I should see the radio with id "fixed3" checked
       And I should see the radio with id "fixed4" checked
       And I click "#resolution_comment_button3"
-      Then I should not see content "test content" within "#entry_email_response_to_customers_3"
+      Then I should not see content "test content" within "#entry-email-response-to-customers_3"
       When I click "#resolution_comment_button3"
       And I click "#resolution_comment_button4"
-      Then I should not see content "test content" within "#entry_email_response_to_customers_4"
+      Then I should not see content "test content" within "#entry-email-response-to-customers_4"
       And I should not see any selectized items within "#input_cat_3-selectized"
       And I should not see any selectized items within "#input_cat_4-selectized"
       When I click "#internal_comment_button3"

@@ -24,7 +24,7 @@
         %label.content-label-sm.full-row-label{'for':'customer_facing_comment'} Response to Customer
         %textarea#email-response-to-customers.email-response-input{type: 'text', name: 'customer_facing_comment'}
       .col-xs-2.text-right
-        %button#customer-facing-apply-button.resolution-apply-button.extra-top-margin-button
+        %button#customer-facing-apply-button.resolution-apply-button.extra-top-margin-button{ disabled: true }
     .row.bottom-border
       .col-xs-12.categories-container
         .resolution-category-options
@@ -39,7 +39,7 @@
           .resolution-input-wrapper
             %select#webcat-bulk-categories.edit-resolution-select{name: 'webcat-bulk-categories', placeholder: 'Enter Categories / Confidence Order', value: ''}
           .resolution-apply-wrapper
-            %button#category-apply-button.resolution-apply-button
+            %button#category-apply-button.resolution-apply-button{ disabled: true }
     .row.bottom-border
       .col-xs-10.internal-comment-container
         %label.content-label-sm.full-row-label{'for':'internal_comment'} Internal Comment
@@ -47,7 +47,7 @@
           .resolution-input-wrapper.webcat-textarea-input-rapper
             %textarea.form-control.internal-comment-textbox#internal_comment{:name => "internal_comment", :type => "text", :value => ""}
       .col-xs-2.text-right
-        %button#internal-comment-button.resolution-apply-button.extra-top-margin-button
+        %button#internal-comment-button.resolution-apply-button.extra-top-margin-button{ disabled: true }
 
     .row
       .col-xs-12.button-wrapper

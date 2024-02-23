@@ -128,7 +128,7 @@
         }
       }
 
-      &.disabled {
+      &:disabled {
         background-color: lighten(#d7dadb, 10%) !important;
       }
     }
@@ -231,8 +231,8 @@
 }
 
 .resolution-apply-button {
-  background-color: lighten(#d7dadb, 7%);
-  background-image: url(image_path('icon_apply_light_grey.svg'));
+  background-color: #d7dadb;
+  background-image: url(image_path('icon_apply_grey.svg'));
   background-repeat: no-repeat;
   background-size: 20px 20px;
   background-position: center center;
@@ -243,9 +243,9 @@
   width: 35px;
   margin: 5px 0;
 
-  &.applied {
-    background-color: #d7dadb;
-    background-image: url(image_path('icon_apply_grey.svg'));
+  &:disabled {
+    background-color: lighten(#d7dadb, 7%);
+    background-image: url(image_path('icon_apply_light_grey.svg'));
   }
   &.extra-top-margin-button {
     margin-top: 14px;
