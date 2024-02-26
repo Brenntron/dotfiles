@@ -1,11 +1,11 @@
 # Bulk resolution tool logic
-submittable_rows = []
+window.webcat_submittable_rows = []
 
 apply_resolution = () ->
   entry_ids = []
   resolution_to_apply = $('input[name="complaint[resolution]"]:checked')[0].value
 
-  for row in submittable_rows
+  for row in window.webcat_submittable_rows
     {entry_id, status} = row
 
     entry_ids.push(entry_id)
@@ -19,11 +19,13 @@ apply_resolution = () ->
   $('#customer-facing-apply-button').prop('disabled', false)
 
 apply_customer_facing_comment = () ->
+  email_template = $('#email-response-to-customers-select').val()
   customer_facing_comment = $('#email-response-to-customers').val()
 
-  for row in submittable_rows
+  for row in window.webcat_submittable_rows
     {entry_id, status} = row
 
+    $("#entry-email-response-to-customers-select_#{entry_id}").val(email_template)
     $("#entry-email-response-to-customers_#{entry_id}").val(customer_facing_comment)
     store_entry_changes(entry_id, 'submit')
     sessionStorage.setItem("#{entry_id}_customer_facing_comment", 'staged')
@@ -31,18 +33,17 @@ apply_customer_facing_comment = () ->
 apply_category = () ->
   category_option = $('input[name="complaint[category_option]"]:checked')[0].value
 
-  if category_option is 'DROP_ALL'
-    categories_to_apply = []
-  else
-    categories_to_apply = $('#webcat-bulk-categories')[0].selectize.items
+  categories_to_apply = $('#webcat-bulk-categories')[0].selectize.items
 
-  for row in submittable_rows
+  for row in window.webcat_submittable_rows
     {entry_id, status} = row
 
     if category_option is 'ADD'
       $("#input_cat_#{entry_id}")[0].selectize.addItems(categories_to_apply)
     else if category_option is 'REPLACE'
       $("#input_cat_#{entry_id}")[0].selectize.setValue(categories_to_apply)
+    else if category_option is 'DROP_ALL'
+      $("#input_cat_#{entry_id}")[0].selectize.clear()
 
     store_entry_changes(entry_id, 'submit')
     sessionStorage.setItem("#{entry_id}_categories", 'staged')
@@ -50,7 +51,7 @@ apply_category = () ->
 apply_internal_comment = () ->
   internal_comment = $('#internal_comment').val()
 
-  for row in submittable_rows
+  for row in window.webcat_submittable_rows
     {entry_id, status} = row
 
     $("#internal_comment_#{entry_id}").val(internal_comment)
@@ -60,7 +61,7 @@ apply_internal_comment = () ->
 clear_resolution = () ->
   entry_ids = []
 
-  for row in submittable_rows
+  for row in window.webcat_submittable_rows
     {entry_id, status} = row
 
     $("#fixed#{entry_id}").prop('checked', true)
@@ -79,7 +80,7 @@ clear_resolution = () ->
 clear_customer_facing_comment = () ->
   entry_ids = []
 
-  for row in submittable_rows
+  for row in window.webcat_submittable_rows
     {entry_id, status} = row
 
     entry_ids.push(entry_id)
@@ -91,7 +92,7 @@ clear_customer_facing_comment = () ->
   get_resolution_templates('FIXED', 'individual', entry_ids)
 
 clear_category = () ->
-  for row in submittable_rows
+  for row in window.webcat_submittable_rows
     {entry_id, status} = row
 
     $("#input_cat_#{entry_id}")[0].selectize.clear()
@@ -101,7 +102,7 @@ clear_category = () ->
     sessionStorage.removeItem("#{entry_id}_category")
 
 clear_internal_comment = () ->
-  for row in submittable_rows
+  for row in window.webcat_submittable_rows
     {entry_id, status} = row
 
     $("#internal-comment-#{entry_id}").val('')
@@ -116,7 +117,7 @@ staged_changes = (storage_key) ->
   !!storage_value
 
 has_submittable_status = (rowData) ->
-  submittable_statuses = ['ASSIGNED', 'NEW', 'COMPLETED', 'REOPENED', 'RESOLVED']
+  submittable_statuses = ['ASSIGNED', 'NEW', 'REOPENED', 'RESOLVED']
 
   rowData.status in submittable_statuses
 
@@ -124,7 +125,7 @@ should_clear = (button_id) ->
   item_key = button_id.replace(/-apply-button|-button/, '')
 
   # Fields should only clear if all submittable rows have staged changes
-  for row in submittable_rows
+  for row in window.webcat_submittable_rows
     if staged_changes("#{row.entry_id}_#{item_key}")
       continue
     else
@@ -133,25 +134,29 @@ should_clear = (button_id) ->
   return true
 
 window.bulk_resolution_select_handler = (dt, indexes) ->
-  submittable_rows = dt.rows(indexes).data().toArray().filter(has_submittable_status)
+  newly_selected_submmittable_rows = dt.rows(indexes).data().toArray().filter(has_submittable_status)
+  window.webcat_submittable_rows = window.webcat_submittable_rows.concat(newly_selected_submmittable_rows)
 
-  return if submittable_rows.length is 0
+  return if window.webcat_submittable_rows.length is 0
 
   category_option = $('input[name="complaint[category_option]"]:checked')[0].value
 
-  $('#category-apply-button').prop('disabled', false) if $('#webcat_bulk_categories').val() || category_option is 'DROP_ALL'
+  $('#category-apply-button').prop('disabled', false) if $('#webcat-bulk-categories').val() || category_option is 'DROP_ALL'
   $('#internal-comment-button').prop('disabled', false) if $('#internal_comment').val()
 
-window.bulk_resolution_deselect_hander = (dt, indexes) ->
-  submittable_rows = dt.rows(indexes).data().toArray().filter(has_submittable_status)
+window.bulk_resolution_deselect_handler = (dt, indexes) ->
+  rows_to_remove = dt.rows(indexes).data().pluck('DT_RowId').toArray()
+  window.webcat_submittable_rows = window.webcat_submittable_rows.filter((row) -> !rows_to_remove.includes(row.entry_id))
 
-  return if submittable_rows.length > 0
+  return if window.webcat_submittable_rows.length > 0
 
+  $('#resolution-apply-button').prop('disabled', true)
+  $('#customer-facing-apply-button').prop('disabled', true)
   $('#category-apply-button').prop('disabled', true)
   $('#internal-comment-button').prop('disabled', true)
 
 window.clearBulkResolution = () ->
-  return if submittable_rows.length is 0
+  return if window.webcat_submittable_rows.length is 0
 
   clear_resolution()
 
@@ -160,7 +165,7 @@ window.clearBulkResolution = () ->
   clear_customer_facing_comment()
 
   unless $('#category-apply-button').prop('disabled')
-    $('#webcat_bulk_categories')[0].selectize.clear()
+    $('#webcat-bulk-categories')[0].selectize.clear()
     clear_category()
 
   unless $('#internal-comment-button').prop('disabled')
@@ -168,14 +173,14 @@ window.clearBulkResolution = () ->
     clear_internal_comment()
 
 window.applyAll = () ->
-  return if submittable_rows.length is 0
+  return if window.webcat_submittable_rows.length is 0
 
   apply_resolution()
 
   if $('#email-response-to-customers').val()
     apply_customer_facing_comment()
 
-  if $('#webcat_bulk_categories')[0].selectize.getValue().length > 0 || $('input[name="complaint[category_option]"]:checked').val() is 'DROP_ALL'
+  if $('#webcat-bulk-categories')[0].selectize.getValue().length > 0 || $('input[name="complaint[category_option]"]:checked').val() is 'DROP_ALL'
     apply_category()
 
   if $('#internal_comment').val()
@@ -184,7 +189,7 @@ window.applyAll = () ->
 $ ->
   if $('#complaints-index').length
     $('.resolution-apply-button').click (event) ->
-      return if submittable_rows.length is 0
+      return if window.webcat_submittable_rows.length is 0
 
       button_id = $(event.target).attr('id')
 
@@ -202,7 +207,7 @@ $ ->
           when 'internal-comment-button' then apply_internal_comment()
 
     $('input[name="complaint[category_option]"]').on 'change', () ->
-      $('#category-apply-button').prop('disabled', false) if submittable_rows.length > 0
+      $('#category-apply-button').prop('disabled', false) if window.webcat_submittable_rows.length > 0
 
     $('textarea#internal_comment').on 'input', () ->
-      $('#internal-comment-button').prop('disabled', false) if $('#internal-comment-button').prop('disabled') && submittable_rows.length > 0
+      $('#internal-comment-button').prop('disabled', false) if $('#internal-comment-button').prop('disabled') && window.webcat_submittable_rows.length > 0

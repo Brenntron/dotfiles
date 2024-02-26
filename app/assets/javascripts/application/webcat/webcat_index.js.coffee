@@ -70,7 +70,7 @@ build_complaints_table = (url) ->
         # set listeners for bulk changes
         $('#complaints-index').DataTable().on('select', (_e, dt, _type, indexes) ->
           bulk_resolution_select_handler(dt, indexes)
-        ).on('dselect', (_e, dt, _type, indexes) ->
+        ).on('deselect', (_e, dt, _type, indexes) ->
           bulk_resolution_deselect_handler(dt, indexes)
         )
 
