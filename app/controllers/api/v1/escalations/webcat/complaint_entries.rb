@@ -48,7 +48,7 @@ module API
                 end
 
               rescue Exception => e
-                  return {error:e.message}.to_json
+                  return {error:e.message, entry_id: entry.id}.to_json
               end
               {entry_id: entry.id}.to_json
               end

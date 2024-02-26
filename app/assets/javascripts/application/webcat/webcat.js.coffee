@@ -701,13 +701,18 @@ process_entry = (entry_data) ->
     data: entry_data
     success: (response) ->
       data = $.parseJSON(response)
-      msg = $('#' + data.entry_id + ' .temp-msg')
-      $(msg).text('Submitted. Refresh to see new results.')
-      $(msg).addClass('submitted-row')
-      remove_entry_from_changes(data.entry_id, 'submit')
+      if data.error?
+        err_msg = data.error
+        msg = $('#' + data.entry_id + ' .temp-msg')
+        $(msg).text('Submission failed: ' + err_msg)
+      else
+        msg = $('#' + data.entry_id + ' .temp-msg')
+        $(msg).text('Submitted. Refresh to see new results.')
+        $(msg).addClass('submitted-row')
+        remove_entry_from_changes(data.entry_id, 'submit')
     error: (response) ->
       msg = response.resonseJSON.error
-      std_msg_error("Error submitting entries", msg, reload: false)
+      std_msg_error("Error submitting entry", msg, reload: false)
   , this)
 
 
