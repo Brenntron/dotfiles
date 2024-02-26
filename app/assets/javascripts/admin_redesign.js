@@ -22,6 +22,7 @@
 //= require admin/std_msg
 //= require application/custom
 //= require application/webcat/complaints-support
+//= require application/webcat/categorize_dropdown
 //= require application/webrep/disputes-support
 //= require application/webrep/disputes
 //= require application/webrep/communications
@@ -56,6 +57,7 @@
 //= require application/escalations_users
 //= require application/webcat/webCatRepLookup
 //= require application/webrep/webrep-report-engine
+//= require application/webrep/autoresolve_disputes
 //= require application/file_rep/file_rep
 //= require application/file_rep/communications
 //= require application/file_rep/naming_guide
@@ -65,6 +67,7 @@
 //= require application/users
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
+//= require application/webrep/reputation_history
 //= require application/context-tags
 //= require application/dt-jquery-highlight.js
 //= require admin/admin-tools

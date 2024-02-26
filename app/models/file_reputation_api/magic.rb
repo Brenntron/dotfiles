@@ -4,7 +4,7 @@ class FileReputationApi::Magic
   include ActiveModel::Model
   include ApiRequester::ApiRequester
   set_api_requester_config Rails.configuration.magic_api
-  set_default_request_type :query_body
+  set_default_request_type :form_data
   set_default_headers({})
 
   #attr_accessor :score, :disposition, :got, :score_tg, :samples_disp, :state, :name, :samples_name

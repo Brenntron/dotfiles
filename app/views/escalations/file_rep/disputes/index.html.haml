@@ -5,7 +5,7 @@
 
   .row
     .col-xs-12
-      %table.table.responsive#file-rep-datatable{'data-source': escalations_file_rep_disputes_path(format: :json)}
+      %table.table.responsive#file-rep-datatable{'data-source': escalations_file_rep_disputes_path(format: :json), 'data-banhammer-host': Rails.configuration.banhammer_host}
         %thead
           %tr
             %th

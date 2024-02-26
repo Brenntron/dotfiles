@@ -2,6 +2,8 @@ class Wbrs::ManualWlbl < Wbrs::Base
   FIELD_NAMES = %w{id ctime list_type mtime threat_cats url username state notes}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
+  SERVICE_STATUS_NAME = "RULEAPI:WEB_REPUTATION"
+
   WLBL_MAP = {
       "WL-weak" => 31,
       "WL-med" => 32,
@@ -11,6 +13,14 @@ class Wbrs::ManualWlbl < Wbrs::Base
       "BL-heavy" => 38
   }
   attr_accessor *FIELD_SYMS
+
+  def self.service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
 
   def initialize(attributes = {})
     if attributes.keys.present?
@@ -30,8 +40,29 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # Get all the manual WL/BL entries.
   # @return [Array<Wbrs::ThreatCategory>] Array of the results.
   def self.types
+    service_status_data = {}
     unless @types
       response = call_json_request(:get, '/v1/rep/wlbl/types/get', body: {})
+
+      if response.code >= 300
+        (0..2).each do
+          response = call_json_request(:get, '/v1/rep/wlbl/types/get', body: {})
+          if response.code < 300
+            break
+          end
+        end
+      end
+
+      if response.code >= 300
+        service_status_data[:type] = "outage"
+        service_status_data[:exception] = "/v1/rep/wlbl/types/get not loading or responding"
+        service_status_data[:exception_details] = response.error rescue response.body
+
+        service_status.log(service_status_data)
+      else
+        service_status_data[:type] = "working"
+        service_status.log(service_status_data)
+      end
 
       response_body = JSON.parse(response.body)
       @types = response_body['data']
@@ -53,7 +84,28 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [Integer] id the WL/BL
   # @return [Wbrs::Prefix] the WL/BL
   def self.find(id)
+    service_status_data = {}
     response = call_json_request(:get, "/v1/rep/wlbl/get/#{id}", body: {})
+
+    if response.code >= 300
+      (0..2).each do
+        response = call_json_request(:get, "/v1/rep/wlbl/get/#{id}", body: {})
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/rep/wlbl/get/:id not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
 
     response_body = JSON.parse(response.body)
     new_from_attributes(response_body)
@@ -70,8 +122,32 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [Array<String>] list_types The WL/BL entry’s type (optional)
   # @return [Array<Wbrs::ThreatCategory>] Array of the results.
   def self.where(conditions = {}, raw = false)
+    service_status_data = {}
     params = stringkey_params(conditions)
     response = post_request(path: '/v1/rep/wlbl/get', body: params)
+
+    if response.code >= 300
+      (0..2).each do
+        response = post_request(path: '/v1/rep/wlbl/get', body: params)
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/rep/wlbl/get not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
+
+
     return response.body if raw == true
     response_body = JSON.parse(response.body)
     response_body['data'].map {|datum| new_from_attributes(datum)}
@@ -85,8 +161,30 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [String] note: User’s note
   # @return [String] JSON for array of warnings
   def self.add_from_params(entries, wlbl_params)
+    service_status_data = {}
     wlbl_params['urls'] = entries.map {|entry| entry.hostlookup}
     response = post_request(path: '/v1/rep/wlbl/add', body: wlbl_params)
+
+    if response.code >= 300
+      (0..2).each do
+        response = post_request(path: '/v1/rep/wlbl/add', body: wlbl_params)
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/rep/wlbl/add not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
     wlbl_params.delete('urls')
 
     wlbl_ids = JSON.parse(response.body)["ids"]
@@ -104,11 +202,34 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [String] note: User’s note
   # @return [String] JSON for array of warnings
   def self.new_wlbl_from_params(wlbl_params)
+    service_status_data = {}
     response = post_request(path: '/v1/rep/wlbl/add', body: wlbl_params)
+
+    if response.code >= 300
+      (0..2).each do
+        response = post_request(path: '/v1/rep/wlbl/add', body: wlbl_params)
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/rep/wlbl/add not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
     response
   end
 
   def self.bulk_new_wlbl_from_params(wlbl_params)
+    service_status_data = {}
     boolean = true
     string_params = stringkey_params(wlbl_params)
     list_types = string_params['trgt_list']
@@ -117,6 +238,28 @@ class Wbrs::ManualWlbl < Wbrs::Base
     list_types.each do |list_type|
       string_params['trgt_list'] = list_type.to_s
       response = post_request(path: '/v1/rep/wlbl/add', body: string_params)
+
+      if response.code >= 300
+        (0..2).each do
+          response = post_request(path: '/v1/rep/wlbl/add', body: string_params)
+          if response.code < 300
+            break
+          end
+        end
+      end
+
+      if response.code >= 300
+        service_status_data[:type] = "outage"
+        service_status_data[:exception] = "/v1/rep/wlbl/add not loading or responding"
+        service_status_data[:exception_details] = response.error rescue response.body
+
+        service_status.log(service_status_data)
+      else
+        service_status_data[:type] = "working"
+        service_status.log(service_status_data)
+      end
+
+
       if response.code != 200
         boolean = false
       end
@@ -131,9 +274,31 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [Array<String>] thrt_cats: List of up to five unique threat categories IDs
   # @param [String] note: User’s note
   def self.edit_from_params(entries, wlbl_params)
+    service_status_data = {}
     entries.each do |entry|
       wlbl_params['wlbl_id'] = entry.webrep_wlbl_key
-      post_request(path: '/v1/rep/wlbl/edit', body: wlbl_params)
+      response = post_request(path: '/v1/rep/wlbl/edit', body: wlbl_params)
+
+      if response.code >= 300
+        (0..2).each do
+          response = post_request(path: '/v1/rep/wlbl/edit', body: wlbl_params)
+          if response.code < 300
+            break
+          end
+        end
+      end
+
+      if response.code >= 300
+        service_status_data[:type] = "outage"
+        service_status_data[:exception] = "/v1/rep/wlbl/edit not loading or responding"
+        service_status_data[:exception_details] = response.error rescue response.body
+
+        service_status.log(service_status_data)
+      else
+        service_status_data[:type] = "working"
+        service_status.log(service_status_data)
+      end
+
       wlbl_params.delete('wlbl_id')
     end
 
@@ -143,8 +308,30 @@ class Wbrs::ManualWlbl < Wbrs::Base
   # @param [Array<DisputeEntry>] entries the database records for the entries to add the WL/BL to.
   # @param [String] usr: User creating the WL/BL entries
   def self.drop_from_params(entries, wlbl_params)
+    service_status_data = {}
     wlbl_params['ids'] = entries.map {|entry| entry.webrep_wlbl_key}
     response = post_request(path: '/v1/rep/wlbl/drop', body: wlbl_params)
+
+    if response.code >= 300
+      (0..2).each do
+        response = post_request(path: '/v1/rep/wlbl/drop', body: wlbl_params)
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/rep/wlbl/drop not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
     wlbl_params.delete('ids')
 
     entries.each { |entry| entry.update(webrep_wlbl_key: nil) }
@@ -153,9 +340,32 @@ class Wbrs::ManualWlbl < Wbrs::Base
   end
 
   def self.drop_from_ids(ids, username)
+    service_status_data = {}
     drop_params = {'ids' => ids, 'usr' => username}
 
     response = post_request(path: '/v1/rep/wlbl/drop', body: drop_params)
+
+    if response.code >= 300
+      (0..2).each do
+        response = post_request(path: '/v1/rep/wlbl/drop', body: drop_params)
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/rep/wlbl/drop not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
+
     response
   end
 
@@ -244,7 +454,8 @@ class Wbrs::ManualWlbl < Wbrs::Base
       details = Wbrs::ManualWlbl.find(response.id)
 
       if details.notes.any?
-        details.notes.each do |note|
+        notes = details.notes
+        notes.each do |note|
           note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response, "#{note['user']} - #{note['ctime']}: #{note['note']}")
         end
       else
@@ -256,10 +467,18 @@ class Wbrs::ManualWlbl < Wbrs::Base
 
   def self.add_to_history_modal(response, note)
     note_entries = []
-    m_date = ''
-    c_date = ''
-    m_date = Date.parse(response.mtime).to_s unless response.mtime.blank?
-    c_date = Date.parse(response.ctime).to_s unless response.ctime.blank?
+
+    if response.mtime.blank?
+      m_date = ''
+    else
+      m_date = Date.parse(response.mtime).to_s
+    end
+
+    if response.ctime.blank?
+      c_date = ''
+    else
+      c_date = Date.parse(response.ctime).to_s
+    end
 
     if response.ctime != response.mtime
       note_entries.push({:state => response.state, :date => m_date, :sort_date => DateTime.parse(response.mtime), :list_type => response.list_type, :note => note})
@@ -291,6 +510,8 @@ class Wbrs::ManualWlbl < Wbrs::Base
   end
 
   def self.project_new_score(url, add, remove)
+    service_status_data = {}
+
     conditions = {}
     conditions["urls"] = []
 
@@ -311,6 +532,26 @@ class Wbrs::ManualWlbl < Wbrs::Base
     conditions["urls"] << url_conditions
     params = stringkey_params(conditions)
     response = post_request(path: '/v1/rep/complaints/score', body: params)
+
+    if response.code >= 300
+      (0..2).each do
+        response = post_request(path: '/v1/rep/complaints/score', body: params)
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/rep/complaints/score not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
 
     response_body = JSON.parse(response.body)
     response_body["data"][url].first["top_threat_key"]["score"]

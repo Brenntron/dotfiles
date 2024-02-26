@@ -4,7 +4,8 @@
 %input{type: 'hidden', name: 'webrep-dispute-submission-type', value: "#{@dispute.submission_type}"}
 %input{type: 'hidden', name: 'webrep-dispute-submitter-type', value: "#{@dispute.submitter_type}"}
 
-.content-wrapper.top-case-info
+.content-wrapper.top-case-info.webrep-show
+  #alertMessage
 
   .row
     .col-xs-4.col-with-divider
@@ -22,25 +23,29 @@
           %a.case-id-tag.related-dropdown-text#dispute_id= @dispute.case_id_str
 
       .dispute-owner-wrapper
+        .assigned-check-container
+          .assigned-check.hidden
+          %p#assignedAlert.hidden Assigned
+          %p#unassignedAlert.hidden Unassigned
         %label.content-label-sm
           Assignee
         %div
-          - if @dispute.assignee == 'Unassigned'
-            %span.missing-data#dispute-assignee= @dispute.assignee || "None"
-          - else
-            %span#dispute-assignee= @dispute.assignee || "None"
+          - if User.find_by_cvs_username(@dispute.assignee)&.is_inactive?
+            %span#dispute-assignee.inactive-user="#{@dispute.assignee} (inactive)"
+          -else
+            %span#dispute-assignee{class:"#{'missing-data' if @is_unassigned}"}= @dispute.assignee || "None"
           - if can? :update, Dispute
             .dispute-owner-buttons-wrapper
-              - if @dispute.assignee == current_user.cvs_username
-                - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                  %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
+              - if @is_assignee
+                - if !@is_duplicate && !@is_resolved
+                  %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();', :disabled=> @entry_disabled}
               - else
-                - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED) && (@dispute.user.cvs_username == 'vrtincom')
-                  %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
+                - if !@is_duplicate && !@is_resolved && (@dispute.user.cvs_username == 'vrtincom')
+                  %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});", :disabled=> @entry_disabled}
 
                 %span.dropdown
-                  - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                    %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                  - if !@is_duplicate && !@is_resolved
+                    %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', :disabled=> @disabled_when_processing}
                   .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
                     .change-assignee-dropdown-wrapper
                       %h3 Change Assignee
@@ -49,12 +54,12 @@
                           %div
                             %label.toolbar-section-label Assignee
                             =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
-                          %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
+                          %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();', :disabled=> @entry_disabled}
                             Assign
 
-              - if (@dispute.assignee != 'Unassigned')
+              - if !@is_unassigned
                 .container_unassign
-                  %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
+                  %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();', :disabled=> @entry_disabled}
                     Unassign
 
 
@@ -62,7 +67,12 @@
           %label.content-label-sm
             Status
           %br
-          - if (@dispute.resolution != Dispute::DUPLICATE)
+          - if @is_duplicate
+            .duplicate-status-notice
+              =@dispute.resolution
+          -elsif @dispute.status == Dispute::PROCESSING
+            =@dispute.status
+          -else
             %span.dropdown
               %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'onclick': "dispute_status_drop_down()"}
                 - if @dispute.status.nil?
@@ -131,9 +141,6 @@
             - elsif @dispute&.resolution_comment.present?
               %button.status-comment-button.esc-tooltipped{title: @dispute&.resolution_comment}
 
-          - else
-            .duplicate-status-notice
-              =@dispute.resolution
 
     .col-xs-2.col-with-divider
       .disposition-wrapper
@@ -176,9 +183,9 @@
         %label.content-label-sm
           Age
         %div=@dispute.dispute_age
-      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+      - if !@is_duplicate && !@is_resolved
         .top-info-buttons-wrapper
-          %button.edit-button.dispute-top-buttons#edit-dispute-button.esc-tooltipped{title: 'Edit ticket information'}
+          %button.edit-button.dispute-top-buttons#edit-dispute-button.esc-tooltipped{title: 'Edit ticket information', :disabled=> @disabled_when_processing}
           %button.save-button.dispute-top-buttons#save-dispute-button.hidden.esc-tooltipped{title: 'Save ticket changes', onclick: 'save_dispute();'}
           %button.cancel-button.dispute-top-buttons#cancel-dispute-button.hidden.esc-tooltipped{title: 'Cancel'}
 
@@ -208,7 +215,11 @@
         .col-xs-3.col-with-divider
           %label.content-label-sm
             Contact Email
-          %p.dispute-edit-field#dispute-customer-email= @dispute.customer.email
+          %p.dispute-edit-field#dispute-customer-email
+            - email = @dispute.customer.email
+            #{email}
+            %a.ban.white.dispute-show{title: "Ban #{email}", href: "#{Rails.configuration.banhammer_host + '?q=' + email}", target: "_blank"}
+
           %input.dispute-edit-input#dispute-customer-email-input{type: 'text', value: "#{@dispute.customer.email}"}
       %h3 Case Management Information
       .row

@@ -1,3 +1,5 @@
+assigned_timeout_id = ''
+
 $(document).ready ->
   Chart.defaults.global.plugins.datalabels.display = false
   $('span#mark-as-related').on 'show.bs.dropdown', ->
@@ -210,17 +212,8 @@ window.dispute_status_drop_down = () ->
   wrapper = radio.parent()
   wrapper.addClass('selected')
 
-window.popup_response_error =(response, prefix) ->
-  if response.responseJSON == undefined
-    response_lines = response.responseText.split("\n")
-    if 2 < response_lines.length
-      errormsg = response_lines[0] + "\n" + response_lines[1]
-    else
-      errormsg = response.responseText
-  else if response.responseJSON.error != undefined
-    errormsg = response.responseJSON.error
-  else
-    errormsg = response.responseText
+window.popup_response_error = (response, prefix) ->
+  assemble_error_message(response)
 
   alert(prefix + "\n" + errormsg)
 
@@ -355,8 +348,33 @@ window.toolbar_show_change_assignee = () ->
     data: data
     dataType: 'json'
     success: (response) ->
-      show_message('success', 'Ticket assignment has been updated!', 5)
-      window.location.reload()
+      $assignee_element = $('#dispute-assignee')
+      current_user_id = $('input[name="current_user_id"]').val()
+      { user_id } = JSON.parse(response).data[0]
+      is_assignee = parseInt(current_user_id) is user_id
+      username = $('#index_target_assignee option:selected').text()
+
+      $assignee_element.text(username)
+      $assignee_element.removeClass('missing-data') if $assignee_element.hasClass('missing-data')
+      $('#show_ticket_assign').attr('disabled', true)
+
+      if is_assignee
+        $('.return-ticket-button').attr('disabled', false)
+      else
+        $('.container_unassign').attr('disabled', false)
+        $('.return-ticket-button').attr('disabled', true)
+
+      $('#show-edit-ticket-status-button').text('ASSIGNED')
+      $('#index_change_assign').dropdown('toggle')
+
+      clearTimeout(assigned_timeout_id)
+      $('#unassignedAlert').addClass('hidden') if !$('#unassignedAlert').hasClass('hidden')
+      $('#assignedAlert').removeClass('hidden') if $('#assignedAlert').hasClass('hidden')
+      $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+      assigned_timeout_id = setTimeout () ->
+        $('.assigned-check').addClass('hidden')
+        $('#assignedAlert').addClass('hidden')
+      , 5000
     error: (response) ->
       show_message('error', 'Ticket assignment could not be updated.', 5)
       std_msg_error('No Tickets Selected', ['Select at least one ticket to assign to yourself.'])
@@ -412,9 +430,29 @@ window.toolbar_unassign_dispute = () ->
     data: data
     dataType: 'json'
     success: (response) ->
-      window.location.reload()
+      $assignee_element = $('#dispute-assignee')
+
+      $assignee_element.text('Unassigned')
+      $assignee_element.addClass('missing-data')
+
+      $('.return-ticket-button').attr('disabled', true)
+      $('.container_unassign').attr('disabled', true)
+      $('#show_ticket_assign').attr('disabled', false)
+      $('#index_change_assign').attr('disabled', false)
+      $('#show-edit-ticket-status-button').text('NEW')
+
+      clearTimeout(assigned_timeout_id)
+      $('#assignedAlert').addClass('hidden') if !$('#assignedAlert').hasClass('hidden')
+      $('#unassignedAlert').removeClass('hidden') if $('#unassignedAlert').hasClass('hidden')
+      $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+      assigned_timeout_id = setTimeout () ->
+        $('.assigned-check').addClass('hidden')
+        $('#unassignedAlert').addClass('hidden')
+      , 5000
     error: (response) ->
-      popup_response_error(response, 'Error removing assignee')
+      errormsg = assemble_error_message(response)
+
+      show_message('error', "Error removing assignee \n #{errormsg}", 5, '#alertMessage')
   )
 
 window.toolbar_index_mark_duplicate = (box_names) ->
@@ -545,11 +583,27 @@ window.take_single_dispute = (id) ->
     success_reload: true
     success: (response) ->
       if response.dispute_ids.length > 0
-        show_message('success', 'Ticket assignment has been updated!', 5)
-        location.reload()
+        $assignee_element = $('#dispute-assignee')
+        $assignee_element.text(response.username)
+
+        if $assignee_element.hasClass('missing-data')
+          $assignee_element.removeClass('missing-data')
+
+        $('.return-ticket-button').attr('disabled', false)
+        $('.container_unassign').attr('disabled', true)
+        $('#show_ticket_assign').attr('disabled', true)
+        $('#show-edit-ticket-status-button').text('ASSIGNED') unless $('#show-edit-ticket-status-button').text() is 'ASSIGNED'
+
+        clearTimeout(assigned_timeout_id)
+        $('#unassignedAlert').addClass('hidden') if !$('#unassignedAlert').hasClass('hidden')
+        $('#assignedAlert').removeClass('hidden') if $('#assignedAlert').hasClass('hidden')
+        $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+        assigned_timeout_id = setTimeout () ->
+          $('.assigned-check').addClass('hidden')
+          $('#assignedAlert').addClass('hidden')
+        , 5000
       else
-        show_message('error', 'Ticket assnigment could not be updated.', 5)
-        location.reload()
+        show_message('error', 'Ticket assnigment could not be updated.', false, '#alertMessage')
   )
 
 window.return_dispute = (dispute_id) ->
@@ -784,6 +838,20 @@ window.webrep_reset_search = () ->
 
 window.clearSelectize = (input) ->
   $("##{input}")[0].selectize.clear()
+
+assemble_error_message = (response) ->
+  if response.responseJSON == undefined
+    response_lines = response.responseText.split("\n")
+    if 2 < response_lines.length
+      errormsg = response_lines[0] + "\n" + response_lines[1]
+    else
+      errormsg = response.responseText
+  else if response.responseJSON.error != undefined
+    errormsg = response.responseJSON.error
+  else
+    errormsg = response.responseText
+
+  errormsg
 
 $ ->
   # Get the webrep_data for the table and format the search header
@@ -1194,7 +1262,11 @@ $ ->
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
       { data: 'submitter_name' }
-      { data: 'submitter_email' }
+      {
+        data: 'submitter_email'
+        render: (data) ->
+          return "<span>#{data}</span> <a href='#{$('#disputes-index').data('banhammer-host') + '?q=' + data}' target='_blank' title='Block #{data}' class='ban esc-tooltipped'></a>"
+      }
       { data: 'status_comment' }
       { data: 'updated_at' }
       {
@@ -1653,7 +1725,8 @@ $ ->
 
     $('#dispute-customer-name').hide()
     $('#dispute-customer-email').hide()
-
+    $('a.ban.dispute-show').hide()
+    
     $('.dispute-edit-input').css('display','block')
 
     $('#save-dispute-button').removeClass('hidden')
@@ -1674,6 +1747,7 @@ $ ->
     $('.dispute-edit-field').show()
     $('#dispute-submission-type-select').hide()
     $('.dispute-submission-type').show()
+    $('#dispute-customer-email .ban').show()
 
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')
@@ -1877,7 +1951,7 @@ $ ->
       'tooltipster-borderless-comment'
     ]
     debug: false
-    maxWidth: 500
+    maxWidth: 5000
 
   $('.esc-tooltipped:disabled').tooltipster
     disable: true
@@ -2725,7 +2799,7 @@ get_webrep_current_cats = (entries, uris) ->
           convert_selectize = $convert_category_selectize[0].selectize
           convert_selectize.setValue cat_ids
 
-        ), 500
+        ), 5000
 
 
       check_convert_to_webcat_ready()
