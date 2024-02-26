@@ -21,6 +21,14 @@ class RepApi::Blacklist < RepApi::Base
     super
   end
 
+  def self.service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def new_record?
     @new_record
   end
@@ -34,7 +42,7 @@ class RepApi::Blacklist < RepApi::Base
   end
 
   def self.classifications
-    unless @classifications
+    unless @classifications.present?
       #response = call_json_request(:get, '/blacklist/classifications', body: {})
       response = call_json_request(:get, '/api/v3/classifications/get', body: {})
       @classifications = JSON.parse(response.body)
@@ -43,7 +51,7 @@ class RepApi::Blacklist < RepApi::Base
   end
 
   def self.detailed_classifications
-    unless @classifications
+    unless @classifications.present?
       #response = call_json_request(:get, '/blacklist/classifications', body: {})
       response = call_json_request(:get, '/api/v3/classifications/get', body: {})
       @classifications = JSON.parse(response.body)
@@ -194,7 +202,31 @@ class RepApi::Blacklist < RepApi::Base
 
     #response = call_json_request(:post, '/escalations/add', body: build_request_body(input))
 
-    response = call_json_request(:post, base_url, body: conditions)
+
+    retries = 0
+    service_status_data = {}
+    begin
+      response = call_json_request(:post, base_url, body: conditions)
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    rescue Exception => e
+      Rails.logger.error(e.message)
+
+      if retries < 3
+        retries += 1
+        sleep(5)
+        retry
+      end
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/api/v3/blocklist/add not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+      raise e.message
+    end
+
+
+
 
     blocklist_objects = []
 

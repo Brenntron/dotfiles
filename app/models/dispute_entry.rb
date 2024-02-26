@@ -6,6 +6,7 @@ class DisputeEntry < ApplicationRecord
   attr_accessor :running_verdict
 
   has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
+  has_many :telemetry_histories
   belongs_to :dispute, touch: true
   belongs_to :user, optional: true
   has_many :dispute_rule_hits
@@ -15,6 +16,8 @@ class DisputeEntry < ApplicationRecord
   NEW = "NEW"
   ASSIGNED = "ASSIGNED"
   CLOSED = "CLOSED"
+  PROCESSING = "PROCESSING"
+
 
   STATUS_RESEARCHING = "RESEARCHING"
   STATUS_ESCALATED = "ESCALATED"
@@ -69,6 +72,27 @@ class DisputeEntry < ApplicationRecord
 
   end
 
+  def build_claim(packet)
+    real_claim = nil
+    if self.entry_type == "IP"
+      claim_exists = packet["payload"]["investigate_ips"][self.hostlookup] rescue nil
+      if claim_exists.present?
+        real_claim = claim_exists["sbrs"]["claim"]
+      end
+    else
+      claim_exists = packet["payload"]["investigate_urls"][self.hostlookup] rescue nil
+      if claim_exists.present?
+        real_claim = claim_exists["claim"]
+      end
+    end
+
+    if real_claim.present?
+      self.claim = real_claim
+      self.save(:validate => false)
+    end
+
+  end
+
   def self.create_dispute_entry(dispute, ip_url, status = NEW)
     begin
       ip_url = ip_url.gsub("\u200B", "")
@@ -77,6 +101,8 @@ class DisputeEntry < ApplicationRecord
       new_dispute_entry.status = status
 
       sbrs_api_rulehits = nil
+
+      th_packet = {}
       if is_ip?(ip_url)
 
         wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
@@ -97,6 +123,7 @@ class DisputeEntry < ApplicationRecord
         else
           new_dispute_entry.wbrs_score = nil
         end
+
 
         if sbrs_api_response != nil && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs']['score'] != 'noscore'
           new_dispute_entry.sbrs_score = sbrs_api_response['sbrs']['score']
@@ -147,7 +174,7 @@ class DisputeEntry < ApplicationRecord
 
           if extra_wbrs_stuff.present?
             new_dispute_entry.score = extra_wbrs_stuff["wbrs"]["score"]
-
+            th_packet[:multi_ip_score] = new_dispute_entry.score
             threat_cats = extra_wbrs_stuff["threat_cats"]
 
             threat_cat_names = []
@@ -157,10 +184,11 @@ class DisputeEntry < ApplicationRecord
                 threat_cat_names << name[:name]
               end
               new_dispute_entry.multi_wbrs_threat_category = threat_cat_names
+              th_packet[:rule_hits] = threat_cat_names.to_json
             end
           end
           new_dispute_entry.save
-
+          multi_ip_rulehits = []
           extra_wbrs_stuff_rulehits.each do |rule_hit|
             new_rule_hit = DisputeRuleHit.new
             new_rule_hit.dispute_entry_id = new_dispute_entry.id
@@ -168,31 +196,40 @@ class DisputeEntry < ApplicationRecord
             new_rule_hit.rule_type = "WBRS"
             new_rule_hit.is_multi_ip_rulehit = true
             new_rule_hit.save
+            multi_ip_rulehits << {:name => new_rule_hit.name, :rule_type => new_rule_hit.rule_type}
           end
-
+          th_packet[:multi_rule_hits] = multi_ip_rulehits.to_json
         end
 
-
-
-
       end
+
+      th_packet[:wbrs_score] = new_dispute_entry.wbrs_score rescue nil
+      th_packet[:sbrs_score] = new_dispute_entry.sbrs_score rescue nil
 
       new_dispute_entry.save!
       ::Preloader::Base.fetch_all_api_data(ip_url, new_dispute_entry.id)
       # Create Dispute Entry RuleHits
+
+      rule_hits_snapshot = []
+
       wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_api_response)
 
       if wbrs_rule_hits.present?
         wbrs_rule_hits.each do |rule_hit|
           DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
+          rule_hits_snapshot << {:name => rule_hit, :rule_type => "WBRS"}
         end
       end
 
       if sbrs_api_rulehits.present?
         sbrs_api_rulehits.each do |rule_hit|
           DisputeRuleHit.create(rule_type:'SBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
+          rule_hits_snapshot << {:name => rule_hit, :rule_type => "SBRS"}
         end
       end
+
+      th_packet[:rule_hits] = rule_hits_snapshot.to_json rescue nil
+      TelemetryHistory.save_dispute_entry_snapshot(th_packet, new_dispute_entry.id, true)
       return new_dispute_entry
     rescue Exception => ex
       log_exception(ex)
@@ -568,6 +605,11 @@ class DisputeEntry < ApplicationRecord
   def new_payload_item
 
     case
+    when PROCESSING == status
+      payload = {
+          status: Dispute::TI_NEW,
+          resolution_message: '',
+      }
     when NEW == status
       payload = {
           status: Dispute::TI_NEW,
@@ -652,7 +694,7 @@ class DisputeEntry < ApplicationRecord
 
   def sync_up
     dispute_rule_hits.destroy_all
-
+    th_packet = {}
     ::Preloader::Base.fetch_all_api_data(self.hostlookup, self.id)
     #
     extra_wbrs_stuff = nil
@@ -683,7 +725,7 @@ class DisputeEntry < ApplicationRecord
 
     if extra_wbrs_stuff.present?
       self.score = extra_wbrs_stuff.dig("wbrs", "score")
-
+      th_packet[:multi_ip_score] = self.score rescue nil
       threat_cats = extra_wbrs_stuff["threat_cats"]
 
       threat_cat_names = []
@@ -693,13 +735,14 @@ class DisputeEntry < ApplicationRecord
           threat_cat_names << name[:name]
         end
         self.multi_wbrs_threat_category = threat_cat_names
+        th_packet[:multi_threat_categories] = threat_cat_names.to_json
       end
     end
 
 
 
     self.wbrs_score = wbrs_stuff["wbrs"]["score"] if wbrs_stuff["wbrs"].present?
-
+    th_packet[:wbrs_score] = self.wbrs_score
     if wbrs_stuff["threat_cats"].present?
       threat_cats = wbrs_stuff["threat_cats"]
 
@@ -710,17 +753,19 @@ class DisputeEntry < ApplicationRecord
         threat_cat_names << name[:name]
       end
       self.wbrs_threat_category = threat_cat_names
-
+      th_packet[:threat_categories] = threat_cat_names.to_json
     end
-
+    rule_hits_snapshot = []
     wbrs_stuff_rulehits.each do |rule_hit|
       new_rule_hit = DisputeRuleHit.new
       new_rule_hit.dispute_entry_id = self.id
       new_rule_hit.name = rule_hit.strip
       new_rule_hit.rule_type = "WBRS"
       new_rule_hit.save
+      rule_hits_snapshot << {:name => new_rule_hit.name, :rule_type => new_rule_hit.rule_type}
     end
 
+    multi_rule_hits_snapshot = []
     extra_wbrs_stuff_rulehits.each do |rule_hit|
       new_rule_hit = DisputeRuleHit.new
       new_rule_hit.dispute_entry_id = self.id
@@ -728,7 +773,9 @@ class DisputeEntry < ApplicationRecord
       new_rule_hit.rule_type = "WBRS"
       new_rule_hit.is_multi_ip_rulehit = true
       new_rule_hit.save
+      multi_rule_hits_snapshot << {:name => new_rule_hit.name, :rule_type => new_rule_hit.rule_type}
     end
+    th_packet[:multi_rule_hits] = multi_rule_hits_snapshot.to_json rescue nil
 
     if self.entry_type == "IP"
       sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => self.hostlookup})
@@ -736,16 +783,19 @@ class DisputeEntry < ApplicationRecord
 
 
       self.sbrs_score = sbrs_stuff["sbrs"]["score"]
+      th_packet[:sbrs_score] = self.sbrs_score rescue nil
       sbrs_stuff_rules.each do |rule_hit|
         new_rule_hit = DisputeRuleHit.new
         new_rule_hit.dispute_entry_id = self.id
         new_rule_hit.name = rule_hit.strip
         new_rule_hit.rule_type = "SBRS"
         new_rule_hit.save
+        rule_hits_snapshot << {:name => new_rule_hit.name, :rule_type => new_rule_hit.rule_type}
       end
 
     end
-
+    th_packet[:rule_hits] = rule_hits_snapshot.to_json rescue nil
+    TelemetryHistory.save_dispute_entry_snapshot(th_packet, self.id, false)
     save
   end
 

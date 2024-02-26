@@ -289,7 +289,7 @@ $ ->
 
           # only show WHOIS lookup button for normal domains, not ip addresses
           if !is_ip.test(domain)
-            html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='domain_whois(\"#{domain}\")'></button>"
+            html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='WebCat.RepLookup.whoIsLookup(\"#{domain}\")'></button>"
           else
             html += "<button type='button' class='whois-btn right-margin domain-spacer'></button>"
 

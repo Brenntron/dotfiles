@@ -27,6 +27,8 @@ development:
   bugzilla:
     host: "fmd-bugzil-01tst.vrt.sourcefire.com"
     api_key: "redacted"
+  banhammer:
+    host: 'http://localhost:5173/search/'
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   elastic:
@@ -188,6 +190,8 @@ test:
   bugzilla:
     host: "fmd-bugzil-01tst.vrt.sourcefire.com"
     api_key: "redacted"
+  banhammer:
+    host: 'http://localhost:5173/search/'
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   elastic:
@@ -346,6 +350,8 @@ staging:
     login: "talosweb@cisco.com"
     password: "redacted"
     api_key: "redacted"
+  banhammer:
+    host: 'http://localhost:5173/search/'
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   elastic:
@@ -566,6 +572,8 @@ production:
     username: "u/sourcefire"
     password: "redacted"
     url: "https://ticloud-cdn-api.reversinglabs.com/"
+    api_key: "redacted"
+    local_api_url: "https://rl.vrt.sourcefire.com/api/samples/"
   sds:
     host: "v2.sds.cisco.com"
     v3_host: "v3-web-intel-rest.talos.cisco.com"

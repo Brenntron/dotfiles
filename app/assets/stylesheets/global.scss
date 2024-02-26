@@ -1100,6 +1100,7 @@ button {
 .ticket-status-button:hover,
 .ticket-owner-button:hover,
 .ticket-owner-unassigned-button:hover,
+.refresh-sdr-button:hover,
 .adjust-reptool-button:hover,
 .adjust-wlbl-button:hover,
 .export-button:hover,
@@ -1116,7 +1117,9 @@ button {
 .expand-all:hover,
 .approve-all-button:hover,
 .reject-all-button:hover {
-  background-color: lighten($nav-toolbar-color, 8%)!important;
+  &:not(:disabled){
+    background-color: lighten($nav-toolbar-color, 8%)!important;
+  }
 }
 
 .expand-row-button:focus,
@@ -2348,6 +2351,7 @@ a.static-nav-item {
 .icon-active-tickets {background-image: url(image_path('icon_active_tickets_white.svg')); background-size: 18px;}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
+.icon-autoresolved-white{background-image: url(image_path('icon_autoresolved_white.svg'));}
 .icon-team-grey {background-image: url(image_path('icon_team_grey.svg'));}
 .icon-custom-user-grey {background-image: url(image_path('icon_custom_user_grey.svg'));}
 .icon-invalid-grey {background-image: url(image_path('icon_invalid_grey.svg'));}
@@ -2469,7 +2473,7 @@ a.static-nav-item {
   margin-top: -15px;
   border-top-right-radius: 4px;
   border-bottom-left-radius: 0;
-  min-height: 388px;
+  min-height: 407px;
   padding-top: 10px;
 }
 
@@ -4868,6 +4872,7 @@ button.tertiary {
 .icon-categories {background-image: url(image_path('icon_categories.svg'));}
 .icon-reports {background-image: url(image_path('icon_reports.svg'));}
 .icon-reports:disabled {background-image: url(image_path('icon_reports_grey.svg'));}
+.icon-autoresolved{background-image: url(image_path('icon_autoresolved.svg'));}
 .icon-reports-white {background-image: url(image_path('icon_reports_white.svg'));}
 .icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 .icon-categorize-white {background-image: url(image_path('icon_categorize_white.svg'));}
@@ -6367,7 +6372,6 @@ table > tbody > tr > td.research-table-row-wrapper {
 .crosslisted-details-table { background-color: $warning-accent-color;}
 .virustotal-details-table { background-color: $rule-accent-color;}
 .reptool-details-table {background-color: $fifth-section-color;}
-.enrich-details-table, .prevalence-details-table  {background-color: $escalations-section-color;}
 .auto-resolve-details-table {
   background-color: $content-label-color;
   div{
@@ -6959,7 +6963,7 @@ td.data-table-emph {
 button[disabled] {
   background-color: lighten($content-label-color, 10%) !important;
   color: $faint-neutral-color;
-  cursor: not-allowed;
+  cursor: not-allowed!important;
 }
 
 button.dropdown-submit-button {
@@ -7332,7 +7336,7 @@ td.ticket-total::before {
 #index-change-assign-dropdown .toolbar, #file-disp-dropdown .toolbar {
   margin-bottom: 5px;
 }
-.secondary.ticket-owner-unassigned-button{
+.secondary.ticket-owner-unassigned-button, .secondary.refresh-sdr-button{
   background-color: darken($nav-toolbar-color, 10%);
   margin: 0 0 0 5px;
   text-transform: none;
@@ -7342,24 +7346,9 @@ td.ticket-total::before {
   font-size: 11px;
   line-height: .75em;
   font-weight: 600;
-  &:hover {
-    background-color: $bug-section-color !important;
-  }
 }
-.secondary.refresh-sdr-button{
-  background-color: darken($nav-toolbar-color, 10%);
-  margin: 0 5px 5px 5px;
-  text-transform: none;
-  display: inline-block;
-  padding: 0 20px;
-  height: 20px;
-  font-size: 11px;
-  line-height: .75em;
-  font-weight: 600;
+.secondary{
   float: right;
-  &:hover {
-    background-color: $bug-section-color !important;
-  }
 }
 .container_unassign {
   display: inline-block;
@@ -10138,6 +10127,10 @@ td.text-center span {
       padding-left: 25px;
     }
   }
+
+  .dialog-content-wrapper {
+    border: none;
+  }
 }
 
 .ticket-age-over3hr {
@@ -12637,7 +12630,7 @@ input[type="radio"].resolution_radio_button {
     top: -55px;
   }
 }
-@media (min-width: 1700px) {
+@media (min-width: 1850px) {
 
   #webrep-index-toolbar {
     .toolbar-button {
@@ -12661,7 +12654,6 @@ input[type="radio"].resolution_radio_button {
 }
 // webcat - 1950px below is our current "widest" breakpoint
 @media (min-width: 1950px) {
-
   #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
@@ -12673,11 +12665,13 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
-@media (max-width: 1951px)  {
+
+@media (max-width: 2042px)  {
   #webcat-index-toolbar .toolbar-button-text {
     display: none !important;
   }
 }
+
 @media screen and (max-width: 1800px) and (min-width: 1705px){
   #webcat-index-toolbar .toolbar-button-text {
     .toolbar-button {
@@ -12854,7 +12848,7 @@ input[type="radio"].resolution_radio_button {
 
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
-@media screen and (max-width: 1600px) and (min-width: 1401px) {
+@media screen and (max-width: 1700px) and (min-width: 1551px) {
   #research-tab-toolbar {
     .toolbar-button {
       background-position: 6px 6px;
@@ -12867,7 +12861,7 @@ input[type="radio"].resolution_radio_button {
   }
 }
 // fix the collapse breakpoint
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1550px) {
   #research-tab-toolbar .toolbar-button-text, .toolbar-button-text {
     display: none;
     margin-left: 8px;
@@ -15077,4 +15071,45 @@ input.wl-bl-list-inline {
 
 .hide-temporarily {
   display: none;
+}
+
+.reputation_history_resolved_ip{
+  text-align: center;
+}
+
+#reputation-history-button {
+  background-image: url(image_path('icon_history.svg'));
+}
+
+.reputation_history_rule_hits {
+  padding-left: 6px;
+}
+
+.ban {
+  background-image: url(image_path('icon_ban_user_grey.svg'));
+  background-repeat: no-repeat;
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  float: right;
+  border: none;
+  background-color: transparent;
+  &.white {
+    background-image: url(image_path('icon_ban_user_white.svg'));
+  }
+}
+
+td > a.ban {
+  display: inline;
+}
+
+.webcat-customer-email, .filerep-customer-email {
+  min-width: 150px;
+}
+
+#dispute-customer-email {
+  display: flex;
+  .ban {
+    margin-left: 10px;
+  }
 }
