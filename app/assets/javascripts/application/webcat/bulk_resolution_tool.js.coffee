@@ -137,11 +137,13 @@ window.bulk_resolution_select_handler = (dt, indexes) ->
   newly_selected_submmittable_rows = dt.rows(indexes).data().toArray().filter(has_submittable_status)
   window.webcat_submittable_rows = window.webcat_submittable_rows.concat(newly_selected_submmittable_rows)
 
-  return if window.webcat_submittable_rows.length is 0
-
   category_option = $('input[name="complaint[category_option]"]:checked')[0].value
 
-  $('#category-apply-button').prop('disabled', false) if $('#webcat-bulk-categories').val() || category_option is 'DROP_ALL'
+  staged_resolution_changes_for_selected = window.webcat_submittable_rows.some((row) -> staged_changes("#{row.entry_id}_resolution"))
+
+  $('#resolution-apply-button').prop('disabled', false)
+  $('#customer-facing-apply-button').prop('disabled', false) if staged_resolution_changes_for_selected
+  $('#category-apply-button').prop('disabled', false) if $('#webcat-bulk-categories')[0].selectize.getValue().length > 0 || category_option is 'DROP_ALL'
   $('#internal-comment-button').prop('disabled', false) if $('#internal_comment').val()
 
 window.bulk_resolution_deselect_handler = (dt, indexes) ->
