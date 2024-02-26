@@ -64,8 +64,17 @@ build_complaints_table = (url) ->
         get_current_cats(rows)
         create_ind_res_dialogs()
 
-        # confirm this function is in the right locatino
-        use_user_preference_filter()
+        $('#complaints-index tbody tr.cat-index-main-row .nested-col-table tr td').click ->
+          # allows individual selection of rows while clicking in nested data, is a little buggy with the multiselect
+          if $(this).hasClass('non-selectable')
+            return
+          else
+            main_row = $(this).parents('tr.cat-index-main-row')[0]
+            row_id = $(main_row).attr('id')
+            if $(main_row).hasClass('selected')
+              complaint_table.row("##{row_id}").deselect()
+            else
+              complaint_table.row("##{row_id}").select()
 
         # set listeners for bulk changes
         $('#complaints-index').DataTable().on('select', (_e, dt, _type, indexes) ->
@@ -333,7 +342,7 @@ build_complaints_table = (url) ->
               '<td class="uri-ip-col">' + entry + '</td>' +
               '</tr>' +
               '<tr>' +
-              '<td class="quick-edit-uri-tool-col">' +
+              '<td class="quick-edit-uri-tool-col non-selectable">' +
               '<span class="dropdown">' +
               '<button class="edit-button" id="quick_edit_uri_' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"' + edit_button_status + '></button>' +
               '<div id="quick_edit_dropdown_' + full.entry_id + '" class="dropdown-menu quick-edit-uri-dropdown" aria-labelledby="quick_edit_uri_' + full.entry_id + '">' +
@@ -344,7 +353,7 @@ build_complaints_table = (url) ->
               '</ul>' +
               '</div>' +
               '</td>' +
-              '<td class="edit-uri-col">' +
+              '<td class="edit-uri-col non-selectable">' +
               '<input class="nested-table-input complaint-uri-input" id="edit_uri_input_' +
               full.entry_id + '" type="text" data-domain="' + domain + ' "value="' + input_uri + '"' + input_status + '/>' +
               '</td></tr>' +
@@ -400,7 +409,7 @@ build_complaints_table = (url) ->
             '<table class="nested-col-table">' +
               '<tbody>' +
               '<tr><td id="current_cat_' + full.entry_id + '" class="current-cat-col"></td></tr>' +
-              '<tr><td class="edit-cat-col">' +
+              '<tr><td class="edit-cat-col non-selectable">' +
               '<select id="input_cat_' + full.entry_id + '" name="input_cat_' +
               full.entry_id + '" class="nested-table-input" placeholder="Enter categories / confidence order" ' + disabled + '>' +
               '</select>' +
