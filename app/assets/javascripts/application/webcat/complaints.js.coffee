@@ -235,7 +235,6 @@ window.review_bulk_submit = () ->
     std_msg_error('No changes to submit', ['Select "Commit" or "Decline on at least 1 entry."'])
 
   entries = changes.split(",").filter((item) -> return item)
-  self_review = $('#self_review').is(':checked')
 
   entries_to_update = []
   declined_entries = []
@@ -277,9 +276,9 @@ window.review_bulk_submit = () ->
         id: entry_id,
         prefix: uri,
         commit: status,
-#        status: resolution, #I dont see the old var in current dom??
+        status: '',
         comment: comment,
-#        resolution_comment: resolution_comment,
+        resolution_comment: resolution_comment,
         categories: cat_ids,
         category_names: category_names,
         self_review: self_review

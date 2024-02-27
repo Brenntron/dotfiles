@@ -796,6 +796,7 @@ $ ->
   window.submit_changes = (entry_id) ->
     row = $('#' + entry_id)
     curr_status = $(row).attr('data-status')
+    self_review = $('#self_review').is(':checked')
 
     # slight differences in data sent
     if curr_status == 'PENDING'
@@ -830,7 +831,8 @@ $ ->
       'commit': commit,
       'comment': comment,
       'resolution_comment': resolution_msg,
-      'uri_as_categorized': uri
+      'uri_as_categorized': uri,
+      'self_review': self_review
     }
 
     # check data here before submitting
