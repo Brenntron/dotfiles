@@ -561,7 +561,7 @@ $ ->
       searchField: ['category_name', 'category_code'],
       options: AC.WebCat.createSelectOptions("#webcat-bulk-categories")
       onChange: () ->
-        return unless webcat_submittable_rows.length > 0
+        return unless get_webcat_submittable_rows.length > 0
 
         if this.items.length > 0
           $('#category-apply-button').prop('disabled', false)
