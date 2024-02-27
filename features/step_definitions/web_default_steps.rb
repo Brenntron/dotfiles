@@ -672,3 +672,7 @@ end
 And(/^I should not see an element with an id and class of "(.*?)"$/) do | id_class_combo |
   expect(page.has_css?(id_class_combo)).to eq false
 end
+
+And(/^I should see element "(.*?)" with text "(.*?)" a total of "(.*?)" times/) do | element , text, count |
+  page.all("#{element}", :text => "#{text}").count.should == count.to_i
+end

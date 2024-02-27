@@ -316,13 +316,43 @@ Feature: Webcat complaint entry assignment
     And I wait for "1" seconds
     And I should see "Linda Belcher"
 
+  @javascript
+  Scenario: a manager can assign a user to multiple complaints
+    Given a user with role "webcat manager" exists and is logged in
+    And the following users exist
+      | id | cvs_username  | cec_username  | display_name   |
+      | 2  | bob_belcher   | bob_belcher   | Bob Belcher    |
+      | 3  | linda_belcher | linda_belcher | Linda Belcher  |
+      | 4  | tina_belcher  | tina_belcher  | Tina Belcher   |
+    And the following org_subsets exist:
+      | id | name   |
+      | 7  | webcat |
+    And the following roles exist:
+      | id | role        | org_subset_id |
+      | 17 | webcat user |     7         |
+    And a user with id "2" has a role of "webcat user"
+    And a user with id "3" has a role of "webcat user"
+    And a user with id "4" has a role of "webcat user"
+    And the following complaint entries exist:
+      | id    | uri                 | domain          | entry_type | status  |
+      | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
+      | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | NEW     |
+    And  I goto "/escalations/webcat/complaints"
+    And  I wait for "3" seconds
+    #Need to show User column with Assignee data - hidden by default
+    And I click "#webcat-index-table-show-columns-button"
+    And I click "#view-user-col-cb"
+    And I click "#view-data-assignee-cb"
+    And I click "#complaints_select_all"
+    And I click "#index_change_assign"
+    And I wait for "1" seconds
+    And I click "#index_target_assignee"
+    And I click "#assignee_3"
+    And I click "#button_reassign"
+    And I wait for "1" seconds
+    And the first row of table "complaints-index" and col "users-col" should have content "Linda Belcher"
+    And I should see element ".assignee-row" with text "Linda Belcher" a total of "2" times
 
-
-# TODO Part 1
-
-#  Scenario: a manager can assign a user to multiple complaints
-
-  #TODO: finish below
   @javascript
   Scenario: a manager can assign a user as a reviewer to a complaint
     Given a user with role "webcat manager" exists and is logged in
@@ -541,37 +571,37 @@ Feature: Webcat complaint entry assignment
     And I wait for "2" seconds
     And I should see "The following entries could not be assigned: Complaint is already assigned to bob_belcher - 1"
 
-##  I can't get this test to work in the browser, it allows pending and complete tickets to change assignee, which it doesn't locally
-#  @javascript
-#  Scenario: a manager cannot change assignee when complaint is PENDING or COMPLETE
-#    Given a user with role "webcat manager" exists and is logged in
-#    And the following users exist
-#      | id | cvs_username  | cec_username  | display_name   |
-#      | 2  | bob_belcher   | bob_belcher   | Bob Belcher    |
-#    And the following org_subsets exist:
-#      | id | name   |
-#      | 7  | webcat |
-#    And the following roles exist:
-#      | id | role        | org_subset_id |
-#      | 17 | webcat user |     7         |
-#    And a user with id "2" has a role of "webcat user"
-#    And the following complaint entries exist:
-#      | id    | uri                 | domain          | entry_type | status     |
-#      | 1111  | abc.com             | abc.com         | URI/DOMAIN | PENDING    |
-#      | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | COMPLETED  |
-#    And  I goto "/escalations/webcat/complaints"
-#    And  I wait for "2" seconds
+  ## Note: The pending ticket does not work as expected at the moment
+  @javascript
+  Scenario: a manager cannot change assignee when complaint is PENDING or COMPLETE
+    Given a user with role "webcat manager" exists and is logged in
+    And the following users exist
+      | id | cvs_username  | cec_username  | display_name   |
+      | 2  | bob_belcher   | bob_belcher   | Bob Belcher    |
+    And the following org_subsets exist:
+      | id | name   |
+      | 7  | webcat |
+    And the following roles exist:
+      | id | role        | org_subset_id |
+      | 17 | webcat user |     7         |
+    And a user with id "2" has a role of "webcat user"
+    And the following complaint entries exist:
+      | id    | uri                 | domain          | entry_type | status     |
+      | 1111  | abc.com             | abc.com         | URI/DOMAIN | PENDING    |
+      | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | COMPLETED  |
+    And  I goto "/escalations/webcat/complaints"
+    And  I wait for "2" seconds
 #    And I click row with id "1"
 #    And I click "#index_change_assign"
 #    And I click "#button_reassign"
 #    And I wait for "1" seconds
 #    And I should see "The following entries could not be assigned: Already completed - 1"
 #    And I click row with id "1"
-#    And I click row with id "2"
-#    And I click "#index_change_assign"
-#    And I click "#button_reassign"
-#    And I wait for "1000" seconds
-#    And I should see "The following entries could not be assigned: Already completed - 1"
+    And I click row with id "2"
+    And I click "#index_change_assign"
+    And I click "#button_reassign"
+    And I wait for "2" seconds
+    And I should see "The following entries could not be assigned: Already completed - 2"
 
   @javascript
   Scenario:  a non-manager can unassign a user from a complaint
@@ -634,7 +664,7 @@ Feature: Webcat complaint entry assignment
     And I should see "The following entries could not be returned: Someone else is currently reviewing - 1"
 
 
-# TODO Part 2
+# TODO
 #  Scenario: a non-manager cannot assign a user other than themself to a complaint
 #  Scenario: a non-manager cannot assign a user other than themself as a reviewer to a complaint
 #  Scenario: a non-manager cannot assign a user other than themself as a second reviewer to a complaint
