@@ -360,7 +360,7 @@ $ ->
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
-      options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"}, {name: "ACTIVE"},
+      options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"},
                {name: "COMPLETED"}, {name: "PENDING"}, {name: "REOPENED"}]
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
