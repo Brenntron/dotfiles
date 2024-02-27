@@ -255,13 +255,18 @@ module API
             post "change_assignee" do
               results = []
               user = User.find(params[:user_id])
-              params[:complaint_entry_ids].each do |id|
-                entry = ComplaintEntry.find(id)
-                result = entry.reassign(user, permitted_params['assignment_type'])
-                results << { id: id, result: result }
+
+              ActiveRecord::Base.transaction do
+                params[:complaint_entry_ids].each do |id|
+                  entry = ComplaintEntry.find(id)
+                  result = entry.reassign(user, permitted_params['assignment_type'])
+                  results << { id: id, result: result }
+                end
               end
 
               {status: "success", data: results, cvs_username: user.cvs_username, name: user.display_name }.to_json
+            rescue => e
+              {error: e.message}.to_json
             end
 
 

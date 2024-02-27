@@ -230,14 +230,14 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def reassign(assignee, assignment_type)
-    return("Complaint is already assigned to #{assignee.cvs_username}") if user == assignee
-    return("#{reviewer.cvs_username} is already reviewing Complaint") if reviewer.present? && user == reviewer
-    return("#{second_reviewer.cvs_username} is already the second reviewer for Complaint") if second_reviewer.present? && user == second_reviewer
+    raise "#{id}: Complaint is already assigned to #{assignee.cvs_username}" if user == assignee
+    raise "#{id}: #{reviewer.cvs_username} is already reviewing Complaint" if reviewer.present? && user == reviewer
+    raise "#{id}: #{second_reviewer.cvs_username} is already the second reviewer for Complaint" if second_reviewer.present? && user == second_reviewer
 
     case assignment_type
     when 'assignee'
       if !is_important
-        return("Already completed") if status == "COMPLETED"
+        raise "#{id}: Already completed" if status == "COMPLETED"
 
         update(user: assignee, status: "ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
@@ -245,14 +245,14 @@ class ComplaintEntry < ApplicationRecord
         update(user: assignee, status: "ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
       else
-        return("Status is pending")
+        raise "#{id}: Status is pending"
       end
     when 'reviewer'
       update(reviewer: assignee)
     when 'second_reviewer'
       update(second_reviewer: assignee)
     end
-    "#{assignee.cvs_username} assigned to Complaint as #{assignment_type}"
+    "#{id}: #{assignee.cvs_username} assigned to Complaint as #{assignment_type}"
   end
 
   def is_pending?
