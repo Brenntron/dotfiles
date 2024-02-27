@@ -176,6 +176,8 @@ class ComplaintEntry < ApplicationRecord
   def return_complaint(current_user, assignment_type)
     return("Already completed") if status == 'COMPLETED'
 
+
+
     case assignment_type
     when 'assignee'
       return("Not yet assigned") if user.display_name == 'Vrt Incoming'
@@ -204,8 +206,15 @@ class ComplaintEntry < ApplicationRecord
     'Entry returned'
   end
 
-  def unassign(assignment_type)
+  def unassign(current_user, assignment_type)
     return("Complaint is already assigned to Vrt Incoming") if user == User.vrtincoming
+
+    webcat_user = Role.where(role: 'webcat user').first
+
+    #non-managers can only unassign reviewers from a ticket that is assigned to someone else - they can't unassign assignee or second reviewer
+    if current_user.id != user&.id && user.roles.include?(webcat_user) && assignment_type != "reviewer"
+      return("Someone else is assigned to this ticket")
+    end
 
     case assignment_type
     when 'assignee'
