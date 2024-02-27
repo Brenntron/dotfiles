@@ -518,53 +518,35 @@ window.updateResolution = () ->
   )
 
 $ ->
-    # If resolution is changed (to unchanged or invalid) enable the bulk submit button
-    $(document).on 'change', '.resolution_radio_button', ->
-      id = this.name.split("resolution")[1]
-      store_entry_changes(id, 'submit')
-      $('#master-submit').removeAttr('disabled')
+  # If resolution is changed (to unchanged or invalid) enable the bulk submit button
+  $(document).on 'change', '.resolution_radio_button', ->
+    id = this.name.split("resolution")[1]
+    store_entry_changes(id, 'submit')
+    $('#master-submit').removeAttr('disabled')
 
-    $(document).on 'change', '.review_radio_button', ->
-      id = this.name.split("resolution_review")[1]
-      res = $('input[name="resolution_review' + id + '"').val()
-      if res != 'ignore'
-        $('#submit_changes_' + id).removeAttr('disabled')
-        store_entry_changes(id, 'review')
-      else
-        $('#submit_changes_' + id).attr('disabled', 'true')
-
-    # TODO - is this needed?
-    if !window.location.pathname.includes('/escalations/webcat')
-      $('#filter-complaints-nav').hide()
-      $('#fetch').hide()
-      $('#complaints-nav-search-wrapper').hide()
-      $('#new-complaint-nav-wrapper').hide()
+  $(document).on 'change', '.review_radio_button', ->
+    id = this.name.split("resolution_review")[1]
+    res = $('input[name="resolution_review' + id + '"').val()
+    if res != 'ignore'
+      $('#submit_changes_' + id).removeAttr('disabled')
+      store_entry_changes(id, 'review')
     else
-      $('#filter-complaints').show()
-      $('#fetch').show()
-      $('#complaints-nav-search-wrapper').show()
-      $('#new-complaint-nav-wrapper').show()
+      $('#submit_changes_' + id).attr('disabled', 'true')
 
-    # If a stupidly long email address is returned it will wrap
-    # rather than pushing the column into the column beside it
-    $('.email-row').find('.case-history-author').each ->
-      if $(this).text().length > 28
-        $(this).addClass('break-word')
+  # TODO - is this needed?
+  if !window.location.pathname.includes('/escalations/webcat')
+    $('#filter-complaints-nav').hide()
+    $('#fetch').hide()
+    $('#complaints-nav-search-wrapper').hide()
+    $('#new-complaint-nav-wrapper').hide()
+  else
+    $('#filter-complaints').show()
+    $('#fetch').show()
+    $('#complaints-nav-search-wrapper').show()
+    $('#new-complaint-nav-wrapper').show()
 
-    $('#webcat-bulk-categories').selectize {
-      persist: true,
-      create: false,
-      maxItems: 5,
-      closeAfterSelect: false,
-      valueField: 'category_id',
-      labelField: 'category_name',
-      searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions("#webcat-bulk-categories")
-      onChange: () ->
-        return unless get_webcat_submittable_rows.length > 0
-
-        if this.items.length > 0
-          $('#category-apply-button').prop('disabled', false)
-        else
-          $('#category-apply-button').prop('disabled', true)
-    }
+  # If a stupidly long email address is returned it will wrap
+  # rather than pushing the column into the column beside it
+  $('.email-row').find('.case-history-author').each ->
+    if $(this).text().length > 28
+      $(this).addClass('break-word')
