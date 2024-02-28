@@ -1,4 +1,4 @@
-.urgent-flag {
+.attention-flag {
   background-image: url(image_path('icon_warning_orange.svg'));
   background-repeat: no-repeat;
   background-size: 20px;
@@ -35,5 +35,16 @@
   width: auto;
   .toolbar-container {
     display: inline-block;
+  }
+}
+
+#webcat-csam-reports-index {
+  .tools-col {
+    padding: 2px 0 2px 8px;
+    text-align: right;
+
+  }
+  .attention-flag-col {
+    width: 24px;
   }
 }

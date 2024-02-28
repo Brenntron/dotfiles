@@ -848,3 +848,10 @@ table.dataTable tbody tr.submitting-entry {
     border: none;
   }
 }
+
+#complaints-nav-search-wrapper {
+  padding: 0 10px !important;
+  .input-group.search-group {
+    margin: 8px 0;
+  }
+}

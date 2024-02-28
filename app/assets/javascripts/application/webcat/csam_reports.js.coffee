@@ -28,6 +28,11 @@ build_csam_reports_table = () ->
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
+    order: [ 2, 'desc']
+    columnDefs: [
+      targets: [0, 9]
+      orderable: false
+    ]
 
     initComplete: ->
       $('#webcat-csam-reports-index_filter input').addClass('table-search-input')
@@ -36,11 +41,9 @@ build_csam_reports_table = () ->
 
 enable_report_buttons = () ->
   if $('tr.selected').length >= 1
-    $('#send-to-ncmec-button').removeAttr('disabled')
-    $('#send-to-iwf-button').removeAttr('disabled')
+    $('.csam-reports-toolbar button').removeAttr('disabled')
   else
-    $('#send-to-ncmec-button').attr('disabled', 'disabled')
-    $('#send-to-iwf-button').attr('disabled', 'disabled')
+    $('.csam-reports-toolbar button').attr('disabled', 'disabled')
 
 
 build_csam_report_dialogs = () ->
