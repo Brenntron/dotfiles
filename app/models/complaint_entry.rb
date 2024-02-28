@@ -209,11 +209,12 @@ class ComplaintEntry < ApplicationRecord
   def unassign(current_user, assignment_type)
     return("Complaint is already assigned to Vrt Incoming") if user == User.vrtincoming
 
-    webcat_user = Role.where(role: 'webcat user').first
-
-    #non-managers can only unassign reviewers from a ticket that is assigned to someone else - they can't unassign assignee or second reviewer
-    if current_user.id != user&.id && user.roles.include?(webcat_user) && assignment_type != "reviewer"
-      return("Someone else is assigned to this ticket")
+    #non-managers can only unassign reviewers, they can't unassign assignee or second reviewer
+    webcat_manager = Role.where(role: 'webcat manager').first
+    unless current_user.roles.include?(webcat_manager)
+      if current_user.id != user&.id && assignment_type != "reviewer"
+        return("Cannot unassign assignees or second reviewers")
+      end
     end
 
     case assignment_type

@@ -165,7 +165,9 @@ window.check_enable_toolbar_buttons = () ->
     $('.take-ticket-toolbar-button').removeAttr('disabled')
     $('.return-ticket-toolbar-button').removeAttr('disabled')
     $('.remove-assignee-toolbar-button').removeAttr('disabled')
-    $('.ticket-owner-button').removeAttr('disabled')
+    if $('.ticket-owner-button').attr('data-user-role') == 'manager'
+      $('.ticket-owner-button').removeAttr('disabled')
+
   else
     $('.open-selected').attr('disabled', 'disabled')
     $('#convert-ticket-button').attr('disabled', 'disabled')
