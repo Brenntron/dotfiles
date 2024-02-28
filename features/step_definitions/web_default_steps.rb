@@ -14,8 +14,12 @@ Given(/^I fill in "(.*?)" with "(.*?)" and press enter$/) do |field_label, value
   find(:id, field_label).native.send_keys(:enter)
 end
 
-Given(/^I fill in element, "(.*?)" with "(.*?)"$/) do |identifier, value|
+Given(/^I fill in element "(.*?)" with "(.*?)"$/) do |identifier, value|
   page.find(identifier).set(value)
+end
+
+Given(/^I clear element "(.*?)"$/) do |identifier|
+  page.find(identifier).send_keys [:backspace]
 end
 
 Given(/^I fill in "(.*?)" with "(.*?)" and "(.*?)" separated by blank lines$/) do |field_label, value, value_2|
@@ -208,6 +212,11 @@ end
 
 Then(/^I should see the "(.*?)" radio checked$/) do |radio_class|
   radio = page.find(:xpath, "//input[@type='radio' and @class='#{radio_class}']")
+  raise "Radio with class #{radio_class} not checked" if radio.checked?.blank?
+end
+
+Then(/^I should see the radio with id "(.*?)" checked$/) do |radio_id|
+  radio = page.find(:xpath, "//input[@type='radio' and @id='#{radio_id}']")
   raise "Radio with class #{radio_class} not checked" if radio.checked?.blank?
 end
 
@@ -586,10 +595,9 @@ Given(/^I fill in selectized with "(.*?)"$/) do |value|
   find('div.selectize-dropdown-content > div', match: :first).click
 end
 
+# Needs #id and ['value'] like this
 Given(/^I fill in selectized of element "(.*?)" with "(.*?)"$/) do |element, value|
-
   page.execute_script("$('#{element}')[0].selectize.setValue(#{value})")
-
 end
 
 When(/^I select contenteditable text in "(.*?)"$/) do |target|
@@ -614,6 +622,13 @@ Then(/^I click input with id "(.*?)"$/) do |id_name|
   page.find(:xpath, "//input[@id='#{id_name}']").click
 end
 
+Then(/^element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
+  elem = page.find(:xpath, "//input[@id='#{id_name}']")[:value]
+  unless elem == content
+    raise "Element found but with different content; expected: '#{content}' but found: '#{elem}'"
+  end
+end
+
 Then(/^element with id "(.*?)" should contain a value of "(.*?)"$/) do |id_name, content|
   elem = find(:xpath, "//*[@id='#{id_name}']")
   unless elem.value == content
@@ -633,4 +648,12 @@ end
 Then(/^I accept the user prompt$/) do
   alert = page.driver.browser.switch_to.alert
   alert.accept
+end
+
+And(/^I refresh the page$/) do
+  page.driver.browser.navigate.refresh
+end
+
+When(/^I click element with tag "(.*?)" and text "(.*?)"$/) do |tag, text|
+  page.find(tag, text: text).click
 end

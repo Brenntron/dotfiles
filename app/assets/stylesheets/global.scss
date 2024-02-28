@@ -410,16 +410,17 @@ table.dataTable.no-footer {
 
 // Don't consolidate these further, they don't work in different orders
 .table-search-input::-webkit-input-placeholder, .restricted-table-search-input::-webkit-input-placeholder {
-  font-size: 7pt;
-  color: $content-tab-color;
+  font-size: 11px;
+  color: $content-label-color;
 }
-.table-search-input::-moz-placeholder, .restricted-table-search-input::-moz-placeholder {
-  font-size: 7pt;
-  color: $content-tab-color;
+.table-search-input::-moz-placeholder, .restricted-table-search-input::-moz-placeholder,
+{
+  font-size: 11px;
+  color: $content-label-color;
 }
 .table-search-input::-ms-input-placeholder, .restricted-table-search-input::-ms-input-placeholder {
-  font-size: 7pt;
-  color: $content-tab-color;
+  font-size: 11px;
+  color: $content-label-color;
 }
 
 .dt-button {
@@ -2409,20 +2410,20 @@ a.static-nav-item {
 }
 
 .search-box::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-  color: $content-tab-color;
-  font-size: 7pt;
+  color: $content-label-color;
+  font-size: 11px;
 }
 .search-box::-moz-placeholder { /* Firefox 19+ */
-  color: $content-tab-color;
-  font-size: 7pt;
+  color: $content-label-color;
+  font-size: 11px;
 }
 .search-box:-ms-input-placeholder { /* IE 10+ */
-  color: $content-tab-color;
-  font-size: 7pt;
+  color: $content-label-color;
+  font-size: 11px;
 }
 .search-box:-moz-placeholder { /* Firefox 18- */
-  color: $content-tab-color;
-  font-size: 7pt;
+  color: $content-label-color;
+  font-size: 11px;
 }
 
 .nav-tools-dropdown {
@@ -4886,6 +4887,9 @@ button.tertiary {
 .icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}
 .icon-notes {background-image: url(image_path('icon_status_comment.svg'));}
 .icon-resolution-manager-page {background-image: url(image_path('icon_email_read_white.svg'));}
+.icon-email {background-image: url(image_path('icon_email_grey.svg'));}
+.icon-email:disabled {background-image: url(image_path('icon_email_lt_grey.svg'));}
+.icon-warning {background-image: url(image_path('icon_warning_white.svg'));}
 
 .remove-input {
   background-image: url(image_path('icon_minus_blue.svg'));

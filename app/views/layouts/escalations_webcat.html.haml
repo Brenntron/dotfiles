@@ -6,7 +6,7 @@
   %input{type:'hidden', name: 'xml_token', value: "#{xml_token}"}
   %input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
 
-  .nav-tool-blocks.nav-page-button-wrapper.col-xs-4.col-sm-4.col-md-3.col-lg-3
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-6.col-sm-5.col-md-4.col-lg-3
     %a#complaints.nav-page-button{href: '/escalations/webcat/complaints', class: ("active" if current_page?('/escalations/webcat/complaints'))}
       %span.nav-toolbar-icon-large.icon-queue
     %a#rules.nav-page-button{href: '/escalations/webcat/clusters'}
@@ -18,7 +18,11 @@
     %a#reports.nav-page-button{href: '/escalations/webcat/complaints/resolution_message_templates', class: ("active" if current_page?('/escalations/webcat/complaints/resolution_message_templates'))}
       %span.nav-toolbar-icon-large.icon-resolution-manager-page
 
-  .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown#new-complaint-nav-wrapper
+    -# TODO Need role for csam reports here, only show if user has access
+    %a#csam-reports.nav-page-button{href: '/escalations/webcat/csam_reports', class: ("active" if current_page?('/escalations/webcat/csam_reports'))}
+      %span.nav-toolbar-icon-large.icon-warning
+
+  .nav-tool-blocks.col-xs-1.col-sm-1.col-md-1.col-lg-1.dropdown#new-complaint-nav-wrapper
     %a{href: '#', class: 'dropdown-toggle', id: 'new-complaint', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-new-white'}
       New
@@ -30,7 +34,7 @@
 
   =render 'escalations/webcat/shared/categorize_dropdown'
 
-  .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown#filter-complaints-nav
+  .nav-tool-blocks.col-xs-2.col-sm-1.col-md-1.col-lg-1.dropdown#filter-complaints-nav
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-complaints', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
@@ -61,7 +65,7 @@
                     = image_tag('icon_cancel_grey.svg')
                   %span.nav-dropdown-icon.favorite-search-icon
 
-  .nav-tool-blocks.col-xs-2.col-sm-3.col-lg-3.search-wrapper#complaints-nav-search-wrapper
+  .nav-tool-blocks.hidden-xs.hidden-sm.col-md-4.col-lg-3.search-wrapper#complaints-nav-search-wrapper
     .input-group.search-group#web-cat-search
       = text_field_tag 'general_search', "#{}", class: 'search-box', placeholder: 'Search'
 
@@ -74,7 +78,7 @@
           = render 'escalations/webcat/complaints/advanced_search'
 
 
-  #login-div.nav-tool-block.col-sm-2.col-lg-2
+  #login-div.nav-tool-block.hidden-xs.hidden-sm.hidden-md.col-lg-2
     - if current_user
       %a.nav-username{href: "/escalations/users/#{current_user[:id]}"}
         = current_user[:display_name]

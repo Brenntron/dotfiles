@@ -1707,7 +1707,7 @@ $ ->
     platforms_input = $('#platform-input').selectize {
       persist: true
       create: false
-      valueField: 'public_name',
+      valueField: 'id',
       labelField: 'public_name',
       searchField: 'public_name',
       options: AC.FileRep.createPlatformOptions()
