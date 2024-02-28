@@ -89,7 +89,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 
         curr_report = response.data[0]
         last_report = response.data[1]
-        currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
+        currentSkippedText = if curr_report?.cases_skipped? then curr_report.cases_skipped else '0'
 
         # Add current report info to top bar report area
 
@@ -142,7 +142,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
           $('.wbnp-full-report-title-status').remove()
 
       else
-        curr_report = response.data[0]
+        curr_report = response.data[0] || {}
         currentSkippedText = if curr_report.cases_skipped? then curr_report.cases_skipped else '0'
         # Add current report info to top bar report area
         $('.wbnp-report-status').text(curr_report.status)

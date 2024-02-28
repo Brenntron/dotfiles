@@ -85,90 +85,15 @@ Feature: WebCat Bulk Resolution Tool
       And "Default Unchanged 2" should be selected in the "entry-email-response-to-customers-select_4" dropdown
 
     @javascript
-    Scenario: a webcat user adds categories to submittable tickets
-      When I fill in "input_cat_3-selectized" with "Arts"
-      And I fill in "input_cat_4-selectized" with "Arts"
-      And I click webcat row with id "3"
-      And I click webcat row with id "4"
-      And I click "#index_update_resolution"
-      When I fill in "webcat-bulk-categories-selectized" with "Auctions"
-      And I click "#category-apply-button"
-      And I wait for "2" seconds
-      Then I should see selectized items "[Arts, Auctions]" within "#input_cat_3-selectized"
-      And I should see selectized items "[Arts, Auctions]" within "#input_cat_4-selectized"
-
-    @javascript
-    Scenario: a webcat user replaces categories for submittable tickets
-      When I fill in "input_cat_3-selectized" with "Auctions"
-      And I fill in "input_cat_4-selectized" with "Arts"
-      And I click webcat row with id "3"
-      And I shift click webcat row with id "4"
-      And I click "#index_update_resolution"
-      And I wait for "2" seconds
-      When I fill in selectized of element "#webcat-bulk-categories" with "[88, 107, 110, 97, 82]"
-      And I click "#webcat_resolution_replace_option"
-      And I click "#category-apply-button"
-      And I click ".ui-dialog-titlebar-close"
-      And I wait for "2" seconds
-      And I should not see content "Auctions" within "#input_cat_3-selectized"
-      And I should see selectized items "['Animals and Pets', 'Conventions, Conferences and Trade Shows', 'DIY Projects', 'Digital Postcards']" within "#input_cat_3"
-      And I should not see content "Arts" within "#input_cat_4-selectized"
-      And I should see selectized items "['Animals and Pets', 'Conventions, Conferences and Trade Shows', 'DIY Projects', 'Digital Postcards']" within "#input_cat_4"
-
-    @javascript
-    Scenario: a webcat user drops categories for submittable tickets
-      When I click webcat row with id "3"
-      And I click webcat row with id "4"
-      And I click "#index_update_resolution"
-      And I wait for "2" seconds
-      And I fill in "webcat-bulk-categories-selectized" with "Arts"
-      And I click "#category-apply-button"
-      Then I should see content "Arts" within "#input_cat_3-selectized"
-      And I should see content "Arts" within "#input_cat_4-selectized"
-      When I click "#webcat_resolution_drop_option"
-      And I click "#category-apply-button"
-      Then I should not see content "Arts" within "#input_cat_3-selectized"
-      And I should not see content "Arts" within "#input_cat_4-selectized"
-
-    @javascript
     Scenario: a webcat user updates a submittable tickets internal comment
       When I click webcat row with id "3"
-      And I click webcat row with id "4"
+      And I shift click webcat row with id "4"
       And I wait for "2" seconds
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I fill in "internal_comment" with "This is an internal comment."
       And I click "#internal-comment-button"
       And I click "#internal_comment_button3"
-      And I wait for "2" seconds
-      Then I should see content "This is an internal comment." within "#internal_comment_3"
-      When I click "#internal_comment_button3"
-      And I click "#internal_comment_button4"
-      And I wait for "2" seconds
-      Then I should see content "This is an internal comment." within "#internal_comment_4"
-
-    @javascript
-    Scenario: a webcat user updates resolution status, customer comment, categories and internal comments with the APPLY ALL button
-      When I click webcat row with id "3"
-      And I shift click webcat row with id "4"
-      And I click "#index_update_resolution"
-      And I wait for "2" seconds
-      And I click "#webcat_resolution_invalid_option"
-      And I type content "test content" within input with id "customer_facing_comment"
-      And I fill in "webcat-bulk-categories-selectized" with "Arts"
-      And I fill in "internal_comment" with "This is an internal comment."
-      And I click "#internal-comment-button"
-      And I click ".apply-all-button"
-      And I wait for "2" seconds
-      Then I should see the radio with id "invalid3" checked
-      And I should see the radio with id "invalid4" checked
-      And I click "#resolution_comment_button3"
-      And I should see content "test content" within "#entry-email-response-to-customers_3"
-      When I click "#resolution_comment_button4"
-      Then I should see content "test content" within "#entry-email-response-to-customers_4"
-      And I should see content "Arts" within "#input_cat_3-selectized"
-      And I should see content "Arts" within "#input_cat_4-selectized"
-      When I click "#internal_comment_button3"
       And I wait for "2" seconds
       Then I should see content "This is an internal comment." within "#internal_comment_3"
       When I click "#internal_comment_button3"
@@ -192,22 +117,19 @@ Feature: WebCat Bulk Resolution Tool
       And I select "Default Unchanged 1" from "email-response-to-customers-select"
       Then button with id "customer-facing-apply-button" should be enabled
 
-  Rule: the Internal Comment and Category buttons should be disabled until a row is selected
+  Rule: the Internal Comment button should be disabled until a row is selected
     @javascript
-    Scenario: a webcat user attempts to apply an internal comment and category without selecting a row
+    Scenario: a webcat user attempts to apply an internal comment without selecting a row
       When I click "#index_update_resolution"
       And I wait for "2" seconds
-      Then button with id "category-apply-button" should be disabled
-      And button with id "internal-comment-button" should be disabled
+      Then button with id "internal-comment-button" should be disabled
 
     @javascript
-    Scenario: a webcat user attempts to apply an internal comment and category after selecting a row
+    Scenario: a webcat user attempts to apply an internal comment after selecting a row
       When I click webcat row with id "3"
       And I click "#index_update_resolution"
-      And I click "#webcat_resolution_replace_option"
       And I fill in "internal_comment" with "This is an internal comment."
-      Then button with id "category-apply-button" should be enabled
-      And button with id "internal-comment-button" should be enabled
+      Then button with id "internal-comment-button" should be enabled
 
   Rule: The Bulk Resolution Tool should apply updates to rows selected after a first round of updates.
     @javascript
@@ -238,27 +160,23 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#webcat_resolution_invalid_option"
       And I click "#resolution-apply-button"
       And I select "Default Invalid 2" from "email-response-to-customers-select"
-      And I click "#webcat_resolution_replace_option"
-      And I fill in "webcat-bulk-categories-selectized" with "Auctions"
       And I fill in "internal_comment" with "This is an internal comment."
       When I click ".resolution-clear-button"
       And I wait for "2" seconds
       Then I should see the radio with id "webcat_resolution_unchanged_option" checked
       And "Default Unchanged 1" should be selected in the "email-response-to-customers-select" dropdown
       And I should see content "Default Unchanged 1 body" within "#email-response-to-customers"
-      And I should see the radio with id "webcat_resolution_add_option" checked
       And Input with id "internal_comment" should be empty
 
   Rule: Reopened tickets are also submitable
     @javascript
-    Scenario: a webcat user updates resolution status, customer comment, categories and internal comments for reopened tickets
+    Scenario: a webcat user updates resolution status, customer comment, and internal comments for reopened tickets
       When I click "#reopen_6"
       And I shift click webcat row with id "5"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I click "#webcat_resolution_invalid_option"
       And I type content "test content" within input with id "customer_facing_comment"
-      And I fill in "webcat-bulk-categories-selectized" with "Arts"
       And I fill in "internal_comment" with "This is an internal comment."
       And I click "#internal-comment-button"
       And I click ".apply-all-button"

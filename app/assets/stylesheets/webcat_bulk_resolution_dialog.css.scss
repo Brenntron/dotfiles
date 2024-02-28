@@ -148,34 +148,6 @@
       margin: 0;
     }
 
-    .categories-container {
-      .resolution-category-options {
-        align-items: center;
-        display: flex;
-        justify-content: end;
-        position: relative;
-        width: 80%;
-
-        .content-label-sm {
-          position: absolute;
-          left: 0;
-        }
-
-        input, .resolution-radio-label {
-          margin-bottom: 4px;
-          margin-top: 8px;
-        }
-      }
-
-      .resolution-controls {
-        display: flex;
-      }
-
-      .resolution-apply-wrapper {
-        margin-top: -6px;
-      }
-    }
-
     .email-response-input {
       height: 20px;
       border: none;

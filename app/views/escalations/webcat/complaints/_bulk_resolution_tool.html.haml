@@ -26,21 +26,6 @@
       .col-xs-2.text-right
         %button#customer-facing-apply-button.resolution-apply-button.extra-top-margin-button{ disabled: true }
     .row.bottom-border
-      .col-xs-12.categories-container
-        .resolution-category-options
-          %label.content-label-sm.edit-resolution-label{ for: 'complaint[categories]' } Categories to Apply
-          %input#webcat_resolution_add_option{ type: 'radio', name: 'complaint[category_option]', value: 'ADD', checked: 'checked' }
-          %label.resolution-radio-label{ for: 'webcat_resolution_add_option' } Add
-          %input#webcat_resolution_replace_option{ type: 'radio', name: 'complaint[category_option]', value: 'REPLACE' }
-          %label.resolution-radio-label{ for: 'webcat_resolution_replace_option' } Replace
-          %input#webcat_resolution_drop_option{ type: 'radio', name: 'complaint[category_option]', value: 'DROP_ALL' }
-          %label.resolution-radio-label{ for: 'webcat_resolution_drop_option' } Drop All
-        .resolution-controls
-          .resolution-input-wrapper
-            %select#webcat-bulk-categories.edit-resolution-select{name: 'webcat-bulk-categories', placeholder: 'Enter Categories / Confidence Order', value: ''}
-          .resolution-apply-wrapper
-            %button#category-apply-button.resolution-apply-button{ disabled: true }
-    .row.bottom-border
       .col-xs-10.internal-comment-container
         %label.content-label-sm.full-row-label{'for':'internal_comment'} Internal Comment
         .resolution-controls
