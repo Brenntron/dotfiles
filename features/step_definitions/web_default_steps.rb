@@ -202,6 +202,10 @@ Then(/^Element with class "(.*?)" should not be empty$/) do |class_name|
   end
 end
 
+Then(/^Input with id "(.*?)" should be empty$/) do |id_name|
+  find(:xpath, "//*[@id='#{id_name}']")[:value] == ""
+end
+
 Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
   find(:xpath, "//*[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
 end

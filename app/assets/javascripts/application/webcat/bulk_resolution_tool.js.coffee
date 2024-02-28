@@ -58,11 +58,25 @@ apply_internal_comment = () ->
 
 has_submittable_status = (rowData) ->
   submittable_statuses = ['ASSIGNED', 'NEW', 'REOPENED']
+  is_reopened = $("##{rowData.entry_id}").find('.state-row td').text() == 'REOPENED'
 
-  rowData.status in submittable_statuses
+  if rowData.status in submittable_statuses || is_reopened
+    return true
+  else
+    return false
 
-window.get_webcat_submittable_rows = () ->
-  submittable_rows
+has_submittable_resolution_selected = () ->
+  submittable_resolutions = ['UNCHANGED', 'INVALID']
+
+  for row in submittable_rows
+    resolution = $("##{row.entry_id}").find('.resolution_radio_button:checked').val()
+
+    if resolution in submittable_resolutions
+      return true
+    else
+      continue
+
+    return false
 
 window.bulk_resolution_select_handler = (dt, indexes) ->
   newly_selected_submmittable_rows = dt.rows(indexes).data().toArray().filter(has_submittable_status)
@@ -72,32 +86,55 @@ window.bulk_resolution_select_handler = (dt, indexes) ->
 
   category_option = $('input[name="complaint[category_option]"]:checked')[0].value
 
+  $('.apply-all-button').prop('disabled', false)
   $('#resolution-apply-button').prop('disabled', false)
-  $('#customer-facing-apply-button').prop('disabled', false)
-  $('#category-apply-button').prop('disabled', false) if $('#webcat-bulk-categories')[0].selectize.getValue().length > 0 || category_option is 'DROP_ALL'
-  $('#internal-comment-button').prop('disabled', false) if $('#internal_comment').val()
+
+  if has_submittable_resolution_selected()
+    $('#customer-facing-apply-button').prop('disabled', false)
+  else
+    $('#customer-facing-apply-button').prop('disabled', true)
+
+  if $('#webcat-bulk-categories')[0].selectize.getValue().length > 0 || category_option is 'DROP_ALL'
+    $('#category-apply-button').prop('disabled', false)
+  else
+    $('#category-apply-button').prop('disabled', true)
+
+  if !!$('#internal_comment').val()
+    $('#internal-comment-button').prop('disabled', true)
+  else
+    $('#internal-comment-button').prop('disabled', false)
 
 window.bulk_resolution_deselect_handler = (dt, indexes) ->
   rows_to_remove = dt.rows(indexes).data().pluck('DT_RowId').toArray()
   submittable_rows = submittable_rows.filter((row) -> !rows_to_remove.includes(row.entry_id))
 
+  $('#customer-facing-apply-button').prop('disabled', false) if has_submittable_resolution_selected(dt)
+
   return if submittable_rows.length > 0
 
+  $('.apply-all-button').prop('disabled', true)
   $('#resolution-apply-button').prop('disabled', true)
   $('#customer-facing-apply-button').prop('disabled', true)
   $('#category-apply-button').prop('disabled', true)
   $('#internal-comment-button').prop('disabled', true)
 
 window.clearBulkResolution = () ->
-  return if submittable_rows.length is 0
-
   $('#webcat_resolution_unchanged_option').prop('checked', true)
+  $('#resolution-apply-button').prop('disabled', true)
 
   get_resolution_templates('UNCHANGED', 'bulk')
 
+  if has_submittable_resolution_selected()
+    $('#customer-facing-apply-button').prop('disabled', false)
+  else
+    $('#customer-facing-apply-button').prop('disabled', true)
+
+  $('input[name="complaint[category_option]"][value="ADD"]').prop('checked', true)
   $('#webcat-bulk-categories')[0].selectize.clear()
+  $('#category-apply-button').prop('disabled', true)
 
   $('#internal_comment').val('')
+  $('#internal-comment-button').prop('disabled', true)
 
 window.applyAll = () ->
   return if submittable_rows.length is 0
@@ -115,6 +152,24 @@ window.applyAll = () ->
 
 $ ->
   if $('#complaints-index').length
+    $('#webcat-bulk-categories').selectize {
+      persist: true,
+      create: false,
+      maxItems: 5,
+      closeAfterSelect: false,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: AC.WebCat.createSelectOptions("#webcat-bulk-categories")
+      onChange: () ->
+        return unless submittable_rows.length > 0
+
+        if this.items.length > 0
+          $('#category-apply-button').prop('disabled', false)
+        else
+          $('#category-apply-button').prop('disabled', true)
+    }
+
     $('.resolution-apply-button').click (event) ->
       return if submittable_rows.length is 0
 
@@ -132,5 +187,5 @@ $ ->
     $('textarea#internal_comment').on 'input', () ->
       if $('#internal-comment-button').prop('disabled') && submittable_rows.length > 0 && $(this).val()
         $('#internal-comment-button').prop('disabled', false)
-      else if !!$(this).val()
+      else if !$(this).val()
         $('#internal-comment-button').prop('disabled', true)

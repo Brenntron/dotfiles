@@ -54,7 +54,7 @@
         %button.secondary.button-update-resolution.resolution-clear-button{type:'button', onclick:'clearBulkResolution();'}
           =inline_svg 'icon_clear_white.svg', class: 'resolution-button-icon'
           %span Reset
-        %button.secondary.button-update-resolution.apply-all-button{type:'button', onclick:'applyAll();'}
+        %button.secondary.button-update-resolution.apply-all-button{ type:'button', onclick:'applyAll();', disabled: true }
           =inline_svg 'icon_apply_all_white.svg', class: 'resolution-button-icon'
           %span Apply All
         -#%button{class: 'primary button-update-resolution update-resolution-button', type:'button', onclick:'updateResolutionDialog();'}
