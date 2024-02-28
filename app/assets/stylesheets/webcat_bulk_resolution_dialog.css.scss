@@ -35,6 +35,7 @@
 
       .internal-comment-textbox {
         height: 70px;
+        padding-right: 0;
         resize: vertical;
       }
 
@@ -168,10 +169,6 @@
 
       .resolution-controls {
         display: flex;
-      }
-
-      .resolution-input-wrapper {
-        padding: 0;
       }
 
       .resolution-apply-wrapper {

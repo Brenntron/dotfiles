@@ -182,7 +182,10 @@ $ ->
         when 'internal-comment-button' then apply_internal_comment()
 
     $('input[name="complaint[category_option]"]').on 'change', () ->
-      $('#category-apply-button').prop('disabled', false) if submittable_rows.length > 0
+      if (submittable_rows.length > 0 && $('#webcat-bulk-categories')[0].selectize.getValue().length > 0) || category_option is 'DROP_ALL'
+        $('#category-apply-button').prop('disabled', false)
+      else
+        $('#category-apply-button').prop('disabled', true)
 
     $('textarea#internal_comment').on 'input', () ->
       if $('#internal-comment-button').prop('disabled') && submittable_rows.length > 0 && $(this).val()
