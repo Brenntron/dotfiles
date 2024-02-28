@@ -72,7 +72,7 @@ class Webcat::Ncmec
     url = "#{protocol}://#{host}:#{port}#{path}"
     request = HTTPI::Request.new(url)
     #request.auth.basic(Rails.configuration.iwf_config.username, Rails.configuration.iwf_config.password)
-    request.auth.basic("CiscoSystemsInc", "Mw4+Cq2@Fq9%")
+    request.auth.basic(Rails.configuration.ncmec_username, Rails.configuration.ncmec_password)
     request.read_timeout = read_timeout
     request.open_timeout = open_timeout
 
