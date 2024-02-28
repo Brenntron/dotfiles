@@ -349,7 +349,7 @@ window.webcat_change_assignee = () ->
       data: data
       dataType: 'json'
       success: (response) ->
-        $('#webcat-change-assignee-index-dropdown').dropdown('toggle')
+        $('#index_change_assign').dropdown('toggle')
         json = $.parseJSON(response)
         if json.error
           if jQuery.type(json.error) != 'array'
