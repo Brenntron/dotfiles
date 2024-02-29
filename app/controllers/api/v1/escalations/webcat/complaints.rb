@@ -492,6 +492,59 @@ module API
 
               {:data => {:score => score, :category => category}}.to_json
             end
+
+            params do
+              requires :complaint_entry_id, type: Integer
+              optional :force, type: Boolean
+            end
+
+            post 'resubmit_abuse_report' do
+              begin
+                complaint_entry = ComplaintEntry.find(params[:complaint_entry_id])
+                force = false
+                if params[:force].present? && params[:force] == true
+                  force = true
+                end
+                AbusiveContentTool.submit_abuse_to_authorities(complaint_entry, user, url, force)
+                return {:status => "success"}
+              rescue Exception => e
+                Rails.logger.error(e)
+                return {:status => "error", :error => e.to_s}
+              end
+
+            end
+
+            params do
+              requires :complaint_entry_id, type: Integer
+              optional :cc, type: String
+            end
+
+            post 'forward_report' do
+              begin
+                complaint_entry = ComplaintEntry.find(params[:complaint_entry_id])
+                AbusiveContentTool.forward_report(complaint_entry, params[:cc])
+                return {:status => "success"}
+              rescue Exception => e
+                Rails.logger.error(e)
+                return {:status => "error", :error => e.to_s}
+              end
+
+            end
+
+            params do
+              requires :complaint_entry_id, type: Integer
+            end
+
+            get 'abuse_report_details' do
+              begin
+                report_data = AbusiveContentTool.get_report_data(params[:complaint_entry_id])
+                return {:status => "success", :data => report_data}
+              rescue Exception => e
+                Rails.logger.error(e)
+                return {:status => "error", :error => e.to_s}
+              end
+
+            end
           end
         end
       end

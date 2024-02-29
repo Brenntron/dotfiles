@@ -117,13 +117,13 @@ class AbusiveContentTool
 
   end
 
-  def self.submit_abuse_to_authorities(complaint_entry, user, url)
+  def self.submit_abuse_to_authorities(complaint_entry, user, url, force=false)
 
     #do a report existence check for each before sending, as this method will be re-used by a recovery tool
 
     abuse_records = AbuseRecord.where(:complaint_entry_id => complaint_entry.id)
-    iwf_exists = abuse_records.select {|rec| rec.source == AbuseRecord::IWF && rec.report_ident.present?}.present?
-    ncmec_exists = abuse_records.select {|rec| rec.source == AbuseRecord::NCMEC && rec.report_ident.present?}.present?
+    iwf_exists = abuse_records.any? {|rec| rec.source == AbuseRecord::IWF && rec.report_ident.present?} rescue false
+    ncmec_exists = abuse_records.any? {|rec| rec.source == AbuseRecord::NCMEC && rec.report_ident.present?} rescue false
 
     ncmec_results = nil
     iwf_results = nil
@@ -156,6 +156,7 @@ class AbusiveContentTool
     end
     self.process_email_report(ncmec_results, iwf_results)
 
+    report_results
   end
 
   def self.process_email_report(ncmec_results, iwf_results)
@@ -273,16 +274,111 @@ class AbusiveContentTool
     results[:message] = response["responseDescription"]
     results[:data] = response["responseData"]
 
-    AbuseRecord.build_and_save_record(params, response, results[:data], AbuseRecord::IWF, complaint_entry, user)
+    AbuseRecord.build_and_save_record(params, response, results[:data], AbuseRecord::IWF, user, complaint_entry)
     results
 
 
   end
 
   def self.validate_report(complaint_entry)
+    abuse_records = complaint_entry.abuse_records
 
+    has_iwf = nil
+    has_ncmec = nil
 
+    has_iwf = abuse_records.any? {|rec| rec.report_ident.present? && rec.source == AbuseRecord::IWF }
+    has_ncmec = abuse_records.any? {|rec| rec.report_ident.present? && rec.source == AbuseRecord::NCMEC }
+
+    if [has_iwf, has_ncmec].include?(false)
+      generate_email_for_notification(complaint_entry, abuse_records)
+    end
 
     #check if both reports exist, if one is missing, construct report and send to talosweb
   end
+
+  def self.generate_email_for_notification(complaint_entry, abuse_records)
+    subject = "ALERT: ABUSE RECORD FAILURE FOR SDO DETECTED"
+
+    iwf_record_id = abuse_records.select {|rec| rec.source == AbuseRecord::IWF}.first.record_ident.to_s rescue ""
+    ncmec_record_id = abuse_records.select {|rec| rec.source == AbuseRecord::NCMEC}.first.record_ident.to_s rescue ""
+    body = "Possible reporting failure detected.  Here is known report info breakdown:\n"
+    body += "Complaint Entry ID: #{complaint_entry.id}\n"
+    body += "IWF Report ID: #{iwf_record_id}\n"
+    body += "NCMEC Report ID: #{ncmec_record_id}\n"
+
+    report_alert_args = {}
+    report_alert_args[:to] = "talosweb@cisco.com"
+    report_alert_args[:from] = "noreply@talosintelligence.com"
+    report_alert_args[:subject] = subject
+    report_alert_args[:body] = body
+
+    attachments_to_mail = []
+    conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+    conn.post(report_alert_args, attachments_to_mail)
+  end
+
+  def self.forward_report(complaint_entry, cc)
+    subject = ""
+    body = self.generate_body_for_third_party(complaint_entry)
+    report_alert_args = {}
+    report_alert_args[:from] = "noreply@talosintelligence.com"
+    report_alert_args[:subject] = subject
+    report_alert_args[:body] = body
+
+    emails_array = Rails.configuration.abuse_emails.split(",")
+    emails_array += cc.split(",")
+    attachments_to_mail = []
+    emails_array.each do |email_address|
+      report_alert_args[:to] = email_address.strip
+      conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+      conn.post(report_alert_args, attachments_to_mail)
+    end
+
+  end
+
+  def self.generate_body_for_third_party(complaint_entry)
+
+  end
+
+  def self.get_report_data(complaint_entry_id)
+    report_data = {}
+    report_data[:ncmec_report] = {}
+    report_data[:iwf_report] = {}
+    report_data[:complaint_ticket_info] = {}
+
+    complaint_entry = ComplaintEntry.find(complaint_entry_id)
+
+    abuse_records = complaint_entry.abuse_records
+
+    ncmec_report = abuse_records.select {|rec| rec.source == AbuseRecord::NCMEC}.first rescue nil
+    iwf_report = abuse_records.select {|rec| rec.source == AbuseRecord::IWF}.first rescue nil
+
+    if ncmec_report.present?
+      report_data[:ncmec_report][:report_ident] = ncmec_report.report_ident
+      report_data[:ncmec_report][:report_submitted] = ncmec_report.report_submitted
+      report_data[:ncmec_report][:result] = ncmec_report.result
+      report_data[:ncmec_report][:submitter] = ncmec_report.submitter
+      report_data[:ncmec_report][:created] = ncmec_report.created_at
+    end
+
+    if iwf_report.present?
+      report_data[:iwf_report][:report_ident] = iwf_report.report_ident
+      report_data[:iwf_report][:report_submitted] = iwf_report.report_submitted
+      report_data[:iwf_report][:result] = iwf_report.result
+      report_data[:iwf_report][:submitter] = iwf_report.submitter
+      report_data[:iwf_report][:created] = iwf_report.created_at
+    end
+
+    assignee = User
+    reviewer = User
+    second_reviewer = User
+
+    report_data[:complaint_ticket_info][:url] = complaint_entry.hostlookup
+    report_data[:complaint_ticket_info][:assignee] = complaint_entry.hostlookup
+    report_data[:complaint_ticket_info][:reviewer] = complaint_entry.hostlookup
+    report_data[:complaint_ticket_info][:second_reviewer] = complaint_entry.hostlookup
+    report_data[:complaint_ticket_info][:created] = complaint_entry.hostlookup
+    report_data
+  end
+
 end

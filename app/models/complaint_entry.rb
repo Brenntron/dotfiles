@@ -562,11 +562,12 @@ class ComplaintEntry < ApplicationRecord
       category_ids_array = AbusiveContentTool.reclassify_abuse_categories(category_ids_array)
 
       abuse_info = {}
+      abuse_info[:user_id] = self.user.id
       abuse_info[:user] = self.user.cvs_username
       abuse_info[:url] = ip_or_uri
       self.abuse_information = abuse_info.to_json
       self.save!
-      result = AbusiveContentTool.submit_abuse_to_authorities(self, user, SimpleIDN.to_ascii(ip_or_uri))
+      result = AbusiveContentTool.submit_abuse_to_authorities(self, self.user, SimpleIDN.to_ascii(ip_or_uri))
       abuse_info[:iwf_report] = result[:iwf_report]
       abuse_info[:ncmec_report] = result[:ncmec_report]
       self.abuse_information = abuse_info.to_json

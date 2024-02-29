@@ -246,6 +246,16 @@ bast_config = env_config.fetch('bast', nil)
 raise 'config.yml missing bast section' unless bast_config
 Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)
 
+abuse_emails_config = env_config.fetch('abuse_emails', nil)
+raise 'config.yml missing abuse emails section' unless abuse_emails_config
+Rails.configuration.abuse_emails = abuse_emails_config['emails']
+
+ncmec_config = env_config.fetch('ncmec', nil)
+raise 'config.yml missing ncmec section' unless ncmec_config
+Rails.configuration.ncmec_username = ncmec_config['username']
+Rails.configuration.ncmec_password = ncmec_config['password']
+
+
 ##### VAULT AND ENCRYPTION STUFF######
 # ORDER MATTERS HERE
 # ###################################
