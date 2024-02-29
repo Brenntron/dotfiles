@@ -26,3 +26,6 @@ SELECT domain, platform_id, category_ids, status, traffic_hits, comment, 'Meraki
 -- Insert timestamp into schema_migrations
 INSERT INTO `schema_migrations` (`version`) VALUES ('20240221123843');
 
+drop table umbrella_clusters;
+drop table ngfw_clusters;
+drop table meraki_clusters;

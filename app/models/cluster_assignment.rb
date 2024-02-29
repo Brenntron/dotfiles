@@ -1,5 +1,6 @@
 class ClusterAssignment < ApplicationRecord
   belongs_to :user
+  belongs_to :web_cat_cluster, foreign_key: 'domain', primary_key: 'domain'
 
   EXPIRED_TIMEOUT = 60 # minutes
 
