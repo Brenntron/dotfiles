@@ -18,9 +18,7 @@ function M.config()
   local diagnostics = null_ls.builtins.diagnostics
   -- https://github.com/nvimtools/none-ls.nvim/tree/main/lua/none-ls/builtins/formatting
   local formatting = null_ls.builtins.formatting
-  -- https://github.com/nvimtools/none-ls.nvim/tree/main/lua/none-ls/builtins/hover
-  local hover = null_ls.builtins.formatting
-  -- https://github.com/nvimtools/none-ls.nvim/tree/main/lua/none-ls/builtins/helpders
+  -- https://github.com/nvimtools/none-ls.nvim/tree/main/lua/none-ls/builtins/helpers
   local helpers = require "null-ls.helpers"
   local coffeelint_query = {
     name = "coffeelint",
@@ -33,11 +31,11 @@ function M.config()
     sources = {
       -- completions
       completions.spell.with {
-        filetypes = { "coffee", "erb", "eruby", "haml", "html", "markdown" },
+        filetypes = { "coffee", "css", "cucumber", "erb", "eruby", "javascript", "haml", "html", "markdown", "scss", "yaml" },
       },
       -- diagnostics
       diagnostics.codespell.with {
-        filetypes = { "coffee", "erb", "eruby", "haml", "html", "markdown" },
+        filetypes = { "coffee", "css", "cucumber", "erb", "eruby", "javascript", "haml", "html", "markdown", "scss", "yaml" },
       },
       diagnostics.eslint,
       diagnostics.haml_lint,

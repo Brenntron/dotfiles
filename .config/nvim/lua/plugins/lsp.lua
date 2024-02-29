@@ -128,14 +128,14 @@ function M.config()
   lspconfig.cucumber_language_server.setup(cucumber_language_server_opts)
 
   -- gramarly setup require nodejs 16
-  local grammarly_opts = opts
-  local grammarly_require_ok, grammarly_settings = pcall(require, "lspsettings.grammarly")
-
-  if grammarly_require_ok then
-    grammarly_opts = vim.tbl_deep_extend("force", grammarly_settings, grammarly_opts)
-  end
-
-  lspconfig.grammarly.setup(grammarly_opts)
+  -- local grammarly_opts = opts
+  -- local grammarly_require_ok, grammarly_settings = pcall(require, "lspsettings.grammarly")
+  --
+  -- if grammarly_require_ok then
+  --   grammarly_opts = vim.tbl_deep_extend("force", grammarly_settings, grammarly_opts)
+  -- end
+  --
+  -- lspconfig.grammarly.setup(grammarly_opts)
 end
 
 return M

@@ -40,6 +40,7 @@ vim.opt.undofile = true  -- enable persistent undo
 vim.opt.updatetime = 100 -- faster completion (4000ms default)
 vim.opt.wrap = false -- display lines as one long line
 vim.opt.writebackup = false  -- if a file is being edited by another program (or was written to file while editing with another program), it is not allowed to be edited
+vim.opt.eol = true
 
 -- Tab settings
 vim.opt.expandtab = true -- convert tabs to spaces
