@@ -7,41 +7,32 @@
           attributes using the Apply All button at the bottom of this form.
 
     .row.bottom-border
-      .col-xs-10
+      .col-xs-12
         %label.content-label-sm Resolution (Fixed resolution cannot be applied in bulk.)
         .resolution-input-wrapper
           %input#webcat_resolution_unchanged_option.bulk-resolution-radio{type: 'radio',  name: 'complaint[resolution]', value: 'UNCHANGED', checked: 'checked'}
           %label.resolution-radio-label{for: 'webcat_resolution_unchanged_option'} Unchanged
           %input#webcat_resolution_invalid_option.bulk-resolution-radio{type: 'radio', name: 'complaint[resolution]', value: 'INVALID'}
           %label.resolution-radio-label{for: 'webcat_resolution_invalid_option'} Invalid
-      .col-xs-2.text-right
-        %button#resolution-apply-button.resolution-apply-button{ disabled: true }
 
     .row.bottom-border
-      .col-xs-10.customer-facing-comment-container
+      .col-xs-12.customer-facing-comment-container
         %label.content-label-sm.full-row-label{'for':'customer_facing_select'} Resolution Email Template
         %select#email-response-to-customers-select{name: 'customer_facing_comment_select'}
         %label.content-label-sm.full-row-label{'for':'customer_facing_comment'} Response to Customer
         %textarea#email-response-to-customers.email-response-input{type: 'text', name: 'customer_facing_comment'}
-      .col-xs-2.text-right
-        %button#customer-facing-apply-button.resolution-apply-button.extra-top-margin-button{ disabled: true }
     .row.bottom-border
-      .col-xs-10.internal-comment-container
+      .col-xs-12.internal-comment-container
         %label.content-label-sm.full-row-label{'for':'internal_comment'} Internal Comment
         .resolution-controls
           .resolution-input-wrapper.webcat-textarea-input-rapper
             %textarea.form-control.internal-comment-textbox#internal_comment{:name => "internal_comment", :type => "text", :value => ""}
-      .col-xs-2.text-right
-        %button#internal-comment-button.resolution-apply-button.extra-top-margin-button{ disabled: true }
 
     .row
       .col-xs-12.button-wrapper
+        %button.primary.button-update-resolution#apply_resolution_button{ type:'button', onclick:'applyAll();', disabled: true }
+          Apply
         %button.secondary.button-update-resolution.resolution-clear-button{type:'button', onclick:'clearBulkResolution();'}
-          =inline_svg 'icon_clear_white.svg', class: 'resolution-button-icon'
-          %span Reset
-        %button.secondary.button-update-resolution.apply-all-button{ type:'button', onclick:'applyAll();', disabled: true }
-          =inline_svg 'icon_apply_all_white.svg', class: 'resolution-button-icon'
-          %span Apply All
+          Reset
         -#%button{class: 'primary button-update-resolution update-resolution-button', type:'button', onclick:'updateResolutionDialog();'}
-        -#  =inline_svg 'icon_submit_arrow.svg', class: 'resolution-button-icon'
         -#  %span Submit

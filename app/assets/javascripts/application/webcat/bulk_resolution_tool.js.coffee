@@ -12,19 +12,18 @@ apply_resolution = () ->
     $("##{resolution_to_apply.toLowerCase()}#{entry_id}").prop('checked', true)
     store_entry_changes(entry_id, 'submit')
 
-  # Update the resolution templates for the submittable rows
-  get_resolution_templates(resolution_to_apply, 'individual', entry_ids)
-  # Enable the customer facing comment button if there is an applied resolution status
-  $('#customer-facing-apply-button').prop('disabled', false)
+  return {applied_resolution: resolution_to_apply, updated_entry_ids: entry_ids}
 
 apply_customer_facing_comment = () ->
+  bulk_tool_resolution = $('.bulk-resolution-radio:checked').val()
   email_template = $('#email-response-to-customers-select').val()
   customer_facing_comment = $('#email-response-to-customers').val()
 
   for row in submittable_rows
     {entry_id, status} = row
+    row_resolution = $(".resolution_radio_button[name='resolution#{entry_id}']:checked").val()
 
-    continue unless $("#entry-email-response-to-customers-select_#{entry_id}").val()
+    continue unless bulk_tool_resolution is row_resolution && $("#entry-email-response-to-customers-select_#{entry_id}").val()
 
     $("#entry-email-response-to-customers-select_#{entry_id}").val(email_template)
     $("#entry-email-response-to-customers_#{entry_id}").val(customer_facing_comment)
@@ -32,6 +31,8 @@ apply_customer_facing_comment = () ->
 
 apply_internal_comment = () ->
   internal_comment = $('#internal_comment').val()
+
+  return unless !!internal_comment
 
   for row in submittable_rows
     {entry_id, status} = row
@@ -41,97 +42,52 @@ apply_internal_comment = () ->
 
 has_submittable_status = (rowData) ->
   submittable_statuses = ['ASSIGNED', 'NEW', 'REOPENED']
-  is_reopened = $("##{rowData.entry_id}").find('.state-row td').text() == 'REOPENED'
+  is_reopened = $("##{rowData.entry_id}").find('.state-row td').text() is 'REOPENED'
 
-  if rowData.status in submittable_statuses || is_reopened
-    return true
-  else
-    return false
 
-has_submittable_resolution_selected = () ->
-  submittable_resolutions = ['UNCHANGED', 'INVALID']
+  rowData.status in submittable_statuses || is_reopened
+
+get_unique_rows = () ->
+  unique_rows = []
+  unique_ids = []
 
   for row in submittable_rows
-    resolution = $("##{row.entry_id}").find('.resolution_radio_button:checked').val()
+    unless unique_ids.includes(row.entry_id)
+      unique_rows.push(row)
+      unique_ids.push(row.entry_id)
 
-    if resolution in submittable_resolutions
-      return true
-    else
-      continue
-
-    return false
+  unique_rows
 
 window.bulk_resolution_select_handler = (dt, indexes) ->
   newly_selected_submmittable_rows = dt.rows(indexes).data().toArray().filter(has_submittable_status)
-  submittable_rows = submittable_rows.concat(newly_selected_submmittable_rows)
+  submittable_rows = [submittable_rows..., newly_selected_submmittable_rows...]
+
+  submittable_rows = get_unique_rows()
 
   return if submittable_rows.length is 0
 
-  $('.apply-all-button').prop('disabled', false)
-  $('#resolution-apply-button').prop('disabled', false)
-
-  if has_submittable_resolution_selected()
-    $('#customer-facing-apply-button').prop('disabled', false)
-  else
-    $('#customer-facing-apply-button').prop('disabled', true)
-
-  if !!$('#internal_comment').val()
-    $('#internal-comment-button').prop('disabled', true)
-  else
-    $('#internal-comment-button').prop('disabled', false)
+  $('#apply_resolution_button').prop('disabled', false)
 
 window.bulk_resolution_deselect_handler = (dt, indexes) ->
   rows_to_remove = dt.rows(indexes).data().pluck('DT_RowId').toArray()
   submittable_rows = submittable_rows.filter((row) -> !rows_to_remove.includes(row.entry_id))
 
-  $('#customer-facing-apply-button').prop('disabled', false) if has_submittable_resolution_selected(dt)
-
   return if submittable_rows.length > 0
 
-  $('.apply-all-button').prop('disabled', true)
-  $('#resolution-apply-button').prop('disabled', true)
-  $('#customer-facing-apply-button').prop('disabled', true)
-  $('#internal-comment-button').prop('disabled', true)
+  $('#apply_resolution_button').prop('disabled', true)
 
 window.clearBulkResolution = () ->
   $('#webcat_resolution_unchanged_option').prop('checked', true)
-  $('#resolution-apply-button').prop('disabled', true)
 
   get_resolution_templates('UNCHANGED', 'bulk')
 
-  if has_submittable_resolution_selected()
-    $('#customer-facing-apply-button').prop('disabled', false)
-  else
-    $('#customer-facing-apply-button').prop('disabled', true)
-
   $('#internal_comment').val('')
-  $('#internal-comment-button').prop('disabled', true)
 
 window.applyAll = () ->
-  return if submittable_rows.length is 0
+  {applied_resolution, updated_entry_ids} = apply_resolution()
 
-  apply_resolution()
-
-  if $('#email-response-to-customers').val()
-    apply_customer_facing_comment()
-
-  if $('#internal_comment').val()
-    apply_internal_comment()
-
-$ ->
-  if $('#complaints-index').length
-    $('.resolution-apply-button').click (event) ->
-      return if submittable_rows.length is 0
-
-      button_id = $(event.target).attr('id')
-
-      switch button_id
-        when 'resolution-apply-button' then apply_resolution()
-        when 'customer-facing-apply-button' then apply_customer_facing_comment()
-        when 'internal-comment-button' then apply_internal_comment()
-
-    $('textarea#internal_comment').on 'input', () ->
-      if $('#internal-comment-button').prop('disabled') && submittable_rows.length > 0 && $(this).val()
-        $('#internal-comment-button').prop('disabled', false)
-      else if !$(this).val()
-        $('#internal-comment-button').prop('disabled', true)
+  # Update the resolution templates for the submittable rows
+  new get_resolution_templates(applied_resolution, 'individual', updated_entry_ids)
+    .then(apply_customer_facing_comment.bind(null))
+    .then null, (err) -> console.error err
+  apply_internal_comment()

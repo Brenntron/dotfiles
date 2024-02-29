@@ -28,7 +28,7 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I click "#webcat_resolution_unchanged_option"
-      And I click "#resolution-apply-button"
+      And I click "#apply_resolution_button"
       And I wait for "2" seconds
       Then I should see the radio with id "ignore2" checked
       And I should see the radio with id "unchanged3" checked
@@ -41,7 +41,7 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I click "#webcat_resolution_unchanged_option"
-      And I click "#resolution-apply-button"
+      And I click "#apply_resolution_button"
       And I wait for "2" seconds
       Then I should see the radio with id "unchanged3" checked
       And I should see the radio with id "unchanged4" checked
@@ -53,9 +53,8 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I click "#webcat_resolution_unchanged_option"
-      And I click "#resolution-apply-button"
       And I select "Default Unchanged 2" from "email-response-to-customers-select"
-      And I click "#customer-facing-apply-button"
+      And I click "#apply_resolution_button"
       And I wait for "2" seconds
       And I click "#resolution_comment_button3"
       Then I should see content "Default Unchanged 2 body" within "#entry-email-response-to-customers_3"
@@ -70,12 +69,10 @@ Feature: WebCat Bulk Resolution Tool
       And I shift click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
-      And I click "#index_update_resolution"
       And I click "#webcat_resolution_unchanged_option"
-      And I click "#resolution-apply-button"
       And I select "Default Unchanged 2" from "email-response-to-customers-select"
       And I type content "modified" within input with id "customer_facing_comment"
-      And I click "#customer-facing-apply-button"
+      And I click "#apply_resolution_button"
       And I wait for "2" seconds
       And I click "#resolution_comment_button3"
       Then I should see content "Default Unchanged 2 body modified" within "#entry-email-response-to-customers_3"
@@ -88,11 +85,11 @@ Feature: WebCat Bulk Resolution Tool
     Scenario: a webcat user updates a submittable tickets internal comment
       When I click webcat row with id "3"
       And I shift click webcat row with id "4"
-      And I wait for "2" seconds
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I fill in "internal_comment" with "This is an internal comment."
-      And I click "#internal-comment-button"
+      And I click "#apply_resolution_button"
+      And I wait for "2" seconds
       And I click "#internal_comment_button3"
       And I wait for "2" seconds
       Then I should see content "This is an internal comment." within "#internal_comment_3"
@@ -101,35 +98,16 @@ Feature: WebCat Bulk Resolution Tool
       And I wait for "2" seconds
       Then I should see content "This is an internal comment." within "#internal_comment_4"
 
-  Rule: The customer facing comments button should be disabled until a submittable selected row is changed
+  Rule: The apply button should be disabled until a submittable selected row is selected
     @javascript
     Scenario: a webcat user attempts to apply a customer facing comment before selecting a submittable ticket
-      When I click webcat row with id "2"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
-      And I select "Default Unchanged 1" from "email-response-to-customers-select"
-      Then button with id "customer-facing-apply-button" should be disabled
+      Then button with id "apply_resolution_button" should be disabled
       When I click webcat row with id "3"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
-      And I click "#webcat_resolution_unchanged_option"
-      And I click "#resolution-apply-button"
-      And I select "Default Unchanged 1" from "email-response-to-customers-select"
-      Then button with id "customer-facing-apply-button" should be enabled
-
-  Rule: the Internal Comment button should be disabled until a row is selected
-    @javascript
-    Scenario: a webcat user attempts to apply an internal comment without selecting a row
-      When I click "#index_update_resolution"
-      And I wait for "2" seconds
-      Then button with id "internal-comment-button" should be disabled
-
-    @javascript
-    Scenario: a webcat user attempts to apply an internal comment after selecting a row
-      When I click webcat row with id "3"
-      And I click "#index_update_resolution"
-      And I fill in "internal_comment" with "This is an internal comment."
-      Then button with id "internal-comment-button" should be enabled
+      Then button with id "apply_resolution_button" should be enabled
 
   Rule: The Bulk Resolution Tool should apply updates to rows selected after a first round of updates.
     @javascript
@@ -138,14 +116,14 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I click "#webcat_resolution_unchanged_option"
-      And I click "#resolution-apply-button"
+      And I click "#apply_resolution_button"
       And I wait for "2" seconds
       Then I should see the radio with id "unchanged3" checked
       And I click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I click "#webcat_resolution_invalid_option"
-      And I click "#resolution-apply-button"
+      And I click "#apply_resolution_button"
       And I wait for "2" seconds
       Then I should see the radio with id "unchanged3" checked
       And I should see the radio with id "invalid4" checked
@@ -158,7 +136,7 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I click "#webcat_resolution_invalid_option"
-      And I click "#resolution-apply-button"
+      And I click "#apply_resolution_button"
       And I select "Default Invalid 2" from "email-response-to-customers-select"
       And I fill in "internal_comment" with "This is an internal comment."
       When I click ".resolution-clear-button"
@@ -178,8 +156,7 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#webcat_resolution_invalid_option"
       And I type content "test content" within input with id "customer_facing_comment"
       And I fill in "internal_comment" with "This is an internal comment."
-      And I click "#internal-comment-button"
-      And I click ".apply-all-button"
+      And I click "#apply_resolution_button"
       And I wait for "2" seconds
       Then I should see the radio with id "invalid5" checked
       And I should see the radio with id "invalid6" checked
@@ -187,8 +164,6 @@ Feature: WebCat Bulk Resolution Tool
       And I should see content "test content" within "#entry-email-response-to-customers_5"
       When I click "#resolution_comment_button6"
       Then I should see content "test content" within "#entry-email-response-to-customers_6"
-      And I should see content "Arts" within "#input_cat_5-selectized"
-      And I should see content "Arts" within "#input_cat_6-selectized"
       When I click "#internal_comment_button5"
       And I wait for "2" seconds
       Then I should see content "This is an internal comment." within "#internal_comment_5"
