@@ -537,7 +537,8 @@ module API
 
             get 'abuse_report_details' do
               begin
-
+                report_data = AbusiveContentTool.get_report_data(params[:complaint_entry_id])
+                return {:status => "success", :data => report_data}
               rescue Exception => e
                 Rails.logger.error(e)
                 return {:status => "error", :error => e.to_s}
