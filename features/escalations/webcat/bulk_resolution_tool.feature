@@ -20,7 +20,7 @@ Feature: WebCat Bulk Resolution Tool
     And I go to "/escalations/webcat/complaints"
     And I wait for "2" seconds
 
-  Rule: The Bulk Resolution Tool button only updates submitable rows
+  Rule: The Bulk Resolution Tool button only updates submittable rows
     @javascript
     Scenario: a webcat user selects one pending entry
       When I click webcat row with id "2"
@@ -146,7 +146,7 @@ Feature: WebCat Bulk Resolution Tool
       And I should see content "Default Unchanged 1 body" within "#email-response-to-customers"
       And Input with id "internal_comment" should be empty
 
-  Rule: Reopened tickets are also submitable
+  Rule: Reopened tickets are also submittable
     @javascript
     Scenario: a webcat user updates resolution status, customer comment, and internal comments for reopened tickets
       When I click "#reopen_6"
