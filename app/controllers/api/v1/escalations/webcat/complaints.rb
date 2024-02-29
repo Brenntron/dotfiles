@@ -244,22 +244,54 @@ module API
               prefix_ids = {}
 
               urls = permitted_params['urls']
-
+              paper_trail_urls = {}
               urls.each do |key, value|
-                if !Wbrs::Prefix.where(:urls => [value]).empty?
-                  prefix_ids[key] = Wbrs::Prefix.where(:urls => [value]).first.prefix_id
-                else
-                  prefix_ids[key] = nil
-                end
-              end
+                begin
+                  if !Wbrs::Prefix.where(:urls => [value]).empty?
+                    prefix_ids[key] = Wbrs::Prefix.where(:urls => [value]).first.prefix_id
+                    top_url = Wbrs::TopUrl.check_urls([value]).first.is_important
+                    description = "Dropping all current categories for #{value}"
 
-              prefix_ids.each do |key, value|
-                if prefix_ids[key] != nil
-                  response[key] = Wbrs::Prefix.disable(value, current_user.email)
-                else
+                    if top_url
+                      Complaint.create_complaint_paper_trail(EscalationTicket, value, description, nil, nil, nil, nil, nil, current_user)
+                    else
+                      response[key] = Wbrs::Prefix.disable(prefix_ids[key], current_user.email)
+                      Complaint.create_complaint_paper_trail()
+                    end
+
+                  else
+                    prefix_ids[key] = nil
+                  end
+                rescue
+                  prefix_ids[key] = nil
+
                   response[key] = nil
                 end
+
               end
+
+              #prefix_ids.each do |key, value|
+              #  begin
+              #    if prefix_ids[key] != nil
+              #      response[key] = Wbrs::Prefix.disable(value, current_user.email)
+
+              #    else
+              #      response[key] = nil
+              #      paper_trail_urls[key] = nil
+              #    end
+              #  rescue
+              #    response[key] = nil
+              #    paper_trail_urls[key] = nil
+              #end
+            #
+              #end
+
+              #paper_trail_urls.each do |key, value|
+              #  if value.present?
+              #    Complaint.create_action(bugzilla_rest_session, value, description, nil, nil, nil, PENDING, category_names_string, current_user)
+              #  end
+              #end
+              #create complaint here
 
               render json: response
             end
