@@ -1,13 +1,9 @@
-
-
 init_tooltip = () ->
   $('.esc-tooltipped:not(.tooltipstered)').tooltipster
     theme: [
       'tooltipster-borderless'
       'tooltipster-borderless-customized'
     ]
-
-
 
 # Store changes in local storage to see if Bulk Submit can be used
 # call this when resolution is changed or a cat is added
@@ -39,8 +35,7 @@ window.remove_entry_from_changes = (entry_id, type) ->
     new_changes = entries.splice(submitted_entry, 1)
     sessionStorage.setItem(changed, new_changes)
 
-
-getTouchedFormCount = ()->
+window.getTouchedFormCount = () ->
   form_item = (sessionStorage.getItem("webcat_entries_changed") || "")
   form_item = form_item.split(",")
   form_item = form_item.filter((item) -> return item)
@@ -215,7 +210,7 @@ window.process_bulk_submission = () ->
 
 
 
-window.webcat_reset_search = ()->
+window.webcat_reset_search = () ->
   inputs = document.getElementsByClassName('form-control')
   for i in inputs
     i.value = ""
@@ -346,7 +341,6 @@ window.reopenComplaint = (entry_id) ->
     method: 'POST'
     data: {'complaint_entry_id': entry_id}
     success: (response) ->
-      debugger
     entry_row = $('#' + entry_id)
 
     $(entry_row).find('.state-row td').text('REOPENED')
@@ -359,8 +353,8 @@ window.reopenComplaint = (entry_id) ->
     cat_input =   $('#input_cat_' + entry_id)[0].selectize
     cat_input.enable()
 
-    comment_dropdown = $('#internal_comment_dropdown_' + entry_id)
-    comment = $('#internal_comment_' + entry_id)
+    comment_dropdown = $('#internal-comment-dropdown_' + entry_id)
+    comment = $('#internal-comment-' + entry_id)
     if $(comment).text() != ''
       comment_text = $(comment).text()
     else
@@ -418,8 +412,6 @@ window.verifyMasterSubmit = () ->
     boolean = true
   return boolean
 
-
-
 window.updateResolutionDialog = (confirm) ->
 #   { status } = row
 #  if status == 'COMPLETED'
@@ -455,15 +447,18 @@ window.updateResolutionDialog = (confirm) ->
         full_domain = ''
         domain = $(row).find("#domain_#{id}").attr('data-full')
         $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
+
   $('#resolution_dialog').modal("show")
   if selected_rows.length > 1
     html = "Set the following #{complaint_entries.length} entries to <span class='bold'>RESOLUTION</span> <span class='resolution-emp bold'>#{resolution}.</span>"
   else
     html = "Set the following entry to <span class='bold'>RESOLUTION</span> <span class='resolution-emp bold'>#{resolution}.</span>"
   html += pending_msg
+
   $('#resolution_text').html(html)
 
   tbody = $('#resolution_dialog').find('tbody')
+
   setTimeout ->
     if $('#complaint_entries_to_update').height() > 399
       $(tbody).addClass('scrollable-table')
@@ -522,15 +517,11 @@ window.updateResolution = () ->
   )
 
 $ ->
-
-
-
   # If resolution is changed (to unchanged or invalid) enable the bulk submit button
   $(document).on 'change', '.resolution_radio_button', ->
     id = this.name.split("resolution")[1]
     store_entry_changes(id, 'submit')
     $('#master-submit').removeAttr('disabled')
-
 
   $(document).on 'change', '.review_radio_button', ->
     id = this.name.split("resolution_review")[1]
@@ -541,20 +532,17 @@ $ ->
     else
       $('#submit_changes_' + id).attr('disabled', 'true')
 
-
-
   # TODO - is this needed?
-  $(document).ready ->
-    if !window.location.pathname.includes('/escalations/webcat')
-      $('#filter-complaints-nav').hide()
-      $('#fetch').hide()
-      $('#complaints-nav-search-wrapper').hide()
-      $('#new-complaint-nav-wrapper').hide()
-    else
-      $('#filter-complaints').show()
-      $('#fetch').show()
-      $('#complaints-nav-search-wrapper').show()
-      $('#new-complaint-nav-wrapper').show()
+  if !window.location.pathname.includes('/escalations/webcat')
+    $('#filter-complaints-nav').hide()
+    $('#fetch').hide()
+    $('#complaints-nav-search-wrapper').hide()
+    $('#new-complaint-nav-wrapper').hide()
+  else
+    $('#filter-complaints').show()
+    $('#fetch').show()
+    $('#complaints-nav-search-wrapper').show()
+    $('#new-complaint-nav-wrapper').show()
 
   # If a stupidly long email address is returned it will wrap
   # rather than pushing the column into the column beside it

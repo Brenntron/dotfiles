@@ -46,7 +46,7 @@ $ ->
     if keyCode == 13
       webcat_search_string = $('#web-cat-search .search-box').val().trim()
       if webcat_search_string == ''
-       refresh_localStorage()
+       refresh_webcat_localStorage()
       else
         localStorage.webcat_search_type = 'contains'
         localStorage.webcat_search_name = ''
@@ -176,7 +176,7 @@ $ ->
   current_url = window.location.href
 
   window.webcat_refresh = ()->
-    refresh_localStorage()
+    refresh_webcat_localStorage()
     refresh_url()
 
   refresh_url = (href) ->
@@ -189,7 +189,7 @@ $ ->
       window.location.replace('/escalations/webcat/complaints')
       localStorage.setItem('webcat_reset_page', true)
 
-  window.refresh_localStorage = () ->
+  window.refresh_webcat_localStorage = () ->
     localStorage.removeItem('webcat_search_type')
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
@@ -233,7 +233,7 @@ $ ->
     # do not redirect if there is already some chosen search/filter (not from the settings)
     return if localStorage.webcat_search_type || window.location.search
 
-    refresh_localStorage()
+    refresh_webcat_localStorage()
     if is_default_filter(icon) then refresh_url(name) else build_webcat_named_search(name);
 
 
@@ -944,7 +944,7 @@ window.temporary_search_link = (webcat_search_name, webcat_search_conditions) ->
 
   $(new_delete).on 'click', () ->
     window.delete_disputes_named_search(this,  webcat_search_name)
-    refresh_localStorage()
+    refresh_webcat_localStorage()
 
   $(new_tr).append(new_td)
   $(new_td).append(new_link)
