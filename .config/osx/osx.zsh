@@ -19,3 +19,32 @@ export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 export ZPLUG_HOME=/usr/local/opt/zplug
 
 source "$(brew --prefix zsh-syntax-highlighting)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(
+  1password
+  aliases
+  alias-finder
+  asdf
+  autoenv
+  brew
+  bundler
+  copyfile
+  copypath
+  cp
+  docker
+  docker-compose
+  fzf
+  gh
+  git
+  gpg-agent
+  rails
+  ruby
+  ssh-agent
+  thefuck
+  yarn
+)
