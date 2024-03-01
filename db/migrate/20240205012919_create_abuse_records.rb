@@ -7,6 +7,7 @@ class CreateAbuseRecords < ActiveRecord::Migration[6.1]
       t.text        :result
       t.text        :report_submitted
       t.string      :submitter
+      t.text        :url
       t.timestamps
     end
   end

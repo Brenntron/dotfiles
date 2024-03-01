@@ -223,7 +223,7 @@ class AbusiveContentTool
     response_code = response_xml.xpath('//responseCode').text
     if response_code == "0"
       report_id = doc.xpath('//reportId').text
-      AbuseRecord.build_and_save_record(body, response_xml, report_id, AbuseRecord::NCMEC, user, complaint_entry)
+      AbuseRecord.build_and_save_record(url, body, response_xml, report_id, AbuseRecord::NCMEC, user, complaint_entry)
     end
 
   end
@@ -274,7 +274,7 @@ class AbusiveContentTool
     results[:message] = response["responseDescription"]
     results[:data] = response["responseData"]
 
-    AbuseRecord.build_and_save_record(params, response, results[:data], AbuseRecord::IWF, user, complaint_entry)
+    AbuseRecord.build_and_save_record(url, params, response, results[:data], AbuseRecord::IWF, user, complaint_entry)
     results
 
 
