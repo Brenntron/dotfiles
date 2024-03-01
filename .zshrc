@@ -6,28 +6,27 @@ export ZSH="${HOME}/.oh-my-zsh"
 
 source $ZSH/oh-my-zsh.sh
 
-antigen use oh-my-zsh
-
 if [[ $(uname) == "Linux" ]]; then
   source ~/.config/linux/linux_antigen.zsh
 else
   source ~/.config/osx/osx_antigen.zsh
 fi
 
+antigen use oh-my-zsh
+
 antigen bundle 1password
-antigen bundle aliases
 antigen bundle alias-finder
+antigen bundle aliases
 antigen bundle asdf
+antigen bundle aubreypwd/zsh-plugin-require
 antigen bundle autoenv
 antigen bundle bundler
-antigen bundle zsh-colorls
 antigen bundle command-not-found
 antigen bundle containers
 antigen bundle copybuffer
 antigen bundle copyfile
 antigen bundle copypath
 antigen bundle cp
-antigen bundle aubreypwd/zsh-plugin-fd@1.0.0
 antigen bundle fzf
 antigen bundle gh
 antigen bundle git
@@ -40,10 +39,7 @@ antigen bundle ruby
 antigen bundle ssh-agent
 antigen bundle thefuck
 antigen bundle yarn
-antigen bundle aubreypwd/zsh-plugin-require
 antigen bundle zsh-users/zsh-syntax-highlighting
-
-antigen theme romkatv/powerlevel10k
 
 if [[ $(uname) == "Linux" ]]; then
   source ~/.config/linux/linux_zsh_plugins.zsh
@@ -52,6 +48,9 @@ else
 fi
 
 antigen apply
+
+# oh-my-posh theme
+eval "$(oh-my-posh init zsh --config ~/.config/tokyonight/oh-my-posh/tokyonight_moon.omp.json)"
 
 # Source zsh config based on operating system used.
 
@@ -228,33 +227,12 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export FZF_DEFAULT_COMMAND='rg --files --hidden'
 export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4 --preview "cat --color=always {}" --preview-window "~3"'
 
-. ~/.asdf/plugins/java/set-java-home.zsh
-
-require "colorls" "gem install colorls"
-
-source $(dirname $(gem which colorls))/tab_complete.sh
-
-alias cc='gcc'
-alias CC='gcc'
-
-# Set alias for dotfiles config
-alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
-
+export PATH="$PATH::$(yarn global bin)"
 export PATH="${HOME}/.local/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 
@@ -262,5 +240,78 @@ export XDG_CONFIG_HOME="${HOME}/.config"
 export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
 export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 
-# Precommand for kitty tab title
-precmd () {print -Pn "\e]0;%~\a"}
+. ~/.asdf/plugins/java/set-java-home.zsh
+
+require "l" "gem install colorls"
+
+source $(dirname $(gem which colorls))/tab_complete.sh
+
+alias lc = "colorls --dark"
+alias l = "colorls -l --dark"
+alias ll = "colorls -lA --dark"
+alias la = "colorls -la --dark"
+alias lt = "colorls -lt --dark"
+alias lS = "colorls -lS --dark"
+alias lr = "colorls --tree=5 --dark"
+alias lx = "colorls -lAX --dark"
+
+alias zshrc='${=EDITOR} ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc file
+
+alias grep='grep --color'
+alias sgrep='grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS} '
+
+alias t='tail -f'
+
+# Command line head / tail shortcuts
+alias -g H='| head'
+alias -g T='| tail'
+alias -g G='| grep'
+alias -g L="| less"
+alias -g M="| most"
+alias -g LL="2>&1 | less"
+alias -g CA="2>&1 | cat -A"
+alias -g NE="2> /dev/null"
+alias -g NUL="> /dev/null 2>&1"
+alias -g P="2>&1| pygmentize -l pytb"
+
+alias dud='du -d 1 -h'
+alias duf='du -sh *'
+alias fd='find -L . -type d | fzf > selected --height=100%'
+alias ff='find -L . -type f | fzf > selected --height=100%'
+
+alias h='history'
+alias hgrep="fc -El 0 | grep"
+alias help='man'
+alias p='ps -f'
+alias sortnr='sort -n -r'
+alias unexport='unset'
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+#read documents
+alias -s ps=gv
+alias -s dvi=xdvi
+alias -s chm=xchm
+alias -s djvu=djview
+
+#list whats inside packed file
+alias -s zip="unzip -l"
+alias -s rar="unrar l"
+alias -s tar="tar tf"
+alias -s tar.gz="echo "
+alias -s ace="unace l"
+
+alias cc='gcc'
+alias CC='gcc'
+
+# Set alias for dotfiles config
+alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+
+# enable autocomplete for fnt
+autoload -U compinit && compinit
+
+# enable alias-finder
+zstyle ':omz:plugins:alias-finder' autoload yes # disabled by default
+
