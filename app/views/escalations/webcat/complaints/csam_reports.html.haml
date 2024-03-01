@@ -25,9 +25,8 @@
             %th Date Entry was Resolved
             %th URL
             %th Analyst
-            %th.alt-col NCMEC ID
-            %th Date Sent
-            %th.alt-col IWF ID
+            %th Source
+            %th Report ID
             %th Date Sent
             %th
               -# actions column
@@ -40,9 +39,8 @@
             %td 2024-02-21 22:01:14
             %td badurlsobad.co/superbad
             %td Analyst Name
-            %td.alt-col.csam-report-id-col.ncmec-report-id
             %td
-            %td.alt-col.csam-report-id-col.iwf-report-id
+            %td.alt-col.csam-report-id-col
             %td
             %td.tools-col
               %button.toolbar-button.toolbar-button-spacer.icon-reports.esc-tooltipped{title: 'Resend report to IWF and NCMEC'}
@@ -55,27 +53,23 @@
             %td 2024-02-18 12:03:08
             %td alsobad.com/evisl&ick
             %td Analyst Name
-            %td.alt-col.csam-report-id-col.ncmec-report-id
             %td
-            %td.alt-col.csam-report-id-col.iwf-report-id
+            %td.alt-col.csam-report-id-col
             %td
             %td.tools-col
               %button.toolbar-button.toolbar-button-spacer.icon-reports.esc-tooltipped{title: 'Resend report to IWF and NCMEC'}
               %button.toolbar-button.icon-email.esc-tooltipped{title: 'Forward report to external email address'}
           %tr
-            %td.attention-flag-col.attention-flag
+            %td.attention-flag-col
             %td.entry-id-col
               %a{href: ''} 123613
             %td 2024-02-05 02:05:43
             %td grossurl.com
             %td Analyst Name
-            %td.alt-col.csam-report-id-col.ncmec-report-id{'data-ncmec-id': '3962592'}
+            %td NCMEC
+            %td.alt-col.csam-report-id-col{'data-report-id': '3962592', 'data-report-source': 'ncmec'}
               %span.report-id-wrapper 3962592
-              -#%span.report-email-wrapper
-              -#  %button.
             %td 2024-02-05 13:45:07
-            %td.alt-col.csam-report-id-col.iwf-report-id
-            %td
             %td.tools-col
               %button.toolbar-button.toolbar-button-spacer.icon-reports.esc-tooltipped{title: 'Resend report to IWF and NCMEC'}
               %button.toolbar-button.icon-email.esc-tooltipped{title: 'Forward report to external email address'}
@@ -86,9 +80,8 @@
             %td 2024-01-05 17:23:19
             %td domainnamehere.com
             %td Analyst Name
-            %td.alt-col.csam-report-id-col.ncmec-report-id{'data-ncmec-id': '3962514'} 3962514
-            %td 2024-01-05 23:43:10
-            %td.alt-col.csam-report-id-col.iwf-report-id{'data-iwf-id': '1124442'} 1124442
+            %td IWF
+            %td.alt-col.csam-report-id-col{'data-report-id': '1124442', 'data-report-source': 'iwf'} 1124442
             %td 2024-01-05 23:52:06
             %td.tools-col
               %button.toolbar-button.toolbar-button-spacer.icon-reports.esc-tooltipped{title: 'Resend report to IWF and NCMEC'}
@@ -100,10 +93,9 @@
             %td 2024-01-01 13:56:22
             %td morebadurl.com/no
             %td Analyst Name
-            %td.alt-col.csam-report-id-col.ncmec-report-id{'data-ncmec-id': '3962220'} 3962220
+            %td NCMEC
+            %td.alt-col.csam-report-id-col{'data-report-id': '3962220', 'data-report-source': 'ncmec'} 3962220
             %td 2024-01-02 07:43:22
-            %td.alt-col.csam-report-id-col.iwf-report-id{'data-iwf-id': '1124403'} 1124403
-            %td 2024-01-02 07:43:35
             %td.tools-col
               %button.toolbar-button.toolbar-button-spacer.icon-reports.esc-tooltipped{title: 'Resend report to IWF and NCMEC'}
               %button.toolbar-button.icon-email.esc-tooltipped{title: 'Forward report to external email address'}

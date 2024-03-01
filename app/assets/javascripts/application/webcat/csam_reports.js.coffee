@@ -1,19 +1,16 @@
 $ ->
-  build_csam_reports_table()
-  build_csam_report_dialogs()
 
-  $(document).on 'click', '#webcat-csam-reports-index tbody tr', ->
-    enable_report_buttons()
+  if $('#webcat-csam-reports-index').length
+    build_csam_reports_table()
+    build_csam_report_dialogs()
 
-  $('.ncmec-report-id').click ->
-    unless $(this).attr('data-ncmec-id')?
-      return
-    report_id = $(this).attr('data-ncmec-id')
-    open_csam_report(report_id, 'ncmec')
+    $(document).on 'click', '#webcat-csam-reports-index tbody tr', ->
+      enable_report_buttons()
 
-  $('.iwf-report-id').click ->
-    report_id = $(this).attr('data-iwf-id')
-    open_csam_report(report_id, 'iwf')
+    $('.csam-report-id-col').click ->
+      source = $(this).attr('data-report-source')
+      report_id = $(this).attr('data-report-id')
+      open_csam_report(report_id, source)
 
 
 
@@ -21,7 +18,7 @@ $ ->
 
 build_csam_reports_table = () ->
   csam_table = $('#webcat-csam-reports-index').DataTable(
-    stateSave: true
+#    stateSave: true
     select: true
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     language: {
@@ -30,7 +27,7 @@ build_csam_reports_table = () ->
     }
     order: [ 2, 'desc']
     columnDefs: [
-      targets: [0, 9]
+      targets: [0, 8]
       orderable: false
     ]
 
