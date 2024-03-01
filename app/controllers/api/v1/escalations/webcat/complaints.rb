@@ -253,10 +253,11 @@ module API
                     description = "Dropping all current categories for #{value}"
 
                     if top_url
+                      description += " Moving to peer review as attempt of category drop is on an important url"
                       Complaint.create_complaint_paper_trail(EscalationTicket, value, description, nil, nil, nil, nil, nil, current_user)
                     else
                       response[key] = Wbrs::Prefix.disable(prefix_ids[key], current_user.email)
-                      Complaint.create_complaint_paper_trail()
+                      Complaint.create_complaint_paper_trail(EscalationTicket, value, description, nil, nil, nil, nil, nil, current_user)
                     end
 
                   else
