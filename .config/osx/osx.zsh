@@ -33,6 +33,7 @@ plugins=(
   autoenv
   brew
   bundler
+  containers
   copyfile
   copypath
   cp
@@ -40,7 +41,6 @@ plugins=(
   gh
   git
   gpg-agent
-  podman
   rails
   ruby
   ssh-agent
