@@ -17,6 +17,7 @@ plugins=(
   autoenv
   brew
   bundler
+  containers
   copyfile
   copypath
   cp
