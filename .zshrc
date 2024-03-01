@@ -4,19 +4,62 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 # Path to your oh-my-zsh installation.
 export ZSH="${HOME}/.oh-my-zsh"
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+source $ZSH/oh-my-zsh.sh
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-ZSH_THEME="powerlevel10k/powerlevel10k"
+antigen use oh-my-zsh
 
-source $HOME/.oh-my-zsh/custom/themes/powerlevel10k/powerlevel10k.zsh-theme
+if [[ $(uname) == "Linux" ]]; then
+  source ~/.config/linux/linux_antigen.zsh
+else
+  source ~/.config/osx/osx_antigen.zsh
+fi
+
+antigen bundle 1password
+antigen bundle aliases
+antigen bundle alias-finder
+antigen bundle asdf
+antigen bundle autoenv
+antigen bundle bundler
+antigen bundle zsh-colorls
+antigen bundle command-not-found
+antigen bundle containers
+antigen bundle copybuffer
+antigen bundle copyfile
+antigen bundle copypath
+antigen bundle cp
+antigen bundle aubreypwd/zsh-plugin-fd@1.0.0
+antigen bundle fzf
+antigen bundle gh
+antigen bundle git
+antigen bundle gpg-agent
+antigen bundle pip
+antigen bundle podman
+antigen bundle rails
+antigen bundle rsync
+antigen bundle ruby
+antigen bundle ssh-agent
+antigen bundle thefuck
+antigen bundle yarn
+antigen bundle aubreypwd/zsh-plugin-require
+antigen bundle zsh-users/zsh-syntax-highlighting
+
+antigen theme romkatv/powerlevel10k
+
+if [[ $(uname) == "Linux" ]]; then
+  source ~/.config/linux/linux_zsh_plugins.zsh
+else
+  source ~/.config/osx/osx_zsh_plugins.zsh
+fi
+
+antigen apply
+
+# Source zsh config based on operating system used.
+
+if [[ $(uname) == "Linux" ]]; then
+  source ~/.config/linux/linux.zsh
+else
+  source ~/.config/osx/osx.zsh
+fi
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -158,16 +201,6 @@ ZSH_HIGHLIGHT_STYLES[arg0]='fg=#F8F8F2'
 ZSH_HIGHLIGHT_STYLES[default]='fg=#F8F8F2'
 ZSH_HIGHLIGHT_STYLES[cursor]='standout'
 
-# Source zsh config based on operating system used.
-
-if [[ $(uname) == "Linux" ]]; then
-  source ~/.config/linux/linux.zsh
-else
-  source ~/.config/osx/osx.zsh
-fi
-
-source $ZSH/oh-my-zsh.sh
-
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -208,16 +241,16 @@ fi
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export FZF_DEFAULT_COMMAND='rg --files --hidden'
-export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4 --preview "bat --color=always {}" --preview-window "~3"'
+export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4 --preview "cat --color=always {}" --preview-window "~3"'
 
 . ~/.asdf/plugins/java/set-java-home.zsh
 
-if [ -x "$(command -v colorls)" ]; then
-  source $(dirname $(gem which colorls))/tab_complete.sh
-  alias ls='colorls --sd --dark'
-  alias la='colorls -lA --sd --dark'
-  alias tree='colorls --sd -t --dark'
-fi
+require "colorls" "gem install colorls"
+
+source $(dirname $(gem which colorls))/tab_complete.sh
+
+alias cc='gcc'
+alias CC='gcc'
 
 # Set alias for dotfiles config
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
@@ -231,6 +264,3 @@ export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 
 # Precommand for kitty tab title
 precmd () {print -Pn "\e]0;%~\a"}
-
-# Generated for envman. Do not edit.
-[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
