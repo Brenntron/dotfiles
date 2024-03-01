@@ -18,7 +18,6 @@ $ ->
 
 build_csam_reports_table = () ->
   csam_table = $('#webcat-csam-reports-index').DataTable(
-#    stateSave: true
     select: true
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     language: {
@@ -55,9 +54,12 @@ open_csam_report = (report_id, report_type) ->
 
 
 
-submit_ncmec_report = () ->
+resubmit_report = (report_id) ->
   debugger
 
-submit_iwf_report = () ->
+
+forward_report = (report_id) ->
   debugger
+
+
 
