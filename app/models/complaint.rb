@@ -167,7 +167,7 @@ For future web and email reputation requests, please open a web and email reputa
       description += " This paper trail entry was sent to pending because the url was flagged as high telemetry."
       Complaint.create_action(bugzilla_rest_session, url, description, nil, nil, nil, PENDING, category_names_string, user)
     else
-      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, nil, COMPLETED, category_names_string, current_user)
+      Complaint.create_action(bugzilla_rest_session, url, description, nil, nil, nil, COMPLETED, category_names_string, user)
     end
 
   end
