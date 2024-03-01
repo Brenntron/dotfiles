@@ -274,7 +274,7 @@ class AbusiveContentTool
     results[:message] = response["responseDescription"]
     results[:data] = response["responseData"]
 
-    AbuseRecord.build_and_save_record(url, params, response, results[:data], AbuseRecord::IWF, user, complaint_entry)
+    AbuseRecord.build_and_save_record(url, params.to_json, response, results[:data], AbuseRecord::IWF, user, complaint_entry)
     results
 
 
