@@ -36,12 +36,11 @@ plugins=(
   copyfile
   copypath
   cp
-  docker
-  docker-compose
   fzf
   gh
   git
   gpg-agent
+  podman
   rails
   ruby
   ssh-agent
