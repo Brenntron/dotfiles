@@ -12,11 +12,10 @@ class AbuseRecord < ApplicationRecord
     abuse_record.complaint_entry_id = complaint_entry.id
     abuse_record.source = report_source
     abuse_record.result = response.to_s
-    abuse_record.report_submitted = report_submitted.to_s
+    abuse_record.report_submitted = report_submitted
     abuse_record.report_ident = report_ident
     abuse_record.url = url
     abuse_record.save
-
 
   end
 
