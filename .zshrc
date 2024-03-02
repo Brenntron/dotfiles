@@ -246,14 +246,14 @@ require "l" "gem install colorls"
 
 source $(dirname $(gem which colorls))/tab_complete.sh
 
-alias lc = "colorls --dark"
-alias l = "colorls -l --dark"
-alias ll = "colorls -lA --dark"
-alias la = "colorls -la --dark"
-alias lt = "colorls -lt --dark"
-alias lS = "colorls -lS --dark"
-alias lr = "colorls --tree=5 --dark"
-alias lx = "colorls -lAX --dark"
+alias lc="colorls --dark"
+alias l="colorls -l --dark"
+alias ll="colorls -lA --dark"
+alias la="colorls -la --dark"
+alias lt="colorls -lt --dark"
+alias lS="colorls -lS --dark"
+alias lr="colorls --tree=5 --dark"
+alias lx="colorls -lAX --dark"
 
 alias zshrc='${=EDITOR} ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc file
 
