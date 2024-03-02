@@ -12,6 +12,8 @@ else
   source ~/.config/osx/osx_antigen.zsh
 fi
 
+source $(brew --prefix)/share/antigen/antigen.zsh
+
 antigen use oh-my-zsh
 
 antigen bundle 1password
