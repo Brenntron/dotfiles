@@ -1,3 +1,4 @@
+require 'nokogiri'
 class AbusiveContentTool
   #INCIDENTDATETIME FORMAT = 2012-10-15T08:00:00-07:00
   BACKUP_NCMEC_REPORT_TEMPLATE = <<-EOT
@@ -49,7 +50,7 @@ class AbusiveContentTool
     <internetDetails>
         <webPageIncident thirdPartyHostedContent="true">
             <url>[MALICIOUS_URL]</url>
-            <additionalInfo>TBD - potentially description of suspected csam if not obvious</additionalInfo>
+            <additionalInfo>TBD</additionalInfo>
         </webPageIncident>
     </internetDetails>
     <reporter>
@@ -81,7 +82,36 @@ class AbusiveContentTool
 </report>
   EOT
 
+  REQUEST_FOR_INFO_EMAIL_BODY_TEMPLATE = <<-EOT
 
+    <br />CSAM REPORT BREAKDOWN FOR SUBMITTED URL: [REPORT_URL]<br/>
+  
+    <h3>ORIGINAL COMPLAINT BREAKDOWN</h3>
+
+    <br />
+    complaint id: [REPORT_COMPLAINT_ID]<br />
+    complaint entry id: [REPORT_COMPLAINT_ENTRY_ID]<br />
+    complaint url: [REPORT_URL]<br />
+    complaint status: [REPORT_COMPLAINT_STATUS]<br />
+    complaint resolution: [REPORT_COMPLAINT_RESOLUTION]<br />
+    complaint resolution message: [REPORT_COMPLAINT_MESSAGE]<br />
+    complaint created on: [REPORT_COMPLAINT_CREATED]<br />
+    complaint resolved on: [REPORT_COMPLAINT_RESOLVED_ON]<br />
+    <br />
+
+    <h3>IWF REPORT SUBMISSION</h3>
+    [REPORT_IWF_SUBMISSION_FIELDS]
+    <br />
+    <h3>IWF RESPONSE</h3>
+    [REPORT_IWF_RESPONSE]
+    <br />
+    <h3>NCMEC REPORT SUBMISSION</h3>
+    [REPORT_NCMEC_SUBMISSION_FIELDS]
+    <br />
+    <h3>NCMEC RESPONSE</h3>
+    [REPORT_NCMEC_RESPONSE]
+    <br />
+  EOT
 
   #<reportResponse>
       #<responseCode>0</responseCode>
@@ -318,7 +348,7 @@ class AbusiveContentTool
   end
 
   def self.forward_report(complaint_entry, cc)
-    subject = ""
+    subject = "CSAM INCIDENT REPORT FOR A CATEGORIZED URL"
     body = self.generate_body_for_third_party(complaint_entry)
     report_alert_args = {}
     report_alert_args[:from] = "noreply@talosintelligence.com"
@@ -337,7 +367,59 @@ class AbusiveContentTool
   end
 
   def self.generate_body_for_third_party(complaint_entry)
+    abuse_records = complaint_entry.abuse_records
+    report_complaint_id = complaint_entry.complaint.id
+    report_complaint_entry_id = complaint_entry.id
+    report_url = abuse_records.first.url
+    report_complaint_status = complaint_entry.status
+    report_complaint_resolution = complaint_entry.resolution
+    report_complaint_message = complaint_entry.resolution_comment
+    report_complaint_created = complaint_entry.created_on
+    report_complaint_resolved_on = complaint_entry.case_resolved_at
 
+    report_iwf_submission_fields = ""
+    report_iwf_response = ""
+
+    report_ncmec_submission_fields = ""
+    report_ncmec_response = ""
+
+    iwf_report = abuse_records.select {|rec| rec.source == AbuseRecord::IWF}.first rescue nil
+    if iwf_report.present?
+      iwf_fields = JSON.parse(iwf_report.report_submitted) rescue nil
+      if iwf_fields.present?
+        report_iwf_submission_fields += "<br />"
+        iwf_fields.each do |key, field|
+          report_iwf_submission_fields += "#{key}: #{field}<br />"
+        end
+      end
+      report_iwf_response = iwf_report.result
+    end
+
+
+    ncmec_report = abuse_records.select {|rec| rec.source == AbuseRecord::NCMEC}.first rescue nil
+    if ncmec_report.present?
+      ncmec_xml_doc = Nokogiri::XML(ncmec_report.report_submitted)
+      report_ncmec_submission_fields = self.traverse_report_xml(ncmec_xml_doc.root)
+      report_ncmec_response = ncmec_report.result
+    end
+
+    email_body = REQUEST_FOR_INFO_EMAIL_BODY_TEMPLATE.gsub('[REPORT_URL]', report_url).gsub('[REPORT_COMPLAINT_ID]', report_complaint_id).gsub('[REPORT_COMPLAINT_ENTRY_ID]', report_complaint_entry_id)
+                     .gsub('[REPORT_COMPLAINT_STATUS]', report_complaint_status).gsub('[REPORT_COMPLAINT_RESOLUTION]', report_complaint_resolution).gsub('[REPORT_COMPLAINT_MESSAGE]', report_complaint_message)
+                     .gsub('[REPORT_COMPLAINT_CREATED]', report_complaint_created).gsub('[REPORT_COMPLAINT_RESOLVED_ON]', report_complaint_resolved_on).gsub('[REPORT_IWF_SUBMISSION_FIELDS]', report_iwf_submission_fields)
+                     .gsub('[REPORT_IWF_RESPONSE]', report_iwf_response).gsub('[REPORT_NCMEC_SUBMISSION_FIELDS]', report_ncmec_submission_fields).gsub('[REPORT_NCMEC_RESPONSE]', report_ncmec_response)
+    email_body
+  end
+
+  def self.traverse_report_xml(xml_node)
+    captured_string = ""
+    xml_node.children.each do |child|
+      if child.element? && child.children.size == 1 && child.children.first.text?
+        captured_string += "#{child.name}: #{child.text}\n"
+      else
+        captured_string += traverse_report_xml(child)
+      end
+    end
+    captured_string
   end
 
   def self.get_report_data(complaint_entry_id)
