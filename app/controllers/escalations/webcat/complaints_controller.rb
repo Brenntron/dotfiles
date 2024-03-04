@@ -18,10 +18,6 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
     render layout: "escalations/webcat/clusters"
   end
 
-  def csam_reports
-    render layout: "escalations/webcat/csam_reports"
-  end
-
   def show_multiple
     ids = params["selected_ids"]&.split(',') || nil
     @complaints = Complaint.where(id:ids)
