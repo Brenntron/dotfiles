@@ -571,7 +571,6 @@ Feature: Webcat complaint entry assignment
     And I wait for "2" seconds
     And I should see "The following entries could not be assigned: Complaint is already assigned to bob_belcher - 1"
 
-  ## Note: The pending ticket does not work as expected at the moment
   @javascript
   Scenario: a manager cannot change assignee when complaint is PENDING or COMPLETE
     Given a user with role "webcat manager" exists and is logged in
@@ -586,17 +585,18 @@ Feature: Webcat complaint entry assignment
       | 17 | webcat user |     7         |
     And a user with id "2" has a role of "webcat user"
     And the following complaint entries exist:
-      | id    | uri                 | domain          | entry_type | status     |
-      | 1111  | abc.com             | abc.com         | URI/DOMAIN | PENDING    |
-      | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | COMPLETED  |
+      | id    | uri                 | domain          | entry_type | status     | is_important |
+      | 1111  | abc.com             | abc.com         | URI/DOMAIN | PENDING    |       1      |
+      | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | COMPLETED  |       0      |
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "2" seconds
-#    And I click row with id "1"
-#    And I click "#index_change_assign"
-#    And I click "#button_reassign"
-#    And I wait for "1" seconds
-#    And I should see "The following entries could not be assigned: Already completed - 1"
-#    And I click row with id "1"
+    And I click row with id "1"
+    And I click "#index_change_assign"
+    And I click "#button_reassign"
+    And I wait for "1" seconds
+    And I should see "The following entries could not be assigned: Status is pending - 1"
+    Then I click ".close"
+    And I click row with id "1"
     And I click row with id "2"
     And I click "#index_change_assign"
     And I click "#button_reassign"
@@ -604,14 +604,67 @@ Feature: Webcat complaint entry assignment
     And I should see "The following entries could not be assigned: Already completed - 2"
 
   @javascript
+  Scenario: a user cannot change the reviewer on a COMPLETED entry
+    Given a user with role "webcat manager" exists and is logged in
+    And the following users exist
+      | id | cvs_username  | cec_username  | display_name   |
+      | 2  | bob_belcher   | bob_belcher   | Bob Belcher    |
+    And the following org_subsets exist:
+      | id | name   |
+      | 7  | webcat |
+    And the following roles exist:
+      | id | role        | org_subset_id |
+      | 17 | webcat user |     7         |
+    And a user with id "2" has a role of "webcat user"
+    And the following complaint entries exist:
+      | id    | uri                 | domain          | entry_type | status     |
+      | 1111  | whatever.com        | whatever.com    | URI/DOMAIN | COMPLETED  |
+    And  I goto "/escalations/webcat/complaints"
+    And  I wait for "2" seconds
+    And I click row with id "1"
+    And I click "#assignment-type-reviewer"
+    And I click "#index_change_assign"
+    And I click "#button_reassign"
+    And I wait for "1" seconds
+    And I should see "The following entries could not be assigned: Already completed - 1"
+
+  @javascript
+  Scenario: a user cannot change the second reviewer on a COMPLETED entry
+    Given a user with role "webcat manager" exists and is logged in
+    And the following users exist
+      | id | cvs_username  | cec_username  | display_name   |
+      | 2  | bob_belcher   | bob_belcher   | Bob Belcher    |
+      | 3  | linda_belcher | linda_belcher | Linda Belcher  |
+    And the following org_subsets exist:
+      | id | name   |
+      | 7  | webcat |
+    And the following roles exist:
+      | id | role        | org_subset_id |
+      | 17 | webcat user |     7         |
+    And a user with id "2" has a role of "webcat user"
+    And the following complaint entries exist:
+    And the following complaint entries exist:
+      | id | uri            | domain          | entry_type | status     | user_id | reviewer_id  |
+      | 1  | abc.com        | abc.com         | URI/DOMAIN | ASSIGNED   |    4    |     3        |
+    And  I goto "/escalations/webcat/complaints"
+    And  I wait for "2" seconds
+    And I click row with id "1"
+    And I click "#assignment-type-second-reviewer"
+    And I click "#index_change_assign"
+    And I click "#button_reassign"
+    And I wait for "1" seconds
+    And I should see "The following entries could not be assigned: Already completed - 1"
+
+  @javascript
   Scenario:  a non-manager can unassign a user from a complaint
     Given a user with role "webcat user" exists and is logged in
     And the following users exist
-      | id | cvs_username | cec_username | display_name |
-      | 3  | test_user    | test_user    | test_user    |
+      | id | cvs_username   | cec_username   | display_name |
+      | 3  | test_user      | test_user      | test_user    |
+      | 4  | test_user2     | test_user2    | test_user2    |
     And the following complaint entries exist:
       | id | uri            | domain          | entry_type | status     | user_id | second_reviewer_id |
-      | 1  | abc.com        | abc.com         | URI/DOMAIN | ASSIGNED   |    3    |               |
+      | 1  | abc.com        | abc.com         | URI/DOMAIN | ASSIGNED   |    3    |          3         |
     And  I goto "/escalations/webcat/complaints"
     And the first Complaint Ticket is assigned to user id "3"
     #Need to show User column - hidden by default
@@ -620,7 +673,7 @@ Feature: Webcat complaint entry assignment
     And I click "#view-data-assignee-cb"
     And  I click ".cat-index-main-row"
     Then I should see "ASSIGNED"
-    And  I click ".remove-assignee-toolbar-button"
+    And  I click "#webcat-remove-assignee-toolbar-button"
     Then I wait for "4" seconds
     And  I should not see "ASSIGNED"
     And  I should see "Vrt Incoming"
@@ -632,17 +685,17 @@ Feature: Webcat complaint entry assignment
     And the following users exist
       | id | cvs_username  | cec_username | display_name |
       | 3  | test_user     | test_user    | test_user    |
-      | 4  | test_user2    | test_user 2   | test_user2    |
+      | 4  | test_user2    | test_user 2   | test_user2  |
     And the following complaint entries exist:
       | id | uri            | domain          | entry_type | status     | user_id | reviewer_id  |
       | 1  | abc.com        | abc.com         | URI/DOMAIN | ASSIGNED   |    4    |     3        |
     And  I goto "/escalations/webcat/complaints"
     And I click ".cat-index-main-row"
     And I click "#assignment-type-reviewer"
-    And I click ".return-ticket-toolbar-button"
+    And I click "#webcat-remove-assignee-toolbar-button"
     And I wait for "2" seconds
-    And I should see "ERROR RETURNING ENTRIES"
-    And I should see "The following entries could not be returned: Someone else is currently reviewing - 1"
+    And I should see "ERROR REMOVING ASSIGNEES"
+    And I should see "The following entries could not be assigned: Cannot remove assigned reviewer - 1"
 
   @javascript
   Scenario:  a non-manager cannot unassign a second reviewer from a complaint
@@ -658,10 +711,10 @@ Feature: Webcat complaint entry assignment
     And  I goto "/escalations/webcat/complaints"
     And I click ".cat-index-main-row"
     And I click "#assignment-type-second-reviewer"
-    And I click ".return-ticket-toolbar-button"
+    And I click "#webcat-remove-assignee-toolbar-button"
     And I wait for "2" seconds
-    And I should see "ERROR RETURNING ENTRIES"
-    And I should see "The following entries could not be returned: Someone else is currently reviewing - 1"
+    And I should see "ERROR REMOVING ASSIGNEES"
+    And I should see "The following entries could not be assigned: Cannot remove assigned reviewer - 1"
 
   @javascript
   Scenario: a non-manager cannot assign a user other than themself to a complaint as assignee, reviewer or second reviewer
@@ -687,7 +740,3 @@ Feature: Webcat complaint entry assignment
     And button "index_change_assign" should be disabled
     And I click "#assignment-type-second-reviewer"
     And button "index_change_assign" should be disabled
-
-
-#  Scenario: a user cannot change the reviewer on a COMPLETED entry
-#  Scenario: a user cannot change the second reviewer on a COMPLETED entry

@@ -676,3 +676,7 @@ end
 And(/^I should see element "(.*?)" with text "(.*?)" a total of "(.*?)" times/) do | element , text, count |
   page.all("#{element}", :text => "#{text}").count.should == count.to_i
 end
+
+And(/the first row of table "(.*?)" and col "(.*?)" should have content "(.*?)"/) do | table, col, content|
+  page.find("##{table} tbody .#{col}", match: :first).text.should match(content)
+end
