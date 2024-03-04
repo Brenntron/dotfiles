@@ -556,18 +556,18 @@ class ComplaintEntry < ApplicationRecord
 
   ####Generic method to handle any logic to alter categories and any other necessary activities before sending categories
   # to RuleAPI
-  def pre_commit_processing(category_ids_array, ip_or_uri)
-
+  def pre_commit_processing(category_ids_array, ip_or_uri, user)
+    user = User.find_by_email(user) rescue self.user
     if category_ids_array.include?(AbusiveContentTool.current_child_abuse_category[:id])
       category_ids_array = AbusiveContentTool.reclassify_abuse_categories(category_ids_array)
 
       abuse_info = {}
-      abuse_info[:user_id] = self.user.id
-      abuse_info[:user] = self.user.cvs_username
+      abuse_info[:user_id] = user.id
+      abuse_info[:user] = user.email
       abuse_info[:url] = ip_or_uri
       self.abuse_information = abuse_info.to_json
       self.save!
-      result = AbusiveContentTool.submit_abuse_to_authorities(self, self.user, SimpleIDN.to_ascii(ip_or_uri))
+      result = AbusiveContentTool.submit_abuse_to_authorities(self, user, SimpleIDN.to_ascii(ip_or_uri))
       abuse_info[:iwf_report] = result[:iwf_report]
       abuse_info[:ncmec_report] = result[:ncmec_report]
       self.abuse_information = abuse_info.to_json
@@ -575,7 +575,7 @@ class ComplaintEntry < ApplicationRecord
 
       #needs an official notification system here but for right now email talosweb if there is an anomaly
       # in reporting results
-      AbuseContentTool.validate_report(self)
+      AbusiveContentTool.validate_report(self)
 
 
       #if result[:status].to_s == "success"
@@ -615,7 +615,7 @@ class ComplaintEntry < ApplicationRecord
 
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
-    category_ids_array = pre_commit_processing(category_ids_array, ip_or_uri)
+    category_ids_array = pre_commit_processing(category_ids_array, ip_or_uri, user)
 
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"

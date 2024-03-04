@@ -101,7 +101,6 @@ class Webcat::Ncmec
 
     case method
       when :post
-        binding.pry
         HTTPI.post(request)
 
       else #:get

@@ -8,7 +8,7 @@ class AbuseRecord < ApplicationRecord
   def self.build_and_save_record(url, report_submitted = nil, response = nil, report_ident = nil, report_source = nil, user = nil, complaint_entry = nil)
 
     abuse_record = AbuseRecord.new
-    abuse_record.submitter = user.cvs_username
+    abuse_record.submitter = user.email
     abuse_record.complaint_entry_id = complaint_entry.id
     abuse_record.source = report_source
     abuse_record.result = response.to_s
@@ -17,6 +17,7 @@ class AbuseRecord < ApplicationRecord
     abuse_record.url = url
     abuse_record.save
 
+    abuse_record
   end
 
 end

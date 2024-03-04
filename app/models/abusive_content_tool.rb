@@ -152,8 +152,8 @@ class AbusiveContentTool
     #do a report existence check for each before sending, as this method will be re-used by a recovery tool
 
     abuse_records = AbuseRecord.where(:complaint_entry_id => complaint_entry.id)
-    iwf_exists = abuse_records.any? {|rec| rec.source == AbuseRecord::IWF && rec.report_ident.present?} rescue false
-    ncmec_exists = abuse_records.any? {|rec| rec.source == AbuseRecord::NCMEC && rec.report_ident.present?} rescue false
+    iwf_exists = abuse_records.select {|rec| rec.source == AbuseRecord::IWF && rec.report_ident.present?}.first rescue false
+    ncmec_exists = abuse_records.select {|rec| rec.source == AbuseRecord::NCMEC && rec.report_ident.present?}.first rescue false
 
     ncmec_results = nil
     iwf_results = nil
@@ -161,7 +161,7 @@ class AbusiveContentTool
     report_results = {}
     report_results[:status] = "success"
 
-    if !iwf_exists
+    if !iwf_exists.present?
       begin
         iwf_results = self.submit_to_iwf(complaint_entry, user, url)
         report_results[:iwf] = iwf_results
@@ -171,9 +171,11 @@ class AbusiveContentTool
         report_results[:iwf] = {:status => "error"}
         iwf_results = nil
       end
+    else
+      report_results[:iwf] = {:status => "exists", :abuse_record_report_id => iwf_exists.report_ident}
     end
 
-    if !ncmec_exists
+    if !ncmec_exists.present?
       begin
         ncmec_results = self.submit_to_ncmec(complaint_entry, user, url)
         report_results[:ncmec] = ncmec_results
@@ -183,22 +185,27 @@ class AbusiveContentTool
         report_results[:ncmec] = {:status => "error"}
         ncmec_results = nil
       end
+    else
+      report_results[:ncmec] = {:status => "exists", :abuse_record_report_id => ncmec_exists.report_ident}
     end
-    self.process_email_report(ncmec_results, iwf_results)
+    self.process_email_report(complaint_entry, report_results)
 
     report_results
   end
 
-  def self.process_email_report(ncmec_results, iwf_results)
-    abusive_info = {}
-    abusive_info[:iwf_report_id] = "IWF report submission ID: #{result[:data]}"
-    self.abuse_information = abusive_info.to_json
-    self.save!
+  def self.process_email_report(complaint_entry, report_results)
+
     report_alert_args = {}
     report_alert_args[:to] = "admatter@cisco.com"
     report_alert_args[:from] = "noreply@talosintelligence.com"
     report_alert_args[:subject] = "IWF Report Notification"
-    report_alert_args[:body] = "Reference Data <br /> Complaint ID: #{self.complaint.id} <br /> Complaint Entry ID: #{self.id} <br /> Entry: #{self.hostlookup} <br /> User assigned: #{self.user.cvs_username}"
+
+    body = "Reference Data <br /> Complaint ID: #{complaint_entry.complaint.id} <br /> Complaint Entry ID: #{complaint_entry.id} <br /> Entry: #{complaint_entry.hostlookup} <br /> User assigned: #{complaint_entry.user.cvs_username}"
+    body += "<br />"
+    body += "NCMEC Report ID: #{report_results[:ncmec][:abuse_record_report_id]}"
+    body += "<br />"
+    body += "IWF Report ID: #{report_results[:iwf][:abuse_record_report_id]}"
+    report_alert_args[:body] = body
 
     attachments_to_mail = []
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
@@ -246,15 +253,29 @@ class AbusiveContentTool
   end
 
   def self.submit_to_ncmec(complaint_entry, user, url)
+    results = {}
+    results[:status] = nil
+    results[:response_code] = nil
+    results[:response] = nil
+
     body = self.build_ncmec_body(complaint_entry, user, url)
     response = Webcat::Ncmec.call_xml_request(body, "/ispws/submit")
 
     response_xml = Nokogiri::XML(response.body)
     response_code = response_xml.xpath('//responseCode').text
     if response_code == "0"
-      report_id = doc.xpath('//reportId').text
-      AbuseRecord.build_and_save_record(url, body, response_xml, report_id, AbuseRecord::NCMEC, user, complaint_entry)
+      results[:status] = "success"
+      report_id = response_xml.xpath('//reportId').text
+      abuse_record = AbuseRecord.build_and_save_record(url, body, response_xml, report_id, AbuseRecord::NCMEC, user, complaint_entry)
+    else
+      results[:status] = "error"
     end
+
+    results[:response_code] = response_code
+    results[:response] = response.body
+    results[:abuse_record_id] = abuse_record.id
+    results[:abuse_record_report_id] = abuse_record.report_ident
+    results
 
   end
 
@@ -304,7 +325,9 @@ class AbusiveContentTool
     results[:message] = response["responseDescription"]
     results[:data] = response["responseData"]
 
-    AbuseRecord.build_and_save_record(url, params.to_json, response, results[:data], AbuseRecord::IWF, user, complaint_entry)
+    abuse_record = AbuseRecord.build_and_save_record(url, params.to_json, response, results[:data], AbuseRecord::IWF, user, complaint_entry)
+    results[:abuse_record_id] = abuse_record.id
+    results[:abuse_record_report_id] = abuse_record.report_ident
     results
 
 
