@@ -5,6 +5,7 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 export ZSH="${HOME}/.oh-my-zsh"
 
 source $ZSH/oh-my-zsh.sh
+source ~/code/Tools/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 if [[ $(uname) == "Linux" ]]; then
   source ~/.config/linux/linux_antigen.zsh
@@ -37,7 +38,6 @@ antigen bundle rails
 antigen bundle rsync
 antigen bundle ruby
 antigen bundle ssh-agent
-antigen bundle thefuck
 antigen bundle yarn
 antigen bundle zsh-users/zsh-syntax-highlighting
 
@@ -242,18 +242,16 @@ export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
 
 . ~/.asdf/plugins/java/set-java-home.zsh
 
-require "l" "gem install colorls"
-
 source $(dirname $(gem which colorls))/tab_complete.sh
 
-alias lc = "colorls --dark"
-alias l = "colorls -l --dark"
-alias ll = "colorls -lA --dark"
-alias la = "colorls -la --dark"
-alias lt = "colorls -lt --dark"
-alias lS = "colorls -lS --dark"
-alias lr = "colorls --tree=5 --dark"
-alias lx = "colorls -lAX --dark"
+alias lc="colorls --dark"
+alias l="colorls -l --dark"
+alias ll="colorls -lA --dark"
+alias la="colorls -la --dark"
+alias lt="colorls -lt --dark"
+alias lS="colorls -lS --dark"
+alias lr="colorls --tree=5 --dark"
+alias lx="colorls -lAX --dark"
 
 alias zshrc='${=EDITOR} ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc file
 
@@ -309,9 +307,7 @@ alias CC='gcc'
 # Set alias for dotfiles config
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
-# enable autocomplete for fnt
-autoload -U compinit && compinit
-
 # enable alias-finder
 zstyle ':omz:plugins:alias-finder' autoload yes # disabled by default
-
+source $(brew --prefix autoenv)/activate.sh
+eval "$(zoxide init zsh)"
