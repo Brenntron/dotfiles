@@ -13,6 +13,8 @@ else
   source ~/.config/osx/osx_antigen.zsh
 fi
 
+source $(brew --prefix)/share/antigen/antigen.zsh
+
 antigen use oh-my-zsh
 
 antigen bundle 1password
@@ -226,6 +228,19 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+require "fnt" "brew install fnt"
+require "find" "brew install findutils"
+require "fzf" "brew install fzf"
+require "gcc" "brew install gcc"
+require "imagemagick" "brew install imagemagick@6"
+require "make" "brew install make"
+require "openssl" "brew install openssl@3"
+require "oh-my-posh" "brew install oh-my-posh"
+
+export PATH="$(brew --prefix)/opt/imagemagick@6/bin:$PATH"
+export PATH="$(brew --prefix)/opt/openssl@3/bin:$PATH"
+export PATH="$(brew --prefix)/opt/make/libexec/gnubin:$PATH"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
