@@ -128,8 +128,8 @@
         %span.toolbar-button-text Take
       %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)', disabled: 'true'}
         %span.toolbar-button-text Return
-    %span.toolbar-concise-button-area.webrep-change-assignee-wrapper
-      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text.darkened-button{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true'}
+    %span.toolbar-concise-button-area.webcat-change-assignee-wrapper
+      %button#webcat-remove-assignee-toolbar-button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text.darkened-button{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true'}
       %span.dropdown
         - if current_user.has_role?('webcat manager')
           %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true', 'data-user-role': 'manager'}

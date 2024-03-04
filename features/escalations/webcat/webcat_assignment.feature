@@ -663,11 +663,31 @@ Feature: Webcat complaint entry assignment
     And I should see "ERROR RETURNING ENTRIES"
     And I should see "The following entries could not be returned: Someone else is currently reviewing - 1"
 
+  @javascript
+  Scenario: a non-manager cannot assign a user other than themself to a complaint as assignee, reviewer or second reviewer
+    Given a user with role "webcat user" exists within org subset "webcat" and is logged in
+    And the following users exist
+      | id | cvs_username  | cec_username  | display_name  |
+      | 2  | test_user     | test_user     | test_user     |
+      | 3  | test_user2    | test_user2    | test_user2    |
+    And the following complaint entries exist:
+      | id | uri            | domain          | entry_type | status     | user_id | reviewer_id  |  reviewer_id  |
+      | 1  | abc.com        | abc.com         | URI/DOMAIN | ASSIGNED   |    4    |     3        |       5       |
+    And the following org_subsets exist:
+      | id | name   |
+      | 7  | webcat |
+    And a user with id "2" has a role of "webcat user"
+    And a user with id "3" has a role of "webcat user"
+    And  I goto "/escalations/webcat/complaints"
+    And I click row with id "1"
+    And I click "#assignment-type-assignee"
+    And button "webcat-remove-assignee-toolbar-button" should be enabled
+    And button "index_change_assign" should be disabled
+    And I click "#assignment-type-reviewer"
+    And button "index_change_assign" should be disabled
+    And I click "#assignment-type-second-reviewer"
+    And button "index_change_assign" should be disabled
 
-# TODO
-#  Scenario: a non-manager cannot assign a user other than themself to a complaint
-#  Scenario: a non-manager cannot assign a user other than themself as a reviewer to a complaint
-#  Scenario: a non-manager cannot assign a user other than themself as a second reviewer to a complaint
 
 #  Scenario: a user cannot change the reviewer on a COMPLETED entry
 #  Scenario: a user cannot change the second reviewer on a COMPLETED entry
