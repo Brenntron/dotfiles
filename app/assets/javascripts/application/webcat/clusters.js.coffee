@@ -1050,8 +1050,8 @@ $ ->
     platform = url.searchParams.get('platform')
     cluster_type = url.searchParams.get('cluster_type')
     dropdownShouldToggle = true
- 
-    platforms = platform.split(',')
+     
+    platforms = if platform then  platform.split(',') else ['Umbrella', 'Meraki', 'NGFW']
     $("input.show-platforms-filter").prop('checked', false)
    
     for platform in platforms
@@ -1072,7 +1072,7 @@ $ ->
     }
     pagingType: 'full_numbers'
     order: [ [
-      5
+      6
       'desc'
     ] ]
     lengthMenu: [50, 100, 200]
@@ -1082,8 +1082,10 @@ $ ->
           0
           1
           2
-          9
+          5
+          7
           10
+          11
         ]
         orderable: false
         searchable: false
@@ -1130,19 +1132,26 @@ $ ->
         className: 'cluster_identifier'
       }
       {
+        data: 'domain'
+        className: 'domain-column'
+        render: (data) ->
+           "<span ondblclick='copy_domain(\"#{data}\", this)'> #{data} </span>"
+      }
+      {
         data: null
-        className: 'domain-column',
+        className: 'cluster-actions',
+        with: '100px',
         render:  (data, _type, _full, meta) ->
           {domain, cluster_size, platform, duplicates} = data  # get domain string and cluster_size out of the data
           is_ip = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
 
-          html = "<span ondblclick='copy_domain(\"#{domain}\", this)'> #{domain} </span>"
+          html = ""
 
           # only show WHOIS lookup button for normal domains, not ip addresses
           if !is_ip.test(domain)
-            html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='WebCat.RepLookup.whoIsLookup(\"#{domain}\")'></button>"
+            html += "<button type='button' class='whois-btn  esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='WebCat.RepLookup.whoIsLookup(\"#{domain}\")'></button>"
           else
-            html += "<button type='button' class='whois-btn right-margin domain-spacer'></button>"
+            html += "<button type='button' class='whois-btn right-margin'></button>"
 
           html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
                   <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
@@ -1165,6 +1174,7 @@ $ ->
       }
       {
         data: 'assigned_to'
+        orderable: true
         className: "alt-col assignee-col"
         render: (data, type, full, meta) ->
           escaped_domain = full.domain.replaceAll('.', '_') # jquery doesn't like dots in id

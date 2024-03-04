@@ -9,11 +9,12 @@ class Clusters::Datatable < AjaxDatatablesRails::ActiveRecord
 
   def view_columns
     @view_columns ||= {
-      cluster_id: { source: 'WebCatCluster.id', data: 'id' },
-      domain: { source: 'WebCatCluster.domain', data: 'domain' },
-      global_volume: { source: 'WebCatCluster.traffic_hits', data: 'traffic_hits' },
-      categories: { source: 'WebCatCluster.category_ids', data: 'category_ids' },
-      platform: { source: 'WebCatCluster.cluster_type', data: 'cluster_type' }
+      cluster_id: { source: 'WebCatCluster.id', data: :id },
+      domain: { source: 'WebCatCluster.domain', data: :domain, orderable: true },
+      global_volume: { source: 'WebCatCluster.traffic_hits', data: :traffic_hits },
+      categories: { source: 'WebCatCluster.category_ids', data: :category_ids },
+      platform: { source: 'WebCatCluster.cluster_type', data: :cluster_type },
+      assigned_to: { source: 'User.cvs_username', data: :cvs_username },
     }
   end
 
@@ -23,6 +24,15 @@ class Clusters::Datatable < AjaxDatatablesRails::ActiveRecord
 
   def get_raw_records
     WebCatCluster.visible
+  end
+
+  def sort_records(records)
+    case datatable.orders.first.column.sort_query
+    when 'users.cvs_username'
+      records.sorted_by_user(datatable.orders.first.direction)
+    else
+      super
+    end
   end
 
   def filter_records(records)
@@ -37,53 +47,52 @@ class Clusters::Datatable < AjaxDatatablesRails::ActiveRecord
       records = records.left_outer_joins(:cluster_assignments).where(cluster_assignments: { id: nil }).distinct
     when 'pending'
       records = records.pending
+    else
+      records = records
     end
-
     records
   end
-
 
   private
 
   def format_data(clusters)
-    domains = clusters.pluck(:domain)
+    new_clusters = clusters.dup.to_a
+    domains = new_clusters.pluck(:domain)
     dup_clusters = WebCatCluster.where(domain: domains)
     wbrs_scores = wbrs_score(domains)
     is_important = is_important_data(domains)
     assignments = ClusterAssignment.fetch_assignments_for(domains: domains)
-
-
     dup_clusters = dup_clusters.map do |cluster|
       {
         cluster_id: cluster['id'],
+        is_important: is_important[cluster['domain']],
         domain: cluster['domain'],
         global_volume: cluster['traffic_hits'],
-        is_pending: cluster['status'] == 'pending' ? true : false,
-        categories: cluster['category_ids'].nil? ? [] : JSON.parse(cluster['category_ids']),
-        platform: cluster['platform'],
-        assigned_to: assignments.filter { |assignment| assignment['domain'] == cluster['domain'] }.first&.user&.cvs_username || '',
-        platform: cluster['cluster_type'],
-        is_important: is_important[cluster['domain']],
         wbrs_score: wbrs_scores[cluster['domain']],
-      }
+        platform: cluster['cluster_type'],
+        is_pending: cluster['status'] == 'pending' ? true : false,
+        assigned_to: assignments.filter { |assignment| assignment['domain'] == cluster['domain'] }.first&.user&.cvs_username || '',
+        categories: cluster['category_ids'].nil? ? [] : JSON.parse(cluster['category_ids']),
+         }
     end
 
-    clusters.each_with_object([]) do |cluster, result|
+    data = new_clusters.each_with_object([]) do |cluster, result|
+      main_cluster = dup_clusters.select { |cluster_with_data| cluster_with_data[:cluster_id].eql?(cluster['id']) }
       duplicates = dup_clusters.select do |cluster_with_data|
         cluster_with_data[:domain].eql?(cluster.domain) && cluster_with_data[:cluster_id] != cluster['id']
       end
-      main_cluster = dup_clusters.select { |cluster_with_data| cluster_with_data[:cluster_id].eql?(cluster['id']) }
       
       cluster_with_duplicates = main_cluster.first
       cluster_with_duplicates[:duplicates] = duplicates.to_json
       result << cluster_with_duplicates
     end
+    data
   end
 
   def wbrs_score(domains)
     beaker_urls_list = domains.map { |domain| {'url' => domain} }
     parsed_response = {}
-    Beaker::Verdicts.verdicts(beaker_urls_list).each do |top_url_response|
+    ::Beaker::Verdicts.verdicts(beaker_urls_list).each do |top_url_response|
       next if top_url_response['response'].blank? || top_url_response['response']['error'].present?
 
       parsed_response[top_url_response['request']['url']] = top_url_response['response']['thrt']['scor']
