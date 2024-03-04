@@ -1,23 +1,21 @@
 class AbuseRecordDatatable < AjaxDatatablesRails::Base
 
-  def initialize(params, user)
+  def initialize(params, user:)
     @user = user
     super(params, {})
   end
 
-  #def view_columns
-    # Declare strings in this format: ModelName.column_name
-    # or in aliased_join_table.column_name format
-  #  @view_columns ||={
-        #complaint_entry_id:       {source: "Cluster.cluster_id", cond: :eq, searchable: true, orderable: true},
-      # age:      {source: "Cluster.age", cond: :eq, searchable: true, orderable: true},
-        #domain:   {source: "Cluster.domain", cond: :eq, searchable: true, orderable: true},
-      # cluster_entries_count: {source: "Cluster.entry_count", cond: :eq, searchable: false, orderable: true},
-      # customer_name: {source: "Complaint.customer_name", cond: :eq, searchable: true, orderable: true},
-        #global_volume: {source: "Cluster.global_volume", cond: :eq, searchable: true, orderable: true},
-        #age:  {source: "Cluster.ctime", cond: :eq, searchable: true, orderable: true},
+  def view_columns
+    @view_columns ||= {
+        complaint_entry_id: {source: "ComplaintEntry.id", cond: :like},
+        url:                {source: "AbuseRecord.url", data: :url, cond: :like},
+        date_resolved:      {source: "ComplaintEntry.case_resolved_at", data: :case_resolved_at, cond: :date_range},
+        analyst:            {source: "AbuseRecord.submitter", data: :submitter, cond: :like},
+        source:             {source: "AbuseRecord.source", data: :source, cond: :like},
+        report_id:          {source: "AbuseRecord.report_ident", data: :report_ident, cond: :like},
+        date_sent:          {source: "AbuseRecord.created_at", data: :created_at, cond: :date_range}
     }
-  #end
+  end
 
   def data
     records.map do |record|

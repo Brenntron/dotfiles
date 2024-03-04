@@ -13,7 +13,6 @@
             %span
               Forward Report(s)
 
-      -# Entry id links to (complaint) show page
       -# Report id's open up the compiled report in a dialog
 
       %table.table.responsive.dataTable.no-footer.webcat-list-view#webcat-csam-reports-index{role:'datatable'}
@@ -31,7 +30,7 @@
             %th
               -# actions column
 
-        %tbody
+        -#%tbody
 
           -# - @reports.each do | report |
           -#   %tr
@@ -104,33 +103,14 @@
           -#
 
 
+- @reports.each do |report|
+  .csam-report-dialog{id: "#{report.source}_report_dialog_#{report.report_ident}", title: "#{report.source} Report ##{report.report_ident}"}
+    .dialog-content-wrapper
+      .row
+        .col-xs-12
+          %h4 Report Response
+          = report.result
 
-.csam-report-dialog#ncmec_report_dialog_3962592{title: 'NCMEC Report #3962592'}
-  .dialog-content-wrapper
-    .row
-      .col-xs-12
-        Add report content here for NCMEC 3962592
-
-.csam-report-dialog#ncmec_report_dialog_3962514{title: 'NCMEC Report #3962514'}
-  .dialog-content-wrapper
-    .row
-      .col-xs-12
-        Add report content here for NCMEC 3962514
-
-.csam-report-dialog#ncmec_report_dialog_3962220{title: 'NCMEC Report #3962220'}
-  .dialog-content-wrapper
-    .row
-      .col-xs-12
-        Add report content here for NCMEC 3962220
-
-.csam-report-dialog#iwf_report_dialog_1124442{title: 'IWF Report #1124442'}
-  .dialog-content-wrapper
-    .row
-      .col-xs-12
-        Add report content here for IWF 1124442
-
-.csam-report-dialog#iwf_report_dialog_1124403{title: 'IWF Report #1124403'}
-  .dialog-content-wrapper
-    .row
-      .col-xs-12
-        Add report content here for IWF 1124403
+          %hr
+          %h4 Report Content
+          = report.report_submitted
