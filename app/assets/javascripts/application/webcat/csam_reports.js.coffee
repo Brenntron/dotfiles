@@ -29,6 +29,12 @@ build_csam_reports_table = () ->
       targets: [0, 8]
       orderable: false
     ]
+    ajax:
+      url: $('#webcat-scam-reports-index').data('source')
+      data: ''
+      error: () ->
+        console.log 'There has been an error calling the backend data'
+
 
     initComplete: ->
       $('#webcat-csam-reports-index_filter input').addClass('table-search-input')
