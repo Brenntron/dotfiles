@@ -1,8 +1,10 @@
 .attention-flag {
+  display: block;
+  width: 20px;
+  height: 20px;
   background-image: url(image_path('icon_warning_orange.svg'));
   background-repeat: no-repeat;
-  background-size: 20px;
-  background-position: left 6px center;
+  background-size: contain;
 }
 
 .tooltip-dotted-underline {
@@ -40,11 +42,14 @@
 
 #webcat-csam-reports-index {
   .tools-col {
-    padding: 2px 0 2px 8px;
+    padding: 3px 0 0 8px;
     text-align: right;
-
+    .toolbar-button {
+      display: inline-block;
+      float: none;
+    }
   }
   .attention-flag-col {
-    width: 24px;
+    padding: 6px 0 0 0;
   }
 }

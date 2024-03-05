@@ -4602,6 +4602,7 @@ td.wbrs-highlight, td.sbrs-highlight {
 .escalations--webrep--disputes-controller,
 .escalations--webcat--complaints-controller,
 .escalations--webcat--reports-controller,
+.escalations--webcat--csam_reports-controller,
 .users-controller,
 .escalations--file_rep--disputes-controller,
 .escalations--sdr--disputes-controller {
@@ -13718,14 +13719,18 @@ table > tbody > tr > td.no-padding {
 
 
 // CATEGORIZE URLs dropdown - overall wrapper
-.escalations--webcat--complaints-controller .nav-tools-dropdown[aria-labelledby='categorize-urls'] {
+.escalations--webcat--complaints-controller .nav-tools-dropdown[aria-labelledby='categorize-urls'],
+.escalations--webcat--csam_reports-controller .nav-tools-dropdown[aria-labelledby='categorize-urls']
+{
   padding-top: 5px;
   h3 {
     padding: 6px 5px 9px;
   }
 }
 
-.escalations--webcat--complaints-controller .tooltipster-box {
+.escalations--webcat--complaints-controller .tooltipster-box,
+.escalations--webcat--csam_reports-controller .tooltipster-box
+{
   margin-top: 7px !important;
 }
 

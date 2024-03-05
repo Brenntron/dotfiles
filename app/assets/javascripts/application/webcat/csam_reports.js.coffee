@@ -7,11 +7,6 @@ $ ->
     $(document).on 'click', '#webcat-csam-reports-index tbody tr', ->
       enable_report_buttons()
 
-    $('.csam-report-id-col').click ->
-      source = $(this).attr('data-report-source')
-      report_id = $(this).attr('data-report-id')
-      open_csam_report(report_id, source)
-
 
 
 
@@ -29,9 +24,19 @@ build_csam_reports_table = () ->
     pagingType: 'full_numbers'
     order: [7, 'desc']
     columnDefs: [
-      targets: [0, 8]
-      orderable: false
-      searcheable: false
+      {
+        targets: [0, 8]
+        orderable: false
+        searcheable: false
+      }
+      {
+        targets: [0]
+        className: 'attention-flag-col'
+      }
+      {
+        targets: [8]
+        className: 'tools-col'
+      }
     ]
     ajax:
       url: $('#webcat-scam-reports-index').data('source')
@@ -40,6 +45,11 @@ build_csam_reports_table = () ->
     columns: [
       {
         data: 'record_id'
+        render: (data, type, full, meta) ->
+          if full.report_id? && full.report_id != ''
+            return ''
+          else
+            return '<span class="attention-flag"></span>'
       }
       {
         data: 'complaint_entry_id'
@@ -58,19 +68,32 @@ build_csam_reports_table = () ->
       }
       {
         data: 'report_id'
+        className: 'csam-report-id-col'
+        render: (data, type, full, meta) ->
+          if full.report_id? && full.report_id != ''
+            return '<span class="report-id-wrapper" data-record-id="' + full.record_id + '" data-report-id="' + full.report_id + '" data-report-source="' + full.source + '">' + full.report_id + '</span>'
+          else
+            return ''
       }
       {
         data: 'date_sent'
       }
       {
-        data: 'report_id'
+        data: 'record_id'
         render: (data) ->
-         return "<button class='toolbar-button toolbar-button-spacer icon-reports esc-tooltipped' title='Resend report'</button><button class='toolbar-button icon-email esc-tooltipped' title='Forward report to external email address'</button>"
+         return '<button id="resend_csam_report_' + data + '" class="toolbar-button toolbar-button-spacer icon-reports esc-tooltipped" title="Resend report"</button><button id="forward_csam_report_' + data + '" class="toolbar-button icon-email esc-tooltipped" title="Forward report to external email address"</button>'
       }
     ]
 
     initComplete: ->
       $('#webcat-csam-reports-index_filter input').addClass('table-search-input')
+      $('.report-id-wrapper').click ->
+        source = $(this).attr('data-report-source')
+        record_id = $(this).attr('data-record-id')
+        open_csam_report(record_id, source)
+      $('#webcat-csam-reports-index .esc-tooltipped').tooltipster
+        theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+        debug: false
   )
 
 
@@ -87,8 +110,8 @@ build_csam_report_dialogs = () ->
       autoOpen: false
       minWidth: 500
 
-open_csam_report = (report_id, report_type) ->
-  dialog_id = "##{report_type}_report_dialog_#{report_id}"
+open_csam_report = (record_id, report_type) ->
+  dialog_id = "##{report_type}_report_dialog_#{record_id}"
   $(dialog_id).dialog('open')
 
 
