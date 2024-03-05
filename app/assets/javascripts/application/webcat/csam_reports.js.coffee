@@ -19,22 +19,56 @@ $ ->
 build_csam_reports_table = () ->
   csam_table = $('#webcat-csam-reports-index').DataTable(
     select: true
+    processing: true
+    serverSide: true
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     language: {
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
+    pagingType: 'full_numbers'
     order: [ 2, 'desc']
     columnDefs: [
       targets: [0, 8]
       orderable: false
+      searcheable: false
     ]
     ajax:
       url: $('#webcat-scam-reports-index').data('source')
       data: ''
       error: () ->
         console.log 'There has been an error calling the backend data'
-
+    columns: [
+      {
+        data: null
+      }
+      {
+        data: 'complaint_entry_id'
+      }
+      {
+        data: 'date_resolved'
+      }
+      {
+        data: 'url'
+      }
+      {
+        data: 'analyst'
+      }
+      {
+        data: 'source'
+      }
+      {
+        data: 'report_id'
+      }
+      {
+        data: 'date_sent'
+      }
+      {
+        data: 'report_id'
+        render: (data) ->
+         return "<button class='toolbar-button toolbar-button-spacer icon-reports esc-tooltipped' title='Resend report'</button><button class='toolbar-button icon-email esc-tooltipped' title='Forward report to external email address'</button>"
+      }
+    ]
 
     initComplete: ->
       $('#webcat-csam-reports-index_filter input').addClass('table-search-input')
