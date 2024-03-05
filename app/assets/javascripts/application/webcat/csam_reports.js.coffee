@@ -27,7 +27,7 @@ build_csam_reports_table = () ->
       searchPlaceholder: "Search within table"
     }
     pagingType: 'full_numbers'
-    order: [ 2, 'desc']
+    order: [ 6, 'desc']
     columnDefs: [
       targets: [0, 8]
       orderable: false
@@ -35,12 +35,11 @@ build_csam_reports_table = () ->
     ]
     ajax:
       url: $('#webcat-scam-reports-index').data('source')
-      data: ''
       error: () ->
         console.log 'There has been an error calling the backend data'
     columns: [
       {
-        data: null
+        data: 'record_id'
       }
       {
         data: 'complaint_entry_id'
