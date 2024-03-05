@@ -12,7 +12,7 @@ function M.config()
     ignore_lsp = {},
     manual_mode = false,
     on_config_done = nil,
-    patterns = { ".git", "Makefile", "package.json" },
+    patterns = { ".git", ".luacheckrc", ".styelua.toml", "Gemfil", "Makefile", "package.json" },
     scope_chdir = "global",
     show_hidden = false,
     silent_chdir = true,

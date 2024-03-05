@@ -98,8 +98,10 @@ function M.config()
       update_root = true,
     },
     view = {
-      width = 30,
+      number = true,
+      relativenumber = true,
       side = "left",
+      width = 30,
     },
   }
 end

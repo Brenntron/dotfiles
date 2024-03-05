@@ -3,13 +3,11 @@ local M = {
   event = { "BufReadPre", "BufAdd", "BufNew", "BufReadPost" },
   dependencies = {
     {
-      "famiu/bufdelete.nvim",
+      "nvim-tree/nvim-web-devicons",
     },
   },
 }
 function M.config()
-  local colors = require('tokyonight.colors').setup()
-
   require("bufferline").setup {
     options = {
       close_command = "Bdelete! %d", -- can be a string | function, see "Mouse actions"

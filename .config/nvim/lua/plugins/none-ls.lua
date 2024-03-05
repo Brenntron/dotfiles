@@ -1,11 +1,9 @@
 local M = {
   "nvimtools/none-ls.nvim",
   event = "BufReadPre",
-  commit = "60b4a7167c79c7d04d1ff48b55f2235bf58158a7",
   dependencies = {
     {
       "nvim-lua/plenary.nvim",
-      commit = "9a0d3bf7b832818c042aaf30f692b081ddd58bd9",
     },
   },
 }
@@ -37,10 +35,12 @@ function M.config()
       diagnostics.codespell.with {
         filetypes = { "coffee", "css", "cucumber", "erb", "eruby", "javascript", "haml", "html", "markdown", "scss", "yaml" },
       },
+      diagnostics.erb_lint,
       diagnostics.eslint,
       diagnostics.haml_lint,
       diagnostics.rubocop,
       diagnostics.shellcheck,
+      diagnostics.spectral,
       diagnostics.stylelint,
       diagnostics.zsh,
       -- formatters

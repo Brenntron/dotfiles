@@ -27,10 +27,10 @@
           "type": "os",
           "style": "plain",
           "foreground": "p:terminal-blue",
-          "template": "{{.Icon}}}",
+          "template": "{{.Icon}} ",
           "properties": {
-            "linux": "\uf32a",
-            "macos": "mac"
+            "linux": "",
+            "macos": ""
           }
         },
         {
