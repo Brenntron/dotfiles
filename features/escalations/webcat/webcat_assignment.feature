@@ -60,12 +60,9 @@ Feature: Webcat complaint entry assignment
     And the following complaint entries exist:
       | id | uri            | domain          | entry_type | status     |
       | 1  | abc.com        | abc.com         | URI/DOMAIN | NEW        |
+    And I show all webcat index columns
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "3" seconds
-    #Need to show User column - hidden by default
-    And I click "#webcat-index-table-show-columns-button"
-    And I click "#view-user-col-cb"
-    And I click "#view-data-assignee-cb"
     And  I should not see "ASSIGNED"
     And  I click ".cat-index-main-row"
     And  I click ".take-ticket-toolbar-button"
@@ -118,12 +115,9 @@ Feature: Webcat complaint entry assignment
     And the following complaint entries exist:
       | id | uri            | domain          | entry_type | status |
       | 1  | abc.com        | abc.com         | URI/DOMAIN | NEW    |
+    And I show all webcat index columns
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "3" seconds
-    #Need to show User column - hidden by default
-    And I click "#webcat-index-table-show-columns-button"
-    And I click "#view-user-col-cb"
-    And I click "#view-data-assignee-cb"
     And  I click ".cat-index-main-row"
     And  I click ".return-ticket-toolbar-button"
     Then I wait for "3" seconds
@@ -305,12 +299,9 @@ Feature: Webcat complaint entry assignment
       | id    | uri                 | domain          | entry_type | status  |
       | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
       | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | NEW     |
+    And I show all webcat index columns
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "3" seconds
-    #Need to show User column with Assignee data - hidden by default
-    And I click "#webcat-index-table-show-columns-button"
-    And I click "#view-user-col-cb"
-    And I click "#view-data-assignee-cb"
     And I click row with id "1"
     And I click "#index_change_assign"
     And I wait for "1" seconds
@@ -341,12 +332,9 @@ Feature: Webcat complaint entry assignment
       | id    | uri                 | domain          | entry_type | status  |
       | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
       | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | NEW     |
+    And I show all webcat index columns
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "3" seconds
-    #Need to show User column with Assignee data - hidden by default
-    And I click "#webcat-index-table-show-columns-button"
-    And I click "#view-user-col-cb"
-    And I click "#view-data-assignee-cb"
     And I click "#complaints_select_all"
     And I click "#index_change_assign"
     And I wait for "1" seconds
@@ -378,12 +366,9 @@ Feature: Webcat complaint entry assignment
       | id    | uri                 | domain          | entry_type | status  |
       | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
       | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | NEW     |
+    And I show all webcat index columns
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "3" seconds
-    #Need to show User column with Reviewer data - hidden by default
-    And I click "#webcat-index-table-show-columns-button"
-    And I click "#view-user-col-cb"
-    And I click "#view-data-reviewer-cb"
     And I click row with id "1"
     And I click "#assignment-type-reviewer"
     And I click "#index_change_assign"
@@ -415,12 +400,9 @@ Feature: Webcat complaint entry assignment
       | id    | uri                 | domain          | entry_type | status  |
       | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
       | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | NEW     |
+    And I show all webcat index columns
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "3" seconds
-    #Need to show User column with Second Reviewer data - hidden by default
-    And I click "#webcat-index-table-show-columns-button"
-    And I click "#view-user-col-cb"
-    And I click "#view-data-sec-reviewer-cb"
     And I click row with id "1"
     And I click "#assignment-type-second-reviewer"
     And I click "#index_change_assign"
@@ -448,19 +430,15 @@ Feature: Webcat complaint entry assignment
       | id    | uri                 | domain          | entry_type | status  |
       | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
       | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | NEW     |
+    And I show all webcat index columns
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "3" seconds
-    #Need to show User column with Assignee data - hidden by default
-    And I click "#webcat-index-table-show-columns-button"
-    And I click "#view-user-col-cb"
-    And I click "#view-data-assignee-cb"
     And I click row with id "1"
     And I click "#index_change_assign"
     And I wait for "1" seconds
     And I click "#button_reassign"
     And I wait for "1" seconds
     And I should see "Bob Belcher"
-    And I click row with id "1"
     And I click ".remove-assignee-toolbar-button"
     And I should not see "Bob Belcher"
 
@@ -486,12 +464,9 @@ Feature: Webcat complaint entry assignment
       | id    | uri                 | domain          | entry_type | status  |
       | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
       | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | NEW     |
+    And I show all webcat index columns
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "3" seconds
-    #Need to show User column with Reviewer data - hidden by default
-    And I click "#webcat-index-table-show-columns-button"
-    And I click "#view-user-col-cb"
-    And I click "#view-data-reviewer-cb"
     And I click row with id "1"
     And I click "#assignment-type-reviewer"
     And I click "#index_change_assign"
@@ -524,12 +499,9 @@ Feature: Webcat complaint entry assignment
       | id    | uri                 | domain          | entry_type | status  |
       | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
       | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | NEW     |
+    And I show all webcat index columns
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "3" seconds
-    #Need to show User column with Second Reviewer data - hidden by default
-    And I click "#webcat-index-table-show-columns-button"
-    And I click "#view-user-col-cb"
-    And I click "#view-data-sec-reviewer-cb"
     And I click row with id "1"
     And I click "#assignment-type-second-reviewer"
     And I click "#index_change_assign"
@@ -557,12 +529,9 @@ Feature: Webcat complaint entry assignment
       | id    | uri                 | domain          | entry_type | status  |
       | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
       | 2222  | whatever.com        | whatever.com    | URI/DOMAIN | NEW     |
+    And I show all webcat index columns
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "3" seconds
-    #Need to show User column - hidden by default
-    And I click "#webcat-index-table-show-columns-button"
-    And I click "#view-user-col-cb"
-    And I click "#view-data-sec-reviewer-cb"
     And I click row with id "1"
     And I click "#index_change_assign"
     And I click "#button_reassign"
@@ -674,12 +643,9 @@ Feature: Webcat complaint entry assignment
     And the following complaint entries exist:
       | id | uri            | domain          | entry_type | status     | user_id | second_reviewer_id |
       | 1  | abc.com        | abc.com         | URI/DOMAIN | ASSIGNED   |    3    |          3         |
+    And I show all webcat index columns
     And  I goto "/escalations/webcat/complaints"
     And the first Complaint Ticket is assigned to user id "3"
-    #Need to show User column - hidden by default
-    And I click "#webcat-index-table-show-columns-button"
-    And I click "#view-user-col-cb"
-    And I click "#view-data-assignee-cb"
     And  I click ".cat-index-main-row"
     Then I should see "ASSIGNED"
     And  I click "#webcat-remove-assignee-toolbar-button"
