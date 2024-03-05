@@ -14,7 +14,7 @@ else
 fi
 
 # Customer syntax highlighting must come before activating zsh-syntax-highlighting
-source .config/tokyonight/zsh-syntax-highlighting/tokyonight-moom.zsh
+source .config/tokyonight/zsh-syntax-highlighting/tokyonight-moon.zsh
 
 source $(brew --prefix)/share/antigen/antigen.zsh
 
@@ -99,14 +99,15 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export PATH="$(brew --prefix)/opt/imagemagick@6/bin:$PATH"
-export PATH="$(brew --prefix)/opt/openssl@3/bin:$PATH"
-export PATH="$(brew --prefix)/opt/make/libexec/gnubin:$PATH"
+export PATH="$(brew --prefix imagemagick@6)/bin:$PATH"
+export PATH="$(brew --prefix openssl@3)/bin:$PATH"
+export PATH="$(brew --prefix make)/libexec/gnubin:$PATH"
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
+# FZF setup
+export FZF_BASE="$(brew --prefix fzf)"
 export FZF_DEFAULT_COMMAND='fd -H -i'
 export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4 --preview "cat --color=always {}" --preview-window "~3"'
+source ~/.fzf.zsh
 
 export PATH="$PATH::$(yarn global bin)"
 export PATH="${HOME}/.local/bin:$PATH"
@@ -115,8 +116,6 @@ export PATH="/usr/local/sbin:$PATH"
 export XDG_CONFIG_HOME="${HOME}/.config"
 export YAMLLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/yamllint/config.yml"
 export PRETTIERD_DEFAULT_CONFIG="~/.config/prettier/prettier.config.js"
-
-. ~/.asdf/plugins/java/set-java-home.zsh
 
 source $(dirname $(gem which colorls))/tab_complete.sh
 
