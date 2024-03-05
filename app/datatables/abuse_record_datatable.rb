@@ -10,9 +10,9 @@ class AbuseRecordDatatable < AjaxDatatablesRails::ActiveRecord
   def view_columns
     @view_columns ||= {
         record_id:          {source: "AbuseRecord.id"},
-        complaint_entry_id: {source: "ComplaintEntry.id"},
+        complaint_entry_id: {source: "AbuseRecord.complaint_entry_id"},
         url:                {source: "AbuseRecord.url", data: :url},
-        date_resolved:      {source: "ComplaintEntry.case_resolved_at", data: :case_resolved_at, cond: :date_range},
+        date_resolved:      {source: "ComplaintEntry.case_resolved_at", data: :date_resolved, cond: :date_range},
         analyst:            {source: "AbuseRecord.submitter", data: :analyst},
         source:             {source: "AbuseRecord.source", data: :source},
         report_id:          {source: "AbuseRecord.report_ident", data: :report_id},
@@ -26,7 +26,7 @@ class AbuseRecordDatatable < AjaxDatatablesRails::ActiveRecord
           record_id:                record.id,
           complaint_entry_id:       record.complaint_entry_id,
           url:                      record.url,
-          date_resolved:            record.complaint_entry&.case_resolved_at,
+          date_resolved:            record.complaint_entry.case_resolved_at,
           analyst:                  record.submitter,
           source:                   record.source,
           report_id:                record.report_ident,
@@ -38,6 +38,15 @@ class AbuseRecordDatatable < AjaxDatatablesRails::ActiveRecord
 
   def get_raw_records
     AbuseRecord.all
+  end
+
+  def sort_records (records)
+    case datatable.orders.first.column.sort_query
+    when
+      records.left_joins(:complaint_entry).order("complaint_entries.case_resolved_at #{datatable.orders.first.direction}")
+    else
+      super
+    end
   end
 
 end
