@@ -62,6 +62,10 @@ Feature: Webcat complaint entry assignment
       | 1  | abc.com        | abc.com         | URI/DOMAIN | NEW        |
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "3" seconds
+    #Need to show User column - hidden by default
+    And I click "#webcat-index-table-show-columns-button"
+    And I click "#view-user-col-cb"
+    And I click "#view-data-assignee-cb"
     And  I should not see "ASSIGNED"
     And  I click ".cat-index-main-row"
     And  I click ".take-ticket-toolbar-button"
@@ -463,20 +467,21 @@ Feature: Webcat complaint entry assignment
   @javascript
   Scenario: a manager can unassign a reviewer from a complaint
     Given a user with role "webcat manager" exists and is logged in
+    And vrtincoming exists
     And the following users exist
       | id | cvs_username  | cec_username  | display_name   |
-      | 2  | bob_belcher   | bob_belcher   | Bob Belcher    |
-      | 3  | linda_belcher | linda_belcher | Linda Belcher  |
-      | 4  | tina_belcher  | tina_belcher  | Tina Belcher   |
+      | 3  | bob_belcher   | bob_belcher   | Bob Belcher    |
+      | 4  | linda_belcher | linda_belcher | Linda Belcher  |
+      | 5  | tina_belcher  | tina_belcher  | Tina Belcher   |
     And the following org_subsets exist:
       | id | name   |
       | 7  | webcat |
     And the following roles exist:
       | id | role        | org_subset_id |
       | 17 | webcat user |     7         |
-    And a user with id "2" has a role of "webcat user"
     And a user with id "3" has a role of "webcat user"
     And a user with id "4" has a role of "webcat user"
+    And a user with id "5" has a role of "webcat user"
     And the following complaint entries exist:
       | id    | uri                 | domain          | entry_type | status  |
       | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
@@ -500,16 +505,21 @@ Feature: Webcat complaint entry assignment
   @javascript
   Scenario: a manager can unassign a second reviewer from a complaint
     Given a user with role "webcat manager" exists and is logged in
+    And vrtincoming exists
     And the following users exist
       | id | cvs_username  | cec_username  | display_name   |
-      | 2  | bob_belcher   | bob_belcher   | Bob Belcher    |
+      | 3  | bob_belcher   | bob_belcher   | Bob Belcher    |
+      | 4  | linda_belcher | linda_belcher | Linda Belcher  |
+      | 5  | tina_belcher  | tina_belcher  | Tina Belcher   |
     And the following org_subsets exist:
       | id | name   |
       | 7  | webcat |
     And the following roles exist:
       | id | role        | org_subset_id |
       | 17 | webcat user |     7         |
-    And a user with id "2" has a role of "webcat user"
+    And a user with id "3" has a role of "webcat user"
+    And a user with id "4" has a role of "webcat user"
+    And a user with id "5" has a role of "webcat user"
     And the following complaint entries exist:
       | id    | uri                 | domain          | entry_type | status  |
       | 1111  | abc.com             | abc.com         | URI/DOMAIN | NEW     |
@@ -643,9 +653,8 @@ Feature: Webcat complaint entry assignment
       | 17 | webcat user |     7         |
     And a user with id "2" has a role of "webcat user"
     And the following complaint entries exist:
-    And the following complaint entries exist:
-      | id | uri            | domain          | entry_type | status     | user_id | reviewer_id  |
-      | 1  | abc.com        | abc.com         | URI/DOMAIN | ASSIGNED   |    4    |     3        |
+      | id | uri            | domain          | entry_type | status      | user_id | reviewer_id  |
+      | 1  | abc.com        | abc.com         | URI/DOMAIN | COMPLETED   |    4    |     3        |
     And  I goto "/escalations/webcat/complaints"
     And  I wait for "2" seconds
     And I click row with id "1"
