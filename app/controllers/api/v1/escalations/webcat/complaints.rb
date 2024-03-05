@@ -505,7 +505,8 @@ module API
                 if params[:force].present? && params[:force] == true
                   force = true
                 end
-                AbusiveContentTool.submit_abuse_to_authorities(complaint_entry, user, url, force)
+                url = complaint_entry.hostlookup
+                AbusiveContentTool.submit_abuse_to_authorities(complaint_entry, current_user, url, force)
                 return {:status => "success"}
               rescue Exception => e
                 Rails.logger.error(e)

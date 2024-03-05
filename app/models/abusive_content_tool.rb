@@ -99,16 +99,16 @@ class AbusiveContentTool
     complaint resolved on: [REPORT_COMPLAINT_RESOLVED_ON]<br />
     <br />
 
-    <h3>IWF REPORT SUBMISSION</h3>
+    <h3>IWF REPORT SUBMISSION</h3><br />
     [REPORT_IWF_SUBMISSION_FIELDS]
     <br />
-    <h3>IWF RESPONSE</h3>
+    <h3>IWF RESPONSE</h3><br />
     [REPORT_IWF_RESPONSE]
     <br />
-    <h3>NCMEC REPORT SUBMISSION</h3>
+    <h3>NCMEC REPORT SUBMISSION</h3><br />
     [REPORT_NCMEC_SUBMISSION_FIELDS]
     <br />
-    <h3>NCMEC RESPONSE</h3>
+    <h3>NCMEC RESPONSE</h3><br />
     [REPORT_NCMEC_RESPONSE]
     <br />
   EOT
@@ -161,7 +161,7 @@ class AbusiveContentTool
     report_results = {}
     report_results[:status] = "success"
 
-    if !iwf_exists.present?
+    if (!iwf_exists.present?) || force==true
       begin
         iwf_results = self.submit_to_iwf(complaint_entry, user, url)
         report_results[:iwf] = iwf_results
@@ -175,7 +175,7 @@ class AbusiveContentTool
       report_results[:iwf] = {:status => "exists", :abuse_record_report_id => iwf_exists.report_ident}
     end
 
-    if !ncmec_exists.present?
+    if (!ncmec_exists.present?) || force==true
       begin
         ncmec_results = self.submit_to_ncmec(complaint_entry, user, url)
         report_results[:ncmec] = ncmec_results
@@ -379,7 +379,7 @@ class AbusiveContentTool
     report_alert_args[:body] = body
 
     emails_array = Rails.configuration.abuse_emails.split(",")
-    emails_array += cc.split(",")
+    emails_array += cc.split(",") unless cc.blank?
     attachments_to_mail = []
     emails_array.each do |email_address|
       report_alert_args[:to] = email_address.strip
@@ -391,14 +391,14 @@ class AbusiveContentTool
 
   def self.generate_body_for_third_party(complaint_entry)
     abuse_records = complaint_entry.abuse_records
-    report_complaint_id = complaint_entry.complaint.id
-    report_complaint_entry_id = complaint_entry.id
-    report_url = abuse_records.first.url
-    report_complaint_status = complaint_entry.status
-    report_complaint_resolution = complaint_entry.resolution
-    report_complaint_message = complaint_entry.resolution_comment
-    report_complaint_created = complaint_entry.created_on
-    report_complaint_resolved_on = complaint_entry.case_resolved_at
+    report_complaint_id = complaint_entry.complaint.id.to_s
+    report_complaint_entry_id = complaint_entry.id.to_s
+    report_url = abuse_records.first.url.to_s
+    report_complaint_status = complaint_entry.status.to_s
+    report_complaint_resolution = complaint_entry.resolution.to_s
+    report_complaint_message = complaint_entry.resolution_comment.to_s
+    report_complaint_created = complaint_entry.created_at.to_s
+    report_complaint_resolved_on = complaint_entry.case_resolved_at.to_s
 
     report_iwf_submission_fields = ""
     report_iwf_response = ""
