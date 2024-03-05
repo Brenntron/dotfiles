@@ -1,7 +1,6 @@
 local M = {
   "lewis6991/gitsigns.nvim",
   event = "Bufenter",
-  commit = "5a9a6ac29a7805c4783cda21b80a1e361964b3f2",
   cmd = "Gitsigns",
 }
 M.config = function()

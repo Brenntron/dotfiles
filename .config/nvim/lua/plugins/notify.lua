@@ -4,7 +4,10 @@ local M = {
 }
 
 function M.config()
-  vim.notify = require("notify")
+  vim.notify = require("notify").setup({
+    render = "simple",
+    stages = "slide",
+  })
 end
 
 return M

@@ -5,17 +5,21 @@ local M = {
   dependencies = {
     {
       "ahmedkhalf/project.nvim",
-      commit = "8c6bad7d22eef1b71144b401c9f74ed01526a4fb",
       event = "VeryLazy",
     },
+    { "nvim-lua/popup.nvim" },
+    { "nvim-lua/plenary.nvim" },
     {
       "nvim-telescope/telescope-file-browser.nvim",
-      event = "VeryLazy"
+      event = "VeryLazy",
     },
     {
       "nvim-telescope/telescope-fzf-native.nvim",
       build = "make",
       event = "Bufenter",
+    },
+    {
+      "jvgrootveld/telescope-zoxide",
     },
     {
       "rcarriga/nvim-notify",
@@ -143,24 +147,28 @@ function M.config()
       },
       project = {
         base_dirs = {
-          '~/.config/nvim/',
+          "~/.config/nvim/",
         },
         hidden_files = true,
         on_project_select = function(prompt_bufnr)
-          local project_actions = require 'telescope._extensions.project.actions'
+          local project_actions = require "telescope._extensions.project.actions"
           project_actions.change_working_directory(prompt_bufnr, false)
         end,
-        order_by = 'asc',
-        search_by = 'title',
-        theme = 'dropdown',
+        order_by = "asc",
+        search_by = "title",
+        theme = "dropdown",
       },
+      zoxide = {
+        keepinsert = true,
+      }
     },
   }
 
-  telescope.load_extension 'file_browser'
-  telescope.load_extension 'fzf'
-  telescope.load_extension 'notify'
+  telescope.load_extension "file_browser"
+  telescope.load_extension "fzf"
+  telescope.load_extension "notify"
   telescope.load_extension "projects"
+  telescope.load_extension "zoxide"
 end
 
 return M
