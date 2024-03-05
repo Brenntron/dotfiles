@@ -27,7 +27,7 @@ build_csam_reports_table = () ->
       searchPlaceholder: "Search within table"
     }
     pagingType: 'full_numbers'
-    order: [ 6, 'desc']
+    order: [7, 'desc']
     columnDefs: [
       targets: [0, 8]
       orderable: false

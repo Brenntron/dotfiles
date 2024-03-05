@@ -26,7 +26,7 @@ class AbuseRecordDatatable < AjaxDatatablesRails::ActiveRecord
           record_id:                record.id,
           complaint_entry_id:       record.complaint_entry_id,
           url:                      record.url,
-          date_resolved:            record.complaint_entry.case_resolved_at,
+          date_resolved:            record.complaint_entry&.case_resolved_at,
           analyst:                  record.submitter,
           source:                   record.source,
           report_id:                record.report_ident,
@@ -42,7 +42,7 @@ class AbuseRecordDatatable < AjaxDatatablesRails::ActiveRecord
 
   def sort_records (records)
     case datatable.orders.first.column.sort_query
-    when
+    when 'abuse_records.date_resolved'
       records.left_joins(:complaint_entry).order("complaint_entries.case_resolved_at #{datatable.orders.first.direction}")
     else
       super
