@@ -7,45 +7,62 @@ $ ->
     $(document).on 'click', '#webcat-csam-reports-index tbody tr', ->
       enable_report_buttons()
 
+    $('#resend-csam-reports-button').click ->
+      entries = []
+      $('#webcat-csam-reports-index tr.selected').each ->
+        entry_id = $(this).find('.report-entry-id-col').text()
+        url = $(this).find('.entry-url-col').text()
+        entry_data = {entry_id: entry_id, url: url}
+        entries.push(entry_data)
+      open_resubmit_report_dialog(entries)
 
-  window.resubmit_csam_report = () ->
-    force = 'false'
-    if $('#resend_csam_reports_force').checked == true
-      force = 'true'
-    $('#resend_csam_reports_table tbody tr').each ->
-      entry_id = $(this).find('.report-entry-id-col').text()
-      data = {complaint_entry_id: entry_id, force: force}
-      $.ajax(
-        url: '/escalations/api/v1/escalations/webcat/complaints/resubmit_abuse_report'
-        data: data
-        method: 'POST'
-        headers: 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
-        success: (response) ->
-          console.log response
-          std_msg_success('Report sent.')
-        error: (response) ->
-          console.log response
-          std_msg_error('Error sending report')
-      , this)
+    $('#email-csam-reports-button').click ->
+      entries = []
+      $('#webcat-csam-reports-index tr.selected').each ->
+        entry_id = $(this).find('.report-entry-id-col').text()
+        url = $(this).find('.entry-url-col').text()
+        entry_data = {entry_id: entry_id, url: url}
+        entries.push(entry_data)
+      open_forward_report_dialog(entries)
+
+    window.resubmit_csam_report = () ->
+      force = 'false'
+      if $('#resend_csam_reports_force').checked == true
+        force = 'true'
+      $('#resend_csam_reports_table tbody tr').each ->
+        entry_id = $(this).find('.report-entry-id-col').text()
+        data = {complaint_entry_id: entry_id, force: force}
+        $.ajax(
+          url: '/escalations/api/v1/escalations/webcat/complaints/resubmit_abuse_report'
+          data: data
+          method: 'POST'
+          headers: 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
+          success: (response) ->
+            console.log response
+            std_msg_success('Report sent.')
+          error: (response) ->
+            console.log response
+            std_msg_error('Error sending report')
+        , this)
 
 
-  window.forward_csam_report = () ->
-    cc_email = $('#cc_email_address').val()
-    $('#forward_csam_reports_table tbody tr').each ->
-      entry_id = $(this).find('.report-entry-id-col').text()
-      data = {complaint_entry_id: entry_id, cc: cc_email}
-      $.ajax(
-        url: '/escalations/api/v1/escalations/webcat/complaints/forward_report'
-        data: data
-        method: 'POST'
-        headers: 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
-        success: (response) ->
-          console.log response
-          std_msg_success('Report sent.')
-        error: (response) ->
-          console.log response
-          std_msg_error('Error sending report')
-      , this)
+    window.forward_csam_report = () ->
+      cc_email = $('#cc_email_address').val()
+      $('#forward_csam_reports_table tbody tr').each ->
+        entry_id = $(this).find('.report-entry-id-col').text()
+        data = {complaint_entry_id: entry_id, cc: cc_email}
+        $.ajax(
+          url: '/escalations/api/v1/escalations/webcat/complaints/forward_report'
+          data: data
+          method: 'POST'
+          headers: 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
+          success: (response) ->
+            console.log response
+            std_msg_success('Report sent.')
+          error: (response) ->
+            console.log response
+            std_msg_error('Error sending report')
+        , this)
 
 
 
@@ -68,14 +85,6 @@ build_csam_reports_table = () ->
         searcheable: false
         sortable: false
       }
-      {
-        targets: [0]
-        className: 'attention-flag-col'
-      }
-      {
-        targets: [8]
-        className: 'tools-col'
-      }
     ]
     ajax:
       url: $('#webcat-scam-reports-index').data('source')
@@ -84,6 +93,7 @@ build_csam_reports_table = () ->
     columns: [
       {
         data: 'record_id'
+        className: 'attention-flag-col'
         render: (data, type, full, meta) ->
           if full.report_id? && full.report_id != ''
             return ''
@@ -92,12 +102,14 @@ build_csam_reports_table = () ->
       }
       {
         data: 'complaint_entry_id'
+        className: 'report-entry-id-col'
       }
       {
         data: 'date_resolved'
       }
       {
         data: 'url'
+        className: 'entry-url-col'
       }
       {
         data: 'analyst'
@@ -119,6 +131,7 @@ build_csam_reports_table = () ->
       }
       {
         data: 'record_id'
+        className: 'tools-col'
         render: (data, type, full, meta) ->
 
           buttons =
