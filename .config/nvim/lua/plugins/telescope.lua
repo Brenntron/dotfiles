@@ -9,6 +9,7 @@ local M = {
     },
     { "nvim-lua/popup.nvim" },
     { "nvim-lua/plenary.nvim" },
+    { "nvim-telescope/telescope-dap.nvim" },
     {
       "nvim-telescope/telescope-file-browser.nvim",
       event = "VeryLazy",
@@ -16,15 +17,20 @@ local M = {
     {
       "nvim-telescope/telescope-fzf-native.nvim",
       build = "make",
-      event = "Bufenter",
     },
     {
       "jvgrootveld/telescope-zoxide",
     },
     {
       "rcarriga/nvim-notify",
-      lazy = true,
     },
+    {
+      "ryanmsnyder/toggleterm-manager.nvim",
+      config = true
+    },
+    {
+      "tsarkirist/telescope-lazy.nvim"
+    }
   },
   event = "Bufenter",
   lazy = true,
@@ -64,7 +70,6 @@ function M.config()
       sorting_strategy = nil,
       vimgrep_arguments = {
         "rg",
-        "--color=never",
         "--no-heading",
         "--with-filename",
         "--line-number",
@@ -145,6 +150,32 @@ function M.config()
         override_file_sorter = true, -- override the file sorter
         case_mode = "smart_case", -- or "ignore_case" or "respect_case"
       },
+      lazy = {
+        theme = "dropdown",
+        show_icon = true,
+        mappings = {
+          open_in_browser = "<C-o>",
+          open_in_file_browser = "<M-b>",
+          open_in_find_files = "<C-f>",
+          open_in_live_grep = "<C-g>",
+          open_in_terminal = "<C-t>",
+          open_plugins_picker = "<C-b>", -- Works only after having called first another action
+          open_lazy_root_find_files = "<C-r>f",
+          open_lazy_root_live_grep = "<C-r>g",
+          change_cwd_to_plugin = "<C-c>d",
+        },
+        -- Configuration that will be passed to the window that hosts the terminal
+        -- For more configuration options check 'nvim_open_win()'
+        terminal_opts = {
+          relative = "editor",
+          style = "minimal",
+          border = "rounded",
+          title = "Telescope lazy",
+          title_pos = "center",
+          width = 0.5,
+          height = 0.5,
+        },
+      },
       project = {
         base_dirs = {
           "~/.config/nvim/",
@@ -164,8 +195,10 @@ function M.config()
     },
   }
 
+  telescope.load_extension "dap"
   telescope.load_extension "file_browser"
   telescope.load_extension "fzf"
+  telescope.load_extension "lazy"
   telescope.load_extension "notify"
   telescope.load_extension "projects"
   telescope.load_extension "zoxide"

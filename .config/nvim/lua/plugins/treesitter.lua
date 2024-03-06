@@ -40,6 +40,7 @@ function M.config()
     ensure_installed = {
       "bash",
       "comment",
+      "dap_repl",
       "dockerfile",
       "dot",
       "gitignore",
@@ -61,7 +62,6 @@ function M.config()
     highlight = {
       additional_vim_regex_highlighting = false,
       enable = true, -- false will disable the whole extension
-      disable = { "markdown" }, -- list of language that will be disabled
     },
     ignore_install = { "" }, -- List of parsers to ignore installing
     indent = { enable = true },

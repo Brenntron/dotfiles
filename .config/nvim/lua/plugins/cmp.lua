@@ -36,6 +36,9 @@ local M = {
       event = { "InsertEnter", "LspAttach" },
     },
     {
+      "rcarriga/cmp-dap",
+    },
+    {
       "hrsh7th/cmp-nvim-lsp",
       event = { "InsertEnter", "LspAttach" },
     },
@@ -68,7 +71,6 @@ local M = {
 
 function M.config()
   local cmp = require "cmp"
-  local copilot_cmp = require "copilot_cmp"
   local icons = require "utils.icons"
   local lspkind = require "lspkind"
   local luasnip = require "luasnip"
@@ -95,6 +97,10 @@ function M.config()
       behavior = cmp.ConfirmBehavior.Replace,
       select = false,
     },
+    enabled = function()
+      return vim.api.nvim_buf_get_option(0, "buftype") ~= "prompt"
+        or require("cmp_dap").is_dap_buffer()
+    end,
     experimental = {
       ghost_text = true,
     },
@@ -260,6 +266,9 @@ function M.config()
       }
     })
   })
+
+  -- DAP setup
+  cmp.setup.filetype({ "dap-repl"}, { source = { name = "dap" }})
 
   pcall(function()
     local function on_confirm_done(...)

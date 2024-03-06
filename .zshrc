@@ -14,7 +14,7 @@ else
 fi
 
 # Customer syntax highlighting must come before activating zsh-syntax-highlighting
-source .config/tokyonight/zsh-syntax-highlighting/tokyonight-moon.zsh
+source ~/.config/tokyonight/zsh-syntax-highlighting.zsh
 
 source $(brew --prefix)/share/antigen/antigen.zsh
 
