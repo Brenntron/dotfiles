@@ -48,7 +48,7 @@ module API
                 end
 
               rescue Exception => e
-                  return {error:e.message}.to_json
+                  return {error:e.message, entry_id: entry.id}.to_json
               end
               {entry_id: entry.id}.to_json
               end
@@ -285,38 +285,41 @@ module API
             end
             post "change_assignee" do
               begin
-                results = []
-                user = User.find(params[:user_id])
                 error_entry_ids = {}
                 error_count = 0
-                params[:complaint_entry_ids].each do |id|
-                  entry = ComplaintEntry.find(id)
-                  result = entry.reassign(user, permitted_params['assignment_type'])
-                  results << { id: id, result: result }
-                  next if result == "#{user.cvs_username} assigned to Complaint as #{permitted_params['assignment_type']}"
+                results = []
+                user = User.find(params[:user_id])
 
-                  error_count += 1
-                  if error_entry_ids[result].nil?
-                    error_entry_ids[result] = [id]
-                  else
-                    error_entry_ids[result] << id
-                  end
-                end
+                ActiveRecord::Base.transaction do
+                  params[:complaint_entry_ids].each do |id|
+                    entry = ComplaintEntry.find(id)
+                    result = entry.reassign(user, permitted_params['assignment_type'])
+                    results << { id: id, result: result }
+                    next if result == "#{id}: #{user.cvs_username} assigned to Complaint as #{permitted_params['assignment_type']}"
 
-                unless error_entry_ids.keys.empty?
-                  error_message = if error_count == permitted_params['complaint_entry_ids'].count
-                                    ["The following entries could not be assigned:"]
-                                  else
-                                    ["Some entries were successfully assigned, but the following entries could not be returned:"]
-                                  end
+                    error_count += 1
+                    if error_entry_ids[result].nil?
+                      error_entry_ids[result] = [id]
+                    else
+                      error_entry_ids[result] << id
+                    end
+                  end
 
-                  error_entry_ids.each_key do |key|
-                    error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
+                  unless error_entry_ids.keys.empty?
+                    error_message = if error_count == permitted_params['complaint_entry_ids'].count
+                                      ["The following entries could not be assigned:"]
+                                    else
+                                      ["Some entries were successfully assigned, but the following entries could not be returned:"]
+                                    end
+
+                    error_entry_ids.each_key do |key|
+                      error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
+                    end
+                    unless error_count == permitted_params['complaint_entry_ids'].count
+                      error_message << "Refresh the page to pickup the latest changes."
+                    end
+                    return {error: error_message}.to_json
                   end
-                  unless error_count == permitted_params['complaint_entry_ids'].count
-                    error_message << "Refresh the page to pickup the latest changes."
-                  end
-                  return {error: error_message}.to_json
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"

@@ -160,7 +160,17 @@ For future web and email reputation requests, please open a web and email reputa
 
   end
 
+  def create_complaint_paper_trail(bugzilla_rest_session, url, description, customer, tags, platform, status, category_names_string, user)
+    top_url = Wbrs::TopUrl.check_urls([url]).first.is_important
 
+    if top_url
+      description += " This paper trail entry was sent to pending because the url was flagged as high telemetry."
+      Complaint.create_action(bugzilla_rest_session, url, description, nil, nil, nil, PENDING, category_names_string, user)
+    else
+      Complaint.create_action(bugzilla_rest_session, url, description, nil, nil, nil, COMPLETED, category_names_string, user)
+    end
+
+  end
   def self.commit_without_complaint(ip_or_uri:, category_ids_string:, category_names_string:, description:, user:, bugzilla_rest_session:)
     # check to see if URL is in Top URLS
     top_url = Wbrs::TopUrl.check_urls([ip_or_uri]).first.is_important
@@ -182,6 +192,9 @@ For future web and email reputation requests, please open a web and email reputa
       # add credit to the user for internal categorization
       user_object = User.find_by_email(user)
       WebcatCredits::InternalCategorizations::CreditHandler.new(user_object, ip_or_uri).handle_internal_credit
+
+      #create complaint here for papertrail purposes
+      Complaint.create_action(EscalationTicket, ip_or_uri, description, nil, nil, nil, COMPLETED, category_names_string, user)
     end
     top_url
   end

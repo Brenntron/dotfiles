@@ -682,6 +682,28 @@ Feature: Webcat complaints index
     And I should see "blah.com"
 
   @javascript
+  Scenario: a user submits a high traffic (!important) entry and has Self Review checked, and it does not go into the Review queue
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | id  | uri          | domain        | entry_type | status | is_important |
+      | 111 | food.com     | food.com      | URI/DOMAIN | NEW    |      1       |
+      | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |      1       |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "3" seconds
+    And I should see "food.com"
+    And I should see "blah.com"
+    And I click "#self_review"
+    And I fill in selectized of element "#input_cat_222" with "['77']"
+    And I click "#submit_changes_222"
+    Then I goto "/escalations/webcat/complaints?f=COMPLETED"
+    And I wait for "3" seconds
+    And I should see "blah.com"
+    Then I goto "/escalations/webcat/complaints?f=REVIEW"
+    And I wait for "3" seconds
+    And I should not see "blah.com"
+
+
+  @javascript
   Scenario: a reviewer commits a FIXED PENDING entry
     Given a user with role "webcat manager" exists and is logged in
     And the following users exist

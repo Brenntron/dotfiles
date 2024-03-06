@@ -16,3 +16,12 @@ end
 Given(/^a complaint entry preload exists$/)  do
   FactoryBot.create(:complaint_entry_preload)
 end
+
+# This is to select a row in the webcat table
+When(/^I click webcat row with id "(.*?)"$/) do |id|
+  page.find(:xpath, "//tr[contains(@id, '#{id}')]/td[contains(@class, 'tag-col')]").click
+end
+
+When(/^I shift click webcat row with id "(.*?)"$/) do |id|
+  page.find(:xpath, "//tr[contains(@id, '#{id}')]/td[contains(@class, 'tag-col')]").click(:shift)
+end

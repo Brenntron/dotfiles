@@ -46,7 +46,7 @@ $ ->
     if keyCode == 13
       webcat_search_string = $('#web-cat-search .search-box').val().trim()
       if webcat_search_string == ''
-       refresh_localStorage()
+       refresh_webcat_localStorage()
       else
         localStorage.webcat_search_type = 'contains'
         localStorage.webcat_search_name = ''
@@ -176,7 +176,7 @@ $ ->
   current_url = window.location.href
 
   window.webcat_refresh = ()->
-    refresh_localStorage()
+    refresh_webcat_localStorage()
     refresh_url()
 
   refresh_url = (href) ->
@@ -189,7 +189,7 @@ $ ->
       window.location.replace('/escalations/webcat/complaints')
       localStorage.setItem('webcat_reset_page', true)
 
-  refresh_localStorage = () ->
+  window.refresh_webcat_localStorage = () ->
     localStorage.removeItem('webcat_search_type')
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
@@ -233,7 +233,7 @@ $ ->
     # do not redirect if there is already some chosen search/filter (not from the settings)
     return if localStorage.webcat_search_type || window.location.search
 
-    refresh_localStorage()
+    refresh_webcat_localStorage()
     if is_default_filter(icon) then refresh_url(name) else build_webcat_named_search(name);
 
 
@@ -724,13 +724,18 @@ process_entry = (entry_data) ->
     data: entry_data
     success: (response) ->
       data = $.parseJSON(response)
-      msg = $('#' + data.entry_id + ' .temp-msg')
-      $(msg).text('Submitted. Refresh to see new results.')
-      $(msg).addClass('submitted-row')
-      remove_entry_from_changes(data.entry_id, 'submit')
+      if data.error?
+        err_msg = data.error
+        msg = $('#' + data.entry_id + ' .temp-msg')
+        $(msg).text('Submission failed: ' + err_msg)
+      else
+        msg = $('#' + data.entry_id + ' .temp-msg')
+        $(msg).text('Submitted. Refresh to see new results.')
+        $(msg).addClass('submitted-row')
+        remove_entry_from_changes(data.entry_id, 'submit')
     error: (response) ->
       msg = response.resonseJSON.error
-      std_msg_error("Error submitting entries", msg, reload: false)
+      std_msg_error("Error submitting entry", msg, reload: false)
   , this)
 
 
@@ -814,6 +819,7 @@ $ ->
   window.submit_changes = (entry_id) ->
     row = $('#' + entry_id)
     curr_status = $(row).attr('data-status')
+    self_review = $('#self_review').is(':checked')
 
     # slight differences in data sent
     if curr_status == 'PENDING'
@@ -848,7 +854,8 @@ $ ->
       'commit': commit,
       'comment': comment,
       'resolution_comment': resolution_msg,
-      'uri_as_categorized': uri
+      'uri_as_categorized': uri,
+      'self_review': self_review
     }
 
     # check data here before submitting
@@ -960,7 +967,7 @@ window.temporary_search_link = (webcat_search_name, webcat_search_conditions) ->
 
   $(new_delete).on 'click', () ->
     window.delete_disputes_named_search(this,  webcat_search_name)
-    refresh_localStorage()
+    refresh_webcat_localStorage()
 
   $(new_tr).append(new_td)
   $(new_td).append(new_link)

@@ -9,7 +9,6 @@ $ ->
     $.when(pull_user_preference_filter()).done ->
       build_complaints_table(url)
 
-
 #### New complaints index table setup
 build_complaints_table = (url) ->
   complaint_table = $('#complaints-index').DataTable(
@@ -32,7 +31,7 @@ build_complaints_table = (url) ->
       $('.dataTables_filter').append $clearButton, $searchButton
 
       # Make the datatables search prettier
-      $('#complaints-index_filter input').addClass('restricted-table-search-input');
+      $('#complaints-index_filter input').addClass('restricted-table-search-input')
 
       # properly init these search/clear icons
       $('.dt-button').tooltipster
@@ -57,6 +56,7 @@ build_complaints_table = (url) ->
         ###
         console.log 'There has been an error calling the backend data'
         webcat_refresh()
+
       complete: ->
 
         # Grab current categories per entry
@@ -64,9 +64,24 @@ build_complaints_table = (url) ->
         get_current_cats(rows)
         create_ind_res_dialogs()
 
-        $('#complaints-index tbody tr *').click ->
-          main_row = $(this).parents('tr.cat-index-main-row')[0]
-          $(main_row).toggleClass('selected')
+        $('#complaints-index tbody tr.cat-index-main-row .nested-col-table tr td').click ->
+          # allows individual selection of rows while clicking in nested data, is a little buggy with the multiselect
+          if $(this).hasClass('non-selectable')
+            return
+          else
+            main_row = $(this).parents('tr.cat-index-main-row')[0]
+            row_id = $(main_row).attr('id')
+            if $(main_row).hasClass('selected')
+              complaint_table.row("##{row_id}").deselect()
+            else
+              complaint_table.row("##{row_id}").select()
+
+        # set listeners for bulk changes
+        $('#complaints-index').DataTable().on('select', (_e, dt, _type, indexes) ->
+          bulk_resolution_select_handler(dt, indexes)
+        ).on('deselect', (_e, dt, _type, indexes) ->
+          bulk_resolution_deselect_handler(dt, indexes)
+        )
 
     createdRow: (row, data) ->
       $(row).addClass('cat-index-main-row')
@@ -91,9 +106,9 @@ build_complaints_table = (url) ->
         ###
         text_check = !window.find_saved_search_by_name(webcat_search_name)
         search_name_check = webcat_search_name != ''
+
         if webcat_search_type == 'advanced' && search_name_check && text_check
-          window.add_tmp_tr_to_named_search_list(webcat_search_name)
-          window.sort_named_search_list()
+          temporary_search_link(webcat_search_name, webcat_search_conditions)
 
     pagingType: 'full_numbers'
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
@@ -327,7 +342,7 @@ build_complaints_table = (url) ->
               '<td class="uri-ip-col">' + entry + '</td>' +
               '</tr>' +
               '<tr>' +
-              '<td class="quick-edit-uri-tool-col">' +
+              '<td class="quick-edit-uri-tool-col non-selectable">' +
               '<span class="dropdown">' +
               '<button class="edit-button" id="quick_edit_uri_' + full.entry_id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"' + edit_button_status + '></button>' +
               '<div id="quick_edit_dropdown_' + full.entry_id + '" class="dropdown-menu quick-edit-uri-dropdown" aria-labelledby="quick_edit_uri_' + full.entry_id + '">' +
@@ -338,7 +353,7 @@ build_complaints_table = (url) ->
               '</ul>' +
               '</div>' +
               '</td>' +
-              '<td class="edit-uri-col">' +
+              '<td class="edit-uri-col non-selectable">' +
               '<input class="nested-table-input complaint-uri-input" id="edit_uri_input_' +
               full.entry_id + '" type="text" data-domain="' + domain + ' "value="' + input_uri + '"' + input_status + '/>' +
               '</td></tr>' +
@@ -394,7 +409,7 @@ build_complaints_table = (url) ->
             '<table class="nested-col-table">' +
               '<tbody>' +
               '<tr><td id="current_cat_' + full.entry_id + '" class="current-cat-col"></td></tr>' +
-              '<tr><td class="edit-cat-col">' +
+              '<tr><td class="edit-cat-col non-selectable">' +
               '<select id="input_cat_' + full.entry_id + '" name="input_cat_' +
               full.entry_id + '" class="nested-table-input" placeholder="Enter categories / confidence order" ' + disabled + '>' +
               '</select>' +
