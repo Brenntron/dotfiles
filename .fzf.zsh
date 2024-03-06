@@ -7,8 +7,8 @@ fi
 
 # Auto-completion
 # ---------------
-source "${$FZF_BASE}/shell/completion.zsh"
+source ${FZF_BASE}/shell/completion.zsh
 
 # Key bindings
 # ------------
-source "${$FZF_BASE}/shell/key-bindings.zsh"
+source ${FZF_BASE}/shell/key-bindings.zsh

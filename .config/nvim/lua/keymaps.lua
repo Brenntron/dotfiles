@@ -2,17 +2,16 @@ local utils = require "utils.keymaps-helpers"
 local maps = utils.empty_map_table()
 
 local sections = {
+  b = { desc = "﬘ Buffer"},
   c = { desc = " Copilot"},
-  d = { desc = " Debug" },
-  f = { desc = "󰭎 Telescope" },
+  d = { desc = " Dadbod UI" },
   g = { desc = "󰊢 Git" },
   l = { desc = " LSP" },
   m = { desc = "🏗 Mason"},
-  n = { desc = "␀ Null-Ls" },
+  n = { desc = "󰟢 Null-Ls" },
   r = { desc = "🧪 Tests" },
+  t = { desc = "󰭎 Telescope" },
   s = { desc = "󱙝 Spectre" },
-  t = { desc = "󱉯 Trouble" },
-  u = { desc = " Dadbod UI" },
   v = { desc = " Vim"}
 }
 
@@ -40,17 +39,8 @@ maps.n["<leader>h"] = { "<cmd>nohlsearch<cr>", desc = "Clear highlights" }
 maps.n["<leader>w"] = { "<cmd>w!<cr>", desc = "Write to file" }
 maps.n["<leader>wq"] = { "<cmd>wq!<cr>", desc = "Write to file and quit" }
 
--- Quite
+-- Quit
 maps.n["<leader>q"] = { "<cmd>q<cr>", desc = "Quit" }
-
--- Vim commonds
-maps.n["<leader>v"] = sections.v
-maps.n["<leader>vb"] = { desc = 'Buffer commands' }
-maps.n["<leader>vbd"] = { "<cmd>lua require('bufdelete').bufdelete(0, false)<cr>", desc = "Delete Buffer" }
-maps.n["<leader>vbc"] = { "<cmd>Bclose<cr>", desc = "Close Buffer" }
-maps.n["<leader>vl"] = { "<cmd>Lazy<cr>", desc = "Lazy Plugin Manager" }
-maps.n["<leader>vm"] = { "<cmd>messages<cr>", desc = "Open messages" }
-maps.n["<leader>vn"] = { "<cmd>Notifications<cr>", desc = "Open notifications" }
 
 -- Visual --
 -- Better paste
@@ -59,6 +49,23 @@ maps.v["p"] = { "P", desc = "Better paste" }
 -- Stay in indent mode
 maps.v["<"] = { "<gv", desc = "Indent to the left" }
 maps.v[">"] = { ">gv", desc = "Indent to the right" }
+
+-- Vim commands
+maps.n["<leader>v"] = sections.v
+maps.n["<leader>vl"] = { "<cmd>Lazy<cr>", desc = "Lazy Plugin Manager" }
+maps.n["<leader>vm"] = { "<cmd>messages<cr>", desc = "Open messages" }
+maps.n["<leader>vn"] = { "<cmd>Notifications<cr>", desc = "Open notifications" }
+maps.n["<leader>vq"] = { "<cmd>q<cr>", desc = "Quit" }
+
+-- Troubel lists for basic functionality
+maps.n["<leader>vt"] = { desc = 'Trouble lists' }
+maps.n["<leader>vtq"] = { function() require("trouble").toggle("quickfix") end, desc = "QuickFix" }
+maps.n["<leader>vtl"] = { function() require("trouble").toggle("loclist") end, desc = "LocationList" }
+
+-- Buffer commands
+maps.n["<leader>b"] = sections.b
+maps.n["<leader>bc"] = { "<cmd>bdelete<cr>", desc = "Close and delete buffer" }
+maps.n["<leader>bd"] = { "<cmd>Bdelete<cr>", desc = "Delete buffer without closing the window" }
 
 -- Plugins --
 
@@ -81,30 +88,37 @@ maps.n["<leader>u"] = sections.u
 maps.n["<leader>ui"] = { "<cmd>DBUI<cr>", desc = "Open Dad Bod UI" }
 maps.n["<leader>ua"] = { "<cmd>DBUIAddConnection", desc = "Add Dad Bod UI connection" }
 
--- Dap
-maps.n["<leader>d"] = sections.d
-maps.n["<leader>db"] = { "<cmd>lua require'dap'.toggle_breakpoint()<cr>", desc = "Toggle breakpoint" }
-maps.n["<leader>dc"] = { "<cmd>lua require'dap'.continue()<cr>", desc = "Continue" }
-maps.n["<leader>di"] = { "<cmd>lua require'dap'.step_into()<cr>", desc = "Step into" }
-maps.n["<leader>do"] = { "<cmd>lua require'dap'.step_over()<cr>", desc = "Step over" }
-maps.n["<leader>dO"] = { "<cmd>lua require'dap'.step_out()<cr>", desc = "Step out" }
-maps.n["<leader>dr"] = { "<cmd>lua require'dap'.repl.toggle()<cr>", desc = "Toggle REPL" }
-maps.n["<leader>dl"] = { "<cmd>lua require'dap'.run_last()<cr>", desc = "Run last" }
-maps.n["<leader>du"] = { "<cmd>lua require'dapui'.toggle()<cr>", desc = "Toggle Dap UI" }
-maps.n["<leader>dt"] = { "<cmd>lua require'dap'.terminate()<cr>", desc = "Terminate" }
-
--- Explorer
+-- NvimTree/Explorer
 maps.n["<leader>e"] = { "<cmd>NvimTreeToggle<cr>", desc = "Toggle tree explorer" }
 
 -- Telescope
-maps.n["<leader>f"] = sections.f
-maps.n["<leader>fbr"] = { "<cmd>Telescope file_browser path=%:p:h select_buffer=true<cr>", desc = "Open file browser" }
-maps.n["<leader>fbu"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
-maps.n["<leader>ff"] = { "<cmd>Telescope find_files<cr>", desc = "Find files" }
-maps.n["<leader>fn"] = { "<cmd>Telescope notify<cr>", desc = "Search message history" }
-maps.n["<leader>fp"] = { "<cmd>Telescope projects<cr>", desc = "Find projects" }
-maps.n["<leader>fw"] = { "<cmd>Telescope live_grep<cr>", desc = "Find words" }
-maps.n["<leader>fz"] = { "<cmd>Telescope zoxide list", desc = "List directories" }
+maps.n["<leader>t"] = sections.t
+maps.n["<leader>tbr"] = { "<cmd>Telescope file_browser path=%:p:h select_buffer=true<cr>", desc = "Open file browser" }
+maps.n["<leader>tbu"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
+maps.n["<leader>tf"] = { "<cmd>Telescope find_files<cr>", desc = "Find files" }
+maps.n["<leader>tl"] = { "<cmd>Telescope lazy<cr>", desc = "Lazy plugin info" }
+maps.n["<leader>tn"] = { "<cmd>Telescope notify<cr>", desc = "Search message history" }
+maps.n["<leader>tp"] = { "<cmd>Telescope projects<cr>", desc = "Find projects" }
+maps.n["<leader>tw"] = { "<cmd>Telescope live_grep<cr>", desc = "Find words" }
+maps.n["<leader>tz"] = { "<cmd>Telescope zoxide list", desc = "List directories" }
+maps.n["<leader>tt"] = { "<cmd>Telescope toggleterm_manager", desc = "List Terminals" }
+
+-- Telescope for DAP
+maps.n["<leader>td"] = { desc = 'DAP' }
+maps.n["<leader>tdb"] = { "<cmd>lua require'dap'.toggle_breakpoint()<cr>", desc = "Toggle breakpoint" }
+maps.n["<leader>tdc"] = { "<cmd>lua require'dap'.continue()<cr>", desc = "Continue" }
+maps.n["<leader>tdcm"] = { "<cmd>Telescope dap commands<cr>", desc = "Commands" }
+maps.n["<leader>tdcn"] = { "<cmd>Telescope dap configurations<cr>", desc = "Config" }
+maps.n["<leader>tdf"] = { "<cmd>Telescope dap frames<cr>", desc = "Frames" }
+maps.n["<leader>tdi"] = { "<cmd>lua require'dap'.step_into()<cr>", desc = "Step into" }
+maps.n["<leader>tdl"] = { "<cmd>Telescope dap list_breakpoints<cr>", desc = "List breakpoints" }
+maps.n["<leader>tdrl"] = { "<cmd>lua require'dap'.run_last()<cr>", desc = "Run last" }
+maps.n["<leader>tdO"] = { "<cmd>lua require'dap'.step_out()<cr>", desc = "Step out" }
+maps.n["<leader>tdo"] = { "<cmd>lua require'dap'.step_over()<cr>", desc = "Step over" }
+maps.n["<leader>tdr"] = { "<cmd>lua require'dap'.repl.toggle()<cr>", desc = "Toggle REPL" }
+maps.n["<leader>tdt"] = { "<cmd>lua require'dap'.terminate()<cr>", desc = "Terminate" }
+maps.n["<leader>tdu"] = { "<cmd>lua require'dapui'.toggle()<cr>", desc = "Toggle Dap UI" }
+maps.n["<leader>tdv"] = { "<cmd>Telescope dap variables<cr>", desc = "Variables" }
 
 -- Git
 maps.n["<leader>g"] = sections.g
@@ -139,15 +153,27 @@ maps.n["<leader>lr"] = { "<cmd>lua vim.lsp.buf.rename()<cr>", desc = "Rename" }
 maps.n["<leader>ls"] = { "<cmd>lua vim.lsp.buf.signature_help()<CR>", desc = "Signature help" }
 maps.n["<leader>lq"] = { "<cmd>lua vim.diagnostic.setloclist()<CR>", desc = "Setloclist" }
 
+-- Trouble for LSP
+maps.n["<leader>lt"] = { desc = 'Trouble lists' }
+maps.n["<leader>ltr"] = { function() require("trouble").toggle("lsp_references") end, desc = "References" }
+maps.n["<leader>ltf"] = { function() require("trouble").toggle("lsp_definitions") end, desc = "Definitions" }
+maps.n["<leader>ltq"] = { function() require("trouble").toggle("quickfix") end, desc = "QuickFix" }
+maps.n["<leader>ltl"] = { function() require("trouble").toggle("loclist") end, desc = "LocationList" }
+
 -- Mason
 maps.n["<leader>m"] = sections.m
 maps.n["<leader>mi"] = { "<cmd>Mason<cr>", desc = "Mason Control Panel" }
 maps.n["<leader>ml"] = { "<cmd>MasonLog<cr>", desc = "Mason Log" }
 
--- Null-Ls (None-Ls)
+-- None-Ls
 maps.n["<leader>n"] = sections.n
 maps.n["<leader>ni"] = { "<cmd>NullLsInfo<cr>", desc = "Null-Ls Info" }
 maps.n["<leader>nl"] = { "<cmd>NullLsLog<cr>", desc = "Null-Ls Log"}
+
+-- Trouble for None-Ls
+maps.n["<leader>lt"] = { desc = 'Trouble Windows' }
+maps.n["<leader>ntd"] = { function() require("trouble").toggle("document_diagnostics") end, desc = "Diagnostics" }
+maps.n["<leader>ntw"] = { function() require("trouble").toggle("workspace_diagnostics") end, desc = "Workspace Diagnostics" }
 
 -- Vim-Test
 maps.n["<leader>r"] = sections.r
@@ -164,14 +190,5 @@ maps.n["<leader>sw"] =
   { "<cmd>lua require('spectre').open_visual({select_word=true})<cr>", desc = "Search current word" }
 maps.n["<leader>sp"] =
   { "<cmd>lua require('spectre').open_file_search({select_word=true})<cr>", desc = "Search on current file" }
-
--- Trouble
-maps.n["<leader>t"] = sections.t
-maps.n["<leader>tr"] = { function() require("trouble").toggle("lsp_references") end, desc = "References" }
-maps.n["<leader>tf"] = { function() require("trouble").toggle("lsp_definitions") end, desc = "Definitions" }
-maps.n["<leader>td"] = { function() require("trouble").toggle("document_diagnostics") end, desc = "Diagnostics" }
-maps.n["<leader>tq"] = { function() require("trouble").toggle("quickfix") end, desc = "QuickFix" }
-maps.n["<leader>tl"] = { function() require("trouble").toggle("loclist") end, desc = "LocationList" }
-maps.n["<leader>tw"] = { function() require("trouble").toggle("workspace_diagnostics") end, desc = "Workspace Diagnostics" }
 
 utils.set_mappings(maps)
