@@ -8,6 +8,27 @@ $ ->
       enable_report_buttons()
 
 
+  window.resubmit_report_dialog = () ->
+    force = 'false'
+    if $('#resend_csam_reports_force').checked == true
+      force = 'true'
+    $('#resend_csam_reports_table tbody tr').each ->
+      entry_id = $(this).find('.report-entry-id-col').text()
+
+      data: {complaint_entry_id: entry_id, force: force}
+      $.ajax(
+        url: '/escalations/api/v1/escalations/webcat/complaints/resubmit_abuse_report'
+        data: data
+        method: 'POST'
+        success: (response) ->
+          console.log response
+          std_msg_success('Report sent.')
+        error: (response) ->
+          console.log response
+          std_msg_error('Error sending report')
+      , this)
+
+
 
 
 
@@ -28,6 +49,7 @@ build_csam_reports_table = () ->
         targets: [0, 8]
         orderable: false
         searcheable: false
+        sortable: false
       }
       {
         targets: [0]
@@ -80,20 +102,34 @@ build_csam_reports_table = () ->
       }
       {
         data: 'record_id'
-        render: (data) ->
-         return '<button id="resend_csam_report_' + data + '" class="toolbar-button toolbar-button-spacer icon-reports esc-tooltipped" title="Resend report"</button><button id="forward_csam_report_' + data + '" class="toolbar-button icon-email esc-tooltipped" title="Forward report to external email address"</button>'
+        render: (data, type, full, meta) ->
+
+          buttons =
+            '<button id="resend_csam_report_' + data + '" class="toolbar-button toolbar-button-spacer icon-reports esc-tooltipped resend-csam-report" title="Resend report" data-entry-id="' + full.complaint_entry_id + '" data-url="' + full.url + '"></button>' +
+            '<button id="forward_csam_report_' + data + '" class="toolbar-button icon-email esc-tooltipped" title="Forward report to external email address"></button>'
+          return buttons
       }
     ]
 
     initComplete: ->
+      # these cannot be initialized until after the dt is built
       $('#webcat-csam-reports-index_filter input').addClass('table-search-input')
+
       $('.report-id-wrapper').click ->
         source = $(this).attr('data-report-source')
         record_id = $(this).attr('data-record-id')
         open_csam_report(record_id, source)
+
       $('#webcat-csam-reports-index .esc-tooltipped').tooltipster
         theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
         debug: false
+
+      $('.resend-csam-report').click ->
+        entry_id = $(this).attr('data-entry-id')
+        url = $(this).attr('data-url')
+        entry_data = {entry_id: entry_id, url: url}
+        open_resubmit_report_dialog([entry_data])
+
   )
 
 
@@ -108,19 +144,29 @@ build_csam_report_dialogs = () ->
   $('.csam-report-dialog').each ->
     $(this).dialog
       autoOpen: false
-      minWidth: 500
+      minWidth: 700
+      resizable: true
 
 open_csam_report = (record_id, report_type) ->
   dialog_id = "##{report_type}_report_dialog_#{record_id}"
   $(dialog_id).dialog('open')
 
 
+# works for individual or bulk re-submits
+open_resubmit_report_dialog = (entries) ->
+  $('#resend_csam_reports_table tbody').empty()
+  #add check to prevent dups? Maybe, backend handles dups
+  $(entries).each ->
+    entry_id = this.entry_id
+    url = this.url
+    dialog_table_row = "<tr><td class='report-entry-id-col'>#{entry_id}</td><td class='entry-url-col'>#{url}</td></tr>"
+    $('#resend_csam_reports_table').append(dialog_table_row)
 
-resubmit_report = (report_id) ->
-  debugger
+  $('#resend_csam_reports_dialog').dialog 'open'
 
 
-forward_report = (report_id) ->
+
+forward_report = (row) ->
   debugger
 
 

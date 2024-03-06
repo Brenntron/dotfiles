@@ -30,13 +30,60 @@
 
 
 - @reports.each do |report|
-  .csam-report-dialog{id: "#{report.source}_report_dialog_#{report.id}", title: "#{report.source} Report ##{report.report_ident}"}
+
+  .csam-report-dialog{id: "#{report.source}_report_dialog_#{report.id}", title: "#{report.source.upcase} Report ##{report.report_ident}"}
     .dialog-content-wrapper
       .row
         .col-xs-12
-          %h4 Report Response
-          = report.result
+          %h5 Report Response
+          .note-block
+            %pre= report.result
 
           %hr
-          %h4 Report Content
-          = report.report_submitted
+          %h5 Report Content
+          .note-block
+            %pre= report.report_submitted
+
+
+#resend_csam_reports_dialog.csam-report-dialog{title: 'Resend CSAM Report to IWF and NCMEC'}
+  .dialog-content-wrapper
+    .row
+      .col-xs-12
+        %table#resend_csam_reports_table
+          %thead
+            %tr
+              %th Entry
+              %th Url
+    .row
+      .col-xs-12.text-center
+        %label.content-label-sm Checking 'Force' will resend report even if report has been successfully sent previously.
+        .checkbox-wrapper
+          %input#resend_csam_reports_force{name: 'resend_csam_reports_force', type: 'checkbox'}
+          %label.checkbox-label{for: 'resend_csam_reports_force', value: 'force'} Force send
+
+        %hr.thin
+    .row
+      .col-xs-12.text-center.button-row
+        %button#resend_csam_reports_submit.primary{type: 'button', value: 'submit', onclick: 'resubmit_report_dialog()'} Resend Report
+
+
+
+#forward_csam_reports_dialog.csam-report-dialog{title: 'Forward CSAM Report'}
+  .dialog-content-wrapper
+    .row
+      .col-xs-12
+        %label.content-label-sm Forward CSAM report to Legal
+        %hr.thin
+
+    .row
+      .col-xs-12
+        %table#resend_csam_reports_table
+          %thead
+            %tr
+              %th Entry
+              %th Url
+        %hr.thin
+
+    .row
+      .col-xs-12.text-center
+        %button#resend_csam_reports_submit.primary{type: 'button', value: 'submit'} Forward Report
