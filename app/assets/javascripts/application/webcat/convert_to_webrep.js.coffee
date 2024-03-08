@@ -3,88 +3,100 @@
 # Prepare ticket for converting
 window.prep_complaint_to_convert = () ->
   if $('tr.selected').length > 1
-# This shouldn't happen, but just in case
-    std_api_error('Can only convert 1 complaint at a time.')
+    # This shouldn't happen, but just in case
+    std_msg_error('Can only convert 1 complaint at a time.', [])
   else
-# get all data associated with the selected row
+    # get all data associated with the selected row
     complaint_row = $('tr.selected')[0]
     row_data = $('#complaints-index').DataTable().row(complaint_row).data()
+    complaint_source = row_data.complaint_source
+    complaint_status = row_data.status
 
-    complaint_id = row_data.complaint_id
-    summary = row_data.description
-    entries_table = $('#entries-to-convert tbody')
-    entry_id = row_data.entry_id
+    # entry checks, we check again after response for tickets that are not 1 ticket 1 entry, although multiple entries will only exist in older tickets
+    if complaint_source == 'talos-intelligence' || complaint_source == 'talos-intelligence-api'
+      if complaint_status == 'NEW' || complaint_status == 'ASSIGNED' || complaint_status == 'REOPENED'
 
-    # clear residual info from prev selections
-    $('#complaint-id-to-convert').empty()
-    $('.convert-entry-count').empty()
-    $(entries_table).empty()
-    $('#convert-ticket-summary').empty()
-    $('#convert-to-webrep').attr('disabled', 'disabled')
+        complaint_id = row_data.complaint_id
+        summary = row_data.description
+        entries_table = $('#entries-to-convert tbody')
+        entry_id = row_data.entry_id
 
-    std_msg_ajax(
-      method: 'POST'
-      url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
-      data:
-        complaint_entry_id: entry_id
-      success: (response) ->
-        response = $.parseJSON(response)
-        entries = response.data.complaint_entries
-        entry_count = entries.length
+        # clear residual info from prev selections
+        $('#complaint-id-to-convert').empty()
+        $('.convert-entry-count').empty()
+        $(entries_table).empty()
+        $('#convert-ticket-summary').empty()
+        $('#convert-to-webrep').attr('disabled', 'disabled')
 
-        # now that we have parent data, check complaint status & source
-        complaint_status = response.data.complaint.status
-        complaint_source = response.data.complaint.ticket_source
+        std_msg_ajax(
+          method: 'POST'
+          url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
+          data:
+            complaint_entry_id: entry_id
+          success: (response) ->
+            debugger
+            response = $.parseJSON(response)
+            entries = response.data.complaint_entries
+            entry_count = entries.length
 
-        if complaint_source == 'talos-intelligence' || complaint_source == 'talos-intelligence-api'
-          if complaint_status == 'NEW' || complaint_status == 'ACTIVE' || complaint_status == 'REOPENED'
-# populate the dropdown
-            $('#complaint-id-to-convert').text(complaint_id)
-            $('.convert-entry-count').text('(' + entry_count + ')')
+            # now that we have parent data, check complaint (parent ticket) status
+            # these *should* match the entry status for any new tickets
+            complaint_status = response.data.complaint.status
 
-            # extra handling to deal with too many entries and overlapping issues with selectize
-            if entry_count > 8
-              $('.convert-entry-table-wrapper').addClass('max-scroll')
-            else
-              $('.convert-entry-table-wrapper').removeClass('max-scroll')
+            if complaint_status == 'NEW' || complaint_status == 'ACTIVE' || complaint_status == 'REOPENED' || complaint_status == 'ASSIGNED'
+              # populate the dropdown
+              $('#complaint-id-to-convert').text(complaint_id)
+              $('.convert-entry-count').text('(' + entry_count + ')')
 
-            $(entries).each ->
-              if this.entry_type == 'IP'
-                entry_content = this.ip_address
+              # extra handling to deal with too many entries and overlapping issues with selectize
+              if entry_count > 8
+                $('.convert-entry-table-wrapper').addClass('max-scroll')
               else
-                entry_content = this.uri
+                $('.convert-entry-table-wrapper').removeClass('max-scroll')
 
-              entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
-                '<td class="text-center entry-disposition">' +
-                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio" title="Customer says the website is safe and should be allowed.">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
-                '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio" title="Customer says the website is malicious and should be blocked">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
-                '</td></tr>'
+              $(entries).each ->
+                if this.entry_type == 'IP'
+                  entry_content = this.ip_address
+                else
+                  entry_content = this.uri
 
-              $(entries_table).append(entry_row)
+                entry_row = '<tr><td>' + this.id + '</td><td class="entry-content-to-convert">' + entry_content + '</td>' +
+                  '<td class="text-center entry-disposition">' +
+                  '<div class="inline-radio-wrapper"><label for="' + this.id + '-fp-radio" title="Customer says the website is safe and should be allowed.">FP</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fp" id="' + this.id + '-fp-radio"/></div>' +
+                  '<div class="inline-radio-wrapper"><label for="' + this.id + '-fn-radio" title="Customer says the website is malicious and should be blocked">FN</label><input type="radio" class="disposition-radio" name="disposition-' + this.id + '" value="fn" id="' + this.id + '-fn-radio"/></div>' +
+                  '</td></tr>'
 
-            $('#convert-ticket-summary').append(summary)
-            $('.entry-disposition > .inline-radio-wrapper > label').tooltipster
-              theme: [
-                'tooltipster-borderless'
-                'tooltipster-borderless-customized'
-              ]
+                $(entries_table).append(entry_row)
 
-          else
-            std_msg_error('Ticket cannot be converted', ['Selected entry\'s parent ticket is not in a convertible (open) status.'])
-            return
+              $('#convert-ticket-summary').append(summary)
+              $('.entry-disposition > .inline-radio-wrapper > label').tooltipster
+                theme: [
+                  'tooltipster-borderless'
+                  'tooltipster-borderless-customized'
+                ]
 
-        else
-          std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
-          return
+            else
+              std_msg_error('Ticket cannot be converted', ['Selected entry\'s parent ticket is not in a convertible (open) status.'])
+              return
 
-      error: (response) ->
-        console.log response
-        std_msg_error('Error preparing ticket for conversion', [response])
-    )
+          error: (response) ->
+            console.log response
+            std_msg_error('Error preparing ticket for conversion', [response])
+        )
+      else
+        std_msg_error('Ticket cannot be converted', ['Selected ticket is not in a convertible (open) status.'])
+        return
+    else
+      std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
+      return
+
+
+
+
 
 
 convert_complaint_to_webrep = () ->
-# get the parent ticket info
+  # get the parent ticket info
   complaint_id = parseInt($('#complaint-id-to-convert').text())
   summary = $('#convert-ticket-summary').val()
   submission_type = $('input[name=ticket-type]:checked').val()
