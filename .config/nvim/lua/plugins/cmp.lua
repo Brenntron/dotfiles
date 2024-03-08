@@ -13,7 +13,10 @@ local M = {
       "zbirenbaum/copilot-cmp",
       event = { "InsertEnter", "LspAttach" },
       config = function()
-        require("copilot_cmp").setup()
+        require("copilot_cmp").setup({
+          -- copilot_cmp shouldn't be accoungint for every languages's matchers.
+          fix_pairs = false,
+        })
       end,
     },
     {
@@ -30,10 +33,6 @@ local M = {
       init = function()
         require("cmp_kitty"):setup()
       end,
-    },
-    {
-      "saadparwaiz1/cmp_luasnip",
-      event = { "InsertEnter", "LspAttach" },
     },
     {
       "rcarriga/cmp-dap",
@@ -58,24 +57,15 @@ local M = {
       "onsails/lspkind.nvim",
       event = { "InsertEnter", "LspAttach" },
     },
-    {
-      "L3MON4D3/LuaSnip",
-      event = { "InsertEnter", "LspAttach" },
-      dependencies = {
-        "rafamadriz/friendly-snippets",
-      },
-    },
   },
   event = { "InsertEnter", "LspAttach" },
 }
 
 function M.config()
   local cmp = require "cmp"
+  local cmp_autopairs = require("nvim-autopairs.completion.cmp")
   local icons = require "utils.icons"
   local lspkind = require "lspkind"
-  local luasnip = require "luasnip"
-
-  require("luasnip/loaders/from_vscode").lazy_load()
 
   vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#6CC644" })
   vim.api.nvim_set_hl(0, "CmpItemKindCrate", { fg = "#F64D00" })
@@ -118,7 +108,6 @@ function M.config()
           vim_item.menu = ({
             nvim_lsp = "",
             nvim_lua = "",
-            luasnip = "",
             buffer = "",
             path = "",
             emoji = "",
@@ -168,12 +157,6 @@ function M.config()
           cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
         elseif cmp.visible() then
           cmp.select_next_item()
-        elseif luasnip.expandable() then
-          luasnip.expand()
-        elseif luasnip.expand_or_jumpable() then
-          luasnip.expand_or_jump()
-        elseif check_backspace() then
-          fallback()
         else
           fallback()
         end
@@ -184,8 +167,6 @@ function M.config()
       ["<S-Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_prev_item()
-        elseif luasnip.jumpable(-1) then
-          luasnip.jump(-1)
         else
           fallback()
         end
@@ -193,11 +174,6 @@ function M.config()
         "i",
         "s",
       }),
-    },
-    snippet = {
-      expand = function(args)
-        luasnip.lsp_expand(args.body) -- For `luasnip` users.
-      end,
     },
     sorting = {
       priority_weight = 2,
@@ -222,7 +198,6 @@ function M.config()
       { name = "copilot", group_index = 2 },
       { name = "emoji", group_index = 2 },
       { name = "kitty", group_index = 2 },
-      { name = "luasnip", group_index = 2 },
       { name = "nvim_lsp", group_index = 2 },
       { name = "nvim_lua", group_index = 2 },
       { name = "path", group_index = 2 },
@@ -270,14 +245,9 @@ function M.config()
   -- DAP setup
   cmp.setup.filetype({ "dap-repl"}, { source = { name = "dap" }})
 
-  pcall(function()
-    local function on_confirm_done(...)
-      require("nvim-autopairs.completion.cmp").on_confirm_done()(...)
-    end
-
-    require("cmp").event:off("confirm_done", on_confirm_done)
-    require("cmp").event:on("confirm_done", on_confirm_done)
-  end)
+  -- Autopairs setup
+  cmp.event:off("confirm_done", cmp_autopairs.on_confirm_done())
+  cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 end
 
 return M

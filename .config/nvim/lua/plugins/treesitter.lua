@@ -1,42 +1,41 @@
 local M = {
   "nvim-treesitter/nvim-treesitter",
   build = ":TSUpdate",
-  commit = "afa103385a2b5ef060596ed822ef63276ae88016",
   dependencies = {
     {
       "windwp/nvim-autopairs",
       event = "InsertEnter",
-      commit = "f6c71641f6f183427a651c0ce4ba3fb89404fa9e",
     },
     {
       "nvim-treesitter/nvim-treesitter-textobjects",
       event = "VeryLazy",
-      commit = "78c49ca7d2f7ccba2115c11422c037713c978ad1",
     },
     {
       "windwp/nvim-ts-autotag",
       event = "VeryLazy",
-      commit = "6be1192965df35f94b8ea6d323354f7dc7a557e4",
     },
     {
-      "JoosepAlviste/nvim-ts-context-commentstring",
+      "andymass/vim-matchup",
+      config = function()
+        vim.g.matchup_matchparen_offscreen = { method = "popup" }
+      end,
+    },
+    {
+      "liadOz/nvim-dap-repl-highlights",
       event = "VeryLazy",
-      commit = "92e688f013c69f90c9bbd596019ec10235bc51de",
+      config = function()
+        require("nvim-dap-repl-highlights").setup()
+      end,
     },
   },
   event = { "BufNewFile", "BufReadPost" },
 }
 
 function M.config()
+  vim.g.skip_ts_context_commenstring_module = true
+
   require("nvim-treesitter.configs").setup {
-    autopairs = {
-      enable = true,
-    },
     autotag = { enable = true },
-    context_commentstring = {
-      enable = true,
-      enable_autocmd = false,
-    },
     ensure_installed = {
       "bash",
       "comment",
@@ -55,6 +54,7 @@ function M.config()
       "scss",
       "sql",
       "vim",
+      "vimdoc",
       "vue",
       "yaml",
     },
@@ -66,10 +66,8 @@ function M.config()
     ignore_install = { "" }, -- List of parsers to ignore installing
     indent = { enable = true },
     matchup = {
-      enable = {},
-      disable = { "lua" },
+      enable = true,
     },
-    sync_install = false, -- install languages synchronously (only applied to `ensure_installed`)
     textobjects = {
       select = {
         enable = true,

@@ -36,17 +36,12 @@ function M.config()
         filetypes = { "coffee", "css", "cucumber", "erb", "eruby", "javascript", "haml", "html", "markdown", "scss", "yaml" },
       },
       diagnostics.erb_lint,
-      diagnostics.eslint,
       diagnostics.haml_lint,
       diagnostics.rubocop,
-      diagnostics.shellcheck,
       diagnostics.spectral,
       diagnostics.stylelint,
       diagnostics.zsh,
       -- formatters
-      formatting.beautysh.with {
-        filetypes = { "bash", "zsh" },
-      },
       formatting.erb_lint,
       formatting.markdownlint,
       formatting.prettierd.with {

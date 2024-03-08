@@ -1,6 +1,5 @@
 local M = {
   "nvim-telescope/telescope.nvim",
-  commit = "74ce793a60759e3db0d265174f137fb627430355",
   cmd = "Telescope",
   dependencies = {
     {
@@ -29,7 +28,7 @@ local M = {
       config = true
     },
     {
-      "tsarkirist/telescope-lazy.nvim"
+      "tsakirist/telescope-lazy.nvim"
     }
   },
   event = "Bufenter",
@@ -127,23 +126,6 @@ function M.config()
       },
     },
     extensions = {
-      file_browser = {
-        hijack_netrw = true,
-        mappings = {
-          i = {
-            ["<C-n>"] = actions.cycle_history_next,
-            ["<C-p>"] = actions.cycle_history_prev,
-            ["<C-j>"] = actions.move_selection_next,
-            ["<C-k>"] = actions.move_selection_previous,
-          },
-          n = {
-            ["<esc>"] = actions.close,
-            ["j"] = actions.move_selection_next,
-            ["k"] = actions.move_selection_previous,
-            ["q"] = actions.close,
-          },
-        },
-      },
       fzf = {
         fuzzy = true, -- false will only do exact matching
         override_generic_sorter = true, -- override the generic sorter
@@ -155,7 +137,6 @@ function M.config()
         show_icon = true,
         mappings = {
           open_in_browser = "<C-o>",
-          open_in_file_browser = "<M-b>",
           open_in_find_files = "<C-f>",
           open_in_live_grep = "<C-g>",
           open_in_terminal = "<C-t>",
@@ -196,7 +177,6 @@ function M.config()
   }
 
   telescope.load_extension "dap"
-  telescope.load_extension "file_browser"
   telescope.load_extension "fzf"
   telescope.load_extension "lazy"
   telescope.load_extension "notify"

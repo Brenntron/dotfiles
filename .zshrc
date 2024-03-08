@@ -5,7 +5,7 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 export ZSH="${HOME}/.oh-my-zsh"
 
 source $ZSH/oh-my-zsh.sh
-source ~/code/Tools/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+source ~/code/tools/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 if [[ $(uname) == "Linux" ]]; then
   source ~/.config/linux/linuxbrew.zsh
@@ -178,6 +178,9 @@ alias -s ace="unace l"
 
 alias cc='gcc'
 alias CC='gcc'
+
+# Podman Compose aliases
+alias pc='podman compose'
 
 # Set alias for dotfiles config
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
