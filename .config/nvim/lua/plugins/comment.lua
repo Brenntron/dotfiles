@@ -1,5 +1,16 @@
 local M = {
   "numToStr/Comment.nvim",
+  dependencies = {
+    {
+      "JoosepAlviste/nvim-ts-context-commentstring",
+      config = function()
+        require('ts_context_commentstring').setup {
+          enable_autocmd = false,
+        }
+      end,
+      event = "VeryLazy",
+    },
+  },
   event = "VeryLazy",
   lazy = false,
 }
@@ -44,14 +55,7 @@ function M.config()
       extra = true,
     },
     ---Function to call before (un)comment
-    pre_hook = function(...)
-      local loaded, ts_comment = pcall(require, "ts_context_commentstring.integrations.comment_nvim")
-      if loaded and ts_comment then
-        return ts_comment.create_pre_hook()(...)
-      end
-    end,
-    ---Function to call after (un)comment
-    post_hook = nil,
+    pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook(),
   }
 end
 
