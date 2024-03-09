@@ -63,13 +63,14 @@ maps.n["<leader>wq"] = { "<cmd>wq!<cr>", desc = "Write to file and quit" }
 
 -- Miscellaneous Vim commands
 maps.n["<leader>v"] = sections.v
-maps.n["<leader>vll"] = { function() require("trouble").toggle("loclist") end, desc = "LocationList" }
-maps.n["<leader>vlz"] = { "<cmd>Lazy<cr>", desc = "Lazy Plugin Manager" }
+maps.n["<leader>va"] = { "<cmd>Alpha<cr>", desc = "Dashboard" }
+maps.n["<leader>vl"] = { function() require("trouble").toggle("loclist") end, desc = "LocationList" }
 maps.n["<leader>vm"] = { "<cmd>messages<cr>", desc = "Open messages" }
 maps.n["<leader>vn"] = { "<cmd>Telescope notify<cr>", desc = "Open notifications history" }
 maps.n["<leader>vp"] = { "<cmd>Telescope lazy<cr>", desc = "Plugin info" }
 maps.n["<leader>vq"] = { function() require("trouble").toggle("quickfix") end, desc = "QuickFix" }
 maps.n["<leader>vw"] = { "<cmd>Twilight<cr>", desc = "Toggle Twilight"}
+maps.n["<leader>vz"] = { "<cmd>Lazy<cr>", desc = "Lazy Plugin Manager" }
 
 -- Visual --
 -- Better paste

@@ -5,9 +5,9 @@ local M = {
 
 function M.config()
   local execs = {
-    { nil, "<M-1>", "Horizontal Terminal", "horizontal", 0.3 },
-    { nil, "<M-2>", "Vertical Terminal", "vertical", 0.4 },
-    { nil, "<M-3>", "Float Terminal", "float", nil },
+    { '/bin/zsh', "<M-1>", "Horizontal Terminal", "horizontal", 0.3 },
+    { '/bin/zsh', "<M-2>", "Vertical Terminal", "vertical", 0.4 },
+    { '/bin/zsh', "<M-3>", "Float Terminal", "float", nil },
   }
 
   local function get_buf_size()
@@ -80,7 +80,7 @@ function M.config()
     persist_size = false,
     direction = "float",
     close_on_exit = true, -- close the terminal window when the process exits
-    shell = nil, -- change the default shell
+    shell = '/bin/zsh', -- change the default shell
     float_opts = {
       border = "rounded",
       winblend = 0,

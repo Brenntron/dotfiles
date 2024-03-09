@@ -13,6 +13,19 @@ else
   source ~/.config/osx/homebrew.zsh
 fi
 
+# FZF setup
+export FZF_BASE="$(brew --prefix fzf)"
+export FZF_DEFAULT_COMMAND='fd -H -i'
+export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4 --preview "cat --color=always {}" --preview-window "~3"'
+source ~/.fzf.zsh
+
+# asdf setup
+source ~/.config/asdf/asdf_setup.zsh
+
+# obsidianmd-cli completions
+source ~/.config/completions/obsidianmd.zsh
+
+
 # Customer syntax highlighting must come before activating zsh-syntax-highlighting
 source ~/.config/tokyonight/zsh-syntax-highlighting.zsh
 
@@ -20,10 +33,8 @@ source $(brew --prefix)/share/antigen/antigen.zsh
 
 antigen use oh-my-zsh
 
-antigen bundle 1password
 antigen bundle alias-finder
 antigen bundle aliases
-antigen bundle asdf
 antigen bundle autoenv
 antigen bundle bundler
 antigen bundle command-not-found
