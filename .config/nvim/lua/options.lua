@@ -65,7 +65,7 @@ vim.g.loaded_perl_provider = 0 -- Disable Perl provider
 vim.g.mapleader = " "
 
 -- add filetypes
-vim.filetype.add({ extension = { coffee = "coffee" }, { config = "conf" } })
+vim.filetype.add { extension = { coffee = "coffee" }, { config = "conf" } }
 
 -- netrw
 vim.g.netrw_banner = 0
