@@ -34,7 +34,6 @@ window.prep_complaint_to_convert = () ->
           data:
             complaint_entry_id: entry_id
           success: (response) ->
-            debugger
             response = $.parseJSON(response)
             entries = response.data.complaint_entries
             entry_count = entries.length
