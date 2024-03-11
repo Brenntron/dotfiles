@@ -62,7 +62,7 @@
     %label.content-label-sm Resolution
     %input.form-control.selectize#resolution-input{name: 'resolution', multiple: 'multiple', tabindex:'-1'}
     %button#remove-criteria-resolution.remove-input{onclick:'clearSelectize("resolution-input")', type: 'button'}
-  
+
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
     %input.form-control.selectize#submitter-type-input{name: 'submitter-type', multiple: 'multiple', tabindex: '-1', data: 'webcat'}
@@ -128,7 +128,7 @@
               Date Submitted (Newer)
           %li.hidden
             %label.search-criteria-label
-              %input.search-checkbox#tags-cb{type: 'checkbox', name: 'search-criteria', value: 'Tags', for: 'tags-input-selectized'}
+              %input.search-checkbox#tags-cb{type: 'checkbox', name: 'search-criteria', value: 'Tags', for: 'tags-input'}
               Tags
           -#  Default hidden options below
           %li
@@ -198,14 +198,3 @@
       Submit Search
     %button.secondary#reset-advanced-search.reset{type: 'button', onclick: 'webcat_reset_search();'}
       Reset Search
-
-
-
--# Fetch user preferences for which fields to display in the advanced search
-:javascript
-
-  $(document).ready( function() {
-    window.set_advanced_search_pref();
-  });
-
-
