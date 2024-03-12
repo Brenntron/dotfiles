@@ -141,7 +141,13 @@ build_complaints_table = (url) ->
               age_class = 'ticket-age-over3hr'
 
           if full.channel?
-            complaint_channel = full.channel
+            if full.channel == 'talosintel'
+              if full.complaint_source == 'talos-intelligence'
+                complaint_channel = 'TI Webform'
+              else if full.complaint_source == 'talos-intelligence-api'
+                complaint_channel = 'TI API'
+            else
+              complaint_channel = full.channel
           else
             complaint_channel = '<span class="missing-data">Channel unknown</span>'
 
