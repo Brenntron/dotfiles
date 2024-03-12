@@ -56,92 +56,46 @@ $ ->
   $('#filter-cases-list a').on 'click', (e)->
     localStorage.setItem('webcat_reset_page', true)
 
+
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
+
     form = {}
-    user_id = if assignee_input[0].selectize? then assignee_input[0].selectize.items else []
-    tags = if tag_input[0].selectize? then tag_input[0].selectize.items else []
-    company = if $('#company-input')[0].selectize? then $('#company-input')[0].selectize.items else []
-    status = if $('#status-input')[0].selectize? then $('#status-input')[0].selectize.items else []
-    resolution = if $('#resolution-input')[0].selectize? then $('#resolution-input')[0].selectize.items else []
-    customer_name = if $('#name-input')[0].selectize? then $('#name-input')[0].selectize.items else []
-    { items, options } = category_input[0].selectize
-    complaints = if $('#complaint-input')[0].selectize? then $('#complaint-input')[0].selectize.items else []
-    channels = if $('#channel-input')[0].selectize? then $('#channel-input')[0].selectize.items else []
-    entry_ids = if $('#entryid-input')[0].selectize? then $('#entryid-input')[0].selectize.items else []
-    complaint_ids = if $('#complaintid-input')[0].selectize? then $('#complaintid-input')[0].selectize.items else []
-    jira_ids = if $('#jiraid-input')[0].selectize? then $('#jiraid-input')[0].selectize.items else []
-    platform_ids = if $('#platform-input')[0].selectize? then $('#platform-input')[0].selectize.items else []
-    submitter_types = if $('#submitter-type-input')[0].selectize? then $('#submitter-type-input')[0].selectize.items else []
+    # Get each visible search item - should either be a selectized select, or an input
+    console.log $('#cat_named_search .search-item:not(:hidden)').length
 
+    $('#cat_named_search .search-item:not(:hidden)').each ->
+      # selectized values will be arrays that need to be joined
+      if $(this).find('select')[0]
+        select = $(this).find('select')[0]
+        search_item = $(select).attr('name')
+        search_item_val = $(select).val()
+        if search_item_val?
+          # need both ids and names for categories and platforms
+          if search_item == 'category-input' || search_item == 'platform'
+            options = []
+            selected_options = $(select).find('option:selected')
+            $(selected_options).each ->
+              options.push(this.innerText)
+            if search_item == 'category-input'
+              form['category'] = options.join(', ')
+              form['category_ids'] = search_item_val.join(', ')
+            if search_item == 'platform'
+              form['platform_display'] = options.join(', ')
+              form['platform_ids'] = search_item_val.join(', ')
+          else
+            search_item_val = search_item_val.join(', ')
+      else
+        input = $(this).find('input')
+        search_item = $(input).attr('name')
+        search_item_val = $(input).val()
 
-    if tags.length
-      form['tags'] = tags.join(', ')
-    if items.length
-      form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
-      form['category_ids'] = items.map( (cat) -> options[cat].category_id ).join(', ')
-    if company.length
-      form['company'] = company.join(', ')
-    if status.length
-      form['status'] = status.join(', ')
-    if resolution.length
-      form['resolution'] = resolution.join(', ')
-    if customer_name.length
-      form['customer_name'] = customer_name.join(', ')
-    if complaints.length
-      form['ip_or_uri'] = complaints.join(', ')
-    if channels.length
-      form['channel'] = channels.join(', ')
-    if entry_ids.length
-      form['entry_id'] = entry_ids.join(', ')
-    if complaint_ids.length
-      form['complaint_id'] = complaint_ids.join(', ')
-    if jira_ids.length
-      form['jira_id'] = jira_ids.join(', ')
-    if user_id.length
-      form['user_id'] = user_id.join(', ')
-    if submitter_types.length
-      form['submitter_type'] = submitter_types.join(', ')
-
-    form['platform_display'] = []
-    if platform_ids.length
-      form['platform_ids'] = platform_ids.join(',')
-      for id in platform_ids
-        form['platform_display'].push($('#platform-input')[0].selectize.options[id].public_name)
-
-
-    for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
-      { name, value } = item
-      name = name.toLowerCase().replace(/-/g, '_')
-      if name != 'tags' && name != 'category'&&  name != 'companies'
-        form[name] = value
+      if search_item_val? && search_item_val != '' && search_item != 'category-input' && search_item != 'platform'
+        form[search_item] = search_item_val
 
     localStorage.webcat_search_type = 'advanced'
     localStorage.webcat_search_name = form.search_name
-    localStorage.webcat_search_conditions = JSON.stringify(
-      category: form.category
-      category_ids: form.category_ids
-      channel: form.channel
-      company_name: form.company
-      complaint_id: form.complaint_id
-      jira_id: form.jira_id
-      customer_email: form.customer_email
-      customer_name: form.customer_name
-      domain: form.domain
-      id: form.entry_id
-      ip_or_uri: form.ip_or_uri
-      modified_newer: form.date_modified_older
-      modified_older: form.date_modified_newer
-      platform_ids: form.platform_ids
-      platforms: form.platform_display.join(', ')
-      resolution: form.resolution
-      status: form.status
-      submitted_newer: form.date_submitted_newer
-      submitted_older: form.date_submitted_older
-      tags: form.tags
-      user_id: form.user_id
-      submitter_type: form.submitter_type
-    )
+    localStorage.webcat_search_conditions = JSON.stringify(form)
     refresh_url()
 
 
@@ -150,12 +104,11 @@ $ ->
     localStorage.webcat_search_type = 'named'
     localStorage.webcat_search_name  = search_name
     localStorage.webcat_search_conditions = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
-
     refresh_url()
+
 
   window.search_for_tag = (tag) ->
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
-
     try
       webcat_search_conditions = JSON.parse webcat_search_conditions
     catch e
@@ -165,11 +118,7 @@ $ ->
     webcat_search_conditions.tags = tag
 
     localStorage.webcat_search_conditions = JSON.stringify webcat_search_conditions
-
     refresh_url()
-
-
-
 
 
 
@@ -178,6 +127,7 @@ $ ->
   window.webcat_refresh = ()->
     refresh_webcat_localStorage()
     refresh_url()
+
 
   refresh_url = (href) ->
     { webcat_search_type, webcat_search_name } = localStorage
