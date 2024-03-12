@@ -88,6 +88,15 @@ build_complaints_table = (url) ->
       $(row).attr('data-categories', data.category)
       $(row).attr('data-status', data.status)
 
+    #set starting entry to 0 so that filters load on the first page
+    stateSaveParams: (settings, data) ->
+      data.start = 0
+
+    stateLoadParams: () ->
+      storage = localStorage.getItem('DataTables_complaints-index_' + window.location.pathname);
+      if storage?
+        return storage
+
     drawCallback: () ->
       console.log 'complaint drawcallback'
       if localStorage.webcat_reset_page
