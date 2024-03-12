@@ -53,6 +53,7 @@ $(document).ready ->
     data['status-comment'] = $("#status-comment-checkbox").is(':checked')
     data['last-updated'] = $("#last-updated-checkbox").is(':checked')
     data['platform'] = $("#platform-checkbox").is(':checked')
+    data['channel'] = $("#channel-checkbox").is(':checked')
     std_msg_ajax(
       url: "/escalations/api/v1/escalations/user_preferences/update"
       method: 'POST'
