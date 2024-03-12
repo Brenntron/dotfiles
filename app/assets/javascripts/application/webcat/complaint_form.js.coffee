@@ -21,7 +21,7 @@ $ ->
       success: (response) ->
         $('#platformList').empty()
         for platform in response.data
-          $('#platformList').append '<option value="' + platform + '"></option>'
+          $('#platformList').append '<option value="' + platform.public_name + '"></option>'
     )
 
 
