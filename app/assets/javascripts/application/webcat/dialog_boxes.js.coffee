@@ -101,7 +101,7 @@ window.history_dialog = (id, url) ->
           "
            <div class='tab-pane' role='tabpanel' id='xbrs-history-tab'>
             <h5>XBRS Timeline</h5>
-              <table class=''history-table xbrs-history-table' id='webcat-xbrs-history'></table>
+              <table class='history-table xbrs-history-table' id='webcat-xbrs-history'></table>
             </div>
            "
 
@@ -147,7 +147,7 @@ window.get_xbrs_history = (url, tab) ->
         $(xbrs_table).append(document.createElement('tbody'))
         thead = $(xbrs_table).find('thead')
         tbody = $(xbrs_table).find('tbody')
-        table_headers = ['Timestamp', 'Scrore', 'V2 Content Cat', 'V3 Content Cats', 'Threat Cats', 'Rule Hits']
+        table_headers = ['Timestamp', 'Score', 'V2 Content Cats', 'V3 Content Cats', 'Threat Cats', 'Rule Hits']
 
         parsed_rows = []
         thead_row = ''

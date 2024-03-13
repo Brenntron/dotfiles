@@ -370,7 +370,7 @@ build_complaints_table = (url) ->
           history_button =
             '<button class="history-button esc-tooltipped" id="entry-history-' + full.entry_id + '" ' +
               'onclick="history_dialog(\'' + full.entry_id + '\', \'' + history_url + '\')" ' +
-              'title="Domain History"></button>'
+              'title="History Information"></button>'
 
           whois_url = full.domain || full.ip_address
           whois_button =
