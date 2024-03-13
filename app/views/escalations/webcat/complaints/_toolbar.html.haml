@@ -205,7 +205,7 @@
       %span.toolbar-button-text WBNP Data
   .webcat-toolbar-push
     - if params[:f] == "REVIEW"
-      %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
+      %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
         %span.toolbar-button-text-wider Confirm Review
     - else
       %button#index_update_resolution.toolbar-button.resolution-submit-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', onclick: "$('#index_change_resolution_dialog').dialog('open');"}
