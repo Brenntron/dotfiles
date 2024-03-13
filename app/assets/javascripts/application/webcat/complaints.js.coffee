@@ -228,6 +228,7 @@ window.review_bulk_submit = () ->
   changes = (sessionStorage.getItem("webcat_entries_reviewed")|| "" )
   if (changes.split(',').length < 0) || (changes == '')
     std_msg_error('No changes to submit', ['Select "Commit" or "Decline on at least 1 entry."'])
+    return
 
   entries = changes.split(",").filter((item) -> return item)
 
@@ -243,6 +244,7 @@ window.review_bulk_submit = () ->
     uri = $($(entry_row).find('.complaint-uri-input')[0]).val()
     status = $(entry_row).find('.review_radio_button:checked').val()
     comment = $(entry_row).find('textarea.internal-comment').val()
+    resolution_comment = $("#entry-email-response-to-customers_#{entry_id}").val()
 
     if $('#input_cat_' + entry_id).val() != null
       cat_ids_array = $('#input_cat_' + entry_id).val()

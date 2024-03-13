@@ -246,12 +246,35 @@ $ ->
     name = if is_default_filter(fav_icon) then link.attr('href') else link.text().trim()
     { icon: fav_icon, link: link, name: name }
 
-  window.current_page_is_favourite = ->
+  window.current_page_is_favourite = (search_name) ->
     { icon, name } = chosen_default_filter()
     if is_default_filter(icon)
-      return name == decodeURIComponent(window.location.search)
+      filter_dropdown = $("#filter-cases-list > span.favorite-search-icon-active")
+      if filter_dropdown
+        #Check if filter link matches current url path
+        if name == decodeURIComponent(window.location.search)
+          return true
+        #If no url path check if active link matches current filter name
+        else
+          link_text = $("#filter-dropdown > #filter-cases-list a.active-link").text().trim().toLowerCase()
+          if link_text == search_name
+            return true
+
+    #check if on current saved search
+    if name == localStorage.webcat_search_name
+      return true
+
+    #catch for when no favorites are set - currently loads All Tickets page, will need to be adjusted if that changes
+    else if $('.favorite-search-icon-active').length == 0 && search_name == 'all tickets'
+      return true
+
+    #check if saved search favorite is set but there's no local storage saved
     else
-      return name == localStorage.webcat_search_name
+      saved_search_dropdown = $("#saved-searches-wrapper > span.favorite-search-icon-active")
+      if saved_search_dropdown.length > 0
+        saved_name = $('#saved-searches-wrapper .active-link').text().trim()
+        if search_name == saved_name
+          return true
 
 
 
@@ -337,7 +360,7 @@ $ ->
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
-      options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"}, {name: "ACTIVE"},
+      options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"},
                {name: "COMPLETED"}, {name: "PENDING"}, {name: "REOPENED"}]
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')

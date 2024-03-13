@@ -128,19 +128,22 @@
         %span.toolbar-button-text Take
       %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)', disabled: 'true'}
         %span.toolbar-button-text Return
-    %span.toolbar-concise-button-area.webrep-change-assignee-wrapper
-      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text.darkened-button{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true'}
+    %span.toolbar-concise-button-area.webcat-change-assignee-wrapper
+      %button#webcat-remove-assignee-toolbar-button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text.darkened-button{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true'}
       %span.dropdown
-        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true'}
-          %span.toolbar-button-text
-            Change Assignee
+        - if current_user.has_role?('webcat manager')
+          %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true', 'data-user-role': 'manager'}
+        - else
+          %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true', 'data-user-role': 'user'}
+            %span.toolbar-button-text
+              Change Assignee
         #webcat-change-assignee-index-dropdown.dropdown-menu.toolbar-dropdown{'aria-labelledby': 'index_change_assign'}
           %h3 Change Assignee
           .inline-tool-content-wrapper
             .toolbar
               %div
                 %label.toolbar-section-label Assignee
-                %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
+                %select{name: 'index_target_assignee', id: 'index_target_assignee', class: 'toolbar-select'}
                   - User.joins(roles: :org_subset).where(org_subsets: { name: 'webcat' }).distinct.order(:cvs_username).each do |u|
                     %option{id: "assignee_#{u.id}", value: u.id, label: u.cvs_username}
                       = u.cvs_username
@@ -202,7 +205,7 @@
       %span.toolbar-button-text WBNP Data
   .webcat-toolbar-push
     - if params[:f] == "REVIEW"
-      %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
+      %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
         %span.toolbar-button-text-wider Confirm Review
     - else
       %button#index_update_resolution.toolbar-button.resolution-submit-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', onclick: "$('#index_change_resolution_dialog').dialog('open');"}

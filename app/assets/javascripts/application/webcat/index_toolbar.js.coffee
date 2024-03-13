@@ -165,7 +165,9 @@ window.check_enable_toolbar_buttons = () ->
     $('.take-ticket-toolbar-button').removeAttr('disabled')
     $('.return-ticket-toolbar-button').removeAttr('disabled')
     $('.remove-assignee-toolbar-button').removeAttr('disabled')
-    $('.ticket-owner-button').removeAttr('disabled')
+    if $('.ticket-owner-button').attr('data-user-role') == 'manager'
+      $('.ticket-owner-button').removeAttr('disabled')
+
   else
     $('.open-selected').attr('disabled', 'disabled')
     $('#convert-ticket-button').attr('disabled', 'disabled')
@@ -349,7 +351,7 @@ window.webcat_change_assignee = () ->
       data: data
       dataType: 'json'
       success: (response) ->
-        $('#webcat-change-assignee-index-dropdown').dropdown('toggle')
+        $('#index_change_assign').dropdown('toggle')
         json = $.parseJSON(response)
         if json.error
           if jQuery.type(json.error) != 'array'

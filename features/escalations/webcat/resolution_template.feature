@@ -54,9 +54,9 @@ Feature: Webcat resolution template manager
     Then I click "#create-form_resolution_type"
     Then I click element with tag "option" and text "Fixed"
     And button "create-resolution-template-submit" should be disabled
-    Then I fill in element, "#create-resolution-template-name" with "Fixed 03 Name"
-    Then I fill in element, "#create-resolution-template-description" with "Fixed 03 Description"
-    Then I fill in element, "#create-resolution-template-message" with "Fixed 03 Message"
+    Then I fill in element "#create-resolution-template-name" with "Fixed 03 Name"
+    Then I fill in element "#create-resolution-template-description" with "Fixed 03 Description"
+    Then I fill in element "#create-resolution-template-message" with "Fixed 03 Message"
     Then I click button "create-resolution-template-submit"
     And I should see "RESOLUTION MESSAGE TEMPLATE CREATED"
     And I wait for "4" seconds
@@ -80,9 +80,9 @@ Feature: Webcat resolution template manager
     And I should see element "#editResolutionMessageTemplatesDialog"
     Then I click "#update-form_resolution_type"
     Then I click element with tag "option" and text "Invalid"
-    Then I fill in element, "#update-resolution-template-name" with "New name"
-    Then I fill in element, "#update-resolution-template-description" with "New description"
-    Then I fill in element, "#update-resolution-template-message" with "New body message"
+    Then I fill in element "#update-resolution-template-name" with "New name"
+    Then I fill in element "#update-resolution-template-description" with "New description"
+    Then I fill in element "#update-resolution-template-message" with "New body message"
     Then I click button "update-resolution-template-submit"
     Then I should see "RESOLUTION MESSAGE TEMPLATE UPDATED"
     #confirm table has updated
