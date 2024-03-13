@@ -86,6 +86,7 @@ Feature: Webcat complaints index
       | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    | 0.0        |
       | 222 | google.com     | google.com      | URI/DOMAIN | NEW    | 2.5        |
       | 333 | badurl.com     | badurl.com      | URI/DOMAIN | NEW    | -7.8       |
+    And I show all webcat index columns
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "2" seconds
     And I click "#open-111"
@@ -100,6 +101,7 @@ Feature: Webcat complaints index
       | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    | 0.0        |
       | 222 | google.com     | google.com      | URI/DOMAIN | NEW    | 2.5        |
       | 333 | badurl.com     | badurl.com      | URI/DOMAIN | NEW    | -7.8       |
+    And I show all webcat index columns
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "2" seconds
     And button with id "open-333" should be disabled
@@ -110,6 +112,7 @@ Feature: Webcat complaints index
     And the following complaint entries exist:
       | id  | uri            | domain          | entry_type | status | wbrs_score |
       | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    | 0.0        |
+    And I show all webcat index columns
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "2" seconds
     And I click "#google-111"
@@ -122,6 +125,7 @@ Feature: Webcat complaints index
     And the following complaint entries exist:
       | id  | uri            | domain          | entry_type | status | wbrs_score |
       | 111 | abc.com        | abc.com         | URI/DOMAIN | NEW    | 0.0        |
+    And I show all webcat index columns
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "2" seconds
     And I click "#entry-history-111"
@@ -136,6 +140,7 @@ Feature: Webcat complaints index
     And the following complaint entries exist:
       |id|  domain      | status |
       |1 | food.com     |  NEW   |
+    And I show all webcat index columns
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#whois-1"
     And I wait for the ajax request to finish
@@ -739,6 +744,7 @@ Feature: Webcat complaints index
       | id  | uri          | domain        | entry_type | status     | url_primary_category | resolution | user_id | is_important |
       | 111 | food.com     | food.com      | URI/DOMAIN | PENDING    | Health and Medicine  |            |         |       0      |
       | 222 | blah.com     | blah.com      | URI/DOMAIN | PENDING    | Arts                 | UNCHANGED  |    123  |       1      |
+    And I show all webcat index columns
     When I goto "/escalations/webcat/complaints?f=REVIEW"
     And I wait for "3" seconds
     And I click row with id "222"
@@ -850,6 +856,7 @@ Feature: Webcat complaints index
       | id | name        |
       | 1  | Investigate |
     And I add a complaint_tag of id "1" to complaint of id "5111"
+    And I show all webcat index columns
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "3" seconds
     And I should see "9111"
@@ -907,6 +914,7 @@ Feature: Webcat complaints index
       | id   | complaint_id | uri                    | domain                | entry_type | status   | platform_id | suggested_disposition | user_id |
       | 9111 | 5111         | hurricaneshere.com     | hurricaneshere.com    | URI/DOMAIN | ASSIGNED |      1      | News                  |    1    |
       | 9222 | 5112         | tinyhiddenislands.com  | tinyhiddenislands.com | URI/DOMAIN | ASSIGNED |      1      | Travel                |    1    |
+    And I show all webcat index columns
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "3" seconds
     When I click "#webcat-index-table-show-columns-button"
