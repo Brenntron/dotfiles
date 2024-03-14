@@ -180,7 +180,7 @@ window.check_enable_toolbar_buttons = () ->
 
 # Opening urls in tabs
 
-window.open_selected = () ->
+window.open_selected_urls = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
@@ -215,7 +215,14 @@ open_selected = (selected_rows, toggle) ->
         new_domain = domain
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
-        window.open("http://"+selected_row.ip_address)
+        ipv4_regex = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/gm
+
+        # Because IPv6 includes colons an IPv6 must be wrapped in square brackets if it's used as a hostname.
+        if ipv4_regex.test(selected_row.ip_address)
+          window.open("http://#{selected_row.ip_address}")
+        else
+          console.log "Opening #{selected_row.ip_address}"
+          window.open("http://[#{selected_row.ip_address}]")
 
   if low_rep_entries.length >= 10
     error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores."
@@ -229,8 +236,7 @@ open_selected = (selected_rows, toggle) ->
         domains_and_ips.push "<li>#{lre.ip_address}</li>"
 
     error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores. <ul>#{domains_and_ips.join('')}</ul>"
-
-  show_message('error', "#{error_message}", false, '#alertMessage')
+    show_message('error', "#{error_message}", false, '#alertMessage')
 
 
 
