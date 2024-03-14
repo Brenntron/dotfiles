@@ -577,26 +577,6 @@ class ComplaintEntry < ApplicationRecord
       # in reporting results
       AbusiveContentTool.validate_report(self)
 
-
-      #if result[:status].to_s == "success"
-        #move this to the abuse content tool
-        #abusive_info = {}
-        #abusive_info[:iwf_report_id] = "IWF report submission ID: #{result[:data]}"
-        #self.abuse_information = abusive_info.to_json
-        #self.save!
-        #report_alert_args = {}
-        #report_alert_args[:to] = "admatter@cisco.com"
-        #report_alert_args[:from] = "noreply@talosintelligence.com"
-        #report_alert_args[:subject] = "IWF Report Notification"
-        #report_alert_args[:body] = "Reference Data <br /> Complaint ID: #{self.complaint.id} <br /> Complaint Entry ID: #{self.id} <br /> Entry: #{self.hostlookup} <br /> User assigned: #{self.user.cvs_username}"
-
-        #attachments_to_mail = []
-        #conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
-        #conn.post(report_alert_args, attachments_to_mail)
-
-      #else
-      #  raise "Abuse submission issue: #{result[:message]}"
-      #end
     end
 
     return category_ids_array

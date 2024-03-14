@@ -188,7 +188,7 @@ class AbusiveContentTool
     else
       report_results[:ncmec] = {:status => "exists", :abuse_record_report_id => ncmec_exists.report_ident}
     end
-    self.process_email_report(complaint_entry, report_results)
+    self.validate_report(complaint_entry, report_results)
 
     report_results
   end
@@ -333,7 +333,7 @@ class AbusiveContentTool
 
   end
 
-  def self.validate_report(complaint_entry)
+  def self.validate_report(complaint_entry, report_results)
     abuse_records = complaint_entry.abuse_records
 
     has_iwf = nil
@@ -344,7 +344,11 @@ class AbusiveContentTool
 
     if [has_iwf, has_ncmec].include?(false)
       generate_email_for_notification(complaint_entry, abuse_records)
+    else
+      process_email_report(complaint_entry, report_results)
     end
+
+
 
     #check if both reports exist, if one is missing, construct report and send to talosweb
   end
@@ -355,19 +359,23 @@ class AbusiveContentTool
     iwf_record_id = abuse_records.select {|rec| rec.source == AbuseRecord::IWF}.first.record_ident.to_s rescue ""
     ncmec_record_id = abuse_records.select {|rec| rec.source == AbuseRecord::NCMEC}.first.record_ident.to_s rescue ""
     body = "Possible reporting failure detected.  Here is known report info breakdown:\n"
-    body += "Complaint Entry ID: #{complaint_entry.id}\n"
-    body += "IWF Report ID: #{iwf_record_id}\n"
-    body += "NCMEC Report ID: #{ncmec_record_id}\n"
+    body += "Complaint Entry ID: #{complaint_entry.id}\n" rescue ""
+    body += "IWF Report ID: #{iwf_record_id}\n" rescue ""
+    body += "NCMEC Report ID: #{ncmec_record_id}\n" rescue ""
 
     report_alert_args = {}
-    report_alert_args[:to] = "talosweb@cisco.com"
+
     report_alert_args[:from] = "noreply@talosintelligence.com"
     report_alert_args[:subject] = subject
     report_alert_args[:body] = body
 
     attachments_to_mail = []
-    conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
-    conn.post(report_alert_args, attachments_to_mail)
+    ["admatter@cisco.com", "talosweb@cisco.com"].each do |email_address|
+      report_alert_args[:to] = email_address
+      conn = ::Bridge::SendGenericEmailEvent.new(addressee: 'talos-intelligence')
+      conn.post(report_alert_args, attachments_to_mail)
+    end
+
   end
 
   def self.forward_report(complaint_entry, cc)
@@ -383,7 +391,7 @@ class AbusiveContentTool
     attachments_to_mail = []
     emails_array.each do |email_address|
       report_alert_args[:to] = email_address.strip
-      conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+      conn = ::Bridge::SendGenericEmailEvent.new(addressee: 'talos-intelligence')
       conn.post(report_alert_args, attachments_to_mail)
     end
 
