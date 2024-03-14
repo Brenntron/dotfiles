@@ -90,7 +90,8 @@ build_complaints_table = (url) ->
 
     #set starting entry to 0 so that filters load on the first page
     stateSaveParams: (settings, data) ->
-      data.start = 0
+      if data.start?
+        data.start = 0
 
     stateLoadParams: () ->
       storage = localStorage.getItem('DataTables_complaints-index_' + window.location.pathname);
