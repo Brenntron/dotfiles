@@ -55,7 +55,11 @@ $ ->
       refresh_url()
 
   $('#filter-cases-list a').on 'click', (e)->
+    filter_url = $(this).attr('href')
     localStorage.setItem('webcat_reset_page', true)
+    localStorage.setItem('webcat_search_type', 'standard')
+    localStorage.setItem('webcat_search_name', filter_url)
+    localStorage.removeItem('webcat_search_conditions')
     $('#complaints-index').DataTable().state.clear()
 
 
