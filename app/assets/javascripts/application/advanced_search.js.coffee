@@ -35,12 +35,7 @@ toggle_search_criteria = (element) ->
   $search_criteria = $search_wrapper.find('.search-item')
   search_pref = {}
 
-  $name = if window.location.pathname.indexOf("webrep") != -1
-            "WebRepAdvancedSearchFieldsDisplayed"
-          else if window.location.href.includes('file_rep') != -1
-            'FileRepAdvancedSearchFieldsDisplayed'
-          else
-            "WebCatAdvancedSearchFieldsDisplayed"
+  name = pageFiltersIdentifier()
 
   $search_criteria.each ->
     $this = $(this)
@@ -61,20 +56,22 @@ toggle_search_criteria = (element) ->
   )
 
 #  Pull in the saved user preferences of search items
-window.set_advanced_search_pref = () ->
+set_advanced_search_pref = () ->
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/user_preferences/"
-    data: {name: window.pageFiltersIdentifier()}
+    data: {name: pageFiltersIdentifier()}
     success: (response) ->
       response = JSON.parse(response)
+
       if response?
         $.each response, (criteria, state) ->
-          # submission type has a different DOM stucture, so need to remove the -w-cb
+          # submission type has a different DOM structure, so need to remove the -w-cb
           criteria = criteria.replace(/-w-cb/g, '')
           criteria_id   = '#' + criteria
           search_input  = $($(criteria_id)[0]).parents('.search-item')[0]
           search_toggle = $($('input[for="' + criteria + '"]')[0]).parents('li')[0]
+
           if state == 'true'
             $(search_input).removeClass('hidden')
             $(search_toggle).addClass('hidden')
@@ -83,26 +80,29 @@ window.set_advanced_search_pref = () ->
             $(search_toggle).removeClass('hidden')
   )
 
-window.pageFiltersIdentifier = () ->
-  if window.location.href.includes('file_rep')
+pageFiltersIdentifier = () ->
+  href = window.location.href
+
+  if href.includes('file_rep')
     'FileRepAdvancedSearchFieldsDisplayed'
-  else
+  else if href.includes('webcat')
+    'WebCatAdvancedSearchFieldsDisplayed'
+  else if href.includes('webrep')
     'WebRepAdvancedSearchFieldsDisplayed'
+  else if href.includes('sdr')
+    'SDRAdvancedSearchFieldsDisplayed'
 
 $ ->
-  window.set_advanced_search_pref()
+  set_advanced_search_pref()
 
   $('#add-search-items-button').click ->
     $('#search-criteria-options').show()
-    false
 
   $('#cancel-add-criteria').click ->
     $('#search-criteria-options').hide()
-    false
 
   $('.search-item').click ->
     $('#search-criteria-options').hide()
-    return
 
   $('.search-criteria-label').click ->
     toggle_search_criteria(this)
