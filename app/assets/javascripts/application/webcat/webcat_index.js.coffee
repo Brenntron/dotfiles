@@ -76,6 +76,11 @@ build_complaints_table = (url) ->
             else
               complaint_table.row("##{row_id}").select()
 
+        # Prevent internal comment dropdown from closing when clicking into
+        $('.internal-comment-dropdown').on 'click', (e) ->
+          e.stopPropagation()
+
+
         # set listeners for bulk changes
         $('#complaints-index').DataTable().on('select', (_e, dt, _type, indexes) ->
           bulk_resolution_select_handler(dt, indexes)
