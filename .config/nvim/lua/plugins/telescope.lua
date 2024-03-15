@@ -18,6 +18,10 @@ local M = {
       build = "make",
     },
     {
+      "nvim-telescope/telescope-live-grep-args.nvim",
+      version = "^1.0.0"
+    },
+    {
       "jvgrootveld/telescope-zoxide",
     },
     {
@@ -179,6 +183,7 @@ function M.config()
   telescope.load_extension "dap"
   telescope.load_extension "fzf"
   telescope.load_extension "lazy"
+  telescope.load_extension "live_grep_args"
   telescope.load_extension "notify"
   telescope.load_extension "projects"
   telescope.load_extension "zoxide"

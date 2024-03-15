@@ -38,9 +38,9 @@ maps.v["<leader>/"] = { "<esc><cmd>lua require('Comment.api').toggle.linewise(vi
 -- Find commands
 maps.n["<leader>f"] = sections.f
 maps.n["<leader>fb"] = { "<cmd>Telescope buffers<cr>", desc = "Find buffers" }
-maps.n["<leader>ff"] = { "<cmd>Telescope find_files<cr>", desc = "Find files" }
+maps.n["<leader>ff"] = { "<cmd>Telescope find_files find_command=rg,--ignore,--hidden,--files <cr>", desc = "Find files" }
 maps.n["<leader>fp"] = { "<cmd>Telescope projects<cr>", desc = "Find projects" }
-maps.n["<leader>fw"] = { "<cmd>Telescope live_grep<cr>", desc = "Find words" }
+maps.n["<leader>fw"] = { "<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>", desc = "Find words" }
 maps.n["<leader>fz"] = { "<cmd>Telescope zoxide list<cr>", desc = "List directories" }
 maps.n["<leader>ft"] = { "<cmd>Telescope toggleterm_manager<cr>", desc = "List Terminals" }
 
@@ -162,7 +162,7 @@ maps.n["<leader>ni"] = { "<cmd>NullLsInfo<cr>", desc = "Null-Ls Info" }
 maps.n["<leader>nl"] = { "<cmd>NullLsLog<cr>", desc = "Null-Ls Log"}
 
 -- Trouble for None-Ls
-maps.n["<leader>lt"] = { desc = 'Trouble Windows' }
+maps.n["<leader>nt"] = { desc = 'Trouble Windows' }
 maps.n["<leader>ntd"] = { function() require("trouble").toggle("document_diagnostics") end, desc = "Diagnostics" }
 maps.n["<leader>ntw"] = { function() require("trouble").toggle("workspace_diagnostics") end, desc = "Workspace Diagnostics" }
 
