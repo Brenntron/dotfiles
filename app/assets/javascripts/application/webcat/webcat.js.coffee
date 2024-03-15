@@ -46,15 +46,17 @@ $ ->
     if keyCode == 13
       webcat_search_string = $('#web-cat-search .search-box').val().trim()
       if webcat_search_string == ''
-       refresh_webcat_localStorage()
+        refresh_webcat_localStorage()
       else
         localStorage.webcat_search_type = 'contains'
         localStorage.webcat_search_name = ''
         localStorage.webcat_search_conditions = JSON.stringify({value:webcat_search_string})
+      $('#complaints-index').DataTable().state.clear()
       refresh_url()
 
   $('#filter-cases-list a').on 'click', (e)->
     localStorage.setItem('webcat_reset_page', true)
+    $('#complaints-index').DataTable().state.clear()
 
 
   window.set_webcat_advanced = () ->
@@ -96,6 +98,7 @@ $ ->
     localStorage.webcat_search_type = 'advanced'
     localStorage.webcat_search_name = form.search_name
     localStorage.webcat_search_conditions = JSON.stringify(form)
+    $('#complaints-index').DataTable().state.clear()
     refresh_url()
 
 
@@ -104,6 +107,7 @@ $ ->
     localStorage.webcat_search_type = 'named'
     localStorage.webcat_search_name  = search_name
     localStorage.webcat_search_conditions = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
+    $('#complaints-index').DataTable().state.clear()
     refresh_url()
 
 
@@ -118,12 +122,15 @@ $ ->
     webcat_search_conditions.tags = tag
 
     localStorage.webcat_search_conditions = JSON.stringify webcat_search_conditions
+    $('#complaints-index').DataTable().state.clear()
     refresh_url()
 
 
 
   current_url = window.location.href
 
+  # This is used when there is an error calling the data
+  # or when clearing the search to the default data (favorite filter if set by user)
   window.webcat_refresh = ()->
     refresh_webcat_localStorage()
     refresh_url()
@@ -143,6 +150,7 @@ $ ->
     localStorage.removeItem('webcat_search_type')
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
+    $('#complaints-index').DataTable().state.clear()
 
 
 

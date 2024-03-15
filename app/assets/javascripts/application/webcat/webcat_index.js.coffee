@@ -93,25 +93,11 @@ build_complaints_table = (url) ->
       $(row).attr('data-categories', data.category)
       $(row).attr('data-status', data.status)
 
-    #set starting entry to 0 so that filters load on the first page
-    stateSaveParams: (settings, data) ->
-      if data.start?
-        data.start = 0
-
-    stateLoadParams: () ->
-      storage = localStorage.getItem('DataTables_complaints-index_' + window.location.pathname);
-      if storage?
-        return storage
-
     drawCallback: () ->
-      console.log 'complaint drawcallback'
+
       if localStorage.webcat_reset_page
         localStorage.removeItem('webcat_reset_page')
-      #         trying to figure out why we are redrawing the table here
-      #          setTimeout () ->
-      #            $('#complaints-index').DataTable().page(0).draw( true )
-      #          , 100
-      #
+
       if localStorage.webcat_search_name
         { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
         ### check variables below
