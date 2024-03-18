@@ -11,6 +11,11 @@ $ ->
 
 #### New complaints index table setup
 build_complaints_table = (url) ->
+
+  #get count of entries per page from localstorage, set to 25 if none found
+  entries_per_page = localStorage.getItem 'webcat_entries_per_page'
+  if entries_per_page == null then entries_per_page = 25
+
   complaint_table = $('#complaints-index').DataTable(
     initComplete: ->
       # Get display prefs
@@ -42,6 +47,7 @@ build_complaints_table = (url) ->
         ]
 
     lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
+    pageLength: entries_per_page
     processing: true
     serverSide: true
     stateSave: true
@@ -86,6 +92,11 @@ build_complaints_table = (url) ->
           bulk_resolution_select_handler(dt, indexes)
         ).on('deselect', (_e, dt, _type, indexes) ->
           bulk_resolution_deselect_handler(dt, indexes)
+        )
+
+        # set listener for table length changes and save to localstorage
+        $('#complaints-index').DataTable().on('length.dt', (e, settings, len) ->
+          localStorage.setItem 'webcat_entries_per_page', len
         )
 
     createdRow: (row, data) ->
