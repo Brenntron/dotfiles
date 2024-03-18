@@ -190,6 +190,7 @@ Then(/^I should see user, "(.*?)", in element "(.*?)"$/) do |username, element|
 end
 
 Given(/^a user with role "(.*?)" exists within org subset "(.*?)" and is logged in$/) do |role, org_subset|
+  FactoryBot.create(:guest_company)
   @user = FactoryBot.create(:current_user, confirmed: true)
   FactoryBot.create(:org_subset, name: org_subset)
   @user.roles << FactoryBot.create(:role, role: role, org_subset_id: 1)

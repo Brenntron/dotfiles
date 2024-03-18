@@ -34,7 +34,7 @@ window.onkeydown = (e) ->
     else if (e.altKey && e.shiftKey && e.which == 79) #alt + shift + o
       open_all() #open all
     else if (e.altKey && e.which == 79) #alt + o
-      open_selected() #open ticket
+      open_selected_urls() #open ticket
     else if ( e.altKey && e.which == 70) #alt + f
       collapse_selected() #collapse selected tickets
     else if (e.altKey && e.which == 72) #alt + h
