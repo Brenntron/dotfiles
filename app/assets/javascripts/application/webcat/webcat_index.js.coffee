@@ -439,6 +439,8 @@ build_complaints_table = (url) ->
           dialog_title = 'Customer Response for: ' + observable
           if (full.resolution_comment == null) || (full.resolution_comment == '')
             res_comment = 'No response created or sent to customer.'
+          else
+            res_comment = full.resolution_comment
 
           res_comment_dialog_html =
             '<div class="resolution-comment-dialog hide" id="resolution_comment_dialog_' + full.entry_id + '" title="' + dialog_title + '">' +
@@ -457,7 +459,7 @@ build_complaints_table = (url) ->
               '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
               '<label class="content-label-sm full-row-label">Email Response to Customer</label>' +
               '</div></div><div class="row"><div class="col-xs-12">' +
-              '<div id="entry-email-response-to-customers_' + full.entry_id + '">' + res_comment + '</div>' +
+              '<div class="email-response-text" id="entry-email-response-to-customers_' + full.entry_id + '">' + res_comment + '</div>' +
               '</div></div></div>' +
               '</div>'
 
