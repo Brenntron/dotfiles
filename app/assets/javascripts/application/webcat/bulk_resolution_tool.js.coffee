@@ -137,7 +137,7 @@ window.applyAll = () ->
     .done () ->
       apply_customer_facing_comment()
 
-      if submittable_rows.length is $('#complaint-index').DataTable().rows({selected: true}).count()
+      if submittable_rows.length is $('#complaints-index').DataTable().rows({selected: true}).count()
         display_success_message()
       else
         display_warning_message()
