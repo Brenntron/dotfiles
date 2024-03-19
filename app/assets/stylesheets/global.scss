@@ -3212,10 +3212,15 @@ a.code-content:hover {
 #new-comment-wrapper {
   border-top: none;
 }
-.edit-resolution-container{
+
+.edit-resolution-container {
+  .top-text {
+  }
+
   .internal_comment_container{
     margin-top: 10px;
   }
+
   .internal_comment_container, .customer_facing_comment_container {
     margin-top: 30px;
     .toolbar-section-label{
@@ -8262,28 +8267,18 @@ table.dispute-entry-table tbody tr.selected {
   font-size: 8pt;
 }
 
-#copiedAlert, #assignedAlert, #unassignedAlert, .bulk-success {
+#copiedAlert, #assignedAlert, #unassignedAlert {
   color: $success-color;
   font-size: 80%;
   display: inline;
   vertical-align: top;
 }
 
-.bulk-warning {
-  @extend .bulk-success;
-  color: $warning-accent-color;
-}
-
-.bulk-error {
-  @extend .bulk-success;
-  color: $second-section-color;
-}
-
 .nested-complaint-static-data .copied-container, .assigned-check-container {
   margin-top: -7px;
 }
 
-.copied-check, .assigned-check, .bulk-success-icon {
+.copied-check, .assigned-check {
   height: 12px;
   width: 10px;
   display: inline-block;
@@ -8291,27 +8286,6 @@ table.dispute-entry-table tbody tr.selected {
   background-repeat: no-repeat;
   position: relative;
   top: 2px;
-}
-
-.bulk-warning-icon {
-  @extend .bulk-success-icon;
-
-  background-image: url(image_path('icon_warning.svg'));
-  top: 0;
-  width: 12px;
-}
-
-.bulk-error-icon {
-  @extend .bulk-success-icon;
-  background-image: url(image_path('icon_error.svg'));
-}
-
-.copied-container, .assigned-check-container, .bulk-resolution-message-container {
-  position: absolute;
-}
-
-.bulk-resolution-message-container {
-  top: 60px;
 }
 
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {

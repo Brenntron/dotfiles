@@ -32,7 +32,7 @@ Feature: WebCat Bulk Resolution Tool
       And I wait for "2" seconds
       Then I should see the radio with id "ignore2" checked
       And I should see the radio with id "unchanged3" checked
-      And I should see content "Changes applied to submittable entries only." within ".bulk-success"
+      And I should see content "Changes applied to submittable entries only." within ".bulk-warning"
 
   Rule: Submittable complaint entries should be updated by the bulk resolution tool
     @javascript

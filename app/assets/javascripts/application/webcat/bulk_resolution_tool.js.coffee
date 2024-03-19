@@ -61,8 +61,8 @@ get_unique_rows = () ->
 display_success_message = () ->
   html = """
          <div class='bulk-resolution-message-container'>
-           <span class='bulk-success-icon'></span>
-           <p class='bulk-success'>
+           <span class='bulk-icon bulk-success-icon'></span>
+           <p class='bulk-message bulk-success'>
              Applied bulk resolution changes to selected entries.
            </p>
          </div>
@@ -73,8 +73,8 @@ display_success_message = () ->
 display_warning_message = () ->
   html = """
          <div class='bulk-resolution-message-container'>
-           <span class='bulk-warning-icon'></span>
-           <p class='bulk-warning'>
+           <span class='bulk-icon bulk-warning-icon'></span>
+           <p class='bulk-message bulk-warning'>
              Changes applied to submittable entries only.
            </p>
          </div>
@@ -85,8 +85,8 @@ display_warning_message = () ->
 display_error_message = () ->
   html = """
          <div class='bulk-resolution-message-container'>
-           <span class='bulk-error-icon'></span>
-           <p class='bulk-error'>
+           <span class='bulk-icon bulk-error-icon'></span>
+           <p class='bulk-message bulk-error'>
              Unable to apply resolution to one or more entries.
            </p>
          </div>
@@ -95,11 +95,14 @@ display_error_message = () ->
   append_message(html)
 
 append_message = (html) ->
-  $("#index_change_resolution_dialog .button-wrapper").append(html)
+  $(".edit-resolution-container .top-text").append(html)
+  $('.bulk-resolution-message-container').fadeIn().css('display', 'flex')
 
   setTimeout(() ->
-    $('.bulk-resolution-message-container').remove()
-  , 5000)
+    $('.bulk-resolution-message-container').fadeOut("slow",
+      $('.bulk-resolution-message-container').remove()
+    )
+  , 10000)
 
 
 window.bulk_resolution_select_handler = (dt, indexes) ->
