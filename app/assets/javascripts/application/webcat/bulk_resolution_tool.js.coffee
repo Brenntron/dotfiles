@@ -60,10 +60,22 @@ get_unique_rows = () ->
 
 display_success_message = () ->
   html = """
-         <div class='bulk-resolution-container'>
+         <div class='bulk-resolution-message-container'>
            <span class='bulk-success-icon'></span>
            <p class='bulk-success'>
-             Applied bulk resolution changes to selected entries
+             Applied bulk resolution changes to selected entries.
+           </p>
+         </div>
+         """
+
+  append_message(html)
+
+display_warning_message = () ->
+  html = """
+         <div class='bulk-resolution-message-container'>
+           <span class='bulk-warning-icon'></span>
+           <p class='bulk-warning'>
+             Changes applied to submittable entries only.
            </p>
          </div>
          """
@@ -72,10 +84,10 @@ display_success_message = () ->
 
 display_error_message = () ->
   html = """
-         <div class='bulk-resolution-container'>
+         <div class='bulk-resolution-message-container'>
            <span class='bulk-error-icon'></span>
            <p class='bulk-error'>
-             Unable to apply resolution to one or more entries
+             Unable to apply resolution to one or more entries.
            </p>
          </div>
          """
@@ -85,9 +97,9 @@ display_error_message = () ->
 append_message = (html) ->
   $("#index_change_resolution_dialog .button-wrapper").append(html)
 
-  # setTimeout(() ->
-  #   $('.bulk-resolution-container').remove()
-  # , 5000)
+  setTimeout(() ->
+    $('.bulk-resolution-message-container').remove()
+  , 5000)
 
 
 window.bulk_resolution_select_handler = (dt, indexes) ->
@@ -124,7 +136,11 @@ window.applyAll = () ->
   new get_resolution_templates(applied_resolution, 'individual', updated_entry_ids)
     .done () ->
       apply_customer_facing_comment()
-      display_success_message()
+
+      if submittable_rows.length is $('#complaint-index').DataTable().rows().select().count()
+        display_success_message()
+      else
+        display_warning_message()
     .error (err) ->
       console.error err
       display_error_message()

@@ -8269,6 +8269,11 @@ table.dispute-entry-table tbody tr.selected {
   vertical-align: top;
 }
 
+.bulk-warning {
+  @extend .bulk-success;
+  color: $warning-accent-color;
+}
+
 .bulk-error {
   @extend .bulk-success;
   color: $second-section-color;
@@ -8283,8 +8288,17 @@ table.dispute-entry-table tbody tr.selected {
   width: 10px;
   display: inline-block;
   background-image: url(image_path('icon_check_dark_green.svg'));
+  background-repeat: no-repeat;
   position: relative;
   top: 2px;
+}
+
+.bulk-warning-icon {
+  @extend .bulk-success-icon;
+
+  background-image: url(image_path('icon_warning.svg'));
+  top: 0;
+  width: 12px;
 }
 
 .bulk-error-icon {
