@@ -7511,9 +7511,10 @@ td.ticket-total::before {
   width: 20px;
   height: 20px;
 }
-.highlight-second-review .important-flag-col,{
+.highlight-second-review .important-flag-col {
   max-width: 50px!important;
 }
+
 td.in_zoo{
   text-align: center;
 }
@@ -8253,7 +8254,7 @@ table.dispute-entry-table tbody tr.selected {
 .nested-complaint-data-wrapper .selectize-input {
   margin: 0 !important;
   padding: 0 !important;
-  min-height: 30px !important;;
+  min-height: 30px !important;
   border-radius: 1px;
   border: 2px solid $content-bg-color;
   outline: 1px solid #cccccc;
@@ -8261,25 +8262,44 @@ table.dispute-entry-table tbody tr.selected {
   font-size: 8pt;
 }
 
-#copiedAlert, #assignedAlert, #unassignedAlert {
+#copiedAlert, #assignedAlert, #unassignedAlert, .bulk-success {
   color: $success-color;
-  color: #5FB766;
   font-size: 80%;
   display: inline;
   vertical-align: top;
 }
+
+.bulk-error {
+  @extend .bulk-success;
+  color: $second-section-color;
+}
+
 .nested-complaint-static-data .copied-container, .assigned-check-container {
   margin-top: -7px;
 }
-.copied-check, .assigned-check{
+
+.copied-check, .assigned-check, .bulk-success-icon {
   height: 12px;
   width: 10px;
   display: inline-block;
   background-image: url(image_path('icon_check_dark_green.svg'));
+  position: relative;
+  top: 2px;
 }
-.copied-container, .assigned-check-container {
+
+.bulk-error-icon {
+  @extend .bulk-success-icon;
+  background-image: url(image_path('icon_error.svg'));
+}
+
+.copied-container, .assigned-check-container, .bulk-resolution-message-container {
   position: absolute;
 }
+
+.bulk-resolution-message-container {
+  top: 60px;
+}
+
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
   padding: 2px 6px;
   margin: 2px;

@@ -58,6 +58,38 @@ get_unique_rows = () ->
 
   unique_rows
 
+display_success_message = () ->
+  html = """
+         <div class='bulk-resolution-container'>
+           <span class='bulk-success-icon'></span>
+           <p class='bulk-success'>
+             Applied bulk resolution changes to selected entries
+           </p>
+         </div>
+         """
+
+  append_message(html)
+
+display_error_message = () ->
+  html = """
+         <div class='bulk-resolution-container'>
+           <span class='bulk-error-icon'></span>
+           <p class='bulk-error'>
+             Unable to apply resolution to one or more entries
+           </p>
+         </div>
+         """
+
+  append_message(html)
+
+append_message = (html) ->
+  $("#index_change_resolution_dialog .button-wrapper").append(html)
+
+  # setTimeout(() ->
+  #   $('.bulk-resolution-container').remove()
+  # , 5000)
+
+
 window.bulk_resolution_select_handler = (dt, indexes) ->
   newly_selected_submmittable_rows = dt.rows(indexes).data().toArray().filter(has_submittable_status)
   submittable_rows = [submittable_rows..., newly_selected_submmittable_rows...]
@@ -86,8 +118,13 @@ window.clearBulkResolution = () ->
 window.applyAll = () ->
   {applied_resolution, updated_entry_ids} = apply_resolution()
 
+  apply_internal_comment()
+
   # Update the resolution templates for the submittable rows
   new get_resolution_templates(applied_resolution, 'individual', updated_entry_ids)
-    .then(apply_customer_facing_comment.bind(null))
-    .then null, (err) -> console.error err
-  apply_internal_comment()
+    .done () ->
+      apply_customer_facing_comment()
+      display_success_message()
+    .error (err) ->
+      console.error err
+      display_error_message()
