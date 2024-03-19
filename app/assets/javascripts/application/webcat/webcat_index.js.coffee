@@ -11,6 +11,11 @@ $ ->
 
 #### New complaints index table setup
 build_complaints_table = (url) ->
+
+  #get count of entries per page from localstorage, set to 25 if none found
+  entries_per_page = localStorage.getItem 'webcat_entries_per_page'
+  if entries_per_page == null then entries_per_page = 25
+
   complaint_table = $('#complaints-index').DataTable(
     initComplete: ->
       # Get display prefs
@@ -42,6 +47,7 @@ build_complaints_table = (url) ->
         ]
 
     lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
+    pageLength: entries_per_page
     processing: true
     serverSide: true
     stateSave: true
@@ -88,20 +94,21 @@ build_complaints_table = (url) ->
           bulk_resolution_deselect_handler(dt, indexes)
         )
 
+        # set listener for table length changes and save to localstorage
+        $('#complaints-index').DataTable().on('length.dt', (e, settings, len) ->
+          localStorage.setItem 'webcat_entries_per_page', len
+        )
+
     createdRow: (row, data) ->
       $(row).addClass('cat-index-main-row')
       $(row).attr('data-categories', data.category)
       $(row).attr('data-status', data.status)
 
     drawCallback: () ->
-      console.log 'complaint drawcallback'
+
       if localStorage.webcat_reset_page
         localStorage.removeItem('webcat_reset_page')
-      #         trying to figure out why we are redrawing the table here
-      #          setTimeout () ->
-      #            $('#complaints-index').DataTable().page(0).draw( true )
-      #          , 100
-      #
+
       if localStorage.webcat_search_name
         { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
         ### check variables below
