@@ -63,7 +63,7 @@ display_success_message = () ->
          <div class='bulk-resolution-message-container'>
            <span class='bulk-icon bulk-success-icon'></span>
            <p class='bulk-message bulk-success'>
-             Applied bulk resolution changes to selected entries.
+             Successfully applied to selected entries.
            </p>
          </div>
          """
@@ -75,7 +75,7 @@ display_warning_message = () ->
          <div class='bulk-resolution-message-container'>
            <span class='bulk-icon bulk-warning-icon'></span>
            <p class='bulk-message bulk-warning'>
-             Changes applied to submittable entries only.
+             Unable to apply to all selected entries, applied to submittable entries only.
            </p>
          </div>
          """
