@@ -17,14 +17,30 @@ apply_resolution = () ->
 
 apply_customer_facing_comment = () ->
   bulk_tool_resolution = $('.bulk-resolution-radio:checked').val()
-  email_template = $('#email-response-to-customers-select').val()
+  $email_select = $('#email-response-to-customers-select')
+  email_template = $email_select.val()
+  email_options = $email_select[0].options
   customer_facing_comment = $('#email-response-to-customers').val()
 
   for row in submittable_rows
-    {entry_id, status} = row
+    {entry_id} = row
     row_resolution = $(".resolution_radio_button[name='resolution#{entry_id}']:checked").val()
 
-    continue unless bulk_tool_resolution is row_resolution && $("#entry-email-response-to-customers-select_#{entry_id}").val()
+    continue unless bulk_tool_resolution is row_resolution
+
+    for option in email_options
+      $option = $(option)
+      data = $option.data()
+      name = $option.val()
+
+      template_option = """
+                        <option class='webcat-resolution-template-option' val='#{name}'
+                          data-body='#{data.body}'
+                          data-description='#{data.description}'>
+                          #{name}
+                        </option>
+                        """
+      $("#entry-email-response-to-customers-select_#{entry_id}").append(template_option)
 
     $("#entry-email-response-to-customers-select_#{entry_id}").val(email_template)
     $("#entry-email-response-to-customers_#{entry_id}").val(customer_facing_comment)
@@ -137,17 +153,11 @@ window.clearBulkResolution = () ->
 window.applyAll = () ->
   {applied_resolution, updated_entry_ids} = apply_resolution()
 
+  apply_customer_facing_comment()
+
   apply_internal_comment()
 
-  # Update the resolution templates for the submittable rows
-  new get_resolution_templates(applied_resolution, 'individual', updated_entry_ids)
-    .done () ->
-      apply_customer_facing_comment()
-
-      if submittable_rows.length is $('#complaints-index').DataTable().rows({selected: true}).count()
-        display_success_message()
-      else
-        display_warning_message()
-    .error (err) ->
-      console.error err
-      display_error_message()
+  if submittable_rows.length is $('#complaints-index').DataTable().rows({selected: true}).count()
+    display_success_message()
+  else
+    display_warning_message()
