@@ -102,7 +102,7 @@
       color: #666;
       font-size: 0.75em;
       font-weight: 400;
-      padding: 10px 0;
+      padding: 15px 0 10px 0;
     }
 
     .edit-resolution-label {
@@ -205,7 +205,8 @@
     .button-wrapper{
       display: flex;
       justify-content: center;
-      margin-bottom: 25px;
+      margin-top: 15px;
+      margin-bottom: 20px;
 
       .update-resolution-button {
         background-color: #E47433;
