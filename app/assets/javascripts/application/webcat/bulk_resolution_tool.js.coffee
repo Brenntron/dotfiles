@@ -1,4 +1,5 @@
 # Bulk resolution tool logic
+message_timeout = null
 submittable_rows = []
 
 apply_resolution = () ->
@@ -95,10 +96,13 @@ display_error_message = () ->
   append_message(html)
 
 append_message = (html) ->
-  $(".edit-resolution-container .top-text").append(html)
-  $('.bulk-resolution-message-container').fadeIn().css('display', 'flex')
+  clearTimeout(message_timeout)
+  $('.bulk-resolution-message-container').remove()
 
-  setTimeout(() ->
+
+  $(".edit-resolution-container .top-text").append(html)
+
+  message_timeout = setTimeout(() ->
     $('.bulk-resolution-message-container').fadeOut("slow",
       $('.bulk-resolution-message-container').remove()
     )
