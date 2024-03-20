@@ -3,9 +3,9 @@ toggle_search_criteria = (element) ->
   $element = $(element)
   $search_wrapper = $element.parents('#advanced-search-wrapper')
 
-  if $(element).hasClass('search-criteria-label')
+  if $element.hasClass('search-checkbox')
     # show criteria
-    criteria = $($element.find('.search-checkbox')).attr('for')
+    criteria = $element.attr('for')
     $criteria_wrapper = $element.parents('li')
     $search_input = $search_wrapper.find('#' + criteria)
     $input_wrapper = $search_input.parents('.search-item')
@@ -104,7 +104,7 @@ $ ->
   $('.search-item').click ->
     $('#search-criteria-options').hide()
 
-  $('.search-criteria-label').click ->
+  $('#search-criteria-options .search-checkbox').click ->
     toggle_search_criteria(this)
 
   $('.remove-input').click ->

@@ -24,7 +24,7 @@
   .form-group.search-item
     %label.content-label-sm{for: 'tags'} Tags
     %select.form-control.selectize#tags-input{name: 'tags', multiple: 'multiple', tabindex:'-1'}
-    %select.hidden#search_tag_list{value: ComplaintTag.all.sort_by(&:name).map { |tag| tag.name }.join(','), name: 'tags'}
+    %input.hidden#search_tag_list{value: ComplaintTag.all.sort_by(&:name).map { |tag| tag.name }.join(','), name: 'tags'}
     %button#remove-criteria-tags.remove-input{onclick:'clearSelectize("tags-input")', type: 'button'}
 
   .form-group.search-item.hidden
@@ -127,7 +127,7 @@
           %li.hidden
             %label.search-criteria-label{for: 'tags-cb'}
               Tags
-            %input.search-checkbox#tags-cb{type: 'checkbox', name: 'search-criteria', value: 'Tags', for: 'tags-input-selectized'}
+            %input.search-checkbox#tags-cb{type: 'checkbox', name: 'search-criteria', value: 'Tags', for: 'tags-input'}
           %li
             %label.search-criteria-label{for: 'category-cb'}
               Category
