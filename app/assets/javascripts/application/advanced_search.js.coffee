@@ -13,8 +13,8 @@ window.toggle_search_criteria = (element) ->
     $criteria_wrapper.addClass('hidden')
     $input_wrapper.removeClass('hidden')
 
-    #check if all search criteria has been selected, close form if so
-    if $('#search-criteria-options .multicol-2 ul').children(':visible').length == 0
+    #check if all search criteria have been selected, close form if so
+    if $('#search-criteria-options .multicol-2 ul').find(':not(.hidden)').length == 0
       $('#search-criteria-options').hide()
       $('#add-search-items-button').addClass('hidden')
 
@@ -31,7 +31,8 @@ window.toggle_search_criteria = (element) ->
     $criteria_toggle.prop('checked', false)
     $criteria_wrapper.removeClass('hidden')
 
-update_search_pref = () ->
+update_search_pref = (element) ->
+  $search_wrapper = $(element).parents('#advanced-search-wrapper')
   # grab visible criteria
   $search_criteria = $search_wrapper.find('.search-item')
   search_pref = {}
@@ -109,11 +110,11 @@ $ ->
 
   $('#search-criteria-options .search-checkbox').click ->
     window.toggle_search_criteria(this)
-    update_search_pref()
+    update_search_pref(this)
 
   $('.remove-input').click ->
     window.toggle_search_criteria(this)
-    update_search_pref()
+    update_search_pref(this)
 
   $('#disputes-advanced-search-form .remove-input').click ->
     $field = $(this).parent()
