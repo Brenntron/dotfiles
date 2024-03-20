@@ -1,5 +1,5 @@
 # Doing this a little bit differently to help with storing user preferences
-toggle_search_criteria = (element) ->
+window.toggle_search_criteria = (element) ->
   $element = $(element)
   $search_wrapper = $element.parents('#advanced-search-wrapper')
 
@@ -31,6 +31,7 @@ toggle_search_criteria = (element) ->
     $criteria_toggle.prop('checked', false)
     $criteria_wrapper.removeClass('hidden')
 
+update_search_pref = () ->
   # grab visible criteria
   $search_criteria = $search_wrapper.find('.search-item')
   search_pref = {}
@@ -40,10 +41,12 @@ toggle_search_criteria = (element) ->
   $search_criteria.each ->
     $this = $(this)
     search_item = $($this.find('.form-control')).attr('id')
+
     if $this.hasClass('hidden')
       search_pref[search_item] = 'false'
     else
       search_pref[search_item] = 'true'
+
   data = search_pref
   # save to db
   std_msg_ajax(
@@ -105,10 +108,12 @@ $ ->
     $('#search-criteria-options').hide()
 
   $('#search-criteria-options .search-checkbox').click ->
-    toggle_search_criteria(this)
+    window.toggle_search_criteria(this)
+    update_search_pref()
 
   $('.remove-input').click ->
-    toggle_search_criteria(this)
+    window.toggle_search_criteria(this)
+    update_search_pref()
 
   $('#disputes-advanced-search-form .remove-input').click ->
     $field = $(this).parent()
