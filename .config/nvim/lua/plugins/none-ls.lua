@@ -42,7 +42,7 @@ function M.config()
       diagnostics.stylelint,
       diagnostics.zsh,
       -- formatters
-      formatting.erb_lint,
+      formatting.erb_format,
       formatting.markdownlint,
       formatting.prettierd.with {
         extra_filetypes = { "toml" },
