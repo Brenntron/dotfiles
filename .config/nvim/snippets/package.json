@@ -1,0 +1,12 @@
+{
+  "name": "snippets",
+  "contributes": {
+    "snippets": [
+      {
+      "language": "coffee",
+      "path": "./coffeescript.json"
+      }
+    ]
+
+  }
+}

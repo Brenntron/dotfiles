@@ -1,0 +1,49 @@
+{
+  "functionDef": {
+    "prefix": "function",
+    "body": [
+      {
+        "() -> "
+      }
+    ]
+  },
+  "inArray": {
+    "prefix": "inArray",
+    "body": [
+      "$1 in $2"
+    ]
+  },
+  "hasObject": {
+    "prefix": "hasObject",
+    "body": [
+      "$1 of $2"
+    ]
+  },
+  "propertyExistOrCreate": {
+    "prefix": "propertyExistOrCreate",
+    "body": [
+      "if !$2?",
+      "$2 = $1"
+    ]
+  },
+  "search": {
+    "prefix": "search",
+    "body": [
+      "$2.search($1) isnt -1"
+    ]
+  },
+  "split": {
+    "prefix": "split",
+    "body": [
+      "$1.split($2)"
+    ]
+  },
+  "switch": {
+    "prefix": "switch",
+    "body": [
+      "switch $1",
+      "  case $2 then $3",
+      "  default then $4"
+    ]
+  }
+}
