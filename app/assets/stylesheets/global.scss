@@ -4825,7 +4825,7 @@ button.tertiary {
 #search-criteria-options {
   color: $type-base-color;
   border: 1px solid $faint-neutral-color;
-  padding: 6px 20px;
+  padding: 6px 10px;
   font-weight: 300;
   font-size: 9pt;
   position: absolute;
@@ -4845,20 +4845,22 @@ button.tertiary {
 .create.active{
   display: none;
 }
+
 #search-criteria-options input[type='checkbox'] {
-  box-shadow: none !important;
-  outline: none !important;
   border: none !important;
-  margin-right: 6px;
+  box-shadow: none !important;
+  margin: 0 4px 0 0;
+  min-height: unset;
+  outline: none !important;
+  position: relative;
+  top: 2px;
 }
 
 .search-criteria-label {
-  padding: 6px 0 1px 0;
-  width: 100%;
-  display: inline-flex;
   align-items: center;
-  white-space: nowrap;
+  display: inline-flex;
   height: 30px;
+  padding: 6px 0 1px 0;
 }
 
 .multicol-2 {

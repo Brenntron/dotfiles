@@ -251,12 +251,15 @@ $ ->
     # it's for Adv searching tags
     createSelectOptions = ->
       tags = $('#search_tag_list')[0]
+
       if tags
         tag_list = tags.value
-        array = tag_list.split(',')
+        tag_array = tag_list.split(',')
         options = []
-        for x in array
-          options.push {name: x}
+
+        for tag in tag_array
+          options.push {name: tag}
+
         return options
 
     assignee_input = $('#assignee-input').selectize {
