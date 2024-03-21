@@ -76,6 +76,10 @@ else
   source ~/.config/osx/osx.zsh
 fi
 
+# enable autocomplete function
+autoload -U compinit
+compinit
+
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
