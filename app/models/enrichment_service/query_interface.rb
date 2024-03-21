@@ -14,7 +14,7 @@ class EnrichmentService::QueryInterface
       prevalence_response = ::EnrichmentService::Enrich.query_ip_prevalence([query_item])
     when 'url'
       response = ::EnrichmentService::Enrich.query_url(query_item)
-      prevalence_response = ::EnrichmentService::Enrich.query_domain_prevalence([DisputeEntry.safe_domain_of(query_item)])
+      prevalence_response = nil
     when 'sha'
       response = ::EnrichmentService::Enrich.query_sha(query_item)
       prevalence_response = ::EnrichmentService::Enrich.query_hash_prevalence([query_item])
@@ -36,8 +36,7 @@ class EnrichmentService::QueryInterface
 
   def self.url_query(query_item)
     response = ::EnrichmentService::Enrich.query_url(query_item)
-    prevalence_response = ::EnrichmentService::Enrich.query_domain_prevalence([DisputeEntry.safe_domain_of(query_item)])
-    process_response(response, prevalence_response)
+    process_response(response, nil)
   end
 
   def self.sha_query(query_item)
@@ -47,11 +46,15 @@ class EnrichmentService::QueryInterface
   end
 
   def self.get_suggestion(query_item)
-    return 'url' if query_item.match(/https?:\/\//).present?
     return 'sha' if query_item.match(/^[a-fA-F0-9]{64}$/).present?
     ip = IPAddr.new(query_item) rescue nil
     return 'ip' if ip&.ipv4? || ip&.ipv6?
-    'domain'
+
+    parser = Addressable::URI
+    uri = parser.parse(parser.parse(query_item).scheme.nil? ? "http://#{query_item}" : query_item)
+    return 'domain' if uri.hostname == query_item
+
+    'url'
   end
 
   private

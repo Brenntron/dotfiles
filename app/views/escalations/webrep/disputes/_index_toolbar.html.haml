@@ -4,8 +4,10 @@
       Table View
     %span.dropdown
       %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+
         %span.toolbar-button-text
           Show/Hide Columns
+
       .dropdown-menu.toolbar-dropdown#table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button'}
         .dropdown-menu-content-block
           .dropdown-menu-toolbar-header.ticket-showcol-header Ticket Columns
@@ -213,7 +215,9 @@
           .button-row-center
             %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
               Convert Ticket
-
+    %button.icon-autoresolved.toolbar-button.esc-tooltipped.toolbar-button-spacer{title: 'Auto Resolve', onclick: "auto_resolve_tickets(#{current_user.id});"}
+      %span.toolbar-button-text
+        Auto Resolve
   %div
     %label.toolbar-section-label
       Edit Dispute Entry

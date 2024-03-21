@@ -155,6 +155,8 @@ Rails.configuration.rep_api             = ApiRequester::ApiRequester.config_of(r
 reversing_labs_config = env_config['reversing_labs']
 raise 'config.yml missing ReversingLabs section' unless reversing_labs_config
 Rails.configuration.reversing_labs      = ApiRequester::ApiRequester.config_of(reversing_labs_config)
+Rails.configuration.reversing_labs.local_api = reversing_labs_config['api_key']
+Rails.configuration.reversing_labs.local_url = reversing_labs_config['local_api_url']
 
 
 sds_config = env_config.fetch('sds', nil)
@@ -206,24 +208,28 @@ raise 'config.yml missing k2 section' unless k2_config
 Rails.configuration.k2                  = ApiRequester::ApiRequester.config_of(k2_config)
 Rails.configuration.k2.token            = k2_config['token']
 
-umbrella_fetcher_config = env_config.fetch('umbrella_data_fetcher', nil)
-raise 'config.yml missing umbrella_data_fetcher aws section' unless umbrella_fetcher_config
-umbrella_aws_config = OpenStruct.new
-umbrella_aws_config.aws_access_key_id = umbrella_fetcher_config.dig('aws', 'access_key_id')
-umbrella_aws_config.aws_secret_access_key = umbrella_fetcher_config.dig('aws', 'secret_access_key')
-Rails.configuration.umbrella_data_fetcher = umbrella_aws_config
-
-ngfw_telemetry_config = env_config.fetch('ngfw_telemetry', nil)
-raise 'config.yml missing ngfw_telemetry section' unless ngfw_telemetry_config
-ngfw_telemetry_aws_config = OpenStruct.new
-ngfw_telemetry_aws_config.aws_access_key_id = ngfw_telemetry_config.dig('aws', 'access_key_id')
-ngfw_telemetry_aws_config.aws_secret_access_key = ngfw_telemetry_config.dig('aws', 'secret_access_key')
-Rails.configuration.ngfw_telemetry = ngfw_telemetry_aws_config
+clustes_fetcher_config = env_config.fetch('clusters_telemetry', nil)
+raise 'config.yml missing clusters_telemetry aws section' unless clustes_fetcher_config
+clusters_config = OpenStruct.new
+clusters_config.aws_access_key_id = clustes_fetcher_config.dig('aws', 'access_key_id')
+clusters_config.aws_secret_access_key = clustes_fetcher_config.dig('aws', 'secret_access_key')
+clusters_config.aws_bucket = clustes_fetcher_config.dig('aws', 'bucket')
+clusters_config.aws_prefix = clustes_fetcher_config.dig('aws', 'prefix')
+clusters_config.aws_region = clustes_fetcher_config.dig('aws', 'region')
+Rails.configuration.clusters_telemetry_source = clusters_config
 
 file_mgmt_config = env_config.fetch('file_mgmt', nil)
 raise 'config.yml missing file_mgmt section' unless file_mgmt_config
 Rails.configuration.base_host_path = file_mgmt_config['base_host_path']
 Rails.configuration.base_file_path = file_mgmt_config['base_file_path']
+
+tmi_config = env_config.fetch('tmi', nil)
+raise 'config.yml missing tmi section' unless tmi_config
+Rails.configuration.tmi           =  OpenStruct.new
+Rails.configuration.tmi.hostport  =  tmi_config['hostport']
+Rails.configuration.tmi.ca_file   =  tmi_config['ca_file']
+Rails.configuration.tmi.cert_file =  tmi_config['cert_file']
+Rails.configuration.tmi.key_file  =  tmi_config['key_file']
 jira_config = env_config['jira']
 raise "config.yml missing jira section" unless jira_config
 Rails.configuration.jira                = ApiRequester::ApiRequester.config_of(jira_config)
@@ -234,3 +240,12 @@ Rails.configuration.jira.auth_type      = jira_config['auth_type'].to_sym
 bast_config = env_config.fetch('bast', nil)
 raise 'config.yml missing bast section' unless bast_config
 Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)
+
+resolution_report_config = env_config.fetch('resolution_report', nil)
+raise 'config.yml missing resolution_report section' unless resolution_report_config
+Rails.configuration.resolution_report = OpenStruct.new
+Rails.configuration.resolution_report.cache_expiration = resolution_report_config['cache_expiration']
+
+banhammer_host = env_config.dig('banhammer', 'host')
+raise 'config.yml missing banhammer section' unless banhammer_host
+Rails.configuration.banhammer_host = banhammer_host

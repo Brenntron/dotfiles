@@ -114,6 +114,21 @@
             .data-report-score#rl-scanner-results
             %label.content-label-sm Scanner Results
         %hr.thin
+          .row
+            %label.data-report-label 
+            .col-xs-3.col-lg-3
+              %label.data-report-label Threat name
+              %span.data-report-content#local-rl-threat-name
+            .col-xs-3.col-lg-3
+              %label.data-report-label Threat status
+              %span.data-report-content#local-rl-threat-status
+            .col-xs-3.col-lg-3
+              %label.data-report-label Last scan date
+              %span.data-report-content#local-rl-threat-scan
+            .ccol-xs-3.col-lg-3
+              %label.data-report-label Digital signer
+              %span.data-report-content#local-rl-signer
+        %hr.thin
         .row
           .col-xs-12
             %table.data-report-table#rl-scanner-table
@@ -126,31 +141,3 @@
       %span.sample-present-false
       %div.data-report-wrapper
         %span.missing-data Not in Reversing Labs
-
-.row
-  .col-xs-12.col-md-12.col-lg-8
-    %div.data-report-wrapper
-      %h2.enrich-filerep-header.research-data-header Enrichment
-      #enrich-loader
-        .inline-loader-wrapper
-          .gear-loader-wrapper
-            = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
-          %span.loader-msg Loading data...
-      .enrich-filerep-data-present
-        %span.sample-present-true
-      .enrich-filerep-data-missing
-        %span.sample-present-false
-        .text-center.missing-data No enrichment service data found.
-
-.row
-  .col-xs-12.col-md-12.col-lg-8
-    %div.data-report-wrapper
-      %h2.prevalence-filerep-header.research-data-header Prevalence
-      #prevalence-loader
-        .inline-loader-wrapper
-          .gear-loader-wrapper
-            = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
-          %span.loader-msg Loading data...
-      .prevalence-filerep-data-present
-      .prevalence-filerep-data-missing
-        .text-center.missing-data No prevalence data found.

@@ -1,3 +1,5 @@
+assigned_timeout_id = ''
+
 $(document).ready ->
   Chart.defaults.global.plugins.datalabels.display = false
   $('span#mark-as-related').on 'show.bs.dropdown', ->
@@ -31,56 +33,57 @@ $(document).ready ->
               $("##{column}-checkbox").prop('checked', false)
               window.dispute_table.column("##{column}").visible false
   )
-  $('.toggle-vis').click ->
-    data = {}
-    data['priority'] = $("#priority-checkbox").is(':checked')
-    data['case-id'] = $("#case-id-checkbox").is(':checked')
-    data['status'] = $("#status-checkbox").is(':checked')
-    data['resolution'] = $("#resolution-checkbox").is(':checked')
-    data['submission-type'] = $("#submission-type-checkbox").is(':checked')
-    data['dispute'] = $("#dispute-checkbox").is(':checked')
-    data['owner'] = $("#owner-checkbox").is(':checked')
-    data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
-    data['age'] = $("#age-checkbox").is(':checked')
-    data['case-origin'] = $("#case-origin-checkbox").is(':checked')
-    data['submitter-type'] = $("#submitter-type-checkbox").is(':checked')
-    data['submitter-org'] = $("#submitter-org-checkbox").is(':checked')
-    data['submitter-domain'] = $("#submitter-domain-checkbox").is(':checked')
-    data['contact-name'] = $("#contact-name-checkbox").is(':checked')
-    data['contact-email'] = $("#contact-email-checkbox").is(':checked')
-    data['status-comment'] = $("#status-comment-checkbox").is(':checked')
-    data['last-updated'] = $("#last-updated-checkbox").is(':checked')
-    data['platform'] = $("#platform-checkbox").is(':checked')
-    std_msg_ajax(
-      url: "/escalations/api/v1/escalations/user_preferences/update"
-      method: 'POST'
-      data: {data, name: 'WebRepColumns'}
-      dataType: 'json'
-      success: (response) ->
-    )
 
-  $('.toggle-vis-nested').click ->
-    data = {}
-    data['dispute-entry'] = $("#dispute-entry-checkbox").is(':checked')
-    data['entry-status'] = $("#entry-status-checkbox").is(':checked')
-    data['entry-resolution'] = $("#entry-resolution-checkbox").is(':checked')
-    data['suggested-disposition'] = $("#suggested-disposition-checkbox").is(':checked')
-    data['category'] = $("#category-checkbox").is(':checked')
-    data['platform-entry'] = $("#platform-entry-checkbox").is(':checked')
-    data['wbrs-score'] = $("#wbrs-score-checkbox").is(':checked')
-    data['wbrs-total-rule-hits'] = $("#wbrs-total-rule-hits-checkbox").is(':checked')
-    data['wbrs-rules'] = $("#wbrs-rules-checkbox").is(':checked')
-    data['sbrs-score'] = $("#sbrs-score-checkbox").is(':checked')
-    data['sbrs-total-rule-hits'] = $("#sbrs-total-rule-hits-checkbox").is(':checked')
-    data['sbrs-rules'] = $("#sbrs-rules-checkbox").is(':checked')
+window.update_webrep_checkbox_user_preferences = ->
+  data = {}
+  data['priority'] = $("#priority-checkbox").is(':checked')
+  data['case-id'] = $("#case-id-checkbox").is(':checked')
+  data['status'] = $("#status-checkbox").is(':checked')
+  data['resolution'] = $("#resolution-checkbox").is(':checked')
+  data['submission-type'] = $("#submission-type-checkbox").is(':checked')
+  data['dispute'] = $("#dispute-checkbox").is(':checked')
+  data['owner'] = $("#owner-checkbox").is(':checked')
+  data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
+  data['age'] = $("#age-checkbox").is(':checked')
+  data['case-origin'] = $("#case-origin-checkbox").is(':checked')
+  data['submitter-type'] = $("#submitter-type-checkbox").is(':checked')
+  data['submitter-org'] = $("#submitter-org-checkbox").is(':checked')
+  data['submitter-domain'] = $("#submitter-domain-checkbox").is(':checked')
+  data['contact-name'] = $("#contact-name-checkbox").is(':checked')
+  data['contact-email'] = $("#contact-email-checkbox").is(':checked')
+  data['status-comment'] = $("#status-comment-checkbox").is(':checked')
+  data['last-updated'] = $("#last-updated-checkbox").is(':checked')
+  data['platform'] = $("#platform-checkbox").is(':checked')
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/user_preferences/update"
+    method: 'POST'
+    data: {data, name: 'WebRepColumns'}
+    dataType: 'json'
+    success: (response) ->
+  )
 
-    std_msg_ajax(
-      url: "/escalations/api/v1/escalations/user_preferences/update"
-      method: 'POST'
-      data: {data, name: 'WebRepColumns'}
-      dataType: 'json'
-      success: (response) ->
-    )
+window.update_webrep_nested_checkbox_user_preferences = ->
+  data = {}
+  data['dispute-entry'] = $("#dispute-entry-checkbox").is(':checked')
+  data['entry-status'] = $("#entry-status-checkbox").is(':checked')
+  data['entry-resolution'] = $("#entry-resolution-checkbox").is(':checked')
+  data['suggested-disposition'] = $("#suggested-disposition-checkbox").is(':checked')
+  data['category'] = $("#category-checkbox").is(':checked')
+  data['platform-entry'] = $("#platform-entry-checkbox").is(':checked')
+  data['wbrs-score'] = $("#wbrs-score-checkbox").is(':checked')
+  data['wbrs-total-rule-hits'] = $("#wbrs-total-rule-hits-checkbox").is(':checked')
+  data['wbrs-rules'] = $("#wbrs-rules-checkbox").is(':checked')
+  data['sbrs-score'] = $("#sbrs-score-checkbox").is(':checked')
+  data['sbrs-total-rule-hits'] = $("#sbrs-total-rule-hits-checkbox").is(':checked')
+  data['sbrs-rules'] = $("#sbrs-rules-checkbox").is(':checked')
+
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/user_preferences/update"
+    method: 'POST'
+    data: {data, name: 'WebRepColumns'}
+    dataType: 'json'
+    success: (response) ->
+  )
 
 window.select_or_deselect_all = (dispute_id)->
 
@@ -210,17 +213,8 @@ window.dispute_status_drop_down = () ->
   wrapper = radio.parent()
   wrapper.addClass('selected')
 
-window.popup_response_error =(response, prefix) ->
-  if response.responseJSON == undefined
-    response_lines = response.responseText.split("\n")
-    if 2 < response_lines.length
-      errormsg = response_lines[0] + "\n" + response_lines[1]
-    else
-      errormsg = response.responseText
-  else if response.responseJSON.error != undefined
-    errormsg = response.responseJSON.error
-  else
-    errormsg = response.responseText
+window.popup_response_error = (response, prefix) ->
+  assemble_error_message(response)
 
   alert(prefix + "\n" + errormsg)
 
@@ -355,8 +349,33 @@ window.toolbar_show_change_assignee = () ->
     data: data
     dataType: 'json'
     success: (response) ->
-      show_message('success', 'Ticket assignment has been updated!', 5)
-      window.location.reload()
+      $assignee_element = $('#dispute-assignee')
+      current_user_id = $('input[name="current_user_id"]').val()
+      { user_id } = JSON.parse(response).data[0]
+      is_assignee = parseInt(current_user_id) is user_id
+      username = $('#index_target_assignee option:selected').text()
+
+      $assignee_element.text(username)
+      $assignee_element.removeClass('missing-data') if $assignee_element.hasClass('missing-data')
+      $('#show_ticket_assign').attr('disabled', true)
+
+      if is_assignee
+        $('.return-ticket-button').attr('disabled', false)
+      else
+        $('.container_unassign').attr('disabled', false)
+        $('.return-ticket-button').attr('disabled', true)
+
+      $('#show-edit-ticket-status-button').text('ASSIGNED')
+      $('#index_change_assign').dropdown('toggle')
+
+      clearTimeout(assigned_timeout_id)
+      $('#unassignedAlert').addClass('hidden') if !$('#unassignedAlert').hasClass('hidden')
+      $('#assignedAlert').removeClass('hidden') if $('#assignedAlert').hasClass('hidden')
+      $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+      assigned_timeout_id = setTimeout () ->
+        $('.assigned-check').addClass('hidden')
+        $('#assignedAlert').addClass('hidden')
+      , 5000
     error: (response) ->
       show_message('error', 'Ticket assignment could not be updated.', 5)
       std_msg_error('No Tickets Selected', ['Select at least one ticket to assign to yourself.'])
@@ -412,9 +431,29 @@ window.toolbar_unassign_dispute = () ->
     data: data
     dataType: 'json'
     success: (response) ->
-      window.location.reload()
+      $assignee_element = $('#dispute-assignee')
+
+      $assignee_element.text('Unassigned')
+      $assignee_element.addClass('missing-data')
+
+      $('.return-ticket-button').attr('disabled', true)
+      $('.container_unassign').attr('disabled', true)
+      $('#show_ticket_assign').attr('disabled', false)
+      $('#index_change_assign').attr('disabled', false)
+      $('#show-edit-ticket-status-button').text('NEW')
+
+      clearTimeout(assigned_timeout_id)
+      $('#assignedAlert').addClass('hidden') if !$('#assignedAlert').hasClass('hidden')
+      $('#unassignedAlert').removeClass('hidden') if $('#unassignedAlert').hasClass('hidden')
+      $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+      assigned_timeout_id = setTimeout () ->
+        $('.assigned-check').addClass('hidden')
+        $('#unassignedAlert').addClass('hidden')
+      , 5000
     error: (response) ->
-      popup_response_error(response, 'Error removing assignee')
+      errormsg = assemble_error_message(response)
+
+      show_message('error', "Error removing assignee \n #{errormsg}", 5, '#alertMessage')
   )
 
 window.toolbar_index_mark_duplicate = (box_names) ->
@@ -545,11 +584,27 @@ window.take_single_dispute = (id) ->
     success_reload: true
     success: (response) ->
       if response.dispute_ids.length > 0
-        show_message('success', 'Ticket assignment has been updated!', 5)
-        location.reload()
+        $assignee_element = $('#dispute-assignee')
+        $assignee_element.text(response.username)
+
+        if $assignee_element.hasClass('missing-data')
+          $assignee_element.removeClass('missing-data')
+
+        $('.return-ticket-button').attr('disabled', false)
+        $('.container_unassign').attr('disabled', true)
+        $('#show_ticket_assign').attr('disabled', true)
+        $('#show-edit-ticket-status-button').text('ASSIGNED') unless $('#show-edit-ticket-status-button').text() is 'ASSIGNED'
+
+        clearTimeout(assigned_timeout_id)
+        $('#unassignedAlert').addClass('hidden') if !$('#unassignedAlert').hasClass('hidden')
+        $('#assignedAlert').removeClass('hidden') if $('#assignedAlert').hasClass('hidden')
+        $('.assigned-check').removeClass('hidden') if $('.assigned-check').hasClass('hidden')
+        assigned_timeout_id = setTimeout () ->
+          $('.assigned-check').addClass('hidden')
+          $('#assignedAlert').addClass('hidden')
+        , 5000
       else
-        show_message('error', 'Ticket assnigment could not be updated.', 5)
-        location.reload()
+        show_message('error', 'Ticket assnigment could not be updated.', false, '#alertMessage')
   )
 
 window.return_dispute = (dispute_id) ->
@@ -784,6 +839,20 @@ window.webrep_reset_search = () ->
 
 window.clearSelectize = (input) ->
   $("##{input}")[0].selectize.clear()
+
+assemble_error_message = (response) ->
+  if response.responseJSON == undefined
+    response_lines = response.responseText.split("\n")
+    if 2 < response_lines.length
+      errormsg = response_lines[0] + "\n" + response_lines[1]
+    else
+      errormsg = response.responseText
+  else if response.responseJSON.error != undefined
+    errormsg = response.responseJSON.error
+  else
+    errormsg = response.responseText
+
+  errormsg
 
 $ ->
   # Get the webrep_data for the table and format the search header
@@ -1194,7 +1263,11 @@ $ ->
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
       { data: 'submitter_name' }
-      { data: 'submitter_email' }
+      {
+        data: 'submitter_email'
+        render: (data) ->
+          return "<span>#{data}</span> <a href='#{$('#disputes-index').data('banhammer-host') + '?q=' + data}' target='_blank' title='Block #{data}' class='ban esc-tooltipped'></a>"
+      }
       { data: 'status_comment' }
       { data: 'updated_at' }
       {
@@ -1394,17 +1467,19 @@ $ ->
     $(this).on 'click', ->
       $(checkbox).prop 'checked', !checkbox.prop('checked')
       column.visible !column.visible()
+      update_webrep_checkbox_user_preferences() #update checkbox history whenever checkbox container is clicked
       return
     $(checkbox).on 'click', ->
       $(checkbox).prop 'checked', !checkbox.prop('checked')
       return
-    return
+
   $('.toggle-vis-nested').each ->
     checkbox_trigger = $(this).attr('data-column')
     checkbox = $(this).find('input')
 
     $(this).on 'click', ->
       $(checkbox).prop 'checked', !checkbox.prop('checked')
+      update_webrep_nested_checkbox_user_preferences() #update nested checkbox history whenever checkbox container is clicked
       $('.dispute-entry-table td, .dispute-entry-table th').each ->
         if $(this).hasClass(checkbox_trigger)
           $(this).toggle()
@@ -1653,7 +1728,8 @@ $ ->
 
     $('#dispute-customer-name').hide()
     $('#dispute-customer-email').hide()
-
+    $('a.ban.dispute-show').hide()
+    
     $('.dispute-edit-input').css('display','block')
 
     $('#save-dispute-button').removeClass('hidden')
@@ -1674,6 +1750,7 @@ $ ->
     $('.dispute-edit-field').show()
     $('#dispute-submission-type-select').hide()
     $('.dispute-submission-type').show()
+    $('#dispute-customer-email .ban').show()
 
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')
@@ -1877,7 +1954,7 @@ $ ->
       'tooltipster-borderless-comment'
     ]
     debug: false
-    maxWidth: 500
+    maxWidth: 5000
 
   $('.esc-tooltipped:disabled').tooltipster
     disable: true
@@ -2725,7 +2802,7 @@ get_webrep_current_cats = (entries, uris) ->
           convert_selectize = $convert_category_selectize[0].selectize
           convert_selectize.setValue cat_ids
 
-        ), 500
+        ), 5000
 
 
       check_convert_to_webcat_ready()

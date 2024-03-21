@@ -20,9 +20,9 @@
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
           = image_tag('layout/icon_escalations.svg', class: 'sidenav-icon', alt: 'Escalations')
         %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav-icons'}
-          - if is_rule_user?
+          - if ips_escalator?
             %li{class: 'ips-link'}
-              %a{href: '/escalation_bugs'}
+              %a{href: '/snort_escalations'}
                 =inline_svg 'icon_snort.svg'
           - if can?(:read, Admin)
             %li{class: 'clam-link disabled-link'}
@@ -71,7 +71,7 @@
             =inline_svg 'icon_confluence.svg'
         %li{class: 'release-link'}
           - if !@version.nil?
-            %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}", target: '_blank'}
+            %a{href: "https://confluence.vrt.sourcefire.com/display/ATLAS/ACE+v#{@version}", target: '_blank'}
               =inline_svg 'icon_confluence.svg'
           - else
             %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349", target: '_blank'}
@@ -119,9 +119,9 @@
           %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
             Escalations
           %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav'}
-            - if is_rule_user?
+            - if ips_escalator?
               %li{class: 'ips-link'}
-                %a{href: '/escalation_bugs'} Snort Escalations
+                %a{href: '/snort_escalations'} Snort Escalations
             - if can?(:read, Admin)
               %li{class: 'clam-link disabled-link'}
                 %a.disabled-link Clam
@@ -164,7 +164,7 @@
             %a{href: 'https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=61384557', target: '_blank'} User Docs
           %li{class: 'release-link'}
             - if !@version.nil?
-              %a{href: "https://confluence.vrt.sourcefire.com/display/OSDWE/ACE+v#{@version}", target: '_blank'} V #{@version}
+              %a{href: "https://confluence.vrt.sourcefire.com/display/ATLAS/ACE+v#{@version}", target: '_blank'} V #{@version}
             - else
               %a{href: "https://confluence.vrt.sourcefire.com/pages/viewpage.action?pageId=74714349", target: '_blank'} Release Notes
       %ul{class:'temp-links'}

@@ -4,6 +4,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
   before_action :require_login
 
   def index
+    @user = current_user
     respond_to do |format|
       format.html
       format.xlsx do
@@ -33,9 +34,21 @@ class Escalations::Webrep::DisputesController < ApplicationController
   end
 
   def show
-    @dispute = Dispute.eager_load([:dispute_comments, :dispute_emails]).eager_load(:dispute_entries => [:dispute_rule_hits, :dispute_entry_preload]).where(:id => params[:id]).first
+    @dispute = Dispute.eager_load([:dispute_comments, :dispute_emails]).eager_load(dispute_entries: [:dispute_rule_hits, :dispute_entry_preload]).where(id: params[:id]).first
+    @is_assignee =   @dispute.assignee == current_user.cvs_username
+    @is_duplicate =  @dispute.resolution == Dispute::DUPLICATE
+    @is_resolved =   @dispute.status == Dispute::RESOLVED
+    @is_processing = @dispute.status == "PROCESSING"
+    @is_unassigned = @dispute.assignee == 'Unassigned'
+    @entry_disabled =
+        if @is_duplicate || !@is_resolved || !@is_processing
+          true
+        else
+          false
+        end
+
     @versioned_items = @dispute.compose_versioned_items
-    #to compare against entry.dispute_rule_hits:
+    # to compare against entry.dispute_rule_hits:
     # rulehit = @all_rulehits.find({|hit| hit.mnemonic == dispute_rule_hit.name})
     #
     # to get malware probability, divide by 100.0
@@ -47,6 +60,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
     # long description
     #
     # rulehit.desc_long
+    #
     @all_rulehits = Wbrs::RuleHit.all
 
     @entries = @dispute.dispute_entries
@@ -63,11 +77,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
     @dispute.peek(user: current_user)
 
-    #@entries.each do |entry|
-      #todo: do lazy load style checking with blacklist here
-      #entry.blacklist(reload: true)
-
-    #end
+    # @entries.each do |entry|
+    #   todo: do lazy load style checking with blacklist here
+    #   entry.blacklist(reload: true)
+    # end
   end
 
   def update
@@ -474,7 +487,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
         if params['customtickets'] == "true"
           # Not yet implemented
         end
-        
+
       end
     end
   end
@@ -486,7 +499,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
   def tickets
   end
-  
+
   # def advanced_search
   #   @dispute = Dispute.new
   # end

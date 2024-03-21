@@ -115,5 +115,13 @@ class Ability
         user.ancestors.include?(current_user)
       end
     end
+
+    if role_names.include?('tmi viewer')
+      can [:read_observable, :read_taxonomy_map], Tmi
+    end
+
+    if role_names.include?('tmi manager')
+      can [:read_observable, :read_taxonomy_map, :update_observable], Tmi
+    end
   end
 end

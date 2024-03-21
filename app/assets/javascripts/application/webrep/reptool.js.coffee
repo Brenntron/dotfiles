@@ -161,18 +161,15 @@ window.bulk_get_current_reptool = (page) ->
                 '<td class="reptool-entry-name">' + rep_entry + '</td>' +
                 '<td class="reptool-entry-class" data-classification="' + rep_class_list + '">' + rep_class_td_content + '</td>' +
                 '<td>' + rep_class_exp + '</td>' +
-                '<td class="reptool-entry-comment">' + comment + '</td>' +
+                '<td class="reptool-entry-comment" id="'+ rep_entry + '_comment">' + comment + '</td>' +
               '</tr>'
             tbody.append(entry_row)
 
-            # ellipsis-trick the comment if too huge for reptool dropdown
             if comment.length > 50
-              entry_comment_trunc = entry['comment'].substring(0, 50) + '...'
-              $('.reptool-entry-comment').text(entry_comment_trunc)
-              $('.reptool-entry-comment').addClass('esc-tooltipped')
-              $('.esc-tooltipped').attr('title', comment)
-            else
-              $('.reptool-entry-comment').text(comment)
+              comment_cell = $(document.getElementById(rep_entry + '_comment'))
+              comment_cell.text(comment.substring(0, 50) + '...')
+              comment_cell.addClass('esc-tooltipped')
+              comment_cell.attr('title', comment)
 
             # put the auto-generated comment into the read-only div
             $('.reptool-generated-comment').html(comment_trail)
