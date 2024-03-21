@@ -85,7 +85,7 @@ function M.config()
       },
       indent_width = 2,
       root_folder_label = ":t",
-      special_files = { "Makefile", "README.md", "readme.md" },
+      special_files = { "Makefile", "README.md", "readme.md", ".obsidian" },
       symlink_destination = true,
     },
     sync_root_with_cwd = true,

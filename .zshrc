@@ -197,6 +197,8 @@ alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 # enable alias-finder
 zstyle ':omz:plugins:alias-finder' autoload yes # disabled by default
 
+alias spectral='spectral-language-server'
+
 # enable autoenv
 source $(brew --prefix autoenv)/activate.sh
 
