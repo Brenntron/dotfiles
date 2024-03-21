@@ -18,8 +18,53 @@
     padding: 5px 0 5px 30px
   }
 
-  .edit-resolution-container{
+  .edit-resolution-container {
     padding: 10px 20px;
+
+    .bulk-resolution-message-container {
+      align-items: center;
+      display: flex;
+      position: absolute;
+      bottom: 35px;
+
+      .bulk-message {
+        display: flex;
+        font-size: 80%;
+      }
+
+      .bulk-success {
+        color: #5FB766;
+      }
+
+      .bulk-warning {
+        color: #E47433;
+      }
+
+      .bulk-error {
+        color: #fc4349;
+      }
+
+      .bulk-icon {
+        background-repeat: no-repeat;
+        display: flex;
+        height: 15px;
+        position: relative;
+        width: 15px;
+      }
+
+      .bulk-success-icon {
+        background-image: url(image_path('icon_check_dark_green.svg'));
+      }
+
+      .bulk-warning-icon {
+        margin-top: -2px;
+        background-image: url(image_path('icon_warning.svg'));
+      }
+
+      .bulk-error-icon {
+        background-image: url(image_path('icon_error.svg'));
+      }
+    }
 
     .internal-comment-container, .customer-facing-comment-container {
       .toolbar-section-label{
@@ -58,7 +103,7 @@
       color: #666;
       font-size: 0.75em;
       font-weight: 400;
-      padding-bottom: 10px;
+      padding: 15px 0 10px 0;
     }
 
     .edit-resolution-label {
@@ -161,7 +206,8 @@
     .button-wrapper{
       display: flex;
       justify-content: center;
-      margin-bottom: 25px;
+      margin-top: 15px;
+      margin-bottom: 20px;
 
       .update-resolution-button {
         background-color: #E47433;
