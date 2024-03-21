@@ -36,6 +36,11 @@ local M = {
     },
     {
       "rcarriga/cmp-dap",
+      event = { "InsertEnter", "LspAttach" },
+    },
+    {
+      "saadparwaiz1/cmp_luasnip",
+      event = { "InsertEnter", "LspAttach" },
     },
     {
       "hrsh7th/cmp-nvim-lsp",
@@ -175,6 +180,11 @@ function M.config()
         "s",
       }),
     },
+    snippet = {
+      expand = function(args)
+        require("luasnip").lsp_expand(args.body)
+      end,
+    },
     sorting = {
       priority_weight = 2,
       comparators = {
@@ -198,6 +208,7 @@ function M.config()
       { name = "copilot", group_index = 2 },
       { name = "emoji", group_index = 2 },
       { name = "kitty", group_index = 2 },
+      { name = "luasnip", group_index = 2},
       { name = "nvim_lsp", group_index = 2 },
       { name = "nvim_lua", group_index = 2 },
       { name = "path", group_index = 2 },

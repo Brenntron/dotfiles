@@ -1,5 +1,7 @@
+local util = require 'lspconfig'.util
+
 return {
   settings = {
-    root_dir = lspconfig.util.root_pattern '.git'
+    root_dir = util.root_pattern('coffeesense.config.js', 'Gemfile', 'package.json')
   }
 }
