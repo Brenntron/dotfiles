@@ -238,7 +238,6 @@
     &:hover {
       background-color: darken(#D7DADB, 10%)
     }
-
   }
 }
 
@@ -851,7 +850,14 @@ table.dataTable tbody tr.submitting-entry {
 
 #complaints-nav-search-wrapper {
   padding: 0 10px !important;
+
   .input-group.search-group {
     margin: 8px 0;
   }
+}
+
+.email-response-text {
+  font-size: 13px;
+  padding-top: 4px;
+  line-height: 1.15em;
 }

@@ -46,102 +46,63 @@ $ ->
     if keyCode == 13
       webcat_search_string = $('#web-cat-search .search-box').val().trim()
       if webcat_search_string == ''
-       refresh_localStorage()
+        refresh_webcat_localStorage()
       else
         localStorage.webcat_search_type = 'contains'
         localStorage.webcat_search_name = ''
         localStorage.webcat_search_conditions = JSON.stringify({value:webcat_search_string})
+      $('#complaints-index').DataTable().state.clear()
       refresh_url()
 
   $('#filter-cases-list a').on 'click', (e)->
+    filter_url = $(this).attr('href')
     localStorage.setItem('webcat_reset_page', true)
+    localStorage.setItem('webcat_search_type', 'standard')
+    localStorage.setItem('webcat_search_name', filter_url)
+    localStorage.removeItem('webcat_search_conditions')
+    $('#complaints-index').DataTable().state.clear()
+
 
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
+
     form = {}
-    user_id = if assignee_input[0].selectize? then assignee_input[0].selectize.items else []
-    tags = if tag_input[0].selectize? then tag_input[0].selectize.items else []
-    company = if $('#company-input')[0].selectize? then $('#company-input')[0].selectize.items else []
-    status = if $('#status-input')[0].selectize? then $('#status-input')[0].selectize.items else []
-    resolution = if $('#resolution-input')[0].selectize? then $('#resolution-input')[0].selectize.items else []
-    customer_name = if $('#name-input')[0].selectize? then $('#name-input')[0].selectize.items else []
-    { items, options } = category_input[0].selectize
-    complaints = if $('#complaint-input')[0].selectize? then $('#complaint-input')[0].selectize.items else []
-    channels = if $('#channel-input')[0].selectize? then $('#channel-input')[0].selectize.items else []
-    entry_ids = if $('#entryid-input')[0].selectize? then $('#entryid-input')[0].selectize.items else []
-    complaint_ids = if $('#complaintid-input')[0].selectize? then $('#complaintid-input')[0].selectize.items else []
-    jira_ids = if $('#jiraid-input')[0].selectize? then $('#jiraid-input')[0].selectize.items else []
-    platform_ids = if $('#platform-input')[0].selectize? then $('#platform-input')[0].selectize.items else []
-    submitter_types = if $('#submitter-type-input')[0].selectize? then $('#submitter-type-input')[0].selectize.items else []
+    # Get each visible search item - should either be a selectized select, or an input
+    console.log $('#cat_named_search .search-item:not(:hidden)').length
 
+    $('#cat_named_search .search-item:not(:hidden)').each ->
+      # selectized values will be arrays that need to be joined
+      if $(this).find('select')[0]
+        select = $(this).find('select')[0]
+        search_item = $(select).attr('name')
+        search_item_val = $(select).val()
+        if search_item_val?
+          # need both ids and names for categories and platforms
+          if search_item == 'category-input' || search_item == 'platform'
+            options = []
+            selected_options = $(select).find('option:selected')
+            $(selected_options).each ->
+              options.push(this.innerText)
+            if search_item == 'category-input'
+              form['category'] = options.join(', ')
+              form['category_ids'] = search_item_val.join(', ')
+            if search_item == 'platform'
+              form['platform_display'] = options.join(', ')
+              form['platform_ids'] = search_item_val.join(', ')
+          else
+            search_item_val = search_item_val.join(', ')
+      else
+        input = $(this).find('input')
+        search_item = $(input).attr('name')
+        search_item_val = $(input).val()
 
-    if tags.length
-      form['tags'] = tags.join(', ')
-    if items.length
-      form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
-      form['category_ids'] = items.map( (cat) -> options[cat].category_id ).join(', ')
-    if company.length
-      form['company'] = company.join(', ')
-    if status.length
-      form['status'] = status.join(', ')
-    if resolution.length
-      form['resolution'] = resolution.join(', ')
-    if customer_name.length
-      form['customer_name'] = customer_name.join(', ')
-    if complaints.length
-      form['ip_or_uri'] = complaints.join(', ')
-    if channels.length
-      form['channel'] = channels.join(', ')
-    if entry_ids.length
-      form['entry_id'] = entry_ids.join(', ')
-    if complaint_ids.length
-      form['complaint_id'] = complaint_ids.join(', ')
-    if jira_ids.length
-      form['jira_id'] = jira_ids.join(', ')
-    if user_id.length
-      form['user_id'] = user_id.join(', ')
-    if submitter_types.length
-      form['submitter_type'] = submitter_types.join(', ')
-
-    form['platform_display'] = []
-    if platform_ids.length
-      form['platform_ids'] = platform_ids.join(',')
-      for id in platform_ids
-        form['platform_display'].push($('#platform-input')[0].selectize.options[id].public_name)
-
-
-    for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
-      { name, value } = item
-      name = name.toLowerCase().replace(/-/g, '_')
-      if name != 'tags' && name != 'category'&&  name != 'companies'
-        form[name] = value
+      if search_item_val? && search_item_val != '' && search_item != 'category-input' && search_item != 'platform'
+        form[search_item] = search_item_val
 
     localStorage.webcat_search_type = 'advanced'
     localStorage.webcat_search_name = form.search_name
-    localStorage.webcat_search_conditions = JSON.stringify(
-      category: form.category
-      category_ids: form.category_ids
-      channel: form.channel
-      company_name: form.company
-      complaint_id: form.complaint_id
-      jira_id: form.jira_id
-      customer_email: form.customer_email
-      customer_name: form.customer_name
-      domain: form.domain
-      id: form.entry_id
-      ip_or_uri: form.ip_or_uri
-      modified_newer: form.date_modified_older
-      modified_older: form.date_modified_newer
-      platform_ids: form.platform_ids
-      platforms: form.platform_display.join(', ')
-      resolution: form.resolution
-      status: form.status
-      submitted_newer: form.date_submitted_newer
-      submitted_older: form.date_submitted_older
-      tags: form.tags
-      user_id: form.user_id
-      submitter_type: form.submitter_type
-    )
+    localStorage.webcat_search_conditions = JSON.stringify(form)
+    $('#complaints-index').DataTable().state.clear()
     refresh_url()
 
 
@@ -150,12 +111,12 @@ $ ->
     localStorage.webcat_search_type = 'named'
     localStorage.webcat_search_name  = search_name
     localStorage.webcat_search_conditions = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
-
+    $('#complaints-index').DataTable().state.clear()
     refresh_url()
+
 
   window.search_for_tag = (tag) ->
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
-
     try
       webcat_search_conditions = JSON.parse webcat_search_conditions
     catch e
@@ -165,19 +126,19 @@ $ ->
     webcat_search_conditions.tags = tag
 
     localStorage.webcat_search_conditions = JSON.stringify webcat_search_conditions
-
+    $('#complaints-index').DataTable().state.clear()
     refresh_url()
-
-
-
 
 
 
   current_url = window.location.href
 
+  # This is used when there is an error calling the data
+  # or when clearing the search to the default data (favorite filter if set by user)
   window.webcat_refresh = ()->
-    refresh_localStorage()
+    refresh_webcat_localStorage()
     refresh_url()
+
 
   refresh_url = (href) ->
     { webcat_search_type, webcat_search_name } = localStorage
@@ -189,10 +150,11 @@ $ ->
       window.location.replace('/escalations/webcat/complaints')
       localStorage.setItem('webcat_reset_page', true)
 
-  window.refresh_localStorage = () ->
+  window.refresh_webcat_localStorage = () ->
     localStorage.removeItem('webcat_search_type')
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
+    $('#complaints-index').DataTable().state.clear()
 
 
 
@@ -233,7 +195,7 @@ $ ->
     # do not redirect if there is already some chosen search/filter (not from the settings)
     return if localStorage.webcat_search_type || window.location.search
 
-    refresh_localStorage()
+    refresh_webcat_localStorage()
     if is_default_filter(icon) then refresh_url(name) else build_webcat_named_search(name);
 
 
@@ -246,12 +208,35 @@ $ ->
     name = if is_default_filter(fav_icon) then link.attr('href') else link.text().trim()
     { icon: fav_icon, link: link, name: name }
 
-  window.current_page_is_favourite = ->
+  window.current_page_is_favourite = (search_name) ->
     { icon, name } = chosen_default_filter()
     if is_default_filter(icon)
-      return name == decodeURIComponent(window.location.search)
+      filter_dropdown = $("#filter-cases-list > span.favorite-search-icon-active")
+      if filter_dropdown
+        #Check if filter link matches current url path
+        if name == decodeURIComponent(window.location.search)
+          return true
+        #If no url path check if active link matches current filter name
+        else
+          link_text = $("#filter-dropdown > #filter-cases-list a.active-link").text().trim().toLowerCase()
+          if link_text == search_name
+            return true
+
+    #check if on current saved search
+    if name == localStorage.webcat_search_name
+      return true
+
+    #catch for when no favorites are set - currently loads All Tickets page, will need to be adjusted if that changes
+    else if $('.favorite-search-icon-active').length == 0 && search_name == 'all tickets'
+      return true
+
+    #check if saved search favorite is set but there's no local storage saved
     else
-      return name == localStorage.webcat_search_name
+      saved_search_dropdown = $("#saved-searches-wrapper > span.favorite-search-icon-active")
+      if saved_search_dropdown.length > 0
+        saved_name = $('#saved-searches-wrapper .active-link').text().trim()
+        if search_name == saved_name
+          return true
 
 
 
@@ -266,12 +251,15 @@ $ ->
     # it's for Adv searching tags
     createSelectOptions = ->
       tags = $('#search_tag_list')[0]
+
       if tags
         tag_list = tags.value
-        array = tag_list.split(',')
+        tag_array = tag_list.split(',')
         options = []
-        for x in array
-          options.push {name: x}
+
+        for tag in tag_array
+          options.push {name: tag}
+
         return options
 
     assignee_input = $('#assignee-input').selectize {
@@ -337,7 +325,7 @@ $ ->
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
-      options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"}, {name: "ACTIVE"},
+      options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"},
                {name: "COMPLETED"}, {name: "PENDING"}, {name: "REOPENED"}]
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
@@ -701,13 +689,18 @@ process_entry = (entry_data) ->
     data: entry_data
     success: (response) ->
       data = $.parseJSON(response)
-      msg = $('#' + data.entry_id + ' .temp-msg')
-      $(msg).text('Submitted. Refresh to see new results.')
-      $(msg).addClass('submitted-row')
-      remove_entry_from_changes(data.entry_id, 'submit')
+      if data.error?
+        err_msg = data.error
+        msg = $('#' + data.entry_id + ' .temp-msg')
+        $(msg).text('Submission failed: ' + err_msg)
+      else
+        msg = $('#' + data.entry_id + ' .temp-msg')
+        $(msg).text('Submitted. Refresh to see new results.')
+        $(msg).addClass('submitted-row')
+        remove_entry_from_changes(data.entry_id, 'submit')
     error: (response) ->
       msg = response.resonseJSON.error
-      std_msg_error("Error submitting entries", msg, reload: false)
+      std_msg_error("Error submitting entry", msg, reload: false)
   , this)
 
 
@@ -791,6 +784,7 @@ $ ->
   window.submit_changes = (entry_id) ->
     row = $('#' + entry_id)
     curr_status = $(row).attr('data-status')
+    self_review = $('#self_review').is(':checked')
 
     # slight differences in data sent
     if curr_status == 'PENDING'
@@ -825,7 +819,8 @@ $ ->
       'commit': commit,
       'comment': comment,
       'resolution_comment': resolution_msg,
-      'uri_as_categorized': uri
+      'uri_as_categorized': uri,
+      'self_review': self_review
     }
 
     # check data here before submitting
@@ -937,7 +932,7 @@ window.temporary_search_link = (webcat_search_name, webcat_search_conditions) ->
 
   $(new_delete).on 'click', () ->
     window.delete_disputes_named_search(this,  webcat_search_name)
-    refresh_localStorage()
+    refresh_webcat_localStorage()
 
   $(new_tr).append(new_td)
   $(new_td).append(new_link)

@@ -1,13 +1,9 @@
-
-
 init_tooltip = () ->
   $('.esc-tooltipped:not(.tooltipstered)').tooltipster
     theme: [
       'tooltipster-borderless'
       'tooltipster-borderless-customized'
     ]
-
-
 
 # Store changes in local storage to see if Bulk Submit can be used
 # call this when resolution is changed or a cat is added
@@ -39,8 +35,7 @@ window.remove_entry_from_changes = (entry_id, type) ->
     new_changes = entries.splice(submitted_entry, 1)
     sessionStorage.setItem(changed, new_changes)
 
-
-getTouchedFormCount = ()->
+window.getTouchedFormCount = () ->
   form_item = (sessionStorage.getItem("webcat_entries_changed") || "")
   form_item = form_item.split(",")
   form_item = form_item.filter((item) -> return item)
@@ -215,7 +210,7 @@ window.process_bulk_submission = () ->
 
 
 
-window.webcat_reset_search = ()->
+window.webcat_reset_search = () ->
   inputs = document.getElementsByClassName('form-control')
   for i in inputs
     i.value = ""
@@ -233,9 +228,9 @@ window.review_bulk_submit = () ->
   changes = (sessionStorage.getItem("webcat_entries_reviewed")|| "" )
   if (changes.split(',').length < 0) || (changes == '')
     std_msg_error('No changes to submit', ['Select "Commit" or "Decline on at least 1 entry."'])
+    return
 
   entries = changes.split(",").filter((item) -> return item)
-  self_review = $('#self_review').is(':checked')
 
   entries_to_update = []
   declined_entries = []
@@ -249,6 +244,7 @@ window.review_bulk_submit = () ->
     uri = $($(entry_row).find('.complaint-uri-input')[0]).val()
     status = $(entry_row).find('.review_radio_button:checked').val()
     comment = $(entry_row).find('textarea.internal-comment').val()
+    resolution_comment = $("#entry-email-response-to-customers_#{entry_id}").val()
 
     if $('#input_cat_' + entry_id).val() != null
       cat_ids_array = $('#input_cat_' + entry_id).val()
@@ -277,9 +273,9 @@ window.review_bulk_submit = () ->
         id: entry_id,
         prefix: uri,
         commit: status,
-#        status: resolution, #I dont see the old var in current dom??
+        status: '',
         comment: comment,
-#        resolution_comment: resolution_comment,
+        resolution_comment: resolution_comment,
         categories: cat_ids,
         category_names: category_names,
         self_review: self_review
@@ -340,40 +336,42 @@ window.process_bulk_reviews = () ->
 ## Allows analyst to set ticket status to reopened and allows them to interact
 # with the submission form
 window.reopenComplaint = (entry_id) ->
-  # Redrawing the row redraws the whole datatable and removes the 'reopened' entry from the results
+  # Redrawing the row redraws the whole datatable which can remove the 'reopened' entry from the results
   # Faking the update on the front after success to avoid DT resetting
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/reopen_complaint_entry'
     method: 'POST'
     data: {'complaint_entry_id': entry_id}
     success: (response) ->
-      debugger
-    entry_row = $('#' + entry_id)
+      entry_row = $('#' + entry_id)
 
-    $(entry_row).find('.state-row td').text('REOPENED')
-    $(entry_row).find('.resolution_radio_button').each ->
-      $(this).prop('disabled', false)
-    $('#edit_uri_input_' + entry_id).removeAttr('disabled')
+      $(entry_row).find('.state-row td').text('REOPENED')
+      $(entry_row).find('.resolution_radio_button').each ->
+        $(this).prop('disabled', false)
+      $('#edit_uri_input_' + entry_id).removeAttr('disabled')
 
-    # res comment when avail
-    cat_input = $('#input_cat_' + entry_id)
-    cat_input =   $('#input_cat_' + entry_id)[0].selectize
-    cat_input.enable()
+      # res comment when avail
+      cat_input = $('#input_cat_' + entry_id)
+      cat_input =   $('#input_cat_' + entry_id)[0].selectize
+      cat_input.enable()
 
-    comment_dropdown = $('#internal_comment_dropdown_' + entry_id)
-    comment = $('#internal_comment_' + entry_id)
-    if $(comment).text() != ''
-      comment_text = $(comment).text()
-    else
-      comment_text = ''
-    comment_input = '<textarea id="' + entry_id + '" placeholder="Internal note for choosing categories" class="intenral-comment">' + comment_text + '</textarea>'
-    comment.remove()
-    $(comment_dropdown).append(comment_input)
+      comment_dropdown = $('#internal-comment-dropdown_' + entry_id)
+      comment = $('#internal-comment-' + entry_id)
+      if $(comment).text() != ''
+        comment_text = $(comment).text()
+      else
+        comment_text = ''
+      comment_input = '<textarea id="' + entry_id + '" placeholder="Internal note for choosing categories" class="intenral-comment">' + comment_text + '</textarea>'
+      comment.remove()
+      $(comment_dropdown).append(comment_input)
 
-    button = $('#reopen_' + entry_id)
-    $(button).attr('onclick', 'submit_changes(' + entry_id + ');')
-    $(button).text('Submit')
-    $(button).attr('id', 'submit_changes_' + entry_id)
+      button = $('#reopen_' + entry_id)
+      $(button).attr('onclick', 'submit_changes(' + entry_id + ');')
+      $(button).text('Submit')
+      $(button).attr('id', 'submit_changes_' + entry_id)
+
+      store_entry_changes(entry_id, 'submit')
+      $('#master-submit').removeAttr('disabled')
 
     error: (response) ->
       console.log response
@@ -419,8 +417,6 @@ window.verifyMasterSubmit = () ->
     boolean = true
   return boolean
 
-
-
 window.updateResolutionDialog = (confirm) ->
 #   { status } = row
 #  if status == 'COMPLETED'
@@ -456,15 +452,18 @@ window.updateResolutionDialog = (confirm) ->
         full_domain = ''
         domain = $(row).find("#domain_#{id}").attr('data-full')
         $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
+
   $('#resolution_dialog').modal("show")
   if selected_rows.length > 1
     html = "Set the following #{complaint_entries.length} entries to <span class='bold'>RESOLUTION</span> <span class='resolution-emp bold'>#{resolution}.</span>"
   else
     html = "Set the following entry to <span class='bold'>RESOLUTION</span> <span class='resolution-emp bold'>#{resolution}.</span>"
   html += pending_msg
+
   $('#resolution_text').html(html)
 
   tbody = $('#resolution_dialog').find('tbody')
+
   setTimeout ->
     if $('#complaint_entries_to_update').height() > 399
       $(tbody).addClass('scrollable-table')
@@ -523,15 +522,11 @@ window.updateResolution = () ->
   )
 
 $ ->
-
-
-
   # If resolution is changed (to unchanged or invalid) enable the bulk submit button
   $(document).on 'change', '.resolution_radio_button', ->
     id = this.name.split("resolution")[1]
     store_entry_changes(id, 'submit')
     $('#master-submit').removeAttr('disabled')
-
 
   $(document).on 'change', '.review_radio_button', ->
     id = this.name.split("resolution_review")[1]
@@ -542,20 +537,17 @@ $ ->
     else
       $('#submit_changes_' + id).attr('disabled', 'true')
 
-
-
   # TODO - is this needed?
-  $(document).ready ->
-    if !window.location.pathname.includes('/escalations/webcat')
-      $('#filter-complaints-nav').hide()
-      $('#fetch').hide()
-      $('#complaints-nav-search-wrapper').hide()
-      $('#new-complaint-nav-wrapper').hide()
-    else
-      $('#filter-complaints').show()
-      $('#fetch').show()
-      $('#complaints-nav-search-wrapper').show()
-      $('#new-complaint-nav-wrapper').show()
+  if !window.location.pathname.includes('/escalations/webcat')
+    $('#filter-complaints-nav').hide()
+    $('#fetch').hide()
+    $('#complaints-nav-search-wrapper').hide()
+    $('#new-complaint-nav-wrapper').hide()
+  else
+    $('#filter-complaints').show()
+    $('#fetch').show()
+    $('#complaints-nav-search-wrapper').show()
+    $('#new-complaint-nav-wrapper').show()
 
   # If a stupidly long email address is returned it will wrap
   # rather than pushing the column into the column beside it
