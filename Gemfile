@@ -47,7 +47,7 @@ gem 'devise', '~> 4.5'
 gem 'net-ldap', '0.16.1'
 gem 'httpi'
 gem 'her', '1.0.3'
-gem 'curb', '0.9.8' #Libcurl bindings for Ruby
+gem 'curb', '1.0.5' #Libcurl bindings for Ruby
 gem 'net-ssh', '5.0.2'
 # next 4 gems were added to avoid 'already initialized constant' warning
 # feel free to remove those lines and see those warnings all the time :)
@@ -58,7 +58,7 @@ gem "uri", "0.12.0"
 gem 'httparty', '~> 0.15.3'
 
 # gem 'peake-bridge-client', '0.2.0.2', path: 'vendor/gems/peake-bridge-client'
-gem 'peake-bridge-client', '>= 0.2.0.2', git: "https://github.com/cisco-sbg/talos-atlas-peake-bridge-client.git"
+gem 'peake-bridge-client', '~> 0.2.1' #, git: "https://github.com/cisco-sbg/talos-atlas-peake-bridge-client.git"
 
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'

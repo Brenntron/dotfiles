@@ -1,13 +1,3 @@
-GIT
-  remote: https://github.com/cisco-sbg/talos-atlas-peake-bridge-client.git
-  revision: bc42826c08fce28b56b6eb66a1768d320d70191e
-  specs:
-    peake-bridge-client (0.2.0.2)
-      curb (>= 0.9)
-      httpi (>= 2.4.2)
-      json (>= 2.6.2)
-      openssl (>= 2.1.4)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -1581,7 +1571,7 @@ GEM
       rexml (~> 3.0)
       webrick (~> 1.7)
     cucumber-tag-expressions (4.1.0)
-    curb (0.9.8)
+    curb (1.0.5)
     daemons (1.2.6)
     dalli (2.7.9)
     database_cleaner (1.7.0)
@@ -1829,6 +1819,11 @@ GEM
     paper_trail (12.0.0)
       activerecord (>= 5.2)
       request_store (~> 1.1)
+    peake-bridge-client (0.2.1.0)
+      curb (>= 1.0.5)
+      httpi (>= 2.4.2)
+      json (>= 2.6.2)
+      openssl (>= 3.2.0)
     poltergeist (1.18.1)
       capybara (>= 2.1, < 4)
       cliver (~> 0.3.1)
@@ -2039,7 +2034,7 @@ DEPENDENCIES
   clipboard-rails (= 1.7.1)
   coffee-rails (= 5.0.0)
   cucumber-rails (= 2.6.1)
-  curb (= 0.9.8)
+  curb (= 1.0.5)
   daemons (= 1.2.6)
   dalli (= 2.7.9)
   database_cleaner (= 1.7.0)
@@ -2089,7 +2084,7 @@ DEPENDENCIES
   net-ssh (= 5.0.2)
   nokogiri (= 1.15.3)
   paper_trail (= 12.0.0)
-  peake-bridge-client (>= 0.2.0.2)!
+  peake-bridge-client (~> 0.2.1)
   poltergeist (= 1.18.1)
   pry (= 0.12.2)
   pry-remote (~> 0.1.8)
