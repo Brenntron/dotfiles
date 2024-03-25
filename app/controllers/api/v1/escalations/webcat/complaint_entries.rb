@@ -48,10 +48,9 @@ module API
                 end
 
               rescue Exception => e
-                  return {error:e.message}.to_json
+                  return {error:e.message, entry_id: entry.id}.to_json
               end
-              {display_name: current_user.display_name, status: entry.status, entry_resolution: permitted_params['status'],
-               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path, categories: params[:categories]}.to_json
+              {entry_id: entry.id}.to_json
               end
             end
 
@@ -136,84 +135,95 @@ module API
             desc 'take entry'
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
+              requires :assignment_type, type: String, desc: 'Assignment type'
             end
             post 'take_entry' do
               begin
                 error_entry_ids = {}
                 error_count = 0
+
                 permitted_params['complaint_entry_ids'].each do |id|
-                  status = ComplaintEntry.find(id).take_complaint(current_user)
-                  if status != "Complaint taken"
-                    error_count += 1
-                    if error_entry_ids[status].nil?
-                      error_entry_ids[status] = [id]
-                    else
-                      error_entry_ids[status] << id
-                    end
+                  status = ComplaintEntry.find(id).take_complaint(current_user, permitted_params['assignment_type'])
+
+                  next if status == "Entry taken"
+
+                  error_count += 1
+                  if error_entry_ids[status].nil?
+                    error_entry_ids[status] = [id]
+                  else
+                    error_entry_ids[status] << id
                   end
                 end
+
                 unless error_entry_ids.keys.empty?
-                  if error_count == permitted_params['complaint_entry_ids'].count
-                    error_message = ["The following entries could not be taken:"]
-                  else
-                    error_message = ["Some entries were successfully taken, but the following entries could not be taken:"]
-                  end
-                  error_entry_ids.keys.each do |key|
+                  error_message = if error_count == permitted_params['complaint_entry_ids'].count
+                                    ["The following entries could not be taken: "]
+                                  else
+                                    ["Some entries were successfully taken, but the following entries could not be taken: "]
+                                  end
+
+                  error_entry_ids.each_key do |key|
                     error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
                   end
                   unless error_count == permitted_params['complaint_entry_ids'].count
                     error_message << "Refresh the page to pickup the latest changes."
                   end
-                  return {:error => error_message}.to_json
+                  return {error: error_message}.to_json
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
-                error = "#{e.message}"
-                return {:error => error}.to_json
+                error = e.message.to_s
+                return { error: error }.to_json
               end
-              {name:current_user.display_name, cvs_username: current_user.cvs_username}.to_json
+              {name: current_user.display_name}.to_json
             end
 
 
             desc 'return entry'
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
+              requires :assignment_type, type: String, desc: 'Assignment type'
             end
             post 'return_entry' do
               begin
                 error_entry_ids = {}
                 error_count = 0
                 permitted_params['complaint_entry_ids'].each do |id|
-                  status = ComplaintEntry.find(id).return_complaint(current_user)
-                  if status != "Complaint returned"
-                    error_count += 1
-                    if error_entry_ids[status].nil?
-                      error_entry_ids[status] = [id]
-                    else
-                      error_entry_ids[status] << id
-                    end
+                  status = ComplaintEntry.find(id).return_complaint(current_user, permitted_params['assignment_type'])
+
+                  next if status == "Entry returned"
+
+                  error_count += 1
+
+                  if error_entry_ids[status].nil?
+                    error_entry_ids[status] = [id]
+                  else
+                    error_entry_ids[status] << id
                   end
                 end
+
                 unless error_entry_ids.keys.empty?
-                  if error_count == permitted_params['complaint_entry_ids'].count
-                    error_message = ["The following entries could not be returned:"]
-                  else
-                    error_message = ["Some entries were successfully returned, but the following entries could not be returned:"]
-                  end
-                  error_entry_ids.keys.each do |key|
+                  error_message = if error_count == permitted_params['complaint_entry_ids'].count
+                                    ["The following entries could not be returned:"]
+                                  else
+                                    ["Some entries were successfully returned, but the following entries could not be returned:"]
+                                  end
+
+                  error_entry_ids.each_key do |key|
                     error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
                   end
+
                   unless error_count == permitted_params['complaint_entry_ids'].count
                     error_message << "Refresh the page to pickup the latest changes."
                   end
-                  return {:error => error_message}.to_json
+                  return {error: error_message}.to_json
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
-                error = "#{e.message}"
-                return {:error => error}.to_json
+                error = e.message.to_s
+                return {error: error}.to_json
               end
-              {name:current_user.display_name}.to_json
+              {name: current_user.display_name}.to_json
 
             end
 
@@ -221,16 +231,49 @@ module API
             desc "Remove assignee from a group of complaint entry IDs (revert to vrtincoming)"
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: "analyst-console database id"
+              requires :assignment_type, type: String, desc: 'Assignment type'
             end
             post "unassign_all" do
-              results = []
-              params[:complaint_entry_ids].each do |id|
-                entry = ComplaintEntry.find(id)
-                result = entry.unassign
-                results << {id: id, result: result}
-              end
+              begin
+                results = []
+                error_entry_ids = {}
+                error_count = 0
+                params[:complaint_entry_ids].each do |id|
+                  entry = ComplaintEntry.find(id)
+                  result = entry.unassign(current_user, permitted_params['assignment_type'])
+                  results << { id: id, result: result }
 
-              {:status => "success", :data => results}.to_json
+                  next if result == "Unassigned the Complaint's #{permitted_params['assignment_type']}"
+
+                  error_count += 1
+                  if error_entry_ids[result].nil?
+                    error_entry_ids[result] = [id]
+                  else
+                    error_entry_ids[result] << id
+                  end
+                end
+
+                unless error_entry_ids.keys.empty?
+                  error_message = if error_count == permitted_params['complaint_entry_ids'].count
+                                    ["The following entries could not be assigned:"]
+                                  else
+                                    ["Some entries were successfully assigned, but the following entries could not be returned:"]
+                                  end
+
+                  error_entry_ids.each_key do |key|
+                    error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
+                  end
+                  unless error_count == permitted_params['complaint_entry_ids'].count
+                    error_message << "Refresh the page to pickup the latest changes."
+                  end
+                  return {error: error_message}.to_json
+                end
+              rescue Exception => e
+                Rails.logger.error "Failed to take entry: error=> #{e.message}"
+                error = e.message.to_s
+                return {error: error}.to_json
+              end
+              { status: "success", data: results }.to_json
             end
 
 
@@ -238,17 +281,52 @@ module API
             params do
               requires :complaint_entry_ids, type: Array[Integer], desc: "analyst-console database id"
               requires :user_id, type: Integer, desc: "analyst-console database id"
+              requires :assignment_type, type: String, desc: 'Assignment type'
             end
             post "change_assignee" do
-              results = []
-              user = User.find(params[:user_id])
-              params[:complaint_entry_ids].each do |id|
-                entry = ComplaintEntry.find(id)
-                result = entry.reassign(user)
-                results << {id: id, result: result}
-              end
+              begin
+                error_entry_ids = {}
+                error_count = 0
+                results = []
+                user = User.find(params[:user_id])
 
-              {:status => "success", :data => results, :cvs_username => user.cvs_username}.to_json
+                ActiveRecord::Base.transaction do
+                  params[:complaint_entry_ids].each do |id|
+                    entry = ComplaintEntry.find(id)
+                    result = entry.reassign(user, permitted_params['assignment_type'])
+                    results << { id: id, result: result }
+                    next if result == "#{id}: #{user.cvs_username} assigned to Complaint as #{permitted_params['assignment_type']}"
+
+                    error_count += 1
+                    if error_entry_ids[result].nil?
+                      error_entry_ids[result] = [id]
+                    else
+                      error_entry_ids[result] << id
+                    end
+                  end
+
+                  unless error_entry_ids.keys.empty?
+                    error_message = if error_count == permitted_params['complaint_entry_ids'].count
+                                      ["The following entries could not be assigned:"]
+                                    else
+                                      ["Some entries were successfully assigned, but the following entries could not be returned:"]
+                                    end
+
+                    error_entry_ids.each_key do |key|
+                      error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
+                    end
+                    unless error_count == permitted_params['complaint_entry_ids'].count
+                      error_message << "Refresh the page to pickup the latest changes."
+                    end
+                    return {error: error_message}.to_json
+                  end
+                end
+              rescue Exception => e
+                Rails.logger.error "Failed to take entry: error=> #{e.message}"
+                error = e.message.to_s
+                return {error: error}.to_json
+              end
+              {status: "success", data: results, cvs_username: user.cvs_username, name: user.display_name }.to_json
             end
 
 
@@ -360,47 +438,6 @@ module API
                 # find the lookup info for the url
                 complaint_entry_packet.to_json
               end
-            end
-
-
-
-            desc 'look up who is information from the domain given a complaint entry id'
-            params do
-              requires :lookup, type: String, desc: 'ComplaintEntry ids'
-            end
-            post 'domain_whois' do
-              whois = {}
-              begin
-                if /\A[\d\.]*\z/ !~ params[:lookup]
-                  tld = params[:lookup].split('.').last
-                  Whois::Server.define(:tld, tld, "whois.iana.org")
-                end
-                record = Whois.whois(params[:lookup])
-                parser = Whois::Parser.new(record)
-                parser.record.content.each_line do |line|
-                  key,value = line.split(":",2)
-                  if value&.strip == nil
-                    next
-                  end
-                  key = key.gsub(">>>","").gsub("   ","").downcase.gsub(" ","_").to_sym
-                  value = value.gsub("<<<","").gsub("   ","")&.strip
-                  if whois[key]
-                    if whois[key].kind_of?(Array)
-                      whois[key] << value
-                    else
-                      whois[key] = [whois[key], value]
-                    end
-                  else
-                    whois[key] = value
-                  end
-                end
-              rescue Exception => e
-                Rails.logger.error "Failed to determine Whois info: error=> #{e.message}"
-                error = "#{e.message}"
-                return {:error => error}.to_json
-              end
-
-              whois.to_json
             end
 
 
@@ -520,16 +557,6 @@ module API
               end
             end
 
-            desc 'Inherit categories from master domain'
-            params do
-              requires :id, type: Integer
-            end
-            post 'inherit_categories_from_master_domain' do
-              std_api_v2 do
-                complaint_entry = ComplaintEntry.find(params[:id])
-                complaint_entry.inherit_categories(ip_or_uri: complaint_entry.uri, description:'Inherited from master domain', user: current_user.email)
-              end
-            end
 
             desc 'Update several entries at once'
             params do
@@ -541,32 +568,28 @@ module API
                 response = []
                 permitted_params['data'].each do |entry|
                   begin
-                    if entry['error'] == false
-                      complaint_entry = ComplaintEntry.find(entry['entry_id'])
-                      uri_as_categorized = entry['uri_as_categorized'].blank? ? complaint_entry.uri : entry['uri_as_categorized']
-                      complaint_entry.change_category(entry['prefix'],
-                                                      entry['categories'],
-                                                      entry['category_names'],
-                                                      entry['status'],
-                                                      entry['comment'],
-                                                      entry['resolution_comment'],
-                                                      uri_as_categorized,
-                                                      current_user,
-                                                      "",
-                                                      entry['self_review'])
+                    complaint_entry = ComplaintEntry.find(entry['entry_id'])
+                    uri_as_categorized = entry['uri_as_categorized'].blank? ? complaint_entry.uri : entry['uri_as_categorized']
+                    complaint_entry.change_category(entry['prefix'],
+                                                    entry['categories'],
+                                                    entry['category_names'],
+                                                    entry['status'],
+                                                    entry['comment'],
+                                                    entry['resolution_comment'],
+                                                    uri_as_categorized,
+                                                    current_user,
+                                                    "",
+                                                    entry['self_review'])
 
-                      Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry) }
-                      if complaint_entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
-                        message = Bridge::ComplaintUpdateStatusEvent.new
-                        message.post_complaint(complaint_entry.complaint)
-                      end
-
-                      response.push({error: false, entry_id: entry['entry_id'], row_id: entry['row_id'], status: complaint_entry.status, resolution: entry['status'],
-                                         comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
-                                         category_names: entry['category_names']})
-                    elsif entry['error'] == true && entry['reason'] == 'nil_categories'
-                      response.push({error: true, entry_id: entry['entry_id'], reason: 'nil_categories'})
+                    Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry) }
+                    if complaint_entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
+                      message = Bridge::ComplaintUpdateStatusEvent.new
+                      message.post_complaint(complaint_entry.complaint)
                     end
+
+                    response.push({entry_id: entry['entry_id'], row_id: entry['row_id'], status: complaint_entry.status, resolution: entry['status'],
+                                       comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
+                                       category_names: entry['category_names']})
                   rescue Exception => e
                     response.push({error: true, entry_id: entry['entry_id'], reason: 'api'})
                     next

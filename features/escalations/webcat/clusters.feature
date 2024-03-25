@@ -296,3 +296,17 @@ Feature: Webcat clusters
     Then I select "All" from "webcat-cluster-type-filter"
     And I should see "example.com"
     And I should see "127.0.0.1"
+
+
+  Rule: domain names (not ip addresses) can display whois information
+  @javascript
+  Scenario: user should be able to see whois info for domains
+    Given a user with id "1" has a role "webcat user" and is logged in
+    When I goto "/escalations/webcat/clusters"
+    Then I should see "imhungry.com"
+    When I click first element of class ".whois-btn"
+    And I wait for the ajax request to finish
+    Then I should see "DOMAIN NAME"
+    And I should see "IMHUNGRY.COM"
+    And I should see "REGISTRANT"
+    And I should see "NAME SERVERS"

@@ -1,4 +1,10 @@
 development:
+  iwf_abuse_config:
+    username: "redacted"
+    password: "redacted"
+  vault_config:
+    role_id: "redacted"
+    secret_id: "redacted"
   api_timeout:
     timeout: 15
   app_info:

@@ -802,6 +802,7 @@ button {
 .email-button {background-image: url(image_path('icon_message.svg'));}
 .manage-button {background-image: url(image_path('icon_manage_team.svg'));}
 .show-col-button  {background-image: url(image_path('icon_columns.svg'));  }
+.open .show-col-button  {background-image: url(image_path('icon_columns_white.svg'));  }
 .collapse-button  {background-image: url(image_path('icon_collapse.svg'));}
 .select-all-button  {background-image: url(image_path('icon_check_grey.svg'));}
 .ticket-status-button {background-image: url(image_path('icon_status.svg'));}
@@ -2505,13 +2506,17 @@ a.static-nav-item {
   font-size: 9pt;
 }
 
-#advanced-search-button, #webrep-advanced-search-button {
+#advanced-search-button,
+#webrep-advanced-search-button,
+#webcat-advanced-search-button {
   margin-top: -4px;
   background-color: transparent;
   color: $type-lighter-color;
 }
 
-#advanced-search-button::before, #webrep-advanced-search-button::before {
+#advanced-search-button::before,
+#webrep-advanced-search-button::before,
+#webcat-advanced-search-button::before {
   content: '|';
   color: $bug-accent-color;
 }
@@ -2695,10 +2700,6 @@ table .bug-priority {
 
 .bug-state-col {
   margin-bottom: 5px;
-}
-
-.submitter-col {
-  text-align: center;
 }
 
 .complaint-submitter-type {
@@ -3135,10 +3136,15 @@ a.code-content:hover {
 #new-comment-wrapper {
   border-top: none;
 }
-.edit-resolution-container{
+
+.edit-resolution-container {
+  .top-text {
+  }
+
   .internal_comment_container{
     margin-top: 10px;
   }
+
   .internal_comment_container, .customer_facing_comment_container {
     margin-top: 30px;
     .toolbar-section-label{
@@ -4553,7 +4559,9 @@ td.wbrs-highlight, td.sbrs-highlight {
     }
   }
 
-  #advanced-search-button, #webrep-advanced-search-button {
+  #advanced-search-button,
+  #webrep-advanced-search-button,
+  #webcat-advanced-search-button {
     background-color: darken($faint-neutral-color, 5%);
     color: $type-lighter-color;
     text-transform: uppercase;
@@ -4565,7 +4573,9 @@ td.wbrs-highlight, td.sbrs-highlight {
     position: absolute;
     right: 0;
   }
-  #advanced-search-button::before, #webrep-advanced-search-button::before {
+  #advanced-search-button::before,
+  #webrep-advanced-search-button::before,
+  #webcat-advanced-search-button::before {
     display: none;
   }
 
@@ -4741,7 +4751,7 @@ button.tertiary {
 #search-criteria-options {
   color: $type-base-color;
   border: 1px solid $faint-neutral-color;
-  padding: 6px 20px;
+  padding: 6px 10px;
   font-weight: 300;
   font-size: 9pt;
   position: absolute;
@@ -4761,20 +4771,22 @@ button.tertiary {
 .create.active{
   display: none;
 }
+
 #search-criteria-options input[type='checkbox'] {
-  box-shadow: none !important;
-  outline: none !important;
   border: none !important;
-  margin-right: 6px;
+  box-shadow: none !important;
+  margin: 0 4px 0 0;
+  min-height: unset;
+  outline: none !important;
+  position: relative;
+  top: 2px;
 }
 
 .search-criteria-label {
-  padding: 6px 0 1px 0;
-  width: 100%;
-  display: inline-flex;
   align-items: center;
-  white-space: nowrap;
+  display: inline-flex;
   height: 30px;
+  padding: 6px 0 1px 0;
 }
 
 .multicol-2 {
@@ -5108,7 +5120,10 @@ table > tbody > tr > td.dispute_rep_tools {
 #reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
   width: 400px;
 }
-[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"],[aria-describedby="whoisContent"]  {
+[aria-describedby="complaint_button_dialog"],
+[aria-describedby="history_dialog"],
+[aria-describedby="whoisContent"],
+[aria-describedby="resolution_comment_dialog"] {
   z-index: 999;
 }
 
@@ -5171,6 +5186,9 @@ table > tbody > tr > td.dispute_rep_tools {
 .toolbar .dropdown.open .toolbar-button {
   background-color: $bug-section-color;
   color: $content-bg-color;
+  &:hover {
+    background-color: darken($bug-section-color, 10%) !important;
+  }
 }
 .dispute-inline-buttons.edit-button{background-image: url(image_path('icon_edit_white.svg'));}
 .dispute-inline-buttons.adjust-wlbl-button, .toolbar .dropdown.open .adjust-wlbl-button  { background-image: url(image_path('icon_wlbl_white.svg')); }
@@ -5616,22 +5634,7 @@ input.table-entry-input:focus {
 #top_bar_extended_info p {
   font-weight: 300;
 }
-.domain-categories{
-  &{
-    display: none;
-    margin-top: 10px;
-  }
-  ul{
-    display: inline-block;
-    min-width: 140px;
-  }
-  li {
-    border-bottom: 1px solid $faint-neutral-color;
-    border-top: none;
-    padding: 5px;
-    margin-right: 5px
-  }
-}
+
 
 #top_bar_extended_info .col-with-divider {
   border-right-color: $faint-neutral-color;
@@ -7436,22 +7439,26 @@ td.ticket-total::before {
 .tc_data {
     display: inline-block;
 }
-.entry-important-flag::before, .highlight-second-review .important-flag-col .is-important {
+.entry-important-flag::before,
+.highlight-second-review .important-flag-col .is-important,
+.important-flag-col .highlight-second-review.is-important {
   background-image: url(image_path('icon_important.svg'));
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
 }
-.highlight-second-review .important-flag-col{
+.highlight-second-review .important-flag-col {
   max-width: 50px!important;
 }
+
 td.in_zoo{
   text-align: center;
 }
 .container-important-tags{
   display: inline-flex;
 }
-.highlight-second-review .important-flag-col span {
+.highlight-second-review .important-flag-col span,
+.important-flag-col .highlight-second-review {
   display: block;
 }
 .font-weight-bold{
@@ -7569,7 +7576,7 @@ table.dispute-entry-table tbody tr.selected {
   width: 100%;
 }
 
-.dispute-owner-buttons-wrapper .dropdown.open, .webrep-change-assignee-wrapper .dropdown.open{
+.dispute-owner-buttons-wrapper .dropdown.open, .webrep-change-assignee-wrapper .dropdown.open, .webcat-change-assignee-wrapper .dropdown.open{
   background-color: transparent !important;
 }
 
@@ -8199,7 +8206,7 @@ table.dispute-entry-table tbody tr.selected {
 .nested-complaint-data-wrapper .selectize-input {
   margin: 0 !important;
   padding: 0 !important;
-  min-height: 30px !important;;
+  min-height: 30px !important;
   border-radius: 1px;
   border: 2px solid $content-bg-color;
   outline: 1px solid #cccccc;
@@ -8209,23 +8216,25 @@ table.dispute-entry-table tbody tr.selected {
 
 #copiedAlert, #assignedAlert, #unassignedAlert {
   color: $success-color;
-  color: #5FB766;
   font-size: 80%;
   display: inline;
   vertical-align: top;
 }
+
 .nested-complaint-static-data .copied-container, .assigned-check-container {
   margin-top: -7px;
 }
-.copied-check, .assigned-check{
+
+.copied-check, .assigned-check {
   height: 12px;
   width: 10px;
   display: inline-block;
   background-image: url(image_path('icon_check_dark_green.svg'));
+  background-repeat: no-repeat;
+  position: relative;
+  top: 2px;
 }
-.copied-container, .assigned-check-container {
-  position: absolute;
-}
+
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
   padding: 2px 6px;
   margin: 2px;
@@ -8289,24 +8298,7 @@ table.dispute-entry-table tbody tr.selected {
 
 .category-tooltip-table td, .category-tooltip-table th {
   text-align: left;
-}
-
-.category-tooltip-table tr:first-child td {
-  padding-top: 6px;
-}
-.category-tooltip-table td {
-  border-bottom: none;
-  font-weight: 300 !important;
-  padding: 0 6px 0 6px;
-  font-size: 8pt;
-}
-
-.category-tooltip-table th {
-  border-bottom: 1px solid $type-lighter-color;
-  text-transform: none;
-  font-weight: 400;
-  color: darken($content-bg-color, 10%);
-  padding: 2px 6px;
+  word-break: normal;
 }
 
 .tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-bottom .tooltipster-arrow-border {
@@ -8433,16 +8425,19 @@ hr.condensed {
 .categorize-radio-wrapper {
   line-height: initial;
   background-color: $faint-neutral-color;
-}
 
-.categorize-radio-wrapper .radio-label {
-  font-size: 8pt;
-  padding-left: 8px;
-}
+  .radio-label {
+    font-size: 8pt;
+    padding-left: 8px;
+    vertical-align: middle;
+  }
 
-.categorize-radio-wrapper input[type="radio"] {
-  border: none !important;
-  outline: none !important;
+  .cat-url-radio {
+    border: none !important;
+    margin-top: -1px;
+    outline: none !important;
+    vertical-align: middle;
+  }
 }
 
 .categorize-radio-wrapper.row {
@@ -8508,7 +8503,8 @@ table#duplicates a {
   overflow-y: scroll !important;
 }
 
-.highlight-was-dismissed .important-flag-col .was-reviewed::after {
+.highlight-was-dismissed .important-flag-col .was-reviewed::after,
+.important-flag-col .highlight-second-review.was-reviewed::after{
   display: block;
   background-image: url(image_path('icon_reviewed_check.svg'));
   width: 20px;
@@ -9765,9 +9761,11 @@ td.text-center span {
 .webcat-loader-wrapper, .webrep-loader-wrapper, .sdr-loader-wrapper {
   margin: 0 37%;
 }
-.webcat-loader-wrapper{
-  margin-top: 25px;
+
+.webcat-loader-wrapper {
+  margin-top: 20px;
 }
+
 .sdr-loader-wrapper {
   top: 5px;
 }
@@ -12202,16 +12200,7 @@ table.rl-content {
   padding-bottom: 6px;
 }
 
-.nested-complaint-editable-table {
-  label.content-label-sm {
-    padding-top: 0 !important;
-  }
-  input[type="radio"].resolution_radio_button {
-    margin-right: 3px;
-  }
-}
-
-input[type="radio"].resolution_radio_button {
+input[type="radio"].resolution_radio_button, input[type="radio"].review_radio_button {
   margin-right: 3px;
 }
 
@@ -12223,11 +12212,6 @@ input[type="radio"].resolution_radio_button {
 // fix margin on this button
 .nested-complaint-data-wrapper button.tertiary {
   margin: 12px 0 6px 0;
-}
-
-// more width so this aligns with the comment fields and for long URIs
-.complaint-uri-input {
-  width: 65%;
 }
 
 // ensure the XBRS history headers are accurate and stay put while scrolling
@@ -12348,134 +12332,6 @@ input[type="radio"].resolution_radio_button {
     top: -55px;
   }
 }
-// webcat - 1950px below is our current "widest" breakpoint
-@media (min-width: 1950px) {
-
-  #webcat-index-toolbar {
-    .toolbar-button {
-      background-position: 4px 6px;
-      padding-left: 13px;
-      padding-right: 7px;
-      min-height: 25px;
-      background-size: 14px 14px; // icon size
-      transition: background-color 0.2s;
-    }
-  }
-}
-@media (max-width: 1951px)  {
-  #webcat-index-toolbar .toolbar-button-text {
-    display: none !important;
-  }
-}
-@media screen and (max-width: 1800px) and (min-width: 1705px){
-  #webcat-index-toolbar .toolbar-button-text {
-    .toolbar-button {
-      background-position: 4px 6px;
-    }
-  }
-}
-.toolbar#webcat-index-toolbar {
-  background: $content-bg-color;
-  bottom: 2px;
-  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
-  flex-direction: row;
-  float: left;
-  margin: 2px 0 -35px 0;
-  padding: 0 0 0 20px;
-  position: relative;
-  width: 100%;
-  z-index: 1;
-
-  .toolbar-checkbox-wrapper {
-    padding-top: 0;
-    padding-left: 5px;
-    font-weight: normal;
-  }
-
-  div {
-    margin: 4px 3px 0 0;
-  }
-
-  .toolbar-dropdown {
-    margin-top: 0 !important;
-  }
-
-  .primary-text-divider {
-    margin-top: 0 !important;
-  }
-
-  .btn-group.toolbar-btn-group {
-    margin: 0;
-    vertical-align: baseline;
-  }
-
-  .webcat-toolbar-select-all-wrapper, .webcat-toolbar-tall-wrapper {
-    background-color: $faint-neutral-color;
-    display: block;
-    height: 27px;
-    line-height: 25px;
-    float: none;
-    margin: 0;
-    padding: 0 8px;
-
-    input {
-      margin: 6px 0 0;
-      vertical-align: top;
-    }
-
-    label {
-      display: inline-block;
-      font-weight: 400;
-      height: 27px;
-      margin-left: 2px;
-    }
-  }
-
-  .webcat-toolbar-bulk-res {
-    background-color: #255c7d !important;
-    color: $type-lightest !important;
-
-    &:disabled {
-      opacity: 0.5;
-    }
-  }
-
-  .webcat-toolbar-tall-wrapper {
-    height: 45px;
-    line-height: 45px;
-    margin: 0 0 0 3px;
-    padding: 0 15px;
-
-    input {
-      margin: 16px 0 0;
-    }
-  }
-
-  .webcat-manage-templates-button {
-    background-color: $faint-neutral-color;
-    padding-left: 24px;
-  }
-
-  .webcat-toolbar-push {
-    margin-left: auto;
-  }
-}
-
-//sticky toolbar needs extra top spacing on small screens
-@media (max-width: 999px) {
-  .toolbar#webcat-index-toolbar {
-    margin-top: 18px;
-  }
-}
-
-#complaints-index_wrapper .datatable-top-tools {
-  margin-bottom: 10px !important;
-}
-
-#webcat-index-toolbar .dropdown.open {
-  background-color: transparent !important;
-}
-
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
 @media screen and (max-width: 1600px) and (min-width: 1401px) {
@@ -12845,8 +12701,10 @@ span.threat-cat-no-data {
 }
 .reputation-icon-container{
   display: inline-flex;
+  float: left;
   .reputation-icon{
-    top: -1px
+    top: -1px;
+    margin-left: -6px;
   }
 }
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
@@ -13034,11 +12892,20 @@ table > tbody > tr > td.no-padding {
   left: -2px;
 }
 
-.webrep-change-assignee-wrapper .toolbar label {
+.webcat-change-assignee-wrapper .dropdown-menu {
+  border-radius: 0 4px 4px 4px;
+  border: none;
+  background-color: #6dbcdb;
+  min-width: 200px;
+  top: 27px;
+  left: 0;
+}
+
+.webrep-change-assignee-wrapper .toolbar label, .webcat-change-assignee-wrapper .toolbar label{
   display: block !important;
 }
 
-.webrep-change-assignee-wrapper .dropdown-menu h3 {
+.webrep-change-assignee-wrapper .dropdown-menu h3, .webcat-change-assignee-wrapper .dropdown-menu h3 {
   color: $content-bg-color;
   padding: 0 10px;
   font-weight: 400;
@@ -13046,7 +12913,7 @@ table > tbody > tr > td.no-padding {
   margin: 8px 0 8px 0;
 }
 
-.webrep-change-assignee-wrapper .inline-tool-content-wrapper {
+.webrep-change-assignee-wrapper .inline-tool-content-wrapper,.webcat-change-assignee-wrapper .inline-tool-content-wrapper  {
   padding: 4px 10px 20px 4px;
 }
 
@@ -13720,12 +13587,6 @@ table > tbody > tr > td.no-padding {
   }
 }
 
-#webcat-index-title {
-  padding-top: 25px;
-  line-height: 12px;
-  margin: 8px 0 10px 0;
-}
-
 // ensure text doesn't break/wrap in data table
 .ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
@@ -14174,27 +14035,6 @@ table > tbody > tr > td.no-padding {
   min-width: 30px;
 }
 
-
-
-// webcat index DT, adhering to existing naming conventions
-#webcat-index-table-show-columns-dropdown {
-  width: 320px;
-  ul {
-    display: inline-block;
-    padding: 10px;
-    width: 49%;
-    vertical-align: text-top;
-    li {
-      font-size: 9pt;
-      padding: 4px 12px;
-      cursor: default;
-      input {
-        margin-right: 8px;
-      }
-    }
-  }
-}
-
 #webcat-index-toolbar .collapse-all {
   margin-right: 0;
 }
@@ -14207,7 +14047,9 @@ table > tbody > tr > td.no-padding {
 }
 
 // adding the down caret icon using the sort_by svg for advanced search button
-#advanced-search-button::after, #webrep-advanced-search-button::after {
+#advanced-search-button::after,
+#webrep-advanced-search-button::after,
+#webcat-advanced-search-button::after {
   content: '';
   display: block;
   width: 16px;

@@ -1,38 +1,28 @@
-!!!
+!!! html
 %html
   %head
-    %meta{content: "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
-    %title= content_for?(:title) ? '# ' + content_for(:title) : "# Analyst Console"
-    %link{href: "#{image_path('analyst-console-favicon.ico')}", rel: "shortcut icon"}/
+    %title= content_for?(:title) ? content_for(:title) : 'Analyst Console'
+    %link{rel: "shortcut icon", href: image_path('analyst-console-favicon.ico')}
     = stylesheet_link_tag("admin_redesign", media: "all", "data-turbolinks-track" => true)
-    = stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true
-    = javascript_include_tag "application", "data-turbolinks-track" => true
+    = javascript_include_tag("admin_redesign", "data-turbolinks-track" => true)
     = csrf_meta_tags
-  %body.retro-styling
-    - ac_namespace = params[:controller].split('/')[0..-2].join("/")
-    - if controller_name == 'bugs'
-      - if ac_namespace == 'escalations'
-        = render 'escalations/shared/bug_search_modal'
-      - else
-        = render 'shared/bug_search_modal'
+
+  %body{class: "rocket-layout #{controller_path.gsub('/', '--')}-controller #{action_name}-action"}
+
+    = render '/shared/alert_modal'
+    = render '/shared/loader_modal'
+    = render '/shared/login_modal'
+    = render '/shared/flash_modal'
+    = render '/shared/close_ticket_modal'
+
     = render 'layouts/left_nav'
-    #main-content.overall
-      .container-fluid
-        .row
-          - if current_user
-            %a{href: "/escalations/users/#{current_user[:id]}"}
-              %p.login-area
-                %span.login-label
-                  %strong.current_user= current_user[:display_name]
-            #username{style: "display:none;"}= current_user.cvs_username
-          - if controller_name == 'bugs'
-            - if ac_namespace == 'escalations'
-              = render 'layouts/escalations_layout'
-            - else
-              = render 'layouts/bugs_layout'
-          - elsif controller_name == "rule_docs"
-            = render 'layouts/rule_docs_layout'
-          - elsif ac_namespace == "escalations/webrep"
-            = render 'layouts/webrep_disputes_layout'
-    - unless %w{bugs}.include?(controller_name)
-      = yield
+
+    #page-wrapper
+
+      %nav{id: "nav-banner"}
+        = content_for(:nav_banner) if content_for?(:nav_banner)
+
+
+      #page-content-wrapper
+        =yield
+

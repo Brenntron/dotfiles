@@ -1,0 +1,37 @@
+-# Confirm submit reviewed entries modal
+
+#bulk-submit-review-confirmation.bulk-entries-modal.modal.fade{'aria-labelledby': 'bulk-submit-review-modal-title', role: 'dialog', tabindex: '-1'}
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{'aria-label': 'Close', 'data-dismiss': 'modal', type: 'button'}
+        #bulk-submit-review-modal-title.modal-title Reviewed Entries to Submit
+
+      .modal-body
+        .loader-wrapper.hidden
+          .gear-loader-wrapper
+            = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+          %span.loader-msg Submitting entries...
+
+        #approved-entries-wrapper.hidden
+          %h5 The following entries are marked as approved
+          %table#approved-entries-table.entry-confirmation-table
+            %thead
+              %tr
+                %th Entry ID
+                %th URI/IP
+                %th Categories
+
+        #declined-entries-wrapper.hidden
+          %h5 The following entries are marked as declined
+          %table#declined-entries-table.entry-confirmation-table
+            %thead
+              %tr
+                %th Entry ID
+                %th URI/IP
+                %th Categories
+
+        #bulk-submit-review-buttons.text-center.hidden
+          %button.btn.secondary{type: 'button', 'data-dismiss': 'modal'} Cancel
+          %button.btn.btn-primary.primary{type: 'button', onclick: 'process_bulk_reviews();'} Submit above entries
+

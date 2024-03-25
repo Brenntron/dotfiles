@@ -6,7 +6,65 @@
 
     .col-xs-10
       .complaint-mgt-top-area
-        = render "escalations/webcat/shared/telemetry"
+        .row.webcat-reports-only
+          %table.tickets-totals-table.table-condensed.col-with-divider
+            %tr
+              %th{colspan: '2'}
+                %span.data-report-label Submitter Type
+            %tbody
+              - @submitter_reports.each do |type, val|
+                %tr
+                  %td.header-td=type
+                  %td.content-td=val
+
+          %table.tickets-totals-table.table-condensed.col-with-divider
+            %tr
+              %th{colspan: '2'}
+                %span.data-report-label Entries
+            %tbody.col-with-divider
+              - @entries_reports.each do |type, val|
+                %tr
+                  %td.header-td=type
+                  %td.content-td=val
+
+          %table.tickets-totals-table.table-condensed.col-with-divider
+            %tr
+              %th{colspan: '2'}
+                %span.data-report-label Complaints
+            %tbody
+              - @complaints_reports.each do |type, val|
+                %tr
+                  %td.header-td=type
+                  %td.content-td=val
+
+          %table.tickets-totals-table.wbnp-table.table-condensed.col-with-divider
+            %tr
+              %th
+                %span.data-report-label WBNP Reports
+              %th.content-td.wbnp-report-status
+            %tbody
+              %tr
+                %td.header-td Attempted
+                %td.content-td#wbnp-report-attempted
+              %tr
+                %td.header-td Succeeded
+                %td.content-td#wbnp-report-succeeded
+              %tr
+                %td.header-td Rejected
+                %td.content-td#wbnp-report-rejected
+              %tr
+                %td.header-td Skipped
+                %td.content-td#wbnp-full-report-skipped
+
+          %table.tickets-totals-table.table-condensed.col-with-divider
+            %tr
+              %th{colspan: '2'}
+                %span.data-report-label Jira Imports
+            %tbody
+              - @jira_reports.each do |type, val|
+                %tr
+                  %td.header-td=type
+                  %td.content-td=val
 
 %ul.nav.nav-tabs#reports-tab{role: 'tablist'}
   %li.nav-item{role:'presentation'}
