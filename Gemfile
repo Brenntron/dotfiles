@@ -12,7 +12,7 @@ gem 'grape-swagger', '0.31.1'
 gem 'grape-swagger-rails', '0.3.1'
 gem 'grape-active_model_serializers', '1.5.2'
 gem 'hashie-forbidden_attributes', '~> 0.1.1'
-gem 'activerecord-session_store', '2.0.0'
+gem 'activerecord-session_store', '2.1.0'
 gem 'simple_form', '4.0.1'
 
 # Asset Pipeline
