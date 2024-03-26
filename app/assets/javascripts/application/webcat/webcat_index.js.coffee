@@ -705,7 +705,7 @@ build_header = (data) ->
     catch e
       webcat_search_conditions = {}
 
-    if search_type == 'standard'
+    if search_type == 'standard' && search_name?
       search_name = search_name.toLowerCase().replace('complaints', 'tickets')
 
       if !search_name.endsWith('tickets')
