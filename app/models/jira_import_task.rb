@@ -18,7 +18,7 @@ class JiraImportTask < ApplicationRecord
   STATUS_GENERATING_TICKETS = "Generating Tickets"
 
   VALID_FILE_TYPE = "text/csv"
-  
+
   EXPORT_FIELD_NAMES = {
     'ISSUE_KEY' => 'Jira Ticket ID',
     'SUBMITTED_URL' => 'Submitted URL',
@@ -176,7 +176,7 @@ class JiraImportTask < ApplicationRecord
                   description,
                   Customer::JIRA_GENERATED,
                   nil,                     # tags
-                  nil,                     # platform
+                  issue_platform,          # platform
                   Complaint::NEW,          # status
                   nil,                     # categories
                   nil,                     # user email
