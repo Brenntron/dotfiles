@@ -645,6 +645,8 @@ $ ->
     callsToMake = 0
     callsCompleted = 0
     urlListItems = $(listId).find('li')
+    # TODO - pretty sure this self review item is not on the DOM in
+    # the research section and therefore shouldnt be here
     self_review = $('#self_review').is(':checked')
 
     for listItem in urlListItems

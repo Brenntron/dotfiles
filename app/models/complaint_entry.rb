@@ -176,7 +176,7 @@ class ComplaintEntry < ApplicationRecord
 
   def return_complaint(current_user, assignment_type)
     return("Already completed") if status == 'COMPLETED'
-
+    
     case assignment_type
     when 'assignee'
       return("Not yet assigned") if user.display_name == 'Vrt Incoming'
@@ -205,13 +205,21 @@ class ComplaintEntry < ApplicationRecord
     'Entry returned'
   end
 
-  def unassign(assignment_type)
+  def unassign(current_user, assignment_type)
     return("Complaint is already assigned to Vrt Incoming") if user == User.vrtincoming
+    return("Already completed") if status == 'COMPLETED'
+
+    #non-managers can only unassign assignees, not reviewer or second reviewer
+    webcat_manager = Role.where(role: 'webcat manager').first
+    unless current_user.roles.include?(webcat_manager)
+      if current_user.id != user&.id && assignment_type != "assignee"
+        return("Cannot remove assigned reviewer")
+      end
+    end
 
     case assignment_type
     when 'assignee'
       if !is_important
-        return("Already completed") if status == 'COMPLETED'
 
         update(user: User.vrtincoming, status: "NEW")
         complaint.set_status("NEW")
@@ -231,29 +239,28 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def reassign(assignee, assignment_type)
-    return("Complaint is already assigned to #{assignee.cvs_username}") if user == assignee
-    return("#{reviewer.cvs_username} is already reviewing Complaint") if reviewer.present? && user == reviewer
-    return("#{second_reviewer.cvs_username} is already the second reviewer for Complaint") if second_reviewer.present? && user == second_reviewer
+    raise "#{id}: Complaint is already assigned to #{assignee.cvs_username}" if user == assignee
+    raise "#{id}: #{reviewer.cvs_username} is already reviewing Complaint" if reviewer.present? && user == reviewer
+    raise "#{id}: #{second_reviewer.cvs_username} is already the second reviewer for Complaint" if second_reviewer.present? && user == second_reviewer
+    raise "Already completed" if status == "COMPLETED"
 
     case assignment_type
     when 'assignee'
       if !is_important
-        return("Already completed") if status == "COMPLETED"
-
         update(user: assignee, status: "ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
       elsif is_important && status != "PENDING"
         update(user: assignee, status: "ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
       else
-        return("Status is pending")
+        raise "#{id}: Status is pending"
       end
     when 'reviewer'
       update(reviewer: assignee)
     when 'second_reviewer'
       update(second_reviewer: assignee)
     end
-    "#{assignee.cvs_username} assigned to Complaint as #{assignment_type}"
+    "#{id}: #{assignee.cvs_username} assigned to Complaint as #{assignment_type}"
   end
 
   def is_pending?

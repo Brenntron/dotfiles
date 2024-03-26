@@ -18,6 +18,11 @@ Given(/^I fill in element "(.*?)" with "(.*?)"$/) do |identifier, value|
   page.find(identifier).set(value)
 end
 
+Given(/^I fill in element "(.*?)" with "(.*?)" and press enter$/) do |identifier, value|
+  page.find(identifier).set(value)
+  page.find(identifier).native.send_keys(:enter)
+end
+
 Given(/^I clear element "(.*?)"$/) do |identifier|
   page.find(identifier).send_keys [:backspace]
 end
@@ -37,10 +42,6 @@ When(/^I click "(.*?)"$/) do |target|
     rescue Capybara::ElementNotFound => e
       page.find("#{target}").click
     end
-end
-
-When(/^I select row "(.*?)"$/) do |target|
-  page.execute_script("$('##{target}').addClass('selected')")
 end
 
 Then(/^a new window should be opened$/) do
@@ -206,6 +207,10 @@ Then(/^Element with class "(.*?)" should not be empty$/) do |class_name|
   end
 end
 
+Then(/^Input with id "(.*?)" should be empty$/) do |id_name|
+  find(:xpath, "//*[@id='#{id_name}']")[:value] == ""
+end
+
 Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
   find(:xpath, "//*[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
 end
@@ -217,7 +222,7 @@ end
 
 Then(/^I should see the radio with id "(.*?)" checked$/) do |radio_id|
   radio = page.find(:xpath, "//input[@type='radio' and @id='#{radio_id}']")
-  raise "Radio with class #{radio_class} not checked" if radio.checked?.blank?
+  raise "Radio with id #{radio_id} not checked" if radio.checked?.blank?
 end
 
 Then(/^I should see the "(.*?)" checkbox checked$/) do |checkbox_class|
@@ -561,10 +566,6 @@ And(/^I enter the pin toolbar hot key$/) do
   page.find(:xpath, "//body").send_keys("^")
 end
 
-Then(/^button "(.*?)" should be enabled$/) do |button|
-  expect(page).to have_button(button)
-end
-
 Then(/^button "(.*?)" should be disabled$/) do |button|
   expect(page).to have_button(button, disabled: true)
 end
@@ -582,7 +583,6 @@ Then(/^button with id "(.*?)" should be disabled$/) do |id_name|
 
   button = find(:xpath, "//button[contains(@id, '#{id_name}')]")
   button.disabled?.should be true
-  #
 end
 
 Then(/^button with id "(.*?)" should be enabled$/) do |id_name|
@@ -598,6 +598,18 @@ end
 # Needs #id and ['value'] like this
 Given(/^I fill in selectized of element "(.*?)" with "(.*?)"$/) do |element, value|
   page.execute_script("$('#{element}')[0].selectize.setValue(#{value})")
+end
+
+Then(/^I should see at least these selectized item "(.*?)" within "(.*?)"$/) do |content, element|
+  page.has_select?(element, with_selected: content)
+end
+
+Then(/^I should see selectized items "(.*?)" within "(.*?)"$/) do |content, element|
+  page.has_select?(element, selected: content)
+end
+
+Then(/^I should not see any selectized items within "(.*?)"$/) do |element|
+  page.has_select?(element, selected: [])
 end
 
 When(/^I select contenteditable text in "(.*?)"$/) do |target|
@@ -656,4 +668,22 @@ end
 
 When(/^I click element with tag "(.*?)" and text "(.*?)"$/) do |tag, text|
   page.find(tag, text: text).click
+end
+
+
+#can use the following for whatever css but it's especially useful for finding if an id has a class
+And(/^I should see an element with an id and class of "(.*?)"$/) do | id_class_combo |
+  expect(page.has_css?(id_class_combo)).to eq true
+end
+
+And(/^I should not see an element with an id and class of "(.*?)"$/) do | id_class_combo |
+  expect(page.has_css?(id_class_combo)).to eq false
+end
+
+And(/^I should see element "(.*?)" with text "(.*?)" a total of "(.*?)" times/) do | element , text, count |
+  page.all("#{element}", :text => "#{text}").count.should == count.to_i
+end
+
+And(/the first row of table "(.*?)" and col "(.*?)" should have content "(.*?)"/) do | table, col, content|
+  page.find("##{table} tbody .#{col}", match: :first).text.should match(content)
 end
