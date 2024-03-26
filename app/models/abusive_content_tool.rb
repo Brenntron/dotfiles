@@ -188,6 +188,8 @@ class AbusiveContentTool
     else
       report_results[:ncmec] = {:status => "exists", :abuse_record_report_id => ncmec_exists.report_ident}
     end
+    #needs an official notification system here but for right now email talosweb if there is an anomaly
+    # in reporting results
     self.validate_report(complaint_entry, report_results)
 
     report_results
@@ -202,9 +204,9 @@ class AbusiveContentTool
 
     body = "Reference Data <br /> Complaint ID: #{complaint_entry.complaint.id} <br /> Complaint Entry ID: #{complaint_entry.id} <br /> Entry: #{complaint_entry.hostlookup} <br /> User assigned: #{complaint_entry.user.cvs_username}"
     body += "<br />"
-    body += "NCMEC Report ID: #{report_results[:ncmec][:abuse_record_report_id]}"
+    body += "NCMEC Report ID: #{report_results[:ncmec][:abuse_record_report_id]}" rescue "Error in NCMEC reporting"
     body += "<br />"
-    body += "IWF Report ID: #{report_results[:iwf][:abuse_record_report_id]}"
+    body += "IWF Report ID: #{report_results[:iwf][:abuse_record_report_id]}" rescue "Error in IWF reporting"
     report_alert_args[:body] = body
 
     attachments_to_mail = []

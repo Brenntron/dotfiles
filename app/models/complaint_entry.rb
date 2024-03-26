@@ -573,9 +573,6 @@ class ComplaintEntry < ApplicationRecord
       self.abuse_information = abuse_info.to_json
       self.save
 
-      #needs an official notification system here but for right now email talosweb if there is an anomaly
-      # in reporting results
-      AbusiveContentTool.validate_report(self)
 
     end
 
