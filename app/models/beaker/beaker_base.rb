@@ -29,7 +29,7 @@ class Beaker::BeakerBase
     Talos::IPConnection.new(
         direction: Talos::IPConnection::Direction::IP_DIR_OUT,
         proto: Talos::IPConnection::Protocol::IP_PROTO_TCP,
-        guid: guid || SecureRandom.uuid
+        guid: guid || [SecureRandom.uuid.gsub("-", "")].pack("H*")
     )
   end
 

@@ -100,13 +100,26 @@ class DisputeEntry < ApplicationRecord
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.status = status
 
+      wbrs_api_response = {"wbrs" => {} }
+      sbrs_api_response = {"sbrs" => {} }
+
       sbrs_api_rulehits = nil
 
+      urs_stuff = nil
       th_packet = {}
+
       if is_ip?(ip_url)
 
-        wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
-        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs('ip' => ip_url)
+
+        #wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
+        #sbrs_api_response = Sbrs::ManualSbrs.call_sbrs('ip' => ip_url)
+
+        urs_stuff = Beaker::Urs.query_reputation(self.hostlookup).result.first.result.first rescue nil
+        sbrs_stuff = CloudIntel::Reputation.reputation_ips([self.hostlookup]).first rescue nil
+
+
+        wbrs_api_response["wbrs"]["score"] = (urs_stuff.reputation_score_x10 / 10.0).to_f rescue nil
+        sbrs_api_response["sbrs"]["score"] = sbrs_stuff.last[:reputation].score rescue nil
         sbrs_api_rulehits = CloudIntel::Reputation.mnemonics_ip(ip_url)
 
 
@@ -138,9 +151,13 @@ class DisputeEntry < ApplicationRecord
           new_dispute_entry.web_ips = [resolved_ip]
         end
 
+        #wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
+        
+        urs_stuff = Beaker::Urs.query_reputation(ip_url, resolved_ip).result.first.result.first rescue nil
 
+        wbrs_api_response["wbrs"]["score"] = (urs_stuff.reputation_score_x10 / 10.0).to_f
 
-        wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
+        #don't have a urs/ipd equivalent of this
         sbrs_api_response = Sbrs::ManualSbrs.call_sbrs({'url' => ip_url}, type: 'wbrs')
 
         url_parts = Complaint.parse_url(ip_url)
@@ -169,6 +186,8 @@ class DisputeEntry < ApplicationRecord
         if new_dispute_entry.uri.present? && new_dispute_entry.web_ips.present?
           web_ips_formatted = new_dispute_entry.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
 
+          #leaving this as SDS for now, as we already do this by default with new URS stuff and would just show redundant info
+          # should probably modify the front end to specify "this is from URS,  this is from SDS"
           extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(new_dispute_entry.uri, web_ips_formatted)
           extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
 
@@ -209,10 +228,11 @@ class DisputeEntry < ApplicationRecord
       new_dispute_entry.save!
       ::Preloader::Base.fetch_all_api_data(ip_url, new_dispute_entry.id)
       # Create Dispute Entry RuleHits
+      #wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_api_response)
+      wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_urs(urs_stuff.rep_rule_id) rescue []
 
       rule_hits_snapshot = []
 
-      wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_api_response)
 
       if wbrs_rule_hits.present?
         wbrs_rule_hits.each do |rule_hit|
@@ -693,8 +713,12 @@ class DisputeEntry < ApplicationRecord
   end
 
   def sync_up
+    wbrs_stuff = {"wbrs" => {} }
+    sbrs_stuff = {"sbrs" => {} }
+
     dispute_rule_hits.destroy_all
     th_packet = {}
+
     ::Preloader::Base.fetch_all_api_data(self.hostlookup, self.id)
     #
     extra_wbrs_stuff = nil
@@ -702,12 +726,30 @@ class DisputeEntry < ApplicationRecord
       web_ips_formatted = self.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
 
       extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.uri, web_ips_formatted)
-      wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
+
+      is_ip_address = !!(DisputeEntry.domain_of(self.hostlookup)  =~ Resolv::IPv4::Regex)
+
+      if is_ip_address
+        urs_stuff = Beaker::Urs.query_reputation_for_ip(DisputeEntry.domain_of(self.hostlookup)).result.first.result.first rescue nil   #domain_of will strip something like http://2.3.4.5/something.php down to just 2.3.4.5
+      else
+        resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(self.hostlookup)) rescue nil
+        if resolved_ip.blank?
+          urs_stuff = Beaker::Urs.query_reputation(self.hostlookup).result.first.result.first rescue nil
+        else
+          urs_stuff = Beaker::Urs.query_reputation(self.hostlookup, resolved_ip).result.first.result.first rescue nil
+        end
+      end
+
+      #urs_stuff = Beaker::Urs.query_reputation(self.hostlookup, web_ips_formatted).result.first.result.first rescue nil
+      wbrs_stuff["wbrs"]["score"] = (urs_stuff.reputation_score_x10 / 10.0).to_f
+      #wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
     else
-      wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
+      urs_stuff = Beaker::Urs.query_reputation(self.hostlookup).result.first.result.first rescue nil
+      wbrs_stuff["wbrs"]["score"] = (urs_stuff.reputation_score_x10 / 10.0).to_f
+      #wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
     end
 
-    wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue nil
+    wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_urs(urs_stuff.rep_rule_id) rescue []
 
     extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
 
@@ -742,20 +784,19 @@ class DisputeEntry < ApplicationRecord
 
 
     self.wbrs_score = wbrs_stuff["wbrs"]["score"] if wbrs_stuff["wbrs"].present?
+
     th_packet[:wbrs_score] = self.wbrs_score
-    if wbrs_stuff["threat_cats"].present?
-      threat_cats = wbrs_stuff["threat_cats"]
-
-      threat_cat_names = []
-
-      threat_cat_info = DisputeEntry.threat_cats_from_ids(threat_cats)
-      threat_cat_info.each do |name|
-        threat_cat_names << name[:name]
-      end
-      self.wbrs_threat_category = threat_cat_names
-      th_packet[:threat_categories] = threat_cat_names.to_json
+    begin
+      complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => self.hostlookup})
+      self.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ') rescue nil
+      th_packet[:threat_categories] = self.wbrs_threat_category.split(', ').to_json rescue nil
+    rescue => e
+      Rails.logger.error e
+      Rails.logger.error e.backtrace.join("\n")
     end
+
     rule_hits_snapshot = []
+
     wbrs_stuff_rulehits.each do |rule_hit|
       new_rule_hit = DisputeRuleHit.new
       new_rule_hit.dispute_entry_id = self.id
@@ -778,7 +819,10 @@ class DisputeEntry < ApplicationRecord
     th_packet[:multi_rule_hits] = multi_rule_hits_snapshot.to_json rescue nil
 
     if self.entry_type == "IP"
-      sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => self.hostlookup})
+      ipd_stuff = CloudIntel::Reputation.reputation_ips([self.hostlookup]).first rescue nil
+      sbrs_stuff["sbrs"]["score"] = ipd_stuff.last[:reputation].score rescue nil
+      #sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => self.hostlookup})
+
       sbrs_stuff_rules = CloudIntel::Reputation.mnemonics_ip(self.hostlookup)
 
 
@@ -833,7 +877,7 @@ class DisputeEntry < ApplicationRecord
     end
 
     if attributes['uri'].present? && attributes['web_ips'].blank?
-      resolved_ip = Resolv.getaddress(self.domain_of(self.uri)) rescue nil
+      resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(self.uri)) rescue nil
       if resolved_ip.present?
         attributes['web_ips'] = resolved_ip
       end
@@ -957,17 +1001,40 @@ class DisputeEntry < ApplicationRecord
     entries.each do |entry|
       is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
 
-      wbrs_stuff = Sbrs::Base.remote_call_sds_v3(entry.uri, "wbrs")
-      wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue []
-      if wbrs_stuff_rulehits.blank?
-        wbrs_stuff_rulehits = []
-      end
+      wbrs_stuff = {"wbrs" => {} }
+      sbrs_stuff = {"sbrs" => {} }
+
+
 
       ip_addr = IPSocket.getaddress(entry.uri) rescue nil
 
       if ip_addr.blank?
         ip_addr = Resolv.getaddress(self.domain_of(entry.uri)) rescue nil
       end
+
+      web_ip = Resolv.getaddress(self.domain_of(entry.uri)) rescue nil
+
+      #wbrs_stuff = Sbrs::Base.remote_call_sds_v3(entry.uri, "wbrs")
+
+      is_ip_address = !!(self.domain_of(entry.uri)  =~ Resolv::IPv4::Regex)
+
+      if is_ip_address
+        urs_stuff = Beaker::Urs.query_reputation_for_ip(DisputeEntry.domain_of(entry.uri)).result.first.result.first rescue nil  #domain_of will strip something like http://2.3.4.5/something.php down to just 2.3.4.5
+      else
+        resolved_ip = Resolv.getaddress(self.domain_of(entry.uri)) rescue nil
+        if resolved_ip.blank?
+          urs_stuff = Beaker::Urs.query_reputation(entry.uri).result.first.result.first rescue nil
+        else
+          urs_stuff = Beaker::Urs.query_reputation(entry.uri, resolved_ip).result.first.result.first rescue nil
+        end
+      end
+      wbrs_stuff_rulehits = []
+      if urs_stuff.present?
+        wbrs_stuff["wbrs"]["score"] = (urs_stuff.reputation_score_x10 / 10.0).to_f
+        wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_urs(urs_stuff.rep_rule_id) rescue []
+      end
+      #wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue []
+
 
       if ip_addr
         #wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
@@ -1005,7 +1072,7 @@ class DisputeEntry < ApplicationRecord
       end
 
       if wbrs_stuff.kind_of?(Hash)
-        entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
+        entry.wbrs_score = wbrs_stuff["wbrs"]["score"] rescue nil
       else
         entry.wbrs_score = nil
       end
@@ -1019,7 +1086,9 @@ class DisputeEntry < ApplicationRecord
       end
 
       if is_ip_address === true
-        sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
+        ipd_stuff = CloudIntel::Reputation.reputation_ips([entry.uri]).first rescue nil
+        sbrs_stuff["sbrs"]["score"] = ipd_stuff.last[:reputation].score rescue nil
+        #sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
         entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
         sbrs_stuff_rules = CloudIntel::Reputation.mnemonics_ip(entry.uri)
 
@@ -1292,13 +1361,46 @@ class DisputeEntry < ApplicationRecord
         return false
       end
 
-      wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
-      sbrs_api_response = Sbrs::ManualSbrs.call_sbrs('ip' => self.hostlookup)
-      raw_sbrs_score = sbrs_api_response['sbrs']['score'] rescue nil
-      raw_wbrs_score = wbrs_stuff["wbrs"]["score"] rescue nil
+      #urs_stuff = Beaker::Urs.query_reputation("google.com").result.first.result.first rescue nil
 
-      extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.hostlookup, [])
-      extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
+      is_ip_address = !!(DisputeEntry.domain_of(self.hostlookup)  =~ Resolv::IPv4::Regex)
+
+      if is_ip_address
+        urs_stuff = Beaker::Urs.query_reputation_for_ip(DisputeEntry.domain_of(self.hostlookup)).result.first.result.first rescue nil    #domain_of will strip something like http://2.3.4.5/something.php down to just 2.3.4.5
+      else
+
+        resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(self.hostlookup)) rescue nil
+
+        if resolved_ip.blank?
+          urs_stuff = Beaker::Urs.query_reputation(self.hostlookup).result.first.result.first rescue nil
+        else
+          urs_stuff = Beaker::Urs.query_reputation(self.hostlookup, resolved_ip).result.first.result.first rescue nil
+        end
+
+      end
+
+
+      raw_wbrs_score = nil
+      if urs_stuff.present?
+        raw_wbrs_score = (urs_stuff.reputation_score_x10 / 10.0).to_f
+        extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_urs(urs_stuff.rep_rule_id) rescue []
+      end
+
+      sbrs_stuff = CloudIntel::Reputation.reputation_ips([self.hostlookup]).first rescue nil
+      raw_sbrs_score = sbrs_stuff.last[:reputation].score rescue nil
+      #sbrs_rules = sbrs_stuff.last[:reputation].mnemonics rescue nil
+
+
+
+
+      #wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
+      #sbrs_api_response = Sbrs::ManualSbrs.call_sbrs('ip' => self.hostlookup)
+      #raw_sbrs_score = sbrs_api_response['sbrs']['score'] rescue nil
+      #raw_wbrs_score = wbrs_stuff["wbrs"]["score"] rescue nil
+
+      #extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.hostlookup, [])
+      #extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
 
       includes_phishtank_rulehit = extra_wbrs_stuff_rulehits.include?("phtk")
 
