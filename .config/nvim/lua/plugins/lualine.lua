@@ -1,8 +1,9 @@
 local M = {
   "nvim-lualine/lualine.nvim",
   dependencies = {
-    'nvim-tree/nvim-web-devicons',
     'AndreM222/copilot-lualine',
+    "epwalsh/pomo.nvim",
+    'nvim-tree/nvim-web-devicons',
   },
   lazy = false,
 }
@@ -43,7 +44,25 @@ function M.config()
       lualine_a = { "mode" },
       lualine_b = { "branch", diff, diagnostics },
       lualine_c = { "filename" },
-      lualine_x = { "copilot", "encoding", "fileformat", "filetype" },
+      lualine_x = {
+        "copilot",
+        function()
+          local ok, pomo = pcall(require, "pomo")
+
+          if not ok then
+            return ''
+          end
+
+          local timer = pomo.get_first_to_finish()
+
+          if timer == nil then
+            return ''
+          end
+
+          return "  " .. tostring(timer)
+        end,
+        "filetype"
+      },
       lualine_y = { "progress" },
       lualine_z = { "location" },
     },

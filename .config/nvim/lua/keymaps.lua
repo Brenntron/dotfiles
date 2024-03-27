@@ -3,17 +3,19 @@ local maps = utils.empty_map_table()
 
 local sections = {
   b = { desc = "﬘ Buffer"},
-  c = { desc = " Copilot"},
-  dap = { desc = " DAP" },
-  db = { desc = " Dadbod UI" },
-  f = { desc = " Find" },
-  g = { desc = "󰊢 Git" },
-  l = { desc = " LSP" },
-  m = { desc = "🏗 Mason"},
-  n = { desc = "󰟢 Null-Ls" },
+  c = { desc = "  Copilot"},
+  db = { desc = "  Dadbod UI" },
+  dp = { desc = "  DAP" },
+  f = { desc = "  Find" },
+  g = { desc = "󰊢  Git" },
+  l = { desc = "  LSP" },
+  m = { desc = "🏗  Mason"},
+  n = { desc = "󰟢  Null-Ls" },
+  o = { desc = "  Obsidian" },
+  p = { desc = "  Pomodoro" },
   r = { desc = "🧪 Tests" },
-  s = { desc = "󱙝 Spectre" },
-  v = { desc = " Vim"}
+  s = { desc = "󱙝  Spectre" },
+  v = { desc = "  Vim"}
 }
 
 -- Normal --
@@ -160,6 +162,23 @@ maps.n["<leader>ml"] = { "<cmd>MasonLog<cr>", desc = "Mason Log" }
 maps.n["<leader>n"] = sections.n
 maps.n["<leader>ni"] = { "<cmd>NullLsInfo<cr>", desc = "Null-Ls Info" }
 maps.n["<leader>nl"] = { "<cmd>NullLsLog<cr>", desc = "Null-Ls Log"}
+
+-- Obsidian.md
+maps.n["<leader>o"] = sections.o
+maps.n["<leader>ob"] = { "<cmd>ObsidianBacklinks<cr>", desc = "Open picker list of references to the current buffer." }
+maps.n["<leader>ol"] = { "<cmd>ObsidianLinks<cr>", desc = "Open picker list of all links in the current buffer." }
+maps.n["<leader>oo"] = { "<cmd>ObsidianOpen<cr>", desc = "Open current buffer in Obsidian." }
+maps.n["<leader>on"] = { "<cmd>ObsidianNew<cr>", desc = "Open new note in Obsidian." }
+maps.n["<leader>os"] = { "<cmd>ObsidianQuickSwitch<cr>", desc = "Switch to another note in Obsidian." }
+
+-- pomo.nvim
+maps.n["<leader>p"] = sections.p
+maps.n["<leader>pb"] = { "<cmd>TimerStart 5m short_break<cr>", desc = "Start short break." }
+maps.n["<leader>pl"] = { "<cmd>TimerStart 15m long_break<cr>", desc = "Start long break." }
+maps.n["<leader>ps"] = { desc = "Stop timers." }
+maps.n["<leader>psa"] = { "<cmd>TimerStop -1<cr>", desc = "Stop all timers." }
+maps.n["<leader>psr"] = { "<cmd>TimerStop<cr>", desc = "Stop most recent timer." }
+maps.n["<leader>pw"] = { "<cmd>TimerStart 25m work<cr>", desc = "Start work time." }
 
 -- Trouble for None-Ls
 maps.n["<leader>nt"] = { desc = 'Trouble Windows' }

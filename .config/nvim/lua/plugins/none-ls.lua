@@ -22,6 +22,10 @@ function M.config()
     name = "coffeelint",
     filetype = "coffee",
   }
+  local coffee_fmt_query = {
+    name = "coffee_fmt",
+    filetype = "coffee",
+  }
 
   -- https://github.com/prettier-solidity/prettier-plugin-solidity
   null_ls.setup {
@@ -108,6 +112,20 @@ function M.config()
 
     null_ls.register(coffeelint)
   end
+
+  -- if not null_ls.is_registered(coffee_fmt_query) then
+  --   local coffee_fmt = {
+  --     name = "coffee_fmt",
+  --     method = null_ls.methods.FORMATTING,
+  --     filetypes = { "coffee" },
+  --     generator = null_ls.generator {
+  --       command = "coffee-fmt",
+  --       args = { "--write", "$FILENAME" },
+  --     },
+  --   }
+  --
+  --   null_ls.register(coffee_fmt)
+  -- end
 end
 
 return M
