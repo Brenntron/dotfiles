@@ -82,19 +82,19 @@
           "type": "node",
           "style": "plain",
           "foreground": "p:pistachio-green",
-          "template": "\ue718 {{ .Full }} "
+          "template": "\ue718  {{ .Full }} "
         },
         {
           "type": "python",
           "style": "plain",
           "foreground": "p:terminal-yellow",
-          "template": "\uE235 {{ .Full }}"
+          "template": "\uE235  {{ .Full }}"
         },
         {
           "type": "ruby",
           "style": "plain",
           "foreground": "p:terminal-red",
-          "template": "\uE791 {{ .Full}}"
+          "template": "\uE791  {{ .Full}}"
         },
         {
           "type": "command",

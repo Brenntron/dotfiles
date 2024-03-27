@@ -59,7 +59,7 @@ function M.config()
             return ''
           end
 
-          return "  " .. tostring(timer)
+          return " " .. tostring(timer)
         end,
         "filetype"
       },
