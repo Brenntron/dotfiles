@@ -18,7 +18,7 @@ class JiraImportTask < ApplicationRecord
   STATUS_GENERATING_TICKETS = "Generating Tickets"
 
   VALID_FILE_TYPE = "text/csv"
-  
+
   EXPORT_FIELD_NAMES = {
     'ISSUE_KEY' => 'Jira Ticket ID',
     'SUBMITTED_URL' => 'Submitted URL',
@@ -248,6 +248,22 @@ class JiraImportTask < ApplicationRecord
       issues = project.issues(filters)
       count = issues.count
       Rails.cache.write("question_type_count", {'count' => count, 'last_queried' => Time.now}.to_json)
+    else
+      count = stored_count['count']
+    end
+    count
+  end
+
+  def self.opendns_ticket_count
+    filters = ['status != Resolved', "issuetype != 'Question / Assistance'", "cf[20425] = 'OpenDNS'"]
+    project_key = Rails.configuration.jira.project_key
+
+    stored_count = JSON.parse(Rails.cache.read("opendns_count") || "{}")
+    if stored_count.blank? || stored_count['last_queried'] < 15.minutes.ago
+      project = JiraRest::Project.new(project_key)
+      issues = project.issues(filters)
+      count = issues.count
+      Rails.cache.write("opendns_count", {'count' => count, 'last_queried' => Time.now}.to_json)
     else
       count = stored_count['count']
     end

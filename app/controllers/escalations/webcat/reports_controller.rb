@@ -2,7 +2,7 @@ class Escalations::Webcat::ReportsController < Escalations::WebcatController
   before_action { authorize!(:read, Complaint) }
 
   def index
-    @question_type_tickets = JiraImportTask.question_type_ticket_count
+    @question_type_tickets = JiraImportTask.question_type_ticket_count + JiraImportTask.opendns_ticket_count
   end
 
   def old_resolution
