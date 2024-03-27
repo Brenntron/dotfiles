@@ -19,7 +19,7 @@ local M = {
     },
     {
       "nvim-telescope/telescope-live-grep-args.nvim",
-      version = "^1.0.0"
+      version = "^1.0.0",
     },
     {
       "jvgrootveld/telescope-zoxide",
@@ -29,11 +29,11 @@ local M = {
     },
     {
       "ryanmsnyder/toggleterm-manager.nvim",
-      config = true
+      config = true,
     },
     {
-      "tsakirist/telescope-lazy.nvim"
-    }
+      "tsakirist/telescope-lazy.nvim",
+    },
   },
   event = "Bufenter",
   lazy = true,
@@ -42,6 +42,7 @@ local M = {
 function M.config()
   local actions = require "telescope.actions"
   local icons = require "utils.icons"
+  local lga = require "telescope-live-grep-args.actions"
   local telescope = require "telescope"
 
   telescope.setup {
@@ -157,26 +158,53 @@ function M.config()
           border = "rounded",
           title = "Telescope lazy",
           title_pos = "center",
-          width = 0.5,
+          with = 0.5,
           height = 0.5,
+        },
+      },
+      live_grep_args = {
+        auto_quoting = true,
+        mappings = {
+          ["<C-k>"] = lga.quote_prompt(),
+          ["<C-j>"] = lga.quote_prompt { postfix = " --iglob" },
+          ["<C-t>"] = lga.quote_prompt { postfix = " -t" },
         },
       },
       project = {
         base_dirs = {
-          "~/.config/nvim/",
+          "~/.config/nvim",
+          "~/.config/kitty",
+          "~/.config/solargraph",
+          "~/.config/rubocop",
+          "~/.config/tokyonight",
+          "~/.config/yamllint",
         },
-        hidden_files = true,
+        exclude_dirs = {
+          "Users/jewillin"
+        },
+        hidden_files = false,
         on_project_select = function(prompt_bufnr)
           local project_actions = require "telescope._extensions.project.actions"
           project_actions.change_working_directory(prompt_bufnr, false)
         end,
         order_by = "asc",
+        patterns = {
+          ".git",
+          "Dockerfile",
+          "Gemfile",
+          "Makefile",
+          "package.json",
+          ".obsidian",
+          ".tool-versions",
+          ".ruby-version"
+        },
         search_by = "title",
+        sync_with_nvim = true,
         theme = "dropdown",
       },
       zoxide = {
         keepinsert = true,
-      }
+      },
     },
   }
 

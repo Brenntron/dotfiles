@@ -56,6 +56,7 @@ antigen bundle ssh-agent
 antigen bundle yarn
 antigen bundle redxtech/zsh-kitty
 antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle atuinsh/atuin@main
 
 if [[ $(uname) == "Linux" ]]; then
   source ~/.config/linux/linux_zsh_plugins.zsh

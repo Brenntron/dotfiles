@@ -4,16 +4,15 @@ local M = {
   lazy = false,
   event = { "BufReadPre" },
   dependencies = {
-    {
-      "folke/neodev.nvim",
-    },
-    { "SmiteshP/nvim-navic" }
+    { "folke/neodev.nvim" },
+    { "SmiteshP/nvim-navic" },
   },
 }
 
 function M.config()
   local function common_capabilities()
     local status_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+
     if status_ok then
       return cmp_nvim_lsp.default_capabilities()
     end
@@ -32,6 +31,7 @@ function M.config()
   local function on_attach(client, bufnr)
     if client.server_capabilities.documentSymbolProvider then
       local status_ok, navic = pcall(require, "nvim-navic")
+
       if status_ok then
         return navic.attach(client, bufnr)
       end
@@ -88,11 +88,10 @@ function M.config()
 
   local opts = {
     capabilities = common_capabilities(),
-    on_attach = on_attach
+    on_attach = on_attach,
   }
 
   for _, server in ipairs(servers) do
-
     local require_ok, settings = pcall(require, "lspsettings." .. server)
 
     if require_ok then
