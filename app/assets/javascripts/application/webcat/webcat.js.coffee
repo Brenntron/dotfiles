@@ -35,9 +35,7 @@ $ ->
 
     $('#nav-banner').append(toolbar)
 
-    if $body.hasClass(".index-action")
-      $('.escalations--webcat--complaints-controller.index-action #page-content-wrapper').css('padding-top','60px')
-    else
+    $('#page-content-wrapper').css('padding-top','60px')
 
     #align tooltips under toolbar
     $body.addClass('pinned-toolbar-true')
