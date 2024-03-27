@@ -152,8 +152,8 @@ class AbusiveContentTool
     #do a report existence check for each before sending, as this method will be re-used by a recovery tool
 
     abuse_records = AbuseRecord.where(:complaint_entry_id => complaint_entry.id)
-    iwf_exists = abuse_records.select {|rec| rec.source == AbuseRecord::IWF && rec.report_ident.present?}.first rescue false
-    ncmec_exists = abuse_records.select {|rec| rec.source == AbuseRecord::NCMEC && rec.report_ident.present?}.first rescue false
+    iwf_exists = abuse_records.select {|rec| rec.source == AbuseRecord::IWF && rec.report_ident.present?}.first rescue nil
+    ncmec_exists = abuse_records.select {|rec| rec.source == AbuseRecord::NCMEC && rec.report_ident.present?}.first rescue nil
 
     ncmec_results = nil
     iwf_results = nil
@@ -163,7 +163,7 @@ class AbusiveContentTool
 
     if (!iwf_exists.present?) || force==true
       begin
-        iwf_results = self.submit_to_iwf(complaint_entry, user, url)
+        iwf_results = self.submit_to_iwf(complaint_entry, user, url, iwf_exists)
         report_results[:iwf] = iwf_results
       rescue Exception => e
         Rails.logger.error(e.message)
@@ -177,7 +177,7 @@ class AbusiveContentTool
 
     if (!ncmec_exists.present?) || force==true
       begin
-        ncmec_results = self.submit_to_ncmec(complaint_entry, user, url)
+        ncmec_results = self.submit_to_ncmec(complaint_entry, user, url, ncmec_exists)
         report_results[:ncmec] = ncmec_results
       rescue Exception => e
         Rails.logger.error(e.message)
@@ -254,34 +254,43 @@ class AbusiveContentTool
     return clean_xml_body
   end
 
-  def self.submit_to_ncmec(complaint_entry, user, url)
+  def self.submit_to_ncmec(complaint_entry, user, url, abuse_record = nil)
     results = {}
     results[:status] = nil
     results[:response_code] = nil
     results[:response] = nil
 
     body = self.build_ncmec_body(complaint_entry, user, url)
-    response = Webcat::Ncmec.call_xml_request(body, "/ispws/submit")
+    begin
+      response = Webcat::Ncmec.call_xml_request(body, "/ispws/submit")
 
-    response_xml = Nokogiri::XML(response.body)
-    response_code = response_xml.xpath('//responseCode').text
-    if response_code == "0"
-      results[:status] = "success"
-      report_id = response_xml.xpath('//reportId').text
-      abuse_record = AbuseRecord.build_and_save_record(url, body, response_xml, report_id, AbuseRecord::NCMEC, user, complaint_entry)
-    else
+      response_xml = Nokogiri::XML(response.body)
+      response_code = response_xml.xpath('//responseCode').text
+      if response_code == "0"
+        results[:status] = "success"
+        report_id = response_xml.xpath('//reportId').text
+        abuse_record = AbuseRecord.update_and_save_record(abuse_record, url, body, response_xml, report_id, AbuseRecord::NCMEC, user, complaint_entry, abuse_record)
+      else
+        results[:status] = "error"
+        abuse_record = AbuseRecord.build_and_save_record(url, body, response_xml, nil, AbuseRecord::NCMEC, user, complaint_entry, abuse_record)
+      end
+
+      results[:response_code] = response_code
+      results[:response] = response.body
+      results[:abuse_record_id] = abuse_record.id
+      results[:abuse_record_report_id] = abuse_record.report_ident
+    rescue
       results[:status] = "error"
+      abuse_record = AbuseRecord.build_and_save_record(url, body, nil, nil, AbuseRecord::NCMEC, user, complaint_entry, abuse_record)
+      results[:abuse_record_id] = abuse_record.id
+      results[:abuse_record_report_id] = abuse_record.report_ident
     end
 
-    results[:response_code] = response_code
-    results[:response] = response.body
-    results[:abuse_record_id] = abuse_record.id
-    results[:abuse_record_report_id] = abuse_record.report_ident
     results
 
   end
 
-  def self.submit_to_iwf(complaint_entry, user, url)
+  def self.submit_to_iwf(complaint_entry, user, url, abuse_record = nil)
 
     results = {}
 
@@ -316,20 +325,28 @@ class AbusiveContentTool
     params["Reporter_Reference"] = "de-id-#{complaint_entry.id}"  #dispute entry id, later should probably be dispute id when 1 ticket 1 entry
 
     #puts params.inspect
+    begin
+      response = Webcat::Iwf.call_json_request(params)
 
-    response = Webcat::Iwf.call_json_request(params)
+      if response["responseCode"].to_i == 200
+        results[:status] = "success"
+      else
+        results[:status] = "error"
+      end
+      results[:message] = response["responseDescription"]
+      results[:data] = response["responseData"] rescue nil
 
-    if response["responseCode"].to_i == 200
-      results[:status] = "success"
-    else
+      abuse_record = AbuseRecord.build_and_save_record(url, params.to_json, response, results[:data], AbuseRecord::IWF, user, complaint_entry, abuse_record)
+      results[:abuse_record_id] = abuse_record.id
+      results[:abuse_record_report_id] = abuse_record.report_ident
+
+    rescue
       results[:status] = "error"
+      abuse_record = AbuseRecord.build_and_save_record(url, params.to_json, nil, nil, AbuseRecord::IWF, user, complaint_entry, abuse_record)
+      results[:abuse_record_id] = abuse_record.id
+      results[:abuse_record_report_id] = abuse_record.report_ident
     end
-    results[:message] = response["responseDescription"]
-    results[:data] = response["responseData"]
 
-    abuse_record = AbuseRecord.build_and_save_record(url, params.to_json, response, results[:data], AbuseRecord::IWF, user, complaint_entry)
-    results[:abuse_record_id] = abuse_record.id
-    results[:abuse_record_report_id] = abuse_record.report_ident
     results
 
 
