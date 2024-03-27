@@ -164,10 +164,12 @@ function M.config()
       },
       live_grep_args = {
         auto_quoting = true,
-        mappings = {
-          ["<C-k>"] = lga.quote_prompt(),
-          ["<C-j>"] = lga.quote_prompt { postfix = " --iglob" },
-          ["<C-t>"] = lga.quote_prompt { postfix = " -t" },
+        i = {
+          mappings = {
+            ["<C-k>"] = lga.quote_prompt(),
+            ["<C-j>"] = lga.quote_prompt { postfix = " --iglob" },
+            ["<C-t>"] = lga.quote_prompt { postfix = " -t" },
+          },
         },
       },
       project = {
