@@ -36,13 +36,13 @@
       Filter
     .dropdown-menu.nav-tools-dropdown#filter-dropdown.webcat-filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
-        - Complaint::FILTER_VIEW_OPTIONS.each do |filter|
+        - Complaint::FILTER_VIEW_OPTIONS.each_with_index do |filter, index|
           - if filter[:label] == 'Manager Queue' && current_user.is_webcat_manager? || filter[:label] != 'Manager Queue'
             %li{class: ('selected' if params[:f] == filter[:param])}
               %a{href: "?f=#{filter[:param]}"}
                 %span.nav-dropdown-icon{class: filter[:icon]}
                 = filter[:label]
-              %span.nav-dropdown-icon.favorite-search-icon
+              %span.nav-dropdown-icon.favorite-search-icon{id: "webcat-favorite-search-icon-#{index}"}
         %li.favorite-instruction
           Star filter to set as default
 
@@ -59,13 +59,13 @@
                     = named_search.name
                   %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                     = image_tag('icon_cancel_grey.svg')
-                  %span.nav-dropdown-icon.favorite-search-icon
+                  %span.nav-dropdown-icon.favorite-search-icon.favorite-search-icon-saved-searches
 
   .nav-tool-blocks.col-xs-2.col-sm-3.col-lg-3.search-wrapper#complaints-nav-search-wrapper
     .input-group.search-group#web-cat-search
       = text_field_tag 'general_search', "#{}", class: 'search-box', placeholder: 'Search'
 
-      %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#webcat-advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         Advanced
       .dropdown-menu.nav-tools-dropdown#advanced-search-dropdown{'aria-labelledby': 'advanced-search-button'}
         %h3.nav-tool-dropdown-header.inverse

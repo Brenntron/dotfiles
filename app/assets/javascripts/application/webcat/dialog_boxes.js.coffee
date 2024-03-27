@@ -69,7 +69,7 @@ window.history_dialog = (id, url) ->
             '<h5>Complaint Entry History</h5>'
 
         if json.entry_history.complaint_history.length < 1
-          history_dialog_content += '<span class="missing-data">No complaint entry history available.</span>'
+          history_dialog_content += '<span class="missing-data">No complaint entry history available.</span></div>'
         else
           history_dialog_content +=
             '<table class="history-table"><thead><th>Time</th><th>User</th><th>Details</th></thead>' +
@@ -101,7 +101,7 @@ window.history_dialog = (id, url) ->
           "
            <div class='tab-pane' role='tabpanel' id='xbrs-history-tab'>
             <h5>XBRS Timeline</h5>
-              <table class=''history-table xbrs-history-table' id='webcat-xbrs-history'></table>
+              <table class='history-table xbrs-history-table' id='webcat-xbrs-history'></table>
             </div>
            "
 
@@ -143,11 +143,12 @@ window.get_xbrs_history = (url, tab) ->
       if response.data.length < 1
         $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
       else
+        $(xbrs_table).empty() #extra table empty to prevent multiple api calls from stacking table content
         $(xbrs_table).append(document.createElement('thead'))
         $(xbrs_table).append(document.createElement('tbody'))
         thead = $(xbrs_table).find('thead')
         tbody = $(xbrs_table).find('tbody')
-        table_headers = ['Timestamp', 'Scrore', 'V2 Content Cat', 'V3 Content Cats', 'Threat Cats', 'Rule Hits']
+        table_headers = ['Timestamp', 'Score', 'V2 Content Cats', 'V3 Content Cats', 'Threat Cats', 'Rule Hits']
 
         parsed_rows = []
         thead_row = ''

@@ -221,3 +221,24 @@ Feature: WebCat Advanced Search
     And  I should not see "Complaint (URL/IP/Domain)"
     And  I should not see "Added Through Channel"
     And  I should see "Submitter Name"
+
+  Rule: a user can add and remove fields to be displayed in the advanced search
+    @javascript
+    Scenario: A user removes  the tags criteria from the advanced search menu and then adds it back.
+      Given a user with role "webcat user" exists and is logged in
+      And the following complaint_tags exist:
+        | id | name       |
+        | 1  | Slytherin  |
+        | 2  | Gryffindor |
+        | 3  | Ravenclaw  |
+        | 4  | Hufflepuff |
+      When I go to "/escalations/webcat/complaints"
+      And I click "#advanced-search-button"
+      Then I should see element "search_tag_list"
+      When I click "#remove-criteria-tags"
+      Then I should not see element "search_tag_list"
+      When I click "#add-search-items-button"
+      Then I should see element "#tags-cb"
+      When I click "#tags-cb"
+      And I click "#cancel-add-criteria"
+      Then I should see element "search_tag_list"

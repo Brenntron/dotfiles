@@ -241,7 +241,6 @@
     &:hover {
       background-color: darken(#D7DADB, 10%)
     }
-
   }
 }
 
@@ -850,4 +849,10 @@ table.dataTable tbody tr.submitting-entry {
     max-height: 100px;
     border: none;
   }
+}
+
+.email-response-text {
+  font-size: 13px;
+  padding-top: 4px;
+  line-height: 1.15em;
 }

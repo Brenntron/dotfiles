@@ -1,4 +1,5 @@
 # Bulk resolution tool logic
+message_timeout = null
 submittable_rows = []
 
 apply_resolution = () ->
@@ -16,14 +17,30 @@ apply_resolution = () ->
 
 apply_customer_facing_comment = () ->
   bulk_tool_resolution = $('.bulk-resolution-radio:checked').val()
-  email_template = $('#email-response-to-customers-select').val()
+  $email_select = $('#email-response-to-customers-select')
+  email_template = $email_select.val()
+  email_options = $email_select[0].options
   customer_facing_comment = $('#email-response-to-customers').val()
 
   for row in submittable_rows
-    {entry_id, status} = row
+    {entry_id} = row
     row_resolution = $(".resolution_radio_button[name='resolution#{entry_id}']:checked").val()
 
-    continue unless bulk_tool_resolution is row_resolution && $("#entry-email-response-to-customers-select_#{entry_id}").val()
+    continue unless bulk_tool_resolution is row_resolution
+
+    for option in email_options
+      $option = $(option)
+      data = $option.data()
+      name = $option.val()
+
+      template_option = """
+                        <option class='webcat-resolution-template-option' val='#{name}'
+                          data-body='#{data.body}'
+                          data-description='#{data.description}'>
+                          #{name}
+                        </option>
+                        """
+      $("#entry-email-response-to-customers-select_#{entry_id}").append(template_option)
 
     $("#entry-email-response-to-customers-select_#{entry_id}").val(email_template)
     $("#entry-email-response-to-customers_#{entry_id}").val(customer_facing_comment)
@@ -58,6 +75,56 @@ get_unique_rows = () ->
 
   unique_rows
 
+display_success_message = () ->
+  html = """
+         <div class='bulk-resolution-message-container'>
+           <span class='bulk-icon bulk-success-icon'></span>
+           <p class='bulk-message bulk-success'>
+             Successfully applied to selected entries.
+           </p>
+         </div>
+         """
+
+  append_message(html)
+
+display_warning_message = () ->
+  html = """
+         <div class='bulk-resolution-message-container'>
+           <span class='bulk-icon bulk-warning-icon'></span>
+           <p class='bulk-message bulk-warning'>
+             Unable to apply to all selected entries, applied to submittable entries only.
+           </p>
+         </div>
+         """
+
+  append_message(html)
+
+display_error_message = () ->
+  html = """
+         <div class='bulk-resolution-message-container'>
+           <span class='bulk-icon bulk-error-icon'></span>
+           <p class='bulk-message bulk-error'>
+             Unable to apply resolution to one or more entries.
+           </p>
+         </div>
+         """
+
+  append_message(html)
+
+append_message = (html) ->
+  clearTimeout(message_timeout)
+  $('.bulk-resolution-message-container').remove()
+
+
+  $(".edit-resolution-container .top-text").append(html)
+
+  message_timeout = setTimeout(() ->
+    $('.bulk-resolution-message-container').fadeOut("slow",
+      $('.bulk-resolution-message-container').remove()
+    )
+  , 10000)
+
+
 window.bulk_resolution_select_handler = (dt, indexes) ->
   newly_selected_submmittable_rows = dt.rows(indexes).data().toArray().filter(has_submittable_status)
   submittable_rows = [submittable_rows..., newly_selected_submmittable_rows...]
@@ -86,8 +153,11 @@ window.clearBulkResolution = () ->
 window.applyAll = () ->
   {applied_resolution, updated_entry_ids} = apply_resolution()
 
-  # Update the resolution templates for the submittable rows
-  new get_resolution_templates(applied_resolution, 'individual', updated_entry_ids)
-    .then(apply_customer_facing_comment.bind(null))
-    .then null, (err) -> console.error err
+  apply_customer_facing_comment()
+
   apply_internal_comment()
+
+  if submittable_rows.length is $('#complaints-index').DataTable().rows({selected: true}).count()
+    display_success_message()
+  else
+    display_warning_message()

@@ -11,6 +11,11 @@ $ ->
 
 #### New complaints index table setup
 build_complaints_table = (url) ->
+
+  #get count of entries per page from localstorage, set to 25 if none found
+  entries_per_page = localStorage.getItem 'webcat_entries_per_page'
+  if entries_per_page == null then entries_per_page = 25
+
   complaint_table = $('#complaints-index').DataTable(
     initComplete: ->
       # Get display prefs
@@ -42,6 +47,7 @@ build_complaints_table = (url) ->
         ]
 
     lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
+    pageLength: entries_per_page
     processing: true
     serverSide: true
     stateSave: true
@@ -76,11 +82,21 @@ build_complaints_table = (url) ->
             else
               complaint_table.row("##{row_id}").select()
 
+        # Prevent internal comment dropdown from closing when clicking into
+        $('.internal-comment-dropdown').on 'click', (e) ->
+          e.stopPropagation()
+
+
         # set listeners for bulk changes
         $('#complaints-index').DataTable().on('select', (_e, dt, _type, indexes) ->
           bulk_resolution_select_handler(dt, indexes)
         ).on('deselect', (_e, dt, _type, indexes) ->
           bulk_resolution_deselect_handler(dt, indexes)
+        )
+
+        # set listener for table length changes and save to localstorage
+        $('#complaints-index').DataTable().on('length.dt', (e, settings, len) ->
+          localStorage.setItem 'webcat_entries_per_page', len
         )
 
     createdRow: (row, data) ->
@@ -89,14 +105,10 @@ build_complaints_table = (url) ->
       $(row).attr('data-status', data.status)
 
     drawCallback: () ->
-      console.log 'complaint drawcallback'
+
       if localStorage.webcat_reset_page
         localStorage.removeItem('webcat_reset_page')
-      #         trying to figure out why we are redrawing the table here
-      #          setTimeout () ->
-      #            $('#complaints-index').DataTable().page(0).draw( true )
-      #          , 100
-      #
+
       if localStorage.webcat_search_name
         { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
         ### check variables below
@@ -368,7 +380,7 @@ build_complaints_table = (url) ->
           history_button =
             '<button class="history-button esc-tooltipped" id="entry-history-' + full.entry_id + '" ' +
               'onclick="history_dialog(\'' + full.entry_id + '\', \'' + history_url + '\')" ' +
-              'title="Domain History"></button>'
+              'title="History Information"></button>'
 
           whois_url = full.domain || full.ip_address
           whois_button =
@@ -432,6 +444,8 @@ build_complaints_table = (url) ->
           dialog_title = 'Customer Response for: ' + observable
           if (full.resolution_comment == null) || (full.resolution_comment == '')
             res_comment = 'No response created or sent to customer.'
+          else
+            res_comment = full.resolution_comment
 
           res_comment_dialog_html =
             '<div class="resolution-comment-dialog hide" id="resolution_comment_dialog_' + full.entry_id + '" title="' + dialog_title + '">' +
@@ -450,7 +464,7 @@ build_complaints_table = (url) ->
               '<div class="dialog-content-wrapper"><div class="row"><div class="col-xs-12">' +
               '<label class="content-label-sm full-row-label">Email Response to Customer</label>' +
               '</div></div><div class="row"><div class="col-xs-12">' +
-              '<div id="entry-email-response-to-customers_' + full.entry_id + '">' + res_comment + '</div>' +
+              '<div class="email-response-text" id="entry-email-response-to-customers_' + full.entry_id + '">' + res_comment + '</div>' +
               '</div></div></div>' +
               '</div>'
 
@@ -634,6 +648,19 @@ build_data = () ->
     build_header(data)
     return data
 
+  #check if saved search favorite has been set - need to grab data from icon's sibling link
+  else if $('.favorite-search-icon-saved-searches').hasClass('favorite-search-icon-active')
+    fav = $('.favorite-search-icon-active')
+    if fav.length > 0
+      search_name = $('#saved-searches-wrapper .active-link').text().trim()
+      refresh_localStorage()
+      data = {
+        search_type: 'named'
+        search_name: search_name
+      }
+      build_header(data)
+      return data
+
   else
     # check users chosen default filter
     fav = $('.favorite-search-icon-active')
@@ -650,6 +677,15 @@ build_data = () ->
       build_header(data)
       return data
 
+    #no saved settings, no filter, currently loads All Tickets by default
+    else
+      data = {
+        search_type: 'standard'
+        search_name: 'all'
+      }
+      build_header(data)
+      return data
+
 
 ###
   # Depending on the data, this function builds the search header
@@ -658,10 +694,8 @@ build_data = () ->
   # search definitions will be made with the build_subheader function
 ###
 build_header = (data) ->
-  console.log 'building header'
   container = $('#webcat_searchref_container')
   if data != undefined && container.length > 0
-    reset_icon = "<span #{if current_page_is_favourite() then 'hidden style="display: none"' else ''} id='refresh-filter-button' class='reset-filter esc-tooltipped' title='Clear Search Results' onclick='webcat_refresh()'></span>"
     {search_type, search_name} = data
 
     try
@@ -674,32 +708,39 @@ build_header = (data) ->
 
       if !search_name.endsWith('tickets')
         search_name += ' tickets'
-
+      search_name = search_name.replace(/_|%20/g, " ")
+      reset_icon = get_reset_icon(search_name)
       new_header =
         '<div>' +
-          '<span class="text-capitalize">' + search_name.replace(/_|%20/g, " ") + ' </span>' +
+          '<span class="text-capitalize">' + search_name + ' </span>' +
           reset_icon +
           '</div>'
 
     else if search_type == 'advanced'
+      reset_icon = get_visible_reset_icon()
       new_header =
         '<div>Results for Advanced Search ' +
           reset_icon +
           '</div>'
       build_subheader(webcat_search_conditions)
+
     else if search_type == 'named'
+      reset_icon = get_reset_icon(search_name)
       new_header =
         '<div>Results for "' + search_name + '" Saved Search' +
           reset_icon +
           '</div>'
       el = localStorage.webcat_search_conditions
-      if !el.includes('temp_row')
-        subheader = $("##{el} .saved-search")[0].dataset.search_conditions
+      if el
+        if !el.includes('temp_row')
+          subheader = $("##{el} .saved-search")[0].dataset.search_conditions
       else
         last_row = $('#saved-search-tbody')[0].lastElementChild
         subheader = $(last_row).find('.saved-search').attr('data-search_conditions')
       build_subheader(subheader)
+
     else if search_type == 'contains'
+      reset_icon = get_visible_reset_icon()
       new_header =
         '<div>Results for "' + webcat_search_conditions.value + '" '+
           reset_icon +
@@ -743,6 +784,22 @@ build_subheader = (subheader) ->
 
       container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
 
+get_visible_reset_icon = ->
+  reset_icon = "<span id='refresh-filter-button'
+    class='reset-filter esc-tooltipped'
+    title='Clear Search Results' onclick='webcat_refresh()'></span>"
+
+#for filters and saved searches we need to check if currently on the favorite page since it's the index
+get_reset_icon = (search_name) ->
+  if current_page_is_favourite(search_name)
+    reset_icon_class = 'hidden style="display: none"'
+  else
+    reset_icon_class = ''
+  reset_icon = "<span #{reset_icon_class} id='refresh-filter-button'
+    class='reset-filter esc-tooltipped'
+    title='Clear Search Results' onclick='webcat_refresh()'></span>"
+  return reset_icon
+
 
 window.pull_user_preference_filter = () ->
   return if window.location.pathname != '/escalations/webcat/complaints'
@@ -763,5 +820,8 @@ set_icon_for_favorite_filter = (filter_name) ->
 
   if filter_dropdown.length > 0
     filter_dropdown.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+    filter_dropdown.addClass 'active-link'
+
   else if saved_search
     saved_search.parent().find('.favorite-search-icon').removeClass('favorite-search-icon').addClass('favorite-search-icon-active')
+    saved_search.addClass 'active-link'

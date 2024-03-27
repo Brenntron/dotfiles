@@ -22,7 +22,7 @@ Feature: WebCat Bulk Resolution Tool
 
   Rule: The Bulk Resolution Tool button only updates submittable rows
     @javascript
-    Scenario: a webcat user selects one pending entry
+    Scenario: a webcat user selects one pending entry and one new entry
       When I click webcat row with id "2"
       And I shift click webcat row with id "3"
       And I click "#index_update_resolution"
@@ -32,6 +32,7 @@ Feature: WebCat Bulk Resolution Tool
       And I wait for "2" seconds
       Then I should see the radio with id "ignore2" checked
       And I should see the radio with id "unchanged3" checked
+      And I should see content "Changes applied to submittable entries only." within ".bulk-warning"
 
   Rule: Submittable complaint entries should be updated by the bulk resolution tool
     @javascript
@@ -45,6 +46,7 @@ Feature: WebCat Bulk Resolution Tool
       And I wait for "2" seconds
       Then I should see the radio with id "unchanged3" checked
       And I should see the radio with id "unchanged4" checked
+      And I should see content "Applied bulk resolution changes to selected entries." within ".bulk-success"
 
     @javascript
     Scenario: a webcat user updates a submittable tickets customer comment with an email template
@@ -62,6 +64,7 @@ Feature: WebCat Bulk Resolution Tool
       When I click "#resolution_comment_button4"
       Then I should see content "Default Unchanged 2 body" within "#entry-email-response-to-customers_4"
       And "Default Unchanged 2" should be selected in the "entry-email-response-to-customers-select_4" dropdown
+      And I should see content "Applied bulk resolution changes to selected entries." within ".bulk-success"
 
     @javascript
     Scenario: a webcat user updates a submittable tickets customer comment with a modified template
@@ -80,6 +83,7 @@ Feature: WebCat Bulk Resolution Tool
       When I click "#resolution_comment_button4"
       Then I should see content "Default Unchanged 2 body modified" within "#entry-email-response-to-customers_4"
       And "Default Unchanged 2" should be selected in the "entry-email-response-to-customers-select_4" dropdown
+      And I should see content "Applied bulk resolution changes to selected entries." within ".bulk-success"
 
     @javascript
     Scenario: a webcat user updates a submittable tickets internal comment
@@ -97,6 +101,7 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#internal_comment_button4"
       And I wait for "2" seconds
       Then I should see content "This is an internal comment." within "#internal_comment_4"
+      And I should see content "Applied bulk resolution changes to selected entries." within ".bulk-success"
 
   Rule: The apply button should be disabled until a submittable selected row is selected
     @javascript
@@ -108,6 +113,7 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       Then button with id "apply_resolution_button" should be enabled
+      And I should see content "Applied bulk resolution changes to selected entries." within ".bulk-success"
 
   Rule: The Bulk Resolution Tool should apply updates to rows selected after a first round of updates.
     @javascript
@@ -119,7 +125,8 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#apply_resolution_button"
       And I wait for "2" seconds
       Then I should see the radio with id "unchanged3" checked
-      And I click webcat row with id "4"
+      And I should see content "Applied bulk resolution changes to selected entries" within ".bulk-success"
+      When I click webcat row with id "4"
       And I click "#index_update_resolution"
       And I wait for "2" seconds
       And I click "#webcat_resolution_invalid_option"
@@ -127,6 +134,7 @@ Feature: WebCat Bulk Resolution Tool
       And I wait for "2" seconds
       Then I should see the radio with id "unchanged3" checked
       And I should see the radio with id "invalid4" checked
+      And I should see content "Applied bulk resolution changes to selected entries." within ".bulk-success"
 
   Rule: The reset button should set the Bulk Resolution Tool fields to their default values but not affect the selected rows
     @javascript
@@ -171,3 +179,4 @@ Feature: WebCat Bulk Resolution Tool
       And I click "#internal_comment_button6"
       And I wait for "2" seconds
       Then I should see content "This is an internal comment." within "#internal_comment_6"
+      And I should see content "Applied bulk resolution changes to selected entries." within ".bulk-success"
