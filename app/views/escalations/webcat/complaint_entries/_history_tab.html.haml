@@ -1,10 +1,10 @@
 .row.ce-history-tab
   .col-xs-6.ce-history-column
-    %h1.ce-tab-titleHistory
+    %h1.ce-tab-title
       History
     %h5.text-uppercase
       domain history
-    %table.data-report-table.bottom-divider#ce-domain-history-table
+    %table.data-report-table.bottom-divider#ce_domain_history_table
       %thead
         %tr
           %th
@@ -17,14 +17,21 @@
             user
           %th
             category
-      %tbody#ce-domain-history-table-body
+      %tbody#ce_domain_history_table_body
     %h5.text-uppercase
       entry history
-    %p.data-missing#entry-history
-      No entry history
+    %table.data-report-table.bottom-divider#ce_entry_history_table
+      %thead
+        %tr
+          %th
+            time
+          %th
+            user
+          %th
+            details
     %h5.text-uppercase
       xbrs history
-    %table.data-report-table.bottom-divider#ce-xbrs-history-table
+    %table.data-report-table.bottom-divider#ce_xbrs_history_table
       %thead
         %tr
           %th
@@ -39,10 +46,10 @@
             path
           %th
             operation
-      %tbody#ce-xbrs-history-table-body
+      %tbody#ce_xbrs_history_table_body
     %h5.text-uppercase
       related history
-    %table#ce-related-history-table
+    %table.data-report-table#ce_related_history_table
       %thead
         %tr
           %th
@@ -57,4 +64,4 @@
             user/source
           %th
             last modified
-      %tbody#cw-related-history-table-body
+      %tbody#ce_related_history_table_body

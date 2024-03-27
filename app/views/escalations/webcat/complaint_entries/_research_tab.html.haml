@@ -1,9 +1,9 @@
 .row.ce-research-tab
-  .col-xs-3.ce-research-column
+  .col-xs-4.ce-research-column
     %h1.ce-tab-title Research
     %h5.research-data-header.text-uppercase
       customer submitted info
-    #ce-research-toolbar
+    #ce_research_toolbar
       .toolbar
         .view-btn-group
           %label.toolbar-section-label
@@ -17,24 +17,23 @@
           .btn-group.toolbar-btn-group
             %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.tooltipstered.convert-ticket-button{ type: 'button' }
     .ce-submitted-wbrs-wrapper
-      #ce-submitted-ip-uri-wrapper
+      #ce_submitted_ip_uri_wrapper
         %label.content-label-sm
           Submitted IP/URI
         %p.ce-submitted-ip-uri
           = @complaint_entry.domain
-      #ce-wbrs-score-wrapper
+      #ce_wbrs_score_wrapper
         %label.content-label-sm
           WBRS Score
-    #ce-suggested-categories-wrapper
+    #ce_suggested_categories_wrapper
       %label.content-label-sm
         Suggested Categories
-    .bottom-divider#ce-description-wrapper
+    .bottom-divider#ce_description_wrapper
       %label.content-label-sm
         Description
-      %p#ce-description
     %h5.research-data-header.text-uppercase
       current categories
-    %table.data-report-table.bottom-divider#ce-categories-data-table
+    %table.data-report-table.bottom-divider#ce_categories_data_table
       %thead
         %tr
           %th source
@@ -44,8 +43,9 @@
       %tbody
     %h5.research-data-header.text-uppercase
       tags
-    #ce-tags-wrapper
-      %p.missing-data#ce-tags No tags
+    #ce_tags_wrapper
+      %p.missing-data#ce_tags No tags
+      %button.tags-button
 
   .col-xs-3.ce-research-column
     %h5.research-data-header.text-uppercase
@@ -71,29 +71,31 @@
         Resolution
       .ce-radio-group-wrapper
         .ce-radio-group
-          %input.ce-resolution-radio-button{ name: 'resolution',
-                                             type: 'radio',
-                                             value: 'unchanged' }
+          %input.resolution-radio-button{ name: 'resolution',
+                                          type: 'radio',
+                                          value: 'unchanged' }
           %label.radio-label{ for: 'unchanged' }
             Unchanged
         .ce-radio-group
-          %input.ce-resolution-radio-button{ name: 'resolution',
-                                             type: 'radio',
-                                             value: 'fixed' }
+          %input.resolution-radio-button{ name: 'resolution',
+                                          checked: true,
+                                          type: 'radio',
+                                          value: 'fixed' }
           %label.radio-label{ for: 'fixed' }
             Fixed
         .ce-radio-group
-          %input.ce-resolution-radio-button{ name: 'resolution',
-                                             type: 'radio',
-                                             value: 'invalid' }
+          %input.resolution-radio-button{ name: 'resolution',
+                                          type: 'radio',
+                                          value: 'invalid' }
           %label.radio-label{ for: 'invalid' }
             Invalid
     .ce-customer-comment-wrapper
       %label.content-label-sm
         Email Response to Customer
-      %select.ce-customer-comment-select-box.ce-input
+      %select.ce-customer-comment-select-box.ce-input{ id: "entry-email-response-to-customers-select_#{@complaint_entry.id}" }
         %option{ value: 'fixed', selected: true } Fixed- Default Response
-      %textarea.ce-customer-comment-textarea.ce-input{ name: 'ce_customer_comment_textarea',
+      %textarea.ce-customer-comment-textarea.ce-input{ id: "entry-email-response-to-customers_#{@complaint_entry.id}",
+                                                       name: 'ce_customer_comment_textarea',
                                                        maxlength: '64000' }
     .ce-internal-comment-wrapper
       %label.content-label-sm
@@ -103,38 +105,35 @@
     .text-center
       %button.tertiary.ce-submit-button
         submit
-  .col-xs-6.ce-research-column
+  .col-xs-3.ce-research-column
     %h5.research-data-header.text-uppercase
       whois
     %label.data-report-label
       domain
-    %table.data-report-table#ce-domain-table
+    %table.data-report-table#ce_domain_table
       %tbody
         %tr
-          %td
+          %td#domain_title
             = @complaint_entry.domain
-    %label.data-report-label#ce-registrant-label
+    %label.data-report-label#ce_registrant_label
       registrant
-    %table.data-report-table#ce-registrant-table
+    %table.data-report-table#ce_registrant_table
       %tbody
         %tr
           %td.data-report-table-column-header
             Organization
-          %td#registrant-organization
+          %td#registrant_organization
         %tr
           %td.data-report-table-column-header
             Country
-          %td#registrant-country
+          %td#registrant_country
         %tr
           %td.data-report-table-column-header
             State/Province
-          %td#registrant-state
-    %label.data-report-label#ce-name-servers-label
-      name servers
-    %table.data-report-table#ce-name-servers-table
+          %td#registrant_state
+    %table.data-report-table#ce_name_servers_table
       %thead
         %tr
-          %th
-      %tbody
-        %tr
-          %td
+          %th#ce_name_servers_header
+            name servers
+      %tbody#ce_nserver_tbody

@@ -3,8 +3,47 @@ headers = ''
 wbrs_confidence = 0
 wbrs_certainty = 0
 
+get_whois_data = (domain) ->
+  $.ajax(
+    method: 'GET'
+    url: '/escalations/api/v1/escalations/cloud_intel/whois/lookup'
+    headers: headers
+    data:
+      name: domain
+    success: (response) ->
+      if response?
+        parsed_data = WebCat.RepLookup.parseIcannData(response.data)
+
+        for datum_key, datum_value of parsed_data
+          switch datum_key
+            when 'registrant organization' then $('#registrant_organization').append(datum_value)
+            when 'registrant country' then $('#registrant_country').append(datum_value)
+            when 'registrant state/province' then $('#registrant_state').append(datum_value)
+            when 'nserver'
+              for nserver in datum_value
+                row = "<tr><td>#{nserver}</td></tr>"
+
+                $('#ce_nserver_tbody').append(row)
+      else
+        message = "No available responses. The IP address may be unallocated or its whois server is unavailable."
+
+        std_msg_error("Error retrieving WHOIS query.", [message])
+    error: (response) ->
+      if response?
+        { responseJSON } = response
+
+        if !responseJSON
+          std_msg_error("Error retrieving WHOIS query.","")
+        else
+          std_msg_error("Error retrieving WHOIS query.", [responseJSON.message])
+
+        return $.each(response.responseJSON, (key, value) ->
+          console.error value
+        )
+  )
+
 update_wbrs_data = () ->
-  $categories_table = $('#ce-categories-data-table')
+  $categories_table = $('#ce_categories_data_table')
 
   return unless $.fn.dataTable.isDataTable($categories_table)
 
@@ -12,9 +51,9 @@ update_wbrs_data = () ->
   wbrs_data.wbrs_certainty = wbrs_certainty
   wbrs_data.wbrs_confidence = wbrs_confidence
 
-  $('#ce-categories-data-table').DataTable().row(0).data(wbrs_data)
+  $('#ce_categories_data_table').DataTable().row(0).data(wbrs_data)
 
-window.get_suggested_categories = (domain) ->
+get_suggested_categories = (domain) ->
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/current_content_categories'
     method: 'POST'
@@ -33,12 +72,17 @@ window.get_suggested_categories = (domain) ->
               cat_names.push(category.descr)
 
       cat_names = cat_names.join(', ')
-      $('#ce-suggested-categories-wrapper').append("<p id='ce-suggested-categories'>#{cat_names}</p>")
+      category_message = if cat_names.length > 0
+                           "<p id='ce_suggested_categories'>#{cat_names}</p>"
+                         else
+                           "<p class='missing-data' id='ce_suggested_categories'>'No suggested categories available.'</p>"
+
+      $('#ce_suggested_categories_wrapper').append(category_message)
     error: (errorResponse) ->
       std_api_error(errorResponse, "Suggested Categories for this Entry could not be retrieved.", reload: false)
   )
 
-window.get_current_categories = (domain) ->
+get_current_categories = (domain) ->
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories_by_url'
     method: 'POST'
@@ -68,9 +112,8 @@ window.get_current_categories = (domain) ->
           certainty: ''
         }
       ]
-      console.log 'current categories data: ', data
 
-      $('#ce-categories-data-table').DataTable(
+      $('#ce_categories_data_table').DataTable(
         data: data
         ordering: false
         info: false
@@ -96,7 +139,7 @@ window.get_current_categories = (domain) ->
       std_api_error(errorResponse, "Current Categories for this Entry could not be retrieved.", reload: false)
   )
 
-window.get_ce_domain_history = (domain) ->
+get_domain_history = (domain) ->
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/get_domain_history'
     method: 'GET'
@@ -110,8 +153,8 @@ window.get_ce_domain_history = (domain) ->
       wbrs_score = recent_data.score
       rep = wbrs_display(wbrs_score)
 
-      $('#ce-description-wrapper').append("<p id='ce-description'>#{description}</p>")
-      $('#ce-wbrs-score-wrapper').append("<div><span class='webcat-research-svg icon-#{rep}'></span><p id='ce-wbrs-score'>#{wbrs_score}</p></div>")
+      $('#ce_description_wrapper').append("<p id='ce_description'>#{description}</p>")
+      $('#ce_wbrs_score_wrapper').append("<div><span class='webcat-research-svg icon-#{rep}'></span><p id='ce_wbrs_score'>#{wbrs_score}</p></div>")
 
       wbrs_certainty = recent_data.certainty
       wbrs_confidence = recent_data.confidence
@@ -120,9 +163,8 @@ window.get_ce_domain_history = (domain) ->
 
       # remove baseline domain entry
       data.splice(0, 1)
-      console.log 'domain history data: ', data
 
-      $('#ce-domain-history-table').DataTable
+      $('#ce_domain_history_table').DataTable
         data: data
         ordering: false
         info: false
@@ -157,7 +199,62 @@ window.get_ce_domain_history = (domain) ->
       std_api_error(errorResponse, "Domain History for this Entry could not be retrieved.", reload: false)
     )
 
-window.get_ce_xbrs_history = (domain) ->
+get_entry_history = (entry_id) ->
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
+    method: 'POST'
+    headers: headers
+    data:
+      'id': entry_id
+    success: (response) ->
+      parsed_response = $.parseJSON(response)
+
+      if parsed_response.error
+        alert(response.error)
+      else
+        formatted_entry_history = parsed_response.entry_history.complaint_history.map((historical_data) ->
+          formatted_history_data = {}
+          formatted_history_data['time'] = historical_data[0]
+          formatted_history_data['user'] = historical_data[1]['whodunnit']
+
+          delete historical_data[1]['whodunnit']
+
+          formatted_history_data['details'] = historical_data[1]
+
+          return formatted_history_data
+        )
+
+        $('#ce_entry_history_table').DataTable
+          data: formatted_entry_history
+          ordering: false
+          info: false
+          paging: false
+          searching: false
+          stateSave: false
+          columns: [
+            {
+              data: 'time'
+            }
+            {
+              data: 'user'
+            }
+            {
+              data: null
+              render: (data) ->
+                details = data.details
+                detail_segments = []
+
+                for key, value of details
+                  detail_segments.push("<span class='bold'>#{key}</span>: #{value} <br>")
+
+                return detail_segments.join('')
+            }
+          ]
+        $('#ce_entry_history_table')
+    error: (response) ->
+  )
+
+get_xbrs_history = (domain) ->
   $.ajax(
     url: "/escalations/api/v1/escalations/webcat/complaints/get_xbrs_domain_history"
     method: 'GET'
@@ -188,7 +285,7 @@ window.get_ce_xbrs_history = (domain) ->
 
         console.log 'xbrs history data: ', data
 
-        $('#ce-xbrs-history-table').DataTable({
+        $('#ce_xbrs_history_table').DataTable({
           data: data
           ordering: false
           info: false
@@ -225,8 +322,49 @@ window.get_ce_xbrs_history = (domain) ->
     error: (error) ->
   )
 
-window.get_ce_related_history = (domain) ->
+get_related_history = (domain) ->
   # TODO: implement this when the related history endpoint exists.
+  $('#ce_related_history_table').DataTable({
+    data: {}
+    ordering: false
+    info: false
+    paging: false
+    searching: false
+    stateSave: false
+    columns: [
+      {
+        data: 'subdomain'
+      }
+      {
+        data: 'domain'
+      }
+      {
+        data: 'path'
+      }
+      {
+        data: 'categories'
+      }
+      {
+        data: 'user/source'
+      }
+      {
+        data: 'last modified'
+      }
+    ]
+  })
 
 $ ->
-  headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
+  if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
+    headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
+    resolution = $('.ce-radio-group > .resolution-radio-button:checked').val()
+    entry_id = Number($('#complaint_entry_id')[0].innerText)
+    domain_title = $('#domain_title')[0].innerText.replace(/(\r\n|\n|\r)/gm, "") # remove newlines
+
+    get_resolution_templates(resolution, 'individual', [entry_id])
+    get_current_categories(domain_title)
+    get_suggested_categories(domain_title)
+    get_whois_data(domain_title)
+    get_domain_history(domain_title)
+    get_entry_history(entry_id)
+    get_xbrs_history(domain_title)
+    get_related_history(domain_title)

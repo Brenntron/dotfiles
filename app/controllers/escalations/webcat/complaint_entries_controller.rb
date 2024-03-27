@@ -15,22 +15,26 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
     @complaint_entry = ComplaintEntry.find(params[:id])
     @complaint = @complaint_entry.complaint
     @source = @complaint.ticket_source
+    @org_name = if @complaint.customer.nil?
+                  'Guest'
+                else
+                  @complaint.customer_org
+                end
   end
 
-  def update
-  end
+  def update; end
 
   def serve_image
     complaint_entry = ComplaintEntry.find(params[:complaint_entry_id])
-    data = complaint_entry.complaint_entry_screenshot&.screenshot     #<—this should return a binary blob
+    data = complaint_entry.complaint_entry_screenshot&.screenshot # <—this should return a binary blob
+
     if data
       send_data data, type: 'image/jpeg'
     else
-      file_data = File.open("app/assets/images/removed_screenshot.jpg").read()
+      file_data = File.read("app/assets/images/removed_screenshot.jpg")
       send_data file_data, type: 'image/jpeg'
     end
   end
-
 
   private
 
@@ -41,7 +45,7 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   end
 
   def datatables_search_params
-    params.fetch(:search, {value: ''}).permit(:value)
+    params.fetch(:search, { value: '' }).permit(:value)
   end
 
   def robust_search_params
@@ -49,7 +53,7 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   end
 
   def search_conditions
-    params.has_key?('search_conditions') ? params.require('search_conditions').permit! : nil
+    params.key?('search_conditions') ? params.require('search_conditions').permit! : nil
   end
 
   def initialize_params

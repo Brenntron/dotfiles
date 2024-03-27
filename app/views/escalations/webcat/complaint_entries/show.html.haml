@@ -3,10 +3,7 @@
     .col-xs-2.col-with-divider.webcat-complaint-case-wrapper
       .webcat-complaint-case-id-wrapper
         .complaint-entry-id
-          -# ToDo: This is neither a link nor
-            part of a dropdown. Should be changed to a span and have the
-            dropdown class removed.
-          %span.complet-entry-id#complaint-id
+          %span#complaint_entry_id
             = @complaint_entry.id.to_s
         .complaint-status-col-wrapper
           %label.content-label-sm
@@ -137,14 +134,14 @@
               %button.status-comment-button.esc-tooltipped{ title: @complaint_entry&.resolution_comment }
 
     .col-xs-2.col-with-divider
-      .row.complaint-assignee-wrapper
-        .complaint-owner-wrapper.col-xs-6
+      .complaint-assignee-wrapper
+        .complaint-owner-wrapper
           %label.content-label-sm
             Assignee
           %div
             %span#complaint-assignee{ class: ('missing-data' if @complaint_entry.user_id.nil? || @complaint_entry.user.cvs_username == 'vrtincom' ) }= @complaint_entry.user&.cvs_username || Unassigned
         - if can? :update, ComplaintEntry
-          .complaint-owner-buttons-wrapper.col-xs-6
+          .complaint-owner-buttons-wrapper
             - if @complaint_entry.user_id == current_user.id
               - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
                 %button.return-ticket-button.esc-tooltipped{ onclick: 'webcat_toolbar_unassign_complaint();',
@@ -170,14 +167,14 @@
                                                                                                                                   'aria-haspopup': 'true',
                                                                                                                                   'data-toggle': 'dropdown',
                                                                                                                                   title: 'Change Assignee' }
-      .row.complaint-reviewer-wrapper
-        .complaint-owner-wrapper.col-xs-6
+      .complaint-reviewer-wrapper
+        .complaint-owner-wrapper
           %label.content-label-sm
             Reviewer
           %div
             %span#complaint-reviewer{ class: ('missing-data' if @complaint_entry.reviewer_id.nil? || @complaint_entry.reviewer.cvs_username == 'vrtincom' ) }= @complaint_entry.reviewer&.cvs_username || 'Unassigned'
         - if can? :update, ComplaintEntry
-          .complaint-owner-buttons-wrapper.col-xs-6
+          .complaint-owner-buttons-wrapper
             - if @complaint_entry.user_id == current_user.id
               - if (@complaint_entry.resolution != ComplaintEntry::STATUS_RESOLVED_DUPLICATE) && (@complaint_entry.status != ComplaintEntry::RESOLVED)
                 %button.return-ticket-button.esc-tooltipped{ onclick: 'webcat_toolbar_unassign_complaint();',
@@ -233,15 +230,16 @@
               = @source
           - else
             Internal
-    .col-xs-2.com-with-divider
+    .col-xs-2.col-with-divider
       .submitter-type-wrapper
         %label.content-label-sm
           Submitter Type
-        %p= @complaint.submitter_type || 'None'
+        %p= @complaint.submitter_type || 'NON-CUSTOMER'
       .submitter-org-wrapper
         %label.content-label-sm
           Submitter Organization
-        %p= @complaint.customer_org || 'None'
+        %p= @org_name
+
     .col-xs-2
       .contact-name-wrapper
         %label.content-label-sm
@@ -252,32 +250,21 @@
           Contact Email
         %p.complaint-edit-field#complaint-customer-email= @complaint.customer&.email || 'None'
 
-%ul.nav.nav-tabs#ce-tabs{ role: 'tablist' }
+%ul.nav.nav-tabs#ce_tabs{ role: 'tablist' }
   %li.nav-item.active{ role: 'presentation' }
-    %a.nav-link#ce-research-tab-link{ 'aria-controls': 'research',
-                                      'data-toggle': 'tab',
-                                      href: '#research-tab',
-                                      role: 'tab' }
+    %a.nav-link#research-tab-link{ 'aria-controls': 'research',
+                                    'data-toggle': 'tab',
+                                    href: '#research-tab',
+                                    role: 'tab' }
       research
   %li.nav-item{ role: 'presentation' }
-    %a.nav-link#ce-history-tab-link{ 'aria-controls': 'history',
-                                     'data-toggle': 'tab', href: '#history-tab',
-                                     role: 'tab' }
+    %a.nav-link#history-tab-link{ 'aria-controls': 'history',
+                                   'data-toggle': 'tab', href: '#history-tab',
+                                   role: 'tab' }
       history
 -# Bootstrap tabs: https://getbootstrap.com/docs/3.4/javascript/#tabs
-.tab-content.content-wrapper#ce-tab-content
+.tab-content.content-wrapper#ce_tab_content
   .tab-pane.active#research-tab{ role: 'tabpanel' }
     = render 'escalations/webcat/complaint_entries/research_tab'
   .tab-pane#history-tab{ role: 'tabpanel' }
     = render 'escalations/webcat/complaint_entries/history_tab'
-
-:javascript
-  $(document).ready(function() {
-    var domain = "#{@complaint_entry.domain}";
-
-    window.get_suggested_categories(domain)
-    window.get_current_categories(domain);
-    window.get_ce_domain_history(domain);
-    window.get_ce_xbrs_history(domain);
-    window.get_ce_related_history(domain);
-  })

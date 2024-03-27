@@ -16,11 +16,29 @@
     }
   }
 
+  .col-with-divider {
+    min-height: 82px;
+  }
+
   .complaint-assignee-wrapper {
     margin-bottom: 10px;
   }
 
+  .complaint-assignee-wrapper, .complaint-reviewer-wrapper {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .complaint-owner-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
   .complaint-owner-buttons-wrapper {
+    align-self: flex-end;
+    display: flex;
+
     h3 {
       padding: 2px 10px !important;
     }
@@ -100,7 +118,7 @@
 
 .ce-research-column, .ce-history-column {
   & > div {
-    margin: 10px 0;
+    padding: 0 0 10px;
   }
 
   & > label {
@@ -109,6 +127,10 @@
 
   div {
     box-sizing: border-box;
+  }
+
+  .ce-tab-title {
+    margin-bottom: 14px;
   }
 
   .research-data-header, .history-data-header {
@@ -127,14 +149,16 @@
     }
   }
 
-  #ce-wbrs-score-wrapper {
+  #ce_wbrs_score_wrapper {
     float: right;
 
     .webcat-research-svg {
+      bottom: 1px;
       display: initial;
+      position: relative;
     }
 
-    #ce-wbrs-score {
+    #ce_wbrs_score {
       line-height: normal;
     }
   }
@@ -160,8 +184,17 @@
     margin: 5px 0 40px;
   }
 
-  #ce-tags-wrapper {
-    button {
+  #ce_tags_wrapper {
+    display: flex;
+    gap: 100px;
+
+    p {
+      align-items: center;
+      display: flex;
+    }
+
+    .tags-button {
+      background-image: url(image_path('icon_edit.svg'));
       background-position: center center;
       background-repeat: no-repeat;
       border: none;
@@ -234,7 +267,7 @@
     display: flex;
     gap: 4px;
 
-    .ce-resolution-radio-button {
+    .resolution-radio-button {
       appearance: none;
       --webkit-appearance: none;
       background-color: $content-bg-color;
@@ -281,7 +314,6 @@
   }
 
   .ce-customer-comment-textarea, .ce-internal-comment-textarea {
-    color: $type-lighter-color;
     font-size: 12px;
     line-height: 1.4;
     resize: none;
@@ -293,18 +325,24 @@
 
   .ce-internal-comment-textarea {
     min-height: 50px;
+
+    &::placeholder {
+      color: $type-lighter-color;
+      font-style: italic;
+    }
   }
 
-  #ce-registrant-label, #ce-name-servers-label {
+  #ce_registrant_label, #ce_name_servers_header {
     border-bottom: 1px solid $faint-neutral-color;
   }
 
-  #ce-registrant-table {
+  #ce_registrant_table {
     margin-top: 0;
     border-bottom: 1px solid $faint-neutral-color;
   }
 
   .data-report-table-column-header {
     font-weight: 900;
+    width: 125px;
   }
 }

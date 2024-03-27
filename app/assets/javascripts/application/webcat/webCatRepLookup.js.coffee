@@ -66,10 +66,10 @@ namespace 'WebCat.RepLookup', (exports) ->
   # The inline whois dialog may not need all the information either, and may just
   # need what is displayed for clusters.
   exports.formatIcannData = (whoisData) ->
-    parsedData = parseIcannData(whoisData)
+    parsedData = WebCat.RepLookup.parseIcannData(whoisData)
     return stringifyData(parsedData)
 
-  parseIcannData = (whoisData) ->
+  exports.parseIcannData = (whoisData) ->
     domainStatuses = []
     keyedData = []
     nservers = []
