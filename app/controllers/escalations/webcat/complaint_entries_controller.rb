@@ -31,7 +31,7 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
     if data
       send_data data, type: 'image/jpeg'
     else
-      file_data = File.read("app/assets/images/removed_screenshot.jpg")
+      file_data = File.open("app/assets/images/removed_screenshot.jpg").read()
       send_data file_data, type: 'image/jpeg'
     end
   end
@@ -45,7 +45,7 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   end
 
   def datatables_search_params
-    params.fetch(:search, { value: '' }).permit(:value)
+    params.fetch(:search, {value: ''}).permit(:value)
   end
 
   def robust_search_params
@@ -53,7 +53,7 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   end
 
   def search_conditions
-    params.key?('search_conditions') ? params.require('search_conditions').permit! : nil
+    params.has_key?('search_conditions') ? params.require('search_conditions').permit! : nil
   end
 
   def initialize_params
