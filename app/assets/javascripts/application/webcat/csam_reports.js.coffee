@@ -26,12 +26,9 @@ $ ->
       open_forward_report_dialog(entries)
 
     window.resubmit_csam_report = () ->
-      force = 'false'
-      if $('#resend_csam_reports_force').checked == true
-        force = 'true'
       $('#resend_csam_reports_table tbody tr').each ->
         entry_id = $(this).find('.report-entry-id-col').text()
-        data = {complaint_entry_id: entry_id, force: force}
+        data = {complaint_entry_id: entry_id, force: true}
         $.ajax(
           url: '/escalations/api/v1/escalations/webcat/complaints/resubmit_abuse_report'
           data: data
@@ -39,10 +36,14 @@ $ ->
           headers: 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
           success: (response) ->
             console.log response
-            std_msg_success('Report sent.')
+            $('#resend_csam_reports_table tbody').empty()
+            $('#resend_csam_reports_dialog').dialog 'close'
+            std_msg_success('Success', ['Report resent.'])
           error: (response) ->
             console.log response
-            std_msg_error('Error sending report')
+            $('#resend_csam_reports_table tbody').empty()
+            $('#resend_csam_reports_dialog').dialog 'close'
+            std_msg_error('Error', ['Report was not able to be sent'])
         , this)
 
 
@@ -58,10 +59,14 @@ $ ->
           headers: 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
           success: (response) ->
             console.log response
-            std_msg_success('Report sent.')
+            $('#forward_csam_reports_table tbody').empty()
+            $('#forward_csam_reports_dialog').dialog 'close'
+            std_msg_success('Success', ['Report emailed.'])
           error: (response) ->
             console.log response
-            std_msg_error('Error sending report')
+            $('#forward_csam_reports_table tbody').empty()
+            $('#forward_csam_reports_dialog').dialog 'close'
+            std_msg_error('Error', ['Report was not able to be forwarded.'])
         , this)
 
 

@@ -59,14 +59,7 @@
             %tr
               %th Entry
               %th Url
-    .row
-      .col-xs-12.text-center
-        %label.content-label-sm Checking 'Force' will resend report even if report has been successfully sent previously.
-        .checkbox-wrapper
-          %input#resend_csam_reports_force{name: 'resend_csam_reports_force', type: 'checkbox'}
-          %label.checkbox-label{for: 'resend_csam_reports_force', value: 'force'} Force send
 
-        %hr.thin
     .row
       .col-xs-12.text-center.button-row
         %button#resend_csam_reports_submit.primary{type: 'button', value: 'submit', onclick: 'resubmit_csam_report()'} Resend Report
