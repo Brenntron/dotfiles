@@ -134,6 +134,7 @@ maps.n["[g"] = { "<cmd>lua require('gitsigns').prev_hunk()<cr>", desc = "Previou
 
 -- Lsp
 maps.n["<leader>l"] = sections.l
+maps.n["<leader>ld"] = { function() require("trouble").toggle("document_diagnostics") end, desc = "Diagnostics" }
 maps.n["<leader>li"] = { "<cmd>LspInfo<cr>", desc = "Lsp Info"}
 maps.n["<leader>ll"] = { "<cmd>LspLog<cr>", desc = "Lsp Log"}
 maps.n["<leader>lf"] = { "<cmd>lua vim.lsp.buf.format{ async = true, timeout_ms = 5000 }<cr>", desc = "Format file" }
@@ -148,6 +149,7 @@ maps.n["<leader>la"] = { "<cmd>lua vim.lsp.buf.code_action()<cr>", desc = "Code 
 maps.n["<leader>lj"] = { "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", desc = "Next diagnostic" }
 maps.n["<leader>lk"] = { "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", desc = "Previous diagnostic" }
 maps.n["<leader>lr"] = { "<cmd>lua vim.lsp.buf.rename()<cr>", desc = "Rename" }
+maps.n["<leader>lw"] = { function() require("trouble").toggle("workspace_diagnostics") end, desc = "Workspace Diagnostics" }
 maps.n["<leader>lsh"] = { "<cmd>lua vim.lsp.buf.signature_help()<CR>", desc = "Signature help" }
 maps.n["<leader>lsr"] = { function() require("trouble").toggle("lsp_references") end, desc = "Show References" }
 maps.n["<leader>lsd"] = { function() require("trouble").toggle("lsp_definitions") end, desc = "Show Definitions" }
@@ -179,11 +181,6 @@ maps.n["<leader>ps"] = { desc = "Stop timers." }
 maps.n["<leader>psa"] = { "<cmd>TimerStop -1<cr>", desc = "Stop all timers." }
 maps.n["<leader>psr"] = { "<cmd>TimerStop<cr>", desc = "Stop most recent timer." }
 maps.n["<leader>pw"] = { "<cmd>TimerStart 25m work<cr>", desc = "Start work time." }
-
--- Trouble for None-Ls
-maps.n["<leader>nt"] = { desc = 'Trouble Windows' }
-maps.n["<leader>ntd"] = { function() require("trouble").toggle("document_diagnostics") end, desc = "Diagnostics" }
-maps.n["<leader>ntw"] = { function() require("trouble").toggle("workspace_diagnostics") end, desc = "Workspace Diagnostics" }
 
 -- Vim-Test
 maps.n["<leader>r"] = sections.r
