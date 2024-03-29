@@ -12,5 +12,3 @@ source ${FZF_BASE}/shell/completion.zsh
 # Key bindings
 # ------------
 source ${FZF_BASE}/shell/key-bindings.zsh
-
-eval "$(fzf --zsh)"
