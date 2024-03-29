@@ -958,15 +958,6 @@ button {
   position: absolute;
 }
 
-#research-tab-toolbar {
-  .dropdown {
-    max-height: 27px;
-  }
-
-  .toolbar-dropdown {
-    margin-left: 3px;
-  }
-}
 
 #convert-ticket-dropdown, #webrep-convert-ticket-dropdown {
   border-top-right-radius: 4px;
@@ -6467,17 +6458,7 @@ h5.entry-details-table-header {
   margin-top: 0;
 }
 
-// show full toolbar labels on smaller screens for less-wide toolbars
-@media (min-width: 1100px) {
-  #research-tab-toolbar .toolbar-button-text {
-    display: block;
-    margin-left: 8px;
-  }
-  // context tags tab exists on both webrep and filerep
-  .tab-context-tags .toolbar-button-text {
-    display: block;
-  }
-}
+
 
 .col-editing {
   padding: 0 8px !important;
@@ -11714,13 +11695,7 @@ button.secondary.view-report-external-button {
   width: 100%;
 }
 
-// dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
-@media screen and (min-width: 1600px) {
-  #research-tab-toolbar .toolbar-button-label .toolbar-button-text, .toolbar-button-label
-  .toolbar-button-text {
-    padding-top: 1px;
-  }
-}
+
 #temp_row .delete-search-image{
   background-image: url(image_path('icon_cancel_grey.svg'));
   display: block;
@@ -12847,26 +12822,7 @@ input[type="radio"].resolution_radio_button {
 }
 
 
-// webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
-@media screen and (max-width: 1700px) and (min-width: 1551px) {
-  #research-tab-toolbar {
-    .toolbar-button {
-      background-position: 6px 6px;
-      padding-left: 9px;
-      padding-right: 8px;
-      min-height: 25px;
-      background-size: 14px 14px; // icon size
-      transition: background-color 0.2s;
-    }
-  }
-}
-// fix the collapse breakpoint
-@media screen and (max-width: 1550px) {
-  #research-tab-toolbar .toolbar-button-text, .toolbar-button-text {
-    display: none;
-    margin-left: 8px;
-  }
-}
+
 
 // styles for talos logo + copyright info in bottom-left of side nav
 .copyright-area {
@@ -13450,10 +13406,6 @@ table > tbody > tr > td.no-padding {
 #disputes-research-table {
   border-collapse: separate;
   border-spacing: 0 10px;  // add vertical space between rows
-}
-
-#research-tab-toolbar, #research-page-toolbar {
-  margin-bottom: 5px;
 }
 
 .research-table-details-wrapper table td {
