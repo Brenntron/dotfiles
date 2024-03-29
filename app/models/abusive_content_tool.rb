@@ -269,7 +269,7 @@ class AbusiveContentTool
       if response_code == "0"
         results[:status] = "success"
         report_id = response_xml.xpath('//reportId').text
-        abuse_record = AbuseRecord.update_and_save_record(abuse_record, url, body, response_xml, report_id, AbuseRecord::NCMEC, user, complaint_entry, abuse_record)
+        abuse_record = AbuseRecord.build_and_save_record(url, body, response_xml, report_id, AbuseRecord::NCMEC, user, complaint_entry, abuse_record)
       else
         results[:status] = "error"
         abuse_record = AbuseRecord.build_and_save_record(url, body, response_xml, nil, AbuseRecord::NCMEC, user, complaint_entry, abuse_record)
