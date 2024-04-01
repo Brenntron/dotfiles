@@ -45,6 +45,7 @@ vim.opt.eol = true
 -- Tab settings
 vim.opt.expandtab = true -- convert tabs to spaces
 vim.opt.tabstop = 2 -- insert 2 spaces for a tab
+vim.opt.softtabstop = 2 -- insert 2 spaces for a tab
 
 -- Indent settings
 vim.opt.shiftwidth = 2 -- the number of spaces inserted for each indentation

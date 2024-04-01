@@ -180,6 +180,7 @@ function M.config()
           "~/.config/rubocop",
           "~/.config/tokyonight",
           "~/.config/yamllint",
+          "~/Documents/Second Brain/"
         },
         exclude_dirs = {
           "Users/jewillin"
