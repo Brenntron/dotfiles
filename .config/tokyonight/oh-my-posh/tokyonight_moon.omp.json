@@ -29,8 +29,8 @@
           "foreground": "p:terminal-blue",
           "template": "{{.Icon}} ",
           "properties": {
-            "linux": "",
-            "macos": ""
+            "linux": " ",
+            "macos": " "
           }
         },
         {

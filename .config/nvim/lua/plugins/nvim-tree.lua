@@ -38,6 +38,7 @@ function M.config()
       },
       show_on_dirs = true,
     },
+    filters = { custom = { "^.git$" } },
     on_attach = on_attach,
     renderer = {
       add_trailing = false,
