@@ -25,12 +25,18 @@
       #ce_wbrs_score_wrapper
         %label.content-label-sm
           WBRS Score
+        %div
+          %span{ class: ['webcat-research-svg', wbrs_score_icon(@complaint_entry.wbrs_score)] }
+          %p#ce_wbrs_score= @complaint_entry.wbrs_score
     #ce_suggested_categories_wrapper
       %label.content-label-sm
         Suggested Categories
+      = suggested_categories(@complaint_entry.suggested_disposition)
     .bottom-divider#ce_description_wrapper
       %label.content-label-sm
         Description
+      %p#ce_description
+        = @complaint.description
     %h5.research-data-header.text-uppercase
       current categories
     %label.categories-table-label WBRS

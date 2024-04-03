@@ -134,7 +134,7 @@ get_domain_history = (domain) ->
 
       $('#ce_domain_history_table').DataTable
         data: data
-        ordering: false
+        ordering: true
         info: false
         paging: false
         searching: false
@@ -194,7 +194,7 @@ get_entry_history = (entry_id) ->
 
         $('#ce_entry_history_table').DataTable
           data: formatted_entry_history
-          ordering: false
+          ordering: true
           info: false
           paging: false
           searching: false
@@ -251,11 +251,9 @@ get_xbrs_history = (domain) ->
 
         data = data[domainKey]
 
-        console.log 'xbrs history data: ', data
-
         $('#ce_xbrs_history_table').DataTable({
           data: data
-          ordering: false
+          ordering: true
           info: false
           paging: false
           searching: false
@@ -294,7 +292,7 @@ get_related_history = (domain) ->
   # TODO: implement this when the related history endpoint exists.
   $('#ce_related_history_table').DataTable({
     data: {}
-    ordering: false
+    ordering: true
     info: false
     paging: false
     searching: false
