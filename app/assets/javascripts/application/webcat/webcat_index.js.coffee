@@ -174,7 +174,7 @@ build_complaints_table = (url) ->
           ticket_col =
             '<table class="nested-col-table">' +
               '<tbody>' +
-              '<tr class="entry-id-row"><td><a href="complaints/' + full.complaint_id + '" >' + full.entry_id + '</a></td></tr>' +
+              '<tr class="entry-id-row"><td><a href="complaint_entries/' + full.entry_id + '" >' + full.entry_id + '</a></td></tr>' +
               '<tr class="age-row"><td class="' + age_class + '">' + data + '</td></tr>' +
               '<tr class="state-row"><td>' + full.status + '</td></tr>' +
               '<tr class="source-row"><td>' + complaint_source + '</td></tr>' +
