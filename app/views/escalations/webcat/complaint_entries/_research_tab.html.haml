@@ -33,13 +33,20 @@
         Description
     %h5.research-data-header.text-uppercase
       current categories
-    %table.data-report-table.bottom-divider#ce_categories_data_table
+    %label.categories-table-label WBRS
+    %table.categories-table#ce_wbrs_categories_table
       %thead
         %tr
-          %th source
           %th conf
-          %th categories
+          %th wbrs categories
           %th certainty
+      %tbody
+    %label.categories-table-label SDS
+    %table.categories-table#ce_sds_categories_table
+      %thead
+        %tr
+          %th sds uri category
+          %th sds domain category
       %tbody
     %h5.research-data-header.text-uppercase
       tags

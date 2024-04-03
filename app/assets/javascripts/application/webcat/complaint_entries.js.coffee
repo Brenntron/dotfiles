@@ -1,7 +1,5 @@
 #set empty string header so it can be updated on document ready
 headers = ''
-wbrs_confidence = 0
-wbrs_certainty = 0
 
 get_whois_data = (domain) ->
   $.ajax(
@@ -42,99 +40,79 @@ get_whois_data = (domain) ->
         )
   )
 
-update_wbrs_data = () ->
-  $categories_table = $('#ce_categories_data_table')
-
-  return unless $.fn.dataTable.isDataTable($categories_table)
-
-  wbrs_data = $categories_table.DataTable().row(0).data()
-  wbrs_data.wbrs_certainty = wbrs_certainty
-  wbrs_data.wbrs_confidence = wbrs_confidence
-
-  $('#ce_categories_data_table').DataTable().row(0).data(wbrs_data)
-
-get_suggested_categories = (domain) ->
+get_current_categories = (entry_id) ->
   $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/current_content_categories'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     method: 'POST'
     headers: headers
     data:
-      'uri': [ domain ]
+      'id': entry_id
     success: (response) ->
-      cat_names = []
+      { current_category_data : current_categories, sds_category, sds_domain_category } = JSON.parse(response)
+      wbrs_table_rows = ""
+      current_categories = if Object.keys(current_categories).length > 0
+                             current_categories
+                           else
+                             {
+                               "1.0": {
+                                 "category_id": 2,
+                                 "desc_long": "Galleries and exhibitions; artists and art; photography; literature and books; performing arts and theater; musicals; ballet; museums; design; architecture.  Cinema and television are classified as Entertainment.",
+                                 "descr": "Arts",
+                                 "mnem": "art",
+                                 "is_active": true,
+                                 "confidence": 1,
+                                 "top_certainty": 1000,
+                                 "certainties": [
+                                   {
+                                     "category_id": 2,
+                                     "certainty": 1000,
+                                     "source_mnemonic": "cipr_multi",
+                                     "source_description": "Multicat Cisco/IronPort Rules"
+                                   }
+                                 ]
+                               }
+                             }
+      if Object.keys(current_categories).length > 0
+        $.each current_categories, (conf, current_category) ->
+          # For $.each returning non-false is the same as a continue statement in a for loop
+          return 'continue' unless current_category.is_active
 
-      $(response.data).each ->
-        if this[0].url == domain
-          categories = this[0].categories
+          { confidence, mnem: mnemonic, top_certainty, certainties } = current_category
+          wbrs_table_rows = ""
 
-          if Object.keys(categories).length > 0
-            jQuery.each categories, (id, category) ->
-              cat_names.push(category.descr)
+          if certainties?
+            certainties.forEach (certainty) ->
+              { certainty: source_certainty, source_description, source_mnemonic } = certainty
 
-      cat_names = cat_names.join(', ')
-      category_message = if cat_names.length > 0
-                           "<p id='ce_suggested_categories'>#{cat_names}</p>"
-                         else
-                           "<p class='missing-data' id='ce_suggested_categories'>'No suggested categories available.'</p>"
+              wbrs_table_rows += "<tr>
+                                     <td>
+                                       #{source_certainty}
+                                     </td>
+                                     <td>
+                                       #{source_mnemonic}
+                                     </td>
+                                     <td>
+                                       #{source_description}
+                                     </td>
+                                   </tr>"
+          else
+            wbrs_table_rows += "<tr>
+                                  <td>
+                                    #{confidence}
+                                  </td>
+                                  <td>
+                                    #{mnemonic}
+                                  </td>
+                                  <td>
+                                    #{top_certainty}
+                                  </td>
+                                </tr>"
 
-      $('#ce_suggested_categories_wrapper').append(category_message)
-    error: (errorResponse) ->
-      std_api_error(errorResponse, "Suggested Categories for this Entry could not be retrieved.", reload: false)
-  )
+        $('#ce_wbrs_categories_table > tbody').append(wbrs_table_rows)
+      if sds_category? || sds_domain_category?
+        sds_table_row = "<td>#{sds_category}</td><td>#{sds_domain_category}</td>"
 
-get_current_categories = (domain) ->
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories_by_url'
-    method: 'POST'
-    headers: headers
-    data:
-      'domain': domain
-    success: (response) ->
-      parsed_response = JSON.parse response
-      { sds_category, sds_domain_category } = parsed_response
-      data = [
-        {
-          source: 'WBRS',
-          conf: wbrs_confidence,
-          categories: '',
-          certainty: wbrs_certainty
-        },
-        {
-          source: 'SDS URI',
-          conf: '',
-          categories: sds_category,
-          certainty: ''
-        },
-        {
-          source: 'SDS Domain',
-          conf: '',
-          categories: sds_domain_category,
-          certainty: ''
-        }
-      ]
-
-      $('#ce_categories_data_table').DataTable(
-        data: data
-        ordering: false
-        info: false
-        paging: false
-        searching: false
-        stateSave: false
-        columns: [
-          {
-            data: 'source'
-          }
-          {
-            data: 'conf'
-          }
-          {
-            data: 'categories'
-          }
-          {
-            data: 'certainty'
-          }
-        ]
-      )
+        $('#ce_sds_categories_table > tbody').append(sds_table_row)
     error: (errorResponse) ->
       std_api_error(errorResponse, "Current Categories for this Entry could not be retrieved.", reload: false)
   )
@@ -150,16 +128,6 @@ get_domain_history = (domain) ->
       data = response.data
       recent_data = data.at(-1)
       description = recent_data.description
-      wbrs_score = recent_data.score
-      rep = wbrs_display(wbrs_score)
-
-      $('#ce_description_wrapper').append("<p id='ce_description'>#{description}</p>")
-      $('#ce_wbrs_score_wrapper').append("<div><span class='webcat-research-svg icon-#{rep}'></span><p id='ce_wbrs_score'>#{wbrs_score}</p></div>")
-
-      wbrs_certainty = recent_data.certainty
-      wbrs_confidence = recent_data.confidence
-
-      update_wbrs_data()
 
       # remove baseline domain entry
       data.splice(0, 1)
@@ -361,8 +329,7 @@ $ ->
     domain_title = $('#domain_title')[0].innerText.replace(/(\r\n|\n|\r)/gm, "") # remove newlines
 
     get_resolution_templates(resolution, 'individual', [entry_id])
-    get_current_categories(domain_title)
-    get_suggested_categories(domain_title)
+    get_current_categories(entry_id)
     get_whois_data(domain_title)
     get_domain_history(domain_title)
     get_entry_history(entry_id)

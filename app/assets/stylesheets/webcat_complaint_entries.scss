@@ -170,6 +170,23 @@ $type-faint-accent: #D7DADB; /* Lighter Grey */
     }
   }
 
+  .categories-table-label {
+    font-style: bold;
+  }
+
+  .categories-table {
+    font-size: 11px;
+    text-align: left;
+    margin-top: 6px;
+    margin-bottom: 15px;
+
+    td, th {
+      border-color: #707070;
+      padding: 4px;
+      line-height: 1.25em;
+    }
+  }
+
   .data-report-table {
     margin-bottom: 20px;
 
