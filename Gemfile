@@ -25,7 +25,7 @@ gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'bootstrap-sass', '~> 3.4.1'
 gem "sassc", '2.4.0'
 gem "sassc-rails", '~> 2.0'
-gem 'mini_racer', '0.8.0'
+# gem 'libv8', '3.16.14.19'
 gem 'turbolinks', '5.2.0'
 gem "sprockets", '~> 3.7.1'
 gem 'jbuilder', '2.9.0'
@@ -33,7 +33,7 @@ gem 'inline_svg', '1.3.1'
 gem 'selectize-rails', '~> 0.12.4'
 
 # Database
-gem 'mysql2', '0.5.4'
+gem 'mysql2'
 gem 'paper_trail', '12.0.0'
 gem 'rails_admin', '~> 2.2.1'
 gem 'redis'
@@ -57,9 +57,12 @@ gem "net-imap"
 gem "uri", "0.12.0"
 gem 'httparty', '~> 0.15.3'
 
-gem 'peake-bridge-client', '~> 0.2.0.0', path: 'vendor/gems/peake-bridge-client'
+gem 'peake-bridge-client', '0.2.0.2', path: 'vendor/gems/peake-bridge-client'
+
 # gem 'peake-bridge-client', '0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
-# gem 'peake-bridge-client', '0.1.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
+# gem 'peake-bridge-client', '0.2.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
+# gem 'peake-bridge-client', '~> 0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
+# gem 'peake-bridge-client', '~> 0.2.0', git: "https://github.com/cisco-sbg/talos-atlas-peake-bridge-client.git"
 
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'
@@ -104,6 +107,7 @@ gem 'delayed_job_web', '1.4.3'
 gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
 
+
 gem 'clipboard-rails', '1.7.1'
 
 gem 'poltergeist', '1.18.1'
@@ -119,11 +123,9 @@ gem 'hashie'
 
 gem 'mail'
 gem 'simpleidn'
-gem 'red-parquet', '8.0.0'
 
 gem 'symmetric-encryption', require: false
 gem 'vault'
-
 
 group :production, :staging do
   gem 'elastic-apm', '4.5.0'
