@@ -15,6 +15,11 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
     @complaint_entry = ComplaintEntry.find(params[:id])
     @complaint = @complaint_entry.complaint
     @source = @complaint.ticket_source
+    @submitted_ip_uri = if @complaint_entry.uri.nil?
+                          @complaint_entry.ip_address
+                        else
+                          @complaint_entry.uri
+                        end
     @org_name = if @complaint.customer.nil?
                   'Guest'
                 else
