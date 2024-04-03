@@ -1,19 +1,10 @@
 module Escalations::Webcat::ComplaintEntriesHelper
-  def complaint_entry_age(assigned_at)
-    return '' unless assigned_at
+  def complaint_entry_age(complaint_entry)
+    created_at_in_words = time_ago_in_words(complaint_entry.created_at.to_time, { scope: 'datetime.distance_in_words', include_seconds: false })
+    ComplaintEntry.first_two_time_layers(created_at_in_words)
+  end
 
-    age = assigned_at - DateTime.now
-    age = age.abs # lazy
-    mm, _ss = age.divmod(60)
-    hh, mm = mm.divmod(60)
-    dd, hh = hh.divmod(24)
 
-    if dd > 0
-      "%dd %dh" % [dd, hh]
-    elsif hh > 0
-      "%dh %dm" % [hh, mm]
-    elsif hh == 0
-      "<1 hr"
     end
   end
 
