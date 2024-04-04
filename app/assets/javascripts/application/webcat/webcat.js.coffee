@@ -111,8 +111,13 @@ $ ->
     localStorage.webcat_search_type = 'named'
     localStorage.webcat_search_name  = search_name
     localStorage.webcat_search_conditions = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
-    $('#complaints-index').DataTable().state.clear()
-    refresh_url()
+    $complaints_index = $('#complaints-index')
+
+    if $complaints_index.length
+      $complaints_index.DataTable().state.clear()
+      refresh_url()
+    else
+      window.location.replace('/escalations/webcat/complaints')
 
 
   window.search_for_tag = (tag) ->
@@ -135,7 +140,7 @@ $ ->
 
   # This is used when there is an error calling the data
   # or when clearing the search to the default data (favorite filter if set by user)
-  window.webcat_refresh = ()->
+  window.webcat_refresh = () ->
     refresh_webcat_localStorage()
     refresh_url()
 
@@ -144,9 +149,10 @@ $ ->
     { webcat_search_type, webcat_search_name } = localStorage
     url_check = current_url.split('/escalations/webcat/complaints/')[0]
     new_url = '/escalations/webcat/complaints'
+
     if href != undefined
       window.location.replace( new_url + href )
-    if !href && typeof parseInt(url_check) == 'number'
+    else if !href && typeof parseInt(url_check) == 'number'
       window.location.replace('/escalations/webcat/complaints')
       localStorage.setItem('webcat_reset_page', true)
 
@@ -238,7 +244,7 @@ $ ->
         if search_name == saved_name
           return true
 
-  if $('#complaints-index').length
+  if $('#complaints-index').length || ($body.hasClass('escalations--webcat--complaint_entries-controller') && $body.hasClass('show-action'))
 
     ## WEBCAT ADVANCED SEARCH FUNCTIONS
 
