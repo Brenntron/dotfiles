@@ -214,7 +214,13 @@ build_complaints_table = (url) ->
 
           if full.customer_email?
             if full.customer_email != ''
-              email_row = '<tr class="submitter-email-row"><td>' + full.customer_email + '</td></tr>'
+              email_row =
+                '<tr class="submitter-email-row">' +
+                  '<td>' +
+                  '<span>' + full.customer_email + '</span>' +
+                  '<a href="' + $('#complaints-index').data('banhammer-host') + '?q=' + full.customer_email + ' " title="Ban user: ' + full.customer_email + '" class="ban esc-tooltipped"></a>' +
+                  '</td>' +
+                '</tr>'
             else
               email_row = ''
           else
