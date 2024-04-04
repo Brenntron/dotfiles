@@ -25,7 +25,7 @@ gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'bootstrap-sass', '~> 3.4.1'
 gem "sassc", '2.4.0'
 gem "sassc-rails", '~> 2.0'
-gem 'mini_racer', '0.8.0'
+# gem 'libv8', '3.16.14.19'
 gem 'turbolinks', '5.2.0'
 gem "sprockets", '~> 3.7.1'
 gem 'jbuilder', '2.9.0'
@@ -33,7 +33,7 @@ gem 'inline_svg', '1.3.1'
 gem 'selectize-rails', '~> 0.12.4'
 
 # Database
-gem 'mysql2', '0.5.4'
+gem 'mysql2'
 gem 'paper_trail', '12.0.0'
 gem 'rails_admin', '~> 2.2.1'
 gem 'redis'
@@ -58,8 +58,6 @@ gem "uri", "0.12.0"
 gem 'httparty', '~> 0.15.3'
 
 gem 'peake-bridge-client', '~> 0.2.0.0', path: 'vendor/gems/peake-bridge-client'
-# gem 'peake-bridge-client', '0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
-# gem 'peake-bridge-client', '0.1.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
 
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'
@@ -119,11 +117,9 @@ gem 'hashie'
 
 gem 'mail'
 gem 'simpleidn'
-gem 'red-parquet', '8.0.0'
 
 gem 'symmetric-encryption', require: false
 gem 'vault'
-
 
 group :production, :staging do
   gem 'elastic-apm', '4.5.0'
