@@ -29,32 +29,21 @@
           .grid-header{:style => "width:100%"}
       %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}/
 
-      %table.table.responsive.no-wrap#complaints-index{role: 'datatable', 'data-source': escalations_webcat_complaint_entries_path(format: :json), 'data-banhammer-host': Rails.configuration.banhammer_host }
+      %table.table.responsive.no-wrap#complaints-index{role: 'datatable', 'data-source': escalations_webcat_complaint_entries_path(format: :json) }
         %thead
           %tr
-            %th.sorting_disabled
-              -#  Expandable button area
-              %input#complaints_check_box{type: 'checkbox'}
-            %th.webcat-sorting#important
-            %th.webcat-sorting#entry Entry ID
-            %th.webcat-sorting#age Age
-            %th.webcat-sorting#status Status
-            %th.webcat-sorting#tags Tags
-            %th.webcat-sorting#subdomain Subdomain
-            %th.webcat-sorting#domain Domain / IP
-            %th.webcat-sorting#path Path
-            %th.webcat-sorting#uri URI
-            %th.webcat-sorting#primary Primary Cat
-            %th.webcat-sorting#suggested Suggested Cat
-            %th.webcat-sorting#wbrs WBRS
-            %th.webcat-sorting#platform Platform
-            %th.webcat-sorting#submittertype Submitter Type
-            %th.webcat-sorting#submitterorg Submitter Org
-            %th.webcat-sorting#submitteremail Submitter Email
-            %th.webcat-sorting#channel Channel
-            %th.webcat-sorting#assignee Assignee
-            %th.webcat-sorting#reviewer Reviewer
-            %th.webcat-sorting#second_reviewer Second Reviewer
+            %th Ticket
+            %th Submitter
+            %th Tags
+            %th Users
+            %th Description
+            %th Suggested
+            %th IP/URI
+            %th Tools
+            %th Categories
+            %th Resolution
+
+
 
 .modal.fade#resolution_dialog
   .modal-dialog.modal-sm
@@ -69,6 +58,10 @@
         %hr.thin.form-divider
         %button#submit_resolution_changes.primary{type: 'button', 'onclick': 'updateResolution();'} Confirm
         %button.secondary{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Cancel'} Cancel
+
+= render 'escalations/webcat/complaints/submit_entries_confirmation'
+= render 'escalations/webcat/complaints/submit_reviewed_confirmation'
+= render 'escalations/webcat/complaints/bulk_resolution_tool'
 
 - if current_user.is_webcat_manager?
   = render 'escalations/webcat/complaints/wbnp_full_report'

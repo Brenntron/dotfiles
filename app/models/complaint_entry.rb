@@ -3,6 +3,14 @@ include ActionView::Helpers::DateHelper
 class ComplaintEntry < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at, :case_resolved_at, :case_assigned_at]
 
+  before_update :update_duplicates
+
+  after_create :check_and_process_duplicate
+
+  belongs_to :canonical, class_name: "ComplaintEntry", optional: true
+
+  has_many :duplicate_entries, class_name: "ComplaintEntry", foreign_key: 'canonical_id'
+
   belongs_to :complaint
   belongs_to :user, optional: true
   belongs_to :reviewer, class_name: 'User', optional: true
@@ -15,6 +23,7 @@ class ComplaintEntry < ApplicationRecord
   delegate :cvs_username, :display_name, to: :user, allow_nil: true, prefix: true
 
   scope :open, -> { where.not(status: [STATUS_COMPLETED, RESOLVED]) }
+  scope :open_tickets, -> { where.not(status: [STATUS_COMPLETED, RESOLVED]) }
   scope :closed, -> { where(status: [STATUS_COMPLETED, RESOLVED]) }
   scope :new_entries, -> { where(status: [NEW]) }
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
@@ -25,6 +34,7 @@ class ComplaintEntry < ApplicationRecord
   RESOLVED = "RESOLVED"
   NEW = "NEW"
   PENDING = "PENDING"
+  ASSIGNED = "ASSIGNED"
   STATUS_COMPLETED = "COMPLETED"
   STATUS_REOPENED = "REOPENED"
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
@@ -33,7 +43,51 @@ class ComplaintEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_INVALID = "INVALID"
   STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
+  #this is a temporary status until R-ACE has made it across all of ac-e
+  STATUS_WEBCAT_DUPLICATE = "WC-DUPLICATE"
+
   validates_length_of :resolution_comment, maximum: 2000, allow_blank: true
+
+  def find_duplicates
+    uri_or_ip = self.hostlookup
+    #support for ipv6 carried over from work done in WEB-11015 while this was being developed
+    #is_ip_address = !!(uri_or_ip  =~ Resolv::IPv4::Regex)
+    is_ip_address = !!(uri_or_ip =~ Resolv::IPv4::Regex || uri_or_ip =~ Resolv::IPv6::Regex)
+
+    if is_ip_address
+      ComplaintEntry.open_tickets.where(:ip_address => uri_or_ip).where("id <> #{self.id}").first
+    else
+      ComplaintEntry.open_tickets.where(:uri => uri_or_ip).where("id <> #{self.id}").first
+    end
+
+  end
+
+  def convert_to_duplicate(canonical_entry)
+    self.canonical_id = canonical_entry.id
+    self.status = STATUS_WEBCAT_DUPLICATE
+    self.save
+  end
+
+  def check_and_process_duplicate
+    canonical = find_duplicates
+
+    if canonical.present?
+      convert_to_duplicate(canonical)
+    end
+  end
+
+  def update_duplicates
+
+    self.duplicate_entries.each do |dupe|
+
+      dupe.status = self.status
+      dupe.resolution = self.resolution
+      dupe.resolution_comment = self.resolution_comment
+      dupe.save
+      message = Bridge::ComplaintUpdateStatusEvent.new
+      message.post_complaint(self.complaint)
+    end
+  end
 
   def self.what_time_is_it(value)
     distance_of_time_in_words(value)
@@ -90,9 +144,9 @@ class ComplaintEntry < ApplicationRecord
 
   def take_complaint(current_user, assignment_type)
     error_messages = {
-      'assignee' => 'Currently assigned to someone else',
-      'reviewer' => 'Someone else is currently reviewing',
-      'second_reviewer' => 'Someone else is currently reviewing'
+        'assignee' => 'Currently assigned to someone else',
+        'reviewer' => 'Someone else is currently reviewing',
+        'second_reviewer' => 'Someone else is currently reviewing'
     }
 
     return("Already completed") if status == "COMPLETED"
@@ -116,7 +170,7 @@ class ComplaintEntry < ApplicationRecord
       return(error_messages[assignment_type])
     end
 
-    return 'Complaint taken'
+    return 'Entry taken'
   end
 
   def return_complaint(current_user, assignment_type)
@@ -147,16 +201,24 @@ class ComplaintEntry < ApplicationRecord
       update(second_reviewer: nil)
     end
 
-    'Complaint returned'
+    'Entry returned'
   end
 
-  def unassign(assignment_type)
+  def unassign(current_user, assignment_type)
     return("Complaint is already assigned to Vrt Incoming") if user == User.vrtincoming
+    return("Already completed") if status == 'COMPLETED'
+
+    #non-managers can only unassign assignees, not reviewer or second reviewer
+    webcat_manager = Role.where(role: 'webcat manager').first
+    unless current_user.roles.include?(webcat_manager)
+      if current_user.id != user&.id && assignment_type != "assignee"
+        return("Cannot remove assigned reviewer")
+      end
+    end
 
     case assignment_type
     when 'assignee'
       if !is_important
-        return("Already completed") if status == 'COMPLETED'
 
         update(user: User.vrtincoming, status: "NEW")
         complaint.set_status("NEW")
@@ -176,30 +238,28 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def reassign(assignee, assignment_type)
-    return("Complaint is already assigned to #{assignee.cvs_username}") if user == assignee
-    return("#{reviewer.cvs_username} is already reviewing Complaint") if user == reviewer
-    return("#{second_reviewer.cvs_username} is already the second reviewer for Complaint") if user == second_reviewer
+    raise "#{id}: Complaint is already assigned to #{assignee.cvs_username}" if user == assignee
+    raise "#{id}: #{reviewer.cvs_username} is already reviewing Complaint" if reviewer.present? && user == reviewer
+    raise "#{id}: #{second_reviewer.cvs_username} is already the second reviewer for Complaint" if second_reviewer.present? && user == second_reviewer
+    raise "Already completed" if status == "COMPLETED"
 
     case assignment_type
     when 'assignee'
       if !is_important
-        return("Already completed") if status == "COMPLETED"
-
         update(user: assignee, status: "ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
       elsif is_important && status != "PENDING"
         update(user: assignee, status: "ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
       else
-        return("Status is pending")
+        raise "#{id}: Status is pending"
       end
     when 'reviewer'
       update(reviewer: assignee)
     when 'second_reviewer'
       update(second_reviewer: assignee)
     end
-
-    "#{assignee.cvs_username} assigned to Complaint as #{assignment_type}"
+    "#{id}: #{assignee.cvs_username} assigned to Complaint as #{assignment_type}"
   end
 
   def is_pending?
@@ -233,6 +293,106 @@ class ComplaintEntry < ApplicationRecord
     @remote_prefixes_with_path ||= Wbrs::Prefix.where({:urls => [DisputeEntry.domain_of_with_path(prefix_given)]})
   end
 
+  #################################################################################################################
+  # CATEGORY CHANGING SECTION
+  #################################################################################################################
+
+  def categorize_simple(prefix,
+                        categories_string,
+                        category_names_string,
+                        entry_status,
+                        comment,
+                        resolution_comment,
+                        uri_as_categorized,
+                        current_user,
+                        commit_pending,
+                        self_review)
+
+    # not important case or resolution is "unchanged"
+    current_status = STATUS_COMPLETED
+    self.case_assigned_at ||= Time.now
+    update!(resolution: entry_status,
+            url_primary_category: category_names_string,
+            category: category_names_string,
+            status: current_status,
+            internal_comment: comment,
+            resolution_comment: resolution_comment,
+            uri_as_categorized: uri_as_categorized,
+            case_resolved_at: Time.now,user:current_user)
+    complaint.set_status(current_status)
+
+
+    #this is where we should send off the category to the API
+    if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && categories_string.present?
+      existing_prefixes = remote_prefixes(prefix_given: prefix)
+      commit_category(existing_prefixes,
+                      ip_or_uri: prefix,
+                      categories_string: categories_string,
+                      description: comment,
+                      user: current_user.email,
+                      casenumber: self.complaint.id )
+      update!(url_primary_category: category_names_string, category: category_names_string, uri_as_categorized: uri_as_categorized)
+    else
+      # TODO Do we need to update the record when we are not making a change?
+      existing_prefixes = remote_prefixes(prefix_given: prefix)
+      cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
+      update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+    end
+
+  end
+
+  def categorize_important(prefix,
+                           categories_string,
+                           category_names_string,
+                           entry_status,
+                           comment,
+                           resolution_comment,
+                           uri_as_categorized,
+                           current_user,
+                           commit_pending,
+                           self_review)
+
+    self.case_assigned_at ||= Time.now
+    # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
+    update!(status:STATUS_COMPLETED,
+            category: categories_string,
+            internal_comment: comment,
+            resolution_comment: resolution_comment,
+            uri_as_categorized: uri_as_categorized,
+            case_resolved_at: Time.now,
+            user:current_user)
+    complaint.set_status(STATUS_COMPLETED)
+    #this is where we should send off the category to the API
+
+    if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
+      existing_prefixes = remote_prefixes(prefix_given: prefix)
+      commit_category(existing_prefixes,
+                      ip_or_uri: prefix,
+                      categories_string: categories_string,
+                      description: comment,
+                      user: current_user.email,
+                      casenumber: self.complaint.id)
+      update!(url_primary_category: category_names_string, category: category_names_string)
+    else
+      # TODO Do we need to update the record when we are not making a change?
+      existing_prefixes = remote_prefixes(prefix_given: prefix)
+      cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
+      update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+    end
+
+  end
+
+
+  def post_categorize(current_user)
+    WebcatCredits::ComplaintEntries::CreditProcessor.new(current_user, self).process
+
+    if self.status == STATUS_COMPLETED && self.complaint_entry_screenshot.present?
+      self.complaint_entry_screenshot.destroy
+    end
+
+    return
+  end
+
   def change_category(prefix,
                       categories_string,
                       category_names_string,
@@ -241,168 +401,116 @@ class ComplaintEntry < ApplicationRecord
                       resolution_comment,
                       uri_as_categorized,
                       current_user,
-                      commit_pending)
+                      commit_pending,
+                      self_review)
     ActiveRecord::Base.transaction do
 
-      # If the prefix is a high telemetry value then the status needs to be set to PENDING
-      if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
-        if self.status == "PENDING"
-          if commit_pending == "commit"
-            # commit from pending of important case
+      if categories_string.blank? && entry_status == "FIXED"
+        raise "categories string is empty"
+      end
 
-            ###############################################################################################################################################################
-            ###guard rails
+      #Although it's more code efficient to put this in one block, i seperated it out for the sake of visual clarity since there's a ton
+      # of stuff going on with the categorization workflow
 
-            # TODO: this code should be refactored to use Webcat::EntryVerdictChecker class
-            verdict_pass = true
-            verdict_reasons = []
-            if categories_string.blank?
-              raise "categories string is empty"
-            end
-            begin
-              all_cats = Wbrs::Category.all
+      #First, check if not important.  If not, super simple no guardrails categorization path
+      if !self.is_important
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        return post_categorize(current_user)
+      end
 
-              category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
+      #Second, check to see if this is an unchanged decision, if it is, then there's nothing to guardrails here.
+      if entry_status == Complaint::RESOLUTION_UNCHANGED
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        return post_categorize(current_user)
+      end
 
-              cats_by_short = []
+      #Third if self-review is set to true, then it's not necessary to go through full guard rails workflow (i see this path being potentially worked on later for security reasons)
+      if self_review == true
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        return post_categorize(current_user)
+      end
 
-              category_ids_array.each do |cat_id|
-                all_cats.each do |base_cat|
-                  if base_cat.category_id == cat_id
-                    cats_by_short << base_cat.mnem
-                  end
-                end
-              end
+      #################
 
-              cats_by_short.each do |cat|
-                result = JSON.parse(Webcat::GuardRails.verdict_for_entry(prefix, cat).body)
-
-                verdict_data = result[prefix]
-
-                if verdict_data["color"] != Webcat::GuardRails::PASS
-                  verdict_pass = false
-                  verdict_reason = "|#{cat} = #{verdict_data["color"]}:"
-                  verdict_reason += "#{verdict_data["why"]["reason"].pluck("reason").join(",")} \n" rescue "no reasons data\n"
-                  verdict_reasons << verdict_reason
-                end
-
-              end
-            rescue Exception => e
-              Rails.logger.error(e.message)
-              verdict_pass = false
-              verdict_reasons << "there was an api call failure, erring to manager review"
-            end
-
-            ###############################################################################################################################################################
-            if verdict_pass == true || current_user.is_webcat_manager?
-
-              #################################################
-              current_status = "COMPLETED"
-              self.case_assigned_at ||= Time.now
-              # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
-              update!(status:current_status,
-                     category: categories_string,
-                     internal_comment: comment,
-                     resolution_comment: resolution_comment,
-                     uri_as_categorized: uri_as_categorized,
-                     case_resolved_at: Time.now,
-                     user:current_user)
-              complaint.set_status(current_status)
-              #this is where we should send off the category to the API
-
-              if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
-                existing_prefixes = remote_prefixes(prefix_given: prefix)
-                commit_category(existing_prefixes,
-                                ip_or_uri: prefix,
-                                categories_string: categories_string,
-                                description: comment,
-                                user: current_user.email,
-                                casenumber: self.complaint.id)
-                update!(url_primary_category: category_names_string, category: category_names_string)
-              else
-                # TODO Do we need to update the record when we are not making a change?
-                existing_prefixes = remote_prefixes(prefix_given: prefix)
-                cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
-                update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
-              end
-              ###################################################
-            end
-
-            if !current_user.is_webcat_manager?
-              if verdict_pass == false
-                manager_user = User.where(:cvs_username => Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
-                guard_rails_reasons = verdict_reasons.join(";")
-                update!(user: manager_user,
-                              internal_comment: "FAILED GUARDRAILS! Reason: #{guard_rails_reasons}"
-                )
-              end
-            end
-          else
-            # dismiss from pending of important case
-            current_status = "ASSIGNED"
-            update!(status:current_status,
-                   url_primary_category: self.category,
-                   internal_comment: comment,
-                   resolution_comment: resolution_comment,
-                   uri_as_categorized: uri_as_categorized,
-                   case_assigned_at: Time.now,
-                   was_dismissed: true)
-          end
-        else
-          # important not from pending
-          current_status = "PENDING"
-          update!(resolution: entry_status,
-                 url_primary_category: category_names_string,
-                 status:current_status,
-                 internal_comment: comment,
-                 resolution_comment: resolution_comment,
-                 uri_as_categorized: uri_as_categorized,
-                 user:current_user)
-        end
-      else
-        # not important case or resolution is "unchanged"
-        current_status = "COMPLETED"
-        self.case_assigned_at ||= Time.now
-        # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
+      #if the code has made it here then it's going to get guardrailed.  First step is to set the categorization attempt to "PENDING" so that it goes into
+      # 2nd person review box, which is done here.  This will set it to PENDING, and the next go around it will skip this and head closer to the workflow.
+      if self.status != PENDING
         update!(resolution: entry_status,
-               url_primary_category: categories_string,
-               category: categories_string,
-               status: current_status,
-               internal_comment: comment,
-               resolution_comment: resolution_comment,
-               uri_as_categorized: uri_as_categorized,
-               case_resolved_at: Time.now,user:current_user)
-        complaint.set_status(current_status)
-        #this is where we should send off the category to the API
-        if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && categories_string.present?
-          existing_prefixes = remote_prefixes(prefix_given: prefix)
-          commit_category(existing_prefixes,
-                          ip_or_uri: prefix,
-                          categories_string: categories_string,
-                          description: comment,
-                          user: current_user.email,
-                          casenumber: self.complaint.id )
-          update!(url_primary_category: category_names_string, category: category_names_string, uri_as_categorized: uri_as_categorized)
-        else
-          # TODO Do we need to update the record when we are not making a change?
-          existing_prefixes = remote_prefixes(prefix_given: prefix)
-          cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
-          update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+                url_primary_category: category_names_string,
+                status: PENDING,
+                internal_comment: comment,
+                resolution_comment: resolution_comment,
+                uri_as_categorized: uri_as_categorized,
+                user:current_user)
+        return post_categorize(current_user)
+      end
+
+      #if the code has made it here it's because it was in the 2nd person review and failed that review, as in, the peer reviewer did not agree with the
+      # category and has denied the commital of the categorization, which effectively sets the ticket back to assigned for the original analyst to keep
+      # working on
+      if commit_pending != "commit"
+        update!(status: ASSIGNED,
+                url_primary_category: self.category,
+                internal_comment: comment,
+                resolution_comment: resolution_comment,
+                uri_as_categorized: uri_as_categorized,
+                case_assigned_at: Time.now,
+                was_dismissed: true)
+        return post_categorize(current_user)
+      end
+
+      ###  this section deals with the full guardrails of categorizing a high traffic "important" domain
+
+      verdict_pass = true
+      verdict_reasons = []
+
+      ## call guardrails
+
+      #begin
+      category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
+
+      verdict_results = Webcat::EntryVerdictChecker.new(prefix, category_ids_array).check
+
+      verdict_pass = verdict_results[:verdict_pass]
+      verdict_reasons = verdict_results[:verdict_reasons]
+      #binding.pry
+      #rescue Exception => e
+      #  Rails.logger.error(e.message)
+      #  verdict_pass = false
+      #  verdict_reasons << "there was an api call failure, erring to manager review"
+      #end
+
+      ## if verdict does not pass and is not a webcat manager then kickback to manager with why it failed
+      if verdict_pass == false
+        if !current_user.is_webcat_manager?
+          manager_user = User.where(:cvs_username => Complaint::MAIN_WEBCAT_MANAGER_CONTACT).first
+          guard_rails_reasons = verdict_reasons.join(";")
+          update!(user: manager_user,
+                  internal_comment: "FAILED GUARDRAILS! Reason: #{guard_rails_reasons}"
+          )
+          return post_categorize(current_user)
         end
       end
 
-      # add credit for user's contribution to complaint entry
-      WebcatCredits::ComplaintEntries::CreditProcessor.new(current_user, self).process
+      ## The remaining logic belows handles a verdict_pass of true or a webcat manager's categorization, which is exempt from verdicts.
 
-      if self.status == "COMPLETED" && self.complaint_entry_screenshot.present?
-        self.complaint_entry_screenshot.destroy
-      end
+      categorize_important(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+
+      return post_categorize(current_user)
+      ###
+
     end
 
   end
 
-  def commit_category(existing_prefixes, ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
-    # Look for existing prefix
+
+  #############################################################################################
+  # CATEGORY COMMIT LOGIC
+  # ###########################################################################################
+
+  def find_matching_prefix_with_observable(existing_prefixes, ip_or_uri)
+    #support for ipv6 carried over from work done in WEB-11015 while this was being developed
+    #is_ip_address = !!(uri_or_ip  =~ Resolv::IPv4::Regex)
     is_ip_address = !!(ip_or_uri =~ Resolv::IPv4::Regex || ip_or_uri =~ Resolv::IPv6::Regex)
 
     url_parts = Complaint.parse_url(ip_or_uri) unless is_ip_address
@@ -448,7 +556,56 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
+    return existing_prefix
+
+  end
+
+  ####Generic method to handle any logic to alter categories and any other necessary activities before sending categories
+  # to RuleAPI
+  def pre_commit_processing(category_ids_array, ip_or_uri)
+
+    if category_ids_array.include?(AbusiveContentTool.current_child_abuse_category[:id])
+      category_ids_array = AbusiveContentTool.reclassify_abuse_categories(category_ids_array)
+      result = AbusiveContentTool.submit_abuse_to_authorities(self, user, SimpleIDN.to_ascii(ip_or_uri))
+
+      if result[:status].to_s == "success"
+        abusive_info = {}
+        abusive_info[:iwf_report_id] = "IWF report submission ID: #{result[:data]}"
+        self.abuse_information = abusive_info.to_json
+        self.save!
+        report_alert_args = {}
+        report_alert_args[:to] = "admatter@cisco.com"
+        report_alert_args[:from] = "noreply@talosintelligence.com"
+        report_alert_args[:subject] = "IWF Report Notification"
+        report_alert_args[:body] = "Reference Data <br /> Complaint ID: #{self.complaint.id} <br /> Complaint Entry ID: #{self.id} <br /> Entry: #{self.hostlookup} <br /> User assigned: #{self.user.cvs_username}"
+
+        attachments_to_mail = []
+        conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+        conn.post(report_alert_args, attachments_to_mail)
+
+      else
+        raise "IWF submission issue: #{result[:message]}"
+      end
+    end
+
+    return category_ids_array
+
+  end
+
+  #####Generic method to handle any finishing logic that should happen after committing categories to RuleAPI
+  def post_commit_processing()
+
+  end
+
+  def commit_category(existing_prefixes, ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
+
+    # Look for existing prefix
+    existing_prefix = find_matching_prefix_with_observable(existing_prefixes, ip_or_uri)
+
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
+
+    category_ids_array = pre_commit_processing(category_ids_array, ip_or_uri)
+
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"
     end
@@ -459,6 +616,8 @@ class ComplaintEntry < ApplicationRecord
     else
       Wbrs::Prefix.create_from_url(url: SimpleIDN.to_ascii(ip_or_uri), categories: category_ids_array, user: user, description: description)
     end
+
+    post_commit_processing()
   end
 
   def inherit_categories(ip_or_uri:, description:, user:, casenumber: nil)
@@ -688,11 +847,11 @@ class ComplaintEntry < ApplicationRecord
     ###this should be eventually removed, but commenting out for now to see if it speeds up the NEW button for bulk entries
 
     #begin
-      #this is where screen grabs happen.
+    #this is where screen grabs happen.
     #  screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
     #  screenshot_entry.grab_screenshot
     #rescue Timeout::Error => e
-      #couldnt complete in time
+    #couldnt complete in time
     #  Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
     #  ces = ComplaintEntryScreenshot.new
     #  ces.error_message = e.message
@@ -703,7 +862,7 @@ class ComplaintEntry < ApplicationRecord
     #  ces.save!
     #rescue Exception => e
     #  Rails.logger.error("#{e.message}")
-      # do nothing, it was worth a try. kittens are sad now
+    # do nothing, it was worth a try. kittens are sad now
     #  ces = ComplaintEntryScreenshot.new
     #  ces.error_message = e.message
     #  ces.complaint_entry_id = new_complaint_entry.id
@@ -727,16 +886,16 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.robust_search(search_type, search_name: nil, params: nil, user:)
     case search_type
-      when 'advanced'
-        advanced_search(params, search_name: search_name, user: user)
-      when 'named'
-        named_search(search_name, user: user)
-      when 'standard'
-        standard_search(search_name, user: user)
-      when 'contains'
-        contains_search(params['value'])
-      else
-        where({})
+    when 'advanced'
+      advanced_search(params, search_name: search_name, user: user)
+    when 'named'
+      named_search(search_name, user: user)
+    when 'standard'
+      standard_search(search_name, user: user)
+    when 'contains'
+      contains_search(params['value'])
+    else
+      where({})
     end
   end
 
@@ -774,66 +933,62 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.standard_search(search_name, user:)
     case search_name
-      when "NEW"
-        new_entries
-      when "COMPLETED"
-        closed
-      when "ACTIVE"
-        open.where.not(status:"NEW")
-      when "REVIEW"
-        if user.allowed_self_review
-          where(status: "PENDING")
-        else
-          where(status: "PENDING").where.not(user_id: user.id)
-        end
-      when "MY COMPLAINTS"
-        where(user_id: user.id)
-      when "MY OPEN COMPLAINTS"
-        open.where(user_id: user.id)
-      when "MY CLOSED COMPLAINTS"
-        closed.where(user_id: user.id)
-      when "MANAGER QUEUE"
-        joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
-      when "NEW JIRA"
-          where(status: 'NEW', complaint_id: Complaint.from_jira)
-      when "JIRA OVERDUE"
-        where(complaint_id: Complaint.from_jira).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-      when "JIRA ASSIGNED"
-        where(status: 'ASSIGNED', complaint_id: Complaint.from_jira)
-      when "ALL JIRA"
-        where(complaint_id: Complaint.from_jira)
-      when "ALL TALOS"
-        where(complaint_id: Complaint.from_ti)
-      when "NEW TALOS"
-        where(status: 'NEW', complaint_id: Complaint.from_ti)
-      when "TALOS OVERDUE"
-        where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-      when "TALOS ASSIGNED"
-        where(status: 'ASSIGNED', complaint_id: Complaint.from_ti)
-      when "ALL WBNP"
-        where(complaint_id: Complaint.from_wbnp)
-      when "NEW WBNP"
-        where(status: 'NEW', complaint_id: Complaint.from_wbnp)
-      when "WBNP OVERDUE"
-        where(complaint_id: Complaint.from_wbnp).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-      when "WBNP ASSIGNED"
-        where(status: 'ASSIGNED', complaint_id: Complaint.from_wbnp)
-      when "ALL INTERNAL"
-        where(complaint_id: Complaint.from_int)
-      when "NEW INTERNAL"
-        where(status: 'NEW', complaint_id: Complaint.from_int)
-      when "INTERNAL OVERDUE"
-        where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-      when "INTERNAL ASSIGNED"
-        where(status: 'ASSIGNED', complaint_id: Complaint.from_int)
-      when "ALL PENDING"
-        where(status: 'PENDING')
-      when "PENDING OVERDUE"
-        where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
-      when "ALL"
-        all
-      else
-        all
+    when "NEW"
+      new_entries
+    when "COMPLETED"
+      closed
+    when "ACTIVE"
+      open.where.not(status:"NEW")
+    when "REVIEW"
+      where(status: "PENDING")
+    when "MY COMPLAINTS"
+      where(user_id: user.id)
+    when "MY OPEN COMPLAINTS"
+      open.where(user_id: user.id)
+    when "MY CLOSED COMPLAINTS"
+      closed.where(user_id: user.id)
+    when "MANAGER QUEUE"
+      joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
+    when "NEW JIRA"
+      where(status: 'NEW', complaint_id: Complaint.from_jira)
+    when "JIRA OVERDUE"
+      where(complaint_id: Complaint.from_jira).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+    when "JIRA ASSIGNED"
+      where(status: 'ASSIGNED', complaint_id: Complaint.from_jira)
+    when "ALL JIRA"
+      where(complaint_id: Complaint.from_jira)
+    when "ALL TALOS"
+      where(complaint_id: Complaint.from_ti)
+    when "NEW TALOS"
+      where(status: 'NEW', complaint_id: Complaint.from_ti)
+    when "TALOS OVERDUE"
+      where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+    when "TALOS ASSIGNED"
+      where(status: 'ASSIGNED', complaint_id: Complaint.from_ti)
+    when "ALL WBNP"
+      where(complaint_id: Complaint.from_wbnp)
+    when "NEW WBNP"
+      where(status: 'NEW', complaint_id: Complaint.from_wbnp)
+    when "WBNP OVERDUE"
+      where(complaint_id: Complaint.from_wbnp).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+    when "WBNP ASSIGNED"
+      where(status: 'ASSIGNED', complaint_id: Complaint.from_wbnp)
+    when "ALL INTERNAL"
+      where(complaint_id: Complaint.from_int)
+    when "NEW INTERNAL"
+      where(status: 'NEW', complaint_id: Complaint.from_int)
+    when "INTERNAL OVERDUE"
+      where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+    when "INTERNAL ASSIGNED"
+      where(status: 'ASSIGNED', complaint_id: Complaint.from_int)
+    when "ALL PENDING"
+      where(status: 'PENDING')
+    when "PENDING OVERDUE"
+      where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
+    when "ALL"
+      all
+    else
+      all
     end
   end
 
@@ -903,22 +1058,9 @@ class ComplaintEntry < ApplicationRecord
       present_params['jira_id'] = present_params['jira_id'].split(',').map {|item| item.strip}
     end
 
-    simple_params = present_params.slice(*%w{id complaint_id resolution})
+    simple_params = present_params.slice(*%w{id complaint_id resolution status})
 
     relation = where(simple_params)
-
-    if present_params['status'].include?('PENDING')
-      if user.allowed_self_review
-        relation = relation.where(status: present_params['status'])
-      else
-        present_params['status'].delete('PENDING')
-        relation = relation.where(status: present_params['status'])
-        pending_relation = where(status: "PENDING").where.not(user_id: user.id)
-        relation = relation.or(pending_relation)
-      end
-    else
-      relation = relation.where(status: present_params['status'])
-    end
 
     if params['user_id'].present?
 
@@ -1012,8 +1154,8 @@ class ComplaintEntry < ApplicationRecord
     if ip_or_uri.present?
       vals = ip_or_uri.map{ |e| "'#{e}'"}.join(',')
       relation = relation.where("complaint_entries.domain in (#{vals})")
-                         .or(where("complaint_entries.ip_address in (#{vals})"))
-                         .or(where("complaint_entries.uri in (#{vals})"))
+                     .or(where("complaint_entries.ip_address in (#{vals})"))
+                     .or(where("complaint_entries.uri in (#{vals})"))
     end
 
     complaint_fields = present_params.to_h.slice(*%w{description channel})
@@ -1023,7 +1165,7 @@ class ComplaintEntry < ApplicationRecord
         if type == Complaint::SUBMITTER_TYPE_CUSTOMER
           memo << Complaint::SUBMITTER_TYPE_CUSTOMER
         else 'GUEST'
-          memo.push(Complaint::SUBMITTER_TYPE_NONCUSTOMER, nil)
+        memo.push(Complaint::SUBMITTER_TYPE_NONCUSTOMER, nil)
         end
         memo
       end
@@ -1042,12 +1184,12 @@ class ComplaintEntry < ApplicationRecord
 
   def hostlookup
     case
-      when self.entry_type == "IP"
-        self.ip_address
-      when self.entry_type == "URI/DOMAIN"
-        self.uri
-      else
-        self.uri.blank? ? self.ip_address : self.uri
+    when self.entry_type == "IP"
+      self.ip_address
+    when self.entry_type == "URI/DOMAIN"
+      self.uri
+    else
+      self.uri.blank? ? self.ip_address : self.uri
     end
   end
 
@@ -1463,4 +1605,11 @@ class ComplaintEntry < ApplicationRecord
     return nil
   end
 
+  def ti_status
+    if self.status == STATUS_WEBCAT_DUPLICATE
+      return PENDING
+    else
+      return self.status
+    end
+  end
 end
