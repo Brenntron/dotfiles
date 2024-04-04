@@ -24,6 +24,8 @@ development:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  banhammer:
+    host: 'http://localhost:5173/search/'
   beaker:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     hostport: "annapolis-stage.vrt.sourcefire.com:4252"
@@ -180,6 +182,8 @@ test:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  banhammer:
+    host: 'http://localhost:5173/search/'
   beaker:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     hostport: "annapolis-stage.vrt.sourcefire.com:4252"
@@ -330,6 +334,8 @@ staging:
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       # umbrella always uses https and verify peer
       api_key: "redacted"
+  banhammer:
+    host: 'http://localhost:5173/search/'
   beaker:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     hostport: "annapolis-stage.vrt.sourcefire.com:4252"

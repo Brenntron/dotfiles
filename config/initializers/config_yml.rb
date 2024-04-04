@@ -222,6 +222,16 @@ ngfw_telemetry_aws_config.aws_access_key_id = ngfw_telemetry_config.dig('aws', '
 ngfw_telemetry_aws_config.aws_secret_access_key = ngfw_telemetry_config.dig('aws', 'secret_access_key')
 Rails.configuration.ngfw_telemetry = ngfw_telemetry_aws_config
 
+clusters_fetcher_config = env_config.fetch('clusters_telemetry', nil)
+raise 'config.yml missing clusters_telemetry aws section' unless clusters_fetcher_config
+clusters_config = OpenStruct.new
+clusters_config.aws_access_key_id = clusters_fetcher_config.dig('aws', 'access_key_id')
+clusters_config.aws_secret_access_key = clusters_fetcher_config.dig('aws', 'secret_access_key')
+clusters_config.aws_bucket = clusters_fetcher_config.dig('aws', 'bucket')
+clusters_config.aws_prefix = clusters_fetcher_config.dig('aws', 'prefix')
+clusters_config.aws_region = clusters_fetcher_config.dig('aws', 'region')
+Rails.configuration.clusters_telemetry_source = clusters_config
+
 file_mgmt_config = env_config.fetch('file_mgmt', nil)
 raise 'config.yml missing file_mgmt section' unless file_mgmt_config
 Rails.configuration.base_host_path = file_mgmt_config['base_host_path']
@@ -245,6 +255,16 @@ Rails.configuration.jira.auth_type      = jira_config['auth_type'].to_sym
 bast_config = env_config.fetch('bast', nil)
 raise 'config.yml missing bast section' unless bast_config
 Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)
+
+resolution_report_config = env_config.fetch('resolution_report', nil)
+raise 'config.yml missing resolution_report section' unless resolution_report_config
+Rails.configuration.resolution_report = OpenStruct.new
+Rails.configuration.resolution_report.cache_expiration = resolution_report_config['cache_expiration']
+
+banhammer_host = env_config.dig('banhammer', 'host')
+raise 'config.yml missing banhammer section' unless banhammer_host
+Rails.configuration.banhammer_host = banhammer_host
+
 
 ##### VAULT AND ENCRYPTION STUFF######
 # ORDER MATTERS HERE
