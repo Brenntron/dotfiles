@@ -25,7 +25,7 @@ development:
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
   banhammer:
-    host: 'http://localhost:5173/search/'
+    host: 'http://development.talos-atlas-talosintelligence-banhammer.pages.dev/search/'
   beaker:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     hostport: "annapolis-stage.vrt.sourcefire.com:4252"
@@ -183,7 +183,7 @@ test:
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
   banhammer:
-    host: 'http://localhost:5173/search/'
+    host: 'http://development.talos-atlas-talosintelligence-banhammer.pages.dev/search/'
   beaker:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     hostport: "annapolis-stage.vrt.sourcefire.com:4252"
@@ -335,7 +335,7 @@ staging:
       # umbrella always uses https and verify peer
       api_key: "redacted"
   banhammer:
-    host: 'http://localhost:5173/search/'
+    host: 'http://development.talos-atlas-talosintelligence-banhammer.pages.dev/search/'
   beaker:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     hostport: "annapolis-stage.vrt.sourcefire.com:4252"
