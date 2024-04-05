@@ -46,6 +46,25 @@ class Sbrs::ManualSbrs < Sbrs::Base
     end
   end
 
+  def self.get_rule_names_from_urs(hit_array)
+    all_rules = Sbrs::Base.rules_matchup
+
+    uri_rules = []
+
+    if hit_array.present?
+      hit_array.each do |rule_id|
+        rule_id = rule_id.to_s
+        if all_rules[rule_id].present?
+          uri_rules.append(all_rules[rule_id]["mnemonic"])
+
+        else
+          uri_rules.append(rule_id)
+
+        end
+      end
+    end
+    uri_rules
+  end
   def self.get_rule_names_from_rulehits(rep_data)
     all_rules = Sbrs::Base.rules_matchup
 

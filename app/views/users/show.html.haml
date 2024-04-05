@@ -57,9 +57,9 @@
           = link_to 'View Team Details', escalations_users_path(user: @user), class: 'view-team-details'
       .row
         - if @user.has_role?('manager') && @user.children.length > 0
-          .col-xs-6
+          .col-xs-6.user-col-wrapper
             %h5.content-label-sm Reports
-            .multi-col
+            %div.user-col-layout.last{style: "column-count: #{(@user.children.length.to_f).ceil}"}
               %ul.related-user-list
                 - @user.children.each do |user|
                   %div
@@ -67,7 +67,6 @@
                     %br
                     = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
-          .col-xs-6.user-col-wrapper
             - if @user.parent.present?
               .user-relationship-wrapper
                 %h5.content-label-sm Manager
