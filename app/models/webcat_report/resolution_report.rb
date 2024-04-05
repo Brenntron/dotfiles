@@ -20,45 +20,89 @@ class WebcatReport::ResolutionReport
             'avg(time_to_sec(timediff( case_resolved_at, created_at ))) as dept_avg, ' +
             'max( time_to_sec( timediff( case_resolved_at, created_at ))) as dept_max'
 
-    counts = WebcatCredit.where(created_at: (@date_from..@date_to+1)).group(:credit).count
+    cached_resolution_count = JSON.parse(Rails.cache.read("total_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}") || "{}")
+    if cached_resolution_count.present?
+      res_count = ResolutionCount.new(username: 'TOTAL',
+                                      internal: cached_resolution_count['internal'],
+                                      pending: cached_resolution_count['pending'],
+                                      fixed: cached_resolution_count['fixed'],
+                                      invalid: cached_resolution_count['invalid'],
+                                      unchanged: cached_resolution_count['unchanged'],
+                                      duplicate: cached_resolution_count['duplicate'],
+                                      eng_avg: cached_resolution_count['eng_avg'], eng_max: cached_resolution_count['eng_max'],
+                                      dept_avg: cached_resolution_count['dept_avg'], dept_max: cached_resolution_count['dept_max'])
+    else
+      counts = WebcatCredit.where(created_at: (@date_from..@date_to+1)).group(:credit).count
 
-    times =
-        ComplaintEntry.where.not(resolution: nil)
-            .where(case_resolved_at: (@date_from..@date_to+1))
-            .select(times_select_phrase).first
+      times =
+          ComplaintEntry.where.not(resolution: nil)
+              .where(case_resolved_at: (@date_from..@date_to+1))
+              .select(times_select_phrase).first
 
-    yield ResolutionCount.new(username: 'TOTAL',
-                              internal: counts[WebcatCredit::INTERNAL],
-                              pending: counts[WebcatCredit::PENDING],
-                              fixed: counts[WebcatCredit::FIXED],
-                              invalid: counts[WebcatCredit::INVALID],
-                              unchanged: counts[WebcatCredit::UNCHANGED],
-                              duplicate: counts[WebcatCredit::DUPLICATE],
-                              eng_avg: times.eng_avg, eng_max: times.eng_max,
-                              dept_avg: times.dept_avg, dept_max: times.dept_max)
 
+
+      res_count = ResolutionCount.new(username: 'TOTAL',
+                                      internal: counts[WebcatCredit::INTERNAL],
+                                      pending: counts[WebcatCredit::PENDING],
+                                      fixed: counts[WebcatCredit::FIXED],
+                                      invalid: counts[WebcatCredit::INVALID],
+                                      unchanged: counts[WebcatCredit::UNCHANGED],
+                                      duplicate: counts[WebcatCredit::DUPLICATE],
+                                      eng_avg: times.eng_avg, eng_max: times.eng_max,
+                                      dept_avg: times.dept_avg, dept_max: times.dept_max)
+
+      if @date_to < Date.today
+        Rails.cache.write("total_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}", res_count.to_json)
+      else
+        Rails.cache.write("total_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}", res_count.to_json, expires_in: Rails.configuration.resolution_report.cache_expiration.minutes)
+      end
+    end
+
+    yield res_count
 
     User.joins(:webcat_credits)
         .where(webcat_credits: {created_at: (@date_from..@date_to+1)})
         .group(:id).order(:cvs_username).each do |user|
 
-      counts =
-          WebcatCredit.where(user_id: user.id, created_at: (@date_from..@date_to+1)).group(:credit).count
+      cached_resolution_count = JSON.parse(Rails.cache.read("#{user.cvs_username}_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}") || "{}")
+      if cached_resolution_count.present?
+        res_count = ResolutionCount.new(username: cached_resolution_count['username'],
+                                        internal: cached_resolution_count['internal'],
+                                        pending: cached_resolution_count['pending'],
+                                        fixed: cached_resolution_count['fixed'],
+                                        invalid: cached_resolution_count['invalid'],
+                                        unchanged: cached_resolution_count['unchanged'],
+                                        duplicate: cached_resolution_count['duplicate'],
+                                        eng_avg: cached_resolution_count['eng_avg'], eng_max: cached_resolution_count['eng_max'],
+                                        dept_avg: cached_resolution_count['dept_avg'], dept_max: cached_resolution_count['dept_max'])
+      else
 
-      times =
-          ComplaintEntry.where.not(resolution: nil)
-          .where(user_id: user.id, case_resolved_at: (@date_from..@date_to+1))
-          .select(times_select_phrase).first
+        counts =
+            WebcatCredit.where(user_id: user.id, created_at: (@date_from..@date_to+1)).group(:credit).count
 
-      yield ResolutionCount.new(username: user.cvs_username,
-                                internal: counts[WebcatCredit::INTERNAL],
-                                pending: counts[WebcatCredit::PENDING],
-                                fixed: counts[WebcatCredit::FIXED],
-                                invalid: counts[WebcatCredit::INVALID],
-                                unchanged: counts[WebcatCredit::UNCHANGED],
-                                duplicate: counts[WebcatCredit::DUPLICATE],
-                                eng_avg: times.eng_avg, eng_max: times.eng_max,
-                                dept_avg: times.dept_avg, dept_max: times.dept_max)
+        times =
+            ComplaintEntry.where.not(resolution: nil)
+            .where(user_id: user.id, case_resolved_at: (@date_from..@date_to+1))
+            .select(times_select_phrase).first
+
+        res_count = ResolutionCount.new(username: user.cvs_username,
+                                  internal: counts[WebcatCredit::INTERNAL],
+                                  pending: counts[WebcatCredit::PENDING],
+                                  fixed: counts[WebcatCredit::FIXED],
+                                  invalid: counts[WebcatCredit::INVALID],
+                                  unchanged: counts[WebcatCredit::UNCHANGED],
+                                  duplicate: counts[WebcatCredit::DUPLICATE],
+                                  eng_avg: times.eng_avg, eng_max: times.eng_max,
+                                  dept_avg: times.dept_avg, dept_max: times.dept_max)
+
+        if @date_to < Date.today
+          Rails.cache.write("#{user.cvs_username}_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}", res_count.to_json)
+        else
+          Rails.cache.write("#{user.cvs_username}_resolution_count_#{@date_from.to_s}-#{@date_to.to_s}", res_count.to_json, expires_in: Rails.configuration.resolution_report.cache_expiration.minutes)
+        end
+      end
+
+      yield res_count
     end
   end
 

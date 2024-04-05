@@ -1062,7 +1062,12 @@ $ ->
       }
       { data: 'customer_name' }
       { data: 'customer_company_name' }
-      { data: 'customer_email' }
+      {
+        data: 'customer_email',
+        className: 'filerep-customer-email'
+        render: (data) ->
+          return "<span>#{data}</span> <a href='#{$('#file-rep-datatable').data('banhammer-host') + '?q=' + data}' target='_blank' title='Ban #{data}' class='ban esc-tooltipped'></a>"
+      }
       {
         data: 'assigned'
         className: "alt-col assignee-col"
@@ -1072,7 +1077,10 @@ $ ->
           else if data == 'vrtincom' || data == ""
             return "<span class='missing-data missing-data-index' id='owner_#{full.id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.id}' onClick='file_rep_take_dispute(#{full.id})'/></button></span>"
           else
-            return data
+            if data.includes("(inactive)")            
+              return "<span class='inactive-user'> #{data} </span>"
+            else
+              return data
       }
     ]
 

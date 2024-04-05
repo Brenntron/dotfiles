@@ -371,11 +371,18 @@ $ ->
     ###
     # Depending on the data, this function builds the search header
     # With the search header the reset filter button is attached
-    # If the search_type is 'named' or 'advanced', a subheader with search definitions will be made with the build_subheader function
+    # If the search_type is 'named' or 'advanced', a subheader within
+    # search definitions will be made with the build_subheader function
     ###
     container = $('#webcat_searchref_container')
     if data != undefined && container.length > 0
-      reset_icon = "<span #{if current_page_is_favourite() then 'hidden style="display: none"' else ''} id='refresh-filter-button' class='reset-filter esc-tooltipped' title='Clear Search Results' onclick='webcat_refresh()'></span>"
+      if current_page_is_favourite()
+        reset_icon_class = 'hidden style="display: none"'
+      else
+        reset_icon_class = ''
+      reset_icon = "<span #{reset_icon_class} id='refresh-filter-button'
+        class='reset-filter esc-tooltipped'
+        title='Clear Search Results' onclick='webcat_refresh()'></span>"
       {search_type, search_name} = data
 
       try
@@ -409,7 +416,7 @@ $ ->
             '</div>'
         el = localStorage.webcat_search_conditions
         if !el.includes('temp_row')
-          subheader = $("##{el} .saved-search")[0].dataset.search_conditions
+          subheader = webcat_search_conditions
         else
           last_row = $('#saved-search-tbody')[0].lastElementChild
           subheader = $(last_row).find('.saved-search').attr('data-search_conditions')
@@ -525,7 +532,7 @@ $ ->
             }
             {
               targets: [ 3 ]
-              orderData: 18 #This is ordered by the age int column. Anytime the columns are changed this needs to be updated.
+              orderData: 20 #This is ordered by the age int column. Anytime the columns are changed this needs to be updated.
             }
             {
               targets: [ 14 ]
@@ -607,7 +614,7 @@ $ ->
                       tag_items = ''
                       tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
                       for tag in tag_list
-                        item = "<span class='tag-capsule' onclick='search_for_tag(\"#{tag}\")'>" + tag + "</span>"
+                        item = "<span class='tag-capsule' onclick='search_for_tag(\"#{tag}\")'>#{tag}</span>"
                         tag_items += item
 
                   tag_items
@@ -615,14 +622,14 @@ $ ->
               {
 #                subdomain column
                 data: 'subdomain'
+                className: 'data-truncate'
                 render:(data,type,full,meta)->
                   {subdomain, entry_id} = full
 
                   if subdomain
-                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + subdomain + '</span>'
+                    "<span id='subdomain_#{entry_id}' class='webcat-subdomain-holder'>#{subdomain}</span>"
                   else
-                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + '</span>'
-                width: '50px'
+                    "<span id='subdomain_#{entry_id}' class='webcat-subdomain-holder'></span>"
               }
               {
                 data: 'domain'
@@ -648,11 +655,12 @@ $ ->
               }
               {
                 data: 'path'
+                className: 'data-truncate'
                 render: ( data, type, full, meta ) ->
                   { path , entry_id } = full
                   if type == 'display'
                     path = td_truncate(data, 20)
-                  return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + path + '">' + path + '</span>'
+                  return "<span class='esc-tooltipped' id='path_#{entry_id}' title='#{path}'>#{path}</span>" if path?
               }
               {
                 data: 'uri'
@@ -670,7 +678,7 @@ $ ->
                     category = categories[0]
                     if category == "Not in our list"
                       category = ""
-                  '<span id="category_' + entry_id + '">' + category + '</span>'
+                  "<span id='category_#{entry_id}'>#{category}</span>"
               }
               {
                 data: 'suggested_disposition'
@@ -714,7 +722,14 @@ $ ->
                 data: 'company_name'
               }
               {
-                data: 'customer_email'
+                data: 'customer_email',
+                className: 'webcat-customer-email',
+                render: (data) ->
+                  if data
+                    return "<span>#{data}</span> <a href='#{$('#complaints-index').data('banhammer-host') + '?q=' + data}' target='_blank' title='Ban #{data}' class='ban esc-tooltipped'></a>"
+                  else
+                    return ''
+
               }
               {
                 data: 'channel'
@@ -723,6 +738,17 @@ $ ->
               {
                 data: 'assigned_to'
                 className: 'assignee-col'
+                render: (data) ->
+                  if data.includes("(inactive)")
+                    "<span class='inactive-user'> #{data} </span>"
+                  else
+                    data
+              }
+              {
+                data: 'reviewer'
+              }
+              {
+                data: 'second_reviewer'
               }
               {
                 data: 'age_int'
@@ -1000,16 +1026,17 @@ $ ->
       url: "/escalations/api/v1/escalations/user_preferences/"
       data: {name: 'WebCatColumns'}
       success: (response) ->
-        response = JSON.parse(response)
+        parsed_response = JSON.parse(response)
 
-        $.each response, (column, state) ->
-          if state == true
-            $("##{column}-checkbox").prop('checked', true)
+        $.each parsed_response, (column, state) ->
+          formatted_key = column.replace('_', '-')
+
+          if state
+            $("##{formatted_key}-checkbox").prop('checked', true)
             $('#complaints-index').DataTable().column("##{column}").visible true
           else
-            $("##{column}-checkbox").prop('checked', false)
+            $("##{formatted_key}-checkbox").prop('checked', false)
             $('#complaints-index').DataTable().column("##{column}").visible false
-
     )
 
   # webcat > on click any show/hide column, update user prefs table
@@ -1032,6 +1059,8 @@ $ ->
     data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
     data['submitteremail'] = $("#submitteremail-checkbox").is(':checked')
     data['assignee'] = $("#assignee-checkbox").is(':checked')
+    data['reviewer'] = $('#reviewer-checkbox').is(':checked')
+    data['second_reviewer'] = $('#second-reviewer-checkbox').is(':checked')
     data['channel'] = $("#channel-checkbox").is(':checked')
 
     std_msg_ajax(

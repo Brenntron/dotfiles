@@ -7,6 +7,16 @@ class Wbrs::Prefix < Wbrs::Base
 
   alias_method(:id, :prefix_id)
 
+  SERVICE_STATUS_NAME = "RULEAPI:CATEGORY_PREFIX"
+
+  def self.service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def is_active?
     0 < is_active
   end
@@ -39,12 +49,33 @@ class Wbrs::Prefix < Wbrs::Base
   # @return [Array<Wbrs::Prefix>] Array of the results.
   # TODO Almost all the time "where" is called with "urls", so add a convenience method "from_urls"
   def self.where(conditions = {})
+    service_status_data = {}
     params = stringkey_params(conditions)
     # category_ids = Wbrs::Category.category_ids_from_params(params)
     # params['categories'] = category_ids if category_ids.present?
     params['is_active'] = params.delete('active') ? 1 : 0 if params['active'].present?
 
     response = post_request(path: '/v1/cat/rules/get', body: params)
+
+    if response.code >= 300
+      (0..2).each do
+        response = post_request(path: '/v1/cat/rules/get', body: params)
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/cat/rules/get not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
 
     response_body = JSON.parse(response.body)
 
@@ -59,7 +90,28 @@ class Wbrs::Prefix < Wbrs::Base
 
   # @return [Array<Wbrs::Category>] array of categories related to this prefix.
   def categories
+    service_status_data = {}
     response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [ id ] })
+
+    if response.code >= 300
+      (0..2).each do
+        response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [ id ] })
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/cat/rules/get not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
 
     response_body = JSON.parse(response.body)
 
@@ -115,7 +167,28 @@ class Wbrs::Prefix < Wbrs::Base
   # @param [String] description: A description
   # @return [Integer] id of created prefix.
   def self.create_from_url(params)
+    service_status_data = {}
     response = post_request(path: '/v1/cat/rules/add', body: stringkey_params(params))
+
+    if response.code >= 300
+      (0..2).each do
+        response = post_request(path: '/v1/cat/rules/add', body: stringkey_params(params))
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/cat/rules/add not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
 
     response_body = JSON.parse(response.body)
     response_body['Created']
@@ -127,6 +200,7 @@ class Wbrs::Prefix < Wbrs::Base
   # @param [String] description: A description
   # @return [Integer] id of updated prefix.
   def set_categories(category_ids_array, user:, description: nil, prefix_id: nil)
+    service_status_data = {}
     options = {
         'prefix_id' => prefix_id || self.id,
         'categories' => category_ids_array,
@@ -135,6 +209,28 @@ class Wbrs::Prefix < Wbrs::Base
     }
     response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/edit', body: Wbrs::Prefix.stringkey_params(options))
 
+    if response.code >= 300
+      (0..2).each do
+        response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/edit', body: Wbrs::Prefix.stringkey_params(options))
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/cat/rules/edit not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
+
+
     response_body = JSON.parse(response.body)
     response_body['Updated']
   end
@@ -142,29 +238,121 @@ class Wbrs::Prefix < Wbrs::Base
   # @param [String] user: The user for this action
 
   def disable(user:)
+    service_status_data = {}
+
     options = { 'prefix_ids' => [ self.id ], 'user' => user }
-    Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
+    response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
+
+    if response.code >= 300
+      (0..2).each do
+        response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/cat/rules/disable not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
+
+    response
   end
 
   def self.disable(prefix_id, user)
+    service_status_data = {}
+
     options = { 'prefix_ids' => [ prefix_id ], 'user' => user }
-    Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
+    response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
+
+    if response.code >= 300
+      (0..2).each do
+        response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/cat/rules/disable not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
+    response
   end
 
   def self.rulelib_rule_sources
-
+    service_status_data = {}
     response = Wbrs::Prefix.call_json_request(:get, "/v1/wbrsrulelib/cat/sources", body: {})
+
+    if response.code >= 300
+      (0..2).each do
+        response = Wbrs::Prefix.call_json_request(:get, "/v1/wbrsrulelib/cat/sources", body: {})
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/wbrsrulelib/cat/sources not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
+
     response_body = JSON.parse(response.body)
     response_body
   end
 
   def self.get_certainty_sources_for_urls(urls, strict_matching = 1)
+    service_status_data = {}
     options = {}
     options[:urls] = urls
     options[:strict_matching] = strict_matching
 
-    response = Wbrs::Prefix.post_request(path: '/v1/wbrsrulelib/cat/rules',
-                                         body: Wbrs::Prefix.stringkey_params(options))
+    response = Wbrs::Prefix.post_request(path: '/v1/wbrsrulelib/cat/rules', body: Wbrs::Prefix.stringkey_params(options))
+
+    if response.code >= 300
+      (0..2).each do
+        response = Wbrs::Prefix.post_request(path: '/v1/wbrsrulelib/cat/rules', body: Wbrs::Prefix.stringkey_params(options))
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/wbrsrulelib/cat/rules not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
     response_body = JSON.parse(response.body)
     response_body
   end

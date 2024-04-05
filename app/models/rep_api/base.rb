@@ -1,6 +1,16 @@
 class RepApi::Base
   include ActiveModel::Model
 
+  SERVICE_STATUS_NAME = "REPTOOL"
+
+  def self.service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def self.host
     @host ||= Rails.configuration.rep_api.host || 'localhost'
   end
@@ -158,8 +168,27 @@ class RepApi::Base
     #        body
     #    end
     request.body = body.to_json
+    service_status_data = {}
+    retries = 0
+    begin
+      response = request_error_handling(call_request(method, request))
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
 
-    request_error_handling(call_request(method, request))
+      response
+    rescue Exception => e
+      if retries < 3
+        retries += 1
+        sleep(2)
+        retry
+      end
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "#{path} not loading or responding"
+      service_status_data[:exception_details] = e.message + " " + e.backtrace.join("\n")
+      service_status.log(service_status_data)
+      raise e.message + " " + e.backtrace.join("\n")
+    end
+
   end
 
   def call_json_request(method, path, body:)
