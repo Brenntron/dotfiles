@@ -422,7 +422,7 @@ class ComplaintEntry < ApplicationRecord
       end
 
       #Third if self-review is set to true, then it's not necessary to go through full guard rails workflow (i see this path being potentially worked on later for security reasons)
-      if current_user.allowed_self_review == true
+      if current_user.enabled_self_review
         categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
         return post_categorize(current_user)
       end

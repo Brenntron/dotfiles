@@ -12,7 +12,7 @@ $ ->
   $("#self_review").click ->
     self_review = $(this).prop('checked')
 
-    data = {"allowed": self_review}
+    data = {"enabled": self_review}
     std_msg_ajax(
       url: "/escalations/api/v1/escalations/user_preferences/update"
       method: "POST"
