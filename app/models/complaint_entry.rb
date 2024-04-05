@@ -305,8 +305,7 @@ class ComplaintEntry < ApplicationRecord
                         resolution_comment,
                         uri_as_categorized,
                         current_user,
-                        commit_pending,
-                        self_review)
+                        commit_pending)
 
     # not important case or resolution is "unchanged"
     current_status = STATUS_COMPLETED
@@ -349,8 +348,7 @@ class ComplaintEntry < ApplicationRecord
                            resolution_comment,
                            uri_as_categorized,
                            current_user,
-                           commit_pending,
-                           self_review)
+                           commit_pending)
 
     self.case_assigned_at ||= Time.now
     # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
@@ -401,8 +399,7 @@ class ComplaintEntry < ApplicationRecord
                       resolution_comment,
                       uri_as_categorized,
                       current_user,
-                      commit_pending,
-                      self_review)
+                      commit_pending)
     ActiveRecord::Base.transaction do
 
       if categories_string.blank? && entry_status == "FIXED"
@@ -414,19 +411,19 @@ class ComplaintEntry < ApplicationRecord
 
       #First, check if not important.  If not, super simple no guardrails categorization path
       if !self.is_important
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
         return post_categorize(current_user)
       end
 
       #Second, check to see if this is an unchanged decision, if it is, then there's nothing to guardrails here.
       if entry_status == Complaint::RESOLUTION_UNCHANGED
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
         return post_categorize(current_user)
       end
 
       #Third if self-review is set to true, then it's not necessary to go through full guard rails workflow (i see this path being potentially worked on later for security reasons)
-      if self_review == true
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+      if current_user.allowed_self_review == true
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
         return post_categorize(current_user)
       end
 
@@ -494,7 +491,7 @@ class ComplaintEntry < ApplicationRecord
 
       ## The remaining logic belows handles a verdict_pass of true or a webcat manager's categorization, which is exempt from verdicts.
 
-      categorize_important(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+      categorize_important(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
 
       return post_categorize(current_user)
       ###

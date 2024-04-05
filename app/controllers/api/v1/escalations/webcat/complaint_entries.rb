@@ -22,7 +22,6 @@ module API
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
               optional :uri_as_categorized, type: String, desc: 'Value of the `Edit Uri` box at the time analyst submitted it'
-              optional :self_review, type: Boolean, desc: 'If a category change could be done with a self review'
             end
             post 'update'do
               std_api_v2 do
@@ -38,8 +37,7 @@ module API
                                          permitted_params['resolution_comment'],
                                          uri_as_categorized,
                                          current_user,
-                                         "",
-                                         permitted_params['self_review'])
+                                         "")
 
 
                   if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
@@ -89,8 +87,7 @@ module API
                                          submitted_complaint[:resolution_comment],
                                          '',
                                          current_user,
-                                         submitted_complaint[:commit],
-                                         submitted_complaint[:self_review])
+                                         submitted_complaint[:commit])
 
                   if submitted_complaint[:commit] == 'decline'
                     category_data = @entry.current_category_data.to_a
@@ -574,8 +571,7 @@ module API
                                                     entry['resolution_comment'],
                                                     uri_as_categorized,
                                                     current_user,
-                                                    "",
-                                                    entry['self_review'])
+                                                    "")
 
                     Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry) }
                     if complaint_entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
