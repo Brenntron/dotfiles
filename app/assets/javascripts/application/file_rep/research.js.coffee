@@ -10,7 +10,8 @@ $ ->
 
 # load the local RL api data the first time page loads:
 $(document).on 'ready',->
-  if $('body').hasClass('escalations--file_rep--disputes-controller')
+
+  if $('body').hasClass('escalations--file_rep--disputes-controller') && $('body').hasClass('show-action')
     window.get_local_reversinglabs_api()
 
 
