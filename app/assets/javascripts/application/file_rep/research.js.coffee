@@ -10,7 +10,8 @@ $ ->
 
 # load the local RL api data the first time page loads:
 $(document).on 'ready',->
-  window.get_local_reversinglabs_api()
+  if $('body').hasClass('escalations--file_rep--disputes-controller')
+    window.get_local_reversinglabs_api()
 
 
 # Update the research reports and the items in the db
