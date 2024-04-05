@@ -27,30 +27,30 @@ module API
             post 'update'do
               std_api_v2 do
 
-              begin
-                entry = ComplaintEntry.find(permitted_params['id'])
-                uri_as_categorized = permitted_params['uri_as_categorized'].blank? ? entry.uri : permitted_params['uri_as_categorized']
-                entry.change_category( permitted_params['prefix'],
-                                       permitted_params['categories'],
-                                       permitted_params['category_names'],
-                                       permitted_params['status'],
-                                       permitted_params['comment'],
-                                       permitted_params['resolution_comment'],
-                                       uri_as_categorized,
-                                       current_user,
-                                       "",
-                                       permitted_params['self_review'])
+                begin
+                  entry = ComplaintEntry.find(permitted_params['id'])
+                  uri_as_categorized = permitted_params['uri_as_categorized'].blank? ? entry.uri : permitted_params['uri_as_categorized']
+                  entry.change_category( permitted_params['prefix'],
+                                         permitted_params['categories'],
+                                         permitted_params['category_names'],
+                                         permitted_params['status'],
+                                         permitted_params['comment'],
+                                         permitted_params['resolution_comment'],
+                                         uri_as_categorized,
+                                         current_user,
+                                         "",
+                                         permitted_params['self_review'])
 
-                Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
-                if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
-                  message = Bridge::ComplaintUpdateStatusEvent.new
-                  message.post_complaint(entry.complaint)
-                end
 
-              rescue Exception => e
+                  if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
+                    message = Bridge::ComplaintUpdateStatusEvent.new
+                    message.post_complaint(entry.complaint)
+                  end
+
+                rescue Exception => e
                   return {error:e.message, entry_id: entry.id}.to_json
-              end
-              {entry_id: entry.id}.to_json
+                end
+                {entry_id: entry.id}.to_json
               end
             end
 
@@ -336,22 +336,22 @@ module API
             end
             post 'history' do
               begin
-                  entry = ComplaintEntry.find(params[:id])
-                  complaint_entry_packet={}
-                  complaint_entry_packet[:entry_history] = {}
-                  #if entry.complaint_entry_preload.present?
-                  #  if entry.complaint_entry_preload.historic_category_information.present?
-                  #    complaint_entry_packet[:entry_history][:domain_history] = entry.complaint_entry_preload.historic_category_information
-                  #  else
-                  #    complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
-                  #  end
-                  #else
-                  #  complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
-                  #end
+                entry = ComplaintEntry.find(params[:id])
+                complaint_entry_packet={}
+                complaint_entry_packet[:entry_history] = {}
+                #if entry.complaint_entry_preload.present?
+                #  if entry.complaint_entry_preload.historic_category_information.present?
+                #    complaint_entry_packet[:entry_history][:domain_history] = entry.complaint_entry_preload.historic_category_information
+                #  else
+                #    complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
+                #  end
+                #else
+                #  complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
+                #end
 
-                  complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
+                complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
 
-                  complaint_entry_packet[:entry_history][:complaint_history] = entry.compose_versions
+                complaint_entry_packet[:entry_history][:complaint_history] = entry.compose_versions
 
 
 
@@ -424,7 +424,7 @@ module API
                       #TODO: replace this with working code when the API is finished and we can actually get certainty.
                       complaint_entry_packet[:current_categories][key][:certainty] = [
                           {:source => "Missing Source data", :source_category => "Missing Category", :source_certainty => "N/A", :source_confidence => 'N.A'}
-                                                                                      ]
+                      ]
                     end
 
 
@@ -584,8 +584,9 @@ module API
                     end
 
                     response.push({entry_id: entry['entry_id'], row_id: entry['row_id'], status: complaint_entry.status, resolution: entry['status'],
-                                       comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
-                                       category_names: entry['category_names']})
+                       comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
+                       category_names: entry['category_names']})
+
                   rescue Exception => e
                     response.push({error: true, entry_id: entry['entry_id'], reason: 'api'})
                     next

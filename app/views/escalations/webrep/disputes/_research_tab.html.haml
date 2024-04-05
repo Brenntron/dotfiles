@@ -14,9 +14,12 @@
           %span.toolbar-button-text Expand All Rows
         %button.toolbar-button.collapse-button#collapse-all-rows
           %span.toolbar-button-text Collapse All Rows
-      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+      - if @dispute.resolution != Dispute::DUPLICATE && @dispute.status != Dispute::RESOLVED && @dispute.status != Dispute::PROCESSING
         %div
           %label.toolbar-section-label Edit
+          %button.icon-autoresolved.toolbar-button.esc-tooltipped.toolbar-button-spacer{title: 'Auto Resolve', onclick: "auto_resolve_tickets(#{current_user.id}, #{@dispute.id});"}
+            %span.toolbar-button-text
+              Auto Resolve
           %button.toolbar-button.edit-button#edit-dispute-entry-button.esc-tooltipped{title: 'Edit Dispute Entry'}
             %span.toolbar-button-text Edit Dispute Entry
           %span.dropdown
@@ -66,11 +69,10 @@
                   %button#convert-webrep-ticket-dropdown.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
                     Convert Ticket
 
-      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         %div
           %label.toolbar-section-label Reputation
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("show")'}
+            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("show")', :disabled=> @disabled_when_processing}
               %span.toolbar-button-text Adjust WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               = form_for :wlbl, html: {class: 'adjust-wlbl-form bulk-wlbl-form'} do |wlbl_form|
@@ -282,6 +284,8 @@
         %label.toolbar-section-label Data
         %button.toolbar-button.sync-button#sync-data-button.toolbar-button-spacer
           %span.toolbar-button-text Refresh Data
+        %button.toolbar-button#reputation-history-button.esc-tooltipped.toolbar-button-spacer{title: 'Reputation History', onclick: "get_reputation_history();"}
+          %span.toolbar-button-text Reputation History
         %form#dispute_research_export_form{action: export_escalations_webrep_dispute_path(@dispute, format: :csv), method: 'get'}
           %button.toolbar-button.export-button
             %span.toolbar-button-text Export
@@ -291,6 +295,8 @@
         - if @entries.blank? && @dispute.bridge_packet.present?
           %button.toolbar-button.ping-button.esc-tooltipped{title: 'Entry Recovery - Ping bridge to grab missing Entry content', onclick: "dispute_entry_recovery(#{@dispute.id});"}
             %span.toolbar-button-text Dispute Entry Recovery
+
+
 
       .edit-button-wrapper.edit-entries-buttons.hidden
         %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',
@@ -426,103 +432,103 @@
                     = entry.dispute_entry_preload&.created_at&.strftime('%F %T')
 
                   %td.dispute_rep_tools.rep-tools-cell{rowpan: '2'}
-                    - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+                    - if @dispute.resolution != Dispute::DUPLICATE && @dispute.status != Dispute::RESOLVED && @dispute.status != Dispute::PROCESSING
                       %button.dispute-inline-buttons.edit-button.inline-edit-entry-button.esc-tooltipped{'data-entry-id': "#{entry.id}", title: 'Edit this entry'}
+                      %span.dropdown
+                        - if @dispute.resolution != Dispute::DUPLICATE && @dispute.status != Dispute::RESOLVED && @dispute.status != Dispute::PROCESSING
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle.esc-tooltipped{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);'}
+                        .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
+                          = form_for :wlbl, html: {class: 'adjust-wlbl-form inline-wlbl-form'} do |wlbl_form|
+                            .dispute-wlbl-adjust-wrapper
+                              %input.adjust-wlbl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
+                              %h3 Adjust WL/BL
+                              %table.dispute_tool_current
+                                %thead
+                                  %tr
+                                    %th.content-label-sm.no-word-break Current WL/BL List
+                                    %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                                    %th.text-center.content-label-sm.no-word-break Projected Score
+                                    %th.content-label-sm.no-word-break.th-threat-cat Threat Category
+                                %tbody
+                                  %tr
+                                    %td.wlbl-entry-wlbl
+                                    %td.wlbl-current-entry-wbrs
+                                    %td.wlbl-projected-entry-wbrs.text-center
+                                    %td.wlbl-threat-cat-inline
+
+                              .inline-tool-content-wrapper
+                                .row
+                                  .col-xs-12
+                                    %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
+                                .row.lists-row
+                                  .col-xs-4
+                                    %ul.wlbl-toggle-list
+                                      %li
+                                        %label.toggle-switch
+                                          %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
+                                          %span.toggle-slider#wl-weak-slider
+                                        WL - Weak
+                                      %li
+                                        %label.toggle-switch
+                                          %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
+                                          %span.toggle-slider#bl-weak-slider
+                                        BL - Weak
+                                  .col-xs-4
+                                    %ul.wlbl-toggle-list
+                                      %li
+                                        %label.toggle-switch
+                                          %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-med', onclick: 'prepare_for_wbrs_preview(this)'}
+                                          %span.toggle-slider#wl-med-slider
+                                        WL - Medium
+                                      %li
+                                        %label.toggle-switch
+                                          %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-med', onclick: 'prepare_for_wbrs_preview(this)'}
+                                          %span.toggle-slider#bl-med-slider
+                                        BL - Medium
+                                  .col-xs-4
+                                    %ul.wlbl-toggle-list
+                                      %li
+                                        %label.toggle-switch
+                                          %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
+                                          %span.toggle-slider#wl-heavy-slider
+                                        WL - Heavy
+                                      %li
+                                        %label.toggle-switch
+                                          %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
+                                          %span.toggle-slider#bl-heavy-slider
+                                        BL - Heavy
+
+                                .button-row-center
+                                  %button.preview-wbrs-button{type: 'button', disabled: true, onclick: 'preview_wbrs_score(this);', 'data-add': '', 'data-remove': ''}
+                                    Preview Projected Score
+                                  %button.reset-form-button.esc-tooltipped{type: 'button', title: 'Reset list toggles.', onclick: 'reset_score_preview(this)'}
+
+                                -# threat cats row (2 of 2 for this file)
+                                .row.dropdown-tool-grey-row.threat-cat-row.hidden
+                                  .threat-cat-note
+                                    %label.content-label-sm
+                                      Threat Categories
+                                      %span.threat-cat-required
+                                        *Required for adding to any blacklist.
+                                        %span.five-note Up to 5 can be selected
+                                  .threat-cat-area
+                                    .row
+                                    - Wbrs::ThreatCategory.selections.each do |label, value|
+                                      .col-md-6.threat-cat-cell
+                                        = wlbl_form.check_box(:thrt_cat_id, {id: "thrt_cat_id_#{value}", class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
+                                        = label
+
+                                .comment-wrapper
+                                  %label.content-label-sm Comment
+                                  %textarea.dropdown-comment.adjust-wlbl-input.note-input
+                                .button-row-center
+                                  %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'submit_individual_wlbl(this);'}
+                                    Submit Changes
+
+
+
                     %span.dropdown
-                      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                        %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle.esc-tooltipped{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);'}
-                      .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
-                        = form_for :wlbl, html: {class: 'adjust-wlbl-form inline-wlbl-form'} do |wlbl_form|
-                          .dispute-wlbl-adjust-wrapper
-                            %input.adjust-wlbl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
-                            %h3 Adjust WL/BL
-                            %table.dispute_tool_current
-                              %thead
-                                %tr
-                                  %th.content-label-sm.no-word-break Current WL/BL List
-                                  %th.text-center.content-label-sm.no-word-break Current WBRS Score
-                                  %th.text-center.content-label-sm.no-word-break Projected Score
-                                  %th.content-label-sm.no-word-break.th-threat-cat Threat Category
-                              %tbody
-                                %tr
-                                  %td.wlbl-entry-wlbl
-                                  %td.wlbl-current-entry-wbrs
-                                  %td.wlbl-projected-entry-wbrs.text-center
-                                  %td.wlbl-threat-cat-inline
-
-                            .inline-tool-content-wrapper
-                              .row
-                                .col-xs-12
-                                  %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
-                              .row.lists-row
-                                .col-xs-4
-                                  %ul.wlbl-toggle-list
-                                    %li
-                                      %label.toggle-switch
-                                        %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
-                                        %span.toggle-slider#wl-weak-slider
-                                      WL - Weak
-                                    %li
-                                      %label.toggle-switch
-                                        %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
-                                        %span.toggle-slider#bl-weak-slider
-                                      BL - Weak
-                                .col-xs-4
-                                  %ul.wlbl-toggle-list
-                                    %li
-                                      %label.toggle-switch
-                                        %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-med', onclick: 'prepare_for_wbrs_preview(this)'}
-                                        %span.toggle-slider#wl-med-slider
-                                      WL - Medium
-                                    %li
-                                      %label.toggle-switch
-                                        %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-med', onclick: 'prepare_for_wbrs_preview(this)'}
-                                        %span.toggle-slider#bl-med-slider
-                                      BL - Medium
-                                .col-xs-4
-                                  %ul.wlbl-toggle-list
-                                    %li
-                                      %label.toggle-switch
-                                        %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
-                                        %span.toggle-slider#wl-heavy-slider
-                                      WL - Heavy
-                                    %li
-                                      %label.toggle-switch
-                                        %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
-                                        %span.toggle-slider#bl-heavy-slider
-                                      BL - Heavy
-
-                              .button-row-center
-                                %button.preview-wbrs-button{type: 'button', disabled: true, onclick: 'preview_wbrs_score(this);', 'data-add': '', 'data-remove': ''}
-                                  Preview Projected Score
-                                %button.reset-form-button.esc-tooltipped{type: 'button', title: 'Reset list toggles.', onclick: 'reset_score_preview(this)'}
-
-                              -# threat cats row (2 of 2 for this file)
-                              .row.dropdown-tool-grey-row.threat-cat-row.hidden
-                                .threat-cat-note
-                                  %label.content-label-sm
-                                    Threat Categories
-                                    %span.threat-cat-required
-                                      *Required for adding to any blacklist.
-                                      %span.five-note Up to 5 can be selected
-                                .threat-cat-area
-                                  .row
-                                  - Wbrs::ThreatCategory.selections.each do |label, value|
-                                    .col-md-6.threat-cat-cell
-                                      = wlbl_form.check_box(:thrt_cat_id, {id: "thrt_cat_id_#{value}", class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
-                                      = label
-
-                              .comment-wrapper
-                                %label.content-label-sm Comment
-                                %textarea.dropdown-comment.adjust-wlbl-input.note-input
-                              .button-row-center
-                                %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'submit_individual_wlbl(this);'}
-                                  Submit Changes
-
-
-
-                    %span.dropdown
-                      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+                      - if @dispute.resolution != Dispute::DUPLICATE && @dispute.status != Dispute::RESOLVED && @dispute.status != Dispute::PROCESSING
                         %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle.esc-tooltipped{onclick: "get_current_reptool(this, 'show')", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                       .dropdown-menu.toolbar-dropdown.reptool-inline-dropdown{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
                         = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
@@ -1085,3 +1091,4 @@
                                     %td= entry.blacklist.first_seen
                                     %td= entry.blacklist.last_seen
 
+= render 'escalations/webrep/disputes/reputation_history_dialog'

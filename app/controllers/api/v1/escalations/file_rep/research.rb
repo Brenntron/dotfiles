@@ -30,6 +30,20 @@ module API
               end
             end
 
+            desc "Make an API call to local Reversing Labs data"
+            params do
+              requires :id, type: Integer, desc: "file rep id"
+            end
+            get "local_reversinglabs_api" do
+
+              filerep = FileReputationDispute.where(:id => permitted_params[:id]).first
+              if filerep.present?
+                results = filerep.local_reversing_labs_api
+              end
+
+              render results
+            end            
+
             desc "update file rep columns"
             params do
               requires :id, type: Integer, desc: "file rep id"

@@ -41,7 +41,7 @@ class SdrDisputeDatatable < AjaxDatatablesRails::ActiveRecord
         age:                    SenderDomainReputationDispute.humanize_secs(Time.now - dispute.created_at),
         status:                 dispute.status,
         resolution:             dispute.resolution,
-        assignee:               dispute.user&.cvs_username,
+        assignee:               dispute.user&.is_inactive? ? "#{dispute.user&.cvs_username} (inactive)": dispute.user&.cvs_username,
         source:                 dispute.source || 'Internal',
         priority:               dispute.priority,
         suggested_disposition:  dispute.suggested_disposition,

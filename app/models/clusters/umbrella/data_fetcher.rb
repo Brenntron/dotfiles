@@ -58,7 +58,7 @@ class Clusters::Umbrella::DataFetcher < Clusters::Templates::DataFetcher
           cluster_id: '', # cluster_id is not related to our local record id
           cluster_size: nil, # no data for Umbrella. follow general data structure
           domain: cluster.domain,
-          global_volume: 0, # TODO: remove this tmp placeholder, needed for generic sorting in Clusters::Fetcher.fetch
+          global_volume: cluster.traffic_hits,
           is_pending: cluster.pending?,
           categories: cluster.category_ids.present? ? JSON.parse(cluster.category_ids) : [], # mysql can't store arrays =(
           platform: DATA_PLATFORM

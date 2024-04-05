@@ -94,6 +94,14 @@ class User < ApplicationRecord
     (parent.nil? && children.empty?) ? false : true
   end
 
+  def is_inactive? 
+    if roles.blank?
+      return true
+    else
+      return false
+    end
+  end
+
   def team_manager
     if children.empty? && parent
       parent
@@ -180,6 +188,11 @@ class User < ApplicationRecord
 
   def chart_timeframe_preference
     metrics_timeframe ? metrics_timeframe : DEFAULT_METRICS_TIMEFRAME
+  end
+
+  def allowed_self_review
+    self_review = JSON.parse(self.user_preferences.where(name: 'SelfReview').first&.value || '{}')
+    !!self_review['allowed']
   end
 
   private

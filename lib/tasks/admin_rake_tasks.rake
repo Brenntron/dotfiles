@@ -58,14 +58,76 @@ namespace :escalations do
     end
   end
 
-  task :run_ngfw_import => :environment do
-    Ngfw::Importer.import_without_delay
-  end
-  
-  task :run_umbrella_import => :environment do
-    Umbrella::Importer.import_without_delay
+  task :run_clusters_import => :environment do
+    Clusters::Importer.import_without_delay
   end
 
+  ################AUTO RESOLVE##############################
+
+  task :auto_resolve_tickets => :environment do
+    disputes_to_auto_resolve = Dispute.where(:status => Dispute::PROCESSING)
+
+    disputes_to_auto_resolve.each do |new_dispute|
+
+      dispute_packet = JSON.parse(new_dispute.bridge_packet) rescue nil
+      if dispute_packet.blank?
+        next
+      end
+
+      begin
+        new_dispute.dispute_entries.each do |dispute_entry|
+
+          if dispute_entry.status != DisputeEntry::PROCESSING
+            next
+          end
+
+          if dispute_entry.claim.blank?
+            dispute_entry.build_claim(dispute_packet)
+            dispute_entry.reload
+          end
+
+          initial_log = "--------Starting Data---------<br>"
+          initial_log += "suggested disposition: #{dispute_entry.suggested_disposition}<br>"
+          initial_log += "effective disposition info: #{dispute_entry.running_verdict.inspect.to_s}<br>"
+          initial_log += "-----------------------------<br>"
+
+          dispute_entry.auto_resolve_log += initial_log
+          dispute_entry.save!
+          dispute_entry.reload
+
+          auto_resolve_params = {}
+          auto_resolve_params[:entry_claim] = dispute_entry.claim
+          auto_resolve_params[:dispute_entry] = dispute_entry
+
+          AutoResolve.process_auto_resolution(auto_resolve_params)
+
+        end
+
+        new_dispute.reload
+        new_dispute.auto_check_entries_and_update(Dispute::ALL_AUTO_RESOLVED)
+
+
+        message = Bridge::DisputeEntryUpdateStatusEvent.new
+        message.post_entries(new_dispute.dispute_entries)
+      rescue Exception => e
+        morsel_output = "AUTO RESOLVE EXCEPTION FOR DISPUTE #{new_dispute.id.to_s}:\n\n"
+        morsel_output += e.message + "\n"
+        morsel_output += e.backtrace.join("\n")
+
+        morsel = Morsel.create(:output => morsel_output)
+
+        Rails.logger.error morsel_output
+
+        new_dispute.status = Dispute::PROCESSING
+        new_dispute.save
+      end
+
+
+    end
+
+  end
+
+  ##########################################################
   task :convert_files_from_bugzilla_to_local => :environment do
 
     morsel = Morsel.new

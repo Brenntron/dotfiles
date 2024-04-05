@@ -25,6 +25,11 @@ module API
               ::Clusters::Assignor.new(clusters, current_user).assign_permanent!
               ::Clusters::Processor.new(clusters, current_user).process
               return {:status => "success"}.to_json
+            rescue Exception => e
+              {
+                  status: 'failed',
+                  error: e.message
+              }.to_json
             end
 
             desc 'get all clusters'

@@ -6,6 +6,16 @@ class Wbrs::ThreatCategory < Wbrs::Base
 
   alias_method(:id, :category_id)
 
+  SERVICE_STATUS_NAME = "RULEAPI:THREAT_CATEGORY"
+
+  def self.service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def initialize(attributes = {})
     if attributes.keys.present?
       attributes.keys.each do |attr|
@@ -25,8 +35,30 @@ class Wbrs::ThreatCategory < Wbrs::Base
   # Get all the threat categories.
   # @return [Array<Wbrs::ThreatCategory>] Array of the results.
   def self.all(reload: false)
+    service_status_data = {}
     unless @all || reload
       response = call_json_request(:get, '/v1/rep/thrtcats', body: '')
+
+      if response.code >= 300
+        (0..2).each do
+          response = call_json_request(:get, '/v1/rep/thrtcats', body: '')
+          if response.code < 300
+            break
+          end
+        end
+      end
+
+      if response.code >= 300
+        service_status_data[:type] = "outage"
+        service_status_data[:exception] = "/v1/rep/thrtcats not loading or responding"
+        service_status_data[:exception_details] = response.error rescue response.body
+
+        service_status.log(service_status_data)
+      else
+        service_status_data[:type] = "working"
+        service_status.log(service_status_data)
+      end
+
 
       response_body = JSON.parse(response.body)
       active = response_body['data'].select {|cat| cat["is_active"] == 1}
