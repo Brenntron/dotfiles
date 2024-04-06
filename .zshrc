@@ -67,7 +67,7 @@ fi
 antigen apply
 
 # oh-my-posh theme
-eval "$(oh-my-posh init zsh --config ~/.config/tokyonight/oh-my-posh/tokyonight_moon.omp.json)"
+eval "$(oh-my-posh init zsh --config ~/.config/tokyonight/oh-my-posh/tokyonight_moon.omp.yaml)"
 
 # Source zsh config based on operating system used.
 
