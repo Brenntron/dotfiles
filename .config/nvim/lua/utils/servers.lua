@@ -12,13 +12,13 @@ M.server_list = {
   "jsonls",
   "lua_ls",
   "marksman",
-  "rubocop",
+  -- "rubocop", # lspconfig does not recognize this configuration
   "solargraph",
-  "somesass_ls",
+  -- "somesass_ls", # lspconfig does not recognize this configuration
   "sqlls",
   "stylelint_lsp",
   "tsserver",
-  "typos_lsp",
+  -- "typos_lsp", # lspconfig does not recognize this configuration
   "volar",
   "yamlls",
 }
