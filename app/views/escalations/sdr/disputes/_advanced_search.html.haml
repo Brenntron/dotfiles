@@ -1,5 +1,3 @@
--#%form#search-webrep-cases-form{method: 'get', 'accept-charset': 'UTF-8'}
--#=simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
 = form_for :advanced_search, html: {id: 'sdr-disputes-advanced-search-form'}, url: escalations_sdr_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |advanced_search_form|
   .form-group.search-item
     %label.content-label-sm Case IDs
@@ -73,14 +71,6 @@
     %label.content-label-sm Case Age (Older) ex: 7d 12h
     %input.form-control#age-older-input{name: 'age'}
     %button.remove-input#remove-criteria-age-older{type: 'button'}
-  -#.form-group.search-item.hidden
-  -#  %label.content-label-sm Last Modified (Newer)
-  -#  %input.form-control#modified-newer-input{type: 'date', name: 'date-modified-newer'}
-  -#  %button.remove-input#remove-criteria-modified-newer
-  -#.form-group.search-item.hidden
-  -#  %label.content-label-sm Last Modified (Older)
-  -#  %input.form-control#modified-older-input{type: 'date', name: 'date-modified-older'}
-  -#  %button.remove-input#remove-criteria-modified-older
 
   %button#add-search-items-button{type: 'button'}
     Add Search Criteria
@@ -151,14 +141,6 @@
           %input.search-checkbox#age-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Age', for: 'age-older-input'}
           %label.search-criteria-label
             Case Age (Older)
-        -#%li
-      -#    %input.search-checkbox#modified-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified (Newer)', for: 'modified-newer-input'}
-        -#  %label.search-criteria-label
-        -#    Last Modified (Newer)
-        -#%li
-      -#    %input.search-checkbox#modified-older-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Modified (Older)', for: 'modified-older-input'}
-        -#  %label.search-criteria-label
-        -#    Last Modified (Older)
     .form-group.text-center
       %button.tertiary#cancel-add-criteria{type: 'button'}
         Close
@@ -173,4 +155,3 @@
       Submit Search
     %button.secondary#reset-advanced-search.reset{type: 'button', onclick: 'sdr_reset_search()'}
       Reset Search
-

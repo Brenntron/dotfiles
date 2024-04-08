@@ -23,6 +23,7 @@
  *= require daterangepicker
  *= require utility_classes
  *= require webrep_research
+ *= require webrep_research_tab
  *= require context_tags
  *= require escalations_sdr
  *= require flash_messages

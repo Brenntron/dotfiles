@@ -33,57 +33,57 @@ $(document).ready ->
               $("##{column}-checkbox").prop('checked', false)
               window.dispute_table.column("##{column}").visible false
   )
-  $('.toggle-vis').click ->
-    data = {}
-    data['priority'] = $("#priority-checkbox").is(':checked')
-    data['case-id'] = $("#case-id-checkbox").is(':checked')
-    data['status'] = $("#status-checkbox").is(':checked')
-    data['resolution'] = $("#resolution-checkbox").is(':checked')
-    data['submission-type'] = $("#submission-type-checkbox").is(':checked')
-    data['dispute'] = $("#dispute-checkbox").is(':checked')
-    data['owner'] = $("#owner-checkbox").is(':checked')
-    data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
-    data['age'] = $("#age-checkbox").is(':checked')
-    data['case-origin'] = $("#case-origin-checkbox").is(':checked')
-    data['submitter-type'] = $("#submitter-type-checkbox").is(':checked')
-    data['submitter-org'] = $("#submitter-org-checkbox").is(':checked')
-    data['submitter-domain'] = $("#submitter-domain-checkbox").is(':checked')
-    data['contact-name'] = $("#contact-name-checkbox").is(':checked')
-    data['contact-email'] = $("#contact-email-checkbox").is(':checked')
-    data['status-comment'] = $("#status-comment-checkbox").is(':checked')
-    data['last-updated'] = $("#last-updated-checkbox").is(':checked')
-    data['platform'] = $("#platform-checkbox").is(':checked')
-    data['channel'] = $("#channel-checkbox").is(':checked')
-    std_msg_ajax(
-      url: "/escalations/api/v1/escalations/user_preferences/update"
-      method: 'POST'
-      data: {data, name: 'WebRepColumns'}
-      dataType: 'json'
-      success: (response) ->
-    )
 
-  $('.toggle-vis-nested').click ->
-    data = {}
-    data['dispute-entry'] = $("#dispute-entry-checkbox").is(':checked')
-    data['entry-status'] = $("#entry-status-checkbox").is(':checked')
-    data['entry-resolution'] = $("#entry-resolution-checkbox").is(':checked')
-    data['suggested-disposition'] = $("#suggested-disposition-checkbox").is(':checked')
-    data['category'] = $("#category-checkbox").is(':checked')
-    data['platform-entry'] = $("#platform-entry-checkbox").is(':checked')
-    data['wbrs-score'] = $("#wbrs-score-checkbox").is(':checked')
-    data['wbrs-total-rule-hits'] = $("#wbrs-total-rule-hits-checkbox").is(':checked')
-    data['wbrs-rules'] = $("#wbrs-rules-checkbox").is(':checked')
-    data['sbrs-score'] = $("#sbrs-score-checkbox").is(':checked')
-    data['sbrs-total-rule-hits'] = $("#sbrs-total-rule-hits-checkbox").is(':checked')
-    data['sbrs-rules'] = $("#sbrs-rules-checkbox").is(':checked')
+window.update_webrep_checkbox_user_preferences = ->
+  data = {}
+  data['priority'] = $("#priority-checkbox").is(':checked')
+  data['case-id'] = $("#case-id-checkbox").is(':checked')
+  data['status'] = $("#status-checkbox").is(':checked')
+  data['resolution'] = $("#resolution-checkbox").is(':checked')
+  data['submission-type'] = $("#submission-type-checkbox").is(':checked')
+  data['dispute'] = $("#dispute-checkbox").is(':checked')
+  data['owner'] = $("#owner-checkbox").is(':checked')
+  data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
+  data['age'] = $("#age-checkbox").is(':checked')
+  data['case-origin'] = $("#case-origin-checkbox").is(':checked')
+  data['submitter-type'] = $("#submitter-type-checkbox").is(':checked')
+  data['submitter-org'] = $("#submitter-org-checkbox").is(':checked')
+  data['submitter-domain'] = $("#submitter-domain-checkbox").is(':checked')
+  data['contact-name'] = $("#contact-name-checkbox").is(':checked')
+  data['contact-email'] = $("#contact-email-checkbox").is(':checked')
+  data['status-comment'] = $("#status-comment-checkbox").is(':checked')
+  data['last-updated'] = $("#last-updated-checkbox").is(':checked')
+  data['platform'] = $("#platform-checkbox").is(':checked')
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/user_preferences/update"
+    method: 'POST'
+    data: {data, name: 'WebRepColumns'}
+    dataType: 'json'
+    success: (response) ->
+  )
 
-    std_msg_ajax(
-      url: "/escalations/api/v1/escalations/user_preferences/update"
-      method: 'POST'
-      data: {data, name: 'WebRepColumns'}
-      dataType: 'json'
-      success: (response) ->
-    )
+window.update_webrep_nested_checkbox_user_preferences = ->
+  data = {}
+  data['dispute-entry'] = $("#dispute-entry-checkbox").is(':checked')
+  data['entry-status'] = $("#entry-status-checkbox").is(':checked')
+  data['entry-resolution'] = $("#entry-resolution-checkbox").is(':checked')
+  data['suggested-disposition'] = $("#suggested-disposition-checkbox").is(':checked')
+  data['category'] = $("#category-checkbox").is(':checked')
+  data['platform-entry'] = $("#platform-entry-checkbox").is(':checked')
+  data['wbrs-score'] = $("#wbrs-score-checkbox").is(':checked')
+  data['wbrs-total-rule-hits'] = $("#wbrs-total-rule-hits-checkbox").is(':checked')
+  data['wbrs-rules'] = $("#wbrs-rules-checkbox").is(':checked')
+  data['sbrs-score'] = $("#sbrs-score-checkbox").is(':checked')
+  data['sbrs-total-rule-hits'] = $("#sbrs-total-rule-hits-checkbox").is(':checked')
+  data['sbrs-rules'] = $("#sbrs-rules-checkbox").is(':checked')
+
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/user_preferences/update"
+    method: 'POST'
+    data: {data, name: 'WebRepColumns'}
+    dataType: 'json'
+    success: (response) ->
+  )
 
 window.select_or_deselect_all = (dispute_id)->
 
@@ -1265,7 +1265,11 @@ $ ->
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
       { data: 'submitter_name' }
-      { data: 'submitter_email' }
+      {
+        data: 'submitter_email'
+        render: (data) ->
+          return "<span>#{data}</span> <a href='#{$('#disputes-index').data('banhammer-host') + '?q=' + data}' target='_blank' title='Block #{data}' class='ban esc-tooltipped'></a>"
+      }
       { data: 'status_comment' }
       { data: 'channel' }
       { data: 'updated_at' }
@@ -1466,17 +1470,19 @@ $ ->
     $(this).on 'click', ->
       $(checkbox).prop 'checked', !checkbox.prop('checked')
       column.visible !column.visible()
+      update_webrep_checkbox_user_preferences() #update checkbox history whenever checkbox container is clicked
       return
     $(checkbox).on 'click', ->
       $(checkbox).prop 'checked', !checkbox.prop('checked')
       return
-    return
+
   $('.toggle-vis-nested').each ->
     checkbox_trigger = $(this).attr('data-column')
     checkbox = $(this).find('input')
 
     $(this).on 'click', ->
       $(checkbox).prop 'checked', !checkbox.prop('checked')
+      update_webrep_nested_checkbox_user_preferences() #update nested checkbox history whenever checkbox container is clicked
       $('.dispute-entry-table td, .dispute-entry-table th').each ->
         if $(this).hasClass(checkbox_trigger)
           $(this).toggle()
@@ -1741,7 +1747,8 @@ $ ->
 
     $('#dispute-customer-name').hide()
     $('#dispute-customer-email').hide()
-
+    $('a.ban.dispute-show').hide()
+    
     $('.dispute-edit-input').css('display','block')
 
     $('#save-dispute-button').removeClass('hidden')
@@ -1762,6 +1769,7 @@ $ ->
     $('.dispute-edit-field').show()
     $('#dispute-submission-type-select').hide()
     $('.dispute-submission-type').show()
+    $('#dispute-customer-email .ban').show()
 
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')

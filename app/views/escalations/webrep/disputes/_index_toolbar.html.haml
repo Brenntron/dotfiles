@@ -217,7 +217,9 @@
           .button-row-center
             %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
               Convert Ticket
-
+    %button.icon-autoresolved.toolbar-button.esc-tooltipped.toolbar-button-spacer{title: 'Auto Resolve', onclick: "auto_resolve_tickets(#{current_user.id});"}
+      %span.toolbar-button-text
+        Auto Resolve
   %div
     %label.toolbar-section-label
       Edit Dispute Entry

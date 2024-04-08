@@ -6,6 +6,8 @@ class Wbrs::RuleUiComplaint < Wbrs::Base
 
   alias_method(:id, :prefix_id)
 
+  SERVICE_STATUS_NAME = "RULEAPI:COMPLAINT_RECORD"
+
   def initialize(attributes = {})
     if attributes.keys.present?
       attributes.keys.each do |attr|
@@ -15,6 +17,14 @@ class Wbrs::RuleUiComplaint < Wbrs::Base
       end
     end
     super
+  end
+
+  def self.service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
   end
 
   def self.new_from_attributes(attributes)
@@ -35,12 +45,33 @@ class Wbrs::RuleUiComplaint < Wbrs::Base
   # @param [Integer] offset: Offset of the first record to return
   # @return [Array<Wbrs::Prefix>] Array of the results.
   def self.where(conditions = {})
+    service_status_data = {}
     params = stringkey_params(conditions)
     # category_ids = Wbrs::Category.category_ids_from_params(params)
     # params['categories'] = category_ids if category_ids.present?
     params['is_active'] = params.delete('active') ? 1 : 0 if params['active'].present?
 
     response = post_request(path: '/v1/cat/complaints/get', body: params)
+
+    if response.code >= 300
+      (0..2).each do
+        response = post_request(path: '/v1/cat/complaints/get', body: params)
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/cat/complaints/get not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
 
     response_body = JSON.parse(response.body)
 
@@ -61,7 +92,28 @@ class Wbrs::RuleUiComplaint < Wbrs::Base
   # @param [Array<Integer>] complaint_ids: List of complaint ids
   # @param [String] user: username
   def self.assign_tickets(params)
+    service_status_data = {}
     response = post_request(path: '/v1/cat/complaints/assign', body: stringkey_params(params))
+
+    if response.code >= 300
+      (0..2).each do
+        response = post_request(path: '/v1/cat/complaints/assign', body: stringkey_params(params))
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/cat/complaints/assign not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
 
     response_body = JSON.parse(response.body)
 
@@ -69,7 +121,28 @@ class Wbrs::RuleUiComplaint < Wbrs::Base
   end
 
   def self.tag_complaint(params)
+    service_status_data = {}
     response = post_request(path: '/v1/cat/complaints/tag', body: stringkey_params(params))
+
+    if response.code >= 300
+      (0..2).each do
+        response = post_request(path: '/v1/cat/complaints/tag', body: stringkey_params(params))
+        if response.code < 300
+          break
+        end
+      end
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/v1/cat/complaints/tag not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
 
     response_body = JSON.parse(response.body)
     response_body

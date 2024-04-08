@@ -21,11 +21,14 @@ $ ->
     prev_row = existing_rows.eq(parent_index - 2)[0].innerText
     $(existing_rows).each ->
       data = $(this).find('.col-bulk-dispute').attr('data')
-      text_list = text_list.filter( (text)-> return !text_list.includes(data) )
 
-      if !isEmpty(data)
-        disputes_data.push(data)
-        disputes.push(this)
+      if data?
+        data = data.trim()
+        text_list = text_list.filter( (text)-> return !text_list.includes(data) )
+
+        if !isEmpty(data)
+          disputes_data.push(data)
+          disputes.push(this)
     if !isEmpty(parent_data) && text_list.includes(parent_data)
       index = disputes.indexOf(parent_data)
       disputes.splice(index, 1)
@@ -152,8 +155,8 @@ $ ->
     { which: key, shiftKey, type } = e
     text = el.innerText.trim()
 
-    get_rep_check(e)
-    if text != undefined
+    if text != undefined && !isEmpty(text)
+      get_rep_check(e)
       text_list = text.split(/[\s\t\n]+/)
       row = el.closest('tr')
       tbody = row.closest('tbody')
@@ -182,12 +185,12 @@ $ ->
         else
           $(row).data(text)
       else if key == 8
-        length_check = isEmpty(text) || text.length == 1
+        length_check = text.length == 1
         col_disp = $(tbody).find('.col-bulk-dispute')
 
         if length_check && $(tbody).children().length > 1
 
-          # setting data to empty  so there is no chance the row data may persist on deletion
+          # setting data to empty so there is no chance the row data may persist on deletion
           $(row).remove()
           if !isEmpty(col_disp.filter('[data]').attr('data')) || col_disp.length != 1
             $('#add_addtional_row').css('display', 'flex')
@@ -197,6 +200,8 @@ $ ->
         if isEmpty($(col_disp).text()) && col_disp.length == 1
             $(col_disp[0]).attr('data', "")
             $('#add_addtional_row').css('display', 'none')
+    else
+      el.innerText = ''
 
 
 

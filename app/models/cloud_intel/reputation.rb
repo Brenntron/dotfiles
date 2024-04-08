@@ -12,6 +12,10 @@ class CloudIntel::Reputation
     @ip_result
   end
 
+  def score
+    ip_result.reputation_x10.to_f / 10.0
+  end
+
   # Key id for reputation hits.
   # Value can be looked up in ReputationRuleMap class.
   # @return [Array<Integer>] ids for reputation hits.

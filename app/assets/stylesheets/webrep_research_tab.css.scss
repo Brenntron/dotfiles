@@ -1,0 +1,51 @@
+#research-tab-toolbar {
+  .dropdown {
+    max-height: 27px;
+  }
+
+  .toolbar-dropdown {
+    margin-left: 3px;
+  }
+  .toolbar-button-text, .toolbar-button-text {
+    display: none;
+    margin-left: 8px;
+  }
+}
+
+// show full toolbar labels on smaller screens for less-wide toolbars
+@media (min-width: 1675px) {
+  #research-tab-toolbar .toolbar-button-text {
+    display: block;
+    margin-left: 8px;
+  }
+  // context tags tab exists on both webrep and filerep
+  .tab-context-tags .toolbar-button-text {
+    display: block;
+  }
+}
+
+// dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
+@media screen and (min-width: 1675px) {
+  #research-tab-toolbar .toolbar-button-label .toolbar-button-text, .toolbar-button-label
+  .toolbar-button-text {
+    padding-top: 1px;
+  }
+}
+
+// webrep - research tab toolbar - show smaller icons until there is enough space to show full size again
+@media screen and (min-width: 1675px) and (max-width: 1850px) {
+  #research-tab-toolbar {
+    .toolbar-button {
+      background-position: 6px 6px;
+      padding-left: 9px;
+      padding-right: 8px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+
+#research-tab-toolbar, #research-page-toolbar {
+  margin-bottom: 5px;
+}

@@ -1,7 +1,7 @@
 class Clusters::Wbnp::DataFetcher < Clusters::Templates::DataFetcher
   attr_accessor :regex, :filter, :user
 
-  DATA_PATFORM = 'WSA'.freeze
+  DATA_PLATFORM = 'WSA'.freeze
 
   def initialize(regex, filter = {}, user)
     @regex = regex
@@ -52,7 +52,7 @@ class Clusters::Wbnp::DataFetcher < Clusters::Templates::DataFetcher
       parsed_cluster = parse_cluster(cluster)
       parsed_cluster[:is_pending] = cluster_pending?(cluster, pending_clusters)
       parsed_cluster[:categories] = cluster_categories(cluster, pending_clusters)
-      parsed_cluster[:platform] = DATA_PATFORM
+      parsed_cluster[:platform] = DATA_PLATFORM
       parsed_clusters << parsed_cluster
     end
 

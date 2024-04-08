@@ -4,6 +4,15 @@ class Umbrella::SecurityInfo
 
   UMBRELLA_VOLUME_BASE_URL = "https://investigate.api.umbrella.com/security/name/"
 
+  SERVICE_STATUS_NAME = "UMBRELLA:SECURITY_INFO"
+  def self.service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
+  def service_status
+    @service_status ||= ServiceStatus.where(:name => SERVICE_STATUS_NAME).first
+  end
+
   def self.new_request(address)
 
     full_url = UMBRELLA_VOLUME_BASE_URL + address
@@ -21,7 +30,31 @@ class Umbrella::SecurityInfo
   def self.query_info(address:)
     request = new_request(address)
 
-    HTTPI.get(request)
+    service_status_data = {}
+
+    response = nil
+
+    (0..2).each do
+      response = HTTPI.get(request)
+      if response.code.to_i < 300
+        break
+      end
+      sleep(2)
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/security/name not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
+
+    response
   end
 
   def self.query_malicious_domains(address)
@@ -35,7 +68,31 @@ class Umbrella::SecurityInfo
 
     request.headers['Content-Type'] = 'application/json'
 
-    HTTPI.get(request).body
+    service_status_data = {}
+
+    response = nil
+
+    (0..2).each do
+      response = HTTPI.get(request)
+      if response.code.to_i < 300
+        break
+      end
+      sleep(2)
+    end
+
+    if response.code >= 300
+      service_status_data[:type] = "outage"
+      service_status_data[:exception] = "/pdns/ip/ not loading or responding"
+      service_status_data[:exception_details] = response.error rescue response.body
+
+      service_status.log(service_status_data)
+    else
+      service_status_data[:type] = "working"
+      service_status.log(service_status_data)
+    end
+
+
+    response.body
   end
 
   def self.health_check
@@ -49,7 +106,7 @@ class Umbrella::SecurityInfo
 
     (1..times_to_try).each do |i|
       begin
-        result = query_domain_volume(address: TEST_URL)
+        result = query_info(address: TEST_URL)
         if result.code == 200
           times_successful += 1
         else
