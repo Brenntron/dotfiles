@@ -477,7 +477,7 @@ Then(/^I search for bug id "(.*?)"$/) do |value|
 end
 
 Then(/^take a screenshot$/) do
-  page.save_screenshot('/tmp/screenshot.png', :full => true)
+  page.save_screenshot('/tmp/screenshot.png')
   `open /tmp/screenshot.png`
 end
 
