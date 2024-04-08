@@ -86,7 +86,10 @@ Rails.application.configure do
   config.log_formatter = ::Logger::Formatter.new
 
   # Use a different logger for distributed setups.
-  config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'analyst-console-escalations')
+  Syslog::Logger.send(:include, ActiveSupport::LoggerSilence)
+  logger = Syslog::Logger.new('analyst-console-escalations')
+  logger.formatter = config.log_formatter
+  config.logger = ActiveSupport::TaggedLogging.new(logger)
 
   if ENV["RAILS_LOG_TO_STDOUT"].present?
     logger           = ActiveSupport::Logger.new(STDOUT)
