@@ -216,67 +216,71 @@ window.retrieve_history = (position) ->
 
 
 window.cat_new_url = ()->
-  data = {}
-  isEmpty = true
-  $('#categorize-urls').dropdown('toggle')
-  for i in [1...6] by 1
-    categories = []
-    for j in [0...5] by 1
-      if $("#cat_new_url_#{i}")[0][j]
-        categories.push($("#cat_new_url_#{i}")[0][j].text)
+  categorizations_to_submit = {}
 
-    data[i] = {url: $("#url_#{i}").val(), category_names: categories, category_ids: $("#cat_new_url_#{i}").val()}
+  $('#categorize-diff-form .individual-url').each ->
+    url_input = $($(this).find('.url-input')[0]).val()
+    cats_input_ids = $($(this).find('.cat_new_url')[0]).val()
+    cats_input_names = []
+    url_index = $($(this).find('.url-input')[0]).attr('id').split('_').pop()
 
-    if data[i].url.length > 0 && data[i].category_ids != null
-      isEmpty = false
+    if url_input == '' || cats_input_ids == ''
+      return
+    else
+      $(this).find('.selectize-input .item').each ->
+        cat_name = $(this).text()
+        cats_input_names.push(cat_name)
 
-  if !isEmpty
-    std_msg_ajax(
-      url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
-      method: 'POST'
-      data: {data: data}
-      success: (response) ->
-        timesTouched = 0
-        popular_entries = []
-        message = ""
-        for key, val of response
-          if val.popular == true
-            popular_entries.push(val.url)
+      categorizations_to_submit[url_index] = {
+        'url': url_input,
+        'category_names': cats_input_names,
+        'category_ids': cats_input_ids
+      }
 
-        if popular_entries.length > 0
-           message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
-        else
-           message = "No pending complaint entries have been created"
+  #remove this console log when ready
+  console.log categorizations_to_submit
 
-        reload_message = "</br><a href='.'>Refresh the page</a> to see the result"
-        std_msg_success(
-          'URLs categorized successfully',
-          [message, "All other entries have been submitted directly to WBRS.", reload_message],
-          reload: false,
-          complete: (->
-            # clear url inputs
-            $('#url_1').val('')
-            $('#url_2').val('')
-            $('#url_3').val('')
-            $('#url_4').val('')
-            $('#url_5').val('')
-            # clear categories inputs
-            $('#cat_new_url_1')[0].selectize.clear()
-            $('#cat_new_url_2')[0].selectize.clear()
-            $('#cat_new_url_3')[0].selectize.clear()
-            $('#cat_new_url_4')[0].selectize.clear()
-            $('#cat_new_url_5')[0].selectize.clear()
-          )
+  std_msg_ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
+    method: 'POST'
+    data: {data: categorizations_to_submit}
+    success: (response) ->
+#      debugger
+      popular_entries = []
+      message = ""
+      for key, val of response
+        if val.popular == true
+          popular_entries.push(val.url)
+
+      if popular_entries.length > 0
+         message = "Pending complaint entries have been created for #{popular_entries.join(',')}"
+      else
+         message = "No pending complaint entries have been created"
+
+      reload_message = "</br><a href='.'>Refresh the page</a> to see the result"
+      std_msg_success(
+        'URLs categorized successfully',
+        [message, "All other entries have been submitted directly to WBRS.", reload_message],
+        reload: false,
+        complete: (->
+          # clear url inputs
+          $('.url-input').val('')
+          # clear categories inputs
+          $('#cat_new_url_1')[0].selectize.clear()
+          $('#cat_new_url_2')[0].selectize.clear()
+          $('#cat_new_url_3')[0].selectize.clear()
+          $('#cat_new_url_4')[0].selectize.clear()
+          $('#cat_new_url_5')[0].selectize.clear()
         )
-      error: (response) ->
-        # TODO - Find out where this response text is generated and fix, it makes no sense
-        if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
-          std_api_error(response, "Please make sure you have the appropriate permissions. Unable to categorize url.", reload: false)
-        else
-          std_api_error(response, "Unable to categorize url.", reload: false)
-    )
-  else
-    std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
+      )
+    error: (response) ->
+      debugger
+      # TODO - Find out where this response text is generated and fix, it makes no sense
+      if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
+        std_api_error(response, "Please make sure you have the appropriate permissions. Unable to categorize url.", reload: false)
+      else
+        std_api_error(response, "Unable to categorize url.", reload: false)
+  )
 
 
 
