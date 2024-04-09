@@ -9,7 +9,7 @@ gem 'rack-cors', '0.4.1', require: 'rack/cors'
 gem 'active_model_serializers', '0.10.12'
 gem 'grape', '1.6.2'
 gem 'grape-swagger', '0.31.1'
-gem 'grape-swagger-rails', '0.3.1'
+gem 'grape-swagger-rails', '0.5.0'
 gem 'grape-active_model_serializers', '1.5.2'
 gem 'hashie-forbidden_attributes', '~> 0.1.1'
 gem 'activerecord-session_store', '2.1.0'
@@ -62,7 +62,7 @@ gem 'peake-bridge-client', '~> 0.2.1' #, git: "https://github.com/cisco-sbg/talo
 
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'
-gem 'aws-sdk', '3.1.0'
+gem 'aws-sdk-s3', '1.117.2'
 gem 'grpc', '1.56.0'
 gem 'grpc-tools', '1.45.0'
 
