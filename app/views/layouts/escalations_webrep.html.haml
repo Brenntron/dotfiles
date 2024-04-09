@@ -67,6 +67,10 @@
           %a{href: "#{escalations_webrep_disputes_path}?f=closed"}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Closed Tickets
+        %li{class: ("selected" if params[:f] == "autoresolved_processing")}
+          %a{href: "#{escalations_webrep_disputes_path}?f=autoresolved_processing"}
+            %span.nav-dropdown-icon.icon-autoresolved-white
+            Processing
         %li{class: ("selected" if params[:f] == "all")}
           %a{href: "#{escalations_webrep_disputes_path}?f=all"}
             %span.nav-dropdown-icon.icon-all-tickets

@@ -1136,7 +1136,7 @@ window.category_ids_to_names = (categories_hash, category_ids) ->
 
 window.webcat_platform_filter = () ->
   platforms = $("input.show-platforms-filter:checked")
-  if $(platforms).length == 3 || $(platforms).length == 0
+  if $(platforms).length == 4 || $(platforms).length == 0
     selected_platform = 'All'
   else
     selected_platform = []

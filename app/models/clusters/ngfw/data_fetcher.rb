@@ -10,7 +10,7 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
   # But platforms are managed by Talos Intelligence app and can be edited there
   # Since clusters processing are using platform name as an identifier
   # we use hardcoded value to be isolated from potential category name change on TI side
-  DATA_PATFORM = 'NGFW'.freeze
+  DATA_PLATFORM = 'NGFW'.freeze
 
   def initialize(regex, filter = {}, user)
     @regex = regex
@@ -61,7 +61,7 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
         global_volume: cluster.traffic_hits,
         is_pending: cluster.pending?,
         categories: cluster.category_ids.present? ? JSON.parse(cluster.category_ids) : [], # mysql can't store arrays =(
-        platform: DATA_PATFORM
+        platform: DATA_PLATFORM
       }
     end
   end

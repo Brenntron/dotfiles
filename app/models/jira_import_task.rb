@@ -171,7 +171,7 @@ class JiraImportTask < ApplicationRecord
                 end
               else
                 complaint_options = [
-                  BugzillaRest::Session.default_session,
+                  EscalationTicket,
                   ticketable_urls.first.submitted_url,
                   description,
                   Customer::JIRA_GENERATED,
@@ -319,5 +319,9 @@ class JiraImportTask < ApplicationRecord
       issue_status = issue_data['status']
     end
     issue_status
+  end
+
+  def has_open_complaints?
+    self.import_urls.joins(:complaint).where.not(complaint: {status: [Complaint::COMPLETED, Complaint::RESOLVED]}).any?
   end
 end

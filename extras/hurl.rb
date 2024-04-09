@@ -314,10 +314,8 @@ class Hurl
         output_tar_path = args.input_tar_path
       else
         output_tar_path = args.gen_output_tar_path
-        # puts   "curl -Lku #{@args.user}:#{@args.git_auth_token}  https://gitlab.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
-        # system "curl -Lku #{@args.user}:#{@args.git_auth_token}  https://gitlab.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
-        puts "curl --header 'PRIVATE-TOKEN:#{@args.git_auth_token}' 'https://gitlab.vrt.sourcefire.com/api/v4/projects/talosweb%2F#{args.project}/repository/archive.tar.gz?sha=#{args.base_dir}' > #{output_tar_path}"
-        system "curl --header 'PRIVATE-TOKEN:#{@args.git_auth_token}' 'https://gitlab.vrt.sourcefire.com/api/v4/projects/talosweb%2F#{args.project}/repository/archive.tar.gz?sha=#{args.base_dir}' > #{output_tar_path}"
+        puts "curl -L -H 'Accept: application/vnd.github+json' -H 'Authorization: Bearer #{@args.git_auth_token}' -H 'X-GitHub-Api-Version: 2022-11-28' https://api.github.com/repos/cisco-sbg/talos-atlas-#{args.project}/tarball/refs/tags/#{args.base_dir} > #{output_tar_path}"
+        system "curl -L -H 'Accept: application/vnd.github+json' -H 'Authorization: Bearer #{@args.git_auth_token}' -H 'X-GitHub-Api-Version: 2022-11-28' https://api.github.com/repos/cisco-sbg/talos-atlas-#{args.project}/tarball/refs/tags/#{args.base_dir} > #{output_tar_path}"
       end
     end
 
