@@ -210,7 +210,7 @@ class AbusiveContentTool
     report_alert_args[:body] = body
 
     attachments_to_mail = []
-    conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
+    conn = ::Bridge::SendGenericEmailEvent.new(addressee: 'talos-intelligence')
     conn.post(report_alert_args, attachments_to_mail)
   end
 
