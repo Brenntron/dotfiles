@@ -198,7 +198,12 @@ class AbusiveContentTool
   def self.process_email_report(complaint_entry, report_results)
 
     report_alert_args = {}
-    report_alert_args[:to] = "admatter@cisco.com"
+    if Rails.env == "production"
+      report_alert_args[:to] = "admatter@cisco.com"
+    else
+      report_alert_args[:to] = "talosweb@cisco.com"
+    end
+
     report_alert_args[:from] = "noreply@talosintelligence.com"
     report_alert_args[:subject] = "IWF Report Notification"
 
@@ -389,7 +394,11 @@ class AbusiveContentTool
     report_alert_args[:body] = body
 
     attachments_to_mail = []
-    ["admatter@cisco.com", "talosweb@cisco.com"].each do |email_address|
+    email_list = ["talosweb@cisco.com"]
+    if Rails.env == "production"
+      email_list << "admatter@cisco.com"
+    end
+    email_list.each do |email_address|
       report_alert_args[:to] = email_address
       conn = ::Bridge::SendGenericEmailEvent.new(addressee: 'talos-intelligence')
       conn.post(report_alert_args, attachments_to_mail)
