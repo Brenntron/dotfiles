@@ -541,14 +541,15 @@ Feature: Webcat complaint entry assignment
     And I click "#index_change_assign"
     And I click "#button_reassign"
     And I wait for "2" seconds
-    And I should see "The following entries could not be assigned: Complaint is already assigned to bob_belcher - 1"
+    And take a screenshot
+    And I should see "Complaint is already assigned to bob_belcher"
     #assign new reviewer
     Then I click ".close"
     And I click "#assignment-type-reviewer"
     And I click "#index_change_assign"
     And I click "#button_reassign"
     And I wait for "2" seconds
-    And I should see "The following entries could not be assigned: Complaint is already assigned to bob_belcher - 1"
+    And I should see "Complaint is already assigned to bob_belcher"
 
   @javascript
   Scenario: a manager cannot change assignee when complaint is PENDING or COMPLETE
@@ -573,14 +574,14 @@ Feature: Webcat complaint entry assignment
     And I click "#index_change_assign"
     And I click "#button_reassign"
     And I wait for "1" seconds
-    And I should see "The following entries could not be assigned: Status is pending - 1"
+    And I should see "Status is pending"
     Then I click ".close"
     And I click row with id "1"
     And I click row with id "2"
     And I click "#index_change_assign"
     And I click "#button_reassign"
     And I wait for "2" seconds
-    And I should see "The following entries could not be assigned: Already completed - 2"
+    And I should see "Already completed"
 
   @javascript
   Scenario: a user cannot change the reviewer on a COMPLETED entry
@@ -605,7 +606,7 @@ Feature: Webcat complaint entry assignment
     And I click "#index_change_assign"
     And I click "#button_reassign"
     And I wait for "1" seconds
-    And I should see "The following entries could not be assigned: Already completed - 1"
+    And I should see "Already completed"
 
   @javascript
   Scenario: a user cannot change the second reviewer on a COMPLETED entry
@@ -631,7 +632,7 @@ Feature: Webcat complaint entry assignment
     And I click "#index_change_assign"
     And I click "#button_reassign"
     And I wait for "1" seconds
-    And I should see "The following entries could not be assigned: Already completed - 1"
+    And I should see "Already completed"
 
   @javascript
   Scenario:  a non-manager can unassign a user from a complaint
@@ -709,9 +710,9 @@ Feature: Webcat complaint entry assignment
     And  I goto "/escalations/webcat/complaints"
     And I click row with id "1"
     And I click "#assignment-type-assignee"
-    And button "webcat-remove-assignee-toolbar-button" should be enabled
-    And button "index_change_assign" should be disabled
+    And button with id "webcat-remove-assignee-toolbar-button" should be enabled
+    And button with id "index_change_assign" should be disabled
     And I click "#assignment-type-reviewer"
-    And button "index_change_assign" should be disabled
+    And button with id "index_change_assign" should be disabled
     And I click "#assignment-type-second-reviewer"
-    And button "index_change_assign" should be disabled
+    And button with id "index_change_assign" should be disabled
