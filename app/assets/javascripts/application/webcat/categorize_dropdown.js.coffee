@@ -273,7 +273,6 @@ window.cat_new_url = ()->
         )
       )
     error: (response) ->
-      debugger
       # TODO - Find out where this response text is generated and fix, it makes no sense
       if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
         std_api_error(response, "Please make sure you have the appropriate permissions. Unable to categorize url.", reload: false)
