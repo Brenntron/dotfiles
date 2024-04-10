@@ -126,6 +126,7 @@ window.advanced_webrep_index_table = () ->
     modified_older: form.find('input[id="modified-older-input"]').val()
     modified_newer: form.find('input[id="modified-newer-input"]').val()
     case_origin: form.find('input[id="case-origin-input"]').val()
+    channel: form.find('input[id="channel-input"]').val()
   }
 
   unless form.find('#submission-type').parent().hasClass('hidden')
@@ -836,6 +837,7 @@ window.webrep_reset_search = () ->
   $("#status-input")[0].selectize.clear()
   $("#priority-input")[0].selectize.clear()
   $("#resolution-input")[0].selectize.clear()
+  $("#channel-input")[0].selectize.clear()
 
 window.clearSelectize = (input) ->
   $("##{input}")[0].selectize.clear()
@@ -1192,7 +1194,7 @@ $ ->
       }
       {
         targets: [ 10 ]
-        orderData: 20 # The age column is ordered by the age_int column. If columns are added or removed this must be updated.
+        orderData: 21 # The age column is ordered by the age_int column. If columns are added or removed this must be updated.
         className: 'age-col'
       }
     ]
@@ -1269,6 +1271,7 @@ $ ->
           return "<span>#{data}</span> <a href='#{$('#disputes-index').data('banhammer-host') + '?q=' + data}' target='_blank' title='Block #{data}' class='ban esc-tooltipped'></a>"
       }
       { data: 'status_comment' }
+      { data: 'channel' }
       { data: 'updated_at' }
       {
         data: 'age_int'
@@ -1587,6 +1590,8 @@ $ ->
           $('#modified-newer-input').val filters.modified_newer
           #Last Modified (Older)
           $('#modified-older-input').val filters.modified_older
+          #Channel
+          $('#channel-input').val filters.channel
 
           #check for submission types parameter - if field is hidden there is no .submission_type attached
           if filters.submission_type?
@@ -1655,6 +1660,20 @@ $ ->
             valueField: 'id',
             labelField: 'public_name',
             options: response.json.priorities
+            onFocus: () ->
+              window.toggle_selectize_layer(this, 'true')
+            onBlur: () ->
+              window.toggle_selectize_layer(this, 'false')
+          }
+
+          $('#channel-input').selectize {
+            persist: false,
+            create: false,
+            maxItems: 2,
+            valueField: 'name',
+            labelField: 'name',
+            searchField: 'name',
+            options: [ {name: "RMS"}, {name: "RMS Alert"} ]
             onFocus: () ->
               window.toggle_selectize_layer(this, 'true')
             onBlur: () ->
@@ -2977,6 +2996,7 @@ window.format_webrep_header = (data) ->
         submitted_older: 'Submitted before'
         submitter_type: 'Submitter Type'
         case_origin: 'Case Origin'
+        channel: 'Channel'
       }
       for conditionName, condition of search_conditions
         if condition == '' || ['search', 'search_name', 'search_type'].includes(conditionName)

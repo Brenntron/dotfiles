@@ -152,18 +152,16 @@ build_complaints_table = (url) ->
             else if full.age_int > 10800
               age_class = 'ticket-age-over3hr'
 
-          source = ''
-          if full.complaint_source?
-            if full.complaint_source == 'talos-intelligence'
-              complaint_source = 'TI Webform'
-            else if full.complaint_source == 'talos-intelligence-api'
-              complaint_source = 'TI API'
-            else if full.complaint_source == ''
-              complaint_source = '<span class="missing-data">Source unknown</span>'
+          if full.channel?
+            if full.channel == 'talosintel'
+              if full.complaint_source == 'talos-intelligence'
+                complaint_channel = 'TI Webform'
+              else if full.complaint_source == 'talos-intelligence-api'
+                complaint_channel = 'TI API'
             else
-              complaint_source = full.complaint_source
+              complaint_channel = full.channel
           else
-            complaint_source = '<span class="missing-data">Source unknown</span>'
+            complaint_channel = '<span class="missing-data">Channel unknown</span>'
 
           is_important_flags = ''
           if full.is_important == "true"
@@ -177,7 +175,7 @@ build_complaints_table = (url) ->
               '<tr class="entry-id-row"><td><a href="complaints/' + full.complaint_id + '" >' + full.entry_id + '</a></td></tr>' +
               '<tr class="age-row"><td class="' + age_class + '">' + data + '</td></tr>' +
               '<tr class="state-row"><td>' + full.status + '</td></tr>' +
-              '<tr class="source-row"><td>' + complaint_source + '</td></tr>' +
+              '<tr class="channel-row"><td>' + complaint_channel + '</td></tr>' +
               '<tr class="important-flag-row"><td>' + is_important_flags + '</td></tr>' +
               '</tbody>' +
               '</table>'

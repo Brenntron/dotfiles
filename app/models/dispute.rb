@@ -1055,6 +1055,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       new_dispute.product_version = message_payload["payload"]["product_version"] unless message_payload["payload"]["product_version"].blank?
       new_dispute.in_network = message_payload["payload"]["network"] unless message_payload["payload"]["network"].blank?
       new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
+      new_dispute.channel = message_payload["payload"]["channel"]
       new_dispute.status = PROCESSING
 
       new_dispute.customer_id = customer&.id
@@ -1454,7 +1455,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     end
 
     if params['case_origin'].present?
-      
+
       if params['case_origin'] == 'Internal'
         dispute_fields['ticket_source'] = nil
       else
@@ -1467,7 +1468,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       dispute_fields[field] = dispute_fields[field].split(/[\s,]+/)
     end
 
-    ['status', 'resolution'].each do |field|
+    ['status', 'resolution', 'channel'].each do |field|
       next unless params[field].present?
       dispute_fields[field] = params[field].split(',')
     end
@@ -1539,7 +1540,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     company_name = nil
     customer_params = params.fetch('customer', {}).slice(*%w{name email company_name}).to_h
     customer_params = customer_params.select{|ignore_key, value| value.present?}
-  
+
     if customer_params.any?
       if customer_params['company_name'].present?
         company_name = customer_params.delete('company_name')
@@ -1835,6 +1836,8 @@ For future Web categorization requests, please open a Web categorization ticket 
         dispute_packet[k] = '' if dispute_packet[k].nil?
       end
 
+      dispute_packet[:channel] = dispute.channel
+
       dispute_packet
     end
   end
@@ -1901,7 +1904,7 @@ For future Web categorization requests, please open a Web categorization ticket 
       entries = dispute.dispute_entries.where(status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED, DisputeEntry::ASSIGNED])
 
       Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries.to_a)
-    end 
+    end
 
     disputes_ary
   end
@@ -2772,7 +2775,7 @@ For future Web categorization requests, please open a Web categorization ticket 
     return_hash[:dispute_entries] = []
     new_dispute.dispute_entries.each do |entry|
       return_hash[:dispute_entries] << {:dispute_entry_id => entry.id, :entry => entry.hostlookup}
-    end  
+    end
 
     return return_hash
   end
@@ -2932,4 +2935,3 @@ For future Web categorization requests, please open a Web categorization ticket 
     return nil
   end
 end
-
