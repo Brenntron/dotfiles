@@ -245,7 +245,6 @@ window.cat_new_url = ()->
     method: 'POST'
     data: {data: categorizations_to_submit}
     success: (response) ->
-#      debugger
       popular_entries = []
       message = ""
       for key, val of response
