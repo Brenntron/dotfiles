@@ -10,6 +10,7 @@ class ComplaintEntry < ApplicationRecord
   belongs_to :canonical, class_name: "ComplaintEntry", optional: true
 
   has_many :duplicate_entries, class_name: "ComplaintEntry", foreign_key: 'canonical_id'
+  has_many :abuse_records
 
   belongs_to :complaint
   belongs_to :user, optional: true
@@ -562,30 +563,24 @@ class ComplaintEntry < ApplicationRecord
 
   ####Generic method to handle any logic to alter categories and any other necessary activities before sending categories
   # to RuleAPI
-  def pre_commit_processing(category_ids_array, ip_or_uri)
-
+  def pre_commit_processing(category_ids_array, ip_or_uri, user)
+    user = User.find_by_email(user) rescue self.user
     if category_ids_array.include?(AbusiveContentTool.current_child_abuse_category[:id])
       category_ids_array = AbusiveContentTool.reclassify_abuse_categories(category_ids_array)
+
+      abuse_info = {}
+      abuse_info[:user_id] = user.id
+      abuse_info[:user] = user.email
+      abuse_info[:url] = ip_or_uri
+      self.abuse_information = abuse_info.to_json
+      self.save!
       result = AbusiveContentTool.submit_abuse_to_authorities(self, user, SimpleIDN.to_ascii(ip_or_uri))
+      abuse_info[:iwf_report] = result[:iwf_report]
+      abuse_info[:ncmec_report] = result[:ncmec_report]
+      self.abuse_information = abuse_info.to_json
+      self.save
 
-      if result[:status].to_s == "success"
-        abusive_info = {}
-        abusive_info[:iwf_report_id] = "IWF report submission ID: #{result[:data]}"
-        self.abuse_information = abusive_info.to_json
-        self.save!
-        report_alert_args = {}
-        report_alert_args[:to] = "admatter@cisco.com"
-        report_alert_args[:from] = "noreply@talosintelligence.com"
-        report_alert_args[:subject] = "IWF Report Notification"
-        report_alert_args[:body] = "Reference Data <br /> Complaint ID: #{self.complaint.id} <br /> Complaint Entry ID: #{self.id} <br /> Entry: #{self.hostlookup} <br /> User assigned: #{self.user.cvs_username}"
 
-        attachments_to_mail = []
-        conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
-        conn.post(report_alert_args, attachments_to_mail)
-
-      else
-        raise "IWF submission issue: #{result[:message]}"
-      end
     end
 
     return category_ids_array
@@ -604,7 +599,7 @@ class ComplaintEntry < ApplicationRecord
 
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
-    category_ids_array = pre_commit_processing(category_ids_array, ip_or_uri)
+    category_ids_array = pre_commit_processing(category_ids_array, ip_or_uri, user)
 
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"

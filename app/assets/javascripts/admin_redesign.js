@@ -57,6 +57,7 @@
 //= require application/webcat/research
 //= require application/webcat/jira_imports
 //= require application/webcat/webcat_index
+//= require application/webcat/csam_reports
 //= require application/webcat/bulk_resolution_tool
 //= require application/escalations_users
 //= require application/webcat/webCatRepLookup

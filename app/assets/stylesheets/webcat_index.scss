@@ -528,7 +528,7 @@ table.dataTable tbody tr.submitting-entry {
   display: inline-block;
 }
 
-.entry-id-row a {
+.entry-id-row a, .entry-id-col {
   text-decoration: underline;
 }
 
@@ -848,6 +848,14 @@ table.dataTable tbody tr.submitting-entry {
     overflow-y: scroll;
     max-height: 100px;
     border: none;
+  }
+}
+
+#complaints-nav-search-wrapper {
+  padding: 0 10px !important;
+
+  .input-group.search-group {
+    margin: 8px 0;
   }
 }
 

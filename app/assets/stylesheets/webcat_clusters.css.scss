@@ -108,3 +108,227 @@
     width: 315px;
   }
 }
+
+#copycat_dialog {
+  .dialog-content-wrapper {
+    border: none;
+  }
+}
+
+// copycat tool dialog
+#copycat_dialog {
+  display: none;
+}
+.copycat_tool_dialog {
+  min-width: 400px;
+  min-height: 135px;
+  font-family: 'Open Sans', sans-serif !important;
+
+}
+
+.copycat_tool_dialog .ui-dialog-titlebar {
+  background-color: #3e5a72;
+  background-image: url(image_path('icon_copycat.svg'));
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  background-size: 24px 24px;
+  padding-left: 40px;
+  border: none;
+  width: 100%;
+  font-weight: bold;
+  .selectize-input{
+    font-size: 8.5pt;
+  }
+}
+
+#copycat-categories-selectized {
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e0e0e0;
+}
+
+.copycat-tool-footer {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0 25px 15px 25px;
+  font-size: 12px;
+}
+
+.copycat-btn {
+  margin: 4px 0 0 5px;
+  background-color: #3e5a72;
+  color: #fff;
+  display: block;
+  height: 27px;
+  background-size: 19px!important;
+}
+
+.copycat-btn.active, .wsa-btn.active {
+  background-color: #6dbcdb;
+}
+.copycat-btn:hover, .wsa-btn:hover  {
+  background-color: #2c3e50;
+}
+
+
+// copycat tool dialog
+
+.copycat-tool-footer .cluster-button{
+  width: 135px;
+  background-size: 15px;
+  &.copycat-clear-btn {
+    background-color: #D7DADB;
+    color: unset;
+    background-size: 22px;
+    padding-left: 39px;
+    width: unset;
+    &:hover {
+      background-color: darken(#d7dadb, 10%)!important;
+    }
+  }
+}
+
+#clusters-nav-regex-wrapper {
+  .input-group.search-group {
+    display: inline-block;
+    margin-right: 0;
+    top: -4px;
+    width: 60%;
+
+    @media (min-width: 1000px) {
+      width: 70%;
+    }
+
+    @media (min-width: 1600px) {
+      width: 80%;
+    }
+  }
+
+  .clusters-nav-regex-container {
+    display: inline-block;
+    height: 15px;
+    margin: 15px 0 0 0;
+    width: 80px;
+
+    input {
+      float: right;
+      margin: 0;
+    }
+
+    label {
+      float: left;
+      font-size: 11px;
+      font-weight: 400;
+      margin: 0 5px 0 0;
+    }
+  }
+}
+
+.cluster-button{
+  white-space: nowrap;
+  background-color: #6dbcdb;
+  background-position: 10px center;
+  color: #fff;
+  height: 30px;
+  border: none;
+  border-radius: 2px;
+  text-transform: capitalize;
+  font-weight: 500;
+  font-family: "Open Sans", sans-serif !important;
+  min-width: 154px;
+  width: fit-content;
+  font-size: 9pt !important;
+  transition: background-color 0.2s!important;
+
+  &:hover{
+    background-color: darken(#6dbcdb, 10%)!important;
+  }
+
+  &.icon-filter-white{
+    padding: 0 15px 0 38px;
+    background-position: 7px center!important;
+  }
+
+  &.icon-submit{
+    min-width: 135px;
+  }
+
+  &.icon-search{
+    min-width: 110px;
+    background-size: 17px;
+  }
+}
+
+// Cluster mgmt UI - Comment box / Category Submission
+.card {
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+  .card-body {
+    display: inline-flex;
+    width: 100%;
+    margin: 0;
+    input {
+      width: 80%;
+    }
+    button.icon-submit {
+      width: 20%;
+      background-color: #6dbcdb;
+      background-position-x: 6px;
+      margin: 0 0 0 10px;
+      padding: 5px 5px 5px 25px;
+      font-size: 9pt;
+      color: #fff;
+    }
+  }
+}
+
+.current-cluster-info-wrapper {
+  padding: 25px 0 10px;
+  .result-label.vertical-separator {
+    border-right: 1px solid #d7dadb;
+  }
+  .result-label {
+    font-size: .8rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-top: 0;
+    display: inline-block;
+    padding: 0 15px 0 5px;
+    span {
+      color: #6dbcdb;
+      text-transform: none;
+      padding-left: 10px;
+      float: right;
+      display: inline-block;
+      min-width: 40px;
+    }
+    &.regex-area {
+      padding-left: 20px;  // regex field on clusters
+      border-left: solid 1px #EAEAEA;
+    }
+  }
+}
+
+// Cluster top bar header
+.cluster-mgt-top-area {
+  background-color: #3e5a72;
+  padding-bottom: 20px;
+  border-radius: 4px 4px 0 0;
+  margin: -15px;
+}
+#wsa_statuses, #clusters-index_filter, #cluster_comment_field{
+  &:empty{
+    font-size: 8.5pt!important;
+  }
+  &::-webkit-input-placeholder, &::-moz-placeholder {
+    font-size: 8.5pt!important;
+    color: #303030!important;
+    font-family: inherit!important;
+    line-height: 18px!important;
+    -webkit-font-smoothing: inherit!important;
+  }
+}
