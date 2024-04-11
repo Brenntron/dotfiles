@@ -647,7 +647,6 @@ $ ->
     urlListItems = $(listId).find('li')
     # TODO - pretty sure this self review item is not on the DOM in
     # the research section and therefore shouldnt be here
-    self_review = $('#self_review').is(':checked')
 
     for listItem in urlListItems
       entries.push $(listItem).data().url
@@ -680,8 +679,7 @@ $ ->
         data:
           'entries': [entry],
           'category_ids': category_ids,
-          'categories': categories,
-          'self_review': self_review
+          'categories': categories
         success: (response) ->
           data = response.data
           callsCompleted += 1

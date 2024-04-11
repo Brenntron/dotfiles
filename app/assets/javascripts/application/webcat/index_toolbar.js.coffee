@@ -9,6 +9,18 @@ $ ->
     toggle_display_data(this)
     save_display_prefs()
 
+  $("#self_review").click ->
+    self_review = $(this).prop('checked')
+
+    data = {"enabled": self_review}
+    std_msg_ajax(
+      url: "/escalations/api/v1/escalations/user_preferences/update"
+      method: "POST"
+      data: {data, name: "SelfReview"}
+      dataType: "json"
+      success: (response) ->
+    )
+
 window.get_display_prefs = () ->
   current_filter = get_current_webcat_filter() #check which page user is on for filter purposes
   std_msg_ajax(
