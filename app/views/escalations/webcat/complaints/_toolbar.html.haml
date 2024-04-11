@@ -1,93 +1,151 @@
 #webcat-index-toolbar.toolbar
   %div
-    %div.webcat-toolbar-select-all-wrapper
+    .webcat-toolbar-select-all-wrapper
       %input{type: 'checkbox', id:'complaints_select_all'}
-      %label{for: 'complaints_select_all'} Select All
+      %label.toolbar-button-text-wider{for: 'complaints_select_all'} Select All
   %div
     %span.dropdown
       %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
-          Show/Hide Columns
+          Show/Hide Data
       .dropdown-menu.toolbar-dropdown#webcat-index-table-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
-        %ul
-          %li.toggle-vis-webcat.hidden{'data-column':'1'}
-            %input.important-checkbox{type: 'checkbox', checked: true, id: 'important-checkbox'} Important
-          %li.toggle-vis-webcat{'data-column':'3'}
-            %input.age-checkbox{type: 'checkbox', checked: true, id: 'age-checkbox'} Age
-          %li.toggle-vis-webcat{'data-column':'4'}
-            %input.status-checkbox{type: 'checkbox', checked: true, id: 'status-checkbox'} Status
-          %li.toggle-vis-webcat{'data-column':'5'}
-            %input.tags-checkbox{type: 'checkbox', checked: true, id: 'tags-checkbox'} Tags
-          %li.toggle-vis-webcat{'data-column':'6'}
-            %input.subdomain-checkbox{type: 'checkbox', checked: true, id: 'subdomain-checkbox'} Subdomain
-          %li.toggle-vis-webcat{'data-column':'7'}
-            %input.domain-checkbox{type: 'checkbox', checked: true, id: 'domain-checkbox'} Domain / IP
-          %li.toggle-vis-webcat{'data-column':'8'}
-            %input.path-checkbox{type: 'checkbox', checked: true, id: 'path-checkbox'} Path
-          %li.toggle-vis-webcat{'data-column':'9'}
-            %input.uri-checkbox{type: 'checkbox', checked: true, id: 'uri-checkbox'} URI
-          %li.toggle-vis-webcat{'data-column':'10'}
-            %input.primary-checkbox{type: 'checkbox', checked: true, id: 'primary-checkbox'} Primary Cat
-          %li.toggle-vis-webcat{'data-column':'11'}
-            %input.suggested-checkbox{type: 'checkbox', checked: true, id: 'suggested-checkbox' } Suggested Cat
+        %label.dropdown-label Show/Hide Data
+        .row
+          .col-xs-3
+            %ul.show-col-list
+              %li
+                %input#view-ticket-col-cb.webcat-view-data-cb.webcat-view-col-cb{type: 'checkbox', checked: true, 'data-column': '0'}
+                %label{for: 'view-ticket-col-cb'} Ticket
+              %li.sub-checkbox-wrapper
+                %input#view-data-entry-id.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'entry-id-row'}
+                %label{for: 'view-data-entry-id'} Entry ID
+              %li.sub-checkbox-wrapper
+                %input#view-data-age.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'age-row'}
+                %label{for: 'view-data-age'} Age
+              %li.sub-checkbox-wrapper
+                %input#view-data-status.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'state-row'}
+                %label{for: 'view-data-status'} Status
+              %li.sub-checkbox-wrapper
+                %input#view-data-source.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'channel-row'}
+                %label{for: 'view-data-source'} Channel
+          .col-xs-3
+            %ul.show-col-list
+              %li
+                %input#view-submitter-col-cb.webcat-view-data-cb.webcat-view-col-cb{type: 'checkbox', checked: true, 'data-column': '1'}
+                %label{for: 'view-submitter-col-cb'} Submitter
+              %li.sub-checkbox-wrapper
+                %input#view-data-org-cb.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'company-row'}
+                %label{for: 'view-data-org-cb'} Organization
+              %li.sub-checkbox-wrapper
+                %input#view-data-name-cb.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'submitter-name-row'}
+                %label{for: 'view-data-name-cb'} Name
+              %li.sub-checkbox-wrapper
+                %input#view-data-email-cb.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'submitter-email-row'}
+                %label{for: 'view-data-email-cb'} Email
+              %li.sub-checkbox-wrapper
+                %input#view-data-platform-cb.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'platform-row'}
+                %label{for: 'view-data-platform-cb'} Platform
+          .col-xs-3
+            %ul.show-col-list
+              %li
+                %input#view-user-col-cb.webcat-view-data-cb.webcat-view-col-cb{type: 'checkbox', checked: true, 'data-column': '3'}
+                %label{for: 'view-user-col-cb'} Users
+              %li.sub-checkbox-wrapper
+                %input#view-data-assignee-cb.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'assignee-row'}
+                %label{for: 'view-data-assignee-cb'} Assignee
+              %li.sub-checkbox-wrapper
+                %input#view-data-reviewer-cb.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'reviewer-row'}
+                %label{for: 'view-data-reviewer-cb'} Reviewer
+              %li.sub-checkbox-wrapper
+                %input#view-data-sec-reviewer-cb.webcat-view-data-cb{type: 'checkbox', checked: true, 'data-class': 'second-reviewer-row'}
+                %label{for: 'view-data-sec-reviewer-cb'} 2nd Reviewer
+          .col-xs-3
+            %ul.show-col-list
+              %li
+                %input#view-tags-col-cb.webcat-view-data-cb.webcat-view-col-cb{type: 'checkbox', checked: true, 'data-column': '2'}
+                %label{for: 'view-tags-col-cb'} Tags
+              %li
+                %input#view-description-col-cb.webcat-view-data-cb.webcat-view-col-cb{type: 'checkbox', checked: true, 'data-column': '4'}
+                %label{for: 'view-description-col-cb'} Description
+              %li
+                %input#view-sugg-col-cb.webcat-view-data-cb.webcat-view-col-cb{type: 'checkbox', checked: true, 'data-column': '5'}
+                %label{for: 'view-sugg-col-cb'} Suggested
+              %li
+                %input#view-tools-col-cb.webcat-view-data-cb.webcat-view-col-cb{type: 'checkbox', checked: true, 'data-column': '7'}
+                %label{for: 'view-tools-col-cb'} Tools
+  %div
+    %div#sort-btn-group.btn-group.toolbar-btn-group
+      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.darkened-button.direct-sorter.sort-asc.concise-button.concise-button-first{title: 'Sort by age: ascending', onclick: 'toggle_direct_sort("10", "age", this);', 'data-sort': 'asc'} Age
+      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.direct-sorter.sort-asc.concise-button.concise-button-last{title: 'Sort by IP/URI: ascending', onclick: 'toggle_direct_sort("12", "IP/URI", this);', 'data-sort': 'asc'} IP/URI
 
-        %ul
-          %li.toggle-vis-webcat{'data-column':'12'}
-            %input.wbrs-checkbox{type: 'checkbox', checked: true, id: 'wbrs-checkbox'} WBRS
-          %li.toggle-vis-webcat{'data-column':'13'}
-            %input.platform-checkbox{type: 'checkbox', checked: true, id: 'platform-checkbox'} Platform
-          %li.toggle-vis-webcat{'data-column':'14'}
-            %input.submittertype-checkbox{type: 'checkbox', checked: true, id: 'submittertype-checkbox'} Submitter Type
-          %li.toggle-vis-webcat{'data-column':'15'}
-            %input.submitterorg-checkbox{type: 'checkbox', checked: true, id: 'submitterorg-checkbox'} Submitter Org
-          %li.toggle-vis-webcat{'data-column':'16'}
-            %input.submitterorg-checkbox{type: 'checkbox', checked: true, id: 'submitteremail-checkbox'} Submitter Email
-          %li.toggle-vis-webcat{'data-column':'17'}
-            %input.channel-checkbox{type: 'checkbox', checked: true, id: 'channel-checkbox'} Channel
-          %li.toggle-vis-webcat{'data-column':'18'}
-            %input.assignee-checkbox{type: 'checkbox', checked: true, id: 'assignee-checkbox'} Assignee
-          %li.toggle-vis-webcat{'data-column':'19'}
-            %input.reviewer-checkbox{type: 'checkbox', checked: false, id: 'reviewer-checkbox'} Reviewer
-          %li.toggle-vis-webcat{'data-column':'20'}
-            %input.second-reviewer-checkbox{type: 'checkbox', checked: false, id: 'second-reviewer-checkbox' } Second Reviewer
+    %span.dropdown
+      %button#webcat-index-table-sort-button.toolbar-button.sort-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Sort data', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Sort Data
+      .dropdown-menu.toolbar-dropdown#webcat-index-table-sort-dropdown{'aria-labelledby': 'webcat-index-table-sort-button'}
+        %label.dropdown-label Sort results by
+        .row
+          .col-xs-12
+            %select#webcat-index-sort-select
+              %option{value: '17'} Assignee
+              %option{value: '11'} Entry ID
+              %option{value: '14'} Resolution
+              %option{value: '13'} Status
+              %option{value: '16'} Submitter Org
+              %option{value: '15'} WBRS Score
+            %button#webcat-index-sort-order.direct-sorter.sort-asc.toolbar-button{'data-sort': 'asc', onclick: 'toggle_select_order(this);'}
+            %label Ascending
+        .row
+          .col-xs-12.text-center
+            %button.primary.apply-button{onclick: 'sort_webcat_index(this);'}
+              Apply Sort
 
   %div
     %div.btn-group.toolbar-btn-group
-      %button.btn.toolbar-button.open-selected.esc-tooltipped-webcat-toolbar{onclick: 'open_selected()', type: 'button', title: 'Open Selected (alt + o)'}
+      %button.btn.toolbar-button.open-selected.esc-tooltipped-webcat-toolbar{onclick: 'open_selected_urls()', type: 'button', title: 'Open Selected (alt + o)', disabled: 'true'}
         %span.toolbar-button-text Selected
-      %button.btn.toolbar-button.open-all.esc-tooltipped-webcat-toolbar{onclick: 'open_all()', type: 'button', title: 'Open All (shift + alt + o)'}
+      %button#toolbar-open-all.btn.toolbar-button.open-all.esc-tooltipped-webcat-toolbar{onclick: 'open_all()', type: 'button', title: 'Open All (shift + alt + o)'}
         %span.toolbar-button-text.text-button-all All
   %div
     %span.btn-group.toolbar-btn-group.assignment-btn-group
       .inline-radio-wrapper
         %input#assignment-type-assignee.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'assignee', checked: 'checked'}
-        %label{for: 'assignment-type-assignee'} Assignee
+        %label{for: 'assignment-type-assignee'}
+          %span.toolbar-button-text-wider-alt.no-float-no-pad Ass.
+          %span.toolbar-button-text-wider.no-float-no-pad Assignee
       .inline-radio-wrapper
         %input#assignment-type-reviewer.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'reviewer'}
-        %label{for: 'assignment-type-reviewer'} Reviewer
+        %label{for: 'assignment-type-reviewer'}
+          %span.toolbar-button-text-wider-alt.no-float-no-pad Rev.
+          %span.toolbar-button-text-wider.no-float-no-pad Reviewer
       .inline-radio-wrapper
         %input#assignment-type-second-reviewer.assignment-type-input{type: 'radio', name: 'assignment-type', value: 'second_reviewer'}
-        %label{for: 'assignment-type-second-reviewer'} Second Reviewer
+        %label{for: 'assignment-type-second-reviewer'}
+          %span.no-float-no-pad 2nd
+          %span.toolbar-button-text-wider.no-float-no-pad Reviewer
     %span.toolbar-concise-button-area
-      %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)', disabled: 'true'}
+      %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.darkened-button{onclick: 'take_selected()', type: 'button', title: 'Take (alt + t)', disabled: 'true'}
         %span.toolbar-button-text Take
-      %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)', disabled: 'true'}
+      %button.toolbar-button.return-ticket-toolbar-button.dropdown-button-margin-right.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{onclick: 'return_selected()', type: 'button', title: 'Return (alt + r)', disabled: 'true'}
         %span.toolbar-button-text Return
-    %span.toolbar-concise-button-area.webrep-change-assignee-wrapper
-      %button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true'}
+    %span.toolbar-concise-button-area.webcat-change-assignee-wrapper
+      %button#webcat-remove-assignee-toolbar-button.toolbar-button.remove-assignee-toolbar-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-first.concise-button-no-text.darkened-button{onclick: 'webcat_remove_assignee()', title: 'Remove Assignee (alt + u)', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true'}
       %span.dropdown
-        %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last.darkened-button{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true'}
-          %span.toolbar-button-text
-            Change Assignee
-        .dropdown-menu.toolbar-dropdown{'aria-labelledby': 'index_change_assign'}
+        - if current_user.has_role?('webcat manager')
+          %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true', 'data-user-role': 'manager'}
+        - else
+          %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.concise-button.concise-button-last{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: 'true', 'data-user-role': 'user'}
+            %span.toolbar-button-text
+              Change Assignee
+        #webcat-change-assignee-index-dropdown.dropdown-menu.toolbar-dropdown{'aria-labelledby': 'index_change_assign'}
           %h3 Change Assignee
           .inline-tool-content-wrapper
             .toolbar
               %div
                 %label.toolbar-section-label Assignee
-                %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
+                %select{name: 'index_target_assignee', id: 'index_target_assignee', class: 'toolbar-select'}
                   - User.joins(roles: :org_subset).where(org_subsets: { name: 'webcat' }).distinct.order(:cvs_username).each do |u|
-                    %option{id: u.id, value: u.id, label: u.cvs_username}
+                    %option{id: "assignee_#{u.id}", value: u.id, label: u.cvs_username}
                       = u.cvs_username
               %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'webcat_change_assignee();'}
                 Assign
@@ -141,92 +199,25 @@
               Convert Ticket
 
   %div
-    %button.toolbar-button.collapse-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'collapse_selected()', type: 'button', title: 'Collapse Selected (alt + f)'}
-      %span.toolbar-button-text Selected
-    %button.toolbar-button.collapse-all.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'collapse_all()', type: 'button', title: 'Collapse All (alt + h)'}
-      %span.toolbar-button-text.text-button-all All
-  %div
-    %button.toolbar-button.expand-row-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected (alt + d)'}
-      %span.toolbar-button-text Selected
-    %button.toolbar-button.expand-all.esc-tooltipped-webcat-toolbar{type: 'button', title: 'Expand All (alt + g)'}
-      %span.toolbar-button-text.text-button-all All
-  %div
     %button.toolbar-button.sync-button#fetch.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
       %span.toolbar-button-text Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped-webcat-toolbar{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
       %span.toolbar-button-text WBNP Data
-
-  %div.webcat-toolbar-push
-    - if params[:f] != "REVIEW"
-      %button#index_update_resolution.toolbar-button.resolution-submit-button.dropdown-toggle.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-        %span.toolbar-button-text
+  .webcat-toolbar-push
+    - if params[:f] == "REVIEW"
+      %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
+        %span.toolbar-button-text-wider Confirm Review
+    - else
+      %button#index_update_resolution.toolbar-button.resolution-submit-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.webcat-toolbar-bulk-res{title: 'Resolve multiple selected entries with the same resolution and comments', onclick: "$('#index_change_resolution_dialog').dialog('open');"}
+        %span.toolbar-button-text-wider
           Bulk Resolution Tool
-      .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_update_resolution'}
-        #index_change_resolution_dialog.row{title: 'Bulk Resolution Tool'}
-          .edit-resolution-container
-            .col-xs-12
-              .edit-resolution-comment
-                Fixed submission resolutions cannot be chosen in bulk.
-            .col-xs-12.resolution-container
-              %label.content-label-sm.edit-resolution-label Resolution
-              .resolution-controls
-                .resolution-input-wrapper
-                  %input{type: 'radio', id: 'webcat_resolution_unchanged_option', name: 'complaint[resolution]', value: 'UNCHANGED'}
-                  %label.resolution-radio-label{for: 'webcat_resolution_unchanged_option'} Unchanged
-                  %input{type: 'radio', id: 'webcat_resolution_invalid_option', name: 'complaint[resolution]', value: 'INVALID'}
-                  %label.resolution-radio-label{for: 'webcat_resolution_invalid_option'} Invalid
-                .resolution-apply-wrapper
-                  %button#resolution-apply-button.resolution-apply-button
-            .col-xs-12.customer-facing-comment-container
-              %label.content-label-sm.edit-resolution-label{'for':'customer_facing_comment'} Customer Facing Comment
-              .resolution-controls
-                #webcat-resolution-select-wrapper.resolution-input-wrapper
-                  %select#email-response-to-customers-select{name: 'customer_facing_comment_select'}
-                  %textarea#email-response-to-customers.email-response-input{type: 'text', name: 'customer_facing_comment'}
-                .resolution-apply-wrapper
-                  %button#customer-facing-apply-button.resolution-apply-button
-            -#.col-xs-12.categories-container
-            -#  .resolution-category-options
-            -#    %label.content-label-sm.edit-resolution-label{for: 'complaint[categories]'} Categories to Apply
-            -#    %input{type: 'radio', name: 'complaint[category_option]', value: 'ADD', checked: 'checked'}
-            -#    %label.resolution-radio-label Add
-            -#    %input{type: 'radio', name: 'complaint[category_option]', value: 'REPLACE'}
-            -#    %label.resolution-radio-label Replace
-            -#    %input{type: 'radio', name: 'complaint[category_option]', value: 'DROP_ALL'}
-            -#    %label.resolution-radio-label Drop All
-            -#  .resolution-controls
-            -#    .resolution-input-wrapper
-            -#      %select#webcat-bulk-categories.edit-resolution-select{name: 'webcat-bulk-categories', placeholder: 'Enter Categories / Confidence Order', value: ''}
-            -#    .resolution-apply-wrapper
-            -#      %button#category-apply-button.resolution-apply-button
-            .col-xs-12.internal-comment-container
-              %label.content-label-sm.edit-resolution-label{'for':'internal_comment'} Internal Comment
-              .resolution-controls
-                .resolution-input-wrapper.webcat-textarea-input-rapper
-                  %textarea.form-control.internal-comment-textbox#internal_comment{:name => "internal_comment", :type => "text", :value => ""}
-                .resolution-apply-wrapper
-                  %button#internal-comment-button.resolution-apply-button
-            .col-xs-12.button-wrapper
-              %button{class: 'primary button-update-resolution resolution-clear-button', type:'button', onclick:'clearBulkResolution();'}
-                =inline_svg 'icon_clear_white.svg', class: 'resolution-button-icon'
-                %span Reset
-              -#%button{class: 'primary button-update-resolution apply-all-button', type:'button', onclick:'applyAll();'}
-              -#  =inline_svg 'icon_apply_all_white.svg', class: 'resolution-button-icon'
-              -#  %span Apply All
-              %button{class: 'primary button-update-resolution update-resolution-button', type:'button', onclick:'updateResolutionDialog();'}
-                =inline_svg 'icon_submit_arrow.svg', class: 'resolution-button-icon'
-                %span Submit
-
-      %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'master_submit();', title: 'Submit multiple selected entries with any changes entered by row'}
-        %span.toolbar-button-text
-          Bulk Submit
-      %span.dropdown
-    - else
-      %button.toolbar-button.master-submit-button#review-bulk-submit.esc-tooltipped-webcat-toolbar.toolbar-button-spacer{ onclick: 'review_bulk_submit();', title: 'Bulk Review'}
-        %span.toolbar-button-text Confirm Review
-  %div.webcat-toolbar-tall-wrapper
-    - if current_user.allowed_self_review
-      %input{type: 'checkbox', id: 'self_review', checked: true}
-    - else
+      %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped-webcat-toolbar{ onclick: 'bulk_submit_categorize_entries();', title: 'Submit multiple edited entries with any changes entered.', disabled: 'disabled'}
+        %span.toolbar-button-text-wider Bulk Submit
+  .webcat-toolbar-tall-wrapper
+    - if current_user.enabled_self_review
+      %input{type: 'checkbox', id:'self_review', checked: true}
+    - else 
       %input{type: 'checkbox', id:'self_review', checked: false}
-    %label{for: 'self_review'} Allow Self Review
+    %label{for: 'self_review'}
+      %span.toolbar-button-text-wider.no-float-no-pad Allow
+      %span.no-float-no-pad Self Review

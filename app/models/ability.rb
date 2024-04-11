@@ -42,11 +42,12 @@ class Ability
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
+      can :manage, [Complaint, ComplaintEntry, ResolutionMessageTemplate]
       can [:read, :show_multiple, :advanced_search, :named_search, :standard_search, :contains_search], Complaint
     end
 
     if role_names.include?('webcat user')
-      can :manage, [Complaint, ComplaintEntry]
+      can :manage, [Complaint, ComplaintEntry, ResolutionMessageTemplate]
     end
 
 

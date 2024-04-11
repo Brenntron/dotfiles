@@ -33,7 +33,7 @@ gem 'inline_svg', '1.3.1'
 gem 'selectize-rails', '~> 0.12.4'
 
 # Database
-gem 'mysql2', '0.5.4'
+gem 'mysql2'
 gem 'paper_trail', '12.0.0'
 gem 'rails_admin', '~> 2.2.1'
 gem 'redis'
@@ -57,8 +57,7 @@ gem "net-imap"
 gem "uri", "0.12.0"
 gem 'httparty', '~> 0.15.3'
 
-# gem 'peake-bridge-client', '0.2.0.2', path: 'vendor/gems/peake-bridge-client'
-gem 'peake-bridge-client', '~> 0.2.1' #, git: "https://github.com/cisco-sbg/talos-atlas-peake-bridge-client.git"
+gem 'peake-bridge-client', '~> 0.2.1' , path: 'vendor/gems/peake-bridge-client'
 
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'
@@ -103,7 +102,6 @@ gem 'delayed_job_web', '1.4.3'
 gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
 
-
 gem 'clipboard-rails', '1.7.1'
 
 gem 'poltergeist', '1.18.1'
@@ -119,6 +117,9 @@ gem 'hashie'
 
 gem 'mail'
 gem 'simpleidn'
+
+gem 'symmetric-encryption', require: false
+gem 'vault'
 
 group :production, :staging do
   gem 'elastic-apm', '4.5.0'

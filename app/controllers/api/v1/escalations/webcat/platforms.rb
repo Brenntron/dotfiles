@@ -11,7 +11,7 @@ module API
             end
 
             get "" do
-              platfoms = Platform.all.map(&:public_name)
+              platfoms = Platform.all.map {|m| {id: m.id, public_name: m.public_name}}
               {:data => platfoms}
             end
           end

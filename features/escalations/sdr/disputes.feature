@@ -16,7 +16,7 @@ Feature: Disputes
     When I go to "/escalations/sdr/disputes"
     And I wait for "2" seconds
     Then I click "#new-sdr-dispute"
-    And I fill in element, "#sender" with "cisco.com"
+    And I fill in element "#sender" with "cisco.com"
     And I select "P1" from "priority"
     And I select "False Positive" from "reputation"
     And I fill in "platforms" with "FirePower"

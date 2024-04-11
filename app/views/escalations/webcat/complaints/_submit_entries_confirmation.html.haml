@@ -1,0 +1,41 @@
+-# Confirm submit entries to be resolved modal
+
+#bulk-submit-confirmation.bulk-entries-modal.modal.fade{'aria-labelledby': 'bulk-submit-modal-title', role: 'dialog', tabindex: '-1'}
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{'aria-label': 'Close', 'data-dismiss': 'modal', type: 'button'}
+        #bulk-submit-modal-title.modal-title Entries to Submit
+
+      .modal-body
+        .loader-wrapper.hidden
+          .gear-loader-wrapper
+            = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+          %span.loader-msg Submitting entries...
+
+        #incomplete-entries-wrapper.hidden
+          %h5 The following entries are incomplete or incorrect
+          %table#incomplete-entries-table.entry-confirmation-table
+            %thead
+              %tr
+                %th Entry ID
+                %th URI/IP
+                %th Categories
+                %th.resolution-col Resolution
+                %th User Changes
+
+        #complete-entries-wrapper.hidden
+          %h5 The following entries are ready to be submitted
+          %table#complete-entries-table.entry-confirmation-table
+            %thead
+              %tr
+                %th Entry ID
+                %th URI/IP
+                %th Categories
+                %th.resolution-col Resolution
+                %th User Changes
+
+        #bulk-submit-buttons.text-center.hidden
+          %button.btn.secondary{type: 'button', 'data-dismiss': 'modal'} Cancel
+          %button#bulk-submit-correct-btn.btn.btn-primary.primary{type: 'button', onclick: 'process_bulk_submission();', disabled: 'disabled'} Submit correct entries
+

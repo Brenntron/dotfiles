@@ -43,6 +43,10 @@ window.std_msg =(banner, messages, options = {}) ->
         options.complete()
         $('#msg-modal').on('hidden.bs.modal', -> { })
       )
+    else if options.timed_reload == true
+      setTimeout (->
+        location.reload(true)
+      ), 1000
 
     $('#msg-modal').modal('show')
 

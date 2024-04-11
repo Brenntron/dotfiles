@@ -1,0 +1,37 @@
+#index_change_resolution_dialog{title: 'Bulk Resolution Tool'}
+  .edit-resolution-container
+    .row.bottom-border
+      .col-xs-12.top-text
+        .edit-resolution-comment
+          Apply any below attributes to selected tickets using the APPLY button button at the bottom of this form.
+
+    .row.bottom-border
+      .col-xs-12
+        %label.content-label-sm Resolution (Fixed resolution cannot be applied in bulk.)
+        .resolution-input-wrapper
+          %input#webcat_resolution_unchanged_option.bulk-resolution-radio{type: 'radio',  name: 'complaint[resolution]', value: 'UNCHANGED', checked: 'checked'}
+          %label.resolution-radio-label{for: 'webcat_resolution_unchanged_option'} Unchanged
+          %input#webcat_resolution_invalid_option.bulk-resolution-radio{type: 'radio', name: 'complaint[resolution]', value: 'INVALID'}
+          %label.resolution-radio-label{for: 'webcat_resolution_invalid_option'} Invalid
+
+    .row.bottom-border
+      .col-xs-12.customer-facing-comment-container
+        %label.content-label-sm.full-row-label{'for':'customer_facing_select'} Resolution Email Template
+        %select#email-response-to-customers-select{name: 'customer_facing_comment_select'}
+        %label.content-label-sm.full-row-label{'for':'customer_facing_comment'} Response to Customer
+        %textarea#email-response-to-customers.email-response-input{type: 'text', name: 'customer_facing_comment'}
+    .row.bottom-border
+      .col-xs-12.internal-comment-container
+        %label.content-label-sm.full-row-label{'for':'internal_comment'} Internal Comment
+        .resolution-controls
+          .resolution-input-wrapper.webcat-textarea-input-rapper
+            %textarea.form-control.internal-comment-textbox#internal_comment{:name => "internal_comment", :type => "text", :value => ""}
+
+    .row
+      .col-xs-12.button-wrapper
+        %button.primary.button-update-resolution#apply_resolution_button{ type:'button', onclick:'applyAll();', disabled: true }
+          Apply
+        %button.secondary.button-update-resolution.resolution-clear-button{type:'button', onclick:'clearBulkResolution();'}
+          Reset
+        -#%button{class: 'primary button-update-resolution update-resolution-button', type:'button', onclick:'updateResolutionDialog();'}
+        -#  %span Submit

@@ -86,7 +86,6 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           assigned_to:      complaint_entry.user&.display_name,
           reviewer:         complaint_entry.reviewer&.display_name,
           second_reviewer:  complaint_entry.second_reviewer&.display_name,
-
           uri:              complaint_entry.uri,
           resolution:       complaint_entry.resolution,
           internal_comment: complaint_entry.internal_comment,

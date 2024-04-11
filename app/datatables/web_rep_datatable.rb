@@ -29,6 +29,7 @@ class WebRepDatatable < AjaxDatatablesRails::ActiveRecord
       submitter_type: { source: 'Dispute.submitter_type', data: 'submitter_type' },
       submitter_name: { source: 'Dispute.submitter_name', data: 'submitter_name' },
       submitter_email: { source: 'Dispute.submitter_email', data: 'submitter_email' },
+      channel: { source: 'Dispute.channel', data: 'channel' }
     }
   end
 
