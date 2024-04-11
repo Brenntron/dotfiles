@@ -1,5 +1,4 @@
 # TMI AJAX - WEBREP AND FILEREP
-# TMI AJAX - WEBREP AND FILEREP
 window.tmi_ajax_get_data = (query_item) ->
   query_type = determine_string_type(query_item)  # will be ip, domain, url, or sha
   data = {
@@ -112,21 +111,21 @@ window.tmi_ajax_get_data = (query_item) ->
             # add row to dom
             $('.tmi-tbody').append(report_tr)  # add to dom
 
-
     error: (response) ->
-      # user is not tmi viewer/manager? dont show read_observable error, just hide the tmi data, show enrich data
-      unless response.responseJSON.message.includes('read_observable')
+      error_response_status = response.responseJSON.status
+
+      # user is not tmi viewer/manager? dont show read_observable error, just show enrich data. The tmi section isn't displayed to none tmi viewers/managers anyway.
+      unless error_response_status == 403
         std_msg_error("Error with loading data", [response.responseJSON.message], reload: false)
-      $('.tmi-loader, .enrichment-loader, .prevalence-loader').addClass('hidden')  # hide all loaders
-      $('.tmi-error').removeClass('hidden')
+        $('.tmi-error').removeClass('hidden')
+        $('.tmi-loader').addClass('hidden')  # hide all loaders
 
-
-
-
-# WEBREP ENRICHMENT
 # WEBREP ENRICHMENT (enrich and prev data come from same place)
 window.enrich_ajax_webrep = (query_item, query_type) ->
   data = {'query_item': query_item, 'query_type': query_type}
+
+  $('.enrichment-loader, .prevalence-loader, .tmi-loader').removeClass('hidden')  # show all loaders
+
   std_msg_ajax
     url: '/escalations/api/v1/escalations/cloud_intel/enrichment_service/query/'
     method: 'GET'
@@ -148,15 +147,21 @@ window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
     $('.tmi-main-content, .enrichment-table, .prevalence-table').addClass('hidden')  # hide the tables in general
     $('.tmi-table tbody, .enrichment-table tbody, .prevalence-table tbody').empty()  # reset the table rows
 
-  # tmi promise for that separate api call (sep from enrich api)
-  tmi_promise = new Promise (resolve, reject) ->
-    tmi_built = tmi_ajax_get_data(curr_entry)
-    if tmi_built
-      resolve tmi_built
+  if window.tmi_manager || window.tmi_viewer
+    # tmi promise for that separate api call (sep from enrich api)
+    tmi_promise = new Promise (resolve, reject) ->
+      tmi_built = tmi_ajax_get_data(curr_entry)
 
-  # when promised response comes back, continue with data
-  tmi_promise.then (response) ->
-    tmi_dt_init()  # ensure dt init after api call resolved
+      if tmi_built
+        resolve tmi_built
+
+    # when promised response comes back, continue with data
+    tmi_promise.then (response) ->
+      tmi_dt_init()  # ensure dt init after api call resolved
+
+    tmi_promise.catch (error) ->
+      if error.responseJSON.status == 403
+        console.log error.responseJSON.message
 
   # enrichment services uses a separate api call
   enrich_promise = new Promise (resolve, reject) ->
@@ -199,8 +204,6 @@ window.tmi_enrich_prev_dt_inits = (action, curr_entry) ->
     $('.enrichment-area .read-more-button').click ->
       $(this).prev('p').toggleClass('condensed')
       $(this).find('.down-caret').toggleClass('expanded')
-
-
 
 window.create_webrep_enrichment_section = (tags, context) ->
   $('.enrichment-table').removeClass('hidden')
@@ -1038,7 +1041,6 @@ $ ->
     entries_num = parseInt(entries_str)
     if entries_num > 1
       $('.ctt-choose-an-entry').removeClass('hidden')
-
 
   # FILEREP - tmi kick things off on filerep, we need the sha (one sha per dispute)
   else if $('.tab-ctt-filerep').length > 0

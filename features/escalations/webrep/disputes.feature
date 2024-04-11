@@ -3,8 +3,6 @@ Feature: Disputes
   as a user
   I will provide ways to interact with disputes
 
-
-
   @javascript
   Scenario: a user visits the duplicate cases tab and sees a table of duplicate cases
     Given a user with role "webrep user" exists and is logged in
@@ -41,7 +39,7 @@ Feature: Disputes
     And I fill in "search_uri" with "ough.com"
     Then I click "submit-button rep-research"
     And I wait for "60" seconds
-    Then I should see "Entry Search Results for"
+    Then I should see "Results for"
     Then I click "#select-all-entries"
     Then I click "add-to-ticket-button"
     When I click ".submit_new_dispute"
@@ -1172,8 +1170,7 @@ Feature: Disputes
     And  I wait for "3" seconds
     Then I click "#new-dispute"
     And  I wait for "1" seconds
-#    WHY IS THERE A COMMA IN THIS STEP DEF?
-    And  I fill in element, "#ips_urls" with "petful.com"
+    And  I fill in element "#ips_urls" with "petful.com"
     And  I click button "submit"
     And  I wait for "10" seconds
     And  I click button with class "close"

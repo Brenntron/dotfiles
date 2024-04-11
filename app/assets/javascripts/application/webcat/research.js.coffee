@@ -645,6 +645,8 @@ $ ->
     callsToMake = 0
     callsCompleted = 0
     urlListItems = $(listId).find('li')
+    # TODO - pretty sure this self review item is not on the DOM in
+    # the research section and therefore shouldnt be here
 
     for listItem in urlListItems
       entries.push $(listItem).data().url

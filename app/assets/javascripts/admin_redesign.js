@@ -26,6 +26,7 @@
 //= require application/webrep/disputes-support
 //= require application/webrep/disputes
 //= require application/webrep/communications
+//= require application/webrep/advanced_search
 //= require application/sdr/disputes
 //= require application/sdr/research
 //= require application/sdr/communications
@@ -35,13 +36,13 @@
 //= require moment
 //= require resolution_message_templates
 
+//= require application/advanced_search
 //= require application/chart.pieceLabel.min
 //= require application/chartjs-plugin-annotation.min
 //= require application/chartjs-plugin-datalabels.min
 //= require application/jquery-ui.min
 //= require application/daterangepicker
 //= require application/toolbar-shortcuts
-//= require application/webrep_advanced_search
 //= require application/webcat/complaints
 //= require application/webcat/clusters
 //= require application/sdr/disputes
@@ -54,6 +55,10 @@
 //= require application/webcat/categories
 //= require application/webcat/advanced_search
 //= require application/webcat/research
+//= require application/webcat/jira_imports
+//= require application/webcat/webcat_index
+//= require application/webcat/csam_reports
+//= require application/webcat/bulk_resolution_tool
 //= require application/escalations_users
 //= require application/webcat/webCatRepLookup
 //= require application/webrep/webrep-report-engine
@@ -71,3 +76,11 @@
 //= require application/context-tags
 //= require application/dt-jquery-highlight.js
 //= require admin/admin-tools
+
+// Temp stuff, move / remove and grab whole director after culling ticket goes through
+
+//=require application/webcat/categorize_dropdown
+//=require application/webcat/index_toolbar
+//=require application/webcat/wbnp_reports
+//=require application/webcat/convert_to_webrep
+//=require application/webcat/dialog_boxes

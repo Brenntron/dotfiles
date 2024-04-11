@@ -48,6 +48,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
         end
 
     @versioned_items = @dispute.compose_versioned_items
+    @tmi_manager = current_user.has_role?('tmi manager')
+    @tmi_viewer = current_user.has_role?('tmi viewer')
     # to compare against entry.dispute_rule_hits:
     # rulehit = @all_rulehits.find({|hit| hit.mnemonic == dispute_rule_hit.name})
     #

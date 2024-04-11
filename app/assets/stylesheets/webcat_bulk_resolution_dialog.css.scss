@@ -1,0 +1,231 @@
+.index-change-resolution-dialog {
+  border: none !important;
+  border-radius: 3px;
+  z-index: 999;
+
+  .ui-dialog-titlebar {
+    background-color: #3e5a72;
+    padding: 5px 2px;
+  }
+
+  .ui-dialog-title {
+    background-image: url(image_path('icon_bulk_resolve_white.svg'));
+    background-position: left -2px;
+    background-repeat: no-repeat;
+    background-size: 25px 25px;
+    font-weight: 600;
+    margin-left: 5px;
+    padding: 5px 0 5px 30px
+  }
+
+  .edit-resolution-container {
+    padding: 10px 20px;
+
+    .bulk-resolution-message-container {
+      align-items: center;
+      display: flex;
+      position: absolute;
+      bottom: 35px;
+
+      .bulk-message {
+        display: flex;
+        font-size: 80%;
+      }
+
+      .bulk-success {
+        color: #5FB766;
+      }
+
+      .bulk-warning {
+        color: #E47433;
+      }
+
+      .bulk-error {
+        color: #fc4349;
+      }
+
+      .bulk-icon {
+        background-repeat: no-repeat;
+        display: flex;
+        height: 15px;
+        position: relative;
+        width: 15px;
+      }
+
+      .bulk-success-icon {
+        background-image: url(image_path('icon_check_dark_green.svg'));
+      }
+
+      .bulk-warning-icon {
+        margin-top: -2px;
+        background-image: url(image_path('icon_warning.svg'));
+      }
+
+      .bulk-error-icon {
+        background-image: url(image_path('icon_error.svg'));
+      }
+    }
+
+    .internal-comment-container, .customer-facing-comment-container {
+      .toolbar-section-label{
+        margin-top: -25px;
+      }
+    }
+
+    .internal-comment-container {
+      .internal-comment-textbox {
+        height: 70px;
+        padding-right: 0;
+        resize: vertical;
+      }
+    }
+
+    .bottom-border {
+      padding-top: 5px;
+    }
+
+    #webcat-resolution-select-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #email-response-to-customers {
+      font-size: 12px;
+      width: 100%;
+      margin-top: 5px;
+      margin-bottom: 12px;
+      min-height: 100px;
+      resize: vertical;
+      padding: 4px 5px;
+    }
+
+    .edit-resolution-comment {
+      color: #666;
+      font-size: 0.75em;
+      font-weight: 400;
+      padding: 15px 0 10px 0;
+    }
+
+    .edit-resolution-label {
+      font-size: 0.75em;
+      margin: 8px 0 4px -3px;
+      padding-bottom: 0;
+      padding-top: 0;
+    }
+
+    .resolution-controls {
+      min-height: 35px;
+    }
+
+    .resolution-input-wrapper {
+      align-items: center;
+      display: flex;
+      height: 100%;
+      width: 100%;
+      padding-bottom: 13px;
+
+      .selectize-control.multi {
+        width: 100%;
+      }
+
+      input[type='text'], input[type='select-multiple'], select {
+        width: 100% !important;
+      }
+    }
+
+    #email-response-to-customers-select {
+      font-size: 12px;
+      padding: 2px;
+      outline: 1px solid #bfbfbf;
+      border: 0;
+      width: 100%;
+      margin: 5px 0;
+      &:disabled {
+        font-style: italic;
+        cursor: not-allowed;
+      }
+    }
+
+    .webcat-textarea-input-rapper {
+      display: block;
+    }
+
+    .selectize-input.items {
+      margin: 0 !important;
+      padding: 0 !important;
+      min-height: 30px !important;
+      border-radius: 1px;
+      border: none;
+      outline: 1px solid lighten(#999, 15%) !important;
+      box-shadow: none;
+      font-size: 8pt;
+
+      input[type='select-multiple'] {
+        padding: 5px !important;
+
+        &::placeholder {
+          font-size: 10px;
+          font-style: italic;
+        }
+      }
+
+      &:disabled {
+        background-color: lighten(#d7dadb, 10%) !important;
+      }
+    }
+
+    .resolution-radio-label {
+      font-size: 12px;
+      color: #666;
+      margin: 0 15px 0 0;
+      padding-left: 5px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    input[type='radio'] {
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .email-response-input {
+      height: 20px;
+      border: none;
+      outline: 1px solid lighten(#999, 15%);
+    }
+
+    .edit-resolution-select .selectize-input, .internal-comment-textbox {
+      /* Important flag is to override selectize defaults */
+      border-radius: 0;
+      margin-left: 0 !important;
+      outline: 1px solid lighten(#999, 15%);
+      padding-bottom: 15px;
+      margin-top: 5px;
+    }
+
+    .button-wrapper{
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+      margin-bottom: 20px;
+
+      .update-resolution-button {
+        background-color: #E47433;
+      }
+    }
+  }
+
+  .button-update-resolution:disabled {
+    background-color: #6dbcdb !important;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.bottom-border::after {
+  content: '';
+  width: calc(100% - 30px);
+  height: 1px;
+  margin-left: 15px;
+  border-bottom: 1px solid #F2F2F2;
+}

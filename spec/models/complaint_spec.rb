@@ -199,6 +199,61 @@ describe Complaint do
     expect(parse[:path]).to eq('/test/go')
   end
 
+  it "should save new complaint entry as a duplicate" do
+    complaint = Complaint.create(:ticket_source_key => 1001, :customer_id => 3, :status => "NEW")
+
+    new_complaint_entry = ComplaintEntry.new
+    new_complaint_entry.complaint_id = complaint.id
+    new_complaint_entry.user_id = 1
+    new_complaint_entry.uri = "www.google.com"
+    new_complaint_entry.entry_type = "URI/DOMAIN"
+    new_complaint_entry.wbrs_score = nil
+    new_complaint_entry.suggested_disposition = "Search Engines and Portals"
+    new_complaint_entry.url_primary_category = "Search Engines and Portals"
+    new_complaint_entry.subdomain = "www"
+    new_complaint_entry.domain = "test.com"
+    new_complaint_entry.path = nil
+    new_complaint_entry.status = ComplaintEntry::NEW
+    new_complaint_entry.is_important = 0
+    new_complaint_entry.save
+
+    complaint = Complaint.create(:ticket_source_key => 1002, :customer_id => 3, :status => "NEW")
+
+    new_complaint_entry2 = ComplaintEntry.new
+    new_complaint_entry2.complaint_id = complaint.id
+    new_complaint_entry2.user_id = 1
+    new_complaint_entry2.uri = "www.google.com"
+    new_complaint_entry2.entry_type = "URI/DOMAIN"
+    new_complaint_entry2.wbrs_score = nil
+    new_complaint_entry2.suggested_disposition = "Search Engines and Portals"
+    new_complaint_entry2.url_primary_category = "Search Engines and Portals"
+    new_complaint_entry2.subdomain = "www"
+    new_complaint_entry2.domain = "test.com"
+    new_complaint_entry2.path = nil
+    new_complaint_entry2.status = ComplaintEntry::NEW
+    new_complaint_entry2.is_important = 0
+    new_complaint_entry2.save
+
+    new_complaint_entry.reload
+    new_complaint_entry2.reload
+    
+    expect(new_complaint_entry2.status).to eql("WC-DUPLICATE")
+    expect(new_complaint_entry.duplicate_entries.size).to eql(1)
+
+    new_complaint_entry.status = ComplaintEntry::STATUS_COMPLETED
+    new_complaint_entry.resolution = ComplaintEntry::STATUS_RESOLVED_FIXED_FN
+    new_complaint_entry.resolution_comment = "this is a test"
+    new_complaint_entry.save
+
+    new_complaint_entry.reload
+    new_complaint_entry2.reload
+
+    expect(DelayedJob.all.size).to eql(1)
+    expect(new_complaint_entry2.status).to eql(new_complaint_entry.status)
+    expect(new_complaint_entry2.resolution).to eql(new_complaint_entry.resolution)
+    expect(new_complaint_entry2.resolution_comment).to eql(new_complaint_entry.resolution_comment)
+  end
+
   it "should create convert messages to disputes" do
     current_user = FactoryBot.create(:current_user)
     customer = FactoryBot.create(:customer, name: 'Some Customer')

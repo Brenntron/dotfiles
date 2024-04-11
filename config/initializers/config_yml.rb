@@ -1,3 +1,5 @@
+require 'symmetric-encryption'
+
 all_configs = YAML.load_file(Rails.root.join("config", "config.yml"))
 env_config = all_configs[Rails.env]
 env_config['bugzilla']
@@ -208,14 +210,14 @@ raise 'config.yml missing k2 section' unless k2_config
 Rails.configuration.k2                  = ApiRequester::ApiRequester.config_of(k2_config)
 Rails.configuration.k2.token            = k2_config['token']
 
-clustes_fetcher_config = env_config.fetch('clusters_telemetry', nil)
-raise 'config.yml missing clusters_telemetry aws section' unless clustes_fetcher_config
+clusters_fetcher_config = env_config.fetch('clusters_telemetry', nil)
+raise 'config.yml missing clusters_telemetry aws section' unless clusters_fetcher_config
 clusters_config = OpenStruct.new
-clusters_config.aws_access_key_id = clustes_fetcher_config.dig('aws', 'access_key_id')
-clusters_config.aws_secret_access_key = clustes_fetcher_config.dig('aws', 'secret_access_key')
-clusters_config.aws_bucket = clustes_fetcher_config.dig('aws', 'bucket')
-clusters_config.aws_prefix = clustes_fetcher_config.dig('aws', 'prefix')
-clusters_config.aws_region = clustes_fetcher_config.dig('aws', 'region')
+clusters_config.aws_access_key_id = clusters_fetcher_config.dig('aws', 'access_key_id')
+clusters_config.aws_secret_access_key = clusters_fetcher_config.dig('aws', 'secret_access_key')
+clusters_config.aws_bucket = clusters_fetcher_config.dig('aws', 'bucket')
+clusters_config.aws_prefix = clusters_fetcher_config.dig('aws', 'prefix')
+clusters_config.aws_region = clusters_fetcher_config.dig('aws', 'region')
 Rails.configuration.clusters_telemetry_source = clusters_config
 
 file_mgmt_config = env_config.fetch('file_mgmt', nil)
@@ -230,6 +232,7 @@ Rails.configuration.tmi.hostport  =  tmi_config['hostport']
 Rails.configuration.tmi.ca_file   =  tmi_config['ca_file']
 Rails.configuration.tmi.cert_file =  tmi_config['cert_file']
 Rails.configuration.tmi.key_file  =  tmi_config['key_file']
+
 jira_config = env_config['jira']
 raise "config.yml missing jira section" unless jira_config
 Rails.configuration.jira                = ApiRequester::ApiRequester.config_of(jira_config)
@@ -241,6 +244,16 @@ bast_config = env_config.fetch('bast', nil)
 raise 'config.yml missing bast section' unless bast_config
 Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)
 
+
+abuse_emails_config = env_config.fetch('abuse_emails', nil)
+raise 'config.yml missing abuse emails section' unless abuse_emails_config
+Rails.configuration.abuse_emails = abuse_emails_config['emails']
+
+ncmec_config = env_config.fetch('ncmec', nil)
+raise 'config.yml missing ncmec section' unless ncmec_config
+Rails.configuration.ncmec_username = ncmec_config['username']
+Rails.configuration.ncmec_password = ncmec_config['password']
+
 resolution_report_config = env_config.fetch('resolution_report', nil)
 raise 'config.yml missing resolution_report section' unless resolution_report_config
 Rails.configuration.resolution_report = OpenStruct.new
@@ -249,3 +262,41 @@ Rails.configuration.resolution_report.cache_expiration = resolution_report_confi
 banhammer_host = env_config.dig('banhammer', 'host')
 raise 'config.yml missing banhammer section' unless banhammer_host
 Rails.configuration.banhammer_host = banhammer_host
+
+
+
+
+##### VAULT AND ENCRYPTION STUFF######
+# ORDER MATTERS HERE
+# ###################################
+
+#problem with the config.token constantly expiring every 3 hours
+
+#in this order:
+
+vault_key_config = env_config.fetch('vault_config', nil)
+raise 'config.yml missing vault_config section' unless vault_key_config
+
+begin
+  Vault.address = "https://vault.vrt.sourcefire.com"
+  Vault.ssl_verify = nil
+  Vault.auth.approle(vault_key_config['role_id'], vault_key_config['secret_id'])
+  vault_result = Vault.logical.read("/webdevops-kv/config/ace")
+  se_creds = JSON.parse(vault_result.data[:"SE.json"])
+rescue
+  raise "Unable to connect to Vault to retrieve necessary keys.  Vault must be running and keys must exist to continue."
+end
+
+SymmetricEncryption.cipher = SymmetricEncryption::Cipher.new(
+    :key         => se_creds["key"],
+    :iv          => se_creds["iv"],
+    :cipher_name => 'aes-128-cbc'
+)
+
+######END VAULT STUFF################
+iwf_abuse_config = env_config.fetch('iwf_abuse_config', nil)
+raise 'config.yml missing iwf_abuse_config section' unless iwf_abuse_config
+iwf_config = OpenStruct.new
+iwf_config.username = SymmetricEncryption.decrypt(iwf_abuse_config['username'])
+iwf_config.password = SymmetricEncryption.decrypt(iwf_abuse_config['password'])
+Rails.configuration.iwf_config = iwf_config

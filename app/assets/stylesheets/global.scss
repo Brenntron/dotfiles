@@ -410,16 +410,17 @@ table.dataTable.no-footer {
 
 // Don't consolidate these further, they don't work in different orders
 .table-search-input::-webkit-input-placeholder, .restricted-table-search-input::-webkit-input-placeholder {
-  font-size: 7pt;
-  color: $content-tab-color;
+  font-size: 11px;
+  color: $content-label-color;
 }
-.table-search-input::-moz-placeholder, .restricted-table-search-input::-moz-placeholder {
-  font-size: 7pt;
-  color: $content-tab-color;
+.table-search-input::-moz-placeholder, .restricted-table-search-input::-moz-placeholder,
+{
+  font-size: 11px;
+  color: $content-label-color;
 }
 .table-search-input::-ms-input-placeholder, .restricted-table-search-input::-ms-input-placeholder {
-  font-size: 7pt;
-  color: $content-tab-color;
+  font-size: 11px;
+  color: $content-label-color;
 }
 
 .dt-button {
@@ -882,6 +883,7 @@ button {
 .email-button {background-image: url(image_path('icon_message.svg'));}
 .manage-button {background-image: url(image_path('icon_manage_team.svg'));}
 .show-col-button  {background-image: url(image_path('icon_columns.svg'));  }
+.open .show-col-button  {background-image: url(image_path('icon_columns_white.svg'));  }
 .collapse-button  {background-image: url(image_path('icon_collapse.svg'));}
 .select-all-button  {background-image: url(image_path('icon_check_grey.svg'));}
 .ticket-status-button {background-image: url(image_path('icon_status.svg'));}
@@ -958,15 +960,6 @@ button {
   position: absolute;
 }
 
-#research-tab-toolbar {
-  .dropdown {
-    max-height: 27px;
-  }
-
-  .toolbar-dropdown {
-    margin-left: 3px;
-  }
-}
 
 #convert-ticket-dropdown, #webrep-convert-ticket-dropdown {
   border-top-right-radius: 4px;
@@ -2412,20 +2405,20 @@ a.static-nav-item {
 }
 
 .search-box::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-  color: $content-tab-color;
-  font-size: 7pt;
+  color: $content-label-color;
+  font-size: 11px;
 }
 .search-box::-moz-placeholder { /* Firefox 19+ */
-  color: $content-tab-color;
-  font-size: 7pt;
+  color: $content-label-color;
+  font-size: 11px;
 }
 .search-box:-ms-input-placeholder { /* IE 10+ */
-  color: $content-tab-color;
-  font-size: 7pt;
+  color: $content-label-color;
+  font-size: 11px;
 }
 .search-box:-moz-placeholder { /* Firefox 18- */
-  color: $content-tab-color;
-  font-size: 7pt;
+  color: $content-label-color;
+  font-size: 11px;
 }
 
 .nav-tools-dropdown {
@@ -2589,13 +2582,17 @@ a.static-nav-item {
   font-size: 9pt;
 }
 
-#advanced-search-button, #webrep-advanced-search-button {
+#advanced-search-button,
+#webrep-advanced-search-button,
+#webcat-advanced-search-button {
   margin-top: -4px;
   background-color: transparent;
   color: $type-lighter-color;
 }
 
-#advanced-search-button::before, #webrep-advanced-search-button::before {
+#advanced-search-button::before,
+#webrep-advanced-search-button::before,
+#webcat-advanced-search-button::before {
   content: '|';
   color: $bug-accent-color;
 }
@@ -2616,10 +2613,6 @@ a.static-nav-item {
   color: $bug-accent-color;
 }
 
-#sdr-advanced-search-dropdown {
-  min-width: 400px;
-  z-index: 51;
-}
 
 .search-group form {
   display: inline-block;
@@ -2631,7 +2624,8 @@ a.static-nav-item {
 /******* Page Content ******/
 
 .content-label-sm {
-  font-size: 7pt;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 10px;
   color: $content-label-color;
   padding: 4px 0;
   line-height: 1.25em;
@@ -2779,10 +2773,6 @@ table .bug-priority {
 
 .bug-state-col {
   margin-bottom: 5px;
-}
-
-.submitter-col {
-  text-align: center;
 }
 
 .complaint-submitter-type {
@@ -3223,6 +3213,25 @@ a.code-content:hover {
 
 #new-comment-wrapper {
   border-top: none;
+}
+
+.edit-resolution-container {
+
+  .internal_comment_container {
+    margin-top: 10px;
+  }
+
+  .internal_comment_container, .customer_facing_comment_container {
+    margin-top: 30px;
+
+    .toolbar-section-label {
+      margin-top: -25px;
+    }
+  }
+
+  #button_update_resolution {
+    margin: 11px 60px 0 60px;
+  }
 }
 
 .resolution-message{
@@ -4595,6 +4604,7 @@ td.wbrs-highlight, td.sbrs-highlight {
 .escalations--webrep--disputes-controller,
 .escalations--webcat--complaints-controller,
 .escalations--webcat--reports-controller,
+.escalations--webcat--csam_reports-controller,
 .users-controller,
 .escalations--file_rep--disputes-controller,
 .escalations--sdr--disputes-controller {
@@ -4623,7 +4633,9 @@ td.wbrs-highlight, td.sbrs-highlight {
     }
   }
 
-  #advanced-search-button, #webrep-advanced-search-button {
+  #advanced-search-button,
+  #webrep-advanced-search-button,
+  #webcat-advanced-search-button {
     background-color: darken($faint-neutral-color, 5%);
     color: $type-lighter-color;
     text-transform: uppercase;
@@ -4635,7 +4647,9 @@ td.wbrs-highlight, td.sbrs-highlight {
     position: absolute;
     right: 0;
   }
-  #advanced-search-button::before, #webrep-advanced-search-button::before {
+  #advanced-search-button::before,
+  #webrep-advanced-search-button::before,
+  #webcat-advanced-search-button::before {
     display: none;
   }
 
@@ -4811,7 +4825,7 @@ button.tertiary {
 #search-criteria-options {
   color: $type-base-color;
   border: 1px solid $faint-neutral-color;
-  padding: 6px 20px;
+  padding: 6px 10px;
   font-weight: 300;
   font-size: 9pt;
   position: absolute;
@@ -4831,20 +4845,22 @@ button.tertiary {
 .create.active{
   display: none;
 }
+
 #search-criteria-options input[type='checkbox'] {
-  box-shadow: none !important;
-  outline: none !important;
   border: none !important;
-  margin-right: 6px;
+  box-shadow: none !important;
+  margin: 0 4px 0 0;
+  min-height: unset;
+  outline: none !important;
+  position: relative;
+  top: 2px;
 }
 
 .search-criteria-label {
-  padding: 6px 0 1px 0;
-  width: 100%;
-  display: inline-flex;
   align-items: center;
-  white-space: nowrap;
+  display: inline-flex;
   height: 30px;
+  padding: 6px 0 1px 0;
 }
 
 .multicol-2 {
@@ -4881,6 +4897,9 @@ button.tertiary {
 .icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}
 .icon-notes {background-image: url(image_path('icon_status_comment.svg'));}
 .icon-resolution-manager-page {background-image: url(image_path('icon_email_read_white.svg'));}
+.icon-email {background-image: url(image_path('icon_email_grey.svg'));}
+.icon-email:disabled {background-image: url(image_path('icon_email_lt_grey.svg'));}
+.icon-warning {background-image: url(image_path('icon_warning_white.svg'));}
 
 .remove-input {
   background-image: url(image_path('icon_minus_blue.svg'));
@@ -5179,7 +5198,10 @@ table > tbody > tr > td.dispute_rep_tools {
 #reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
   width: 400px;
 }
-[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"],[aria-describedby="whoisContent"]  {
+[aria-describedby="complaint_button_dialog"],
+[aria-describedby="history_dialog"],
+[aria-describedby="whoisContent"],
+[aria-describedby="resolution_comment_dialog"] {
   z-index: 999;
 }
 
@@ -5242,6 +5264,9 @@ table > tbody > tr > td.dispute_rep_tools {
 .toolbar .dropdown.open .toolbar-button {
   background-color: $bug-section-color;
   color: $content-bg-color;
+  &:hover {
+    background-color: darken($bug-section-color, 10%) !important;
+  }
 }
 .dispute-inline-buttons.edit-button{background-image: url(image_path('icon_edit_white.svg'));}
 .dispute-inline-buttons.adjust-wlbl-button, .toolbar .dropdown.open .adjust-wlbl-button  { background-image: url(image_path('icon_wlbl_white.svg')); }
@@ -5687,22 +5712,7 @@ input.table-entry-input:focus {
 #top_bar_extended_info p {
   font-weight: 300;
 }
-.domain-categories{
-  &{
-    display: none;
-    margin-top: 10px;
-  }
-  ul{
-    display: inline-block;
-    min-width: 140px;
-  }
-  li {
-    border-bottom: 1px solid $faint-neutral-color;
-    border-top: none;
-    padding: 5px;
-    margin-right: 5px
-  }
-}
+
 
 #top_bar_extended_info .col-with-divider {
   border-right-color: $faint-neutral-color;
@@ -6467,17 +6477,7 @@ h5.entry-details-table-header {
   margin-top: 0;
 }
 
-// show full toolbar labels on smaller screens for less-wide toolbars
-@media (min-width: 1100px) {
-  #research-tab-toolbar .toolbar-button-text {
-    display: block;
-    margin-left: 8px;
-  }
-  // context tags tab exists on both webrep and filerep
-  .tab-context-tags .toolbar-button-text {
-    display: block;
-  }
-}
+
 
 .col-editing {
   padding: 0 8px !important;
@@ -7210,7 +7210,6 @@ table.dispute_tool_current tr:last-of-type td {
   width: 30px;
   height: 30px;
   display: inline-block;
-  padding-right: 100px;
   margin: 6px 0 -6px 15px;
 }
 
@@ -7347,9 +7346,7 @@ td.ticket-total::before {
   line-height: .75em;
   font-weight: 600;
 }
-.secondary{
-  float: right;
-}
+
 .container_unassign {
   display: inline-block;
   float: right;
@@ -7491,22 +7488,26 @@ td.ticket-total::before {
 .tc_data {
     display: inline-block;
 }
-.entry-important-flag::before, .highlight-second-review .important-flag-col .is-important {
+.entry-important-flag::before,
+.highlight-second-review .important-flag-col .is-important,
+.important-flag-col .highlight-second-review.is-important {
   background-image: url(image_path('icon_important.svg'));
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
 }
-.highlight-second-review .important-flag-col{
+.highlight-second-review .important-flag-col {
   max-width: 50px!important;
 }
+
 td.in_zoo{
   text-align: center;
 }
 .container-important-tags{
   display: inline-flex;
 }
-.highlight-second-review .important-flag-col span {
+.highlight-second-review .important-flag-col span,
+.important-flag-col .highlight-second-review {
   display: block;
 }
 .font-weight-bold{
@@ -7624,7 +7625,7 @@ table.dispute-entry-table tbody tr.selected {
   width: 100%;
 }
 
-.dispute-owner-buttons-wrapper .dropdown.open, .webrep-change-assignee-wrapper .dropdown.open{
+.dispute-owner-buttons-wrapper .dropdown.open, .webrep-change-assignee-wrapper .dropdown.open, .webcat-change-assignee-wrapper .dropdown.open{
   background-color: transparent !important;
 }
 
@@ -8238,7 +8239,7 @@ table.dispute-entry-table tbody tr.selected {
 .nested-complaint-data-wrapper .selectize-input {
   margin: 0 !important;
   padding: 0 !important;
-  min-height: 30px !important;;
+  min-height: 30px !important;
   border-radius: 1px;
   border: 2px solid $content-bg-color;
   outline: 1px solid #cccccc;
@@ -8248,23 +8249,25 @@ table.dispute-entry-table tbody tr.selected {
 
 #copiedAlert, #assignedAlert, #unassignedAlert {
   color: $success-color;
-  color: #5FB766;
   font-size: 80%;
   display: inline;
   vertical-align: top;
 }
+
 .nested-complaint-static-data .copied-container, .assigned-check-container {
   margin-top: -7px;
 }
-.copied-check, .assigned-check{
+
+.copied-check, .assigned-check {
   height: 12px;
   width: 10px;
   display: inline-block;
   background-image: url(image_path('icon_check_dark_green.svg'));
+  background-repeat: no-repeat;
+  position: relative;
+  top: 2px;
 }
-.copied-container, .assigned-check-container {
-  position: absolute;
-}
+
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
   padding: 2px 6px;
   margin: 2px;
@@ -8339,24 +8342,7 @@ table.dispute-entry-table tbody tr.selected {
 
 .category-tooltip-table td, .category-tooltip-table th {
   text-align: left;
-}
-
-.category-tooltip-table tr:first-child td {
-  padding-top: 6px;
-}
-.category-tooltip-table td {
-  border-bottom: none;
-  font-weight: 300 !important;
-  padding: 0 6px 0 6px;
-  font-size: 8pt;
-}
-
-.category-tooltip-table th {
-  border-bottom: 1px solid $type-lighter-color;
-  text-transform: none;
-  font-weight: 400;
-  color: darken($content-bg-color, 10%);
-  padding: 2px 6px;
+  word-break: normal;
 }
 
 .tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-bottom .tooltipster-arrow-border {
@@ -8561,7 +8547,8 @@ table#duplicates a {
   overflow-y: scroll !important;
 }
 
-.highlight-was-dismissed .important-flag-col .was-reviewed::after {
+.highlight-was-dismissed .important-flag-col .was-reviewed::after,
+.important-flag-col .highlight-second-review.was-reviewed::after{
   display: block;
   background-image: url(image_path('icon_reviewed_check.svg'));
   width: 20px;
@@ -9424,147 +9411,15 @@ td.text-center span {
 }
 
 
-
-
-
-// Cluster top bar header
-.cluster-mgt-top-area {
-  background-color: $content-tab-color;
-  padding-bottom: 20px;
-  border-radius: 4px 4px 0 0;
-  margin: -15px;
-}
-#wsa_statuses, #clusters-index_filter, #cluster_comment_field{
-  &:empty{
-    font-size: 8.5pt!important;
-  }
-  &::-webkit-input-placeholder, &::-moz-placeholder {
-    font-size: 8.5pt!important;
-    color: #303030!important;
-    font-family: inherit!important;
-    line-height: 18px!important;
-    -webkit-font-smoothing: inherit!important;
-  }
-}
-.current-cluster-info-wrapper {
-  padding: 25px 0 10px;
-  .result-label.vertical-separator {
-    border-right: 1px solid $nav-toolbar-color;
-  }
-  .result-label {
-    font-size: .8rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    margin-top: 0;
-    display: inline-block;
-    padding: 0 15px 0 5px;
-    span {
-      color: $primary-section-color;
-      text-transform: none;
-      padding-left: 10px;
-      float: right;
-      display: inline-block;
-      min-width: 40px;
-    }
-    &.regex-area {
-      padding-left: 20px;  // regex field on clusters
-      border-left: solid 1px $medium-neutral-color;
-    }
-  }
-}
-
-
-.copycat-btn, .wsa-btn {
+.wsa-btn {
   background-color: $content-tab-color;
   color: $type-lightest;
   display: block;
   height: 27px;
   background-size: 19px!important;
-}
-
-.copycat-btn {
-  margin: 4px 0 0 5px;
-}
-
-.wsa-btn {
   margin: 4px 5px 0 5px;
 }
 
-.copycat-btn.active, .wsa-btn.active {
-  background-color: $primary-section-color;
-}
-.copycat-btn:hover, .wsa-btn:hover  {
-  background-color: $sidebar-nav-base;
-}
-
-// Cluster mgmt UI - Comment box / Category Submission
-.card {
-  width: 100%;
-  padding: 10px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
-  .card-body {
-    display: inline-flex;
-    width: 100%;
-    margin: 0;
-    input {
-      width: 80%;
-    }
-    button.icon-submit {
-      width: 20%;
-      background-color: $primary-section-color;
-      background-position-x: 6px;
-      margin: 0 0 0 10px;
-      padding: 5px 5px 5px 25px;
-      font-size: 9pt;
-      color: $type-lightest;
-    }
-  }
-}
-
-// copycat tool dialog
-#copycat_dialog {
-  display: none;
-}
-.copycat_tool_dialog {
-  min-width: 400px;
-  min-height: 135px;
-  font-family: 'Open Sans', sans-serif !important;
-
-}
-
-.copycat_tool_dialog .ui-dialog-titlebar {
-  background-color: $content-tab-color;
-  background-image: url(image_path('icon_copycat.svg'));
-  background-repeat: no-repeat;
-  background-position: 8px center;
-  background-size: 24px 24px;
-  padding-left: 40px;
-  border: none;
-  width: 100%;
-  font-weight: bold;
-  .selectize-input{
-    font-size: 8.5pt;
-  }
-}
-
-#copycat-categories-selectized {
-  width: 100%;
-  height: 30px;
-  padding: 0 10px;
-  border: 1px solid #e0e0e0;
-}
-
-.copycat-tool-footer {
-  display: flex;
-  justify-content: space-evenly;
-  padding: 0 25px 15px 25px;
-  font-size: 12px;
-}
-
-
-// copycat tool dialog
 #wsa-status-dialog {
   display: none;
 }
@@ -9598,92 +9453,6 @@ td.text-center span {
   font-weight: 600;
   white-space: nowrap;
   height: 30px;
-}
-
-.cluster-button{
-  white-space: nowrap;
-  background-color: $primary-section-color;
-  background-position: 10px center;
-  color: $content-bg-color;
-  height: 30px;
-  border: none;
-  border-radius: 2px;
-  text-transform: capitalize;
-  font-weight: 500;
-  font-family: "Open Sans", sans-serif !important;
-  min-width: 154px;
-  width: fit-content;
-  font-size: 9pt !important;
-  transition: background-color 0.2s!important;
-
-  &:hover{
-    background-color: darken($primary-section-color, 10%)!important;
-  }
-
-  &.icon-filter-white{
-    padding: 0 15px 0 38px;
-    background-position: 7px center!important;
-  }
-
-  &.icon-submit{
-    min-width: 135px;
-  }
-
-  &.icon-search{
-    min-width: 110px;
-    background-size: 17px;
-  }
-}
-
-.copycat-tool-footer .cluster-button{
-  width: 135px;
-  background-size: 15px;
-  &.copycat-clear-btn {
-    background-color: $type-faint-accent;
-    color: unset;
-    background-size: 22px;
-    padding-left: 39px;
-    width: unset;
-    &:hover {
-      background-color: darken($nav-toolbar-color, 10%)!important;
-    }
-  }
-}
-
-#clusters-nav-regex-wrapper {
-  .input-group.search-group {
-    display: inline-block;
-    margin-right: 0;
-    top: -4px;
-    width: 60%;
-
-    @media (min-width: 1000px) {
-      width: 70%;
-    }
-
-    @media (min-width: 1400px) {
-      width: 80%;
-    }
-  }
-
-  .clusters-nav-regex-container {
-    display: inline-block;
-    height: 15px;
-    margin: 15px 0 0 0;
-    width: 80px;
-
-    input {
-      float: right;
-      margin: 0;
-    }
-
-    label {
-      float: left;
-      font-size: 11px;
-      font-weight: 400;
-      margin: 0 5px 0 0;
-    }
-  }
 }
 
 #wsa_statuses{
@@ -10065,9 +9834,11 @@ td.text-center span {
 .webcat-loader-wrapper, .webrep-loader-wrapper, .sdr-loader-wrapper {
   margin: 0 37%;
 }
-.webcat-loader-wrapper{
-  margin-top: 25px;
+
+.webcat-loader-wrapper {
+  margin-top: 20px;
 }
+
 .sdr-loader-wrapper {
   top: 5px;
 }
@@ -11714,13 +11485,7 @@ button.secondary.view-report-external-button {
   width: 100%;
 }
 
-// dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
-@media screen and (min-width: 1600px) {
-  #research-tab-toolbar .toolbar-button-label .toolbar-button-text, .toolbar-button-label
-  .toolbar-button-text {
-    padding-top: 1px;
-  }
-}
+
 #temp_row .delete-search-image{
   background-image: url(image_path('icon_cancel_grey.svg'));
   display: block;
@@ -12506,16 +12271,7 @@ table.rl-content {
   padding-bottom: 6px;
 }
 
-.nested-complaint-editable-table {
-  label.content-label-sm {
-    padding-top: 0 !important;
-  }
-  input[type="radio"].resolution_radio_button {
-    margin-right: 3px;
-  }
-}
-
-input[type="radio"].resolution_radio_button {
+input[type="radio"].resolution_radio_button, input[type="radio"].review_radio_button {
   margin-right: 3px;
 }
 
@@ -12527,11 +12283,6 @@ input[type="radio"].resolution_radio_button {
 // fix margin on this button
 .nested-complaint-data-wrapper button.tertiary {
   margin: 12px 0 6px 0;
-}
-
-// more width so this aligns with the comment fields and for long URIs
-.complaint-uri-input {
-  width: 65%;
 }
 
 // ensure the XBRS history headers are accurate and stay put while scrolling
@@ -12650,221 +12401,6 @@ input[type="radio"].resolution_radio_button {
 @media (min-width: 2030px) {
   #disputes-index_wrapper {
     top: -55px;
-  }
-}
-// webcat - 1950px below is our current "widest" breakpoint
-@media (min-width: 1950px) {
-  #webcat-index-toolbar {
-    .toolbar-button {
-      background-position: 4px 6px;
-      padding-left: 13px;
-      padding-right: 7px;
-      min-height: 25px;
-      background-size: 14px 14px; // icon size
-      transition: background-color 0.2s;
-    }
-  }
-}
-
-@media (max-width: 2042px)  {
-  #webcat-index-toolbar .toolbar-button-text {
-    display: none !important;
-  }
-}
-
-@media screen and (max-width: 1800px) and (min-width: 1705px){
-  #webcat-index-toolbar .toolbar-button-text {
-    .toolbar-button {
-      background-position: 4px 6px;
-    }
-  }
-}
-.toolbar#webcat-index-toolbar {
-  background: $content-bg-color;
-  bottom: 2px;
-  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
-  flex-direction: row;
-  float: left;
-  margin: 2px 0 -35px 0;
-  padding: 0 0 0 20px;
-  position: relative;
-  width: 100%;
-  z-index: 1;
-
-  .toolbar-checkbox-wrapper {
-    padding-top: 0;
-    padding-left: 5px;
-    font-weight: normal;
-  }
-
-  div {
-    margin: 4px 3px 0 0;
-  }
-
-  .toolbar-dropdown {
-    margin-top: 0 !important;
-  }
-
-  .primary-text-divider {
-    margin-top: 0 !important;
-  }
-
-  .btn-group.toolbar-btn-group {
-    margin: 0;
-    vertical-align: baseline;
-  }
-
-  .btn-group.toolbar-btn-group.assignment-btn-group {
-    align-items: center;
-    background-color: $nav-toolbar-color;
-    border: none;
-    display: flex;
-    margin: 0 3px 0 0;
-    float: left;
-    padding-left: 0;
-
-    .inline-radio-wrapper {
-      align-items: center;
-      border: none;
-      display: flex;
-      height: 27px;
-      margin-top: 0;
-    }
-
-    .assignment-type-input {
-      -webkit-appearance: none;
-      appearance: none;
-      background-color: $content-bg-color;
-      border-radius: 50%;
-      border: 0.15em solid $type-lighter-color;
-      color: $type-lighter-color;
-      display: grid;
-      font: inherit;
-      height: 1.15em;
-      margin: 0 3px 0 0;
-      place-content: center;
-      vertical-align: middle;
-      width: 1.15em;
-    }
-
-    .assignment-type-input:checked {
-      background-color: $type-darkest;
-    }
-
-    .assignment-type-input::before {
-      border-color: lighten($type-base-color, 15%);
-      border-radius: 50%;
-      box-shadow: inset 1em 1em lighten($type-base-color, 15%);
-      content: '';
-      height: 0.65em;
-      transform: scale(0);
-      transition: 120ms transform ease-in-out;
-      width: 0.65em;
-    }
-
-    .assignment-type-input:checked::before {
-      transform: scale(1);
-    }
-
-    .assignment-type-input:first-of-type {
-      margin-left: 3px;
-    }
-
-    label:last-of-type {
-      margin-right: 3px;
-    }
-  }
-
-  .concise-button:disabled {
-    opacity: 0.5;
-  }
-
-  .webcat-toolbar-select-all-wrapper, .webcat-toolbar-tall-wrapper {
-    background-color: $faint-neutral-color;
-    display: block;
-    height: 27px;
-    line-height: 25px;
-    float: none;
-    margin: 0;
-    padding: 0 8px;
-
-    input {
-      margin: 6px 0 0;
-      vertical-align: top;
-    }
-
-    label {
-      display: inline-block;
-      font-weight: 400;
-      height: 27px;
-      margin-left: 2px;
-    }
-  }
-
-  .webcat-toolbar-bulk-res {
-    background-color: #255c7d !important;
-    color: $type-lightest !important;
-
-    &:disabled {
-      opacity: 0.5;
-    }
-  }
-
-  .webcat-toolbar-tall-wrapper {
-    height: 45px;
-    line-height: 45px;
-    margin: 0 0 0 3px;
-    padding: 0 15px;
-
-    input {
-      margin: 16px 0 0;
-    }
-  }
-
-  .webcat-manage-templates-button {
-    background-color: $faint-neutral-color;
-    padding-left: 24px;
-  }
-
-  .webcat-toolbar-push {
-    margin-left: auto;
-  }
-}
-
-//sticky toolbar needs extra top spacing on small screens
-@media (max-width: 999px) {
-  .toolbar#webcat-index-toolbar {
-    margin-top: 18px;
-  }
-}
-
-#complaints-index_wrapper .datatable-top-tools {
-  margin-bottom: 10px !important;
-}
-
-#webcat-index-toolbar .dropdown.open {
-  background-color: transparent !important;
-}
-
-
-// webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
-@media screen and (max-width: 1700px) and (min-width: 1551px) {
-  #research-tab-toolbar {
-    .toolbar-button {
-      background-position: 6px 6px;
-      padding-left: 9px;
-      padding-right: 8px;
-      min-height: 25px;
-      background-size: 14px 14px; // icon size
-      transition: background-color 0.2s;
-    }
-  }
-}
-// fix the collapse breakpoint
-@media screen and (max-width: 1550px) {
-  #research-tab-toolbar .toolbar-button-text, .toolbar-button-text {
-    display: none;
-    margin-left: 8px;
   }
 }
 
@@ -13215,8 +12751,10 @@ span.threat-cat-no-data {
 }
 .reputation-icon-container{
   display: inline-flex;
+  float: left;
   .reputation-icon{
-    top: -1px
+    top: -1px;
+    margin-left: -6px;
   }
 }
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
@@ -13404,11 +12942,20 @@ table > tbody > tr > td.no-padding {
   left: -2px;
 }
 
-.webrep-change-assignee-wrapper .toolbar label {
+.webcat-change-assignee-wrapper .dropdown-menu {
+  border-radius: 0 4px 4px 4px;
+  border: none;
+  background-color: #6dbcdb;
+  min-width: 200px;
+  top: 27px;
+  left: 0;
+}
+
+.webrep-change-assignee-wrapper .toolbar label, .webcat-change-assignee-wrapper .toolbar label{
   display: block !important;
 }
 
-.webrep-change-assignee-wrapper .dropdown-menu h3 {
+.webrep-change-assignee-wrapper .dropdown-menu h3, .webcat-change-assignee-wrapper .dropdown-menu h3 {
   color: $content-bg-color;
   padding: 0 10px;
   font-weight: 400;
@@ -13416,7 +12963,7 @@ table > tbody > tr > td.no-padding {
   margin: 8px 0 8px 0;
 }
 
-.webrep-change-assignee-wrapper .inline-tool-content-wrapper {
+.webrep-change-assignee-wrapper .inline-tool-content-wrapper,.webcat-change-assignee-wrapper .inline-tool-content-wrapper  {
   padding: 4px 10px 20px 4px;
 }
 
@@ -13450,10 +12997,6 @@ table > tbody > tr > td.no-padding {
 #disputes-research-table {
   border-collapse: separate;
   border-spacing: 0 10px;  // add vertical space between rows
-}
-
-#research-tab-toolbar, #research-page-toolbar {
-  margin-bottom: 5px;
 }
 
 .research-table-details-wrapper table td {
@@ -14090,12 +13633,6 @@ table > tbody > tr > td.no-padding {
   }
 }
 
-#webcat-index-title {
-  padding-top: 25px;
-  line-height: 12px;
-  margin: 8px 0 10px 0;
-}
-
 // ensure text doesn't break/wrap in data table
 .ticket-age-over12hr, .ticket-age-over18hr {
   white-space: nowrap;
@@ -14402,14 +13939,18 @@ table > tbody > tr > td.no-padding {
 
 
 // CATEGORIZE URLs dropdown - overall wrapper
-.escalations--webcat--complaints-controller .nav-tools-dropdown[aria-labelledby='categorize-urls'] {
+.escalations--webcat--complaints-controller .nav-tools-dropdown[aria-labelledby='categorize-urls'],
+.escalations--webcat--csam_reports-controller .nav-tools-dropdown[aria-labelledby='categorize-urls']
+{
   padding-top: 5px;
   h3 {
     padding: 6px 5px 9px;
   }
 }
 
-.escalations--webcat--complaints-controller .tooltipster-box {
+.escalations--webcat--complaints-controller .tooltipster-box,
+.escalations--webcat--csam_reports-controller .tooltipster-box
+{
   margin-top: 7px !important;
 }
 
@@ -14539,35 +14080,6 @@ table > tbody > tr > td.no-padding {
   }
 }
 
-// webcat > button text "All" in toolbar
-.text-button-all {
-  min-width: 30px;
-}
-
-
-
-// webcat index DT, adhering to existing naming conventions
-#webcat-index-table-show-columns-dropdown {
-  width: 330px;
-  ul {
-    display: inline-block;
-    padding: 10px;
-    width: 49%;
-    vertical-align: text-top;
-    li {
-      font-size: 9pt;
-      padding: 4px 12px;
-      cursor: default;
-      input {
-        margin-right: 8px;
-      }
-    }
-  }
-}
-
-#webcat-index-toolbar .collapse-all {
-  margin-right: 0;
-}
 
 .threat-cat-tag:not(:first-child)::before {
   content: ', ';
@@ -14577,7 +14089,9 @@ table > tbody > tr > td.no-padding {
 }
 
 // adding the down caret icon using the sort_by svg for advanced search button
-#advanced-search-button::after, #webrep-advanced-search-button::after {
+#advanced-search-button::after,
+#webrep-advanced-search-button::after,
+#webcat-advanced-search-button::after {
   content: '';
   display: block;
   width: 16px;

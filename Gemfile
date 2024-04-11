@@ -9,10 +9,10 @@ gem 'rack-cors', '0.4.1', require: 'rack/cors'
 gem 'active_model_serializers', '0.10.12'
 gem 'grape', '1.6.2'
 gem 'grape-swagger', '0.31.1'
-gem 'grape-swagger-rails', '0.3.1'
+gem 'grape-swagger-rails', '0.5.0'
 gem 'grape-active_model_serializers', '1.5.2'
 gem 'hashie-forbidden_attributes', '~> 0.1.1'
-gem 'activerecord-session_store', '2.0.0'
+gem 'activerecord-session_store', '2.1.0'
 gem 'simple_form', '4.0.1'
 
 # Asset Pipeline
@@ -33,7 +33,7 @@ gem 'inline_svg', '1.3.1'
 gem 'selectize-rails', '~> 0.12.4'
 
 # Database
-gem 'mysql2', '0.5.4'
+gem 'mysql2'
 gem 'paper_trail', '12.0.0'
 gem 'rails_admin', '~> 2.2.1'
 gem 'redis'
@@ -57,16 +57,11 @@ gem "net-imap"
 gem "uri", "0.12.0"
 gem 'httparty', '~> 0.15.3'
 
-gem 'peake-bridge-client', '0.2.1.0', path: 'vendor/gems/peake-bridge-client'
-
-# gem 'peake-bridge-client', '0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
-# gem 'peake-bridge-client', '0.2.0.0', git: "git@gitlab.vrt.sourcefire.com:talosweb/peake-bridge-client.git"
-# gem 'peake-bridge-client', '~> 0.2.0.0', git: "https://gitlab.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
-# gem 'peake-bridge-client', '~> 0.2.0', git: "https://github.com/cisco-sbg/talos-atlas-peake-bridge-client.git"
+gem 'peake-bridge-client', '~> 0.2.1' , path: 'vendor/gems/peake-bridge-client'
 
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'
-gem 'aws-sdk', '3.1.0'
+gem 'aws-sdk-s3', '1.117.2'
 gem 'grpc', '1.56.0'
 gem 'grpc-tools', '1.45.0'
 
@@ -107,7 +102,6 @@ gem 'delayed_job_web', '1.4.3'
 gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
 
-
 gem 'clipboard-rails', '1.7.1'
 
 gem 'poltergeist', '1.18.1'
@@ -123,6 +117,9 @@ gem 'hashie'
 
 gem 'mail'
 gem 'simpleidn'
+
+gem 'symmetric-encryption', require: false
+gem 'vault'
 
 group :production, :staging do
   gem 'elastic-apm', '4.5.0'
@@ -151,7 +148,7 @@ group :test do
   # gem 'json_spec', '1.1.5' # cannot find any usage of this one, last updated in 2017
   gem 'simplecov', '0.16.1', :require => false
   gem "timecop"
-  gem 'geckodriver-helper'
+  gem 'selenium-webdriver'
   gem 'rexml', '3.2.5'
 end
 

@@ -55,3 +55,15 @@ end
 Then (/^that Complaint Ticket should not have an assignee of current user$/) do
   expect(ComplaintEntry.first.user_id).not_to eq(1)
 end
+
+Then (/^the last Complaint Ticket should have an assignee of current user$/) do
+  expect(ComplaintEntry.last.user_id).to eq(1)
+end
+
+Given(/^the first Complaint Ticket is assigned to user id "(.*?)$/) do | id |
+  expect(ComplaintEntry.first.user_id).to eq(id.to_i)
+end
+
+Given(/^the first Complaint Ticket is not assigned to user id "(.*?)"$/) do | id |
+  expect(ComplaintEntry.first.user_id).not_to eq(id.to_i)
+end

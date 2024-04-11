@@ -1,4 +1,4 @@
-complaint_status_list= ["NEW", "RESOLVED", "ASSIGNED", "ACTIVE","COMPLETED", "PENDING", "REOPENED" ]
+complaint_status_list= ["NEW", "RESOLVED", "ASSIGNED", "COMPLETED", "PENDING", "REOPENED" ]
 complaint_resolution_list=["FIXED", "INVALID", "UNCHANGED", "DUPLICATE"]
 $ ->
 
@@ -21,11 +21,11 @@ $ ->
       success: (response) ->
         $('#platformList').empty()
         for platform in response.data
-          $('#platformList').append '<option value="' + platform + '"></option>'
+          $('#platformList').append '<option value="' + platform.public_name + '"></option>'
     )
 
 
-  $('#advanced-search-button').on 'click', ->
+  $('#webcat-advanced-search-button').on 'click', ->
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/customers_names'
       method: 'GET'

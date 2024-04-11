@@ -1,4 +1,10 @@
 development:
+  iwf_abuse_config:
+    username: "redacted"
+    password: "redacted"
+  vault_config:
+    role_id: "redacted"
+    secret_id: "redacted"
   api_timeout:
     timeout: 15
   app_info:
@@ -18,6 +24,8 @@ development:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  banhammer:
+    host: 'http://development.talos-atlas-talosintelligence-banhammer.pages.dev/search/'
   beaker:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     hostport: "annapolis-stage.vrt.sourcefire.com:4252"
@@ -181,6 +189,8 @@ test:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  banhammer:
+    host: 'http://development.talos-atlas-talosintelligence-banhammer.pages.dev/search/'
   beaker:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     hostport: "annapolis-stage.vrt.sourcefire.com:4252"
@@ -339,6 +349,8 @@ staging:
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       # umbrella always uses https and verify peer
       api_key: "redacted"
+  banhammer:
+    host: 'http://development.talos-atlas-talosintelligence-banhammer.pages.dev/search/'
   beaker:
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     hostport: "annapolis-stage.vrt.sourcefire.com:4252"
