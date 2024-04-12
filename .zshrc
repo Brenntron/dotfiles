@@ -77,6 +77,9 @@ else
   source ~/.config/osx/osx.zsh
 fi
 
+# start zoxide before zsh-autcomplete
+eval "$(zoxide init zsh)"
+
 # enable autocomplete function
 autoload -U compinit
 compinit
@@ -202,9 +205,6 @@ alias spectral='spectral-language-server'
 
 # enable autoenv
 source $(brew --prefix autoenv)/activate.sh
-
-# start zoxide
-eval "$(zoxide init zsh)"
 
 # kitty completeions
 __kitty_complete
