@@ -22,35 +22,33 @@ module API
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
               optional :uri_as_categorized, type: String, desc: 'Value of the `Edit Uri` box at the time analyst submitted it'
-              optional :self_review, type: Boolean, desc: 'If a category change could be done with a self review'
             end
             post 'update'do
               std_api_v2 do
 
-              begin
-                entry = ComplaintEntry.find(permitted_params['id'])
-                uri_as_categorized = permitted_params['uri_as_categorized'].blank? ? entry.uri : permitted_params['uri_as_categorized']
-                entry.change_category( permitted_params['prefix'],
-                                       permitted_params['categories'],
-                                       permitted_params['category_names'],
-                                       permitted_params['status'],
-                                       permitted_params['comment'],
-                                       permitted_params['resolution_comment'],
-                                       uri_as_categorized,
-                                       current_user,
-                                       "",
-                                       permitted_params['self_review'])
+                begin
+                  entry = ComplaintEntry.find(permitted_params['id'])
+                  uri_as_categorized = permitted_params['uri_as_categorized'].blank? ? entry.uri : permitted_params['uri_as_categorized']
+                  entry.change_category( permitted_params['prefix'],
+                                         permitted_params['categories'],
+                                         permitted_params['category_names'],
+                                         permitted_params['status'],
+                                         permitted_params['comment'],
+                                         permitted_params['resolution_comment'],
+                                         uri_as_categorized,
+                                         current_user,
+                                         "")
 
-                Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
-                if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
-                  message = Bridge::ComplaintUpdateStatusEvent.new
-                  message.post_complaint(entry.complaint)
-                end
 
-              rescue Exception => e
+                  if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
+                    message = Bridge::ComplaintUpdateStatusEvent.new
+                    message.post_complaint(entry.complaint)
+                  end
+
+                rescue Exception => e
                   return {error:e.message, entry_id: entry.id}.to_json
-              end
-              {entry_id: entry.id}.to_json
+                end
+                {entry_id: entry.id}.to_json
               end
             end
 
@@ -89,8 +87,7 @@ module API
                                          submitted_complaint[:resolution_comment],
                                          '',
                                          current_user,
-                                         submitted_complaint[:commit],
-                                         submitted_complaint[:self_review])
+                                         submitted_complaint[:commit])
 
                   if submitted_complaint[:commit] == 'decline'
                     category_data = @entry.current_category_data.to_a
@@ -234,14 +231,45 @@ module API
               requires :assignment_type, type: String, desc: 'Assignment type'
             end
             post "unassign_all" do
-              results = []
+              begin
+                results = []
+                error_entry_ids = {}
+                error_count = 0
+                params[:complaint_entry_ids].each do |id|
+                  entry = ComplaintEntry.find(id)
+                  result = entry.unassign(current_user, permitted_params['assignment_type'])
+                  results << { id: id, result: result }
 
-              params[:complaint_entry_ids].each do |id|
-                entry = ComplaintEntry.find(id)
-                result = entry.unassign(permitted_params['assignment_type'])
-                results << { id: id, result: result }
+                  next if result == "Unassigned the Complaint's #{permitted_params['assignment_type']}"
+
+                  error_count += 1
+                  if error_entry_ids[result].nil?
+                    error_entry_ids[result] = [id]
+                  else
+                    error_entry_ids[result] << id
+                  end
+                end
+
+                unless error_entry_ids.keys.empty?
+                  error_message = if error_count == permitted_params['complaint_entry_ids'].count
+                                    ["The following entries could not be assigned:"]
+                                  else
+                                    ["Some entries were successfully assigned, but the following entries could not be returned:"]
+                                  end
+
+                  error_entry_ids.each_key do |key|
+                    error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
+                  end
+                  unless error_count == permitted_params['complaint_entry_ids'].count
+                    error_message << "Refresh the page to pickup the latest changes."
+                  end
+                  return {error: error_message}.to_json
+                end
+              rescue Exception => e
+                Rails.logger.error "Failed to take entry: error=> #{e.message}"
+                error = e.message.to_s
+                return {error: error}.to_json
               end
-
               { status: "success", data: results }.to_json
             end
 
@@ -253,20 +281,49 @@ module API
               requires :assignment_type, type: String, desc: 'Assignment type'
             end
             post "change_assignee" do
-              results = []
-              user = User.find(params[:user_id])
+              begin
+                error_entry_ids = {}
+                error_count = 0
+                results = []
+                user = User.find(params[:user_id])
 
-              ActiveRecord::Base.transaction do
-                params[:complaint_entry_ids].each do |id|
-                  entry = ComplaintEntry.find(id)
-                  result = entry.reassign(user, permitted_params['assignment_type'])
-                  results << { id: id, result: result }
+                ActiveRecord::Base.transaction do
+                  params[:complaint_entry_ids].each do |id|
+                    entry = ComplaintEntry.find(id)
+                    result = entry.reassign(user, permitted_params['assignment_type'])
+                    results << { id: id, result: result }
+                    next if result == "#{id}: #{user.cvs_username} assigned to Complaint as #{permitted_params['assignment_type']}"
+
+                    error_count += 1
+                    if error_entry_ids[result].nil?
+                      error_entry_ids[result] = [id]
+                    else
+                      error_entry_ids[result] << id
+                    end
+                  end
+
+                  unless error_entry_ids.keys.empty?
+                    error_message = if error_count == permitted_params['complaint_entry_ids'].count
+                                      ["The following entries could not be assigned:"]
+                                    else
+                                      ["Some entries were successfully assigned, but the following entries could not be returned:"]
+                                    end
+
+                    error_entry_ids.each_key do |key|
+                      error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
+                    end
+                    unless error_count == permitted_params['complaint_entry_ids'].count
+                      error_message << "Refresh the page to pickup the latest changes."
+                    end
+                    return {error: error_message}.to_json
+                  end
                 end
+              rescue Exception => e
+                Rails.logger.error "Failed to take entry: error=> #{e.message}"
+                error = e.message.to_s
+                return {error: error}.to_json
               end
-
               {status: "success", data: results, cvs_username: user.cvs_username, name: user.display_name }.to_json
-            rescue => e
-              {error: e.message}.to_json
             end
 
 
@@ -276,22 +333,22 @@ module API
             end
             post 'history' do
               begin
-                  entry = ComplaintEntry.find(params[:id])
-                  complaint_entry_packet={}
-                  complaint_entry_packet[:entry_history] = {}
-                  #if entry.complaint_entry_preload.present?
-                  #  if entry.complaint_entry_preload.historic_category_information.present?
-                  #    complaint_entry_packet[:entry_history][:domain_history] = entry.complaint_entry_preload.historic_category_information
-                  #  else
-                  #    complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
-                  #  end
-                  #else
-                  #  complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
-                  #end
+                entry = ComplaintEntry.find(params[:id])
+                complaint_entry_packet={}
+                complaint_entry_packet[:entry_history] = {}
+                #if entry.complaint_entry_preload.present?
+                #  if entry.complaint_entry_preload.historic_category_information.present?
+                #    complaint_entry_packet[:entry_history][:domain_history] = entry.complaint_entry_preload.historic_category_information
+                #  else
+                #    complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
+                #  end
+                #else
+                #  complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
+                #end
 
-                  complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
+                complaint_entry_packet[:entry_history][:domain_history] = entry.historic_category_data
 
-                  complaint_entry_packet[:entry_history][:complaint_history] = entry.compose_versions
+                complaint_entry_packet[:entry_history][:complaint_history] = entry.compose_versions
 
 
 
@@ -364,7 +421,7 @@ module API
                       #TODO: replace this with working code when the API is finished and we can actually get certainty.
                       complaint_entry_packet[:current_categories][key][:certainty] = [
                           {:source => "Missing Source data", :source_category => "Missing Category", :source_certainty => "N/A", :source_confidence => 'N.A'}
-                                                                                      ]
+                      ]
                     end
 
 
@@ -514,8 +571,7 @@ module API
                                                     entry['resolution_comment'],
                                                     uri_as_categorized,
                                                     current_user,
-                                                    "",
-                                                    entry['self_review'])
+                                                    "")
 
                     Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry) }
                     if complaint_entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
@@ -524,8 +580,9 @@ module API
                     end
 
                     response.push({entry_id: entry['entry_id'], row_id: entry['row_id'], status: complaint_entry.status, resolution: entry['status'],
-                                       comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
-                                       category_names: entry['category_names']})
+                       comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
+                       category_names: entry['category_names']})
+
                   rescue Exception => e
                     response.push({error: true, entry_id: entry['entry_id'], reason: 'api'})
                     next

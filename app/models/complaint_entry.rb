@@ -10,6 +10,7 @@ class ComplaintEntry < ApplicationRecord
   belongs_to :canonical, class_name: "ComplaintEntry", optional: true
 
   has_many :duplicate_entries, class_name: "ComplaintEntry", foreign_key: 'canonical_id'
+  has_many :abuse_records
 
   belongs_to :complaint
   belongs_to :user, optional: true
@@ -53,7 +54,7 @@ class ComplaintEntry < ApplicationRecord
     #support for ipv6 carried over from work done in WEB-11015 while this was being developed
     #is_ip_address = !!(uri_or_ip  =~ Resolv::IPv4::Regex)
     is_ip_address = !!(uri_or_ip =~ Resolv::IPv4::Regex || uri_or_ip =~ Resolv::IPv6::Regex)
-    
+
     if is_ip_address
       ComplaintEntry.open_tickets.where(:ip_address => uri_or_ip).where("id <> #{self.id}").first
     else
@@ -204,13 +205,21 @@ class ComplaintEntry < ApplicationRecord
     'Entry returned'
   end
 
-  def unassign(assignment_type)
+  def unassign(current_user, assignment_type)
     return("Complaint is already assigned to Vrt Incoming") if user == User.vrtincoming
+    return("Already completed") if status == 'COMPLETED'
+
+    #non-managers can only unassign assignees, not reviewer or second reviewer
+    webcat_manager = Role.where(role: 'webcat manager').first
+    unless current_user.roles.include?(webcat_manager)
+      if current_user.id != user&.id && assignment_type != "assignee"
+        return("Cannot remove assigned reviewer")
+      end
+    end
 
     case assignment_type
     when 'assignee'
       if !is_important
-        return("Already completed") if status == 'COMPLETED'
 
         update(user: User.vrtincoming, status: "NEW")
         complaint.set_status("NEW")
@@ -233,12 +242,11 @@ class ComplaintEntry < ApplicationRecord
     raise "#{id}: Complaint is already assigned to #{assignee.cvs_username}" if user == assignee
     raise "#{id}: #{reviewer.cvs_username} is already reviewing Complaint" if reviewer.present? && user == reviewer
     raise "#{id}: #{second_reviewer.cvs_username} is already the second reviewer for Complaint" if second_reviewer.present? && user == second_reviewer
+    raise "Already completed" if status == "COMPLETED"
 
     case assignment_type
     when 'assignee'
       if !is_important
-        raise "#{id}: Already completed" if status == "COMPLETED"
-
         update(user: assignee, status: "ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED") unless complaint.status == "ASSIGNED"
       elsif is_important && status != "PENDING"
@@ -298,8 +306,7 @@ class ComplaintEntry < ApplicationRecord
                         resolution_comment,
                         uri_as_categorized,
                         current_user,
-                        commit_pending,
-                        self_review)
+                        commit_pending)
 
     # not important case or resolution is "unchanged"
     current_status = STATUS_COMPLETED
@@ -342,8 +349,7 @@ class ComplaintEntry < ApplicationRecord
                            resolution_comment,
                            uri_as_categorized,
                            current_user,
-                           commit_pending,
-                           self_review)
+                           commit_pending)
 
     self.case_assigned_at ||= Time.now
     # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
@@ -394,8 +400,7 @@ class ComplaintEntry < ApplicationRecord
                       resolution_comment,
                       uri_as_categorized,
                       current_user,
-                      commit_pending,
-                      self_review)
+                      commit_pending)
     ActiveRecord::Base.transaction do
 
       if categories_string.blank? && entry_status == "FIXED"
@@ -407,19 +412,19 @@ class ComplaintEntry < ApplicationRecord
 
       #First, check if not important.  If not, super simple no guardrails categorization path
       if !self.is_important
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
         return post_categorize(current_user)
       end
 
       #Second, check to see if this is an unchanged decision, if it is, then there's nothing to guardrails here.
       if entry_status == Complaint::RESOLUTION_UNCHANGED
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
         return post_categorize(current_user)
       end
 
       #Third if self-review is set to true, then it's not necessary to go through full guard rails workflow (i see this path being potentially worked on later for security reasons)
-      if self_review == true
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+      if current_user.enabled_self_review
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
         return post_categorize(current_user)
       end
 
@@ -487,7 +492,7 @@ class ComplaintEntry < ApplicationRecord
 
       ## The remaining logic belows handles a verdict_pass of true or a webcat manager's categorization, which is exempt from verdicts.
 
-      categorize_important(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+      categorize_important(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
 
       return post_categorize(current_user)
       ###
@@ -555,30 +560,24 @@ class ComplaintEntry < ApplicationRecord
 
   ####Generic method to handle any logic to alter categories and any other necessary activities before sending categories
   # to RuleAPI
-  def pre_commit_processing(category_ids_array, ip_or_uri)
-
+  def pre_commit_processing(category_ids_array, ip_or_uri, user)
+    user = User.find_by_email(user) rescue self.user
     if category_ids_array.include?(AbusiveContentTool.current_child_abuse_category[:id])
       category_ids_array = AbusiveContentTool.reclassify_abuse_categories(category_ids_array)
+
+      abuse_info = {}
+      abuse_info[:user_id] = user.id
+      abuse_info[:user] = user.email
+      abuse_info[:url] = ip_or_uri
+      self.abuse_information = abuse_info.to_json
+      self.save!
       result = AbusiveContentTool.submit_abuse_to_authorities(self, user, SimpleIDN.to_ascii(ip_or_uri))
+      abuse_info[:iwf_report] = result[:iwf_report]
+      abuse_info[:ncmec_report] = result[:ncmec_report]
+      self.abuse_information = abuse_info.to_json
+      self.save
 
-      if result[:status].to_s == "success"
-        abusive_info = {}
-        abusive_info[:iwf_report_id] = "IWF report submission ID: #{result[:data]}"
-        self.abuse_information = abusive_info.to_json
-        self.save!
-        report_alert_args = {}
-        report_alert_args[:to] = "admatter@cisco.com"
-        report_alert_args[:from] = "noreply@talosintelligence.com"
-        report_alert_args[:subject] = "IWF Report Notification"
-        report_alert_args[:body] = "Reference Data <br /> Complaint ID: #{self.complaint.id} <br /> Complaint Entry ID: #{self.id} <br /> Entry: #{self.hostlookup} <br /> User assigned: #{self.user.cvs_username}"
 
-        attachments_to_mail = []
-        conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
-        conn.post(report_alert_args, attachments_to_mail)
-
-      else
-        raise "IWF submission issue: #{result[:message]}"
-      end
     end
 
     return category_ids_array
@@ -597,7 +596,7 @@ class ComplaintEntry < ApplicationRecord
 
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
-    category_ids_array = pre_commit_processing(category_ids_array, ip_or_uri)
+    category_ids_array = pre_commit_processing(category_ids_array, ip_or_uri, user)
 
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"
@@ -840,11 +839,11 @@ class ComplaintEntry < ApplicationRecord
     ###this should be eventually removed, but commenting out for now to see if it speeds up the NEW button for bulk entries
 
     #begin
-      #this is where screen grabs happen.
+    #this is where screen grabs happen.
     #  screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
     #  screenshot_entry.grab_screenshot
     #rescue Timeout::Error => e
-      #couldnt complete in time
+    #couldnt complete in time
     #  Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
     #  ces = ComplaintEntryScreenshot.new
     #  ces.error_message = e.message
@@ -855,7 +854,7 @@ class ComplaintEntry < ApplicationRecord
     #  ces.save!
     #rescue Exception => e
     #  Rails.logger.error("#{e.message}")
-      # do nothing, it was worth a try. kittens are sad now
+    # do nothing, it was worth a try. kittens are sad now
     #  ces = ComplaintEntryScreenshot.new
     #  ces.error_message = e.message
     #  ces.complaint_entry_id = new_complaint_entry.id
@@ -879,16 +878,16 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.robust_search(search_type, search_name: nil, params: nil, user:)
     case search_type
-      when 'advanced'
-        advanced_search(params, search_name: search_name, user: user)
-      when 'named'
-        named_search(search_name, user: user)
-      when 'standard'
-        standard_search(search_name, user: user)
-      when 'contains'
-        contains_search(params['value'])
-      else
-        where({})
+    when 'advanced'
+      advanced_search(params, search_name: search_name, user: user)
+    when 'named'
+      named_search(search_name, user: user)
+    when 'standard'
+      standard_search(search_name, user: user)
+    when 'contains'
+      contains_search(params['value'])
+    else
+      where({})
     end
   end
 
@@ -926,62 +925,62 @@ class ComplaintEntry < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.standard_search(search_name, user:)
     case search_name
-      when "NEW"
-        new_entries
-      when "COMPLETED"
-        closed
-      when "ACTIVE"
-        open.where.not(status:"NEW")
-      when "REVIEW"
-        where(status: "PENDING")
-      when "MY COMPLAINTS"
-        where(user_id: user.id)
-      when "MY OPEN COMPLAINTS"
-        open.where(user_id: user.id)
-      when "MY CLOSED COMPLAINTS"
-        closed.where(user_id: user.id)
-      when "MANAGER QUEUE"
-        joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
-      when "NEW JIRA"
-          where(status: 'NEW', complaint_id: Complaint.from_jira)
-      when "JIRA OVERDUE"
-        where(complaint_id: Complaint.from_jira).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-      when "JIRA ASSIGNED"
-        where(status: 'ASSIGNED', complaint_id: Complaint.from_jira)
-      when "ALL JIRA"
-        where(complaint_id: Complaint.from_jira)
-      when "ALL TALOS"
-        where(complaint_id: Complaint.from_ti)
-      when "NEW TALOS"
-        where(status: 'NEW', complaint_id: Complaint.from_ti)
-      when "TALOS OVERDUE"
-        where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-      when "TALOS ASSIGNED"
-        where(status: 'ASSIGNED', complaint_id: Complaint.from_ti)
-      when "ALL WBNP"
-        where(complaint_id: Complaint.from_wbnp)
-      when "NEW WBNP"
-        where(status: 'NEW', complaint_id: Complaint.from_wbnp)
-      when "WBNP OVERDUE"
-        where(complaint_id: Complaint.from_wbnp).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-      when "WBNP ASSIGNED"
-        where(status: 'ASSIGNED', complaint_id: Complaint.from_wbnp)
-      when "ALL INTERNAL"
-        where(complaint_id: Complaint.from_int)
-      when "NEW INTERNAL"
-        where(status: 'NEW', complaint_id: Complaint.from_int)
-      when "INTERNAL OVERDUE"
-        where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
-      when "INTERNAL ASSIGNED"
-        where(status: 'ASSIGNED', complaint_id: Complaint.from_int)
-      when "ALL PENDING"
-        where(status: 'PENDING')
-      when "PENDING OVERDUE"
-        where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
-      when "ALL"
-        all
-      else
-        all
+    when "NEW"
+      new_entries
+    when "COMPLETED"
+      closed
+    when "ACTIVE"
+      open.where.not(status:"NEW")
+    when "REVIEW"
+      where(status: "PENDING")
+    when "MY COMPLAINTS"
+      where(user_id: user.id)
+    when "MY OPEN COMPLAINTS"
+      open.where(user_id: user.id)
+    when "MY CLOSED COMPLAINTS"
+      closed.where(user_id: user.id)
+    when "MANAGER QUEUE"
+      joins(:complaint).where(user_id: User.webcat_manager_ids).where("complaint_entries.status not in ('COMPLETED','RESOLVED','NEW')")
+    when "NEW JIRA"
+      where(status: 'NEW', complaint_id: Complaint.from_jira)
+    when "JIRA OVERDUE"
+      where(complaint_id: Complaint.from_jira).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+    when "JIRA ASSIGNED"
+      where(status: 'ASSIGNED', complaint_id: Complaint.from_jira)
+    when "ALL JIRA"
+      where(complaint_id: Complaint.from_jira)
+    when "ALL TALOS"
+      where(complaint_id: Complaint.from_ti)
+    when "NEW TALOS"
+      where(status: 'NEW', complaint_id: Complaint.from_ti)
+    when "TALOS OVERDUE"
+      where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+    when "TALOS ASSIGNED"
+      where(status: 'ASSIGNED', complaint_id: Complaint.from_ti)
+    when "ALL WBNP"
+      where(complaint_id: Complaint.from_wbnp)
+    when "NEW WBNP"
+      where(status: 'NEW', complaint_id: Complaint.from_wbnp)
+    when "WBNP OVERDUE"
+      where(complaint_id: Complaint.from_wbnp).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+    when "WBNP ASSIGNED"
+      where(status: 'ASSIGNED', complaint_id: Complaint.from_wbnp)
+    when "ALL INTERNAL"
+      where(complaint_id: Complaint.from_int)
+    when "NEW INTERNAL"
+      where(status: 'NEW', complaint_id: Complaint.from_int)
+    when "INTERNAL OVERDUE"
+      where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours)
+    when "INTERNAL ASSIGNED"
+      where(status: 'ASSIGNED', complaint_id: Complaint.from_int)
+    when "ALL PENDING"
+      where(status: 'PENDING')
+    when "PENDING OVERDUE"
+      where(status: 'PENDING').where("created_at < ?",Time.now - 12.hours)
+    when "ALL"
+      all
+    else
+      all
     end
   end
 
@@ -1060,7 +1059,7 @@ class ComplaintEntry < ApplicationRecord
       relation =
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
     end
-    
+
     if params['jira_id'].present?
       relation = relation.joins(complaint: {import_urls: :jira_import_task}).where(jira_import_tasks: {issue_key: present_params['jira_id']})
     end
@@ -1147,8 +1146,8 @@ class ComplaintEntry < ApplicationRecord
     if ip_or_uri.present?
       vals = ip_or_uri.map{ |e| "'#{e}'"}.join(',')
       relation = relation.where("complaint_entries.domain in (#{vals})")
-                         .or(where("complaint_entries.ip_address in (#{vals})"))
-                         .or(where("complaint_entries.uri in (#{vals})"))
+                     .or(where("complaint_entries.ip_address in (#{vals})"))
+                     .or(where("complaint_entries.uri in (#{vals})"))
     end
 
     complaint_fields = present_params.to_h.slice(*%w{description channel})
@@ -1158,7 +1157,7 @@ class ComplaintEntry < ApplicationRecord
         if type == Complaint::SUBMITTER_TYPE_CUSTOMER
           memo << Complaint::SUBMITTER_TYPE_CUSTOMER
         else 'GUEST'
-          memo.push(Complaint::SUBMITTER_TYPE_NONCUSTOMER, nil)
+        memo.push(Complaint::SUBMITTER_TYPE_NONCUSTOMER, nil)
         end
         memo
       end
@@ -1177,12 +1176,12 @@ class ComplaintEntry < ApplicationRecord
 
   def hostlookup
     case
-      when self.entry_type == "IP"
-        self.ip_address
-      when self.entry_type == "URI/DOMAIN"
-        self.uri
-      else
-        self.uri.blank? ? self.ip_address : self.uri
+    when self.entry_type == "IP"
+      self.ip_address
+    when self.entry_type == "URI/DOMAIN"
+      self.uri
+    else
+      self.uri.blank? ? self.ip_address : self.uri
     end
   end
 

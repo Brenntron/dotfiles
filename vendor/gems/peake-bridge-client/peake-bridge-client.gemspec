@@ -1,7 +1,7 @@
 Gem::Specification.new do |spec|
   spec.name        = 'peake-bridge-client'
-  spec.version     = '0.2.0.0'
-  spec.date        = '2021-10-05'
+  spec.version     = '0.2.0.2'
+  spec.date        = '2023-09-05'
   spec.summary     = "Talos web app gateway"
   spec.description = "Messaging service among Talos Atlas Group web apps"
   spec.authors     = ["Marlin Pierce", "Nicolette Verbeck", "Nick Herbert"]
@@ -11,10 +11,10 @@ Gem::Specification.new do |spec|
   spec.license     = 'Nonstandard'
   spec.rdoc_options += %w[-x .*]
 
-  spec.add_dependency('json',  '~> 2.6', '>=2.6.2')
-  spec.add_dependency('httpi', '~> 2.4', '>=2.4.2')
-  spec.add_dependency('curb',  '~> 0.9')
-  spec.add_dependency('openssl', '< 4.0', '>= 2.1.4')
+  spec.add_dependency('json',  '>= 2.6.2')
+  spec.add_dependency('httpi', '>= 2.4.2')
+  spec.add_dependency('curb',  '>= 0.9')
+  spec.add_dependency('openssl', '>= 2.1.4')
 
 end
 

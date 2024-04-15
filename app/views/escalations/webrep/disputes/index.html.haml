@@ -15,7 +15,7 @@
 
   .row
     .col-xs-12
-      %table.table.responsive#disputes-index
+      %table.table.responsive#disputes-index{'data-banhammer-host': Rails.configuration.banhammer_host}
         %thead
           %tr
             %th
@@ -41,6 +41,7 @@
             %th#contact-name Contact Name
             %th#contact-email Contact Email
             %th#status-comment Status Comment
+            %th#channel Channel
             %th#updated-at Last Updated
             %th
 

@@ -29,6 +29,8 @@
             %li.toggle-vis{'data-column':'9'}
               %input{type: 'checkbox', checked: true, id: 'time-submitted-checkbox'} Time Submitted
             %li.toggle-vis{'data-column':'19'}
+              %input{type: 'checkbox', checked: true, id: 'channel-checkbox'} Channel
+            %Li.toggle-vis{'data-column':'20'}
               %input{type: 'checkbox', checked: true, id: 'last-updated-checkbox'} Last Updated
 
           %ul
@@ -215,7 +217,9 @@
           .button-row-center
             %button.primary.dropdown-submit-button{type: 'button', onclick:'convert_dispute_to_webcat();', disabled: 'disabled'}
               Convert Ticket
-
+    %button.icon-autoresolved.toolbar-button.esc-tooltipped.toolbar-button-spacer{title: 'Auto Resolve', onclick: "auto_resolve_tickets(#{current_user.id});"}
+      %span.toolbar-button-text
+        Auto Resolve
   %div
     %label.toolbar-section-label
       Edit Dispute Entry

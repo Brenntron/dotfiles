@@ -73,6 +73,13 @@ Given(/^a webcat manager with id "(.*?)" exists and is logged in$/) do |user_id|
   sign_in_user
 end
 
+Given(/^a webrep user with the role "(.*?)" exists and is logged in$/) do |role|
+  @user = FactoryBot.create(:current_user, confirmed: true)
+  @user.roles << FactoryBot.create(:role, role: 'webrep user')
+  @user.roles << FactoryBot.create(:role, role: role)
+  sign_in_user
+end
+
 Given(/^current user exists$/) do
   @user = FactoryBot.create(:current_user, confirmed: true)
 end
@@ -96,6 +103,7 @@ def sign_in_user
   # click_on('top_banner_bugzilla_login_button')
   # sleep 3
 end
+
 Given (/^the user signs in$/) do
   sign_in_user
 end
@@ -190,6 +198,7 @@ Then(/^I should see user, "(.*?)", in element "(.*?)"$/) do |username, element|
 end
 
 Given(/^a user with role "(.*?)" exists within org subset "(.*?)" and is logged in$/) do |role, org_subset|
+  FactoryBot.create(:guest_company)
   @user = FactoryBot.create(:current_user, confirmed: true)
   FactoryBot.create(:org_subset, name: org_subset)
   @user.roles << FactoryBot.create(:role, role: role, org_subset_id: 1)

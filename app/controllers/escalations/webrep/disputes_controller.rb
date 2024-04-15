@@ -4,6 +4,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
   before_action :require_login
 
   def index
+    @user = current_user
     respond_to do |format|
       format.html
       format.xlsx do
@@ -34,11 +35,21 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
   def show
     @dispute = Dispute.eager_load([:dispute_comments, :dispute_emails]).eager_load(dispute_entries: [:dispute_rule_hits, :dispute_entry_preload]).where(id: params[:id]).first
-    @is_assignee = @dispute.assignee == current_user.cvs_username
-    @is_duplicate = @dispute.resolution == Dispute::DUPLICATE
-    @is_resolved = @dispute.status == Dispute::RESOLVED
+    @is_assignee =   @dispute.assignee == current_user.cvs_username
+    @is_duplicate =  @dispute.resolution == Dispute::DUPLICATE
+    @is_resolved =   @dispute.status == Dispute::RESOLVED
+    @is_processing = @dispute.status == "PROCESSING"
     @is_unassigned = @dispute.assignee == 'Unassigned'
+    @entry_disabled =
+        if @is_duplicate || !@is_resolved || !@is_processing
+          true
+        else
+          false
+        end
+
     @versioned_items = @dispute.compose_versioned_items
+    @tmi_manager = current_user.has_role?('tmi manager')
+    @tmi_viewer = current_user.has_role?('tmi viewer')
     # to compare against entry.dispute_rule_hits:
     # rulehit = @all_rulehits.find({|hit| hit.mnemonic == dispute_rule_hit.name})
     #
@@ -51,6 +62,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
     # long description
     #
     # rulehit.desc_long
+    #
     @all_rulehits = Wbrs::RuleHit.all
 
     @entries = @dispute.dispute_entries

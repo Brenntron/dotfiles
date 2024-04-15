@@ -122,6 +122,7 @@ class Webcat::Iwf
     if response.code > 204
       raise RepApi::RepApiError, "HTTP code: #{response.code} Error code #{code.to_s}: #{description}"
     else
+      response_body["IWFReportService1.0"]["rawBody"] = response.body
       data = response_body["IWFReportService1.0"]
     end
 

@@ -26,6 +26,7 @@
 //= require application/webrep/disputes-support
 //= require application/webrep/disputes
 //= require application/webrep/communications
+//= require application/webrep/advanced_search
 //= require application/sdr/disputes
 //= require application/sdr/research
 //= require application/sdr/communications
@@ -35,13 +36,13 @@
 //= require moment
 //= require resolution_message_templates
 
+//= require application/advanced_search
 //= require application/chart.pieceLabel.min
 //= require application/chartjs-plugin-annotation.min
 //= require application/chartjs-plugin-datalabels.min
 //= require application/jquery-ui.min
 //= require application/daterangepicker
 //= require application/toolbar-shortcuts
-//= require application/webrep_advanced_search
 //= require application/webcat/complaints
 //= require application/webcat/clusters
 //= require application/sdr/disputes
@@ -56,10 +57,12 @@
 //= require application/webcat/research
 //= require application/webcat/jira_imports
 //= require application/webcat/webcat_index
+//= require application/webcat/csam_reports
 //= require application/webcat/bulk_resolution_tool
 //= require application/escalations_users
 //= require application/webcat/webCatRepLookup
 //= require application/webrep/webrep-report-engine
+//= require application/webrep/autoresolve_disputes
 //= require application/file_rep/file_rep
 //= require application/file_rep/communications
 //= require application/file_rep/naming_guide
@@ -69,6 +72,7 @@
 //= require application/users
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
+//= require application/webrep/reputation_history
 //= require application/context-tags
 //= require application/dt-jquery-highlight.js
 //= require admin/admin-tools

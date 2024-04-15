@@ -18,6 +18,11 @@ Given(/^I fill in element "(.*?)" with "(.*?)"$/) do |identifier, value|
   page.find(identifier).set(value)
 end
 
+Given(/^I fill in element "(.*?)" with "(.*?)" and press enter$/) do |identifier, value|
+  page.find(identifier).set(value)
+  page.find(identifier).native.send_keys(:enter)
+end
+
 Given(/^I clear element "(.*?)"$/) do |identifier|
   page.find(identifier).send_keys [:backspace]
 end
@@ -472,7 +477,7 @@ Then(/^I search for bug id "(.*?)"$/) do |value|
 end
 
 Then(/^take a screenshot$/) do
-  page.save_screenshot('/tmp/screenshot.png', :full => true)
+  page.save_screenshot('/tmp/screenshot.png')
   `open /tmp/screenshot.png`
 end
 
@@ -663,4 +668,22 @@ end
 
 When(/^I click element with tag "(.*?)" and text "(.*?)"$/) do |tag, text|
   page.find(tag, text: text).click
+end
+
+
+#can use the following for whatever css but it's especially useful for finding if an id has a class
+And(/^I should see an element with an id and class of "(.*?)"$/) do | id_class_combo |
+  expect(page.has_css?(id_class_combo)).to eq true
+end
+
+And(/^I should not see an element with an id and class of "(.*?)"$/) do | id_class_combo |
+  expect(page.has_css?(id_class_combo)).to eq false
+end
+
+And(/^I should see element "(.*?)" with text "(.*?)" a total of "(.*?)" times/) do | element , text, count |
+  page.all("#{element}", :text => "#{text}").count.should == count.to_i
+end
+
+And(/the first row of table "(.*?)" and col "(.*?)" should have content "(.*?)"/) do | table, col, content|
+  page.find("##{table} tbody .#{col}", match: :first).text.should match(content)
 end

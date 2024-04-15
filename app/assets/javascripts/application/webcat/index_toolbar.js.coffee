@@ -9,6 +9,18 @@ $ ->
     toggle_display_data(this)
     save_display_prefs()
 
+  $("#self_review").click ->
+    self_review = $(this).prop('checked')
+
+    data = {"enabled": self_review}
+    std_msg_ajax(
+      url: "/escalations/api/v1/escalations/user_preferences/update"
+      method: "POST"
+      data: {data, name: "SelfReview"}
+      dataType: "json"
+      success: (response) ->
+    )
+
 window.get_display_prefs = () ->
   current_filter = get_current_webcat_filter() #check which page user is on for filter purposes
   std_msg_ajax(
@@ -165,7 +177,9 @@ window.check_enable_toolbar_buttons = () ->
     $('.take-ticket-toolbar-button').removeAttr('disabled')
     $('.return-ticket-toolbar-button').removeAttr('disabled')
     $('.remove-assignee-toolbar-button').removeAttr('disabled')
-    $('.ticket-owner-button').removeAttr('disabled')
+    if $('.ticket-owner-button').attr('data-user-role') == 'manager'
+      $('.ticket-owner-button').removeAttr('disabled')
+
   else
     $('.open-selected').attr('disabled', 'disabled')
     $('#convert-ticket-button').attr('disabled', 'disabled')
@@ -178,7 +192,7 @@ window.check_enable_toolbar_buttons = () ->
 
 # Opening urls in tabs
 
-window.open_selected = () ->
+window.open_selected_urls = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
@@ -213,7 +227,14 @@ open_selected = (selected_rows, toggle) ->
         new_domain = domain
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
-        window.open("http://"+selected_row.ip_address)
+        ipv4_regex = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/gm
+
+        # Because IPv6 includes colons an IPv6 must be wrapped in square brackets if it's used as a hostname.
+        if ipv4_regex.test(selected_row.ip_address)
+          window.open("http://#{selected_row.ip_address}")
+        else
+          console.log "Opening #{selected_row.ip_address}"
+          window.open("http://[#{selected_row.ip_address}]")
 
   if low_rep_entries.length >= 10
     error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores."
@@ -227,8 +248,7 @@ open_selected = (selected_rows, toggle) ->
         domains_and_ips.push "<li>#{lre.ip_address}</li>"
 
     error_message = "#{low_rep_entries.length} row(s) could not open due to low WBRS Scores. <ul>#{domains_and_ips.join('')}</ul>"
-
-  show_message('error', "#{error_message}", false, '#alertMessage')
+    show_message('error', "#{error_message}", false, '#alertMessage')
 
 
 
@@ -349,7 +369,7 @@ window.webcat_change_assignee = () ->
       data: data
       dataType: 'json'
       success: (response) ->
-        $('#webcat-change-assignee-index-dropdown').dropdown('toggle')
+        $('#index_change_assign').dropdown('toggle')
         json = $.parseJSON(response)
         if json.error
           if jQuery.type(json.error) != 'array'

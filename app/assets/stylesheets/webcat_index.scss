@@ -118,6 +118,9 @@
   .edit-cat-col {
     min-width: 300px;
   }
+  .channel-row {
+    text-transform: capitalize;
+  }
   button {
     background-color: #D7DADB;
     background-repeat: no-repeat;
@@ -238,7 +241,6 @@
     &:hover {
       background-color: darken(#D7DADB, 10%)
     }
-
   }
 }
 
@@ -526,7 +528,7 @@ table.dataTable tbody tr.submitting-entry {
   display: inline-block;
 }
 
-.entry-id-row a {
+.entry-id-row a, .entry-id-col {
   text-decoration: underline;
 }
 
@@ -847,4 +849,18 @@ table.dataTable tbody tr.submitting-entry {
     max-height: 100px;
     border: none;
   }
+}
+
+#complaints-nav-search-wrapper {
+  padding: 0 10px !important;
+
+  .input-group.search-group {
+    margin: 8px 0;
+  }
+}
+
+.email-response-text {
+  font-size: 13px;
+  padding-top: 4px;
+  line-height: 1.15em;
 }

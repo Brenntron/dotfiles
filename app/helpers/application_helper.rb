@@ -45,6 +45,10 @@ module ApplicationHelper
     current_user&.has_role?(['admin', 'analyst', 'committer', 'build coordinator', 'manager'])
   end
 
+  def ips_escalator?
+    current_user&.has_role?(['ips escalator', 'ips escalator manager'])
+  end
+
   def role_options_for(user)
     if user.has_role?('admin')
       Role.all
