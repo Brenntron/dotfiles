@@ -1,7 +1,7 @@
 = form_for NamedSearch.new, url: escalations_webcat_complaint_entries_path, method: 'get', 'accept-charset': 'UTF-8', html: {id: 'cat_named_search'} do |named_form|
   -# Default search criteria
   .form-group.search-item.hidden-selectize-dropdown
-    %label.content-label-sm{for: 'ip_or_uri'} Complaint (URL/IP/Domain)
+    %label.content-label-sm{for: 'ip_or_uri'} IP/URI
     %input.form-control.selectize#complaint-input{name: 'ip_or_uri', multiple: 'multiple', tabindex:'-1'}
     %button#remove-criteria-complaint.remove-input{onclick:'clearSelectize("complaint-input")', type: 'button'}
 
@@ -108,8 +108,8 @@
           -# Default shown options
           %li.hidden
             %label.search-criteria-label
-              %input.search-checkbox#complaint-cb{type: 'checkbox', name: 'search-criteria', value: 'Complaint (URL/IP/Domain)', for: 'complaint-input'}
-              Complaint (URL/IP/Domain)
+              %input.search-checkbox#complaint-cb{type: 'checkbox', name: 'search-criteria', value: 'IP/URI', for: 'complaint-input'}
+              IP/URI
           %li.hidden
             %label.search-criteria-label
               %input.search-checkbox#company-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Org', for: 'company-input'}
