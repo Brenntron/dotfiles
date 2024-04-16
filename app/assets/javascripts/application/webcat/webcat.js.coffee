@@ -70,6 +70,8 @@ $ ->
     # Get each visible search item - should either be a selectized select, or an input
     console.log $('#cat_named_search .search-item:not(:hidden)').length
 
+    form['search_name'] = $('#cat_named_search input[name="search_name"]').val()
+
     $('#cat_named_search .search-item:not(:hidden)').each ->
       # selectized values will be arrays that need to be joined
       if $(this).find('select')[0]
