@@ -1016,38 +1016,14 @@ class ComplaintEntry < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-    present_params = params.select{|ignore_key, value| value.present?}
+    present_params = params.select { |_, value| value.present? }
 
-    if present_params['status'].present?
-      present_params['status'] = present_params['status'].split(',').map {|item| item.strip }
+    if present_params['entry_id'].present?
+      present_params['id'] = present_params['entry_id'].split(',').map { |item| item.strip }
     end
 
-    if present_params['resolution'].present?
-      present_params['resolution'] = present_params['resolution'].split(',').map {|item| item.strip }
-    end
-
-    if present_params['id'].present?
-      present_params['id'] = present_params['id'].split(',').map {|item| item.strip }
-    end
-
-    if present_params['complaint_id'].present?
-      present_params['complaint_id'] = present_params['complaint_id'].split(',').map {|item| item.strip }
-    end
-
-    if present_params['channel'].present?
-      present_params['channel'] = present_params['channel'].split(',').map {|item| item.strip }
-    end
-
-    if present_params['ip_or_uri'].present?
-      present_params['ip_or_uri'] = present_params['ip_or_uri'].split(',').map {|item| item.strip }
-    end
-
-    if present_params['user_id'].present?
-      present_params['user_id'] = present_params['user_id'].split(',').map {|item| item.strip }
-    end
-
-    if present_params['jira_id'].present?
-      present_params['jira_id'] = present_params['jira_id'].split(',').map {|item| item.strip}
+    %w[status resolution complaint_id channel ip_or_uri user_id jira_id].each do |key|
+      present_params[key] = present_params[key].split(',').map { |item| item.strip } if present_params[key].present?
     end
 
     simple_params = present_params.slice(*%w{id complaint_id resolution status})
