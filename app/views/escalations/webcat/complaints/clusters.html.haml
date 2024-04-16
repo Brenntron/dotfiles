@@ -72,17 +72,17 @@
         %div
           %label.toolbar-section-label Show Platforms
           %span.toolbar-select-wrapper
-            %label.toolbar-button-label.esc-tooltipped
-              %input.show-platforms-filter.toolbar-checkbox{name: 'show-platform-WSA', value: 'WSA', type: 'checkbox', checked: true, onclick: 'webcat_platform_filter();'}
+            %label.toolbar-button-label.esc-tooltipped.wsa
+              %input.show-platforms-filter.toolbar-checkbox{name: 'WSA_platform', value: 'WSA', type: 'checkbox', checked: false}
               %span.toolbar-button-text WSA
             %label.toolbar-button-label.esc-tooltipped
-              %input.show-platforms-filter.toolbar-checkbox{name: 'show-platform-NGFW', value: 'NGFW', type: 'checkbox', checked: true, onclick: 'webcat_platform_filter();'}
+              %input.show-platforms-filter.toolbar-checkbox{name: 'NGFW_platform', value: 'NGFW', type: 'checkbox', checked: true}
               %span.toolbar-button-text NGFW
             %label.toolbar-button-label.esc-tooltipped
-              %input.show-platforms-filter.toolbar-checkbox{name: 'show-platform-Umbrella', value: 'Umbrella', type: 'checkbox', checked: true, onclick: 'webcat_platform_filter();'}
+              %input.show-platforms-filter.toolbar-checkbox{name: 'Umbrella_platform', value: 'Umbrella', type: 'checkbox', checked: true}
               %span.toolbar-button-text Umbrella
             %label.toolbar-button-label.esc-tooltipped
-              %input.show-platforms-filter.toolbar-checkbox{name: 'show-platform-Meraki', value: 'Meraki', type: 'checkbox', checked: true, onclick: 'webcat_platform_filter();'}
+              %input.show-platforms-filter.toolbar-checkbox{name: 'Meraki_platform', value: 'Meraki', type: 'checkbox', checked: true}
               %span.toolbar-button-text Meraki
         %div
           %label.toolbar-section-label Show Types
@@ -106,6 +106,7 @@
             %th
             %th Cluster ID
             %th Cluster Domain
+            %th 
             %th Global Volume
             %th WBRS Score
             %th Platform

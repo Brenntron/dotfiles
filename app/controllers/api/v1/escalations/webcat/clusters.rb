@@ -37,25 +37,24 @@ module API
               optional :f, type: String, desc: 'filter'
               optional :platform, type: String, desc: 'platform filter(WSA/NGFW/Umbrella)'
               optional :cluster_type, type: String, desc: 'cluster type filter(ip/domain)'
-              optional :save_regex, type: Boolean, desc: 'Save regex'
+              
             end
 
             # Uses class Beaker::Verdicts in old Beaker namespace.
             get "" do
               authorize!(:index, Complaint)
-              filter = {
-                f: params[:f],
-                platform: params[:platform],
-                cluster_type: params[:cluster_type]
-              }
-              clusters = ::Clusters::Fetcher.new(filter, params[:regex], params[:save_regex], current_user).fetch
-              named_search = current_user.named_searches.where(name: params[:regex]).first
-
-              if params[:save_regex]
-                named_search = NamedSearch.create!(user: current_user, name: params[:regex], project_type: 'webcat_clusters_regex') unless named_search
+              if params[:platform] == 'WSA'
+                filter = {
+                  f: params[:f],
+                  platform: params[:platform],
+                  cluster_type: params[:cluster_type]
+                }
+                clusters = ::Clusters::Fetcher.new(filter, params[:regex], params[:save_regex], current_user).fetch
+                response = {:status => "success", :data => clusters}
+              else
+                response = ::Clusters::Datatable.new(ActionController::Parameters.new(params).permit!, current_user)
               end
-
-              {:status => "success", :data => clusters, :named_search => named_search}.to_json
+              response
             end
 
             #returns an array of hashes about urls associated with a cluster_id
@@ -195,6 +194,24 @@ module API
               search.destroy_all
               true
             end
+
+            desc 'save regex search for webcat clusters'
+            params do
+              requires :regex, type: String, desc: 'filter'
+              requires :save_regex
+            end
+
+            post 'searches' do
+              named_search = current_user.named_searches.where(name: params[:regex]).first
+
+              if params[:save_regex].present? && params[:regex].present? && named_search.nil?
+                named_search = NamedSearch.create!(user: current_user, name: params[:regex], project_type: 'webcat_clusters_regex')
+              end
+
+              { status: 'success', data: named_search }.to_json
+
+            end
+
           end
         end
       end

@@ -7,8 +7,8 @@ describe Clusters::Umbrella::DataFetcher do
   let(:filter) { {} }
 
   before do
-    FactoryBot.create(:umbrella_cluster, domain: '127.0.0.1')
-    FactoryBot.create(:umbrella_cluster, domain: 'example.com')
+    FactoryBot.create(:cluster, :umbrella, domain: '127.0.0.1')
+    FactoryBot.create(:cluster, :umbrella, domain: 'example.com')
   end
 
   describe '.fetch' do
@@ -94,7 +94,7 @@ describe Clusters::Umbrella::DataFetcher do
       context 'pending filter' do
         let(:filter) { { f: 'pending' } }
 
-        before { UmbrellaCluster.last.pending! }
+        before { WebCatCluster.umbrella.last.pending! }
 
         let(:expected_response) do
           [

@@ -25,7 +25,7 @@ class Clusters::Umbrella::DataFetcher < Clusters::Templates::DataFetcher
   private
 
     def fetch_data
-      data = UmbrellaCluster.visible.order(traffic_hits: :desc)
+      data = WebCatCluster.umbrella.visible.order(traffic_hits: :desc)
 
       case filter[:f]
       when 'my'

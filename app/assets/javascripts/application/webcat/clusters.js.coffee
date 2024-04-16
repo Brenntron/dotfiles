@@ -43,7 +43,7 @@ window.apply_filter_to_table = () ->
   $('#regex-filter').html(filter)
 
   populate_clusters_index_table(filter)
-
+    
 window.populate_clusters_index_table = (filter) ->
   if $('#clusters-index_wrapper').length > 0
     loader = $('.cluster-mgt-loader-wrapper')
@@ -58,34 +58,42 @@ window.populate_clusters_index_table = (filter) ->
       filter_param += "&regex=" + filter
     if save_regex && filter_param
       filter_param += "&save_regex=" + save_regex
+    table =  $("#clusters-index").DataTable()
+    if save_regex
+      $.ajax(
+        url: "/escalations/api/v1/escalations/webcat/clusters/searches"
+        headers: window.headers()
+        data: { save_regex: save_regex, regex: filter}
+        method: 'POST'
+        success: (response) ->
+          search = $.parseJSON(response).data
+          $('#saved-search-tbody').append("<tr id='saved_search_#{search.id}'><td><a class='input-truncate saved-search esc-tooltipped tooltipstered' name='#{search.name}' onclick='build_webcat_clusters_named_search(this);'>#{filter}</a><a class='delete-search' name='#{search.name}' onclick='delete_clusters_named_search(this);' title='Delete Saved Search'><img src='/assets/icon_cancel_grey.svg'></a></td></tr>")
 
-    $.ajax(
-      url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
-      method: 'GET'
-      headers: window.headers()
-      success: (response) ->
-        loader.addClass('hidden')
-        json = $.parseJSON(response)
-        if json.data.length == 0
-          std_msg_error("No clusters available.","")
-        if json.error
-          std_msg_error('Table Error', [json.error])
-        else
-          datatable = $('#clusters-index').DataTable()
-          datatable.clear();
-          datatable.rows.add(json.data);
-          datatable.draw();
-          selectize_category_inputs();
-          populate_cat_select(json.data)
+      )
+    if window.location.search.includes('WSA')
+      $.ajax(
+        url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
+        method: 'GET'
+        headers: window.headers()
+        success: (response) ->
+          loader.addClass('hidden')
+          if response.data.length == 0
+            std_msg_error("No clusters available.","")
+          if response.error
+            std_msg_error('Table Error', [response.error])
+          else
+            datatable = $('#clusters-index').DataTable()
+            datatable.clear();
+            datatable.rows.add(response.data);
+            datatable.draw();
 
-          if save_regex && $(".saved-search[name='#{filter}']").length < 1
-            $('#saved-search-tbody').append("<tr id='saved_search_#{json.named_search.id}'><td><a class='input-truncate saved-search esc-tooltipped tooltipstered' name='#{filter}' onclick='build_webcat_clusters_named_search(this);'>#{filter}</a><a class='delete-search' name='#{filter}' onclick='delete_clusters_named_search(this);' title='Delete Saved Search'><img src='/assets/icon_cancel_grey.svg'></a></td></tr>")
+        error: (response) ->
+          loader.addClass('hidden')
+          std_msg_error('Table Error', [response.responseText])
+      , this)
+    else
+      table.ajax.url("/escalations/api/v1/escalations/webcat/clusters.json" + filter_param).load()    
 
-
-      error: (response) ->
-        loader.addClass('hidden')
-        std_msg_error('Table Error', [response.responseText])
-    , this)
 
 window.build_webcat_clusters_named_search = (namedSearch) ->
   $("#cluster_filter_field").val($(namedSearch).attr('name'))
@@ -176,7 +184,6 @@ window.categorize_clusters = (review_action) ->
       url: url
       method: 'POST'
       headers: window.headers()
-      data: data
       success: (response) ->
         loader.addClass('hidden')
         json = $.parseJSON(response)
@@ -214,148 +221,35 @@ window.categorize_clusters = (review_action) ->
 
 
 $ ->
-#  Populate the cluster management table (temp data currently)
-  window.clusters_table = $('#clusters-index').DataTable(
-    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
-    language: {
-      search: "_INPUT_"
-      searchPlaceholder: "Search within table"
-    }
-    pagingType: 'full_numbers'
-    order: [ [
-      5
-      'desc'
-    ] ]
-    lengthMenu: [50, 100, 200]
-    columnDefs: [
-      {
-        targets: [
-          0
-          1
-          2
-          9
-          10
-        ]
-        orderable: false
-        searchable: false
-        sortable: false
-      }
-      {
-        targets: [2]
-        className: 'important-flag-col'
-        searchable: false
-        orderable: false
-      }
-    ]
-    columns: [
-      {
-        data: null
-        width: '14px'
-        className: 'expandable-row-column'
-        'render':(data,type,full,meta)->
-          if full.platform == 'WSA'
-            return "<button class='expand-row-button-inline expand-row-button-#{data.cluster_id}'></button>"
-          else
-            return "<span />"
-      }
-      {
-        data: null
-        render: (data, type, full, meta) ->
-          element_id = "cluster_row_#{meta.row}"
-          return "<input type='checkbox' class='cluster-row-select' name='#{element_id}' id='#{element_id}' onclick='window.selectRow(#{element_id})'>"
-      }
-      {
-        data: null
-        width: '10px'
-        defaultContent: '<span></span>'
-        render: ( data )->
-          { is_important } = data
-          if is_important
-            '<span class="entry-important-flag esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
-      }
-      {
-        data: 'cluster_id'
-        width: '100px'
-        className: 'cluster_identifier'
-      }
-      {
-        data: null
-        className: 'domain-column',
-        render:  (data, _type, _full, meta) ->
-          {domain, cluster_size, platform, duplicates} = data  # get domain string and cluster_size out of the data
-          is_ip = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+  $('.show-platforms-filter').click (event) ->
+    if event.target.value == 'WSA' && event.target.checked
+      $("[name='NGFW_platform'], [name='Umbrella_platform'], [name='Meraki_platform']").prop('checked', false)
+    if event.target.value != 'WSA' && event.target.checked
+      $("[name='WSA_platform']").prop('checked', false)
+    platforms = $("input.show-platforms-filter:checked")
 
-          html = "<span ondblclick='copy_domain(\"#{domain}\", this)'> #{domain} </span>"
+    selected_platform = []
+    platforms.each -> selected_platform.push($(this).val());
+  
+    url = new URL(document.location.href)
+    url.searchParams.set('platform', selected_platform)
+    document.location = url;
+  
+  window.build_clusters_filters = ()=>
+    filter_param = window.location.search
+    if $('#clusters-index_wrapper').length > 0
+      loader = $('.cluster-mgt-loader-wrapper')
+      loader.removeClass('hidden')
 
-          # only show WHOIS lookup button for normal domains, not ip addresses
-          if !is_ip.test(domain)
-            html += "<button type='button' class='whois-btn right-margin esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='WebCat.RepLookup.whoIsLookup(\"#{domain}\")'></button>"
-          else
-            html += "<button type='button' class='whois-btn right-margin domain-spacer'></button>"
+      filter_param = window.location.search
+      save_regex = $('#saveRegex')[0].checked
 
-          html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
-                   <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
-
-          if duplicates && duplicates.length > 0
-            html += "<button type='button' class='cluster-dup-btn right-margin esc-tooltipped' title='Show duplicates' onclick='show_duplicates(#{meta.row})'></button>"
-
-          if platform == 'WSA'
-            html += "<span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
-          return html
-      }
-      {
-        data: 'global_volume'
-      }
-      {
-        data: 'wbrs_score'
-      }
-      {
-        data: 'platform'
-      }
-      {
-        data: 'assigned_to'
-        className: "alt-col assignee-col"
-        render: (data, type, full, meta) ->
-          escaped_domain = full.domain.replaceAll('.', '_') # jquery doesn't like dots in id
-          return "<span id='owner_#{escaped_domain}_#{full.platform}'> #{data} </span>"
-      }
-      {
-        data: 'cluster_id'
-        className: 'category-column'
-        render: (data, type, full, meta) ->
-          escaped_domain = full.domain.replaceAll('.', '_') # jquery doesn't like dots in id
-          "<select id='#{escaped_domain}_#{full.platform}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='6' name='' #{if full.is_pending then 'disabled'}>"
-      }
-      {
-        data: 'cluster_id'
-        className: "alt-col"
-        width: '70px'
-        defaultContent: '<span></span>'
-        render: (data, type, full, meta) ->
-          if full.is_pending
-            return "<div class='cluster-btn-container'>
-                      <button class='toolbar-button icon-submit toolbar-button-spacer cluster-submit-button tooltipped' onclick='window.approve_cluster(#{meta.row})' type='button' title='Confirm Changes' />
-                      <button class='toolbar-button cluster-cancel-button tooltipped' onclick='window.decline_cluster(#{meta.row})' type='button' title='Decline Updates' />
-                    </div>"
-      }
-    ]
-    initComplete: ->
-      setTimeout (->
-#         ensure the tooltips on cluster categories buttons appear on init and redraw, deal with lag
-        $('#clusters-index .tooltipped').tooltipster
-          theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
-      ), 500
-    drawCallback: ->
-      setTimeout (->
-        $('#clusters-index .tooltipped').tooltipster
-          theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
-      ), 500
-  )
-  $('#clusters-index_filter input').addClass('table-search-input');
-  window.populate_clusters_index_table()
-  window.build_clusters_header()
-
-$ ->
+      if filter_param.length == 0
+        filter_param += "?f=all"
+      if save_regex && filter_param
+        filter_param += "&save_regex=" + save_regex
+    
+    filter_param
   $(document).ready ->
     # uncheck the select all checkbox on page change.
     $('#clusters-index').DataTable().on('page.dt', () ->
@@ -549,7 +443,7 @@ window.populate_cat_select = ->
   setTimeout (->
     data = $("#clusters-index").DataTable().data()
     for cluster in data
-      if cluster.is_pending
+      if cluster.is_pending == 'true'
         escaped_domain = cluster.domain.replaceAll('.', '_')
         cat_select = $("##{escaped_domain}_#{cluster.platform}_categories")[0]
         if cat_select
@@ -592,7 +486,7 @@ $ ->
   $("#clusters-index").on 'draw.dt order.dt', ->
     selectize_category_inputs()
     populate_cat_select()
-
+# 
   #  Expand cluster rows
   $('#clusters-index tbody').on 'click', '.expand-row-button-inline, .entry-count', ->
     expandSingleRow(this)
@@ -1092,6 +986,13 @@ window.build_clusters_header = () ->
 window.webcat_clusters_refresh = () ->
   window.location.replace('/escalations/webcat/clusters');
 
+window.htmlEntitiesDecode = (str) ->
+  str.replace(/&gt;/g, '>')
+     .replace(/&quot;/g, '"')
+     .replace(/&apos;/g, "'")
+     .replace(/&amp;/g, '&')
+     .replace(/&lt;/g, '<')
+
 window.show_duplicates = (row) ->
   AC.WebCat.getAUPCategories().then((categories) ->
     $('#clusters-index-duplicates').find('tbody').html('')
@@ -1100,8 +1001,8 @@ window.show_duplicates = (row) ->
       reverted_categories[value] = key.split(' - ')[0]
 
     data = window.clusters_table.row(row).data()
-    duplicates = data.duplicates
 
+    duplicates = JSON.parse(window.htmlEntitiesDecode(data.duplicates))
     for duplicate in duplicates
       row = "<tr>"
       # check if already converted ids to names
@@ -1134,17 +1035,6 @@ window.category_ids_to_names = (categories_hash, category_ids) ->
     categories.push(categories_hash[category_id])
   return categories
 
-window.webcat_platform_filter = () ->
-  platforms = $("input.show-platforms-filter:checked")
-  if $(platforms).length == 4 || $(platforms).length == 0
-    selected_platform = 'All'
-  else
-    selected_platform = []
-    platforms.each -> selected_platform.push($(this).val());
-  url = new URL(document.location.href)
-  url.searchParams.set('platform', selected_platform)
-  document.location = url;
-
 window.webcat_cluster_type_filter = () ->
   types = $("input.show-cluster-types-filter:checked")
   if $(types).length > 1 || $(types).length == 0
@@ -1154,22 +1044,18 @@ window.webcat_cluster_type_filter = () ->
   url = new URL(document.location.href)
   url.searchParams.set('cluster_type', selected_type)
   document.location = url;
-
 $ ->
   $(document).ready ->
     url = new URL(document.location.href)
     platform = url.searchParams.get('platform')
     cluster_type = url.searchParams.get('cluster_type')
     dropdownShouldToggle = true
-
-    if(platform)
-      if platform == 'All'
-        $("input.show-platforms-filter").prop('checked', true)
-      else
-        platforms = platform.split(',')
-        $("input.show-platforms-filter").prop('checked', false)
-        for platform in platforms
-          $("input.show-platforms-filter[name='show-platform-#{platform}'").prop('checked', true)
+     
+    platforms = if platform then  platform.split(',') else ['Umbrella', 'Meraki', 'NGFW']
+    $("input.show-platforms-filter").prop('checked', false)
+   
+    for platform in platforms
+      $("[name='#{platform}_platform']").prop('checked', true)
 
     if(cluster_type)
       if cluster_type == 'all'
@@ -1177,4 +1063,173 @@ $ ->
       else
         $("input.show-cluster-types-filter").prop('checked', false)
         $("input.show-cluster-types-filter[name='show-cluster-#{cluster_type}'").prop('checked', true)
+
+
+  @tableAttributes =
+    language: {
+      search: "_INPUT_"
+      searchPlaceholder: "Search within table"
+    }
+    pagingType: 'full_numbers'
+    order: [ [
+      6
+      'desc'
+    ] ]
+    lengthMenu: [50, 100, 200]
+    columnDefs: [
+      {
+        targets: [
+          0
+          1
+          2
+          5
+          7
+          10
+          11
+        ]
+        orderable: false
+        searchable: false
+        sortable: false
+      }
+      {
+        targets: [2]
+        className: 'important-flag-col'
+        searchable: false
+        orderable: false
+        orderable: true
+      }
+    ]
+    columns: [
+      {
+        data: null
+        width: '14px'
+        className: 'expandable-row-column'
+        'render':(data,type,full,meta)->
+          if full.platform == 'WSA'
+            return "<button class='expand-row-button-inline expand-row-button-#{data.cluster_id}'></button>"
+          else
+            return "<span />"
+      }
+      {
+        data: null
+        render: (data, type, full, meta) ->
+          element_id = "cluster_row_#{meta.row}"
+          return "<input type='checkbox' class='cluster-row-select' name='#{element_id}' id='#{element_id}' onclick='window.selectRow(#{element_id})'>"
+      }
+      {
+        data: null
+        width: '10px'
+        defaultContent: '<span></span>'
+        render: ( data )->
+
+          { is_important } = data
+          if is_important == 'true'
+            '<span class="entry-important-flag esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
+      }
+      {
+        data: 'cluster_id'
+        width: '100px'
+        className: 'cluster_identifier'
+      }
+      {
+        data: 'domain'
+        className: 'domain-column'
+        render: (data) ->
+           "<span ondblclick='copy_domain(\"#{data}\", this)'> #{data} </span>"
+      }
+      {
+        data: null
+        className: 'cluster-actions',
+        with: '100px',
+        render:  (data, _type, _full, meta) ->
+          {domain, cluster_size, platform, duplicates} = data  # get domain string and cluster_size out of the data
+          is_ip = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+
+          html = ""
+
+          # only show WHOIS lookup button for normal domains, not ip addresses
+          if !is_ip.test(domain)
+            html += "<button type='button' class='whois-btn  esc-tooltipped' title='WHOIS Domain Lookup Information' onclick='WebCat.RepLookup.whoIsLookup(\"#{domain}\")'></button>"
+          else
+            html += "<button type='button' class='whois-btn right-margin'></button>"
+
+          html += "<button type='button' class='google-btn right-margin esc-tooltipped' title='Google it!' onclick='window.open(\"https://www.google.com/search?q=#{domain}\", \"_blank\")'></button>
+                  <button type='button' onclick='window.open(\"https://#{domain}\", \"_blank\")' class='open-in-tab-btn right-margin esc-tooltipped' title='Open #{domain} in a new tab'></button>"
+          
+          if window.htmlEntitiesDecode(duplicates) != '[]'
+            html += "<button type='button' class='cluster-dup-btn right-margin esc-tooltipped' title='Show duplicates' onclick='show_duplicates(#{meta.row})'></button>"
+
+          if platform == 'WSA'
+            html += "<span class='vertical-separator'></span><span class='entry-count'>#{cluster_size}</span>"
+          return html
+      }
+      {
+        data: 'global_volume'
+      }
+      {
+        data: 'wbrs_score'
+      }
+      {
+        data: 'platform'
+      }
+      {
+        data: 'assigned_to'
+        orderable: true
+        className: "alt-col assignee-col"
+        render: (data, type, full, meta) ->
+          escaped_domain = full.domain.replaceAll('.', '_') # jquery doesn't like dots in id
+          return "<span id='owner_#{escaped_domain}_#{full.platform}'> #{data} </span>"
+      }
+      {
+        data: 'cluster_id'
+        className: 'category-column'
+        render: (data, type, full, meta) ->
+          escaped_domain = full.domain.replaceAll('.', '_') # jquery doesn't like dots in id
+          "<select id='#{escaped_domain}_#{full.platform}_categories' class='form-control selectize cluster_categories' multiple='multiple' placeholder='Enter up to 5 categories' value='6' name='' #{if full.is_pending == 'true' then 'disabled'}>"
+      }
+      {
+        data: 'cluster_id'
+        className: "alt-col"
+        width: '70px'
+        defaultContent: '<span></span>'
+        render: (data, type, full, meta) ->
+          if full.is_pending == 'true'
+            return "<div class='cluster-btn-container'>
+                      <button class='toolbar-button icon-submit toolbar-button-spacer cluster-submit-button tooltipped' onclick='window.approve_cluster(#{meta.row})' type='button' title='Confirm Changes' />
+                      <button class='toolbar-button cluster-cancel-button tooltipped' onclick='window.decline_cluster(#{meta.row})' type='button' title='Decline Updates' />
+                    </div>"
+      }
+    ]
+    initComplete: ->
+      setTimeout (->
+#         ensure the tooltips on cluster categories buttons appear on init and redraw, deal with lag
+        $('#clusters-index .tooltipped').tooltipster
+          theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+      ), 500
+    drawCallback: ->
+      setTimeout (->
+        $('#clusters-index .tooltipped').tooltipster
+          theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+      ), 500
+      loader = $('.cluster-mgt-loader-wrapper')
+      if loader.length > 0
+        loader.addClass('hidden')
+
+  if window.location.search.includes('WSA')
+    @additional_attributes = {processing: true, pagin: true}
+  else
+    @additional_attributes = {
+      serverSide: true
+      processing: true
+      ajax:
+        url: ("/escalations/api/v1/escalations/webcat/clusters.json" + window.build_clusters_filters())
+        headers: window.headers()
+    }
+  window.clusters_table = $('#clusters-index').DataTable($.extend({}, @tableAttributes, @additional_attributes))
+
+  $('#clusters-index_filter input').addClass('table-search-input');
+
+  window.populate_clusters_index_table()
+  window.build_clusters_header()
+
 
