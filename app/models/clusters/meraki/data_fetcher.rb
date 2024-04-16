@@ -25,7 +25,7 @@ class Clusters::Meraki::DataFetcher < Clusters::Templates::DataFetcher
   private
 
   def fetch_data
-    data = MerakiCluster.visible.order(traffic_hits: :desc)
+    data = WebCatCluster.meraki.visible.order(traffic_hits: :desc)
 
     case filter[:f]
     when 'my'

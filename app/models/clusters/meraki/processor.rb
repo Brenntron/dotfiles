@@ -50,7 +50,7 @@ class Clusters::Meraki::Processor < Clusters::Templates::Processor
 
   def decline
     cluster_domains = clusters.map { |cluster| cluster[:domain] }
-    MerakiCluster.where(domain: cluster_domains).update(category_ids: '', status: :created)
+    WebCatCluster.meraki.where(domain: cluster_domains).update(category_ids: '', status: :created)
     # assign clusters to the person who declined current categorization
     clusters.each do |cluster|
       ClusterAssignment.assign!(cluster, user)
@@ -92,7 +92,7 @@ class Clusters::Meraki::Processor < Clusters::Templates::Processor
   end
 
   def meraki_cluster(cluster)
-    MerakiCluster.find_by(domain: cluster[:domain])
+    WebCatCluster.meraki.find_by(domain: cluster[:domain])
   end
 
   def third_person_review_cluster?(cluster)

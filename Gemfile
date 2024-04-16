@@ -57,7 +57,7 @@ gem "net-imap"
 gem "uri", "0.12.0"
 gem 'httparty', '~> 0.15.3'
 
-gem 'peake-bridge-client', '~> 0.2.1' , path: 'vendor/gems/peake-bridge-client'
+gem 'peake-bridge-client', '~> 0.2.0', '>= 0.2.0.2', path: 'vendor/gems/peake-bridge-client'
 
 gem 'stomp', '1.4.6'
 #gem 'aws-sdk', '2.11.170'

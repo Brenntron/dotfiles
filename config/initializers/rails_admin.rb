@@ -72,19 +72,17 @@ RailsAdmin.config do |config|
       "FileReputationDispute",
       "ImportUrl",
       "JiraImportTask",
-      "MerakiCluster",
-      "NgfwCluster",
       "Platform",
       "ResolutionMessageTemplate",
       "SenderDomainReputationDispute",
       "SenderDomainReputationDisputeAttachment",
       "SenderDomainReputationDisputeComment",
       "SenderDomainReputationEmailTemplate",
-      "UmbrellaCluster",
       "User",
       "UserApiKey",
       "UserPreference",
-      "WebcatCredit"
+      "WebcatCredit",
+      'WebCatCluster'
   ]
 
   config.actions do

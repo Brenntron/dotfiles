@@ -783,6 +783,10 @@ button {
   height: 20px;
 }
 
+.toolbar-button-label.wsa {
+  border-right: 4px solid #fffbfb;
+}
+
 .toolbar-button-spacer {
   margin-right: 3px
 }
@@ -5431,13 +5435,19 @@ table > tbody > tr > td.dispute_rep_tools {
   margin-top: 1px;
 }
 
+.cluster-actions {
+  .entry-count {
+    margin-right: 4px;
+  }
+}
+
 // webcat clusters table light gray border
-.domain-column .vertical-separator {
+.cluster-actions .vertical-separator {
   border-right: 1px solid $nav-toolbar-color;
   display: inline-block;
   height: 16px;
   margin-top: 3px;
-  margin-right: 8px;
+  margin-right: 4px;
   padding: 1px;
   float: right;
   transform: none;  // remove the odd transformY property
@@ -9777,11 +9787,14 @@ td.text-center span {
 .category-column fieldset {
   margin: 0;
 }
-
 .domain-column {
-  min-width: 300px;
+  min-width: 200px;
 }
 
+.cluster-actions {
+  min-width: 102px;
+  padding: 4px
+}
 #copycat_dialog {
   overflow: visible;
 
