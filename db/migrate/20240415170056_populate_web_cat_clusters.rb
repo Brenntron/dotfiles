@@ -1,4 +1,6 @@
 class PopulateWebCatClusters < ActiveRecord::Migration[6.1]
+  CHUNK_SIZE = 5000
+
   def up
     umbrella_data = UmbrellaCluster.all.map do |cluster|
       {
@@ -42,10 +44,21 @@ class PopulateWebCatClusters < ActiveRecord::Migration[6.1]
       }
     end
 
-    # Perform bulk inserts for each data set
-    WebCatCluster.insert_all!(umbrella_data)
-    WebCatCluster.insert_all!(ngfw_data)
-    WebCatCluster.insert_all!(meraki_data)
+
+    # Process Umbrella data in chunks
+    umbrella_data.each_slice(CHUNK_SIZE) do |chunk|
+      WebCatCluster.insert_all!(chunk)
+    end
+
+    # Process NGFW data in chunks
+    ngfw_data.each_slice(CHUNK_SIZE) do |chunk|
+      WebCatCluster.insert_all!(chunk)
+    end
+
+    # Process Meraki data in chunks
+    meraki_data.each_slice(CHUNK_SIZE) do |chunk|
+      WebCatCluster.insert_all!(chunk)
+    end
   end
 
   def down
