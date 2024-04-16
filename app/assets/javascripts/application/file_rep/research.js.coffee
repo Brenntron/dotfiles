@@ -335,8 +335,11 @@ window.update_file_rep_data = () ->
 
 ########### REVERSING LABS LOCAL API ############
 window.get_local_reversinglabs_api = () ->
+  unless $('body').hasClass('escalations--file_rep--disputes-controller') && $('body').hasClass('show-action')
+    return
+    
   file_rep_id = $(".case-id-tag")[0].innerText
-
+  
   threat_name = $("#local-rl-threat-name")
   threat_status = $("#local-rl-threat-status")
   threat_scan = $("#local-rl-threat-scan")

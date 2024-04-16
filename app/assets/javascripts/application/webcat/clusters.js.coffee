@@ -1211,6 +1211,9 @@ $ ->
         $('#clusters-index .tooltipped').tooltipster
           theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
       ), 500
+      loader = $('.cluster-mgt-loader-wrapper')
+      if loader.length > 0
+        loader.addClass('hidden')
 
   if window.location.search.includes('WSA')
     @additional_attributes = {processing: true, pagin: true}

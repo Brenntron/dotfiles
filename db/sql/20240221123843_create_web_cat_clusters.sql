@@ -12,6 +12,8 @@ CREATE TABLE web_cat_clusters (
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );
+-- Add index to new table
+ALTER TABLE web_cat_clusters ADD INDEX idx_web_cat_clusters_cluster_type (cluster_type);
 
 -- populate new table
 INSERT INTO web_cat_clusters (domain, platform_id, category_ids, status, traffic_hits, comment, cluster_type, created_at, updated_at)
@@ -25,7 +27,4 @@ SELECT domain, platform_id, category_ids, status, traffic_hits, comment, 'Meraki
 
 -- Insert timestamp into schema_migrations
 INSERT INTO `schema_migrations` (`version`) VALUES ('20240221123843');
-
-drop table umbrella_clusters;
-drop table ngfw_clusters;
-drop table meraki_clusters;
+INSERT INTO `schema_migrations` (`version`) VALUES ('20240415170056');
