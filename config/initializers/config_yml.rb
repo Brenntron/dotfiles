@@ -244,6 +244,16 @@ bast_config = env_config.fetch('bast', nil)
 raise 'config.yml missing bast section' unless bast_config
 Rails.configuration.bast = ApiRequester::ApiRequester.config_of(bast_config)
 
+
+abuse_emails_config = env_config.fetch('abuse_emails', nil)
+raise 'config.yml missing abuse emails section' unless abuse_emails_config
+Rails.configuration.abuse_emails = abuse_emails_config['emails']
+
+ncmec_config = env_config.fetch('ncmec', nil)
+raise 'config.yml missing ncmec section' unless ncmec_config
+Rails.configuration.ncmec_username = ncmec_config['username']
+Rails.configuration.ncmec_password = ncmec_config['password']
+
 resolution_report_config = env_config.fetch('resolution_report', nil)
 raise 'config.yml missing resolution_report section' unless resolution_report_config
 Rails.configuration.resolution_report = OpenStruct.new
@@ -252,6 +262,7 @@ Rails.configuration.resolution_report.cache_expiration = resolution_report_confi
 banhammer_host = env_config.dig('banhammer', 'host')
 raise 'config.yml missing banhammer section' unless banhammer_host
 Rails.configuration.banhammer_host = banhammer_host
+
 
 
 

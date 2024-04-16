@@ -44,7 +44,6 @@ class Ability
       end
       can :manage, [Complaint, ComplaintEntry, ResolutionMessageTemplate]
       can [:read, :show_multiple, :advanced_search, :named_search, :standard_search, :contains_search], Complaint
-      can :manage, [Complaint, ComplaintEntry, ResolutionMessageTemplate]
     end
 
     if role_names.include?('webcat user')

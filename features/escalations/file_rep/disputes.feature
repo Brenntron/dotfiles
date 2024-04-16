@@ -6,6 +6,7 @@ Feature: Disputes
   Scenario: a user visits their profile page and edits their ThreatGrid and Sandbox API Keys
     Given a user with role "admin" exists and is logged in
     And I go to "/escalations/users/1"
+    And I wait for "2" seconds
     And I click ".edit-button"
     When I fill in "user[threatgrid_api_key]" with "Let's go."
     And I fill in "user[sandbox_api_key]" with "One more time."

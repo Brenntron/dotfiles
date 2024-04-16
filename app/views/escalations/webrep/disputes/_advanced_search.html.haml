@@ -10,6 +10,11 @@
     %input.form-control#dispute-input{name: 'ip_or_uri'}
     %button.remove-input#remove-criteria-dispute{type: 'button'}
   .form-group.search-item
+    %label.content-label-sm{for: 'channel'} Added Through Channel
+    %input.form-control.selectize#channel-input{name: 'channel', list: 'channel-input-list', multiple: 'multiple', tabindex:'-1'}
+    %datalist#channel-input-list
+    %button#remove-criteria-channel.remove-input{onclick:'clearSelectize("channel-input")'}
+  .form-group.search-item
     %label.content-label-sm Assignee
     %input.form-control#owner-input{name: 'username', list: 'user-list'}
     %datalist#user-list

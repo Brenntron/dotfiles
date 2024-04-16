@@ -19,6 +19,7 @@
  *= require webcat_complaint_entries
  *= require webcat_clusters
  *= require webcat_bulk_resolution_dialog
+ *= require webcat_csam_reports
  *= require tooltipster.bundle.min
  *= require tooltipster-sideTip-borderless.min
  *= require daterangepicker

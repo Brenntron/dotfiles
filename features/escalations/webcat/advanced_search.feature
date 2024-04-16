@@ -11,7 +11,7 @@ Feature: WebCat Advanced Search
       | 4  | FIXED      | NEW       | abc.com      | abc.com       | URI/DOMAIN |
     When I go to "/escalations/webcat/complaints"
     And I wait for "3" seconds
-    And I click "#advanced-search-button"
+    And I click "#webcat-advanced-search-button"
     And I fill in selectized of element "#resolution-input" with "['FIXED','DUPLICATE']"
     And I fill in selectized of element "#status-input" with "['PENDING','COMPLETED']"
     And I click "#submit-advanced-search"
@@ -43,7 +43,7 @@ Feature: WebCat Advanced Search
       | 222 | blah.com     | blah.com      | URI/DOMAIN | NEW    |      1002    |
     When I go to "/escalations/webcat/complaints"
     And I wait for "5" seconds
-    And I click "#advanced-search-button"
+    And I click "#webcat-advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#resolution-cb"
     And I click "#cancel-add-criteria"
@@ -77,7 +77,7 @@ Feature: WebCat Advanced Search
       | 4  | Thor          | asgard@marvel.com      |
     When I go to "/escalations/webcat/complaints"
     And I wait for "4" seconds
-    And I click "#advanced-search-button"
+    And I click "#webcat-advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#name-cb"
     And I click "#cancel-add-criteria"
@@ -116,7 +116,7 @@ Feature: WebCat Advanced Search
     Given I add a complaint_tag of id "3" to complaint of id "3"
     Given I add a complaint_tag of id "4" to complaint of id "4"
     When I go to "/escalations/webcat/complaints"
-    And I click "#advanced-search-button"
+    And I click "#webcat-advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#name-cb"
     And I click "#resolution-cb"
@@ -150,7 +150,7 @@ Feature: WebCat Advanced Search
       | 11  | hpotter       | Harry Potter |
       | 22  | rweasle       | Ron Weasley  |
     When I go to "/escalations/webcat/complaints"
-    And I click "#advanced-search-button"
+    And I click "#webcat-advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#assignee-cb"
     And I click "#resolution-cb"
@@ -182,7 +182,7 @@ Feature: WebCat Advanced Search
       | 3  | FIXED      | PENDING   | 3            | 1           |
 
     When I go to "/escalations/webcat/complaints"
-    And I click "#advanced-search-button"
+    And I click "#webcat-advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#platform-cb"
     And I click "#cancel-add-criteria"
@@ -205,7 +205,7 @@ Feature: WebCat Advanced Search
   Scenario: a user changes the fields they want displayed in the advanced search and those are maintained
     Given a user with role "webcat user" exists and is logged in
     When I go to "/escalations/webcat/complaints"
-    And  I click "#advanced-search-button"
+    And  I click "#webcat-advanced-search-button"
     Then I should see "Complaint (URL/IP/Domain)"
     And  I should see "Added Through Channel"
     And  I should not see "Customer Name"
@@ -217,7 +217,7 @@ Feature: WebCat Advanced Search
     And  I click "#name-cb"
     And  I should see "Submitter Name"
     And  I go to "/escalations/webcat/complaints"
-    And  I click "#advanced-search-button"
+    And  I click "#webcat-advanced-search-button"
     And  I should not see "Complaint (URL/IP/Domain)"
     And  I should not see "Added Through Channel"
     And  I should see "Submitter Name"
@@ -233,7 +233,7 @@ Feature: WebCat Advanced Search
         | 3  | Ravenclaw  |
         | 4  | Hufflepuff |
       When I go to "/escalations/webcat/complaints"
-      And I click "#advanced-search-button"
+      And I click "#webcat-advanced-search-button"
       Then I should see element "search_tag_list"
       When I click "#remove-criteria-tags"
       Then I should not see element "search_tag_list"

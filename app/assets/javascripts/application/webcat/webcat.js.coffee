@@ -379,7 +379,7 @@ $ ->
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
-      options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"},{name: "Jira"} ]
+      options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"},{name: "Jira"}, {name: "RMS"}, {name: "RMS Alert"} ]
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->
@@ -785,7 +785,6 @@ $ ->
   window.submit_changes = (entry_id) ->
     row = $('#' + entry_id)
     curr_status = $(row).attr('data-status')
-    self_review = $('#self_review').is(':checked')
 
     # slight differences in data sent
     if curr_status == 'PENDING'
@@ -820,8 +819,7 @@ $ ->
       'commit': commit,
       'comment': comment,
       'resolution_comment': resolution_msg,
-      'uri_as_categorized': uri,
-      'self_review': self_review
+      'uri_as_categorized': uri
     }
 
     # check data here before submitting

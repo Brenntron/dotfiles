@@ -25,7 +25,7 @@ class Clusters::Ngfw::DataFetcher < Clusters::Templates::DataFetcher
   private
 
   def fetch_data
-    data = NgfwCluster.visible.order(traffic_hits: :desc)
+    data = WebCatCluster.ngfw.visible.order(traffic_hits: :desc)
 
     case filter[:f]
     when 'my'

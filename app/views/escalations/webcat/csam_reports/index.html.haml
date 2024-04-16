@@ -1,0 +1,94 @@
+.content-wrapper
+  .row
+    .col-xs-12
+      %h1 CSAM Reports
+
+      .toolbar.csam-reports-toolbar
+        .toolbar-container
+          %label.toolbar-section-label
+            Send Report
+          %button.toolbar-button.toolbar-button-spacer.icon-reports.esc-tooltipped#resend-csam-reports-button{title: 'Resend reports to IWF or NCMEC', disabled: 'disabled'}
+            %span Resend Reports
+          %button.toolbar-button.icon-email.esc-tooltipped#email-csam-reports-button{title: 'Forward reports to external email address', disabled: 'disabled'}
+            %span
+              Forward Reports
+
+      %table.table.responsive.dataTable.no-footer.webcat-list-view#webcat-csam-reports-index{role:'datatable'}
+        %thead
+          %tr
+            %th.attention-flag-col
+              -# attention flag
+            %th Entry ID
+            %th Date Entry was Resolved
+            %th URL
+            %th Analyst
+            %th Source
+            %th Report ID
+            %th Date Sent
+            %th
+              -# actions column
+
+
+- @reports.each do |report|
+
+  .csam-report-dialog{id: "#{report.source}_report_dialog_#{report.id}", title: "#{report.source.upcase} Report ##{report.report_ident}"}
+    .dialog-content-wrapper
+      .row
+        .col-xs-12
+          %h5 Report Response
+          .note-block
+            %pre= report.result
+
+          %hr
+          %h5 Report Content
+          .note-block
+            %pre= report.report_submitted
+
+
+#resend_csam_reports_dialog.csam-report-dialog{title: 'Resend CSAM Report to IWF and NCMEC'}
+  .dialog-content-wrapper
+    .row
+      .col-xs-12.form-note
+        The below entries' reports will be resubmitted to IWF and NCMEC upon submit.
+        %hr.thin
+
+    .row
+      .col-xs-12
+        %table#resend_csam_reports_table
+          %thead
+            %tr
+              %th Entry
+              %th Url
+
+    .row
+      .col-xs-12.text-center.button-row
+        %button#resend_csam_reports_submit.primary{type: 'button', value: 'submit', onclick: 'resubmit_csam_report()'} Resend Report
+
+
+
+#forward_csam_reports_dialog.csam-report-dialog{title: 'Forward CSAM Report to Legal'}
+  .dialog-content-wrapper
+    .row
+      .col-xs-12.form-note
+        The reports for the below entries will be forwarded to Legal upon submit, any email address in the CC box below will receive a copy.
+        %hr.thin
+
+    .row
+      .col-xs-12
+        %label.content-label-sm{for: 'cc_email_address'} CC:
+        %input#cc_email_address.text-input.form-control{type: 'email'}
+        %hr.thin
+
+    .row
+      .col-xs-12
+        %table#forward_csam_reports_table
+          %thead
+            %tr
+              %th Entry
+              %th Url
+
+        %hr.thin
+
+    .row
+      .col-xs-12.text-center.button-row
+        %button#forward_csam_reports_submit.primary{type: 'button', value: 'submit', onclick: 'forward_csam_report()'} Forward Report

@@ -16,7 +16,7 @@ describe Clusters::Umbrella::Processor do
   end
 
   describe 'process_2nd_person_review' do
-    let!(:umbrella_cluster) { FactoryBot.create(:umbrella_cluster, domain: cluster[:domain]) }
+    let!(:umbrella_cluster) { FactoryBot.create(:cluster, :umbrella, domain: cluster[:domain]) }
 
     it 'creates ClusterAssignment instead of cluster processing' do
       expect(Wbrs::Prefix).not_to receive(:create_from_url)
@@ -32,7 +32,7 @@ describe Clusters::Umbrella::Processor do
   end
 
   describe 'process' do
-    let!(:umbrella_cluster) { FactoryBot.create(:umbrella_cluster, domain: cluster[:domain]) }
+    let!(:umbrella_cluster) { FactoryBot.create(:cluster, :umbrella, domain: cluster[:domain]) }
 
     context 'if cluster is not important' do
       before { cluster[:is_important] = false }
@@ -44,7 +44,6 @@ describe Clusters::Umbrella::Processor do
 
         processor.process
         umbrella_cluster.reload
-
         expect(umbrella_cluster.processed?).to be_truthy
         expect(umbrella_cluster.comment).to eq cluster[:comment]
       end
@@ -67,7 +66,7 @@ describe Clusters::Umbrella::Processor do
 
   describe 'decline' do
     let!(:umbrella_cluster) do
-      FactoryBot.create(:umbrella_cluster, domain: cluster[:domain],
+      FactoryBot.create(:cluster, :umbrella, domain: cluster[:domain],
                                            category_ids: cluster[:categories],
                                            status: :pending)
     end

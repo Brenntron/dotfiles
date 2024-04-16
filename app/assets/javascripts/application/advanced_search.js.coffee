@@ -97,7 +97,10 @@ pageFiltersIdentifier = () ->
     'SDRAdvancedSearchFieldsDisplayed'
 
 $ ->
-  set_advanced_search_pref()
+  # This function should only be called on pages where there are advanced searches present
+  # For example, we do not have advanced searches on the user pages so loading this ends up triggering an error
+  if $('#advanced-search-dropdown').length > 0
+    set_advanced_search_pref()
 
   $('#add-search-items-button').click ->
     $('#search-criteria-options').show()

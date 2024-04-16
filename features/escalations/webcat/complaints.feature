@@ -14,6 +14,8 @@ Feature: Webcat complaints
   Scenario: a user attempts to view reports more than once
     Given an admin user with role "webcat user" exists and is logged in
     And I goto "/escalations/webcat/reports"
+    And I click "#generate-reports-tab-link"
+    And I wait for "1" seconds
     And I fill in "complaint_entry_report_from" with "2018-08-01"
     And I fill in "complaint_entry_report_to" with "2018-08-02"
     Then I click "#complaint_entry_report" and switch to the new window
@@ -53,18 +55,6 @@ Feature: Webcat complaints
 #    And I goto "/escalations/webcat/complaints?f=ALL"
 #    And I should see content "cisco.com" within "#domain_1"
 
-
-  # This will eventually need to be stubbed, because the response from SDS might update
-  @javascript
-  Scenario: a user expands a Complaint Entry and sees SDS data when WBRS data is not present
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaint entries exist:
-      | uri             | domain        | subdomain | path | entry_type |
-      | baumpflege.ac   | baumpflege.ac |           |      | URI/DOMAIN |
-    When I goto "/escalations/webcat/complaints?f=ALL"
-#    And I click ".expand-row-button-inline"
-    And I wait for "8" seconds
-    Then I should see content "Nature and Conservation" within first element of class ".sds_category"
 
   @javascript
   Scenario: when a complaint in the WBNP queue is resolved,

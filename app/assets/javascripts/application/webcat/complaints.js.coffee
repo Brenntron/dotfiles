@@ -62,7 +62,6 @@ window.bulk_submit_categorize_entries = () ->
   $('#incomplete-entries-wrapper tbody').empty()
 
   entries = changes.split(",").filter((item) -> return item)
-  self_review = $('#self_review').is(':checked')
 
   entries_to_submit = []
   incomplete_entries = []
@@ -136,8 +135,7 @@ window.bulk_submit_categorize_entries = () ->
         status: status,
         comment: comment,
         resolution_comment: resolution_comment,
-        uri_as_categorized: uri,
-        self_review: self_review
+        uri_as_categorized: uri
       })
       $(submit_table).append(table_row)
 
@@ -277,8 +275,7 @@ window.review_bulk_submit = () ->
         comment: comment,
         resolution_comment: resolution_comment,
         categories: cat_ids,
-        category_names: category_names,
-        self_review: self_review
+        category_names: category_names
       })
 
   if entries_to_update.length > 0

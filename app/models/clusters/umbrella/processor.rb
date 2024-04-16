@@ -50,7 +50,7 @@ class Clusters::Umbrella::Processor < Clusters::Templates::Processor
 
   def decline
     cluster_domains = clusters.map { |cluster| cluster[:domain] }
-    UmbrellaCluster.where(domain: cluster_domains).update(category_ids: '', status: :created)
+    WebCatCluster.umbrella.where(domain: cluster_domains).update(category_ids: '', status: :created)
     # assign clusters to the person who declined current categorization
     clusters.each do |cluster|
       ClusterAssignment.assign!(cluster, user)
@@ -92,7 +92,7 @@ class Clusters::Umbrella::Processor < Clusters::Templates::Processor
     end
 
     def umbrella_cluster(cluster)
-      UmbrellaCluster.find_by(domain: cluster[:domain])
+      WebCatCluster.umbrella.where(domain: cluster[:domain]).first
     end
 
     def third_person_review_cluster?(cluster)

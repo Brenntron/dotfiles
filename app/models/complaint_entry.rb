@@ -10,6 +10,7 @@ class ComplaintEntry < ApplicationRecord
   belongs_to :canonical, class_name: "ComplaintEntry", optional: true
 
   has_many :duplicate_entries, class_name: "ComplaintEntry", foreign_key: 'canonical_id'
+  has_many :abuse_records
 
   belongs_to :complaint
   belongs_to :user, optional: true
@@ -305,8 +306,7 @@ class ComplaintEntry < ApplicationRecord
                         resolution_comment,
                         uri_as_categorized,
                         current_user,
-                        commit_pending,
-                        self_review)
+                        commit_pending)
 
     # not important case or resolution is "unchanged"
     current_status = STATUS_COMPLETED
@@ -349,8 +349,7 @@ class ComplaintEntry < ApplicationRecord
                            resolution_comment,
                            uri_as_categorized,
                            current_user,
-                           commit_pending,
-                           self_review)
+                           commit_pending)
 
     self.case_assigned_at ||= Time.now
     # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
@@ -401,8 +400,7 @@ class ComplaintEntry < ApplicationRecord
                       resolution_comment,
                       uri_as_categorized,
                       current_user,
-                      commit_pending,
-                      self_review)
+                      commit_pending)
     ActiveRecord::Base.transaction do
 
       if categories_string.blank? && entry_status == "FIXED"
@@ -414,19 +412,19 @@ class ComplaintEntry < ApplicationRecord
 
       #First, check if not important.  If not, super simple no guardrails categorization path
       if !self.is_important
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
         return post_categorize(current_user)
       end
 
       #Second, check to see if this is an unchanged decision, if it is, then there's nothing to guardrails here.
       if entry_status == Complaint::RESOLUTION_UNCHANGED
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
         return post_categorize(current_user)
       end
 
       #Third if self-review is set to true, then it's not necessary to go through full guard rails workflow (i see this path being potentially worked on later for security reasons)
-      if self_review == true
-        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+      if current_user.enabled_self_review
+        categorize_simple(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
         return post_categorize(current_user)
       end
 
@@ -494,7 +492,7 @@ class ComplaintEntry < ApplicationRecord
 
       ## The remaining logic belows handles a verdict_pass of true or a webcat manager's categorization, which is exempt from verdicts.
 
-      categorize_important(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending, self_review)
+      categorize_important(prefix, categories_string, category_names_string, entry_status, comment, resolution_comment, uri_as_categorized, current_user, commit_pending)
 
       return post_categorize(current_user)
       ###
@@ -562,30 +560,24 @@ class ComplaintEntry < ApplicationRecord
 
   ####Generic method to handle any logic to alter categories and any other necessary activities before sending categories
   # to RuleAPI
-  def pre_commit_processing(category_ids_array, ip_or_uri)
-
+  def pre_commit_processing(category_ids_array, ip_or_uri, user)
+    user = User.find_by_email(user) rescue self.user
     if category_ids_array.include?(AbusiveContentTool.current_child_abuse_category[:id])
       category_ids_array = AbusiveContentTool.reclassify_abuse_categories(category_ids_array)
+
+      abuse_info = {}
+      abuse_info[:user_id] = user.id
+      abuse_info[:user] = user.email
+      abuse_info[:url] = ip_or_uri
+      self.abuse_information = abuse_info.to_json
+      self.save!
       result = AbusiveContentTool.submit_abuse_to_authorities(self, user, SimpleIDN.to_ascii(ip_or_uri))
+      abuse_info[:iwf_report] = result[:iwf_report]
+      abuse_info[:ncmec_report] = result[:ncmec_report]
+      self.abuse_information = abuse_info.to_json
+      self.save
 
-      if result[:status].to_s == "success"
-        abusive_info = {}
-        abusive_info[:iwf_report_id] = "IWF report submission ID: #{result[:data]}"
-        self.abuse_information = abusive_info.to_json
-        self.save!
-        report_alert_args = {}
-        report_alert_args[:to] = "admatter@cisco.com"
-        report_alert_args[:from] = "noreply@talosintelligence.com"
-        report_alert_args[:subject] = "IWF Report Notification"
-        report_alert_args[:body] = "Reference Data <br /> Complaint ID: #{self.complaint.id} <br /> Complaint Entry ID: #{self.id} <br /> Entry: #{self.hostlookup} <br /> User assigned: #{self.user.cvs_username}"
 
-        attachments_to_mail = []
-        conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
-        conn.post(report_alert_args, attachments_to_mail)
-
-      else
-        raise "IWF submission issue: #{result[:message]}"
-      end
     end
 
     return category_ids_array
@@ -604,7 +596,7 @@ class ComplaintEntry < ApplicationRecord
 
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
-    category_ids_array = pre_commit_processing(category_ids_array, ip_or_uri)
+    category_ids_array = pre_commit_processing(category_ids_array, ip_or_uri, user)
 
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"

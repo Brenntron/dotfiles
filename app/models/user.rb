@@ -94,7 +94,7 @@ class User < ApplicationRecord
     (parent.nil? && children.empty?) ? false : true
   end
 
-  def is_inactive? 
+  def is_inactive?
     if roles.blank?
       return true
     else
@@ -190,9 +190,9 @@ class User < ApplicationRecord
     metrics_timeframe ? metrics_timeframe : DEFAULT_METRICS_TIMEFRAME
   end
 
-  def allowed_self_review
+  def enabled_self_review
     self_review = JSON.parse(self.user_preferences.where(name: 'SelfReview').first&.value || '{}')
-    !!self_review['allowed']
+    !!self_review['enabled']
   end
 
   private
