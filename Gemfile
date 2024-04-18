@@ -45,7 +45,7 @@ gem 'devise', '~> 4.5'
 
 # Networking and Messaging
 gem 'net-ldap', '0.16.1'
-gem 'httpi'
+gem 'httpi', '2.4.2'
 gem 'her', '1.0.3'
 gem 'curb', '1.0.5' #Libcurl bindings for Ruby
 gem 'net-ssh', '5.0.2'
