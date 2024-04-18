@@ -7,8 +7,8 @@ describe Clusters::Ngfw::DataFetcher do
   let(:filter) { {} }
 
   describe '.fetch' do
-    let!(:ngfw_cluster_url) { FactoryBot.create(:ngfw_cluster, domain: 'example.com', traffic_hits: 123) }
-    let!(:ngfw_cluster_ip) { FactoryBot.create(:ngfw_cluster, domain: '127.0.0.1', traffic_hits: 124) }
+    let!(:ngfw_cluster_url) { FactoryBot.create(:cluster, :ngfw, domain: 'example.com', traffic_hits: 123) }
+    let!(:ngfw_cluster_ip) { FactoryBot.create(:cluster, :ngfw, domain: '127.0.0.1', traffic_hits: 124) }
 
     let(:cluster_ip_response) do
       {
