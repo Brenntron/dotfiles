@@ -97,7 +97,7 @@ maps.n["<leader>cst"] = { "<cmd>Copilot status<cr>", desc = "Display Copilot sta
 -- Dad Bod UI
 maps.n["<leader>db"] = sections.db
 maps.n["<leader>dbi"] = { "<cmd>DBUI<cr>", desc = "Open Dad Bod UI" }
-maps.n["<leader>dba"] = { "<cmd>DBUIAddConnection", desc = "Add Dad Bod UI connection" }
+maps.n["<leader>dba"] = { "<cmd>DBUIAddConnection<ce>", desc = "Add Dad Bod UI connection" }
 
 -- NvimTree/Explorer
 maps.n["<leader>e"] = { "<cmd>NvimTreeToggle<cr>", desc = "Toggle tree explorer" }
