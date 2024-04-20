@@ -57,6 +57,7 @@ function M.config()
         extra_args = { "--dialect", "mysql" }
       }),
       formatting.stylua,
+      formatting.yamlfix
     },
   }
 
