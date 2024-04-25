@@ -6,7 +6,7 @@ $ ->
 
     # Create index table
     url = $('#complaints-index').data('source')
-    $.when(pull_user_preference_filter()).done ->
+    $.when(window.pull_user_preference_filter()).done ->
       build_complaints_table(url)
 
 #### New complaints index table setup
@@ -639,11 +639,19 @@ build_data = () ->
           search_conditions: webcat_search_conditions
         }
       when 'standard'
-        urlParams = new URLSearchParams(location.search);
+        # check address bar, then local storage
+        if location.search != ''
+          urlParams = new URLSearchParams(location.search);
+          search_name = urlParams.get('f')
+        else if webcat_search_name?
+          search_name = webcat_search_name.split('=').pop()
+        else
+          # this shouldn't happen but just in case something wasn't stored properly this will at least reset to some data populating
+          search_name = "MY TICKETS"
         refresh_localStorage()
         data = {
           search_type: webcat_search_type
-          search_name: urlParams.get('f')
+          search_name: search_name
         }
       when 'named'
         data = {
