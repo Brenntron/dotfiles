@@ -49,6 +49,7 @@ RailsAdmin.config do |config|
   config.main_app_name = ["Analyst Console Escalations", "#{version}"]
 
   config.included_models = [
+      "AbuseRecord",
       "ClusterAssignment",
       "ClusterCategorization",
       "Company",
