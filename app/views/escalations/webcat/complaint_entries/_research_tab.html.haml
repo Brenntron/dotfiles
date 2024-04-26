@@ -158,7 +158,7 @@
       %textarea.ce-internal-comment-textarea.ce-input{ name: 'ce_internal_comment_textarea',
                                                        placeholder: 'Internal note for choosing categories' }
     .text-center
-      %button.tertiary.ce-submit-button
+      %button.tertiary.ce-submit-button{ onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
         submit
   .col-xs-3.ce-research-column
     %h5.research-data-header.text-uppercase
