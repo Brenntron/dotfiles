@@ -376,7 +376,6 @@ $ ->
     $('#channel-input').selectize {
       persist: false,
       create: false,
-      maxItems: 2,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
