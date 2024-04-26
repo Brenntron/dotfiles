@@ -9,13 +9,55 @@
           %label.toolbar-section-label
             View
           .btn-group.toolbar-btn-group
-            %button.btn.toolbar-button.toolbar-button-spacer.esc-tooltipped-webcat-toolbar.tooltipstered.open-all{ type: 'button' }
-            %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.tooltipstered.google-btn{ type: 'button' }
+            %button.btn.toolbar-button.toolbar-button-spacer.esc-tooltipped-webcat-toolbar.tooltipstered.open-all{ type: 'button', onclick: 'open_ip_uri()' }
+              %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.tooltipstered.google-btn{ title: 'Google It!', type: 'button', onclick: "google_it()" }
         .edit-btn-group
           %label.toolbar-section-label
             Edit
-          .btn-group.toolbar-btn-group
-            %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.tooltipstered.convert-ticket-button{ type: 'button' }
+          .dropdown.btn-group.toolbar-btn-group
+            %button.dropdown-toggle.toolbar-button.esc-tooltipped-webcat-toolbar.convert-ticket-button#convert-ticket-button{ 'aria-haspopup': 'true', 'aria-expanded': 'false', 'data-toggle': 'dropdown', onclick: "prep_complaint_to_convert_show_page(#{@complaint_entry.id})", title: 'Convert ticket to web reputation ticket', type: 'button' }
+            .dropdown-menu.toolbar-dropdown#convert-ticket-dropdown{ 'aria-labelledby': 'convert-ticket-button' }
+              .dropdown-tool-text-divider.primary-text-divider Convert to Reputation Dispute
+              .inline-tool-content-wrapper
+                .dropdown-loader-wrapper.hidden
+                  .gear-loader-wrapper
+                    = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+                  %span.loader-msg Converting to Webrep...
+                .row
+                  .col-xs-8
+                    %label.content-label-sm
+                      Ticket ID to Convert:
+                    %span.ticket-id-to-convert#complaint-id-to-convert
+                  .col-xs-4
+                    %label.content-label-sm Reputation Ticket Type
+                    #convert-ticket-type.form-group
+                      .inline-radio-wrapper
+                        %label{ for: 'web-ticket-type' } Web
+                        %input.convert-input#web-ticket-type{ type: 'radio', name: 'ticket-type', value: 'w' }
+                      .inline-radio-wrapper
+                        %label{ for: 'email-ticket-type' } Email
+                        %input.convert-input#email-ticket-type{ type: 'radio', name: 'ticket-type', value: 'e' }
+                %hr.thin
+                .row
+                  .col-xs-12
+                    %label.content-label-sm
+                      Ticket Entries:
+                      %span.convert-entry-count
+                    .convert-entry-table-wrapper
+                      %table#entries-to-convert
+                        %thead
+                          %tr
+                            %th Entry ID
+                            %th Entry Content
+                            %th.convert-disposition-cell.text-right Suggested Disposition
+                        %tbody
+                %hr.thin
+                .comment-wrapper
+                  %label.content-label-sm Ticket Summary
+                  %textarea.dropdown-comment.note-input#convert-ticket-summary
+                .button-row-center
+                  %button.primary.dropdown-submit-button#convert-to-webrep{ type: 'button', disabled: 'disabled' }
+                    Convert Ticket
     .ce-submitted-wbrs-wrapper
       #ce_submitted_ip_uri_wrapper
         %label.content-label-sm
@@ -27,7 +69,7 @@
           WBRS Score
         %div
           %span{ class: ['webcat-research-svg', wbrs_score_icon(@complaint_entry.wbrs_score)] }
-          %p#ce_wbrs_score= @complaint_entry.wbrs_score.round(2)
+          %p#ce_wbrs_score= @wbrs_score
     #ce_suggested_categories_wrapper
       %label.content-label-sm
         Suggested Categories
@@ -57,8 +99,9 @@
     %h5.research-data-header.text-uppercase
       tags
     #ce_tags_wrapper
-      %p.missing-data#ce_tags No tags
-      %button.tags-button
+      = render_tags(@tags)
+      %input.ce-tags-select.hidden#ce_tags_select{ placeholder: 'Enter Tags' }
+      %button.tags-button#edit_tags
 
   .col-xs-3.ce-research-column
     %h5.research-data-header.text-uppercase
@@ -66,7 +109,7 @@
     .ce-resolved-ip-uri-wrapper
       %label.content-label-sm
         Resolved IP/URI
-      %input.ce-input.ce-ip-uri-input{ value: @complaint_entry.domain }
+      %input.ce-input.ce-ip-uri-input{ value: @submitted_ip_uri }
       .ce-resolved-ip-uri-button-wrapper
         %button.ip-uri-button
           domain
@@ -74,11 +117,10 @@
           subdomain
         %button.ip-uri-button
           original uri
-        %button.bug-button
     .ce-categories-wrapper
       %label.content-label-sm
         Categories
-      %input.ce-categories-select.ce-input{ placeholder: 'Enter Categories / Confidence Order' }
+      %input.ce-categories-select.ce-input#ce_categories_select{ placeholder: 'Enter Categories / Confidence Order' }
     .ce-resolution-wrapper
       %label.content-label-sm
         Resolution
@@ -127,7 +169,7 @@
       %tbody
         %tr
           %td#domain_title
-            = @complaint_entry.domain
+            = @submitted_ip_uri
     %label.data-report-label#ce_registrant_label
       registrant
     %table.data-report-table#ce_registrant_table
@@ -150,3 +192,8 @@
           %th#ce_name_servers_header
             name servers
       %tbody#ce_nserver_tbody
+:javascript
+  window.set_headers();
+  window.set_entry_id();
+  window.set_complaint_entry_data("#{@complaint_entry.category}", #{@complaint_entry.status});
+  window.set_tags("#{@tags.join(', ')}");

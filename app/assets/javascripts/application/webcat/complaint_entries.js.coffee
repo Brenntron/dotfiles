@@ -1,5 +1,137 @@
 #set empty string header so it can be updated on document ready
 headers = ''
+entry_id = 0
+
+window.set_headers = () ->
+  headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
+
+window.set_entry_id = () ->
+  entry_id = Number($('#complaint_entry_id')[0].innerText)
+
+window.set_tags = (tags) ->
+  split_tags = tags.split(', ')
+  createTagOptions = ->
+    tags = $('#complaint_tag_list')[0]
+    if tags
+      tag_list = tags.value
+      array = tag_list.split(',')
+      options = []
+      for x in array
+        options.push { name: x }
+      return options
+
+  $('#ce_tags_select').selectize {
+    persist: false,
+    create: (input) ->
+      { name: input }
+    maxItems: null,
+    closeAfterSelect: false,
+    valueField: 'name'
+    labelField: 'name'
+    searchField: 'name'
+    options: createTagOptions(),
+    items: split_tags,
+  }
+
+  $('#edit_tags').on 'click', () ->
+    $ce_tags = $('#ce_tags')
+
+    if $ce_tags.is(':visible')
+      $ce_tags.hide()
+      $('#ce_tags_select')[0].selectize.enable()
+      $('.ce-tags-select').removeClass('hidden')
+    else
+      $('.ce-tags-select').addClass('hidden')
+      $('#ce_tags_select')[0].selectize.disable()
+      $ce_tags.show()
+
+window.set_complaint_entry_data = (category_data, ce_entry_status) ->
+  ce_current_categories = if category_data? then category_data.split(', ') else []
+
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
+    method: 'GET'
+    headers: headers
+    success: (response) ->
+      all_categories = response
+      category_ids = []
+      cat_options = []
+      cleaned_cats = []
+
+      if ce_current_categories
+        cleaned_cats = ce_current_categories
+        #splice together 'Conventions, Conferences and Trade Shows' due to extra comma
+        if ce_current_categories.includes('Conferences and Trade Shows')
+          $(cleaned_cats).each (i, category) ->
+            if category == 'Conventions'
+              cleaned_cats.splice(i, 1)
+            else if category == ' Conferences and Trade Shows'
+              i2 = i - 1
+              cleaned_cats.splice(i2, 1, 'Conventions, Conferences and Trade Shows')
+
+      for key, value of all_categories
+        cat_code = key.split(' - ')[1]
+        value_name = key.split(' - ')[0]
+        cat_options.push({ category_id: value, category_name: value_name, category_code: cat_code })
+
+      # find the category ids that match the current cats on the entry
+      for name in cleaned_cats
+        for x, y of all_categories
+          value_name = x.split(' - ')[0]
+          if name.trim() == value_name
+            category_ids.push(y)
+
+      # adds category ids to row for fetching later
+      $('#' + entry_id).attr('data-cat-ids', category_ids.join(','))
+
+      if ce_entry_status == 'COMPLETED'
+        # need to initialize the selectize function but disable it here if entry is completed
+        $completed_selectize = $('#ce_categories_select').selectize {
+          persist: true,
+          create: false,
+          maxItems: 5,
+          closeAfterSelect: true,
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
+          options: cat_options,
+          items: category_ids,
+        }
+        select_complete = $completed_selectize[0].selectize
+        select_complete.disable()
+      else
+        $('#ce_categories_select').selectize {
+          persist: false,
+          create: false,
+          maxItems: 5,
+          closeAfterSelect: true,
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
+          options: cat_options,
+          items: category_ids,
+          score: (input) ->
+            #  Adding some customization for autofill
+            #  restricting on certain cats to avoid accidental categorization
+            #  (replaces selectize's built-in `getScoreFunction()` with our own)
+            (item) ->
+              if item.category_code == 'cprn' ||
+                item.category_code == 'xpol' ||
+                item.category_code == 'xita' ||
+                item.category_code == 'xgbr' ||
+                item.category_code == 'xdeu' ||
+                item.category_code == 'piah'
+                  item.category_code == input ? 1 : 0
+              else if item.category_name.toLowerCase().startsWith(input.toLowerCase())
+                1
+              else if item.category_name.toLowerCase().includes(input.toLowerCase()) ||
+                item.category_code.toLowerCase().includes(input.toLowerCase())
+                  0.9
+              else
+                0
+        }
+      )
+
 
 get_whois_data = (domain) ->
   $.ajax(
@@ -164,6 +296,7 @@ get_domain_history = (domain) ->
           }
         ]
     error: (errorResponse) ->
+      console.error(errorResponse)
       std_api_error(errorResponse, "Domain History for this Entry could not be retrieved.", reload: false)
     )
 
@@ -235,21 +368,26 @@ get_xbrs_history = (domain) ->
       if data.error?
         std_msg_error(data.error, [])
       else
-        domainKey = Object.keys(data)[0]
+        object_keys = Object.keys(data)
 
-        for entry in data[domainKey]
-          entry.domain = domainKey
+        data = if object_keys.length > 0
+                 domainKey = Object.keys(data)[0]
 
-          subdomain_array = domainKey.split('.')[0]
-          entry.subdomain = if subdomain_array.length > 1 then subdomain_array[0] else ''
+                 for entry in data[domainKey]
+                   entry.domain = domainKey
 
-          # separate on first occurrence of '/' to capture the path
-          path_array = domainKey.split(/\/(.*)/)
-          entry.path = if path_array.length > 1 then path_array[1]  else ''
+                   subdomain_array = domainKey.split('.')[0]
+                   entry.subdomain = if subdomain_array.length > 1 then subdomain_array[0] else ''
 
-          entry.operation = if entry.operation? then entry.operation else ''
+                   # separate on first occurrence of '/' to capture the path
+                   path_array = domainKey.split(/\/(.*)/)
+                   entry.path = if path_array.length > 1 then path_array[1]  else ''
 
-        data = data[domainKey]
+                   entry.operation = if entry.operation? then entry.operation else ''
+
+                 data[domainKey]
+               else
+                 []
 
         $('#ce_xbrs_history_table').DataTable({
           data: data
@@ -319,11 +457,54 @@ get_related_history = (domain) ->
     ]
   })
 
+window.open_ip_uri = () ->
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
+    data:
+      complaint_entry_id: entry_id
+    success: (data) ->
+      { viewable, uri, wbrs_score, ip_address } = data.complaint_entry
+      ipv4_regex = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/gm
+      path = ''
+
+      unless ip_address?
+        path = "http://#{uri}"
+      else if ipv4_regex.test(selected_row.ip_address)
+        # Because IPv6 includes colons an IPv6 must be wrapped in square brackets if it's used as a hostname.
+        path = "http://#{ip_address}"
+      else
+        path = "http://[#{ip_address}]"
+
+      if parseInt(wbrs_score) <= -6
+        show_message('error', "#{path} could not open due to low WBRS Scores.")
+      else if viewable
+        window.open(path, '_blank')
+      else
+        show_message('error', 'Complaint Address is not viewable.', false, '#alert_message')
+  )
+
+window.google_it = () ->
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
+    data:
+      complaint_entry_id: entry_id
+    success: (data) ->
+      { uri, ip_address } = data.complaint_entry
+      path = ''
+
+      unless ip_address?
+        path = uri
+      else
+        path = ip_address
+
+      window.open("https://www.google.com/search?q=#{path}", '_blank')
+  )
+
 $ ->
   if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
-    headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
     resolution = $('.ce-radio-group > .resolution-radio-button:checked').val()
-    entry_id = Number($('#complaint_entry_id')[0].innerText)
     domain_title = $('#domain_title')[0].innerText.replace(/(\r\n|\n|\r)/gm, "") # remove newlines
 
     get_resolution_templates(resolution, 'individual', [entry_id])

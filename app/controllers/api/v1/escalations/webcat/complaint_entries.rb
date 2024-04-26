@@ -6,6 +6,7 @@ module API
           include API::V1::Defaults
 
           resource "escalations/webcat/complaint_entries" do
+          require 'pry'
 
             before do
               PaperTrail.request.whodunnit = current_user.id if current_user.present?
@@ -610,10 +611,14 @@ module API
               pre_raw_records = []
 
               prefix_records = Wbrs::Prefix.where({:urls => [Addressable::URI.escape(SimpleIDN.to_ascii(params[:domain]))]})
-              prefix_records.each do |prefix_record|
-                history_records = Wbrs::HistoryRecord.where({:prefix_id => prefix_record.prefix_id})
-                pre_raw_records += history_records
+
+              unless prefix_records.nil?
+                prefix_records.each do |prefix_record|
+                  history_records = Wbrs::HistoryRecord.where({:prefix_id => prefix_record.prefix_id})
+                  pre_raw_records.push history_records
+                end
               end
+
               clean_domain = Addressable::URI.escape(SimpleIDN.to_ascii(params[:domain]))
 
               rule_lib_records = Wbrs::Prefix.get_certainty_sources_for_urls([clean_domain], 0)[clean_domain]
@@ -625,7 +630,9 @@ module API
               ### this change is to de-duplicate the records that come in from a combo Prefix and HistoryRecord call
               # uniq doesn't work, and it needs to be tested against 3 different attributes.
               pre_raw_records.each do |raw_record|
+                next if raw_record.nil?
                 skip = false
+                binding.pry
                 raw_records.each do |raw_check|
                   if raw_record.event_id == raw_check.event_id && raw_record.prefix_id == raw_check.prefix_id && raw_record.category.category_id == raw_check.category.category_id
                     skip = true

@@ -89,10 +89,78 @@ window.prep_complaint_to_convert = () ->
       std_msg_error('Ticket cannot be converted', ['Selected ticket is not a customer ticket from talos-intelligence.'])
       return
 
+window.prep_complaint_to_convert_show_page = (entry_id) ->
+  $('#convert-to-webrep').attr('disabled', 'disabled')
 
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/view_complaint'
+    data:
+      complaint_entry_id: entry_id
+    success: (response) ->
+      data = $.parseJSON(response).data
+      { id: complaint_id, description, status, ticket_source } = data.complaint
+      entries = data.complaint_entries
+      { id: entry_id } = data.complaint_entry
 
+      if ['talos-intelligence', 'talos-intelligence-api'].includes(ticket_source)
+        if ['NEW', 'ACTIVE', 'ASSIGNED', 'REOPENED'].includes(status)
+          entry_count = entries.length
+          entries_table = $('#entries-to-convert tbody')
 
+          $('#complaint-id-to-convert').text(complaint_id)
+          $('.convert-entry-count').text("('#{entry_count}')")
 
+          if entry_count > 8
+            $('.convert-entry-table-wrapper').addClass('max-scroll')
+          else
+            $('.convert-entry-table-wrapper').removeClass('max-scroll')
+
+          $(entries).each ->
+            if this.entry_type == 'IP'
+              entry_contante = this.ip_address
+            else
+              entry_content = this.uri
+
+            entry_row = """
+              <tr>
+                <td>
+                  #{this.id}
+                </td>
+                <td class='entry-content-to-convert'>
+                  #{entry_content}
+                </td>
+                <td class='text-center entry-disposition'>
+                  <div class='inline-radio-wrapper'>
+                    <label for='#{this.id}-fp-radio' title='Customer says the website is safe and should be allowed.'>
+                      FP
+                    </label>
+                    <input type='radio' class='disposition-radio' name='disposition-#{this.id}' value='fp' id='#{this.id}-fp-radio'/>
+                  </div>
+                  <div class='inline-radio-wrapper'>
+                    <label for='#{this.id}-fn-radio' title='Customer says the website is malicious and should be blocked.'>
+                      FN
+                    </label>
+                    <input type='radio' class='disposition-radio' name='disposition-#{this.id}' value='fn' id='#{this.id}-fn-radio'/>
+                  </div>
+                </td>
+              </tr>
+            """
+
+            $(entries_table).append(entry_row)
+            $('#convert-ticket-summary').append(description)
+            $('.entry-disposition > .inline-radio-wrapper > label').tooltipster
+              theme: [
+                'tooltipster-borderless'
+                'tooltipster-borderless-customized'
+              ]
+        else
+          std_msg_error('The Complaint cannot be converted', ['The Complaint is not in a convertible (open) status.'])
+          return
+      else
+        std_msg_error('The Complaint cannot be converted', ['The Complaint is not a customer ticket from talos-intelligence.'])
+        return
+  )
 
 convert_complaint_to_webrep = () ->
   # get the parent ticket info
@@ -124,7 +192,6 @@ convert_complaint_to_webrep = () ->
     error: (response) ->
       std_msg_error('Error converting ticket', ['Complaint unable to be converted to Reputation Dispute.'], reload: false)
   )
-
 
 $ ->
   # check prior to enabling submit convert to webrep button

@@ -45,4 +45,16 @@ module Escalations::Webcat::ComplaintEntriesHelper
       cleaned_cats.join(', ')
     end
   end
+
+  def render_tags(tags)
+    if !tags.empty?
+      content_tag :div, id: 'ce_tags' do
+        tags.collect do |tag|
+         concat(content_tag(:span, tag, class: 'tag-capsule'))
+        end
+      end
+    else
+      content_tag :p, 'No tags', id: 'ce_tags', class: 'missing-data'
+    end
+  end
 end

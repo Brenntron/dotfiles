@@ -482,8 +482,7 @@ module API
               complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
               complaint = complaint_entry.complaint
 
-              {:data => {:complaint => complaint, :complaint_entries => complaint.complaint_entries}}.to_json
-
+              { data: { complaint: complaint, complaint_entries: complaint.complaint_entries, complaint_entry: complaint_entry }}.to_json
             end
 
             params do

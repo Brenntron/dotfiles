@@ -6,6 +6,7 @@ $type-base-color:    #333;   /* Dark Grey */
 $faint-accent-color:  #dff1f7;
 $nav-toolbar-color: #d7dadb;    /* Medium Grey     */
 $type-faint-accent: #D7DADB; /* Lighter Grey */
+$selectize-border: #E5E5E5;
 
 .complaint-entry-show-content-wrapper {
   @-moz-document url-prefix() {
@@ -140,6 +141,55 @@ $type-faint-accent: #D7DADB; /* Lighter Grey */
     margin-bottom: 14px;
   }
 
+  #ce_research_toolbar {
+    .toolbar .dropdown-menu {
+      margin: 0 !important;
+
+      .row {
+        margin-right: -15px !important;
+        margin-top: 0;
+        margin-bottom: 0;
+        width: 100%;
+        .col-xs-3 {
+          margin: 0 !important;
+          border-right: 1px solid #d8dadb;
+          &:last-of-type {
+            border-right: none;
+          }
+        }
+      }
+
+      .dropdown-label {
+        margin: 10px 10px 0 10px;
+        font-weight: 600;
+      }
+
+      ul.show-col-list {
+        li {
+          display: block;
+          padding: 4px 8px;
+
+          &.sub-checkbox-wrapper {
+            background-color: #F5F5F5;
+            padding: 5px 12px 2px 12px;
+          }
+
+          .webcat-view-data-cb {
+            float: left;
+            cursor: pointer;
+            margin: 0 5px 0 0;
+          }
+
+          label {
+            cursor: pointer;
+            margin: 0 0 4px 0;
+          }
+        }
+      }
+    }
+  }
+
+
   .research-data-header, .history-data-header {
     border-bottom: none;
     color: $type-lighter-color;
@@ -206,11 +256,27 @@ $type-faint-accent: #D7DADB; /* Lighter Grey */
 
   #ce_tags_wrapper {
     display: flex;
-    gap: 100px;
+    gap: 50px;
 
     p {
       align-items: center;
       display: flex;
+    }
+
+    .tag-capsule {
+      cursor: unset;
+
+      &:hover {
+        background-color: $primary-section-color;
+      }
+    }
+
+    .ce-tags-select {
+      border: 1px solid $selectize-border;
+      border-radius: 1px;
+      min-height: 26px;
+      padding: 4px;
+      width: 100%;
     }
 
     .tags-button {
@@ -257,8 +323,22 @@ $type-faint-accent: #D7DADB; /* Lighter Grey */
     }
   }
 
-  .ce-ip-uri-input, .ce-categories-select, .ce-customer-comment-select-box {
-    min-height: 30px;
+  .ce-ip-uri-input, .ce-customer-comment-select-box, .ce-categories-select {
+    min-height: 33px;
+  }
+
+  .ce-categories-select {
+    .selectize-input {
+      background-color: lighten($faint-accent-color, 5%);
+      top: 8px;
+
+      input {
+        left: 2px;
+      }
+    }
+    .selectize-input.disabled {
+      top: 2px;
+    }
   }
 
   .ce-customer-comment-select-box {

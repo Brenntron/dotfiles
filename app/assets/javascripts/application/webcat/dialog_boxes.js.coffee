@@ -8,12 +8,12 @@
 # and xbrs history of the url.
 window.history_dialog = (id, url) ->
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  headers = { 'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val() }
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
     method: 'POST'
     headers: headers
-    data: {'id': id}
+    data: { 'id': id }
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
@@ -42,7 +42,7 @@ window.history_dialog = (id, url) ->
             <div class='tab-pane active' role='tabpanel' id='domain-history-tab'>
             <h5>Domain History</h5>"
 
-        if json.entry_history.domain_history.length < 1
+        if json.entry_history && json.entry_history.domain_history.length < 1
           history_dialog_content += '<span class="missing-data">No domain history available.</span>'
         else
           history_dialog_content +=
