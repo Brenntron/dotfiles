@@ -70,6 +70,8 @@ $ ->
     # Get each visible search item - should either be a selectized select, or an input
     console.log $('#cat_named_search .search-item:not(:hidden)').length
 
+    form['search_name'] = $('#cat_named_search input[name="search_name"]').val()
+
     $('#cat_named_search .search-item:not(:hidden)').each ->
       # selectized values will be arrays that need to be joined
       if $(this).find('select')[0]
@@ -264,8 +266,8 @@ $ ->
         return options
 
     assignee_input = $('#assignee-input').selectize {
-      persist: true
-      create: false
+      persist: true,
+      create: false,
       valueField: 'name',
       labelField: 'display_name',
       searchField: ['name', 'display_name'],
@@ -296,7 +298,7 @@ $ ->
     }
 
     category_input = $('#category-input').selectize {
-      persist: false,
+      persist: true,
       create: false,
       maxItems: 5,
       valueField: 'category_id',
@@ -309,7 +311,7 @@ $ ->
         window.toggle_selectize_layer(this, 'false')
     }
     $('#company-input').selectize {
-      persist: false,
+      persist: true,
       create: false,
       valueField: 'company_name',
       labelField: 'company_name',
@@ -449,7 +451,8 @@ $ ->
 
     $('#submitter-type-input').selectize {
       delimiter: ',',
-      persist: false,
+      persist: true,
+      create: false,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
