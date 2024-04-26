@@ -43,14 +43,14 @@ window.get_display_prefs = () ->
   )
 
 get_current_webcat_filter = ->
-  full_url = window.location.href
-  if full_url.includes('?f=NEW%20TALOS')
+  filter = localStorage.getItem 'webcat_search_name'
+  if filter == '?f=NEW TALOS'
     return 'WebcatNewTalosColumns'
-  else if full_url.includes('?f=NEW%20WBNP')
+  else if filter == '?f=NEW WBNP'
     return 'WebcatNewWbnpColumns'
-  else if full_url.includes('?f=NEW%20JIRA')
+  else if filter == '?f=NEW JIRA'
     return 'WebcatNewJiraColumns'
-  else if full_url.includes('?f=NEW%20INTERNAL')
+  else if filter == '?f=NEW INTERNAL'
     return 'WebcatNewInternalColumns'
   else
     return 'WebcatDefaultColumns'
@@ -115,9 +115,9 @@ window.sort_webcat_index = () ->
   order = $('#webcat-index-sort-order').attr('data-sort')
   sort_by = $('#webcat-index-sort-select').val()
   complaint_table = $('#complaints-index').DataTable()
-  complaint_table
-    .order( [ sort_by, order ] )
-    .draw();
+  complaint_table.order([col, order]).draw();
+  complaint_table.on 'draw', ->
+    get_display_prefs()
 
 window.toggle_direct_sort = (col, field, button) ->
   order = $(button).attr('data-sort')
@@ -133,9 +133,9 @@ window.toggle_direct_sort = (col, field, button) ->
     $(button).attr('title', title)
 
   complaint_table = $('#complaints-index').DataTable()
-  complaint_table
-    .order( [ col, order] )
-    .draw();
+  complaint_table.order([col, order]).draw();
+  complaint_table.on 'draw', ->
+    get_display_prefs()
 
 window.toggle_select_order = (button) ->
   order = $(button).attr('data-sort')
