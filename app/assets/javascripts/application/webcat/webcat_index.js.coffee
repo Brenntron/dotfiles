@@ -347,8 +347,10 @@ build_complaints_table = (url) ->
 
           if (full.status == 'COMPLETED') || (full.status == 'PENDING')
             input_uri = full.uri_as_categorized
-          else
+          else if domain? && domain != ''
             input_uri = domain
+          else
+            input_uri = entry
 
           domain_col =
             '<table class="nested-col-table">' +

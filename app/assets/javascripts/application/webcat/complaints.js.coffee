@@ -30,10 +30,17 @@ window.remove_entry_from_changes = (entry_id, type) ->
 
   changes = (sessionStorage.getItem(changed) || "")
   if changes.includes(entry_id)
-    entries = changes.split(",").filter((item) -> return item)
-    submitted_entry = entries.indexOf(entry_id)
-    new_changes = entries.splice(submitted_entry, 1)
+    entries = changes.split(',')
+    new_changes = []
+
+    $(entries).each ->
+      entry = this.toString()
+      if entry != entry_id.toString()
+        new_changes.push(entry)
+
+    new_changes.join(',')
     sessionStorage.setItem(changed, new_changes)
+
 
 window.getTouchedFormCount = () ->
   form_item = (sessionStorage.getItem("webcat_entries_changed") || "")

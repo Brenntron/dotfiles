@@ -717,7 +717,6 @@ process_review = (entry_data) ->
       data: [entry_data]
     }
     success: (response) ->
-#      debugger
       data = $.parseJSON(response)
       msg = $('#' + data.entry_id + ' .temp-msg')
       $(msg).text('Submitted. Refresh to see new results.')
@@ -844,9 +843,13 @@ $ ->
     temp_msg = '<h3 class="temp-msg">Submitting entry...</h3>'
     $(row).append('<td colspan="' + visible_cols + '">' + temp_msg + '</td>')
 
+    # remove from changes must be done before submission in case user clicks
+    # bulk submission before ind submission is finished processing
     if curr_status == 'PENDING'
+      remove_entry_from_changes(entry_id, 'review')
       process_review(entry_data)
     else
+      remove_entry_from_changes(entry_id, 'submit')
       process_entry(entry_data)
       # submit for real
 
