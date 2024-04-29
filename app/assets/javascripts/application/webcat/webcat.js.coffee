@@ -299,7 +299,6 @@ $ ->
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,
-      maxItems: 5,
       valueField: 'category_id',
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
@@ -323,7 +322,6 @@ $ ->
     $('#status-input').selectize {
       persist: false,
       create: false,
-      maxItems: 6,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
@@ -337,7 +335,6 @@ $ ->
     $('#resolution-input').selectize {
       persist: false,
       create: false,
-      maxItems: 3,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
@@ -376,7 +373,6 @@ $ ->
     $('#channel-input').selectize {
       persist: false,
       create: false,
-      maxItems: 2,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
