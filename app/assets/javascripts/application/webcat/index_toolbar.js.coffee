@@ -113,7 +113,7 @@ save_display_prefs = () ->
 # Sorting functions
 window.sort_webcat_index = () ->
   order = $('#webcat-index-sort-order').attr('data-sort')
-  sort_by = $('#webcat-index-sort-select').val()
+  col = $('#webcat-index-sort-select').val()
   complaint_table = $('#complaints-index').DataTable()
   complaint_table.order([col, order]).draw();
   complaint_table.on 'draw', ->
