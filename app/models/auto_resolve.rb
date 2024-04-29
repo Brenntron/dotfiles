@@ -512,7 +512,7 @@ class AutoResolve
       dispute_entry.save
 
       if dispute_entry.retries <= 3
-        dispute_entry.satus = DisputeEntry::PROCESSING
+        dispute_entry.status = DisputeEntry::PROCESSING
       else
         dispute_entry.status = DisputeEntry::NEW
       end
