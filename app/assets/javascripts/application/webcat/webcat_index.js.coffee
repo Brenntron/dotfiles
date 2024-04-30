@@ -105,7 +105,6 @@ build_complaints_table = (url) ->
       $(row).attr('data-status', data.status)
 
     drawCallback: () ->
-
       if localStorage.webcat_reset_page
         localStorage.removeItem('webcat_reset_page')
 
@@ -121,6 +120,9 @@ build_complaints_table = (url) ->
 
         if webcat_search_type == 'advanced' && search_name_check && text_check
           temporary_search_link(webcat_search_name, webcat_search_conditions)
+
+        ## Make sure we are showing correct cols - this is needed here for if user changes page length & other dt actions
+        get_display_prefs()
 
     pagingType: 'full_numbers'
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
