@@ -147,9 +147,11 @@ build_csam_reports_table = () ->
     ]
 
     initComplete: ->
-      # these need to be initialized after the dt is built
+      # this need to be initialized after the dt is built
       $('#webcat-csam-reports-index_filter input').addClass('table-search-input')
 
+    drawCallback: () ->
+      # call whenever table is drawn
       $('.report-id-wrapper').click ->
         source = $(this).attr('data-report-source')
         record_id = $(this).attr('data-record-id')
@@ -170,7 +172,6 @@ build_csam_reports_table = () ->
         url = $(this).attr('data-url')
         entry_data = {entry_id: entry_id, url: url}
         open_forward_report_dialog([entry_data])
-
   )
 
 
