@@ -109,13 +109,21 @@
     .ce-resolved-ip-uri-wrapper
       %label.content-label-sm
         Resolved IP/URI
-      %input.ce-input.ce-ip-uri-input{ value: @submitted_ip_uri }
+      %input.ce-input.ce-ip-uri-input{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                       value: @submitted_ip_uri }
       .ce-resolved-ip-uri-button-wrapper
-        %button.ip-uri-button
+        %button.ip-uri-button#ce_ip_uri_domain{ data: { val: @complaint_entry.domain },
+                                                # Disable the domain button if the ComplaintEntry doesn't have a path or a subdomain.
+                                                disabled: @complaint_entry.path.empty? && @complaint_entry.subdomain.empty?,
+                                                onclick: "update_uri_input('#{@complaint_entry.domain}', 'domain')" }
           domain
-        %button.ip-uri-button
+        %button.ip-uri-button#ce_ip_uri_subdomain{ data: { val: @complaint_entry.subdomain },
+                                                   disabled: @complaint_entry.subdomain.empty?,
+                                                   onclick: "update_uri_input('#{@complaint_entry.subdomain}.#{@complaint_entry.domain}', 'subdomain')" }
           subdomain
-        %button.ip-uri-button
+        %button.ip-uri-button#ce_ip_uri_original{ data: { val: @complaint_entry.path },
+                                                  disabled: true,
+                                                  onclick: "update_uri_input('#{@complaint_entry.uri}', 'original uri')" }
           original uri
     .ce-categories-wrapper
       %label.content-label-sm

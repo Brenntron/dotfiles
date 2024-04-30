@@ -502,6 +502,40 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         window.open("https://www.google.com/search?q=#{path}", '_blank')
     )
 
+  window.update_uri_input = (value, type) ->
+    $input = $('.ce-ip-uri-input')
+    $domain = $('#ce_ip_uri_domain')
+    $subdomain = $('#ce_ip_uri_subdomain')
+    $original = $('#ce_ip_uri_original')
+
+    $input.val(value)
+
+    if ['original uri', 'subdomain'].includes(type)
+      $domain.prop('disabled', false)
+
+      switch type
+        when 'original uri'
+          $original.prop('disabled', true)
+
+          unless $('#ce_ip_uri_subdomain').attr('data-val') == ''
+            $subdomain.prop('disabled', false)
+
+          break
+        when 'subdomain'
+          $subdomain.prop('disabled', true)
+
+          unless $('#ce_ip_uri_original').attr('data-val') == ''
+            $original.prop('disabled', false)
+
+          break
+    else
+      $domain.prop('disabled', true)
+
+      unless $subdomain.attr('data-val') == ''
+        $subdomain.prop('disabled', false)
+      unless $original.attr('data-val') == ''
+        $original.prop('disabled', false)
+
   window.submit_show_page_changes = (entry_id) ->
     std_msg_ajax(
       method: 'POST'
