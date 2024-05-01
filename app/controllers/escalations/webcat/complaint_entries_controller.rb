@@ -15,7 +15,7 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
     @complaint_entry = ComplaintEntry.find(params[:id])
     @complaint = @complaint_entry.complaint
     @source = @complaint.ticket_source
-    @wbrs_score = @complaint_entry.wbrs_score.nil? ? 0 : @complaint_entry.wbrs_score.round(2)
+    @wbrs_score = @complaint_entry.wbrs_score.nil? ? 0 : @complaint_entry.wbrs_score.round(1)
     @submitted_ip_uri = if @complaint_entry.uri.nil?
                           @complaint_entry.ip_address
                         else
