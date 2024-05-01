@@ -57,4 +57,12 @@ module Escalations::Webcat::ComplaintEntriesHelper
       content_tag :p, 'No tags', id: 'ce_tags', class: 'missing-data'
     end
   end
+
+  def missing_path?(complaint_entry)
+    @complaint_entry.path.nil? || @complaint_entry.path.empty?
+  end
+
+  def missing_subdomain?(complaint_entry)
+    @complaint_entry.subdomain.nil? || @complaint_entry.subdomain.empty?
+  end
 end
