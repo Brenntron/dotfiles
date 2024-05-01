@@ -174,26 +174,28 @@
     %label.data-report-label
       domain
     %table.data-report-table#ce_domain_table
-      %tbody
+      %tbody.ce_domain_tbody
         %tr
+          %td.data-report-table-column-header
+            Domain Name
           %td#domain_title
-            = @submitted_ip_uri
-    %label.data-report-label#ce_registrant_label
+            = @complaint_entry.domain
+    %label.data-report-label.ce-whois-label#ce_admin_label
+      admin
+    %table.data-report-table.ce-whois-table#ce_admin_table
+      %tbody#ce_admin_tbody
+    %label.data-report-label.ce-whois-label#ce_registrant_label
       registrant
-    %table.data-report-table#ce_registrant_table
-      %tbody
-        %tr
-          %td.data-report-table-column-header
-            Organization
-          %td#registrant_organization
-        %tr
-          %td.data-report-table-column-header
-            Country
-          %td#registrant_country
-        %tr
-          %td.data-report-table-column-header
-            State/Province
-          %td#registrant_state
+    %table.data-report-table.ce-whois-table#ce_registrant_table
+      %tbody#ce_registrant_tbody
+    %label.data-report-label.ce-whois-label#ce_tech_label
+      tech
+    %table.data-report-table.ce-whois-table#ce_tech_table
+      %tbody#ce_tech_tbody
+    %label.data-report-label.ce-whois-label#ce_domain_status_label
+      domain status
+    %table.data-report-table.ce-whois-table#ce_domain_status_table
+      %tbody#ce_domain_status_tbody
     %table.data-report-table#ce_name_servers_table
       %thead
         %tr
@@ -203,5 +205,5 @@
 :javascript
   window.set_headers();
   window.set_entry_id();
-  window.set_complaint_entry_data("#{@complaint_entry.category}", #{@complaint_entry.status});
+  window.set_complaint_entry_data("#{@complaint_entry.category}", '#{@complaint_entry.status}');
   window.set_tags("#{@tags.join(', ')}");

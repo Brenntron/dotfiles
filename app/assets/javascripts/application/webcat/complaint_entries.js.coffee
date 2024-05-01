@@ -143,15 +143,69 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           parsed_data = WebCat.RepLookup.parseIcannData(response.data)
 
           for datum_key, datum_value of parsed_data
+            # Skip to the next iteration if the value is falsy
+            continue unless datum_value
+
             switch datum_key
-              when 'registrant organization' then $('#registrant_organization').append(datum_value)
-              when 'registrant country' then $('#registrant_country').append(datum_value)
-              when 'registrant state/province' then $('#registrant_state').append(datum_value)
+              when 'Domain Name', 'name server' then continue
+              when 'domain status'
+                rows = ''
+                for domain_status in datum_value
+                  continue unless domain_status
+
+                  rows += """
+                  <tr>
+                    <td>
+                      #{domain_status}
+                    </td>
+                  </tr>
+                  """
+
+                $('#ce_domain_status_label').show()
+                $('#ce_domain_status_table').show()
+                $('#ce_domain_status_tbody').append(rows)
               when 'nserver'
                 for nserver in datum_value
+                  continue unless nserver
+
                   row = "<tr><td>#{nserver}</td></tr>"
 
                   $('#ce_nserver_tbody').append(row)
+                  $('#ce_name_servers_table').show()
+              else
+                switch
+                  when datum_key.includes('admin')
+                    $('#ce_admin_label').show()
+                    $('#ce_admin_table').show()
+                    $tbody = $('#ce_admin_tbody')
+                  when datum_key.includes('registrant')
+                    $('#ce_registrant_label').show()
+                    $('#ce_registrant_table').show()
+                    $tbody = $('#ce_registrant_tbody')
+                  when datum_key.includes('tech')
+                    $('#ce_tech_label').show()
+                    $('#ce_tech_table').show()
+                    $tbody = $('#ce_tech_tbody')
+                  when datum_key.includes('updated date') || datum_key.includes('registry domain id')
+                    $tbody = $('#ce_domain_tbody')
+
+                header = datum_key.split(/[\s|\/]/).map((word) -> word[0].toUpperCase() + word[1..-1])
+                  .reduce((acc, word) ->
+                    return acc + (if acc.includes('State') then '/' else ' ') + word
+                  )
+
+                row = """
+                <tr>
+                  <td class='data-report-table-column-header'>
+                    #{header}
+                  </td>
+                  <td id='#{datum_key.split(' ').join('_').replace('/', '_')}'>
+                    #{datum_value}
+                  </td>
+                </tr>
+                """
+
+                $tbody.append(row)
         else
           message = "No available responses. The IP address may be unallocated or its whois server is unavailable."
 
