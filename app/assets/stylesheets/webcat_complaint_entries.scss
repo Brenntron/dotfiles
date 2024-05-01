@@ -373,7 +373,7 @@ $selectize-border: #E5E5E5;
       background-color: $content-bg-color;
       border: 1px solid $type-lighter-color;
       border-radius: 50%;
-      color: black;
+      // color: black;
       display: grid;
       height: 14px;
       margin: 0;
@@ -406,6 +406,22 @@ $selectize-border: #E5E5E5;
       &:focus {
         outline: none;
       }
+
+      &:disabled {
+        appearance: auto;
+        background-color: $type-lighter-color;
+        border-color: $type-lighter-color;
+        color: $content-bg-color;
+      }
+
+      &:disabled::before {
+        background-color: initial;
+        border: 0;
+        content: none;
+        outline: 0;
+        outline-offset: 0;
+        transform: none;
+      }
     }
 
     .radio-label {
@@ -432,17 +448,27 @@ $selectize-border: #E5E5E5;
     }
   }
 
-  #ce_registrant_label, #ce_name_servers_header {
+  #ce_whois_label, #ce_name_servers_header {
     border-bottom: 1px solid $faint-neutral-color;
   }
 
-  #ce_registrant_table {
-    margin-top: 0;
+  #ce_whois_label {
+    display: none;
+  }
+
+  #ce_whois_table {
     border-bottom: 1px solid $faint-neutral-color;
+    display: none;
+    margin-top: 0;
+  }
+
+  #ce_name_servers_table {
+    display: none;
   }
 
   .data-report-table-column-header {
     font-weight: 900;
+    padding-right: 5px;
     width: 125px;
   }
 }
