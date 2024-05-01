@@ -174,19 +174,19 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
                   $('#ce_name_servers_table').show()
               else
                 switch
-                  when datum_key.includes('admin')
+                  when datum_key.includes('admin ')
                     $('#ce_admin_label').show()
                     $('#ce_admin_table').show()
                     $tbody = $('#ce_admin_tbody')
-                  when datum_key.includes('registrant')
+                  when datum_key.includes('registrant ')
                     $('#ce_registrant_label').show()
                     $('#ce_registrant_table').show()
                     $tbody = $('#ce_registrant_tbody')
-                  when datum_key.includes('tech')
+                  when datum_key.includes('tech ')
                     $('#ce_tech_label').show()
                     $('#ce_tech_table').show()
                     $tbody = $('#ce_tech_tbody')
-                  when datum_key.includes('updated date') || datum_key.includes('registry domain id')
+                  else
                     $tbody = $('#ce_domain_tbody')
 
                 header = datum_key.split(/[\s|\/]/).map((word) -> word[0].toUpperCase() + word[1..-1])

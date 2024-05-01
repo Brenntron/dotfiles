@@ -174,12 +174,15 @@
     %label.data-report-label
       domain
     %table.data-report-table#ce_domain_table
-      %tbody.ce_domain_tbody
+      %tbody#ce_domain_tbody
         %tr
           %td.data-report-table-column-header
-            Domain Name
+            - if @complaint_entry.domain.present?
+              Domain Name
+            - else
+              IP Address
           %td#domain_title
-            = @complaint_entry.domain
+            = @whois_lookup
     %label.data-report-label.ce-whois-label#ce_admin_label
       admin
     %table.data-report-table.ce-whois-table#ce_admin_table

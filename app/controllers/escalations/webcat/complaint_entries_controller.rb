@@ -26,6 +26,7 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
                 else
                   @complaint.customer_org
                 end
+    @whois_lookup = @complaint_entry.domain.present? ? @complaint_entry.domain : @complaint_entry.ip_address
     @tags = @complaint.complaint_tags.map(&:name)
   end
 
