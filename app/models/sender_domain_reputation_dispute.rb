@@ -56,12 +56,6 @@ class SenderDomainReputationDispute < ApplicationRecord
 }.freeze
 
   def self.process_bridge_payload(message_payload)
-    customer_payload = {
-        customer_name: message_payload[:payload][:customer_name],
-        customer_email: message_payload[:payload][:customer_email],
-        company_name: message_payload[:payload][:company_name]
-    }
-
     #check to see if ticket already exists in database to prevent accidental dupes
     record_exists = SenderDomainReputationDispute.where(:ticket_source_key => message_payload[:source_key]).first
 
@@ -71,6 +65,11 @@ class SenderDomainReputationDispute < ApplicationRecord
     end
 
     begin
+      customer_payload = {
+        customer_name: message_payload[:payload][:customer_name],
+        customer_email: message_payload[:payload][:customer_email],
+        company_name: message_payload[:payload][:company_name]
+      }
 
       is_duplicate = false
       user = User.where(cvs_username:"vrtincom").first
