@@ -1,5 +1,5 @@
 .complaints-metrics-banner
-  // middle column
+
   .main-metrics
     .metrics-col
       %span.metric-header#allTalosTickets
@@ -56,15 +56,15 @@
         %a#jira-assigned-count.metric-assigned.metric-number{href: '?f=JIRA%20ASSIGNED'}
           = "#{@jira_assigned_count} Assigned"
 
-    // right column
-    .metrics-col.wbnp-area
-      .metric-header
-        %span.wbnp-loading-spinner.sync-button-white.sync_rotate
-        WBNP Report Status:
-      %a#wbnp-report-status-link.esc-tooltipped-webcat-toolbar{'data-tooltip-content':'#tooltip-wbnp-content'}
-        .wbnp-report-status Checking...
-      - if current_user.is_webcat_manager?
-        %button#wbnp-report-button.wbnp-full-report.icon-reports-white
+  // right column
+  .metrics-col.wbnp-area
+    .metric-header
+      %span.wbnp-loading-spinner.sync-button-white.sync_rotate
+      WBNP Report Status:
+    %a#wbnp-report-status-link.esc-tooltipped-webcat-toolbar{'data-tooltip-content':'#tooltip-wbnp-content'}
+      .wbnp-report-status Checking...
+    - if current_user.is_webcat_manager?
+      %button#wbnp-report-button.wbnp-full-report.icon-reports-white
 
 
 #tooltip-wbnp

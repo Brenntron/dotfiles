@@ -300,7 +300,6 @@ $ ->
     category_input = $('#category-input').selectize {
       persist: true,
       create: false,
-      maxItems: 5,
       valueField: 'category_id',
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
@@ -324,7 +323,6 @@ $ ->
     $('#status-input').selectize {
       persist: false,
       create: false,
-      maxItems: 6,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
@@ -338,7 +336,6 @@ $ ->
     $('#resolution-input').selectize {
       persist: false,
       create: false,
-      maxItems: 3,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
@@ -377,7 +374,6 @@ $ ->
     $('#channel-input').selectize {
       persist: false,
       create: false,
-      maxItems: 2,
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
@@ -719,7 +715,6 @@ process_review = (entry_data) ->
       data: [entry_data]
     }
     success: (response) ->
-#      debugger
       data = $.parseJSON(response)
       msg = $('#' + data.entry_id + ' .temp-msg')
       $(msg).text('Submitted. Refresh to see new results.')
@@ -846,9 +841,13 @@ $ ->
     temp_msg = '<h3 class="temp-msg">Submitting entry...</h3>'
     $(row).append('<td colspan="' + visible_cols + '">' + temp_msg + '</td>')
 
+    # remove from changes must be done before submission in case user clicks
+    # bulk submission before ind submission is finished processing
     if curr_status == 'PENDING'
+      remove_entry_from_changes(entry_id, 'review')
       process_review(entry_data)
     else
+      remove_entry_from_changes(entry_id, 'submit')
       process_entry(entry_data)
       # submit for real
 

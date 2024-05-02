@@ -6,7 +6,7 @@ $ ->
 
     # Create index table
     url = $('#complaints-index').data('source')
-    $.when(pull_user_preference_filter()).done ->
+    $.when(window.pull_user_preference_filter()).done ->
       build_complaints_table(url)
 
 #### New complaints index table setup
@@ -105,7 +105,6 @@ build_complaints_table = (url) ->
       $(row).attr('data-status', data.status)
 
     drawCallback: () ->
-
       if localStorage.webcat_reset_page
         localStorage.removeItem('webcat_reset_page')
 
@@ -121,6 +120,9 @@ build_complaints_table = (url) ->
 
         if webcat_search_type == 'advanced' && search_name_check && text_check
           temporary_search_link(webcat_search_name, webcat_search_conditions)
+
+        ## Make sure we are showing correct cols - this is needed here for if user changes page length & other dt actions
+        get_display_prefs()
 
     pagingType: 'full_numbers'
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
@@ -347,8 +349,10 @@ build_complaints_table = (url) ->
 
           if (full.status == 'COMPLETED') || (full.status == 'PENDING')
             input_uri = full.uri_as_categorized
-          else
+          else if domain? && domain != ''
             input_uri = domain
+          else
+            input_uri = entry
 
           domain_col =
             '<table class="nested-col-table">' +
@@ -639,11 +643,19 @@ build_data = () ->
           search_conditions: webcat_search_conditions
         }
       when 'standard'
-        urlParams = new URLSearchParams(location.search);
+        # check address bar, then local storage
+        if location.search != ''
+          urlParams = new URLSearchParams(location.search);
+          search_name = urlParams.get('f')
+        else if webcat_search_name?
+          search_name = webcat_search_name.split('=').pop()
+        else
+          # this shouldn't happen but just in case something wasn't stored properly this will at least reset to some data populating
+          search_name = "MY TICKETS"
         refresh_localStorage()
         data = {
           search_type: webcat_search_type
-          search_name: urlParams.get('f')
+          search_name: search_name
         }
       when 'named'
         data = {
