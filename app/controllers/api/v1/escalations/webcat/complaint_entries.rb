@@ -632,7 +632,6 @@ module API
               pre_raw_records.each do |raw_record|
                 next if raw_record.nil?
                 skip = false
-                binding.pry
                 raw_records.each do |raw_check|
                   if raw_record.event_id == raw_check.event_id && raw_record.prefix_id == raw_check.prefix_id && raw_record.category.category_id == raw_check.category.category_id
                     skip = true
