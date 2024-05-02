@@ -35,6 +35,13 @@ class JiraImportTask < ApplicationRecord
     'BAST_COMMENT' => 'BAST comment'
   }
 
+  #Platforms that have different names in Jira
+  PLATFORM_MAP = {
+    'Secure Email' => 'Email Security Appliance',
+    'Secure Firewall' => 'FirePower',
+    'Secure Web' => 'Web Security Appliance',
+  }
+
   CACHE_LIFESPAN = 30
 
   def issue
@@ -170,13 +177,14 @@ class JiraImportTask < ApplicationRecord
                   ticketable_url.update(bast_verdict: v["import"], complaint_id: existing_entry.complaint_id)
                 end
               else
+                platform = PLATFORM_MAP[issue_platform].present? ? PLATFORM_MAP[issue_platform] : issue_platform
                 complaint_options = [
                   EscalationTicket,
                   ticketable_urls.first.submitted_url,
                   description,
                   Customer::JIRA_GENERATED,
                   nil,                     # tags
-                  issue_platform,          # platform
+                  platform,                # platform
                   Complaint::NEW,          # status
                   nil,                     # categories
                   nil,                     # user email
@@ -324,4 +332,5 @@ class JiraImportTask < ApplicationRecord
   def has_open_complaints?
     self.import_urls.joins(:complaint).where.not(complaint: {status: [Complaint::COMPLETED, Complaint::RESOLVED]}).any?
   end
+
 end
