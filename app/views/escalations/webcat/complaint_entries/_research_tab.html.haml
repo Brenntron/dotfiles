@@ -1,4 +1,5 @@
 .row.ce-research-tab
+  #alert_message
   .col-xs-4.ce-research-column
     %h1.ce-tab-title Research
     %h5.research-data-header.text-uppercase
@@ -128,26 +129,30 @@
     .ce-categories-wrapper
       %label.content-label-sm
         Categories
-      %input.ce-categories-select.ce-input#ce_categories_select{ placeholder: 'Enter Categories / Confidence Order' }
+      %input.ce-categories-select.ce-input#ce_categories_select{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                                                 placeholder: 'Enter Categories / Confidence Order' }
     .ce-resolution-wrapper
       %label.content-label-sm
         Resolution
       .ce-radio-group-wrapper
         .ce-radio-group
-          %input.resolution-radio-button{ name: 'resolution',
+          %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                          name: 'resolution',
                                           type: 'radio',
                                           value: 'unchanged' }
           %label.radio-label{ for: 'unchanged' }
             Unchanged
         .ce-radio-group
-          %input.resolution-radio-button{ name: 'resolution',
+          %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                          name: 'resolution',
                                           checked: true,
                                           type: 'radio',
                                           value: 'fixed' }
           %label.radio-label{ for: 'fixed' }
             Fixed
         .ce-radio-group
-          %input.resolution-radio-button{ name: 'resolution',
+          %input.resolution-radio-button{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                          name: 'resolution',
                                           type: 'radio',
                                           value: 'invalid' }
           %label.radio-label{ for: 'invalid' }
@@ -155,19 +160,25 @@
     .ce-customer-comment-wrapper
       %label.content-label-sm
         Email Response to Customer
-      %select.ce-customer-comment-select-box.ce-input{ id: "entry-email-response-to-customers-select_#{@complaint_entry.id}" }
-        %option{ value: 'fixed', selected: true } Fixed- Default Response
-      %textarea.ce-customer-comment-textarea.ce-input{ id: "entry-email-response-to-customers_#{@complaint_entry.id}",
+      %select.ce-customer-comment-select-box.ce-input.response-template-select{ id: "entry-email-response-to-customers-select_#{@complaint_entry.id}" }
+        %option{ value: 'fixed', selected: true } Fixed - Default Response
+      %textarea.ce-customer-comment-textarea.ce-input{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                                       id: "entry-email-response-to-customers_#{@complaint_entry.id}",
                                                        name: 'ce_customer_comment_textarea',
                                                        maxlength: '64000' }
     .ce-internal-comment-wrapper
       %label.content-label-sm
         Internal Comment
-      %textarea.ce-internal-comment-textarea.ce-input{ name: 'ce_internal_comment_textarea',
+      %textarea.ce-internal-comment-textarea.ce-input{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                                       name: 'ce_internal_comment_textarea',
                                                        placeholder: 'Internal note for choosing categories' }
     .text-center
-      %button.tertiary.ce-submit-button{ onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
-        submit
+      - if @complaint_entry.status == 'COMPLETED'
+        %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
+          reopen
+      - else
+        %button.tertiary.ce-submit-button{ onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+          submit
   .col-xs-3.ce-research-column
     %h5.research-data-header.text-uppercase
       whois
