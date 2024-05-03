@@ -6,7 +6,6 @@ module API
           include API::V1::Defaults
 
           resource "escalations/webcat/complaint_entries" do
-          require 'pry'
 
             before do
               PaperTrail.request.whodunnit = current_user.id if current_user.present?

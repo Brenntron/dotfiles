@@ -223,6 +223,12 @@ $ ->
     entry_id = $(this).attr('id').replace(lc_res, '')
     get_resolution_templates(resolution, 'individual', [entry_id])
 
+  # Update complaint entry show page templates and text when a user selects a different resolution
+  if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
+    $(document).on 'change', '.resolution-radio-button', ->
+      entry_id = $('#complaint_entry_id')[0].innerText
+      resolution = $(this).val()
+      get_resolution_templates(resolution, 'individual', [entry_id])
 
 window.create_ind_res_dialogs = () ->
   fixed_res = []
