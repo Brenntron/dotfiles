@@ -323,21 +323,24 @@ $selectize-border: #E5E5E5;
     }
   }
 
-  .ce-ip-uri-input, .ce-customer-comment-select-box, .ce-categories-select {
+  .selectize-control.ce-ip-uri-input, .selectize-control.ce-customer-comment-select-box, .selectize-control.ce-categories-select {
+    margin: 0;
     min-height: 33px;
+    padding: 3px 4px 7px 4px;
   }
 
   .ce-categories-select {
     .selectize-input {
       background-color: lighten($faint-accent-color, 5%);
-      top: 8px;
-
-      input {
-        left: 2px;
-      }
+      margin-bottom: -7px !important;
     }
+
     .selectize-input.disabled {
       top: 2px;
+    }
+
+    &.selectize-dropdown {
+      margin-top: 12px;
     }
   }
 
