@@ -399,7 +399,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         'url': url
       success: (response) ->
         data = response.data
-        console.log('data: ', data)
 
         if data.error?
           std_msg_error(data.error, [])
