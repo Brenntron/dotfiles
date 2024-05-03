@@ -171,7 +171,7 @@ For future web and email reputation requests, please open a web and email reputa
 
   end
 
-  def create_complaint_paper_trail(bugzilla_rest_session, url, description, customer, tags, platform, status, category_names_string, user)
+  def self.create_complaint_paper_trail(bugzilla_rest_session, url, description, customer, tags, platform, status, category_names_string, user)
     top_url = Wbrs::TopUrl.check_urls([url]).first.is_important
 
     if top_url
