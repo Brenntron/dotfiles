@@ -130,7 +130,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           }
         )
 
-
   get_whois_data = (domain) ->
     $.ajax(
       method: 'GET'
@@ -234,28 +233,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       success: (response) ->
         { current_category_data : current_categories, sds_category, sds_domain_category } = JSON.parse(response)
         wbrs_table_rows = ""
-        current_categories = if Object.keys(current_categories).length > 0
-                               current_categories
-                             else
-                               {
-                                 "1.0": {
-                                   "category_id": 2,
-                                   "desc_long": "Galleries and exhibitions; artists and art; photography; literature and books; performing arts and theater; musicals; ballet; museums; design; architecture.  Cinema and television are classified as Entertainment.",
-                                   "descr": "Arts",
-                                   "mnem": "art",
-                                   "is_active": true,
-                                   "confidence": 1,
-                                   "top_certainty": 1000,
-                                   "certainties": [
-                                     {
-                                       "category_id": 2,
-                                       "certainty": 1000,
-                                       "source_mnemonic": "cipr_multi",
-                                       "source_description": "Multicat Cisco/IronPort Rules"
-                                     }
-                                   ]
-                                 }
-                               }
+
         if Object.keys(current_categories).length > 0
           $.each current_categories, (conf, current_category) ->
             # For $.each returning non-false is the same as a continue statement in a for loop
@@ -368,6 +346,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           formatted_entry_history = parsed_response.entry_history.complaint_history.map((historical_data) ->
             formatted_history_data = {}
             formatted_history_data['time'] = historical_data[0]
+            formatted_history_data['sortable_time'] = moment(historical_data[0], 'MMMM D, YYYY at HH:mm A')
             formatted_history_data['user'] = historical_data[1]['whodunnit']
 
             delete historical_data[1]['whodunnit']
@@ -402,44 +381,31 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
                   return detail_segments.join('')
               }
+              {
+                data: 'sortable_time'
+                visible: false
+              }
             ]
           $('#ce_entry_history_table')
       error: (response) ->
     )
 
-  get_xbrs_history = (domain) ->
+  get_xbrs_history = (url) ->
     $.ajax(
-      url: "/escalations/api/v1/escalations/webcat/complaints/get_xbrs_domain_history"
-      method: 'GET'
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/xbrs'
+      method: 'POST'
       headers: headers
       data:
-        'domains': domain
+        'url': url
       success: (response) ->
-        data = JSON.parse response
+        data = response.data
+        console.log('data: ', data)
 
         if data.error?
           std_msg_error(data.error, [])
         else
-          object_keys = Object.keys(data)
-
-          data = if object_keys.length > 0
-                   domainKey = Object.keys(data)[0]
-
-                   for entry in data[domainKey]
-                     entry.domain = domainKey
-
-                     subdomain_array = domainKey.split('.')[0]
-                     entry.subdomain = if subdomain_array.length > 1 then subdomain_array[0] else ''
-
-                     # separate on first occurrence of '/' to capture the path
-                     path_array = domainKey.split(/\/(.*)/)
-                     entry.path = if path_array.length > 1 then path_array[1]  else ''
-
-                     entry.operation = if entry.operation? then entry.operation else ''
-
-                   data[domainKey]
-                 else
-                   []
+          for datum in data
+            datum['sortable_time'] = moment(datum.time, 'MMMM D, YYYY at HH:mm A')
 
           $('#ce_xbrs_history_table').DataTable({
             data: data
@@ -448,34 +414,39 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             paging: false
             searching: false
             stateSave: false
-            columns: [
+            columnDefs: [
               {
-                data: null
-                render: (data) ->
-                  if data.aups.length > 0
-                    cats = $.unique(data.aups.map((aup) -> aup.cat)).toString().split(',').join(', ')
-                    return "<p>#{cats}</p>"
-                  else
-                    return "<p class='missing-data'>N/A</p>"
+                targets: [ 0 ]
+                orderData: 6
               }
+            ]
+            columns: [
               {
                 data: 'time'
               }
               {
-                data: 'subdomain'
+                data: 'score'
               }
               {
-                data: 'domain'
+                data: 'v2'
               }
               {
-                data: 'path'
+                data: 'v3'
               }
               {
-                data: 'operation'
+                data: 'threatCats'
+              }
+              {
+                data: 'ruleHits'
+              }
+              {
+                data: 'sortable_time'
+                visible: false
               }
             ]
           })
       error: (error) ->
+        console.error(error)
     )
 
   get_related_history = (domain) ->
@@ -530,7 +501,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           path = "http://[#{ip_address}]"
 
         if parseInt(wbrs_score) <= -6
-          show_message('error', "#{path} could not open due to low WBRS Scores.")
+          show_message('error', "#{path} could not open due to low WBRS Scores.", false, '#alert_message')
         else if viewable
           window.open(path, '_blank')
         else
@@ -604,32 +575,35 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         # slight differences in data sent
         if curr_status == 'PENDING'
           status = ''
+        { status: curr_status } = data.complaint
+        { uri } = data.complaint_entry
+        cat_ids = null
+        category_names = []
+        comment = $('.ce-internal-comment-textarea').val()
+        commit = ''
+        resolution_msg = $('ce-customer-comment-textarea').val()
+        status = ''
+
+        # slight differences in data sent
+        if curr_status == 'PENDING'
           commit = $('input[name=resolution]:checked').val()
           # we are disabling the button if ignore is checked, but just in case
           if commit == 'ignore'
             return
         else
-          commit = ''
           status = $('input[name=resolution]:checked').val()
-
-        comment = $('.ce-internal-comment-textarea').val()
-        resolution_msg = $('ce-customer-comment-textarea').val()
 
         if $('#ce_categories_select-selectized').val() != null
           cat_ids = $('#ce_categories_select-selectized').val().toString()
-        else
-          cat_ids = null
-        category_name = $('#ce_categories_select-selectized').next('.selectize-control').find('.item')
-        category_names = []
-        category_name.each ->
+
+        $('#ce_categories_select-selectized').next('.selectize-control').find('.item').each ->
           category_names.push($(this).text())
-        category_names = category_names.toString()
 
         entry_data = {
           'id': entry_id,
           'prefix': uri,
           'categories': cat_ids,
-          'category_names': category_names,
+          'category_names': category_names.toString(),
           'status': status,
           'commit': commit,
           'comment': comment,
@@ -666,24 +640,20 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       data: entry_data
       success: (response) ->
         data = $.parseJSON(response)
+
         if data.error?
-          err_msg = data.error
-          msg = $('#' + data.entry_id + ' .temp-msg')
-          $(msg).text('Submission failed: ' + err_msg)
+          show_message('error', "Submittions failed: #{data.error}", false, '#alert_message')
         else
-          msg = $('#' + data.entry_id + ' .temp-msg')
-          $(msg).text('Submitted. Refresh to see new results.')
-          $(msg).addClass('submitted-row')
-          remove_entry_from_changes(data.entry_id, 'submit')
+          show_message('success', 'Submitted. Refresh to see new results.', false, '#alert_message')
       error: (response) ->
         msg = response.resonseJSON.error
+
         std_msg_error("Error submitting entry", msg, reload: false)
     , this)
 
-
   # Sending individual reviewed (PENDING) entry info to the backend
   process_review = (entry_data) ->
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    headers = { 'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val() }
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
       method: 'POST'
@@ -692,16 +662,35 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         data: [entry_data]
       }
       success: (response) ->
-#      debugger
-        data = $.parseJSON(response)
-        msg = $('#' + data.entry_id + ' .temp-msg')
-        $(msg).text('Submitted. Refresh to see new results.')
-        $(msg).addClass('submitted-row')
-        remove_entry_from_changes(data.entry_id, 'review')
+        show_message('success', 'Submitted. Refresh to see new results.', false, '#alert_message')
       error: (response) ->
         msg = response.resonseJSON.error
+
         std_msg_error("Error submitting reviewed entries", msg, reload: false)
     , this)
+
+  window.reopen_complaint = () ->
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/reopen_complaint_entry'
+      method: 'POST'
+      data: { 'complaint_entry_id': entry_id }
+      success: (response) ->
+        $button = $('.ce-submit-button')
+
+        $('#RE-OPENED').prop('checked', true)
+
+        $('.resolution-radio-button').each ->
+          $(this).prop('disabled', false)
+        $('.ce-ip-uri-input').prop('disabled', false)
+        $('#ce_categories_select')[0].selectize.enable()
+        $('.ce-internal-comment-textarea').prop('disabled', false)
+
+        $button.attr('onclick', "submit_changes(#{entry_id});")
+        $button.text('submit')
+
+      error: (response) ->
+        std_msg_error(response,"", reload: false)
+    )
 
   $ ->
     if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
