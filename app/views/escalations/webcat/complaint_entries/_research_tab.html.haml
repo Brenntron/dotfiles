@@ -160,7 +160,8 @@
     .ce-customer-comment-wrapper
       %label.content-label-sm
         Email Response to Customer
-      %select.ce-customer-comment-select-box.ce-input.response-template-select{ id: "entry-email-response-to-customers-select_#{@complaint_entry.id}" }
+      %select.ce-customer-comment-select-box.ce-input.response-template-select{ disabled: (true if @complaint_entry.status == "COMPLETED"),
+                                                                                id: "entry-email-response-to-customers-select_#{@complaint_entry.id}" }
         %option{ value: 'fixed', selected: true } Fixed - Default Response
       %textarea.ce-customer-comment-textarea.ce-input{ disabled: (true if @complaint_entry.status == "COMPLETED"),
                                                        id: "entry-email-response-to-customers_#{@complaint_entry.id}",
@@ -172,13 +173,31 @@
       %textarea.ce-internal-comment-textarea.ce-input{ disabled: (true if @complaint_entry.status == "COMPLETED"),
                                                        name: 'ce_internal_comment_textarea',
                                                        placeholder: 'Internal note for choosing categories' }
-    .text-center
-      - if @complaint_entry.status == 'COMPLETED'
-        %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
-          reopen
-      - else
-        %button.tertiary.ce-submit-button{ onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
-          submit
+    - if @complaint_entry.is_important
+      .row.text-center
+        .col-xs-6
+          .ce-allow-review-container
+            - if current_user.enabled_self_review
+              %input{ type: 'checkbox', id: 'self_review', checked: true }
+            - else
+              %input{ type: 'checkbox', id: 'self_review', checked: false }
+            %label{ for: 'self_review' }
+              Allow Self Review
+        .col-xs-6
+          - if @complaint_entry.status == 'COMPLETED'
+            %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
+              reopen
+          - else
+            %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+              submit
+    - else
+      .text-center
+        - if @complaint_entry.status == 'COMPLETED'
+          %button.tertiary.ce-submit-button{ onclick: "reopen_complaint(#{@complaint_entry.id})" }
+            reopen
+        - else
+          %button.tertiary.ce-submit-button{ disabled: true, onclick: "submit_show_page_changes(#{@complaint_entry.id})" }
+            submit
   .col-xs-3.ce-research-column
     %h5.research-data-header.text-uppercase
       whois

@@ -21,7 +21,7 @@
                                                       class: ['inline-select-dropdown',
                                                               'ticket-status-button',
                                                               'dropdown-toggle'],
-                                                      onclick: "webcat_complaint_drop_down(#{@complaint_entry.id})",
+                                                      onclick: "webcat_complaint_drop_down()",
                                                       title: 'Edit Ticket Status' }
                 - if @complaint_entry.status.nil?
                   NEW
@@ -47,12 +47,12 @@
                                                          value: ComplaintEntry::STATUS_COMPLETED.to_s }
                       %label.radio-label.webcat-ticket-status-radio-label{ for: ComplaintEntry::STATUS_COMPLETED.to_s } Completed
                     %li.status-radio-wrapper
-                      %input.webcat-ticket-status-radio.resolution-drodown-menu{ 'data-status': ComplaintEntry::RESOLVED.to_s,
-                                                                                 id: ComplaintEntry::RESOLVED.to_s,
-                                                                                 name: 'complaint-status',
-                                                                                 type: 'radio',
-                                                                                 value: ComplaintEntry::RESOLVED.to_s }
-                      %label.radio-label.webcat-ticket-status-radio-label{ for: ComplaintEntry::RESOLVED.to_s } Resolved / Closed
+                      %input.webcat-ticket-status-radio.resolution-dropdown-menu{ 'data-status': ComplaintEntry::RESOLVED.to_s,
+                                                                                  id: ComplaintEntry::RESOLVED.to_s,
+                                                                                  name: 'complaint-status',
+                                                                                  type: 'radio',
+                                                                                  value: ComplaintEntry::RESOLVED.to_s }
+                      %label.radio-label.webcat-ticket-status-radio-label{ for: ComplaintEntry::RESOLVED.to_s } Resolved
                       .dropdown-menu#show-ticket-resolution-submenu
                         .submenu-left-wrapper#webcat-resolution-selector
                           .submenu-header

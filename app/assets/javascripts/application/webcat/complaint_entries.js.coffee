@@ -32,6 +32,27 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       searchField: 'name'
       options: createTagOptions(),
       items: split_tags,
+      onItemAdd: ->
+        # User shouldn't be able to change cats in pending, but just in case
+        unless entry_status == 'PENDING'
+          store_entry_changes(entry_id, 'submit')
+
+          if verifyMasterSubmit() == true
+            $('.ce-submit-button').prop('disabled', false)
+            window.prevent_close('true')
+          else
+            $('.ce-submit-button').prop('disabled', true)
+            window.prevent_close()
+      onItemRemove: ->
+        unless entry_status == 'PENDING'
+          store_entry_changes(entry_id, 'submit')
+
+          if verifyMasterSubmit() == true
+            $('.ce-submit-button').prop('disabled', false)
+            window.prevent_close('true')
+          else
+            $('.ce-submit-button').prop('disabled', true)
+            window.prevent_close()
     }
 
     $('#edit_tags').on 'click', () ->
@@ -94,6 +115,27 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             searchField: ['category_name', 'category_code'],
             options: cat_options,
             items: category_ids,
+            onItemAdd: ->
+              # User shouldn't be able to change cats in pending, but just in case
+              unless entry_status == 'PENDING'
+                store_entry_changes(entry_id, 'submit')
+
+                if verifyMasterSubmit() == true
+                  $('.ce-submit-button').prop('disabled', false)
+                  window.prevent_close('true')
+                else
+                  $('.ce-submit-button').prop('disabled', true)
+                  window.prevent_close()
+            onItemRemove: ->
+              unless entry_status == 'PENDING'
+                store_entry_changes(entry_id, 'submit')
+
+                if verifyMasterSubmit() == true
+                  $('.ce-submit-button').prop('disabled', false)
+                  window.prevent_close('true')
+                else
+                  $('.ce-submit-button').prop('disabled', true)
+                  window.prevent_close()
           }
           select_complete = $completed_selectize[0].selectize
           select_complete.disable()
@@ -108,6 +150,27 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
             searchField: ['category_name', 'category_code'],
             options: cat_options,
             items: category_ids,
+            onItemAdd: ->
+              # User shouldn't be able to change cats in pending, but just in case
+              unless entry_status == 'PENDING'
+                store_entry_changes(entry_id, 'submit')
+
+                if verifyMasterSubmit() == true
+                  $('.ce-submit-button').prop('disabled', false)
+                  window.prevent_close('true')
+                else
+                  $('.ce-submit-button').prop('disabled', true)
+                  window.prevent_close()
+            onItemRemove: ->
+              unless entry_status == 'PENDING'
+                store_entry_changes(entry_id, 'submit')
+
+                if verifyMasterSubmit() == true
+                  $('.ce-submit-button').prop('disabled', false)
+                  window.prevent_close('true')
+                else
+                  $('.ce-submit-button').prop('disabled', true)
+                  window.prevent_close()
             score: (input) ->
               #  Adding some customization for autofill
               #  restricting on certain cats to avoid accidental categorization
@@ -129,6 +192,22 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
                   0
           }
         )
+
+  window.webcat_complaint_drop_down = () ->
+    # deselect all statuses
+    $('.status-radio-wrapper').removeClass 'selected'
+    $('.webcat-ticket-status-radio').prop 'checked', false
+
+    # close comment dropdowns
+    $('.webcat-non-resolution-submit-wrapper').removeClass 'selected'
+    $('#show-ticket-resolution-submenu').hide()
+
+    # select the current status in the drodpwon (NEW is not an option so that won't select anything)
+    status = $('#show-edit-ticket-status-button').text().trim()
+    radio = $(".webcat-ticket-status-radio[data-status='#{status}'] ")
+    radio.prop("checked", true)
+    wrapper = radio.parent()
+    wrapper.addClass('selected')
 
   get_whois_data = (domain) ->
     $.ajax(
@@ -223,7 +302,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
           )
     )
 
-  get_current_categories = (entry_id) ->
+  get_current_categories = () ->
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
       method: 'POST'
@@ -330,7 +409,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         std_api_error(errorResponse, "Domain History for this Entry could not be retrieved.", reload: false)
       )
 
-  get_entry_history = (entry_id) ->
+  get_entry_history = () ->
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
       method: 'POST'
@@ -479,6 +558,15 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       ]
     })
 
+  check_for_customer_show_page_webcat = () ->
+    submitter_type = $(".submitter-type-wrapper p").text().toLowerCase()
+    is_customer = false
+
+    if submitter_type == 'customer'
+      is_customer = true
+
+    is_customer
+
   window.open_ip_uri = () ->
     std_msg_ajax(
       method: 'POST'
@@ -570,21 +658,17 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         data = $.parseJSON(response).data
         { curr_status: status } = data.complaint
         { uri } = data.complaint_entry
-
-        # slight differences in data sent
-        if curr_status == 'PENDING'
-          status = ''
-        { status: curr_status } = data.complaint
-        { uri } = data.complaint_entry
         cat_ids = null
+        # slight differences in data sent
+        { uri } = data.complaint_entry
         category_names = []
         comment = $('.ce-internal-comment-textarea').val()
         commit = ''
         resolution_msg = $('ce-customer-comment-textarea').val()
-        status = ''
 
         # slight differences in data sent
-        if curr_status == 'PENDING'
+        if status == 'PENDING'
+          status = ''
           commit = $('input[name=resolution]:checked').val()
           # we are disabling the button if ignore is checked, but just in case
           if commit == 'ignore'
@@ -592,10 +676,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         else
           status = $('input[name=resolution]:checked').val()
 
-        if $('#ce_categories_select-selectized').val() != null
-          cat_ids = $('#ce_categories_select-selectized').val().toString()
+        if $('#ce_categories_select').val() != null
+          cat_ids = $('#ce_categories_select').val().toString()
 
-        $('#ce_categories_select-selectized').next('.selectize-control').find('.item').each ->
+        $('#ce_categories_select').next('.selectize-control').find('.item').each ->
           category_names.push($(this).text())
 
         entry_data = {
@@ -623,8 +707,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         visible_cols = $('#complaints-index thead th').length
 
         if curr_status == 'PENDING'
+          remove_entry_from_changes(entry_id, 'review')
           process_review(entry_data)
         else
+          remove_entry_from_changes(entry_id, 'submit')
           process_entry(entry_data)
           # submit for real
     )
@@ -648,6 +734,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
         msg = response.resonseJSON.error
 
         std_msg_error("Error submitting entry", msg, reload: false)
+        remove_entry_from_changes(data.entry_id, 'submit')
     , this)
 
   # Sending individual reviewed (PENDING) entry info to the backend
@@ -662,6 +749,7 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       }
       success: (response) ->
         show_message('success', 'Submitted. Refresh to see new results.', false, '#alert_message')
+        remove_entry_from_changes(data.entry_id, 'submit')
       error: (response) ->
         msg = response.resonseJSON.error
 
@@ -680,12 +768,13 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
         $('.resolution-radio-button').each ->
           $(this).prop('disabled', false)
-        $('.ce-ip-uri-input').prop('disabled', false)
         $('#ce_categories_select')[0].selectize.enable()
-        $('.ce-internal-comment-textarea').prop('disabled', false)
+        $('.ce-input').prop('disabled', false)
 
+        store_entry_changes(entry_id, 'submit')
         $button.attr('onclick', "submit_changes(#{entry_id});")
         $button.text('submit')
+        $button.removeAttr('disabled')
 
       error: (response) ->
         std_msg_error(response,"", reload: false)
@@ -696,10 +785,42 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
       resolution = $('.ce-radio-group > .resolution-radio-button:checked').val()
       domain_title = $('#domain_title')[0].innerText.replace(/(\r\n|\n|\r)/gm, "") # remove newlines
 
-      get_resolution_templates(resolution, 'individual', [entry_id])
-      get_current_categories(entry_id)
-      get_whois_data(domain_title)
+      get_current_categories()
+      get_entry_history()
+
       get_domain_history(domain_title)
-      get_entry_history(entry_id)
-      get_xbrs_history(domain_title)
       get_related_history(domain_title)
+      get_whois_data(domain_title)
+      get_xbrs_history(domain_title)
+
+      get_resolution_templates(resolution, 'individual', [entry_id])
+
+      # Show page resolution select
+      $('.show-action .webcat-ticket-status-radio').click ->
+        if $(this).is(':checked')
+          wrapper = $(this).parent()
+          $('.show-action .status-radio-wrapper').removeClass('selected')
+          $(wrapper).addClass('selected')
+
+        if $(this).attr('id') == 'RESOLVED'
+          $('#show-ticket-resolution-submenu').show()
+          stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+          $('#ticket-non-res-submit').hide()
+          $(stat_comment).val('')
+          # check first resolution checkbox (and Fixed-FP parent) if none checked after opening
+          if !($("input.ticket-resolution-radio").is(':checked'))
+            $('input#FIXED').prop('checked', true)
+            is_customer = check_for_customer_show_page_webcat()
+            populate_resolved_webcat_templates('Fixed - FP: Sudden Spike', is_customer)
+        else
+          $('#ticket-non-res-submit').show()
+          res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+          $('.ticket-resolution-radio').prop('checked', false)
+          $('#show-ticket-resolution-submenu').hide()
+          $(res_comment[0]).val('')
+
+        store_entry_changes(entry_id, 'submit')
+
+      $(document).on 'change', '.resolution_radio_button, .ce-input', ->
+        $('.ce-submit-button').prop('disabled', false)
+        store_entry_changes(entry_id, 'submit')
