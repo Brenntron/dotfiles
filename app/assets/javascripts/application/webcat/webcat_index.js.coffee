@@ -107,8 +107,10 @@ build_complaints_table = (url) ->
 
           if $(wrapper).text() == short
             $(wrapper).text(full)
+            $(this).html('&larr;')
           else
             $(wrapper).text(short)
+            $(this).html('&hellip;')
 
 
     createdRow: (row, data) ->
