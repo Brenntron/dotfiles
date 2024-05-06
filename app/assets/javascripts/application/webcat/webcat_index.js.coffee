@@ -99,6 +99,18 @@ build_complaints_table = (url) ->
           localStorage.setItem 'webcat_entries_per_page', len
         )
 
+        # for longer descriptions let user toggle full vs truncated
+        $('.truncated-description').on 'click', () ->
+          short = $(this).attr('data-truncated')
+          full = $(this).attr('data-full')
+          wrapper = $(this).prev()
+
+          if $(wrapper).text() == short
+            $(wrapper).text(full)
+          else
+            $(wrapper).text(short)
+
+
     createdRow: (row, data) ->
       $(row).addClass('cat-index-main-row')
       $(row).attr('data-categories', data.category)
@@ -113,7 +125,6 @@ build_complaints_table = (url) ->
         ### check variables below
             text_check makes sure that the table doesn't have the named search with the same name being saved now
             search_name_check makes sure that the search is being saved as a named search
-            Not super complicated, but that if statement was looking gross and confusing
         ###
         text_check = !window.find_saved_search_by_name(webcat_search_name)
         search_name_check = webcat_search_name != ''
@@ -282,7 +293,12 @@ build_complaints_table = (url) ->
         className: 'description-col'
         render: (data) ->
           if data?
-            description = '<span onclick="copy_description(this)">' + data + '</span>'
+            if data.length > 500
+              truncated_desc = data.substring(0, 500)
+              description = '<span class="description-wrapper">' + truncated_desc + '</span><span class="truncated-description" data-truncated="' + truncated_desc + '" data-full="' + data + '">&hellip;</span>'
+            else
+              description = '<span class="description-wrapper">' + data '</span>'
+
           return description
       }
       {

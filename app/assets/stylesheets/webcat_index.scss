@@ -5,6 +5,20 @@
     padding: 6px;
     line-height: 1.22em;
   }
+  .description-col {
+    .description-wrapper {
+      word-break: break-all;
+      min-width: 150px;
+    }
+  }
+  .truncated-description {
+    // this is the hex code for the ellipsis character
+    //content: '\002026';
+    display: inline-block;
+    background-color: #d7e6ee;
+    cursor: pointer;
+    margin-left: 2px;
+  }
   table.nested-col-table td {
     padding: 1px 0;
     border: none;
