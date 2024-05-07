@@ -4,13 +4,14 @@ $ ->
   # call below and related functions only if we're on webcat index
   if $('#complaints-index').length
 
+    debugger
     # Create index table
     url = $('#complaints-index').data('source')
     $.when(window.pull_user_preference_filter()).done ->
       build_complaints_table(url)
 
 #### New complaints index table setup
-build_complaints_table = (url) ->
+window.build_complaints_table = (url) ->
 
   #get count of entries per page from localstorage, set to 25 if none found
   entries_per_page = localStorage.getItem 'webcat_entries_per_page'
@@ -61,6 +62,9 @@ build_complaints_table = (url) ->
         webcat_refresh()
 
       complete: ->
+        # Keep this function at top of complete
+        $('#complaints-index tbody').removeClass('hide')
+
         # Get display prefs
         get_display_prefs()
         # Set active sort
@@ -106,6 +110,7 @@ build_complaints_table = (url) ->
       $(row).attr('data-status', data.status)
 
     drawCallback: () ->
+
       if localStorage.webcat_reset_page
         localStorage.removeItem('webcat_reset_page')
 
