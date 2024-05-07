@@ -119,15 +119,11 @@ window.sort_webcat_index = () ->
   complaint_table.on 'draw', ->
     get_display_prefs()
 
-#    1 - for the default sort (look at the dt) - does the button for that sort look active / match
-#    2 - titles for the sorts should be there from the git go
-#    3 - how are we tooltipping two different ways (post sort click)
-#    4 - make sure we're properly sorting - I clicked descending and it didnt change
-#    5 - need to store if dt isn't properly (double check)
-#     ths might be a clear all thing somewhere
-#    6 - active versus non active - if user presses active button it should be toggling,
-#    but if button is not active it should just be implementing
-#    7 - changing filters is reloading the page - can we not do that...
+
+
+# 8 - dt is maintaing sort - need to access to make sure that the correct button is 'active'
+# 9 - implement on non-direct sorts
+# 10 - hide old data as new data loads to avoid users clicking into shit while stuff loads
 
 
 window.toggle_direct_sort = (col, field, button) ->
@@ -174,7 +170,27 @@ window.toggle_select_order = (button) ->
     $(button).removeClass('sort-desc').addClass('sort-asc')
     $(button).next().text('Ascending')
 
+window.set_active_sort = () ->
+  curr_sort = $('#complaints-index').DataTable().order()
+  col = curr_sort[0][0]
+  direction = curr_sort[0][1]
 
+  if col == '10' || col == '12'
+    # then we need to check if active direct sort button matches
+    $('#sort-btn-group button').each ->
+      if col == $(this).attr('data-column')
+        $(this).addClass('active-sort')
+        if direction != $(this).attr('data-sort')
+          if direction == 'asc'
+            $(this).removeClass('sort-desc').addClass('sort-asc')
+            $(this).attr('data-sort', 'asc')
+          else
+            $(this).removeClass('sort-asc').addClass('sort-desc')
+            $(this).attr('data-sort', 'desc')
+      else
+        $(this).removeClass('active-sort')
+
+    # next implement for the other sort dropdown
 
 # Selecting rows / enabling / disabling buttons based on selections
 $ ->

@@ -75,8 +75,8 @@
                 %label{for: 'view-tools-col-cb'} Tools
   %div
     %div#sort-btn-group.btn-group.toolbar-btn-group
-      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.darkened-button.direct-sorter.sort-desc.concise-button.concise-button-first.active-sort{title: 'Sort by age: descending', onclick: 'toggle_direct_sort("10", "age", this);', 'data-sort': 'desc'} Age
-      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.direct-sorter.sort-asc.concise-button.concise-button-last{title: 'Sort by IP/URI: ascending', onclick: 'toggle_direct_sort("12", "IP/URI", this);', 'data-sort': 'asc'} IP/URI
+      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.darkened-button.direct-sorter.sort-desc.concise-button.concise-button-first{title: 'Sort by age: descending', onclick: 'toggle_direct_sort("10", "age", this);', 'data-sort': 'desc', 'data-column': '10'} Age
+      %button.btn.toolbar-button.esc-tooltipped-webcat-toolbar.toolbar-button-spacer.direct-sorter.sort-asc.concise-button.concise-button-last{title: 'Sort by IP/URI: ascending', onclick: 'toggle_direct_sort("12", "IP/URI", this);', 'data-sort': 'asc', 'data-column':'12'} IP/URI
 
     %span.dropdown
       %button#webcat-index-table-sort-button.toolbar-button.sort-button.dropdown-toggle.esc-tooltipped-webcat-toolbar{title: 'Sort data', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}

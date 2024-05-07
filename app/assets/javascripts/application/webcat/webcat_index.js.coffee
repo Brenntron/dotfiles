@@ -5,7 +5,6 @@ $ ->
   if $('#complaints-index').length
 
     # Create index table
-    debugger
     url = $('#complaints-index').data('source')
     $.when(window.pull_user_preference_filter()).done ->
       build_complaints_table(url)
@@ -19,9 +18,6 @@ build_complaints_table = (url) ->
 
   complaint_table = $('#complaints-index').DataTable(
     initComplete: ->
-      # Get display prefs
-      get_display_prefs()
-
       input = $('.dataTables_filter input').unbind()
       self = @api()
 
@@ -65,6 +61,10 @@ build_complaints_table = (url) ->
         webcat_refresh()
 
       complete: ->
+        # Get display prefs
+        get_display_prefs()
+        # Set active sort
+        window.set_active_sort()
 
         # Grab current categories per entry
         rows = $('#complaints-index').find('.cat-index-main-row')
@@ -713,7 +713,6 @@ build_data = () ->
   # search definitions will be made with the build_subheader function
 ###
 window.build_header = (data) ->
-  debugger
   container = $('#webcat_searchref_container')
 
   if container.length > 0
