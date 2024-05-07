@@ -5,6 +5,7 @@ $ ->
   if $('#complaints-index').length
 
     # Create index table
+    debugger
     url = $('#complaints-index').data('source')
     $.when(window.pull_user_preference_filter()).done ->
       build_complaints_table(url)
@@ -711,15 +712,38 @@ build_data = () ->
   # If the search_type is 'named' or 'advanced', a subheader with
   # search definitions will be made with the build_subheader function
 ###
-build_header = (data) ->
+window.build_header = (data) ->
+  debugger
   container = $('#webcat_searchref_container')
-  if data != undefined && container.length > 0
-    {search_type, search_name} = data
 
-    try
-      webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
-    catch e
-      webcat_search_conditions = {}
+  if container.length > 0
+    if data != undefined
+      {search_type, search_name} = data
+
+      try
+        webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
+      catch e
+        webcat_search_conditions = {}
+    else
+      # check local storage - can hit here if we are updating table without refreshing page
+      # all the catches in case local storage doesn't have these values
+      try
+        webcat_search_conditions = JSON.parse localStorage.webcat_search_conditions
+      catch e
+        webcat_search_conditions = {}
+
+      try
+        search_type = localStorage.webcat_search_type
+      catch e
+        search_type = ''
+
+      try
+        search_name = localStorage.webcat_search_name
+      catch e
+        search_name = ''
+
+      if search_name.includes('?f=')
+        search_name = search_name.replace('?f=', '')
 
     if search_type == 'standard'
       search_name = search_name.toLowerCase().replace('complaints', 'tickets')

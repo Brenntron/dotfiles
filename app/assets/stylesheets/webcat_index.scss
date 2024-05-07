@@ -538,6 +538,9 @@ table.dataTable tbody tr.submitting-entry {
 .sort-asc {
   background-image: url(image_path('icon_sort_asc_grey.svg'));
 }
+.active-sort {
+  background-color: #b0d7e7;
+}
 #webcat-index-table-sort-dropdown {
   min-width: 260px;
   label {

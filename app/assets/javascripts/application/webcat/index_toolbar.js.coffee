@@ -119,23 +119,49 @@ window.sort_webcat_index = () ->
   complaint_table.on 'draw', ->
     get_display_prefs()
 
+#    1 - for the default sort (look at the dt) - does the button for that sort look active / match
+#    2 - titles for the sorts should be there from the git go
+#    3 - how are we tooltipping two different ways (post sort click)
+#    4 - make sure we're properly sorting - I clicked descending and it didnt change
+#    5 - need to store if dt isn't properly (double check)
+#     ths might be a clear all thing somewhere
+#    6 - active versus non active - if user presses active button it should be toggling,
+#    but if button is not active it should just be implementing
+#    7 - changing filters is reloading the page - can we not do that...
+
+
 window.toggle_direct_sort = (col, field, button) ->
-  order = $(button).attr('data-sort')
-  if order == 'asc'
-    $(button).attr('data-sort', 'desc')
-    $(button).removeClass('sort-asc').addClass('sort-desc')
-    title = 'Sort by ' + field + ': descending'
-    $(button).attr('title', title)
+  current_order = $(button).attr('data-sort')
+
+  if $(button).hasClass('active-sort')
+    # if button is currently active, then toggle to opposite direction on click
+    # otherwise the displayed order on the button is the desired order to change to
+    if current_order == 'asc'
+      desired_order = 'desc'
+    else
+      desired_order = 'asc'
   else
+    # employ currently visible sort & set to active
+    # clear current active
+    $('#sort-btn-group .active-sort').removeClass('active-sort')
+    $(button).addClass('active-sort')
+    desired_order = current_order
+
+  if desired_order == 'asc'
     $(button).attr('data-sort', 'asc')
     $(button).removeClass('sort-desc').addClass('sort-asc')
     title = 'Sort by ' + field + ': ascending'
-    $(button).attr('title', title)
+  else
+    $(button).attr('data-sort', 'desc')
+    $(button).removeClass('sort-asc').addClass('sort-desc')
+    title = 'Sort by ' + field + ': descending'
 
+  $(button).tooltipster('content', title);
   complaint_table = $('#complaints-index').DataTable()
-  complaint_table.order([col, order]).draw();
+  complaint_table.order([col, desired_order]).draw();
   complaint_table.on 'draw', ->
     get_display_prefs()
+
 
 window.toggle_select_order = (button) ->
   order = $(button).attr('data-sort')
