@@ -299,7 +299,7 @@ build_complaints_table = (url) ->
               truncated_desc = data.substring(0, 500)
               description = '<span class="description-wrapper">' + truncated_desc + '</span><span class="truncated-description" data-truncated="' + truncated_desc + '" data-full="' + data + '">&hellip;</span>'
             else
-              description = '<span class="description-wrapper">' + data '</span>'
+              description = '<span class="description-wrapper">' + data + '</span>'
 
           return description
       }
