@@ -7661,12 +7661,6 @@ table.dispute-entry-table tbody tr.selected {
   padding: 2px 10px !important;
 }
 
-.complaint-owner-wrapper {
-  .content-label-sm {
-    margin-bottom: 0;
-  }
-}
-
 #dispute-assignee {
   margin-top: 0;
   float: left;
@@ -8173,7 +8167,7 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 .bottom-divider {
-  border-bottom: 2px solid darken($content-bg-color, 6.5%)
+  border-bottom: 1px solid darken($content-bg-color, 6.5%)
 }
 
 .simple-nested-table th {

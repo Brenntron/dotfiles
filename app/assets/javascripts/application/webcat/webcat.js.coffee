@@ -35,8 +35,6 @@ $ ->
 
     $('#nav-banner').append(toolbar)
 
-    $('#page-content-wrapper').css('padding-top','60px')
-
     #align tooltips under toolbar
     $body.addClass('pinned-toolbar-true')
 

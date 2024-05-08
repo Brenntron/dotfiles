@@ -1,14 +1,15 @@
-.content-wrapper.complaint-entry-show-content-wrapper#page-content-wrapper
+.content-wrapper.complaint-entry-show-content-wrapper.top-case-info
+
   .row
     .col-xs-2.col-with-divider.webcat-complaint-case-wrapper
       .webcat-complaint-case-id-wrapper
         .complaint-entry-id
-          %span#complaint_entry_id
+          %label.content-label-sm Complaint Entry ID
+          #complaint_entry_id.top-info-data
             = @complaint_entry.id.to_s
         .complaint-status-col-wrapper
           %label.content-label-sm
             Status
-          %br
           -# bugzilla_popover_state
           - if @complaint_entry.resolution == ComplaintEntry::STATUS_RESOLVED_DUPLICATE
             .duplicate-status-notice
@@ -138,7 +139,7 @@
         .complaint-owner-wrapper
           %label.content-label-sm
             Assignee
-          %div
+          %div.top-info-data
             %span#complaint-assignee{ class: ('missing-data' if @complaint_entry.user_id.nil? || @complaint_entry.user.cvs_username == 'vrtincom' ) }= @complaint_entry.user&.cvs_username || Unassigned
         - if can? :update, ComplaintEntry
           .complaint-owner-buttons-wrapper
@@ -204,23 +205,23 @@
       .complaint-submitted-at-wrapper
         %label.content-label-sm
           Submitted At
-        %p.submitted-time
+        .submitted-time.top-info-data
           = @complaint_entry.created_at
       .complaint-age-wrapper
         %label.content-label-sm
           Age
-        %p.complaint-complaint_entry-age
+        .complaint-complaint_entry-age.top-info-data
           = complaint_entry_age @complaint_entry
     .col-xs-2.col-with-divider
       .complaint-submitted-at-wrapper
         %label.content-label-sm
           Platform
-        %p.submitted-time
+        .submitted-time.top-info-data
           = @complaint_entry.platform&.public_name || 'None'
       .complaint-age-wrapper
         %label.content-label-sm
           Source
-        %p.complaint-complaint_entry-age
+        .complaint-complaint_entry-age.top-info-data
           - if @source
             - if @source == 'talos-intelligence'
               TI Webform
@@ -234,21 +235,21 @@
       .submitter-type-wrapper
         %label.content-label-sm
           Submitter Type
-        %p= @complaint.submitter_type || 'NON-CUSTOMER'
+        .top-info-data= @complaint.submitter_type || 'NON-CUSTOMER'
       .submitter-org-wrapper
         %label.content-label-sm
           Submitter Organization
-        %p= @org_name
+        .top-info-data= @org_name
 
     .col-xs-2
       .contact-name-wrapper
         %label.content-label-sm
           Contact Name
-        %p.complaint-edit-field#complaint-customer-name= @complaint.customer&.name || 'None'
+        .top-info-data.complaint-edit-field#complaint-customer-name= @complaint.customer&.name || 'None'
       .contact-email-wrapper
         %label.content-label-sm
           Contact Email
-        %p.complaint-edit-field#complaint-customer-email= @complaint.customer&.email || 'None'
+        .top-info-data.complaint-edit-field#complaint-customer-email= @complaint.customer&.email || 'None'
 
 %ul.nav.nav-tabs#ce_tabs{ role: 'tablist' }
   %li.nav-item.active{ role: 'presentation' }

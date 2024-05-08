@@ -9,6 +9,9 @@ $type-faint-accent: #D7DADB; /* Lighter Grey */
 $selectize-border: #E5E5E5;
 
 .complaint-entry-show-content-wrapper {
+  &.top-case-info {
+    padding-bottom: 15px;
+  }
   @-moz-document url-prefix() {
     .complaint-owner-buttons-wrapper button#index_change_assign {
       position: relative;
@@ -22,14 +25,6 @@ $selectize-border: #E5E5E5;
         margin-left: 1px;
       }
     }
-  }
-
-  .col-with-divider {
-    min-height: 82px;
-  }
-
-  .complaint-assignee-wrapper {
-    margin-bottom: 10px;
   }
 
   .complaint-assignee-wrapper, .complaint-reviewer-wrapper {
@@ -110,17 +105,29 @@ $selectize-border: #E5E5E5;
 }
 
 .ce-research-tab {
+  .ticket-report-header {
+    margin-top: 20px;
+  }
+  .toolbar {
+    margin-bottom: 20px;
+    margin-top: 24px;
+  }
   & > div {
-    border-left: 1px solid darken($content-bg-color, 6.5%);
     border-right: 1px solid darken($content-bg-color, 6.5%);
-
-    &:first-child {
-      border-left: none;
-    }
 
     &:last-child {
       border-right: none;
     }
+  }
+  .bottom-divider {
+    padding-bottom: 30px !important;
+    margin-bottom: 30px !important;
+  }
+  .content-label-sm {
+    margin-bottom: 0;
+  }
+  .customer-submitted-data-wrapper {
+    margin-bottom: 10px;
   }
 }
 
@@ -137,6 +144,12 @@ $selectize-border: #E5E5E5;
     box-sizing: border-box;
   }
 
+  p {
+    font-size: 12px;
+  }
+  #ce_description {
+    word-break: break-all;
+  }
   .ce-input:disabled {
     color: $type-lighter-color;
     cursor: not-allowed;
@@ -207,7 +220,7 @@ $selectize-border: #E5E5E5;
     justify-content: space-between;
 
     .ce-submitted-ip-uri {
-      font-weight: 700;
+      font-weight: 500;
     }
   }
 
@@ -228,8 +241,11 @@ $selectize-border: #E5E5E5;
   .categories-table {
     font-size: 11px;
     text-align: left;
-    margin-top: 6px;
-    margin-bottom: 15px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    &:last-of-type {
+      margin-bottom: 0;
+    }
 
     td, th {
       border-color: #eee;
