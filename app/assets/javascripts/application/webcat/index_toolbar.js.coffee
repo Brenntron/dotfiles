@@ -115,7 +115,7 @@ window.sort_webcat_index = () ->
   col = $('#webcat-index-sort-select').val()
   $('#sort-btn-group .active-sort').removeClass('active-sort')
   $('#webcat-index-table-sort-button').addClass('active-sort')
-  $('#webcat-direct-sort-dd').dropdown('toggle')
+  $('#webcat-index-table-sort-button').dropdown('toggle')
   $('#complaints-index').DataTable().order(col, order).draw();
   $('#complaints-index').DataTable().on 'draw', ->
     get_display_prefs()
@@ -170,6 +170,10 @@ window.set_active_sort = () ->
   curr_sort = $('#complaints-index').DataTable().order()
   col = curr_sort[0].toString()
   direction = curr_sort[1]
+
+  # Somewhere 'dec' is getting sent instead of 'desc' - remove this line if we find the culprit
+  if direction == 'dec'
+    direction = 'desc'
 
   if col == '10' || col == '12'
     # then we need to check if active direct sort button matches
