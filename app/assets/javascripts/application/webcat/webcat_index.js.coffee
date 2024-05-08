@@ -4,7 +4,6 @@ $ ->
   # call below and related functions only if we're on webcat index
   if $('#complaints-index').length
 
-    debugger
     # Create index table
     url = $('#complaints-index').data('source')
     $.when(window.pull_user_preference_filter()).done ->

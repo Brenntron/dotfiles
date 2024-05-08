@@ -127,6 +127,7 @@ window.sort_webcat_index = () ->
 
 
 window.toggle_direct_sort = (col, field, button) ->
+  debugger
   current_order = $(button).attr('data-sort')
 
   if $(button).hasClass('active-sort')
@@ -172,9 +173,8 @@ window.toggle_select_order = (button) ->
 
 window.set_active_sort = () ->
   curr_sort = $('#complaints-index').DataTable().order()
-  col = curr_sort[0][0]
-  direction = curr_sort[0][1]
-
+  col = curr_sort[0].toString()
+  direction = curr_sort[1]
   if col == '10' || col == '12'
     # then we need to check if active direct sort button matches
     $('#sort-btn-group button').each ->

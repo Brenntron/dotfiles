@@ -67,44 +67,16 @@ $ ->
     new_url = '/escalations/webcat/complaints' + filter_url
     if $('#complaints-index').length
       # manually change the selected filter
-      # hiding loading tbody until data is fetched (prevent errant clicks while new sort or filter is happening)
-#      $('#complaints-index tbody').addClass('hide')
       $('#filter-cases-list li').removeClass('selected')
       selected = $(this).parent().addClass('selected')
       # update address bar with new filter without refreshing the page
       window.history.replaceState( {} , 'Web Categorization Complaints - Analyst Console', new_url )
 
-      #debugger
-
-#      search_name = filter_url.split('=').pop()
-#      data = {
-#        search_type: 'standard'
-#        search_name: search_name
-#      }
-#      window.build_header(data)
+      # hiding loading tbody until data is fetched
+      # (prevent errant clicks while new filter is loading)
+      $('#complaints-index tbody').addClass('hide')
       $('#complaints-index').DataTable().destroy()
       window.build_complaints_table()
-
-      # I know there is a way to grab fresh data from the damn server without a page reload, why can't i figure it out
-      #should remove all current rows
-#      $('#complaints-index').DataTable().clear()
-
-      #debugger
-      # HELP TIIIIM
-      #$('#complaints-index').DataTable().destroy()
-      #debugger
-      #window.build_complaints_table('/escalations/webcat/complaint_entries.json')
-
-
-#      new_data = build_data()
-#      $('#complaints-index').DataTable().ajax.data == new_data
-#      $('#complaints-index').DataTable().clear()
-#      $('#complaints-index').DataTable().ajax.reload()
-#      $('#complaints-index').DataTable().draw()
-#      $('#complaints-index').DataTable().clear()
-#      $('#complaints-index').DataTable().rows.add(new_data).draw()
-#
-#      $('#complaints-index').DataTable()
 
     else
       # need to go to index (useful if person was on show page, research page, etc)
