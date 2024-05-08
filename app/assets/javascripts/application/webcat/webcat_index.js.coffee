@@ -137,7 +137,7 @@ window.build_complaints_table = (url) ->
       searchPlaceholder: "Search within table"
     }
     # default ordering - keep on hidden age column
-    order: [ 10, 'dec' ]
+    order: [ 10, 'desc' ]
     columnDefs: [
       {
         targets: [10,11,12,13,14,15,16,17]

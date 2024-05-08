@@ -115,7 +115,7 @@ window.sort_webcat_index = () ->
   col = $('#webcat-index-sort-select').val()
   $('#sort-btn-group .active-sort').removeClass('active-sort')
   $('#webcat-index-table-sort-button').addClass('active-sort')
-
+  $('#webcat-direct-sort-dd').dropdown('toggle')
   $('#complaints-index').DataTable().order(col, order).draw();
   $('#complaints-index').DataTable().on 'draw', ->
     get_display_prefs()

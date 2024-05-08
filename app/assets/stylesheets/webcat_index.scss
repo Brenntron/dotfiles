@@ -522,6 +522,9 @@ table.dataTable tbody tr.submitting-entry {
 
 #sort-btn-group {
   float: left;
+  .toolbar-button:focus {
+    outline: 1px #7ad2f5 solid;
+  }
 }
 .direct-sorter {
   padding-bottom: 0;
