@@ -74,7 +74,7 @@ $ ->
       # update address bar with new filter without refreshing the page
       window.history.replaceState( {} , 'Web Categorization Complaints - Analyst Console', new_url )
 
-      debugger
+      #debugger
 
 #      search_name = filter_url.split('=').pop()
 #      data = {
@@ -89,11 +89,11 @@ $ ->
       #should remove all current rows
 #      $('#complaints-index').DataTable().clear()
 
-      debugger
+      #debugger
       # HELP TIIIIM
-      $('#complaints-index').DataTable().destroy()
-      debugger
-      window.build_complaints_table('/escalations/webcat/complaint_entries.json')
+      #$('#complaints-index').DataTable().destroy()
+      #debugger
+      #window.build_complaints_table('/escalations/webcat/complaint_entries.json')
 
 
 #      new_data = build_data()
