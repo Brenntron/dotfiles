@@ -109,26 +109,21 @@ save_display_prefs = () ->
   )
 
 
-
 # Sorting functions
 window.sort_webcat_index = () ->
   order = $('#webcat-index-sort-order').attr('data-sort')
   col = $('#webcat-index-sort-select').val()
-  complaint_table = $('#complaints-index').DataTable()
-  complaint_table.order([col, order]).draw();
-  complaint_table.on 'draw', ->
+  $('#sort-btn-group .active-sort').removeClass('active-sort')
+  $('#webcat-index-table-sort-button').addClass('active-sort')
+
+  $('#complaints-index').DataTable().order(col, order).draw();
+  $('#complaints-index').DataTable().on 'draw', ->
     get_display_prefs()
 
 
-
-# 8 - dt is maintaing sort - need to access to make sure that the correct button is 'active'
-# 9 - implement on non-direct sorts
-# 10 - hide old data as new data loads to avoid users clicking into shit while stuff loads
-
-
 window.toggle_direct_sort = (col, field, button) ->
-  debugger
   current_order = $(button).attr('data-sort')
+  $('#webcat-index-table-sort-button').removeClass('active-sort')
 
   if $(button).hasClass('active-sort')
     # if button is currently active, then toggle to opposite direction on click
@@ -154,7 +149,7 @@ window.toggle_direct_sort = (col, field, button) ->
     title = 'Sort by ' + field + ': descending'
 
   $(button).tooltipster('content', title);
-  $('#complaints-index').DataTable().order([col, desired_order]).draw();
+  $('#complaints-index').DataTable().order(col, desired_order).draw();
   $('#complaints-index').DataTable().on 'draw', ->
     get_display_prefs()
 
@@ -170,16 +165,11 @@ window.toggle_select_order = (button) ->
     $(button).removeClass('sort-desc').addClass('sort-asc')
     $(button).next().text('Ascending')
 
+
 window.set_active_sort = () ->
   curr_sort = $('#complaints-index').DataTable().order()
-  # For whatever reason, sometimes the DT order returns one way and sometimes it returns another
-  # Below handles both cases, do not remove
-  if curr_sort[0][0]?
-    col = curr_sort[0][0].toString()
-    direction = curr_sort[0][1]
-  else
-    col = curr_sort[0].toString()
-    direction = curr_sort[1]
+  col = curr_sort[0].toString()
+  direction = curr_sort[1]
 
   if col == '10' || col == '12'
     # then we need to check if active direct sort button matches
@@ -187,16 +177,26 @@ window.set_active_sort = () ->
       if col == $(this).attr('data-column')
         $(this).addClass('active-sort')
         if direction != $(this).attr('data-sort')
-          if direction == 'asc'
-            $(this).removeClass('sort-desc').addClass('sort-asc')
-            $(this).attr('data-sort', 'asc')
-          else
-            $(this).removeClass('sort-asc').addClass('sort-desc')
-            $(this).attr('data-sort', 'desc')
+          $(this).removeClass('sort-asc').removeClass('sort-desc').addClass('sort-' + direction)
+          $(this).attr('data-sort', direction)
       else
         $(this).removeClass('active-sort')
+  else
+    # sort is being implemented via the sort dropdown
+    if direction == 'asc'
+      label = 'Ascending'
+    else
+      label = 'Descending'
+    # set active-sort on button, selected option, direction arrow, and label in dropdown
+    $('#sort-btn-group .active-sort').removeClass('active-sort')
+    $('#webcat-index-table-sort-button').addClass('active-sort')
+    $('#webcat-index-sort-select').val(col)
+    $('#webcat-index-sort-order').removeClass('sort-asc').removeClass('sort-desc').addClass('sort-' + direction)
+    $('#webcat-index-sort-order').attr('data-sort', direction)
+    $('#webcat-index-sort-order').next('label').text(label)
 
-    # next implement for the other sort dropdown
+
+
 
 # Selecting rows / enabling / disabling buttons based on selections
 $ ->
