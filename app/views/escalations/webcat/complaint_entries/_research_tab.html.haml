@@ -239,7 +239,5 @@
             name servers
       %tbody#ce_nserver_tbody
 :javascript
-  window.set_headers();
-  window.set_entry_id();
   window.set_complaint_entry_data("#{@complaint_entry.category}", '#{@complaint_entry.status}');
   window.set_tags("#{@tags.join(', ')}");

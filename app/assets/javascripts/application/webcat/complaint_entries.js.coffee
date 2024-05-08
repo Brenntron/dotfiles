@@ -3,12 +3,6 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
   headers = ''
   entry_id = 0
 
-  window.set_headers = () ->
-    headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
-
-  window.set_entry_id = () ->
-    entry_id = Number($('#complaint_entry_id')[0].innerText)
-
   window.set_tags = (tags) ->
     split_tags = tags.split(', ')
     createTagOptions = ->
@@ -782,8 +776,10 @@ if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
 
   $ ->
     if !!~ window.location.pathname.indexOf '/escalations/webcat/complaint_entries/'
-      resolution = $('.ce-radio-group > .resolution-radio-button:checked').val()
       domain_title = $('#domain_title')[0].innerText.replace(/(\r\n|\n|\r)/gm, "") # remove newlines
+      entry_id = Number($('#complaint_entry_id')[0].innerText)
+      headers = 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
+      resolution = $('.ce-radio-group > .resolution-radio-button:checked').val()
 
       get_current_categories()
       get_entry_history()
