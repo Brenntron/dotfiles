@@ -174,7 +174,6 @@ $ ->
       localStorage.setItem('webcat_reset_page', true)
 
   window.refresh_webcat_localStorage = () ->
-    debugger
     localStorage.removeItem('webcat_search_type')
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
