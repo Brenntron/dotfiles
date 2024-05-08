@@ -66,8 +66,9 @@ window.build_complaints_table = (url) ->
 
         # Get display prefs
         get_display_prefs()
-        # Set active sort
-        window.set_active_sort()
+        # Set active sort, unless its already set
+        if $('.active-sort').length < 1
+          window.set_active_sort()
 
         # Grab current categories per entry
         rows = $('#complaints-index').find('.cat-index-main-row')

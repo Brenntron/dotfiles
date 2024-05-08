@@ -154,9 +154,8 @@ window.toggle_direct_sort = (col, field, button) ->
     title = 'Sort by ' + field + ': descending'
 
   $(button).tooltipster('content', title);
-  complaint_table = $('#complaints-index').DataTable()
-  complaint_table.order([col, desired_order]).draw();
-  complaint_table.on 'draw', ->
+  $('#complaints-index').DataTable().order([col, desired_order]).draw();
+  $('#complaints-index').DataTable().on 'draw', ->
     get_display_prefs()
 
 
@@ -173,8 +172,15 @@ window.toggle_select_order = (button) ->
 
 window.set_active_sort = () ->
   curr_sort = $('#complaints-index').DataTable().order()
-  col = curr_sort[0].toString()
-  direction = curr_sort[1]
+  # For whatever reason, sometimes the DT order returns one way and sometimes it returns another
+  # Below handles both cases, do not remove
+  if curr_sort[0][0]?
+    col = curr_sort[0][0].toString()
+    direction = curr_sort[0][1]
+  else
+    col = curr_sort[0].toString()
+    direction = curr_sort[1]
+
   if col == '10' || col == '12'
     # then we need to check if active direct sort button matches
     $('#sort-btn-group button').each ->
