@@ -274,17 +274,26 @@ build_complaints_table = (url) ->
         data: 'assigned_to'
         className: 'users-col'
         render: (data, type, full, meta) ->
-          if data == ''
+          debugger
+          if data == '' || data == 'Vrt Incoming'
             user = '<span class="missing-data">No assignee</span>'
           else
             user = data
+
+          reviewer = full.reviewer
+          if full.reviewer == ''
+            reviewer = '<span class="missing-data">No reviewer</span>'
+
+          second_reviewer = full.second_reviewer
+          if full.second_reviewer == ''
+            second_reviewer = '<span class="missing-data">No 2nd reviewer</span>'
 
           users_col =
             '<table class="nested-col-table">' +
               '<tbody>' +
               '<tr class="assignee-row"><td>' + user + '</td></tr>' +
-              '<tr class="reviewer-row"><td>' + full.reviewer + '</td></tr>' +
-              '<tr class="second-reviewer-row"><td>' + full.second_reviewer + '</td></tr>' +
+              '<tr class="reviewer-row"><td>' + reviewer + '</td></tr>' +
+              '<tr class="second-reviewer-row"><td>' + second_reviewer + '</td></tr>' +
               '</tbody>' +
               '</table>'
 
