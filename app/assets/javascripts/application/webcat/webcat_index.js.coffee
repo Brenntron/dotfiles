@@ -274,7 +274,6 @@ build_complaints_table = (url) ->
         data: 'assigned_to'
         className: 'users-col'
         render: (data, type, full, meta) ->
-          debugger
           if data == '' || data == 'Vrt Incoming'
             user = '<span class="missing-data">No assignee</span>'
           else
