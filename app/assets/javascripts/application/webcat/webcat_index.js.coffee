@@ -334,7 +334,7 @@ build_complaints_table = (url) ->
           domain = full.domain || full.ip_address
 
           # quick edit button status & individual selections statuses
-          if full.status == 'REOPENED' && full.uri_as_categorized? && full.uri_as_categorized != domain
+          if full.uri_as_categorized? && full.uri_as_categorized != domain
             domain_status = ''
             domain_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + domain + '\', \'domain\');"'
           else
@@ -374,7 +374,7 @@ build_complaints_table = (url) ->
             input_uri = domain
           else
             input_uri = entry
-            
+
           # status of the input textbox
           if (full.status == 'COMPLETED') || (full.status == 'PENDING')
             input_status = 'disabled'
