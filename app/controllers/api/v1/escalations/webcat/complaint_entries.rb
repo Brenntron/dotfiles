@@ -80,6 +80,7 @@ module API
                 params[:data].each do |submitted_complaint|
                   @entry = ComplaintEntry.find(submitted_complaint[:id])
                   @entry.change_category(submitted_complaint[:prefix],
+                                         submitted_complaint[:uri_as_categorized],
                                          submitted_complaint[:categories],
                                          submitted_complaint[:category_names],
                                          submitted_complaint[:status],
