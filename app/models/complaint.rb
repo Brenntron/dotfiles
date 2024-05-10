@@ -122,12 +122,20 @@ For future web and email reputation requests, please open a web and email reputa
     uri = Addressable::URI.parse(Addressable::URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
     #subdomain = uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{domain.domain}$"), '')
-    {
-        subdomain: domain.trd || '',
-        domain: domain.domain,
-        path: uri.path,
-        query: uri.query
+    result = {
+      subdomain: nil,
+      domain: nil,
+      path: uri.path,
+      query: uri.query
     }
+     # when we have url like "101.79.74.67/www/huh/what/grrr.apx" we should not save subdomain of it
+    if ComplaintEntry.is_ip?(URI.parse(uri.to_s).host)
+      result[:domain] = URI.parse(uri.to_s).host
+    else
+      result[:domain] = domain.domain
+      result[:subdomain] = domain.trd || ''
+    end
+    result
   end
 
   def self.is_possible_company_duplicate(complaint, entry, entry_type)
