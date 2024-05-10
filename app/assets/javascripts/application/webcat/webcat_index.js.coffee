@@ -323,11 +323,7 @@ build_complaints_table = (url) ->
         data: 'uri'
         className: 'uri-col'
         render: (data, type, full, meta) ->
-          if (full.status == 'PENDING') || (full.status == 'COMPLETED')
-            disabled = "disabled=true"
-          else
-            disabled = ''
-
+          # wbrs score section
           rep = wbrs_display(full.wbrs_score)
           wbrs_score = parseFloat(full.wbrs_score).toFixed(1)
           if rep == undefined then rep = 'unknown'
@@ -338,9 +334,6 @@ build_complaints_table = (url) ->
           domain = full.domain || full.ip_address
 
           # quick edit button status & individual selections statuses
-          if (full.status == 'COMPLETED') || (full.status == 'PENDING')
-            input_status = 'disabled="disabled"'
-
           if full.status == 'REOPENED' && full.uri_as_categorized? && full.uri_as_categorized != domain
             domain_status = ''
             domain_function = 'onclick="update_editURI(\'' + full.entry_id + '\', \'' + domain + '\', \'domain\');"'
@@ -381,6 +374,12 @@ build_complaints_table = (url) ->
             input_uri = domain
           else
             input_uri = entry
+            
+          # status of the input textbox
+          if (full.status == 'COMPLETED') || (full.status == 'PENDING')
+            input_status = 'disabled'
+          else
+            input_status = ''
 
           domain_col =
             '<table class="nested-col-table">' +
