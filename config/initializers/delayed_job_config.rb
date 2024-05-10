@@ -1,5 +1,5 @@
 Delayed::Worker.raise_signal_exceptions = :term
-Delayed::Worker.destroy_failed_jobs = false
+Delayed::Worker.destroy_failed_jobs = false # TODO: remove later, investigating WEB-12859
 Delayed::Worker.sleep_delay = 45
 Delayed::Worker.max_attempts = 3
 Delayed::Worker.max_run_time = 10.minutes
